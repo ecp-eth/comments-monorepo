@@ -1,11 +1,15 @@
 import { Effect } from "effect";
 import type { APICommentsResponse, Hex } from "./types.js";
 
-type PublicClientOptions = {
+type ClientOptions = {
   /**
    * The URL of the indexer to use for fetching comments and replies
    */
   indexerUrl: string;
+  /**
+   * Public key of the app signer used to filter comments and replies
+   */
+  appSigner: Hex;
 };
 
 type GetCommentsOptions = {
@@ -40,10 +44,10 @@ type GetCommentRepliesOptions = {
 };
 
 /**
- * A public client for fetching comments and replies
+ * Comments client
  */
-export class PublicClient {
-  constructor(public options: PublicClientOptions) {}
+export class Client {
+  constructor(public options: ClientOptions) {}
 
   /**
    * Fetch comments for a given target URL
@@ -53,7 +57,8 @@ export class PublicClient {
     { retries = 3 }: GetCommentsOptions = {}
   ): Promise<APICommentsResponse> {
     const url = new URL("/api/comments", this.options.indexerUrl);
-    url.searchParams.append("targetUrl", targetUrl);
+    url.searchParams.set("targetUrl", targetUrl);
+    url.searchParams.set("appSigner", this.options.appSigner);
 
     const fetchResponseTask = Effect.tryPromise(async () => {
       const response = await Effect.runPromise(
@@ -105,9 +110,10 @@ export class PublicClient {
       this.options.indexerUrl
     );
 
-    url.searchParams.append("offset", offset.toString());
-    url.searchParams.append("limit", limit.toString());
-    url.searchParams.append("sort", sort);
+    url.searchParams.set("appSigner", this.options.appSigner);
+    url.searchParams.set("offset", offset.toString());
+    url.searchParams.set("limit", limit.toString());
+    url.searchParams.set("sort", sort);
 
     const fetchResponseTask = Effect.tryPromise(async () => {
       const response = await Effect.runPromise(
@@ -150,6 +156,6 @@ export class PublicClient {
 /**
  * Creates a new public client
  */
-export function createPublicClient(options: PublicClientOptions): PublicClient {
-  return new PublicClient(options);
+export function createPublicClient(options: ClientOptions): Client {
+  return new Client(options);
 }
