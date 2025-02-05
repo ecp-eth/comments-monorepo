@@ -22,7 +22,7 @@ type UsePostCommentAsAuthorOptions = {
 /**
  * Provides methods to sign and post comments an author.
  *
- * Sending the comment using this method costs author's funds.
+ * Sending the comment using this method costs author's funds..
  */
 export function usePostCommentAsAuthor({
   commentsContractAddress,
@@ -59,6 +59,7 @@ export function usePostCommentAsAuthor({
         return signCommentForPostingAsAuthor({
           comment,
           apiUrl: commentsApiUrlRef.current,
+          chainId: chainIdRef.current,
         });
       },
     };

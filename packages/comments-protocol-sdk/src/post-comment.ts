@@ -22,6 +22,7 @@ type SignCommentForPostingAsAuthorOptions = {
    * URL of comments api server.
    */
   apiUrl: string;
+  chainId: number;
   /**
    * Number of times to retry the signing operation in case of failure.
    *
@@ -35,6 +36,7 @@ type SignCommentForPostingAsAuthorOptions = {
  */
 export async function signCommentForPostingAsAuthor({
   comment,
+  chainId,
   apiUrl,
   retries = 3,
 }: SignCommentForPostingAsAuthorOptions): Promise<SignCommentResponse> {
@@ -44,7 +46,7 @@ export async function signCommentForPostingAsAuthor({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(comment),
+      body: JSON.stringify({ ...comment, chainId }),
     });
 
     if (!response.ok) {
@@ -85,8 +87,8 @@ export async function postCommentAsAuthor({
     await wallet.switchChain({ id: chainId });
 
     const result = await wallet.writeContract({
-      account: null, // assume that wallet client will fill out the address
-      chain: null, // assume that wallet client will fill out the chain
+      account: null, // use current account
+      chain: null, // use current chain
       abi: CommentsV1Abi,
       address: commentsContractAddress,
       functionName: "postCommentAsAuthor",
