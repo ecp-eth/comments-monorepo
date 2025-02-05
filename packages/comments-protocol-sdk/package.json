@@ -4,7 +4,8 @@
   "type": "module",
   "license": "MIT",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./wagmi": "./dist/wagmi.js"
   },
   "scripts": {
     "check-types": "tsc --noEmit",
@@ -15,10 +16,13 @@
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "@types/react": "^19.0.8"
   },
   "dependencies": {
     "effect": "^3.12.9",
-    "viem": "^2.22.21"
+    "react": "^19.0.0",
+    "viem": "^2.22.21",
+    "wagmi": "^2.14.9"
   }
 }
