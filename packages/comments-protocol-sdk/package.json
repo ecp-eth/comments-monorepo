@@ -7,6 +7,7 @@
     ".": "./dist/index.js"
   },
   "scripts": {
+    "check-types": "tsc --noEmit",
     "dev": "echo 'Add dev script here'",
     "build": "tsup",
     "test": "echo 'Add test script here'",

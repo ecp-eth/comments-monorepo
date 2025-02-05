@@ -2,6 +2,7 @@
   "name": "comments-sdk",
   "private": true,
   "scripts": {
+    "check-types": "turbo run check-types",
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
