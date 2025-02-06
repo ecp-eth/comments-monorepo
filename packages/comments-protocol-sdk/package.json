@@ -5,7 +5,8 @@
   "license": "MIT",
   "exports": {
     ".": "./dist/index.js",
-    "./wagmi": "./dist/wagmi.js"
+    "./wagmi": "./dist/wagmi.js",
+    "./types": "./dist/types.js"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

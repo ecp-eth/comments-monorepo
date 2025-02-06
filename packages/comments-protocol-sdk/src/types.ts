@@ -1,3 +1,5 @@
+import type { SignTypedDataParameters } from "viem";
+
 export type Hex = `0x${string}`;
 
 export type CommentData = {
@@ -40,4 +42,26 @@ export type APICommentsResponse = {
     offset: number;
     hasMore: boolean;
   };
+};
+
+export type SignCommentRequest = {
+  content: string;
+  targetUrl?: string;
+  parentId?: Hex;
+  author: Hex;
+};
+
+export type SignCommentResponse = {
+  signature: Hex;
+  hash: Hex;
+  data: CommentData;
+};
+
+export type SignCommentGaslessResponse = {
+  txHash: `0x${string}`;
+};
+
+export type SignCommentGaslessPrepareResponse = {
+  signTypedDataArgs: SignTypedDataParameters;
+  appSignature: `0x${string}`;
 };

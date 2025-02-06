@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts", "src/wagmi.ts"],
+  entry: ["src/index.ts", "src/wagmi.ts", "src/types.ts"],
   splitting: true,
   dts: true,
   format: "esm",

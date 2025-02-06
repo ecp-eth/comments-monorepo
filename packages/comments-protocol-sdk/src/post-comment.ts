@@ -1,20 +1,13 @@
 import { Effect } from "effect";
 import { WalletClient } from "viem";
-import type { CommentData, Hex } from "./types.js";
+import type {
+  SignCommentRequest,
+  SignCommentGaslessPrepareResponse,
+  SignCommentGaslessResponse,
+  SignCommentResponse,
+  Hex,
+} from "./types.js";
 import { CommentsV1Abi } from "./abis.js";
-
-export type SignCommentRequest = {
-  content: string;
-  targetUrl?: string;
-  parentId?: Hex;
-  author: Hex;
-};
-
-export type SignCommentResponse = {
-  signature: Hex;
-  hash: Hex;
-  data: CommentData;
-};
 
 type SignCommentForPostingAsAuthorOptions = {
   comment: SignCommentRequest;
@@ -105,4 +98,102 @@ export async function postCommentAsAuthor({
   });
 
   return Effect.runPromise(writeCommentTask);
+}
+
+type PrepareCommentForGaslessPostingOptions = {
+  comment: SignCommentRequest;
+  apiUrl: string;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+};
+
+export async function prepareCommentForGaslessPosting({
+  comment,
+  apiUrl,
+  retries = 3,
+}: PrepareCommentForGaslessPostingOptions): Promise<
+  SignCommentGaslessPrepareResponse | SignCommentGaslessResponse
+> {
+  const prepareCommentTask = Effect.tryPromise(async () => {
+    const response = await fetch(
+      new URL("/api/sign-comment/gasless/prepare", apiUrl),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...comment,
+          submitIfApproved: true,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to sign comment: ${response.statusText}`);
+    }
+
+    const responseData:
+      | SignCommentGaslessPrepareResponse
+      | SignCommentGaslessResponse = await response.json();
+
+    return responseData;
+  });
+
+  const repeatableTask = Effect.retry(prepareCommentTask, {
+    times: retries,
+  });
+
+  return Effect.runPromise(repeatableTask);
+}
+
+type PostPreparedGaslessCommentOptions = {
+  authorSignature: Hex;
+  preparedComment: SignCommentGaslessPrepareResponse;
+  apiUrl: string;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+};
+
+export function postPreparedGaslessComment({
+  apiUrl,
+  authorSignature,
+  preparedComment,
+  retries = 3,
+}: PostPreparedGaslessCommentOptions): Promise<SignCommentGaslessResponse> {
+  const prepareCommentTask = Effect.tryPromise(async () => {
+    const response = await fetch(new URL("/api/sign-comment/gasless", apiUrl), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        commentData: preparedComment.signTypedDataArgs.message,
+        appSignature: preparedComment.appSignature,
+        authorSignature: authorSignature,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to sign comment: ${response.statusText}`);
+    }
+
+    const responseData: SignCommentGaslessResponse = await response.json();
+
+    return responseData;
+  });
+
+  const repeatableTask = Effect.retry(prepareCommentTask, {
+    times: retries,
+  });
+
+  return Effect.runPromise(repeatableTask);
 }

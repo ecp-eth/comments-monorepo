@@ -2,10 +2,10 @@ import { useWalletClient } from "wagmi";
 import {
   postCommentAsAuthor,
   signCommentForPostingAsAuthor,
-  type SignCommentResponse,
-  type SignCommentRequest,
+  prepareCommentForGaslessPosting,
+  postPreparedGaslessComment,
 } from "./post-comment.js";
-import type { Hex } from "./types.js";
+import type { Hex, SignCommentRequest, SignCommentResponse } from "./types.js";
 import { useMemo, useRef } from "react";
 
 type UsePostCommentAsAuthorReturnValue = {
@@ -61,6 +61,64 @@ export function usePostCommentAsAuthor({
           apiUrl: commentsApiUrlRef.current,
           chainId: chainIdRef.current,
         });
+      },
+    };
+  }, []);
+}
+
+type UseGalessPostCommentReturnValue = {
+  postComment: (comment: SignCommentRequest) => Promise<Hex>;
+};
+
+type UseGaslessPostCommentOptions = {
+  commentsApiUrl: string;
+  chainId: number;
+};
+
+export function useGaslessPostComment({
+  commentsApiUrl,
+  chainId,
+}: UseGaslessPostCommentOptions): UseGalessPostCommentReturnValue {
+  const { data: walletClient } = useWalletClient();
+  const walletClientRef = useRef(walletClient);
+  walletClientRef.current = walletClient;
+  const chainIdRef = useRef(chainId);
+  chainIdRef.current = chainId;
+  const commentsApiUrlRef = useRef(commentsApiUrl);
+  commentsApiUrlRef.current = commentsApiUrl;
+
+  return useMemo(() => {
+    return {
+      async postComment(comment) {
+        const walletClient = walletClientRef.current;
+
+        if (!walletClient) {
+          throw new Error("Wallet client is not available.");
+        }
+
+        await walletClient.switchChain({ id: chainIdRef.current });
+
+        const prepareCommentResponse = await prepareCommentForGaslessPosting({
+          comment,
+          apiUrl: commentsApiUrlRef.current,
+        });
+
+        if ("txHash" in prepareCommentResponse) {
+          return prepareCommentResponse.txHash;
+        }
+
+        // Sign comment for once-off approval
+        const authorSignature = await walletClient.signTypedData(
+          prepareCommentResponse.signTypedDataArgs
+        );
+
+        const response = await postPreparedGaslessComment({
+          apiUrl: commentsApiUrlRef.current,
+          authorSignature,
+          preparedComment: prepareCommentResponse,
+        });
+
+        return response.txHash;
       },
     };
   }, []);
