@@ -19,7 +19,7 @@ export type CommentData = {
   deadline: bigint;
 };
 
-export type APIComment = {
+export type Comment = {
   timestamp: Date;
   id: Hex;
   content: string;
@@ -32,11 +32,11 @@ export type APIComment = {
   appSigner: Hex;
   txHash: Hex;
   logIndex: number;
-  replies: APIComment[];
+  replies: Comment[];
 };
 
-export type APICommentsResponse = {
-  results: APIComment[];
+export type FetchCommentsResponse = {
+  results: Comment[];
   pagination: {
     limit: number;
     offset: number;
