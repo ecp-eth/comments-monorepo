@@ -11,6 +11,7 @@ import {
 } from "./eip712";
 import { Chain, createPublicClient, http, Transport } from "viem";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
+import type { Hex } from "@ecp.eth/sdk/abis/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -51,11 +52,11 @@ export function createCommentData({
   /** The URI of the page the comment is about */
   targetUri?: string;
   /** The ID of the parent comment */
-  parentId?: `0x${string}`;
+  parentId?: Hex;
   /** The address of the author of the comment */
-  author: `0x${string}`;
+  author: Hex;
   /** The address of the app signer */
-  appSigner: `0x${string}`;
+  appSigner: Hex;
   /** The current nonce of the user on the chain */
   nonce: bigint;
   /** The deadline of the comment submission in seconds since epoch */
@@ -102,8 +103,8 @@ export function createApprovalSignTypedDataArgs({
   deadline,
   chainId,
 }: {
-  author: `0x${string}`;
-  appSigner: `0x${string}`;
+  author: Hex;
+  appSigner: Hex;
   chainId: number;
   nonce: bigint;
   deadline?: bigint;
@@ -132,7 +133,7 @@ export async function getNonce({
   chain,
   transport,
 }: {
-  author: `0x${string}`;
+  author: Hex;
   chain: Chain;
   transport?: Transport;
 }) {
@@ -159,10 +160,10 @@ export function createDeleteCommentTypedDataArgs({
   nonce,
   deadline,
 }: {
-  commentId: `0x${string}`;
+  commentId: Hex;
   chainId: number;
-  author: `0x${string}`;
-  appSigner: `0x${string}`;
+  author: Hex;
+  appSigner: Hex;
   nonce: bigint;
   deadline?: bigint;
 }) {
