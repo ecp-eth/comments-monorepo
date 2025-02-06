@@ -16,6 +16,7 @@ export const getConfig = () =>
   getDefaultConfig({
     chains,
     transports,
+    ssr: true,
     appName: "Comment App",
     projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID!,
   });
