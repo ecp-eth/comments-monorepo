@@ -5,7 +5,7 @@ import {
   prepareCommentForGaslessPosting,
   postPreparedGaslessComment,
   approvePostingCommentsOnUsersBehalf,
-} from "./post-comment.js";
+} from "./comments.js";
 import type {
   PostingCommentsOnUsersBehalfApprovalStatusResponse,
   Hex,
