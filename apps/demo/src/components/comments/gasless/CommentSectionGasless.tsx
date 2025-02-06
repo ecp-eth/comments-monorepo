@@ -5,7 +5,7 @@ import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { useApproveApp } from "@ecp.eth/sdk/wagmi";
 import type { Hex, AppApprovalStatusResponse } from "@ecp.eth/sdk/types";
 import { Button } from "@/components/ui/button";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
+import { COMMENTS_V1_CONTRACT_ADDRESS } from "@modprotocol/comments-protocol-sdk";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -183,7 +183,7 @@ export function CommentSectionGasless() {
               onClick={() => {
                 removeApprovalTx({
                   abi: CommentsV1Abi,
-                  address: COMMENTS_V1_ADDRESS,
+                  address: COMMENTS_V1_CONTRACT_ADDRESS,
                   functionName: "removeApprovalAsAuthor",
                   args: [approvalStatus.appSigner],
                 });
