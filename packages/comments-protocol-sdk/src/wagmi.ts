@@ -5,12 +5,11 @@ import {
   prepareCommentForGaslessPosting,
   postPreparedGaslessComment,
 } from "./post-comment.js";
-import type { Hex, SignCommentRequest, SignCommentResponse } from "./types.js";
+import type { Hex, SignCommentRequest } from "./types.js";
 import { useMemo, useRef } from "react";
 
 type UsePostCommentAsAuthorReturnValue = {
-  postComment: (signedComment: SignCommentResponse) => Promise<Hex>;
-  signComment: (comment: SignCommentRequest) => Promise<SignCommentResponse>;
+  postComment: (comment: SignCommentRequest) => Promise<Hex>;
 };
 
 type UsePostCommentAsAuthorOptions = {
@@ -41,26 +40,28 @@ export function usePostCommentAsAuthor({
 
   return useMemo(() => {
     return {
-      postComment(signedComment) {
+      async postComment(comment) {
         const walletClient = walletClientRef.current;
 
         if (!walletClient) {
           throw new Error("Wallet client is not available.");
         }
 
-        return postCommentAsAuthor({
-          chainId: chainIdRef.current,
-          wallet: walletClient,
-          commentsContractAddress: commentsContractAddressRef.current,
-          signedComment,
-        });
-      },
-      signComment(comment) {
-        return signCommentForPostingAsAuthor({
+        const signCommentResponse = await signCommentForPostingAsAuthor({
           comment,
           apiUrl: commentsApiUrlRef.current,
           chainId: chainIdRef.current,
+          wallet: walletClient,
         });
+
+        const response = await postCommentAsAuthor({
+          chainId: chainIdRef.current,
+          wallet: walletClient,
+          commentsContractAddress: commentsContractAddressRef.current,
+          signedComment: signCommentResponse,
+        });
+
+        return response;
       },
     };
   }, []);
