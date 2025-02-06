@@ -5,6 +5,7 @@ import {
   prepareCommentForGaslessPosting,
   postPreparedGaslessComment,
   approvePostingCommentsOnUsersBehalf,
+  deleteCommentAsAuthor,
 } from "./index.js";
 import type {
   PostingCommentsOnUsersBehalfApprovalStatusResponse,
@@ -175,6 +176,52 @@ export function useApprovePostingCommentsOnUsersBehalf({
           apiUrl: commentsApiUrlRef.current,
           authorSignature,
           statusResponse: request,
+        });
+
+        return txHash;
+      },
+    };
+  }, []);
+}
+
+type UseDeleteCommentAsAuthorReturnValue = {
+  deleteComment: (commentId: Hex) => Promise<Hex>;
+};
+
+type UseDeleteCommentAsAuthorOptions = {
+  commentsContractAddress: Hex;
+  chainId: number;
+  commentsApiUrl: string;
+};
+
+export function useDeleteCommentAsAuthor(
+  options: UseDeleteCommentAsAuthorOptions
+): UseDeleteCommentAsAuthorReturnValue {
+  const { data: walletClient } = useWalletClient();
+  const walletClientRef = useRef(walletClient);
+  walletClientRef.current = walletClient;
+  const chainIdRef = useRef(options.chainId);
+  chainIdRef.current = options.chainId;
+  const commentsApiUrlRef = useRef(options.commentsApiUrl);
+  commentsApiUrlRef.current = options.commentsApiUrl;
+  const commentsContractAddressRef = useRef(options.commentsContractAddress);
+  commentsContractAddressRef.current = options.commentsContractAddress;
+
+  return useMemo(() => {
+    return {
+      async deleteComment(commentId) {
+        const walletClient = walletClientRef.current;
+
+        if (!walletClient) {
+          throw new Error("Wallet client is not available.");
+        }
+
+        await walletClient.switchChain({ id: chainIdRef.current });
+
+        const txHash = await deleteCommentAsAuthor({
+          commentId,
+          commentsContractAddress: commentsContractAddressRef.current,
+          wallet: walletClient,
         });
 
         return txHash;

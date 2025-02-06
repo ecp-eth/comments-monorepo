@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { WalletClient } from "viem";
+import { walletActions, WalletClient } from "viem";
 import type {
   SignCommentRequest,
   SignCommentGaslessPrepareResponse,
@@ -302,4 +302,31 @@ export async function approvePostingCommentsOnUsersBehalf({
   });
 
   return Effect.runPromise(repeatableTask);
+}
+
+type DeleteCommentOptions = {
+  commentId: Hex;
+  commentsContractAddress: Hex;
+  wallet: WalletClient;
+};
+
+export async function deleteCommentAsAuthor({
+  commentId,
+  commentsContractAddress,
+  wallet,
+}: DeleteCommentOptions): Promise<Hex> {
+  const deleteCommentTask = Effect.tryPromise(async () => {
+    const txHash = await wallet.writeContract({
+      account: null, // use current account
+      chain: null, // use current chain
+      abi: CommentsV1Abi,
+      address: commentsContractAddress,
+      functionName: "deleteCommentAsAuthor",
+      args: [commentId],
+    });
+
+    return txHash;
+  });
+
+  return Effect.runPromise(deleteCommentTask);
 }
