@@ -202,8 +202,6 @@ export function useDeleteCommentAsAuthor(
   walletClientRef.current = walletClient;
   const chainIdRef = useRef(options.chainId);
   chainIdRef.current = options.chainId;
-  const commentsApiUrlRef = useRef(options.commentsApiUrl);
-  commentsApiUrlRef.current = options.commentsApiUrl;
 
   return useMemo(() => {
     return {
