@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "check-types": "turbo run check-types",
-    "build": "turbo build",
+    "build": "turbo build --filter=!./apps/demo",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
