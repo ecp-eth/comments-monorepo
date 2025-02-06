@@ -1,9 +1,9 @@
 "use client";
 
+import { fetchComments } from "@ecp.eth/sdk";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { Button } from "@/components/ui/button";
 import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
-import { CommentsResponse } from "@/lib/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -99,19 +99,15 @@ export function CommentSectionGasless() {
       hash: pendingTxHash,
     });
 
-  const { data, isLoading, error, refetch } = useQuery<CommentsResponse>({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["comments", currentUrl, page],
     queryFn: async () => {
-      const url = new URL("/api/comments", currentUrl);
-      url.searchParams.set("targetUri", currentUrl);
-      url.searchParams.set("offset", String(page * pageSize));
-      url.searchParams.set("limit", String(pageSize));
-
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Failed to fetch comments");
-      }
-      return response.json();
+      return fetchComments({
+        apiUrl: process.env.NEXT_PUBLIC_URL!,
+        targetUrl: currentUrl,
+        limit: pageSize,
+        offset: page * pageSize,
+      });
     },
     enabled: !!currentUrl,
   });

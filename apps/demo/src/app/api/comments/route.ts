@@ -1,4 +1,4 @@
-import { CommentsResponse } from "../../../lib/types";
+import type { FetchCommentsResponse } from "@modprotocol/comments-protocol-sdk/types";
 import { privateKeyToAccount } from "viem/accounts";
 
 export const GET = async (req: Request) => {
@@ -27,7 +27,7 @@ export const GET = async (req: Request) => {
     );
   }
 
-  const data: CommentsResponse = await res.json();
+  const data: FetchCommentsResponse = await res.json();
 
   return Response.json(data);
 };
