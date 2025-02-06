@@ -1,6 +1,5 @@
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
 import {
   bigintReplacer,
   createCommentData,
@@ -13,7 +12,9 @@ import {
 } from "../../../lib/wagmi";
 
 export const POST = async (req: Request) => {
-  let { content, targetUri, parentId, chainId, author } = await req.json();
+  // you can check if chainId is supported by your configuration
+  // and use it instead, at the moment we are forcing the first chain
+  const { content, targetUri, parentId, chainId, author } = await req.json();
 
   // Validate target URL is valid
   if (!targetUri.startsWith(process.env.APP_URL!)) {
@@ -44,7 +45,7 @@ export const POST = async (req: Request) => {
 
   const signTypedDataArgs = createCommentSignTypedDataArgs({
     commentData,
-    chainId,
+    chainId: chain.id,
   });
 
   const signature = await account.signTypedData(signTypedDataArgs);
@@ -52,6 +53,7 @@ export const POST = async (req: Request) => {
   const hash = hashTypedData(signTypedDataArgs);
 
   return Response.json({
+    chainId: chain.id,
     signature,
     hash,
     data: JSON.parse(JSON.stringify(commentData, bigintReplacer)),

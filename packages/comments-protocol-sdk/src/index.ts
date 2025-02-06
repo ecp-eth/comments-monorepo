@@ -26,7 +26,6 @@ type SignCommentForPostingAsAuthorOptions = {
    * @default 3
    */
   retries?: number;
-  wallet: WalletClient;
 };
 
 /**
@@ -37,11 +36,8 @@ export async function signCommentForPostingAsAuthor({
   chainId,
   apiUrl,
   retries = 3,
-  wallet,
 }: SignCommentForPostingAsAuthorOptions): Promise<SignCommentResponse> {
   const sendCommentTask = Effect.tryPromise(async () => {
-    await wallet.switchChain({ id: chainId });
-
     const response = await fetch(new URL("/api/sign-comment", apiUrl), {
       method: "POST",
       headers: {
@@ -68,7 +64,6 @@ export async function signCommentForPostingAsAuthor({
 
 type PostCommentAsAuthor = {
   signedComment: SignCommentResponse;
-  chainId: number;
   wallet: WalletClient;
 };
 
@@ -79,12 +74,9 @@ type PostCommentAsAuthor = {
  */
 export async function postCommentAsAuthor({
   signedComment,
-  chainId,
   wallet,
 }: PostCommentAsAuthor): Promise<Hex> {
   const writeCommentTask = Effect.tryPromise(async () => {
-    await wallet.switchChain({ id: chainId });
-
     const result = await wallet.writeContract({
       account: null, // use current account
       chain: null, // use current chain

@@ -55,6 +55,10 @@ export type SignCommentResponse = {
   signature: Hex;
   hash: Hex;
   data: CommentData;
+  /**
+   * Chain id that should be used to sign the comment
+   */
+  chainId: number;
 };
 
 export type SignCommentGaslessResponse = {

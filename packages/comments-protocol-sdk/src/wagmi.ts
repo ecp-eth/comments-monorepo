@@ -19,7 +19,10 @@ type UsePostCommentAsAuthorReturnValue = {
 };
 
 type UsePostCommentAsAuthorOptions = {
-  chainId: number;
+  /**
+   * Chain ID to use for posting comments. If omitted it will use current chain.
+   */
+  chainId?: number;
   commentsApiUrl: string;
 };
 
@@ -49,15 +52,21 @@ export function usePostCommentAsAuthor({
           throw new Error("Wallet client is not available.");
         }
 
+        const chainId = chainIdRef.current ?? walletClient.chain.id;
+
+        await walletClient.switchChain({ id: chainId });
+
         const signCommentResponse = await signCommentForPostingAsAuthor({
           comment,
           apiUrl: commentsApiUrlRef.current,
-          chainId: chainIdRef.current,
-          wallet: walletClient,
+          chainId,
         });
 
+        if (signCommentResponse.chainId !== chainId) {
+          await walletClient.switchChain({ id: signCommentResponse.chainId });
+        }
+
         const response = await postCommentAsAuthor({
-          chainId: chainIdRef.current,
           wallet: walletClient,
           signedComment: signCommentResponse,
         });
@@ -74,7 +83,10 @@ type UseGalessPostCommentReturnValue = {
 
 type UseGaslessPostCommentOptions = {
   commentsApiUrl: string;
-  chainId: number;
+  /**
+   * Chain ID to use for posting comments. If omitted it will use current chain.
+   */
+  chainId?: number;
 };
 
 /**
@@ -101,7 +113,9 @@ export function useGaslessPostComment({
           throw new Error("Wallet client is not available.");
         }
 
-        await walletClient.switchChain({ id: chainIdRef.current });
+        if (chainIdRef.current != null) {
+          await walletClient.switchChain({ id: chainIdRef.current });
+        }
 
         const prepareCommentResponse = await prepareCommentForGaslessPosting({
           comment,
@@ -135,7 +149,10 @@ type UseApprovePostingCommentsReturnValue = {
 
 type UseApprovePostingCommentsOptions = {
   commentsApiUrl: string;
-  chainId: number;
+  /**
+   * Chain ID to use for posting comments. If omitted it will use current chain.
+   */
+  chainId?: number;
 };
 
 /**
@@ -168,7 +185,9 @@ export function useApproveApp({
           throw new Error("Request is already approved.");
         }
 
-        await walletClient.switchChain({ id: chainIdRef.current });
+        if (chainIdRef.current != null) {
+          await walletClient.switchChain({ id: chainIdRef.current });
+        }
 
         const authorSignature = await walletClient.signTypedData(
           request.signTypedDataArgs
@@ -191,6 +210,9 @@ type UseDeleteCommentAsAuthorReturnValue = {
 };
 
 type UseDeleteCommentAsAuthorOptions = {
+  /**
+   * Chain ID to use for posting comments. If omitted it will use current chain.
+   */
   chainId?: number;
 };
 
