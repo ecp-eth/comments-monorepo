@@ -20,7 +20,7 @@ const abi = execFileSync(
 
 const formattedAbi = await format(
   `
-  export const CommentsV1Abi = ${abi};
+  export const CommentsV1Abi = ${abi.trim()} as const;
 `,
   { parser: "typescript" }
 );

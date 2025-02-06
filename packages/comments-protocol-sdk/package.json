@@ -5,6 +5,7 @@
   "license": "MIT",
   "exports": {
     ".": "./dist/index.js",
+    "./abis": "./dist/abis.js",
     "./wagmi": "./dist/wagmi.js",
     "./types": "./dist/types.js"
   },

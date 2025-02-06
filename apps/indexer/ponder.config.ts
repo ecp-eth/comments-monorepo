@@ -1,7 +1,7 @@
 import { createConfig } from "ponder";
 import { http } from "viem";
 
-import { CommentsV1Abi } from "./abis/CommentsV1Abi";
+import { CommentsV1Abi } from "@modprotocol/comments-protocol-sdk/abis";
 
 export default createConfig({
   networks: {

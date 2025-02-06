@@ -739,4 +739,4 @@ export const CommentsV1Abi = [
     name: "NotAuthorized",
     inputs: [],
   },
-];
+] as const;
