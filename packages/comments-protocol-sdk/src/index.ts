@@ -306,6 +306,35 @@ export async function approvePostingCommentsOnUsersBehalf({
   return Effect.runPromise(repeatableTask);
 }
 
+type RejectAppApprovalOptions = {
+  approval: AppApprovalStatusResponse;
+  wallet: WalletClient;
+};
+
+export async function rejectAppApproval({
+  approval,
+  wallet,
+}: RejectAppApprovalOptions): Promise<Hex> {
+  const rejectAppApprovalTask = Effect.tryPromise(async () => {
+    if (!approval.approved) {
+      throw new Error("App is already not approved to post comments");
+    }
+
+    const txHash = await wallet.writeContract({
+      account: null, // use current account
+      chain: null, // use current chain
+      abi: CommentsV1Abi,
+      address: COMMENTS_V1_CONTRACT_ADDRESS,
+      functionName: "removeApprovalAsAuthor",
+      args: [approval.appSigner],
+    });
+
+    return txHash;
+  });
+
+  return Effect.runPromise(rejectAppApprovalTask);
+}
+
 type DeleteCommentOptions = {
   commentId: Hex;
   wallet: WalletClient;

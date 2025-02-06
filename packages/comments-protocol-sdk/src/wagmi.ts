@@ -8,6 +8,7 @@ import {
   deleteCommentAsAuthor,
   prepareCommentForGaslessDeletion,
   performGaslessCommentDeletion,
+  rejectAppApproval,
 } from "./index.js";
 import type {
   AppApprovalStatusResponse,
@@ -199,6 +200,50 @@ export function useApproveApp({
           apiUrl: commentsApiUrlRef.current,
           authorSignature,
           statusResponse: request,
+        });
+
+        return txHash;
+      },
+    };
+  }, []);
+}
+
+type UseRejectAppReturnValue = {
+  reject: (approval: AppApprovalStatusResponse) => Promise<Hex>;
+};
+
+type UseRejectAppOptions = {
+  /**
+   * Chain ID to use for posting comments. If omitted it will use current chain.
+   */
+  chainId?: number;
+};
+
+export function useRejectApp(
+  options: UseRejectAppOptions = {}
+): UseRejectAppReturnValue {
+  const { data: walletClient } = useWalletClient();
+  const walletClientRef = useRef(walletClient);
+  walletClientRef.current = walletClient;
+  const chainIdRef = useRef(options.chainId);
+  chainIdRef.current = options.chainId;
+
+  return useMemo(() => {
+    return {
+      async reject(approval) {
+        const walletClient = walletClientRef.current;
+
+        if (!walletClient) {
+          throw new Error("Wallet client is not available.");
+        }
+
+        if (chainIdRef.current != null) {
+          await walletClient.switchChain({ id: chainIdRef.current });
+        }
+
+        const txHash = await rejectAppApproval({
+          approval,
+          wallet: walletClient,
         });
 
         return txHash;

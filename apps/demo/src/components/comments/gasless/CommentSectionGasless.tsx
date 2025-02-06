@@ -1,22 +1,15 @@
 "use client";
 
 import { fetchComments, fetchAppApprovalStatus } from "@ecp.eth/sdk";
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { useApproveApp } from "@ecp.eth/sdk/wagmi";
+import { useApproveApp, useRejectApp } from "@ecp.eth/sdk/wagmi";
 import type { Hex, AppApprovalStatusResponse } from "@ecp.eth/sdk/types";
 import { Button } from "@/components/ui/button";
-import { COMMENTS_V1_CONTRACT_ADDRESS } from "@modprotocol/comments-protocol-sdk";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  useAccount,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
 import { CommentGasless } from "./CommentGasless";
-import { chains } from "@/lib/wagmi";
 
 interface CommentData {
   id: string;
@@ -31,13 +24,12 @@ export function CommentSectionGasless() {
   const [page, setPage] = useState(0);
   const pageSize = 10;
   const [currentUrl, setCurrentUrl] = useState<string>("");
-  const [pendingTxHash, setPendingTxHash] = useState<Hex>();
 
-  const {
-    writeContract: removeApprovalTx,
-    data: removeApprovalTxHash,
-    reset: resetApprovalTx,
-  } = useWriteContract();
+  const { approve: approveApp } = useApproveApp({
+    commentsApiUrl: process.env.NEXT_PUBLIC_URL!,
+  });
+
+  const { reject: rejectAppApproval } = useRejectApp();
 
   const getApprovalDataMutation = useMutation({
     mutationFn: async ({ author }: { author: Hex }) => {
@@ -48,21 +40,25 @@ export function CommentSectionGasless() {
     },
   });
 
-  const { approve: approvePostingCommentsOnUsersBehalf } = useApproveApp({
-    commentsApiUrl: process.env.NEXT_PUBLIC_URL!,
-    chainId: chains[0].id,
-  });
-
-  const postApprovalSignatureMutation = useMutation({
+  const approveAppMutation = useMutation({
     mutationFn: async (request: AppApprovalStatusResponse) => {
-      return approvePostingCommentsOnUsersBehalf(request);
+      return approveApp(request);
     },
   });
 
-  const { data: receipt, isLoading: isReceiptLoading } =
-    useWaitForTransactionReceipt({
-      hash: postApprovalSignatureMutation.data,
-    });
+  const rejectApprovalMutation = useMutation({
+    mutationFn: async (approval: AppApprovalStatusResponse) => {
+      return rejectAppApproval(approval);
+    },
+  });
+
+  const approveAppReceipt = useWaitForTransactionReceipt({
+    hash: approveAppMutation.data,
+  });
+
+  const rejectAppReceipt = useWaitForTransactionReceipt({
+    hash: rejectApprovalMutation.data,
+  });
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["comments", currentUrl, page],
@@ -96,12 +92,14 @@ export function CommentSectionGasless() {
   };
 
   useEffect(() => {
-    if (receipt?.status === "success" && address) {
+    if (
+      address &&
+      (approveAppReceipt.data?.status === "success" ||
+        rejectAppReceipt.data?.status === "success")
+    ) {
       getApprovalDataMutation.mutate({ author: address });
-      // Need to reset the approval tx here otherwise it will trigger an infinite loop
-      resetApprovalTx();
     }
-  }, [receipt, address]);
+  }, [address, approveAppReceipt.data?.status, rejectAppReceipt.data?.status]);
 
   useEffect(() => {
     if (address) {
@@ -110,21 +108,16 @@ export function CommentSectionGasless() {
   }, [address]);
 
   useEffect(() => {
-    if (removeApprovalTxHash) {
-      setPendingTxHash(removeApprovalTxHash);
-    }
-  }, [removeApprovalTxHash, setPendingTxHash, pendingTxHash]);
-
-  useEffect(() => {
     setCurrentUrl(window.location.href);
   }, []);
 
   const isApprovalPending =
-    isReceiptLoading ||
-    postApprovalSignatureMutation.isPending ||
+    approveAppReceipt.isLoading ||
+    approveAppMutation.isPending ||
     getApprovalDataMutation.isPending;
 
-  const isRemovingApproval = isReceiptLoading && !!removeApprovalTxHash;
+  const isRemovingApproval =
+    rejectAppReceipt.isLoading || rejectApprovalMutation.isPending;
 
   if (isLoading) {
     return <div>Loading comments...</div>;
@@ -153,11 +146,7 @@ export function CommentSectionGasless() {
                 },
                 {
                   onSuccess(approvalSigData) {
-                    postApprovalSignatureMutation.mutate(approvalSigData, {
-                      onSuccess(txHash) {
-                        setPendingTxHash(txHash);
-                      },
-                    });
+                    approveAppMutation.mutate(approvalSigData);
                   },
                 }
               );
@@ -181,12 +170,7 @@ export function CommentSectionGasless() {
               variant="outline"
               disabled={isRemovingApproval}
               onClick={() => {
-                removeApprovalTx({
-                  abi: CommentsV1Abi,
-                  address: COMMENTS_V1_CONTRACT_ADDRESS,
-                  functionName: "removeApprovalAsAuthor",
-                  args: [approvalStatus.appSigner],
-                });
+                rejectApprovalMutation.mutate(approvalStatus);
               }}
             >
               <X />
