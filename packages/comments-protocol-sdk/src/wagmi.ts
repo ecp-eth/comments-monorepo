@@ -19,7 +19,6 @@ type UsePostCommentAsAuthorReturnValue = {
 };
 
 type UsePostCommentAsAuthorOptions = {
-  commentsContractAddress: Hex;
   chainId: number;
   commentsApiUrl: string;
 };
@@ -30,7 +29,6 @@ type UsePostCommentAsAuthorOptions = {
  * Sending the comment using this method costs author's funds..
  */
 export function usePostCommentAsAuthor({
-  commentsContractAddress,
   chainId,
   commentsApiUrl,
 }: UsePostCommentAsAuthorOptions): UsePostCommentAsAuthorReturnValue {
@@ -41,8 +39,6 @@ export function usePostCommentAsAuthor({
   chainIdRef.current = chainId;
   const commentsApiUrlRef = useRef(commentsApiUrl);
   commentsApiUrlRef.current = commentsApiUrl;
-  const commentsContractAddressRef = useRef(commentsContractAddress);
-  commentsContractAddressRef.current = commentsContractAddress;
 
   return useMemo(() => {
     return {
@@ -63,7 +59,6 @@ export function usePostCommentAsAuthor({
         const response = await postCommentAsAuthor({
           chainId: chainIdRef.current,
           wallet: walletClient,
-          commentsContractAddress: commentsContractAddressRef.current,
           signedComment: signCommentResponse,
         });
 
@@ -192,7 +187,6 @@ type UseDeleteCommentAsAuthorReturnValue = {
 };
 
 type UseDeleteCommentAsAuthorOptions = {
-  commentsContractAddress: Hex;
   chainId: number;
   commentsApiUrl: string;
 };
@@ -210,8 +204,6 @@ export function useDeleteCommentAsAuthor(
   chainIdRef.current = options.chainId;
   const commentsApiUrlRef = useRef(options.commentsApiUrl);
   commentsApiUrlRef.current = options.commentsApiUrl;
-  const commentsContractAddressRef = useRef(options.commentsContractAddress);
-  commentsContractAddressRef.current = options.commentsContractAddress;
 
   return useMemo(() => {
     return {
@@ -226,7 +218,6 @@ export function useDeleteCommentAsAuthor(
 
         const txHash = await deleteCommentAsAuthor({
           commentId,
-          commentsContractAddress: commentsContractAddressRef.current,
           wallet: walletClient,
         });
 

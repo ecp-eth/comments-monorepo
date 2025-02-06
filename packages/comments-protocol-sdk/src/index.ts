@@ -11,6 +11,7 @@ import type {
   FetchCommentsResponse,
 } from "./types.js";
 import { CommentsV1Abi } from "./abis.js";
+import { COMMENTS_V1_CONTRACT_ADDRESS } from "./constants.js";
 
 type SignCommentForPostingAsAuthorOptions = {
   comment: SignCommentRequest;
@@ -69,7 +70,6 @@ type PostCommentAsAuthor = {
   signedComment: SignCommentResponse;
   chainId: number;
   wallet: WalletClient;
-  commentsContractAddress: Hex;
 };
 
 /**
@@ -79,7 +79,6 @@ type PostCommentAsAuthor = {
  */
 export async function postCommentAsAuthor({
   signedComment,
-  commentsContractAddress,
   chainId,
   wallet,
 }: PostCommentAsAuthor): Promise<Hex> {
@@ -90,7 +89,7 @@ export async function postCommentAsAuthor({
       account: null, // use current account
       chain: null, // use current chain
       abi: CommentsV1Abi,
-      address: commentsContractAddress,
+      address: COMMENTS_V1_CONTRACT_ADDRESS,
       functionName: "postCommentAsAuthor",
       args: [
         {
@@ -306,13 +305,11 @@ export async function approvePostingCommentsOnUsersBehalf({
 
 type DeleteCommentOptions = {
   commentId: Hex;
-  commentsContractAddress: Hex;
   wallet: WalletClient;
 };
 
 export async function deleteCommentAsAuthor({
   commentId,
-  commentsContractAddress,
   wallet,
 }: DeleteCommentOptions): Promise<Hex> {
   const deleteCommentTask = Effect.tryPromise(async () => {
@@ -320,7 +317,7 @@ export async function deleteCommentAsAuthor({
       account: null, // use current account
       chain: null, // use current chain
       abi: CommentsV1Abi,
-      address: commentsContractAddress,
+      address: COMMENTS_V1_CONTRACT_ADDRESS,
       functionName: "deleteCommentAsAuthor",
       args: [commentId],
     });
