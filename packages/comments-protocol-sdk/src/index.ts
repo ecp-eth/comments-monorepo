@@ -6,7 +6,7 @@ import type {
   SignCommentGaslessResponse,
   SignCommentResponse,
   Hex,
-  PostingCommentsOnUsersBehalfApprovalStatusResponse,
+  AppApprovalStatusResponse,
   ApprovePostingCommentsOnUsersBehalfResponse,
   FetchCommentsResponse,
 } from "./types.js";
@@ -205,7 +205,7 @@ export function postPreparedGaslessComment({
   return Effect.runPromise(repeatableTask);
 }
 
-type FetchPostCommentOnUsersBehalfApprovalStatusOptions = {
+type FetchAppApprovalStatusOptions = {
   /**
    * Wallet address of commenter.
    */
@@ -219,11 +219,11 @@ type FetchPostCommentOnUsersBehalfApprovalStatusOptions = {
   retries?: number;
 };
 
-export async function fetchPostCommentsOnUsersBehalfApprovalStatus({
+export async function fetchAppApprovalStatus({
   apiUrl,
   author,
   retries = 3,
-}: FetchPostCommentOnUsersBehalfApprovalStatusOptions): Promise<PostingCommentsOnUsersBehalfApprovalStatusResponse> {
+}: FetchAppApprovalStatusOptions): Promise<AppApprovalStatusResponse> {
   const fetchStatusTask = Effect.tryPromise(async () => {
     const endpointUrl = new URL("/api/approval", apiUrl);
 
@@ -242,8 +242,7 @@ export async function fetchPostCommentsOnUsersBehalfApprovalStatus({
       );
     }
 
-    const responseData: PostingCommentsOnUsersBehalfApprovalStatusResponse =
-      await response.json();
+    const responseData: AppApprovalStatusResponse = await response.json();
 
     return responseData;
   });
@@ -257,7 +256,7 @@ export async function fetchPostCommentsOnUsersBehalfApprovalStatus({
 
 type ApprovePostingCommentsOnUsersBehalfOptions = {
   apiUrl: string;
-  statusResponse: PostingCommentsOnUsersBehalfApprovalStatusResponse;
+  statusResponse: AppApprovalStatusResponse;
   authorSignature: Hex;
   /**
    * Number of times to retry the signing operation in case of failure.

@@ -8,7 +8,7 @@ import {
   deleteCommentAsAuthor,
 } from "./index.js";
 import type {
-  PostingCommentsOnUsersBehalfApprovalStatusResponse,
+  AppApprovalStatusResponse,
   Hex,
   SignCommentRequest,
 } from "./types.js";
@@ -135,9 +135,7 @@ export function useGaslessPostComment({
 }
 
 type UseApprovePostingCommentsReturnValue = {
-  approve(
-    request: PostingCommentsOnUsersBehalfApprovalStatusResponse
-  ): Promise<Hex>;
+  approve(request: AppApprovalStatusResponse): Promise<Hex>;
 };
 
 type UseApprovePostingCommentsOptions = {
@@ -150,7 +148,7 @@ type UseApprovePostingCommentsOptions = {
  *
  * This operation uses app's funds to pay for gas fees.
  */
-export function useApprovePostingCommentsOnUsersBehalf({
+export function useApproveApp({
   commentsApiUrl,
   chainId,
 }: UseApprovePostingCommentsOptions): UseApprovePostingCommentsReturnValue {
