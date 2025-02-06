@@ -1,21 +1,22 @@
 "use client";
 
-import { fetchComments } from "@ecp.eth/sdk";
+import { fetchComments, fetchAppApprovalStatus } from "@ecp.eth/sdk";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
+import { useApproveApp } from "@ecp.eth/sdk/wagmi";
+import type { Hex, AppApprovalStatusResponse } from "@ecp.eth/sdk/types";
 import { Button } from "@/components/ui/button";
 import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { signTypedData } from "viem/accounts";
 import {
   useAccount,
-  useSignTypedData,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
 import { CommentGasless } from "./CommentGasless";
+import { chains } from "@/lib/wagmi";
 
 interface CommentData {
   id: string;
@@ -25,25 +26,12 @@ interface CommentData {
   replies: CommentData[];
 }
 
-interface ApprovalResponse {
-  approved: boolean;
-  signTypedDataArgs: Parameters<typeof signTypedData>[0];
-  appSignature: `0x${string}`;
-  appSigner: `0x${string}`;
-}
-
-interface SignApprovalRequest {
-  signTypedDataArgs: Parameters<typeof signTypedData>[0];
-  appSignature: `0x${string}`;
-  authorSignature: `0x${string}`;
-}
-
 export function CommentSectionGasless() {
   const { address } = useAccount();
   const [page, setPage] = useState(0);
   const pageSize = 10;
   const [currentUrl, setCurrentUrl] = useState<string>("");
-  const [pendingTxHash, setPendingTxHash] = useState<`0x${string}`>();
+  const [pendingTxHash, setPendingTxHash] = useState<Hex>();
 
   const {
     writeContract: removeApprovalTx,
@@ -52,51 +40,28 @@ export function CommentSectionGasless() {
   } = useWriteContract();
 
   const getApprovalDataMutation = useMutation({
-    mutationFn: async ({
-      author,
-    }: {
-      author: `0x${string}`;
-    }): Promise<ApprovalResponse> => {
-      setPendingTxHash(undefined);
-
-      if (!address) {
-        throw new Error("No address found");
-      }
-
-      const response = await fetch(`/api/approval?author=${author}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch approvals");
-      }
-      return response.json();
+    mutationFn: async ({ author }: { author: Hex }) => {
+      return fetchAppApprovalStatus({
+        apiUrl: process.env.NEXT_PUBLIC_URL!,
+        author,
+      });
     },
   });
 
-  const { signTypedData: signApproval, isPending: isSigningApproval } =
-    useSignTypedData();
+  const { approve: approvePostingCommentsOnUsersBehalf } = useApproveApp({
+    commentsApiUrl: process.env.NEXT_PUBLIC_URL!,
+    chainId: chains[0].id,
+  });
 
   const postApprovalSignatureMutation = useMutation({
-    mutationFn: async (
-      data: SignApprovalRequest
-    ): Promise<{ txHash: `0x${string}` }> => {
-      const response = await fetch("/api/approval", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to post approval signature");
-      }
-
-      return response.json();
+    mutationFn: async (request: AppApprovalStatusResponse) => {
+      return approvePostingCommentsOnUsersBehalf(request);
     },
   });
 
   const { data: receipt, isLoading: isReceiptLoading } =
     useWaitForTransactionReceipt({
-      hash: pendingTxHash,
+      hash: postApprovalSignatureMutation.data,
     });
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -155,23 +120,27 @@ export function CommentSectionGasless() {
   }, []);
 
   const isApprovalPending =
-    isSigningApproval ||
     isReceiptLoading ||
     postApprovalSignatureMutation.isPending ||
     getApprovalDataMutation.isPending;
 
   const isRemovingApproval = isReceiptLoading && !!removeApprovalTxHash;
 
-  if (isLoading) return <div>Loading comments...</div>;
-  if (error)
+  if (isLoading) {
+    return <div>Loading comments...</div>;
+  }
+
+  if (error) {
     return <div>Error loading comments: {(error as Error).message}</div>;
+  }
+
+  const approvalStatus = getApprovalDataMutation.data;
 
   return (
     <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
       <h2 className="text-lg font-semibold">Comments</h2>
 
-      {!getApprovalDataMutation.data?.approved &&
-      getApprovalDataMutation.data?.signTypedDataArgs ? (
+      {!!approvalStatus && !approvalStatus.approved ? (
         <div className="mb-4">
           <Button
             onClick={() => {
@@ -184,21 +153,9 @@ export function CommentSectionGasless() {
                 },
                 {
                   onSuccess(approvalSigData) {
-                    signApproval(approvalSigData.signTypedDataArgs, {
-                      onSuccess(signature) {
-                        postApprovalSignatureMutation.mutate(
-                          {
-                            signTypedDataArgs:
-                              approvalSigData?.signTypedDataArgs,
-                            appSignature: approvalSigData?.appSignature,
-                            authorSignature: signature,
-                          },
-                          {
-                            onSuccess(data) {
-                              setPendingTxHash(data.txHash);
-                            },
-                          }
-                        );
+                    postApprovalSignatureMutation.mutate(approvalSigData, {
+                      onSuccess(txHash) {
+                        setPendingTxHash(txHash);
                       },
                     });
                   },
@@ -214,28 +171,21 @@ export function CommentSectionGasless() {
           </Button>
         </div>
       ) : (
-        getApprovalDataMutation.data?.approved && (
+        !!approvalStatus &&
+        approvalStatus.approved && (
           <div className="flex items-center gap-2">
             <div className="text-sm text-gray-500">
               App has approval to post on your behalf.
             </div>
             <Button
               variant="outline"
-              disabled={!getApprovalDataMutation.data || isRemovingApproval}
+              disabled={isRemovingApproval}
               onClick={() => {
-                if (
-                  !getApprovalDataMutation.data ||
-                  !getApprovalDataMutation.data.appSigner ||
-                  !address
-                ) {
-                  throw new Error("No data found");
-                }
-
                 removeApprovalTx({
                   abi: CommentsV1Abi,
                   address: COMMENTS_V1_ADDRESS,
                   functionName: "removeApprovalAsAuthor",
-                  args: [getApprovalDataMutation.data.appSigner],
+                  args: [approvalStatus.appSigner],
                 });
               }}
             >

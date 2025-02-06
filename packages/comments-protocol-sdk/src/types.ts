@@ -76,8 +76,13 @@ export type ApprovePostingCommentsOnUsersBehalfResponse = {
   txHash: Hex;
 };
 
-export type AppApprovalStatusResponse = {
-  approved: boolean;
-  signTypedDataArgs: SignTypedDataParameters;
-  appSignature: Hex;
-};
+export type AppApprovalStatusResponse =
+  | {
+      approved: false;
+      signTypedDataArgs: SignTypedDataParameters;
+      appSignature: Hex;
+    }
+  | {
+      approved: true;
+      appSigner: Hex;
+    };

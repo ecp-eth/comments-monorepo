@@ -272,6 +272,12 @@ export async function approvePostingCommentsOnUsersBehalf({
   retries = 3,
 }: ApprovePostingCommentsOnUsersBehalfOptions): Promise<Hex> {
   const postApprovalTask = Effect.tryPromise(async () => {
+    if (statusResponse.approved) {
+      throw new Error(
+        "App is already approved to post comments on user's behalf"
+      );
+    }
+
     const response = await fetch(new URL("/api/approval", apiUrl), {
       method: "POST",
       headers: {

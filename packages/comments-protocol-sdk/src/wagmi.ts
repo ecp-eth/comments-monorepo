@@ -164,6 +164,10 @@ export function useApproveApp({
           throw new Error("Wallet client is not available.");
         }
 
+        if (request.approved) {
+          throw new Error("Request is already approved.");
+        }
+
         await walletClient.switchChain({ id: chainIdRef.current });
 
         const authorSignature = await walletClient.signTypedData(
