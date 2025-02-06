@@ -191,8 +191,7 @@ type UseDeleteCommentAsAuthorReturnValue = {
 };
 
 type UseDeleteCommentAsAuthorOptions = {
-  chainId: number;
-  commentsApiUrl: string;
+  chainId?: number;
 };
 
 /**
@@ -216,7 +215,9 @@ export function useDeleteCommentAsAuthor(
           throw new Error("Wallet client is not available.");
         }
 
-        await walletClient.switchChain({ id: chainIdRef.current });
+        if (chainIdRef.current != null) {
+          await walletClient.switchChain({ id: chainIdRef.current });
+        }
 
         const txHash = await deleteCommentAsAuthor({
           commentId,

@@ -8,14 +8,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  useAccount,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useDeleteCommentAsAuthor } from "@ecp.eth/sdk/wagmi";
+import type { Hex } from "@ecp.eth/sdk/types";
 import { getAddress } from "viem";
+import { chains } from "@/lib/wagmi";
+import { useMutation } from "@tanstack/react-query";
 
 interface CommentProps {
   id: `0x${string}`;
@@ -37,6 +35,15 @@ export function Comment({
   onDelete,
 }: CommentProps) {
   const { address: connectedAddress } = useAccount();
+  const { deleteComment } = useDeleteCommentAsAuthor({
+    chainId: chains[0].id,
+  });
+
+  const deleteCommentMutation = useMutation({
+    mutationFn(commentId: Hex) {
+      return deleteComment(commentId);
+    },
+  });
 
   const [isReplying, setIsReplying] = useState(false);
 
@@ -45,14 +52,9 @@ export function Comment({
     setIsReplying(false);
   };
 
-  const {
-    data: deleteTxHash,
-    writeContract,
-    isPending: isDeleteSigPending,
-  } = useWriteContract();
   const { data: deleteTxReceipt, isFetching: isDeleteTxPending } =
     useWaitForTransactionReceipt({
-      hash: deleteTxHash,
+      hash: deleteCommentMutation.data,
       confirmations: 1,
     });
 
@@ -66,7 +68,7 @@ export function Comment({
     ? getAddress(connectedAddress) === getAddress(author)
     : false;
 
-  const isDeleting = isDeleteSigPending || isDeleteTxPending;
+  const isDeleting = deleteCommentMutation.isPending || isDeleteTxPending;
 
   return (
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
@@ -83,12 +85,7 @@ export function Comment({
               <DropdownMenuItem
                 className="text-red-600 cursor-pointer"
                 onClick={() => {
-                  writeContract({
-                    address: COMMENTS_V1_ADDRESS,
-                    abi: CommentsV1Abi,
-                    functionName: "deleteCommentAsAuthor",
-                    args: [id],
-                  });
+                  deleteComment(id);
                 }}
                 disabled={isDeleting}
               >
