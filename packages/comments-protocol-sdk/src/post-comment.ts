@@ -6,6 +6,8 @@ import type {
   SignCommentGaslessResponse,
   SignCommentResponse,
   Hex,
+  PostingCommentsOnUsersBehalfApprovalStatusResponse,
+  ApprovePostingCommentsOnUsersBehalfResponse,
 } from "./types.js";
 import { CommentsV1Abi } from "./abis.js";
 
@@ -173,7 +175,7 @@ export function postPreparedGaslessComment({
   preparedComment,
   retries = 3,
 }: PostPreparedGaslessCommentOptions): Promise<SignCommentGaslessResponse> {
-  const prepareCommentTask = Effect.tryPromise(async () => {
+  const postCommentTask = Effect.tryPromise(async () => {
     const response = await fetch(new URL("/api/sign-comment/gasless", apiUrl), {
       method: "POST",
       headers: {
@@ -195,7 +197,107 @@ export function postPreparedGaslessComment({
     return responseData;
   });
 
-  const repeatableTask = Effect.retry(prepareCommentTask, {
+  const repeatableTask = Effect.retry(postCommentTask, {
+    times: retries,
+  });
+
+  return Effect.runPromise(repeatableTask);
+}
+
+type FetchPostCommentOnUsersBehalfApprovalStatusOptions = {
+  /**
+   * Wallet address of commenter.
+   */
+  author: Hex;
+  apiUrl: string;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+};
+
+export async function fetchPostCommentsOnUsersBehalfApprovalStatus({
+  apiUrl,
+  author,
+  retries = 3,
+}: FetchPostCommentOnUsersBehalfApprovalStatusOptions): Promise<PostingCommentsOnUsersBehalfApprovalStatusResponse> {
+  const fetchStatusTask = Effect.tryPromise(async () => {
+    const endpointUrl = new URL("/api/approval", apiUrl);
+
+    endpointUrl.searchParams.set("author", author);
+
+    const response = await fetch(endpointUrl, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch approval status: ${response.statusText}`
+      );
+    }
+
+    const responseData: PostingCommentsOnUsersBehalfApprovalStatusResponse =
+      await response.json();
+
+    return responseData;
+  });
+
+  const repeatableTask = Effect.retry(fetchStatusTask, {
+    times: retries,
+  });
+
+  return Effect.runPromise(repeatableTask);
+}
+
+type ApprovePostingCommentsOnUsersBehalfOptions = {
+  apiUrl: string;
+  statusResponse: PostingCommentsOnUsersBehalfApprovalStatusResponse;
+  authorSignature: Hex;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+};
+
+export async function approvePostingCommentsOnUsersBehalf({
+  apiUrl,
+  statusResponse,
+  authorSignature,
+  retries = 3,
+}: ApprovePostingCommentsOnUsersBehalfOptions): Promise<Hex> {
+  const postApprovalTask = Effect.tryPromise(async () => {
+    const response = await fetch(new URL("/api/approval", apiUrl), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        signTypedDataArgs: statusResponse.signTypedDataArgs,
+        appSignature: statusResponse.appSignature,
+        authorSignature,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to approve posting comments: ${response.statusText}`
+      );
+    }
+
+    const responseData: ApprovePostingCommentsOnUsersBehalfResponse =
+      await response.json();
+
+    return responseData.txHash;
+  });
+
+  const repeatableTask = Effect.retry(postApprovalTask, {
     times: retries,
   });
 

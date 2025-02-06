@@ -58,10 +58,26 @@ export type SignCommentResponse = {
 };
 
 export type SignCommentGaslessResponse = {
-  txHash: `0x${string}`;
+  txHash: Hex;
 };
 
 export type SignCommentGaslessPrepareResponse = {
   signTypedDataArgs: SignTypedDataParameters;
-  appSignature: `0x${string}`;
+  appSignature: Hex;
+};
+
+export type PostCommentsOnUsersBehalfApprovalRequest = {
+  signTypedDataArgs: SignTypedDataParameters;
+  appSignature: Hex;
+  authorSignature: Hex;
+};
+
+export type ApprovePostingCommentsOnUsersBehalfResponse = {
+  txHash: Hex;
+};
+
+export type PostingCommentsOnUsersBehalfApprovalStatusResponse = {
+  approved: boolean;
+  signTypedDataArgs: SignTypedDataParameters;
+  appSignature: Hex;
 };

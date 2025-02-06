@@ -4,8 +4,13 @@ import {
   signCommentForPostingAsAuthor,
   prepareCommentForGaslessPosting,
   postPreparedGaslessComment,
+  approvePostingCommentsOnUsersBehalf,
 } from "./post-comment.js";
-import type { Hex, SignCommentRequest } from "./types.js";
+import type {
+  PostingCommentsOnUsersBehalfApprovalStatusResponse,
+  Hex,
+  SignCommentRequest,
+} from "./types.js";
 import { useMemo, useRef } from "react";
 
 type UsePostCommentAsAuthorReturnValue = {
@@ -120,6 +125,59 @@ export function useGaslessPostComment({
         });
 
         return response.txHash;
+      },
+    };
+  }, []);
+}
+
+type UseApprovePostingCommentsReturnValue = {
+  approve(
+    request: PostingCommentsOnUsersBehalfApprovalStatusResponse
+  ): Promise<Hex>;
+};
+
+type UseApprovePostingCommentsOptions = {
+  commentsApiUrl: string;
+  chainId: number;
+};
+
+/**
+ * Approves sending comments on user's behalf
+ */
+export function useApprovePostingCommentsOnUsersBehalf({
+  commentsApiUrl,
+  chainId,
+}: UseApprovePostingCommentsOptions): UseApprovePostingCommentsReturnValue {
+  const { data: walletClient } = useWalletClient();
+  const walletClientRef = useRef(walletClient);
+  walletClientRef.current = walletClient;
+  const chainIdRef = useRef(chainId);
+  chainIdRef.current = chainId;
+  const commentsApiUrlRef = useRef(commentsApiUrl);
+  commentsApiUrlRef.current = commentsApiUrl;
+
+  return useMemo(() => {
+    return {
+      async approve(request) {
+        const walletClient = walletClientRef.current;
+
+        if (!walletClient) {
+          throw new Error("Wallet client is not available.");
+        }
+
+        await walletClient.switchChain({ id: chainIdRef.current });
+
+        const authorSignature = await walletClient.signTypedData(
+          request.signTypedDataArgs
+        );
+
+        const txHash = await approvePostingCommentsOnUsersBehalf({
+          apiUrl: commentsApiUrlRef.current,
+          authorSignature,
+          statusResponse: request,
+        });
+
+        return txHash;
       },
     };
   }, []);
