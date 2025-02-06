@@ -82,6 +82,9 @@ type UseGaslessPostCommentOptions = {
   chainId: number;
 };
 
+/**
+ * Sends a comment using app's funds.
+ */
 export function useGaslessPostComment({
   commentsApiUrl,
   chainId,
@@ -143,7 +146,9 @@ type UseApprovePostingCommentsOptions = {
 };
 
 /**
- * Approves sending comments on user's behalf
+ * Approves sending comments on user's behalf.
+ *
+ * This operation uses app's funds to pay for gas fees.
  */
 export function useApprovePostingCommentsOnUsersBehalf({
   commentsApiUrl,
@@ -194,6 +199,9 @@ type UseDeleteCommentAsAuthorOptions = {
   commentsApiUrl: string;
 };
 
+/**
+ * Deletes a comment as an author. This operation costs author's funds.
+ */
 export function useDeleteCommentAsAuthor(
   options: UseDeleteCommentAsAuthorOptions
 ): UseDeleteCommentAsAuthorReturnValue {
