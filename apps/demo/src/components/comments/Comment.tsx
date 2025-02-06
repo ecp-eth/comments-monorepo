@@ -16,13 +16,13 @@ import { chains } from "@/lib/wagmi";
 import { useMutation } from "@tanstack/react-query";
 
 interface CommentProps {
-  id: `0x${string}`;
+  id: Hex;
   content: string;
   author: string;
   timestamp: number;
   replies?: CommentProps[];
-  onReply?: (parentId: string, content: string) => void;
-  onDelete?: (id: string) => void;
+  onReply?: (parentId: Hex, content: string) => void;
+  onDelete?: (id: Hex) => void;
 }
 
 export function Comment({
@@ -85,7 +85,7 @@ export function Comment({
               <DropdownMenuItem
                 className="text-red-600 cursor-pointer"
                 onClick={() => {
-                  deleteComment(id);
+                  deleteCommentMutation.mutate(id);
                 }}
                 disabled={isDeleting}
               >
