@@ -1,24 +1,52 @@
 import { createConfig } from "ponder";
-import { http } from "viem";
-
+import { http, Transport } from "viem";
 import { CommentsV1Abi } from "@modprotocol/comments-protocol-sdk/abis";
 
-export default createConfig({
-  networks: {
-    anvil: {
-      chainId: 31337,
-      transport: http("http://127.0.0.1:8545"),
-      disableCache: true,
-    },
+const networks = Object.entries(process.env).reduce(
+  (acc, [key, value]) => {
+    if (key.startsWith("PONDER_RPC_URL_")) {
+      const chainId = parseInt(key.replace("PONDER_RPC_URL_", ""));
+      const startBlock = parseInt(
+        process.env[`PONDER_START_BLOCK_${chainId}`] || "0"
+      );
+
+      acc[chainId] = {
+        chainId,
+        transport: http(value),
+        disableCache: chainId === 31337,
+        startBlock,
+      };
+    }
+    return acc;
   },
+  {} as Record<
+    string,
+    {
+      chainId: number;
+      transport: Transport;
+      disableCache?: boolean;
+      startBlock?: number;
+    }
+  >
+);
+
+console.log(`Detected networks:`, networks);
+
+export default createConfig({
+  networks,
   contracts: {
     CommentsV1: {
       abi: CommentsV1Abi,
-      network: {
-        anvil: {
-          address: "0xfdb8b4bb77819d9a0501c9ff3731fb45fb38d42d",
+      network: Object.entries(networks).reduce(
+        (acc, [chainId, network]) => {
+          acc[chainId] = {
+            address: "0x1bad911fc92501e3df94203bddeb02d5842e0d21",
+            startBlock: network.startBlock,
+          };
+          return acc;
         },
-      },
+        {} as Record<string, { address: `0x${string}`; startBlock?: number }>
+      ),
     },
   },
 });
