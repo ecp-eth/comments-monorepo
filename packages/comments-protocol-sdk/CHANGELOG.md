@@ -1,5 +1,11 @@
 # @modprotocol/comments-protocol-sdk
 
+## 0.0.2
+
+### Patch Changes
+
+- 115c516: feat: export abi
+
 ## 0.0.1
 
 ### Patch Changes
