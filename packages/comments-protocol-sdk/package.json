@@ -12,7 +12,7 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "predev": "cd ../../apps/protocol && pnpm build:abi",
-    "dev": "echo 'Add dev script here'",
+    "dev": "tsup --watch",
     "prebuild": "cd ../../apps/protocol && pnpm build:abi",
     "build": "tsup",
     "test": "echo 'Add test script here'",
