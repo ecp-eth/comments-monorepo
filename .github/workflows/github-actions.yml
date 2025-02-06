@@ -1,6 +1,7 @@
-name: Comments SDK CI
+name: Comments Protocol CI
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -18,7 +19,69 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-protocol:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Check out the repo"
+        uses: "actions/checkout@v4"
+
+      - name: "Install Foundry"
+        uses: "foundry-rs/foundry-toolchain@v1"
+
+      - name: "Setup pnpm"
+        uses: "pnpm/action-setup@v2"
+
+      - name: "Setup Node.js"
+        uses: "actions/setup-node@v4"
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: "Install the Node.js dependencies"
+        run: "pnpm install --frozen-lockfile"
+
+      - name: "Build the contracts and print their size"
+        run: "forge build --sizes"
+
+      - name: "Add build summary"
+        run: |
+          echo "## Build result" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
+
+  test-protocol:
+    needs: ["build-protocol"]
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Check out the repo"
+        uses: "actions/checkout@v4"
+
+      - name: "Install Foundry"
+        uses: "foundry-rs/foundry-toolchain@v1"
+
+      - name: "Setup pnpm"
+        uses: "pnpm/action-setup@v2"
+
+      - name: "Setup Node.js"
+        uses: "actions/setup-node@v4"
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: "Install the Node.js dependencies"
+        run: "pnpm install"
+
+      - name: "Show the Foundry config"
+        run: "forge config"
+
+      - name: "Run the tests"
+        run: "forge test -vvv"
+
+      - name: "Add test summary"
+        run: |
+          echo "## Tests result" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
+
+  build-js:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:

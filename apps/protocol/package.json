@@ -1,0 +1,19 @@
+{
+  "name": "@modprotocol/comments-protocol",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:abi": "node ./build-abi.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "node": "anvil --block-time 2",
+    "dev": "forge script script/Dev.s.sol:DevScript --rpc-url http://localhost:8545 --broadcast"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
+    "forge-std": "github:foundry-rs/forge-std#v1.8.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

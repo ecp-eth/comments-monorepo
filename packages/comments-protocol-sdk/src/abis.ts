@@ -1,49 +1,103 @@
 export const CommentsV1Abi = [
-  { type: "constructor", inputs: [], stateMutability: "nonpayable" },
+  {
+    type: "constructor",
+    inputs: [],
+    stateMutability: "nonpayable",
+  },
   {
     type: "function",
     name: "ADD_APPROVAL_TYPEHASH",
     inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "COMMENT_TYPEHASH",
     inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "DELETE_COMMENT_TYPEHASH",
     inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "DOMAIN_SEPARATOR",
     inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "REMOVE_APPROVAL_TYPEHASH",
     inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "addApproval",
     inputs: [
-      { name: "author", type: "address", internalType: "address" },
-      { name: "appSigner", type: "address", internalType: "address" },
-      { name: "nonce", type: "uint256", internalType: "uint256" },
-      { name: "deadline", type: "uint256", internalType: "uint256" },
-      { name: "signature", type: "bytes", internalType: "bytes" },
+      {
+        name: "author",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "appSigner",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "nonce",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "deadline",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "signature",
+        type: "bytes",
+        internalType: "bytes",
+      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -51,7 +105,13 @@ export const CommentsV1Abi = [
   {
     type: "function",
     name: "addApprovalAsAuthor",
-    inputs: [{ name: "appSigner", type: "address", internalType: "address" }],
+    inputs: [
+      {
+        name: "appSigner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -59,13 +119,41 @@ export const CommentsV1Abi = [
     type: "function",
     name: "deleteComment",
     inputs: [
-      { name: "commentId", type: "bytes32", internalType: "bytes32" },
-      { name: "author", type: "address", internalType: "address" },
-      { name: "appSigner", type: "address", internalType: "address" },
-      { name: "nonce", type: "uint256", internalType: "uint256" },
-      { name: "deadline", type: "uint256", internalType: "uint256" },
-      { name: "authorSignature", type: "bytes", internalType: "bytes" },
-      { name: "appSignature", type: "bytes", internalType: "bytes" },
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "author",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "appSigner",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "nonce",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "deadline",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "authorSignature",
+        type: "bytes",
+        internalType: "bytes",
+      },
+      {
+        name: "appSignature",
+        type: "bytes",
+        internalType: "bytes",
+      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -73,7 +161,13 @@ export const CommentsV1Abi = [
   {
     type: "function",
     name: "deleteCommentAsAuthor",
-    inputs: [{ name: "commentId", type: "bytes32", internalType: "bytes32" }],
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -81,12 +175,34 @@ export const CommentsV1Abi = [
     type: "function",
     name: "getAddApprovalHash",
     inputs: [
-      { name: "author", type: "address", internalType: "address" },
-      { name: "appSigner", type: "address", internalType: "address" },
-      { name: "nonce", type: "uint256", internalType: "uint256" },
-      { name: "deadline", type: "uint256", internalType: "uint256" },
+      {
+        name: "author",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "appSigner",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "nonce",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "deadline",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "view",
   },
   {
@@ -98,67 +214,185 @@ export const CommentsV1Abi = [
         type: "tuple",
         internalType: "struct CommentsV1.CommentData",
         components: [
-          { name: "content", type: "string", internalType: "string" },
-          { name: "metadata", type: "string", internalType: "string" },
-          { name: "targetUrl", type: "string", internalType: "string" },
-          { name: "parentId", type: "bytes32", internalType: "bytes32" },
-          { name: "author", type: "address", internalType: "address" },
-          { name: "appSigner", type: "address", internalType: "address" },
-          { name: "nonce", type: "uint256", internalType: "uint256" },
-          { name: "deadline", type: "uint256", internalType: "uint256" },
+          {
+            name: "content",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "metadata",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "targetUrl",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "parentId",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "author",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "appSigner",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "nonce",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "deadline",
+            type: "uint256",
+            internalType: "uint256",
+          },
         ],
       },
     ],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "getDeleteCommentHash",
     inputs: [
-      { name: "commentId", type: "bytes32", internalType: "bytes32" },
-      { name: "author", type: "address", internalType: "address" },
-      { name: "appSigner", type: "address", internalType: "address" },
-      { name: "nonce", type: "uint256", internalType: "uint256" },
-      { name: "deadline", type: "uint256", internalType: "uint256" },
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "author",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "appSigner",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "nonce",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "deadline",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "getRemoveApprovalHash",
     inputs: [
-      { name: "author", type: "address", internalType: "address" },
-      { name: "appSigner", type: "address", internalType: "address" },
-      { name: "nonce", type: "uint256", internalType: "uint256" },
-      { name: "deadline", type: "uint256", internalType: "uint256" },
+      {
+        name: "author",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "appSigner",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "nonce",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "deadline",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "isApproved",
     inputs: [
-      { name: "", type: "address", internalType: "address" },
-      { name: "", type: "address", internalType: "address" },
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    outputs: [{ name: "", type: "bool", internalType: "bool" }],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "name",
     inputs: [],
-    outputs: [{ name: "", type: "string", internalType: "string" }],
+    outputs: [
+      {
+        name: "",
+        type: "string",
+        internalType: "string",
+      },
+    ],
     stateMutability: "view",
   },
   {
     type: "function",
     name: "nonces",
-    inputs: [{ name: "", type: "address", internalType: "address" }],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    inputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
     stateMutability: "view",
   },
   {
@@ -170,18 +404,58 @@ export const CommentsV1Abi = [
         type: "tuple",
         internalType: "struct CommentsV1.CommentData",
         components: [
-          { name: "content", type: "string", internalType: "string" },
-          { name: "metadata", type: "string", internalType: "string" },
-          { name: "targetUrl", type: "string", internalType: "string" },
-          { name: "parentId", type: "bytes32", internalType: "bytes32" },
-          { name: "author", type: "address", internalType: "address" },
-          { name: "appSigner", type: "address", internalType: "address" },
-          { name: "nonce", type: "uint256", internalType: "uint256" },
-          { name: "deadline", type: "uint256", internalType: "uint256" },
+          {
+            name: "content",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "metadata",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "targetUrl",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "parentId",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "author",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "appSigner",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "nonce",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "deadline",
+            type: "uint256",
+            internalType: "uint256",
+          },
         ],
       },
-      { name: "authorSignature", type: "bytes", internalType: "bytes" },
-      { name: "appSignature", type: "bytes", internalType: "bytes" },
+      {
+        name: "authorSignature",
+        type: "bytes",
+        internalType: "bytes",
+      },
+      {
+        name: "appSignature",
+        type: "bytes",
+        internalType: "bytes",
+      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -195,17 +469,53 @@ export const CommentsV1Abi = [
         type: "tuple",
         internalType: "struct CommentsV1.CommentData",
         components: [
-          { name: "content", type: "string", internalType: "string" },
-          { name: "metadata", type: "string", internalType: "string" },
-          { name: "targetUrl", type: "string", internalType: "string" },
-          { name: "parentId", type: "bytes32", internalType: "bytes32" },
-          { name: "author", type: "address", internalType: "address" },
-          { name: "appSigner", type: "address", internalType: "address" },
-          { name: "nonce", type: "uint256", internalType: "uint256" },
-          { name: "deadline", type: "uint256", internalType: "uint256" },
+          {
+            name: "content",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "metadata",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "targetUrl",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "parentId",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "author",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "appSigner",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "nonce",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "deadline",
+            type: "uint256",
+            internalType: "uint256",
+          },
         ],
       },
-      { name: "appSignature", type: "bytes", internalType: "bytes" },
+      {
+        name: "appSignature",
+        type: "bytes",
+        internalType: "bytes",
+      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -214,11 +524,31 @@ export const CommentsV1Abi = [
     type: "function",
     name: "removeApproval",
     inputs: [
-      { name: "author", type: "address", internalType: "address" },
-      { name: "appSigner", type: "address", internalType: "address" },
-      { name: "nonce", type: "uint256", internalType: "uint256" },
-      { name: "deadline", type: "uint256", internalType: "uint256" },
-      { name: "signature", type: "bytes", internalType: "bytes" },
+      {
+        name: "author",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "appSigner",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "nonce",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "deadline",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "signature",
+        type: "bytes",
+        internalType: "bytes",
+      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -226,7 +556,13 @@ export const CommentsV1Abi = [
   {
     type: "function",
     name: "removeApprovalAsAuthor",
-    inputs: [{ name: "appSigner", type: "address", internalType: "address" }],
+    inputs: [
+      {
+        name: "appSigner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -234,7 +570,13 @@ export const CommentsV1Abi = [
     type: "function",
     name: "version",
     inputs: [],
-    outputs: [{ name: "", type: "string", internalType: "string" }],
+    outputs: [
+      {
+        name: "",
+        type: "string",
+        internalType: "string",
+      },
+    ],
     stateMutability: "view",
   },
   {
@@ -303,14 +645,46 @@ export const CommentsV1Abi = [
         indexed: false,
         internalType: "struct CommentsV1.CommentData",
         components: [
-          { name: "content", type: "string", internalType: "string" },
-          { name: "metadata", type: "string", internalType: "string" },
-          { name: "targetUrl", type: "string", internalType: "string" },
-          { name: "parentId", type: "bytes32", internalType: "bytes32" },
-          { name: "author", type: "address", internalType: "address" },
-          { name: "appSigner", type: "address", internalType: "address" },
-          { name: "nonce", type: "uint256", internalType: "uint256" },
-          { name: "deadline", type: "uint256", internalType: "uint256" },
+          {
+            name: "content",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "metadata",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "targetUrl",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "parentId",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "author",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "appSigner",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "nonce",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "deadline",
+            type: "uint256",
+            internalType: "uint256",
+          },
         ],
       },
     ],
@@ -335,10 +709,34 @@ export const CommentsV1Abi = [
     ],
     anonymous: false,
   },
-  { type: "error", name: "DeadlineReached", inputs: [] },
-  { type: "error", name: "InvalidAppSignature", inputs: [] },
-  { type: "error", name: "InvalidAuthor", inputs: [] },
-  { type: "error", name: "InvalidAuthorSignature", inputs: [] },
-  { type: "error", name: "InvalidNonce", inputs: [] },
-  { type: "error", name: "NotAuthorized", inputs: [] },
-] as const;
+  {
+    type: "error",
+    name: "DeadlineReached",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "InvalidAppSignature",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "InvalidAuthor",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "InvalidAuthorSignature",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "InvalidNonce",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "NotAuthorized",
+    inputs: [],
+  },
+];

@@ -11,6 +11,7 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "dev": "echo 'Add dev script here'",
+    "prebuild": "cd ../../apps/protocol && pnpm build:abi",
     "build": "tsup",
     "test": "echo 'Add test script here'",
     "lint": "eslint \"./src/**/*.ts\""
