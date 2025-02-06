@@ -6,6 +6,8 @@ import {
   postPreparedGaslessComment,
   approvePostingCommentsOnUsersBehalf,
   deleteCommentAsAuthor,
+  prepareCommentForGaslessDeletion,
+  performGaslessCommentDeletion,
 } from "./index.js";
 import type {
   AppApprovalStatusResponse,
@@ -247,6 +249,84 @@ export function useDeleteCommentAsAuthor(
         });
 
         return txHash;
+      },
+    };
+  }, []);
+}
+
+type UseGaslessDeleteCommentReturnValue = {
+  deleteComment: (commentId: Hex) => Promise<Hex>;
+};
+
+type UseGaslessDeleteCommentOptions = {
+  commentsApiUrl: string;
+  /**
+   * Author's wallet address, if not provided it will use connected wallet.
+   */
+  author?: Hex;
+  /**
+   * Chain ID to use for posting comments. If omitted it will use current chain.
+   */
+  chainId?: number;
+  /**
+   * If true, the comment will be deleted if user already approved the app to act on their behalf.
+   *
+   * @default true
+   */
+  submitIfApproved?: boolean;
+};
+
+export function useGaslessDeleteComment(
+  options: UseGaslessDeleteCommentOptions
+): UseGaslessDeleteCommentReturnValue {
+  const { data: walletClient } = useWalletClient();
+  const walletClientRef = useRef(walletClient);
+  walletClientRef.current = walletClient;
+  const chainIdRef = useRef(options.chainId);
+  chainIdRef.current = options.chainId;
+  const authorIdRef = useRef(options.author);
+  authorIdRef.current = options.author;
+  const submitIfApprovedRef = useRef(options.submitIfApproved);
+  submitIfApprovedRef.current = options.submitIfApproved;
+  const commentsApiUrlRef = useRef(options.commentsApiUrl);
+  commentsApiUrlRef.current = options.commentsApiUrl;
+
+  return useMemo(() => {
+    return {
+      async deleteComment(commentId) {
+        const walletClient = walletClientRef.current;
+
+        if (!walletClient) {
+          throw new Error("Wallet client is not available.");
+        }
+
+        if (chainIdRef.current != null) {
+          await walletClient.switchChain({ id: chainIdRef.current });
+        }
+
+        const prepareCommentResponse = await prepareCommentForGaslessDeletion({
+          commentId,
+          author: authorIdRef.current ?? walletClient.account.address,
+          apiUrl: commentsApiUrlRef.current,
+          submitIfApproved: submitIfApprovedRef.current,
+        });
+
+        if ("txHash" in prepareCommentResponse) {
+          return prepareCommentResponse.txHash;
+        }
+
+        // Sign comment for once-off approval
+        const authorSignature = await walletClient.signTypedData(
+          prepareCommentResponse.signTypedDataArgs
+        );
+
+        const response = await performGaslessCommentDeletion({
+          apiUrl: commentsApiUrlRef.current,
+          authorSignature,
+          request: prepareCommentResponse,
+        });
+
+        return response.txHash;
       },
     };
   }, []);

@@ -1,5 +1,5 @@
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
+import { COMMENTS_V1_CONTRACT_ADDRESS } from "@ecp.eth/sdk";
 import {
   bigintReplacer,
   createDeleteCommentTypedDataArgs,
@@ -67,7 +67,7 @@ export const POST = async (req: Request) => {
 
     // Check approval on chain
     const isApproved = await walletClient.readContract({
-      address: COMMENTS_V1_ADDRESS,
+      address: COMMENTS_V1_CONTRACT_ADDRESS,
       abi: CommentsV1Abi,
       functionName: "isApproved",
       args: [authorAddress, account.address],
@@ -92,7 +92,7 @@ export const POST = async (req: Request) => {
       try {
         const txHash = await walletClient.writeContract({
           abi: CommentsV1Abi,
-          address: COMMENTS_V1_ADDRESS,
+          address: COMMENTS_V1_CONTRACT_ADDRESS,
           functionName: "deleteComment",
           args: [
             commentId,

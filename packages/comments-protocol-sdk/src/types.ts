@@ -90,3 +90,20 @@ export type AppApprovalStatusResponse =
       approved: true;
       appSigner: Hex;
     };
+
+export type SignDeleteCommentGaslessRequest = {
+  signTypedDataArgs: SignTypedDataParameters;
+  appSignature: Hex;
+  authorSignature: Hex;
+};
+
+export type GaslessDeleteCommentApprovedResponse = { txHash: Hex };
+
+export type GaslessDeleteCommentSignResponse = {
+  signTypedDataArgs: SignTypedDataParameters;
+  appSignature: Hex;
+};
+
+export type GaslessDeleteCommentResponse =
+  | GaslessDeleteCommentSignResponse
+  | GaslessDeleteCommentApprovedResponse;

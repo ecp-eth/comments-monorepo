@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { CommentData } from "./types";
-import { COMMENTS_V1_ADDRESS } from "./addresses";
+import { COMMENTS_V1_CONTRACT_ADDRESS } from "@modprotocol/comments-protocol-sdk";
 import {
   DOMAIN_NAME,
   DOMAIN_VERSION,
@@ -88,7 +88,7 @@ export function createCommentSignTypedDataArgs({
       name: DOMAIN_NAME,
       version: DOMAIN_VERSION,
       chainId,
-      verifyingContract: COMMENTS_V1_ADDRESS,
+      verifyingContract: COMMENTS_V1_CONTRACT_ADDRESS,
     },
     types: COMMENT_TYPE,
     primaryType: "AddComment",
@@ -114,7 +114,7 @@ export function createApprovalSignTypedDataArgs({
       name: DOMAIN_NAME,
       version: DOMAIN_VERSION,
       chainId,
-      verifyingContract: COMMENTS_V1_ADDRESS,
+      verifyingContract: COMMENTS_V1_CONTRACT_ADDRESS,
     },
     types: ADD_APPROVAL_TYPE,
     primaryType: "AddApproval",
@@ -143,7 +143,7 @@ export async function getNonce({
   });
 
   const nonce = await publicClient.readContract({
-    address: COMMENTS_V1_ADDRESS,
+    address: COMMENTS_V1_CONTRACT_ADDRESS,
     abi: CommentsV1Abi,
     functionName: "nonces",
     args: [author],
@@ -172,7 +172,7 @@ export function createDeleteCommentTypedDataArgs({
       name: DOMAIN_NAME,
       version: DOMAIN_VERSION,
       chainId,
-      verifyingContract: COMMENTS_V1_ADDRESS,
+      verifyingContract: COMMENTS_V1_CONTRACT_ADDRESS,
     },
     types: DELETE_COMMENT_TYPE,
     primaryType: "DeleteComment",

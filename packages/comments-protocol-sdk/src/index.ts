@@ -9,9 +9,14 @@ import type {
   AppApprovalStatusResponse,
   ApprovePostingCommentsOnUsersBehalfResponse,
   FetchCommentsResponse,
+  GaslessDeleteCommentResponse,
+  GaslessDeleteCommentSignResponse,
+  GaslessDeleteCommentApprovedResponse,
 } from "./types.js";
 import { CommentsV1Abi } from "./abis.js";
 import { COMMENTS_V1_CONTRACT_ADDRESS } from "./constants.js";
+
+export { COMMENTS_V1_CONTRACT_ADDRESS };
 
 type SignCommentForPostingAsAuthorOptions = {
   comment: SignCommentRequest;
@@ -324,6 +329,112 @@ export async function deleteCommentAsAuthor({
   });
 
   return Effect.runPromise(deleteCommentTask);
+}
+
+type PrepareCommentForGaslessDeletionOptions = {
+  apiUrl: string;
+  commentId: Hex;
+  author: Hex;
+  /**
+   * Performs the deletion if user approved the app to act on their behalf.
+   *
+   * @default true
+   */
+  submitIfApproved?: boolean;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+};
+
+export async function prepareCommentForGaslessDeletion({
+  apiUrl,
+  author,
+  commentId,
+  submitIfApproved = true,
+  retries = 3,
+}: PrepareCommentForGaslessDeletionOptions): Promise<GaslessDeleteCommentResponse> {
+  const prepareCommentForDeletionTask = Effect.tryPromise(async () => {
+    const response = await fetch(
+      new URL("/api/delete-comment/prepare", apiUrl),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          author,
+          commentId,
+          submitIfApproved,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to sign comment: ${response.statusText}`);
+    }
+
+    const responseData: GaslessDeleteCommentResponse = await response.json();
+
+    return responseData;
+  });
+
+  const repeatableTask = Effect.retry(prepareCommentForDeletionTask, {
+    times: retries,
+  });
+
+  return Effect.runPromise(repeatableTask);
+}
+
+type PerformGalessCommentDeletionOptions = {
+  apiUrl: string;
+  request: GaslessDeleteCommentSignResponse;
+  authorSignature: Hex;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+};
+
+export async function performGaslessCommentDeletion({
+  apiUrl,
+  authorSignature,
+  request,
+  retries = 3,
+}: PerformGalessCommentDeletionOptions): Promise<GaslessDeleteCommentApprovedResponse> {
+  const deleteCommentTask = Effect.tryPromise(async () => {
+    const response = await fetch(new URL("/api/delete-comment", apiUrl), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...request,
+        authorSignature,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to post approval signature: ${response.statusText}`
+      );
+    }
+
+    const responseData: GaslessDeleteCommentApprovedResponse =
+      await response.json();
+
+    return responseData;
+  });
+
+  const repeatableTask = Effect.retry(deleteCommentTask, {
+    times: retries,
+  });
+
+  return Effect.runPromise(repeatableTask);
 }
 
 type FetchCommentsOptions = {

@@ -1,5 +1,5 @@
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
+import { COMMENTS_V1_CONTRACT_ADDRESS } from "@ecp.eth/sdk";
 import { bigintReplacer, createApprovalSignTypedDataArgs } from "@/lib/utils";
 import {
   chains as configChains,
@@ -40,13 +40,13 @@ export const GET = async (req: NextRequest) => {
     ? await publicClient.multicall({
         contracts: [
           {
-            address: COMMENTS_V1_ADDRESS,
+            address: COMMENTS_V1_CONTRACT_ADDRESS,
             abi: CommentsV1Abi,
             functionName: "isApproved",
             args: [authorAddress, account.address],
           },
           {
-            address: COMMENTS_V1_ADDRESS,
+            address: COMMENTS_V1_CONTRACT_ADDRESS,
             abi: CommentsV1Abi,
             functionName: "nonces",
             args: [authorAddress],
@@ -56,13 +56,13 @@ export const GET = async (req: NextRequest) => {
     : (
         await Promise.all([
           publicClient.readContract({
-            address: COMMENTS_V1_ADDRESS,
+            address: COMMENTS_V1_CONTRACT_ADDRESS,
             abi: CommentsV1Abi,
             functionName: "isApproved",
             args: [authorAddress, account.address],
           }),
           publicClient.readContract({
-            address: COMMENTS_V1_ADDRESS,
+            address: COMMENTS_V1_CONTRACT_ADDRESS,
             abi: CommentsV1Abi,
             functionName: "nonces",
             args: [authorAddress],
@@ -150,7 +150,7 @@ export const POST = async (req: Request) => {
   try {
     const txHash = await walletClient.writeContract({
       abi: CommentsV1Abi,
-      address: COMMENTS_V1_ADDRESS,
+      address: COMMENTS_V1_CONTRACT_ADDRESS,
       functionName: "addApproval",
       args: [
         signTypedDataArgs.message.author,
