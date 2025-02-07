@@ -8,6 +8,7 @@ import {
   type AppSignedCommentSchemaType,
   type AppApprovedStatusResponseSchemaType,
   AppApprovedStatusResponseSchema,
+  HexSchema,
 } from "./schemas.js";
 
 export { COMMENTS_V1_CONTRACT_ADDRESS };
@@ -47,25 +48,23 @@ export async function postCommentAsAuthor({
   return Effect.runPromise(writeCommentTask);
 }
 
-type RejectAppApprovalOptions = {
-  approval: AppApprovedStatusResponseSchemaType;
+type RemoveAppApprovalOptions = {
+  appSigner: Hex;
   wallet: WalletClient;
 };
 
-export async function rejectAppApproval({
-  approval,
+export async function removeAppApproval({
+  appSigner,
   wallet,
-}: RejectAppApprovalOptions): Promise<Hex> {
+}: RemoveAppApprovalOptions): Promise<Hex> {
   const rejectAppApprovalTask = Effect.tryPromise(async () => {
-    const data = AppApprovedStatusResponseSchema.parse(approval);
-
     const txHash = await wallet.writeContract({
       account: null, // use current account
       chain: null, // use current chain
       abi: CommentsV1Abi,
       address: COMMENTS_V1_CONTRACT_ADDRESS,
       functionName: "removeApprovalAsAuthor",
-      args: [data.appSigner],
+      args: [HexSchema.parse(appSigner)],
     });
 
     return txHash;

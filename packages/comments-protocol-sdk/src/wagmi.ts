@@ -2,7 +2,7 @@ import { useWalletClient } from "wagmi";
 import {
   postCommentAsAuthor,
   deleteCommentAsAuthor,
-  rejectAppApproval,
+  removeAppApproval,
 } from "./index.js";
 import type { Hex } from "./types.js";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
@@ -19,8 +19,6 @@ import {
   HexSchema,
   type AppNotApprovedStatusResponseSchemaType,
   AppNotApprovedStatusResponseSchema,
-  type AppApprovedStatusResponseSchemaType,
-  AppApprovedStatusResponseSchema,
 } from "./schemas.js";
 
 type UsePostCommentAsAuthorReturnValue = UseMutationResult<
@@ -292,29 +290,34 @@ export function useApproveApp({
   });
 }
 
-type UseRejectAppReturnValue = UseMutationResult<
+type UseRemoveApprovalReturnValue = UseMutationResult<
   Hex,
   Error,
-  AppApprovedStatusResponseSchemaType
+  {
+    appSigner: Hex;
+  }
 >;
 
-export function useRejectApp(): UseRejectAppReturnValue {
+/**
+ * Removes app approval to post comments on user's behalf.
+ *
+ * This operation uses user's funds.
+ */
+export function useRemoveApproval(): UseRemoveApprovalReturnValue {
   const { data: walletClient } = useWalletClient();
 
   return useMutation({
-    async mutationFn(approval) {
+    async mutationFn({ appSigner }) {
       if (!walletClient) {
         throw new Error("Wallet client is not available.");
       }
 
-      const data = AppApprovedStatusResponseSchema.parse(approval);
-
-      const txHash = await rejectAppApproval({
-        approval: data,
+      const txHash = await removeAppApproval({
+        appSigner,
         wallet: walletClient,
       });
 
-      return HexSchema.parse(txHash);
+      return txHash;
     },
   });
 }

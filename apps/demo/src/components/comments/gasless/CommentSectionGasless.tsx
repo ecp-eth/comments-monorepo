@@ -1,6 +1,6 @@
 "use client";
 
-import { useApproveApp, useRejectApp } from "@ecp.eth/sdk/wagmi";
+import { useApproveApp, useRemoveApproval } from "@ecp.eth/sdk/wagmi";
 import type { Hex } from "@ecp.eth/sdk/types";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -30,7 +30,7 @@ export function CommentSectionGasless() {
     },
   });
 
-  const rejectApprovalMutation = useRejectApp();
+  const removeApprovalMutation = useRemoveApproval();
 
   const getApprovalDataMutation = useMutation({
     mutationFn: async ({ author }: { author: Hex }) => {
@@ -45,7 +45,7 @@ export function CommentSectionGasless() {
   });
 
   const rejectAppReceipt = useWaitForTransactionReceipt({
-    hash: rejectApprovalMutation.data,
+    hash: removeApprovalMutation.data,
   });
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -86,7 +86,7 @@ export function CommentSectionGasless() {
     getApprovalDataMutation.isPending;
 
   const isRemovingApproval =
-    rejectAppReceipt.isLoading || rejectApprovalMutation.isPending;
+    rejectAppReceipt.isLoading || removeApprovalMutation.isPending;
 
   if (isLoading) {
     return <div>Loading comments...</div>;
@@ -141,7 +141,9 @@ export function CommentSectionGasless() {
             variant="outline"
             disabled={isRemovingApproval}
             onClick={() => {
-              rejectApprovalMutation.mutate(approvalStatus);
+              removeApprovalMutation.mutate({
+                appSigner: approvalStatus.appSigner,
+              });
             }}
           >
             <X />
