@@ -17,9 +17,9 @@ import {
   GaslessCommentSignatureResponseSchema,
   type SignGaslessCommentRequiresSigningResponseSchemaType,
   HexSchema,
-  type AppNotApprovedStatusResponseSchemaType,
-  AppNotApprovedStatusResponseSchema,
+  type SignGaslessCommentApprovedResponseSchemaType,
 } from "./schemas.js";
+import type { SignTypedDataParameters } from "viem";
 
 type UsePostCommentAsAuthorReturnValue = UseMutationResult<
   Hex,
@@ -33,9 +33,9 @@ type UsePostCommentAsAuthorOptions = {
    *
    * This signature is then used to post the comment on-chain using the user's wallet.
    */
-  fetchSignTypedData: (
-    comment: SignCommentByAppRequestSchemaType
-  ) => Promise<AppSignedCommentSchemaType>;
+  fetchSignTypedData: (params: {
+    comment: SignCommentByAppRequestSchemaType;
+  }) => Promise<AppSignedCommentSchemaType>;
 };
 
 /**
@@ -43,11 +43,11 @@ type UsePostCommentAsAuthorOptions = {
  *
  * @example
  * ```
- * import { usePostCommentAsAuthor } from '@modprotocol/comments-protocol-sdk/wagmi';
+ * import { usePostCommentAsAuthor } from '@ecp.eth/sdk/wagmi';
  *
  * function Component() {
  *   const { mutate } = usePostCommentAsAuthor({
- *     fetchSignTypedData: async (comment) => {
+ *     fetchSignTypedData: async ({ comment }) => {
  *       const response = await fetch('/api/sign-comment', {
  *         method: 'POST',
  *         body: JSON.stringify(comment),
@@ -74,11 +74,11 @@ type UsePostCommentAsAuthorOptions = {
  *
  * @example
  * ```
- * import { usePostCommentAsAuthor } from '@modprotocol/comments-protocol-sdk/wagmi';
+ * import { usePostCommentAsAuthor } from '@ecp.eth/sdk/wagmi';
  *
  * function Component() {
  *   const { mutate } = usePostCommentAsAuthor({
- *     fetchSignTypedData: async (comment) => {
+ *     fetchSignTypedData: async ({ comment }) => {
  *       const response = await fetch('/api/sign-comment', {
  *         method: 'POST',
  *         body: JSON.stringify(comment),
@@ -115,10 +115,10 @@ export function usePostCommentAsAuthor({
         throw new Error("Wallet client is not available.");
       }
 
-      const request = SignCommentByAppRequestSchema.parse(comment);
-
       const appSignedCommentResponse = AppSignedCommentSchema.parse(
-        await fetchSignTypedData(request)
+        await fetchSignTypedData({
+          comment: SignCommentByAppRequestSchema.parse(comment),
+        })
       );
 
       if (appSignedCommentResponse.chainId !== walletClient.chain.id) {
@@ -142,69 +142,62 @@ type UseGalessPostCommentReturnValue = UseMutationResult<
   Error,
   {
     comment: CommentInputSchemaType;
-    /**
-     * Should the app post the comment immediatelly if user approved the app to act on their behalf?
-     *
-     * @default true
-     */
-    submitIfApproved?: boolean;
   }
 >;
 
-type UseGaslessPostCommentOptions = {
-  /**
-   * Should the app post the comment immediatelly if user approved the app to act on their behalf?
-   *
-   * @default true
-   */
-  submitIfApproved?: boolean;
+type UseGaslessPostCommentOptions<TExtraSignTypeDataValue = {}> = {
   /**
    * Fetches a comment signed by app from app's backend.
    *
-   * If user previously approved the app to act on their behalf,
-   * the comment will be posted directly if submitIfApproved is set to true,
-   * the function should return transaction hash in that case.
+   * If function returs txHash then onSignatureComplete won't be called
+   * and the operation will be finished.
    *
    * Otherwise the function should return a signature of the comment.
    */
-  fetchSignTypedData: (
-    comment: CommentInputSchemaType,
-    submitIfApproved: boolean
-  ) => Promise<GaslessCommentSignatureResponseSchemaType>;
+  fetchSignTypedData: (params: {
+    comment: CommentInputSchemaType;
+  }) => Promise<
+    | Extract<GaslessCommentSignatureResponseSchemaType, { txHash: Hex }>
+    | (Exclude<GaslessCommentSignatureResponseSchemaType, { txHash: Hex }> &
+        TExtraSignTypeDataValue)
+  >;
   /**
    * Function is called if user didn't approve the app to act on their behalf.
    */
-  onSignatureComplete: (signedComment: {
-    authorSignature: Hex;
-    signedComment: SignGaslessCommentRequiresSigningResponseSchemaType;
-  }) => Promise<Hex>;
+  onSignatureComplete: (
+    signedComment: TExtraSignTypeDataValue & {
+      authorSignature: Hex;
+      signTypedDataArgs: SignTypedDataParameters;
+    }
+  ) => Promise<Hex>;
 };
 
 /**
  * Sends a comment using app's funds.
  */
-export function useGaslessPostComment({
+export function useGaslessPostComment<TExtraSignTypeDataValue = {}>({
   fetchSignTypedData,
   onSignatureComplete,
-  submitIfApproved: submitIfApprovedOption = true,
-}: UseGaslessPostCommentOptions): UseGalessPostCommentReturnValue {
+}: UseGaslessPostCommentOptions<TExtraSignTypeDataValue>): UseGalessPostCommentReturnValue {
   const { data: walletClient } = useWalletClient();
 
   return useMutation({
-    async mutationFn({ comment, submitIfApproved = submitIfApprovedOption }) {
+    async mutationFn({ comment }) {
       if (!walletClient) {
         throw new Error("Wallet client is not available.");
       }
 
-      const request = CommentInputSchema.parse(comment);
-
       const commentSignatureResponse =
         GaslessCommentSignatureResponseSchema.parse(
-          await fetchSignTypedData(request, submitIfApproved)
+          await fetchSignTypedData({
+            comment: CommentInputSchema.parse(comment),
+          })
         );
 
       if ("txHash" in commentSignatureResponse) {
-        return commentSignatureResponse.txHash;
+        return (
+          commentSignatureResponse as SignGaslessCommentApprovedResponseSchemaType
+        ).txHash;
       }
 
       const authorSignature = await walletClient.signTypedData(
@@ -213,8 +206,11 @@ export function useGaslessPostComment({
 
       return HexSchema.parse(
         await onSignatureComplete({
+          ...commentSignatureResponse,
           authorSignature,
-          signedComment: commentSignatureResponse,
+        } as TExtraSignTypeDataValue & {
+          authorSignature: Hex;
+          signTypedDataArgs: SignTypedDataParameters;
         })
       );
     },
@@ -224,14 +220,16 @@ export function useGaslessPostComment({
 type UseApprovePostingCommentsReturnValue = UseMutationResult<
   Hex,
   Error,
-  AppNotApprovedStatusResponseSchemaType
+  {
+    signTypedDataArgs: SignTypedDataParameters;
+  }
 >;
 
 type UseApprovePostingCommentsOptions = {
-  postApproval: (
-    approval: AppNotApprovedStatusResponseSchemaType,
-    authorSignature: Hex
-  ) => Promise<Hex>;
+  postApproval: (params: {
+    signTypedDataArgs: SignTypedDataParameters;
+    authorSignature: Hex;
+  }) => Promise<Hex>;
 };
 
 /**
@@ -241,11 +239,11 @@ type UseApprovePostingCommentsOptions = {
  *
  * @example
  * ```
- * import { useApproveApp } from '@modprotocol/comments-protocol-sdk/wagmi';
+ * import { useApproveApp } from '@ecp.eth/sdk/wagmi';
  *
  * function Component() {
  *   const { mutate } = useApproveApp({
- *     postApproval: async (approval, authorSignature) => {
+ *     postApproval: async ({ approval, authorSignature }) => {
  *       const response = await fetch('/api/approve-app', {
  *         method: 'POST',
  *         body: JSON.stringify({ approval, authorSignature }),
@@ -274,18 +272,17 @@ export function useApproveApp({
   const { data: walletClient } = useWalletClient();
 
   return useMutation({
-    async mutationFn(approvalStatus) {
+    async mutationFn({ signTypedDataArgs }) {
       if (!walletClient) {
         throw new Error("Wallet client is not available.");
       }
 
-      const approval = AppNotApprovedStatusResponseSchema.parse(approvalStatus);
+      const authorSignature =
+        await walletClient.signTypedData(signTypedDataArgs);
 
-      const authorSignature = await walletClient.signTypedData(
-        approval.signTypedDataArgs
+      return HexSchema.parse(
+        await postApproval({ signTypedDataArgs, authorSignature })
       );
-
-      return HexSchema.parse(await postApproval(approval, authorSignature));
     },
   });
 }
@@ -351,36 +348,29 @@ type UseGaslessDeleteCommentReturnValue = UseMutationResult<
   Error,
   {
     commentId: Hex;
-    /**
-     * Should the app delete the comment immediatelly if user approved the app to act on their behalf?
-     *
-     * @default true
-     */
-    submitIfApproved?: boolean;
   }
 >;
 
-type UseGaslessDeleteCommentOptions = {
+type UseGaslessDeleteCommentOptions<TExtraSignTypeDataValue = {}> = {
   /**
    * Fetches a delete operation signed by app from app's backend.
    */
   fetchSignTypedData: (data: {
     commentId: Hex;
-    submitIfApproved: boolean;
-  }) => Promise<GaslessCommentSignatureResponseSchemaType>;
+  }) => Promise<
+    | Extract<GaslessCommentSignatureResponseSchemaType, { txHash: Hex }>
+    | (Exclude<GaslessCommentSignatureResponseSchemaType, { txHash: Hex }> &
+        TExtraSignTypeDataValue)
+  >;
   /**
    * User signed the delete operation. The app should send the delete operation to the chain.
    */
-  onSignatureComplete: (data: {
-    authorSignature: Hex;
-    request: SignGaslessCommentRequiresSigningResponseSchemaType;
-  }) => Promise<Hex>;
-  /**
-   * If true, the comment will be deleted if user already approved the app to act on their behalf.
-   *
-   * @default true
-   */
-  submitIfApproved?: boolean;
+  onSignatureComplete: (
+    data: TExtraSignTypeDataValue & {
+      authorSignature: Hex;
+      signTypedDataArgs: SignTypedDataParameters;
+    }
+  ) => Promise<Hex>;
 };
 
 /**
@@ -388,14 +378,14 @@ type UseGaslessDeleteCommentOptions = {
  *
  * @example
  * ```
- * import { useGaslessDeleteComment } from '@modprotocol/comments-protocol-sdk/wagmi';
+ * import { useGaslessDeleteComment } from '@ecp.eth/sdk/wagmi';
  *
  * function Component() {
  *   const { mutate } = useGaslessDeleteComment({
- *     fetchSignTypedData: async ({ commentId, submitIfApproved }) => {
+ *     fetchSignTypedData: async ({ commentId }) => {
  *       const response = await fetch('/api/sign-delete-comment', {
  *         method: 'POST',
- *         body: JSON.stringify({ commentId, submitIfApproved }),
+ *         body: JSON.stringify({ commentId }),
  *         headers: {
  *           'Content-Type': 'application/json',
  *         },
@@ -424,15 +414,14 @@ type UseGaslessDeleteCommentOptions = {
  * }
  * ```
  */
-export function useGaslessDeleteComment({
+export function useGaslessDeleteComment<TExtraSignTypeDataValue = {}>({
   fetchSignTypedData,
   onSignatureComplete,
-  submitIfApproved: submitIfApprovedOption = true,
-}: UseGaslessDeleteCommentOptions): UseGaslessDeleteCommentReturnValue {
+}: UseGaslessDeleteCommentOptions<TExtraSignTypeDataValue>): UseGaslessDeleteCommentReturnValue {
   const { data: walletClient } = useWalletClient();
 
   return useMutation({
-    async mutationFn({ commentId, submitIfApproved = submitIfApprovedOption }) {
+    async mutationFn({ commentId }) {
       if (!walletClient) {
         throw new Error("Wallet client is not available.");
       }
@@ -441,12 +430,13 @@ export function useGaslessDeleteComment({
         GaslessCommentSignatureResponseSchema.parse(
           await fetchSignTypedData({
             commentId: HexSchema.parse(commentId),
-            submitIfApproved,
           })
         );
 
       if ("txHash" in preparedOperationResponse) {
-        return preparedOperationResponse.txHash;
+        return (
+          preparedOperationResponse as SignGaslessCommentApprovedResponseSchemaType
+        ).txHash;
       }
 
       const authorSignature = await walletClient.signTypedData(
@@ -455,8 +445,11 @@ export function useGaslessDeleteComment({
 
       return HexSchema.parse(
         await onSignatureComplete({
+          ...preparedOperationResponse,
           authorSignature,
-          request: preparedOperationResponse,
+        } as TExtraSignTypeDataValue & {
+          authorSignature: Hex;
+          signTypedDataArgs: SignTypedDataParameters;
         })
       );
     },

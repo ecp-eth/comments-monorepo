@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useGaslessPostComment } from "@modprotocol/comments-protocol-sdk/wagmi";
+import { useGaslessPostComment } from "@ecp.eth/sdk/wagmi";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import type { Hex } from "@modprotocol/comments-protocol-sdk/types";
+import type { Hex } from "@ecp.eth/sdk/types";
 import {
   postPreparedGaslessComment,
   prepareCommentForGaslessPosting,
@@ -24,16 +24,17 @@ export function CommentBoxGasless({
   const { address } = useAccount();
   const [content, setContent] = useState("");
   const postCommentMutation = useGaslessPostComment({
-    fetchSignTypedData(comment, submitIfApproved) {
+    fetchSignTypedData({ comment }) {
       return prepareCommentForGaslessPosting({
         comment,
-        submitIfApproved,
+        submitIfApproved: true,
       });
     },
-    onSignatureComplete({ authorSignature, signedComment }) {
+    onSignatureComplete({ authorSignature, signTypedDataArgs, appSignature }) {
       return postPreparedGaslessComment({
+        appSignature,
         authorSignature,
-        preparedComment: signedComment,
+        signTypedDataArgs,
       });
     },
   });

@@ -4,8 +4,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useGaslessDeleteComment } from "@modprotocol/comments-protocol-sdk/wagmi";
-import type { Hex } from "@modprotocol/comments-protocol-sdk/types";
+import { useGaslessDeleteComment } from "@ecp.eth/sdk/wagmi";
+import type { Hex } from "@ecp.eth/sdk/types";
 import { formatDate } from "@/lib/utils";
 import { MoreVertical } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -50,10 +50,11 @@ export function CommentGasless({
         commentId,
       });
     },
-    onSignatureComplete({ authorSignature, request }) {
+    onSignatureComplete({ authorSignature, appSignature, signTypedDataArgs }) {
       return performGaslessCommentDeletion({
         authorSignature,
-        request,
+        appSignature,
+        signTypedDataArgs,
       }).then((res) => res.txHash);
     },
   });

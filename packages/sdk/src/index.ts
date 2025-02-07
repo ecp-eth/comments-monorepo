@@ -6,8 +6,6 @@ import { COMMENTS_V1_CONTRACT_ADDRESS } from "./constants.js";
 import {
   AppSignedCommentSchema,
   type AppSignedCommentSchemaType,
-  type AppApprovedStatusResponseSchemaType,
-  AppApprovedStatusResponseSchema,
   HexSchema,
 } from "./schemas.js";
 

@@ -21,17 +21,6 @@ export function CommentSectionGasless() {
   const pageSize = 10;
   const [currentUrl, setCurrentUrl] = useState<string>("");
 
-  const approveAppMutation = useApproveApp({
-    postApproval(approval, authorSignature) {
-      return approvePostingCommentsOnUsersBehalf({
-        authorSignature,
-        statusResponse: approval,
-      });
-    },
-  });
-
-  const removeApprovalMutation = useRemoveApproval();
-
   const getApprovalDataMutation = useMutation({
     mutationFn: async ({ author }: { author: Hex }) => {
       return fetchAppApprovalStatus({
@@ -39,6 +28,25 @@ export function CommentSectionGasless() {
       });
     },
   });
+
+  const approveAppMutation = useApproveApp({
+    postApproval({ signTypedDataArgs, authorSignature }) {
+      if (
+        !getApprovalDataMutation.data ||
+        getApprovalDataMutation.data?.approved
+      ) {
+        throw new Error("Inconsistent state, approval should not be requested");
+      }
+
+      return approvePostingCommentsOnUsersBehalf({
+        authorSignature,
+        signTypedDataArgs,
+        appSignature: getApprovalDataMutation.data.appSignature,
+      });
+    },
+  });
+
+  const removeApprovalMutation = useRemoveApproval();
 
   const approveAppReceipt = useWaitForTransactionReceipt({
     hash: approveAppMutation.data,
@@ -116,7 +124,9 @@ export function CommentSectionGasless() {
                 {
                   onSuccess(approvalSigData) {
                     if (!approvalSigData.approved) {
-                      approveAppMutation.mutate(approvalSigData);
+                      approveAppMutation.mutate({
+                        signTypedDataArgs: approvalSigData.signTypedDataArgs,
+                      });
                     }
                   },
                 }

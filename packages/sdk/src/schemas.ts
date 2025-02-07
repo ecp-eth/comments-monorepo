@@ -75,13 +75,9 @@ export const AppSignedCommentSchema = z.object({
 
 export type AppSignedCommentSchemaType = z.infer<typeof AppSignedCommentSchema>;
 
-export const SignGaslessCommentApprovedResponseSchema = z
-  .object({
-    txHash: HexSchema,
-  })
-  .describe(
-    "User pre approved automatic sending of comments on his behalf. The transaction hash is the hash of the transaction that was sent to the chain"
-  );
+export const SignGaslessCommentApprovedResponseSchema = z.object({
+  txHash: HexSchema,
+});
 
 export type SignGaslessCommentApprovedResponseSchemaType = z.infer<
   typeof SignGaslessCommentApprovedResponseSchema
@@ -92,11 +88,8 @@ export const SignGaslessCommentRequiresSigningResponseSchema = z
     signTypedDataArgs: z.custom<SignTypedDataParameters>(
       (val) => z.any().safeParse(val).success
     ),
-    appSignature: HexSchema,
   })
-  .describe(
-    'User has not pre approved automatic sending of comments on his behalf. Use should sign the "signTypedData".'
-  );
+  .passthrough();
 
 export type SignGaslessCommentRequiresSigningResponseSchemaType = z.infer<
   typeof SignGaslessCommentRequiresSigningResponseSchema
@@ -109,40 +102,4 @@ export const GaslessCommentSignatureResponseSchema = z.union([
 
 export type GaslessCommentSignatureResponseSchemaType = z.infer<
   typeof GaslessCommentSignatureResponseSchema
->;
-
-export const AppNotApprovedStatusResponseSchema = z
-  .object({
-    approved: z.literal(false),
-    signTypedDataArgs: z.custom<SignTypedDataParameters>(
-      (val) => z.any().safeParse(val).success
-    ),
-    appSignature: HexSchema,
-  })
-  .describe(
-    "User has not approved automatic sending of comments on his behalf"
-  );
-
-export type AppNotApprovedStatusResponseSchemaType = z.infer<
-  typeof AppNotApprovedStatusResponseSchema
->;
-
-export const AppApprovedStatusResponseSchema = z
-  .object({
-    approved: z.literal(true),
-    appSigner: HexSchema,
-  })
-  .describe("User has approved automatic sending of comments on his behalf");
-
-export type AppApprovedStatusResponseSchemaType = z.infer<
-  typeof AppApprovedStatusResponseSchema
->;
-
-export const AppApprovalStatusResponseSchema = z.discriminatedUnion(
-  "approved",
-  [AppApprovedStatusResponseSchema, AppNotApprovedStatusResponseSchema]
-);
-
-export type AppApprovalStatusResponseSchemaType = z.infer<
-  typeof AppApprovalStatusResponseSchema
 >;

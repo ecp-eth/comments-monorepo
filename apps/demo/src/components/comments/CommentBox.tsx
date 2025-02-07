@@ -22,7 +22,7 @@ export function CommentBox({
   const { address } = useAccount();
   const [content, setContent] = useState("");
   const postCommentMutation = usePostCommentAsAuthor({
-    fetchSignTypedData(comment) {
+    fetchSignTypedData({ comment }) {
       return signCommentForPostingAsAuthor({ comment, chainId: chains[0].id });
     },
   });

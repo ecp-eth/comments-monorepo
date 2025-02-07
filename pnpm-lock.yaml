@@ -28,7 +28,7 @@ importers:
     dependencies:
       '@ecp.eth/sdk':
         specifier: workspace:*
-        version: link:../../packages/comments-protocol-sdk
+        version: link:../../packages/sdk
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.5
         version: 2.1.6(@types/react-dom@19.0.3(@types/react@19.0.8))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -116,7 +116,7 @@ importers:
     dependencies:
       '@ecp.eth/sdk':
         specifier: workspace:*
-        version: link:../../packages/comments-protocol-sdk
+        version: link:../../packages/sdk
       hono:
         specifier: ^4.5.0
         version: 4.6.20
@@ -142,37 +142,6 @@ importers:
       forge-std:
         specifier: github:foundry-rs/forge-std#v1.8.1
         version: https://codeload.github.com/foundry-rs/forge-std/tar.gz/bb4ceea94d6f10eeb5b41dc2391c6c8bf8e734ef
-
-  packages/comments-protocol-sdk:
-    dependencies:
-      effect:
-        specifier: ^3.12.9
-        version: 3.12.9
-    devDependencies:
-      '@ecp.eth/eslint-config':
-        specifier: workspace:*
-        version: link:../eslint-config
-      '@ecp.eth/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      '@tanstack/react-query':
-        specifier: '>=5.0.0'
-        version: 5.66.0(react@19.0.0)
-      '@types/react':
-        specifier: ^19.0.8
-        version: 19.0.8
-      react:
-        specifier: ^19.0.0
-        version: 19.0.0
-      viem:
-        specifier: ^2.22.21
-        version: 2.22.21(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
-      wagmi:
-        specifier: ^2.14.9
-        version: 2.14.9(@tanstack/query-core@5.66.0)(@tanstack/react-query@5.66.0(react@19.0.0))(@types/react@19.0.8)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.7.3)(utf-8-validate@5.0.10)(viem@2.22.21(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(zod@3.24.1)
-      zod:
-        specifier: ^3.24.1
-        version: 3.24.1
 
   packages/eslint-config:
     devDependencies:
@@ -209,6 +178,37 @@ importers:
       typescript-eslint:
         specifier: ^8.22.0
         version: 8.22.0(eslint@9.19.0(jiti@1.21.7))(typescript@5.7.3)
+
+  packages/sdk:
+    dependencies:
+      effect:
+        specifier: ^3.12.9
+        version: 3.12.9
+    devDependencies:
+      '@ecp.eth/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@ecp.eth/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@tanstack/react-query':
+        specifier: '>=5.0.0'
+        version: 5.66.0(react@19.0.0)
+      '@types/react':
+        specifier: ^19.0.8
+        version: 19.0.8
+      react:
+        specifier: ^19.0.0
+        version: 19.0.0
+      viem:
+        specifier: ^2.22.21
+        version: 2.22.21(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      wagmi:
+        specifier: ^2.14.9
+        version: 2.14.9(@tanstack/query-core@5.66.0)(@tanstack/react-query@5.66.0(react@19.0.0))(@types/react@19.0.8)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.7.3)(utf-8-validate@5.0.10)(viem@2.22.21(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(zod@3.24.1)
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
 
   packages/typescript-config: {}
 

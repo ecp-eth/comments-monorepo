@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { CommentData } from "./types";
-import { COMMENTS_V1_CONTRACT_ADDRESS } from "@modprotocol/comments-protocol-sdk";
+import { COMMENTS_V1_CONTRACT_ADDRESS } from "@ecp.eth/sdk";
 import {
   DOMAIN_NAME,
   DOMAIN_VERSION,
@@ -10,8 +10,8 @@ import {
   DELETE_COMMENT_TYPE,
 } from "./eip712";
 import { Chain, createPublicClient, http, Transport } from "viem";
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import type { Hex } from "@ecp.eth/sdk/abis/types";
+import { CommentsV1Abi } from "../../../../packages/sdk/dist/abis";
+import type { Hex } from "@ecp.eth/sdk/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

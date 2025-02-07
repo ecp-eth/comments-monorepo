@@ -1,5 +1,5 @@
 ---
-"@modprotocol/comments-protocol-sdk": patch
+"@ecp.eth/sdk": patch
 ---
 
 feat: new helpers for gasless comment deletion

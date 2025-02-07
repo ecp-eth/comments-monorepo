@@ -1,5 +1,5 @@
 ---
-"@modprotocol/comments-protocol-sdk": patch
+"@ecp.eth/sdk/abis": patch
 ---
 
 feat: expose contract address from package

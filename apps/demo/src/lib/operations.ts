@@ -1,23 +1,15 @@
-import type {
-  CommentData,
-  Hex,
-} from "@modprotocol/comments-protocol-sdk/types";
+import type { CommentData, Hex } from "@ecp.eth/sdk/types";
 import {
   HexSchema,
   type CommentInputSchemaType,
   CommentInputSchema,
   type SignCommentByAppRequestSchemaType,
-  type GaslessCommentSignatureResponseSchemaType,
-  GaslessCommentSignatureResponseSchema,
   SignGaslessCommentApprovedResponseSchema,
   type SignGaslessCommentApprovedResponseSchemaType,
-  type SignGaslessCommentRequiresSigningResponseSchemaType,
-  AppNotApprovedStatusResponseSchemaType,
-  AppApprovalStatusResponseSchemaType,
-  AppApprovalStatusResponseSchema,
-} from "@modprotocol/comments-protocol-sdk/schemas";
+} from "@ecp.eth/sdk/schemas";
 import { Effect } from "effect";
 import { z } from "zod";
+import { SignTypedDataParameters } from "viem";
 
 type SignCommentResponse = {
   chainId: number;
@@ -70,6 +62,22 @@ export async function signCommentForPostingAsAuthor({
   return Effect.runPromise(repeatableTask);
 }
 
+const GaslessCommentOperationSchema = z.union([
+  z.object({
+    txHash: HexSchema,
+  }),
+  z.object({
+    signTypedDataArgs: z.custom<SignTypedDataParameters>(
+      (val) => z.any().safeParse(val).success
+    ),
+    appSignature: HexSchema,
+  }),
+]);
+
+type GaslessCommentOperationSchemaType = z.infer<
+  typeof GaslessCommentOperationSchema
+>;
+
 type PrepareCommentForGaslessPostingOptions = {
   comment: CommentInputSchemaType;
   submitIfApproved: boolean;
@@ -85,7 +93,7 @@ export async function prepareCommentForGaslessPosting({
   comment,
   submitIfApproved,
   retries = 3,
-}: PrepareCommentForGaslessPostingOptions): Promise<GaslessCommentSignatureResponseSchemaType> {
+}: PrepareCommentForGaslessPostingOptions): Promise<GaslessCommentOperationSchemaType> {
   const prepareCommentTask = Effect.tryPromise(async () => {
     const data = CommentInputSchema.parse(comment);
     const response = await fetch("/api/sign-comment/gasless/prepare", {
@@ -103,7 +111,7 @@ export async function prepareCommentForGaslessPosting({
       throw new Error(`Failed to sign comment: ${response.statusText}`);
     }
 
-    return GaslessCommentSignatureResponseSchema.parse(await response.json());
+    return GaslessCommentOperationSchema.parse(await response.json());
   });
 
   const repeatableTask = Effect.retry(prepareCommentTask, {
@@ -115,7 +123,8 @@ export async function prepareCommentForGaslessPosting({
 
 type PostPreparedGaslessCommentOptions = {
   authorSignature: Hex;
-  preparedComment: SignGaslessCommentRequiresSigningResponseSchemaType;
+  appSignature: Hex;
+  signTypedDataArgs: SignTypedDataParameters;
   /**
    * Number of times to retry the signing operation in case of failure.
    *
@@ -126,7 +135,8 @@ type PostPreparedGaslessCommentOptions = {
 
 export function postPreparedGaslessComment({
   authorSignature,
-  preparedComment,
+  appSignature,
+  signTypedDataArgs,
   retries = 3,
 }: PostPreparedGaslessCommentOptions): Promise<Hex> {
   const postCommentTask = Effect.tryPromise(async () => {
@@ -136,8 +146,8 @@ export function postPreparedGaslessComment({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        commentData: preparedComment.signTypedDataArgs.message,
-        appSignature: preparedComment.appSignature,
+        commentData: signTypedDataArgs.message,
+        appSignature,
         authorSignature: authorSignature,
       }),
     });
@@ -163,7 +173,8 @@ export function postPreparedGaslessComment({
 }
 
 type ApprovePostingCommentsOnUsersBehalfOptions = {
-  statusResponse: AppNotApprovedStatusResponseSchemaType;
+  signTypedDataArgs: SignTypedDataParameters;
+  appSignature: Hex;
   authorSignature: Hex;
   /**
    * Number of times to retry the signing operation in case of failure.
@@ -174,7 +185,8 @@ type ApprovePostingCommentsOnUsersBehalfOptions = {
 };
 
 export async function approvePostingCommentsOnUsersBehalf({
-  statusResponse,
+  signTypedDataArgs,
+  appSignature,
   authorSignature,
   retries = 3,
 }: ApprovePostingCommentsOnUsersBehalfOptions): Promise<Hex> {
@@ -185,8 +197,8 @@ export async function approvePostingCommentsOnUsersBehalf({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        signTypedDataArgs: statusResponse.signTypedDataArgs,
-        appSignature: statusResponse.appSignature,
+        signTypedDataArgs,
+        appSignature,
         authorSignature,
       }),
     });
@@ -235,7 +247,7 @@ export async function prepareCommentForGaslessDeletion({
   commentId,
   submitIfApproved = true,
   retries = 3,
-}: PrepareCommentForGaslessDeletionOptions): Promise<GaslessCommentSignatureResponseSchemaType> {
+}: PrepareCommentForGaslessDeletionOptions): Promise<GaslessCommentOperationSchemaType> {
   const prepareCommentForDeletionTask = Effect.tryPromise(async () => {
     const response = await fetch("/api/delete-comment/prepare", {
       method: "POST",
@@ -253,7 +265,7 @@ export async function prepareCommentForGaslessDeletion({
       throw new Error(`Failed to sign comment: ${response.statusText}`);
     }
 
-    return GaslessCommentSignatureResponseSchema.parse(await response.json());
+    return GaslessCommentOperationSchema.parse(await response.json());
   });
 
   const repeatableTask = Effect.retry(prepareCommentForDeletionTask, {
@@ -264,7 +276,8 @@ export async function prepareCommentForGaslessDeletion({
 }
 
 type PerformGalessCommentDeletionOptions = {
-  request: SignGaslessCommentRequiresSigningResponseSchemaType;
+  appSignature: Hex;
+  signTypedDataArgs: SignTypedDataParameters;
   authorSignature: Hex;
   /**
    * Number of times to retry the signing operation in case of failure.
@@ -276,7 +289,8 @@ type PerformGalessCommentDeletionOptions = {
 
 export async function performGaslessCommentDeletion({
   authorSignature,
-  request,
+  appSignature,
+  signTypedDataArgs,
   retries = 3,
 }: PerformGalessCommentDeletionOptions): Promise<SignGaslessCommentApprovedResponseSchemaType> {
   const deleteCommentTask = Effect.tryPromise(async () => {
@@ -286,8 +300,9 @@ export async function performGaslessCommentDeletion({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        ...request,
+        appSignature,
         authorSignature,
+        signTypedDataArgs,
       }),
     });
 
@@ -308,6 +323,24 @@ export async function performGaslessCommentDeletion({
 
   return Effect.runPromise(repeatableTask);
 }
+
+const AppApprovalStatusResponseSchema = z.discriminatedUnion("approved", [
+  z.object({
+    approved: z.literal(true),
+    appSigner: HexSchema,
+  }),
+  z.object({
+    approved: z.literal(false),
+    signTypedDataArgs: z.custom<SignTypedDataParameters>(
+      (val) => z.any().safeParse(val).success
+    ),
+    appSignature: HexSchema,
+  }),
+]);
+
+export type AppApprovalStatusResponseSchemaType = z.infer<
+  typeof AppApprovalStatusResponseSchema
+>;
 
 type FetchAppApprovalStatusOptions = {
   /**
