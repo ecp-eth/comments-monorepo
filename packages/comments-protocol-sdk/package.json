@@ -6,6 +6,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./abis": "./dist/abis.js",
+    "./schemas": "./dist/schemas.js",
     "./wagmi": "./dist/wagmi.js",
     "./types": "./dist/types.js"
   },
@@ -19,12 +20,21 @@
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",
     "@ecp.eth/typescript-config": "workspace:*",
-    "@types/react": "^19.0.8"
-  },
-  "dependencies": {
-    "effect": "^3.12.9",
+    "@types/react": "^19.0.8",
+    "@tanstack/react-query": ">=5.0.0",
     "react": "^19.0.0",
     "viem": "^2.22.21",
-    "wagmi": "^2.14.9"
+    "wagmi": "^2.14.9",
+    "zod": "^3.24.1"
+  },
+  "dependencies": {
+    "effect": "^3.12.9"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": ">=5.0.0",
+    "react": "18 || 19",
+    "viem": "^2.22.21",
+    "wagmi": "^2.14.9",
+    "zod": "^3.24.1"
   }
 }

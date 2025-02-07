@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { usePostCommentAsAuthor } from "@ecp.eth/sdk/abis";
-import type { Hex, SignCommentRequest } from "@ecp.eth/sdk/types";
-import { chains } from "../../lib/wagmi";
+import { usePostCommentAsAuthor } from "@ecp.eth/sdk/wagmi";
+import type { Hex } from "@ecp.eth/sdk/types";
 import { toast } from "sonner";
+import { signCommentForPostingAsAuthor } from "@/lib/operations";
+import { chains } from "@/lib/wagmi";
 
 interface CommentBoxProps {
   onSubmit: (content: string) => void;
@@ -21,15 +21,9 @@ export function CommentBox({
 }: CommentBoxProps) {
   const { address } = useAccount();
   const [content, setContent] = useState("");
-  const { postComment } = usePostCommentAsAuthor({
-    // Replace with your desired chain ID
-    chainId: chains[0].id,
-    commentsApiUrl: process.env.NEXT_PUBLIC_URL!,
-  });
-
-  const postCommentMutation = useMutation({
-    mutationFn: async (comment: SignCommentRequest) => {
-      return postComment(comment);
+  const postCommentMutation = usePostCommentAsAuthor({
+    fetchCommentSignature(comment) {
+      return signCommentForPostingAsAuthor({ comment, chainId: chains[0].id });
     },
   });
 
@@ -50,10 +44,12 @@ export function CommentBox({
 
     try {
       postCommentMutation.mutate({
-        content,
-        targetUri: window.location.href,
-        parentId,
-        author: address as `0x${string}`,
+        comment: {
+          author: address as `0x${string}`,
+          content,
+          targetUri: window.location.href,
+          parentId,
+        },
       });
     } catch (error) {
       console.error("Error signing comment:", error);

@@ -1,8 +1,7 @@
 "use client";
 
-import { fetchComments, fetchAppApprovalStatus } from "@ecp.eth/sdk";
 import { useApproveApp, useRejectApp } from "@ecp.eth/sdk/wagmi";
-import type { Hex, AppApprovalStatusResponse } from "@ecp.eth/sdk/types";
+import type { Hex } from "@ecp.eth/sdk/types";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
@@ -10,14 +9,11 @@ import { useEffect, useState } from "react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
 import { CommentGasless } from "./CommentGasless";
-
-interface CommentData {
-  id: string;
-  content: string;
-  author: string;
-  timestamp: number;
-  replies: CommentData[];
-}
+import {
+  approvePostingCommentsOnUsersBehalf,
+  fetchAppApprovalStatus,
+  fetchComments,
+} from "@/lib/operations";
 
 export function CommentSectionGasless() {
   const { address } = useAccount();
@@ -25,30 +21,22 @@ export function CommentSectionGasless() {
   const pageSize = 10;
   const [currentUrl, setCurrentUrl] = useState<string>("");
 
-  const { approve: approveApp } = useApproveApp({
-    commentsApiUrl: process.env.NEXT_PUBLIC_URL!,
-  });
-
-  const { reject: rejectAppApproval } = useRejectApp();
-
-  const getApprovalDataMutation = useMutation({
-    mutationFn: async ({ author }: { author: Hex }) => {
-      return fetchAppApprovalStatus({
-        apiUrl: process.env.NEXT_PUBLIC_URL!,
-        author,
+  const approveAppMutation = useApproveApp({
+    postApproval(approval, authorSignature) {
+      return approvePostingCommentsOnUsersBehalf({
+        authorSignature,
+        statusResponse: approval,
       });
     },
   });
 
-  const approveAppMutation = useMutation({
-    mutationFn: async (request: AppApprovalStatusResponse) => {
-      return approveApp(request);
-    },
-  });
+  const rejectApprovalMutation = useRejectApp();
 
-  const rejectApprovalMutation = useMutation({
-    mutationFn: async (approval: AppApprovalStatusResponse) => {
-      return rejectAppApproval(approval);
+  const getApprovalDataMutation = useMutation({
+    mutationFn: async ({ author }: { author: Hex }) => {
+      return fetchAppApprovalStatus({
+        author,
+      });
     },
   });
 
@@ -64,32 +52,13 @@ export function CommentSectionGasless() {
     queryKey: ["comments", currentUrl, page],
     queryFn: async () => {
       return fetchComments({
-        apiUrl: process.env.NEXT_PUBLIC_URL!,
-        targetUrl: currentUrl,
+        targetUri: currentUrl,
         limit: pageSize,
         offset: page * pageSize,
       });
     },
     enabled: !!currentUrl,
   });
-
-  const addReply = (
-    comments: CommentData[],
-    parentId: string,
-    newReply: CommentData
-  ): CommentData[] => {
-    return comments.map((comment) => {
-      if (comment.id === parentId) {
-        return { ...comment, replies: [...comment.replies, newReply] };
-      } else if (comment.replies.length > 0) {
-        return {
-          ...comment,
-          replies: addReply(comment.replies, parentId, newReply),
-        };
-      }
-      return comment;
-    });
-  };
 
   useEffect(() => {
     if (
@@ -133,7 +102,7 @@ export function CommentSectionGasless() {
     <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
       <h2 className="text-lg font-semibold">Comments</h2>
 
-      {!!approvalStatus && !approvalStatus.approved ? (
+      {!!approvalStatus && !approvalStatus.approved && (
         <div className="mb-4">
           <Button
             onClick={() => {
@@ -146,7 +115,9 @@ export function CommentSectionGasless() {
                 },
                 {
                   onSuccess(approvalSigData) {
-                    approveAppMutation.mutate(approvalSigData);
+                    if (!approvalSigData.approved) {
+                      approveAppMutation.mutate(approvalSigData);
+                    }
                   },
                 }
               );
@@ -159,27 +130,26 @@ export function CommentSectionGasless() {
               : "Request Approval to Comment"}
           </Button>
         </div>
-      ) : (
-        !!approvalStatus &&
-        approvalStatus.approved && (
-          <div className="flex items-center gap-2">
-            <div className="text-sm text-gray-500">
-              App has approval to post on your behalf.
-            </div>
-            <Button
-              variant="outline"
-              disabled={isRemovingApproval}
-              onClick={() => {
-                rejectApprovalMutation.mutate(approvalStatus);
-              }}
-            >
-              <X />
-              <span>
-                {isRemovingApproval ? "Removing..." : "Remove Approval"}
-              </span>
-            </Button>
+      )}
+
+      {!!approvalStatus && approvalStatus.approved && (
+        <div className="flex items-center gap-2">
+          <div className="text-sm text-gray-500">
+            App has approval to post on your behalf.
           </div>
-        )
+          <Button
+            variant="outline"
+            disabled={isRemovingApproval}
+            onClick={() => {
+              rejectApprovalMutation.mutate(approvalStatus);
+            }}
+          >
+            <X />
+            <span>
+              {isRemovingApproval ? "Removing..." : "Remove Approval"}
+            </span>
+          </Button>
+        </div>
       )}
 
       <CommentBoxGasless onSubmit={() => refetch()} />

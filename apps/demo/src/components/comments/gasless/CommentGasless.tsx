@@ -7,12 +7,15 @@ import {
 import { useGaslessDeleteComment } from "@modprotocol/comments-protocol-sdk/wagmi";
 import type { Hex } from "@modprotocol/comments-protocol-sdk/types";
 import { formatDate } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
 import { MoreVertical } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAddress } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
+import {
+  performGaslessCommentDeletion,
+  prepareCommentForGaslessDeletion,
+} from "@/lib/operations";
 
 interface CommentProps {
   id: Hex;
@@ -36,20 +39,29 @@ export function CommentGasless({
   const { address } = useAccount();
 
   const [isReplying, setIsReplying] = useState(false);
-  const { deleteComment } = useGaslessDeleteComment({
-    commentsApiUrl: process.env.NEXT_PUBLIC_URL!,
+  const deleteCommentMutation = useGaslessDeleteComment({
+    fetchSignedComment({ commentId }) {
+      if (!address) {
+        throw new Error("User is not signed in");
+      }
+
+      return prepareCommentForGaslessDeletion({
+        author: address as Hex,
+        commentId,
+      });
+    },
+    deleteComment({ authorSignature, request }) {
+      return performGaslessCommentDeletion({
+        authorSignature,
+        request,
+      }).then((res) => res.txHash);
+    },
   });
 
   const handleReply = (replyContent: string) => {
     onReply?.(id, replyContent);
     setIsReplying(false);
   };
-
-  const deleteCommentMutation = useMutation({
-    mutationFn: async (commentId: Hex) => {
-      return deleteComment(commentId);
-    },
-  });
 
   const { data: receipt, isLoading: isReceiptLoading } =
     useWaitForTransactionReceipt({
@@ -81,7 +93,7 @@ export function CommentGasless({
               <DropdownMenuItem
                 className="text-red-600 cursor-pointer"
                 onClick={() => {
-                  deleteCommentMutation.mutate(id);
+                  deleteCommentMutation.mutate({ commentId: id });
                 }}
                 disabled={isDeleting}
               >

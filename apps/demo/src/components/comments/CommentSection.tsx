@@ -1,18 +1,10 @@
 "use client";
 
-import { fetchComments } from "@modprotocol/comments-protocol-sdk";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Comment } from "./Comment";
 import { CommentBox } from "./CommentBox";
-
-interface CommentData {
-  id: string;
-  content: string;
-  author: string;
-  timestamp: number;
-  replies: CommentData[];
-}
+import { fetchComments } from "@/lib/operations";
 
 export function CommentSection() {
   const [page, setPage] = useState(0);
@@ -27,32 +19,13 @@ export function CommentSection() {
     queryKey: ["comments", currentUrl, page],
     queryFn: async () => {
       return fetchComments({
-        apiUrl: process.env.NEXT_PUBLIC_URL!,
-        targetUrl: currentUrl,
+        targetUri: currentUrl,
         offset: page * pageSize,
         limit: pageSize,
       });
     },
     enabled: !!currentUrl,
   });
-
-  const addReply = (
-    comments: CommentData[],
-    parentId: string,
-    newReply: CommentData
-  ): CommentData[] => {
-    return comments.map((comment) => {
-      if (comment.id === parentId) {
-        return { ...comment, replies: [...comment.replies, newReply] };
-      } else if (comment.replies.length > 0) {
-        return {
-          ...comment,
-          replies: addReply(comment.replies, parentId, newReply),
-        };
-      }
-      return comment;
-    });
-  };
 
   if (isLoading) return <div>Loading comments...</div>;
   if (error)

@@ -1,15 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { chains } from "@/lib/wagmi";
-import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useGaslessPostComment } from "@modprotocol/comments-protocol-sdk/wagmi";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import type {
-  Hex,
-  SignCommentRequest,
-} from "@modprotocol/comments-protocol-sdk/types";
+import type { Hex } from "@modprotocol/comments-protocol-sdk/types";
+import {
+  postPreparedGaslessComment,
+  prepareCommentForGaslessPosting,
+} from "@/lib/operations";
 
 interface CommentBoxProps {
   onSubmit: (content: string) => void;
@@ -24,15 +23,18 @@ export function CommentBoxGasless({
 }: CommentBoxProps) {
   const { address } = useAccount();
   const [content, setContent] = useState("");
-  const { postComment } = useGaslessPostComment({
-    // Replace with your desired chain ID
-    chainId: chains[0].id,
-    commentsApiUrl: process.env.NEXT_PUBLIC_URL!,
-  });
-
-  const postCommentMutation = useMutation({
-    mutationFn: async (comment: SignCommentRequest) => {
-      return postComment(comment);
+  const postCommentMutation = useGaslessPostComment({
+    fetchCommentSignature(comment, submitIfApproved) {
+      return prepareCommentForGaslessPosting({
+        comment,
+        submitIfApproved,
+      });
+    },
+    postSignedComment({ authorSignature, signedComment }) {
+      return postPreparedGaslessComment({
+        authorSignature,
+        preparedComment: signedComment,
+      });
     },
   });
 
@@ -47,10 +49,12 @@ export function CommentBoxGasless({
 
     try {
       postCommentMutation.mutate({
-        content,
-        targetUrl: window.location.href,
-        parentId,
-        author: address,
+        comment: {
+          content,
+          targetUri: window.location.href,
+          parentId,
+          author: address,
+        },
       });
     } catch (error) {
       console.error("Error signing comment:", error);

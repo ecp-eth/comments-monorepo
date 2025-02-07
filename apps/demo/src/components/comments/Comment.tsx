@@ -12,8 +12,6 @@ import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { useDeleteCommentAsAuthor } from "@ecp.eth/sdk/wagmi";
 import type { Hex } from "@ecp.eth/sdk/types";
 import { getAddress } from "viem";
-import { chains } from "@/lib/wagmi";
-import { useMutation } from "@tanstack/react-query";
 
 interface CommentProps {
   id: Hex;
@@ -35,15 +33,7 @@ export function Comment({
   onDelete,
 }: CommentProps) {
   const { address: connectedAddress } = useAccount();
-  const { deleteComment } = useDeleteCommentAsAuthor({
-    chainId: chains[0].id,
-  });
-
-  const deleteCommentMutation = useMutation({
-    mutationFn(commentId: Hex) {
-      return deleteComment(commentId);
-    },
-  });
+  const deleteCommentMutation = useDeleteCommentAsAuthor();
 
   const [isReplying, setIsReplying] = useState(false);
 
@@ -62,7 +52,7 @@ export function Comment({
     if (deleteTxReceipt?.status === "success") {
       onDelete?.(id);
     }
-  }, [deleteTxReceipt]);
+  }, [deleteTxReceipt, onDelete, id]);
 
   const isAuthor = connectedAddress
     ? getAddress(connectedAddress) === getAddress(author)
