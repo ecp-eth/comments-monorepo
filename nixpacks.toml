@@ -1,0 +1,2 @@
+[phases.setup]
+	nixpkgsArchive = '51ad838b03a05b1de6f9f2a0fffecee64a9788ee' # node LTS 22.13.1 - https://github.com/NixOS/nixpkgs/commit/51ad838b03a05b1de6f9f2a0fffecee64a9788ee
