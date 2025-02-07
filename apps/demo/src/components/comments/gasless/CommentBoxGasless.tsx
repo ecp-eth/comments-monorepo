@@ -30,7 +30,7 @@ export function CommentBoxGasless({
         submitIfApproved,
       });
     },
-    postSignedComment({ authorSignature, signedComment }) {
+    onSignatureComplete({ authorSignature, signedComment }) {
       return postPreparedGaslessComment({
         authorSignature,
         preparedComment: signedComment,

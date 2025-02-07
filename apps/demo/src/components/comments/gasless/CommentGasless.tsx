@@ -50,7 +50,7 @@ export function CommentGasless({
         commentId,
       });
     },
-    deleteComment({ authorSignature, request }) {
+    onSignatureComplete({ authorSignature, request }) {
       return performGaslessCommentDeletion({
         authorSignature,
         request,

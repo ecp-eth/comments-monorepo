@@ -174,7 +174,7 @@ type UseGaslessPostCommentOptions = {
   /**
    * Function is called if user didn't approve the app to act on their behalf.
    */
-  postSignedComment: (signedComment: {
+  onSignatureComplete: (signedComment: {
     authorSignature: Hex;
     signedComment: SignGaslessCommentRequiresSigningResponseSchemaType;
   }) => Promise<Hex>;
@@ -185,7 +185,7 @@ type UseGaslessPostCommentOptions = {
  */
 export function useGaslessPostComment({
   fetchSignTypedData,
-  postSignedComment,
+  onSignatureComplete,
   submitIfApproved: submitIfApprovedOption = true,
 }: UseGaslessPostCommentOptions): UseGalessPostCommentReturnValue {
   const { data: walletClient } = useWalletClient();
@@ -212,7 +212,7 @@ export function useGaslessPostComment({
       );
 
       return HexSchema.parse(
-        await postSignedComment({
+        await onSignatureComplete({
           authorSignature,
           signedComment: commentSignatureResponse,
         })
@@ -371,7 +371,7 @@ type UseGaslessDeleteCommentOptions = {
   /**
    * User signed the delete operation. The app should send the delete operation to the chain.
    */
-  deleteComment: (data: {
+  onSignatureComplete: (data: {
     authorSignature: Hex;
     request: SignGaslessCommentRequiresSigningResponseSchemaType;
   }) => Promise<Hex>;
@@ -403,7 +403,7 @@ type UseGaslessDeleteCommentOptions = {
  *
  *       return response.json();
  *     },
- *     deleteComment: async ({ authorSignature, request }) => {
+ *     onSignatureComplete: async ({ authorSignature, request }) => {
  *       const response = await fetch('/api/delete-comment', {
  *         method: 'POST',
  *         body: JSON.stringify({ authorSignature, request }),
@@ -426,7 +426,7 @@ type UseGaslessDeleteCommentOptions = {
  */
 export function useGaslessDeleteComment({
   fetchSignTypedData,
-  deleteComment,
+  onSignatureComplete,
   submitIfApproved: submitIfApprovedOption = true,
 }: UseGaslessDeleteCommentOptions): UseGaslessDeleteCommentReturnValue {
   const { data: walletClient } = useWalletClient();
@@ -454,7 +454,7 @@ export function useGaslessDeleteComment({
       );
 
       return HexSchema.parse(
-        await deleteComment({
+        await onSignatureComplete({
           authorSignature,
           request: preparedOperationResponse,
         })
