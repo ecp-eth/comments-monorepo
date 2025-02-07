@@ -6,7 +6,7 @@ import { format } from "prettier";
 const currentDir = import.meta.dirname;
 const outputAbiPath = resolve(
   currentDir,
-  "../../packages/comments-protocol-sdk/src/abis.ts"
+  "../../packages/sdk/src/abis.ts"
 );
 
 const abi = execFileSync(

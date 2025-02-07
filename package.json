@@ -1,5 +1,5 @@
 {
-  "name": "comments-sdk",
+  "name": "@ecp.eth/monorepo",
   "private": true,
   "scripts": {
     "check-types": "turbo run check-types",

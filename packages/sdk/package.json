@@ -1,5 +1,5 @@
 {
-  "name": "@modprotocol/comments-protocol-sdk",
+  "name": "@ecp.eth/sdk",
   "version": "0.0.2",
   "type": "module",
   "license": "MIT",

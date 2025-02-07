@@ -1,5 +1,5 @@
 {
-  "name": "@modprotocol/comments-indexer",
+  "name": "@ecp.eth/indexer",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@modprotocol/comments-protocol-sdk": "workspace:*",
+    "@ecp.eth/sdk": "workspace:*",
     "hono": "^4.5.0",
     "normalize-url": "^8.0.1",
     "ponder": "^0.9.1",

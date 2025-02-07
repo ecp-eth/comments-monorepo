@@ -1,4 +1,4 @@
-import { CommentsV1Abi } from "@modprotocol/comments-protocol-sdk/abis";
+import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
 import { bigintReplacer, createApprovalSignTypedDataArgs } from "@/lib/utils";
 import {

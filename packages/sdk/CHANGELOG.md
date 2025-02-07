@@ -1,4 +1,4 @@
-# @modprotocol/comments-protocol-sdk
+# @ecp.eth/sdk
 
 ## 0.0.2
 

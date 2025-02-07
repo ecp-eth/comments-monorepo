@@ -1,6 +1,6 @@
 import { createConfig } from "ponder";
 import { http, Transport } from "viem";
-import { CommentsV1Abi } from "@modprotocol/comments-protocol-sdk/abis";
+import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 
 const networks = Object.entries(process.env).reduce(
   (acc, [key, value]) => {

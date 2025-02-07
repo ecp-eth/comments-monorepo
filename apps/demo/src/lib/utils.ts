@@ -10,7 +10,7 @@ import {
   DELETE_COMMENT_TYPE,
 } from "./eip712";
 import { Chain, createPublicClient, http, Transport } from "viem";
-import { CommentsV1Abi } from "@modprotocol/comments-protocol-sdk/abis";
+import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

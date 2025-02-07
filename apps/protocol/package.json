@@ -1,5 +1,5 @@
 {
-  "name": "@modprotocol/comments-protocol",
+  "name": "@ecp.eth/protocol",
   "version": "1.0.0",
   "private": true,
   "type": "module",

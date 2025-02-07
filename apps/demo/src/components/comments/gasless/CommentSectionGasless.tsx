@@ -1,6 +1,6 @@
 "use client";
 
-import { CommentsV1Abi } from "@modprotocol/comments-protocol-sdk/abis";
+import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { Button } from "@/components/ui/button";
 import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
 import { CommentsResponse } from "@/lib/types";

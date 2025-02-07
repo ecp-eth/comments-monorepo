@@ -26,9 +26,9 @@ importers:
 
   apps/demo:
     dependencies:
-      '@modprotocol/comments-protocol-sdk':
+      '@ecp.eth/sdk':
         specifier: workspace:*
-        version: link:../../packages/comments-protocol-sdk
+        version: link:../../packages/sdk
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.5
         version: 2.1.6(@types/react-dom@19.0.3(@types/react@19.0.8))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -108,9 +108,9 @@ importers:
 
   apps/indexer:
     dependencies:
-      '@modprotocol/comments-protocol-sdk':
+      '@ecp.eth/sdk':
         specifier: workspace:*
-        version: link:../../packages/comments-protocol-sdk
+        version: link:../../packages/sdk
       hono:
         specifier: ^4.5.0
         version: 4.6.20
@@ -137,7 +137,7 @@ importers:
         specifier: github:foundry-rs/forge-std#v1.8.1
         version: https://codeload.github.com/foundry-rs/forge-std/tar.gz/bb4ceea94d6f10eeb5b41dc2391c6c8bf8e734ef
 
-  packages/comments-protocol-sdk:
+  packages/sdk:
     dependencies:
       effect:
         specifier: ^3.12.9
