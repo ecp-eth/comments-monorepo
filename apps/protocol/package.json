@@ -6,8 +6,7 @@
   "scripts": {
     "build:abi": "node ./build-abi.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "node": "anvil --block-time 2",
-    "dev": "forge script script/Dev.s.sol:DevScript --rpc-url http://localhost:8545 --broadcast",
+    "dev": "node dev.js",
     "deploy": "forge script script/CommentsV1.s.sol:CommentsV1Script --verify --broadcast"
   },
   "dependencies": {
