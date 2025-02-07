@@ -24,7 +24,7 @@ export function CommentBoxGasless({
   const { address } = useAccount();
   const [content, setContent] = useState("");
   const postCommentMutation = useGaslessPostComment({
-    fetchCommentSignature(comment, submitIfApproved) {
+    fetchSignTypedData(comment, submitIfApproved) {
       return prepareCommentForGaslessPosting({
         comment,
         submitIfApproved,

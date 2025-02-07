@@ -33,7 +33,7 @@ type UsePostCommentAsAuthorOptions = {
    *
    * This signature is then used to post the comment on-chain using the user's wallet.
    */
-  fetchCommentSignature: (
+  fetchSignTypedData: (
     comment: SignCommentByAppRequestSchemaType
   ) => Promise<AppSignedCommentSchemaType>;
 };
@@ -47,7 +47,7 @@ type UsePostCommentAsAuthorOptions = {
  *
  * function Component() {
  *   const { mutate } = usePostCommentAsAuthor({
- *     fetchCommentSignature: async (comment) => {
+ *     fetchSignTypedData: async (comment) => {
  *       const response = await fetch('/api/sign-comment', {
  *         method: 'POST',
  *         body: JSON.stringify(comment),
@@ -78,7 +78,7 @@ type UsePostCommentAsAuthorOptions = {
  *
  * function Component() {
  *   const { mutate } = usePostCommentAsAuthor({
- *     fetchCommentSignature: async (comment) => {
+ *     fetchSignTypedData: async (comment) => {
  *       const response = await fetch('/api/sign-comment', {
  *         method: 'POST',
  *         body: JSON.stringify(comment),
@@ -105,7 +105,7 @@ type UsePostCommentAsAuthorOptions = {
  * ```
  */
 export function usePostCommentAsAuthor({
-  fetchCommentSignature,
+  fetchSignTypedData,
 }: UsePostCommentAsAuthorOptions): UsePostCommentAsAuthorReturnValue {
   const { data: walletClient } = useWalletClient();
 
@@ -118,7 +118,7 @@ export function usePostCommentAsAuthor({
       const request = SignCommentByAppRequestSchema.parse(comment);
 
       const appSignedCommentResponse = AppSignedCommentSchema.parse(
-        await fetchCommentSignature(request)
+        await fetchSignTypedData(request)
       );
 
       if (appSignedCommentResponse.chainId !== walletClient.chain.id) {
@@ -167,7 +167,7 @@ type UseGaslessPostCommentOptions = {
    *
    * Otherwise the function should return a signature of the comment.
    */
-  fetchCommentSignature: (
+  fetchSignTypedData: (
     comment: CommentInputSchemaType,
     submitIfApproved: boolean
   ) => Promise<GaslessCommentSignatureResponseSchemaType>;
@@ -184,7 +184,7 @@ type UseGaslessPostCommentOptions = {
  * Sends a comment using app's funds.
  */
 export function useGaslessPostComment({
-  fetchCommentSignature,
+  fetchSignTypedData,
   postSignedComment,
   submitIfApproved: submitIfApprovedOption = true,
 }: UseGaslessPostCommentOptions): UseGalessPostCommentReturnValue {
@@ -200,7 +200,7 @@ export function useGaslessPostComment({
 
       const commentSignatureResponse =
         GaslessCommentSignatureResponseSchema.parse(
-          await fetchCommentSignature(request, submitIfApproved)
+          await fetchSignTypedData(request, submitIfApproved)
         );
 
       if ("txHash" in commentSignatureResponse) {
@@ -364,7 +364,7 @@ type UseGaslessDeleteCommentOptions = {
   /**
    * Fetches a delete operation signed by app from app's backend.
    */
-  fetchSignedComment: (data: {
+  fetchSignTypedData: (data: {
     commentId: Hex;
     submitIfApproved: boolean;
   }) => Promise<GaslessCommentSignatureResponseSchemaType>;
@@ -392,7 +392,7 @@ type UseGaslessDeleteCommentOptions = {
  *
  * function Component() {
  *   const { mutate } = useGaslessDeleteComment({
- *     fetchSignedComment: async ({ commentId, submitIfApproved }) => {
+ *     fetchSignTypedData: async ({ commentId, submitIfApproved }) => {
  *       const response = await fetch('/api/sign-delete-comment', {
  *         method: 'POST',
  *         body: JSON.stringify({ commentId, submitIfApproved }),
@@ -425,7 +425,7 @@ type UseGaslessDeleteCommentOptions = {
  * ```
  */
 export function useGaslessDeleteComment({
-  fetchSignedComment,
+  fetchSignTypedData,
   deleteComment,
   submitIfApproved: submitIfApprovedOption = true,
 }: UseGaslessDeleteCommentOptions): UseGaslessDeleteCommentReturnValue {
@@ -439,7 +439,7 @@ export function useGaslessDeleteComment({
 
       const preparedOperationResponse =
         GaslessCommentSignatureResponseSchema.parse(
-          await fetchSignedComment({
+          await fetchSignTypedData({
             commentId: HexSchema.parse(commentId),
             submitIfApproved,
           })

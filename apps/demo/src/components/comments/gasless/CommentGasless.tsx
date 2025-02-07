@@ -40,7 +40,7 @@ export function CommentGasless({
 
   const [isReplying, setIsReplying] = useState(false);
   const deleteCommentMutation = useGaslessDeleteComment({
-    fetchSignedComment({ commentId }) {
+    fetchSignTypedData({ commentId }) {
       if (!address) {
         throw new Error("User is not signed in");
       }
