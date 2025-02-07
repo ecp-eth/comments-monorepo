@@ -1,1 +1,0 @@
-# `@modprotocol/comments-protocol-sdk`

@@ -1,5 +1,5 @@
 {
-  "name": "@modprotocol/comments-protocol-sdk",
+  "name": "@ecp.eth/sdk",
   "version": "0.0.2",
   "type": "module",
   "license": "MIT",
@@ -17,8 +17,8 @@
     "lint": "eslint \"./src/**/*.ts\""
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@ecp.eth/eslint-config": "workspace:*",
+    "@ecp.eth/typescript-config": "workspace:*",
     "@types/react": "^19.0.8"
   },
   "dependencies": {

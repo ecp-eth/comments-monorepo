@@ -14,7 +14,7 @@ import {
   useWriteContract,
 } from "wagmi";
 import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
-import { CommentsV1Abi } from "@modprotocol/comments-protocol-sdk/abis";
+import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { getAddress } from "viem";
 
 interface CommentProps {
