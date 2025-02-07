@@ -9,9 +9,10 @@ export const comment = onchainTable(
     targetUri: t.text(),
     parentId: t.hex(),
     author: t.hex(),
-    timestamp: t.timestamp(),
+    // https://github.com/ponder-sh/ponder/issues/1240
+    timestamp: t.timestamp({ withTimezone: true }),
     chainId: t.integer(),
-    deletedAt: t.timestamp(),
+    deletedAt: t.timestamp({ withTimezone: true }),
     appSigner: t.hex(),
     txHash: t.hex(),
     logIndex: t.integer(),
@@ -34,7 +35,7 @@ export const approvals = onchainTable(
     chainId: t.integer(),
     txHash: t.hex(),
     logIndex: t.integer(),
-    deletedAt: t.timestamp(),
+    deletedAt: t.timestamp({ withTimezone: true }),
   }),
   (table) => ({
     authorIdx: index().on(table.author),
