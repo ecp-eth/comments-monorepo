@@ -8,7 +8,7 @@ export type CommentData = {
   /**
    * Empty string for replies
    */
-  targetUrl: string;
+  targetUri: string;
   /**
    * 0 bytes Hex for parent comments
    */
@@ -24,7 +24,7 @@ export type Comment = {
   id: Hex;
   content: string;
   metadata: string;
-  targetUrl: string | null;
+  targetUri: string | null;
   parentId: Hex | null;
   author: Hex;
   chainId: number;
@@ -46,7 +46,7 @@ export type FetchCommentsResponse = {
 
 export type SignCommentRequest = {
   content: string;
-  targetUrl?: string;
+  targetUri?: string;
   parentId?: Hex;
   author: Hex;
 };

@@ -40,7 +40,7 @@ contract CommentsV1Test is Test {
             CommentsV1.CommentData({
                 content: "Test comment",
                 metadata: "{}",
-                targetUrl: "https://example.com",
+                targetUri: "https://example.com",
                 parentId: bytes32(0),
                 author: author,
                 appSigner: appSigner,

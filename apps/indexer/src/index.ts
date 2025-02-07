@@ -3,14 +3,14 @@ import schema from "ponder:schema";
 import { normalizeUrl } from "./lib/utils";
 
 ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
-  let normalizedTargetUrl =
-    event.args.commentData.targetUrl.trim().length > 0
-      ? event.args.commentData.targetUrl
+  let normalizedTargetUri =
+    event.args.commentData.targetUri.trim().length > 0
+      ? event.args.commentData.targetUri
       : null;
 
   try {
-    const urlObj = new URL(event.args.commentData.targetUrl);
-    normalizedTargetUrl = normalizeUrl(urlObj.toString());
+    const urlObj = new URL(event.args.commentData.targetUri);
+    normalizedTargetUri = normalizeUrl(urlObj.toString());
   } catch (error) {
     console.error(error);
   }
@@ -21,7 +21,7 @@ ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
       id: event.args.commentId,
       content: event.args.commentData.content,
       metadata: event.args.commentData.metadata,
-      targetUrl: normalizedTargetUrl,
+      targetUri: normalizedTargetUri,
       parentId:
         event.args.commentData.parentId !==
         "0x0000000000000000000000000000000000000000000000000000000000000000" // bytes32(0)

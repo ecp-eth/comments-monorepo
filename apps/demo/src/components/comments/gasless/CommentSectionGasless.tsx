@@ -103,7 +103,7 @@ export function CommentSectionGasless() {
     queryKey: ["comments", currentUrl, page],
     queryFn: async () => {
       const url = new URL("/api/comments", currentUrl);
-      url.searchParams.set("targetUrl", currentUrl);
+      url.searchParams.set("targetUri", currentUrl);
       url.searchParams.set("offset", String(page * pageSize));
       url.searchParams.set("limit", String(pageSize));
 

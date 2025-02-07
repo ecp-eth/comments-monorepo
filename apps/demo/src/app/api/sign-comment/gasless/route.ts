@@ -72,7 +72,7 @@ export const POST = async (req: Request) => {
           content: commentData.content,
           metadata: commentData.metadata,
           parentId: commentData.parentId,
-          targetUrl: commentData.targetUrl,
+          targetUri: commentData.targetUri,
           deadline: commentData.deadline,
           nonce: commentData.nonce,
         },

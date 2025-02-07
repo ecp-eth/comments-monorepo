@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 
-/// @title CommentsV1 - A decentralized commenting system with signature-based authorization
+/// @title CommentsV1 - A decentralized comments system
 /// @notice This contract allows users to post and manage comments with optional app-signer approval
 /// @dev Implements EIP-712 for typed structured data hashing and signing
 contract CommentsV1 {
@@ -44,8 +44,8 @@ contract CommentsV1 {
     /// @notice Struct containing all data for a comment
     /// @param content The actual text content of the comment
     /// @param metadata Additional JSON metadata for the comment
-    /// @param targetUrl The URL or identifier where the comment is being made
-    /// @param parentId The ID of the parent comment if this is a reply, otherwise 0
+    /// @param targetUri the URI about which the comment is being made
+    /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
     /// @param author The address of the comment author
     /// @param appSigner The address of the application signer that authorized this comment
     /// @param deadline Timestamp after which the signatures for this comment become invalid
@@ -53,7 +53,7 @@ contract CommentsV1 {
     struct CommentData {
         string content;
         string metadata;
-        string targetUrl;
+        string targetUri;
         bytes32 parentId;
         address author;
         address appSigner;
@@ -66,7 +66,7 @@ contract CommentsV1 {
     bytes32 public immutable DOMAIN_SEPARATOR;
     bytes32 public constant COMMENT_TYPEHASH =
         keccak256(
-            "CommentData(string content,string metadata,string targetUrl,bytes32 parentId,address author,address appSigner,uint256 nonce,uint256 deadline)"
+            "AddComment(string content,string metadata,string targetUri,bytes32 parentId,address author,address appSigner,uint256 nonce,uint256 deadline)"
         );
     bytes32 public constant DELETE_COMMENT_TYPEHASH =
         keccak256(
@@ -452,7 +452,7 @@ contract CommentsV1 {
                 COMMENT_TYPEHASH,
                 keccak256(bytes(commentData.content)),
                 keccak256(bytes(commentData.metadata)),
-                keccak256(bytes(commentData.targetUrl)),
+                keccak256(bytes(commentData.targetUri)),
                 commentData.parentId,
                 commentData.author,
                 commentData.appSigner,

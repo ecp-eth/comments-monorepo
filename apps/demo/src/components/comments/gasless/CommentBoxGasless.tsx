@@ -29,7 +29,7 @@ interface SignCommentGaslessResponse {
 
 interface SignCommentGaslessRequest {
   content: string;
-  targetUrl?: string;
+  targetUri?: string;
   parentId?: string;
   author: `0x${string}`;
 }
@@ -112,7 +112,7 @@ export function CommentBoxGasless({
       prepareCommentMutation.mutate(
         {
           content,
-          targetUrl: window.location.href,
+          targetUri: window.location.href,
           parentId,
           author: address as `0x${string}`,
         },

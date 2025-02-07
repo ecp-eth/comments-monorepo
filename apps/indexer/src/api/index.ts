@@ -12,14 +12,14 @@ app.use("/", graphql({ db, schema }));
 app.use("/graphql", graphql({ db, schema }));
 
 app.get("/api/comments", async (c) => {
-  let targetUrl = c.req.query("targetUrl");
+  let targetUri = c.req.query("targetUri");
   const appSigner = c.req.query("appSigner");
   const limit = parseInt(c.req.query("limit") ?? "50");
   const offset = parseInt(c.req.query("offset") ?? "0");
   const sort = c.req.query("sort") ?? "desc";
 
-  if (targetUrl) {
-    targetUrl = normalizeUrl(targetUrl);
+  if (targetUri) {
+    targetUri = normalizeUrl(targetUri);
   }
 
   const query = db.query.comment.findMany({
@@ -33,7 +33,7 @@ app.get("/api/comments", async (c) => {
     where: and(
       isNull(schema.comment.deletedAt),
       isNull(schema.comment.parentId),
-      targetUrl ? eq(schema.comment.targetUrl, targetUrl) : undefined,
+      targetUri ? eq(schema.comment.targetUri, targetUri) : undefined,
       appSigner
         ? eq(schema.comment.appSigner, appSigner as `0x${string}`)
         : undefined

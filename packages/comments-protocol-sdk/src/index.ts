@@ -333,7 +333,7 @@ export async function deleteCommentAsAuthor({
 }
 
 type FetchCommentsOptions = {
-  targetUrl: string;
+  targetUri: string;
   /**
    * URL on which /api/comments endpoint will be called
    */
@@ -365,7 +365,7 @@ type FetchCommentsOptions = {
 
 export async function fetchComments({
   apiUrl,
-  targetUrl,
+  targetUri,
   appSigner,
   sort = "desc",
   offset = 0,
@@ -374,7 +374,7 @@ export async function fetchComments({
 }: FetchCommentsOptions): Promise<FetchCommentsResponse> {
   const fetchCommentsTask = Effect.tryPromise(async () => {
     const url = new URL("/api/comments", apiUrl);
-    url.searchParams.set("targetUrl", targetUrl);
+    url.searchParams.set("targetUri", targetUri);
     url.searchParams.set("sort", sort);
     url.searchParams.set("offset", offset.toString());
     url.searchParams.set("limit", limit.toString());

@@ -28,7 +28,7 @@ interface SignCommentResponse {
 
 interface SignCommentRequest {
   content: string;
-  targetUrl?: string;
+  targetUri?: string;
   parentId?: string;
   chainId: number;
   author: `0x${string}`;
@@ -100,7 +100,7 @@ export function CommentBox({
     try {
       signCommentMutation.mutate({
         content,
-        targetUrl: window.location.href,
+        targetUri: window.location.href,
         parentId,
         author: address as `0x${string}`,
         chainId: chains[0].id, // Replace with your desired chain ID

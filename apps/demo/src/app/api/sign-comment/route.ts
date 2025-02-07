@@ -13,10 +13,10 @@ import {
 } from "../../../lib/wagmi";
 
 export const POST = async (req: Request) => {
-  let { content, targetUrl, parentId, chainId, author } = await req.json();
+  let { content, targetUri, parentId, chainId, author } = await req.json();
 
   // Validate target URL is valid
-  if (!targetUrl.startsWith(process.env.APP_URL!)) {
+  if (!targetUri.startsWith(process.env.APP_URL!)) {
     return Response.json({ error: "Invalid target URL" }, { status: 400 });
   }
 
@@ -35,7 +35,7 @@ export const POST = async (req: Request) => {
 
   const commentData = createCommentData({
     content,
-    targetUrl,
+    targetUri,
     parentId,
     author,
     appSigner: account.address,

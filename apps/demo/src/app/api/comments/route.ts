@@ -3,9 +3,9 @@ import { privateKeyToAccount } from "viem/accounts";
 
 export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
-  const targetUrl = searchParams.get("targetUrl");
+  const targetUri = searchParams.get("targetUri");
 
-  if (!targetUrl) {
+  if (!targetUri) {
     return Response.json({ error: "Target URL is required" }, { status: 400 });
   }
 
@@ -14,7 +14,7 @@ export const GET = async (req: Request) => {
   );
 
   const url = new URL(`${process.env.COMMENTS_INDEXER_URL!}/api/comments`);
-  url.searchParams.set("targetUrl", targetUrl);
+  url.searchParams.set("targetUri", targetUri);
   url.searchParams.set("appSigner", account.address);
 
   const res = await fetch(url);

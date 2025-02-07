@@ -1,7 +1,7 @@
 export type CommentData = {
   content: string;
   metadata: string;
-  targetUrl: string;
+  targetUri: string;
   parentId: `0x${string}`;
   author: `0x${string}`;
   appSigner: `0x${string}`;
@@ -14,7 +14,7 @@ export type APIComment = {
   id: `0x${string}`;
   content: string;
   metadata: string;
-  targetUrl: string | null;
+  targetUri: string | null;
   parentId: `0x${string}` | null;
   author: `0x${string}`;
   chainId: number;

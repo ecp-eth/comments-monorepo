@@ -1,2 +1,2 @@
 export const COMMENTS_V1_ADDRESS =
-  "0xfdb8b4bb77819d9a0501c9ff3731fb45fb38d42d" as const;
+  "0xefb67414d903385437eff1e10c1e193f44a0f7e1" as const;

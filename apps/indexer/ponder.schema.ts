@@ -6,7 +6,7 @@ export const comment = onchainTable(
     id: t.text().primaryKey(),
     content: t.text(),
     metadata: t.text(),
-    targetUrl: t.text(),
+    targetUri: t.text(),
     parentId: t.hex(),
     author: t.hex(),
     timestamp: t.timestamp(),
@@ -17,7 +17,7 @@ export const comment = onchainTable(
     logIndex: t.integer(),
   }),
   (table) => ({
-    targetUrlIdx: index().on(table.targetUrl),
+    targetUriIdx: index().on(table.targetUri),
     parentIdIdx: index().on(table.parentId),
     appSignerIdx: index().on(table.appSigner),
     timestampIdx: index().on(table.timestamp),

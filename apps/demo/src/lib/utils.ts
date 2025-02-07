@@ -36,7 +36,7 @@ export function bigintReplacer(key: string, value: unknown) {
 
 export function createCommentData({
   content,
-  targetUrl,
+  targetUri,
   metadata,
   parentId,
   author,
@@ -48,8 +48,8 @@ export function createCommentData({
   content: string;
   /** Metadata about the comment */
   metadata?: object;
-  /** The URL of the page the comment is on */
-  targetUrl?: string;
+  /** The URI of the page the comment is about */
+  targetUri?: string;
   /** The ID of the parent comment */
   parentId?: `0x${string}`;
   /** The address of the author of the comment */
@@ -64,7 +64,7 @@ export function createCommentData({
   return {
     content,
     metadata: metadata ? JSON.stringify(metadata) : "",
-    targetUrl: targetUrl ? targetUrl : "",
+    targetUri: targetUri ?? "",
     parentId:
       parentId ??
       "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -90,7 +90,7 @@ export function createCommentSignTypedDataArgs({
       verifyingContract: COMMENTS_V1_ADDRESS,
     },
     types: COMMENT_TYPE,
-    primaryType: "CommentData",
+    primaryType: "AddComment",
     message: commentData,
   } as const;
 }

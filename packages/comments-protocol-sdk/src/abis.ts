@@ -225,7 +225,7 @@ export const CommentsV1Abi = [
             internalType: "string",
           },
           {
-            name: "targetUrl",
+            name: "targetUri",
             type: "string",
             internalType: "string",
           },
@@ -415,7 +415,7 @@ export const CommentsV1Abi = [
             internalType: "string",
           },
           {
-            name: "targetUrl",
+            name: "targetUri",
             type: "string",
             internalType: "string",
           },
@@ -480,7 +480,7 @@ export const CommentsV1Abi = [
             internalType: "string",
           },
           {
-            name: "targetUrl",
+            name: "targetUri",
             type: "string",
             internalType: "string",
           },
@@ -656,7 +656,7 @@ export const CommentsV1Abi = [
             internalType: "string",
           },
           {
-            name: "targetUrl",
+            name: "targetUri",
             type: "string",
             internalType: "string",
           },
