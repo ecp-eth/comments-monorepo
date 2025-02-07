@@ -84,7 +84,7 @@ importers:
         specifier: ^2.14.9
         version: 2.14.9(@tanstack/query-core@5.66.0)(@tanstack/react-query@5.66.0(react@19.0.0))(@types/react@19.0.8)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.7.3)(utf-8-validate@5.0.10)(viem@2.22.21(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10))
     devDependencies:
-      '@repo/eslint-config':
+      '@ecp.eth/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
       '@types/node':
@@ -137,31 +137,6 @@ importers:
         specifier: github:foundry-rs/forge-std#v1.8.1
         version: https://codeload.github.com/foundry-rs/forge-std/tar.gz/bb4ceea94d6f10eeb5b41dc2391c6c8bf8e734ef
 
-  packages/sdk:
-    dependencies:
-      effect:
-        specifier: ^3.12.9
-        version: 3.12.9
-      react:
-        specifier: ^19.0.0
-        version: 19.0.0
-      viem:
-        specifier: ^2.22.21
-        version: 2.22.21(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)
-      wagmi:
-        specifier: ^2.14.9
-        version: 2.14.9(@tanstack/query-core@5.66.0)(@tanstack/react-query@5.66.0(react@19.0.0))(@types/react@19.0.8)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.7.3)(utf-8-validate@5.0.10)(viem@2.22.21(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10))
-    devDependencies:
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../eslint-config
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      '@types/react':
-        specifier: ^19.0.8
-        version: 19.0.8
-
   packages/eslint-config:
     devDependencies:
       '@eslint/js':
@@ -197,6 +172,31 @@ importers:
       typescript-eslint:
         specifier: ^8.22.0
         version: 8.22.0(eslint@9.19.0(jiti@1.21.7))(typescript@5.7.3)
+
+  packages/sdk:
+    dependencies:
+      effect:
+        specifier: ^3.12.9
+        version: 3.12.9
+      react:
+        specifier: ^19.0.0
+        version: 19.0.0
+      viem:
+        specifier: ^2.22.21
+        version: 2.22.21(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)
+      wagmi:
+        specifier: ^2.14.9
+        version: 2.14.9(@tanstack/query-core@5.66.0)(@tanstack/react-query@5.66.0(react@19.0.0))(@types/react@19.0.8)(bufferutil@4.0.9)(react@19.0.0)(typescript@5.7.3)(utf-8-validate@5.0.10)(viem@2.22.21(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10))
+    devDependencies:
+      '@ecp.eth/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@ecp.eth/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/react':
+        specifier: ^19.0.8
+        version: 19.0.8
 
   packages/typescript-config: {}
 

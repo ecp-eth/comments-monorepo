@@ -32,7 +32,7 @@
     "wagmi": "^2.14.9"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
+    "@ecp.eth/eslint-config": "workspace:*",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
