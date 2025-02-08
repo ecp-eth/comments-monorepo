@@ -6,7 +6,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./abis": "./dist/abis.js",
-    "./wagmi": "./dist/wagmi.js",
+    "./react": "./dist/react.js",
     "./types": "./dist/types.js"
   },
   "scripts": {

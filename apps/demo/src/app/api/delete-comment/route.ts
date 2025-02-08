@@ -1,14 +1,14 @@
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
-import {
-  bigintReplacer,
-  createDeleteCommentTypedDataArgs,
-  getNonce,
-} from "@/lib/utils";
+import { bigintReplacer } from "@/lib/utils";
 import {
   chains as configChains,
   transports as configTransports,
 } from "@/lib/wagmi";
+import {
+  COMMENTS_V1_ADDRESS,
+  CommentsV1Abi,
+  createDeleteCommentTypedDataArgs,
+  getNonce,
+} from "@ecp.eth/sdk";
 import { NextRequest } from "next/server";
 import { createWalletClient, isAddress, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";

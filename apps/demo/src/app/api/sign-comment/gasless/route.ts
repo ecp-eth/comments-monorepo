@@ -1,19 +1,17 @@
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
 import {
   chains as configChains,
   transports as configTransports,
 } from "@/lib/wagmi";
+import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { createCommentSignTypedDataArgs } from "../../../../lib/utils";
 
 export const POST = async (req: Request) => {
-  let { commentData, appSignature, authorSignature } = await req.json();
+  let { signTypedDataArgs, appSignature, authorSignature } = await req.json();
 
-  if (!commentData || !appSignature || !authorSignature) {
+  if (!signTypedDataArgs || !appSignature || !authorSignature) {
     console.error("Missing required fields", {
-      commentData,
+      signTypedDataArgs,
       appSignature,
       authorSignature,
     });
@@ -39,11 +37,6 @@ export const POST = async (req: Request) => {
     transport,
   }).extend(publicActions);
 
-  const signTypedDataArgs = createCommentSignTypedDataArgs({
-    commentData,
-    chainId: configChains[0].id,
-  });
-
   const isAppSignatureValid = await walletClient.verifyTypedData({
     ...signTypedDataArgs,
     signature: appSignature,
@@ -67,14 +60,14 @@ export const POST = async (req: Request) => {
       functionName: "postComment",
       args: [
         {
-          appSigner: commentData.appSigner,
-          author: commentData.author,
-          content: commentData.content,
-          metadata: commentData.metadata,
-          parentId: commentData.parentId,
-          targetUri: commentData.targetUri,
-          deadline: commentData.deadline,
-          nonce: commentData.nonce,
+          appSigner: signTypedDataArgs.message.appSigner,
+          author: signTypedDataArgs.message.author,
+          content: signTypedDataArgs.message.content,
+          metadata: signTypedDataArgs.message.metadata,
+          parentId: signTypedDataArgs.message.parentId,
+          targetUri: signTypedDataArgs.message.targetUri,
+          deadline: signTypedDataArgs.message.deadline,
+          nonce: signTypedDataArgs.message.nonce,
         },
         authorSignature,
         appSignature,
