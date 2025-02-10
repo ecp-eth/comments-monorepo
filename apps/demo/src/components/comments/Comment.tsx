@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { useDeleteCommentAsAuthor } from "@ecp.eth/sdk/wagmi";
-import type { Hex } from "@ecp.eth/sdk/types";
+import type { Hex } from "@ecp.eth/sdk/schemas";
 import { getAddress } from "viem";
 
 interface CommentProps {

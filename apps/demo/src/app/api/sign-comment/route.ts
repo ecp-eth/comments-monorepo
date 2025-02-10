@@ -5,7 +5,7 @@ import {
   createCommentData,
   createCommentSignTypedDataArgs,
   getNonce,
-} from "@/lib/utils";
+} from "@ecp.eth/sdk/utils";
 import {
   chains as configChains,
   transports as configTransports,

@@ -9,11 +9,11 @@ import {
   deleteCommentAsAuthor,
   removeAppApproval,
 } from "./index.js";
-import type { Hex } from "./types.js";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import {
   type AppSignedCommentSchemaType,
   type SignCommentByAppRequestSchemaType,
+  type Hex,
   AppSignedCommentSchema,
   type CommentInputSchemaType,
   SignCommentByAppRequestSchema,

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { WriteContractParameters } from "viem";
-import type { Hex } from "./types.js";
+import type { Hex } from "./schemas.js";
 import { CommentsV1Abi } from "./abis.js";
 import { COMMENTS_V1_CONTRACT_ADDRESS } from "./constants.js";
 import {

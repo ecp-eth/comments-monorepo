@@ -1,6 +1,7 @@
-import type { CommentData, Hex } from "@ecp.eth/sdk/types";
 import {
   HexSchema,
+  type Hex,
+  type CommentDataType,
   type CommentInputSchemaType,
   CommentInputSchema,
   type SignCommentByAppRequestSchemaType,
@@ -15,7 +16,7 @@ type SignCommentResponse = {
   chainId: number;
   signature: Hex;
   hash: Hex;
-  data: CommentData;
+  data: CommentDataType;
 };
 
 type SignCommentForPostingAsAuthorOptions = {

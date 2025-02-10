@@ -4,9 +4,10 @@ export default defineConfig({
   entry: [
     "src/index.ts",
     "src/abis.ts",
+    "src/eip712.ts",
     "src/schemas.ts",
+    "src/utils.ts",
     "src/wagmi.ts",
-    "src/types.ts",
   ],
   splitting: true,
   dts: true,

@@ -1,5 +1,5 @@
-import { CommentsV1Abi } from "../../../../../../../../packages/sdk/dist/abis";
-import { COMMENTS_V1_CONTRACT_ADDRESS } from "../../../../../../../../packages/sdk/dist";
+import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
+import { COMMENTS_V1_CONTRACT_ADDRESS } from "@ecp.eth/sdk";
 import {
   chains as configChains,
   transports as configTransports,
@@ -11,7 +11,7 @@ import {
   createCommentData,
   createCommentSignTypedDataArgs,
   getNonce,
-} from "@/lib/utils";
+} from "@ecp.eth/sdk/utils";
 
 export const POST = async (req: Request) => {
   let { content, targetUri, parentId, author, submitIfApproved } =

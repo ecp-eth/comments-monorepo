@@ -6,9 +6,10 @@
   "exports": {
     ".": "./dist/index.js",
     "./abis": "./dist/abis.js",
+    "./eip712": "./dist/eip712.js",
     "./schemas": "./dist/schemas.js",
-    "./wagmi": "./dist/wagmi.js",
-    "./types": "./dist/types.js"
+    "./utils": "./dist/utils.js",
+    "./wagmi": "./dist/wagmi.js"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

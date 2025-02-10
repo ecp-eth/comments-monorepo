@@ -1,14 +1,3 @@
-export type CommentData = {
-  content: string;
-  metadata: string;
-  targetUri: string;
-  parentId: `0x${string}`;
-  author: `0x${string}`;
-  appSigner: `0x${string}`;
-  nonce: bigint;
-  deadline: bigint;
-};
-
 export type APIComment = {
   timestamp: Date;
   id: `0x${string}`;

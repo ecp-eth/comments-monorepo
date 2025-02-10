@@ -1,7 +1,7 @@
 "use client";
 
 import { useApproveApp, useRemoveApproval } from "@ecp.eth/sdk/wagmi";
-import type { Hex } from "@ecp.eth/sdk/types";
+import type { Hex } from "@ecp.eth/sdk/schemas";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";

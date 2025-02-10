@@ -1,12 +1,12 @@
-import { CommentsV1Abi } from "../../../../../../../packages/sdk/dist/abis";
-import { COMMENTS_V1_CONTRACT_ADDRESS } from "../../../../../../../packages/sdk/dist";
+import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
+import { COMMENTS_V1_CONTRACT_ADDRESS } from "@ecp.eth/sdk";
 import {
   chains as configChains,
   transports as configTransports,
 } from "@/lib/wagmi";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { createCommentSignTypedDataArgs } from "../../../../lib/utils";
+import { createCommentSignTypedDataArgs } from "@ecp.eth/sdk/utils";
 
 export const POST = async (req: Request) => {
   let { commentData, appSignature, authorSignature } = await req.json();

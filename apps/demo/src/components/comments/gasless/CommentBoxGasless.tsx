@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useGaslessPostComment } from "@ecp.eth/sdk/wagmi";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import type { Hex } from "@ecp.eth/sdk/types";
+import type { Hex } from "@ecp.eth/sdk/schemas";
 import {
   postPreparedGaslessComment,
   prepareCommentForGaslessPosting,

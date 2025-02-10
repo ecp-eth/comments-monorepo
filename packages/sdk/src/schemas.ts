@@ -1,14 +1,15 @@
 import type { SignTypedDataParameters } from "viem";
 import { z } from "zod";
-import type { Hex } from "./types.js";
 
-export const HexSchema = z.custom<Hex>(
+export const HexSchema = z.custom<`0x${string}`>(
   (val) =>
     z
       .string()
       .regex(/^0x[0-9a-fA-F]+$/)
       .safeParse(val).success
 );
+
+export type Hex = z.infer<typeof HexSchema>;
 
 const CommentData = z.object({
   content: z.string(),
@@ -20,6 +21,8 @@ const CommentData = z.object({
   nonce: z.coerce.bigint(),
   deadline: z.coerce.bigint(),
 });
+
+export type CommentDataType = z.infer<typeof CommentData>;
 
 const Comment = z.object({
   timestamp: z.date(),

@@ -1,10 +1,10 @@
-import { CommentsV1Abi } from "../../../../../../packages/sdk/dist/abis";
-import { COMMENTS_V1_CONTRACT_ADDRESS } from "../../../../../../packages/sdk/dist";
+import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
+import { COMMENTS_V1_CONTRACT_ADDRESS } from "@ecp.eth/sdk";
 import {
   bigintReplacer,
   createDeleteCommentTypedDataArgs,
   getNonce,
-} from "@/lib/utils";
+} from "@ecp.eth/sdk/utils";
 import {
   chains as configChains,
   transports as configTransports,

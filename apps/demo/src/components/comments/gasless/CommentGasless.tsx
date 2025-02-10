@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useGaslessDeleteComment } from "@ecp.eth/sdk/wagmi";
-import type { Hex } from "@ecp.eth/sdk/types";
+import type { Hex } from "@ecp.eth/sdk/schemas";
 import { formatDate } from "@/lib/utils";
 import { MoreVertical } from "lucide-react";
 import { useEffect, useState } from "react";
