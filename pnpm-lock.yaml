@@ -109,7 +109,7 @@ importers:
   apps/indexer:
     dependencies:
       '@ecp.eth/sdk':
-        specifier: workspace:*
+        specifier: ^0.0.3
         version: link:../../packages/comments-protocol-sdk
       hono:
         specifier: ^4.5.0

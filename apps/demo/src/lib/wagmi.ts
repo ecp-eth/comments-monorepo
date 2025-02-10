@@ -1,5 +1,5 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
-import { createConfig, http } from "wagmi";
+import { http } from "wagmi";
 import { anvil, base } from "wagmi/chains";
 
 export const chains =
@@ -8,7 +8,7 @@ export const chains =
     : ([base] as const);
 
 export const transports = {
-  [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL),
+  [base.id]: http(process.env.NEXT_PUBLIC_RPC_URL_84532),
   [anvil.id]: http("http://localhost:8545"),
 } as const;
 

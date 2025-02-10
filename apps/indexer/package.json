@@ -12,7 +12,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@ecp.eth/sdk": "workspace:*",
+    "@ecp.eth/sdk": "^0.0.3",
     "hono": "^4.5.0",
     "normalize-url": "^8.0.1",
     "ponder": "^0.9.1",
