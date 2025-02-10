@@ -29,19 +29,19 @@ export function CommentSectionGasless() {
     },
   });
 
-  const approveAppMutation = useApproveApp({
-    postApproval({ signTypedDataArgs, authorSignature }) {
-      if (
-        !getApprovalDataMutation.data ||
-        getApprovalDataMutation.data?.approved
-      ) {
-        throw new Error("Inconsistent state, approval should not be requested");
-      }
+  const approveAppMutation = useApproveApp<{ appSignature: Hex }>({
+    postApproval({ signTypedDataArgs, authorSignature, appSignature }) {
+      console.log(
+        "Approving app",
+        signTypedDataArgs,
+        authorSignature,
+        appSignature
+      );
 
       return approvePostingCommentsOnUsersBehalf({
         authorSignature,
         signTypedDataArgs,
-        appSignature: getApprovalDataMutation.data.appSignature,
+        appSignature,
       });
     },
   });
@@ -123,9 +123,11 @@ export function CommentSectionGasless() {
                 },
                 {
                   onSuccess(approvalSigData) {
+                    console.log(approvalSigData);
                     if (!approvalSigData.approved) {
                       approveAppMutation.mutate({
                         signTypedDataArgs: approvalSigData.signTypedDataArgs,
+                        appSignature: approvalSigData.appSignature,
                       });
                     }
                   },

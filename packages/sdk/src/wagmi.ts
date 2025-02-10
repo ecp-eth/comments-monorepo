@@ -217,19 +217,22 @@ export function useGaslessPostComment<TExtraSignTypeDataValue = {}>({
   });
 }
 
-type UseApprovePostingCommentsReturnValue = UseMutationResult<
-  Hex,
-  Error,
-  {
-    signTypedDataArgs: SignTypedDataParameters;
-  }
->;
+type UseApprovePostingCommentsReturnValue<TExtraVariables = {}> =
+  UseMutationResult<
+    Hex,
+    Error,
+    TExtraVariables & {
+      signTypedDataArgs: SignTypedDataParameters;
+    }
+  >;
 
-type UseApprovePostingCommentsOptions = {
-  postApproval: (params: {
-    signTypedDataArgs: SignTypedDataParameters;
-    authorSignature: Hex;
-  }) => Promise<Hex>;
+type UseApprovePostingCommentsOptions<TExtraVariables = {}> = {
+  postApproval: (
+    params: TExtraVariables & {
+      signTypedDataArgs: SignTypedDataParameters;
+      authorSignature: Hex;
+    }
+  ) => Promise<Hex>;
 };
 
 /**
@@ -266,22 +269,23 @@ type UseApprovePostingCommentsOptions = {
  *   }}>Approve app</Button>;
  * }
  */
-export function useApproveApp({
+export function useApproveApp<TExtraVariables = {}>({
   postApproval,
-}: UseApprovePostingCommentsOptions): UseApprovePostingCommentsReturnValue {
+}: UseApprovePostingCommentsOptions<TExtraVariables>): UseApprovePostingCommentsReturnValue<TExtraVariables> {
   const { data: walletClient } = useWalletClient();
 
   return useMutation({
-    async mutationFn({ signTypedDataArgs }) {
+    async mutationFn(variables) {
       if (!walletClient) {
         throw new Error("Wallet client is not available.");
       }
 
-      const authorSignature =
-        await walletClient.signTypedData(signTypedDataArgs);
+      const authorSignature = await walletClient.signTypedData(
+        variables.signTypedDataArgs
+      );
 
       return HexSchema.parse(
-        await postApproval({ signTypedDataArgs, authorSignature })
+        await postApproval({ ...variables, authorSignature })
       );
     },
   });
