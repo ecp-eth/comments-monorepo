@@ -1,14 +1,14 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { http } from "wagmi";
-import { anvil, baseSepolia } from "wagmi/chains";
+import { anvil, base } from "wagmi/chains";
 
 export const chains =
   process.env.NODE_ENV === "development"
     ? ([anvil] as const)
-    : ([baseSepolia] as const);
+    : ([base] as const);
 
 export const transports = {
-  [baseSepolia.id]: http(process.env.NEXT_PUBLIC_RPC_URL_84532),
+  [base.id]: http(process.env.NEXT_PUBLIC_RPC_URL_84532),
   [anvil.id]: http("http://localhost:8545"),
 } as const;
 
