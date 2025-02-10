@@ -13,9 +13,9 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { getAddress } from "viem";
+import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
 
 interface CommentProps {
   id: `0x${string}`;

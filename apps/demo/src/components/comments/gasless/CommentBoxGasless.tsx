@@ -1,18 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { chains } from "@/lib/wagmi";
-import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { signTypedData } from "viem/accounts";
 import {
   useAccount,
-  useSignTypedData,
   useSwitchChain,
   useWaitForTransactionReceipt,
 } from "wagmi";
+import { useMutation } from "@tanstack/react-query";
+import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 
 interface CommentBoxProps {
+  isApproved?: boolean;
   onSubmit: (content: string) => void;
   placeholder?: string;
   parentId?: string;
@@ -38,31 +38,60 @@ export function CommentBoxGasless({
   onSubmit,
   placeholder = "What are your thoughts?",
   parentId,
+  isApproved = false,
 }: CommentBoxProps) {
   const { address } = useAccount();
-  const { switchChain } = useSwitchChain();
   const [content, setContent] = useState("");
   const [pendingTxHash, setPendingTxHash] = useState<`0x${string}`>();
 
-  const postSignatureMutation = useMutation({
+  const prepareCommentMutation = useMutation({
     mutationFn: async ({
-      commentData,
-      appSignature,
-      authorSignature,
+      submitIfApproved,
     }: {
-      commentData: any;
-      appSignature: `0x${string}`;
-      authorSignature: `0x${string}`;
+      submitIfApproved?: boolean;
     }) => {
+      const response = await fetch("/api/sign-comment/gasless/prepare", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content,
+          targetUri: window.location.href,
+          parentId,
+          author: address as `0x${string}`,
+          submitIfApproved,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to sign comment");
+      }
+
+      const data = await response.json();
+
+      return { signTypedDataArgs: data.signTypedDataArgs, variables: data };
+    },
+  });
+
+  // TODO: Add mutation for approval flow
+  const gaslessMutation = useGaslessTransaction({
+    async prepareSignTypedData() {
+      return prepareCommentMutation.mutateAsync({
+        submitIfApproved: false,
+      });
+    },
+    async sendSignedData({ signature, variables }) {
+      console.log("sendSignedData", { signature, variables });
+
       const response = await fetch("/api/sign-comment/gasless", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          commentData,
-          appSignature,
-          authorSignature,
+          ...variables,
+          authorSignature: signature,
         }),
       });
 
@@ -70,7 +99,9 @@ export function CommentBoxGasless({
         throw new Error("Failed to post comment");
       }
 
-      return response.json() as Promise<SignCommentGaslessResponse>;
+      const data = await response.json();
+
+      return data.txHash;
     },
   });
 
@@ -79,70 +110,29 @@ export function CommentBoxGasless({
       hash: pendingTxHash,
     });
 
-  const prepareCommentMutation = useMutation({
-    mutationFn: async (data: SignCommentGaslessRequest) => {
-      switchChain({ chainId: chains[0].id });
-      setPendingTxHash(undefined);
-
-      const response = await fetch("/api/sign-comment/gasless/prepare", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...data, submitIfApproved: true }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to sign comment");
-      }
-
-      return response.json() as Promise<
-        SignCommentGaslessPrepareResponse | SignCommentGaslessResponse
-      >;
-    },
-  });
-
-  const { signTypedData, isPending: isSignaturePending } = useSignTypedData();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim() || !address) return;
 
     try {
-      prepareCommentMutation.mutate(
-        {
-          content,
-          targetUri: window.location.href,
-          parentId,
-          author: address as `0x${string}`,
-        },
-        {
-          onSuccess(commentDataRes) {
-            if ("txHash" in commentDataRes) {
-              // Comment already submitted via approval, wait for receipt
-              setPendingTxHash(commentDataRes.txHash);
-            } else {
-              // Sign comment for once-off approval
-              signTypedData(commentDataRes.signTypedDataArgs, {
-                onSuccess(authorSignature) {
-                  postSignatureMutation.mutate(
-                    {
-                      commentData: commentDataRes.signTypedDataArgs.message,
-                      appSignature: commentDataRes.appSignature,
-                      authorSignature,
-                    },
-                    {
-                      onSuccess(data) {
-                        setPendingTxHash(data.txHash);
-                      },
-                    }
-                  );
-                },
-              });
-            }
+      if (isApproved) {
+        await prepareCommentMutation.mutateAsync(
+          {
+            submitIfApproved: true,
           },
-        }
-      );
+          {
+            onSuccess(data, variables, context) {
+              setPendingTxHash(data.variables.txHash);
+            },
+          }
+        );
+      } else {
+        gaslessMutation.mutate(void 0, {
+          onSuccess(hash) {
+            setPendingTxHash(hash);
+          },
+        });
+      }
     } catch (error) {
       console.error("Error signing comment:", error);
     }
@@ -157,10 +147,9 @@ export function CommentBoxGasless({
   }, [receipt?.transactionHash]);
 
   const isLoading =
-    isSignaturePending ||
+    gaslessMutation.isPending ||
     isReceiptLoading ||
-    prepareCommentMutation.isPending ||
-    postSignatureMutation.isPending;
+    prepareCommentMutation.isPending;
 
   return (
     <form onSubmit={handleSubmit} className="mb-4 flex flex-col gap-2">

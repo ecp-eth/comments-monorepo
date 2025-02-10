@@ -1,10 +1,13 @@
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
-import { bigintReplacer, createApprovalSignTypedDataArgs } from "@/lib/utils";
+import { bigintReplacer } from "@/lib/utils";
 import {
   chains as configChains,
   transports as configTransports,
 } from "@/lib/wagmi";
+import {
+  COMMENTS_V1_ADDRESS,
+  createApprovalSignTypedDataArgs,
+  CommentsV1Abi,
+} from "@ecp.eth/sdk";
 import { NextRequest } from "next/server";
 import {
   createPublicClient,

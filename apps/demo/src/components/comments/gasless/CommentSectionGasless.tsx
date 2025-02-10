@@ -2,7 +2,6 @@
 
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { Button } from "@/components/ui/button";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
 import { CommentsResponse } from "@/lib/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
@@ -16,6 +15,9 @@ import {
 } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
 import { CommentGasless } from "./CommentGasless";
+import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import { useGaslessTransaction } from "@ecp.eth/sdk/react";
+import { SignTypedDataParameters } from "viem";
 
 interface CommentData {
   id: string;
@@ -27,7 +29,7 @@ interface CommentData {
 
 interface ApprovalResponse {
   approved: boolean;
-  signTypedDataArgs: Parameters<typeof signTypedData>[0];
+  signTypedDataArgs: SignTypedDataParameters;
   appSignature: `0x${string}`;
   appSigner: `0x${string}`;
 }
@@ -71,19 +73,33 @@ export function CommentSectionGasless() {
     },
   });
 
-  const { signTypedData: signApproval, isPending: isSigningApproval } =
-    useSignTypedData();
+  const gaslessMutation = useGaslessTransaction({
+    async prepareSignTypedData() {
+      setPendingTxHash(undefined);
 
-  const postApprovalSignatureMutation = useMutation({
-    mutationFn: async (
-      data: SignApprovalRequest
-    ): Promise<{ txHash: `0x${string}` }> => {
+      if (!address) {
+        throw new Error("No address found");
+      }
+
+      const data = await getApprovalDataMutation.mutateAsync({
+        author: address,
+      });
+
+      return {
+        signTypedDataArgs: data.signTypedDataArgs,
+        variables: data,
+      };
+    },
+    async sendSignedData({ signature, variables }) {
       const response = await fetch("/api/approval", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...variables,
+          authorSignature: signature,
+        }),
       });
 
       if (!response.ok) {
@@ -159,9 +175,8 @@ export function CommentSectionGasless() {
   }, []);
 
   const isApprovalPending =
-    isSigningApproval ||
     isReceiptLoading ||
-    postApprovalSignatureMutation.isPending ||
+    gaslessMutation.isPending ||
     getApprovalDataMutation.isPending;
 
   const isRemovingApproval = isReceiptLoading && !!removeApprovalTxHash;
@@ -179,35 +194,11 @@ export function CommentSectionGasless() {
         <div className="mb-4">
           <Button
             onClick={() => {
-              if (!address) {
-                throw new Error("No address found");
-              }
-              getApprovalDataMutation.mutate(
-                {
-                  author: address,
+              gaslessMutation.mutate(void 0, {
+                onSuccess(data, variables, context) {
+                  setPendingTxHash(data);
                 },
-                {
-                  onSuccess(approvalSigData) {
-                    signApproval(approvalSigData.signTypedDataArgs, {
-                      onSuccess(signature) {
-                        postApprovalSignatureMutation.mutate(
-                          {
-                            signTypedDataArgs:
-                              approvalSigData?.signTypedDataArgs,
-                            appSignature: approvalSigData?.appSignature,
-                            authorSignature: signature,
-                          },
-                          {
-                            onSuccess(data) {
-                              setPendingTxHash(data.txHash);
-                            },
-                          }
-                        );
-                      },
-                    });
-                  },
-                }
-              );
+              });
             }}
             disabled={isApprovalPending}
             variant="default"
@@ -252,7 +243,10 @@ export function CommentSectionGasless() {
         )
       )}
 
-      <CommentBoxGasless onSubmit={() => refetch()} />
+      <CommentBoxGasless
+        onSubmit={() => refetch()}
+        isApproved={getApprovalDataMutation.data?.approved}
+      />
       {data?.results.map((comment) => (
         <CommentGasless
           key={comment.id}

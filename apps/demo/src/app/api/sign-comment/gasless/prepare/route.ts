@@ -1,17 +1,17 @@
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
+import { bigintReplacer } from "@/lib/utils";
 import {
   chains as configChains,
   transports as configTransports,
 } from "@/lib/wagmi";
-import { createWalletClient, publicActions } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
 import {
-  bigintReplacer,
+  COMMENTS_V1_ADDRESS,
+  CommentsV1Abi,
   createCommentData,
   createCommentSignTypedDataArgs,
   getNonce,
-} from "@/lib/utils";
+} from "@ecp.eth/sdk";
+import { createWalletClient, publicActions } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 
 export const POST = async (req: Request) => {
   let { content, targetUri, parentId, author, submitIfApproved } =

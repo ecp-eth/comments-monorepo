@@ -12,7 +12,7 @@ import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { CommentData } from "../../lib/types";
 import { chains } from "../../lib/wagmi";
 import { toast } from "sonner";
-import { COMMENTS_V1_ADDRESS } from "../../lib/addresses";
+import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
 
 interface CommentBoxProps {
   onSubmit: (content: string) => void;

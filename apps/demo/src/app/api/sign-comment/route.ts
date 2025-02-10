@@ -1,16 +1,15 @@
-import { hashTypedData } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import { COMMENTS_V1_ADDRESS } from "@/lib/addresses";
-import {
-  bigintReplacer,
-  createCommentData,
-  createCommentSignTypedDataArgs,
-  getNonce,
-} from "@/lib/utils";
+import { bigintReplacer } from "@/lib/utils";
 import {
   chains as configChains,
   transports as configTransports,
-} from "../../../lib/wagmi";
+} from "@/lib/wagmi";
+import {
+  createCommentData,
+  createCommentSignTypedDataArgs,
+  getNonce,
+} from "@ecp.eth/sdk";
+import { hashTypedData } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 
 export const POST = async (req: Request) => {
   let { content, targetUri, parentId, chainId, author } = await req.json();

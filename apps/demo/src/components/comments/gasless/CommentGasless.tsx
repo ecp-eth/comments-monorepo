@@ -16,6 +16,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
+import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 
 interface CommentProps {
   id: `0x${string}`;
@@ -59,44 +60,8 @@ export function CommentGasless({
     setIsReplying(false);
   };
 
-  const { signTypedData: signApproval, isPending: isSigningApproval } =
-    useSignTypedData();
-
-  const postDeleteCommentMutation = useMutation({
-    mutationFn: async (
-      data: PostDeleteCommentRequest
-    ): Promise<{ txHash: `0x${string}` }> => {
-      const response = await fetch("/api/delete-comment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to post approval signature");
-      }
-
-      return response.json();
-    },
-  });
-
-  const { data: receipt, isLoading: isReceiptLoading } =
-    useWaitForTransactionReceipt({
-      hash: pendingTxHash,
-    });
-
-  const getDeleteCommentSignatureData = useMutation({
-    mutationFn: async ({
-      commentId,
-      author,
-      submitIfApproved = true,
-    }: {
-      commentId: string;
-      author: string;
-      submitIfApproved?: boolean;
-    }): Promise<DeleteCommentResponse> => {
+  const gaslessMutation = useGaslessTransaction({
+    async prepareSignTypedData() {
       setPendingTxHash(undefined);
 
       if (!address) {
@@ -110,16 +75,46 @@ export function CommentGasless({
         },
         body: JSON.stringify({
           author,
-          commentId,
-          submitIfApproved,
+          commentId: id,
         }),
       });
       if (!response.ok) {
         throw new Error("Failed to fetch approvals");
       }
-      return response.json();
+
+      const data = await response.json();
+
+      return {
+        signTypedDataArgs: data.signTypedDataArgs,
+        variables: data,
+      };
+    },
+    async sendSignedData({ signature, variables }) {
+      const response = await fetch("/api/delete-comment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...variables,
+          authorSignature: signature,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to post approval signature");
+      }
+
+      const data = await response.json();
+
+      return data.txHash;
     },
   });
+
+  const { data: receipt, isLoading: isReceiptLoading } =
+    useWaitForTransactionReceipt({
+      hash: pendingTxHash,
+    });
 
   useEffect(() => {
     if (receipt?.status === "success") {
@@ -129,11 +124,7 @@ export function CommentGasless({
 
   const isAuthor = address ? getAddress(address) === getAddress(author) : false;
 
-  const isDeleting =
-    isSigningApproval ||
-    isReceiptLoading ||
-    postDeleteCommentMutation.isPending ||
-    getDeleteCommentSignatureData.isPending;
+  const isDeleting = gaslessMutation.isPending || isReceiptLoading;
 
   return (
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
@@ -150,37 +141,11 @@ export function CommentGasless({
               <DropdownMenuItem
                 className="text-red-600 cursor-pointer"
                 onClick={() => {
-                  getDeleteCommentSignatureData.mutate(
-                    {
-                      commentId: id,
-                      author,
+                  gaslessMutation.mutate(void 0, {
+                    onSuccess(hash) {
+                      setPendingTxHash(hash);
                     },
-                    {
-                      onSuccess(commentSigData) {
-                        if ("txHash" in commentSigData) {
-                          setPendingTxHash(commentSigData.txHash);
-                        } else {
-                          signApproval(commentSigData.signTypedDataArgs, {
-                            onSuccess(authorSigData, variables, context) {
-                              postDeleteCommentMutation.mutate(
-                                {
-                                  signTypedDataArgs:
-                                    commentSigData.signTypedDataArgs,
-                                  appSignature: commentSigData.appSignature,
-                                  authorSignature: authorSigData,
-                                },
-                                {
-                                  onSuccess(data, variables, context) {
-                                    setPendingTxHash(data.txHash);
-                                  },
-                                }
-                              );
-                            },
-                          });
-                        }
-                      },
-                    }
-                  );
+                  });
                 }}
                 disabled={isDeleting}
               >
