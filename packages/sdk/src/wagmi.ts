@@ -1,4 +1,9 @@
-import { useWalletClient } from "wagmi";
+import {
+  useChainId,
+  useSignTypedData,
+  useSwitchChain,
+  useWriteContract,
+} from "wagmi";
 import {
   postCommentAsAuthor,
   deleteCommentAsAuthor,
@@ -15,7 +20,6 @@ import {
   CommentInputSchema,
   type GaslessCommentSignatureResponseSchemaType,
   GaslessCommentSignatureResponseSchema,
-  type SignGaslessCommentRequiresSigningResponseSchemaType,
   HexSchema,
   type SignGaslessCommentApprovedResponseSchemaType,
 } from "./schemas.js";
@@ -107,29 +111,27 @@ type UsePostCommentAsAuthorOptions = {
 export function usePostCommentAsAuthor({
   fetchSignTypedData,
 }: UsePostCommentAsAuthorOptions): UsePostCommentAsAuthorReturnValue {
-  const { data: walletClient } = useWalletClient();
+  const chainId = useChainId();
+  const { switchChainAsync } = useSwitchChain();
+  const { writeContractAsync } = useWriteContract();
 
   return useMutation({
     async mutationFn({ comment }) {
-      if (!walletClient) {
-        throw new Error("Wallet client is not available.");
-      }
-
       const appSignedCommentResponse = AppSignedCommentSchema.parse(
         await fetchSignTypedData({
           comment: SignCommentByAppRequestSchema.parse(comment),
         })
       );
 
-      if (appSignedCommentResponse.chainId !== walletClient.chain.id) {
-        await walletClient.switchChain({
-          id: appSignedCommentResponse.chainId,
+      if (appSignedCommentResponse.chainId !== chainId) {
+        await switchChainAsync({
+          chainId: appSignedCommentResponse.chainId,
         });
       }
 
       const response = await postCommentAsAuthor({
-        wallet: walletClient,
         signedComment: appSignedCommentResponse,
+        writeContract: writeContractAsync,
       });
 
       return response;
@@ -179,14 +181,10 @@ export function useGaslessPostComment<TExtraSignTypeDataValue = {}>({
   fetchSignTypedData,
   onSignatureComplete,
 }: UseGaslessPostCommentOptions<TExtraSignTypeDataValue>): UseGalessPostCommentReturnValue {
-  const { data: walletClient } = useWalletClient();
+  const { signTypedDataAsync } = useSignTypedData();
 
   return useMutation({
     async mutationFn({ comment }) {
-      if (!walletClient) {
-        throw new Error("Wallet client is not available.");
-      }
-
       const commentSignatureResponse =
         GaslessCommentSignatureResponseSchema.parse(
           await fetchSignTypedData({
@@ -200,7 +198,7 @@ export function useGaslessPostComment<TExtraSignTypeDataValue = {}>({
         ).txHash;
       }
 
-      const authorSignature = await walletClient.signTypedData(
+      const authorSignature = await signTypedDataAsync(
         commentSignatureResponse.signTypedDataArgs
       );
 
@@ -272,15 +270,11 @@ type UseApprovePostingCommentsOptions<TExtraVariables = {}> = {
 export function useApproveApp<TExtraVariables = {}>({
   postApproval,
 }: UseApprovePostingCommentsOptions<TExtraVariables>): UseApprovePostingCommentsReturnValue<TExtraVariables> {
-  const { data: walletClient } = useWalletClient();
+  const { signTypedDataAsync } = useSignTypedData();
 
   return useMutation({
     async mutationFn(variables) {
-      if (!walletClient) {
-        throw new Error("Wallet client is not available.");
-      }
-
-      const authorSignature = await walletClient.signTypedData(
+      const authorSignature = await signTypedDataAsync(
         variables.signTypedDataArgs
       );
 
@@ -305,17 +299,13 @@ type UseRemoveApprovalReturnValue = UseMutationResult<
  * This operation uses user's funds.
  */
 export function useRemoveApproval(): UseRemoveApprovalReturnValue {
-  const { data: walletClient } = useWalletClient();
+  const { writeContractAsync } = useWriteContract();
 
   return useMutation({
     async mutationFn({ appSigner }) {
-      if (!walletClient) {
-        throw new Error("Wallet client is not available.");
-      }
-
       const txHash = await removeAppApproval({
         appSigner,
-        wallet: walletClient,
+        writeContract: writeContractAsync,
       });
 
       return txHash;
@@ -329,17 +319,13 @@ type UseDeleteCommentAsAuthorReturnValue = UseMutationResult<Hex, Error, Hex>;
  * Deletes a comment as an author. This operation costs author's funds.
  */
 export function useDeleteCommentAsAuthor(): UseDeleteCommentAsAuthorReturnValue {
-  const { data: walletClient } = useWalletClient();
+  const { writeContractAsync } = useWriteContract();
 
   return useMutation({
     async mutationFn(commentId) {
-      if (!walletClient) {
-        throw new Error("Wallet client is not available.");
-      }
-
       const txHash = await deleteCommentAsAuthor({
         commentId: HexSchema.parse(commentId),
-        wallet: walletClient,
+        writeContract: writeContractAsync,
       });
 
       return HexSchema.parse(txHash);
@@ -422,14 +408,10 @@ export function useGaslessDeleteComment<TExtraSignTypeDataValue = {}>({
   fetchSignTypedData,
   onSignatureComplete,
 }: UseGaslessDeleteCommentOptions<TExtraSignTypeDataValue>): UseGaslessDeleteCommentReturnValue {
-  const { data: walletClient } = useWalletClient();
+  const { signTypedDataAsync } = useSignTypedData();
 
   return useMutation({
     async mutationFn({ commentId }) {
-      if (!walletClient) {
-        throw new Error("Wallet client is not available.");
-      }
-
       const preparedOperationResponse =
         GaslessCommentSignatureResponseSchema.parse(
           await fetchSignTypedData({
@@ -443,7 +425,7 @@ export function useGaslessDeleteComment<TExtraSignTypeDataValue = {}>({
         ).txHash;
       }
 
-      const authorSignature = await walletClient.signTypedData(
+      const authorSignature = await signTypedDataAsync(
         preparedOperationResponse.signTypedDataArgs
       );
 

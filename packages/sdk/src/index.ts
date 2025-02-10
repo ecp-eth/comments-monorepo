@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { WalletClient } from "viem";
+import type { WriteContractParameters } from "viem";
 import type { Hex } from "./types.js";
 import { CommentsV1Abi } from "./abis.js";
 import { COMMENTS_V1_CONTRACT_ADDRESS } from "./constants.js";
@@ -16,7 +16,7 @@ type PostCommentAsAuthor = {
    * Comment signed by app signer.
    */
   signedComment: AppSignedCommentSchemaType;
-  wallet: WalletClient;
+  writeContract: (parameters: WriteContractParameters) => Promise<Hex>;
 };
 
 /**
@@ -26,12 +26,12 @@ type PostCommentAsAuthor = {
  */
 export async function postCommentAsAuthor({
   signedComment,
-  wallet,
+  writeContract,
 }: PostCommentAsAuthor): Promise<Hex> {
   const writeCommentTask = Effect.tryPromise(async () => {
     const signedData = AppSignedCommentSchema.parse(signedComment);
 
-    const result = await wallet.writeContract({
+    const result = await writeContract({
       account: null, // use current account
       chain: null, // use current chain
       abi: CommentsV1Abi,
@@ -48,15 +48,15 @@ export async function postCommentAsAuthor({
 
 type RemoveAppApprovalOptions = {
   appSigner: Hex;
-  wallet: WalletClient;
+  writeContract: (parameters: WriteContractParameters) => Promise<Hex>;
 };
 
 export async function removeAppApproval({
   appSigner,
-  wallet,
+  writeContract,
 }: RemoveAppApprovalOptions): Promise<Hex> {
   const rejectAppApprovalTask = Effect.tryPromise(async () => {
-    const txHash = await wallet.writeContract({
+    const txHash = await writeContract({
       account: null, // use current account
       chain: null, // use current chain
       abi: CommentsV1Abi,
@@ -73,15 +73,15 @@ export async function removeAppApproval({
 
 type DeleteCommentOptions = {
   commentId: Hex;
-  wallet: WalletClient;
+  writeContract: (parameters: WriteContractParameters) => Promise<Hex>;
 };
 
 export async function deleteCommentAsAuthor({
   commentId,
-  wallet,
+  writeContract,
 }: DeleteCommentOptions): Promise<Hex> {
   const deleteCommentTask = Effect.tryPromise(async () => {
-    const txHash = await wallet.writeContract({
+    const txHash = await writeContract({
       account: null, // use current account
       chain: null, // use current chain
       abi: CommentsV1Abi,
