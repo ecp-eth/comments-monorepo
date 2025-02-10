@@ -7,9 +7,9 @@
     ".": "./dist/index.js",
     "./abis": "./dist/abis.js",
     "./eip712": "./dist/eip712.js",
+    "./react": "./dist/react.js",
     "./schemas": "./dist/schemas.js",
-    "./utils": "./dist/utils.js",
-    "./wagmi": "./dist/wagmi.js"
+    "./utils": "./dist/utils.js"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

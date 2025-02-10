@@ -1,6 +1,6 @@
 "use client";
 
-import { useApproveApp, useRemoveApproval } from "@ecp.eth/sdk/wagmi";
+import { useApproveApp, useRemoveApproval } from "@ecp.eth/sdk/react";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";

@@ -47,7 +47,7 @@ type UsePostCommentAsAuthorOptions = {
  *
  * @example
  * ```
- * import { usePostCommentAsAuthor } from '@ecp.eth/sdk/wagmi';
+ * import { usePostCommentAsAuthor } from '@ecp.eth/sdk/react';
  *
  * function Component() {
  *   const { mutate } = usePostCommentAsAuthor({
@@ -78,7 +78,7 @@ type UsePostCommentAsAuthorOptions = {
  *
  * @example
  * ```
- * import { usePostCommentAsAuthor } from '@ecp.eth/sdk/wagmi';
+ * import { usePostCommentAsAuthor } from '@ecp.eth/sdk/react';
  *
  * function Component() {
  *   const { mutate } = usePostCommentAsAuthor({
@@ -240,7 +240,7 @@ type UseApprovePostingCommentsOptions<TExtraVariables = {}> = {
  *
  * @example
  * ```
- * import { useApproveApp } from '@ecp.eth/sdk/wagmi';
+ * import { useApproveApp } from '@ecp.eth/sdk/react';
  *
  * function Component() {
  *   const { mutate } = useApproveApp({
@@ -368,7 +368,7 @@ type UseGaslessDeleteCommentOptions<TExtraSignTypeDataValue = {}> = {
  *
  * @example
  * ```
- * import { useGaslessDeleteComment } from '@ecp.eth/sdk/wagmi';
+ * import { useGaslessDeleteComment } from '@ecp.eth/sdk/react';
  *
  * function Component() {
  *   const { mutate } = useGaslessDeleteComment({

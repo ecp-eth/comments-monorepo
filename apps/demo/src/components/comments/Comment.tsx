@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { useDeleteCommentAsAuthor } from "@ecp.eth/sdk/wagmi";
+import { useDeleteCommentAsAuthor } from "@ecp.eth/sdk/react";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { getAddress } from "viem";
 

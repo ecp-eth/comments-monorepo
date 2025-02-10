@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { usePostCommentAsAuthor } from "@ecp.eth/sdk/wagmi";
+import { usePostCommentAsAuthor } from "@ecp.eth/sdk/react";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { toast } from "sonner";
 import { signCommentForPostingAsAuthor } from "@/lib/operations";
