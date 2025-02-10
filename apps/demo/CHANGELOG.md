@@ -1,5 +1,13 @@
 # @ecp.eth/demo
 
+## 0.1.2
+
+### Patch Changes
+
+- a981998: feat: refactor helpers from demo into sdk
+- Updated dependencies [a981998]
+  - @ecp.eth/sdk@0.0.3
+
 ## 0.1.1
 
 ### Patch Changes
