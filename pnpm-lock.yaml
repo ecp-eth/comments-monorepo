@@ -108,13 +108,8 @@ importers:
 
   apps/indexer:
     dependencies:
-<<<<<<< HEAD
       '@ecp.eth/sdk':
-        specifier: workspace:*
-=======
-      '@modprotocol/comments-protocol-sdk':
-        specifier: ^0.0.2
->>>>>>> 17840e1 (fix: sdk version and linking in indexer)
+        specifier: '>=0.0.2'
         version: link:../../packages/comments-protocol-sdk
       hono:
         specifier: ^4.5.0
