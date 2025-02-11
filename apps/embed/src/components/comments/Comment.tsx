@@ -103,7 +103,7 @@ export function Comment({ comment, onDelete }: CommentProps) {
         />
       )}
       {comment.replies?.map((reply) => (
-        <Comment key={reply.id} comment={reply} />
+        <Comment key={reply.id} comment={reply} onDelete={onDelete} />
       ))}
     </div>
   );
