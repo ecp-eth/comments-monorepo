@@ -53,7 +53,10 @@ export async function POST(req: Request) {
     SignCommentResponseServerSchema.parse({
       signature,
       hash,
-      data: JSON.parse(JSON.stringify(commentData, bigintReplacer)),
+      data: {
+        id: hash,
+        ...JSON.parse(JSON.stringify(commentData, bigintReplacer)),
+      },
     })
   );
 }

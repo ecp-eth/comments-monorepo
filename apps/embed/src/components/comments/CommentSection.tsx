@@ -5,7 +5,11 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
 import { Comment } from "./Comment";
 import { CommentForm } from "./CommentForm";
-import { CommentPageSchema, CommentPageSchemaType } from "@/lib/schemas";
+import {
+  CommentPageSchema,
+  CommentPageSchemaType,
+  SignCommentResponseClientSchemaType,
+} from "@/lib/schemas";
 import { useAccount } from "wagmi";
 import { useEmbedConfig } from "../EmbedConfigProvider";
 import { ErrorScreen } from "../ErrorScreen";
@@ -26,12 +30,13 @@ export function CommentSection() {
       queryKey,
       initialPageParam: {
         offset: 0,
+        limit: COMMENTS_PER_PAGE,
       },
       queryFn: async ({ pageParam, signal }) => {
         const searchParams = new URLSearchParams({
           targetUri,
           offset: pageParam.offset.toString(),
-          limit: COMMENTS_PER_PAGE.toString(),
+          limit: pageParam.limit.toString(),
         });
 
         const response = await fetch(
@@ -54,6 +59,7 @@ export function CommentSection() {
 
         return {
           offset: lastPage.pagination.offset + lastPage.pagination.limit,
+          limit: lastPage.pagination.limit,
         };
       },
     });
@@ -104,6 +110,51 @@ export function CommentSection() {
     [queryKey, client]
   );
 
+  const handleCommentSubmitted = useCallback(
+    (
+      response: SignCommentResponseClientSchemaType | undefined,
+      {
+        txHash,
+        chainId,
+      }: {
+        txHash: Hex;
+        chainId: number;
+      }
+    ) => {
+      if (!response) {
+        return refetch();
+      }
+
+      client.setQueryData<typeof data>(queryKey, (oldData) => {
+        if (!oldData) {
+          return oldData;
+        }
+
+        const clonedOldData = structuredClone(oldData);
+
+        clonedOldData.pages[0].results.unshift({
+          ...response.data,
+          deletedAt: null,
+          logIndex: 0,
+          txHash,
+          chainId,
+          timestamp: new Date(),
+          replies: {
+            results: [],
+            pagination: {
+              hasMore: false,
+              limit: 0,
+              offset: 0,
+            },
+          },
+        });
+
+        return clonedOldData;
+      });
+    },
+    [queryKey, client, refetch]
+  );
+
   const results = useMemo(() => {
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
@@ -126,7 +177,7 @@ export function CommentSection() {
       <h2 className="text-2xl font-bold mb-4">Comments</h2>
       <div className="mb-4">
         {account.address ? (
-          <CommentForm onSubmitSuccess={() => refetch()} />
+          <CommentForm onSubmitSuccess={handleCommentSubmitted} />
         ) : (
           <ConnectButton />
         )}

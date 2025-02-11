@@ -62,13 +62,17 @@ export const SignCommentPayloadRequestSchema = z.object({
   chainId: z.number(),
 });
 
+const CommentDataWithIdSchema = CommentDataSchema.extend({
+  id: HexSchema,
+});
+
 /**
  * Parses output from API endpoint
  */
 export const SignCommentResponseServerSchema = z.object({
   signature: HexSchema,
   hash: HexSchema,
-  data: CommentDataSchema.omit({ nonce: true, deadline: true }).extend({
+  data: CommentDataWithIdSchema.omit({ nonce: true, deadline: true }).extend({
     nonce: z.string().regex(/\d+/),
     deadline: z.string().regex(/\d+/),
   }),
@@ -80,8 +84,12 @@ export const SignCommentResponseServerSchema = z.object({
 export const SignCommentResponseClientSchema = z.object({
   signature: HexSchema,
   hash: HexSchema,
-  data: CommentDataSchema,
+  data: CommentDataWithIdSchema,
 });
+
+export type SignCommentResponseClientSchemaType = z.infer<
+  typeof SignCommentResponseClientSchema
+>;
 
 export const ListCommentsSearchParamsSchema = z.object({
   targetUri: z.string().url(),

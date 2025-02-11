@@ -14,10 +14,20 @@ import { toast } from "sonner";
 import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import { useEmbedConfig } from "../EmbedConfigProvider";
-import { SignCommentResponseClientSchema } from "@/lib/schemas";
+import {
+  SignCommentResponseClientSchema,
+  SignCommentResponseClientSchemaType,
+} from "@/lib/schemas";
+import type { Hex } from "@ecp.eth/sdk/schemas";
 
 interface CommentBoxProps {
-  onSubmitSuccess: () => void;
+  onSubmitSuccess: (
+    response: SignCommentResponseClientSchemaType | undefined,
+    extra: {
+      txHash: Hex;
+      chainId: number;
+    }
+  ) => void;
   placeholder?: string;
   parentId?: string;
 }
@@ -106,17 +116,25 @@ export function CommentForm({
     }
   };
 
+  const signCommentMutationDataRef = useFreshRef(signCommentMutation.data);
+
   useEffect(() => {
     if (postCommentTxReceipt.data?.status === "success") {
       toast.success("Comment posted");
+      onSubmitSuccessRef.current(signCommentMutationDataRef.current, {
+        txHash: postCommentTxReceipt.data.transactionHash,
+        chainId: postCommentTxReceipt.data.chainId,
+      });
       postCommentContract.reset();
-      onSubmitSuccessRef.current();
       setContent("");
     }
   }, [
     onSubmitSuccessRef,
     postCommentContract,
+    postCommentTxReceipt.data?.chainId,
     postCommentTxReceipt.data?.status,
+    postCommentTxReceipt.data?.transactionHash,
+    signCommentMutationDataRef,
   ]);
 
   const isLoading =
