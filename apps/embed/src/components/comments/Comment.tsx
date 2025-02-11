@@ -29,6 +29,11 @@ interface CommentProps {
 
 export function Comment({ comment, onDelete }: CommentProps) {
   const onDeleteRef = useFreshRef(onDelete);
+  /**
+   * Prevents infinite cycle when delete comment transaction succeeded
+   * because comment is updated to be redacted
+   */
+  const commentRef = useFreshRef(comment);
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
 
@@ -44,9 +49,9 @@ export function Comment({ comment, onDelete }: CommentProps) {
 
   useEffect(() => {
     if (deleteCommentTransactionReceipt.data?.status === "success") {
-      onDeleteRef.current?.(comment.id);
+      onDeleteRef.current?.(commentRef.current.id);
     }
-  }, [deleteCommentTransactionReceipt.data?.status, comment, onDeleteRef]);
+  }, [deleteCommentTransactionReceipt.data?.status, commentRef, onDeleteRef]);
 
   const isAuthor = connectedAddress
     ? getAddress(connectedAddress) === getAddress(comment.author)
@@ -62,7 +67,7 @@ export function Comment({ comment, onDelete }: CommentProps) {
         <div className="text-xs text-gray-500 mb-1">
           {comment.author} • {formatDate(comment.timestamp)}
         </div>
-        {isAuthor && (
+        {isAuthor && !comment.deletedAt && (
           <DropdownMenu>
             <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">
               <MoreVertical className="h-4 w-4" />
