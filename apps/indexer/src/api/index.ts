@@ -26,12 +26,10 @@ app.get("/api/comments", async (c) => {
     with: {
       replies: {
         orderBy: desc(schema.comment.timestamp),
-        where: isNull(schema.comment.deletedAt),
         limit: 2,
       },
     },
     where: and(
-      isNull(schema.comment.deletedAt),
       isNull(schema.comment.parentId),
       targetUri ? eq(schema.comment.targetUri, targetUri) : undefined,
       appSigner
@@ -73,10 +71,7 @@ app.get("/api/comments/:commentId/replies", async (c) => {
   const sort = c.req.query("sort") ?? "desc";
 
   const query = db.query.comment.findMany({
-    where: and(
-      eq(schema.comment.parentId, commentId as `0x${string}`),
-      isNull(schema.comment.deletedAt)
-    ),
+    where: and(eq(schema.comment.parentId, commentId as `0x${string}`)),
     orderBy:
       sort === "desc"
         ? desc(schema.comment.timestamp)
