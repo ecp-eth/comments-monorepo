@@ -49,7 +49,13 @@ app.get("/api/comments", async (c) => {
   const comments = await query.execute();
 
   const res = {
-    results: comments.slice(0, limit),
+    results: comments.slice(0, limit).map((comment) => {
+      if (comment.deletedAt) {
+        comment.content = "[deleted]";
+      }
+
+      return comment;
+    }),
     pagination: {
       limit,
       offset,
@@ -82,7 +88,13 @@ app.get("/api/comments/:commentId/replies", async (c) => {
   const replies = await query.execute();
 
   const res = {
-    results: replies,
+    results: replies.slice(0, limit).map((reply) => {
+      if (reply.deletedAt) {
+        reply.content = "[deleted]";
+      }
+
+      return reply;
+    }),
     pagination: {
       limit,
       offset,
