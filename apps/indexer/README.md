@@ -9,7 +9,6 @@ The ECP Indexer monitors Ethereum events for comment-related activities and proc
 - Indexes comments from ECP-compatible smart contracts
 - Processes comment metadata and content
 - Maintains relationships between comments (replies, threads)
-- Handles comment updates and deletions
 - Provides REST API endpoints for querying indexed comments
 
 ## Getting Started
