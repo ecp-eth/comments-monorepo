@@ -6,6 +6,7 @@
  */
 
 import { useMutation } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { Hex, SignTypedDataParameters } from "viem";
 import { useSignTypedData } from "wagmi";
 
@@ -44,4 +45,49 @@ export function useGaslessTransaction(props: {
       return signedData;
     },
   });
+}
+
+type CommentsEmbedProps = {
+  /**
+   * URL of the page to embed comments for. Comments for this uri are rendered in iframe's page.
+   */
+  uri: string;
+  /**
+   * URL of the comments embed iframe page. This page is rendered in the iframe.
+   */
+  embedUri: string;
+  /**
+   * Allows to pass custom props to iframe's wrapper
+   */
+  wrapperProps?: React.HTMLAttributes<HTMLDivElement>;
+  /**
+   * Allows to pass custom props to iframe
+   */
+  iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
+};
+
+export function CommentsEmbed({
+  embedUri,
+  uri,
+  wrapperProps,
+  iframeProps,
+}: CommentsEmbedProps) {
+  const iframeUri = useMemo(() => {
+    const url = new URL(embedUri);
+
+    url.searchParams.set("targetUri", uri);
+
+    return url.toString();
+  }, [embedUri, uri]);
+
+  return (
+    <div {...wrapperProps}>
+      <iframe
+        style={{ border: "none", width: "100%", height: "100%" }}
+        // allow to override style and other props except src and seamless
+        {...iframeProps}
+        src={iframeUri}
+      ></iframe>
+    </div>
+  );
 }
