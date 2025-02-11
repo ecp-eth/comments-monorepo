@@ -91,13 +91,19 @@ app.get("/api/comments", async (c) => {
 });
 
 app.get("/api/comments/:commentId/replies", async (c) => {
+  const appSigner = c.req.query("appSigner");
   const commentId = c.req.param("commentId");
   const limit = parseInt(c.req.query("limit") ?? "50");
   const offset = parseInt(c.req.query("offset") ?? "0");
   const sort = c.req.query("sort") ?? "desc";
 
   const query = db.query.comment.findMany({
-    where: and(eq(schema.comment.parentId, commentId as `0x${string}`)),
+    where: and(
+      eq(schema.comment.parentId, commentId as `0x${string}`),
+      appSigner
+        ? eq(schema.comment.appSigner, appSigner as `0x${string}`)
+        : undefined
+    ),
     orderBy:
       sort === "desc"
         ? desc(schema.comment.timestamp)

@@ -88,3 +88,8 @@ export const ListCommentsSearchParamsSchema = z.object({
   limit: z.coerce.number().int().positive().max(100).optional(),
   offset: z.coerce.number().int().min(0).optional(),
 });
+
+export const ListCommentRepliesSearchParamsSchema = z.object({
+  limit: z.coerce.number().int().positive().max(100).optional(),
+  offset: z.coerce.number().int().min(0).optional(),
+});

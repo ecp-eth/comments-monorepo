@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { CommentForm } from "./CommentForm";
 import { formatDate } from "@/lib/utils";
 import { MoreVertical } from "lucide-react";
@@ -18,9 +18,12 @@ import {
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { getAddress } from "viem";
 import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
-import type { Comment as CommentType } from "@/lib/schemas";
+import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
+import { useInfiniteQuery } from "@tanstack/react-query";
+
+const REPLIES_PER_PAGE = 10;
 
 interface CommentProps {
   comment: CommentType;
@@ -36,6 +39,60 @@ export function Comment({ comment, onDelete }: CommentProps) {
   const commentRef = useFreshRef(comment);
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
+  const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
+
+  const repliesQuery = useInfiniteQuery({
+    queryKey,
+    initialData: {
+      pages: [comment.replies],
+      pageParams: [
+        {
+          offset: comment.replies.pagination.offset,
+          limit: comment.replies.pagination.limit,
+        },
+      ],
+    },
+    initialPageParam: {
+      offset: comment.replies.pagination.offset,
+      limit: comment.replies.pagination.limit,
+    },
+    staleTime: 5000, // do not load the data on first mount
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    queryFn: async ({ pageParam, signal }) => {
+      const searchParams = new URLSearchParams({
+        offset: pageParam.offset.toString(),
+        limit: REPLIES_PER_PAGE.toString(),
+      });
+
+      const response = await fetch(
+        `/api/comments/${comment.id}/replies?${searchParams.toString()}`,
+        {
+          signal,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch comments");
+      }
+
+      return CommentPageSchema.parse(await response.json());
+    },
+    getNextPageParam(lastPage) {
+      if (!lastPage.pagination.hasMore) {
+        return;
+      }
+
+      return {
+        offset: lastPage.pagination.offset + lastPage.pagination.limit,
+        limit: lastPage.pagination.limit,
+      };
+    },
+  });
+
+  const replies = useMemo(() => {
+    return repliesQuery.data.pages.flatMap((page) => page.results);
+  }, [repliesQuery.data.pages]);
 
   const handleSubmitSuccess = useCallback(() => {
     setIsReplying(false);
@@ -107,9 +164,19 @@ export function Comment({ comment, onDelete }: CommentProps) {
           parentId={comment.id}
         />
       )}
-      {comment.replies.results?.map((reply) => (
+      {replies.map((reply) => (
         <Comment key={reply.id} comment={reply} onDelete={onDelete} />
       ))}
+      {repliesQuery.hasNextPage && (
+        <div className="text-xs text-gray-500 mb-2">
+          <button
+            onClick={() => repliesQuery.fetchNextPage()}
+            className="mr-2 hover:underline"
+          >
+            show more replies
+          </button>
+        </div>
+      )}
     </div>
   );
 }
