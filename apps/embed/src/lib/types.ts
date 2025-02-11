@@ -1,5 +1,5 @@
 export type APIComment = {
-  timestamp: Date;
+  timestamp: string;
   id: `0x${string}`;
   content: string;
   metadata: string;
@@ -7,14 +7,14 @@ export type APIComment = {
   parentId: `0x${string}` | null;
   author: `0x${string}`;
   chainId: number;
-  deletedAt: Date | null;
+  deletedAt: string | null;
   appSigner: `0x${string}`;
   txHash: `0x${string}`;
   logIndex: number;
-  replies: APIComment[];
+  replies: APIListCommentsResponse;
 };
 
-export type CommentsResponse = {
+export type APIListCommentsResponse = {
   results: APIComment[];
   pagination: {
     limit: number;

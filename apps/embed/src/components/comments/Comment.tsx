@@ -102,7 +102,7 @@ export function Comment({ comment, onDelete }: CommentProps) {
           parentId={comment.id}
         />
       )}
-      {comment.replies?.map((reply) => (
+      {comment.replies.results?.map((reply) => (
         <Comment key={reply.id} comment={reply} onDelete={onDelete} />
       ))}
     </div>

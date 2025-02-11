@@ -16,9 +16,30 @@ const BaseCommentSchema = z.object({
   timestamp: z.coerce.date(),
 });
 
-export const CommentSchema = BaseCommentSchema.extend({
-  replies: z.lazy(() => BaseCommentSchema.array()).optional(),
-});
+type BaseCommentSchemaType = z.infer<typeof BaseCommentSchema>;
+
+type CommentSchemaType = BaseCommentSchemaType & {
+  replies: {
+    results: CommentSchemaType[];
+    pagination: {
+      limit: number;
+      offset: number;
+      hasMore: boolean;
+    };
+  };
+};
+
+export const CommentSchema: z.ZodType<CommentSchemaType> =
+  BaseCommentSchema.extend({
+    replies: z.object({
+      results: z.lazy(() => CommentSchema.array()),
+      pagination: z.object({
+        limit: z.number(),
+        offset: z.number(),
+        hasMore: z.boolean(),
+      }),
+    }),
+  });
 
 export type Comment = z.infer<typeof CommentSchema>;
 

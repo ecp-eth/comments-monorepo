@@ -125,7 +125,7 @@ export function CommentForm({
     signCommentMutation.isPending;
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 flex flex-col gap-2">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}

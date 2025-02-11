@@ -2,7 +2,8 @@ import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { Hono } from "hono";
 import { and, asc, client, desc, eq, graphql, isNull } from "ponder";
-import { normalizeUrl } from "../lib/utils";
+import { formatComment, normalizeUrl } from "../lib/utils";
+import { APIListCommentsResponse } from "../lib/types";
 
 const app = new Hono();
 
@@ -10,6 +11,8 @@ app.use("/sql/*", client({ db, schema }));
 
 app.use("/", graphql({ db, schema }));
 app.use("/graphql", graphql({ db, schema }));
+
+const REPLIES_PER_COMMENT = 2;
 
 app.get("/api/comments", async (c) => {
   let targetUri = c.req.query("targetUri");
@@ -26,7 +29,7 @@ app.get("/api/comments", async (c) => {
     with: {
       replies: {
         orderBy: desc(schema.comment.timestamp),
-        limit: 2,
+        limit: REPLIES_PER_COMMENT + 1,
       },
     },
     where: and(
@@ -46,13 +49,36 @@ app.get("/api/comments", async (c) => {
 
   const comments = await query.execute();
 
-  const res = {
+  const res: APIListCommentsResponse = {
     results: comments.slice(0, limit).map((comment) => {
-      if (comment.deletedAt) {
-        comment.content = "[deleted]";
-      }
+      const replies: APIListCommentsResponse = {
+        results: comment.replies.slice(0, REPLIES_PER_COMMENT).map((reply) => {
+          // do not go deeper than first level of replies
+          const replies: APIListCommentsResponse = {
+            results: [],
+            pagination: {
+              offset: 0,
+              limit: 0,
+              hasMore: false,
+            },
+          };
 
-      return comment;
+          return {
+            ...formatComment(reply),
+            replies,
+          };
+        }),
+        pagination: {
+          offset: 0,
+          limit: REPLIES_PER_COMMENT,
+          hasMore: comment.replies.length > REPLIES_PER_COMMENT,
+        },
+      };
+
+      return {
+        ...formatComment(comment),
+        replies,
+      };
     }),
     pagination: {
       limit,
@@ -82,13 +108,21 @@ app.get("/api/comments/:commentId/replies", async (c) => {
 
   const replies = await query.execute();
 
-  const res = {
+  const res: APIListCommentsResponse = {
     results: replies.slice(0, limit).map((reply) => {
-      if (reply.deletedAt) {
-        reply.content = "[deleted]";
-      }
+      const replies: APIListCommentsResponse = {
+        results: [],
+        pagination: {
+          offset: 0,
+          limit: 0,
+          hasMore: false,
+        },
+      };
 
-      return reply;
+      return {
+        ...formatComment(reply),
+        replies,
+      };
     }),
     pagination: {
       limit,

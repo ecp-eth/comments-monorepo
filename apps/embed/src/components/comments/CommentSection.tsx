@@ -78,11 +78,13 @@ export function CommentSection() {
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">Comments</h2>
-      {account.address ? (
-        <CommentForm onSubmitSuccess={() => refetch()} />
-      ) : (
-        <ConnectButton />
-      )}
+      <div className="mb-4">
+        {account.address ? (
+          <CommentForm onSubmitSuccess={() => refetch()} />
+        ) : (
+          <ConnectButton />
+        )}
+      </div>
       {results.map((comment) => (
         <Comment
           comment={comment}
