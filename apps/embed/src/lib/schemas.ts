@@ -63,5 +63,5 @@ export const SignCommentResponseClientSchema = z.object({
 export const ListCommentsSearchParamsSchema = z.object({
   targetUri: z.string().url(),
   limit: z.coerce.number().int().positive().max(100).optional(),
-  offset: z.coerce.number().int().positive().optional(),
+  offset: z.coerce.number().int().min(0).optional(),
 });
