@@ -114,7 +114,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build the project
-        run: pnpm build --filter=!apps/embed --filter=!apps/embed-demo-blog
+        run: pnpm build
 
       - name: Lint
         run: pnpm lint
