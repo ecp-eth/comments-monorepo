@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CommentForm } from "./CommentForm";
+import { CommentForm, OnSubmitSuccessFunction } from "./CommentForm";
 import { formatDate } from "@/lib/utils";
 import { MoreVertical } from "lucide-react";
 import {
@@ -18,10 +18,14 @@ import {
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { getAddress } from "viem";
 import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
-import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
+import {
+  CommentPageSchema,
+  SignCommentResponseClientSchemaType,
+  type Comment as CommentType,
+} from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
 const REPLIES_PER_PAGE = 10;
 
@@ -37,6 +41,7 @@ export function Comment({ comment, onDelete }: CommentProps) {
    * because comment is updated to be redacted
    */
   const commentRef = useFreshRef(comment);
+  const client = useQueryClient();
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
   const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
@@ -94,9 +99,52 @@ export function Comment({ comment, onDelete }: CommentProps) {
     return repliesQuery.data.pages.flatMap((page) => page.results);
   }, [repliesQuery.data.pages]);
 
-  const handleSubmitSuccess = useCallback(() => {
-    setIsReplying(false);
-  }, []);
+  const handleCommentSubmitted = useCallback<OnSubmitSuccessFunction>(
+    (
+      response: SignCommentResponseClientSchemaType | undefined,
+      {
+        txHash,
+        chainId,
+      }: {
+        txHash: Hex;
+        chainId: number;
+      }
+    ) => {
+      setIsReplying(false);
+
+      if (!response) {
+        return repliesQuery.refetch();
+      }
+
+      client.setQueryData<typeof repliesQuery.data>(queryKey, (oldData) => {
+        if (!oldData) {
+          return oldData;
+        }
+
+        const clonedOldData = structuredClone(oldData);
+
+        clonedOldData.pages[0].results.unshift({
+          ...response.data,
+          deletedAt: null,
+          logIndex: 0,
+          txHash,
+          chainId,
+          timestamp: new Date(),
+          replies: {
+            results: [],
+            pagination: {
+              hasMore: false,
+              limit: 0,
+              offset: 0,
+            },
+          },
+        });
+
+        return clonedOldData;
+      });
+    },
+    [client, queryKey, repliesQuery]
+  );
 
   const deleteCommentContract = useWriteContract();
 
@@ -159,7 +207,7 @@ export function Comment({ comment, onDelete }: CommentProps) {
       </div>
       {isReplying && (
         <CommentForm
-          onSubmitSuccess={handleSubmitSuccess}
+          onSubmitSuccess={handleCommentSubmitted}
           placeholder="What are your thoughts?"
           parentId={comment.id}
         />

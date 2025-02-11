@@ -20,14 +20,16 @@ import {
 } from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 
+export type OnSubmitSuccessFunction = (
+  response: SignCommentResponseClientSchemaType | undefined,
+  extra: {
+    txHash: Hex;
+    chainId: number;
+  }
+) => void;
+
 interface CommentBoxProps {
-  onSubmitSuccess: (
-    response: SignCommentResponseClientSchemaType | undefined,
-    extra: {
-      txHash: Hex;
-      chainId: number;
-    }
-  ) => void;
+  onSubmitSuccess: OnSubmitSuccessFunction;
   placeholder?: string;
   parentId?: string;
 }

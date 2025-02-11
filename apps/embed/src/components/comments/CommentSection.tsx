@@ -4,7 +4,7 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
 import { Comment } from "./Comment";
-import { CommentForm } from "./CommentForm";
+import { CommentForm, type OnSubmitSuccessFunction } from "./CommentForm";
 import {
   CommentPageSchema,
   CommentPageSchemaType,
@@ -110,7 +110,7 @@ export function CommentSection() {
     [queryKey, client]
   );
 
-  const handleCommentSubmitted = useCallback(
+  const handleCommentSubmitted = useCallback<OnSubmitSuccessFunction>(
     (
       response: SignCommentResponseClientSchemaType | undefined,
       {
