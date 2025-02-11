@@ -49,7 +49,7 @@ app.get("/api/comments", async (c) => {
   const comments = await query.execute();
 
   const res = {
-    results: comments,
+    results: comments.slice(0, limit),
     pagination: {
       limit,
       offset,
