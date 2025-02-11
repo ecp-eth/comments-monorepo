@@ -1,5 +1,5 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
-import { createConfig, http } from "wagmi";
+import { http } from "wagmi";
 import { anvil, base } from "wagmi/chains";
 
 export const chains =
