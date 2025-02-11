@@ -29,6 +29,10 @@ export type OnSubmitSuccessFunction = (
 ) => void;
 
 interface CommentBoxProps {
+  /**
+   * Called when user blurred text area with empty content
+   */
+  onLeftEmpty?: () => void;
   onSubmitSuccess: OnSubmitSuccessFunction;
   placeholder?: string;
   parentId?: string;
@@ -43,6 +47,7 @@ interface SignCommentRequest {
 }
 
 export function CommentForm({
+  onLeftEmpty,
   onSubmitSuccess,
   placeholder = "What are your thoughts?",
   parentId,
@@ -147,6 +152,11 @@ export function CommentForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2">
       <Textarea
+        onBlur={() => {
+          if (!content && !isLoading) {
+            onLeftEmpty?.();
+          }
+        }}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder}

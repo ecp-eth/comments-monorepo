@@ -207,6 +207,7 @@ export function Comment({ comment, onDelete }: CommentProps) {
       </div>
       {isReplying && (
         <CommentForm
+          onLeftEmpty={() => setIsReplying(false)}
           onSubmitSuccess={handleCommentSubmitted}
           placeholder="What are your thoughts?"
           parentId={comment.id}
