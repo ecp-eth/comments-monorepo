@@ -16,7 +16,6 @@ export function CommentSection() {
   const account = useAccount();
   const [page, setPage] = useState(0);
   const pageSize = 10;
-  const isValidTargetUri = URL.canParse(targetUri);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["comments", targetUri, page],
@@ -35,14 +34,7 @@ export function CommentSection() {
 
       return CommentPageSchema.parse(await response.json());
     },
-    enabled: isValidTargetUri,
   });
-
-  if (!isValidTargetUri) {
-    return (
-      <ErrorScreen description="Target URI is missing or its value isn't a valid URL." />
-    );
-  }
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -58,7 +50,8 @@ export function CommentSection() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-8">
+    <div className="max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Comments</h2>
       {account ? (
         <CommentForm onSubmitSuccess={() => refetch()} />
       ) : (
