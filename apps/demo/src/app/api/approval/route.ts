@@ -52,7 +52,7 @@ export const GET = async (req: NextRequest) => {
             address: COMMENTS_V1_ADDRESS,
             abi: CommentsV1Abi,
             functionName: "nonces",
-            args: [authorAddress],
+            args: [authorAddress, account.address],
           },
         ],
       })
@@ -68,7 +68,7 @@ export const GET = async (req: NextRequest) => {
             address: COMMENTS_V1_ADDRESS,
             abi: CommentsV1Abi,
             functionName: "nonces",
-            args: [authorAddress],
+            args: [authorAddress, account.address],
           }),
         ])
       ).map((result) => ({ result }));

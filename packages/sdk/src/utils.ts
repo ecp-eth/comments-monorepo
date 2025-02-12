@@ -106,10 +106,12 @@ export function createApprovalSignTypedDataArgs({
 
 export async function getNonce({
   author,
+  appSigner,
   chain,
   transport,
 }: {
   author: `0x${string}`;
+  appSigner: `0x${string}`;
   chain: Chain;
   transport?: Transport;
 }) {
@@ -122,7 +124,7 @@ export async function getNonce({
     address: COMMENTS_V1_ADDRESS,
     abi: CommentsV1Abi,
     functionName: "nonces",
-    args: [author],
+    args: [author, appSigner],
   });
 
   return nonce;

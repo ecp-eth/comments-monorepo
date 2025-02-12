@@ -385,6 +385,11 @@ export const CommentsV1Abi = [
         type: "address",
         internalType: "address",
       },
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
     ],
     outputs: [
       {

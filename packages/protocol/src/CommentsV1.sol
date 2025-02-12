@@ -82,7 +82,7 @@ contract CommentsV1 {
         );
 
     mapping(address => mapping(address => bool)) public isApproved;
-    mapping(address => uint256) public nonces;
+    mapping(address => mapping(address => uint256)) public nonces;
 
     constructor() {
         DOMAIN_SEPARATOR = keccak256(
@@ -133,11 +133,14 @@ contract CommentsV1 {
             revert DeadlineReached();
         }
 
-        if (nonces[commentData.author] != commentData.nonce) {
+        if (
+            nonces[commentData.author][commentData.appSigner] !=
+            commentData.nonce
+        ) {
             revert InvalidNonce();
         }
 
-        nonces[commentData.author]++;
+        nonces[commentData.author][commentData.appSigner]++;
 
         bytes32 commentId = getCommentId(commentData);
 
@@ -195,11 +198,11 @@ contract CommentsV1 {
             revert DeadlineReached();
         }
 
-        if (nonces[author] != nonce) {
+        if (nonces[author][appSigner] != nonce) {
             revert InvalidNonce();
         }
 
-        nonces[author]++;
+        nonces[author][appSigner]++;
 
         bytes32 deleteHash = getDeleteCommentHash(
             commentId,
@@ -285,11 +288,11 @@ contract CommentsV1 {
             revert DeadlineReached();
         }
 
-        if (nonces[author] != nonce) {
+        if (nonces[author][appSigner] != nonce) {
             revert InvalidNonce();
         }
 
-        nonces[author]++;
+        nonces[author][appSigner]++;
 
         bytes32 addApprovalHash = getAddApprovalHash(
             author,
@@ -328,11 +331,11 @@ contract CommentsV1 {
             revert DeadlineReached();
         }
 
-        if (nonces[author] != nonce) {
+        if (nonces[author][appSigner] != nonce) {
             revert InvalidNonce();
         }
 
-        nonces[author]++;
+        nonces[author][appSigner]++;
 
         bytes32 removeApprovalHash = getRemoveApprovalHash(
             author,
