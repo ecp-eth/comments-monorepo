@@ -10,7 +10,8 @@ contract DevScript is Script {
     function setUp() public {}
 
     function run() public {
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        // Anvil test account private key
+        uint256 deployerPrivateKey = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
         vm.startBroadcast(deployerPrivateKey);
 
         // Fund wallet with real identity for testing
