@@ -66,10 +66,18 @@ type CommentsEmbedProps = {
   iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
 };
 
+/**
+ * Renders comments embed iframe for the given uri.
+ *
+ * @example
+ * ```tsx
+ * <CommentsEmbed uri="https://my-blog.tld/article/use-comments" />
+ * ```
+ */
 export function CommentsEmbed({
   embedUri,
   uri,
-  wrapperProps,
+  containerProps,
   iframeProps,
 }: CommentsEmbedProps) {
   const iframeUri = useMemo(() => {
@@ -81,7 +89,7 @@ export function CommentsEmbed({
   }, [embedUri, uri]);
 
   return (
-    <div {...wrapperProps}>
+    <div {...containerProps}>
       <iframe
         style={{ border: "none", width: "100%", height: "100%" }}
         // allow to override style and other props except src and seamless

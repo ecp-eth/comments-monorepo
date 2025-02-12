@@ -106,7 +106,7 @@ export default async function Blog({
         <CustomMDX source={post.content} />
       </article>
       <CommentsEmbed
-        wrapperProps={{
+        containerProps={{
           className: "h-[500px]",
         }}
         embedUri={process.env.NEXT_PUBLIC_ECP_ETH_EMBED_URL!}
