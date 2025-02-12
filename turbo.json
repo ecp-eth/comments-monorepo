@@ -8,7 +8,12 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "env": [
+        "APP_SIGNER_PRIVATE_KEY",
+        "COMMENTS_INDEXER_URL",
+        "NEXT_PUBLIC_WC_PROJECT_ID"
+      ]
     },
     "check-types": {
       "dependsOn": ["^check-types"]

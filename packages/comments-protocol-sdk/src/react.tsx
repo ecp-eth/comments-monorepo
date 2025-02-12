@@ -6,8 +6,10 @@
  */
 
 import { useMutation } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { Hex, SignTypedDataParameters } from "viem";
 import { useSignTypedData } from "wagmi";
+import { COMMENTS_EMBED_DEFAULT_URL } from "./constants.js";
 
 export function useGaslessTransaction(props: {
   prepareSignTypedData: () => Promise<
@@ -44,4 +46,57 @@ export function useGaslessTransaction(props: {
       return signedData;
     },
   });
+}
+
+type CommentsEmbedProps = {
+  /**
+   * URL of the page to embed comments for. Comments for this uri are rendered in iframe's page.
+   */
+  uri: string;
+  /**
+   * URL of the comments embed iframe page. This page is rendered in the iframe.
+   */
+  embedUri?: string;
+  /**
+   * Allows to pass custom props to iframe's wrapper element
+   */
+  containerProps?: React.HTMLAttributes<HTMLDivElement>;
+  /**
+   * Allows to pass custom props to iframe
+   */
+  iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
+};
+
+/**
+ * Renders comments embed iframe for the given uri.
+ *
+ * @example
+ * ```tsx
+ * <CommentsEmbed uri="https://my-blog.tld/article/use-comments" />
+ * ```
+ */
+export function CommentsEmbed({
+  embedUri = COMMENTS_EMBED_DEFAULT_URL,
+  uri,
+  containerProps,
+  iframeProps,
+}: CommentsEmbedProps) {
+  const iframeUri = useMemo(() => {
+    const url = new URL(embedUri);
+
+    url.searchParams.set("targetUri", uri);
+
+    return url.toString();
+  }, [embedUri, uri]);
+
+  return (
+    <div {...containerProps}>
+      <iframe
+        style={{ border: "none", width: "100%", height: "100%" }}
+        // allow to override style and other props except src and seamless
+        {...iframeProps}
+        src={iframeUri}
+      ></iframe>
+    </div>
+  );
 }

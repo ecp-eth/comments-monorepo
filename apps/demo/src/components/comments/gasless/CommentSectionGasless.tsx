@@ -6,10 +6,8 @@ import { CommentsResponse } from "@/lib/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { signTypedData } from "viem/accounts";
 import {
   useAccount,
-  useSignTypedData,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
@@ -32,12 +30,6 @@ interface ApprovalResponse {
   signTypedDataArgs: SignTypedDataParameters;
   appSignature: `0x${string}`;
   appSigner: `0x${string}`;
-}
-
-interface SignApprovalRequest {
-  signTypedDataArgs: Parameters<typeof signTypedData>[0];
-  appSignature: `0x${string}`;
-  authorSignature: `0x${string}`;
 }
 
 export function CommentSectionGasless() {
@@ -250,16 +242,7 @@ export function CommentSectionGasless() {
       {data?.results.map((comment) => (
         <CommentGasless
           key={comment.id}
-          author={comment.author}
-          content={comment.content}
-          id={comment.id}
-          timestamp={new Date(comment.timestamp).getTime()}
-          replies={comment.replies.map((reply) => ({
-            timestamp: new Date(reply.timestamp).getTime(),
-            id: reply.id,
-            content: reply.content,
-            author: reply.author,
-          }))}
+          comment={comment}
           onReply={(parentId, content) => refetch()}
           onDelete={(id) => {
             refetch();

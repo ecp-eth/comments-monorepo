@@ -6,14 +6,6 @@ import { CommentsResponse } from "../../lib/types";
 import { Comment } from "./Comment";
 import { CommentBox } from "./CommentBox";
 
-interface CommentData {
-  id: string;
-  content: string;
-  author: string;
-  timestamp: number;
-  replies: CommentData[];
-}
-
 export function CommentSection() {
   const [page, setPage] = useState(0);
   const pageSize = 10;
@@ -40,24 +32,6 @@ export function CommentSection() {
     enabled: !!currentUrl,
   });
 
-  const addReply = (
-    comments: CommentData[],
-    parentId: string,
-    newReply: CommentData
-  ): CommentData[] => {
-    return comments.map((comment) => {
-      if (comment.id === parentId) {
-        return { ...comment, replies: [...comment.replies, newReply] };
-      } else if (comment.replies.length > 0) {
-        return {
-          ...comment,
-          replies: addReply(comment.replies, parentId, newReply),
-        };
-      }
-      return comment;
-    });
-  };
-
   if (isLoading) return <div>Loading comments...</div>;
   if (error)
     return <div>Error loading comments: {(error as Error).message}</div>;
@@ -69,18 +43,9 @@ export function CommentSection() {
       {data?.results.map((comment) => (
         <Comment
           key={comment.id}
-          author={comment.author}
-          content={comment.content}
-          id={comment.id}
-          timestamp={new Date(comment.timestamp).getTime()}
-          replies={comment.replies.map((reply) => ({
-            timestamp: new Date(reply.timestamp).getTime(),
-            id: reply.id,
-            content: reply.content,
-            author: reply.author,
-          }))}
-          onReply={(parentId, content) => refetch()}
-          onDelete={(id) => {
+          comment={comment}
+          onReply={() => refetch()}
+          onDelete={() => {
             refetch();
           }}
         />

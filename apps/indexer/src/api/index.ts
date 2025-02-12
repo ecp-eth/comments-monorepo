@@ -2,7 +2,8 @@ import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { Hono } from "hono";
 import { and, asc, client, desc, eq, graphql, isNull } from "ponder";
-import { normalizeUrl } from "../lib/utils";
+import { formatComment, normalizeUrl } from "../lib/utils";
+import { APIListCommentsResponse } from "../lib/types";
 
 const app = new Hono();
 
@@ -10,6 +11,8 @@ app.use("/sql/*", client({ db, schema }));
 
 app.use("/", graphql({ db, schema }));
 app.use("/graphql", graphql({ db, schema }));
+
+const REPLIES_PER_COMMENT = 2;
 
 app.get("/api/comments", async (c) => {
   let targetUri = c.req.query("targetUri");
@@ -26,12 +29,10 @@ app.get("/api/comments", async (c) => {
     with: {
       replies: {
         orderBy: desc(schema.comment.timestamp),
-        where: isNull(schema.comment.deletedAt),
-        limit: 2,
+        limit: REPLIES_PER_COMMENT + 1,
       },
     },
     where: and(
-      isNull(schema.comment.deletedAt),
       isNull(schema.comment.parentId),
       targetUri ? eq(schema.comment.targetUri, targetUri) : undefined,
       appSigner
@@ -48,8 +49,37 @@ app.get("/api/comments", async (c) => {
 
   const comments = await query.execute();
 
-  const res = {
-    results: comments,
+  const res: APIListCommentsResponse = {
+    results: comments.slice(0, limit).map((comment) => {
+      const replies: APIListCommentsResponse = {
+        results: comment.replies.slice(0, REPLIES_PER_COMMENT).map((reply) => {
+          // do not go deeper than first level of replies
+          const replies: APIListCommentsResponse = {
+            results: [],
+            pagination: {
+              offset: 0,
+              limit: 0,
+              hasMore: false,
+            },
+          };
+
+          return {
+            ...formatComment(reply),
+            replies,
+          };
+        }),
+        pagination: {
+          offset: 0,
+          limit: REPLIES_PER_COMMENT,
+          hasMore: comment.replies.length > REPLIES_PER_COMMENT,
+        },
+      };
+
+      return {
+        ...formatComment(comment),
+        replies,
+      };
+    }),
     pagination: {
       limit,
       offset,
@@ -61,6 +91,7 @@ app.get("/api/comments", async (c) => {
 });
 
 app.get("/api/comments/:commentId/replies", async (c) => {
+  const appSigner = c.req.query("appSigner");
   const commentId = c.req.param("commentId");
   const limit = parseInt(c.req.query("limit") ?? "50");
   const offset = parseInt(c.req.query("offset") ?? "0");
@@ -69,7 +100,9 @@ app.get("/api/comments/:commentId/replies", async (c) => {
   const query = db.query.comment.findMany({
     where: and(
       eq(schema.comment.parentId, commentId as `0x${string}`),
-      isNull(schema.comment.deletedAt)
+      appSigner
+        ? eq(schema.comment.appSigner, appSigner as `0x${string}`)
+        : undefined
     ),
     orderBy:
       sort === "desc"
@@ -81,8 +114,22 @@ app.get("/api/comments/:commentId/replies", async (c) => {
 
   const replies = await query.execute();
 
-  const res = {
-    results: replies,
+  const res: APIListCommentsResponse = {
+    results: replies.slice(0, limit).map((reply) => {
+      const replies: APIListCommentsResponse = {
+        results: [],
+        pagination: {
+          offset: 0,
+          limit: 0,
+          hasMore: false,
+        },
+      };
+
+      return {
+        ...formatComment(reply),
+        replies,
+      };
+    }),
     pagination: {
       limit,
       offset,

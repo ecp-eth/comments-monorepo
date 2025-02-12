@@ -16,32 +16,21 @@ import {
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { getAddress } from "viem";
 import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import type { APIComment } from "@/lib/types";
 
 interface CommentProps {
-  id: `0x${string}`;
-  content: string;
-  author: string;
-  timestamp: number;
-  replies?: CommentProps[];
+  comment: APIComment;
   onReply?: (parentId: string, content: string) => void;
   onDelete?: (id: string) => void;
 }
 
-export function Comment({
-  id,
-  content,
-  author,
-  timestamp,
-  replies,
-  onReply,
-  onDelete,
-}: CommentProps) {
+export function Comment({ comment, onReply, onDelete }: CommentProps) {
   const { address: connectedAddress } = useAccount();
 
   const [isReplying, setIsReplying] = useState(false);
 
   const handleReply = (replyContent: string) => {
-    onReply?.(id, replyContent);
+    onReply?.(comment.id, replyContent);
     setIsReplying(false);
   };
 
@@ -58,12 +47,12 @@ export function Comment({
 
   useEffect(() => {
     if (deleteTxReceipt?.status === "success") {
-      onDelete?.(id);
+      onDelete?.(comment.id);
     }
   }, [deleteTxReceipt]);
 
   const isAuthor = connectedAddress
-    ? getAddress(connectedAddress) === getAddress(author)
+    ? getAddress(connectedAddress) === getAddress(comment.author)
     : false;
 
   const isDeleting = isDeleteSigPending || isDeleteTxPending;
@@ -72,7 +61,7 @@ export function Comment({
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
         <div className="text-xs text-gray-500 mb-1">
-          {author} • {formatDate(timestamp)}
+          {comment.author} • {formatDate(comment.timestamp)}
         </div>
         {isAuthor && (
           <DropdownMenu>
@@ -87,7 +76,7 @@ export function Comment({
                     address: COMMENTS_V1_ADDRESS,
                     abi: CommentsV1Abi,
                     functionName: "deleteCommentAsAuthor",
-                    args: [id],
+                    args: [comment.id],
                   });
                 }}
                 disabled={isDeleting}
@@ -98,7 +87,7 @@ export function Comment({
           </DropdownMenu>
         )}
       </div>
-      <div className="mb-2">{content}</div>
+      <div className="mb-2">{comment.content}</div>
       <div className="text-xs text-gray-500 mb-2">
         <button
           onClick={() => setIsReplying(!isReplying)}
@@ -111,11 +100,11 @@ export function Comment({
         <CommentBox
           onSubmit={handleReply}
           placeholder="What are your thoughts?"
-          parentId={id}
+          parentId={comment.id}
         />
       )}
-      {replies?.map((reply) => (
-        <Comment key={reply.id} {...reply} onReply={onReply} />
+      {comment.replies.results?.map((reply) => (
+        <Comment key={reply.id} comment={reply} onReply={onReply} />
       ))}
     </div>
   );

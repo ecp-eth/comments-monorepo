@@ -90,6 +90,10 @@ jobs:
   build-js:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    env:
+      APP_SIGNER_PRIVATE_KEY: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+      COMMENTS_INDEXER_URL: "https://example.com/indexer"
+      NEXT_PUBLIC_WC_PROJECT_ID: "test-project-id"
     strategy:
       matrix:
         node: [22]
