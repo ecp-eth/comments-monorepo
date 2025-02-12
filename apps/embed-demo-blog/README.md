@@ -1,42 +1,44 @@
-# Portfolio Blog Starter
+# Embed Demo Blog
 
-This is a porfolio site template complete with a blog. Includes:
+This is an example of how to embed the Comments service into a blog.
 
-- MDX and Markdown support
-- Optimized for SEO (sitemap, robots, JSON-LD schema)
-- RSS Feed
-- Dynamic OG images
-- Syntax highlighting
-- Tailwind v4
-- Vercel Speed Insights / Web Analytics
-- Geist font
+[See it in action](https://demo-blog.ethcomments.xyz/)
 
-## Demo
-
-https://portfolio-blog-starter.vercel.app
-
-## How to Use
-
-You can choose from one of the following two methods to use this repository:
-
-### One-Click Deploy
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/examples/tree/main/solutions/blog&project-name=blog&repository-name=blog)
-
-### Clone and Deploy
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [pnpm](https://pnpm.io/installation) to bootstrap the example:
+## Installation
 
 ```bash
-pnpm create next-app --example https://github.com/vercel/examples/tree/main/solutions/blog blog
+pnpm install
 ```
 
-Then, run Next.js in development mode:
+## Development
+
+1. Copy `.env.example` to `.env.local`:
+
+```bash
+cp .env.example .env.local
+```
+
+2. Configure environment variables in `.env.local`:
+
+- `NEXT_PUBLIC_ECP_ETH_EMBED_URL` (Optional): URL to ecp.eth embed renderer. Defaults to locally hosted embed server.
+- `NEXT_PUBLIC_URL`: URL of the embed demo blog deployment, used to construct target URI for embedded comments.
+
+3. Start the development server:
 
 ```bash
 pnpm dev
 ```
 
-Deploy it to the cloud with [Vercel](https://vercel.com/templates) ([Documentation](https://nextjs.org/docs/app/building-your-application/deploying)).
+The application will be available at [http://localhost:3003](http://localhost:3003).
+
+## Building for Production
+
+```bash
+pnpm build
+```
+
+## Starting Production Server
+
+```bash
+pnpm start
+```
