@@ -35,6 +35,7 @@ export const GET = async (req: NextRequest) => {
 
   const nonce = await getNonce({
     author: authorAddress,
+    appSigner: account.address,
     chain,
     transport,
   });

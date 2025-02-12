@@ -34,7 +34,7 @@ contract CommentsV1Test is Test {
         view
         returns (CommentsV1.CommentData memory)
     {
-        uint256 nonce = comments.nonces(author);
+        uint256 nonce = comments.nonces(author, appSigner);
 
         return
             CommentsV1.CommentData({
@@ -128,7 +128,7 @@ contract CommentsV1Test is Test {
             commentId,
             author,
             appSigner,
-            comments.nonces(author),
+            comments.nonces(author, appSigner),
             block.timestamp + 1 days
         );
         bytes memory authorDeleteSignature = _signEIP712(
@@ -142,7 +142,7 @@ contract CommentsV1Test is Test {
             commentId,
             author,
             appSigner,
-            comments.nonces(author),
+            comments.nonces(author, appSigner),
             block.timestamp + 1 days,
             authorDeleteSignature,
             ""
@@ -155,12 +155,12 @@ contract CommentsV1Test is Test {
             commentId,
             author,
             appSigner,
-            comments.nonces(author),
+            comments.nonces(author, appSigner),
             block.timestamp + 1 days
         );
         bytes memory wrongSignature = _signEIP712(wrongPrivateKey, deleteHash); // Wrong signer
 
-        uint256 nonce = comments.nonces(author);
+        uint256 nonce = comments.nonces(author, appSigner);
         uint256 deadline = block.timestamp + 1 days;
 
         vm.expectRevert(CommentsV1.NotAuthorized.selector);
@@ -394,7 +394,7 @@ contract CommentsV1Test is Test {
             commentId,
             author,
             appSigner,
-            comments.nonces(author),
+            comments.nonces(author, appSigner),
             block.timestamp + 1 days
         );
         bytes memory appDeleteSignature = _signEIP712(
@@ -408,7 +408,7 @@ contract CommentsV1Test is Test {
             commentId,
             author,
             appSigner,
-            comments.nonces(author),
+            comments.nonces(author, appSigner),
             block.timestamp + 1 days,
             bytes(""), // Empty author signature
             appDeleteSignature

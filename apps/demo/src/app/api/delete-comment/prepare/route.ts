@@ -38,6 +38,7 @@ export const POST = async (req: Request) => {
 
   const nonce = await getNonce({
     author: authorAddress,
+    appSigner: account.address,
     chain,
     transport,
   });
