@@ -172,6 +172,9 @@ export function CommentBoxGasless({
           {isLoading ? "Posting..." : "Comment"}
         </Button>
       </div>
+      {gaslessMutation.error && (
+        <div className="text-red-500">{gaslessMutation.error.message}</div>
+      )}
     </form>
   );
 }

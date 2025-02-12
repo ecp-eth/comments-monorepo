@@ -253,7 +253,7 @@ export function CommentSectionGasless() {
           content={comment.content}
           id={comment.id}
           timestamp={new Date(comment.timestamp).getTime()}
-          replies={comment.replies.map((reply) => ({
+          replies={comment.replies?.results.map((reply) => ({
             timestamp: new Date(reply.timestamp).getTime(),
             id: reply.id,
             content: reply.content,
