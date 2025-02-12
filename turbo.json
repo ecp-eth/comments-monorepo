@@ -1,6 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalEnv": ["NEXT_PUBLIC_WC_PROJECT_ID"],
+  "globalPassThroughEnv": ["APP_SIGNER_PRIVATE_KEY", "COMMENTS_INDEXER_URL"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -8,12 +10,7 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"],
-      "env": [
-        "APP_SIGNER_PRIVATE_KEY",
-        "COMMENTS_INDEXER_URL",
-        "NEXT_PUBLIC_WC_PROJECT_ID"
-      ]
+      "dependsOn": ["^lint"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
