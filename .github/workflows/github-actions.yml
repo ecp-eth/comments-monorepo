@@ -23,7 +23,7 @@ jobs:
     runs-on: "ubuntu-latest"
     defaults:
       run:
-        working-directory: apps/protocol
+        working-directory: packages/protocol
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
@@ -56,7 +56,7 @@ jobs:
     runs-on: "ubuntu-latest"
     defaults:
       run:
-        working-directory: apps/protocol
+        working-directory: packages/protocol
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
