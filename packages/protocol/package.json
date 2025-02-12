@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build:abi": "node ./build-abi.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "forge test",
     "node": "anvil --block-time 2",
     "dev": "node dev.js",
     "deploy": "forge script script/CommentsV1.s.sol:CommentsV1Script --verify --broadcast"
