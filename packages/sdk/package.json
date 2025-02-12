@@ -20,8 +20,9 @@
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",
     "@ecp.eth/typescript-config": "workspace:*",
-    "@types/react": "^19.0.8",
+    "@ecp.eth/protocol": "workspace:*",
     "@tanstack/react-query": ">=5.0.0",
+    "@types/react": "^19.0.8",
     "react": "18 || 19",
     "viem": "^2.22.21",
     "wagmi": "^2.14.9",

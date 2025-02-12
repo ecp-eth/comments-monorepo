@@ -6,8 +6,10 @@ import { format } from "prettier";
 const currentDir = import.meta.dirname;
 const outputAbiPath = resolve(
   currentDir,
-  "../../packages/sdk/src/abis.ts"
+  "./abis.ts"
 );
+
+console.log("Building ABI...");
 
 const abi = execFileSync(
   "pnpm",
@@ -20,6 +22,9 @@ const abi = execFileSync(
 
 const formattedAbi = await format(
   `
+  /**
+   * ABI for the CommentsV1 contract.
+   */
   export const CommentsV1Abi = ${abi.trim()} as const;
 `,
   { parser: "typescript" }

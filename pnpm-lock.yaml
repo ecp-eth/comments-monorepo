@@ -310,6 +310,9 @@ importers:
       '@ecp.eth/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@ecp.eth/protocol':
+        specifier: workspace:*
+        version: link:../protocol
       '@ecp.eth/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
