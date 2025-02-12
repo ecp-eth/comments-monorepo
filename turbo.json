@@ -1,8 +1,13 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalEnv": ["NEXT_PUBLIC_WC_PROJECT_ID"],
-  "globalPassThroughEnv": ["APP_SIGNER_PRIVATE_KEY", "COMMENTS_INDEXER_URL"],
+  "globalEnv": ["NEXT_PUBLIC_WC_PROJECT_ID", "NEXT_PUBLIC_URL"],
+  "globalPassThroughEnv": [
+    "APP_URL",
+    "APP_SIGNER_PRIVATE_KEY",
+    "COMMENTS_INDEXER_URL",
+    "SUBMITTER_PRIVATE_KEY"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
