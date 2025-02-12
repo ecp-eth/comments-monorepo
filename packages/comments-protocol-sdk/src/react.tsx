@@ -9,6 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Hex, SignTypedDataParameters } from "viem";
 import { useSignTypedData } from "wagmi";
+import { COMMENTS_EMBED_DEFAULT_URL } from "./constants.js";
 
 export function useGaslessTransaction(props: {
   prepareSignTypedData: () => Promise<
@@ -55,11 +56,11 @@ type CommentsEmbedProps = {
   /**
    * URL of the comments embed iframe page. This page is rendered in the iframe.
    */
-  embedUri: string;
+  embedUri?: string;
   /**
-   * Allows to pass custom props to iframe's wrapper
+   * Allows to pass custom props to iframe's wrapper element
    */
-  wrapperProps?: React.HTMLAttributes<HTMLDivElement>;
+  containerProps?: React.HTMLAttributes<HTMLDivElement>;
   /**
    * Allows to pass custom props to iframe
    */
@@ -75,7 +76,7 @@ type CommentsEmbedProps = {
  * ```
  */
 export function CommentsEmbed({
-  embedUri,
+  embedUri = COMMENTS_EMBED_DEFAULT_URL,
   uri,
   containerProps,
   iframeProps,
