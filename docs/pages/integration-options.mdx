@@ -48,24 +48,33 @@ See [COMMENTS_V1_ADDRESS](/sdk-reference/default/variables/COMMENTS_V1_ADDRESS)
 First, install the required dependencies:
 
 ```bash
-npm install ethers
+npm install wagmi viem
 # or
-pnpm add ethers
+pnpm add wagmi viem
 ```
 
 ### Basic Setup Code
 
 ```typescript
-import { ethers } from 'ethers';
-import { CommentsV1Abi } from '@ecp.eth/protocol/abi';
+import { createConfig, configureChains } from 'wagmi'
+import { baseMainnet } from 'wagmi/chains'
+import { publicProvider } from 'wagmi/providers/public'
+import { CommentsV1Abi } from '@ecp.eth/protocol/abi'
 
-// Connect to the network
-const provider = new ethers.JsonRpcProvider('YOUR_RPC_URL');
-const signer = new ethers.Wallet('YOUR_PRIVATE_KEY', provider);
+// Configure chains & providers
+const { chains, publicClient } = configureChains(
+  [baseMainnet],
+  [publicProvider()]
+)
 
-// Initialize contract
-const contractAddress = '0xfed9b3a3884940d0c8a91b55f5e631b33a84f669'; // Base mainnet
-const contract = new ethers.Contract(contractAddress, CommentsV1Abi, signer);
+// Create wagmi config
+const config = createConfig({
+  autoConnect: true,
+  publicClient,
+})
+
+// Contract config
+const contractAddress = '0xfed9b3a3884940d0c8a91b55f5e631b33a84f669' // Base mainnet
 ```
 
 ### Best Practices
