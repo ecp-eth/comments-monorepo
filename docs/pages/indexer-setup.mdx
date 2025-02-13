@@ -1,0 +1,68 @@
+# Indexer Setup
+
+The Comments Protocol Indexer is responsible for processing on-chain events and maintaining a queryable database of comments.
+
+## Requirements
+
+- Node.js 16 or later
+- PostgreSQL or SQLite database
+- Access to an Ethereum node (RPC endpoint)
+
+## Installation
+
+```bash
+# Clone the indexer repository
+git clone https://github.com/your-org/comments-protocol-indexer
+
+# Install dependencies
+pnpm install
+```
+
+## Configuration
+
+Create a `.env` file:
+
+```env
+# Networks - specify RPC URLs for each network you want to index
+PONDER_RPC_URL_1="https://eth-mainnet.g.alchemy.com/v2/your-api-key"
+PONDER_RPC_URL_5="https://eth-goerli.g.alchemy.com/v2/your-api-key"
+
+# (Optional) Start block for each network
+PONDER_START_BLOCK_1=12345678
+
+# Database configuration
+DATABASE_URL="postgresql://user:password@localhost:5432/comments"
+```
+
+## Running the Indexer
+
+```bash
+# Start the indexer in development mode
+pnpm dev
+
+# Build and start in production
+pnpm build
+pnpm start
+```
+
+## Monitoring
+
+The indexer provides a monitoring endpoint at `/health` that returns the current indexing status and health metrics.
+
+## Deployment
+
+### Docker Deployment
+```dockerfile
+FROM node:16-alpine
+
+WORKDIR /app
+
+COPY package.json .
+COPY pnpm-lock.yaml .
+
+RUN pnpm install
+
+COPY . .
+
+CMD ["pnpm", "start"]
+``` 

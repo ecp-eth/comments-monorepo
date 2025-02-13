@@ -1,0 +1,70 @@
+# Quick Start
+
+Get started with the Ethereum Comments Protocol in minutes.
+
+## Installation
+
+Run one of the commands below based on your preferred package manager and then follow the steps in the terminal.
+
+:::code-group
+
+```bash [npm]
+npm install @ecp.eth/sdk
+```
+
+```bash [yarn]
+yarn add @ecp.eth/sdk
+```
+
+```bash [pnpm]
+pnpm add @ecp.eth/sdk
+```
+
+:::
+
+## Basic Usage
+
+::::steps
+
+### Install dependencies
+
+```bash
+npm install @ecp.eth/sdk wagmi
+```
+
+### Render the comment box
+
+Render `<CommentsEmbed />` component with a unique url for current page.
+
+```tsx
+import { CommentsEmbed } from '@ecp.eth/sdk/react'
+
+const baseOrigin = 'https://blog.example.com'
+
+export function Comments() {
+  return (
+    <div>
+      <h3>Comments</h3>
+      <CommentsEmbed
+        // the uri for commenting
+        uri={new URL(
+          window.location.pathname,
+          baseOrigin
+        ).toString()}
+      />
+    </div>`
+  )
+}
+```
+
+For details see [integration options: react component library](/integration-options#1-react-component-library)
+
+### Deploy and start interacting with your community!
+
+::::
+
+## Next Steps
+
+- Learn more about [architecture overview](/architecture-overview) and [post comment flow](/post-comment-flow)
+- Explore [integration options](/integration-options)
+- Check out our [demo repository](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo)

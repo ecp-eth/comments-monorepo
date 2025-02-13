@@ -1,3 +1,6 @@
+/**
+ * ABI of the CommentsV1 contract.
+ */
 export const CommentsV1Abi = [
   {
     type: "constructor",

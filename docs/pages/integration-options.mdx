@@ -1,0 +1,224 @@
+# Integration Options
+
+## Integration Methods
+
+### 1. React Component Library
+
+- Pre-built UI components
+- Quick integration
+- Customizable styling
+
+```tsx
+import { CommentsEmbed } from '@ecp.eth/sdk/react'
+
+const baseOrigin = 'https://blog.example.com'
+
+export function Comments() {
+  return (
+    <div>
+      <h3>Comments</h3>
+      <CommentsEmbed
+        // the uri for commenting
+        uri={new URL(
+          window.location.pathname,
+          baseOrigin
+        ).toString()}
+      />
+    </div>`
+  )
+}
+```
+
+Be careful when choosing the value for the `uri` property. The `uri` serves as a unique identifier to locate comments:
+
+1. If your web page is dynamic and accepts query parameters, you should carefully consider which parameters are necessary to locate the correct comments
+and include them in the `uri` property. As a general rule, include query parameters that affect the page content.
+2. If you are rendering the `CommentsEmbed` with server-side rendering (SSR), you do not have access to the `window` object.
+
+The `uri` must be a unique string that follows the [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) standard.
+
+### 2. Contract Interaction
+
+This guide explains how to directly interact with the CommentsV1 smart contract for custom integrations or bot development.
+
+#### Contract Addresses
+
+See [COMMENTS_V1_ADDRESS](/sdk-reference/default/variables/COMMENTS_V1_ADDRESS)
+
+#### Setup
+
+First, install the required dependencies:
+
+```bash
+npm install ethers
+# or
+pnpm add ethers
+```
+
+## Basic Setup Code
+
+```typescript
+import { ethers } from 'ethers';
+import { CommentsV1Abi } from '@ecp.eth/protocol/abi';
+
+// Connect to the network
+const provider = new ethers.JsonRpcProvider('YOUR_RPC_URL');
+const signer = new ethers.Wallet('YOUR_PRIVATE_KEY', provider);
+
+// Initialize contract
+const contractAddress = '0xfed9b3a3884940d0c8a91b55f5e631b33a84f669'; // Base mainnet
+const contract = new ethers.Contract(contractAddress, CommentsV1Abi, signer);
+```
+
+## Common Operations
+
+### 1. Post a Comment as Author
+
+The simplest way to post a comment is directly as the author. This requires the transaction to be signed by the author's wallet.
+
+```typescript
+async function postCommentAsAuthor(
+  content: string,
+  targetUri: string,
+  appSignerAddress: string
+) {
+  const deadline = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
+  const nonce = await contract.nonces(signer.address, appSignerAddress);
+  
+  const commentData = {
+    content,
+    metadata: '', // Optional metadata
+    targetUri,
+    parentId: ethers.ZeroHash, // For top-level comments
+    author: signer.address,
+    appSigner: appSignerAddress,
+    nonce,
+    deadline,
+  };
+
+  // Get app signer's signature (you need to implement this based on your app signer setup)
+  const appSignature = await getAppSignature(commentData);
+
+  // Post the comment
+  const tx = await contract.postCommentAsAuthor(commentData, appSignature);
+  await tx.wait();
+}
+```
+
+### 2. Add Approval for an App Signer
+
+To allow an app signer to post on behalf of the author:
+
+```typescript
+async function addAppSigner(appSignerAddress: string) {
+  const tx = await contract.addApprovalAsAuthor(appSignerAddress);
+  await tx.wait();
+}
+```
+
+### 3. Remove Approval from an App Signer
+
+```typescript
+async function removeAppSigner(appSignerAddress: string) {
+  const tx = await contract.removeApprovalAsAuthor(appSignerAddress);
+  await tx.wait();
+}
+```
+
+### 4. Delete a Comment as Author
+
+```typescript
+async function deleteComment(commentId: string) {
+  const tx = await contract.deleteCommentAsAuthor(commentId);
+  await tx.wait();
+}
+```
+
+## Advanced: Implementing an App Signer
+
+If you want to implement your own app signer, you'll need to handle EIP-712 signatures:
+
+```typescript
+import { ethers } from 'ethers';
+
+const DOMAIN = {
+  name: 'Comments',
+  version: '1',
+  chainId: YOUR_CHAIN_ID, // e.g., 8453 for Base
+  verifyingContract: CONTRACT_ADDRESS
+};
+
+const COMMENT_TYPES = {
+  CommentData: [
+    { name: 'content', type: 'string' },
+    { name: 'metadata', type: 'string' },
+    { name: 'targetUri', type: 'string' },
+    { name: 'parentId', type: 'bytes32' },
+    { name: 'author', type: 'address' },
+    { name: 'appSigner', type: 'address' },
+    { name: 'nonce', type: 'uint256' },
+    { name: 'deadline', type: 'uint256' }
+  ]
+};
+
+async function signComment(commentData, appSignerWallet) {
+  const signature = await appSignerWallet.signTypedData(
+    DOMAIN,
+    COMMENT_TYPES,
+    commentData
+  );
+  return signature;
+}
+```
+
+## Event Listening
+
+To listen for new comments:
+
+```typescript
+function listenToComments() {
+  contract.on('CommentAdded', (commentId, author, appSigner, commentData) => {
+    console.log('New comment:', {
+      id: commentId,
+      author,
+      appSigner,
+      content: commentData.content,
+      targetUri: commentData.targetUri,
+      timestamp: new Date(),
+    });
+  });
+}
+```
+
+## Error Handling
+
+The contract includes several custom errors you should handle:
+
+```typescript
+try {
+  await postCommentAsAuthor(content, targetUri, appSignerAddress);
+} catch (error) {
+  if (error.message.includes('DeadlineReached')) {
+    console.error('Comment deadline has passed');
+  } else if (error.message.includes('InvalidAppSignature')) {
+    console.error('Invalid app signer signature');
+  } else if (error.message.includes('InvalidNonce')) {
+    console.error('Invalid nonce used');
+  } else {
+    console.error('Unknown error:', error);
+  }
+}
+```
+
+## Best Practices
+
+1. Always use fresh nonces by querying them before each operation
+2. Set reasonable deadlines (e.g., 1 hour from current time)
+3. Implement proper error handling
+4. Monitor gas costs and adjust gas limits accordingly
+5. Consider implementing retry mechanisms for failed transactions
+6. Keep private keys secure and never expose them in client-side code
+
+## Rate Limiting
+
+While the contract doesn't impose rate limits, consider implementing application-level rate limiting to prevent spam and manage gas costs effectively.

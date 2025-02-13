@@ -7,7 +7,10 @@
     "dev": "turbo dev --filter=./apps/demo... --filter=./apps/indexer --filter=./packages/protocol",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "publish-packages": "turbo run build lint test --filter=./packages/sdk... && changeset version && changeset publish"
+    "publish-packages": "turbo run build lint test --filter=./packages/sdk... && changeset version && changeset publish",
+    "docs:dev": "pnpm --filter @ecp.eth/docs dev",
+    "docs:build": "pnpm --filter @ecp.eth/docs reference:generate && pnpm --filter @ecp.eth/docs build",
+    "docs:preview": "pnpm --filter @ecp.eth/docs preview"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
