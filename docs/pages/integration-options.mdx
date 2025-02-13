@@ -1,8 +1,6 @@
 # Integration Options
 
-## Integration Methods
-
-### 1. React Component Library
+## 1. React Component Library
 
 - Pre-built UI components
 - Quick integration
@@ -37,15 +35,15 @@ and include them in the `uri` property. As a general rule, include query paramet
 
 The `uri` must be a unique string that follows the [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) standard.
 
-### 2. Contract Interaction
+## 2. Contract Interaction
 
 This guide explains how to directly interact with the CommentsV1 smart contract for custom integrations or bot development.
 
-#### Contract Addresses
+### Contract Addresses
 
 See [COMMENTS_V1_ADDRESS](/sdk-reference/default/variables/COMMENTS_V1_ADDRESS)
 
-#### Setup
+### Setup
 
 First, install the required dependencies:
 
@@ -55,7 +53,7 @@ npm install ethers
 pnpm add ethers
 ```
 
-#### Basic Setup Code
+### Basic Setup Code
 
 ```typescript
 import { ethers } from 'ethers';
@@ -70,7 +68,7 @@ const contractAddress = '0xfed9b3a3884940d0c8a91b55f5e631b33a84f669'; // Base ma
 const contract = new ethers.Contract(contractAddress, CommentsV1Abi, signer);
 ```
 
-## Best Practices
+### Best Practices
 
 1. Always use fresh nonces by querying them before each operation
 2. Set reasonable deadlines (e.g., 1 hour from current time)
@@ -78,7 +76,5 @@ const contract = new ethers.Contract(contractAddress, CommentsV1Abi, signer);
 4. Monitor gas costs and adjust gas limits accordingly
 5. Consider implementing retry mechanisms for failed transactions
 6. Keep private keys secure and never expose them in client-side code
-
-## Rate Limiting
-
-While the contract doesn't impose rate limits, consider implementing application-level rate limiting to prevent spam and manage gas costs effectively.
+7. While the contract doesn't impose rate limits, consider implementing application-level rate limiting to prevent spam and manage gas costs effectively.
+8. Considering anti-spam measures
