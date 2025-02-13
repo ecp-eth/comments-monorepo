@@ -2,8 +2,9 @@ import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { Hono } from "hono";
 import { and, asc, client, desc, eq, graphql, isNull } from "ponder";
-import { formatComment, normalizeUrl } from "../lib/utils";
-import { APIListCommentsResponse } from "../lib/types";
+import { normalizeUrl } from "../lib/utils";
+import type { APIListCommentsResponse } from "../lib/types";
+import { resolveEnsAndFormatListCommentsResponse } from "../lib/response-formatters";
 
 const app = new Hono();
 
@@ -49,45 +50,14 @@ app.get("/api/comments", async (c) => {
 
   const comments = await query.execute();
 
-  const res: APIListCommentsResponse = {
-    results: comments.slice(0, limit).map((comment) => {
-      const replies: APIListCommentsResponse = {
-        results: comment.replies.slice(0, REPLIES_PER_COMMENT).map((reply) => {
-          // do not go deeper than first level of replies
-          const replies: APIListCommentsResponse = {
-            results: [],
-            pagination: {
-              offset: 0,
-              limit: 0,
-              hasMore: false,
-            },
-          };
+  const formattedComments = await resolveEnsAndFormatListCommentsResponse({
+    comments,
+    limit,
+    offset,
+    replyLimit: REPLIES_PER_COMMENT,
+  });
 
-          return {
-            ...formatComment(reply),
-            replies,
-          };
-        }),
-        pagination: {
-          offset: 0,
-          limit: REPLIES_PER_COMMENT,
-          hasMore: comment.replies.length > REPLIES_PER_COMMENT,
-        },
-      };
-
-      return {
-        ...formatComment(comment),
-        replies,
-      };
-    }),
-    pagination: {
-      limit,
-      offset,
-      hasMore: comments.length > limit,
-    },
-  };
-
-  return c.json(res);
+  return c.json<APIListCommentsResponse>(formattedComments);
 });
 
 app.get("/api/comments/:commentId/replies", async (c) => {
@@ -114,30 +84,14 @@ app.get("/api/comments/:commentId/replies", async (c) => {
 
   const replies = await query.execute();
 
-  const res: APIListCommentsResponse = {
-    results: replies.slice(0, limit).map((reply) => {
-      const replies: APIListCommentsResponse = {
-        results: [],
-        pagination: {
-          offset: 0,
-          limit: 0,
-          hasMore: false,
-        },
-      };
+  const formattedComments = await resolveEnsAndFormatListCommentsResponse({
+    comments: replies,
+    limit,
+    offset,
+    replyLimit: REPLIES_PER_COMMENT,
+  });
 
-      return {
-        ...formatComment(reply),
-        replies,
-      };
-    }),
-    pagination: {
-      limit,
-      offset,
-      hasMore: replies.length > limit,
-    },
-  };
-
-  return c.json(res);
+  return c.json<APIListCommentsResponse>(formattedComments);
 });
 
 app.get("/api/approvals", async (c) => {

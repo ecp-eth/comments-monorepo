@@ -239,9 +239,15 @@ importers:
       '@ecp.eth/sdk':
         specifier: ^0.0.4
         version: link:../../packages/sdk
+      dataloader:
+        specifier: ^2.2.3
+        version: 2.2.3
       hono:
         specifier: ^4.5.0
         version: 4.6.20
+      lru-cache:
+        specifier: ^11.0.2
+        version: 11.0.2
       normalize-url:
         specifier: ^8.0.1
         version: 8.0.1
@@ -4841,8 +4847,9 @@ packages:
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
 
-  lru-cache@5.1.1:
-    resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
+  lru-cache@11.0.2:
+    resolution: {integrity: sha512-123qHRfJBmo2jXDbo/a5YOQrJoHF/GNQTLzQ5+IdK5pWpceK17yRc6ozlWd25FxvGKQbIUs91fDFkXmDHTKcyA==}
+    engines: {node: 20 || >=22}
 
   lucide-react@0.474.0:
     resolution: {integrity: sha512-CmghgHkh0OJNmxGKWc0qfPJCYHASPMVSyGY8fj3xgk4v84ItqDg64JNKFZn5hC6E0vHi6gxnbCgwhyVB09wQtA==}
@@ -12585,9 +12592,7 @@ snapshots:
 
   lru-cache@10.4.3: {}
 
-  lru-cache@5.1.1:
-    dependencies:
-      yallist: 3.1.1
+  lru-cache@11.0.2: {}
 
   lucide-react@0.474.0(react@19.0.0):
     dependencies:

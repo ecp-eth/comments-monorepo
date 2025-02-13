@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "@ecp.eth/sdk": "^0.0.4",
+    "dataloader": "^2.2.3",
     "hono": "^4.5.0",
+    "lru-cache": "^11.0.2",
     "normalize-url": "^8.0.1",
     "ponder": "^0.9.1",
     "viem": "^2.22.21"

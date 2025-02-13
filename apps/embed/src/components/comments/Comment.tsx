@@ -125,6 +125,9 @@ export function Comment({ comment, onDelete }: CommentProps) {
 
         clonedOldData.pages[0].results.unshift({
           ...response.data,
+          author: {
+            address: response.data.author,
+          },
           deletedAt: null,
           logIndex: 0,
           txHash,
@@ -158,9 +161,10 @@ export function Comment({ comment, onDelete }: CommentProps) {
     }
   }, [deleteCommentTransactionReceipt.data?.status, commentRef, onDeleteRef]);
 
-  const isAuthor = connectedAddress
-    ? getAddress(connectedAddress) === getAddress(comment.author)
-    : false;
+  const isAuthor =
+    connectedAddress && comment.author
+      ? getAddress(connectedAddress) === getAddress(comment.author.address)
+      : false;
 
   const isDeleting =
     deleteCommentTransactionReceipt.isFetching ||
@@ -170,7 +174,10 @@ export function Comment({ comment, onDelete }: CommentProps) {
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
         <div className="text-xs text-gray-500 mb-1">
-          {comment.author} • {formatDate(comment.timestamp)}
+          {comment.author?.ens?.name ??
+            comment.author?.address ??
+            "Unknown sender"}{" "}
+          • {formatDate(comment.timestamp)}
         </div>
         {isAuthor && !comment.deletedAt && (
           <DropdownMenu>

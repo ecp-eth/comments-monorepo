@@ -92,9 +92,10 @@ export function CommentGasless({ comment, onReply, onDelete }: CommentProps) {
     }
   }, [receipt]);
 
-  const isAuthor = address
-    ? getAddress(address) === getAddress(comment.author)
-    : false;
+  const isAuthor =
+    address && comment.author
+      ? getAddress(address) === getAddress(comment.author.address)
+      : false;
 
   const isDeleting = gaslessMutation.isPending || isReceiptLoading;
 
@@ -102,7 +103,10 @@ export function CommentGasless({ comment, onReply, onDelete }: CommentProps) {
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
         <div className="text-xs text-gray-500 mb-1">
-          {comment.author} • {formatDate(comment.timestamp)}
+          {comment.author?.ens?.name ??
+            comment.author?.address ??
+            "Unknown sender"}{" "}
+          • {formatDate(comment.timestamp)}
         </div>
         {isAuthor && (
           <DropdownMenu>

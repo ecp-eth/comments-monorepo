@@ -134,6 +134,9 @@ export function CommentSection() {
 
         clonedOldData.pages[0].results.unshift({
           ...response.data,
+          author: {
+            address: response.data.author,
+          },
           deletedAt: null,
           logIndex: 0,
           txHash,
