@@ -1,4 +1,10 @@
-import { createPublicClient, http, type PublicClient, type Hex } from "viem";
+import {
+  createPublicClient,
+  http,
+  type PublicClient,
+  type Hex,
+  getAddress,
+} from "viem";
 import { normalize } from "viem/ens";
 import { mainnet } from "viem/chains";
 import DataLoader from "dataloader";
@@ -28,7 +34,7 @@ async function resolveEnsData(
 
   const ensAddress = await client.getEnsAddress({ name: normalizedName });
 
-  if (ensAddress !== address) {
+  if (!ensAddress || getAddress(ensAddress) !== getAddress(address)) {
     return {
       address,
     };
@@ -60,7 +66,6 @@ function createEnsResolverLoader() {
 
   return new DataLoader<Hex, ResolvedName>(
     async (addresses) => {
-      console.log("looking for addresses", addresses);
       return Promise.all(
         addresses.map((address) => resolveEnsData(publicClient, address))
       );

@@ -1,17 +1,19 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { APIComment } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import { useGaslessTransaction } from "@ecp.eth/sdk/react";
+import { blo } from "blo";
 import { MoreVertical } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAddress } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
-import { useGaslessTransaction } from "@ecp.eth/sdk/react";
-import { APIComment } from "@/lib/types";
 
 interface CommentProps {
   comment: APIComment;
@@ -102,11 +104,29 @@ export function CommentGasless({ comment, onReply, onDelete }: CommentProps) {
   return (
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
-        <div className="text-xs text-gray-500 mb-1">
-          {comment.author?.ens?.name ??
-            comment.author?.address ??
-            "Unknown sender"}{" "}
-          • {formatDate(comment.timestamp)}
+        <div className="flex items-center gap-2">
+          <Avatar className="h-4 w-4">
+            {comment.author?.ens?.avatarUrl ? (
+              <AvatarImage
+                src={comment.author?.ens?.avatarUrl ?? undefined}
+                alt="ENS Avatar"
+              />
+            ) : comment.author ? (
+              <AvatarImage
+                src={blo(comment.author?.address)}
+                alt="Generated Avatar"
+              />
+            ) : null}
+            <AvatarFallback>
+              {comment.author?.ens?.name?.[0]?.toUpperCase() ?? "?"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="text-xs text-gray-500">
+            {comment.author?.ens?.name ??
+              comment.author?.address ??
+              "Unknown sender"}{" "}
+            • {formatDate(comment.timestamp)}
+          </div>
         </div>
         {isAuthor && (
           <DropdownMenu>

@@ -26,6 +26,8 @@ import {
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { blo } from "blo";
 
 const REPLIES_PER_PAGE = 10;
 
@@ -173,11 +175,29 @@ export function Comment({ comment, onDelete }: CommentProps) {
   return (
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
-        <div className="text-xs text-gray-500 mb-1">
-          {comment.author?.ens?.name ??
-            comment.author?.address ??
-            "Unknown sender"}{" "}
-          • {formatDate(comment.timestamp)}
+        <div className="flex items-center gap-2">
+          <Avatar className="h-6 w-6">
+            {comment.author?.ens?.avatarUrl ? (
+              <AvatarImage
+                src={comment.author.ens.avatarUrl}
+                alt="ENS Avatar"
+              />
+            ) : comment.author ? (
+              <AvatarImage
+                src={blo(comment.author?.address)}
+                alt="Generated Avatar"
+              />
+            ) : null}
+            <AvatarFallback>
+              {comment.author?.ens?.name?.[0]?.toUpperCase() ?? "?"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="text-xs text-gray-500">
+            {comment.author?.ens?.name ??
+              comment.author?.address ??
+              "Unknown sender"}{" "}
+            • {formatDate(comment.timestamp)}
+          </div>
         </div>
         {isAuthor && !comment.deletedAt && (
           <DropdownMenu>
