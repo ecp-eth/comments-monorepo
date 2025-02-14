@@ -1,0 +1,113 @@
+## Post comment flow
+
+There are different approaches to post a comment, each comes with pros and cons.
+
+### 1. Author pays gas
+
+The simplest approach is having the author pay the gas fee directly. The flow works as follows:
+
+1. The author creates a post comment request containing the comment details
+2. The app server signs this request using its `appSigner` to authorize the post action
+3. The app server returns the signature to the author
+4. The author submits and pays for the transaction on-chain
+
+This provides a direct path for posting comments, though it requires the author to have funds for gas fees.
+
+```mermaid
+sequenceDiagram
+    actor Author
+    participant App server
+    participant Contract
+    participant Indexer
+
+    %% Flow 3: Author pays gas
+    Note over Author,Indexer: Flow 1: Author pays gas
+    Author->>App server: Post the comment request
+    App server->>App server: Signs the comment request
+    App server-->>Author: Responds comment data and app signature
+    Author->>Contract: CommentV1.postCommentAsAuthor(commentData, appSignature)
+    Contract->>Indexer: Emit comment event
+    Indexer->>Indexer: Store the comment
+    Indexer-->>Author: Responds with updated comments feed
+```
+
+While this approach requires authors to interact with their wallet and pay gas fees, 
+which impacts user experience, it provides the strongest security guarantees. 
+Comments can only be published with explicit authorization from the author's wallet, 
+ensuring full control over their content and preventing unauthorized posts.
+
+### 2. Gasless transaction (submitter pays gas)
+
+This approach is similar to the first one, but with a key difference in who pays the gas fees. 
+Instead of the author directly interacting with the contract and paying gas, 
+the author sign a message authorizing a single comment to be posted on their behalf.
+The app server's submitter wallet then handles submitting the transaction and pays the gas fees on behalf of the author.
+
+This enables a smoother user experience since authors don't need to hold network tokens for gas. 
+The app server takes on the responsibility of transaction costs while still maintaining security through the author's signature.
+
+```mermaid
+sequenceDiagram
+    actor Author
+    participant App server
+    participant Contract
+    participant Indexer
+
+    %% Flow 3: Author pays gas
+    Note over Author,Indexer: Flow 2: Sumbmitter pays gas
+    Author->>App server: Post the comment request
+    App server->>App server: Signs the comment request
+    App server-->>Author: Responds comment data and appSignature
+    Author->>Author: Author signs the comment data and appSignature
+    Author->>App server: Post comment data and authorSignature
+    App server->>Contract: CommentV1.postComment(commentData, authorSignature, appSignature)
+    Contract->>Indexer: Emit comment event
+    Indexer->>Indexer: Store the comment
+    Indexer-->>Author: Responds with updated comments feed
+```
+
+This approach significantly improves the user experience by eliminating the need for authors to pay gas fees or maintain token balances.
+The app server handles all transaction costs, making the commenting process seamless for end users.
+While this adds some implementation complexity for the app server developer - requiring proper signature verification and gas fee management - it provides an optimal balance between security and usability. The user's signature still ensures full content ownership and authorization, while removing friction from the interaction process.
+
+### 3. Gasless transaction with prior approval
+
+Both approaches 1 and 2 require the author to sign each transaction, which can be cumbersome for frequent commenters.
+Approach 3 streamlines this process by implementing a prior approval system - the author grants permission to the app server once,
+allowing it to post comments on their behalf going forward. This significantly reduces friction for active users while
+maintaining security through the initial authorization.
+
+```mermaid
+sequenceDiagram
+    actor Author
+    participant App server
+    participant Contract
+    participant Indexer
+
+    %% Flow 3: Author pays gas
+    
+    Note over Author,Indexer: Author approves app signer
+    Author->>App server: Request to approve app signer
+    App server->>Contract: Check if the author has approved the app signer
+
+    alt Author approved
+        Contract-->>App server: Responds with approved=true
+        App server-->>Author: Responds with approved=true
+    else Author is not approved
+        Contract-->>App server: Responds with approved=false
+        App server->>App server: Sign approval request with app signer
+        App server-->>Author: Responds with app signature
+        Author->>Author: Sign the approval request with author signer
+        Author->>App server: Post approval request, author signature, app signature
+        App server->>App server: Verify app signature
+        App server->>Contract: CommentV1.addApproval(authorAddress, appSignerAddress, authorSignature)
+    end
+
+    Note over Author,Indexer: Gasless transaction with prior approval
+    Author->>App server: Post the comment request
+    App server->>App server: Signs the comment request
+    App server->>Contract: CommentV1.postComment(commentData, authorSignature, appSignature)
+    Contract->>Indexer: Emit comment event
+    Indexer->>Indexer: Store the comment
+    Indexer-->>Author: Responds with updated comments feed
+```

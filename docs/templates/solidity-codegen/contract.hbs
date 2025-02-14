@@ -1,0 +1,78 @@
+##### @ecp.eth/protocol
+
+----
+
+# `{{name}}`
+
+{{{natspec.userdoc}}}
+
+{{{natspec.devdoc}}}
+
+{{#if ownStructs}}  
+## Structs
+{{/if}}
+
+{{#each ownStructs}}
+### `{{name}}`
+
+{{#each members}}
+
+- **{{name}}:** {{type}}
+
+{{/each}}
+
+{{/each}}
+
+{{#if ownModifiers}}  
+## Modifiers
+{{/if}}
+
+{{#each ownModifiers}}
+### `{{name}}({{args}})`
+
+{{{natspec.userdoc}}}
+
+{{{natspec.devdoc}}}
+
+{{/each}}
+
+{{#if ownEvents}}  
+## Events
+{{/if}}
+
+{{#each ownEvents}}
+### `{{name}}({{args}})`
+
+{{{natspec.userdoc}}}
+
+{{{natspec.devdoc}}}
+
+{{/each}}
+
+{{#if ownFunctions}}  
+## Functions
+{{/if}}
+
+{{#each ownFunctions}}
+### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
+
+{{{natspec.userdoc}}}
+
+{{{natspec.devdoc}}}
+
+{{/each}}
+
+{{#if ownEnums}}  
+## Enums
+{{/if}}
+
+{{#each ownEnums}}
+### `{{name}}`
+
+{{#each members}}
+
+{{name}}
+
+{{/each}}
+
+{{/each}}

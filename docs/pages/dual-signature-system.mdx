@@ -1,0 +1,20 @@
+## Dual-signature System
+
+The protocol implements a dual-signature system that allows comment authors to delegate comment actions to app server. When an author approves an app signer, that app server can perform actions like posting comments on behalf of the author. This enables features like gasless transactions while maintaining security through cryptographic signatures.
+
+### Author Signer
+- The end user's wallet that creates and owns the comments
+- Signs transactions to post comments directly
+- Can approve or revoke app signers
+
+### App Signer
+- An ethereum account used to authorize comments to be associated with the application
+- Can be approved to post comments on behalf of an author
+
+### Submitter
+
+The app server backend can use a separate submitter wallet to pay for the gas fee.
+
+- A backend wallet that pays for gas
+- Executes transactions on behalf of authors or apps
+- Enables gasless operations when combined with signatures

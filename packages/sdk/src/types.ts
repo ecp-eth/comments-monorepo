@@ -44,10 +44,25 @@ export type FetchCommentsResponse = {
   };
 };
 
+/**
+ * Request for signing a comment.
+ */
 export type SignCommentRequest = {
+  /**
+   * Content of the comment.
+   */
   content: string;
+  /**
+   * Target resource identifier for the comment
+   */
   targetUri?: string;
+  /**
+   * ID of the parent comment.
+   */
   parentId?: Hex;
+  /**
+   * Address of the author of the comment.
+   */
   author: Hex;
 };
 

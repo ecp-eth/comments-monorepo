@@ -1,0 +1,15 @@
+{
+  // different public path for each module
+  // "publicPath": "/sdk-reference",
+  "plugin": ["typedoc-plugin-markdown"],
+  "fileExtension": ".mdx",
+  "gitRevision": "main",
+
+  "expandParameters": false,
+  "expandObjects": false,
+  "indexFormat": "table",
+  "typeDeclarationVisibility": "verbose",
+  "outputFileStrategy": "members",
+  "entryFileName": "index.mdx",
+  "mergeReadme": true,
+}
