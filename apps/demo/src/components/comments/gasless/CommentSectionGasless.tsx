@@ -27,7 +27,7 @@ interface CommentData {
 
 interface ApprovalResponse {
   approved: boolean;
-  signTypedDataArgs: SignTypedDataParameters;
+  signTypedDataParams: SignTypedDataParameters;
   appSignature: `0x${string}`;
   appSigner: `0x${string}`;
 }
@@ -66,7 +66,7 @@ export function CommentSectionGasless() {
   });
 
   const gaslessMutation = useGaslessTransaction({
-    async prepareSignTypedData() {
+    async prepareSignTypedDataParams() {
       setPendingTxHash(undefined);
 
       if (!address) {
@@ -78,7 +78,7 @@ export function CommentSectionGasless() {
       });
 
       return {
-        signTypedDataArgs: data.signTypedDataArgs,
+        signTypedDataParams: data.signTypedDataParams,
         variables: data,
       };
     },
@@ -182,7 +182,7 @@ export function CommentSectionGasless() {
       <h2 className="text-lg font-semibold">Comments</h2>
 
       {!getApprovalDataMutation.data?.approved &&
-      getApprovalDataMutation.data?.signTypedDataArgs ? (
+      getApprovalDataMutation.data?.signTypedDataParams ? (
         <div className="mb-4">
           <Button
             onClick={() => {

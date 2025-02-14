@@ -19,7 +19,7 @@ interface CommentBoxProps {
 }
 
 interface SignCommentGaslessPrepareResponse {
-  signTypedDataArgs: Parameters<typeof signTypedData>[0];
+  signTypedDataParams: Parameters<typeof signTypedData>[0];
   appSignature: `0x${string}`;
 }
 
@@ -70,13 +70,13 @@ export function CommentBoxGasless({
 
       const data = await response.json();
 
-      return { signTypedDataArgs: data.signTypedDataArgs, variables: data };
+      return { signTypedDataParams: data.signTypedDataParams, variables: data };
     },
   });
 
   // TODO: Add mutation for approval flow
   const gaslessMutation = useGaslessTransaction({
-    async prepareSignTypedData() {
+    async prepareSignTypedDataParams() {
       return prepareCommentMutation.mutateAsync({
         submitIfApproved: false,
       });

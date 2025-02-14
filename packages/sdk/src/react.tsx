@@ -12,18 +12,18 @@ import { useSignTypedData } from "wagmi";
 import { COMMENTS_EMBED_DEFAULT_URL } from "./constants.js";
 
 export function useGaslessTransaction(props: {
-  prepareSignTypedData: () => Promise<
+  prepareSignTypedDataParams: () => Promise<
     | SignTypedDataParameters
     | {
-        signTypedDataArgs: SignTypedDataParameters;
+        signTypedDataParams: SignTypedDataParameters;
         /** Miscellaneous data passed to be passed to sendSignedData */
         variables?: object;
       }
   >;
-  signTypedData?: (signTypedDataArgs: SignTypedDataParameters) => Promise<Hex>;
+  signTypedData?: (signTypedDataParams: SignTypedDataParameters) => Promise<Hex>;
   sendSignedData: (args: {
     signature: Hex;
-    /** Miscellaneous data passed from prepareSignTypedData */
+    /** Miscellaneous data passed from prepareSignTypedDataParams */
     variables?: object;
   }) => Promise<Hex>;
 }) {
@@ -33,10 +33,10 @@ export function useGaslessTransaction(props: {
     mutationFn: async () => {
       const signTypedDataFn = props.signTypedData ?? signTypedDataAsync;
 
-      const prepareResult = await props.prepareSignTypedData();
+      const prepareResult = await props.prepareSignTypedDataParams();
       const signature = await signTypedDataFn(
-        "signTypedDataArgs" in prepareResult
-          ? prepareResult.signTypedDataArgs
+        "signTypedDataParams" in prepareResult
+          ? prepareResult.signTypedDataParams
           : prepareResult
       );
       const signedData = await props.sendSignedData({
