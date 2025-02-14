@@ -1,6 +1,7 @@
 import { ponder } from "ponder:registry";
 import schema from "ponder:schema";
 import { normalizeUrl } from "./lib/utils";
+import { getAddress } from "viem";
 
 ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
   let normalizedTargetUri =
@@ -39,7 +40,10 @@ ponder.on("CommentsV1:CommentDeleted", async ({ event, context }) => {
     id: event.args.commentId,
   });
 
-  if (existingComment && existingComment.author === event.args.author) {
+  if (
+    existingComment &&
+    getAddress(existingComment.author) === getAddress(event.args.author)
+  ) {
     await context.db
       .update(schema.comment, {
         id: event.args.commentId,
