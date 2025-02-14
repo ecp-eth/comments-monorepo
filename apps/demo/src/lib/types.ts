@@ -16,7 +16,10 @@ export type APIComment = {
   metadata: string;
   targetUri: string | null;
   parentId: `0x${string}` | null;
-  author: `0x${string}`;
+  author: {
+    address: `0x${string}`;
+    ens?: { name: string; avatarUrl: string | null };
+  } | null;
   chainId: number;
   deletedAt: string | null;
   appSigner: `0x${string}`;

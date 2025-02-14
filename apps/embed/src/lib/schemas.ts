@@ -1,8 +1,18 @@
 import { z } from "zod";
 import { HexSchema, CommentDataSchema } from "@ecp.eth/sdk/schemas";
 
+const CommentAuthorEnsDataSchema = z.object({
+  name: z.string(),
+  avatarUrl: z.string().url(),
+});
+
+const CommentAuthorSchema = z.object({
+  address: HexSchema,
+  ens: CommentAuthorEnsDataSchema.optional(),
+});
+
 const BaseCommentSchema = z.object({
-  author: HexSchema,
+  author: CommentAuthorSchema.nullable(),
   appSigner: HexSchema,
   chainId: z.number(),
   content: z.string(),
