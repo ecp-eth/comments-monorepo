@@ -56,7 +56,7 @@ export type CommentPageSchemaType = z.infer<typeof CommentPageSchema>;
 
 export const SignCommentPayloadRequestSchema = z.object({
   author: HexSchema,
-  content: z.string(),
+  content: z.string().trim().nonempty(),
   targetUri: z.string().url(),
   parentId: HexSchema.optional(),
   chainId: z.number(),
