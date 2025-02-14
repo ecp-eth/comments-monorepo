@@ -6,7 +6,7 @@ import {
 import {
   COMMENTS_V1_ADDRESS,
   CommentsV1Abi,
-  createDeleteCommentTypedDataArgs,
+  createDeleteCommentTypedData,
   getNonce,
 } from "@ecp.eth/sdk";
 import { NextRequest } from "next/server";
@@ -41,7 +41,7 @@ export const GET = async (req: NextRequest) => {
   });
 
   // Construct deletion signature data
-  const signTypedDataArgs = createDeleteCommentTypedDataArgs({
+  const typedDeleteCommentData = createDeleteCommentTypedData({
     commentId: commentId as `0x${string}`,
     chainId: chain.id,
     author: authorAddress,
@@ -49,11 +49,11 @@ export const GET = async (req: NextRequest) => {
     nonce: nonce,
   });
 
-  const signature = await account.signTypedData(signTypedDataArgs);
+  const signature = await account.signTypedData(typedDeleteCommentData);
 
   return Response.json({
     signTypedDataArgs: JSON.parse(
-      JSON.stringify(signTypedDataArgs, bigintReplacer)
+      JSON.stringify(typedDeleteCommentData, bigintReplacer)
     ),
     appSignature: signature,
     approved: false,

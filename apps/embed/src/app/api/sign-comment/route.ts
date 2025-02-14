@@ -10,7 +10,7 @@ import {
 } from "@/lib/wagmi";
 import {
   createCommentData,
-  createCommentSignTypedDataArgs,
+  createCommentTypedData,
   getNonce,
 } from "@ecp.eth/sdk";
 import { hashTypedData } from "viem";
@@ -41,14 +41,14 @@ export async function POST(req: Request) {
     nonce,
   });
 
-  const signTypedDataArgs = createCommentSignTypedDataArgs({
+  const typedCommentData = createCommentTypedData({
     commentData,
     chainId,
   });
 
-  const signature = await account.signTypedData(signTypedDataArgs);
+  const signature = await account.signTypedData(typedCommentData);
 
-  const hash = hashTypedData(signTypedDataArgs);
+  const hash = hashTypedData(typedCommentData);
 
   return Response.json(
     SignCommentResponseServerSchema.parse({

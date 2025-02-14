@@ -7,14 +7,14 @@ import {
   COMMENTS_V1_ADDRESS,
   CommentsV1Abi,
   createCommentData,
-  createCommentSignTypedDataArgs,
+  createCommentTypedData,
   getNonce,
 } from "@ecp.eth/sdk";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export const POST = async (req: Request) => {
-  let { content, targetUri, parentId, author, submitIfApproved } =
+  const { content, targetUri, parentId, author, submitIfApproved } =
     await req.json();
 
   // Validate target URL is valid
@@ -44,12 +44,12 @@ export const POST = async (req: Request) => {
     nonce,
   });
 
-  const signTypedDataArgs = createCommentSignTypedDataArgs({
+  const typedCommentData = createCommentTypedData({
     commentData,
     chainId: configChains[0].id,
   });
 
-  const signature = await account.signTypedData(signTypedDataArgs);
+  const signature = await account.signTypedData(typedCommentData);
 
   if (submitIfApproved) {
     const submitterAccount = privateKeyToAccount(
@@ -72,7 +72,7 @@ export const POST = async (req: Request) => {
     if (isApproved) {
       // Verify app signature
       const isAppSignatureValid = await walletClient.verifyTypedData({
-        ...signTypedDataArgs,
+        ...typedCommentData,
         signature,
         address: account.address,
       });
@@ -105,7 +105,7 @@ export const POST = async (req: Request) => {
 
   const res = {
     signTypedDataArgs: JSON.parse(
-      JSON.stringify(signTypedDataArgs, bigintReplacer)
+      JSON.stringify(typedCommentData, bigintReplacer)
     ),
     appSignature: signature,
   };

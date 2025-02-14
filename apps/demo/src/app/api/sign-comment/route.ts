@@ -5,14 +5,14 @@ import {
 } from "@/lib/wagmi";
 import {
   createCommentData,
-  createCommentSignTypedDataArgs,
+  createCommentTypedData,
   getNonce,
 } from "@ecp.eth/sdk";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export const POST = async (req: Request) => {
-  let { content, targetUri, parentId, chainId, author } = await req.json();
+  const { content, targetUri, parentId, chainId, author } = await req.json();
 
   // Validate target URL is valid
   if (!targetUri.startsWith(process.env.APP_URL!)) {
@@ -42,14 +42,14 @@ export const POST = async (req: Request) => {
     nonce,
   });
 
-  const signTypedDataArgs = createCommentSignTypedDataArgs({
+  const typedCommentData = createCommentTypedData({
     commentData,
     chainId,
   });
 
-  const signature = await account.signTypedData(signTypedDataArgs);
+  const signature = await account.signTypedData(typedCommentData);
 
-  const hash = hashTypedData(signTypedDataArgs);
+  const hash = hashTypedData(typedCommentData);
 
   return Response.json({
     signature,
