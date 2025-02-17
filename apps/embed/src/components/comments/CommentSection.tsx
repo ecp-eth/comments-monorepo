@@ -1,34 +1,27 @@
 "use client";
 
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useCallback, useMemo } from "react";
-import {
-  Comment,
-  OnDeleteComment,
-  OnPostCommentSuccess,
-  OnRetryPostComment,
-} from "./Comment";
-import { CommentForm, type OnSubmitSuccessFunction } from "./CommentForm";
+import { useMemo } from "react";
+import { Comment } from "./Comment";
+import { CommentForm } from "./CommentForm";
 import { CommentPageSchema } from "@/lib/schemas";
 import { useAccount } from "wagmi";
 import { useEmbedConfig } from "../EmbedConfigProvider";
 import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
 import {
-  deletePendingCommentByTransactionHash,
-  insertPendingCommentToPage,
-  markCommentAsDeleted,
-  replaceCommentPendingOperationByComment,
-} from "./helpers";
+  useHandleCommentDeleted,
+  useHandleCommentPostedSuccessfully,
+  useHandleCommentSubmitted,
+  useHandleRetryPostComment,
+} from "./hooks";
 
 const COMMENTS_PER_PAGE = 10;
 
 export function CommentSection() {
   const { targetUri } = useEmbedConfig();
   const account = useAccount();
-
-  const client = useQueryClient();
   const queryKey = useMemo(() => ["comments", targetUri], [targetUri]);
 
   const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
@@ -70,64 +63,16 @@ export function CommentSection() {
       },
     });
 
-  type CommentsQueryData = typeof data;
-
-  const handleCommentDeleted = useCallback<OnDeleteComment>(
-    (commentId) => {
-      // replace content of the comment with redacted message
-      client.setQueryData<typeof data>(queryKey, (oldData) => {
-        if (!oldData) {
-          return oldData;
-        }
-
-        return markCommentAsDeleted(oldData, commentId);
-      });
-    },
-    [queryKey, client]
-  );
-
-  const handleCommentSubmitted = useCallback<OnSubmitSuccessFunction>(
-    (pendingOperation) => {
-      client.setQueryData<CommentsQueryData>(queryKey, (oldData) => {
-        if (!oldData) {
-          return oldData;
-        }
-
-        return insertPendingCommentToPage(oldData, pendingOperation);
-      });
-    },
-    [queryKey, client]
-  );
-
-  const handleCommentPostedSuccessfully = useCallback<OnPostCommentSuccess>(
-    (transactionHash) => {
-      client.setQueryData<CommentsQueryData>(queryKey, (oldData) => {
-        if (!oldData) {
-          return oldData;
-        }
-
-        return deletePendingCommentByTransactionHash(oldData, transactionHash);
-      });
-    },
-    [queryKey, client]
-  );
-
-  const handleRetryPostComment = useCallback<OnRetryPostComment>(
-    (comment, newPendingOperation) => {
-      client.setQueryData<CommentsQueryData>(queryKey, (oldData) => {
-        if (!oldData) {
-          return oldData;
-        }
-
-        return replaceCommentPendingOperationByComment(
-          oldData,
-          comment,
-          newPendingOperation
-        );
-      });
-    },
-    [queryKey, client]
-  );
+  const handleCommentDeleted = useHandleCommentDeleted({
+    queryKey,
+  });
+  const handleCommentSubmitted = useHandleCommentSubmitted({
+    queryKey,
+  });
+  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
+    queryKey,
+  });
+  const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
 
   const results = useMemo(() => {
     return data?.pages.flatMap((page) => page.results) ?? [];

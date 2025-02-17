@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { CommentForm, OnSubmitSuccessFunction } from "./CommentForm";
+import { CommentForm } from "./CommentForm";
 import { formatDate } from "@/lib/utils";
 import {
   Loader2Icon,
@@ -30,21 +30,17 @@ import {
 } from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { blo } from "blo";
 import { toast } from "sonner";
-import {
-  deletePendingCommentByTransactionHash,
-  insertPendingCommentToPage,
-  markCommentAsDeleted,
-  replaceCommentPendingOperationByComment,
-} from "./helpers";
 import { submitCommentMutationFunction } from "./queries";
+import {
+  useHandleCommentDeleted,
+  useHandleCommentPostedSuccessfully,
+  useHandleCommentSubmitted,
+  useHandleRetryPostComment,
+} from "./hooks";
 
 const REPLIES_PER_PAGE = 10;
 
@@ -87,7 +83,6 @@ export function Comment({
    * because comment is updated to be redacted
    */
   const commentRef = useFreshRef(comment);
-  const client = useQueryClient();
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
   const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
@@ -141,70 +136,16 @@ export function Comment({
     },
   });
 
-  type RepliesQueryData = typeof repliesQuery.data;
-
   const replies = useMemo(() => {
     return repliesQuery.data.pages.flatMap((page) => page.results);
   }, [repliesQuery.data.pages]);
 
-  const handleCommentSubmitted = useCallback<OnSubmitSuccessFunction>(
-    (pendingData) => {
-      setIsReplying(false);
-
-      client.setQueryData<RepliesQueryData>(queryKey, (oldData) => {
-        if (!oldData) {
-          return oldData;
-        }
-
-        return insertPendingCommentToPage(oldData, pendingData);
-      });
-    },
-    [client, queryKey]
-  );
-
-  const handleCommentPostedSuccessfully = useCallback<OnPostCommentSuccess>(
-    (transactionHash: Hex) => {
-      client.setQueryData<RepliesQueryData>(queryKey, (oldData) => {
-        if (!oldData) {
-          return oldData;
-        }
-
-        return deletePendingCommentByTransactionHash(oldData, transactionHash);
-      });
-    },
-    [queryKey, client]
-  );
-
-  const handleRetryPostComment = useCallback<OnRetryPostComment>(
-    (comment, newPendingOperation) => {
-      client.setQueryData<RepliesQueryData>(queryKey, (oldData) => {
-        if (!oldData) {
-          return oldData;
-        }
-
-        return replaceCommentPendingOperationByComment(
-          oldData,
-          comment,
-          newPendingOperation
-        );
-      });
-    },
-    [queryKey, client]
-  );
-
-  const handleCommentDeleted = useCallback<OnDeleteComment>(
-    (commentId) => {
-      // replace content of the comment with redacted message
-      client.setQueryData<RepliesQueryData>(queryKey, (oldData) => {
-        if (!oldData) {
-          return oldData;
-        }
-
-        return markCommentAsDeleted(oldData, commentId);
-      });
-    },
-    [queryKey, client]
-  );
+  const handleCommentSubmitted = useHandleCommentSubmitted({ queryKey });
+  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
+    queryKey,
+  });
+  const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
+  const handleCommentDeleted = useHandleCommentDeleted({ queryKey });
 
   const retryPostMutation = useMutation({
     mutationFn: async () => {
@@ -349,7 +290,10 @@ export function Comment({
         <div className="mb-2">
           <CommentForm
             onLeftEmpty={() => setIsReplying(false)}
-            onSubmitSuccess={handleCommentSubmitted}
+            onSubmitSuccess={(pendingOperation) => {
+              setIsReplying(false);
+              handleCommentSubmitted(pendingOperation);
+            }}
             placeholder="What are your thoughts?"
             parentId={comment.id}
           />

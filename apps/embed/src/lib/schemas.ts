@@ -131,3 +131,12 @@ export const ListCommentRepliesSearchParamsSchema = z.object({
   limit: z.coerce.number().int().positive().max(100).optional(),
   offset: z.coerce.number().int().min(0).optional(),
 });
+
+export const ListCommentsQueryDataSchema = z.object({
+  pages: CommentPageSchema.array(),
+  pageParams: z.unknown().array(),
+});
+
+export type ListCommentsQueryDataSchemaType = z.infer<
+  typeof ListCommentsQueryDataSchema
+>;
