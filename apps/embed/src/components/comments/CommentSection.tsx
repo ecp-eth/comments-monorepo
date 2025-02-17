@@ -5,16 +5,16 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
 import { Comment } from "./Comment";
 import { CommentForm, type OnSubmitSuccessFunction } from "./CommentForm";
-import {
-  CommentPageSchema,
-  CommentPageSchemaType,
-  SignCommentResponseClientSchemaType,
-} from "@/lib/schemas";
+import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
 import { useAccount } from "wagmi";
 import { useEmbedConfig } from "../EmbedConfigProvider";
 import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
 import type { Hex } from "@ecp.eth/sdk/schemas";
+import {
+  deletePendingCommentByTransactionHash,
+  insertPendingCommentToPage,
+} from "./helpers";
 
 const COMMENTS_PER_PAGE = 10;
 
@@ -64,9 +64,10 @@ export function CommentSection() {
       },
     });
 
+  type CommentsQueryData = typeof data;
+
   const handleCommentDeleted = useCallback(
     (commentId: Hex) => {
-      console.log({ commentId });
       /**
        * Mutates the response object to redact the content of the comment with the given ID.
        */
@@ -111,51 +112,29 @@ export function CommentSection() {
   );
 
   const handleCommentSubmitted = useCallback<OnSubmitSuccessFunction>(
-    (
-      response: SignCommentResponseClientSchemaType | undefined,
-      {
-        txHash,
-        chainId,
-      }: {
-        txHash: Hex;
-        chainId: number;
-      }
-    ) => {
-      if (!response) {
-        return refetch();
-      }
-
-      client.setQueryData<typeof data>(queryKey, (oldData) => {
+    (pendingOperation) => {
+      client.setQueryData<CommentsQueryData>(queryKey, (oldData) => {
         if (!oldData) {
           return oldData;
         }
 
-        const clonedOldData = structuredClone(oldData);
-
-        clonedOldData.pages[0].results.unshift({
-          ...response.data,
-          author: {
-            address: response.data.author,
-          },
-          deletedAt: null,
-          logIndex: 0,
-          txHash,
-          chainId,
-          timestamp: new Date(),
-          replies: {
-            results: [],
-            pagination: {
-              hasMore: false,
-              limit: 0,
-              offset: 0,
-            },
-          },
-        });
-
-        return clonedOldData;
+        return insertPendingCommentToPage(oldData, pendingOperation);
       });
     },
-    [queryKey, client, refetch]
+    [queryKey, client]
+  );
+
+  const handleCommentPostedSuccessfully = useCallback(
+    (transactionHash: Hex) => {
+      client.setQueryData<CommentsQueryData>(queryKey, (oldData) => {
+        if (!oldData) {
+          return oldData;
+        }
+
+        return deletePendingCommentByTransactionHash(oldData, transactionHash);
+      });
+    },
+    [queryKey, client]
   );
 
   const results = useMemo(() => {
@@ -190,6 +169,7 @@ export function CommentSection() {
           comment={comment}
           key={comment.id}
           onDelete={handleCommentDeleted}
+          onPostSuccess={handleCommentPostedSuccessfully}
         />
       ))}
       {hasNextPage && (

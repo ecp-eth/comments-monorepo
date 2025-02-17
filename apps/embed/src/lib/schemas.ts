@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { HexSchema, CommentDataSchema } from "@ecp.eth/sdk/schemas";
 
+const CommentDataWithIdSchema = CommentDataSchema.extend({
+  id: HexSchema,
+});
+
 const CommentAuthorEnsDataSchema = z.object({
   name: z.string(),
   avatarUrl: z.string().url(),
@@ -28,7 +32,35 @@ const BaseCommentSchema = z.object({
 
 type BaseCommentSchemaType = z.infer<typeof BaseCommentSchema>;
 
+/**
+ * Parses response from API endpoint for usage in client
+ */
+export const SignCommentResponseClientSchema = z.object({
+  signature: HexSchema,
+  hash: HexSchema,
+  data: CommentDataWithIdSchema,
+});
+
+export type SignCommentResponseClientSchemaType = z.infer<
+  typeof SignCommentResponseClientSchema
+>;
+
+export const PendingCommentOperationSchema = z
+  .object({
+    txHash: HexSchema,
+    chainId: z.number().positive().int(),
+    response: SignCommentResponseClientSchema,
+  })
+  .describe(
+    "Contains information about pending operation so we can show that in comment list"
+  );
+
+export type PendingCommentOperationSchemaType = z.infer<
+  typeof PendingCommentOperationSchema
+>;
+
 type CommentSchemaType = BaseCommentSchemaType & {
+  pendingOperation?: PendingCommentOperationSchemaType;
   replies: {
     results: CommentSchemaType[];
     pagination: {
@@ -49,6 +81,7 @@ export const CommentSchema: z.ZodType<CommentSchemaType> =
         hasMore: z.boolean(),
       }),
     }),
+    pendingOperation: PendingCommentOperationSchema.optional(),
   });
 
 export type Comment = z.infer<typeof CommentSchema>;
@@ -72,10 +105,6 @@ export const SignCommentPayloadRequestSchema = z.object({
   chainId: z.number(),
 });
 
-const CommentDataWithIdSchema = CommentDataSchema.extend({
-  id: HexSchema,
-});
-
 /**
  * Parses output from API endpoint
  */
@@ -87,19 +116,6 @@ export const SignCommentResponseServerSchema = z.object({
     deadline: z.string().regex(/\d+/),
   }),
 });
-
-/**
- * Parses response from API endpoint for usage in client
- */
-export const SignCommentResponseClientSchema = z.object({
-  signature: HexSchema,
-  hash: HexSchema,
-  data: CommentDataWithIdSchema,
-});
-
-export type SignCommentResponseClientSchemaType = z.infer<
-  typeof SignCommentResponseClientSchema
->;
 
 export const ListCommentsSearchParamsSchema = z.object({
   targetUri: z.string().url(),
