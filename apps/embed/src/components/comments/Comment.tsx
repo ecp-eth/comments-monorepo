@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import {
   deletePendingCommentByTransactionHash,
   insertPendingCommentToPage,
+  markCommentAsDeleted,
   replaceCommentPendingOperationByComment,
 } from "./helpers";
 import { submitCommentMutationFunction } from "./queries";
@@ -191,8 +192,22 @@ export function Comment({
     [queryKey, client]
   );
 
+  const handleCommentDeleted = useCallback<OnDeleteComment>(
+    (commentId) => {
+      // replace content of the comment with redacted message
+      client.setQueryData<RepliesQueryData>(queryKey, (oldData) => {
+        if (!oldData) {
+          return oldData;
+        }
+
+        return markCommentAsDeleted(oldData, commentId);
+      });
+    },
+    [queryKey, client]
+  );
+
   const retryPostMutation = useMutation({
-    mutationFn: async (e: React.MouseEvent) => {
+    mutationFn: async () => {
       if (!comment.pendingOperation) {
         throw new Error("No pending operation to retry");
       }
@@ -313,34 +328,14 @@ export function Comment({
       </div>
       <div className="mb-2">{comment.content}</div>
       <div className="text-xs text-gray-500 mb-2">
-        {!comment.pendingOperation && (
-          <button
-            onClick={() => setIsReplying(!isReplying)}
-            className="hover:underline"
-          >
-            reply
-          </button>
-        )}
-        {isPosting && (
-          <div className="flex items-center gap-1">
-            <Loader2Icon className="w-3 h-3 animate-spin" />
-            <span>Posting...</span>
-          </div>
-        )}
-        {didPostingFailed && (
-          <div className="flex items-center gap-1 text-red-500">
-            <MessageCircleWarningIcon className="w-3 h-3" />
-            <span>
-              Could not post the comment.{" "}
-              <button
-                className="font-semibold hover:underline"
-                onClick={retryPostMutation.mutate}
-              >
-                Retry
-              </button>
-            </span>
-          </div>
-        )}
+        <CommentActionOrStatus
+          comment={comment}
+          isDeleting={isDeleting}
+          isPosting={isPosting}
+          postingFailed={didPostingFailed}
+          onReplyClick={() => setIsReplying((prev) => !prev)}
+          onRetryPostClick={retryPostMutation.mutate}
+        />
       </div>
       {isReplying && (
         <div className="mb-2">
@@ -356,7 +351,7 @@ export function Comment({
         <Comment
           key={reply.id}
           comment={reply}
-          onDelete={onDelete}
+          onDelete={handleCommentDeleted}
           onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
         />
@@ -372,5 +367,66 @@ export function Comment({
         </div>
       )}
     </div>
+  );
+}
+
+function CommentActionOrStatus({
+  comment,
+  isDeleting,
+  isPosting,
+  postingFailed,
+  onReplyClick,
+  onRetryPostClick,
+}: {
+  comment: CommentType;
+  isDeleting: boolean;
+  isPosting: boolean;
+  postingFailed: boolean;
+  onReplyClick: () => void;
+  onRetryPostClick: () => void;
+}) {
+  if (postingFailed) {
+    return (
+      <div className="flex items-center gap-1 text-red-500">
+        <MessageCircleWarningIcon className="w-3 h-3" />
+        <span>
+          Could not post the comment.{" "}
+          <button
+            className="font-semibold hover:underline"
+            onClick={onRetryPostClick}
+          >
+            Retry
+          </button>
+        </span>
+      </div>
+    );
+  }
+
+  if (isDeleting) {
+    return (
+      <div className="flex items-center gap-1">
+        <Loader2Icon className="w-3 h-3 animate-spin" />
+        <span>Deleting...</span>
+      </div>
+    );
+  }
+
+  if (isPosting) {
+    return (
+      <div className="flex items-center gap-1">
+        <Loader2Icon className="w-3 h-3 animate-spin" />
+        <span>Posting...</span>
+      </div>
+    );
+  }
+
+  if (comment.pendingOperation) {
+    return null;
+  }
+
+  return (
+    <button onClick={onReplyClick} className="hover:underline">
+      reply
+    </button>
   );
 }

@@ -10,15 +10,15 @@ import {
   OnRetryPostComment,
 } from "./Comment";
 import { CommentForm, type OnSubmitSuccessFunction } from "./CommentForm";
-import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
+import { CommentPageSchema } from "@/lib/schemas";
 import { useAccount } from "wagmi";
 import { useEmbedConfig } from "../EmbedConfigProvider";
 import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
-import type { Hex } from "@ecp.eth/sdk/schemas";
 import {
   deletePendingCommentByTransactionHash,
   insertPendingCommentToPage,
+  markCommentAsDeleted,
   replaceCommentPendingOperationByComment,
 } from "./helpers";
 
@@ -74,44 +74,13 @@ export function CommentSection() {
 
   const handleCommentDeleted = useCallback<OnDeleteComment>(
     (commentId) => {
-      /**
-       * Mutates the response object to redact the content of the comment with the given ID.
-       */
-      function deleteComment(
-        response: CommentPageSchemaType,
-        commentId: Hex
-      ): boolean {
-        for (const comment of response.results) {
-          if (comment.id === commentId) {
-            comment.deletedAt = new Date();
-            comment.content = "[deleted]";
-
-            return true;
-          }
-
-          if (deleteComment(comment.replies, commentId)) {
-            return true;
-          }
-        }
-
-        return false;
-      }
-
       // replace content of the comment with redacted message
       client.setQueryData<typeof data>(queryKey, (oldData) => {
         if (!oldData) {
           return oldData;
         }
 
-        const clonedOldData = structuredClone(oldData);
-
-        for (const page of clonedOldData.pages) {
-          if (deleteComment(page, commentId)) {
-            return clonedOldData;
-          }
-        }
-
-        return clonedOldData;
+        return markCommentAsDeleted(oldData, commentId);
       });
     },
     [queryKey, client]

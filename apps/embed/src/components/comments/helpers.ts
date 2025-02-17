@@ -3,7 +3,8 @@ import type {
   PendingCommentOperationSchemaType,
   CommentPageSchemaType,
 } from "@/lib/schemas";
-import { type InfiniteData } from "@tanstack/react-query";
+import type { InfiniteData } from "@tanstack/react-query";
+import type { Hex } from "viem";
 
 export function deletePendingCommentByTransactionHash(
   queryData: InfiniteData<CommentPageSchemaType>,
@@ -93,6 +94,38 @@ export function replaceCommentPendingOperationByComment(
 
   for (const page of clonedData.pages) {
     if (replaceComment(page)) {
+      return clonedData;
+    }
+  }
+
+  return clonedData;
+}
+
+export function markCommentAsDeleted(
+  queryData: InfiniteData<CommentPageSchemaType>,
+  commentId: Hex
+): InfiniteData<CommentPageSchemaType> {
+  const clonedData = structuredClone(queryData);
+
+  function markComment(page: CommentPageSchemaType): boolean {
+    for (const comment of page.results) {
+      if (comment.id === commentId) {
+        comment.content = "[deleted]";
+        comment.deletedAt = new Date();
+
+        return true;
+      }
+
+      if (markComment(comment.replies)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  for (const page of clonedData.pages) {
+    if (markComment(page)) {
       return clonedData;
     }
   }
