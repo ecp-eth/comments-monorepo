@@ -244,6 +244,15 @@ export function Comment({
     hash: deleteCommentContract.data,
   });
 
+  const handleDeleteClick = useCallback(() => {
+    deleteCommentContract.writeContract({
+      address: COMMENTS_V1_ADDRESS,
+      abi: CommentsV1Abi,
+      functionName: "deleteCommentAsAuthor",
+      args: [comment.id],
+    });
+  }, [comment.id, deleteCommentContract]);
+
   useEffect(() => {
     if (deleteCommentTransactionReceipt.data?.status === "success") {
       onDeleteRef.current?.(commentRef.current.id);
@@ -270,6 +279,10 @@ export function Comment({
   const isDeleting =
     deleteCommentTransactionReceipt.isFetching ||
     deleteCommentContract.isPending;
+  const didDeletingFailed =
+    !isDeleting &&
+    (deleteCommentTransactionReceipt.data?.status === "reverted" ||
+      deleteCommentContract.isError);
 
   const isPosting = postingCommentTxReceipt.isFetching;
   const didPostingFailed =
@@ -310,14 +323,7 @@ export function Comment({
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 className="text-red-600 cursor-pointer"
-                onClick={() => {
-                  deleteCommentContract.writeContract({
-                    address: COMMENTS_V1_ADDRESS,
-                    abi: CommentsV1Abi,
-                    functionName: "deleteCommentAsAuthor",
-                    args: [comment.id],
-                  });
-                }}
+                onClick={handleDeleteClick}
                 disabled={isDeleting}
               >
                 Delete
@@ -332,7 +338,9 @@ export function Comment({
           comment={comment}
           isDeleting={isDeleting}
           isPosting={isPosting}
+          deletingFailed={didDeletingFailed}
           postingFailed={didPostingFailed}
+          onRetryDeleteClick={handleDeleteClick}
           onReplyClick={() => setIsReplying((prev) => !prev)}
           onRetryPostClick={retryPostMutation.mutate}
         />
@@ -375,14 +383,18 @@ function CommentActionOrStatus({
   isDeleting,
   isPosting,
   postingFailed,
+  deletingFailed,
   onReplyClick,
+  onRetryDeleteClick,
   onRetryPostClick,
 }: {
   comment: CommentType;
   isDeleting: boolean;
   isPosting: boolean;
   postingFailed: boolean;
+  deletingFailed: boolean;
   onReplyClick: () => void;
+  onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
 }) {
   if (postingFailed) {
@@ -394,6 +406,23 @@ function CommentActionOrStatus({
           <button
             className="font-semibold hover:underline"
             onClick={onRetryPostClick}
+          >
+            Retry
+          </button>
+        </span>
+      </div>
+    );
+  }
+
+  if (deletingFailed) {
+    return (
+      <div className="flex items-center gap-1 text-red-500">
+        <MessageCircleWarningIcon className="w-3 h-3" />
+        <span>
+          Could not delete the comment.{" "}
+          <button
+            className="font-semibold hover:underline"
+            onClick={onRetryDeleteClick}
           >
             Retry
           </button>
