@@ -105,6 +105,10 @@ export const SignCommentPayloadRequestSchema = z.object({
   chainId: z.number(),
 });
 
+export type SignCommentPayloadRequestSchemaType = z.infer<
+  typeof SignCommentPayloadRequestSchema
+>;
+
 /**
  * Parses output from API endpoint
  */

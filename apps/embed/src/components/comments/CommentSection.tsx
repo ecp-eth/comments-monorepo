@@ -3,7 +3,12 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
-import { Comment } from "./Comment";
+import {
+  Comment,
+  OnDeleteComment,
+  OnPostCommentSuccess,
+  OnRetryPostComment,
+} from "./Comment";
 import { CommentForm, type OnSubmitSuccessFunction } from "./CommentForm";
 import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
 import { useAccount } from "wagmi";
@@ -14,6 +19,7 @@ import type { Hex } from "@ecp.eth/sdk/schemas";
 import {
   deletePendingCommentByTransactionHash,
   insertPendingCommentToPage,
+  replaceCommentPendingOperationByComment,
 } from "./helpers";
 
 const COMMENTS_PER_PAGE = 10;
@@ -66,8 +72,8 @@ export function CommentSection() {
 
   type CommentsQueryData = typeof data;
 
-  const handleCommentDeleted = useCallback(
-    (commentId: Hex) => {
+  const handleCommentDeleted = useCallback<OnDeleteComment>(
+    (commentId) => {
       /**
        * Mutates the response object to redact the content of the comment with the given ID.
        */
@@ -124,14 +130,31 @@ export function CommentSection() {
     [queryKey, client]
   );
 
-  const handleCommentPostedSuccessfully = useCallback(
-    (transactionHash: Hex) => {
+  const handleCommentPostedSuccessfully = useCallback<OnPostCommentSuccess>(
+    (transactionHash) => {
       client.setQueryData<CommentsQueryData>(queryKey, (oldData) => {
         if (!oldData) {
           return oldData;
         }
 
         return deletePendingCommentByTransactionHash(oldData, transactionHash);
+      });
+    },
+    [queryKey, client]
+  );
+
+  const handleRetryPostComment = useCallback<OnRetryPostComment>(
+    (comment, newPendingOperation) => {
+      client.setQueryData<CommentsQueryData>(queryKey, (oldData) => {
+        if (!oldData) {
+          return oldData;
+        }
+
+        return replaceCommentPendingOperationByComment(
+          oldData,
+          comment,
+          newPendingOperation
+        );
       });
     },
     [queryKey, client]
@@ -170,6 +193,7 @@ export function CommentSection() {
           key={comment.id}
           onDelete={handleCommentDeleted}
           onPostSuccess={handleCommentPostedSuccessfully}
+          onRetryPost={handleRetryPostComment}
         />
       ))}
       {hasNextPage && (

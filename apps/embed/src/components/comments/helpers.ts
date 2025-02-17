@@ -1,6 +1,7 @@
-import {
+import type {
+  Comment,
   PendingCommentOperationSchemaType,
-  type CommentPageSchemaType,
+  CommentPageSchemaType,
 } from "@/lib/schemas";
 import { type InfiniteData } from "@tanstack/react-query";
 
@@ -63,6 +64,38 @@ export function insertPendingCommentToPage(
     },
     pendingOperation,
   });
+
+  return clonedData;
+}
+
+export function replaceCommentPendingOperationByComment(
+  queryData: InfiniteData<CommentPageSchemaType>,
+  comment: Comment,
+  newPendingOperation: PendingCommentOperationSchemaType
+): InfiniteData<CommentPageSchemaType> {
+  const clonedData = structuredClone(queryData);
+
+  function replaceComment(page: CommentPageSchemaType): boolean {
+    for (const c of page.results) {
+      if (c.id === comment.id) {
+        c.pendingOperation = newPendingOperation;
+
+        return true;
+      }
+
+      if (replaceComment(c.replies)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  for (const page of clonedData.pages) {
+    if (replaceComment(page)) {
+      return clonedData;
+    }
+  }
 
   return clonedData;
 }

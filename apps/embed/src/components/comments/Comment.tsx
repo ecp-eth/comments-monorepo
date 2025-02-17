@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CommentForm, OnSubmitSuccessFunction } from "./CommentForm";
 import { formatDate } from "@/lib/utils";
 import {
@@ -16,38 +16,69 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   useAccount,
+  useSwitchChain,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { getAddress } from "viem";
 import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
-import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
+import {
+  CommentPageSchema,
+  PendingCommentOperationSchemaType,
+  type Comment as CommentType,
+} from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { blo } from "blo";
 import { toast } from "sonner";
 import {
   deletePendingCommentByTransactionHash,
   insertPendingCommentToPage,
+  replaceCommentPendingOperationByComment,
 } from "./helpers";
+import { submitCommentMutationFunction } from "./queries";
 
 const REPLIES_PER_PAGE = 10;
 
+export type OnDeleteComment = (id: Hex) => void;
+export type OnPostCommentSuccess = (transactionHash: Hex) => void;
+export type OnRetryPostComment = (
+  comment: CommentType,
+  newPendingOperation: PendingCommentOperationSchemaType
+) => void;
+
 interface CommentProps {
   comment: CommentType;
-  onDelete?: (id: Hex) => void;
+  onDelete?: OnDeleteComment;
   /**
    * Called when comment is successfully posted to the blockchain.
    *
    * This is called only if comment is pending.
    */
-  onPostSuccess?: (transationHash: Hex) => void;
+  onPostSuccess: OnPostCommentSuccess;
+  /**
+   * Called when comment posting to blockchain failed and the transaction has been reverted
+   * and user pressed retry.
+   */
+  onRetryPost: OnRetryPostComment;
 }
 
-export function Comment({ comment, onDelete, onPostSuccess }: CommentProps) {
+export function Comment({
+  comment,
+  onDelete,
+  onPostSuccess,
+  onRetryPost,
+}: CommentProps) {
+  const { address } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const { writeContractAsync } = useWriteContract();
   const onPostSuccessRef = useFreshRef(onPostSuccess);
   const onDeleteRef = useFreshRef(onDelete);
   /**
@@ -130,7 +161,7 @@ export function Comment({ comment, onDelete, onPostSuccess }: CommentProps) {
     [client, queryKey]
   );
 
-  const handleCommentPostedSuccessfully = useCallback(
+  const handleCommentPostedSuccessfully = useCallback<OnPostCommentSuccess>(
     (transactionHash: Hex) => {
       client.setQueryData<RepliesQueryData>(queryKey, (oldData) => {
         if (!oldData) {
@@ -142,6 +173,55 @@ export function Comment({ comment, onDelete, onPostSuccess }: CommentProps) {
     },
     [queryKey, client]
   );
+
+  const handleRetryPostComment = useCallback<OnRetryPostComment>(
+    (comment, newPendingOperation) => {
+      client.setQueryData<RepliesQueryData>(queryKey, (oldData) => {
+        if (!oldData) {
+          return oldData;
+        }
+
+        return replaceCommentPendingOperationByComment(
+          oldData,
+          comment,
+          newPendingOperation
+        );
+      });
+    },
+    [queryKey, client]
+  );
+
+  const retryPostMutation = useMutation({
+    mutationFn: async (e: React.MouseEvent) => {
+      if (!comment.pendingOperation) {
+        throw new Error("No pending operation to retry");
+      }
+
+      return submitCommentMutationFunction({
+        address,
+        commentRequest: {
+          chainId: comment.pendingOperation.chainId,
+          content: comment.pendingOperation.response.data.content,
+          parentId: comment.pendingOperation.response.data.parentId,
+          targetUri: comment.pendingOperation.response.data.targetUri,
+        },
+        switchChainAsync(chainId) {
+          return switchChainAsync({ chainId });
+        },
+        writeContractAsync(params) {
+          return writeContractAsync({
+            abi: CommentsV1Abi,
+            address: COMMENTS_V1_ADDRESS,
+            functionName: "postCommentAsAuthor",
+            args: [params.data, params.signature],
+          });
+        },
+      });
+    },
+    onSuccess(newPendingOperation) {
+      onRetryPost(comment, newPendingOperation);
+    },
+  });
 
   const deleteCommentContract = useWriteContract();
 
@@ -252,18 +332,25 @@ export function Comment({ comment, onDelete, onPostSuccess }: CommentProps) {
             <MessageCircleWarningIcon className="w-3 h-3" />
             <span>
               Could not post the comment.{" "}
-              <button className="font-semibold hover:underline">Retry</button>
+              <button
+                className="font-semibold hover:underline"
+                onClick={retryPostMutation.mutate}
+              >
+                Retry
+              </button>
             </span>
           </div>
         )}
       </div>
       {isReplying && (
-        <CommentForm
-          onLeftEmpty={() => setIsReplying(false)}
-          onSubmitSuccess={handleCommentSubmitted}
-          placeholder="What are your thoughts?"
-          parentId={comment.id}
-        />
+        <div className="mb-2">
+          <CommentForm
+            onLeftEmpty={() => setIsReplying(false)}
+            onSubmitSuccess={handleCommentSubmitted}
+            placeholder="What are your thoughts?"
+            parentId={comment.id}
+          />
+        </div>
       )}
       {replies.map((reply) => (
         <Comment
@@ -271,6 +358,7 @@ export function Comment({ comment, onDelete, onPostSuccess }: CommentProps) {
           comment={reply}
           onDelete={onDelete}
           onPostSuccess={handleCommentPostedSuccessfully}
+          onRetryPost={handleRetryPostComment}
         />
       ))}
       {repliesQuery.hasNextPage && (
