@@ -1,7 +1,4 @@
-import type {
-  EmbedConfigThemeSchemaType,
-  EmbedConfigThemePaletteSchemaType,
-} from "@ecp.eth/sdk/schemas";
+import type { EmbedConfigThemeSchemaType } from "@ecp.eth/sdk/schemas";
 
 export function createThemeCSSVariables(
   theme: EmbedConfigThemeSchemaType | undefined
@@ -12,20 +9,14 @@ export function createThemeCSSVariables(
 
   const { colors } = theme;
 
-  let lightTheme = "";
-  let darkTheme = "";
-
-  if (colors?.light) {
-    lightTheme = createThemeVariables(colors.light);
-  }
-
-  if (colors?.dark) {
-    darkTheme = createThemeVariables(colors.dark);
-  }
+  const lightTheme = createThemeVariables(colors?.light);
+  const darkTheme = createThemeVariables(colors?.dark);
+  const otherVariables = createThemeVariables(theme.other);
 
   return `
 :root {
 ${lightTheme}
+${otherVariables}
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,9 +31,7 @@ ${lightTheme}
 `;
 }
 
-function createThemeVariables(
-  theme: EmbedConfigThemePaletteSchemaType | undefined
-) {
+function createThemeVariables(theme: Record<string, string> | undefined) {
   if (!theme) {
     return "";
   }
