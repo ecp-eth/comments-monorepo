@@ -6,7 +6,6 @@ import { CommentSection } from "@/components/comments/CommentSection";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
 import { Providers } from "./providers";
-import { cn } from "@/lib/utils";
 import { createThemeCSSVariables } from "@/lib/theming";
 
 const SearchParamsSchema = z.object({
@@ -32,13 +31,26 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
   );
 
   if (!parseSearchParamsResult.success) {
-    return <ErrorScreen description="Invalid search params" />;
+    return (
+      <ErrorScreen
+        description="Invalid search params"
+        extra={
+          <pre className="text-sm text-muted-foreground bg-muted p-2 text-left font-mono max-w-96">
+            {JSON.stringify(
+              parseSearchParamsResult.error.flatten().fieldErrors,
+              null,
+              "  "
+            )}
+          </pre>
+        }
+      />
+    );
   }
 
   const { targetUri, config } = parseSearchParamsResult.data;
 
   return (
-    <body className={cn("antialised", config?.theme?.mode)}>
+    <div className={config?.theme?.mode}>
       <style
         dangerouslySetInnerHTML={{
           __html: createThemeCSSVariables(config?.theme),
@@ -54,6 +66,6 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
         </div>
       </main>
       <Toaster />
-    </body>
+    </div>
   );
 }
