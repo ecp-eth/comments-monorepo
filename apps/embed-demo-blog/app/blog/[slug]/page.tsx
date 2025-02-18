@@ -118,8 +118,12 @@ export default async function Blog({
           theme: {
             colors: {
               light: {
-                background: "0 0 100%",
-                foreground: "0 0 0%",
+                background: "white",
+                foreground: "black",
+              },
+              dark: {
+                background: "black",
+                foreground: "white",
               },
             },
           },
