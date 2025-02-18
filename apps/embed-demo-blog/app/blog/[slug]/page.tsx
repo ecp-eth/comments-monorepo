@@ -114,6 +114,20 @@ export default async function Blog({
           `/blog/${post.slug}`,
           process.env.NEXT_PUBLIC_URL!
         ).toString()}
+        config={{
+          theme: {
+            colors: {
+              light: {
+                background: "white",
+                foreground: "black",
+              },
+              dark: {
+                background: "black",
+                foreground: "white",
+              },
+            },
+          },
+        }}
       />
     </section>
   );

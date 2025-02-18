@@ -1,3 +1,4 @@
+import { MAX_COMMENT_LENGTH } from "@/lib/constants";
 import {
   SignCommentResponseClientSchema,
   type SignCommentResponseClientSchemaType,
@@ -29,8 +30,16 @@ export async function submitCommentMutationFunction({
     throw new SubmitCommentMutationError("Wallet not connected.");
   }
 
-  if (!commentRequest.content.trim()) {
+  const content = commentRequest.content.trim();
+
+  if (!content) {
     throw new SubmitCommentMutationValidationError("Comment cannot be empty.");
+  }
+
+  if (content.length > MAX_COMMENT_LENGTH) {
+    throw new SubmitCommentMutationValidationError(
+      `Comment cannot be longer than ${MAX_COMMENT_LENGTH} characters.`
+    );
   }
 
   const chain = await switchChainAsync(commentRequest.chainId);

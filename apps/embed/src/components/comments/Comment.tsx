@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CommentForm } from "./CommentForm";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import {
   Loader2Icon,
   MessageCircleWarningIcon,
@@ -41,6 +41,7 @@ import {
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
 } from "./hooks";
+import { Button } from "../ui/button";
 
 const REPLIES_PER_PAGE = 10;
 
@@ -230,8 +231,8 @@ export function Comment({
     !isPosting && postingCommentTxReceipt.data?.status === "reverted";
 
   return (
-    <div className="mb-4 border-l-2 border-gray-200 pl-4">
-      <div className="flex justify-between items-center">
+    <div className="mb-4 border-l-2 border-muted pl-4">
+      <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
             {comment.author?.ens?.avatarUrl ? (
@@ -249,7 +250,7 @@ export function Comment({
               {comment.author?.ens?.name?.[0]?.toUpperCase() ?? "?"}
             </AvatarFallback>
           </Avatar>
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-muted-foreground">
             {comment.author?.ens?.name ??
               comment.author?.address ??
               "Unknown sender"}{" "}
@@ -258,12 +259,14 @@ export function Comment({
         </div>
         {isAuthor && !comment.pendingOperation && !comment.deletedAt && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">
-              <MoreVertical className="h-4 w-4" />
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="p-1 text-muted-foreground">
+                <MoreVertical className="h-3 w-3" />
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                className="text-red-600 cursor-pointer"
+                className="text-destructive cursor-pointer"
                 onClick={handleDeleteClick}
                 disabled={isDeleting}
               >
@@ -273,8 +276,15 @@ export function Comment({
           </DropdownMenu>
         )}
       </div>
-      <div className="mb-2">{comment.content}</div>
-      <div className="text-xs text-gray-500 mb-2">
+      <div
+        className={cn(
+          "mb-2 text-foreground",
+          comment.deletedAt && "text-muted-foreground"
+        )}
+      >
+        {comment.content}
+      </div>
+      <div className="mb-2">
         <CommentActionOrStatus
           comment={comment}
           isDeleting={isDeleting}
@@ -309,13 +319,10 @@ export function Comment({
         />
       ))}
       {repliesQuery.hasNextPage && (
-        <div className="text-xs text-gray-500 mb-2">
-          <button
-            onClick={() => repliesQuery.fetchNextPage()}
-            className="mr-2 hover:underline"
-          >
+        <div className="mb-2">
+          <ActionButton onClick={() => repliesQuery.fetchNextPage()}>
             show more replies
-          </button>
+          </ActionButton>
         </div>
       )}
     </div>
@@ -343,16 +350,11 @@ function CommentActionOrStatus({
 }) {
   if (postingFailed) {
     return (
-      <div className="flex items-center gap-1 text-red-500">
+      <div className="flex items-center gap-1 text-xs text-destructive">
         <MessageCircleWarningIcon className="w-3 h-3" />
         <span>
           Could not post the comment.{" "}
-          <button
-            className="font-semibold hover:underline"
-            onClick={onRetryPostClick}
-          >
-            Retry
-          </button>
+          <RetryButton onClick={onRetryPostClick}>Retry</RetryButton>
         </span>
       </div>
     );
@@ -360,16 +362,11 @@ function CommentActionOrStatus({
 
   if (deletingFailed) {
     return (
-      <div className="flex items-center gap-1 text-red-500">
+      <div className="flex items-center gap-1 text-xs text-destructive">
         <MessageCircleWarningIcon className="w-3 h-3" />
         <span>
           Could not delete the comment.{" "}
-          <button
-            className="font-semibold hover:underline"
-            onClick={onRetryDeleteClick}
-          >
-            Retry
-          </button>
+          <RetryButton onClick={onRetryDeleteClick}>Retry</RetryButton>
         </span>
       </div>
     );
@@ -377,7 +374,7 @@ function CommentActionOrStatus({
 
   if (isDeleting) {
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 text-xs text-muted-foreground">
         <Loader2Icon className="w-3 h-3 animate-spin" />
         <span>Deleting...</span>
       </div>
@@ -386,7 +383,7 @@ function CommentActionOrStatus({
 
   if (isPosting) {
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 text-xs text-muted-foreground">
         <Loader2Icon className="w-3 h-3 animate-spin" />
         <span>Posting...</span>
       </div>
@@ -397,9 +394,39 @@ function CommentActionOrStatus({
     return null;
   }
 
+  return <ActionButton onClick={onReplyClick}>reply</ActionButton>;
+}
+
+type RetryButtonProps = {
+  onClick: () => void;
+  children: React.ReactNode;
+};
+
+function RetryButton({ children, onClick }: RetryButtonProps) {
   return (
-    <button onClick={onReplyClick} className="hover:underline">
-      reply
+    <button
+      className="inline-flex items-center justify-center font-semibold transition-colors rounded-md hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      onClick={onClick}
+      type="button"
+    >
+      {children}
+    </button>
+  );
+}
+
+type ActionButtonProps = {
+  onClick: () => void;
+  children: React.ReactNode;
+};
+
+function ActionButton({ children, onClick }: ActionButtonProps) {
+  return (
+    <button
+      className="inline-flex items-center justify-center transition-colors text-muted-foreground text-xs rounded-md hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      onClick={onClick}
+      type="button"
+    >
+      {children}
     </button>
   );
 }

@@ -16,6 +16,7 @@ import {
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
 } from "./hooks";
+import { Button } from "../ui/button";
 
 const COMMENTS_PER_PAGE = 10;
 
@@ -93,7 +94,7 @@ export function CommentSection() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Comments</h2>
+      <h2 className="text-2xl font-bold mb-4 text-foreground">Comments</h2>
       <div className="mb-4">
         {account.address ? (
           <CommentForm onSubmitSuccess={handleCommentSubmitted} />
@@ -111,12 +112,9 @@ export function CommentSection() {
         />
       ))}
       {hasNextPage && (
-        <button
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-          onClick={() => fetchNextPage()}
-        >
+        <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
           Load More
-        </button>
+        </Button>
       )}
     </div>
   );

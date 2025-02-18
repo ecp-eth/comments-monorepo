@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { HexSchema, CommentDataSchema } from "@ecp.eth/sdk/schemas";
+import { MAX_COMMENT_LENGTH } from "./constants";
 
 const CommentDataWithIdSchema = CommentDataSchema.extend({
   id: HexSchema,
@@ -99,7 +100,7 @@ export type CommentPageSchemaType = z.infer<typeof CommentPageSchema>;
 
 export const SignCommentPayloadRequestSchema = z.object({
   author: HexSchema,
-  content: z.string().trim().nonempty(),
+  content: z.string().trim().nonempty().max(MAX_COMMENT_LENGTH),
   targetUri: z.string().url(),
   parentId: HexSchema.optional(),
   chainId: z.number(),
