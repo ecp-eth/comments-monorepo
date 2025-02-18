@@ -106,27 +106,29 @@ export function CommentForm({
         onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "w-full p-2 border border-gray-300 rounded",
+          "w-full p-2",
           submitCommentMutation.error &&
             submitCommentMutation.error instanceof
               SubmitCommentMutationValidationError &&
-            "border-red-500 focus-visible:ring-red-500"
+            "border-destructive focus-visible:ring-destructive"
         )}
         disabled={isSubmitting}
       />
       {address && (
-        <div className="text-xs text-gray-500">Publishing as {address}</div>
+        <div className="text-xs text-muted-foreground">
+          Publishing as {address}
+        </div>
       )}
       {submitCommentMutation.error && (
-        <div className="text-xs text-red-500">
+        <div className="text-xs text-destructive">
           {submitCommentMutation.error.message}
         </div>
       )}
-      <div className="flex items-center text-sm text-gray-500">
+      <div className="flex items-center text-muted-foreground">
         <Button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
           disabled={isSubmitting || !address || !content.trim()}
+          size="sm"
         >
           {isSubmitting ? "Posting..." : "Comment"}
         </Button>
