@@ -33,7 +33,7 @@ export function CommentGasless({ comment, onReply, onDelete }: CommentProps) {
   };
 
   const gaslessMutation = useGaslessTransaction({
-    async prepareSignTypedData() {
+    async prepareSignTypedDataParams() {
       setPendingTxHash(undefined);
 
       if (!address) {
@@ -57,7 +57,7 @@ export function CommentGasless({ comment, onReply, onDelete }: CommentProps) {
       const data = await response.json();
 
       return {
-        signTypedDataArgs: data.signTypedDataArgs,
+        signTypedDataParams: data.signTypedDataParams,
         variables: data,
       };
     },

@@ -5,7 +5,7 @@ import {
 } from "@/lib/wagmi";
 import {
   COMMENTS_V1_ADDRESS,
-  createApprovalSignTypedDataArgs,
+  createApprovalTypedData,
   CommentsV1Abi,
 } from "@ecp.eth/sdk";
 import { NextRequest } from "next/server";
@@ -88,18 +88,18 @@ export const GET = async (req: NextRequest) => {
   }
 
   // Construct approval data
-  const signTypedDataArgs = createApprovalSignTypedDataArgs({
+  const typedApprovalData = createApprovalTypedData({
     author: authorAddress,
     appSigner: account.address,
     chainId: configChains[0].id,
     nonce: nonce as bigint,
   });
 
-  const signature = await account.signTypedData(signTypedDataArgs);
+  const signature = await account.signTypedData(typedApprovalData);
 
   return Response.json({
     signTypedDataArgs: JSON.parse(
-      JSON.stringify(signTypedDataArgs, bigintReplacer)
+      JSON.stringify(typedApprovalData, bigintReplacer)
     ),
     appSignature: signature,
     approved: false,

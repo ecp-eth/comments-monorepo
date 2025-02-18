@@ -6,7 +6,7 @@ import {
 import {
   COMMENTS_V1_ADDRESS,
   CommentsV1Abi,
-  createDeleteCommentTypedDataArgs,
+  createDeleteCommentTypedData,
   getNonce,
 } from "@ecp.eth/sdk";
 import { createWalletClient, isAddress, publicActions } from "viem";
@@ -46,7 +46,7 @@ export const POST = async (req: Request) => {
   console.log("nonce", nonce);
 
   // Construct deletion signature data
-  const signTypedDataArgs = createDeleteCommentTypedDataArgs({
+  const typedDeleteCommentData = createDeleteCommentTypedData({
     commentId: commentId as `0x${string}`,
     chainId: chain.id,
     author: authorAddress,
@@ -54,7 +54,7 @@ export const POST = async (req: Request) => {
     nonce: nonce,
   });
 
-  const signature = await account.signTypedData(signTypedDataArgs);
+  const signature = await account.signTypedData(typedDeleteCommentData);
 
   if (submitIfApproved) {
     const submitterAccount = privateKeyToAccount(
@@ -77,7 +77,7 @@ export const POST = async (req: Request) => {
     if (isApproved) {
       // Verify app signature
       const isAppSignatureValid = await walletClient.verifyTypedData({
-        ...signTypedDataArgs,
+        ...typedDeleteCommentData,
         signature,
         address: account.address,
       });
@@ -100,7 +100,7 @@ export const POST = async (req: Request) => {
             authorAddress,
             account.address,
             nonce,
-            signTypedDataArgs.message.deadline,
+            typedDeleteCommentData.message.deadline,
             "0x",
             signature,
           ],
@@ -118,7 +118,7 @@ export const POST = async (req: Request) => {
 
   return Response.json({
     signTypedDataArgs: JSON.parse(
-      JSON.stringify(signTypedDataArgs, bigintReplacer)
+      JSON.stringify(typedDeleteCommentData, bigintReplacer)
     ),
     appSignature: signature,
   });

@@ -52,7 +52,7 @@ export function createCommentData({
   };
 }
 
-export function createCommentSignTypedDataArgs({
+export function createCommentTypedData({
   commentData,
   chainId,
 }: {
@@ -72,7 +72,7 @@ export function createCommentSignTypedDataArgs({
   } as const;
 }
 
-export function createApprovalSignTypedDataArgs({
+export function createApprovalTypedData({
   author,
   appSigner,
   nonce,
@@ -130,7 +130,7 @@ export async function getNonce({
   return nonce;
 }
 
-export function createDeleteCommentTypedDataArgs({
+export function createDeleteCommentTypedData({
   commentId,
   chainId,
   author,
