@@ -1,5 +1,10 @@
 import { z } from "zod";
 import { HexSchema, CommentDataSchema } from "@ecp.eth/sdk/schemas";
+import { MAX_COMMENT_LENGTH } from "./constants";
+
+const CommentDataWithIdSchema = CommentDataSchema.extend({
+  id: HexSchema,
+});
 
 const CommentAuthorEnsDataSchema = z.object({
   name: z.string(),
@@ -28,7 +33,35 @@ const BaseCommentSchema = z.object({
 
 type BaseCommentSchemaType = z.infer<typeof BaseCommentSchema>;
 
+/**
+ * Parses response from API endpoint for usage in client
+ */
+export const SignCommentResponseClientSchema = z.object({
+  signature: HexSchema,
+  hash: HexSchema,
+  data: CommentDataWithIdSchema,
+});
+
+export type SignCommentResponseClientSchemaType = z.infer<
+  typeof SignCommentResponseClientSchema
+>;
+
+export const PendingCommentOperationSchema = z
+  .object({
+    txHash: HexSchema,
+    chainId: z.number().positive().int(),
+    response: SignCommentResponseClientSchema,
+  })
+  .describe(
+    "Contains information about pending operation so we can show that in comment list"
+  );
+
+export type PendingCommentOperationSchemaType = z.infer<
+  typeof PendingCommentOperationSchema
+>;
+
 type CommentSchemaType = BaseCommentSchemaType & {
+  pendingOperation?: PendingCommentOperationSchemaType;
   replies: {
     results: CommentSchemaType[];
     pagination: {
@@ -49,6 +82,7 @@ export const CommentSchema: z.ZodType<CommentSchemaType> =
         hasMore: z.boolean(),
       }),
     }),
+    pendingOperation: PendingCommentOperationSchema.optional(),
   });
 
 export type Comment = z.infer<typeof CommentSchema>;
@@ -66,15 +100,15 @@ export type CommentPageSchemaType = z.infer<typeof CommentPageSchema>;
 
 export const SignCommentPayloadRequestSchema = z.object({
   author: HexSchema,
-  content: z.string().trim().nonempty(),
+  content: z.string().trim().nonempty().max(MAX_COMMENT_LENGTH),
   targetUri: z.string().url(),
   parentId: HexSchema.optional(),
   chainId: z.number(),
 });
 
-const CommentDataWithIdSchema = CommentDataSchema.extend({
-  id: HexSchema,
-});
+export type SignCommentPayloadRequestSchemaType = z.infer<
+  typeof SignCommentPayloadRequestSchema
+>;
 
 /**
  * Parses output from API endpoint
@@ -88,19 +122,6 @@ export const SignCommentResponseServerSchema = z.object({
   }),
 });
 
-/**
- * Parses response from API endpoint for usage in client
- */
-export const SignCommentResponseClientSchema = z.object({
-  signature: HexSchema,
-  hash: HexSchema,
-  data: CommentDataWithIdSchema,
-});
-
-export type SignCommentResponseClientSchemaType = z.infer<
-  typeof SignCommentResponseClientSchema
->;
-
 export const ListCommentsSearchParamsSchema = z.object({
   targetUri: z.string().url(),
   limit: z.coerce.number().int().positive().max(100).optional(),
@@ -111,3 +132,12 @@ export const ListCommentRepliesSearchParamsSchema = z.object({
   limit: z.coerce.number().int().positive().max(100).optional(),
   offset: z.coerce.number().int().min(0).optional(),
 });
+
+export const ListCommentsQueryDataSchema = z.object({
+  pages: CommentPageSchema.array(),
+  pageParams: z.unknown().array(),
+});
+
+export type ListCommentsQueryDataSchemaType = z.infer<
+  typeof ListCommentsQueryDataSchema
+>;

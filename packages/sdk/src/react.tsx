@@ -1,15 +1,10 @@
-/**
- * - Get data to sign from server
- * - Sign data
- * - Send signed data to server
- * - Wait for transaction hash
- */
-
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Hex, SignTypedDataParameters } from "viem";
 import { useSignTypedData } from "wagmi";
 import { COMMENTS_EMBED_DEFAULT_URL } from "./constants.js";
+import { EmbedConfigSchema, type EmbedConfigSchemaType } from "./schemas.js";
+import { compressToURI } from "lz-ts";
 
 export function useGaslessTransaction(props: {
   prepareSignTypedDataParams: () => Promise<
@@ -65,6 +60,10 @@ type CommentsEmbedProps = {
    * Allows to pass custom props to iframe
    */
   iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
+  /**
+   * Allows to pass custom configuration to the embed iframe.
+   */
+  config?: EmbedConfigSchemaType;
 };
 
 /**
@@ -74,20 +73,31 @@ type CommentsEmbedProps = {
  * ```tsx
  * <CommentsEmbed uri="https://my-blog.tld/article/use-comments" />
  * ```
+ *
+ * @example
+ * ```tsx
+ * // force dark theme
+ * <CommentsEmbed uri="https://my-blog.tld/article/use-comments" config={{ theme: { mode: 'dark' }}} />
+ * ```
  */
 export function CommentsEmbed({
   embedUri = COMMENTS_EMBED_DEFAULT_URL,
   uri,
   containerProps,
   iframeProps,
+  config,
 }: CommentsEmbedProps) {
   const iframeUri = useMemo(() => {
     const url = new URL(embedUri);
 
     url.searchParams.set("targetUri", uri);
 
+    if (config && EmbedConfigSchema.parse(config)) {
+      url.searchParams.set("config", compressToURI(JSON.stringify(config)));
+    }
+
     return url.toString();
-  }, [embedUri, uri]);
+  }, [embedUri, uri, config]);
 
   return (
     <div {...containerProps}>
