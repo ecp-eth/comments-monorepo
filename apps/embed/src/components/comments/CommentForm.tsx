@@ -15,6 +15,7 @@ import {
   submitCommentMutationFunction,
   SubmitCommentMutationValidationError,
 } from "./queries";
+import { MAX_COMMENT_LENGTH } from "@/lib/constants";
 
 export type OnSubmitSuccessFunction = (
   params: PendingCommentOperationSchemaType
@@ -89,6 +90,9 @@ export function CommentForm({
   }, [submitCommentMutation.error]);
 
   const isSubmitting = submitCommentMutation.isPending;
+  const trimmedContent = content.trim();
+  const isContentValid =
+    trimmedContent.length > 0 && trimmedContent.length <= MAX_COMMENT_LENGTH;
 
   return (
     <form
@@ -113,6 +117,7 @@ export function CommentForm({
             "border-destructive focus-visible:ring-destructive"
         )}
         disabled={isSubmitting}
+        maxLength={MAX_COMMENT_LENGTH}
       />
       {address && (
         <div className="text-xs text-muted-foreground">
@@ -127,7 +132,7 @@ export function CommentForm({
       <div className="flex items-center text-muted-foreground">
         <Button
           type="submit"
-          disabled={isSubmitting || !address || !content.trim()}
+          disabled={isSubmitting || !address || isContentValid}
           size="sm"
         >
           {isSubmitting ? "Posting..." : "Comment"}
