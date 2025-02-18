@@ -7,21 +7,22 @@
     "dev": "vocs dev -p 3002",
     "build": "vocs build",
     "preview": "vocs preview",
-    "reference:generate:sdk:index": "typedoc --tsconfig ../packages/sdk/tsconfig.json --out pages/sdk-reference/default --entryPoints ../packages/sdk/src/index.ts --publicPath /sdk-reference/default",
-    "reference:generate:sdk:react": "typedoc --tsconfig ../packages/sdk/tsconfig.json --out pages/sdk-reference/react --entryPoints ../packages/sdk/src/react.tsx --publicPath /sdk-reference/react",
-    "reference:generate:protocol": "solidity-docgen -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen",
-    "reference:generate": "npm run reference:generate:sdk:index && npm run reference:generate:sdk:react"
+    "ref:gen:sdk": "typedoc --tsconfig ../packages/sdk/tsconfig.json --out pages/sdk-reference/ --entryPoints ../packages/sdk/src/index.ts ../packages/sdk/src/types.ts ../packages/sdk/src/react.tsx --publicPath /sdk-reference/",
+    "ref:gen:protocol": "solidity-docgen -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen"
   },
   "dependencies": {
     "@theguild/remark-mermaid": "^0.2.0",
-    "acorn": "^8.0.0",
+    "acorn": "^8.14.0",
     "hono": "^4.6.20",
     "react": "^18.3.1",
     "react-dom": "^18.2.0",
-    "solc": "^0.8.13",
-    "solidity-docgen": "~0.5.17",
-    "typedoc": "^0.27.7",
+    "remark-codesandbox": "^0.10.1",
     "typedoc-plugin-markdown": "^4.4.2",
     "vocs": "1.0.0-alpha.62"
+  },
+  "devDependencies": {
+    "solc": "^0.8.13",
+    "solidity-docgen": "~0.5.17",
+    "typedoc": "^0.27.7"
   }
 }

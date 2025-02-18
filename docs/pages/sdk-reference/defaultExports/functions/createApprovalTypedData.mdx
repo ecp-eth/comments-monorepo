@@ -1,0 +1,91 @@
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [defaultExports](/sdk-reference/defaultExports/index.mdx) / createApprovalTypedData
+
+# Function: createApprovalTypedData()
+
+> **createApprovalTypedData**(`__namedParameters`): `object`
+
+Defined in: [utils.ts:79](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L79)
+
+## Parameters
+
+### \_\_namedParameters
+
+#### appSigner
+
+`` `0x${string}` ``
+
+#### author
+
+`` `0x${string}` ``
+
+#### chainId
+
+`number`
+
+#### deadline?
+
+`bigint`
+
+#### nonce
+
+`bigint`
+
+## Returns
+
+`object`
+
+### domain
+
+> `readonly` **domain**: `object`
+
+#### domain.chainId
+
+> **chainId**: `number`
+
+#### domain.name
+
+> `readonly` **name**: `"Comments"` = `DOMAIN_NAME`
+
+#### domain.verifyingContract
+
+> `readonly` **verifyingContract**: `"0xfed9b3a3884940d0c8a91b55f5e631b33a84f669"` = `COMMENTS_V1_ADDRESS`
+
+#### domain.version
+
+> `readonly` **version**: `"1"` = `DOMAIN_VERSION`
+
+### message
+
+> `readonly` **message**: `object`
+
+#### message.appSigner
+
+> **appSigner**: `` `0x${string}` ``
+
+#### message.author
+
+> **author**: `` `0x${string}` ``
+
+#### message.deadline
+
+> `readonly` **deadline**: `bigint`
+
+#### message.nonce
+
+> **nonce**: `bigint`
+
+### primaryType
+
+> `readonly` **primaryType**: `"AddApproval"` = `"AddApproval"`
+
+### types
+
+> `readonly` **types**: `object` = `ADD_APPROVAL_TYPE`
+
+#### types.AddApproval
+
+> `readonly` **AddApproval**: readonly \[\{ `name`: `"author"`; `type`: `"address"`; \}, \{ `name`: `"appSigner"`; `type`: `"address"`; \}, \{ `name`: `"nonce"`; `type`: `"uint256"`; \}, \{ `name`: `"deadline"`; `type`: `"uint256"`; \}\]

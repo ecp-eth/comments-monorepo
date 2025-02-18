@@ -1,0 +1,67 @@
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [types](/sdk-reference/types/index.mdx) / CommentData
+
+# Type Alias: CommentData
+
+> **CommentData**: `object`
+
+Defined in: [types.ts:13](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L13)
+
+The data structure of a comment to be signed and then passed to the Embed API
+
+## Type declaration
+
+### appSigner
+
+> **appSigner**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+
+The address of the app signer
+
+### author
+
+> **author**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+
+The address of the author of the comment
+
+### content
+
+> **content**: `string`
+
+The content of the comment
+
+### deadline
+
+> **deadline**: `bigint`
+
+The deadline of the comment submission in seconds since epoch
+
+### metadata
+
+> **metadata**: `string`
+
+Metadata about the comment
+
+### nonce
+
+> **nonce**: `bigint`
+
+The nonce of the comment
+
+### parentId
+
+> **parentId**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+
+id of parent comments if it has one, 0x for no parent comment
+
+#### Remarks
+
+This zero address (32 bytes of zeros) indicates the comment has no parent and is a top-level comment
+
+### targetUri
+
+> **targetUri**: `string`
+
+Empty string for replies

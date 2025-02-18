@@ -1,0 +1,77 @@
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [defaultExports](/sdk-reference/defaultExports/index.mdx) / FetchCommentsOptions
+
+# Type Alias: FetchCommentsOptions
+
+> **FetchCommentsOptions**: `object`
+
+Defined in: [api.ts:4](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L4)
+
+## Type declaration
+
+### apiUrl
+
+> **apiUrl**: `string`
+
+URL on which /api/comments endpoint will be called
+
+### appSigner?
+
+> `optional` **appSigner**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+
+Filter comments sent using this app signer key.
+
+### limit?
+
+> `optional` **limit**: `number`
+
+The number of comments to fetch
+
+#### Default
+
+```ts
+50
+```
+
+### offset?
+
+> `optional` **offset**: `number`
+
+The offset of the comments to fetch
+
+#### Default
+
+```ts
+0
+```
+
+### retries?
+
+> `optional` **retries**: `number`
+
+Number of times to retry the signing operation in case of failure.
+
+#### Default
+
+```ts
+3
+```
+
+### sort?
+
+> `optional` **sort**: `"asc"` \| `"desc"`
+
+The sort order, either `asc` or `desc`
+
+#### Default
+
+```ts
+"desc"
+```
+
+### targetUri
+
+> **targetUri**: `string`

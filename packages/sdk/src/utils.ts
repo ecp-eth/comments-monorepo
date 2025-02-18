@@ -11,6 +11,10 @@ import {
 } from "./eip712.js";
 import { CommentData } from "./types.js";
 
+/**
+ * Create the data structure of a comment
+ * @return {CommentData} The data structure of a comment
+ */
 export function createCommentData({
   content,
   targetUri,
@@ -104,6 +108,10 @@ export function createApprovalTypedData({
   } as const;
 }
 
+/**
+ * Read the nonce from CommentsV1 contract for a given author and app signer
+ * @returns The nonce for the given author and app signer
+ */
 export async function getNonce({
   author,
   appSigner,

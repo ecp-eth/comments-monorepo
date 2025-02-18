@@ -1,29 +1,34 @@
-[**@ecp.eth/sdk**](/sdk-reference/react/index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/react/index.mdx) / CommentsEmbed
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [react](/sdk-reference/react/index.mdx) / CommentsEmbed
 
 # Function: CommentsEmbed()
 
-> **CommentsEmbed**(`__namedParameters`): `Element`
+> **CommentsEmbed**(`props`): `Element`
 
-Defined in: [react.tsx:78](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L78)
+Defined in: [react.tsx:105](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L105)
 
 Renders comments embed iframe for the given uri.
 
 ## Parameters
 
-### \_\_namedParameters
+### props
 
-`CommentsEmbedProps`
+[`CommentsEmbedProps`](/sdk-reference/react/type-aliases/CommentsEmbedProps.mdx)
 
 ## Returns
 
 `Element`
 
-## Example
+## Examples
 
 ```tsx
 <CommentsEmbed uri="https://my-blog.tld/article/use-comments" />
+```
+
+```tsx
+// force dark theme
+<CommentsEmbed uri="https://my-blog.tld/article/use-comments" config={{ theme: { mode: 'dark' }}} />
 ```

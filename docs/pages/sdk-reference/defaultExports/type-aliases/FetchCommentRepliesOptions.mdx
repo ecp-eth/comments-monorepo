@@ -1,0 +1,73 @@
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [defaultExports](/sdk-reference/defaultExports/index.mdx) / FetchCommentRepliesOptions
+
+# Type Alias: FetchCommentRepliesOptions
+
+> **FetchCommentRepliesOptions**: `object`
+
+Defined in: [api.ts:89](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L89)
+
+## Type declaration
+
+### apiUrl
+
+> **apiUrl**: `string`
+
+URL on which /api/comments/$commentId/replies endpoint will be called
+
+### appSigner?
+
+> `optional` **appSigner**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+
+Filters only to comments sent using this app signer key.
+
+### commentId
+
+> **commentId**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+
+The ID of the comment to fetch replies for
+
+### limit?
+
+> `optional` **limit**: `number`
+
+#### Default
+
+```ts
+50
+```
+
+### offset?
+
+> `optional` **offset**: `number`
+
+#### Default
+
+```ts
+0
+```
+
+### retries?
+
+> `optional` **retries**: `number`
+
+Number of times to retry the signing operation in case of failure.
+
+#### Default
+
+```ts
+3
+```
+
+### sort?
+
+> `optional` **sort**: `"asc"` \| `"desc"`
+
+#### Default
+
+```ts
+"desc"
+```

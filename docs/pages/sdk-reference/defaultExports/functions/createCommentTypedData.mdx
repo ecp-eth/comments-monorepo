@@ -1,0 +1,63 @@
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [defaultExports](/sdk-reference/defaultExports/index.mdx) / createCommentTypedData
+
+# Function: createCommentTypedData()
+
+> **createCommentTypedData**(`__namedParameters`): `object`
+
+Defined in: [utils.ts:59](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L59)
+
+## Parameters
+
+### \_\_namedParameters
+
+#### chainId
+
+`number`
+
+#### commentData
+
+[`CommentData`](/sdk-reference/types/type-aliases/CommentData.mdx)
+
+## Returns
+
+`object`
+
+### domain
+
+> `readonly` **domain**: `object`
+
+#### domain.chainId
+
+> **chainId**: `number`
+
+#### domain.name
+
+> `readonly` **name**: `"Comments"` = `DOMAIN_NAME`
+
+#### domain.verifyingContract
+
+> `readonly` **verifyingContract**: `"0xfed9b3a3884940d0c8a91b55f5e631b33a84f669"` = `COMMENTS_V1_ADDRESS`
+
+#### domain.version
+
+> `readonly` **version**: `"1"` = `DOMAIN_VERSION`
+
+### message
+
+> `readonly` **message**: [`CommentData`](/sdk-reference/types/type-aliases/CommentData.mdx) = `commentData`
+
+### primaryType
+
+> `readonly` **primaryType**: `"AddComment"` = `"AddComment"`
+
+### types
+
+> `readonly` **types**: `object` = `COMMENT_TYPE`
+
+#### types.AddComment
+
+> `readonly` **AddComment**: readonly \[\{ `name`: `"content"`; `type`: `"string"`; \}, \{ `name`: `"metadata"`; `type`: `"string"`; \}, \{ `name`: `"targetUri"`; `type`: `"string"`; \}, \{ `name`: `"parentId"`; `type`: `"bytes32"`; \}, \{ `name`: `"author"`; `type`: `"address"`; \}, \{ `name`: `"appSigner"`; `type`: `"address"`; \}, \{ `name`: `"nonce"`; `type`: `"uint256"`; \}, \{ `name`: `"deadline"`; `type`: `"uint256"`; \}\]

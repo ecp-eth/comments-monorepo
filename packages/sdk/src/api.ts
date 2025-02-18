@@ -1,14 +1,14 @@
 import { Effect } from "effect";
 import type { FetchCommentsResponse, Hex } from "./types.js";
 
-type FetchCommentsOptions = {
+export type FetchCommentsOptions = {
   targetUri: string;
   /**
    * URL on which /api/comments endpoint will be called
    */
   apiUrl: string;
   /**
-   * Filters only to comments sent using this app signer key.
+   * Filter comments sent using this app signer key.
    */
   appSigner?: Hex;
   /**
@@ -18,20 +18,31 @@ type FetchCommentsOptions = {
    */
   retries?: number;
   /**
+   * The sort order, either `asc` or `desc`
+   *
    * @default "desc"
    */
   sort?: "asc" | "desc";
   /**
-   *
+   * The offset of the comments to fetch
+   * 
    * @default 0
    */
   offset?: number;
   /**
+   * The number of comments to fetch
+   *
    * @default 50
    */
   limit?: number;
 };
 
+/**
+ * Fetch comments from the Embed API
+ * 
+ * @param FetchCommentsResponse 
+ * @returns A promise that resolves comments fetched from the Embed API
+ */
 export async function fetchComments({
   apiUrl,
   targetUri,
@@ -75,7 +86,10 @@ export async function fetchComments({
   return Effect.runPromise(repeatableTask);
 }
 
-type FetchCommentRepliesOptions = {
+export type FetchCommentRepliesOptions = {
+  /**
+   * The ID of the comment to fetch replies for
+   */
   commentId: Hex;
   /**
    * URL on which /api/comments/$commentId/replies endpoint will be called
@@ -106,6 +120,12 @@ type FetchCommentRepliesOptions = {
   limit?: number;
 };
 
+/**
+ * Fetch replies for a comment from the Embed API
+ * 
+ * @param FetchCommentRepliesOptions 
+ * @returns A promise that resolves replies fetched from the Embed API
+ */
 export async function fetchCommentReplies({
   apiUrl,
   appSigner,

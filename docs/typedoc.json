@@ -1,6 +1,4 @@
 {
-  // different public path for each module
-  // "publicPath": "/sdk-reference",
   "plugin": ["typedoc-plugin-markdown"],
   "fileExtension": ".mdx",
   "gitRevision": "main",
