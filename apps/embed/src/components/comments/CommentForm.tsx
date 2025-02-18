@@ -132,7 +132,7 @@ export function CommentForm({
       <div className="flex items-center text-muted-foreground">
         <Button
           type="submit"
-          disabled={isSubmitting || !address || isContentValid}
+          disabled={isSubmitting || !address || !isContentValid}
           size="sm"
         >
           {isSubmitting ? "Posting..." : "Comment"}
