@@ -120,6 +120,25 @@ export const CommentsV1Abi = [
   },
   {
     type: "function",
+    name: "commentAdded",
+    inputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "deleteComment",
     inputs: [
       {

@@ -84,6 +84,9 @@ contract CommentsV1 {
     mapping(address => mapping(address => bool)) public isApproved;
     mapping(address => mapping(address => uint256)) public nonces;
 
+    /// @notice Mapping to track if a comment has been added (does not track deleted comments)
+    mapping(bytes32 => bool) public commentAdded;
+
     constructor() {
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
@@ -163,6 +166,7 @@ contract CommentsV1 {
                 authorSignature
             )
         ) {
+            commentAdded[commentId] = true;
             emit CommentAdded(
                 commentId,
                 commentData.author,

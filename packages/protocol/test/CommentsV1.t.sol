@@ -415,6 +415,22 @@ contract CommentsV1Test is Test {
         );
     }
 
+    function test_CommentAdded_BeforeAndAfterPosting() public {
+        // Create and post a comment
+        CommentsV1.CommentData memory commentData = _createBasicComment();
+        bytes32 commentId = comments.getCommentId(commentData);
+        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+
+        // Verify the comment is not marked as added
+        assertFalse(comments.commentAdded(commentId));
+
+        vm.prank(author);
+        comments.postCommentAsAuthor(commentData, appSignature);
+
+        // Verify the comment is marked as added
+        assertTrue(comments.commentAdded(commentId));
+    }
+
     // Helper function to sign EIP-712 messages
     function _signEIP712(
         uint256 privateKey,
