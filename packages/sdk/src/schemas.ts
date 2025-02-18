@@ -25,9 +25,7 @@ export type CommentData = z.infer<typeof CommentDataSchema>;
 
 export const EmbedConfigThemeColorSchema = z
   .string()
-  .describe(
-    "HSL color value, it is passed to hsl() css function. For example: 0 0 0%"
-  );
+  .describe("Valid CSS color value. For example hsl(0 0 0%) or #000000.");
 
 export const EmbedConfigThemePaletteSchema = z.object({
   background: EmbedConfigThemeColorSchema.optional(),
