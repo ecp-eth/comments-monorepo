@@ -1,16 +1,25 @@
+import { EmbedConfigSchema } from "@ecp.eth/sdk/schemas";
+import { decompressFromURI } from "lz-ts";
 import { Toaster } from "@/components/ui/sonner";
 import { EmbedConfigProvider } from "@/components/EmbedConfigProvider";
-import { CommentSection } from "../components/comments/CommentSection";
+import { CommentSection } from "@/components/comments/CommentSection";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
-import { EmbedConfigSchema } from "@/lib/schemas";
 import { Providers } from "./providers";
 import { cn } from "@/lib/utils";
 import { createThemeCSSVariables } from "@/lib/theming";
 
 const SearchParamsSchema = z.object({
   targetUri: z.string().url(),
-  config: EmbedConfigSchema.optional(),
+  config: z
+    .preprocess((value) => {
+      try {
+        if (typeof value === "string") {
+          return JSON.parse(decompressFromURI(value));
+        }
+      } catch {}
+    }, EmbedConfigSchema)
+    .optional(),
 });
 
 type EmbedPageProps = {

@@ -1,7 +1,7 @@
 import type {
   EmbedConfigThemeSchemaType,
   EmbedConfigThemePaletteSchemaType,
-} from "./schemas";
+} from "@ecp.eth/sdk/schemas";
 
 export function createThemeCSSVariables(
   theme: EmbedConfigThemeSchemaType | undefined
