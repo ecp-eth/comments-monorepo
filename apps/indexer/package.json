@@ -12,7 +12,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@ecp.eth/sdk": "^0.0.4",
+    "@ecp.eth/sdk": "^0.0.5",
     "dataloader": "^2.2.3",
     "hono": "^4.5.0",
     "lru-cache": "^11.0.2",

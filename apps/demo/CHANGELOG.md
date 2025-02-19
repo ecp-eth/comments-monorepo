@@ -1,5 +1,13 @@
 # @ecp.eth/demo
 
+## 0.1.4
+
+### Patch Changes
+
+- ee4dcf3: refactor: renamed typed data related util functions for consistency
+- Updated dependencies [ee4dcf3]
+  - @ecp.eth/sdk@0.0.5
+
 ## 0.1.3
 
 ### Patch Changes
