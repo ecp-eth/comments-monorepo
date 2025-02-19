@@ -61,6 +61,10 @@ export default defineConfig({
           text: "Contract Integration",
           link: "/contract-integration",
         },
+        {
+          text: "Gas Costs",
+          link: "/gas-costs",
+        },
       ],
     },
     {

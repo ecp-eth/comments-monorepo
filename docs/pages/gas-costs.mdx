@@ -1,0 +1,41 @@
+# Gas Costs
+
+This page provides an overview of typical gas costs for posting comments on different chains using the Ethereum Comments Protocol (ECP).
+
+## Base Network
+
+Base is an Ethereum L2 that offers significantly lower gas costs compared to Ethereum mainnet. Here are typical gas costs for posting a comment:
+
+// FIXME
+| Operation | Gas Units | Cost at 0.1 gwei | Cost at 0.5 gwei | Cost at 1 gwei |
+| ---------------- | --------- | ---------------- | ---------------- | -------------- |
+| Post Comment | ~100,000 | $0.01 | $0.05 | $0.10 |
+| Reply to Comment | ~100,000 | $0.01 | $0.05 | $0.10 |
+| Delete Comment | ~50,000 | $0.005 | $0.025 | $0.05 |
+
+## Ethereum Mainnet
+
+| Operation        | Gas Units | Cost at 20 gwei | Cost at 50 gwei | Cost at 100 gwei |
+| ---------------- | --------- | --------------- | --------------- | ---------------- |
+| Post Comment     | ~100,000  | $2.00           | $5.00           | $10.00           |
+| Reply to Comment | ~100,000  | $2.00           | $5.00           | $10.00           |
+| Delete Comment   | ~50,000   | $1.00           | $2.50           | $5.00            |
+
+## Notes
+
+- Gas costs are estimates and may vary based on:
+
+  - The length of the comment content
+  - Network congestion
+  - Current gas prices
+  - Additional metadata included
+
+- Gas prices are highly variable. Check current gas prices on:
+
+  - [Base Gas Tracker](https://basescan.org/gastracker)
+  - [Ethereum Gas Tracker](https://etherscan.io/gastracker)
+
+- Dollar amounts are approximate and will vary based on:
+  - Current ETH price
+  - Gas price at time of transaction
+  - Network conditions
