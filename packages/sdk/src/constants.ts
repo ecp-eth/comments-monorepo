@@ -26,3 +26,9 @@ export const COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL =
  * It is used to fetch comments and replies.
  */
 export const INDEXER_API_URL = "https://api.ethcomments.xyz";
+
+/**
+ * The delimiter for the comment call data suffix used to identify comment data appended to the end of a transaction.
+ * This is the keccak256 hash of the string "ethcomment" sliced to the first 4 bytes.
+ */
+export const COMMENT_CALLDATA_SUFFIX_DELIMITER = "0xe090cb6a" as const;

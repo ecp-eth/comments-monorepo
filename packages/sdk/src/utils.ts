@@ -1,13 +1,18 @@
 import {
   Chain,
+  concat,
   createPublicClient,
-  numberToBytes,
+  encodeAbiParameters,
+  Hex,
   numberToHex,
   Transport,
 } from "viem";
 import { http } from "wagmi";
 import { CommentsV1Abi } from "./abis.js";
-import { COMMENTS_V1_ADDRESS } from "./constants.js";
+import {
+  COMMENT_CALLDATA_SUFFIX_DELIMITER,
+  COMMENTS_V1_ADDRESS,
+} from "./constants.js";
 import {
   ADD_APPROVAL_TYPE,
   COMMENT_TYPE,
@@ -93,6 +98,29 @@ export function createCommentTypedData({
     primaryType: "AddComment",
     message: commentData,
   });
+}
+
+export function createCommentSuffixData({
+  commentData,
+}: {
+  commentData: CommentData;
+}) {
+  const parts: Hex[] = [COMMENT_CALLDATA_SUFFIX_DELIMITER];
+
+  const encodedCommentData = encodeAbiParameters(COMMENT_TYPE.AddComment, [
+    commentData.content,
+    commentData.metadata,
+    commentData.targetUri,
+    commentData.parentId,
+    commentData.author,
+    commentData.appSigner,
+    commentData.salt,
+    commentData.deadline,
+  ]);
+
+  parts.push(encodedCommentData);
+
+  return concat(parts);
 }
 
 /**
