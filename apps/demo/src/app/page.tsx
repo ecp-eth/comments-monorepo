@@ -1,12 +1,12 @@
 "use client";
 
-import { CommentSection } from "../components/comments/CommentSection";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { CommentSectionGasless } from "../components/comments/gasless/CommentSectionGasless";
-import { useAccount } from "wagmi";
+import { Switch } from "@/components/ui/switch";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useState } from "react";
+import { useAccount } from "wagmi";
+import { CommentSection } from "../components/comments/CommentSection";
+import { CommentSectionGasless } from "../components/comments/gasless/CommentSectionGasless";
 
 export default function Home() {
   const { address } = useAccount();

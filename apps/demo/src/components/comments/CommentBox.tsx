@@ -1,19 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  COMMENTS_V1_ADDRESS,
+  CommentsV1Abi,
+  createCommentSuffixData,
+} from "@ecp.eth/sdk";
+import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { parseAbi } from "viem";
 import {
   useAccount,
   useSwitchChain,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { chains } from "../../lib/wagmi";
-import { toast } from "sonner";
-import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
 import { SignCommentResponseSchema } from "@/lib/schemas";
-import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useFreshRef } from "@/lib/hooks";
 
 interface CommentBoxProps {
@@ -41,6 +45,10 @@ export function CommentBox({
         return;
       }
 
+      const formValues = new FormData(e.currentTarget as HTMLFormElement);
+
+      const submitAction = formValues.get("action") as "post" | "yoink";
+
       switchChain({ chainId: chains[0].id });
 
       const response = await fetch("/api/sign-comment", {
@@ -62,6 +70,20 @@ export function CommentBox({
       }
 
       const data = SignCommentResponseSchema.parse(await response.json());
+
+      if (submitAction === "yoink") {
+        const commentDataSuffix = createCommentSuffixData({
+          commentData: data.data,
+        });
+
+        return writeContractAsync({
+          address: "0x4bBFD120d9f352A0BEd7a014bd67913a2007a878",
+          abi: parseAbi(["function yoink()"]),
+          functionName: "yoink",
+          args: [],
+          dataSuffix: commentDataSuffix,
+        });
+      }
 
       return writeContractAsync({
         abi: CommentsV1Abi,
@@ -86,6 +108,7 @@ export function CommentBox({
   }, [receipt?.status, onSubmitRef]);
 
   const isLoading = isReceiptLoading || submitMutation.isPending;
+  const submitDisabled = isLoading || !address || !content.trim();
 
   return (
     <form onSubmit={submitMutation.mutate} className="mb-4 flex flex-col gap-2">
@@ -99,13 +122,24 @@ export function CommentBox({
       {address && (
         <div className="text-xs text-gray-500">Publishing as {address}</div>
       )}
-      <div className="flex items-center text-sm text-gray-500">
+      <div className="flex items-center gap-2 text-sm text-gray-500">
         <Button
+          name="action"
+          value="post"
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded"
-          disabled={isLoading || !address || !content.trim()}
+          disabled={submitDisabled}
         >
           {isLoading ? "Posting..." : "Comment"}
+        </Button>
+        <Button
+          name="action"
+          value="yoink"
+          type="submit"
+          className="bg-purple-500 text-white px-4 py-2 rounded"
+          disabled={submitDisabled}
+        >
+          {isLoading ? "Yoinking..." : "Yoink with comment"}
         </Button>
       </div>
     </form>

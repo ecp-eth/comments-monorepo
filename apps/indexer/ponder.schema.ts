@@ -15,7 +15,7 @@ export const comment = onchainTable(
     chainId: t.integer().notNull(),
     appSigner: t.hex().notNull(),
     txHash: t.hex().notNull(),
-    logIndex: t.integer().notNull(),
+    logIndex: t.integer(),
   }),
   (table) => ({
     targetUriIdx: index().on(table.targetUri),
