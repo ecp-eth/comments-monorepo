@@ -1,0 +1,37 @@
+# Contract Integration Guide
+
+This guide explains how to integrate the Ethereum Comments Protocol (ECP) into your smart contracts.
+
+## Basic Integration
+
+Here's a simple example:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+import "@ecp.eth/protocol/contracts/CommentsV1.sol";
+
+contract MyContract {
+    // The CommentsV1 contract on Base
+    // FIXME
+    CommentsV1 constant comments = CommentsV1(0xfed9b3a3884940d0c8a91b55f5e631b33a84f669);
+
+    // Post a comment
+    function postComment(string memory content) public {
+        comments.postCommentAsAuthor(
+            CommentsV1.CommentData({
+                content: content,
+                metadata: "",
+                targetUri: "myapp:comments",
+                parentId: bytes32(0),
+                author: msg.sender,
+                appSigner: address(this),
+                nonce: comments.nonces(msg.sender, address(this)),
+                deadline: block.timestamp + 1 hours
+            }),
+            "" // Empty signature since we're calling directly
+        );
+    }
+}
+```

@@ -51,6 +51,10 @@ export default defineConfig({
         {
           text: 'Post comment flow',
           link: '/post-comment-flow'
+        },
+        {
+          text: 'Contract Integration',
+          link: '/contract-integration'
         }
       ]
     },
