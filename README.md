@@ -6,7 +6,7 @@ A protocol for commenting built on Ethereum.
 
 | Network | Block Number | Address |
 |---------|--------------|---------|
-| Base | 26283365 | 0xfed9b3a3884940d0c8a91b55f5e631b33a84f669 |
+| Base | 26582217 | 0xdbf97d1bacd56c707b77545e218176ae61a93641 |
 
 ## Packages
 
