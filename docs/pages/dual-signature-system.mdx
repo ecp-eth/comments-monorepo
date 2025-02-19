@@ -3,13 +3,16 @@
 The protocol implements a dual-signature system that allows comment authors to delegate comment actions to app server. When an author approves an app signer, that app server can perform actions like posting comments on behalf of the author. This enables features like gasless transactions while maintaining security through cryptographic signatures.
 
 ### Author Signer
+
 - The end user's wallet that creates and owns the comments
 - Signs transactions to post comments directly
 - Can approve or revoke app signers
 
 ### App Signer
+
 - An ethereum account used to authorize comments to be associated with the application
 - Can be approved to post comments on behalf of an author
+- This app signer can be used as a filter to only show comments signed by your app, from a group of apps, or any app (in which case a spam mechanism is advisable).
 
 ### Submitter
 
