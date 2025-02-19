@@ -94,6 +94,10 @@ export default defineConfig({
       text: "Indexing",
       items: [
         {
+          text: "Free Hosted API",
+          link: "/api-reference",
+        },
+        {
           text: "Ponder",
           link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer",
         },
