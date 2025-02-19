@@ -1,0 +1,34 @@
+# React Component Library
+
+- Pre-built UI components
+- Quick integration
+- Customizable styling
+
+```tsx
+import { CommentsEmbed } from '@ecp.eth/sdk/react'
+
+const baseOrigin = 'https://blog.example.com'
+
+export function Comments() {
+  return (
+    <div>
+      <h3>Comments</h3>
+      <CommentsEmbed
+        // the uri for commenting
+        uri={new URL(
+          window.location.pathname,
+          baseOrigin
+        ).toString()}
+      />
+    </div>`
+  )
+}
+```
+
+Be careful when choosing the value for the `uri` property. The `uri` serves as a unique identifier to locate comments:
+
+1. If your web page is dynamic and accepts query parameters, you should carefully consider which parameters are necessary to locate the correct comments
+   and include them in the `uri` property. As a general rule, include query parameters that affect the page content.
+2. If you are rendering the `CommentsEmbed` with server-side rendering (SSR), you do not have access to the `window` object.
+
+The `uri` must be a unique string that follows the [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) standard.

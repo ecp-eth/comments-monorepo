@@ -1,5 +1,19 @@
 # Integration Options
 
+There are three main ways to integrate comments into your application:
+
+1. [React Component Library](/integration-options/react) - Use our pre-built React components for a seamless integration with React applications.
+
+2. [Contract Interaction](/integration-options/contract) - Directly interact with the smart contract for custom integrations or bot development.
+
+3. [iFrame Integration](/integration-options/iframe) - The simplest way to add comments to any website using an iframe.
+
+Choose the integration method that best suits your needs:
+
+- **React Component Library**: Best for React applications where you want full control over styling and deep integration with your app.
+- **Contract Interaction**: Best for custom implementations, bots, or when you need low-level control.
+- **iFrame Integration**: Best for quick integration with any website, regardless of framework or technology stack.
+
 ## 1. React Component Library
 
 - Pre-built UI components
@@ -30,7 +44,7 @@ export function Comments() {
 Be careful when choosing the value for the `uri` property. The `uri` serves as a unique identifier to locate comments:
 
 1. If your web page is dynamic and accepts query parameters, you should carefully consider which parameters are necessary to locate the correct comments
-and include them in the `uri` property. As a general rule, include query parameters that affect the page content.
+   and include them in the `uri` property. As a general rule, include query parameters that affect the page content.
 2. If you are rendering the `CommentsEmbed` with server-side rendering (SSR), you do not have access to the `window` object.
 
 The `uri` must be a unique string that follows the [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) standard.
@@ -56,25 +70,25 @@ pnpm add wagmi viem
 ### Basic Setup Code
 
 ```typescript
-import { createConfig, configureChains } from 'wagmi'
-import { baseMainnet } from 'wagmi/chains'
-import { publicProvider } from 'wagmi/providers/public'
-import { CommentsV1Abi } from '@ecp.eth/protocol/abi'
+import { createConfig, configureChains } from "wagmi";
+import { baseMainnet } from "wagmi/chains";
+import { publicProvider } from "wagmi/providers/public";
+import { CommentsV1Abi } from "@ecp.eth/protocol/abi";
 
 // Configure chains & providers
 const { chains, publicClient } = configureChains(
   [baseMainnet],
   [publicProvider()]
-)
+);
 
 // Create wagmi config
 const config = createConfig({
   autoConnect: true,
   publicClient,
-})
+});
 
 // Contract config
-const contractAddress = '0xfed9b3a3884940d0c8a91b55f5e631b33a84f669' // Base mainnet
+const contractAddress = "0xfed9b3a3884940d0c8a91b55f5e631b33a84f669"; // Base mainnet
 ```
 
 ### Best Practices

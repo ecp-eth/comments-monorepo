@@ -1,0 +1,52 @@
+# Contract Interaction
+
+This guide explains how to directly interact with the CommentsV1 smart contract for custom integrations or bot development.
+
+## Contract Addresses
+
+See [COMMENTS_V1_ADDRESS](/sdk-reference/default/variables/COMMENTS_V1_ADDRESS)
+
+## Setup
+
+First, install the required dependencies:
+
+```bash
+npm install wagmi viem
+# or
+pnpm add wagmi viem
+```
+
+## Basic Setup Code
+
+```typescript
+import { createConfig, configureChains } from "wagmi";
+import { baseMainnet } from "wagmi/chains";
+import { publicProvider } from "wagmi/providers/public";
+import { CommentsV1Abi } from "@ecp.eth/protocol/abi";
+
+// Configure chains & providers
+const { chains, publicClient } = configureChains(
+  [baseMainnet],
+  [publicProvider()]
+);
+
+// Create wagmi config
+const config = createConfig({
+  autoConnect: true,
+  publicClient,
+});
+
+// Contract config
+const contractAddress = "0xfed9b3a3884940d0c8a91b55f5e631b33a84f669"; // Base mainnet
+```
+
+## Best Practices
+
+1. Always use fresh nonces by querying them before each operation
+2. Set reasonable deadlines (e.g., 1 hour from current time)
+3. Implement proper error handling
+4. Monitor gas costs and adjust gas limits accordingly
+5. Consider implementing retry mechanisms for failed transactions
+6. Keep private keys secure and never expose them in client-side code
+7. While the contract doesn't impose rate limits, consider implementing application-level rate limiting to prevent spam and manage gas costs effectively.
+8. Considering anti-spam measures

@@ -39,6 +39,20 @@ export default defineConfig({
         {
           text: "Integration Options",
           link: "/integration-options",
+          items: [
+            {
+              text: "React Component",
+              link: "/integration-options/react",
+            },
+            {
+              text: "Contract Interaction",
+              link: "/integration-options/contract",
+            },
+            {
+              text: "iFrame (No-code)",
+              link: "/integration-options/iframe",
+            },
+          ],
         },
       ],
     },

@@ -1,0 +1,46 @@
+# iFrame Integration
+
+The iframe integration is the simplest way to add comments to your website. It requires minimal setup and works with any web framework or static site.
+
+## Setup
+
+Add the following HTML to your page where you want the comments to appear:
+
+```html
+<iframe
+  src="https://embed.ethcomments.xyz/?targetUri=YOUR_PAGE_URI"
+  width="100%"
+  height="600px"
+  frameborder="0"
+  style="border: none; width: 100%;"
+></iframe>
+```
+
+Replace `YOUR_PAGE_URI` with your page's URI. This should be a URL-encoded string that uniquely identifies the page where comments should appear.
+
+## Configuration Options
+
+The iframe accepts the following query parameters:
+
+- `targetUri` (required): The unique identifier for the comment thread
+- `theme` (optional): Either "light" or "dark"
+- `height` (optional): Custom height for the iframe (default: "600px")
+
+Example with all options:
+
+```html
+<iframe
+  src="https://embed.ethcomments.xyz/?targetUri=https%3A%2F%2Fblog.example.com%2Fpost-1&theme=dark&height=800"
+  width="100%"
+  height="800px"
+  frameborder="0"
+  style="border: none; width: 100%;"
+></iframe>
+```
+
+## Best Practices
+
+1. Always URL-encode the `targetUri` parameter
+2. Consider using a dynamic height based on content (using postMessage)
+3. Ensure the iframe has sufficient width to display comments properly
+4. For better UX, consider adding a loading state while the iframe loads
