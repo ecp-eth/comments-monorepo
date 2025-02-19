@@ -97,7 +97,7 @@ export function CommentForm({
   return (
     <form
       onSubmit={submitCommentMutation.mutate}
-      className="flex flex-col gap-2"
+      className={cn("flex flex-col gap-2", !address && "opacity-20")}
     >
       <Textarea
         onBlur={() => {
@@ -119,17 +119,10 @@ export function CommentForm({
         disabled={isSubmitting}
         maxLength={MAX_COMMENT_LENGTH}
       />
-      {address && (
-        <div className="text-xs text-muted-foreground">
-          Publishing as {address}
+      <div className="flex gap-2 justify-between">
+        <div className="flex-grow text-xs text-muted-foreground truncate">
+          {address && <>Publishing as {address}</>}
         </div>
-      )}
-      {submitCommentMutation.error && (
-        <div className="text-xs text-destructive">
-          {submitCommentMutation.error.message}
-        </div>
-      )}
-      <div className="flex items-center text-muted-foreground">
         <Button
           type="submit"
           disabled={isSubmitting || !address || !isContentValid}
@@ -138,6 +131,11 @@ export function CommentForm({
           {isSubmitting ? "Posting..." : "Comment"}
         </Button>
       </div>
+      {submitCommentMutation.error && (
+        <div className="text-xs text-destructive">
+          {submitCommentMutation.error.message}
+        </div>
+      )}
     </form>
   );
 }
