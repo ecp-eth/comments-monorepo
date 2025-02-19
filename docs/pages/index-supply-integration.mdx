@@ -1,0 +1,475 @@
+# Using Index Supply as the Indexer
+
+The Ethereum Comments Protocol can be integrated with [Index Supply](https://www.indexsupply.net/) as an alternative indexing solution. This guide explains how to use Index Supply to index and query comments from the protocol.
+
+## Overview
+
+Instead of using the default indexer, you can leverage Index Supply's infrastructure to:
+
+- Index comment events from the CommentsV1 contract
+- Query comments efficiently using SQL
+- Maintain a synchronized view of all comments
+
+### Configure Index Supply Client
+
+Create a simple client wrapper for Index Supply:
+
+```typescript
+interface IndexSupplyResponse {
+  block_height: number;
+  result: [string[], any[][]];
+}
+
+const indexSupplyClient = {
+  async query(chain: string, query: string, eventSignatures: string[]) {
+    const params = new URLSearchParams({
+      chain,
+      query,
+      event_signatures: eventSignatures.join(","),
+    });
+
+    const response = await fetch(
+      `https://api.indexsupply.net/query?${params.toString()}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json() as Promise<IndexSupplyResponse>;
+  },
+};
+```
+
+## Querying Comments
+
+### Fetch Comments for a URI
+
+Here's how to fetch comments for a specific URI using Index Supply:
+
+```typescript
+import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+
+const COMMENT_ADDED_EVENT =
+  "CommentAdded(address indexed author, address indexed appSigner, bytes32 indexed commentId, string targetUri, CommentData commentData)";
+
+interface CommentData {
+  content: string;
+  metadata: Record<string, any>;
+  parent_id: string | null;
+}
+
+interface Comment {
+  id: string;
+  content: string;
+  metadata: Record<string, any>;
+  author: string;
+  appSigner: string;
+  parentId: string | null;
+  blockNumber: number;
+  transactionHash: string;
+}
+
+// The appSigner is the Ethereum address that signed the comment.
+// You can get your appSigner in one of these ways:
+// 1. If you're using the ECP SDK, it's the address you used to sign up for an API key
+// 2. If you deployed your own CommentsV1 contract, it's the address that deployed it
+// 3. If you're using the default CommentsV1 contract, you can find your appSigner in your dashboard at https://ecp.eth.limo/dashboard
+
+async function fetchComments(
+  targetUri: string,
+  appSigner: string,
+  chain = "1"
+): Promise<Comment[]> {
+  // default to mainnet
+  const query = `
+    SELECT author, app_signer, comment_id, target_uri, comment_data, block_num, tx_hash 
+    FROM comment_added 
+    WHERE address = '${COMMENTS_V1_ADDRESS}' 
+    AND target_uri = '${targetUri}'
+    AND app_signer = '${appSigner}'
+    ORDER BY block_num DESC
+  `;
+
+  try {
+    const response = await indexSupplyClient.query(chain, query, [
+      COMMENT_ADDED_EVENT,
+    ]);
+
+    // Check if we have results and column names
+    if (!response.result?.[0] || !response.result?.[1]) {
+      return [];
+    }
+
+    const [columns, rows] = response.result;
+
+    return rows.map((row) => {
+      const rowObj: Record<string, any> = {};
+      columns.forEach((col, i) => {
+        rowObj[col] = row[i];
+      });
+
+      const commentData = rowObj.comment_data as CommentData;
+
+      return {
+        id: rowObj.comment_id,
+        content: commentData.content,
+        metadata: commentData.metadata,
+        author: rowObj.author,
+        appSigner: rowObj.app_signer,
+        parentId: commentData.parent_id,
+        blockNumber: rowObj.block_num,
+        transactionHash: rowObj.tx_hash,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    throw error;
+  }
+}
+```
+
+### Fetch Comment Replies
+
+To fetch replies to a specific comment:
+
+```typescript
+async function fetchReplies(
+  parentId: string,
+  appSigner: string,
+  chain = "1"
+): Promise<Comment[]> {
+  const query = `
+    SELECT author, app_signer, comment_id, target_uri, comment_data, block_num, tx_hash 
+    FROM comment_added 
+    WHERE address = '${COMMENTS_V1_ADDRESS}' 
+    AND comment_data->>'parent_id' = '${parentId}'
+    AND app_signer = '${appSigner}'
+    ORDER BY block_num DESC
+  `;
+
+  try {
+    const response = await indexSupplyClient.query(chain, query, [
+      COMMENT_ADDED_EVENT,
+    ]);
+
+    if (!response.result?.[0] || !response.result?.[1]) {
+      return [];
+    }
+
+    const [columns, rows] = response.result;
+
+    return rows.map((row) => {
+      const rowObj: Record<string, any> = {};
+      columns.forEach((col, i) => {
+        rowObj[col] = row[i];
+      });
+
+      const commentData = rowObj.comment_data as CommentData;
+
+      return {
+        id: rowObj.comment_id,
+        content: commentData.content,
+        metadata: commentData.metadata,
+        author: rowObj.author,
+        appSigner: rowObj.app_signer,
+        parentId: commentData.parent_id,
+        blockNumber: rowObj.block_num,
+        transactionHash: rowObj.tx_hash,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching replies:", error);
+    throw error;
+  }
+}
+```
+
+### Track Deleted Comments
+
+To maintain an accurate view of comments, you'll need to track deletion events:
+
+```typescript
+const COMMENT_DELETED_EVENT = "CommentDeleted(bytes32 indexed commentId)";
+
+interface DeletedComment {
+  id: string;
+  blockNumber: number;
+  transactionHash: string;
+}
+
+async function fetchDeletedComments(
+  appSigner: string,
+  chain = "1"
+): Promise<DeletedComment[]> {
+  const query = `
+    SELECT comment_id, block_num, tx_hash 
+    FROM comment_deleted 
+    WHERE address = '${COMMENTS_V1_ADDRESS}'
+    AND app_signer = '${appSigner}'
+    ORDER BY block_num DESC
+  `;
+
+  try {
+    const response = await indexSupplyClient.query(chain, query, [
+      COMMENT_DELETED_EVENT,
+    ]);
+
+    if (!response.result?.[0] || !response.result?.[1]) {
+      return [];
+    }
+
+    const [columns, rows] = response.result;
+
+    return rows.map((row) => {
+      const rowObj: Record<string, any> = {};
+      columns.forEach((col, i) => {
+        rowObj[col] = row[i];
+      });
+
+      return {
+        id: rowObj.comment_id,
+        blockNumber: rowObj.block_num,
+        transactionHash: rowObj.tx_hash,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching deleted comments:", error);
+    throw error;
+  }
+}
+```
+
+## Live Updates
+
+Index Supply supports Server-Sent Events (SSE) for real-time updates. Here's how to subscribe to new comments:
+
+```typescript
+function subscribeToNewComments(
+  targetUri: string,
+  appSigner: string,
+  chain = "1",
+  onComment: (comment: Comment) => void,
+  onError?: (error: Error) => void
+): EventSource {
+  const query = `
+    SELECT author, app_signer, comment_id, target_uri, comment_data, block_num, tx_hash 
+    FROM comment_added 
+    WHERE address = '${COMMENTS_V1_ADDRESS}' 
+    AND target_uri = '${targetUri}'
+    AND app_signer = '${appSigner}'
+  `;
+
+  const eventSource = new EventSource(
+    `https://api.indexsupply.net/live?chain=${chain}&query=${encodeURIComponent(query)}&event_signatures=${encodeURIComponent(COMMENT_ADDED_EVENT)}`
+  );
+
+  eventSource.onmessage = (event) => {
+    try {
+      const response = JSON.parse(event.data) as IndexSupplyResponse;
+      if (!response.result?.[0] || !response.result?.[1]) {
+        return;
+      }
+
+      const [columns, rows] = response.result;
+
+      rows.forEach((row) => {
+        const rowObj: Record<string, any> = {};
+        columns.forEach((col, i) => {
+          rowObj[col] = row[i];
+        });
+
+        const commentData = rowObj.comment_data as CommentData;
+        const comment: Comment = {
+          id: rowObj.comment_id,
+          content: commentData.content,
+          metadata: commentData.metadata,
+          author: rowObj.author,
+          appSigner: rowObj.app_signer,
+          parentId: commentData.parent_id,
+          blockNumber: rowObj.block_num,
+          transactionHash: rowObj.tx_hash,
+        };
+
+        onComment(comment);
+      });
+    } catch (error) {
+      console.error("Error processing SSE message:", error);
+      if (onError && error instanceof Error) {
+        onError(error);
+      }
+    }
+  };
+
+  eventSource.onerror = (error) => {
+    console.error("SSE connection error:", error);
+    if (onError) {
+      onError(new Error("SSE connection error"));
+    }
+  };
+
+  return eventSource;
+}
+```
+
+## React Integration Example
+
+Here's a simplified example of using Index Supply with React:
+
+```typescript
+import { useState, useEffect, useCallback } from 'react'
+
+interface Comment {
+  id: string
+  content: string
+  author: string
+  parentId: string | null
+  replies?: Comment[]
+}
+
+// Helper function to organize comments into a tree structure
+function buildCommentTree(comments: Comment[]) {
+  const commentMap = new Map<string, Comment>()
+  const rootComments: Comment[] = []
+
+  // First pass: create a map of all comments
+  comments.forEach(comment => {
+    commentMap.set(comment.id, { ...comment, replies: [] })
+  })
+
+  // Second pass: organize into tree structure
+  comments.forEach(comment => {
+    const processedComment = commentMap.get(comment.id)!
+    if (comment.parentId && commentMap.has(comment.parentId)) {
+      const parent = commentMap.get(comment.parentId)!
+      parent.replies!.push(processedComment)
+    } else {
+      rootComments.push(processedComment)
+    }
+  })
+
+  return rootComments
+}
+
+// Individual comment component
+function Comment({ comment, depth = 0 }: { comment: Comment; depth?: number }) {
+  return (
+    <div style={{ marginLeft: `${depth * 20}px`, marginBottom: '16px' }}>
+      <div style={{
+        padding: '12px',
+        border: '1px solid #e1e4e8',
+        borderRadius: '6px',
+        backgroundColor: '#f6f8fa'
+      }}>
+        <p style={{ margin: '0 0 8px 0' }}>{comment.content}</p>
+        <small style={{ color: '#666' }}>By: {comment.author}</small>
+      </div>
+      {comment.replies && comment.replies.length > 0 && (
+        <div style={{ marginTop: '8px' }}>
+          {comment.replies.map(reply => (
+            <Comment key={reply.id} comment={reply} depth={depth + 1} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CustomCommentsEmbed({
+  uri,
+  appSigner,
+  chain = "1"
+}: {
+  uri: string;
+  appSigner: string;
+  chain?: string;
+}) {
+  const [comments, setComments] = useState<Comment[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleNewComment = useCallback((comment: Comment) => {
+    setComments(prevComments => {
+      const newComments = [...prevComments];
+      if (!comment.parentId) {
+        // Root comment
+        newComments.unshift(comment);
+      } else {
+        // Reply - rebuild the tree
+        const allComments = [...newComments.flatMap(c => [c, ...(c.replies || [])])];
+        allComments.push(comment);
+        return buildCommentTree(allComments);
+      }
+      return newComments;
+    });
+  }, []);
+
+  useEffect(() => {
+    let eventSource: EventSource;
+
+    async function loadComments() {
+      try {
+        setError(null);
+        const allComments = await fetchComments(uri, appSigner, chain)
+        const deletedComments = await fetchDeletedComments(appSigner, chain)
+        const deletedIds = new Set(deletedComments.map(c => c.id))
+
+        // Filter out deleted comments
+        const activeComments = allComments.filter(c => !deletedIds.has(c.id))
+        const commentTree = buildCommentTree(activeComments)
+        setComments(commentTree)
+
+        // Subscribe to live updates
+        eventSource = subscribeToNewComments(
+          uri,
+          appSigner,
+          chain,
+          handleNewComment,
+          (error) => setError(error.message)
+        );
+      } catch (error) {
+        console.error('Error loading comments:', error)
+        setError(error instanceof Error ? error.message : 'Failed to load comments')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadComments()
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    }
+  }, [uri, appSigner, chain, handleNewComment])
+
+  if (loading) return <div>Loading comments...</div>
+  if (error) return <div>Error: {error}</div>
+
+  return (
+    <div>
+      {comments.length === 0 ? (
+        <div>No comments yet</div>
+      ) : (
+        comments.map(comment => (
+          <Comment key={comment.id} comment={comment} />
+        ))
+      )}
+    </div>
+  )
+}
+```
+
+## Limitations and Considerations
+
+- Index Supply requires proper query optimization for best performance
+- Consider using pagination for large result sets
+- Add appropriate error handling for API rate limits and network issues
+- The free tier has limitations on query complexity and frequency
+
+## Additional Resources
+
+- [Index Supply Documentation](https://www.indexsupply.net/docs)
+- [ECP Protocol Reference](/protocol-reference/CommentsV1)
+- [Index Supply Query Examples](https://www.indexsupply.net/docs)

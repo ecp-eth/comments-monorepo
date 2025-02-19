@@ -61,10 +61,6 @@ export default defineConfig({
           text: "Contract Integration",
           link: "/contract-integration",
         },
-        {
-          text: "Gas Costs",
-          link: "/gas-costs",
-        },
       ],
     },
     {
@@ -91,6 +87,28 @@ export default defineConfig({
         {
           text: "Demo App Repository",
           link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo",
+        },
+      ],
+    },
+    {
+      text: "Indexing",
+      items: [
+        {
+          text: "Ponder",
+          link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer",
+        },
+        {
+          text: "Index Supply",
+          link: "/index-supply-integration",
+        },
+      ],
+    },
+    {
+      text: "FAQ",
+      items: [
+        {
+          text: "Gas Costs",
+          link: "/gas-costs",
         },
       ],
     },
