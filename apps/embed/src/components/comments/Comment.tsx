@@ -22,10 +22,10 @@ import {
 } from "wagmi";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { getAddress } from "viem";
-import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import { COMMENTS_V1_ADDRESS, fetchCommentReplies } from "@ecp.eth/sdk";
 import {
   CommentPageSchema,
-  PendingCommentOperationSchemaType,
+  type PendingCommentOperationSchemaType,
   type Comment as CommentType,
 } from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
@@ -42,8 +42,10 @@ import {
   useHandleRetryPostComment,
 } from "./hooks";
 import { Button } from "../ui/button";
-
-const REPLIES_PER_PAGE = 10;
+import {
+  MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+  TRUNCATE_COMMENT_LENGTH,
+} from "@/lib/constants";
 
 export type OnDeleteComment = (id: Hex) => void;
 export type OnPostCommentSuccess = (transactionHash: Hex) => void;
@@ -54,6 +56,10 @@ export type OnRetryPostComment = (
 
 interface CommentProps {
   comment: CommentType;
+  /**
+   * @default 1
+   */
+  depth?: number;
   onDelete?: OnDeleteComment;
   /**
    * Called when comment is successfully posted to the blockchain.
@@ -69,6 +75,7 @@ interface CommentProps {
 }
 
 export function Comment({
+  depth = 1,
   comment,
   onDelete,
   onPostSuccess,
@@ -87,43 +94,41 @@ export function Comment({
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
   const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
+  const areRepliesAllowed = depth < 2;
 
   const repliesQuery = useInfiniteQuery({
+    enabled: areRepliesAllowed,
     queryKey,
-    initialData: {
-      pages: [comment.replies],
-      pageParams: [
-        {
-          offset: comment.replies.pagination.offset,
-          limit: comment.replies.pagination.limit,
-        },
-      ],
-    },
+    initialData: comment.replies
+      ? {
+          pages: [comment.replies],
+          pageParams: [
+            {
+              offset: comment.replies.pagination.offset,
+              limit: comment.replies.pagination.limit,
+            },
+          ],
+        }
+      : undefined,
     initialPageParam: {
-      offset: comment.replies.pagination.offset,
-      limit: comment.replies.pagination.limit,
+      offset: comment.replies?.pagination.offset ?? 0,
+      limit:
+        comment.replies?.pagination.limit ??
+        MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
     },
-    staleTime: 5000, // do not load the data on first mount
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async ({ pageParam, signal }) => {
-      const searchParams = new URLSearchParams({
-        offset: pageParam.offset.toString(),
-        limit: REPLIES_PER_PAGE.toString(),
+      const response = await fetchCommentReplies({
+        apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        offset: pageParam.offset,
+        limit: pageParam.limit,
+        commentId: comment.id,
+        signal,
       });
 
-      const response = await fetch(
-        `/api/comments/${comment.id}/replies?${searchParams.toString()}`,
-        {
-          signal,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch comments");
-      }
-
-      return CommentPageSchema.parse(await response.json());
+      return CommentPageSchema.parse(response);
     },
     getNextPageParam(lastPage) {
       if (!lastPage.pagination.hasMore) {
@@ -138,8 +143,8 @@ export function Comment({
   });
 
   const replies = useMemo(() => {
-    return repliesQuery.data.pages.flatMap((page) => page.results);
-  }, [repliesQuery.data.pages]);
+    return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
+  }, [repliesQuery.data?.pages]);
 
   const handleCommentSubmitted = useHandleCommentSubmitted({ queryKey });
   const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
@@ -282,10 +287,15 @@ export function Comment({
           comment.deletedAt && "text-muted-foreground"
         )}
       >
-        <CommentText text={comment.content} />
+        <CommentText
+          // make sure comment is updated if was deleted
+          key={comment.deletedAt?.toISOString()}
+          text={comment.content}
+        />
       </div>
       <div className="mb-2">
         <CommentActionOrStatus
+          areRepliesAllowed={areRepliesAllowed}
           comment={comment}
           isDeleting={isDeleting}
           isPosting={isPosting}
@@ -311,6 +321,7 @@ export function Comment({
       )}
       {replies.map((reply) => (
         <Comment
+          depth={depth + 1}
           key={reply.id}
           comment={reply}
           onDelete={handleCommentDeleted}
@@ -331,6 +342,7 @@ export function Comment({
 
 function CommentActionOrStatus({
   comment,
+  areRepliesAllowed,
   isDeleting,
   isPosting,
   postingFailed,
@@ -340,6 +352,7 @@ function CommentActionOrStatus({
   onRetryPostClick,
 }: {
   comment: CommentType;
+  areRepliesAllowed: boolean;
   isDeleting: boolean;
   isPosting: boolean;
   postingFailed: boolean;
@@ -390,7 +403,7 @@ function CommentActionOrStatus({
     );
   }
 
-  if (comment.pendingOperation) {
+  if (comment.pendingOperation || !areRepliesAllowed) {
     return null;
   }
 
@@ -440,7 +453,9 @@ function truncateText(text: string, maxLength: number): string {
 }
 
 function CommentText({ text }: { text: string }) {
-  const [shownText, setShownText] = useState(truncateText(text, 200));
+  const [shownText, setShownText] = useState(
+    truncateText(text, TRUNCATE_COMMENT_LENGTH)
+  );
   const isTruncated = text.length > shownText.length;
 
   return (

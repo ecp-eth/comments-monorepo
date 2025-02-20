@@ -1,5 +1,11 @@
 import { Effect } from "effect";
-import type { FetchCommentsResponse, Hex } from "./types.js";
+import type { Hex } from "./types.js";
+import {
+  IndexerAPIListCommentRepliesSchema,
+  type IndexerAPIListCommentRepliesSchemaType,
+  IndexerAPIListCommentsSchema,
+  type IndexerAPIListCommentsSchemaType,
+} from "./schemas.js";
 
 /**
  * The options for `fetchComments()`
@@ -28,7 +34,7 @@ export type FetchCommentsOptions = {
   sort?: "asc" | "desc";
   /**
    * The offset of the comments to fetch
-   * 
+   *
    * @default 0
    */
   offset?: number;
@@ -38,12 +44,13 @@ export type FetchCommentsOptions = {
    * @default 50
    */
   limit?: number;
+  signal?: AbortSignal;
 };
 
 /**
  * Fetch comments from the Embed API
- * 
- * @param FetchCommentsResponse 
+ *
+ * @param FetchCommentsResponse
  * @returns A promise that resolves comments fetched from the Embed API
  */
 export async function fetchComments({
@@ -54,8 +61,9 @@ export async function fetchComments({
   offset = 0,
   limit = 50,
   retries = 3,
-}: FetchCommentsOptions): Promise<FetchCommentsResponse> {
-  const fetchCommentsTask = Effect.tryPromise(async () => {
+  signal,
+}: FetchCommentsOptions): Promise<IndexerAPIListCommentsSchemaType> {
+  const fetchCommentsTask = Effect.tryPromise(async (signal) => {
     const url = new URL("/api/comments", apiUrl);
     url.searchParams.set("targetUri", targetUri);
     url.searchParams.set("sort", sort);
@@ -71,22 +79,24 @@ export async function fetchComments({
       headers: {
         Accept: "application/json",
       },
+      cache: "no-cache",
+      signal,
     });
 
     if (!response.ok) {
       throw new Error(`Failed to fetch comments: ${response.statusText}`);
     }
 
-    const responseData: FetchCommentsResponse = await response.json();
+    const responseData = await response.json();
 
-    return responseData;
+    return IndexerAPIListCommentsSchema.parse(responseData);
   });
 
   const repeatableTask = Effect.retry(fetchCommentsTask, {
     times: retries,
   });
 
-  return Effect.runPromise(repeatableTask);
+  return Effect.runPromise(repeatableTask, { signal });
 }
 
 /**
@@ -124,12 +134,13 @@ export type FetchCommentRepliesOptions = {
    * @default 50
    */
   limit?: number;
+  signal?: AbortSignal;
 };
 
 /**
  * Fetch replies for a comment from the Embed API
- * 
- * @param FetchCommentRepliesOptions 
+ *
+ * @param FetchCommentRepliesOptions
  * @returns A promise that resolves replies fetched from the Embed API
  */
 export async function fetchCommentReplies({
@@ -139,8 +150,9 @@ export async function fetchCommentReplies({
   retries = 3,
   offset = 0,
   limit = 50,
-}: FetchCommentRepliesOptions): Promise<FetchCommentsResponse> {
-  const fetchRepliesTask = Effect.tryPromise(async () => {
+  signal,
+}: FetchCommentRepliesOptions): Promise<IndexerAPIListCommentRepliesSchemaType> {
+  const fetchRepliesTask = Effect.tryPromise(async (signal) => {
     const url = new URL(`/api/comments/${commentId}/replies`, apiUrl);
 
     url.searchParams.set("offset", offset.toString());
@@ -155,20 +167,22 @@ export async function fetchCommentReplies({
       headers: {
         Accept: "application/json",
       },
+      cache: "no-cache",
+      signal,
     });
 
     if (!response.ok) {
       throw new Error(`Failed to fetch replies: ${response.statusText}`);
     }
 
-    const responseData: FetchCommentsResponse = await response.json();
+    const responseData = await response.json();
 
-    return responseData;
+    return IndexerAPIListCommentRepliesSchema.parse(responseData);
   });
 
   const repeatableTask = Effect.retry(fetchRepliesTask, {
     times: retries,
   });
 
-  return Effect.runPromise(repeatableTask);
+  return Effect.runPromise(repeatableTask, { signal });
 }

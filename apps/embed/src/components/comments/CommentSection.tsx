@@ -5,7 +5,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useMemo } from "react";
 import { Comment } from "./Comment";
 import { CommentForm } from "./CommentForm";
-import type { CommentPageSchemaType } from "@/lib/schemas";
 import { useAccount } from "wagmi";
 import { useEmbedConfig } from "../EmbedConfigProvider";
 import { ErrorScreen } from "../ErrorScreen";
@@ -17,8 +16,9 @@ import {
   useHandleRetryPostComment,
 } from "./hooks";
 import { Button } from "../ui/button";
-import { fetchComments } from "./queries";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
+import { fetchComments } from "@ecp.eth/sdk";
+import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -41,12 +41,19 @@ export function CommentSection({ initialData }: CommentSectionProps) {
         limit: COMMENTS_PER_PAGE,
       },
       queryFn: async ({ pageParam, signal }) => {
-        return fetchComments({
+        const response = await fetchComments({
+          appSigner: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+          apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           targetUri,
-          pageParam,
+          limit: pageParam.limit,
+          offset: pageParam.offset,
           signal,
         });
+
+        return CommentPageSchema.parse(response);
       },
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
         if (!lastPage.pagination.hasMore) {
           return;

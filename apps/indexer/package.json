@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@ecp.eth/sdk": "^0.0.5",
+    "@neynar/nodejs-sdk": "^2.13.1",
     "dataloader": "^2.2.3",
     "hono": "^4.5.0",
     "lru-cache": "^11.0.2",

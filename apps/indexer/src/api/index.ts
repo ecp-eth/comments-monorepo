@@ -3,9 +3,12 @@ import schema from "ponder:schema";
 import { Hono } from "hono";
 import { cors } from "hono/cors"
 import { and, asc, client, desc, eq, graphql, isNull } from "ponder";
+import {
+  IndexerAPIListCommentRepliesSchema,
+  IndexerAPIListCommentsSchema,
+} from "@ecp.eth/sdk/schemas";
 import { normalizeUrl } from "../lib/utils";
-import type { APIListCommentsResponse } from "../lib/types";
-import { resolveEnsAndFormatListCommentsResponse } from "../lib/response-formatters";
+import { resolveUserDataAndFormatListCommentsResponse } from "../lib/response-formatters";
 
 const app = new Hono();
 
@@ -51,14 +54,14 @@ app.get("/api/comments", async (c) => {
 
   const comments = await query.execute();
 
-  const formattedComments = await resolveEnsAndFormatListCommentsResponse({
+  const formattedComments = await resolveUserDataAndFormatListCommentsResponse({
     comments,
     limit,
     offset,
     replyLimit: REPLIES_PER_COMMENT,
   });
 
-  return c.json<APIListCommentsResponse>(formattedComments);
+  return c.json(IndexerAPIListCommentsSchema.parse(formattedComments));
 });
 
 app.get("/api/comments/:commentId/replies", async (c) => {
@@ -85,14 +88,14 @@ app.get("/api/comments/:commentId/replies", async (c) => {
 
   const replies = await query.execute();
 
-  const formattedComments = await resolveEnsAndFormatListCommentsResponse({
+  const formattedComments = await resolveUserDataAndFormatListCommentsResponse({
     comments: replies,
     limit,
     offset,
     replyLimit: REPLIES_PER_COMMENT,
   });
 
-  return c.json<APIListCommentsResponse>(formattedComments);
+  return c.json(IndexerAPIListCommentRepliesSchema.parse(formattedComments));
 });
 
 app.get("/api/approvals", async (c) => {

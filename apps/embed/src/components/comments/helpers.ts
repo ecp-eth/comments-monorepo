@@ -20,7 +20,7 @@ export function deletePendingCommentByTransactionHash(
         return true;
       }
 
-      if (deleteComment(comment.replies)) {
+      if (comment.replies && deleteComment(comment.replies)) {
         return true;
       }
     }
@@ -84,7 +84,7 @@ export function replaceCommentPendingOperationByComment(
         return true;
       }
 
-      if (replaceComment(c.replies)) {
+      if (c.replies && replaceComment(c.replies)) {
         return true;
       }
     }
@@ -116,7 +116,7 @@ export function markCommentAsDeleted(
         return true;
       }
 
-      if (markComment(comment.replies)) {
+      if (comment.replies && markComment(comment.replies)) {
         return true;
       }
     }

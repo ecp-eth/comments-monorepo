@@ -108,3 +108,87 @@ export const EmbedConfigSchema = z.object({
  * Custom configuration for `<CommentEmbed />` component.
  */
 export type EmbedConfigSchemaType = z.infer<typeof EmbedConfigSchema>;
+
+export const IndexerAPIAuthorEnsDataSchema = z.object({
+  name: z.string(),
+  avatarUrl: z.string().nullable(),
+});
+
+export type IndexerAPIAuthorEnsDataSchemaType = z.infer<
+  typeof IndexerAPIAuthorEnsDataSchema
+>;
+
+export const IndexerAPIFarcasterDataSchema = z.object({
+  fid: z.number().int(),
+  pfpUrl: z.string().optional(),
+  displayName: z.string().optional(),
+  username: z.string().optional(),
+});
+
+export type IndexerAPIFarcasterDataSchemaType = z.infer<
+  typeof IndexerAPIFarcasterDataSchema
+>;
+
+export const IndexerAPIAuthorDataSchema = z.object({
+  address: HexSchema,
+  ens: IndexerAPIAuthorEnsDataSchema.optional(),
+  farcaster: IndexerAPIFarcasterDataSchema.optional(),
+});
+
+export type IndexerAPIAuthorDataSchemaType = z.infer<
+  typeof IndexerAPIAuthorDataSchema
+>;
+
+export const IndexerAPICommentSchema = z.object({
+  appSigner: HexSchema,
+  author: IndexerAPIAuthorDataSchema,
+  id: HexSchema,
+  content: z.string(),
+  chainId: z.number().int(),
+  deletedAt: z.coerce.date().nullable(),
+  logIndex: z.number().int(),
+  metadata: z.string(),
+  parentId: HexSchema.nullable(),
+  targetUri: z.string(),
+  timestamp: z.coerce.date(),
+  txHash: HexSchema,
+});
+
+export type IndexerAPICommentSchemaType = z.infer<
+  typeof IndexerAPICommentSchema
+>;
+
+export const IndexerAPIPaginationSchema = z.object({
+  limit: z.number().int(),
+  offset: z.number().int(),
+  hasMore: z.boolean(),
+});
+
+export type IndexerAPIPaginationSchemaType = z.infer<
+  typeof IndexerAPIPaginationSchema
+>;
+
+const IndxerAPICommentWithRepliesSchema = IndexerAPICommentSchema.extend({
+  replies: z.object({
+    results: z.array(IndexerAPICommentSchema),
+    pagination: IndexerAPIPaginationSchema,
+  }),
+});
+
+export const IndexerAPIListCommentsSchema = z.object({
+  results: z.array(IndxerAPICommentWithRepliesSchema),
+  pagination: IndexerAPIPaginationSchema,
+});
+
+export type IndexerAPIListCommentsSchemaType = z.infer<
+  typeof IndexerAPIListCommentsSchema
+>;
+
+export const IndexerAPIListCommentRepliesSchema = z.object({
+  results: z.array(IndexerAPICommentSchema),
+  pagination: IndexerAPIPaginationSchema,
+});
+
+export type IndexerAPIListCommentRepliesSchemaType = z.infer<
+  typeof IndexerAPIListCommentRepliesSchema
+>;
