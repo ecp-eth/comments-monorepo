@@ -94,8 +94,17 @@ export const EmbedConfigThemeSchema = z.object({
 
 export type EmbedConfigThemeSchemaType = z.infer<typeof EmbedConfigThemeSchema>;
 
+/**
+ * The zod schema for `EmbedConfigSchemaType`
+ */
 export const EmbedConfigSchema = z.object({
+  /**
+   * The theme of the embed. currently support `light`, `dark`, or custom colors.
+   */
   theme: EmbedConfigThemeSchema.optional(),
 });
 
+/**
+ * Custom configuration for `<CommentEmbed />` component.
+ */
 export type EmbedConfigSchemaType = z.infer<typeof EmbedConfigSchema>;

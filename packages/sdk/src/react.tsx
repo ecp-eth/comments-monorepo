@@ -11,6 +11,9 @@ import { COMMENTS_EMBED_DEFAULT_URL } from "./constants.js";
 import { EmbedConfigSchema, type EmbedConfigSchemaType } from "./schemas.js";
 import { compressToURI } from "lz-ts";
 
+// also export the type for generating docs correctly
+export type { EmbedConfigSchemaType } from "./schemas.js";
+
 /**
  * A hook for repeat gasless transaction pattern
  * 
@@ -62,6 +65,9 @@ export function useGaslessTransaction(props: {
   });
 }
 
+/**
+ * The props for `<CommentsEmbed />` component.
+ */
 export type CommentsEmbedProps = {
   /**
    * URL of the page to embed comments for. Comments for this uri are rendered in iframe's page.
