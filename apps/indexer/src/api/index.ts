@@ -1,6 +1,7 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { Hono } from "hono";
+import { cors } from "hono/cors"
 import { and, asc, client, desc, eq, graphql, isNull } from "ponder";
 import { normalizeUrl } from "../lib/utils";
 import type { APIListCommentsResponse } from "../lib/types";
@@ -9,9 +10,9 @@ import { resolveEnsAndFormatListCommentsResponse } from "../lib/response-formatt
 const app = new Hono();
 
 app.use("/sql/*", client({ db, schema }));
-
 app.use("/", graphql({ db, schema }));
 app.use("/graphql", graphql({ db, schema }));
+app.use("/api/*", cors())
 
 const REPLIES_PER_COMMENT = 2;
 
