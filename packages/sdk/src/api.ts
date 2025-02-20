@@ -48,10 +48,10 @@ export type FetchCommentsOptions = {
 };
 
 /**
- * Fetch comments from the Embed API
+ * Fetch comments from the Indexer API
  *
  * @param FetchCommentsResponse
- * @returns A promise that resolves comments fetched from the Embed API
+ * @returns A promise that resolves comments fetched from the Indexer API
  */
 export async function fetchComments({
   apiUrl,
@@ -138,10 +138,10 @@ export type FetchCommentRepliesOptions = {
 };
 
 /**
- * Fetch replies for a comment from the Embed API
+ * Fetch replies for a comment from the Indexer API
  *
  * @param FetchCommentRepliesOptions
- * @returns A promise that resolves replies fetched from the Embed API
+ * @returns A promise that resolves replies fetched from the Indexer API
  */
 export async function fetchCommentReplies({
   apiUrl,

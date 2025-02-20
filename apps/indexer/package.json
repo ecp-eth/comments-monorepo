@@ -19,7 +19,8 @@
     "lru-cache": "^11.0.2",
     "normalize-url": "^8.0.1",
     "ponder": "^0.9.1",
-    "viem": "^2.22.21"
+    "viem": "^2.22.21",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^22.13.1"

@@ -90,7 +90,8 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
         <Toaster />
       </div>
     );
-  } catch {
+  } catch (e) {
+    console.error(e);
     return <ErrorScreen description="Could not load comments" />;
   }
 }
