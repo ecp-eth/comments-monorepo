@@ -1,22 +1,31 @@
-[**@ecp.eth/sdk**](/sdk-reference/react/index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/react/index.mdx) / useGaslessTransaction
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [react](/sdk-reference/react/index.mdx) / useGaslessTransaction
 
 # Function: useGaslessTransaction()
 
 > **useGaslessTransaction**(`props`): `UseMutationResult`\<`` `0x${string}` ``, `Error`, `void`, `unknown`\>
 
-Defined in: [react.tsx:14](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L14)
+Defined in: [react.tsx:28](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L28)
+
+A hook for repeat gasless transaction pattern
+
+Gasless transaction typically requires 3 steps:
+1. prepare typed data to be passed to `signTypedData`, typicall this is also created from server side with an app signature.
+2. sign typed data on client side
+3. send the dual signed data to server
+
+This hook abstracts these steps and help with the repetition of the pattern.
 
 ## Parameters
 
 ### props
 
-#### prepareSignTypedData
+#### prepareSignTypedDataParams
 
-() => `Promise`\<`SignTypedDataParameters` \| \{ `signTypedDataArgs`: `SignTypedDataParameters`; `variables`: `object`; \}\>
+() => `Promise`\<`SignTypedDataParameters` \| \{ `signTypedDataParams`: `SignTypedDataParameters`; `variables`: `object`; \}\>
 
 #### sendSignedData
 
@@ -24,7 +33,7 @@ Defined in: [react.tsx:14](https://github.com/ecp-eth/comments-monorepo/blob/mai
 
 #### signTypedData?
 
-(`signTypedDataArgs`) => `Promise`\<`` `0x${string}` ``\>
+(`signTypedDataParams`) => `Promise`\<`` `0x${string}` ``\>
 
 ## Returns
 

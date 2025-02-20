@@ -1,6 +1,7 @@
 import React from 'react';
 import { defineConfig } from 'vocs';
 import { remarkMermaid } from '@theguild/remark-mermaid';
+import remarkCodesandbox from 'remark-codesandbox';
 
 export default defineConfig({
   title: 'Ethereum Comments Protocol',
@@ -33,7 +34,21 @@ export default defineConfig({
         },
         {
           text: 'Integration Options',
-          link: '/integration-options'
+          link: '/integration-options',
+          items: [
+            {
+              text: 'React Component Library',
+              link: '/integration-options#1-react-component-library'
+            },
+            {
+              text: 'Index API',
+              link: '/integration-options#2-indexer-api',
+            },
+            {
+              text: 'Contract Interaction',
+              link: '/integration-options#4-contract-interaction'
+            }
+          ]
         }
       ]
     },
@@ -62,8 +77,12 @@ export default defineConfig({
           link: '/sdk-reference',
           items: [
             {
-              text: 'Core Module',
-              link: '/sdk-reference/default/'
+              text: 'Default Exports',
+              link: '/sdk-reference/defaultExports/'
+            },
+            {
+              text: 'Types Module',
+              link: '/sdk-reference/types/'
             },
             {
               text: 'React Module',
@@ -86,6 +105,14 @@ export default defineConfig({
     { text: "Github", link: "https://github.com/ecp-eth/comments-monorepo" }
   ],
   markdown: {
-    remarkPlugins: [remarkMermaid]
+    remarkPlugins: [remarkMermaid, [remarkCodesandbox, { 
+      mode: 'button',
+      customTemplates: {
+        'ecp-eth-codesandbox-ts': {
+          extends: 'file:templates/codesandbox-ts',
+          entry: 'src/run.ts',
+        },
+      },
+    }]]
   }
 }) 

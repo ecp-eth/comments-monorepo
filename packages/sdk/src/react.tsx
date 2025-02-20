@@ -1,3 +1,8 @@
+/**
+ * Ethereum Comments Protocol SDK for React
+ * 
+ * @module
+ */
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Hex, SignTypedDataParameters } from "viem";
@@ -6,6 +11,20 @@ import { COMMENTS_EMBED_DEFAULT_URL } from "./constants.js";
 import { EmbedConfigSchema, type EmbedConfigSchemaType } from "./schemas.js";
 import { compressToURI } from "lz-ts";
 
+/**
+ * A hook for repeat gasless transaction pattern
+ * 
+ * Gasless transaction typically requires 3 steps:
+ * 1. prepare typed data to be passed to `signTypedData`, typicall this is also created from server side with an app signature.
+ * 2. sign typed data on client side
+ * 3. send the dual signed data to server
+ * 
+ * This hook abstracts these steps and help with the repetition of the pattern.
+ * 
+ * @category Hooks
+ * @param props 
+ * @returns 
+ */
 export function useGaslessTransaction(props: {
   prepareSignTypedDataParams: () => Promise<
     | SignTypedDataParameters
@@ -43,7 +62,7 @@ export function useGaslessTransaction(props: {
   });
 }
 
-type CommentsEmbedProps = {
+export type CommentsEmbedProps = {
   /**
    * URL of the page to embed comments for. Comments for this uri are rendered in iframe's page.
    */
@@ -68,6 +87,9 @@ type CommentsEmbedProps = {
 
 /**
  * Renders comments embed iframe for the given uri.
+ * 
+ * @category Components
+ * @param props
  *
  * @example
  * ```tsx

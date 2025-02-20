@@ -1,0 +1,39 @@
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [types](/sdk-reference/types/index.mdx) / SignCommentRequest
+
+# Type Alias: SignCommentRequest
+
+> **SignCommentRequest**: `object`
+
+Defined in: [types.ts:87](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L87)
+
+Request for signing a comment.
+
+## Type declaration
+
+### author
+
+> **author**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+
+Address of the author of the comment.
+
+### content
+
+> **content**: `string`
+
+Content of the comment.
+
+### parentId?
+
+> `optional` **parentId**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+
+ID of the parent comment.
+
+### targetUri?
+
+> `optional` **targetUri**: `string`
+
+Target resource identifier for the comment

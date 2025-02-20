@@ -1,10 +1,13 @@
 ## Post comment flow
 
-There are different approaches to post a comment, each comes with pros and cons.
+There are several approaches to posting a comment, each with its own pros and cons.
+
+In this article, we are going through these different flows and we will mention different roles in the system. 
+It is recommanded to finish the [architecture overview](/architecture-overview) and [dual signature system](/dual-signature-system) first.
 
 ### 1. Author pays gas
 
-The simplest approach is having the author pay the gas fee directly. The flow works as follows:
+The simplest approach is having the author pay the gas fee directly. The process works as follows:
 
 1. The author creates a post comment request containing the comment details
 2. The app server signs this request using its `appSigner` to authorize the post action
