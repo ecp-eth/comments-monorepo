@@ -2,9 +2,11 @@ import {
   Chain,
   concat,
   createPublicClient,
+  decodeAbiParameters,
   encodeAbiParameters,
   Hex,
   numberToHex,
+  padHex,
   Transport,
 } from "viem";
 import { http } from "wagmi";
@@ -30,6 +32,63 @@ import {
   AddApprovalTypedDataSchema,
   type AddApprovalTypedDataSchemaType,
 } from "./schemas.js";
+
+export const COMMENT_DATA_SUFFIX_ABI_PARAMETERS = [
+  {
+    name: "commentData",
+    type: "tuple",
+    components: [
+      {
+        name: "content",
+        type: "string",
+        internalType: "string",
+      },
+      {
+        name: "metadata",
+        type: "string",
+        internalType: "string",
+      },
+      {
+        name: "targetUri",
+        type: "string",
+        internalType: "string",
+      },
+      {
+        name: "parentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "author",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "appSigner",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "salt",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "deadline",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    name: "authorSignature",
+    type: "bytes",
+  },
+  {
+    name: "appSignature",
+    type: "bytes",
+  },
+] as const;
 
 /**
  * Create the data structure of a comment
@@ -71,7 +130,8 @@ export function createCommentData({
       "0x0000000000000000000000000000000000000000000000000000000000000000",
     author,
     appSigner,
-    salt: salt ?? numberToHex(Math.floor(Date.now() / 1000)),
+    salt:
+      salt ?? padHex(numberToHex(Math.floor(Date.now() / 1000)), { size: 32 }),
     deadline: deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day
   });
 }
@@ -100,27 +160,45 @@ export function createCommentTypedData({
   });
 }
 
+/**
+ * Encode a comment to be used as a calldata suffix for a transaction
+ * @return The encoded comment data hex string
+ */
 export function createCommentSuffixData({
   commentData,
+  appSignature,
+  authorSignature,
 }: {
+  /** The content of the comment */
   commentData: CommentData;
-}) {
+  /** Signature of the app signer */
+  appSignature: Hex;
+  /** Signature of the author (not required if the author is the origin of the transaction) */
+  authorSignature?: Hex;
+}): Hex {
   const parts: Hex[] = [COMMENT_CALLDATA_SUFFIX_DELIMITER];
 
-  const encodedCommentData = encodeAbiParameters(COMMENT_TYPE.AddComment, [
-    commentData.content,
-    commentData.metadata,
-    commentData.targetUri,
-    commentData.parentId,
-    commentData.author,
-    commentData.appSigner,
-    commentData.salt,
-    commentData.deadline,
-  ]);
+  const encodedCommentData = encodeAbiParameters(
+    COMMENT_DATA_SUFFIX_ABI_PARAMETERS,
+    [commentData, authorSignature ?? "0x", appSignature]
+  );
 
   parts.push(encodedCommentData);
 
   return concat(parts);
+}
+
+export function decodeCommentSuffixData(data: Hex) {
+  const [commentData, authorSignature, appSignature] = decodeAbiParameters(
+    COMMENT_DATA_SUFFIX_ABI_PARAMETERS,
+    data
+  );
+
+  return {
+    appSignature,
+    commentData,
+    authorSignature,
+  };
 }
 
 /**

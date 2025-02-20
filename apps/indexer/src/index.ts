@@ -1,12 +1,12 @@
-import { ponder } from "ponder:registry";
-import schema from "ponder:schema";
-import { normalizeUrl } from "./lib/utils";
-import { decodeAbiParameters, getAddress, hashTypedData } from "viem";
 import {
   COMMENT_CALLDATA_SUFFIX_DELIMITER,
-  COMMENT_TYPE,
   createCommentTypedData,
+  decodeCommentSuffixData,
 } from "@ecp.eth/sdk";
+import { ponder } from "ponder:registry";
+import schema from "ponder:schema";
+import { getAddress, hashTypedData } from "viem";
+import { normalizeUrl } from "./lib/utils";
 
 function transformTargetUri(targetUri: string) {
   let normalizedTargetUri = targetUri.trim().length > 0 ? targetUri : "";
@@ -102,36 +102,27 @@ ponder.on("Transactions:block", async ({ event, context }) => {
     includeTransactions: true,
   });
 
-  const commentDatas = transactions
+  const encodedCommentDatas = transactions
     .map((tx) => ({
       transaction: tx,
-      commentData: tx.input.split(
+      encodedCommentData: tx.input.split(
         COMMENT_CALLDATA_SUFFIX_DELIMITER.slice(2)
-      )[1],
+      )[1] as `0x${string}` | undefined,
     }))
     // TODO: filter out comment data that is not at the end of the transaction (this should be handled by a 4337 UserOp indexer otherwise ignored)
-    .filter((data) => data.commentData && data.commentData.length > 0);
+    .filter(
+      (data) => data.encodedCommentData && data.encodedCommentData.length > 0
+    );
 
-  const rows = commentDatas
-    .map(({ transaction, commentData }) => {
+  const rows = encodedCommentDatas
+    .map(({ transaction, encodedCommentData }) => {
       try {
-        const comment = decodeAbiParameters(
-          COMMENT_TYPE.AddComment,
-          `0x${commentData}`
-        );
+        const { commentData, authorSignature, appSignature } =
+          decodeCommentSuffixData(`0x${encodedCommentData}`);
 
         const commentTypedData = createCommentTypedData({
           chainId: context.network.chainId,
-          commentData: {
-            content: comment[0],
-            metadata: comment[1],
-            targetUri: comment[2],
-            parentId: comment[3] as `0x${string}`,
-            author: comment[4],
-            appSigner: comment[5],
-            nonce: comment[6],
-            deadline: comment[7],
-          },
+          commentData,
         });
 
         const commentId = hashTypedData(commentTypedData);
@@ -139,7 +130,9 @@ ponder.on("Transactions:block", async ({ event, context }) => {
           commentTypedData.message.targetUri
         );
 
-        // TODO: Check signatures
+        // TODO: Check signatures:
+        // - author signature is not required if author = tx.from
+        // - app signature always required
 
         return {
           id: commentId,
@@ -149,7 +142,7 @@ ponder.on("Transactions:block", async ({ event, context }) => {
           parentId: transformParentId(commentTypedData.message.parentId),
           author: commentTypedData.message.author,
           appSigner: commentTypedData.message.appSigner,
-          nonce: commentTypedData.message.nonce,
+          salt: commentTypedData.message.salt,
           deadline: commentTypedData.message.deadline,
           chainId: context.network.chainId,
           timestamp: new Date(Number(event.block.timestamp) * 1000),
