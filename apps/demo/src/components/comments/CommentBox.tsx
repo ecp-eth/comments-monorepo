@@ -74,6 +74,7 @@ export function CommentBox({
       if (submitAction === "yoink") {
         const commentDataSuffix = createCommentSuffixData({
           commentData: data.data,
+          appSignature: data.signature,
         });
 
         return writeContractAsync({

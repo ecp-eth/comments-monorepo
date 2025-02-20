@@ -4,9 +4,9 @@ A protocol for commenting built on Ethereum.
 
 ## Deployments
 
-| Network | Block Number | Address |
-|---------|--------------|---------|
-| Base | 26283365 | 0xfed9b3a3884940d0c8a91b55f5e631b33a84f669 |
+| Network | Block Number | Address                                    |
+| ------- | ------------ | ------------------------------------------ |
+| Base    | 26637776     | 0x4b2fdb900fd003e30919e612d75046823b879554 |
 
 ## Packages
 
