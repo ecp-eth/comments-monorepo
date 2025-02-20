@@ -5,7 +5,12 @@ import {
 } from "@ecp.eth/sdk";
 import { ponder } from "ponder:registry";
 import schema from "ponder:schema";
-import { getAddress, hashTypedData } from "viem";
+import {
+  getAddress,
+  hashTypedData,
+  verifyMessage,
+  verifyTypedData,
+} from "viem";
 import { normalizeUrl } from "./lib/utils";
 
 function transformTargetUri(targetUri: string) {
@@ -130,9 +135,41 @@ ponder.on("Transactions:block", async ({ event, context }) => {
           commentTypedData.message.targetUri
         );
 
-        // TODO: Check signatures:
-        // - author signature is not required if author = tx.from
-        // - app signature always required
+        // TODO: Support smart contract signatures by using client.verifyTypedData
+        const isAppSignatureValid = verifyTypedData({
+          ...commentTypedData,
+          signature: appSignature,
+          address: commentTypedData.message.appSigner,
+        });
+
+        if (!isAppSignatureValid) {
+          console.error("Invalid app signature", {
+            ...commentTypedData,
+            signature: appSignature,
+          });
+
+          return null;
+        }
+
+        if (
+          getAddress(commentTypedData.message.author) !==
+          getAddress(transaction.from)
+        ) {
+          const isAuthorSignatureValid = verifyTypedData({
+            ...commentTypedData,
+            signature: authorSignature,
+            address: commentTypedData.message.author,
+          });
+
+          if (!isAuthorSignatureValid) {
+            console.error("Invalid author signature", {
+              ...commentTypedData,
+              signature: authorSignature,
+            });
+
+            return null;
+          }
+        }
 
         return {
           id: commentId,
