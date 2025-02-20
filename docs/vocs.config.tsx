@@ -131,6 +131,31 @@ export default defineConfig({
       ],
     },
     {
+      text: "Open Source",
+      items: [
+        {
+          text: "Demo App",
+          link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo",
+        },
+        {
+          text: "Indexer",
+          link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer",
+        },
+        {
+          text: "SDK",
+          link: "https://github.com/ecp-eth/comments-monorepo/tree/main/packages/sdk",
+        },
+        {
+          text: "Embeds Service",
+          link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/embed",
+        },
+        {
+          text: "Protocol",
+          link: "https://github.com/ecp-eth/comments-monorepo/tree/main/packages/protocol",
+        },
+      ],
+    },
+    {
       text: "Contact",
       link: "https://t.me/davidfurlong",
     },
