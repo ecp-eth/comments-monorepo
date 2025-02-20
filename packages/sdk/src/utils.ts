@@ -1,4 +1,10 @@
-import { Chain, createPublicClient, Transport } from "viem";
+import {
+  Chain,
+  createPublicClient,
+  numberToBytes,
+  numberToHex,
+  Transport,
+} from "viem";
 import { http } from "wagmi";
 import { CommentsV1Abi } from "./abis.js";
 import { COMMENTS_V1_ADDRESS } from "./constants.js";
@@ -22,7 +28,7 @@ export function createCommentData({
   parentId,
   author,
   appSigner,
-  nonce,
+  salt,
   deadline,
 }: {
   /** The content of the comment */
@@ -38,7 +44,7 @@ export function createCommentData({
   /** The address of the app signer */
   appSigner: `0x${string}`;
   /** The current nonce of the user on the chain */
-  nonce: bigint;
+  salt?: `0x${string}`;
   /** The deadline of the comment submission in seconds since epoch */
   deadline?: bigint;
 }): CommentData {
@@ -51,7 +57,7 @@ export function createCommentData({
       "0x0000000000000000000000000000000000000000000000000000000000000000",
     author,
     appSigner,
-    nonce,
+    salt: salt ?? numberToHex(Math.floor(Date.now() / 1000)),
     deadline: deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day
   };
 }

@@ -67,7 +67,7 @@ export const POST = async (req: Request) => {
           parentId: signTypedDataArgs.message.parentId,
           targetUri: signTypedDataArgs.message.targetUri,
           deadline: signTypedDataArgs.message.deadline,
-          nonce: signTypedDataArgs.message.nonce,
+          salt: signTypedDataArgs.message.salt,
         },
         authorSignature,
         appSignature,

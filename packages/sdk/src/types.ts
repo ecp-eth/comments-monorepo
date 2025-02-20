@@ -1,6 +1,6 @@
 /**
  * Ethereum Comments Protocol SDK types module
- * 
+ *
  * @module
  */
 import type { SignTypedDataParameters } from "viem";
@@ -25,7 +25,7 @@ export type CommentData = {
   targetUri: string;
   /**
    * id of parent comments if it has one, 0x for no parent comment
-   * 
+   *
    * @remarks This zero address (32 bytes of zeros) indicates the comment has no parent and is a top-level comment
    */
   parentId: Hex;
@@ -38,9 +38,9 @@ export type CommentData = {
    */
   appSigner: Hex;
   /**
-   * The nonce of the comment
+   * Random salt for the comment
    */
-  nonce: bigint;
+  salt: Hex;
   /**
    * The deadline of the comment submission in seconds since epoch
    */

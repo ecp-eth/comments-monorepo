@@ -5,7 +5,7 @@ export type CommentData = {
   parentId: `0x${string}`;
   author: `0x${string}`;
   appSigner: `0x${string}`;
-  nonce: bigint;
+  salt: `0x${string}`;
   deadline: bigint;
 };
 

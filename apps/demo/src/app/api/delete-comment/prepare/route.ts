@@ -43,8 +43,6 @@ export const POST = async (req: Request) => {
     transport,
   });
 
-  console.log("nonce", nonce);
-
   // Construct deletion signature data
   const typedDeleteCommentData = createDeleteCommentTypedData({
     commentId: commentId as `0x${string}`,

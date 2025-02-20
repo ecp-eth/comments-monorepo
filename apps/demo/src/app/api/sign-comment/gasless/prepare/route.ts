@@ -8,7 +8,6 @@ import {
   CommentsV1Abi,
   createCommentData,
   createCommentTypedData,
-  getNonce,
 } from "@ecp.eth/sdk";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -28,20 +27,12 @@ export const POST = async (req: Request) => {
   const chain = configChains[0];
   const transport = configTransports[chain.id];
 
-  const nonce = await getNonce({
-    author,
-    appSigner: account.address,
-    chain,
-    transport,
-  });
-
   const commentData = createCommentData({
     content,
     targetUri,
     parentId,
     author,
     appSigner: account.address,
-    nonce,
   });
 
   const typedCommentData = createCommentTypedData({
