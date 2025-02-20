@@ -1,6 +1,9 @@
 import { Effect } from "effect";
 import type { FetchCommentsResponse, Hex } from "./types.js";
 
+/**
+ * The options for `fetchComments()`
+ */
 export type FetchCommentsOptions = {
   targetUri: string;
   /**
@@ -86,6 +89,9 @@ export async function fetchComments({
   return Effect.runPromise(repeatableTask);
 }
 
+/**
+ * The options for `fetchCommentReplies()`
+ */
 export type FetchCommentRepliesOptions = {
   /**
    * The ID of the comment to fetch replies for

@@ -95,8 +95,17 @@ export default defineConfig({
           link: '/protocol-reference/CommentsV1',
         },
         {
-          text: 'Demo App Repository',
-          link: 'https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo'
+          text: 'Demo Repo Links',
+          items: [
+            {
+              text: 'Custom Integration',
+              link: 'https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo'
+            },
+            {
+              text: 'Using <CommentsEmbed />',
+              link: 'https://github.com/ecp-eth/comments-monorepo/tree/main/apps/embed'
+            }
+          ]
         }
       ]
     }

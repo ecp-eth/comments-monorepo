@@ -56,6 +56,10 @@ export function createCommentData({
   };
 }
 
+/**
+ * Create the EIP-712 typed data structure for adding comment
+ * @returns The typed data
+ */
 export function createCommentTypedData({
   commentData,
   chainId,
@@ -76,6 +80,10 @@ export function createCommentTypedData({
   } as const;
 }
 
+/**
+ * Create the EIP-712 typed data structure for approving comment
+ * @returns The typed data
+ */
 export function createApprovalTypedData({
   author,
   appSigner,
@@ -138,6 +146,10 @@ export async function getNonce({
   return nonce;
 }
 
+/**
+ * Create the EIP-712 typed data structure for deleting comment
+ * @returns The typed data
+ */
 export function createDeleteCommentTypedData({
   commentId,
   chainId,

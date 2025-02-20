@@ -3,8 +3,10 @@
  * 
  * @module
  */
-import type { SignTypedDataParameters } from "viem";
 
+/**
+ * Hex string type, must start with `0x`
+ */
 export type Hex = `0x${string}`;
 
 /**
@@ -79,57 +81,4 @@ export type FetchCommentsResponse = {
     offset: number;
     hasMore: boolean;
   };
-};
-
-/**
- * Request for signing a comment.
- */
-export type SignCommentRequest = {
-  /**
-   * Content of the comment.
-   */
-  content: string;
-  /**
-   * Target resource identifier for the comment
-   */
-  targetUri?: string;
-  /**
-   * ID of the parent comment.
-   */
-  parentId?: Hex;
-  /**
-   * Address of the author of the comment.
-   */
-  author: Hex;
-};
-
-export type SignCommentResponse = {
-  signature: Hex;
-  hash: Hex;
-  data: CommentData;
-};
-
-export type SignCommentGaslessResponse = {
-  txHash: Hex;
-};
-
-export type SignCommentGaslessPrepareResponse = {
-  signTypedDataArgs: SignTypedDataParameters;
-  appSignature: Hex;
-};
-
-export type PostCommentsOnUsersBehalfApprovalRequest = {
-  signTypedDataArgs: SignTypedDataParameters;
-  appSignature: Hex;
-  authorSignature: Hex;
-};
-
-export type ApprovePostingCommentsOnUsersBehalfResponse = {
-  txHash: Hex;
-};
-
-export type PostingCommentsOnUsersBehalfApprovalStatusResponse = {
-  approved: boolean;
-  signTypedDataArgs: SignTypedDataParameters;
-  appSignature: Hex;
 };
