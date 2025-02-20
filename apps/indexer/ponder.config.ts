@@ -32,28 +32,34 @@ const networks = Object.entries(process.env).reduce(
 
 console.log(`Detected networks:`, networks);
 
-const networkConfigs = Object.entries(networks).reduce(
-  (acc, [chainId, network]) => {
-    acc[chainId] = {
-      address: COMMENTS_V1_ADDRESS,
-      startBlock: network.startBlock,
-    };
-    return acc;
-  },
-  {} as Record<string, { address: `0x${string}`; startBlock?: number }>
-);
-
 export default createConfig({
   networks,
   contracts: {
     CommentsV1: {
       abi: CommentsV1Abi,
-      network: networkConfigs,
+      network: Object.entries(networks).reduce(
+        (acc, [chainId, network]) => {
+          acc[chainId] = {
+            address: COMMENTS_V1_ADDRESS,
+            startBlock: network.startBlock,
+          };
+          return acc;
+        },
+        {} as Record<string, { address: `0x${string}`; startBlock?: number }>
+      ),
     },
   },
   blocks: {
     Transactions: {
-      network: networkConfigs,
+      network: Object.entries(networks).reduce(
+        (acc, [chainId, network]) => {
+          acc[chainId] = {
+            startBlock: network.startBlock,
+          };
+          return acc;
+        },
+        {} as Record<string, { startBlock?: number }>
+      ),
       interval: 1,
     },
   },
