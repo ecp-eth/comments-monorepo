@@ -248,9 +248,9 @@ export const CommentsV1Abi = [
             internalType: "address",
           },
           {
-            name: "nonce",
-            type: "uint256",
-            internalType: "uint256",
+            name: "salt",
+            type: "bytes32",
+            internalType: "bytes32",
           },
           {
             name: "deadline",
@@ -443,9 +443,9 @@ export const CommentsV1Abi = [
             internalType: "address",
           },
           {
-            name: "nonce",
-            type: "uint256",
-            internalType: "uint256",
+            name: "salt",
+            type: "bytes32",
+            internalType: "bytes32",
           },
           {
             name: "deadline",
@@ -508,9 +508,9 @@ export const CommentsV1Abi = [
             internalType: "address",
           },
           {
-            name: "nonce",
-            type: "uint256",
-            internalType: "uint256",
+            name: "salt",
+            type: "bytes32",
+            internalType: "bytes32",
           },
           {
             name: "deadline",
@@ -684,9 +684,9 @@ export const CommentsV1Abi = [
             internalType: "address",
           },
           {
-            name: "nonce",
-            type: "uint256",
-            internalType: "uint256",
+            name: "salt",
+            type: "bytes32",
+            internalType: "bytes32",
           },
           {
             name: "deadline",

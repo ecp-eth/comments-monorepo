@@ -28,7 +28,7 @@ export const CommentDataSchema = z.object({
   parentId: HexSchema,
   author: HexSchema,
   appSigner: HexSchema,
-  nonce: z.coerce.bigint(),
+  salt: HexSchema,
   deadline: z.coerce.bigint(),
 });
 

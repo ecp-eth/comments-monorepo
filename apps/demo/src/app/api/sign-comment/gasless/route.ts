@@ -89,7 +89,7 @@ export async function POST(
           parentId: signTypedDataParams.message.parentId,
           targetUri: signTypedDataParams.message.targetUri,
           deadline: signTypedDataParams.message.deadline,
-          nonce: signTypedDataParams.message.nonce,
+          salt: signTypedDataParams.message.salt,
         },
         authorSignature,
         appSignature,
