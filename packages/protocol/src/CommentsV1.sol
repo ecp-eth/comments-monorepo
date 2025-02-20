@@ -49,7 +49,7 @@ contract CommentsV1 {
     /// @param author The address of the comment author
     /// @param appSigner The address of the application signer that authorized this comment
     /// @param deadline Timestamp after which the signatures for this comment become invalid
-    /// @param nonce The nonce for the comment
+    /// @param salt Random salt for unique comment ID
     struct CommentData {
         string content;
         string metadata;
@@ -57,7 +57,7 @@ contract CommentsV1 {
         bytes32 parentId;
         address author;
         address appSigner;
-        uint256 nonce;
+        bytes32 salt;
         uint256 deadline;
     }
 
@@ -66,7 +66,7 @@ contract CommentsV1 {
     bytes32 public immutable DOMAIN_SEPARATOR;
     bytes32 public constant COMMENT_TYPEHASH =
         keccak256(
-            "AddComment(string content,string metadata,string targetUri,bytes32 parentId,address author,address appSigner,uint256 nonce,uint256 deadline)"
+            "AddComment(string content,string metadata,string targetUri,bytes32 parentId,address author,address appSigner,bytes32 salt,uint256 deadline)"
         );
     bytes32 public constant DELETE_COMMENT_TYPEHASH =
         keccak256(
@@ -132,15 +132,6 @@ contract CommentsV1 {
         if (block.timestamp > commentData.deadline) {
             revert DeadlineReached();
         }
-
-        if (
-            nonces[commentData.author][commentData.appSigner] !=
-            commentData.nonce
-        ) {
-            revert InvalidNonce();
-        }
-
-        nonces[commentData.author][commentData.appSigner]++;
 
         bytes32 commentId = getCommentId(commentData);
 
@@ -459,7 +450,7 @@ contract CommentsV1 {
                 commentData.parentId,
                 commentData.author,
                 commentData.appSigner,
-                commentData.nonce,
+                commentData.salt,
                 commentData.deadline
             )
         );

@@ -96,8 +96,7 @@ export type SignCommentPayloadRequestSchemaType = z.infer<
 export const SignCommentResponseServerSchema = z.object({
   signature: HexSchema,
   hash: HexSchema,
-  data: CommentDataWithIdSchema.omit({ nonce: true, deadline: true }).extend({
-    nonce: z.string().regex(/\d+/),
+  data: CommentDataWithIdSchema.omit({ deadline: true }).extend({
     deadline: z.string().regex(/\d+/),
   }),
 });

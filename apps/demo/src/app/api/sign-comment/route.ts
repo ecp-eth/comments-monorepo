@@ -5,15 +5,7 @@ import {
   SignCommentResponseSchema,
 } from "@/lib/schemas";
 import { bigintReplacer } from "@/lib/utils";
-import {
-  chains as configChains,
-  transports as configTransports,
-} from "@/lib/wagmi";
-import {
-  createCommentData,
-  createCommentTypedData,
-  getNonce,
-} from "@ecp.eth/sdk";
+import { createCommentData, createCommentTypedData } from "@ecp.eth/sdk";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
@@ -52,23 +44,12 @@ export async function POST(
     process.env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
   );
 
-  const chain = configChains[0];
-  const transport = configTransports[chain.id];
-
-  const nonce = await getNonce({
-    author,
-    appSigner: account.address,
-    chain,
-    transport,
-  });
-
   const commentData = createCommentData({
     content,
     targetUri,
     parentId,
     author,
     appSigner: account.address,
-    nonce,
   });
 
   const typedCommentData = createCommentTypedData({
