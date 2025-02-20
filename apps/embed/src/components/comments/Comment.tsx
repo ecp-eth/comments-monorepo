@@ -239,27 +239,10 @@ export function Comment({
     <div className="mb-4 border-l-2 border-muted pl-4">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
-            {comment.author?.ens?.avatarUrl ? (
-              <AvatarImage
-                src={comment.author.ens.avatarUrl}
-                alt="ENS Avatar"
-              />
-            ) : comment.author ? (
-              <AvatarImage
-                src={blo(comment.author?.address)}
-                alt="Generated Avatar"
-              />
-            ) : null}
-            <AvatarFallback>
-              {comment.author?.ens?.name?.[0]?.toUpperCase() ?? "?"}
-            </AvatarFallback>
-          </Avatar>
+          <AuthorAvatar author={comment.author} />
           <div className="text-xs text-muted-foreground">
-            {comment.author?.ens?.name ??
-              comment.author?.address ??
-              "Unknown sender"}{" "}
-            • {formatDate(comment.timestamp)}
+            {getAuthorNameOrAddress(comment.author)} •{" "}
+            {formatDate(comment.timestamp)}
           </div>
         </div>
         {isAuthor && !comment.pendingOperation && !comment.deletedAt && (
@@ -474,5 +457,30 @@ function CommentText({ text }: { text: string }) {
         </>
       ) : null}
     </>
+  );
+}
+
+function getAuthorNameOrAddress(author: CommentType["author"]): string {
+  return author.ens?.name ?? author.farcaster?.displayName ?? author.address;
+}
+
+type AuthorAvatarProps = {
+  author: CommentType["author"];
+};
+
+function AuthorAvatar({ author }: AuthorAvatarProps) {
+  const name = author.ens?.name ?? author.farcaster?.displayName;
+  const nameOrAddress = getAuthorNameOrAddress(author);
+  const avatarUrl = author.ens?.avatarUrl ?? author.farcaster?.pfpUrl;
+
+  return (
+    <Avatar className="h-6 w-6">
+      {avatarUrl ? (
+        <AvatarImage src={avatarUrl} alt={`${nameOrAddress} Avatar`} />
+      ) : (
+        <AvatarImage src={blo(author.address)} alt="Generated Avatar" />
+      )}
+      <AvatarFallback>{name?.[0]?.toUpperCase() ?? "?"}</AvatarFallback>
+    </Avatar>
   );
 }
