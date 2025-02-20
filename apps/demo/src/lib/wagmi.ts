@@ -4,7 +4,7 @@ import { anvil, base } from "wagmi/chains";
 
 export const chains =
   process.env.NODE_ENV === "development"
-    ? ([base] as const)
+    ? ([anvil] as const)
     : ([base] as const);
 
 export const transports = {
