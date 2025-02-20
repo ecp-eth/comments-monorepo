@@ -6,11 +6,11 @@
 
 # Function: fetchComments()
 
-> **fetchComments**(`FetchCommentsResponse`): `Promise`\<[`FetchCommentsResponse`](/sdk-reference/types/type-aliases/FetchCommentsResponse.mdx)\>
+> **fetchComments**(`FetchCommentsResponse`): `Promise`\<\{ `pagination`: \{ `hasMore`: `boolean`; `limit`: `number`; `offset`: `number`; \}; `results`: `object`[]; \}\>
 
-Defined in: [packages/sdk/src/api.ts:49](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L49)
+Defined in: [packages/sdk/src/api.ts:56](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L56)
 
-Fetch comments from the Embed API
+Fetch comments from the Indexer API
 
 ## Parameters
 
@@ -20,6 +20,6 @@ Fetch comments from the Embed API
 
 ## Returns
 
-`Promise`\<[`FetchCommentsResponse`](/sdk-reference/types/type-aliases/FetchCommentsResponse.mdx)\>
+`Promise`\<\{ `pagination`: \{ `hasMore`: `boolean`; `limit`: `number`; `offset`: `number`; \}; `results`: `object`[]; \}\>
 
-A promise that resolves comments fetched from the Embed API
+A promise that resolves comments fetched from the Indexer API
