@@ -42,3 +42,13 @@ Now you can interact with the contract on network `http://localhost:8545` using 
 ```
 forge test
 ```
+
+## Deployment
+
+Fund the wallet on the network you want to deploy to.
+
+Ensure that etherscan API key is set in the `.env` file.
+
+```
+pnpm run deploy --rpc-url $RPC_URL
+```
