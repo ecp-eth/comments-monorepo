@@ -209,7 +209,7 @@ importers:
   apps/embed-demo-blog:
     dependencies:
       '@ecp.eth/sdk':
-        specifier: ^0.0.4
+        specifier: ^0.0.5
         version: link:../../packages/sdk
       next:
         specifier: 15.1.6
@@ -252,7 +252,7 @@ importers:
   apps/indexer:
     dependencies:
       '@ecp.eth/sdk':
-        specifier: ^0.0.4
+        specifier: ^0.0.5
         version: link:../../packages/sdk
       dataloader:
         specifier: ^2.2.3

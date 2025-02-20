@@ -282,7 +282,7 @@ export function Comment({
           comment.deletedAt && "text-muted-foreground"
         )}
       >
-        {comment.content}
+        <CommentText text={comment.content} />
       </div>
       <div className="mb-2">
         <CommentActionOrStatus
@@ -428,5 +428,36 @@ function ActionButton({ children, onClick }: ActionButtonProps) {
     >
       {children}
     </button>
+  );
+}
+
+function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  return text.slice(0, maxLength).trim() + "...";
+}
+
+function CommentText({ text }: { text: string }) {
+  const [shownText, setShownText] = useState(truncateText(text, 200));
+  const isTruncated = text.length > shownText.length;
+
+  return (
+    <>
+      {shownText}
+      {isTruncated ? (
+        <>
+          {" "}
+          <button
+            onClick={() => setShownText(text)}
+            className="text-accent-foreground inline whitespace-nowrap underline"
+            type="button"
+          >
+            Show more
+          </button>
+        </>
+      ) : null}
+    </>
   );
 }

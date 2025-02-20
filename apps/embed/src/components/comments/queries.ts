@@ -4,6 +4,8 @@ import {
   type SignCommentResponseClientSchemaType,
   type PendingCommentOperationSchemaType,
   type SignCommentPayloadRequestSchemaType,
+  CommentPageSchema,
+  type CommentPageSchemaType,
 } from "@/lib/schemas";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
 
@@ -96,4 +98,35 @@ export async function submitCommentMutationFunction({
       "Failed to post comment, please try again."
     );
   }
+}
+
+type FetchCommentsParams = {
+  targetUri: string;
+  pageParam: {
+    offset: number;
+    limit: number;
+  };
+  signal?: AbortSignal;
+};
+
+export async function fetchComments({
+  pageParam,
+  targetUri,
+  signal,
+}: FetchCommentsParams): Promise<CommentPageSchemaType> {
+  const searchParams = new URLSearchParams({
+    targetUri,
+    offset: pageParam.offset.toString(),
+    limit: pageParam.limit.toString(),
+  });
+
+  const response = await fetch(`/api/comments?${searchParams.toString()}`, {
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch comments");
+  }
+
+  return CommentPageSchema.parse(await response.json());
 }

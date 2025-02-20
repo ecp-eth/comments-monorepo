@@ -1,55 +1,49 @@
-import { env } from "@/env";
-import {
-  CommentPageSchema,
-  ListCommentsSearchParamsSchema,
-} from "@/lib/schemas";
-import { NextRequest } from "next/server";
-import { privateKeyToAccount } from "viem/accounts";
+import { fetchComments, IndexerAPIError } from "@/lib/indexer-api";
+import { ListCommentsSearchParamsSchema } from "@/lib/schemas";
+import type { NextRequest } from "next/server";
+import { z } from "zod";
 
 export async function GET(req: NextRequest) {
-  const parseSearchParamsResult = ListCommentsSearchParamsSchema.safeParse(
-    Object.fromEntries(req.nextUrl.searchParams.entries())
-  );
-
-  if (!parseSearchParamsResult.success) {
-    return Response.json(
-      {
-        errors: parseSearchParamsResult.error.flatten().fieldErrors,
-      },
-      {
-        status: 400,
-      }
+  try {
+    const { targetUri, limit, offset } = ListCommentsSearchParamsSchema.parse(
+      Object.fromEntries(req.nextUrl.searchParams.entries())
     );
-  }
 
-  const { targetUri, limit, offset } = parseSearchParamsResult.data;
+    const response = await fetchComments({
+      targetUri,
+      limit,
+      offset,
+    });
 
-  const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+    return Response.json(response);
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      return Response.json(
+        {
+          errors: e.flatten().fieldErrors,
+        },
+        {
+          status: 400,
+        }
+      );
+    }
 
-  const url = new URL("/api/comments", env.COMMENTS_INDEXER_URL);
-  url.searchParams.set("targetUri", targetUri);
-  url.searchParams.set("appSigner", account.address);
+    if (e instanceof IndexerAPIError) {
+      return Response.json(
+        {
+          error: "Failed to fetch comments",
+          statusCode: e.statusCode,
+          response: await e.response.text(),
+        },
+        { status: 500 }
+      );
+    }
 
-  if (limit) {
-    url.searchParams.set("limit", limit.toString());
-  }
-
-  if (offset) {
-    url.searchParams.set("offset", offset.toString());
-  }
-
-  const res = await fetch(url, {
-    cache: "no-cache",
-  });
-
-  if (!res.ok) {
-    console.error(res.status, await res.text());
+    console.error(e);
 
     return Response.json(
       { error: "Failed to fetch comments" },
       { status: 500 }
     );
   }
-
-  return Response.json(CommentPageSchema.parse(await res.json()));
 }
