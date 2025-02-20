@@ -50,7 +50,7 @@ export type FetchCommentsOptions = {
 /**
  * Fetch comments from the Indexer API
  *
- * @param FetchCommentsResponse
+ * @param FetchCommentsOptions
  * @returns A promise that resolves comments fetched from the Indexer API
  */
 export async function fetchComments({
