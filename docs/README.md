@@ -2,6 +2,32 @@
 
 This documentation site is built using [Vocs](https://vocs.dev), a modern documentation framework powered by [Vite](https://vitejs.dev/).
 
+## Generating references
+
+### SDK
+
+The SDK reference is generated using TypeDoc from the SDK package source files.
+
+```bash
+npm run ref:gen:sdk
+```
+
+### Protocol
+
+The protocol reference is generated using solidity-docgen from the protocol package source files.
+
+```bash
+npm run ref:gen:protocol
+```
+
+### Indexer
+
+The indexer reference is generated using TypeDoc from the indexer package source files.
+
+```bash
+npm run ref:gen:indexer
+```
+
 ## Folder Structure
 
 ```
@@ -35,8 +61,6 @@ This package includes several npm scripts to help manage the documentation:
 - `preview`: Serves the built documentation site locally
 - `ref:gen:sdk`: Generates SDK reference documentation using TypeDoc from the SDK package source files
 - `ref:gen:protocol`: Generates Solidity protocol reference documentation using solidity-docgen
-
-TypeDoc
 
 ## Contributing
 
