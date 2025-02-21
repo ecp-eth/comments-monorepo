@@ -1,3 +1,4 @@
+import { HexSchema } from "@ecp.eth/sdk/schemas";
 import { z } from "zod";
 
 class InvalidServerEnvVariablesError extends Error {
@@ -17,16 +18,19 @@ ${JSON.stringify(this.validationError.flatten(), null, 2)}
 }
 
 const ServerEnvSchema = z.object({
-  APP_SIGNER_PRIVATE_KEY: z.custom<`0x${string}`>(
-    (value) =>
-      z
-        .string()
-        .regex(/^0x[0-9a-fA-F]+$/)
-        .safeParse(value).success
-  ),
-  COMMENTS_INDEXER_URL: z.string().url(),
+  APP_SIGNER_PRIVATE_KEY: HexSchema,
+  NEXT_PUBLIC_APP_SIGNER_ADDRESS: HexSchema,
+  NEXT_PUBLIC_COMMENTS_INDEXER_URL: z.string().url(),
   NEXT_PUBLIC_WC_PROJECT_ID: z.string(),
 });
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace NodeJS {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    interface ProcessEnv extends z.infer<typeof ServerEnvSchema> {}
+  }
+}
 
 const envParseResult = ServerEnvSchema.safeParse(process.env);
 

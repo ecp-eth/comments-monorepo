@@ -1,4 +1,5 @@
 import { EmbedConfigSchema } from "@ecp.eth/sdk/schemas";
+import { fetchComments } from "@ecp.eth/sdk";
 import { decompressFromURI } from "lz-ts";
 import { Toaster } from "@/components/ui/sonner";
 import { EmbedConfigProvider } from "@/components/EmbedConfigProvider";
@@ -8,7 +9,7 @@ import { z } from "zod";
 import { Providers } from "./providers";
 import { createThemeCSSVariables } from "@/lib/theming";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
-import { fetchComments } from "@/lib/indexer-api";
+import { env } from "@/env";
 
 const SearchParamsSchema = z.object({
   targetUri: z.string().url(),
@@ -53,6 +54,8 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
 
   try {
     const comments = await fetchComments({
+      appSigner: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+      apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       targetUri,
       offset: 0,
       limit: COMMENTS_PER_PAGE,
@@ -87,7 +90,8 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
         <Toaster />
       </div>
     );
-  } catch {
+  } catch (e) {
+    console.error(e);
     return <ErrorScreen description="Could not load comments" />;
   }
 }

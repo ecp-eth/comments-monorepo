@@ -1,12 +1,18 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalEnv": ["NEXT_PUBLIC_WC_PROJECT_ID", "NEXT_PUBLIC_URL"],
+  "globalEnv": [
+    "NEXT_PUBLIC_WC_PROJECT_ID",
+    "NEXT_PUBLIC_URL",
+    "NEXT_PUBLIC_APP_SIGNER_ADDRESS",
+    "NEXT_COMMENTS_INDEXER_URL"
+  ],
   "globalPassThroughEnv": [
     "APP_URL",
     "APP_SIGNER_PRIVATE_KEY",
     "COMMENTS_INDEXER_URL",
-    "SUBMITTER_PRIVATE_KEY"
+    "SUBMITTER_PRIVATE_KEY",
+    "NEYNAR_API_KEY"
   ],
   "tasks": {
     "build": {

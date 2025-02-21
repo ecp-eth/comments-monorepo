@@ -1,6 +1,6 @@
 /**
  * Ethereum Comments Protocol SDK types module
- * 
+ *
  * @module
  */
 
@@ -27,7 +27,7 @@ export type CommentData = {
   targetUri: string;
   /**
    * id of parent comments if it has one, 0x for no parent comment
-   * 
+   *
    * @remarks This zero address (32 bytes of zeros) indicates the comment has no parent and is a top-level comment
    */
   parentId: Hex;
@@ -47,38 +47,4 @@ export type CommentData = {
    * The deadline of the comment submission in seconds since epoch
    */
   deadline: bigint;
-};
-
-/**
- * The data structure of a comment to be fetched from the Embed API
- */
-export type Comment = {
-  /**
-   * The timestamp of the comment
-   */
-  timestamp: Date;
-  id: Hex;
-  content: string;
-  metadata: string;
-  targetUri: string | null;
-  parentId: Hex | null;
-  author: Hex;
-  chainId: number;
-  deletedAt: Date | null;
-  appSigner: Hex;
-  txHash: Hex;
-  logIndex: number;
-  replies: Comment[];
-};
-
-/**
- * The response from the Embed API
- */
-export type FetchCommentsResponse = {
-  results: Comment[];
-  pagination: {
-    limit: number;
-    offset: number;
-    hasMore: boolean;
-  };
 };
