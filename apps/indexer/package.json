@@ -2,6 +2,9 @@
   "name": "@ecp.eth/indexer",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22 <23"
+  },
   "scripts": {
     "dev": "ponder dev",
     "start": "ponder start",
