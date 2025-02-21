@@ -11,6 +11,7 @@
     "ref:gen:protocol": "solidity-docgen -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen"
   },
   "dependencies": {
+    "@ecp.eth/sdk": "workspace:*",
     "@theguild/remark-mermaid": "^0.2.0",
     "acorn": "^8.14.0",
     "hono": "^4.6.20",
