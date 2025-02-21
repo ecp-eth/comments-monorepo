@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.6
+
+### Patch Changes
+
+- d916603: feat: pull comments and replies from indexer directly
+
 ## 0.0.5
 
 ### Patch Changes
