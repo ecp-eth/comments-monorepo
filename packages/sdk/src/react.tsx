@@ -9,7 +9,7 @@ import { Hex, SignTypedDataParameters } from "viem";
 import { useSignTypedData } from "wagmi";
 import { COMMENTS_EMBED_DEFAULT_URL } from "./constants.js";
 import { EmbedConfigSchema, type EmbedConfigSchemaType } from "./schemas.js";
-import lz from "lz-ts";
+import * as lz from "lz-ts";
 
 // also export the type for generating docs correctly
 export type { EmbedConfigSchemaType } from "./schemas.js";
