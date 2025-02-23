@@ -168,15 +168,22 @@ export type IndexerAPIPaginationSchemaType = z.infer<
   typeof IndexerAPIPaginationSchema
 >;
 
-const IndxerAPICommentWithRepliesSchema = IndexerAPICommentSchema.extend({
+type IndexerAPICommentWithRepliesSchemaType = IndexerAPICommentSchemaType & {
+  replies: {
+    results: IndexerAPICommentWithRepliesSchemaType[]
+    pagination: IndexerAPIPaginationSchemaType
+  }
+}
+
+const IndexerAPICommentWithRepliesSchema: z.ZodType<IndexerAPICommentWithRepliesSchemaType> = IndexerAPICommentSchema.extend({
   replies: z.object({
-    results: z.array(IndexerAPICommentSchema),
+    results: z.array(z.lazy(() => IndexerAPICommentWithRepliesSchema)),
     pagination: IndexerAPIPaginationSchema,
   }),
 });
 
 export const IndexerAPIListCommentsSchema = z.object({
-  results: z.array(IndxerAPICommentWithRepliesSchema),
+  results: z.array(IndexerAPICommentWithRepliesSchema),
   pagination: IndexerAPIPaginationSchema,
 });
 
