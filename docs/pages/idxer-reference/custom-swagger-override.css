@@ -1,0 +1,103 @@
+
+.rest-api-doc .swagger-ui {
+  background-color: transparent;
+  color: var(--vocs-color_text);
+  font-family: var(--vocs-fontFamily_default);
+  font-size: var(--vocs-fontSize_root);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+.rest-api-doc .swagger-ui .info .title {
+  align-items: center;
+  font-weight: var(--vocs-fontWeight_semibold);
+  font-size: var(--vocs-fontSize_h1);
+  line-height: var(--vocs-lineHeight_heading);
+  letter-spacing: -0.02em;
+  gap: 0.25em;
+}
+
+/* Heading colour */
+.rest-api-doc .swagger-ui .info .title,
+.swagger-ui .parameter__name,
+.rest-api-doc .swagger-ui table thead tr td,
+.rest-api-doc .swagger-ui table thead tr th {
+  color: var(--vocs-color_heading);
+}
+
+/* Text colour */
+.rest-api-doc .swagger-ui .opblock-tag,
+.rest-api-doc .swagger-ui section h3,
+.rest-api-doc .swagger-ui .parameter__type,
+.rest-api-doc .swagger-ui .opblock .opblock-summary-path,
+.rest-api-doc .swagger-ui .opblock-description-wrapper p,
+.rest-api-doc .swagger-ui .opblock-external-docs-wrapper p,
+.rest-api-doc .swagger-ui .opblock-title_normal p,
+.rest-api-doc .swagger-ui .response-col_status,
+.rest-api-doc .swagger-ui .response-col_link,
+.rest-api-doc .swagger-ui .responses-inner h4,
+.rest-api-doc .swagger-ui .responses-inner h5 {
+  color: var(--vocs-color_text);
+}
+
+/* Darker text colour */
+.rest-api-doc .swagger-ui .tab li {
+  color: color-mix(in srgb, var(--vocs-color_text) 80%, black 20%);
+}
+
+.rest-api-doc .swagger-ui .scheme-container {
+  /* we have only one api for test anyway, let's hide options */
+  display: none;
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Content Wrapper */
+.rest-api-doc .swagger-ui .wrapper {
+  padding: 0;
+}
+
+/* Page heading */
+.rest-api-doc .swagger-ui .info {
+  margin-top: 0;
+}
+
+.rest-api-doc .swagger-ui .info .title small .version {
+  font-size: 1em;
+  line-height: 1.2;
+}
+
+/* Links */
+.rest-api-doc .swagger-ui a.link {
+  color: var(--vocs-color_link);
+  font-weight: var(--vocs-fontWeight_medium);
+  text-underline-offset: var(--vocs-space_2);
+  text-decoration: underline;
+  transition: color 0.1s;
+}
+
+.rest-api-doc .swagger-ui .arrow {
+  fill: var(--vocs-color_text);
+}
+
+
+/* Operation block */
+.rest-api-doc .swagger-ui .opblock.opblock-get {
+  border-width: 0;
+}
+
+.rest-api-doc .swagger-ui .opblock .opblock-summary .view-line-link {
+  width: 24px;
+  margin-right: 6px;
+}
+
+.rest-api-doc .swagger-ui .opblock.opblock-get .opblock-summary {
+  /* border-color: var(--vocs-color_codeInlineBorder); */
+}
+
+
+.temp {
+  border: 1px solid var(--vocs-color_codeInlineBorder);
+  background-color: var(--vocs-color_codeBlockBackground);
+  border-radius: var(--vocs-borderRadius_4);
+  padding: var(--vocs-space_20) var(--vocs-space_0);
+}

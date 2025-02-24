@@ -8,23 +8,29 @@
     "build": "vocs build",
     "preview": "vocs preview",
     "ref:gen:sdk": "typedoc --tsconfig ../packages/sdk/tsconfig.json --out pages/sdk-reference/ --entryPoints ../packages/sdk/src/index.ts ../packages/sdk/src/types.ts ../packages/sdk/src/react.tsx --publicPath /sdk-reference/",
-    "ref:gen:protocol": "solidity-docgen -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen"
+    "ref:gen:protocol": "solidity-docgen -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen",
+    "ref:gen:indexer": "NEYNAR_API_KEY=123 tsx --import ./scripts/ponder-module-register.mjs scripts/generate-indexer-openapi-spec.ts"
   },
   "dependencies": {
     "@ecp.eth/sdk": "workspace:*",
     "@theguild/remark-mermaid": "^0.2.0",
     "acorn": "^8.14.0",
     "hono": "^4.6.20",
-    "react": "^18.3.1",
-    "react-dom": "^18.2.0",
+    "react": "~18.3.1",
+    "react-dom": "~18.3.1",
     "remark-codesandbox": "^0.10.1",
+    "swagger-ui-react": "^5.19.0",
     "typedoc-plugin-markdown": "^4.4.2",
     "typedoc-plugin-zod": "^1.3.1",
     "vocs": "1.0.0-alpha.62"
   },
   "devDependencies": {
+    "@ecp.eth/indexer": "workspace:*",
+    "@hono/zod-openapi": "^0.18.4",
+    "js-yaml": "^4.1.0",
     "solc": "^0.8.13",
     "solidity-docgen": "~0.5.17",
+    "tsx": "^4.19.3",
     "typedoc": "^0.27.7"
   }
 }

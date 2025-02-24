@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@ecp.eth/sdk": "^0.0.6",
+    "@hono/zod-openapi": "^0.18.4",
     "@neynar/nodejs-sdk": "^2.13.1",
     "dataloader": "^2.2.3",
     "hono": "^4.5.0",
