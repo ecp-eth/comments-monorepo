@@ -192,3 +192,21 @@ export const IndexerAPIListCommentRepliesSchema = z.object({
 export type IndexerAPIListCommentRepliesSchemaType = z.infer<
   typeof IndexerAPIListCommentRepliesSchema
 >;
+
+export const EmbedResizedEventSchema = z.object({
+  type: z.literal("@ecp.eth/sdk/embed/resize"),
+  height: z.number().min(0).int(),
+  width: z.number().min(0).int(),
+});
+
+export type EmbedResizedEventSchemaType = z.infer<
+  typeof EmbedResizedEventSchema
+>;
+
+export const EmbedGetDimensionsEventSchema = z.object({
+  type: z.literal("@ecp.eth/sdk/embed/get-dimensions"),
+});
+
+export type EmbedGetDimensionsEventSchemaType = z.infer<
+  typeof EmbedGetDimensionsEventSchema
+>;
