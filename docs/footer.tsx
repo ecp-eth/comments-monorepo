@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { CommentsEmbed } from "@ecp.eth/sdk/react";
 
 /**
@@ -6,8 +6,10 @@ import { CommentsEmbed } from "@ecp.eth/sdk/react";
  * @returns
  */
 export default function Footer() {
+  const isMounted = useIsMounted()
+
   // there is no way to retrieve pathname in Vita SSR, so we don't render the comments embed
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" || !isMounted) {
     return null;
   }
 
@@ -30,4 +32,14 @@ export default function Footer() {
       }}
     />
   );
+}
+
+function useIsMounted() {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  return isMounted
 }
