@@ -8,21 +8,27 @@
 
 > **FetchCommentsOptions**: `object`
 
-Defined in: [packages/sdk/src/api.ts:13](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L13)
+Defined in: [packages/sdk/src/api.ts:16](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L16)
 
 The options for `fetchComments()`
 
 ## Type declaration
 
-### apiUrl
+### apiUrl?
 
-> **apiUrl**: `string`
+> `optional` **apiUrl**: `string`
 
 URL on which /api/comments endpoint will be called
 
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
 ### appSigner?
 
-> `optional` **appSigner**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+> `optional` **appSigner**: `Hex`
 
 Filter comments sent using this app signer key.
 

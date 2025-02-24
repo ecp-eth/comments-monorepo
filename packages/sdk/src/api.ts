@@ -66,7 +66,6 @@ const FetchCommentsOptionsSchema = z.object({
 /**
  * Fetch comments from the Indexer API
  *
- * @param FetchCommentsOptions
  * @returns A promise that resolves comments fetched from the Indexer API
  */
 export async function fetchComments(
@@ -164,7 +163,6 @@ const FetchCommentRepliesOptionSchema = z.object({
 /**
  * Fetch replies for a comment from the Indexer API
  *
- * @param FetchCommentRepliesOptions
  * @returns A promise that resolves replies fetched from the Indexer API
  */
 export async function fetchCommentReplies(
