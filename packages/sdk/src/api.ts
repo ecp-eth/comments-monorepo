@@ -1,11 +1,14 @@
 import { Effect } from "effect";
-import type { Hex } from "./types.js";
 import {
+  HexSchema,
+  type Hex,
   IndexerAPIListCommentRepliesSchema,
   type IndexerAPIListCommentRepliesSchemaType,
   IndexerAPIListCommentsSchema,
   type IndexerAPIListCommentsSchemaType,
 } from "./schemas.js";
+import { INDEXER_API_URL } from "./constants.js";
+import { z } from "zod";
 
 /**
  * The options for `fetchComments()`
@@ -14,8 +17,10 @@ export type FetchCommentsOptions = {
   targetUri: string;
   /**
    * URL on which /api/comments endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
    */
-  apiUrl: string;
+  apiUrl?: string;
   /**
    * Filter comments sent using this app signer key.
    */
@@ -47,22 +52,29 @@ export type FetchCommentsOptions = {
   signal?: AbortSignal;
 };
 
+const FetchCommentsOptionsSchema = z.object({
+  targetUri: z.string().url(),
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  appSigner: HexSchema.optional(),
+  retries: z.number().int().positive().default(3),
+  sort: z.enum(["asc", "desc"]).default("desc"),
+  offset: z.number().int().min(0).default(0),
+  limit: z.number().int().positive().default(50),
+  signal: z.instanceof(AbortSignal).optional(),
+});
+
 /**
  * Fetch comments from the Indexer API
  *
  * @param FetchCommentsOptions
  * @returns A promise that resolves comments fetched from the Indexer API
  */
-export async function fetchComments({
-  apiUrl,
-  targetUri,
-  appSigner,
-  sort = "desc",
-  offset = 0,
-  limit = 50,
-  retries = 3,
-  signal,
-}: FetchCommentsOptions): Promise<IndexerAPIListCommentsSchemaType> {
+export async function fetchComments(
+  options: FetchCommentsOptions
+): Promise<IndexerAPIListCommentsSchemaType> {
+  const { apiUrl, limit, offset, retries, sort, targetUri, appSigner, signal } =
+    FetchCommentsOptionsSchema.parse(options);
+
   const fetchCommentsTask = Effect.tryPromise(async (signal) => {
     const url = new URL("/api/comments", apiUrl);
     url.searchParams.set("targetUri", targetUri);
@@ -109,8 +121,10 @@ export type FetchCommentRepliesOptions = {
   commentId: Hex;
   /**
    * URL on which /api/comments/$commentId/replies endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
    */
-  apiUrl: string;
+  apiUrl?: string;
   /**
    * Filters only to comments sent using this app signer key.
    */
@@ -137,21 +151,28 @@ export type FetchCommentRepliesOptions = {
   signal?: AbortSignal;
 };
 
+const FetchCommentRepliesOptionSchema = z.object({
+  commentId: HexSchema,
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  appSigner: HexSchema.optional(),
+  retries: z.number().int().positive().default(3),
+  offset: z.number().int().min(0).default(0),
+  limit: z.number().int().positive().default(50),
+  signal: z.instanceof(AbortSignal).optional(),
+});
+
 /**
  * Fetch replies for a comment from the Indexer API
  *
  * @param FetchCommentRepliesOptions
  * @returns A promise that resolves replies fetched from the Indexer API
  */
-export async function fetchCommentReplies({
-  apiUrl,
-  appSigner,
-  commentId,
-  retries = 3,
-  offset = 0,
-  limit = 50,
-  signal,
-}: FetchCommentRepliesOptions): Promise<IndexerAPIListCommentRepliesSchemaType> {
+export async function fetchCommentReplies(
+  options: FetchCommentRepliesOptions
+): Promise<IndexerAPIListCommentRepliesSchemaType> {
+  const { apiUrl, commentId, limit, offset, retries, appSigner, signal } =
+    FetchCommentRepliesOptionSchema.parse(options);
+
   const fetchRepliesTask = Effect.tryPromise(async (signal) => {
     const url = new URL(`/api/comments/${commentId}/replies`, apiUrl);
 
