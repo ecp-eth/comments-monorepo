@@ -9,29 +9,17 @@ import {
   useWriteContract,
 } from "wagmi";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { CommentData } from "../../lib/types";
 import { chains } from "../../lib/wagmi";
 import { toast } from "sonner";
 import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import { SignCommentResponseSchema } from "@/lib/schemas";
+import type { Hex } from "@ecp.eth/sdk/schemas";
+import { useFreshRef } from "@/lib/hooks";
 
 interface CommentBoxProps {
-  onSubmit: (content: string) => void;
+  onSubmit: () => void;
   placeholder?: string;
-  parentId?: string;
-}
-
-interface SignCommentResponse {
-  signature: `0x${string}`;
-  hash: `0x${string}`;
-  data: CommentData;
-}
-
-interface SignCommentRequest {
-  content: string;
-  targetUri?: string;
-  parentId?: string;
-  chainId: number;
-  author: `0x${string}`;
+  parentId?: Hex;
 }
 
 export function CommentBox({
@@ -39,22 +27,20 @@ export function CommentBox({
   placeholder = "What are your thoughts?",
   parentId,
 }: CommentBoxProps) {
+  const onSubmitRef = useFreshRef(onSubmit);
   const { address } = useAccount();
   const { switchChain } = useSwitchChain();
   const [content, setContent] = useState("");
+  const { writeContractAsync } = useWriteContract();
 
-  const {
-    data: txHash,
-    writeContract,
-    isPending: isWritePending,
-  } = useWriteContract();
-  const { data: receipt, isLoading: isReceiptLoading } =
-    useWaitForTransactionReceipt({
-      hash: txHash,
-    });
+  const submitMutation = useMutation({
+    mutationFn: async (e: React.FormEvent) => {
+      e.preventDefault();
 
-  const signCommentMutation = useMutation({
-    mutationFn: async (data: SignCommentRequest) => {
+      if (!content.trim() || !address) {
+        return;
+      }
+
       switchChain({ chainId: chains[0].id });
 
       const response = await fetch("/api/sign-comment", {
@@ -62,67 +48,47 @@ export function CommentBox({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          content,
+          targetUri: window.location.href,
+          parentId,
+          author: address,
+          chainId: chains[0].id, // Replace with your desired chain ID
+        }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to sign comment");
       }
 
-      return response.json() as Promise<SignCommentResponse>;
-    },
-    onSuccess(data) {
-      writeContract({
+      const data = SignCommentResponseSchema.parse(await response.json());
+
+      return writeContractAsync({
         abi: CommentsV1Abi,
         address: COMMENTS_V1_ADDRESS,
         functionName: "postCommentAsAuthor",
-        args: [
-          {
-            ...data.data,
-            deadline: BigInt(data.data.deadline),
-          },
-          data.signature,
-        ],
+        args: [data.data, data.signature],
       });
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!content.trim() || !address) {
-      console.error("Missing content or address", {
-        content,
-        address,
-      });
-      throw new Error("Missing content or address");
-    }
-
-    try {
-      signCommentMutation.mutate({
-        content,
-        targetUri: window.location.href,
-        parentId,
-        author: address as `0x${string}`,
-        chainId: chains[0].id, // Replace with your desired chain ID
-      });
-    } catch (error) {
-      console.error("Error signing comment:", error);
-    }
-  };
+  const { data: receipt, isLoading: isReceiptLoading } =
+    useWaitForTransactionReceipt({
+      hash: submitMutation.data,
+    });
 
   useEffect(() => {
-    if (receipt?.transactionHash) {
+    if (receipt?.status === "success") {
       toast.success("Comment posted");
-      onSubmit(content);
+      onSubmitRef.current?.();
       setContent("");
     }
-  }, [receipt?.transactionHash]);
+  }, [receipt?.status, onSubmitRef]);
 
-  const isLoading =
-    isWritePending || isReceiptLoading || signCommentMutation.isPending;
+  const isLoading = isReceiptLoading || submitMutation.isPending;
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 flex flex-col gap-2">
+    <form onSubmit={submitMutation.mutate} className="mb-4 flex flex-col gap-2">
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}

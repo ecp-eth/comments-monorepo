@@ -1,4 +1,8 @@
 import {
+  GaslessPostCommentRequestBodySchema,
+  GaslessPostCommentResponseSchema,
+} from "@/lib/schemas";
+import {
   chains as configChains,
   transports as configTransports,
 } from "@/lib/wagmi";
@@ -7,16 +11,16 @@ import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export const POST = async (req: Request) => {
-  let { signTypedDataArgs, appSignature, authorSignature } = await req.json();
+  const parsedBodyResult = GaslessPostCommentRequestBodySchema.safeParse(
+    await req.json()
+  );
 
-  if (!signTypedDataArgs || !appSignature || !authorSignature) {
-    console.error("Missing required fields", {
-      signTypedDataArgs,
-      appSignature,
-      authorSignature,
-    });
-    return Response.json({ error: "Missing required fields" }, { status: 400 });
+  if (!parsedBodyResult.success) {
+    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
   }
+
+  const { signTypedDataParams, appSignature, authorSignature } =
+    parsedBodyResult.data;
 
   // Check that signature is from the app signer
   const appSigner = privateKeyToAccount(
@@ -38,14 +42,14 @@ export const POST = async (req: Request) => {
   }).extend(publicActions);
 
   const isAppSignatureValid = await walletClient.verifyTypedData({
-    ...signTypedDataArgs,
+    ...signTypedDataParams,
     signature: appSignature,
     address: appSigner.address,
   });
 
   if (!isAppSignatureValid) {
     console.log("verifying app signature failed", {
-      ...signTypedDataArgs,
+      ...signTypedDataParams,
       signature: appSignature,
       address: appSigner.address,
     });
@@ -60,20 +64,20 @@ export const POST = async (req: Request) => {
       functionName: "postComment",
       args: [
         {
-          appSigner: signTypedDataArgs.message.appSigner,
-          author: signTypedDataArgs.message.author,
-          content: signTypedDataArgs.message.content,
-          metadata: signTypedDataArgs.message.metadata,
-          parentId: signTypedDataArgs.message.parentId,
-          targetUri: signTypedDataArgs.message.targetUri,
-          deadline: signTypedDataArgs.message.deadline,
-          nonce: signTypedDataArgs.message.nonce,
+          appSigner: signTypedDataParams.message.appSigner,
+          author: signTypedDataParams.message.author,
+          content: signTypedDataParams.message.content,
+          metadata: signTypedDataParams.message.metadata,
+          parentId: signTypedDataParams.message.parentId,
+          targetUri: signTypedDataParams.message.targetUri,
+          deadline: signTypedDataParams.message.deadline,
+          nonce: signTypedDataParams.message.nonce,
         },
         authorSignature,
         appSignature,
       ],
     });
-    return Response.json({ txHash });
+    return Response.json(GaslessPostCommentResponseSchema.parse({ txHash }));
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Failed to post comment" }, { status: 500 });

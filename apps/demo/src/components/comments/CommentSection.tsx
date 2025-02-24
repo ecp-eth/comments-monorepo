@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { fetchComments } from "@ecp.eth/sdk";
 import { useEffect, useState } from "react";
-import { CommentsResponse } from "../../lib/types";
 import { Comment } from "./Comment";
 import { CommentBox } from "./CommentBox";
 
@@ -15,19 +15,16 @@ export function CommentSection() {
     setCurrentUrl(window.location.href);
   }, []);
 
-  const { data, isLoading, error, refetch } = useQuery<CommentsResponse>({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["comments", currentUrl, page],
-    queryFn: async () => {
-      const url = new URL("/api/comments", currentUrl);
-      url.searchParams.set("targetUri", currentUrl);
-      url.searchParams.set("offset", String(page * pageSize));
-      url.searchParams.set("limit", String(pageSize));
-
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Failed to fetch comments");
-      }
-      return response.json();
+    queryFn: () => {
+      return fetchComments({
+        apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        targetUri: currentUrl,
+        offset: page * pageSize,
+        limit: pageSize,
+      });
     },
     enabled: !!currentUrl,
   });

@@ -2,8 +2,7 @@
 
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { Button } from "@/components/ui/button";
-import { CommentsResponse } from "@/lib/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -13,73 +12,52 @@ import {
 } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
 import { CommentGasless } from "./CommentGasless";
-import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import { COMMENTS_V1_ADDRESS, fetchComments } from "@ecp.eth/sdk";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
-import { SignTypedDataParameters } from "viem";
-
-interface CommentData {
-  id: string;
-  content: string;
-  author: string;
-  timestamp: number;
-  replies: CommentData[];
-}
-
-interface ApprovalResponse {
-  approved: boolean;
-  signTypedDataParams: SignTypedDataParameters;
-  appSignature: `0x${string}`;
-  appSigner: `0x${string}`;
-}
+import {
+  ChangeApprovalStatusResponseSchema,
+  GetApprovalStatusSchema,
+} from "@/lib/schemas";
 
 export function CommentSectionGasless() {
   const { address } = useAccount();
   const [page, setPage] = useState(0);
   const pageSize = 10;
   const [currentUrl, setCurrentUrl] = useState<string>("");
-  const [pendingTxHash, setPendingTxHash] = useState<`0x${string}`>();
 
-  const {
-    writeContract: removeApprovalTx,
-    data: removeApprovalTxHash,
-    reset: resetApprovalTx,
-  } = useWriteContract();
+  const removeApprovalContract = useWriteContract();
 
-  const getApprovalDataMutation = useMutation({
-    mutationFn: async ({
-      author,
-    }: {
-      author: `0x${string}`;
-    }): Promise<ApprovalResponse> => {
-      setPendingTxHash(undefined);
-
+  const getApprovalQuery = useQuery({
+    enabled: !!address,
+    queryKey: ["approval", address],
+    queryFn: async () => {
       if (!address) {
         throw new Error("No address found");
       }
 
-      const response = await fetch(`/api/approval?author=${author}`);
+      const response = await fetch(`/api/approval?author=${address}`);
+
       if (!response.ok) {
         throw new Error("Failed to fetch approvals");
       }
-      return response.json();
+
+      return GetApprovalStatusSchema.parse(await response.json());
     },
   });
 
-  const gaslessMutation = useGaslessTransaction({
+  const approveGaslessTransactionsMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
-      setPendingTxHash(undefined);
-
-      if (!address) {
-        throw new Error("No address found");
+      if (!getApprovalQuery.data) {
+        throw new Error("No approval data found");
       }
 
-      const data = await getApprovalDataMutation.mutateAsync({
-        author: address,
-      });
+      if (getApprovalQuery.data.approved) {
+        throw new Error("Already approved");
+      }
 
       return {
-        signTypedDataParams: data.signTypedDataParams,
-        variables: data,
+        signTypedDataParams: getApprovalQuery.data.signTypedDataParams,
+        variables: getApprovalQuery.data,
       };
     },
     async sendSignedData({ signature, variables }) {
@@ -98,99 +76,94 @@ export function CommentSectionGasless() {
         throw new Error("Failed to post approval signature");
       }
 
-      return response.json();
+      return ChangeApprovalStatusResponseSchema.parse(await response.json())
+        .txHash;
     },
   });
 
-  const { data: receipt, isLoading: isReceiptLoading } =
-    useWaitForTransactionReceipt({
-      hash: pendingTxHash,
-    });
+  const approveContractReceipt = useWaitForTransactionReceipt({
+    hash: approveGaslessTransactionsMutation.data,
+  });
 
-  const { data, isLoading, error, refetch } = useQuery<CommentsResponse>({
+  const removeApprovalContractReceipt = useWaitForTransactionReceipt({
+    hash: removeApprovalContract.data,
+  });
+
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["comments", currentUrl, page],
-    queryFn: async () => {
-      const url = new URL("/api/comments", currentUrl);
-      url.searchParams.set("targetUri", currentUrl);
-      url.searchParams.set("offset", String(page * pageSize));
-      url.searchParams.set("limit", String(pageSize));
-
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Failed to fetch comments");
-      }
-      return response.json();
+    queryFn: () => {
+      return fetchComments({
+        apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        targetUri: currentUrl,
+        offset: page * pageSize,
+        limit: pageSize,
+      });
     },
     enabled: !!currentUrl,
   });
 
-  const addReply = (
-    comments: CommentData[],
-    parentId: string,
-    newReply: CommentData
-  ): CommentData[] => {
-    return comments.map((comment) => {
-      if (comment.id === parentId) {
-        return { ...comment, replies: [...comment.replies, newReply] };
-      } else if (comment.replies.length > 0) {
-        return {
-          ...comment,
-          replies: addReply(comment.replies, parentId, newReply),
-        };
-      }
-      return comment;
-    });
-  };
+  const { refetch: refetchApprovalQuery } = getApprovalQuery;
+  const { reset: resetApproveGaslessTransactionsMutation } =
+    approveGaslessTransactionsMutation;
+  const { reset: resetRemoveApprovalContract } = removeApprovalContract;
 
   useEffect(() => {
-    if (receipt?.status === "success" && address) {
-      getApprovalDataMutation.mutate({ author: address });
-      // Need to reset the approval tx here otherwise it will trigger an infinite loop
-      resetApprovalTx();
+    if (approveContractReceipt.data?.status === "success") {
+      refetchApprovalQuery();
+      resetApproveGaslessTransactionsMutation();
+      removeApprovalContract.reset();
     }
-  }, [receipt, address]);
+  }, [
+    approveContractReceipt.data?.status,
+    refetchApprovalQuery,
+    removeApprovalContract,
+    resetApproveGaslessTransactionsMutation,
+  ]);
 
   useEffect(() => {
-    if (address) {
-      getApprovalDataMutation.mutate({ author: address });
+    if (removeApprovalContractReceipt.data?.status === "success") {
+      refetchApprovalQuery();
+      resetApproveGaslessTransactionsMutation();
+      resetRemoveApprovalContract();
     }
-  }, [address]);
-
-  useEffect(() => {
-    if (removeApprovalTxHash) {
-      setPendingTxHash(removeApprovalTxHash);
-    }
-  }, [removeApprovalTxHash, setPendingTxHash, pendingTxHash]);
+  }, [
+    refetchApprovalQuery,
+    removeApprovalContractReceipt.data?.status,
+    resetApproveGaslessTransactionsMutation,
+    resetRemoveApprovalContract,
+  ]);
 
   useEffect(() => {
     setCurrentUrl(window.location.href);
   }, []);
 
   const isApprovalPending =
-    isReceiptLoading ||
-    gaslessMutation.isPending ||
-    getApprovalDataMutation.isPending;
+    approveContractReceipt.isLoading ||
+    approveGaslessTransactionsMutation.isPending ||
+    getApprovalQuery.isPending;
 
-  const isRemovingApproval = isReceiptLoading && !!removeApprovalTxHash;
+  const isRemovingApproval =
+    removeApprovalContract.isPending || removeApprovalContractReceipt.isLoading;
 
-  if (isLoading) return <div>Loading comments...</div>;
-  if (error)
+  if (isLoading) {
+    return <div>Loading comments...</div>;
+  }
+
+  if (error) {
     return <div>Error loading comments: {(error as Error).message}</div>;
+  }
 
   return (
     <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
       <h2 className="text-lg font-semibold">Comments</h2>
 
-      {!getApprovalDataMutation.data?.approved &&
-      getApprovalDataMutation.data?.signTypedDataParams ? (
+      {!getApprovalQuery.data?.approved &&
+      getApprovalQuery.data?.signTypedDataParams ? (
         <div className="mb-4">
           <Button
             onClick={() => {
-              gaslessMutation.mutate(void 0, {
-                onSuccess(data, variables, context) {
-                  setPendingTxHash(data);
-                },
-              });
+              approveGaslessTransactionsMutation.mutate();
             }}
             disabled={isApprovalPending}
             variant="default"
@@ -201,28 +174,28 @@ export function CommentSectionGasless() {
           </Button>
         </div>
       ) : (
-        getApprovalDataMutation.data?.approved && (
+        getApprovalQuery.data?.approved && (
           <div className="flex items-center gap-2">
             <div className="text-sm text-gray-500">
               App has approval to post on your behalf.
             </div>
             <Button
               variant="outline"
-              disabled={!getApprovalDataMutation.data || isRemovingApproval}
+              disabled={!getApprovalQuery.data || isRemovingApproval}
               onClick={() => {
                 if (
-                  !getApprovalDataMutation.data ||
-                  !getApprovalDataMutation.data.appSigner ||
+                  !getApprovalQuery.data ||
+                  !getApprovalQuery.data.approved ||
                   !address
                 ) {
                   throw new Error("No data found");
                 }
 
-                removeApprovalTx({
+                removeApprovalContract.writeContract({
                   abi: CommentsV1Abi,
                   address: COMMENTS_V1_ADDRESS,
                   functionName: "removeApprovalAsAuthor",
-                  args: [getApprovalDataMutation.data.appSigner],
+                  args: [getApprovalQuery.data.appSigner],
                 });
               }}
             >
@@ -237,16 +210,17 @@ export function CommentSectionGasless() {
 
       <CommentBoxGasless
         onSubmit={() => refetch()}
-        isApproved={getApprovalDataMutation.data?.approved}
+        isApproved={getApprovalQuery.data?.approved}
       />
       {data?.results.map((comment) => (
         <CommentGasless
           key={comment.id}
           comment={comment}
-          onReply={(parentId, content) => refetch()}
-          onDelete={(id) => {
+          onReply={() => refetch()}
+          onDelete={() => {
             refetch();
           }}
+          submitIfApproved={getApprovalQuery.data?.approved ?? false}
         />
       ))}
       {data?.pagination.hasMore && (

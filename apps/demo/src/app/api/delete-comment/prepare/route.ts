@@ -1,3 +1,9 @@
+import {
+  PreparedGaslessCommentOperationApprovedSchema,
+  type PreparedGaslessCommentOperationSchemaType,
+  PreparedSignedGaslessCommentOperationNotApprovedSchema,
+  PrepareGaslessCommentDeletionRequestBodySchema,
+} from "@/lib/schemas";
 import { bigintReplacer } from "@/lib/utils";
 import {
   chains as configChains,
@@ -9,28 +15,25 @@ import {
   createDeleteCommentTypedData,
   getNonce,
 } from "@ecp.eth/sdk";
-import { createWalletClient, isAddress, publicActions } from "viem";
+import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 const chain = configChains[0];
 const transport = configTransports[chain.id as keyof typeof configTransports];
 
-export const POST = async (req: Request) => {
+export async function POST(req: Request) {
+  const parsedBodyResult =
+    PrepareGaslessCommentDeletionRequestBodySchema.safeParse(await req.json());
+
+  if (!parsedBodyResult.success) {
+    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
+  }
+
   const {
     author: authorAddress,
     commentId,
     submitIfApproved,
-  } = await req.json();
-
-  if (!authorAddress || !isAddress(authorAddress)) {
-    console.error("Invalid address", authorAddress);
-    return Response.json({ error: "Invalid address" }, { status: 400 });
-  }
-
-  if (!commentId) {
-    console.error("Invalid commentId", commentId);
-    return Response.json({ error: "Invalid commentId" }, { status: 400 });
-  }
+  } = parsedBodyResult.data;
 
   const account = privateKeyToAccount(
     process.env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
@@ -42,8 +45,6 @@ export const POST = async (req: Request) => {
     chain,
     transport,
   });
-
-  console.log("nonce", nonce);
 
   // Construct deletion signature data
   const typedDeleteCommentData = createDeleteCommentTypedData({
@@ -105,7 +106,11 @@ export const POST = async (req: Request) => {
             signature,
           ],
         });
-        return Response.json({ txHash });
+        return Response.json(
+          PreparedGaslessCommentOperationApprovedSchema.parse({
+            txHash,
+          }) satisfies PreparedGaslessCommentOperationSchemaType
+        );
       } catch (error) {
         console.error(error);
         return Response.json(
@@ -116,10 +121,12 @@ export const POST = async (req: Request) => {
     }
   }
 
-  return Response.json({
-    signTypedDataArgs: JSON.parse(
-      JSON.stringify(typedDeleteCommentData, bigintReplacer)
-    ),
-    appSignature: signature,
-  });
-};
+  return Response.json(
+    PreparedSignedGaslessCommentOperationNotApprovedSchema.parse({
+      signTypedDataParams: JSON.parse(
+        JSON.stringify(typedDeleteCommentData, bigintReplacer)
+      ),
+      appSignature: signature,
+    }) satisfies PreparedGaslessCommentOperationSchemaType
+  );
+}

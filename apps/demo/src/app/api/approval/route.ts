@@ -1,3 +1,9 @@
+import {
+  ChangeApprovalStatusRequestBodySchema,
+  GetApprovalStatusApprovedSchema,
+  GetApprovalStatusNotApprovedSchema,
+  type GetApprovalStatusSchemaType,
+} from "@/lib/schemas";
 import { bigintReplacer } from "@/lib/utils";
 import {
   chains as configChains,
@@ -20,7 +26,7 @@ import { privateKeyToAccount } from "viem/accounts";
 const chain = configChains[0];
 const transport = configTransports[chain.id as keyof typeof configTransports];
 
-export const GET = async (req: NextRequest) => {
+export async function GET(req: NextRequest) {
   const authorAddress = req.nextUrl.searchParams.get("author");
 
   if (!authorAddress || !isAddress(authorAddress)) {
@@ -74,10 +80,12 @@ export const GET = async (req: NextRequest) => {
       ).map((result) => ({ result }));
 
   if (isApproved) {
-    return Response.json({
-      approved: true,
-      appSigner: account.address,
-    });
+    return Response.json(
+      GetApprovalStatusApprovedSchema.parse({
+        approved: true,
+        appSigner: account.address,
+      }) satisfies GetApprovalStatusSchemaType
+    );
   }
 
   if (nonce === undefined) {
@@ -97,26 +105,34 @@ export const GET = async (req: NextRequest) => {
 
   const signature = await account.signTypedData(typedApprovalData);
 
-  return Response.json({
-    signTypedDataArgs: JSON.parse(
-      JSON.stringify(typedApprovalData, bigintReplacer)
+  return new Response(
+    JSON.stringify(
+      GetApprovalStatusNotApprovedSchema.parse({
+        signTypedDataParams: typedApprovalData,
+        appSignature: signature,
+        approved: false,
+      }) satisfies GetApprovalStatusSchemaType,
+      bigintReplacer
     ),
-    appSignature: signature,
-    approved: false,
-  });
-};
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+}
 
-export const POST = async (req: Request) => {
-  const { signTypedDataArgs, appSignature, authorSignature } = await req.json();
+export async function POST(req: Request) {
+  const parsedBodyResult = ChangeApprovalStatusRequestBodySchema.safeParse(
+    await req.json()
+  );
 
-  if (!signTypedDataArgs || !appSignature || !authorSignature) {
-    console.error("Missing required fields", {
-      signTypedDataArgs,
-      appSignature,
-      authorSignature,
-    });
-    return Response.json({ error: "Missing required fields" }, { status: 400 });
+  if (!parsedBodyResult.success) {
+    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
   }
+
+  const { signTypedDataParams, appSignature, authorSignature } =
+    parsedBodyResult.data;
 
   // Check that signature is from the app signer
   const appSigner = privateKeyToAccount(
@@ -135,14 +151,14 @@ export const POST = async (req: Request) => {
   }).extend(publicActions);
 
   const isAppSignatureValid = await walletClient.verifyTypedData({
-    ...signTypedDataArgs,
+    ...signTypedDataParams,
     signature: appSignature,
     address: appSigner.address,
   });
 
   if (!isAppSignatureValid) {
     console.log("verifying app signature failed", {
-      ...signTypedDataArgs,
+      ...signTypedDataParams,
       signature: appSignature,
       address: appSigner.address,
     });
@@ -156,10 +172,10 @@ export const POST = async (req: Request) => {
       address: COMMENTS_V1_ADDRESS,
       functionName: "addApproval",
       args: [
-        signTypedDataArgs.message.author,
-        signTypedDataArgs.message.appSigner,
-        signTypedDataArgs.message.nonce,
-        signTypedDataArgs.message.deadline,
+        signTypedDataParams.message.author,
+        signTypedDataParams.message.appSigner,
+        signTypedDataParams.message.nonce,
+        signTypedDataParams.message.deadline,
         authorSignature,
       ],
     });
@@ -168,4 +184,4 @@ export const POST = async (req: Request) => {
     console.error(error);
     return Response.json({ error: "Failed to add approval" }, { status: 500 });
   }
-};
+}

@@ -1,3 +1,7 @@
+import {
+  SignCommentRequestBodySchema,
+  SignCommentResponseSchema,
+} from "@/lib/schemas";
 import { bigintReplacer } from "@/lib/utils";
 import {
   chains as configChains,
@@ -11,8 +15,17 @@ import {
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-export const POST = async (req: Request) => {
-  const { content, targetUri, parentId, chainId, author } = await req.json();
+export async function POST(req: Request) {
+  const parsedBodyResult = SignCommentRequestBodySchema.safeParse(
+    await req.json()
+  );
+
+  if (!parsedBodyResult.success) {
+    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
+  }
+
+  const { content, targetUri, parentId, chainId, author } =
+    parsedBodyResult.data;
 
   // Validate target URL is valid
   if (!targetUri.startsWith(process.env.APP_URL!)) {
@@ -51,9 +64,19 @@ export const POST = async (req: Request) => {
 
   const hash = hashTypedData(typedCommentData);
 
-  return Response.json({
-    signature,
-    hash,
-    data: JSON.parse(JSON.stringify(commentData, bigintReplacer)),
-  });
-};
+  return new Response(
+    JSON.stringify(
+      SignCommentResponseSchema.parse({
+        signature,
+        hash,
+        data: commentData,
+      }),
+      bigintReplacer
+    ),
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+}

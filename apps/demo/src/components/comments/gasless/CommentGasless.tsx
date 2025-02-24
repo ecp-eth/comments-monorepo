@@ -1,64 +1,111 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { APIComment } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
-import { blo } from "blo";
 import { MoreVertical } from "lucide-react";
-import { useEffect, useState } from "react";
-import { getAddress } from "viem";
+import { useCallback, useEffect, useState } from "react";
+import { getAddress, SignTypedDataParameters } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
+import { CommentAuthorAvatar } from "../CommentAuthorAvatar";
+import { getCommentAuthorNameOrAddress } from "../helpers";
+import type { CommentType } from "@/lib/types";
+import { useFreshRef } from "@/lib/hooks";
+import {
+  PreparedGaslessCommentOperationApprovedSchema,
+  PreparedGaslessCommentOperationSchema,
+  PreparedGaslessCommentOperationSchemaType,
+  PreparedSignedGaslessCommentOperationNotApprovedSchema,
+  type PreparedSignedGaslessCommentOperationNotApprovedSchemaType,
+  type PrepareGaslessCommentDeletionRequestBodySchemaType,
+} from "@/lib/schemas";
+import { useMutation } from "@tanstack/react-query";
+
+async function gaslessDeleteComment(
+  params: PrepareGaslessCommentDeletionRequestBodySchemaType
+): Promise<PreparedGaslessCommentOperationSchemaType> {
+  const response = await fetch(`/api/delete-comment/prepare`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete comment");
+  }
+
+  return PreparedGaslessCommentOperationSchema.parse(await response.json());
+}
 
 interface CommentProps {
-  comment: APIComment;
-  onReply?: (parentId: string, content: string) => void;
+  submitIfApproved: boolean;
+  comment: CommentType;
+  onReply?: (parentId: string) => void;
   onDelete?: (id: string) => void;
 }
 
-export function CommentGasless({ comment, onReply, onDelete }: CommentProps) {
+export function CommentGasless({
+  comment,
+  onReply,
+  onDelete,
+  submitIfApproved,
+}: CommentProps) {
   const { address } = useAccount();
-
   const [isReplying, setIsReplying] = useState(false);
-  const [pendingTxHash, setPendingTxHash] = useState<`0x${string}`>();
+  const onDeleteRef = useFreshRef(onDelete);
 
-  const handleReply = (replyContent: string) => {
-    onReply?.(comment.id, replyContent);
+  const handleReply = () => {
+    onReply?.(comment.id);
     setIsReplying(false);
   };
 
-  const gaslessMutation = useGaslessTransaction({
-    async prepareSignTypedDataParams() {
-      setPendingTxHash(undefined);
-
+  const deleteCommentUsingApprovalMutation = useMutation({
+    mutationFn: async () => {
       if (!address) {
         throw new Error("No address found");
       }
 
-      const response = await fetch(`/api/delete-comment/prepare`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          author: comment.author,
-          commentId: comment.id,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch approvals");
+      if (!submitIfApproved) {
+        throw new Error("Not approved");
       }
 
-      const data = await response.json();
+      const result = await gaslessDeleteComment({
+        author: address,
+        commentId: comment.id,
+        submitIfApproved: true,
+      });
+
+      return PreparedGaslessCommentOperationApprovedSchema.parse(result).txHash;
+    },
+  });
+
+  const gaslessDeleteCommentMutation = useGaslessTransaction({
+    async prepareSignTypedDataParams() {
+      if (!address) {
+        throw new Error("No address found");
+      }
+
+      const result = await gaslessDeleteComment({
+        author: address,
+        commentId: comment.id,
+        submitIfApproved: false,
+      });
+
+      const data =
+        PreparedSignedGaslessCommentOperationNotApprovedSchema.parse(result);
 
       return {
         signTypedDataParams: data.signTypedDataParams,
         variables: data,
+      } satisfies {
+        signTypedDataParams: SignTypedDataParameters;
+        variables: PreparedSignedGaslessCommentOperationNotApprovedSchemaType;
       };
     },
     async sendSignedData({ signature, variables }) {
@@ -83,52 +130,52 @@ export function CommentGasless({ comment, onReply, onDelete }: CommentProps) {
     },
   });
 
+  const handleDeleteComment = useCallback(() => {
+    if (submitIfApproved) {
+      deleteCommentUsingApprovalMutation.mutate();
+    } else {
+      gaslessDeleteCommentMutation.mutate();
+    }
+  }, [
+    submitIfApproved,
+    deleteCommentUsingApprovalMutation,
+    gaslessDeleteCommentMutation,
+  ]);
+
   const { data: receipt, isLoading: isReceiptLoading } =
     useWaitForTransactionReceipt({
-      hash: pendingTxHash,
+      hash:
+        gaslessDeleteCommentMutation.data ||
+        deleteCommentUsingApprovalMutation.data,
     });
 
   useEffect(() => {
     if (receipt?.status === "success") {
-      onDelete?.(comment.id);
+      onDeleteRef.current?.(comment.id);
     }
-  }, [receipt]);
+  }, [receipt?.status, onDeleteRef, comment.id]);
 
   const isAuthor =
     address && comment.author
       ? getAddress(address) === getAddress(comment.author.address)
       : false;
 
-  const isDeleting = gaslessMutation.isPending || isReceiptLoading;
+  const isDeleting =
+    gaslessDeleteCommentMutation.isPending ||
+    deleteCommentUsingApprovalMutation.isPending ||
+    isReceiptLoading;
 
   return (
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Avatar className="h-4 w-4">
-            {comment.author?.ens?.avatarUrl ? (
-              <AvatarImage
-                src={comment.author?.ens?.avatarUrl ?? undefined}
-                alt="ENS Avatar"
-              />
-            ) : comment.author ? (
-              <AvatarImage
-                src={blo(comment.author?.address)}
-                alt="Generated Avatar"
-              />
-            ) : null}
-            <AvatarFallback>
-              {comment.author?.ens?.name?.[0]?.toUpperCase() ?? "?"}
-            </AvatarFallback>
-          </Avatar>
+          <CommentAuthorAvatar author={comment.author} />
           <div className="text-xs text-gray-500">
-            {comment.author?.ens?.name ??
-              comment.author?.address ??
-              "Unknown sender"}{" "}
-            • {formatDate(comment.timestamp)}
+            {getCommentAuthorNameOrAddress(comment.author)} •{" "}
+            {formatDate(comment.timestamp)}
           </div>
         </div>
-        {isAuthor && (
+        {isAuthor && !comment.deletedAt && (
           <DropdownMenu>
             <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">
               <MoreVertical className="h-4 w-4" />
@@ -136,13 +183,7 @@ export function CommentGasless({ comment, onReply, onDelete }: CommentProps) {
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 className="text-red-600 cursor-pointer"
-                onClick={() => {
-                  gaslessMutation.mutate(void 0, {
-                    onSuccess(hash) {
-                      setPendingTxHash(hash);
-                    },
-                  });
-                }}
+                onClick={handleDeleteComment}
                 disabled={isDeleting}
               >
                 Delete
@@ -167,9 +208,15 @@ export function CommentGasless({ comment, onReply, onDelete }: CommentProps) {
           parentId={comment.id}
         />
       )}
-      {comment.replies.results?.map((reply) => (
-        <CommentGasless key={reply.id} comment={reply} onReply={onReply} />
-      ))}
+      {"replies" in comment &&
+        comment.replies.results?.map((reply) => (
+          <CommentGasless
+            key={reply.id}
+            comment={reply}
+            onReply={onReply}
+            submitIfApproved={submitIfApproved}
+          />
+        ))}
     </div>
   );
 }
