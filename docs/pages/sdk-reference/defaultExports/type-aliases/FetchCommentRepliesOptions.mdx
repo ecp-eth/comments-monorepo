@@ -8,27 +8,33 @@
 
 > **FetchCommentRepliesOptions**: `object`
 
-Defined in: [packages/sdk/src/api.ts:105](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L105)
+Defined in: [packages/sdk/src/api.ts:116](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L116)
 
 The options for `fetchCommentReplies()`
 
 ## Type declaration
 
-### apiUrl
+### apiUrl?
 
-> **apiUrl**: `string`
+> `optional` **apiUrl**: `string`
 
 URL on which /api/comments/$commentId/replies endpoint will be called
 
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
 ### appSigner?
 
-> `optional` **appSigner**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+> `optional` **appSigner**: `Hex`
 
 Filters only to comments sent using this app signer key.
 
 ### commentId
 
-> **commentId**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
+> **commentId**: `Hex`
 
 The ID of the comment to fetch replies for
 
