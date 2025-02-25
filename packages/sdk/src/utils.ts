@@ -9,7 +9,16 @@ import {
   DOMAIN_NAME,
   DOMAIN_VERSION,
 } from "./eip712.js";
-import { CommentData } from "./types.js";
+import {
+  AddCommentTypedDataSchema,
+  type AddCommentTypedDataSchemaType,
+  CommentDataSchema,
+  type CommentData,
+  DeleteCommentTypedDataSchema,
+  type DeleteCommentTypedDataSchemaType,
+  AddApprovalTypedDataSchema,
+  type AddApprovalTypedDataSchemaType,
+} from "./schemas.js";
 
 /**
  * Create the data structure of a comment
@@ -42,7 +51,7 @@ export function createCommentData({
   /** The deadline of the comment submission in seconds since epoch */
   deadline?: bigint;
 }): CommentData {
-  return {
+  return CommentDataSchema.parse({
     content,
     metadata: metadata ? JSON.stringify(metadata) : "",
     targetUri: targetUri ?? "",
@@ -53,7 +62,7 @@ export function createCommentData({
     appSigner,
     nonce,
     deadline: deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day
-  };
+  });
 }
 
 /**
@@ -66,8 +75,8 @@ export function createCommentTypedData({
 }: {
   commentData: CommentData;
   chainId: number;
-}) {
-  return {
+}): AddCommentTypedDataSchemaType {
+  return AddCommentTypedDataSchema.parse({
     domain: {
       name: DOMAIN_NAME,
       version: DOMAIN_VERSION,
@@ -77,7 +86,7 @@ export function createCommentTypedData({
     types: COMMENT_TYPE,
     primaryType: "AddComment",
     message: commentData,
-  } as const;
+  });
 }
 
 /**
@@ -96,8 +105,8 @@ export function createApprovalTypedData({
   chainId: number;
   nonce: bigint;
   deadline?: bigint;
-}) {
-  return {
+}): AddApprovalTypedDataSchemaType {
+  return AddApprovalTypedDataSchema.parse({
     domain: {
       name: DOMAIN_NAME,
       version: DOMAIN_VERSION,
@@ -113,7 +122,7 @@ export function createApprovalTypedData({
       deadline:
         deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
     },
-  } as const;
+  });
 }
 
 /**
@@ -164,8 +173,8 @@ export function createDeleteCommentTypedData({
   appSigner: `0x${string}`;
   nonce: bigint;
   deadline?: bigint;
-}) {
-  return {
+}): DeleteCommentTypedDataSchemaType {
+  return DeleteCommentTypedDataSchema.parse({
     domain: {
       name: DOMAIN_NAME,
       version: DOMAIN_VERSION,
@@ -182,5 +191,5 @@ export function createDeleteCommentTypedData({
       deadline:
         deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
     },
-  } as const;
+  });
 }

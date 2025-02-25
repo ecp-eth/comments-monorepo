@@ -1,3 +1,8 @@
+import {
+  PreparedGaslessCommentOperationApprovedSchema,
+  PreparedSignedGaslessCommentOperationNotApprovedSchema,
+  PrepareSignedGaslessCommentRequestBodySchema,
+} from "@/lib/schemas";
 import { bigintReplacer } from "@/lib/utils";
 import {
   chains as configChains,
@@ -13,9 +18,16 @@ import {
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-export const POST = async (req: Request) => {
+export async function POST(req: Request) {
+  const parsedBodyResult =
+    PrepareSignedGaslessCommentRequestBodySchema.safeParse(await req.json());
+
+  if (!parsedBodyResult.success) {
+    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
+  }
+
   const { content, targetUri, parentId, author, submitIfApproved } =
-    await req.json();
+    parsedBodyResult.data;
 
   // Validate target URL is valid
   if (!targetUri.startsWith(process.env.APP_URL!)) {
@@ -92,7 +104,10 @@ export const POST = async (req: Request) => {
           functionName: "postComment",
           args: [commentData, "0x", signature],
         });
-        return Response.json({ txHash });
+
+        return Response.json(
+          PreparedGaslessCommentOperationApprovedSchema.parse({ txHash })
+        );
       } catch (error) {
         console.error(error);
         return Response.json(
@@ -103,12 +118,12 @@ export const POST = async (req: Request) => {
     }
   }
 
-  const res = {
-    signTypedDataArgs: JSON.parse(
+  const res = PreparedSignedGaslessCommentOperationNotApprovedSchema.parse({
+    signTypedDataParams: JSON.parse(
       JSON.stringify(typedCommentData, bigintReplacer)
     ),
     appSignature: signature,
-  };
+  });
 
   return Response.json(res);
-};
+}

@@ -31,7 +31,8 @@
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "viem": "^2.22.21",
-    "wagmi": "^2.14.9"
+    "wagmi": "^2.14.9",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",

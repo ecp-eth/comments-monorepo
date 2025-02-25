@@ -1,37 +1,76 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { signTypedData } from "viem/accounts";
-import {
-  useAccount,
-  useSwitchChain,
-  useWaitForTransactionReceipt,
-} from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { useMutation } from "@tanstack/react-query";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
+import { useFreshRef } from "@/lib/hooks";
+import {
+  type PrepareSignedGaslessCommentRequestBodySchemaType,
+  type PreparedSignedGaslessCommentOperationNotApprovedSchemaType,
+  PreparedSignedGaslessCommentOperationNotApprovedSchema,
+  type PreparedGaslessCommentOperationApprovedSchemaType,
+  PreparedGaslessCommentOperationApprovedSchema,
+  GaslessPostCommentResponseSchema,
+} from "@/lib/schemas";
+import type { Hex } from "@ecp.eth/sdk/schemas";
+import type { SignTypedDataParameters } from "viem";
+
+async function prepareSignedGaslessComment(
+  submitIfApproved: true,
+  body: Omit<
+    PrepareSignedGaslessCommentRequestBodySchemaType,
+    "submitIfApproved"
+  >
+): Promise<PreparedGaslessCommentOperationApprovedSchemaType>;
+async function prepareSignedGaslessComment(
+  submitIfApproved: false,
+  body: Omit<
+    PrepareSignedGaslessCommentRequestBodySchemaType,
+    "submitIfApproved"
+  >
+): Promise<PreparedSignedGaslessCommentOperationNotApprovedSchemaType>;
+
+async function prepareSignedGaslessComment(
+  submitIfApproved: boolean,
+  body: Omit<
+    PrepareSignedGaslessCommentRequestBodySchemaType,
+    "submitIfApproved"
+  >
+): Promise<
+  | PreparedGaslessCommentOperationApprovedSchemaType
+  | PreparedSignedGaslessCommentOperationNotApprovedSchemaType
+> {
+  const response = await fetch("/api/sign-comment/gasless/prepare", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ...body,
+      submitIfApproved,
+    } satisfies PrepareSignedGaslessCommentRequestBodySchemaType),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to sign comment");
+  }
+
+  const data = await response.json();
+
+  if (submitIfApproved) {
+    return PreparedGaslessCommentOperationApprovedSchema.parse(data);
+  }
+
+  return PreparedSignedGaslessCommentOperationNotApprovedSchema.parse(data);
+}
 
 interface CommentBoxProps {
   isApproved?: boolean;
-  onSubmit: (content: string) => void;
+  onSubmit: () => void;
   placeholder?: string;
-  parentId?: string;
-}
-
-interface SignCommentGaslessPrepareResponse {
-  signTypedDataParams: Parameters<typeof signTypedData>[0];
-  appSignature: `0x${string}`;
-}
-
-interface SignCommentGaslessResponse {
-  txHash: `0x${string}`;
-}
-
-interface SignCommentGaslessRequest {
-  content: string;
-  targetUri?: string;
-  parentId?: string;
-  author: `0x${string}`;
+  parentId?: Hex;
 }
 
 export function CommentBoxGasless({
@@ -40,50 +79,48 @@ export function CommentBoxGasless({
   parentId,
   isApproved = false,
 }: CommentBoxProps) {
+  const onSubmitRef = useFreshRef(onSubmit);
   const { address } = useAccount();
   const [content, setContent] = useState("");
-  const [pendingTxHash, setPendingTxHash] = useState<`0x${string}`>();
 
-  const prepareCommentMutation = useMutation({
-    mutationFn: async ({
-      submitIfApproved,
-    }: {
-      submitIfApproved?: boolean;
-    }) => {
-      const response = await fetch("/api/sign-comment/gasless/prepare", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content,
-          targetUri: window.location.href,
-          parentId,
-          author: address as `0x${string}`,
-          submitIfApproved,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to sign comment");
+  const prepareApprovedCommentMutation = useMutation({
+    mutationFn: async () => {
+      if (!address) {
+        throw new Error("No address");
       }
 
-      const data = await response.json();
-
-      return { signTypedDataParams: data.signTypedDataParams, variables: data };
+      return prepareSignedGaslessComment(true, {
+        content,
+        targetUri: window.location.href,
+        parentId,
+        author: address,
+      });
     },
   });
 
   // TODO: Add mutation for approval flow
-  const gaslessMutation = useGaslessTransaction({
+  const gaslessSubmitMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
-      return prepareCommentMutation.mutateAsync({
-        submitIfApproved: false,
+      if (!address) {
+        throw new Error("No address");
+      }
+
+      const data = await prepareSignedGaslessComment(false, {
+        content,
+        targetUri: window.location.href,
+        parentId,
+        author: address,
       });
+
+      return {
+        signTypedDataParams: data.signTypedDataParams,
+        variables: data,
+      } satisfies {
+        signTypedDataParams: SignTypedDataParameters;
+        variables: PreparedSignedGaslessCommentOperationNotApprovedSchemaType;
+      };
     },
     async sendSignedData({ signature, variables }) {
-      console.log("sendSignedData", { signature, variables });
-
       const response = await fetch("/api/sign-comment/gasless", {
         method: "POST",
         headers: {
@@ -99,60 +136,53 @@ export function CommentBoxGasless({
         throw new Error("Failed to post comment");
       }
 
-      const data = await response.json();
+      const data = GaslessPostCommentResponseSchema.parse(
+        await response.json()
+      );
 
       return data.txHash;
     },
   });
+
+  const pendingTxHash =
+    gaslessSubmitMutation.data || prepareApprovedCommentMutation.data?.txHash;
 
   const { data: receipt, isLoading: isReceiptLoading } =
     useWaitForTransactionReceipt({
       hash: pendingTxHash,
     });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!content.trim() || !address) return;
+  const submitMutation = useMutation({
+    mutationFn: async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    try {
-      if (isApproved) {
-        await prepareCommentMutation.mutateAsync(
-          {
-            submitIfApproved: true,
-          },
-          {
-            onSuccess(data, variables, context) {
-              setPendingTxHash(data.variables.txHash);
-            },
-          }
-        );
-      } else {
-        gaslessMutation.mutate(void 0, {
-          onSuccess(hash) {
-            setPendingTxHash(hash);
-          },
-        });
+      if (!content.trim() || !address) {
+        return;
       }
-    } catch (error) {
-      console.error("Error signing comment:", error);
-    }
-  };
+
+      if (isApproved) {
+        await prepareApprovedCommentMutation.mutateAsync();
+      } else {
+        await gaslessSubmitMutation.mutateAsync();
+      }
+    },
+  });
 
   useEffect(() => {
-    if (receipt?.transactionHash) {
+    if (receipt?.status === "success") {
       toast.success("Comment posted");
-      onSubmit(content);
+      onSubmitRef.current?.();
       setContent("");
     }
-  }, [receipt?.transactionHash]);
+  }, [receipt?.status, onSubmitRef]);
 
-  const isLoading =
-    gaslessMutation.isPending ||
-    isReceiptLoading ||
-    prepareCommentMutation.isPending;
+  const isPending =
+    gaslessSubmitMutation.isPending || prepareApprovedCommentMutation.isPending;
+
+  const isLoading = isReceiptLoading || isPending;
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 flex flex-col gap-2">
+    <form onSubmit={submitMutation.mutate} className="mb-4 flex flex-col gap-2">
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
