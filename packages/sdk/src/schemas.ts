@@ -170,7 +170,7 @@ export type IndexerAPIPaginationSchemaType = z.infer<
   typeof IndexerAPIPaginationSchema
 >;
 
-const IndxerAPICommentWithRepliesSchema = IndexerAPICommentSchema.extend({
+const IndexerAPICommentWithRepliesSchema = IndexerAPICommentSchema.extend({
   replies: z.object({
     results: z.array(IndexerAPICommentSchema),
     pagination: IndexerAPIPaginationSchema,
@@ -178,11 +178,11 @@ const IndxerAPICommentWithRepliesSchema = IndexerAPICommentSchema.extend({
 });
 
 export type IndexerAPICommentWithRepliesSchemaType = z.infer<
-  typeof IndxerAPICommentWithRepliesSchema
+  typeof IndexerAPICommentWithRepliesSchema
 >;
 
 export const IndexerAPIListCommentsSchema = z.object({
-  results: z.array(IndxerAPICommentWithRepliesSchema),
+  results: z.array(IndexerAPICommentWithRepliesSchema),
   pagination: IndexerAPIPaginationSchema,
 });
 
