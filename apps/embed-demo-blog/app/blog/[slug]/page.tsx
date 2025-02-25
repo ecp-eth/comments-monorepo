@@ -107,7 +107,8 @@ export default async function Blog({
       </article>
       <CommentsEmbed
         containerProps={{
-          className: "h-[500px]",
+          // use min height of 500 because of wallet connect modal
+          className: "min-h-[500px]",
         }}
         embedUri={process.env.NEXT_PUBLIC_ECP_ETH_EMBED_URL!}
         uri={new URL(

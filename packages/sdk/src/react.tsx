@@ -1,14 +1,20 @@
 /**
  * Ethereum Comments Protocol SDK for React
- * 
+ *
  * @module
  */
+"use client";
+
 import { useMutation } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Hex, SignTypedDataParameters } from "viem";
 import { useSignTypedData } from "wagmi";
 import { COMMENTS_EMBED_DEFAULT_URL } from "./constants.js";
-import { EmbedConfigSchema, type EmbedConfigSchemaType } from "./schemas.js";
+import {
+  EmbedConfigSchema,
+  EmbedResizedEventSchema,
+  type EmbedConfigSchemaType,
+} from "./schemas.js";
 import * as lz from "lz-ts";
 
 // also export the type for generating docs correctly
@@ -18,17 +24,17 @@ const { compressToURI } = lz;
 
 /**
  * A hook for repeat gasless transaction pattern
- * 
+ *
  * Gasless transaction typically requires 3 steps:
  * 1. prepare typed data to be passed to `signTypedData`, typicall this is also created from server side with an app signature.
  * 2. sign typed data on client side
  * 3. send the dual signed data to server
- * 
+ *
  * This hook abstracts these steps and help with the repetition of the pattern.
- * 
+ *
  * @category Hooks
- * @param props 
- * @returns 
+ * @param props
+ * @returns
  */
 export function useGaslessTransaction(props: {
   prepareSignTypedDataParams: () => Promise<
@@ -39,7 +45,9 @@ export function useGaslessTransaction(props: {
         variables?: object;
       }
   >;
-  signTypedData?: (signTypedDataParams: SignTypedDataParameters) => Promise<Hex>;
+  signTypedData?: (
+    signTypedDataParams: SignTypedDataParameters
+  ) => Promise<Hex>;
   sendSignedData: (args: {
     signature: Hex;
     /** Miscellaneous data passed from prepareSignTypedDataParams */
@@ -95,7 +103,9 @@ export type CommentsEmbedProps = {
 
 /**
  * Renders comments embed iframe for the given uri.
- * 
+ *
+ * This is client component only.
+ *
  * @category Components
  * @param props
  *
@@ -117,6 +127,11 @@ export function CommentsEmbed({
   iframeProps,
   config,
 }: CommentsEmbedProps) {
+  const [dimensions, setDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const iframeUri = useMemo(() => {
     const url = new URL(embedUri);
 
@@ -129,13 +144,41 @@ export function CommentsEmbed({
     return url.toString();
   }, [embedUri, uri, config]);
 
+  useEffect(() => {
+    const handleIframeMessage = (event: MessageEvent) => {
+      const origin = new URL(iframeUri).origin;
+      const eventData = EmbedResizedEventSchema.safeParse(event.data);
+
+      if (eventData.success && origin === event.origin) {
+        setDimensions({
+          width: eventData.data.width,
+          height: eventData.data.height,
+        });
+      }
+    };
+
+    window.addEventListener("message", handleIframeMessage);
+
+    return () => {
+      window.removeEventListener("message", handleIframeMessage);
+    };
+  }, [iframeUri]);
+
   return (
-    <div {...containerProps}>
+    <div
+      {...containerProps}
+      style={{
+        transition: "height 0.3s ease",
+        ...containerProps?.style,
+        ...dimensions,
+      }}
+    >
       <iframe
         style={{ border: "none", width: "100%", height: "100%" }}
-        // allow to override style and other props except src and seamless
+        // allow to override style and other props except src and ref
         {...iframeProps}
         src={iframeUri}
+        ref={iframeRef}
       ></iframe>
     </div>
   );
