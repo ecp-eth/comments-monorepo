@@ -6,9 +6,9 @@
 
 # Function: createCommentData()
 
-> **createCommentData**(`__namedParameters`): [`CommentData`](/sdk-reference/types/type-aliases/CommentData.mdx)
+> **createCommentData**(`__namedParameters`): `object`
 
-Defined in: [packages/sdk/src/utils.ts:18](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L18)
+Defined in: [packages/sdk/src/utils.ts:27](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L27)
 
 Create the data structure of a comment
 
@@ -66,6 +66,38 @@ The URI of the page the comment is about
 
 ## Returns
 
-[`CommentData`](/sdk-reference/types/type-aliases/CommentData.mdx)
+`object`
 
 The data structure of a comment
+
+### appSigner
+
+> **appSigner**: `` `0x${string}` `` = `HexSchema`
+
+### author
+
+> **author**: `` `0x${string}` `` = `HexSchema`
+
+### content
+
+> **content**: `string`
+
+### deadline
+
+> **deadline**: `bigint`
+
+### metadata
+
+> **metadata**: `string`
+
+### nonce
+
+> **nonce**: `bigint`
+
+### parentId
+
+> **parentId**: `` `0x${string}` `` = `HexSchema`
+
+### targetUri
+
+> **targetUri**: `string`

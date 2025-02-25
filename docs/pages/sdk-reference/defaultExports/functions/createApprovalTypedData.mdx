@@ -8,7 +8,7 @@
 
 > **createApprovalTypedData**(`__namedParameters`): `object`
 
-Defined in: [packages/sdk/src/utils.ts:87](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L87)
+Defined in: [packages/sdk/src/utils.ts:96](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L96)
 
 Create the EIP-712 typed data structure for approving comment
 
@@ -44,7 +44,7 @@ The typed data
 
 ### domain
 
-> `readonly` **domain**: `object`
+> **domain**: `object`
 
 #### domain.chainId
 
@@ -52,31 +52,31 @@ The typed data
 
 #### domain.name
 
-> `readonly` **name**: `"Comments"` = `DOMAIN_NAME`
+> **name**: `"Comments"`
 
 #### domain.verifyingContract
 
-> `readonly` **verifyingContract**: `"0xfed9b3a3884940d0c8a91b55f5e631b33a84f669"` = `COMMENTS_V1_ADDRESS`
+> **verifyingContract**: `"0xfed9b3a3884940d0c8a91b55f5e631b33a84f669"`
 
 #### domain.version
 
-> `readonly` **version**: `"1"` = `DOMAIN_VERSION`
+> **version**: `"1"`
 
 ### message
 
-> `readonly` **message**: `object`
+> **message**: `object`
 
 #### message.appSigner
 
-> **appSigner**: `` `0x${string}` ``
+> **appSigner**: `` `0x${string}` `` = `HexSchema`
 
 #### message.author
 
-> **author**: `` `0x${string}` ``
+> **author**: `` `0x${string}` `` = `HexSchema`
 
 #### message.deadline
 
-> `readonly` **deadline**: `bigint`
+> **deadline**: `bigint`
 
 #### message.nonce
 
@@ -84,12 +84,12 @@ The typed data
 
 ### primaryType
 
-> `readonly` **primaryType**: `"AddApproval"` = `"AddApproval"`
+> **primaryType**: `"AddApproval"`
 
 ### types
 
-> `readonly` **types**: `object` = `ADD_APPROVAL_TYPE`
+> **types**: `object`
 
 #### types.AddApproval
 
-> `readonly` **AddApproval**: readonly \[\{ `name`: `"author"`; `type`: `"address"`; \}, \{ `name`: `"appSigner"`; `type`: `"address"`; \}, \{ `name`: `"nonce"`; `type`: `"uint256"`; \}, \{ `name`: `"deadline"`; `type`: `"uint256"`; \}\]
+> **AddApproval**: (\{ `name`: `"author"`; `type`: `"address"`; \} \| \{ `name`: `"appSigner"`; `type`: `"address"`; \} \| \{ `name`: `"nonce"`; `type`: `"uint256"`; \} \| \{ `name`: `"deadline"`; `type`: `"uint256"`; \})[]
