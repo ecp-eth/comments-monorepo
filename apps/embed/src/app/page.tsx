@@ -1,4 +1,7 @@
-import { EmbedConfigSchema } from "@ecp.eth/sdk/schemas";
+import {
+  EmbedConfigSchema,
+  type EmbedConfigSchemaType,
+} from "@ecp.eth/sdk/schemas";
 import { fetchComments } from "@ecp.eth/sdk";
 import { decompressFromURI } from "lz-ts";
 import { Toaster } from "@/components/ui/sonner";
@@ -63,12 +66,13 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
 
     return (
       <div className={config?.theme?.mode}>
+        <LinkGoogleFont config={config} />
         <style
           dangerouslySetInnerHTML={{
             __html: createThemeCSSVariables(config?.theme),
           }}
         />
-        <main className="min-h-screen p-0 bg-background">
+        <main className="min-h-screen p-0 bg-background font-default">
           <div className="max-w-4xl mx-auto">
             <Providers>
               <EmbedConfigProvider value={{ targetUri }}>
@@ -94,4 +98,19 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
     console.error(e);
     return <ErrorScreen description="Could not load comments" />;
   }
+}
+
+function LinkGoogleFont({ config }: { config?: EmbedConfigSchemaType }) {
+  const fontFamily = config?.theme?.font?.fontFamily;
+
+  if (!fontFamily || !("google" in fontFamily) || !fontFamily.google) {
+    return null;
+  }
+
+  return (
+    <link
+      href={`https://fonts.googleapis.com/css2?family=${fontFamily.google.replace("_", "+")}&display=swap`}
+      rel="stylesheet"
+    />
+  );
 }

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { DOMAIN_NAME, DOMAIN_VERSION } from "./eip712.js";
 import { COMMENTS_V1_ADDRESS } from "./constants.js";
+import { EmbedConfigSupportedFont } from "./schemas.fonts.js";
 
 export const HexSchema = z.custom<`0x${string}`>(
   (value) =>
@@ -95,6 +96,16 @@ export const EmbedConfigFontSizeSchema = z
 
 export const EmbedConfigFontSchema = z
   .object({
+    fontFamily: z.union([
+      z.object({
+        system: z.string().describe("Font family available on system"),
+      }),
+      z.object({
+        google: EmbedConfigSupportedFont.optional().describe(
+          "Font family available on Google fonts"
+        ),
+      }),
+    ]),
     sizes: z
       .object({
         base: EmbedConfigFontSizeSchema,

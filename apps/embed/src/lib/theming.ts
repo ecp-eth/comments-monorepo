@@ -60,6 +60,16 @@ function createFontThemeVariables(
 
   let cssVariables = "";
 
+  if (font.fontFamily) {
+    if ("google" in font.fontFamily && font.fontFamily.google) {
+      const fontFamily = font.fontFamily.google.replace("_", " ");
+
+      cssVariables += `--font-family-default: ${fontFamily};\n`;
+    } else if ("system" in font.fontFamily && font.fontFamily.system) {
+      cssVariables += `--font-family-default: ${font.fontFamily.system};\n`;
+    }
+  }
+
   if (font.sizes) {
     for (const [key, value] of Object.entries(font.sizes)) {
       if (value.size) {
