@@ -83,6 +83,32 @@ export type EmbedConfigThemeOtherSchemaType = z.infer<
   typeof EmbedConfigThemeOtherSchema
 >;
 
+export const EmbedConfigFontSizeSchema = z
+  .object({
+    size: z.string().optional().describe("Font size as valid css value"),
+    lineHeight: z
+      .string()
+      .optional()
+      .describe("Line height as valid css value"),
+  })
+  .partial();
+
+export const EmbedConfigFontSchema = z
+  .object({
+    sizes: z
+      .object({
+        base: EmbedConfigFontSizeSchema,
+        "error-screen-title": EmbedConfigFontSizeSchema,
+        headline: EmbedConfigFontSizeSchema,
+        xs: EmbedConfigFontSizeSchema,
+        sm: EmbedConfigFontSizeSchema,
+      })
+      .partial(),
+  })
+  .partial();
+
+export type EmbedConfigFontSchemaType = z.infer<typeof EmbedConfigFontSchema>;
+
 export const EmbedConfigThemeSchema = z.object({
   mode: z
     .enum(["light", "dark"])
@@ -91,6 +117,7 @@ export const EmbedConfigThemeSchema = z.object({
       'Theme mode, "light" or "dark". Defaults to prefers-color-scheme if omitted.'
     ),
   colors: EmbedConfigThemeColorsSchema.optional(),
+  font: EmbedConfigFontSchema.optional(),
   other: EmbedConfigThemeOtherSchema.optional(),
 });
 

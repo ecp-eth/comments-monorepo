@@ -9,6 +9,38 @@ export default {
   ],
   theme: {
     extend: {
+      fontSize: {
+        base: [
+          "var(--font-size-base, 1rem)",
+          {
+            lineHeight: "var(--line-height-base, 1.5rem)",
+          },
+        ],
+        headline: [
+          "var(--font-size-headline, 1.5rem)",
+          {
+            lineHeight: "var(--line-height-headline, 2rem)",
+          },
+        ],
+        "error-screen-title": [
+          "var(--font-size-error-screen-title, 1.25rem)",
+          {
+            lineHeight: "var(--line-height-error-screen-title, 1.75rem)",
+          },
+        ],
+        sm: [
+          "var(--font-size-sm, 0.875rem)",
+          {
+            lineHeight: "var(--line-height-sm, 1.25rem)",
+          },
+        ],
+        xs: [
+          "var(--font-size-xs, 0.75rem)",
+          {
+            lineHeight: "var(--line-height-xs, 1rem)",
+          },
+        ],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

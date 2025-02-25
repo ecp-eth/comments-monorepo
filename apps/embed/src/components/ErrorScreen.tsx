@@ -15,7 +15,9 @@ export function ErrorScreen({
   return (
     <div className="flex flex-col items-center justify-center p-8 text-center">
       <AlertOctagon className="w-12 h-12 text-destructive mb-4" />
-      <h2 className="text-xl font-semibold mb-2 text-foreground">Ooops!</h2>
+      <h2 className="text-error-screen-title font-semibold mb-2 text-foreground">
+        Ooops!
+      </h2>
       <p className="text-muted-foreground mb-4">{description}</p>
       {extra}
       {onRetry && (
