@@ -20,5 +20,10 @@
   "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=22"
+  },
+  "pnpm": {
+    "overrides": {
+      "@hono/zod-openapi>@asteasolutions/zod-to-openapi": "^7.3.0"
+    }
   }
 }

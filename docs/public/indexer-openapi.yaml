@@ -1,0 +1,463 @@
+openapi: 3.1.0
+info:
+  version: 0.0.1
+  title: Indexer Restful API
+servers:
+  - url: https://api.ethcomments.xyz
+    description: Production Indexer API
+components:
+  schemas: {}
+  parameters: {}
+paths:
+  /api/comments:
+    get:
+      tags:
+        - comments
+      description: Retrieve a list of comments based on the criteria
+      parameters:
+        - schema:
+            description: The address of the app signer
+          required: false
+          name: appSigner
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+            description: The number of comments to return
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type:
+              - integer
+              - 'null'
+            minimum: 0
+            default: 0
+            description: The offset of the comments to return
+          required: false
+          name: offset
+          in: query
+        - schema:
+            type: string
+            format: uri
+            description: The comment target URI
+          required: false
+          name: targetUri
+          in: query
+        - schema:
+            type: string
+            enum: &ref_0
+              - asc
+              - desc
+            default: desc
+            description: The sort order of the comments
+          required: false
+          name: sort
+          in: query
+      responses:
+        '200':
+          description: Retrieve a list of comments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        appSigner: {}
+                        author:
+                          type: object
+                          properties:
+                            address: {}
+                            ens:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                avatarUrl:
+                                  type:
+                                    - string
+                                    - 'null'
+                              required:
+                                - name
+                                - avatarUrl
+                            farcaster:
+                              type: object
+                              properties:
+                                fid:
+                                  type: integer
+                                pfpUrl:
+                                  type: string
+                                displayName:
+                                  type: string
+                                username:
+                                  type: string
+                              required:
+                                - fid
+                          required:
+                            - address
+                        id: {}
+                        content:
+                          type: string
+                        chainId:
+                          type: integer
+                        deletedAt:
+                          type:
+                            - string
+                            - 'null'
+                        logIndex:
+                          type: integer
+                        metadata:
+                          type: string
+                        parentId: {}
+                        targetUri:
+                          type: string
+                        timestamp:
+                          type:
+                            - string
+                            - 'null'
+                        txHash: {}
+                        replies:
+                          type: object
+                          properties:
+                            results:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  appSigner: {}
+                                  author:
+                                    type: object
+                                    properties:
+                                      address: {}
+                                      ens:
+                                        type: object
+                                        properties:
+                                          name:
+                                            type: string
+                                          avatarUrl:
+                                            type:
+                                              - string
+                                              - 'null'
+                                        required:
+                                          - name
+                                          - avatarUrl
+                                      farcaster:
+                                        type: object
+                                        properties:
+                                          fid:
+                                            type: integer
+                                          pfpUrl:
+                                            type: string
+                                          displayName:
+                                            type: string
+                                          username:
+                                            type: string
+                                        required:
+                                          - fid
+                                    required:
+                                      - address
+                                  id: {}
+                                  content:
+                                    type: string
+                                  chainId:
+                                    type: integer
+                                  deletedAt:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  logIndex:
+                                    type: integer
+                                  metadata:
+                                    type: string
+                                  parentId: {}
+                                  targetUri:
+                                    type: string
+                                  timestamp:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  txHash: {}
+                                required:
+                                  - appSigner
+                                  - author
+                                  - id
+                                  - content
+                                  - chainId
+                                  - deletedAt
+                                  - logIndex
+                                  - metadata
+                                  - parentId
+                                  - targetUri
+                                  - timestamp
+                                  - txHash
+                            pagination:
+                              type: object
+                              properties:
+                                limit:
+                                  type: integer
+                                offset:
+                                  type: integer
+                                hasMore:
+                                  type: boolean
+                              required:
+                                - limit
+                                - offset
+                                - hasMore
+                          required:
+                            - results
+                            - pagination
+                      required:
+                        - appSigner
+                        - author
+                        - id
+                        - content
+                        - chainId
+                        - deletedAt
+                        - logIndex
+                        - metadata
+                        - parentId
+                        - targetUri
+                        - timestamp
+                        - txHash
+                        - replies
+                  pagination:
+                    type: object
+                    properties:
+                      limit:
+                        type: integer
+                      offset:
+                        type: integer
+                      hasMore:
+                        type: boolean
+                    required:
+                      - limit
+                      - offset
+                      - hasMore
+                required:
+                  - results
+                  - pagination
+  /api/comments/{commentId}/replies:
+    get:
+      tags:
+        - comments
+      description: Return a single comments according to the id and additional criteria
+      parameters:
+        - schema:
+            description: The comment ID
+          required: true
+          name: commentId
+          in: path
+        - schema:
+            description: The address of the app signer
+          required: false
+          name: appSigner
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+            description: The number of comments to return
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type:
+              - integer
+              - 'null'
+            minimum: 0
+            default: 0
+            description: The offset of the comments to return
+          required: false
+          name: offset
+          in: query
+        - schema:
+            type: string
+            enum: *ref_0
+            default: desc
+            description: The sort order of the comments
+          required: false
+          name: sort
+          in: query
+      responses:
+        '200':
+          description: Retrieve specific comment with its replies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        appSigner: {}
+                        author:
+                          type: object
+                          properties:
+                            address: {}
+                            ens:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                avatarUrl:
+                                  type:
+                                    - string
+                                    - 'null'
+                              required:
+                                - name
+                                - avatarUrl
+                            farcaster:
+                              type: object
+                              properties:
+                                fid:
+                                  type: integer
+                                pfpUrl:
+                                  type: string
+                                displayName:
+                                  type: string
+                                username:
+                                  type: string
+                              required:
+                                - fid
+                          required:
+                            - address
+                        id: {}
+                        content:
+                          type: string
+                        chainId:
+                          type: integer
+                        deletedAt:
+                          type:
+                            - string
+                            - 'null'
+                        logIndex:
+                          type: integer
+                        metadata:
+                          type: string
+                        parentId: {}
+                        targetUri:
+                          type: string
+                        timestamp:
+                          type:
+                            - string
+                            - 'null'
+                        txHash: {}
+                      required:
+                        - appSigner
+                        - author
+                        - id
+                        - content
+                        - chainId
+                        - deletedAt
+                        - logIndex
+                        - metadata
+                        - parentId
+                        - targetUri
+                        - timestamp
+                        - txHash
+                  pagination:
+                    type: object
+                    properties:
+                      limit:
+                        type: integer
+                      offset:
+                        type: integer
+                      hasMore:
+                        type: boolean
+                    required:
+                      - limit
+                      - offset
+                      - hasMore
+                required:
+                  - results
+                  - pagination
+  /api/approvals:
+    get:
+      tags:
+        - approvals
+      description: Retrieve a list of approvals according to the criteria
+      parameters:
+        - schema:
+            description: The author's address
+          required: true
+          name: author
+          in: query
+        - schema:
+            description: The address of the app signer
+          required: true
+          name: appSigner
+          in: query
+        - schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 100
+            default: 50
+            description: The number of comments to return
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type:
+              - integer
+              - 'null'
+            minimum: 0
+            default: 0
+            description: The offset of the comments to return
+          required: false
+          name: offset
+          in: query
+      responses:
+        '200':
+          description: Retrieve a list of approvals according to the criteria
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        appSigner: {}
+                        deletedAt:
+                          type:
+                            - string
+                            - 'null'
+                        chainId:
+                          type: integer
+                        txHash: {}
+                      required:
+                        - id
+                        - appSigner
+                        - deletedAt
+                        - chainId
+                        - txHash
+                  pagination:
+                    type: object
+                    properties:
+                      limit:
+                        type: integer
+                      offset:
+                        type: integer
+                      hasMore:
+                        type: boolean
+                    required:
+                      - limit
+                      - offset
+                      - hasMore
+                required:
+                  - results
+                  - pagination
+webhooks: {}
