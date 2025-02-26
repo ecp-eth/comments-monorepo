@@ -248,18 +248,23 @@ function CommentsEmbedInternal({
       {...containerProps}
       style={{
         transition: "height 0.3s ease",
-        // because of wallet connect dialog
-        // also it will be updated if the height is higher
-        minHeight: "500px",
-        height: "500px",
         ...containerProps?.style,
-        ...dimensions,
       }}
     >
       <iframe
-        style={{ border: "none", width: "100%", height: "100%" }}
         // allow to override style and other props except src and ref
         {...iframeProps}
+        style={{
+          border: "none",
+          width: "100%",
+          ...iframeProps?.style,
+          // because of wallet connect dialog
+          // also it will be updated if the height is higher
+          // also we don't want to allow user to override minHeight
+          // as it will break the layout
+          minHeight: "500px",
+          ...dimensions,
+        }}
         src={src}
         ref={iframeRef}
       ></iframe>
