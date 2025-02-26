@@ -6,6 +6,10 @@ import type {
 import type { InfiniteData } from "@tanstack/react-query";
 import type { Hex } from "viem";
 
+export function getAuthorNameOrAddressFromComment({ author }: Comment): string {
+  return author.ens?.name ?? author.farcaster?.displayName ?? author.address;
+}
+
 export function deletePendingCommentByTransactionHash(
   queryData: InfiniteData<CommentPageSchemaType>,
   transactionHash: string

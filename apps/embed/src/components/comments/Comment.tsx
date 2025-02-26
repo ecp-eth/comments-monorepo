@@ -31,8 +31,6 @@ import {
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { blo } from "blo";
 import { toast } from "sonner";
 import { submitCommentMutationFunction } from "./queries";
 import {
@@ -42,10 +40,10 @@ import {
   useHandleRetryPostComment,
 } from "./hooks";
 import { Button } from "../ui/button";
-import {
-  MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
-  TRUNCATE_COMMENT_LENGTH,
-} from "@/lib/constants";
+import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
+import { CommentText } from "./CommentText";
+import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
+import { getAuthorNameOrAddressFromComment } from "./helpers";
 
 export type OnDeleteComment = (id: Hex) => void;
 export type OnPostCommentSuccess = (transactionHash: Hex) => void;
@@ -239,9 +237,9 @@ export function Comment({
     <div className="mb-4 border-l-2 border-muted pl-4">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
-          <AuthorAvatar author={comment.author} />
+          <CommentAuthorAvatar comment={comment} />
           <div className="text-xs text-muted-foreground">
-            {getAuthorNameOrAddress(comment.author)} •{" "}
+            {getAuthorNameOrAddressFromComment(comment)} •{" "}
             {formatDate(comment.timestamp)}
           </div>
         </div>
@@ -424,63 +422,5 @@ function ActionButton({ children, onClick }: ActionButtonProps) {
     >
       {children}
     </button>
-  );
-}
-
-function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) {
-    return text;
-  }
-
-  return text.slice(0, maxLength).trim() + "...";
-}
-
-function CommentText({ text }: { text: string }) {
-  const [shownText, setShownText] = useState(
-    truncateText(text, TRUNCATE_COMMENT_LENGTH)
-  );
-  const isTruncated = text.length > shownText.length;
-
-  return (
-    <>
-      {shownText}
-      {isTruncated ? (
-        <>
-          {" "}
-          <button
-            onClick={() => setShownText(text)}
-            className="text-accent-foreground inline whitespace-nowrap underline"
-            type="button"
-          >
-            Show more
-          </button>
-        </>
-      ) : null}
-    </>
-  );
-}
-
-function getAuthorNameOrAddress(author: CommentType["author"]): string {
-  return author.ens?.name ?? author.farcaster?.displayName ?? author.address;
-}
-
-type AuthorAvatarProps = {
-  author: CommentType["author"];
-};
-
-function AuthorAvatar({ author }: AuthorAvatarProps) {
-  const name = author.ens?.name ?? author.farcaster?.displayName;
-  const nameOrAddress = getAuthorNameOrAddress(author);
-  const avatarUrl = author.ens?.avatarUrl ?? author.farcaster?.pfpUrl;
-
-  return (
-    <Avatar className="h-6 w-6">
-      {avatarUrl ? (
-        <AvatarImage src={avatarUrl} alt={`${nameOrAddress} Avatar`} />
-      ) : (
-        <AvatarImage src={blo(author.address)} alt="Generated Avatar" />
-      )}
-      <AvatarFallback>{name?.[0]?.toUpperCase() ?? "?"}</AvatarFallback>
-    </Avatar>
   );
 }
