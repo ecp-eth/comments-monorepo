@@ -1,4 +1,7 @@
+import { CommentsByAuthorEmbed } from "@ecp.eth/sdk/react";
 import { BlogPosts } from "app/components/posts";
+import { commentsEmbedTheme } from "./comments-embed-theme";
+import type { Hex } from "@ecp.eth/sdk/schemas";
 
 export default function Page() {
   return (
@@ -16,6 +19,17 @@ export default function Page() {
       <div className="my-8">
         <BlogPosts />
       </div>
+      {process.env.NEXT_PUBLIC_AUTHOR_ADDRESS && (
+        <div className="my-8">
+          <CommentsByAuthorEmbed
+            embedUri={
+              process.env.NEXT_PUBLIC_ECP_ETH_EMBED_COMMENTS_BY_AUTHOR_URL!
+            }
+            author={process.env.NEXT_PUBLIC_AUTHOR_ADDRESS as Hex}
+            config={commentsEmbedTheme}
+          />
+        </div>
+      )}
     </section>
   );
 }

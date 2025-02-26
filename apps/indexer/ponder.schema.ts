@@ -23,6 +23,7 @@ export const comment = onchainTable(
     appSignerIdx: index().on(table.appSigner),
     timestampIdx: index().on(table.timestamp),
     deletedAtIdx: index().on(table.deletedAt),
+    authorIdx: index().on(table.author),
   })
 );
 

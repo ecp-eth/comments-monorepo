@@ -35,7 +35,8 @@ const getCommentsRoute = createRoute({
  */
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { targetUri, appSigner, sort, limit, offset } = c.req.valid('query')
+    const { author, targetUri, appSigner, sort, limit, offset } =
+      c.req.valid("query");
     const query = db.query.comment.findMany({
       with: {
         replies: {
@@ -44,6 +45,7 @@ export default (app: OpenAPIHono) => {
         },
       },
       where: and(
+        author ? eq(schema.comment.author, author) : undefined,
         isNull(schema.comment.parentId),
         targetUri ? eq(schema.comment.targetUri, targetUri) : undefined,
         appSigner

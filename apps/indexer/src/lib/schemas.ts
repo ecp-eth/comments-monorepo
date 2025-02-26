@@ -6,6 +6,7 @@ import { normalizeUrl } from "./utils";
  * Query string schema for getting a list of comments.
  */
 export const GetCommentsQuerySchema = z.object({
+  author: HexSchema.optional(),
   appSigner: HexSchema.optional().openapi({
     description: "The address of the app signer",
   }),

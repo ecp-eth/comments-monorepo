@@ -14,7 +14,14 @@ import { z } from "zod";
  * The options for `fetchComments()`
  */
 export type FetchCommentsOptions = {
-  targetUri: string;
+  /**
+   * The target URI to fetch comments for
+   */
+  targetUri?: string;
+  /**
+   * Filter comments by author
+   */
+  author?: Hex;
   /**
    * URL on which /api/comments endpoint will be called
    *
@@ -53,7 +60,8 @@ export type FetchCommentsOptions = {
 };
 
 const FetchCommentsOptionsSchema = z.object({
-  targetUri: z.string().url(),
+  targetUri: z.string().url().optional(),
+  author: HexSchema.optional(),
   apiUrl: z.string().url().default(INDEXER_API_URL),
   appSigner: HexSchema.optional(),
   retries: z.number().int().positive().default(3),
@@ -71,12 +79,29 @@ const FetchCommentsOptionsSchema = z.object({
 export async function fetchComments(
   options: FetchCommentsOptions
 ): Promise<IndexerAPIListCommentsSchemaType> {
-  const { apiUrl, limit, offset, retries, sort, targetUri, appSigner, signal } =
-    FetchCommentsOptionsSchema.parse(options);
+  const {
+    apiUrl,
+    author,
+    limit,
+    offset,
+    retries,
+    sort,
+    targetUri,
+    appSigner,
+    signal,
+  } = FetchCommentsOptionsSchema.parse(options);
 
   const fetchCommentsTask = Effect.tryPromise(async (signal) => {
     const url = new URL("/api/comments", apiUrl);
-    url.searchParams.set("targetUri", targetUri);
+
+    if (targetUri) {
+      url.searchParams.set("targetUri", targetUri);
+    }
+
+    if (author) {
+      url.searchParams.set("author", author);
+    }
+
     url.searchParams.set("sort", sort);
     url.searchParams.set("offset", offset.toString());
     url.searchParams.set("limit", limit.toString());
