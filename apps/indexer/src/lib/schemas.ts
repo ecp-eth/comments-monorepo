@@ -9,7 +9,9 @@ export const GetCommentsQuerySchema = z.object({
   appSigner: HexSchema.optional().openapi({
     description: "The address of the app signer",
   }),
-  limit: z.coerce.number().int().positive().max(100).default(50).openapi({
+  // zod-openapi plugin doesn't automatically infer the minimum value from `int().positive()`
+  // so use min(1) for better compatibility
+  limit: z.coerce.number().int().min(1).max(100).default(50).openapi({
     description: "The number of comments to return",
   }),
   offset: z.coerce.number().int().min(0).default(0).openapi({
