@@ -2,7 +2,7 @@ import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { cors } from "hono/cors";
 import { client, graphql } from "ponder";
-import { OpenAPIHono } from '@hono/zod-openapi'
+import { OpenAPIHono } from "@hono/zod-openapi";
 import setupRestAPI from "./setupRestAPI";
 
 const app = new OpenAPIHono();
@@ -15,14 +15,14 @@ app.use("/graphql", graphql({ db, schema }));
 app.use("/api/*", cors());
 
 // The OpenAPI documentation will be available at /docs
-app.doc('/docs', {
-  openapi: '3.0.0',
+app.doc("/docs", {
+  openapi: "3.0.0",
   info: {
-    version: '1.0.0',
-    title: 'Ethereum comments protocol indexer API',
+    version: "1.0.0",
+    title: "Ethereum comments protocol indexer API",
   },
-})
+});
 
-setupRestAPI(app)
+setupRestAPI(app);
 
 export default app;

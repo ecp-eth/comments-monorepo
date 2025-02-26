@@ -1,18 +1,17 @@
-import { EmbedConfigSchema } from "@ecp.eth/sdk/schemas";
+import { EmbedConfigSchema, HexSchema } from "@ecp.eth/sdk/schemas";
 import { fetchComments } from "@ecp.eth/sdk";
 import { decompressFromURI } from "lz-ts";
 import { Toaster } from "@/components/ui/sonner";
-import { EmbedConfigProvider } from "@/components/EmbedConfigProvider";
-import { CommentSection } from "@/components/comments/CommentSection";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
-import { Providers } from "./providers";
+import { Providers } from "../providers";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { env } from "@/env";
 import { ApplyTheme } from "@/components/ApplyTheme";
+import { CommentSectionReadonly } from "@/components/comments/CommentSectionReadonly";
 
 const SearchParamsSchema = z.object({
-  targetUri: z.string().url(),
+  author: HexSchema,
   config: z
     .preprocess((value) => {
       try {
@@ -28,7 +27,9 @@ type EmbedPageProps = {
   searchParams: Promise<unknown>;
 };
 
-export default async function EmbedPage({ searchParams }: EmbedPageProps) {
+export default async function EmbedCommentsByAuthorPage({
+  searchParams,
+}: EmbedPageProps) {
   const parseSearchParamsResult = SearchParamsSchema.safeParse(
     await searchParams
   );
@@ -50,13 +51,13 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
     );
   }
 
-  const { targetUri, config } = parseSearchParamsResult.data;
+  const { author, config } = parseSearchParamsResult.data;
 
   try {
     const comments = await fetchComments({
       appSigner: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-      targetUri,
+      author,
       offset: 0,
       limit: COMMENTS_PER_PAGE,
     });
@@ -66,19 +67,18 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
         <main className="min-h-screen p-0 bg-background font-default">
           <div className="max-w-4xl mx-auto">
             <Providers>
-              <EmbedConfigProvider value={{ targetUri }}>
-                <CommentSection
-                  initialData={{
-                    pages: [comments],
-                    pageParams: [
-                      {
-                        limit: comments.pagination.limit,
-                        offset: comments.pagination.offset,
-                      },
-                    ],
-                  }}
-                />
-              </EmbedConfigProvider>
+              <CommentSectionReadonly
+                author={author}
+                initialData={{
+                  pages: [comments],
+                  pageParams: [
+                    {
+                      limit: comments.pagination.limit,
+                      offset: comments.pagination.offset,
+                    },
+                  ],
+                }}
+              />
             </Providers>
           </div>
         </main>

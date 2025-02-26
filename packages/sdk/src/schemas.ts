@@ -127,6 +127,7 @@ export const EmbedConfigFontSchema = z
       .object({
         base: EmbedConfigFontSizeSchema,
         "error-screen-title": EmbedConfigFontSizeSchema,
+        "empty-screen-title": EmbedConfigFontSizeSchema,
         headline: EmbedConfigFontSizeSchema,
         xs: EmbedConfigFontSizeSchema,
         sm: EmbedConfigFontSizeSchema,

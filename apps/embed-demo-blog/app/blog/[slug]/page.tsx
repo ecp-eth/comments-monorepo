@@ -3,6 +3,7 @@ import { CustomMDX } from "app/components/mdx";
 import { formatDate, getBlogPosts } from "app/blog/utils";
 import { baseUrl } from "app/sitemap";
 import { CommentsEmbed } from "@ecp.eth/sdk/react";
+import { commentsEmbedTheme } from "app/comments-embed-theme";
 
 export async function generateStaticParams() {
   let posts = getBlogPosts();
@@ -106,35 +107,12 @@ export default async function Blog({
         <CustomMDX source={post.content} />
       </article>
       <CommentsEmbed
-        containerProps={{
-          // use min height of 500 because of wallet connect modal
-          className: "min-h-[500px]",
-        }}
         embedUri={process.env.NEXT_PUBLIC_ECP_ETH_EMBED_URL!}
         uri={new URL(
           `/blog/${post.slug}`,
           process.env.NEXT_PUBLIC_URL!
         ).toString()}
-        config={{
-          theme: {
-            colors: {
-              light: {
-                background: "#fff",
-                foreground: "#000",
-              },
-              dark: {
-                background: "#000",
-                foreground: "#fff",
-              },
-            },
-            font: {
-              fontFamily: {
-                system:
-                  'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-              },
-            },
-          },
-        }}
+        config={commentsEmbedTheme}
       />
     </section>
   );

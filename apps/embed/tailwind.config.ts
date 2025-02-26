@@ -31,6 +31,12 @@ export default {
             lineHeight: "var(--theme-line-height-error-screen-title, 1.75rem)",
           },
         ],
+        "empty-screen-title": [
+          "var(--theme-font-size-empty-screen-title, 1.25rem)",
+          {
+            lineHeight: "var(--theme-line-height-empty-screen-title, 1.75rem)",
+          },
+        ],
         sm: [
           "var(--theme-font-size-sm, 0.875rem)",
           {
