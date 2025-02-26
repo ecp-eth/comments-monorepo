@@ -119,12 +119,18 @@ export default async function Blog({
           theme: {
             colors: {
               light: {
-                background: "white",
-                foreground: "black",
+                background: "#fff",
+                foreground: "#000",
               },
               dark: {
-                background: "black",
-                foreground: "white",
+                background: "#000",
+                foreground: "#fff",
+              },
+            },
+            font: {
+              fontFamily: {
+                system:
+                  'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
               },
             },
           },

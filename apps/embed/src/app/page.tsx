@@ -1,4 +1,7 @@
-import { EmbedConfigSchema } from "@ecp.eth/sdk/schemas";
+import {
+  EmbedConfigSchema,
+  type EmbedConfigSchemaType,
+} from "@ecp.eth/sdk/schemas";
 import { fetchComments } from "@ecp.eth/sdk";
 import { decompressFromURI } from "lz-ts";
 import { Toaster } from "@/components/ui/sonner";
@@ -10,6 +13,7 @@ import { Providers } from "./providers";
 import { createThemeCSSVariables } from "@/lib/theming";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { env } from "@/env";
+import { cn } from "@/lib/utils";
 
 const SearchParamsSchema = z.object({
   targetUri: z.string().url(),
@@ -62,36 +66,68 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
     });
 
     return (
-      <div className={config?.theme?.mode}>
-        <style
-          dangerouslySetInnerHTML={{
-            __html: createThemeCSSVariables(config?.theme),
-          }}
-        />
-        <main className="min-h-screen p-0 bg-background">
-          <div className="max-w-4xl mx-auto">
-            <Providers>
-              <EmbedConfigProvider value={{ targetUri }}>
-                <CommentSection
-                  initialData={{
-                    pages: [comments],
-                    pageParams: [
-                      {
-                        limit: comments.pagination.limit,
-                        offset: comments.pagination.offset,
-                      },
-                    ],
-                  }}
-                />
-              </EmbedConfigProvider>
-            </Providers>
-          </div>
-        </main>
-        <Toaster />
-      </div>
+      <>
+        <LinkGoogleFont config={config} />
+        <ApplyTheme config={config}>
+          <main className="min-h-screen p-0 bg-background font-default">
+            <div className="max-w-4xl mx-auto">
+              <Providers>
+                <EmbedConfigProvider value={{ targetUri }}>
+                  <CommentSection
+                    initialData={{
+                      pages: [comments],
+                      pageParams: [
+                        {
+                          limit: comments.pagination.limit,
+                          offset: comments.pagination.offset,
+                        },
+                      ],
+                    }}
+                  />
+                </EmbedConfigProvider>
+              </Providers>
+            </div>
+          </main>
+          <Toaster />
+        </ApplyTheme>
+      </>
     );
   } catch (e) {
     console.error(e);
     return <ErrorScreen description="Could not load comments" />;
   }
+}
+
+function LinkGoogleFont({ config }: { config?: EmbedConfigSchemaType }) {
+  const fontFamily = config?.theme?.font?.fontFamily;
+
+  if (!fontFamily || !("google" in fontFamily) || !fontFamily.google) {
+    return null;
+  }
+
+  const googleFontsUrl = new URL("https://fonts.googleapis.com/css2");
+
+  googleFontsUrl.searchParams.set(
+    "family",
+    fontFamily.google.replace("_", " ")
+  );
+  googleFontsUrl.searchParams.set("display", "swap");
+
+  return <link href={googleFontsUrl.toString()} rel="stylesheet" />;
+}
+
+type ApplyThemeProps = {
+  config: EmbedConfigSchemaType | undefined;
+  children: React.ReactNode;
+};
+
+function ApplyTheme({ config, children }: ApplyThemeProps) {
+  return (
+    <div
+      className={cn("theme-root", config?.theme?.mode)}
+      style={createThemeCSSVariables(config)}
+    >
+      {children}
+    </div>
+  );
 }

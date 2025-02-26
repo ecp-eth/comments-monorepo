@@ -9,6 +9,41 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        default: "var(--theme-font-family-default)",
+      },
+      fontSize: {
+        base: [
+          "var(--theme-font-size-base, 1rem)",
+          {
+            lineHeight: "var(--theme-line-height-base, 1.5rem)",
+          },
+        ],
+        headline: [
+          "var(--theme-font-size-headline, 1.5rem)",
+          {
+            lineHeight: "var(--theme-line-height-headline, 2rem)",
+          },
+        ],
+        "error-screen-title": [
+          "var(--theme-font-size-error-screen-title, 1.25rem)",
+          {
+            lineHeight: "var(--theme-line-height-error-screen-title, 1.75rem)",
+          },
+        ],
+        sm: [
+          "var(--theme-font-size-sm, 0.875rem)",
+          {
+            lineHeight: "var(--theme-line-height-sm, 1.25rem)",
+          },
+        ],
+        xs: [
+          "var(--theme-font-size-xs, 0.75rem)",
+          {
+            lineHeight: "var(--theme-line-height-xs, 1rem)",
+          },
+        ],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

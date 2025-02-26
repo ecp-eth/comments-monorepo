@@ -96,7 +96,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-foreground">Comments</h2>
+      <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
       <div className="mb-4 relative">
         {!account.address && (
           <div className="flex items-center justify-center absolute -top-1 -left-1 -bottom-1 -right-1 border rounded-md backdrop-blur-sm z-10">
