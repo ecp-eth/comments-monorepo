@@ -4,7 +4,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatDate } from "@/lib/utils";
+import { bigintReplacer, formatDate } from "@/lib/utils";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 import { MoreVertical } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -16,18 +16,19 @@ import { getCommentAuthorNameOrAddress } from "../helpers";
 import type { CommentType } from "@/lib/types";
 import { useFreshRef } from "@/lib/hooks";
 import {
-  PreparedGaslessCommentOperationApprovedSchema,
-  PreparedGaslessCommentOperationSchema,
-  PreparedGaslessCommentOperationSchemaType,
-  PreparedSignedGaslessCommentOperationNotApprovedSchema,
-  type PreparedSignedGaslessCommentOperationNotApprovedSchemaType,
+  DeleteCommentResponseSchema,
+  PreparedGaslessCommentOperationApprovedResponseSchema,
+  PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema,
+  PreparedSignedGaslessDeleteCommentNotApprovedSchemaType,
+  PrepareGaslessDeleteCommentOperationResponseSchema,
+  PrepareGaslessDeleteCommentOperationResponseSchemaType,
   type PrepareGaslessCommentDeletionRequestBodySchemaType,
 } from "@/lib/schemas";
 import { useMutation } from "@tanstack/react-query";
 
 async function gaslessDeleteComment(
   params: PrepareGaslessCommentDeletionRequestBodySchemaType
-): Promise<PreparedGaslessCommentOperationSchemaType> {
+): Promise<PrepareGaslessDeleteCommentOperationResponseSchemaType> {
   const response = await fetch(`/api/delete-comment/prepare`, {
     method: "POST",
     headers: {
@@ -40,7 +41,9 @@ async function gaslessDeleteComment(
     throw new Error("Failed to delete comment");
   }
 
-  return PreparedGaslessCommentOperationSchema.parse(await response.json());
+  return PrepareGaslessDeleteCommentOperationResponseSchema.parse(
+    await response.json()
+  );
 }
 
 interface CommentProps {
@@ -81,7 +84,8 @@ export function CommentGasless({
         submitIfApproved: true,
       });
 
-      return PreparedGaslessCommentOperationApprovedSchema.parse(result).txHash;
+      return PreparedGaslessCommentOperationApprovedResponseSchema.parse(result)
+        .txHash;
     },
   });
 
@@ -98,14 +102,17 @@ export function CommentGasless({
       });
 
       const data =
-        PreparedSignedGaslessCommentOperationNotApprovedSchema.parse(result);
+        PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema.parse(
+          result
+        );
 
       return {
-        signTypedDataParams: data.signTypedDataParams,
+        signTypedDataParams:
+          data.signTypedDataParams as unknown as SignTypedDataParameters,
         variables: data,
       } satisfies {
         signTypedDataParams: SignTypedDataParameters;
-        variables: PreparedSignedGaslessCommentOperationNotApprovedSchemaType;
+        variables: PreparedSignedGaslessDeleteCommentNotApprovedSchemaType;
       };
     },
     async sendSignedData({ signature, variables }) {
@@ -114,17 +121,20 @@ export function CommentGasless({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...variables,
-          authorSignature: signature,
-        }),
+        body: JSON.stringify(
+          {
+            ...variables,
+            authorSignature: signature,
+          },
+          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+        ),
       });
 
       if (!response.ok) {
         throw new Error("Failed to post approval signature");
       }
 
-      const data = await response.json();
+      const data = DeleteCommentResponseSchema.parse(await response.json());
 
       return data.txHash;
     },

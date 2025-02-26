@@ -1,6 +1,9 @@
+import { JSONResponse } from "@/lib/json-response";
 import {
-  PreparedGaslessCommentOperationApprovedSchema,
-  PreparedSignedGaslessCommentOperationNotApprovedSchema,
+  BadRequestResponseSchema,
+  InternalServerErrorResponseSchema,
+  PreparedGaslessCommentOperationApprovedResponseSchema,
+  PreparedSignedGaslessPostCommentNotApprovedResponseSchema,
   PrepareSignedGaslessCommentRequestBodySchema,
 } from "@/lib/schemas";
 import { bigintReplacer } from "@/lib/utils";
@@ -18,12 +21,25 @@ import {
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request
+): Promise<
+  JSONResponse<
+    | typeof PreparedGaslessCommentOperationApprovedResponseSchema
+    | typeof PreparedSignedGaslessPostCommentNotApprovedResponseSchema
+    | typeof BadRequestResponseSchema
+    | typeof InternalServerErrorResponseSchema
+  >
+> {
   const parsedBodyResult =
     PrepareSignedGaslessCommentRequestBodySchema.safeParse(await req.json());
 
   if (!parsedBodyResult.success) {
-    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      parsedBodyResult.error.flatten().fieldErrors,
+      { status: 400 }
+    );
   }
 
   const { content, targetUri, parentId, author, submitIfApproved } =
@@ -31,7 +47,11 @@ export async function POST(req: Request) {
 
   // Validate target URL is valid
   if (!targetUri.startsWith(process.env.APP_URL!)) {
-    return Response.json({ error: "Invalid target URL" }, { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { targetUri: ["Invalid target URL"] },
+      { status: 400 }
+    );
   }
 
   const account = privateKeyToAccount(
@@ -91,8 +111,10 @@ export async function POST(req: Request) {
 
       if (!isAppSignatureValid) {
         console.error("Invalid app signature");
-        return Response.json(
-          { error: "Invalid app signature" },
+
+        return new JSONResponse(
+          BadRequestResponseSchema,
+          { appSignature: ["Invalid app signature"] },
           { status: 400 }
         );
       }
@@ -105,12 +127,17 @@ export async function POST(req: Request) {
           args: [commentData, "0x", signature],
         });
 
-        return Response.json(
-          PreparedGaslessCommentOperationApprovedSchema.parse({ txHash })
+        return new JSONResponse(
+          PreparedGaslessCommentOperationApprovedResponseSchema,
+          {
+            txHash,
+          }
         );
       } catch (error) {
         console.error(error);
-        return Response.json(
+
+        return new JSONResponse(
+          InternalServerErrorResponseSchema,
           { error: "Failed to post comment" },
           { status: 500 }
         );
@@ -118,12 +145,14 @@ export async function POST(req: Request) {
     }
   }
 
-  const res = PreparedSignedGaslessCommentOperationNotApprovedSchema.parse({
-    signTypedDataParams: JSON.parse(
-      JSON.stringify(typedCommentData, bigintReplacer)
-    ),
-    appSignature: signature,
-  });
-
-  return Response.json(res);
+  return new JSONResponse(
+    PreparedSignedGaslessPostCommentNotApprovedResponseSchema,
+    {
+      signTypedDataParams: typedCommentData,
+      appSignature: signature,
+    },
+    {
+      jsonReplacer: bigintReplacer,
+    }
+  );
 }

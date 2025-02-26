@@ -18,6 +18,8 @@ import {
   ChangeApprovalStatusResponseSchema,
   GetApprovalStatusSchema,
 } from "@/lib/schemas";
+import type { SignTypedDataParameters } from "viem";
+import { bigintReplacer } from "@/lib/utils";
 
 export function CommentSectionGasless() {
   const { address } = useAccount();
@@ -56,7 +58,8 @@ export function CommentSectionGasless() {
       }
 
       return {
-        signTypedDataParams: getApprovalQuery.data.signTypedDataParams,
+        signTypedDataParams: getApprovalQuery.data
+          .signTypedDataParams as unknown as SignTypedDataParameters,
         variables: getApprovalQuery.data,
       };
     },
@@ -66,10 +69,13 @@ export function CommentSectionGasless() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...variables,
-          authorSignature: signature,
-        }),
+        body: JSON.stringify(
+          {
+            ...variables,
+            authorSignature: signature,
+          },
+          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+        ),
       });
 
       if (!response.ok) {
