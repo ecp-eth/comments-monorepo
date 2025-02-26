@@ -1,3 +1,6 @@
+/**
+ * Mock module for the `ponder:*` modules
+ */
 export default {
 }
 
