@@ -272,7 +272,6 @@ function CommentsEmbedInternal({
  */
 function useIframeDimensionsWatcher(iframeUri: string) {
   const [dimensions, setDimensions] = useState<{
-    width: number;
     height: number;
   } | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -284,7 +283,6 @@ function useIframeDimensionsWatcher(iframeUri: string) {
 
       if (eventData.success && origin === event.origin) {
         setDimensions({
-          width: eventData.data.width,
           height: eventData.data.height,
         });
       }
