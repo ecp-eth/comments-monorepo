@@ -26,6 +26,10 @@ export const CommentDataSchema = z.object({
 
 export type CommentData = z.infer<typeof CommentDataSchema>;
 
+const CSSTransparentColorSchema = z
+  .literal("transparent")
+  .describe("Valid CSS transparent color value");
+
 const CSSHexColorSchema = z
   .string()
   .regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/)
@@ -44,7 +48,7 @@ const CSSHSLColorSchema = z
   .describe("Valid CSS HSL color value");
 
 const CSSColorSchema = z
-  .union([CSSHexColorSchema, CSSRGBColorSchema, CSSHSLColorSchema])
+  .union([CSSHexColorSchema, CSSRGBColorSchema, CSSHSLColorSchema, CSSTransparentColorSchema])
   .describe("Valid CSS hex, rgb(), rgba(), hsl() or hsl() color value");
 
 const CSSSizeSchema = z
