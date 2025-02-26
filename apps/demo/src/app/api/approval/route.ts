@@ -1,8 +1,11 @@
+import { JSONResponse } from "@/lib/json-response";
 import {
+  ApproveResponseSchema,
+  BadRequestResponseSchema,
   ChangeApprovalStatusRequestBodySchema,
   GetApprovalStatusApprovedSchema,
   GetApprovalStatusNotApprovedSchema,
-  type GetApprovalStatusSchemaType,
+  InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
 import { bigintReplacer } from "@/lib/utils";
 import {
@@ -26,12 +29,24 @@ import { privateKeyToAccount } from "viem/accounts";
 const chain = configChains[0];
 const transport = configTransports[chain.id as keyof typeof configTransports];
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest
+): Promise<
+  JSONResponse<
+    | typeof GetApprovalStatusApprovedSchema
+    | typeof GetApprovalStatusNotApprovedSchema
+    | typeof BadRequestResponseSchema
+    | typeof InternalServerErrorResponseSchema
+  >
+> {
   const authorAddress = req.nextUrl.searchParams.get("author");
 
   if (!authorAddress || !isAddress(authorAddress)) {
-    console.error("Invalid address", authorAddress);
-    return Response.json({ error: "Invalid address" }, { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { author: ["Invalid address"] },
+      { status: 400 }
+    );
   }
 
   const account = privateKeyToAccount(
@@ -80,18 +95,17 @@ export async function GET(req: NextRequest) {
       ).map((result) => ({ result }));
 
   if (isApproved) {
-    return Response.json(
-      GetApprovalStatusApprovedSchema.parse({
-        approved: true,
-        appSigner: account.address,
-      }) satisfies GetApprovalStatusSchemaType
-    );
+    return new JSONResponse(GetApprovalStatusApprovedSchema, {
+      approved: true,
+      appSigner: account.address,
+    });
   }
 
   if (nonce === undefined) {
-    return Response.json(
+    return new JSONResponse(
+      InternalServerErrorResponseSchema,
       { error: "Nonce could not be loaded" },
-      { status: 400 }
+      { status: 500 }
     );
   }
 
@@ -105,30 +119,36 @@ export async function GET(req: NextRequest) {
 
   const signature = await account.signTypedData(typedApprovalData);
 
-  return new Response(
-    JSON.stringify(
-      GetApprovalStatusNotApprovedSchema.parse({
-        signTypedDataParams: typedApprovalData,
-        appSignature: signature,
-        approved: false,
-      }) satisfies GetApprovalStatusSchemaType,
-      bigintReplacer
-    ),
+  return new JSONResponse(
+    GetApprovalStatusNotApprovedSchema,
     {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
+      signTypedDataParams: typedApprovalData,
+      appSignature: signature,
+      approved: false,
+    },
+    { jsonReplacer: bigintReplacer }
   );
 }
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request
+): Promise<
+  JSONResponse<
+    | typeof BadRequestResponseSchema
+    | typeof InternalServerErrorResponseSchema
+    | typeof ApproveResponseSchema
+  >
+> {
   const parsedBodyResult = ChangeApprovalStatusRequestBodySchema.safeParse(
     await req.json()
   );
 
   if (!parsedBodyResult.success) {
-    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      parsedBodyResult.error.flatten().fieldErrors,
+      { status: 400 }
+    );
   }
 
   const { signTypedDataParams, appSignature, authorSignature } =
@@ -163,7 +183,11 @@ export async function POST(req: Request) {
       address: appSigner.address,
     });
 
-    return Response.json({ error: "Invalid app signature" }, { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { appSignature: ["Invalid app signature"] },
+      { status: 400 }
+    );
   }
 
   try {
@@ -179,9 +203,15 @@ export async function POST(req: Request) {
         authorSignature,
       ],
     });
-    return Response.json({ txHash });
+
+    return new JSONResponse(ApproveResponseSchema, { txHash });
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Failed to add approval" }, { status: 500 });
+
+    return new JSONResponse(
+      InternalServerErrorResponseSchema,
+      { error: "Failed to add approval" },
+      { status: 500 }
+    );
   }
 }

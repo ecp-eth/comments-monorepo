@@ -1,7 +1,9 @@
+import { JSONResponse } from "@/lib/json-response";
 import {
-  PreparedGaslessCommentOperationApprovedSchema,
-  type PreparedGaslessCommentOperationSchemaType,
-  PreparedSignedGaslessCommentOperationNotApprovedSchema,
+  BadRequestResponseSchema,
+  InternalServerErrorResponseSchema,
+  PreparedGaslessCommentOperationApprovedResponseSchema,
+  PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema,
   PrepareGaslessCommentDeletionRequestBodySchema,
 } from "@/lib/schemas";
 import { bigintReplacer } from "@/lib/utils";
@@ -21,12 +23,25 @@ import { privateKeyToAccount } from "viem/accounts";
 const chain = configChains[0];
 const transport = configTransports[chain.id as keyof typeof configTransports];
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request
+): Promise<
+  JSONResponse<
+    | typeof BadRequestResponseSchema
+    | typeof InternalServerErrorResponseSchema
+    | typeof PreparedGaslessCommentOperationApprovedResponseSchema
+    | typeof PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema
+  >
+> {
   const parsedBodyResult =
     PrepareGaslessCommentDeletionRequestBodySchema.safeParse(await req.json());
 
   if (!parsedBodyResult.success) {
-    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      parsedBodyResult.error.flatten().fieldErrors,
+      { status: 400 }
+    );
   }
 
   const {
@@ -84,9 +99,9 @@ export async function POST(req: Request) {
       });
 
       if (!isAppSignatureValid) {
-        console.error("Invalid app signature");
-        return Response.json(
-          { error: "Invalid app signature" },
+        return new JSONResponse(
+          BadRequestResponseSchema,
+          { appSignature: ["Invalid app signature"] },
           { status: 400 }
         );
       }
@@ -106,14 +121,18 @@ export async function POST(req: Request) {
             signature,
           ],
         });
-        return Response.json(
-          PreparedGaslessCommentOperationApprovedSchema.parse({
+
+        return new JSONResponse(
+          PreparedGaslessCommentOperationApprovedResponseSchema,
+          {
             txHash,
-          }) satisfies PreparedGaslessCommentOperationSchemaType
+          }
         );
       } catch (error) {
         console.error(error);
-        return Response.json(
+
+        return new JSONResponse(
+          InternalServerErrorResponseSchema,
           { error: "Failed to delete comment" },
           { status: 500 }
         );
@@ -121,12 +140,14 @@ export async function POST(req: Request) {
     }
   }
 
-  return Response.json(
-    PreparedSignedGaslessCommentOperationNotApprovedSchema.parse({
-      signTypedDataParams: JSON.parse(
-        JSON.stringify(typedDeleteCommentData, bigintReplacer)
-      ),
+  return new JSONResponse(
+    PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema,
+    {
+      signTypedDataParams: typedDeleteCommentData,
       appSignature: signature,
-    }) satisfies PreparedGaslessCommentOperationSchemaType
+    },
+    {
+      jsonReplacer: bigintReplacer,
+    }
   );
 }

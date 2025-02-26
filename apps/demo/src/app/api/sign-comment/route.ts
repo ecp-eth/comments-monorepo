@@ -1,4 +1,6 @@
+import { JSONResponse } from "@/lib/json-response";
 import {
+  BadRequestResponseSchema,
   SignCommentRequestBodySchema,
   SignCommentResponseSchema,
 } from "@/lib/schemas";
@@ -15,13 +17,23 @@ import {
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request
+): Promise<
+  JSONResponse<
+    typeof SignCommentResponseSchema | typeof BadRequestResponseSchema
+  >
+> {
   const parsedBodyResult = SignCommentRequestBodySchema.safeParse(
     await req.json()
   );
 
   if (!parsedBodyResult.success) {
-    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      parsedBodyResult.error.flatten().fieldErrors,
+      { status: 400 }
+    );
   }
 
   const { content, targetUri, parentId, chainId, author } =
@@ -29,7 +41,11 @@ export async function POST(req: Request) {
 
   // Validate target URL is valid
   if (!targetUri.startsWith(process.env.APP_URL!)) {
-    return Response.json({ error: "Invalid target URL" }, { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { targetUri: ["Invalid target URL"] },
+      { status: 400 }
+    );
   }
 
   const account = privateKeyToAccount(
@@ -64,19 +80,15 @@ export async function POST(req: Request) {
 
   const hash = hashTypedData(typedCommentData);
 
-  return new Response(
-    JSON.stringify(
-      SignCommentResponseSchema.parse({
-        signature,
-        hash,
-        data: commentData,
-      }),
-      bigintReplacer
-    ),
+  return new JSONResponse(
+    SignCommentResponseSchema,
     {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      signature,
+      hash,
+      data: commentData,
+    },
+    {
+      jsonReplacer: bigintReplacer,
     }
   );
 }

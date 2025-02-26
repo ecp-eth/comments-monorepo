@@ -5,12 +5,7 @@ import {
   DeleteCommentTypedDataSchema,
   HexSchema,
 } from "@ecp.eth/sdk/schemas";
-import type { SignTypedDataParameters } from "viem";
 import { z } from "zod";
-
-const SignTypedDataParametersSchema = z.custom<SignTypedDataParameters>(
-  (val) => val && typeof val === "object"
-);
 
 export const PrepareSignedGaslessCommentRequestBodySchema = z.object({
   content: z.string().trim().nonempty(),
@@ -34,29 +29,41 @@ export type PrepareGaslessCommentDeletionRequestBodySchemaType = z.infer<
   typeof PrepareGaslessCommentDeletionRequestBodySchema
 >;
 
-export const PreparedSignedGaslessCommentOperationNotApprovedSchema = z.object({
-  signTypedDataParams: SignTypedDataParametersSchema,
-  appSignature: HexSchema,
-});
+export const PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema =
+  z.object({
+    signTypedDataParams: DeleteCommentTypedDataSchema,
+    appSignature: HexSchema,
+  });
 
-export type PreparedSignedGaslessCommentOperationNotApprovedSchemaType =
-  z.infer<typeof PreparedSignedGaslessCommentOperationNotApprovedSchema>;
+export type PreparedSignedGaslessDeleteCommentNotApprovedSchemaType = z.infer<
+  typeof PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema
+>;
 
-export const PreparedGaslessCommentOperationApprovedSchema = z.object({
+export const PreparedSignedGaslessPostCommentNotApprovedResponseSchema =
+  z.object({
+    signTypedDataParams: AddCommentTypedDataSchema,
+    appSignature: HexSchema,
+  });
+
+export type PreparedSignedGaslessPostCommentNotApprovedSchemaType = z.infer<
+  typeof PreparedSignedGaslessPostCommentNotApprovedResponseSchema
+>;
+
+export const PreparedGaslessCommentOperationApprovedResponseSchema = z.object({
   txHash: HexSchema,
 });
 
 export type PreparedGaslessCommentOperationApprovedSchemaType = z.infer<
-  typeof PreparedGaslessCommentOperationApprovedSchema
+  typeof PreparedGaslessCommentOperationApprovedResponseSchema
 >;
 
-export const PreparedGaslessCommentOperationSchema = z.union([
-  PreparedSignedGaslessCommentOperationNotApprovedSchema,
-  PreparedGaslessCommentOperationApprovedSchema,
+export const PrepareGaslessDeleteCommentOperationResponseSchema = z.union([
+  PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema,
+  PreparedGaslessCommentOperationApprovedResponseSchema,
 ]);
 
-export type PreparedGaslessCommentOperationSchemaType = z.infer<
-  typeof PreparedGaslessCommentOperationSchema
+export type PrepareGaslessDeleteCommentOperationResponseSchemaType = z.infer<
+  typeof PrepareGaslessDeleteCommentOperationResponseSchema
 >;
 
 export const DeleteCommentRequestBodySchema = z.object({
@@ -116,7 +123,7 @@ export type SignCommentRequestBodySchemaType = z.infer<
 export const GetApprovalStatusNotApprovedSchema = z.object({
   approved: z.literal(false),
   appSignature: HexSchema,
-  signTypedDataParams: SignTypedDataParametersSchema,
+  signTypedDataParams: AddApprovalTypedDataSchema,
 });
 
 export type GetApprovalStatusNotApprovedSchemaType = z.infer<
@@ -158,3 +165,16 @@ export const ChangeApprovalStatusResponseSchema = z.object({
 export type ChangeApprovalStatusResponseSchemaType = z.infer<
   typeof ChangeApprovalStatusResponseSchema
 >;
+
+export const BadRequestResponseSchema = z.record(
+  z.string(),
+  z.string().array()
+);
+
+export const InternalServerErrorResponseSchema = z.object({
+  error: z.string(),
+});
+
+export const ApproveResponseSchema = z.object({
+  txHash: HexSchema,
+});

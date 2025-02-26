@@ -1,6 +1,9 @@
+import { JSONResponse } from "@/lib/json-response";
 import {
+  BadRequestResponseSchema,
   DeleteCommentRequestBodySchema,
   DeleteCommentResponseSchema,
+  InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
 import {
   chains as configChains,
@@ -13,13 +16,25 @@ import { privateKeyToAccount } from "viem/accounts";
 const chain = configChains[0];
 const transport = configTransports[chain.id as keyof typeof configTransports];
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request
+): Promise<
+  JSONResponse<
+    | typeof BadRequestResponseSchema
+    | typeof DeleteCommentResponseSchema
+    | typeof InternalServerErrorResponseSchema
+  >
+> {
   const parsedBodyResult = DeleteCommentRequestBodySchema.safeParse(
     await req.json()
   );
 
   if (!parsedBodyResult.success) {
-    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      parsedBodyResult.error.flatten().fieldErrors,
+      { status: 400 }
+    );
   }
 
   const { signTypedDataParams, appSignature, authorSignature } =
@@ -54,7 +69,11 @@ export async function POST(req: Request) {
       address: appSigner.address,
     });
 
-    return Response.json({ error: "Invalid app signature" }, { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { appSignature: ["Invalid app signature"] },
+      { status: 400 }
+    );
   }
 
   try {
@@ -73,10 +92,12 @@ export async function POST(req: Request) {
       ],
     });
 
-    return Response.json(DeleteCommentResponseSchema.parse({ txHash }));
+    return new JSONResponse(DeleteCommentResponseSchema, { txHash });
   } catch (error) {
     console.error(error);
-    return Response.json(
+
+    return new JSONResponse(
+      InternalServerErrorResponseSchema,
       { error: "Failed to delete comment" },
       { status: 500 }
     );

@@ -8,14 +8,15 @@ import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 import { useFreshRef } from "@/lib/hooks";
 import {
   type PrepareSignedGaslessCommentRequestBodySchemaType,
-  type PreparedSignedGaslessCommentOperationNotApprovedSchemaType,
-  PreparedSignedGaslessCommentOperationNotApprovedSchema,
   type PreparedGaslessCommentOperationApprovedSchemaType,
-  PreparedGaslessCommentOperationApprovedSchema,
+  PreparedGaslessCommentOperationApprovedResponseSchema,
   GaslessPostCommentResponseSchema,
+  PreparedSignedGaslessPostCommentNotApprovedResponseSchema,
+  PreparedSignedGaslessPostCommentNotApprovedSchemaType,
 } from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import type { SignTypedDataParameters } from "viem";
+import { bigintReplacer } from "@/lib/utils";
 
 async function prepareSignedGaslessComment(
   submitIfApproved: true,
@@ -30,7 +31,7 @@ async function prepareSignedGaslessComment(
     PrepareSignedGaslessCommentRequestBodySchemaType,
     "submitIfApproved"
   >
-): Promise<PreparedSignedGaslessCommentOperationNotApprovedSchemaType>;
+): Promise<PreparedSignedGaslessPostCommentNotApprovedSchemaType>;
 
 async function prepareSignedGaslessComment(
   submitIfApproved: boolean,
@@ -40,7 +41,7 @@ async function prepareSignedGaslessComment(
   >
 ): Promise<
   | PreparedGaslessCommentOperationApprovedSchemaType
-  | PreparedSignedGaslessCommentOperationNotApprovedSchemaType
+  | PreparedSignedGaslessPostCommentNotApprovedSchemaType
 > {
   const response = await fetch("/api/sign-comment/gasless/prepare", {
     method: "POST",
@@ -60,10 +61,10 @@ async function prepareSignedGaslessComment(
   const data = await response.json();
 
   if (submitIfApproved) {
-    return PreparedGaslessCommentOperationApprovedSchema.parse(data);
+    return PreparedGaslessCommentOperationApprovedResponseSchema.parse(data);
   }
 
-  return PreparedSignedGaslessCommentOperationNotApprovedSchema.parse(data);
+  return PreparedSignedGaslessPostCommentNotApprovedResponseSchema.parse(data);
 }
 
 interface CommentBoxProps {
@@ -113,11 +114,12 @@ export function CommentBoxGasless({
       });
 
       return {
-        signTypedDataParams: data.signTypedDataParams,
+        signTypedDataParams:
+          data.signTypedDataParams as unknown as SignTypedDataParameters,
         variables: data,
       } satisfies {
         signTypedDataParams: SignTypedDataParameters;
-        variables: PreparedSignedGaslessCommentOperationNotApprovedSchemaType;
+        variables: PreparedSignedGaslessPostCommentNotApprovedSchemaType;
       };
     },
     async sendSignedData({ signature, variables }) {
@@ -126,10 +128,13 @@ export function CommentBoxGasless({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...variables,
-          authorSignature: signature,
-        }),
+        body: JSON.stringify(
+          {
+            ...variables,
+            authorSignature: signature,
+          },
+          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+        ),
       });
 
       if (!response.ok) {

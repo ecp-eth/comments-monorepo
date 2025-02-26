@@ -1,6 +1,9 @@
+import { JSONResponse } from "@/lib/json-response";
 import {
+  BadRequestResponseSchema,
   GaslessPostCommentRequestBodySchema,
   GaslessPostCommentResponseSchema,
+  InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
 import {
   chains as configChains,
@@ -10,13 +13,25 @@ import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-export const POST = async (req: Request) => {
+export async function POST(
+  req: Request
+): Promise<
+  JSONResponse<
+    | typeof GaslessPostCommentResponseSchema
+    | typeof BadRequestResponseSchema
+    | typeof InternalServerErrorResponseSchema
+  >
+> {
   const parsedBodyResult = GaslessPostCommentRequestBodySchema.safeParse(
     await req.json()
   );
 
   if (!parsedBodyResult.success) {
-    return Response.json(parsedBodyResult.error.flatten(), { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      parsedBodyResult.error.flatten().fieldErrors,
+      { status: 400 }
+    );
   }
 
   const { signTypedDataParams, appSignature, authorSignature } =
@@ -54,7 +69,11 @@ export const POST = async (req: Request) => {
       address: appSigner.address,
     });
 
-    return Response.json({ error: "Invalid app signature" }, { status: 400 });
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { signature: ["Invalid app signature"] },
+      { status: 400 }
+    );
   }
 
   try {
@@ -77,9 +96,15 @@ export const POST = async (req: Request) => {
         appSignature,
       ],
     });
-    return Response.json(GaslessPostCommentResponseSchema.parse({ txHash }));
+
+    return new JSONResponse(GaslessPostCommentResponseSchema, { txHash });
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Failed to post comment" }, { status: 500 });
+
+    return new JSONResponse(
+      InternalServerErrorResponseSchema,
+      { error: "Failed to post comment" },
+      { status: 500 }
+    );
   }
-};
+}
