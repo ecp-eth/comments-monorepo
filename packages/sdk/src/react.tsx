@@ -248,7 +248,10 @@ function CommentsEmbedInternal({
       {...containerProps}
       style={{
         transition: "height 0.3s ease",
-        minHeight: "500px", // because of wallet connect dialog
+        // because of wallet connect dialog
+        // also it will be updated if the height is higher
+        minHeight: "500px",
+        height: "500px",
         ...containerProps?.style,
         ...dimensions,
       }}
