@@ -11,6 +11,7 @@
 import * as yaml from 'js-yaml';
 import { writeFileSync } from 'node:fs';
 import { OpenAPIHono } from "@hono/zod-openapi";
+import indexerPackageJSON from '@ecp.eth/indexer/package.json';
 import setupRestAPI from '@ecp.eth/indexer/src/api/setupRestAPI';
 
 const app = new OpenAPIHono();
@@ -19,9 +20,9 @@ setupRestAPI(app);
 
 // Convert the OpenAPIObject to a YAML string
 const yamlString = yaml.dump(app.getOpenAPI31Document({
-  openapi: '3.0.0',
+  openapi: '3.1.0',
   info: {
-    version: '1.0.0',
+    version: indexerPackageJSON.version,
     title: 'Indexer Restful API',
   },
   servers: [
