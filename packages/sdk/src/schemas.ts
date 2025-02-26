@@ -258,7 +258,6 @@ export type IndexerAPIListCommentRepliesSchemaType = z.infer<
 export const EmbedResizedEventSchema = z.object({
   type: z.literal("@ecp.eth/sdk/embed/resize"),
   height: z.number().min(0).int(),
-  width: z.number().min(0).int(),
 });
 
 export type EmbedResizedEventSchemaType = z.infer<

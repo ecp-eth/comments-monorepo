@@ -9,13 +9,10 @@ import { useEffect } from "react";
 export function WatchDocumentResize() {
   useEffect(() => {
     const notifyParent = () => {
-      // for width use client width, we don't want to resize to sides
-      const width = document.documentElement.clientWidth;
       const height = document.documentElement.scrollHeight;
       window.parent.postMessage(
         EmbedResizedEventSchema.parse({
           type: "@ecp.eth/sdk/embed/resize",
-          width,
           height,
         }),
         "*"
