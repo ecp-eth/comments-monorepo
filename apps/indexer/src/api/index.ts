@@ -5,12 +5,7 @@ import { client, graphql } from "ponder";
 import { OpenAPIHono } from '@hono/zod-openapi'
 import setupRestAPI from "./setupRestAPI";
 
-// this is to bypass the ponder check for hono instance.
-// see: https://github.com/ponder-sh/ponder/issues/1551
-class Hono extends OpenAPIHono {
-}
-
-const app = new Hono();
+const app = new OpenAPIHono();
 
 app.use("/sql/*", client({ db, schema }));
 app.use("/", graphql({ db, schema }));
