@@ -149,6 +149,10 @@ export default defineConfig({
           ],
         },
         {
+          text: "Logo Assets",
+          link: "/logo-assets",
+        },
+        {
           text: "FAQ",
           items: [
             {
@@ -156,10 +160,6 @@ export default defineConfig({
               link: "/gas-costs",
             },
           ],
-        },
-        {
-          text: "Logo Assets",
-          link: "/logo-assets",
         },
       ],
     },
