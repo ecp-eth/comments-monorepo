@@ -157,6 +157,10 @@ export default defineConfig({
             },
           ],
         },
+        {
+          text: "Logo Assets",
+          link: "/logo-assets",
+        },
       ],
     },
   ],
