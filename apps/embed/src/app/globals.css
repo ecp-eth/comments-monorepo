@@ -102,7 +102,9 @@ body {
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
   }
 }

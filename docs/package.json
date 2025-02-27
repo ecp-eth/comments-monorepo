@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vocs dev -p 3002",
+    "dev": "vocs dev -p 3003",
     "build": "vocs build",
     "preview": "vocs preview",
     "ref:gen:sdk": "typedoc --tsconfig ../packages/sdk/tsconfig.json --out pages/sdk-reference/ --entryPoints ../packages/sdk/src/index.ts ../packages/sdk/src/types.ts ../packages/sdk/src/react.tsx --publicPath /sdk-reference/",

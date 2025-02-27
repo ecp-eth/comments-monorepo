@@ -19,7 +19,9 @@ const SearchParamsSchema = z.object({
         if (typeof value === "string") {
           return JSON.parse(decompressFromURI(value));
         }
-      } catch {}
+      } catch (err) {
+        console.warn('failed to parse config', err)
+      }
     }, EmbedConfigSchema)
     .optional(),
 });
@@ -63,7 +65,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
 
     return (
       <ApplyTheme config={config}>
-        <main className="min-h-screen p-0 bg-background font-default">
+        <main className="min-h-screen p-0 bg-background text-foreground font-default">
           <div className="max-w-4xl mx-auto">
             <Providers>
               <EmbedConfigProvider value={{ targetUri }}>
