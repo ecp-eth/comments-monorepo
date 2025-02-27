@@ -118,8 +118,12 @@ export default defineConfig({
           items: [
             {
               text: "Custom Integration",
-              link: "https://demo.ethcomments.xyz/",
+              collapsed: true,
               items: [
+                {
+                  text: "Demo",
+                  link: "https://demo.ethcomments.xyz/",
+                },
                 {
                   text: "Source Code",
                   link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo",
@@ -128,13 +132,26 @@ export default defineConfig({
             },
             {
               text: "Blog with <CommentsEmbed />",
-              link: "https://demo-blog.ethcomments.xyz/",
+              collapsed: true,
               items: [
+                {
+                  text: "Demo",
+                  link: "https://demo-blog.ethcomments.xyz/",
+                },
                 {
                   text: "Source Code",
                   link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/embed-demo-blog",
                 },
               ]
+            },
+          ],
+        },
+        {
+          text: "FAQ",
+          items: [
+            {
+              text: "Gas Costs",
+              link: "/gas-costs",
             },
           ],
         },
