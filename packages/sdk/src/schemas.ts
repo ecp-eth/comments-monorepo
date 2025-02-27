@@ -221,7 +221,7 @@ export const IndexerAPICommentSchema = z.object({
   content: z.string(),
   chainId: z.number().int(),
   deletedAt: z.coerce.date().nullable(),
-  logIndex: z.number().int(),
+  logIndex: z.number().int().nullable(),
   metadata: z.string(),
   parentId: HexSchema.nullable(),
   targetUri: z.string(),
