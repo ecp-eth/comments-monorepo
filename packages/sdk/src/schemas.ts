@@ -161,7 +161,7 @@ export type EmbedConfigThemeSchemaType = z.infer<typeof EmbedConfigThemeSchema>;
  */
 export const EmbedConfigSchema = z.object({
   /**
-   * The theme of the embed. currently support `light`, `dark`, or custom colors.
+   * The theme of the embed. currently support `light` and `dark`.
    */
   theme: EmbedConfigThemeSchema.optional(),
 });
