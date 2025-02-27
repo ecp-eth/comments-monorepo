@@ -6,6 +6,7 @@ import {
   PreparedSignedGaslessPostCommentNotApprovedResponseSchema,
   PrepareSignedGaslessCommentRequestBodySchema,
 } from "@/lib/schemas";
+import { resolveSubmitterAccount } from "@/lib/submitter";
 import { bigintReplacer } from "@/lib/utils";
 import {
   chains as configChains,
@@ -84,9 +85,7 @@ export async function POST(
   const signature = await account.signTypedData(typedCommentData);
 
   if (submitIfApproved) {
-    const submitterAccount = privateKeyToAccount(
-      process.env.SUBMITTER_PRIVATE_KEY! as `0x${string}`
-    );
+    const submitterAccount = await resolveSubmitterAccount();
     const walletClient = createWalletClient({
       account: submitterAccount,
       chain,

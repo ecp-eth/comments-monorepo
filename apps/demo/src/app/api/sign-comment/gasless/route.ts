@@ -5,6 +5,7 @@ import {
   GaslessPostCommentResponseSchema,
   InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
+import { resolveSubmitterAccount } from "@/lib/submitter";
 import {
   chains as configChains,
   transports as configTransports,
@@ -43,9 +44,7 @@ export async function POST(
   );
 
   // Can be any account with funds for gas on desired chain
-  const submitterAccount = privateKeyToAccount(
-    process.env.SUBMITTER_PRIVATE_KEY! as `0x${string}`
-  );
+  const submitterAccount = await resolveSubmitterAccount();
 
   const chain = configChains[0];
   const transport = configTransports[chain.id as keyof typeof configTransports];
