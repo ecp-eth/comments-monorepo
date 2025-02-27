@@ -5,12 +5,7 @@ import {
 } from "@ecp.eth/sdk";
 import { ponder } from "ponder:registry";
 import schema from "ponder:schema";
-import {
-  getAddress,
-  hashTypedData,
-  verifyMessage,
-  verifyTypedData,
-} from "viem";
+import { getAddress, hashTypedData, verifyTypedData } from "viem";
 import { normalizeUrl } from "./lib/utils";
 
 function transformTargetUri(targetUri: string) {
