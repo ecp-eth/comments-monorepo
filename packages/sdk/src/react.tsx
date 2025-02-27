@@ -151,7 +151,7 @@ export function CommentsEmbed({
   );
 }
 
-type CommentsByAuthorEmbedProps = {
+export type CommentsByAuthorEmbedProps = {
   /**
    * The author address to filter comments by
    */

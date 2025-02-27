@@ -1,3 +1,8 @@
+/**
+ * Ethereum Comments Protocol SDK zod schemas
+ * 
+ * @module
+ */
 import { z } from "zod";
 import { DOMAIN_NAME, DOMAIN_VERSION } from "./eip712.js";
 import { COMMENTS_V1_ADDRESS } from "./constants.js";
@@ -11,6 +16,9 @@ export const HexSchema = z.custom<`0x${string}`>(
       .safeParse(value).success
 );
 
+/**
+ * type for hex format string, e.g. `0x1234567890abcdef`
+ */
 export type Hex = z.infer<typeof HexSchema>;
 
 export const CommentDataSchema = z.object({
