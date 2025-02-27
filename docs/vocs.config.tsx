@@ -118,6 +118,7 @@ export default defineConfig({
           items: [
             {
               text: "Custom Integration",
+              link: '/demos/custom-integration',
               collapsed: true,
               items: [
                 {
@@ -132,6 +133,7 @@ export default defineConfig({
             },
             {
               text: "Blog with <CommentsEmbed />",
+              link: '/demos/blog',
               collapsed: true,
               items: [
                 {
