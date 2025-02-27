@@ -98,6 +98,16 @@ export default defineConfig({
         {
           text: "Indexer Reference",
           link: "/idxer-reference/",
+          items: [
+            {
+              text: "RESTful API",
+              link: "/idxer-reference/restful",
+            },
+            {
+              text: "GraphQL API",
+              link: "https://api.ethcomments.xyz/graphql",
+            }
+          ],
         },
         {
           text: "Protocol Reference",
