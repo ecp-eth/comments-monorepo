@@ -1,0 +1,16 @@
+{
+  "name": "@ecp.eth/test-protocol",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "forge test",
+    "dev": "node dev.js"
+  },
+  "dependencies": {
+    "forge-std": "github:foundry-rs/forge-std#v1.8.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
