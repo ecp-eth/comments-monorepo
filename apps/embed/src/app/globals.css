@@ -36,6 +36,7 @@ body {
       hsl(0 0% 98%)
     );
     --border: var(--light-theme-border, hsl(0 0% 89.8%));
+    --border-focus: var(--light-theme-border-focus, hsl(0 0% 3.9%));
     --input: var(--light-theme-border, hsl(0 0% 89.8%));
     --ring: var(--light-theme-ring, hsl(0 0% 3.9%));
     --radius: var(--theme-radius, 0.5rem);
@@ -65,6 +66,7 @@ body {
         hsl(0 0% 98%)
       );
       --border: var(--dark-theme-border, hsl(0 0% 14.9%));
+      --border-focus: var(--dark-theme-border-focus, hsl(0 0% 83.1%));
       --input: var(--dark-theme-border, hsl(0 0% 14.9%));
       --ring: var(--dark-theme-ring, hsl(0 0% 83.1%));
     }
