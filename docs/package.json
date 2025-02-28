@@ -7,7 +7,10 @@
     "dev": "vocs dev -p 3003",
     "build": "vocs build",
     "preview": "vocs preview",
-    "ref:gen:sdk": "typedoc --tsconfig ../packages/sdk/tsconfig.json --out pages/sdk-reference/ --entryPoints ../packages/sdk/src/index.ts ../packages/sdk/src/types.ts ../packages/sdk/src/react.tsx --publicPath /sdk-reference/",
+    "ref:gen:demo:blog": "cp ../apps/embed-demo-blog/README.md pages/demos/blog/index.mdx",
+    "ref:gen:demo:demo": "cp ../apps/demo/README.md pages/demos/custom-integration/index.mdx",
+    "ref:gen:demo": "pnpm run ref:gen:demo:blog && pnpm run ref:gen:demo:demo",
+    "ref:gen:sdk": "typedoc --tsconfig ../packages/sdk/tsconfig.json --out pages/sdk-reference/ --entryPoints ../packages/sdk/src/index.ts ../packages/sdk/src/types.ts ../packages/sdk/src/react.tsx ../packages/sdk/src/schemas.ts --publicPath /sdk-reference/",
     "ref:gen:protocol": "solidity-docgen -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen",
     "ref:gen:indexer": "NEYNAR_API_KEY=123 tsx --import ./scripts/ponder-module-register.mjs scripts/generate-indexer-openapi-spec.ts"
   },

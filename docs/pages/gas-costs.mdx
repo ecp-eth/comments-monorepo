@@ -1,0 +1,55 @@
+# Gas Costs
+
+This page provides an overview of typical gas costs for posting comments on different chains using the Ethereum Comments Protocol (ECP).
+
+_Please note that the figures on this page are provided as estimates to give a general idea of transaction costs. The actual figures will vary._
+
+## Base Network
+
+Base is an Ethereum L2 that offers significantly lower gas costs compared to Ethereum mainnet. Here are estimated fees based on varies L1 gas price:
+
+| Operation           | Gas Units | at 0.1 gwei | at 0.5 gwei  | at 1 gwei      |
+| ------------------- | --------- | ----------- | ------------ | -------------- |
+| postCommentAsAuthor | ~66,000   | $0.00097    | $0.00485     | $0.0095        |
+| postComment         | ~60,000   | $0.00088    | $0.00440     | $0.0088        |
+| Reply to Comment    | ~68,000   | $0.001      | $0.005       | $0.01          |
+| Delete Comment      | ~25,000   | $0.00037    | $0.00185     | $0.0037        |
+
+## Ethereum Mainnet
+
+| Operation           | Gas Units | at 0.1 gwei | at 0.5 gwei  | at 1 gwei  |
+| ------------------- | --------- | ----------- | ------------ | ---------- |
+| postCommentAsAuthor | ~66,000   | $0.05       | $0.24        | $0.50      |
+| postComment         | ~60,000   | $0.04       | $0.22        | $0.40      |
+| Reply to Comment    | ~68,000   | $0.05       | $0.25        | $0.50      |
+| Delete Comment      | ~25,000   | $0.02       | $0.09        | $0.20      |
+
+# Example transactions:
+
+For example a [`postCommentAsAuthor`](/protocol-reference/CommentsV1#postcommentasauthorstruct-commentsv1commentdata-commentdata-bytes-appsignature-external) that replies to a comment,
+the [transaction](https://basescan.org/tx/0x6cb976aeb028cf51140dbfda25a77d628300f39e7244f860cdfc0e0da377c864) is initiated and paid by the author,
+it costs around `66,843` gas units, with a limit of `67,691` gas units on Base L2; `4,190` gas units on L1:
+
+- With a gas price of `0.003135673 Gwei` on L2, the transaction fee on Base L2 is  `0.000000209597790339 ETH`.
+- With a gas price of `0.7471636 Gwei` on L1, after adjustment the final L1 fee is `0.000002326060890698 ETH`.
+
+The user totally paid for `0.000002535658681037 ETH` for the transaction, and at the time of transaction, it was `0.006771 USD`.
+
+## Notes
+
+- Gas costs are estimates and may vary based on:
+
+  - The length of the comment content
+  - Network congestion
+  - Current gas prices
+  - Additional metadata included
+
+- Gas prices are highly variable. Check current gas prices on:
+
+  - [Base Gas Tracker](https://basescan.org/gastracker)
+  - [Ethereum Gas Tracker](https://etherscan.io/gastracker)
+
+- Dollar amounts are approximate and will vary based on:
+  - Current ETH price
+  - Gas price at time of transaction
+  - Network conditions

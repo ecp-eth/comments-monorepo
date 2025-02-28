@@ -75,7 +75,7 @@ export default defineConfig({
       ],
     },
     {
-      text: "Resources",
+      text: "Reference",
       items: [
         {
           text: "SDK Reference",
@@ -98,26 +98,76 @@ export default defineConfig({
         {
           text: "Indexer Reference",
           link: "/idxer-reference/",
+          items: [
+            {
+              text: "RESTful API",
+              link: "/idxer-reference/restful",
+            },
+            {
+              text: "GraphQL API",
+              link: "https://api.ethcomments.xyz/graphql",
+            }
+          ],
         },
         {
           text: "Protocol Reference",
           link: "/protocol-reference/CommentsV1",
         },
+      ],
+    },
+    {
+      text: "Demos & Examples",
+      items: [
         {
-          text: "Demo Repo Links",
+          text: "Custom Integration",
+          link: '/demos/custom-integration',
+          collapsed: true,
           items: [
             {
-              text: "Custom Integration",
-              link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo",
+              text: "Demo",
+              link: "https://demo.ethcomments.xyz/",
             },
             {
-              text: "Using <CommentsEmbed />",
-              link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/embed",
+              text: "Source Code",
+              link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo",
             },
-          ],
+          ]
+        },
+        {
+          text: "Blog with <CommentsEmbed />",
+          link: '/demos/blog',
+          collapsed: true,
+          items: [
+            {
+              text: "Demo",
+              link: "https://demo-blog.ethcomments.xyz/",
+            },
+            {
+              text: "Source Code",
+              link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/embed-demo-blog",
+            },
+          ]
         },
       ],
     },
+    {
+      text: "Resources",
+      items: [
+        {
+          text: "Logo Assets",
+          link: "/logo-assets",
+        },
+        {
+          text: "FAQ",
+          items: [
+            {
+              text: "Gas Costs",
+              link: "/gas-costs",
+            },
+          ],
+        },
+      ]
+    }
   ],
   topNav: [
     { text: "Github", link: "https://github.com/ecp-eth/comments-monorepo" },

@@ -28,9 +28,15 @@ URL on which /api/comments endpoint will be called
 
 ### appSigner?
 
-> `optional` **appSigner**: `Hex`
+> `optional` **appSigner**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
 
 Filter comments sent using this app signer key.
+
+### author?
+
+> `optional` **author**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
+
+Filter comments by author
 
 ### limit?
 
@@ -84,6 +90,8 @@ The sort order, either `asc` or `desc`
 "desc"
 ```
 
-### targetUri
+### targetUri?
 
-> **targetUri**: `string`
+> `optional` **targetUri**: `string`
+
+The target URI to fetch comments for

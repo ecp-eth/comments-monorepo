@@ -1,0 +1,43 @@
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [react](/sdk-reference/react/index.mdx) / CommentsByAuthorEmbedProps
+
+# Type Alias: CommentsByAuthorEmbedProps
+
+> **CommentsByAuthorEmbedProps**: `object`
+
+Defined in: [packages/sdk/src/react.tsx:154](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L154)
+
+## Type declaration
+
+### author
+
+> **author**: `Hex`
+
+The author address to filter comments by
+
+### config?
+
+> `optional` **config**: [`EmbedConfigSchemaType`](/sdk-reference/schemas/type-aliases/EmbedConfigSchemaType.mdx)
+
+Allows to pass custom configuration to the embed iframe.
+
+### containerProps?
+
+> `optional` **containerProps**: `React.HTMLAttributes`\<`HTMLDivElement`\>
+
+Allows to pass custom props to iframe's wrapper element
+
+### embedUri?
+
+> `optional` **embedUri**: `string`
+
+URL of the comments embed iframe page. This page is rendered in the iframe.
+
+### iframeProps?
+
+> `optional` **iframeProps**: `React.IframeHTMLAttributes`\<`HTMLIFrameElement`\>
+
+Allows to pass custom props to iframe

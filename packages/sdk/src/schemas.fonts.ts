@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+/**
+ * It supports the following fonts from GoogleFonts
+ */
 export const EmbedConfigSupportedFont = z.enum([
   "ABeeZee",
   "ADLaM_Display",

@@ -20,6 +20,23 @@ export function Comments() {
           window.location.pathname,
           baseOrigin
         ).toString()}
+        // the config object allows you to customize the CommentsEmbed's appearance
+        config={{
+          theme: {
+            // mode controls which theme to use, it can be 'light' or 'dark'
+            mode: 'light',
+            colors: {
+              dark: {
+                background: 'black',
+                foreground: '#e9e9ea',
+              },
+              light: {
+                background: 'white',
+                foreground: '#4c4c4c',
+              },
+            },
+          },
+        }}
       />
     </div>`
   )
@@ -40,6 +57,7 @@ The `uri` must be a unique string that follows the [RFC 3986](https://datatracke
 
 - [`CommentsEmbed`](/sdk-reference/react/functions/CommentsEmbed)
 - [`CommentsEmbedProps`](/sdk-reference/react/type-aliases/CommentsEmbedProps)
+- [`EmbedConfigSchemaType`](/sdk-reference/schemas/type-aliases/EmbedConfigSchemaType) - detailed customization options
 
 ## 2. Indexer API
 
