@@ -33,65 +33,80 @@ export function CommentBox({
 }: CommentBoxProps) {
   const onSubmitRef = useFreshRef(onSubmit);
   const { address } = useAccount();
-  const { switchChain } = useSwitchChain();
+  const { switchChainAsync } = useSwitchChain();
   const [content, setContent] = useState("");
   const { writeContractAsync } = useWriteContract();
+  const [formState, setFormState] = useState<"posting" | "yoinking" | "idle">(
+    "idle"
+  );
 
   const submitMutation = useMutation({
     mutationFn: async (e: React.FormEvent) => {
-      e.preventDefault();
+      try {
+        e.preventDefault();
 
-      if (!content.trim() || !address) {
-        return;
-      }
+        if (!content.trim() || !address) {
+          return;
+        }
 
-      const formValues = new FormData(e.currentTarget as HTMLFormElement);
+        const formValues = new FormData(e.target as HTMLFormElement);
+        const submitAction = formValues.get("action") as "post" | "yoink";
 
-      const submitAction = formValues.get("action") as "post" | "yoink";
+        setFormState(submitAction === "post" ? "posting" : "yoinking");
 
-      switchChain({ chainId: chains[0].id });
+        await switchChainAsync({ chainId: chains[0].id });
 
-      const response = await fetch("/api/sign-comment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content,
-          targetUri: window.location.href,
-          parentId,
-          author: address,
-          chainId: chains[0].id, // Replace with your desired chain ID
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to sign comment");
-      }
-
-      const data = SignCommentResponseSchema.parse(await response.json());
-
-      if (submitAction === "yoink") {
-        const commentDataSuffix = createCommentSuffixData({
-          commentData: data.data,
-          appSignature: data.signature,
+        const response = await fetch("/api/sign-comment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            content,
+            targetUri: window.location.href,
+            parentId,
+            author: address,
+            chainId: chains[0].id, // Replace with your desired chain ID
+          }),
         });
+
+        if (!response.ok) {
+          throw new Error("Failed to sign comment");
+        }
+
+        const data = SignCommentResponseSchema.parse(await response.json());
+
+        if (submitAction === "yoink") {
+          const yoinkContractAddress =
+            process.env.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS;
+
+          if (!yoinkContractAddress) {
+            throw new Error("Yoink contract address is not set");
+          }
+
+          const commentDataSuffix = createCommentSuffixData({
+            commentData: data.data,
+            appSignature: data.signature,
+          });
+
+          return writeContractAsync({
+            address: yoinkContractAddress,
+            abi: parseAbi(["function yoink()"]),
+            functionName: "yoink",
+            args: [],
+            dataSuffix: commentDataSuffix,
+          });
+        }
 
         return writeContractAsync({
-          address: "0x4bBFD120d9f352A0BEd7a014bd67913a2007a878",
-          abi: parseAbi(["function yoink()"]),
-          functionName: "yoink",
-          args: [],
-          dataSuffix: commentDataSuffix,
+          abi: CommentsV1Abi,
+          address: COMMENTS_V1_ADDRESS,
+          functionName: "postCommentAsAuthor",
+          args: [data.data, data.signature],
         });
+      } finally {
+        setFormState("idle");
       }
-
-      return writeContractAsync({
-        abi: CommentsV1Abi,
-        address: COMMENTS_V1_ADDRESS,
-        functionName: "postCommentAsAuthor",
-        args: [data.data, data.signature],
-      });
     },
   });
 
@@ -123,6 +138,11 @@ export function CommentBox({
       {address && (
         <div className="text-xs text-gray-500">Publishing as {address}</div>
       )}
+      {submitMutation.error && (
+        <div className="text-xs text-red-500">
+          {submitMutation.error.message}
+        </div>
+      )}
       <div className="flex items-center gap-2 text-sm text-gray-500">
         <Button
           name="action"
@@ -131,17 +151,19 @@ export function CommentBox({
           className="bg-blue-500 text-white px-4 py-2 rounded"
           disabled={submitDisabled}
         >
-          {isLoading ? "Posting..." : "Comment"}
+          {formState === "posting" ? "Posting..." : "Comment"}
         </Button>
-        <Button
-          name="action"
-          value="yoink"
-          type="submit"
-          className="bg-purple-500 text-white px-4 py-2 rounded"
-          disabled={submitDisabled}
-        >
-          {isLoading ? "Yoinking..." : "Yoink with comment"}
-        </Button>
+        {process.env.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS && (
+          <Button
+            name="action"
+            value="yoink"
+            type="submit"
+            className="bg-purple-500 text-white px-4 py-2 rounded"
+            disabled={submitDisabled}
+          >
+            {formState === "yoinking" ? "Yoinking..." : "Yoink with comment"}
+          </Button>
+        )}
       </div>
     </form>
   );

@@ -41,6 +41,7 @@ const EnvSchema = z
     NEXT_PUBLIC_WC_PROJECT_ID: z.string().nonempty(),
     APP_URL: z.string().url(),
     NEXT_PUBLIC_COMMENTS_INDEXER_URL: z.string().url(),
+    NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS: HexSchema.optional(),
   })
   .merge(EthSubmitterEnvSchema.partial())
   .merge(PrivySubmitterEnvSchema.partial())
