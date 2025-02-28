@@ -79,8 +79,8 @@ async function main() {
   console.log('fetching comments...')
 
   const comments = await fetchComments({
-    // the url of embed api
-    apiUrl: "https://embed.ethcomments.xyz",
+    // the url of indexer api
+    apiUrl: "https://api.ethcomments.xyz",
     // the uri of commeting target
     targetUri: "https://demo.ethcomments.xyz",
   });
@@ -100,7 +100,19 @@ The response is a list of comments and pagination information:
 {
   results: [
     {
-      author: [Object],
+      author: {
+        "address": "0x8d25687829d6b85d9e0020b8c89e3ca24de20a89",
+        "ens": {
+          "name": "stephancill.eth",
+          "avatarUrl": "https://euc.li/stephancill.eth"
+        },
+        "farcaster": {
+          "fid": 1689,
+          "pfpUrl": "https://images.colorino.site/19c754968a5a0d6e5b554a3aa8107d5fe973a88550080f7b1713e3c33989ffa0.png",
+          "displayName": "Stephan",
+          "username": "stephancill"
+        }
+      },
       appSigner: "0xe86a6df8ead873600050fb669e7bc8d3b8587f3d",
       chainId: 8453,
       content: "hello world",
