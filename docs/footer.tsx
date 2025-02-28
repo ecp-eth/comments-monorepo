@@ -16,10 +16,10 @@ export default function Footer() {
 
   return (
     <CommentsEmbed
+      embedUri="http://localhost:3002"
       uri={`${window.location.origin}/${window.location.pathname}`}
       containerProps={{
         style: {
-          padding: "12px 8px",
           backgroundColor: "var(--vocs-color_backgroundDark)",
           borderRadius: "var(--vocs-borderRadius_8)",
           overflow: "hidden",
@@ -51,6 +51,10 @@ export default function Footer() {
                 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
             },
           },
+          other: {
+            "root-padding-horizontal": "24px",
+            "root-padding-vertical": "12px"
+          }
         }
       }}
     />

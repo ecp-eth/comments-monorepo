@@ -65,7 +65,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
 
     return (
       <ApplyTheme config={config}>
-        <main className="min-h-screen p-0 bg-background text-foreground font-default">
+        <main className="min-h-screen p-0 bg-background text-foreground font-default px-root-padding-horizontal py-root-padding-vertical">
           <div className="max-w-4xl mx-auto">
             <Providers>
               <EmbedConfigProvider value={{ targetUri }}>
