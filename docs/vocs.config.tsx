@@ -75,6 +75,15 @@ export default defineConfig({
       ],
     },
     {
+      text: "Alternative Indexers",
+      items: [
+        {
+          text: "Index Supply",
+          link: "/index-supply",
+        }
+      ]
+    },
+    {
       text: "Reference",
       items: [
         {

@@ -1,0 +1,217 @@
+# Using Index Supply as the Indexer
+
+The Ethereum Comments Protocol can be integrated with [Index Supply](https://www.indexsupply.net/) as an alternative indexing solution.
+This guide will to walk you through the steps to setup Index Supply to query comments from the protocol.
+
+## Event Signatures
+
+All events emitted by the CommentsV1 contract [can be found here](/protocol-reference/CommentsV1#events).
+
+### Struct to Tuple Conversion
+
+Index Supply does not recognize `struct` in event signatures.
+all `struct`s must be converted into a `tuple` according to
+[Human Readable ABI format](https://docs.ethers.org/v5/api/utils/abi/formats/#abi-formats--human-readable-abi).
+
+For example, the `CommentAdded` event was defined as:
+
+```solidity
+event CommentAdded(
+  bytes32 indexed commentId,
+  address indexed author,
+  address indexed appSigner,
+  CommentData commentData
+);
+```
+
+It must be converted to the following tuple form in order to work with Index Supply:
+
+```solidity
+CommentAdded(bytes32 indexed commentId, address indexed author, address indexed appSigner, (string content, string metadata, string targetUri, bytes32 parentId, address author, address appSigner, uint256 nonce, uint256 deadline) commentData)
+```
+
+_please note: at the time of writing, Index Supply's query interface doesn't support multi-line event signatures._
+
+## Dependencies
+
+All examples below requires installing the following dependencies:
+
+```bash
+npm install @ecp.eth/sdk zod
+```
+
+## Fetching Comments
+
+We will build a `fetchComments()` function to fetch comments for a given URI via Index Supply.
+
+::::steps
+
+### Create Index Supply Client
+
+Create a simple client wrapper for Index Supply:
+
+```typescript
+export type ISPrimitive = string | number | boolean | null;
+export type ISRow = ISPrimitive[];
+export type ISRows = ISRow[];
+export type ISResponse = {
+  block_height: number;
+  result: [[string[], ...ISRows]];
+}
+ 
+export const indexSupplyClient = {
+  async query(chain: string, query: string, eventSignatures: string[]) {
+    const params = new URLSearchParams({
+      chain,
+      query,
+      event_signatures: eventSignatures.join(","),
+    });
+ 
+    const response = await fetch(
+      `https://api.indexsupply.net/query?${params.toString()}`
+    );
+ 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+ 
+    return response.json() as Promise<ISResponse>;
+  },
+};
+
+```
+
+### Fetch Comments function for a URI
+
+Here's how to fetch comments for a specific URI using Index Supply:
+
+```typescript
+import { z } from "zod";
+import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import { indexSupplyClient, ISPrimitive } from "./isClient";
+ 
+const COMMENT_ADDED_EVENT =
+  `CommentAdded(
+    bytes32 indexed commentId,
+    address indexed author,
+    address indexed appSigner, 
+    (
+      string content,
+      string metadata,
+      string targetUri,
+      bytes32 parentId,
+      address author,
+      address appSigner,
+      uint256 nonce,
+      uint256 deadline
+    ) commentData
+  )`;
+
+const commentSchema = z.object({
+  id: z.string(),
+  content: z.string(),
+  targetUri: z.string(),
+  author: z.string(),
+  appSigner: z.string(),
+  parentId: z.string().nullable(),
+  blockNumber: z.number(),
+  transactionHash: z.string(),
+})
+ 
+type Comment = z.infer<typeof commentSchema>;
+ 
+async function fetchComments(
+  targetUri: string,
+  appSigner: string,
+  chain = "8453"
+): Promise<Comment[]> {
+
+  const query = `
+    SELECT
+      commentId as "id",
+      (commentData->>'content') as "content",
+      (commentData->>'targetUri') as "targetUri",
+      "author", 
+      "appSigner",
+      (commentData->>'parentId') as "parentId",
+      block_num as "blockNumber",
+      tx_hash as "transactionHash"
+    FROM
+      CommentAdded
+    WHERE
+      address = ${COMMENTS_V1_ADDRESS}
+    AND
+      appSigner = ${appSigner}
+    AND
+      commentData->>'targetUri' = '${targetUri}'
+    ORDER BY block_num DESC
+    LIMIT 10
+  `;
+ 
+  try {
+    const response = await indexSupplyClient.query(chain, query, [
+      COMMENT_ADDED_EVENT,
+    ]);
+
+
+    if (!response.result?.[0]) {
+      return [];
+    }
+ 
+    const [columns, ...rows] = response.result[0];
+
+    if (!columns) {
+      return [];
+    }
+
+    return rows.map<Record<string, ISPrimitive>>((row: ISPrimitive[]) => {
+      return row.reduce<Record<string, ISPrimitive>>((record, value: ISPrimitive, index: number) => {
+        if (!columns[index]) {
+          return record
+        }
+
+        record[columns[index]] = value;
+        return record;
+      }, {} as Record<string, ISPrimitive>)
+    }).filter((maybeComment): maybeComment is Comment => {
+      const result = commentSchema.safeParse(maybeComment)
+      if (!result.success) {
+        console.warn('Invalid comment', result.error)
+      }
+      return result.success
+    })
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    throw error;
+  }
+}
+```
+
+### Run it
+
+```typescript
+import { fetchComments } from "./fetchComments";
+
+console.log(
+  await fetchComments(
+    "https://demo.ethcomments.xyz/",
+    "0xe86a6df8ead873600050fb669e7bc8d3b8587f3d")
+)
+```
+
+### Done
+
+::::
+
+## Limitations and Considerations
+
+- Index Supply requires proper query optimization for best performance
+- Consider using pagination for large result sets
+- Add appropriate error handling for API rate limits and network issues
+- The free tier has limitations on query complexity and frequency
+
+## Additional Resources
+
+- [Index Supply Documentation](https://www.indexsupply.net/docs)
+- [ECP Protocol Reference](/protocol-reference/CommentsV1)
+
