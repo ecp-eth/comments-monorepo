@@ -88,6 +88,7 @@ Here's how to fetch comments for a specific URI using Index Supply:
 ```typescript
 import { z } from "zod";
 import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import { HexSchema } from "@ecp.eth/sdk/schemas";
 import { indexSupplyClient, ISPrimitive } from "./isClient";
  
 const COMMENT_ADDED_EVENT =
@@ -111,11 +112,11 @@ const commentSchema = z.object({
   id: z.string(),
   content: z.string(),
   targetUri: z.string(),
-  author: z.string(),
-  appSigner: z.string(),
+  author: HexSchema,
+  appSigner: HexSchema,
   parentId: z.string().nullable(),
   blockNumber: z.number(),
-  transactionHash: z.string(),
+  transactionHash: HexSchema,
 })
  
 type Comment = z.infer<typeof commentSchema>;
