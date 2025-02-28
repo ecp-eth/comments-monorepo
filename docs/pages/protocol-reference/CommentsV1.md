@@ -32,7 +32,7 @@ Implements EIP-712 for typed structured data hashing and signing
 - **appSigner:** address
 
 
-- **nonce:** uint256
+- **salt:** bytes32
 
 
 - **deadline:** uint256
