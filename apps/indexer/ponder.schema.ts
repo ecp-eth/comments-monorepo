@@ -28,6 +28,7 @@ export const comment = onchainTable(
 );
 
 export type CommentSelectType = typeof comment.$inferSelect;
+export type CommentInserType = typeof comment.$inferInsert;
 
 export const approvals = onchainTable(
   "approvals",
