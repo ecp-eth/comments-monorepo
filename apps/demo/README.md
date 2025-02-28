@@ -20,7 +20,9 @@ pnpm install
 
 ## Development
 
-First, run the development server:
+First, copy the `.env.example` file to `.env` and set the environment variables.
+
+Next, run the development server:
 
 ```bash
 npm run dev
