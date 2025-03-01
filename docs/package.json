@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vocs dev -p 3003",
+    "dev": "vocs dev -p 3004",
     "build": "vocs build",
     "preview": "vocs preview",
     "ref:gen:demo:blog": "cp ../apps/embed-demo-blog/README.md pages/demos/blog/index.mdx",

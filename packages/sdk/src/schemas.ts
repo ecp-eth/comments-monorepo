@@ -92,7 +92,10 @@ export const EmbedConfigThemePaletteSchema = z.object({
   ring: CSSColorSchema.optional().describe(
     "Color used by interactive elements like button when they are focused"
   ),
-  border: CSSColorSchema.optional().describe("Border color - used by sonner"),
+  border: CSSColorSchema.optional().describe("Border color"),
+  "border-focus": CSSColorSchema.optional().describe(
+    "Border color when focused"
+  ),
 });
 
 export type EmbedConfigThemePaletteSchemaType = z.infer<

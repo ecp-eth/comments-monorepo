@@ -1,42 +1,6 @@
 import type { EmbedConfigSchemaType } from "@ecp.eth/sdk/schemas";
 import { CSSProperties } from "react";
 
-export const defaultTheme: EmbedConfigSchemaType = {
-  theme: {
-    colors: {
-      light: {
-        "destructive-foreground": "hsl(0 0% 98%)",
-        "muted-foreground": "hsl(0 0% 45.1%)",
-        "primary-foreground": "hsl(0 0% 98%)",
-        "secondary-foreground": "hsl(0 0% 9%)",
-        background: "white",
-        border: "hsl(0 0% 89.8%)",
-        destructive: "hsl(0 84.2% 60.2%)",
-        foreground: "hsl(0 0% 3.9%)",
-        primary: "hsl(0 0% 9%)",
-        ring: "hsl(0 0% 3.9%)",
-        secondary: "hsl(0 0% 96.1%)",
-      },
-      dark: {
-        "destructive-foreground": "hsl(0 0% 98%)",
-        "muted-foreground": "hsl(0 0% 63.9%)",
-        "primary-foreground": "hsl(0 0% 9%)",
-        "secondary-foreground": "hsl(0 0% 98%)",
-        background: "hsl(0 0% 3.9%)",
-        border: "hsl(0 0% 14.9%)",
-        destructive: "hsl(0 84.2% 60.2%)",
-        foreground: "hsl(0 0% 98%)",
-        primary: "hsl(0 0% 98%)",
-        ring: "hsl(0 0% 83.1%)",
-        secondary: "hsl(0 0% 14.9%)",
-      },
-    },
-    other: {
-      radius: "0.5rem",
-    },
-  },
-};
-
 export function createThemeCSSVariables(
   config: EmbedConfigSchemaType | undefined
 ): CSSProperties {

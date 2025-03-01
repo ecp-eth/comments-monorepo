@@ -114,7 +114,7 @@ export function CommentForm({
           submitCommentMutation.error &&
             submitCommentMutation.error instanceof
               SubmitCommentMutationValidationError &&
-            "border-destructive focus-visible:ring-destructive"
+            "border-destructive focus-visible:border-destructive"
         )}
         disabled={isSubmitting}
         maxLength={MAX_COMMENT_LENGTH}
