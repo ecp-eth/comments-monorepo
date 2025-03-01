@@ -110,5 +110,11 @@ body {
     margin: 0;
     padding: 0;
     background: transparent;
+    /** 
+     * because the container on parent window always sync with the body content height,
+     * we can simply set overflow: hidden to prevent scrollbar showing up and mess up the 
+     * scrollHeight measurement.
+     */
+    overflow: hidden;
   }
 }

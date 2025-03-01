@@ -9,7 +9,10 @@ import { useEffect } from "react";
 export function WatchDocumentResize() {
   useEffect(() => {
     const notifyParent = () => {
-      const height = document.documentElement.scrollHeight;
+      // use body.scrollHeight instead of documentElement.scrollHeight
+      // because body.scrollHeight gives us the real height of __content__
+      // the container on parent window should always sync with the content height
+      const height = document.body.scrollHeight;
       window.parent.postMessage(
         EmbedResizedEventSchema.parse({
           type: "@ecp.eth/sdk/embed/resize",

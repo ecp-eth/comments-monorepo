@@ -258,11 +258,6 @@ function CommentsEmbedInternal({
           border: "none",
           width: "100%",
           ...iframeProps?.style,
-          // because of wallet connect dialog
-          // also it will be updated if the height is higher
-          // also we don't want to allow user to override minHeight
-          // as it will break the layout
-          minHeight: "500px",
           ...dimensions,
         }}
         src={src}

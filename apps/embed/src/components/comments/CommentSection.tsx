@@ -19,6 +19,7 @@ import { Button } from "../ui/button";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { fetchComments } from "@ecp.eth/sdk";
 import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
+import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -28,6 +29,7 @@ type CommentSectionProps = {
 };
 
 export function CommentSection({ initialData }: CommentSectionProps) {
+  useAutoBodyMinHeight();
   const { targetUri } = useEmbedConfig();
   const account = useAccount();
   const queryKey = useMemo(() => ["comments", targetUri], [targetUri]);
