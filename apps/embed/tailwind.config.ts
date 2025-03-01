@@ -89,6 +89,10 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      spacing: {
+        "root-padding-vertical": "var(--theme-root-padding-vertical)",
+        "root-padding-horizontal": "var(--theme-root-padding-horizontal)",
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],

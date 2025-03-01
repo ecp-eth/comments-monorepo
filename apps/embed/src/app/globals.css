@@ -40,6 +40,8 @@ body {
     --input: var(--light-theme-border, hsl(0 0% 89.8%));
     --ring: var(--light-theme-ring, hsl(0 0% 3.9%));
     --radius: var(--theme-radius, 0.5rem);
+    --root-padding-vertical: var(--theme-root-padding-vertical, 0);
+    --root-padding-horizontal: var(--theme-root-padding-horizontal, 0);
   }
 
   @media (prefers-color-scheme: dark) {

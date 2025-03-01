@@ -113,6 +113,8 @@ export type EmbedConfigThemeColorsSchemaType = z.infer<
 
 export const EmbedConfigThemeOtherSchema = z.object({
   radius: CSSSizeSchema.optional(),
+  "root-padding-vertical": CSSSizeSchema.optional(),
+  "root-padding-horizontal": CSSSizeSchema.optional(),
 });
 
 export type EmbedConfigThemeOtherSchemaType = z.infer<
