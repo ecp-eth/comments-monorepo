@@ -16,7 +16,6 @@ export default function Footer() {
 
   return (
     <CommentsEmbed
-      embedUri="http://localhost:3002"
       uri={`${window.location.origin}/${window.location.pathname}`}
       containerProps={{
         style: {
