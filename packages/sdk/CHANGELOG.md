@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.8
+
+### Patch Changes
+
+- 776e987: chore: add script to ensure it was built before publish
+
 ## 0.0.7
 
 ### Patch Changes
