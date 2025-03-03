@@ -15,6 +15,10 @@ paths:
         - comments
       description: Retrieve a list of comments based on the criteria
       parameters:
+        - schema: {}
+          required: false
+          name: author
+          in: query
         - schema:
             description: The address of the app signer
           required: false
@@ -111,7 +115,9 @@ paths:
                             - string
                             - 'null'
                         logIndex:
-                          type: integer
+                          type:
+                            - integer
+                            - 'null'
                         metadata:
                           type: string
                         parentId: {}
@@ -172,7 +178,9 @@ paths:
                                       - string
                                       - 'null'
                                   logIndex:
-                                    type: integer
+                                    type:
+                                      - integer
+                                      - 'null'
                                   metadata:
                                     type: string
                                   parentId: {}
@@ -253,6 +261,10 @@ paths:
           required: true
           name: commentId
           in: path
+        - schema: {}
+          required: false
+          name: author
+          in: query
         - schema:
             description: The address of the app signer
           required: false
@@ -340,7 +352,9 @@ paths:
                             - string
                             - 'null'
                         logIndex:
-                          type: integer
+                          type:
+                            - integer
+                            - 'null'
                         metadata:
                           type: string
                         parentId: {}
