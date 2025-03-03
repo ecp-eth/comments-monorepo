@@ -9,7 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@ecp.eth/sdk": "^0.0.6",
+    "@ecp.eth/sdk": "^0.0.7",
     "next": "15.1.6",
     "next-mdx-remote": "^5.0.0",
     "react": "^19.0.0",

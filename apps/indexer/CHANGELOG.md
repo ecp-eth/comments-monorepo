@@ -1,6 +1,6 @@
-# @ecp.eth/docs
+# @ecp.eth/indexer
 
-## 0.0.3
+## 0.0.2
 
 ### Patch Changes
 
@@ -16,10 +16,3 @@
 - Updated dependencies [2b50f53]
 - Updated dependencies [6900847]
   - @ecp.eth/sdk@0.0.7
-
-## 0.0.2
-
-### Patch Changes
-
-- Updated dependencies [d916603]
-  - @ecp.eth/sdk@0.0.6

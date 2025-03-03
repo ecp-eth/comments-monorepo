@@ -1,6 +1,6 @@
 {
   "name": "@ecp.eth/indexer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "type": "module",
   "engines": {
@@ -16,7 +16,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@ecp.eth/sdk": "^0.0.6",
+    "@ecp.eth/sdk": "^0.0.7",
     "@hono/zod-openapi": "^0.18.4",
     "@neynar/nodejs-sdk": "^2.13.1",
     "dataloader": "^2.2.3",
