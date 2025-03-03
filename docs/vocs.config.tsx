@@ -176,6 +176,10 @@ export default defineConfig({
           ],
         },
       ]
+    },
+    {
+      text: "Contact",
+      link: "https://t.me/davidfurlong",
     }
   ],
   topNav: [
