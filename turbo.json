@@ -5,7 +5,8 @@
     "NEXT_PUBLIC_WC_PROJECT_ID",
     "NEXT_PUBLIC_URL",
     "NEXT_PUBLIC_APP_SIGNER_ADDRESS",
-    "NEXT_COMMENTS_INDEXER_URL"
+    "NEXT_COMMENTS_INDEXER_URL",
+    "NODE_ENV"
   ],
   "globalPassThroughEnv": [
     "APP_URL",
@@ -17,7 +18,8 @@
     "PRIVY_SECRET",
     "PRIVY_AUTHORIZATION_KEY",
     "PRIVY_WALLET_ADDRESS",
-    "PRIVY_WALLET_ID"
+    "PRIVY_WALLET_ID",
+    "SENTRY_DSN"
   ],
   "tasks": {
     "build": {
