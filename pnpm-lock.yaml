@@ -218,7 +218,7 @@ importers:
   apps/embed-demo-blog:
     dependencies:
       '@ecp.eth/sdk':
-        specifier: ^0.0.7
+        specifier: ^0.0.8
         version: link:../../packages/sdk
       next:
         specifier: 15.1.6
@@ -261,7 +261,7 @@ importers:
   apps/indexer:
     dependencies:
       '@ecp.eth/sdk':
-        specifier: ^0.0.7
+        specifier: ^0.0.8
         version: link:../../packages/sdk
       '@hono/zod-openapi':
         specifier: ^0.18.4
