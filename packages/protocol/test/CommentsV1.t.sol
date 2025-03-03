@@ -34,7 +34,7 @@ contract CommentsV1Test is Test {
         view
         returns (CommentsV1.CommentData memory)
     {
-        uint256 nonce = comments.nonces(author, appSigner);
+        bytes32 salt = bytes32(uint256(1));
 
         return
             CommentsV1.CommentData({
@@ -44,7 +44,7 @@ contract CommentsV1Test is Test {
                 parentId: bytes32(0),
                 author: author,
                 appSigner: appSigner,
-                nonce: nonce,
+                salt: salt,
                 deadline: block.timestamp + 1 days
             });
     }
@@ -266,30 +266,6 @@ contract CommentsV1Test is Test {
         assertFalse(comments.isApproved(author, appSigner));
     }
 
-    function test_PostCommentAsAuthor_InvalidNonce() public {
-        CommentsV1.CommentData memory commentData = _createBasicComment();
-        commentData.nonce = commentData.nonce + 1;
-
-        bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
-
-        vm.prank(author);
-        vm.expectRevert(CommentsV1.InvalidNonce.selector);
-        comments.postCommentAsAuthor(commentData, appSignature);
-    }
-
-    function test_PostComment_InvalidNonce() public {
-        CommentsV1.CommentData memory commentData = _createBasicComment();
-        commentData.nonce = commentData.nonce + 1;
-
-        bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
-
-        vm.expectRevert(CommentsV1.InvalidNonce.selector);
-        comments.postComment(commentData, authorSignature, appSignature);
-    }
-
     function test_AddApproval_InvalidNonce() public {
         uint256 wrongNonce = 1;
         uint256 deadline = block.timestamp + 1 days;
@@ -350,7 +326,7 @@ contract CommentsV1Test is Test {
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
 
-        uint256 wrongNonce = 0;
+        uint256 wrongNonce = 100;
         uint256 deadline = block.timestamp + 1 days;
         bytes32 deleteHash = comments.getDeleteCommentHash(
             commentId,

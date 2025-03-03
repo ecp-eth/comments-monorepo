@@ -49,4 +49,18 @@ export default createConfig({
       ),
     },
   },
+  blocks: {
+    Transactions: {
+      network: Object.entries(networks).reduce(
+        (acc, [chainId, network]) => {
+          acc[chainId] = {
+            startBlock: network.startBlock,
+          };
+          return acc;
+        },
+        {} as Record<string, { startBlock?: number }>
+      ),
+      interval: 1,
+    },
+  },
 });

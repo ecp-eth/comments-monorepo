@@ -1,31 +1,21 @@
 import { ponder } from "ponder:registry";
 import schema from "ponder:schema";
-import { normalizeUrl } from "./lib/utils";
 import { getAddress } from "viem";
+import {
+  transformCommentParentId,
+  transformCommentTargetUri,
+} from "./lib/utils";
+import { processTransactionsBlock } from "./lib/process-transactions-block";
 
 ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
-  let normalizedTargetUri =
-    event.args.commentData.targetUri.trim().length > 0
-      ? event.args.commentData.targetUri
-      : "";
-
-  try {
-    const urlObj = new URL(event.args.commentData.targetUri);
-    normalizedTargetUri = normalizeUrl(urlObj.toString());
-  } catch (error) {
-    console.error(error);
-  }
+  const targetUri = transformCommentTargetUri(event.args.commentData.targetUri);
 
   await context.db.insert(schema.comment).values({
     id: event.args.commentId,
     content: event.args.commentData.content,
     metadata: event.args.commentData.metadata,
-    targetUri: normalizedTargetUri,
-    parentId:
-      event.args.commentData.parentId !==
-      "0x0000000000000000000000000000000000000000000000000000000000000000" // bytes32(0)
-        ? event.args.commentData.parentId
-        : null,
+    targetUri,
+    parentId: transformCommentParentId(event.args.commentData.parentId),
     author: event.args.commentData.author,
     txHash: event.transaction.hash,
     timestamp: new Date(Number(event.block.timestamp) * 1000),
@@ -84,4 +74,8 @@ ponder.on("CommentsV1:ApprovalRemoved", async ({ event, context }) => {
     .set({
       deletedAt: new Date(Number(event.block.timestamp) * 1000),
     });
+});
+
+ponder.on("Transactions:block", async (arg) => {
+  await processTransactionsBlock(arg);
 });

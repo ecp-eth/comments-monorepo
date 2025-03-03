@@ -8,7 +8,7 @@ export const chains =
     : ([base] as const);
 
 export const transports = {
-  [base.id]: http(process.env.NEXT_PUBLIC_RPC_URL_84532),
+  [base.id]: http(process.env.NEXT_PUBLIC_RPC_URL_8453),
   [anvil.id]: http("http://localhost:8545"),
 } as const;
 

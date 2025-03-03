@@ -28,7 +28,7 @@ export const CommentDataSchema = z.object({
   parentId: HexSchema,
   author: HexSchema,
   appSigner: HexSchema,
-  nonce: z.coerce.bigint(),
+  salt: HexSchema,
   deadline: z.coerce.bigint(),
 });
 
@@ -56,7 +56,12 @@ const CSSHSLColorSchema = z
   .describe("Valid CSS HSL color value");
 
 const CSSColorSchema = z
-  .union([CSSHexColorSchema, CSSRGBColorSchema, CSSHSLColorSchema, CSSTransparentColorSchema])
+  .union([
+    CSSHexColorSchema,
+    CSSRGBColorSchema,
+    CSSHSLColorSchema,
+    CSSTransparentColorSchema,
+  ])
   .describe("Valid CSS hex, rgb(), rgba(), hsl() or hsl() color value");
 
 const CSSSizeSchema = z
@@ -221,7 +226,7 @@ export const IndexerAPICommentSchema = z.object({
   content: z.string(),
   chainId: z.number().int(),
   deletedAt: z.coerce.date().nullable(),
-  logIndex: z.number().int(),
+  logIndex: z.number().int().nullable(),
   metadata: z.string(),
   parentId: HexSchema.nullable(),
   targetUri: z.string(),
@@ -339,7 +344,7 @@ export const AddCommentTypedDataSchema = z.object({
         z.object({ name: z.literal("parentId"), type: z.literal("bytes32") }),
         z.object({ name: z.literal("author"), type: z.literal("address") }),
         z.object({ name: z.literal("appSigner"), type: z.literal("address") }),
-        z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
+        z.object({ name: z.literal("salt"), type: z.literal("bytes32") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
       ])
     ),

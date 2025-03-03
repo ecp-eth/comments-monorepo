@@ -40,9 +40,9 @@ export type CommentData = {
    */
   appSigner: Hex;
   /**
-   * The nonce of the comment
+   * Random salt for the comment
    */
-  nonce: bigint;
+  salt: Hex;
   /**
    * The deadline of the comment submission in seconds since epoch
    */
