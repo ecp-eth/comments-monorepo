@@ -21,7 +21,7 @@ Ethereum Comments Protocol SDK default exports
 | ------ | ------ |
 | [ADD\_APPROVAL\_TYPE](/sdk-reference/defaultExports/variables/ADD_APPROVAL_TYPE.mdx) | - |
 | [COMMENT\_CALLDATA\_SUFFIX\_DELIMITER](/sdk-reference/defaultExports/variables/COMMENT_CALLDATA_SUFFIX_DELIMITER.mdx) | The delimiter for the comment call data suffix used to identify comment data appended to the end of a transaction. This is the keccak256 hash of the string "ethcomment" sliced to the first 4 bytes. |
-| [COMMENT\_DATA\_SUFFIX\_ABI\_PARAMETERS](/sdk-reference/defaultExports/variables/COMMENT_DATA_SUFFIX_ABI_PARAMETERS.mdx) | - |
+| [COMMENT\_DATA\_SUFFIX\_ABI\_PARAMETERS](/sdk-reference/defaultExports/variables/COMMENT_DATA_SUFFIX_ABI_PARAMETERS.mdx) | The ABI parameters definition for the comment data suffix |
 | [COMMENT\_TYPE](/sdk-reference/defaultExports/variables/COMMENT_TYPE.mdx) | - |
 | [COMMENTS\_EMBED\_DEFAULT\_BY\_AUTHOR\_URL](/sdk-reference/defaultExports/variables/COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL.mdx) | The default `embedUri` for the CommentsByAuthorEmbed component. It runs a service that creates app signatures for requests and submits the transaction to the CommentsV1 contract. |
 | [COMMENTS\_EMBED\_DEFAULT\_URL](/sdk-reference/defaultExports/variables/COMMENTS_EMBED_DEFAULT_URL.mdx) | The default `embedUri` for the CommentsEmbed component. It runs a service that creates app signatures for requests and submits the transaction to the CommentsV1 contract. |
@@ -42,7 +42,7 @@ Ethereum Comments Protocol SDK default exports
 | [createCommentSuffixData](/sdk-reference/defaultExports/functions/createCommentSuffixData.mdx) | Encode a comment to be used as a calldata suffix for a transaction |
 | [createCommentTypedData](/sdk-reference/defaultExports/functions/createCommentTypedData.mdx) | Create the EIP-712 typed data structure for adding comment |
 | [createDeleteCommentTypedData](/sdk-reference/defaultExports/functions/createDeleteCommentTypedData.mdx) | Create the EIP-712 typed data structure for deleting comment |
-| [decodeCommentSuffixData](/sdk-reference/defaultExports/functions/decodeCommentSuffixData.mdx) | - |
+| [decodeCommentSuffixData](/sdk-reference/defaultExports/functions/decodeCommentSuffixData.mdx) | Decode the comment suffix data using the ABI parameters definition |
 | [fetchCommentReplies](/sdk-reference/defaultExports/functions/fetchCommentReplies.mdx) | Fetch replies for a comment from the Indexer API |
 | [fetchComments](/sdk-reference/defaultExports/functions/fetchComments.mdx) | Fetch comments from the Indexer API |
 | [getNonce](/sdk-reference/defaultExports/functions/getNonce.mdx) | Read the nonce from CommentsV1 contract for a given author and app signer |

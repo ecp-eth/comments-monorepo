@@ -8,7 +8,9 @@
 
 > **decodeCommentSuffixData**(`data`): `object`
 
-Defined in: [packages/sdk/src/utils.ts:191](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L191)
+Defined in: [packages/sdk/src/utils.ts:199](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L199)
+
+Decode the comment suffix data using the ABI parameters definition
 
 ## Parameters
 
@@ -16,9 +18,13 @@ Defined in: [packages/sdk/src/utils.ts:191](https://github.com/ecp-eth/comments-
 
 `` `0x${string}` ``
 
+The encoded comment data section (remaining part after the `COMMENT_CALLDATA_SUFFIX_DELIMITER` from the calldata of the transaction)
+
 ## Returns
 
 `object`
+
+The decoded comment suffix data
 
 ### appSignature
 
