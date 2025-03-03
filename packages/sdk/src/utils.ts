@@ -33,6 +33,9 @@ import {
   type AddApprovalTypedDataSchemaType,
 } from "./schemas.js";
 
+/**
+ * The ABI parameters definition for the comment data suffix
+ */
 export const COMMENT_DATA_SUFFIX_ABI_PARAMETERS = [
   {
     name: "commentData",
@@ -116,7 +119,7 @@ export function createCommentData({
   author: `0x${string}`;
   /** The address of the app signer */
   appSigner: `0x${string}`;
-  /** The current nonce of the user on the chain */
+  /** Randomly generated salt for creating a unique comment id */
   salt?: `0x${string}`;
   /** The deadline of the comment submission in seconds since epoch */
   deadline?: bigint;
@@ -188,6 +191,11 @@ export function createCommentSuffixData({
   return concat(parts);
 }
 
+/**
+ * Decode the comment suffix data using the ABI parameters definition
+ * @param data The encoded comment data section (remaining part after the `COMMENT_CALLDATA_SUFFIX_DELIMITER` from the calldata of the transaction)
+ * @returns The decoded comment suffix data
+ */
 export function decodeCommentSuffixData(data: Hex) {
   const [commentData, authorSignature, appSignature] = decodeAbiParameters(
     COMMENT_DATA_SUFFIX_ABI_PARAMETERS,

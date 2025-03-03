@@ -1,4 +1,4 @@
-import type { CommentInserType } from "ponder:schema";
+import type { CommentInsertType } from "ponder:schema";
 import { BlockTransactionSchema } from "./schemas";
 import { createCommentTypedData, decodeCommentSuffixData } from "@ecp.eth/sdk";
 import type { IndexingFunctionArgs } from "ponder:registry";
@@ -20,7 +20,7 @@ export async function processTransactionsBlock({
     includeTransactions: true,
   });
 
-  const commentsToInsert: CommentInserType[] = [];
+  const commentsToInsert: CommentInsertType[] = [];
 
   for (const tx of transactions) {
     const parseResult = BlockTransactionSchema.safeParse(tx);
