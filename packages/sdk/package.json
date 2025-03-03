@@ -15,7 +15,8 @@
     "dev": "tsup --watch",
     "build": "tsup",
     "test": "echo 'Add test script here'",
-    "lint": "eslint \"./src/**/*.ts\""
+    "lint": "eslint \"./src/**/*.ts\"",
+    "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",
