@@ -8,7 +8,7 @@
     "dev:embed": "turbo dev --filter=./apps/embed... --filter=./apps/embed-demo-blog --filter=./apps/indexer --filter=./packages/protocol",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "publish-packages": "turbo run build lint test --filter=./packages/sdk... && changeset version && changeset publish"
+    "prepare-publish-sdk": "scripts/prepare-publish-sdk.sh"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
