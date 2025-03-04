@@ -22,6 +22,10 @@ const ServerEnvSchema = z.object({
   NEXT_PUBLIC_APP_SIGNER_ADDRESS: HexSchema,
   NEXT_PUBLIC_COMMENTS_INDEXER_URL: z.string().url(),
   NEXT_PUBLIC_WC_PROJECT_ID: z.string(),
+  SENTRY_ORG: z.string().optional(),
+  SENTRY_PROJECT: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
+  SENTRY_AUTH_TOKEN: z.string().optional(),
 });
 
 declare global {
