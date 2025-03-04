@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { JSONResponse } from "@/lib/json-response";
 import {
   BadRequestResponseSchema,
@@ -32,7 +33,7 @@ export async function POST(
     parsedBodyResult.data;
 
   // Validate target URL is valid
-  if (!targetUri.startsWith(process.env.APP_URL!)) {
+  if (!targetUri.startsWith(env.APP_URL!)) {
     return new JSONResponse(
       BadRequestResponseSchema,
       { targetUri: ["Invalid target URL"] },
@@ -41,7 +42,7 @@ export async function POST(
   }
 
   const account = privateKeyToAccount(
-    process.env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
+    env.APP_SIGNER_PRIVATE_KEY
   );
 
   const commentData = createCommentData({

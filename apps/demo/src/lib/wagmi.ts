@@ -1,22 +1,21 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { http } from "wagmi";
 import { anvil, base } from "wagmi/chains";
+import { publicEnv } from "@/publicEnv";
 
-export const chains =
-  process.env.NODE_ENV === "development"
-    ? ([anvil] as const)
-    : ([base] as const);
+export const chain = publicEnv.NODE_ENV === "development" ? anvil : base;
 
-export const transports = {
-  [base.id]: http(process.env.NEXT_PUBLIC_RPC_URL_8453),
-  [anvil.id]: http("http://localhost:8545"),
-} as const;
+export const transport =
+  chain.id === base.id
+    ? http(publicEnv.NEXT_PUBLIC_RPC_URL)
+    : http("http://localhost:8545");
 
-export const getConfig = () =>
-  getDefaultConfig({
-    chains,
-    transports,
-    ssr: true,
-    appName: "Comment App",
-    projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID!,
-  });
+export const getConfig = () => getDefaultConfig({
+  chains: [chain],
+  transports: {
+    [chain.id]: transport,
+  },
+  ssr: true,
+  appName: "Comment App",
+  projectId: publicEnv.NEXT_PUBLIC_WC_PROJECT_ID,
+});

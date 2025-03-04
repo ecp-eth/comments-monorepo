@@ -1,30 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  COMMENTS_V1_ADDRESS,
-  CommentsV1Abi,
-  createCommentSuffixData,
-  fetchAuthorData,
+  fetchAuthorData
 } from "@ecp.eth/sdk";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { parseAbi } from "viem";
 import {
   useAccount,
   useSwitchChain,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { chains } from "../../lib/wagmi";
-import { SignCommentResponseSchema } from "@/lib/schemas";
+import { chain } from "../../lib/wagmi";
+import {
+  PendingCommentOperationSchemaType,
+  SignCommentResponseSchema,
+} from "@/lib/schemas";
 import { useFreshRef } from "@/lib/hooks";
 import { getCommentAuthorNameOrAddress } from "./helpers";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
+import {
+  postCommentAsAuthorViaCommentsV1,
+  postCommentViaYoink,
+} from "@/lib/contract";
+import { publicEnv } from "@/publicEnv";
 
 interface CommentBoxProps {
-  onSubmit: () => void;
+  onSubmit: (pendingComment: PendingCommentOperationSchemaType) => void;
   placeholder?: string;
   parentId?: Hex;
 }
@@ -44,17 +48,20 @@ export function CommentBox({
   );
 
   const submitMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
+    mutationFn: async (
+      formData: FormData
+    ): Promise<PendingCommentOperationSchemaType | undefined> => {
       try {
         if (!content.trim() || !address) {
           return;
         }
 
+        const chainId = chain.id;
         const submitAction = formData.get("action") as "post" | "yoink";
 
         setFormState(submitAction === "post" ? "posting" : "yoinking");
 
-        await switchChainAsync({ chainId: chains[0].id });
+        await switchChainAsync({ chainId });
 
         const response = await fetch("/api/sign-comment", {
           method: "POST",
@@ -66,7 +73,7 @@ export function CommentBox({
             targetUri: window.location.href,
             parentId,
             author: address,
-            chainId: chains[0].id, // Replace with your desired chain ID
+            chainId,
           }),
         });
 
@@ -74,36 +81,33 @@ export function CommentBox({
           throw new Error("Failed to sign comment");
         }
 
-        const data = SignCommentResponseSchema.parse(await response.json());
+        const signCommentResponse = SignCommentResponseSchema.parse(
+          await response.json()
+        );
+        const { data: commentData, signature: appSignature } =
+          signCommentResponse;
+        const txHash =
+          submitAction === "yoink"
+            ? await postCommentViaYoink(
+                {
+                  commentData,
+                  appSignature,
+                },
+                writeContractAsync
+              )
+            : await postCommentAsAuthorViaCommentsV1(
+                {
+                  commentData,
+                  appSignature,
+                },
+                writeContractAsync
+              );
 
-        if (submitAction === "yoink") {
-          const yoinkContractAddress =
-            process.env.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS;
-
-          if (!yoinkContractAddress) {
-            throw new Error("Yoink contract address is not set");
-          }
-
-          const commentDataSuffix = createCommentSuffixData({
-            commentData: data.data,
-            appSignature: data.signature,
-          });
-
-          return await writeContractAsync({
-            address: yoinkContractAddress,
-            abi: parseAbi(["function yoink()"]),
-            functionName: "yoink",
-            args: [],
-            dataSuffix: commentDataSuffix,
-          });
-        }
-
-        return await writeContractAsync({
-          abi: CommentsV1Abi,
-          address: COMMENTS_V1_ADDRESS,
-          functionName: "postCommentAsAuthor",
-          args: [data.data, data.signature],
-        });
+        return {
+          chainId,
+          txHash,
+          response: signCommentResponse,
+        };
       } finally {
         setFormState("idle");
       }
@@ -112,16 +116,16 @@ export function CommentBox({
 
   const { data: receipt, isLoading: isReceiptLoading } =
     useWaitForTransactionReceipt({
-      hash: submitMutation.data,
+      hash: submitMutation.data?.txHash,
     });
 
   useEffect(() => {
-    if (receipt?.status === "success") {
+    if (receipt?.status === "success" && submitMutation.data) {
       toast.success("Comment posted");
-      onSubmitRef.current?.();
+      onSubmitRef.current?.(submitMutation.data);
       setContent("");
     }
-  }, [receipt?.status, onSubmitRef]);
+  }, [receipt?.status, onSubmitRef, submitMutation.data]);
 
   const isLoading = isReceiptLoading || submitMutation.isPending;
   const submitDisabled = isLoading || !address || !content.trim();
@@ -153,7 +157,7 @@ export function CommentBox({
         >
           {formState === "posting" ? "Posting..." : "Comment"}
         </Button>
-        {process.env.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS && (
+        {publicEnv.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS && (
           <Button
             name="action"
             value="yoink"

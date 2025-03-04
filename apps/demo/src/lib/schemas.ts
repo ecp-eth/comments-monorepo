@@ -4,6 +4,8 @@ import {
   CommentDataSchema,
   DeleteCommentTypedDataSchema,
   HexSchema,
+  IndexerAPICommentWithRepliesSchema,
+  IndexerAPIPaginationSchema,
 } from "@ecp.eth/sdk/schemas";
 import { z } from "zod";
 
@@ -178,3 +180,45 @@ export const InternalServerErrorResponseSchema = z.object({
 export const ApproveResponseSchema = z.object({
   txHash: HexSchema,
 });
+
+export const PendingCommentOperationSchema = z
+  .object({
+    txHash: HexSchema,
+    chainId: z.number().positive().int(),
+    response: SignCommentResponseSchema,
+  })
+  .describe(
+    "Contains information about pending operation so we can show that in comment list"
+  );
+
+export type PendingCommentOperationSchemaType = z.infer<
+  typeof PendingCommentOperationSchema
+>;
+
+/**
+ * A object with an attached property to indicate the parent object is a pending operation
+ */
+export const PendingOperationSchema = z
+  .object({
+    pendingType: z.enum(["insert", "delete"]).optional(),
+  })
+  .describe(
+    "A object with an attached property to indicate the parent object is a pending operation"
+  );
+
+export type PendingOperationSchemaType = z.infer<typeof PendingOperationSchema>;
+
+export const IndexerAPICommentWithPendingOperationSchema = IndexerAPICommentWithRepliesSchema.extend(PendingOperationSchema.shape)
+
+export type IndexerAPICommentWithPendingOperationSchemaType = z.infer<typeof IndexerAPICommentWithPendingOperationSchema>
+
+export const IndexerAPIListCommentsWithPendingOperationsSchema = z.object({
+  results: z.array(
+    IndexerAPICommentWithRepliesSchema.extend(PendingOperationSchema.shape)
+  ),
+  pagination: IndexerAPIPaginationSchema,
+});
+
+export type IndexerAPIListCommentsWithPendingOperationsSchemaType = z.infer<
+  typeof IndexerAPIListCommentsWithPendingOperationsSchema
+>;
