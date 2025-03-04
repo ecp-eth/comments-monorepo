@@ -6,11 +6,17 @@
     "NEXT_PUBLIC_URL",
     "NEXT_PUBLIC_APP_SIGNER_ADDRESS",
     "NEXT_COMMENTS_INDEXER_URL",
-    "NODE_ENV"
+    "NODE_ENV",
+    "SENTRY_AUTH_TOKEN",
+    "SENTRY_DSN",
+    "SENTRY_ORG",
+    "SENTRY_PROJECT",
+    "NEXT_PUBLIC_SENTRY_DSN"
   ],
   "globalPassThroughEnv": [
     "APP_URL",
     "APP_SIGNER_PRIVATE_KEY",
+    "CI",
     "COMMENTS_INDEXER_URL",
     "SUBMITTER_PRIVATE_KEY",
     "NEYNAR_API_KEY",
@@ -18,8 +24,7 @@
     "PRIVY_SECRET",
     "PRIVY_AUTHORIZATION_KEY",
     "PRIVY_WALLET_ADDRESS",
-    "PRIVY_WALLET_ID",
-    "SENTRY_DSN"
+    "PRIVY_WALLET_ID"
   ],
   "tasks": {
     "build": {
