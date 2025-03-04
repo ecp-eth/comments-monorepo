@@ -3,9 +3,11 @@
   "private": true,
   "scripts": {
     "check-types": "turbo run check-types",
-    "build": "turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./apps/embed-demo-blog",
+    "build": "turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./apps/embed-demo-blog --filter=!./packages/browser-extension",
     "dev": "turbo dev --filter=./apps/demo... --filter=./apps/indexer --filter=./packages/protocol --filter=./packages/test-protocol",
+    "dev:extension": "turbo dev --filter=./packages/browser-extension... --filter=./apps/indexer --filter=./packages/protocol --filter=./apps/demo...",
     "dev:embed": "turbo dev --filter=./apps/embed... --filter=./apps/embed-demo-blog --filter=./apps/indexer --filter=./packages/protocol",
+    "package:extension": "turbo package:extension",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare-publish-sdk": "scripts/prepare-publish-sdk.sh"

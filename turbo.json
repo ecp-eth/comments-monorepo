@@ -42,6 +42,9 @@
       "cache": false,
       "persistent": true
     },
+    "package:extension": {
+      "dependsOn": ["^build"]
+    },
     "test": {},
     "test:watch": {
       "cache": false,
