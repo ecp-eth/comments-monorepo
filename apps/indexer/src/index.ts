@@ -1,5 +1,3 @@
-// must be the first import
-// import "./sentry";
 import { ponder } from "ponder:registry";
 import schema from "ponder:schema";
 import { getAddress } from "viem";

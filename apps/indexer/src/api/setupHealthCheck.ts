@@ -8,7 +8,7 @@ import { db } from "ponder:api";
  * @returns hono app instance
  */
 export default (app: OpenAPIHono) => {
-  app.get("/health", async (c) => {
+  app.get("/api/health", async (c) => {
     await db.query.comment.findFirst();
 
     return c.json({
