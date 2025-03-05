@@ -28,9 +28,6 @@ export function Popup() {
   return (
     <CommentsProvider targetUri={targetUri}>
       <div className="flex flex-col gap-4 p-4 min-w-[400px] min-h-[500px]">
-        <span>{targetUri}</span>
-
-        <ConnectButton />
         <CommentSection />
       </div>
     </CommentsProvider>

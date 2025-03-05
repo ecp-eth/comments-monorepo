@@ -279,6 +279,7 @@ export function Comment({
         <CommentActionOrStatus
           areRepliesAllowed={areRepliesAllowed}
           comment={comment}
+          hasAccountConnected={!!connectedAddress}
           isDeleting={isDeleting}
           isPosting={isPosting}
           deletingFailed={didDeletingFailed}
@@ -332,6 +333,7 @@ function CommentActionOrStatus({
   onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
+  hasAccountConnected,
 }: {
   comment: CommentType;
   areRepliesAllowed: boolean;
@@ -342,6 +344,7 @@ function CommentActionOrStatus({
   onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
+  hasAccountConnected: boolean;
 }) {
   if (postingFailed) {
     return (
@@ -385,7 +388,7 @@ function CommentActionOrStatus({
     );
   }
 
-  if (comment.pendingOperation || !areRepliesAllowed) {
+  if (comment.pendingOperation || !areRepliesAllowed || !hasAccountConnected) {
     return null;
   }
 

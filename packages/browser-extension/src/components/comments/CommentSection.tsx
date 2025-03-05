@@ -96,7 +96,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full">
       <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
       <div className="mb-4 relative">
         {!account.address && (
