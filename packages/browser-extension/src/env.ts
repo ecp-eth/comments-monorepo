@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const envSchema = z.object({
   PLASMO_PUBLIC_WC_PROJECT_ID: z.string(),
-  PLASMO_PUBLIC_COMMENTS_INDEXER_URL: z.string().url(),
+  PLASMO_PUBLIC_COMMENTS_INDEXER_URL: z.string().url().optional(),
   PLASMO_PUBLIC_APP_SIGNER_ADDRESS: HexSchema,
   PLASMO_PUBLIC_BASE_RPC_URL: z.string().url().optional(),
 });
