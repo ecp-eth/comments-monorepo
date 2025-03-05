@@ -41,16 +41,13 @@ export function CommentBox({
   );
 
   const submitMutation = useMutation({
-    mutationFn: async (e: React.FormEvent) => {
+    mutationFn: async (formData: FormData) => {
       try {
-        e.preventDefault();
-
         if (!content.trim() || !address) {
           return;
         }
 
-        const formValues = new FormData(e.target as HTMLFormElement);
-        const submitAction = formValues.get("action") as "post" | "yoink";
+        const submitAction = formData.get("action") as "post" | "yoink";
 
         setFormState(submitAction === "post" ? "posting" : "yoinking");
 
@@ -127,13 +124,15 @@ export function CommentBox({
   const submitDisabled = isLoading || !address || !content.trim();
 
   return (
-    <form onSubmit={submitMutation.mutate} className="mb-4 flex flex-col gap-2">
+    <form action={submitMutation.mutate} className="mb-4 flex flex-col gap-2">
       <Textarea
+        name="comment"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder}
         className="w-full p-2 border border-gray-300 rounded"
-        disabled={isLoading}
+        disabled={isLoading || !address}
+        required
       />
       {address && (
         <div className="text-xs text-gray-500">Publishing as {address}</div>
