@@ -4,14 +4,17 @@ import { writeFileSync } from "node:fs";
 import { format } from "prettier";
 
 const currentDir = import.meta.dirname;
-const outputAbiPath = resolve(
+const outputAbiPaths = [resolve(
+  currentDir,
+  "abis.ts"
+), resolve(
   currentDir,
   "../../packages/sdk/src/abis.ts"
-);
+)];
 
 const abi = execFileSync(
   "pnpm",
-  ["forge", "inspect", "./src/CommentsV1.sol:CommentsV1", "abi"],
+  ["forge", "inspect", "./src/CommentsV1.sol:CommentsV1", "abi", "--json"],
   {
     cwd: currentDir,
     encoding: "utf-8",
@@ -28,4 +31,6 @@ const formattedAbi = await format(
   { parser: "typescript" }
 );
 
-writeFileSync(outputAbiPath, formattedAbi, { encoding: "utf-8" });
+for (const outputAbiPath of outputAbiPaths) {
+  writeFileSync(outputAbiPath, formattedAbi, { encoding: "utf-8" });
+}
