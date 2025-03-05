@@ -15,6 +15,8 @@ contract CommentsV1Script is Script {
 
         comments = new CommentsV1{salt: bytes32(0)}();
 
+        console.log("CommentsV1 deployed at", address(comments));
+
         vm.stopBroadcast();
     }
 }
