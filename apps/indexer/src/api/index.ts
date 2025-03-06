@@ -4,7 +4,6 @@ import { cors } from "hono/cors";
 import { client, graphql } from "ponder";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import setupRestAPI from "./setupRestAPI";
-import setupHealthCheck from "./setupHealthCheck";
 
 const app = new OpenAPIHono();
 
@@ -25,6 +24,5 @@ app.doc("/docs", {
 });
 
 setupRestAPI(app);
-setupHealthCheck(app);
 
 export default app;
