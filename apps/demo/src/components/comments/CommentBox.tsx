@@ -86,7 +86,7 @@ export function CommentBox({
             appSignature: data.signature,
           });
 
-          return writeContractAsync({
+          return await writeContractAsync({
             address: yoinkContractAddress,
             abi: parseAbi(["function yoink()"]),
             functionName: "yoink",
@@ -95,7 +95,7 @@ export function CommentBox({
           });
         }
 
-        return writeContractAsync({
+        return await writeContractAsync({
           abi: CommentsV1Abi,
           address: COMMENTS_V1_ADDRESS,
           functionName: "postCommentAsAuthor",
