@@ -237,9 +237,9 @@ export function Comment({
     <div className="mb-4 border-l-2 border-muted pl-4">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
-          <CommentAuthorAvatar comment={comment} />
+          <CommentAuthorAvatar author={comment.author} />
           <div className="text-xs text-muted-foreground">
-            {getCommentAuthorNameOrAddress(comment)} •{" "}
+            {getCommentAuthorNameOrAddress(comment.author)} •{" "}
             {formatDate(comment.timestamp)}
           </div>
         </div>

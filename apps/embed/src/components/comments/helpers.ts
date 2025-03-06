@@ -53,7 +53,7 @@ export function insertPendingCommentToPage(
 
   clonedData.pages[0].results.unshift({
     ...response.data,
-    author: {
+    author: pendingOperation.resolvedAuthor ?? {
       address: response.data.author,
     },
     deletedAt: null,

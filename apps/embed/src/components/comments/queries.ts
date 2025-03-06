@@ -5,6 +5,7 @@ import {
   type PendingCommentOperationSchemaType,
   type SignCommentPayloadRequestSchemaType,
 } from "@/lib/schemas";
+import { fetchAuthorData } from "@ecp.eth/sdk";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
 
 export class SubmitCommentMutationError extends Error {}
@@ -30,6 +31,14 @@ export async function submitCommentMutationFunction({
     throw new SubmitCommentMutationError("Wallet not connected.");
   }
 
+  // ignore errors here, we don't want to block the comment submission
+  const resolvedAuthor = await fetchAuthorData({
+    address,
+    apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+  }).catch((e) => {
+    console.error(e);
+    return undefined;
+  });
   const content = commentRequest.content.trim();
 
   if (!content) {
@@ -79,6 +88,7 @@ export async function submitCommentMutationFunction({
       response: signedCommentResult.data,
       txHash,
       chainId: chain.id,
+      resolvedAuthor,
     };
   } catch (e) {
     if (
