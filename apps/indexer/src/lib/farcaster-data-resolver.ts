@@ -6,9 +6,10 @@ import {
   IndexerAPIFarcasterDataSchema,
   type IndexerAPIFarcasterDataSchemaType,
 } from "@ecp.eth/sdk/schemas";
-import { type Hex } from "viem";
+import { Address, getAddress, type Hex } from "viem";
 import DataLoader from "dataloader";
 import { LRUCache } from "lru-cache";
+import { BulkUsersByAddressResponse, User } from "@neynar/nodejs-sdk/build/api";
 
 if (!process.env.NEYNAR_API_KEY) {
   throw new Error("NEYNAR_API_KEY is required");
@@ -43,8 +44,15 @@ export const farcasterDataResolver = new DataLoader<Hex, ResolvedFarcasterData>(
         addresses: addresses.slice(),
       });
 
+      const normalizedResponse: Record<Address, User[]> = {};
+
+      for (const [key, value] of Object.entries(response)) {
+        normalizedResponse[getAddress(key)] = value;
+      }
+
       return addresses.map((address) => {
-        const [user] = response[address] ?? [];
+        const normalizedAddress = getAddress(address);
+        const [user] = normalizedResponse[normalizedAddress] ?? [];
         const parseUserDataResult = IndexerAPIFarcasterDataSchema.safeParse({
           fid: user?.fid,
           username: user?.username,
