@@ -6,7 +6,9 @@ import type {
 import type { InfiniteData } from "@tanstack/react-query";
 import type { Hex } from "viem";
 
-export function getAuthorNameOrAddressFromComment({ author }: Comment): string {
+export function getCommentAuthorNameOrAddress(
+  author: Comment["author"]
+): string {
   return author.ens?.name ?? author.farcaster?.displayName ?? author.address;
 }
 

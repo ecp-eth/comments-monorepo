@@ -4,9 +4,10 @@ import {
   COMMENTS_V1_ADDRESS,
   CommentsV1Abi,
   createCommentSuffixData,
+  fetchAuthorData,
 } from "@ecp.eth/sdk";
 import type { Hex } from "@ecp.eth/sdk/schemas";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseAbi } from "viem";
@@ -19,6 +20,8 @@ import {
 import { chains } from "../../lib/wagmi";
 import { SignCommentResponseSchema } from "@/lib/schemas";
 import { useFreshRef } from "@/lib/hooks";
+import { getCommentAuthorNameOrAddress } from "./helpers";
+import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 
 interface CommentBoxProps {
   onSubmit: () => void;
@@ -134,9 +137,7 @@ export function CommentBox({
         disabled={isLoading || !address}
         required
       />
-      {address && (
-        <div className="text-xs text-gray-500">Publishing as {address}</div>
-      )}
+      {address && <CommentBoxAuthor address={address}></CommentBoxAuthor>}
       {submitMutation.error && (
         <div className="text-xs text-red-500">
           {submitMutation.error.message}
@@ -165,5 +166,29 @@ export function CommentBox({
         )}
       </div>
     </form>
+  );
+}
+
+function CommentBoxAuthor({ address }: { address: Hex }) {
+  const queryResult = useQuery({
+    queryKey: ["author", address],
+    queryFn: () => {
+      return fetchAuthorData({
+        address,
+        apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+      });
+    },
+  });
+
+  return (
+    <div
+      className="flex flex-row gap-2 items-center"
+      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}`}
+    >
+      <CommentAuthorAvatar author={queryResult.data ?? { address }} />
+      <div className="text-xs text-gray-500">
+        {getCommentAuthorNameOrAddress(queryResult.data ?? { address })}
+      </div>
+    </div>
   );
 }

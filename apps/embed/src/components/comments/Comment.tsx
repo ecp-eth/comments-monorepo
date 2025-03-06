@@ -43,7 +43,7 @@ import { Button } from "../ui/button";
 import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
 import { CommentText } from "./CommentText";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
-import { getAuthorNameOrAddressFromComment } from "./helpers";
+import { getCommentAuthorNameOrAddress } from "./helpers";
 
 export type OnDeleteComment = (id: Hex) => void;
 export type OnPostCommentSuccess = (transactionHash: Hex) => void;
@@ -239,7 +239,7 @@ export function Comment({
         <div className="flex items-center gap-2">
           <CommentAuthorAvatar comment={comment} />
           <div className="text-xs text-muted-foreground">
-            {getAuthorNameOrAddressFromComment(comment)} •{" "}
+            {getCommentAuthorNameOrAddress(comment)} •{" "}
             {formatDate(comment.timestamp)}
           </div>
         </div>

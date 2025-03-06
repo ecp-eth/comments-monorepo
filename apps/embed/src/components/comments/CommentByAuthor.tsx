@@ -6,7 +6,7 @@ import { type Comment as CommentType } from "@/lib/schemas";
 import Link from "next/link";
 import { CommentText } from "./CommentText";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
-import { getAuthorNameOrAddressFromComment } from "./helpers";
+import { getCommentAuthorNameOrAddress } from "./helpers";
 
 interface CommentByAuthorProps {
   comment: CommentType;
@@ -20,7 +20,7 @@ export function CommentByAuthor({ comment }: CommentByAuthorProps) {
           <CommentAuthorAvatar comment={comment} />
           <div className="flex flex-col justify-center gap-1">
             <div className="text-xs text-muted-foreground">
-              {getAuthorNameOrAddressFromComment(comment)} •{" "}
+              {getCommentAuthorNameOrAddress(comment)} •{" "}
               {formatDate(comment.timestamp)}
             </div>
             <div className="text-xs text-muted-foreground">
