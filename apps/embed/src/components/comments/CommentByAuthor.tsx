@@ -17,10 +17,10 @@ export function CommentByAuthor({ comment }: CommentByAuthorProps) {
     <div className="mb-4 border-l-2 border-muted pl-4">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
-          <CommentAuthorAvatar comment={comment} />
+          <CommentAuthorAvatar author={comment.author} />
           <div className="flex flex-col justify-center gap-1">
             <div className="text-xs text-muted-foreground">
-              {getCommentAuthorNameOrAddress(comment)} •{" "}
+              {getCommentAuthorNameOrAddress(comment.author)} •{" "}
               {formatDate(comment.timestamp)}
             </div>
             <div className="text-xs text-muted-foreground">
