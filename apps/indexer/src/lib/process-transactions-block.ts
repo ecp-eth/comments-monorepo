@@ -5,6 +5,10 @@ import type { IndexingFunctionArgs } from "ponder:registry";
 import { getAddress, hashTypedData, verifyTypedData } from "viem";
 import { transformCommentParentId, transformCommentTargetUri } from "./utils";
 import schema from "ponder:schema";
+import {
+  getCachedGetBlockRpcResponseSkipStatus,
+  markCachedGetBlockRpcResponseAsSkipped,
+} from "./ponder-rpc-results-cache";
 
 class InvalidAppSignatureError extends Error {}
 
@@ -15,6 +19,20 @@ export async function processTransactionsBlock({
   context,
   event,
 }: IndexingFunctionArgs<"Transactions:block">) {
+  /**
+   * checks if we have already processed this block in the past and if it doesn't contain any comments
+   * so we can shortcircuit the processing fot the irrelevant blocks and also save on storage
+   */
+  const skipStatus = await getCachedGetBlockRpcResponseSkipStatus(
+    event.block.number,
+    context.network.chainId
+  );
+
+  if (skipStatus === "skipped") {
+    // we don't care about this block because it doesn't contain any comments
+    return;
+  }
+
   const { transactions } = await context.client.getBlock({
     blockNumber: event.block.number,
     includeTransactions: true,
@@ -98,6 +116,14 @@ export async function processTransactionsBlock({
   }
 
   if (commentsToInsert.length > 0) {
+    console.log("Keeping cache");
     await context.db.insert(schema.comment).values(commentsToInsert);
+  } else {
+    console.log("Skipping cache");
+    // mark this block as skipped because it doesn't contain any comments
+    await markCachedGetBlockRpcResponseAsSkipped(
+      event.block.number,
+      context.network.chainId
+    );
   }
 }

@@ -1,0 +1,10 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ponder
+      POSTGRES_USER: ponder
+      POSTGRES_PASSWORD: ponder
+    ports:
+      - "127.0.0.1:5432:5432"
