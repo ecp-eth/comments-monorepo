@@ -116,10 +116,8 @@ export async function processTransactionsBlock({
   }
 
   if (commentsToInsert.length > 0) {
-    console.log("Keeping cache");
     await context.db.insert(schema.comment).values(commentsToInsert);
   } else {
-    console.log("Skipping cache");
     // mark this block as skipped because it doesn't contain any comments
     await markCachedGetBlockRpcResponseAsSkipped(
       event.block.number,
