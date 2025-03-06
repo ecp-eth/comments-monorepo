@@ -9,20 +9,23 @@ nodeProcess.stdout.on("data", (data) => {
   if (data.includes("Listening on 127.0.0.1:8545")) {
     const devProcess = exec(
       "forge script script/Dev.s.sol:DevScript --rpc-url http://localhost:8545 --broadcast",
-      { cwd },
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error executing dev script: ${error.message}`);
-          process.exit(1);
-        }
-        console.log(stdout);
-        console.error(stderr);
-      }
+      { cwd }
     );
+
+    devProcess.on("message", (message) => {
+      console.log(message);
+    });
+
+    devProcess.on("error", (error) => {
+      console.error(error);
+    });
 
     devProcess.on("exit", (code) => {
       if (code !== 0) {
-        console.error(`Deploying contract exited with code ${code}`);
+        nodeProcess.kill();
+        console.error(
+          `Deploying contract exited with code ${code}, anvil terminated`
+        );
         process.exit(1);
       }
     });

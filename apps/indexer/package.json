@@ -34,5 +34,8 @@
   "devDependencies": {
     "@types/node": "^22.13.1",
     "@types/pg": "^8.11.11"
+  },
+  "installConfig": {
+    "hoistingLimits": "dependencies"
   }
 }

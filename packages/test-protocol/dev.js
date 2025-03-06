@@ -25,9 +25,8 @@ while (retries < 100) {
 console.log("Deploying contract to anvil...");
 
 const script = spawn(
-  "pnpm",
+  "forge",
   [
-    "forge",
     "script",
     "script/dev.s.sol:DevScript",
     "--rpc-url",

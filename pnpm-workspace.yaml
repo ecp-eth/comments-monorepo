@@ -1,5 +1,0 @@
-packages:
-  - "apps/*"
-  - "packages/*"
-  - "docs"
-  - "!docs/templates/*"
