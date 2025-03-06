@@ -6,6 +6,8 @@ import {
   type IndexerAPIListCommentRepliesSchemaType,
   IndexerAPIListCommentsSchema,
   type IndexerAPIListCommentsSchemaType,
+  type IndexerAPIAuthorDataSchemaType,
+  IndexerAPIAuthorDataSchema,
 } from "./schemas.js";
 import { INDEXER_API_URL } from "./constants.js";
 import { z } from "zod";
@@ -225,6 +227,75 @@ export async function fetchCommentReplies(
   });
 
   const repeatableTask = Effect.retry(fetchRepliesTask, {
+    times: retries,
+  });
+
+  return Effect.runPromise(repeatableTask, { signal });
+}
+
+/**
+ * The options for `fetchAuthorData()`
+ */
+export type FetchAuthorDataOptions = {
+  /**
+   * Author's address
+   */
+  address: Hex;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+  /**
+   * URL on which /api/authors/$address endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  signal?: AbortSignal;
+};
+
+const FetchAuthorDataOptionsSchema = z.object({
+  address: HexSchema,
+  retries: z.number().int().positive().default(3),
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  signal: z.instanceof(AbortSignal).optional(),
+});
+
+/**
+ * Fetch author data from the Indexer API
+ *
+ * @returns A promise that resolves author data fetched from the Indexer API
+ */
+export async function fetchAuthorData(
+  options: FetchAuthorDataOptions
+): Promise<IndexerAPIAuthorDataSchemaType> {
+  const { address, retries, apiUrl, signal } =
+    FetchAuthorDataOptionsSchema.parse(options);
+
+  const fetchAuthorTask = Effect.tryPromise(async (signal) => {
+    const url = new URL(`/api/authors/${address}`, apiUrl);
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-cache",
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch author data: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+
+    return IndexerAPIAuthorDataSchema.parse(responseData);
+  });
+
+  const repeatableTask = Effect.retry(fetchAuthorTask, {
     times: retries,
   });
 

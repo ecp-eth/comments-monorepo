@@ -122,7 +122,10 @@ export async function resolveUserDataAndFormatListCommentsResponse({
   };
 }
 
-function formatAuthor(
+/**
+ * This function formats the author data for API response
+ */
+export function formatAuthor(
   author: Hex,
   resolvedEnsData: ResolvedEnsData | null | undefined,
   resolvedFarcasterData: ResolvedFarcasterData | null | undefined
