@@ -151,7 +151,7 @@ export function CommentBox({
           name="action"
           value="post"
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="px-4 py-2 rounded"
           disabled={submitDisabled}
         >
           {formState === "posting" ? "Posting..." : "Comment"}

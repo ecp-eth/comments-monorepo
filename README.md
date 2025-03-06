@@ -16,7 +16,7 @@ A protocol for commenting built on Ethereum.
 
 ## Development
 
-To get started with development, copy the `.env.example` files in each package to `.env` and fill in the values.
+To get started with development, copy the `.env.example` files in each package to `.env` and fill in the values in each of the projects inside of `apps`, as well as `packages/protocol`
 
 Then, install dependencies and run the development server:
 
