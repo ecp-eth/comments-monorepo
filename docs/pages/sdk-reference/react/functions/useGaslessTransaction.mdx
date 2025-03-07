@@ -6,7 +6,7 @@
 
 # Function: useGaslessTransaction()
 
-> **useGaslessTransaction**(`props`): `UseMutationResult`\<`` `0x${string}` ``, `Error`, `void`, `unknown`\>
+> **useGaslessTransaction**\<`VariablesType`, `ReturnValueType`\>(`props`): `UseMutationResult`\<`ReturnValueType`, `Error`, `void`, `unknown`\>
 
 Defined in: [packages/sdk/src/react.tsx:42](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L42)
 
@@ -19,17 +19,23 @@ Gasless transaction typically requires 3 steps:
 
 This hook abstracts these steps and help with the repetition of the pattern.
 
+## Type Parameters
+
+• **VariablesType** *extends* `undefined` \| `object`
+
+• **ReturnValueType**
+
 ## Parameters
 
 ### props
 
 #### prepareSignTypedDataParams
 
-() => `Promise`\<`SignTypedDataParameters` \| \{ `signTypedDataParams`: `SignTypedDataParameters`; `variables`: `object`; \}\>
+() => `Promise`\<`SignTypedDataParameters` \| \{ `signTypedDataParams`: `SignTypedDataParameters`; `variables`: `VariablesType`; \}\>
 
 #### sendSignedData
 
-(`args`) => `Promise`\<`` `0x${string}` ``\>
+(`args`) => `Promise`\<`ReturnValueType`\>
 
 #### signTypedData?
 
@@ -37,4 +43,4 @@ This hook abstracts these steps and help with the repetition of the pattern.
 
 ## Returns
 
-`UseMutationResult`\<`` `0x${string}` ``, `Error`, `void`, `unknown`\>
+`UseMutationResult`\<`ReturnValueType`, `Error`, `void`, `unknown`\>

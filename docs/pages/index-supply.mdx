@@ -27,7 +27,7 @@ event CommentAdded(
 It must be converted to the following tuple form in order to work with Index Supply:
 
 ```solidity
-CommentAdded(bytes32 indexed commentId, address indexed author, address indexed appSigner, (string content, string metadata, string targetUri, bytes32 parentId, address author, address appSigner, uint256 nonce, uint256 deadline) commentData)
+CommentAdded(bytes32 indexed commentId, address indexed author, address indexed appSigner, (string content, string metadata, string targetUri, bytes32 parentId, address author, address appSigner, bytes32 salt, uint256 deadline) commentData)
 ```
 
 _please note: at the time of writing, Index Supply's query interface doesn't support multi-line event signatures._
@@ -103,7 +103,7 @@ const COMMENT_ADDED_EVENT =
       bytes32 parentId,
       address author,
       address appSigner,
-      uint256 nonce,
+      bytes32 salt,
       uint256 deadline
     ) commentData
   )`;
