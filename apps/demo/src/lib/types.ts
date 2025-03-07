@@ -6,3 +6,5 @@ import type {
 export type CommentType =
   | IndexerAPICommentSchemaType
   | IndexerAPICommentWithRepliesSchemaType;
+
+export type AuthorType = CommentType["author"];

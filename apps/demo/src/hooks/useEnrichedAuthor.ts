@@ -1,0 +1,28 @@
+import type { AuthorType } from "@/lib/types";
+import { publicEnv } from "@/publicEnv";
+import { fetchAuthorData } from "@ecp.eth/sdk";
+import { useQuery } from "@tanstack/react-query";
+
+/**
+ * Return author data enriched with ens and farcaster data (if they are not already provided)
+ * @param author
+ */
+export default function useEnrichedAuthor(author: AuthorType) {
+  const { address } = author;
+  const { data: authorData } = useQuery({
+    queryKey: ["author", address],
+    queryFn: () => {
+      return fetchAuthorData({
+        address,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+      });
+    },
+    // only fetch author data if the comment author doesn't already have an ens or farcaster display name
+    enabled: !author.ens && !author.farcaster,
+  });
+
+  return {
+    ...author,
+    ...authorData,
+  };
+}

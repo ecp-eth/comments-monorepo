@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  fetchAuthorData
-} from "@ecp.eth/sdk";
 import type { Hex } from "@ecp.eth/sdk/schemas";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -26,6 +23,8 @@ import {
   postCommentViaYoink,
 } from "@/lib/contract";
 import { publicEnv } from "@/publicEnv";
+import { AuthorType } from "@/lib/types";
+import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 
 interface CommentBoxProps {
   onSubmit: (pendingComment: PendingCommentOperationSchemaType) => void;
@@ -173,25 +172,17 @@ export function CommentBox({
   );
 }
 
-function CommentBoxAuthor({ address }: { address: Hex }) {
-  const queryResult = useQuery({
-    queryKey: ["author", address],
-    queryFn: () => {
-      return fetchAuthorData({
-        address,
-        apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-      });
-    },
-  });
+function CommentBoxAuthor(author: AuthorType) {
+  const enrichedAuthor = useEnrichedAuthor(author);
 
   return (
     <div
       className="flex flex-row gap-2 items-center"
-      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}`}
+      title={`Publishing as ${getCommentAuthorNameOrAddress(enrichedAuthor)}`}
     >
-      <CommentAuthorAvatar author={queryResult.data ?? { address }} />
+      <CommentAuthorAvatar author={enrichedAuthor} />
       <div className="text-xs text-gray-500">
-        {getCommentAuthorNameOrAddress(queryResult.data ?? { address })}
+        {getCommentAuthorNameOrAddress(enrichedAuthor)}
       </div>
     </div>
   );

@@ -22,21 +22,25 @@ import { getCommentAuthorNameOrAddress } from "./helpers";
 import type { CommentType } from "@/lib/types";
 import { useFreshRef } from "@/lib/hooks";
 import { PendingCommentOperationSchemaType } from "@/lib/schemas";
-
+import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 
 interface CommentProps {
   comment: CommentType;
-  onReply?: (pendingCommentOperation: PendingCommentOperationSchemaType) => void;
+  onReply?: (
+    pendingCommentOperation: PendingCommentOperationSchemaType
+  ) => void;
   onDelete?: (id: Hex) => void;
 }
 
 export function Comment({ comment, onReply, onDelete }: CommentProps) {
   const onDeleteRef = useFreshRef(onDelete);
   const { address: connectedAddress } = useAccount();
-
+  const enrichedAuthor = useEnrichedAuthor(comment.author);
   const [isReplying, setIsReplying] = useState(false);
 
-  const handleReply = (pendingCommentOperation: PendingCommentOperationSchemaType) => {
+  const handleReply = (
+    pendingCommentOperation: PendingCommentOperationSchemaType
+  ) => {
     onReply?.(pendingCommentOperation);
     setIsReplying(false);
   };
@@ -58,10 +62,9 @@ export function Comment({ comment, onReply, onDelete }: CommentProps) {
     }
   }, [comment.id, deleteTxReceipt?.status, onDeleteRef]);
 
-  const isAuthor =
-    connectedAddress && comment.author
-      ? getAddress(connectedAddress) === getAddress(comment.author.address)
-      : false;
+  const isAuthor = connectedAddress
+    ? getAddress(connectedAddress) === getAddress(enrichedAuthor.address)
+    : false;
 
   const isDeleting = isDeleteSigPending || isDeleteTxPending;
 
@@ -69,9 +72,9 @@ export function Comment({ comment, onReply, onDelete }: CommentProps) {
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <CommentAuthorAvatar author={comment.author} />
+          <CommentAuthorAvatar author={enrichedAuthor} />
           <div className="text-xs text-gray-500">
-            {getCommentAuthorNameOrAddress(comment.author)} •{" "}
+            {getCommentAuthorNameOrAddress(enrichedAuthor)} •{" "}
             {formatDate(comment.timestamp)}
           </div>
         </div>
@@ -117,7 +120,12 @@ export function Comment({ comment, onReply, onDelete }: CommentProps) {
       )}
       {"replies" in comment &&
         comment.replies.results?.map((reply) => (
-          <Comment key={reply.id} comment={reply} onReply={onReply} onDelete={onDelete} />
+          <Comment
+            key={reply.id}
+            comment={reply}
+            onReply={onReply}
+            onDelete={onDelete}
+          />
         ))}
     </div>
   );

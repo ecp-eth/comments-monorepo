@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Comment } from "./Comment";
 import { CommentBox } from "./CommentBox";
 import { publicEnv } from "@/publicEnv";
-import { useOptimisticCommentingManager } from "./hooks";
+import { useOptimisticCommentingManager } from "@/hooks/useOptimisticCommentingManager";
 
 export function CommentSection() {
   const [page, setPage] = useState(0);
