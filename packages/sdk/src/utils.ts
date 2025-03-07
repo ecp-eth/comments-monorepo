@@ -34,6 +34,15 @@ import {
 } from "./schemas.js";
 
 /**
+ * Check if a hex string is zero
+ * @param hex The hex string to check
+ * @returns True if the hex string is zero, false otherwise
+ */
+export function isZeroHex(hex: `0x${string}`) {
+  return hex.replace(/0/g,'') === 'x'
+}
+
+/**
  * The ABI parameters definition for the comment data suffix
  */
 export const COMMENT_DATA_SUFFIX_ABI_PARAMETERS = [

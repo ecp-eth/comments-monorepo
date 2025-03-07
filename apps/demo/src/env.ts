@@ -1,12 +1,13 @@
 import { HexSchema } from "@ecp.eth/sdk/schemas";
 import { z } from "zod";
+import { publicEnvSchema } from "./publicEnv";
 
 class InvalidServerEnvVariablesError extends Error {
-  constructor(private validationError: z.ZodError) {
+  constructor(private readonly validationError: z.ZodError) {
     super();
   }
 
-  toString() {
+  get message() {
     const message = `
 Invalid environment variables:
 
@@ -36,13 +37,10 @@ export const SubmitterEnvSchema = z.union([
 
 const EnvSchema = z
   .object({
-    APP_SIGNER_PRIVATE_KEY: HexSchema,
-    NEXT_PUBLIC_APP_SIGNER_ADDRESS: HexSchema,
-    NEXT_PUBLIC_WC_PROJECT_ID: z.string().nonempty(),
     APP_URL: z.string().url(),
-    NEXT_PUBLIC_COMMENTS_INDEXER_URL: z.string().url(),
-    NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS: HexSchema.optional(),
+    APP_SIGNER_PRIVATE_KEY: HexSchema,
   })
+  .merge(publicEnvSchema)
   .merge(EthSubmitterEnvSchema.partial())
   .merge(PrivySubmitterEnvSchema.partial())
   .refine((data) => {

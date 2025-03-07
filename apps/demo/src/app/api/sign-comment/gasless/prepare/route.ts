@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { JSONResponse } from "@/lib/json-response";
 import {
   BadRequestResponseSchema,
@@ -9,8 +10,8 @@ import {
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { bigintReplacer } from "@/lib/utils";
 import {
-  chains as configChains,
-  transports as configTransports,
+  chain,
+  transport,
 } from "@/lib/wagmi";
 import {
   COMMENTS_V1_ADDRESS,
@@ -46,7 +47,7 @@ export async function POST(
     parsedBodyResult.data;
 
   // Validate target URL is valid
-  if (!targetUri.startsWith(process.env.APP_URL!)) {
+  if (!targetUri.startsWith(env.APP_URL)) {
     return new JSONResponse(
       BadRequestResponseSchema,
       { targetUri: ["Invalid target URL"] },
@@ -55,10 +56,8 @@ export async function POST(
   }
 
   const account = privateKeyToAccount(
-    process.env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
+    env.APP_SIGNER_PRIVATE_KEY
   );
-  const chain = configChains[0];
-  const transport = configTransports[chain.id];
 
   const commentData = createCommentData({
     content,
@@ -70,7 +69,7 @@ export async function POST(
 
   const typedCommentData = createCommentTypedData({
     commentData,
-    chainId: configChains[0].id,
+    chainId: chain.id,
   });
 
   const signature = await account.signTypedData(typedCommentData);

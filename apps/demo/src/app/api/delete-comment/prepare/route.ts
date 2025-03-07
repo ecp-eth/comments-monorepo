@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { JSONResponse } from "@/lib/json-response";
 import {
   BadRequestResponseSchema,
@@ -9,8 +10,8 @@ import {
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { bigintReplacer } from "@/lib/utils";
 import {
-  chains as configChains,
-  transports as configTransports,
+  chain,
+  transport,
 } from "@/lib/wagmi";
 import {
   COMMENTS_V1_ADDRESS,
@@ -20,9 +21,6 @@ import {
 } from "@ecp.eth/sdk";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-
-const chain = configChains[0];
-const transport = configTransports[chain.id as keyof typeof configTransports];
 
 export async function POST(
   req: Request
@@ -52,7 +50,7 @@ export async function POST(
   } = parsedBodyResult.data;
 
   const account = privateKeyToAccount(
-    process.env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
+    env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
   );
 
   const nonce = await getNonce({

@@ -20,6 +20,7 @@ import {
 } from "@/lib/schemas";
 import type { SignTypedDataParameters } from "viem";
 import { bigintReplacer } from "@/lib/utils";
+import { publicEnv } from "@/publicEnv";
 
 export function CommentSectionGasless() {
   const { address } = useAccount();
@@ -99,8 +100,8 @@ export function CommentSectionGasless() {
     queryKey: ["comments", currentUrl, page],
     queryFn: () => {
       return fetchComments({
-        apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         targetUri: currentUrl,
         offset: page * pageSize,
         limit: pageSize,

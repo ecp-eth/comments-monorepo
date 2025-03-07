@@ -248,7 +248,7 @@ export type IndexerAPIPaginationSchemaType = z.infer<
   typeof IndexerAPIPaginationSchema
 >;
 
-const IndexerAPICommentWithRepliesSchema = IndexerAPICommentSchema.extend({
+export const IndexerAPICommentWithRepliesSchema = IndexerAPICommentSchema.extend({
   replies: z.object({
     results: z.array(IndexerAPICommentSchema),
     pagination: IndexerAPIPaginationSchema,

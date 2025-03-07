@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { JSONResponse } from "@/lib/json-response";
 import {
   BadRequestResponseSchema,
@@ -7,15 +8,12 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import {
-  chains as configChains,
-  transports as configTransports,
+  chain,
+  transport,
 } from "@/lib/wagmi";
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-
-const chain = configChains[0];
-const transport = configTransports[chain.id as keyof typeof configTransports];
 
 export async function POST(
   req: Request
@@ -43,7 +41,7 @@ export async function POST(
 
   // Check that signature is from the app signer
   const appSigner = privateKeyToAccount(
-    process.env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
+    env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
   );
 
   // Can be any account with funds for gas on desired chain

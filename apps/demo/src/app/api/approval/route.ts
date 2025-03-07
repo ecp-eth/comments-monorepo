@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { JSONResponse } from "@/lib/json-response";
 import {
   ApproveResponseSchema,
@@ -10,8 +11,8 @@ import {
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { bigintReplacer } from "@/lib/utils";
 import {
-  chains as configChains,
-  transports as configTransports,
+  chain,
+  transport,
 } from "@/lib/wagmi";
 import {
   COMMENTS_V1_ADDRESS,
@@ -26,9 +27,6 @@ import {
   publicActions,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-
-const chain = configChains[0];
-const transport = configTransports[chain.id as keyof typeof configTransports];
 
 export async function GET(
   req: NextRequest
@@ -51,7 +49,7 @@ export async function GET(
   }
 
   const account = privateKeyToAccount(
-    process.env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
+    env.APP_SIGNER_PRIVATE_KEY
   );
 
   const publicClient = createPublicClient({
@@ -114,7 +112,7 @@ export async function GET(
   const typedApprovalData = createApprovalTypedData({
     author: authorAddress,
     appSigner: account.address,
-    chainId: configChains[0].id,
+    chainId: chain.id,
     nonce: nonce as bigint,
   });
 
@@ -157,7 +155,7 @@ export async function POST(
 
   // Check that signature is from the app signer
   const appSigner = privateKeyToAccount(
-    process.env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
+    env.APP_SIGNER_PRIVATE_KEY
   );
 
   // Can be any account with funds for gas on desired chain

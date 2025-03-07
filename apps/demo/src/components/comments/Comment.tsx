@@ -1,3 +1,4 @@
+import { Hex } from "@ecp.eth/sdk/schemas";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,11 +21,13 @@ import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "./helpers";
 import type { CommentType } from "@/lib/types";
 import { useFreshRef } from "@/lib/hooks";
+import { PendingCommentOperationSchemaType } from "@/lib/schemas";
+
 
 interface CommentProps {
   comment: CommentType;
-  onReply?: (parentId: string) => void;
-  onDelete?: (id: string) => void;
+  onReply?: (pendingCommentOperation: PendingCommentOperationSchemaType) => void;
+  onDelete?: (id: Hex) => void;
 }
 
 export function Comment({ comment, onReply, onDelete }: CommentProps) {
@@ -33,8 +36,8 @@ export function Comment({ comment, onReply, onDelete }: CommentProps) {
 
   const [isReplying, setIsReplying] = useState(false);
 
-  const handleReply = () => {
-    onReply?.(comment.id);
+  const handleReply = (pendingCommentOperation: PendingCommentOperationSchemaType) => {
+    onReply?.(pendingCommentOperation);
     setIsReplying(false);
   };
 
@@ -114,7 +117,7 @@ export function Comment({ comment, onReply, onDelete }: CommentProps) {
       )}
       {"replies" in comment &&
         comment.replies.results?.map((reply) => (
-          <Comment key={reply.id} comment={reply} onReply={onReply} />
+          <Comment key={reply.id} comment={reply} onReply={onReply} onDelete={onDelete} />
         ))}
     </div>
   );

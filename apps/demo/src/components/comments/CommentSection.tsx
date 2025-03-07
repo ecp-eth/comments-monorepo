@@ -2,25 +2,30 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchComments } from "@ecp.eth/sdk";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Comment } from "./Comment";
 import { CommentBox } from "./CommentBox";
+import { publicEnv } from "@/publicEnv";
+import { useOptimisticCommentingManager } from "./hooks";
 
 export function CommentSection() {
   const [page, setPage] = useState(0);
   const pageSize = 10;
   const [currentUrl, setCurrentUrl] = useState<string>("");
+  const queryKeyPrefix = useMemo(() => ["comments", currentUrl], [currentUrl]);
+  const { insertPendingCommentOperation, deletePendingCommentOperation } =
+    useOptimisticCommentingManager([...queryKeyPrefix, 0]);
 
   useEffect(() => {
     setCurrentUrl(window.location.href);
   }, []);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["comments", currentUrl, page],
+    queryKey: [...queryKeyPrefix, page],
     queryFn: () => {
       return fetchComments({
-        apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         targetUri: currentUrl,
         offset: page * pageSize,
         limit: pageSize,
@@ -29,20 +34,39 @@ export function CommentSection() {
     enabled: !!currentUrl,
   });
 
-  if (isLoading) return <div>Loading comments...</div>;
-  if (error)
+  if (isLoading) {
+    return <div>Loading comments...</div>;
+  }
+
+  if (error) {
     return <div>Error loading comments: {(error as Error).message}</div>;
+  }
 
   return (
     <div className="max-w-2xl mx-auto mt-8">
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
-      <CommentBox onSubmit={() => refetch()} />
+      <CommentBox
+        onSubmit={async (pendingCommentOperation) => {
+          // take the user to first page so they can see the comment posted
+          setPage(0);
+
+          insertPendingCommentOperation(pendingCommentOperation);
+
+          // trigger a refetch
+          refetch();
+        }}
+      />
       {data?.results.map((comment) => (
         <Comment
           key={comment.id}
           comment={comment}
-          onReply={() => refetch()}
-          onDelete={() => {
+          onReply={(pendingCommentOperation) => {
+            insertPendingCommentOperation(pendingCommentOperation);
+
+            refetch();
+          }}
+          onDelete={(id) => {
+            deletePendingCommentOperation(id);
             refetch();
           }}
         />
