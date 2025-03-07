@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useRef, useState } from "react";
 import { useAccount, useSwitchChain, useWriteContract } from "wagmi";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { chains } from "../../lib/wagmi";
-import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import { COMMENTS_V1_ADDRESS, fetchAuthorData } from "@ecp.eth/sdk";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import { useEmbedConfig } from "../EmbedConfigProvider";
 import type { PendingCommentOperationSchemaType } from "@/lib/schemas";
@@ -16,6 +16,8 @@ import {
   SubmitCommentMutationValidationError,
 } from "./queries";
 import { MAX_COMMENT_LENGTH } from "@/lib/constants";
+import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
+import { getCommentAuthorNameOrAddress } from "./helpers";
 
 export type OnSubmitSuccessFunction = (
   params: PendingCommentOperationSchemaType
@@ -120,9 +122,7 @@ export function CommentForm({
         maxLength={MAX_COMMENT_LENGTH}
       />
       <div className="flex gap-2 justify-between">
-        <div className="flex-grow text-xs text-muted-foreground truncate">
-          {address && <>Publishing as {address}</>}
-        </div>
+        {address && <CommentFormAuthor address={address} />}
         <Button
           type="submit"
           disabled={isSubmitting || !address || !isContentValid}
@@ -137,5 +137,29 @@ export function CommentForm({
         </div>
       )}
     </form>
+  );
+}
+
+function CommentFormAuthor({ address }: { address: Hex }) {
+  const queryResult = useQuery({
+    queryKey: ["author", address],
+    queryFn: () => {
+      return fetchAuthorData({
+        address,
+        apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+      });
+    },
+  });
+
+  return (
+    <div
+      className="flex flex-row gap-2 items-center overflow-hidden"
+      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}`}
+    >
+      <CommentAuthorAvatar author={queryResult.data ?? { address }} />
+      <div className="flex-grow text-xs text-muted-foreground truncate">
+        {getCommentAuthorNameOrAddress(queryResult.data ?? { address })}
+      </div>
+    </div>
   );
 }

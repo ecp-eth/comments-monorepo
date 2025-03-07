@@ -4,6 +4,7 @@ import {
   CommentDataSchema,
   IndexerAPICommentSchema,
   type IndexerAPICommentSchemaType,
+  IndexerAPIAuthorDataSchema,
 } from "@ecp.eth/sdk/schemas";
 import { MAX_COMMENT_LENGTH } from "./constants";
 
@@ -29,6 +30,7 @@ export const PendingCommentOperationSchema = z
     txHash: HexSchema,
     chainId: z.number().positive().int(),
     response: SignCommentResponseClientSchema,
+    resolvedAuthor: IndexerAPIAuthorDataSchema.optional(),
   })
   .describe(
     "Contains information about pending operation so we can show that in comment list"

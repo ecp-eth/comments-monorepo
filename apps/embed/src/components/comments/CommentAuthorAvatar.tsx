@@ -1,25 +1,23 @@
 import type { Comment } from "@/lib/schemas";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { getAuthorNameOrAddressFromComment } from "./helpers";
+import { getCommentAuthorNameOrAddress } from "./helpers";
 import { blo } from "blo";
 
 type CommentAuthorAvatarProps = {
-  comment: Comment;
+  author: Comment["author"];
 };
 
-export function CommentAuthorAvatar({ comment }: CommentAuthorAvatarProps) {
-  const name =
-    comment.author.ens?.name ?? comment.author.farcaster?.displayName;
-  const nameOrAddress = getAuthorNameOrAddressFromComment(comment);
-  const avatarUrl =
-    comment.author.ens?.avatarUrl ?? comment.author.farcaster?.pfpUrl;
+export function CommentAuthorAvatar({ author }: CommentAuthorAvatarProps) {
+  const name = author.ens?.name ?? author.farcaster?.displayName;
+  const nameOrAddress = getCommentAuthorNameOrAddress(author);
+  const avatarUrl = author.ens?.avatarUrl ?? author.farcaster?.pfpUrl;
 
   return (
     <Avatar className="h-6 w-6">
       {avatarUrl ? (
         <AvatarImage src={avatarUrl} alt={`${nameOrAddress} Avatar`} />
       ) : (
-        <AvatarImage src={blo(comment.author.address)} alt="Generated Avatar" />
+        <AvatarImage src={blo(author.address)} alt="Generated Avatar" />
       )}
       <AvatarFallback>{name?.[0]?.toUpperCase() ?? "?"}</AvatarFallback>
     </Avatar>

@@ -4,6 +4,15 @@ import { normalizeUrl } from "./utils";
 import { COMMENT_CALLDATA_SUFFIX_DELIMITER } from "@ecp.eth/sdk";
 
 /**
+ * Path params schema for resolving an author ENS / Farcaster data.
+ */
+export const GetAuthorParamsSchema = z.object({
+  authorAddress: HexSchema.openapi({
+    description: "The author's address",
+  }),
+});
+
+/**
  * Query string schema for getting a list of comments.
  */
 export const GetCommentsQuerySchema = z.object({
