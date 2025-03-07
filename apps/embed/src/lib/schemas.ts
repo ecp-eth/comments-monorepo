@@ -7,6 +7,7 @@ import {
   IndexerAPIAuthorDataSchema,
 } from "@ecp.eth/sdk/schemas";
 import { MAX_COMMENT_LENGTH } from "./constants";
+import { isProfane } from "./profanity-detection";
 
 const CommentDataWithIdSchema = CommentDataSchema.extend({
   id: HexSchema,
@@ -82,7 +83,12 @@ export type CommentPageSchemaType = z.infer<typeof CommentPageSchema>;
 
 export const SignCommentPayloadRequestSchema = z.object({
   author: HexSchema,
-  content: z.string().trim().nonempty().max(MAX_COMMENT_LENGTH),
+  content: z
+    .string()
+    .trim()
+    .nonempty()
+    .max(MAX_COMMENT_LENGTH)
+    .refine((val) => !isProfane(val), "Comment contains profanity"),
   targetUri: z.string().url(),
   parentId: HexSchema.optional(),
   chainId: z.number(),

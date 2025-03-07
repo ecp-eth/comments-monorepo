@@ -8,9 +8,14 @@ import {
   IndexerAPIPaginationSchema,
 } from "@ecp.eth/sdk/schemas";
 import { z } from "zod";
+import { isProfane } from "./profanity-detection";
 
 export const PrepareSignedGaslessCommentRequestBodySchema = z.object({
-  content: z.string().trim().nonempty(),
+  content: z
+    .string()
+    .trim()
+    .nonempty()
+    .refine((val) => !isProfane(val), "Comment contains profanity"),
   targetUri: z.string().url(),
   parentId: HexSchema.optional(),
   author: HexSchema,
@@ -126,7 +131,13 @@ export const SignCommentResponseSchema = z.object({
 });
 
 export const SignCommentRequestBodySchema = z.object({
-  content: z.string().trim().nonempty(),
+  content: z
+    .string()
+    .trim()
+    .nonempty()
+    .refine((val) => {
+      return !isProfane(val);
+    }, "Comment contains profanity"),
   targetUri: z.string().url(),
   parentId: HexSchema.optional(),
   chainId: z.number(),

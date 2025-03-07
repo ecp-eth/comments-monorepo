@@ -6,9 +6,14 @@ import {
   transformCommentTargetUri,
 } from "./lib/utils";
 import { processTransactionsBlock } from "./lib/process-transactions-block";
+import { isProfane } from "./lib/profanity-detection";
 
 ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
   const targetUri = transformCommentTargetUri(event.args.commentData.targetUri);
+
+  if (isProfane(event.args.commentData.content)) {
+    return;
+  }
 
   await context.db.insert(schema.comment).values({
     id: event.args.commentId,
