@@ -9,6 +9,7 @@ import { bigintReplacer } from "@/lib/utils";
 import { createCommentData, createCommentTypedData } from "@ecp.eth/sdk";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import { signCommentRateLimiter } from "@/services/rate-limiter";
 
 export async function POST(
   req: Request
@@ -38,6 +39,24 @@ export async function POST(
       BadRequestResponseSchema,
       { targetUri: ["Invalid target URL"] },
       { status: 400 }
+    );
+  }
+
+  // Apply rate limiter
+  const rateLimitResult = await signCommentRateLimiter.isRateLimited(author);
+
+  if (!rateLimitResult.success) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { author: ["Too many requests"] },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(
+            Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+          ),
+        },
+      }
     );
   }
 

@@ -78,6 +78,14 @@ export function CommentBox({
         });
 
         if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error("You are posting too frequently");
+          }
+
+          if (response.status === 400) {
+            throw new Error(await response.text());
+          }
+
           throw new Error("Failed to sign comment");
         }
 

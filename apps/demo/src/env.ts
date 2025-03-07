@@ -39,6 +39,8 @@ const EnvSchema = z
   .object({
     APP_URL: z.string().url(),
     APP_SIGNER_PRIVATE_KEY: HexSchema,
+    KV_REST_API_URL: z.string().url().optional(),
+    KV_REST_API_TOKEN: z.string().optional(),
   })
   .merge(publicEnvSchema)
   .merge(EthSubmitterEnvSchema.partial())

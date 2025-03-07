@@ -67,6 +67,14 @@ export async function submitCommentMutationFunction({
   });
 
   if (!response.ok) {
+    if (response.status === 429) {
+      throw new SubmitCommentMutationError("You are posting too frequently.");
+    }
+
+    if (response.status === 400) {
+      throw new SubmitCommentMutationError(await response.text());
+    }
+
     throw new SubmitCommentMutationError(
       "Failed to obtain signed comment data, please try again."
     );

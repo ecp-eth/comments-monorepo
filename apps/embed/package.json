@@ -20,6 +20,8 @@
     "@rainbow-me/rainbowkit": "^2.2.3",
     "@sentry/nextjs": "^9.3.0",
     "@tanstack/react-query": "^5.66.0",
+    "@upstash/ratelimit": "^2.0.5",
+    "@upstash/redis": "^1.34.5",
     "blo": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
