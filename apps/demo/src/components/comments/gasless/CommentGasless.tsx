@@ -14,10 +14,11 @@ import { CommentBoxGasless } from "./CommentBoxGasless";
 import { CommentAuthorAvatar } from "../CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "../helpers";
 import type { CommentType } from "@/lib/types";
-import { useFreshRef } from "@/lib/hooks";
+import { useFreshRef } from "@/hooks/useFreshRef";
 import {
   DeleteCommentResponseSchema,
-  PreparedGaslessCommentOperationApprovedResponseSchema,
+  PendingCommentOperationSchemaType,
+  PreparedSignedGaslessDeleteCommentApprovedResponseSchema,
   PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema,
   PreparedSignedGaslessDeleteCommentNotApprovedSchemaType,
   PrepareGaslessDeleteCommentOperationResponseSchema,
@@ -26,6 +27,7 @@ import {
 } from "@/lib/schemas";
 import { useMutation } from "@tanstack/react-query";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
+import { Hex } from "@ecp.eth/sdk/schemas";
 
 async function gaslessDeleteComment(
   params: PrepareGaslessCommentDeletionRequestBodySchemaType
@@ -48,29 +50,33 @@ async function gaslessDeleteComment(
 }
 
 interface CommentProps {
-  submitIfApproved: boolean;
+  isAppSignerApproved: boolean;
   comment: CommentType;
-  onReply?: (parentId: string) => void;
-  onDelete?: (id: string) => void;
+  onReply?: (
+    pendingCommentOperation: PendingCommentOperationSchemaType
+  ) => void;
+  onDelete?: (id: Hex) => void;
 }
 
 export function CommentGasless({
   comment,
   onReply,
   onDelete,
-  submitIfApproved,
+  isAppSignerApproved: submitIfApproved,
 }: CommentProps) {
   const { address } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
   const onDeleteRef = useFreshRef(onDelete);
   const enrichedAuthor = useEnrichedAuthor(comment.author);
 
-  const handleReply = () => {
-    onReply?.(comment.id);
+  const handleReply = (pendingCommentOperation: PendingCommentOperationSchemaType) => {
+    onReply?.(pendingCommentOperation);
     setIsReplying(false);
   };
 
-  const deleteCommentUsingApprovalMutation = useMutation({
+  // delete a comment that was previously approved, so not need for
+  // user approval for signature for each interaction
+  const deletePriorApprovedCommentMutation = useMutation({
     mutationFn: async () => {
       if (!address) {
         throw new Error("No address found");
@@ -86,12 +92,14 @@ export function CommentGasless({
         submitIfApproved: true,
       });
 
-      return PreparedGaslessCommentOperationApprovedResponseSchema.parse(result)
+      return PreparedSignedGaslessDeleteCommentApprovedResponseSchema.parse(result)
         .txHash;
     },
   });
 
-  const gaslessDeleteCommentMutation = useGaslessTransaction({
+  // delete a comment that was previously NOT approved,
+  // will require user interaction for signature
+  const deletePriorNotApprovedCommentMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
       if (!address) {
         throw new Error("No address found");
@@ -144,21 +152,21 @@ export function CommentGasless({
 
   const handleDeleteComment = useCallback(() => {
     if (submitIfApproved) {
-      deleteCommentUsingApprovalMutation.mutate();
+      deletePriorApprovedCommentMutation.mutate();
     } else {
-      gaslessDeleteCommentMutation.mutate();
+      deletePriorNotApprovedCommentMutation.mutate();
     }
   }, [
     submitIfApproved,
-    deleteCommentUsingApprovalMutation,
-    gaslessDeleteCommentMutation,
+    deletePriorApprovedCommentMutation,
+    deletePriorNotApprovedCommentMutation,
   ]);
 
   const { data: receipt, isLoading: isReceiptLoading } =
     useWaitForTransactionReceipt({
       hash:
-        gaslessDeleteCommentMutation.data ||
-        deleteCommentUsingApprovalMutation.data,
+        deletePriorNotApprovedCommentMutation.data ||
+        deletePriorApprovedCommentMutation.data,
     });
 
   useEffect(() => {
@@ -172,8 +180,8 @@ export function CommentGasless({
     : false;
 
   const isDeleting =
-    gaslessDeleteCommentMutation.isPending ||
-    deleteCommentUsingApprovalMutation.isPending ||
+    deletePriorNotApprovedCommentMutation.isPending ||
+    deletePriorApprovedCommentMutation.isPending ||
     isReceiptLoading;
 
   return (
@@ -217,6 +225,7 @@ export function CommentGasless({
           onSubmit={handleReply}
           placeholder="What are your thoughts?"
           parentId={comment.id}
+          isAppSignerApproved={submitIfApproved}
         />
       )}
       {"replies" in comment &&
@@ -225,7 +234,8 @@ export function CommentGasless({
             key={reply.id}
             comment={reply}
             onReply={onReply}
-            submitIfApproved={submitIfApproved}
+            onDelete={onDelete}
+            isAppSignerApproved={submitIfApproved}
           />
         ))}
     </div>

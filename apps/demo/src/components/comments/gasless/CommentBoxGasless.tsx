@@ -5,18 +5,22 @@ import { toast } from "sonner";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { useMutation } from "@tanstack/react-query";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
-import { useFreshRef } from "@/lib/hooks";
+import { useFreshRef } from "@/hooks/useFreshRef";
 import {
   type PrepareSignedGaslessCommentRequestBodySchemaType,
-  type PreparedGaslessCommentOperationApprovedSchemaType,
-  PreparedGaslessCommentOperationApprovedResponseSchema,
+  type PreparedGaslessPostCommentOperationApprovedSchemaType,
+  PreparedGaslessPostCommentOperationApprovedResponseSchema,
   GaslessPostCommentResponseSchema,
   PreparedSignedGaslessPostCommentNotApprovedResponseSchema,
   PreparedSignedGaslessPostCommentNotApprovedSchemaType,
+  PendingCommentOperationSchemaType,
 } from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import type { SignTypedDataParameters } from "viem";
 import { bigintReplacer } from "@/lib/utils";
+import { chain } from "@/lib/wagmi";
+
+const chainId = chain.id;
 
 async function prepareSignedGaslessComment(
   submitIfApproved: true,
@@ -24,7 +28,7 @@ async function prepareSignedGaslessComment(
     PrepareSignedGaslessCommentRequestBodySchemaType,
     "submitIfApproved"
   >
-): Promise<PreparedGaslessCommentOperationApprovedSchemaType>;
+): Promise<PreparedGaslessPostCommentOperationApprovedSchemaType>;
 async function prepareSignedGaslessComment(
   submitIfApproved: false,
   body: Omit<
@@ -40,7 +44,7 @@ async function prepareSignedGaslessComment(
     "submitIfApproved"
   >
 ): Promise<
-  | PreparedGaslessCommentOperationApprovedSchemaType
+  | PreparedGaslessPostCommentOperationApprovedSchemaType
   | PreparedSignedGaslessPostCommentNotApprovedSchemaType
 > {
   const response = await fetch("/api/sign-comment/gasless/prepare", {
@@ -61,15 +65,15 @@ async function prepareSignedGaslessComment(
   const data = await response.json();
 
   if (submitIfApproved) {
-    return PreparedGaslessCommentOperationApprovedResponseSchema.parse(data);
+    return PreparedGaslessPostCommentOperationApprovedResponseSchema.parse(data);
   }
 
   return PreparedSignedGaslessPostCommentNotApprovedResponseSchema.parse(data);
 }
 
 interface CommentBoxProps {
-  isApproved?: boolean;
-  onSubmit: () => void;
+  isAppSignerApproved?: boolean;
+  onSubmit: (pendingComment: PendingCommentOperationSchemaType) => void;
   placeholder?: string;
   parentId?: Hex;
 }
@@ -78,29 +82,37 @@ export function CommentBoxGasless({
   onSubmit,
   placeholder = "What are your thoughts?",
   parentId,
-  isApproved = false,
+  isAppSignerApproved: isApproved = false,
 }: CommentBoxProps) {
   const onSubmitRef = useFreshRef(onSubmit);
   const { address } = useAccount();
   const [content, setContent] = useState("");
 
-  const prepareApprovedCommentMutation = useMutation({
+  // post a comment that was previously approved, so not need for
+  // user approval for signature for each interaction
+  const postPriorApprovedCommentMutation = useMutation({
     mutationFn: async () => {
       if (!address) {
         throw new Error("No address");
       }
 
-      return prepareSignedGaslessComment(true, {
-        content,
-        targetUri: window.location.href,
-        parentId,
-        author: address,
-      });
+      return prepareSignedGaslessComment(
+        // tell the server to submit right away after preparation of the comment data,
+        // if the app is previously approved
+        true,
+        {
+          content,
+          targetUri: window.location.href,
+          parentId,
+          author: address,
+        }
+      );
     },
   });
 
-  // TODO: Add mutation for approval flow
-  const gaslessSubmitMutation = useGaslessTransaction({
+  // post a comment that was previously NOT approved,
+  // will require user interaction for signature
+  const postPriorNotApprovedSubmitMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
       if (!address) {
         throw new Error("No address");
@@ -141,22 +153,18 @@ export function CommentBoxGasless({
         throw new Error("Failed to post comment");
       }
 
-      const data = GaslessPostCommentResponseSchema.parse(
+      const { txHash} = GaslessPostCommentResponseSchema.parse(
         await response.json()
       );
 
-      return data.txHash;
+      return {
+        txHash,
+        ...variables,
+      };
     },
   });
 
-  const pendingTxHash =
-    gaslessSubmitMutation.data || prepareApprovedCommentMutation.data?.txHash;
-
-  const { data: receipt, isLoading: isReceiptLoading } =
-    useWaitForTransactionReceipt({
-      hash: pendingTxHash,
-    });
-
+  // consolidated mutation for both prior approved or non approved (also gasless) comments
   const submitMutation = useMutation({
     mutationFn: async (e: React.FormEvent) => {
       e.preventDefault();
@@ -165,24 +173,40 @@ export function CommentBoxGasless({
         return;
       }
 
-      if (isApproved) {
-        await prepareApprovedCommentMutation.mutateAsync();
-      } else {
-        await gaslessSubmitMutation.mutateAsync();
-      }
+      return isApproved
+        ? await postPriorApprovedCommentMutation.mutateAsync()
+        : await postPriorNotApprovedSubmitMutation.mutateAsync();
     },
   });
 
+  const { data: receipt, isLoading: isReceiptLoading } =
+    useWaitForTransactionReceipt({
+      hash: submitMutation.data?.txHash,
+    });
+
   useEffect(() => {
-    if (receipt?.status === "success") {
-      toast.success("Comment posted");
-      onSubmitRef.current?.();
-      setContent("");
+    const submitMutationData = submitMutation.data;
+
+    if (!submitMutationData || receipt?.status === "success") {
+      return;
     }
-  }, [receipt?.status, onSubmitRef]);
+
+    toast.success("Comment posted");
+    onSubmitRef.current?.({
+      chainId,
+      txHash: submitMutationData.txHash,
+      response: {
+        signature: submitMutationData.appSignature,
+        hash: submitMutationData.id,
+        data: submitMutationData.commentData,
+      },
+    });
+    setContent("");
+  }, [receipt?.status, onSubmitRef, submitMutation.data]);
 
   const isPending =
-    gaslessSubmitMutation.isPending || prepareApprovedCommentMutation.isPending;
+    postPriorNotApprovedSubmitMutation.isPending ||
+    postPriorApprovedCommentMutation.isPending;
 
   const isLoading = isReceiptLoading || isPending;
 

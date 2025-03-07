@@ -3,7 +3,7 @@ import { JSONResponse } from "@/lib/json-response";
 import {
   BadRequestResponseSchema,
   InternalServerErrorResponseSchema,
-  PreparedGaslessCommentOperationApprovedResponseSchema,
+  PreparedSignedGaslessDeleteCommentApprovedResponseSchema,
   PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema,
   PrepareGaslessCommentDeletionRequestBodySchema,
 } from "@/lib/schemas";
@@ -28,7 +28,7 @@ export async function POST(
   JSONResponse<
     | typeof BadRequestResponseSchema
     | typeof InternalServerErrorResponseSchema
-    | typeof PreparedGaslessCommentOperationApprovedResponseSchema
+    | typeof PreparedSignedGaslessDeleteCommentApprovedResponseSchema
     | typeof PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema
   >
 > {
@@ -120,9 +120,9 @@ export async function POST(
         });
 
         return new JSONResponse(
-          PreparedGaslessCommentOperationApprovedResponseSchema,
+          PreparedSignedGaslessDeleteCommentApprovedResponseSchema,
           {
-            txHash,
+            txHash
           }
         );
       } catch (error) {

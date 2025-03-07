@@ -3,7 +3,7 @@ import { JSONResponse } from "@/lib/json-response";
 import {
   BadRequestResponseSchema,
   InternalServerErrorResponseSchema,
-  PreparedGaslessCommentOperationApprovedResponseSchema,
+  PreparedGaslessPostCommentOperationApprovedResponseSchema,
   PreparedSignedGaslessPostCommentNotApprovedResponseSchema,
   PrepareSignedGaslessCommentRequestBodySchema,
 } from "@/lib/schemas";
@@ -19,14 +19,14 @@ import {
   createCommentData,
   createCommentTypedData,
 } from "@ecp.eth/sdk";
-import { createWalletClient, publicActions } from "viem";
+import { createWalletClient, hashTypedData, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export async function POST(
   req: Request
 ): Promise<
   JSONResponse<
-    | typeof PreparedGaslessCommentOperationApprovedResponseSchema
+    | typeof PreparedGaslessPostCommentOperationApprovedResponseSchema
     | typeof PreparedSignedGaslessPostCommentNotApprovedResponseSchema
     | typeof BadRequestResponseSchema
     | typeof InternalServerErrorResponseSchema
@@ -73,6 +73,7 @@ export async function POST(
   });
 
   const signature = await account.signTypedData(typedCommentData);
+  const commentId = hashTypedData(typedCommentData);
 
   if (submitIfApproved) {
     const submitterAccount = await resolveSubmitterAccount();
@@ -117,9 +118,15 @@ export async function POST(
         });
 
         return new JSONResponse(
-          PreparedGaslessCommentOperationApprovedResponseSchema,
+          PreparedGaslessPostCommentOperationApprovedResponseSchema,
           {
             txHash,
+            id: commentId,
+            appSignature: signature,
+            commentData,
+          },
+          {
+            jsonReplacer: bigintReplacer,
           }
         );
       } catch (error) {
@@ -138,7 +145,9 @@ export async function POST(
     PreparedSignedGaslessPostCommentNotApprovedResponseSchema,
     {
       signTypedDataParams: typedCommentData,
+      id: commentId,
       appSignature: signature,
+      commentData,
     },
     {
       jsonReplacer: bigintReplacer,
