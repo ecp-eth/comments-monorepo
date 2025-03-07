@@ -25,6 +25,7 @@ import {
   type PrepareGaslessCommentDeletionRequestBodySchemaType,
 } from "@/lib/schemas";
 import { useMutation } from "@tanstack/react-query";
+import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 
 async function gaslessDeleteComment(
   params: PrepareGaslessCommentDeletionRequestBodySchemaType
@@ -62,6 +63,7 @@ export function CommentGasless({
   const { address } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
   const onDeleteRef = useFreshRef(onDelete);
+  const enrichedAuthor = useEnrichedAuthor(comment.author);
 
   const handleReply = () => {
     onReply?.(comment.id);
@@ -165,10 +167,9 @@ export function CommentGasless({
     }
   }, [receipt?.status, onDeleteRef, comment.id]);
 
-  const isAuthor =
-    address && comment.author
-      ? getAddress(address) === getAddress(comment.author.address)
-      : false;
+  const isAuthor = address
+    ? getAddress(address) === getAddress(enrichedAuthor.address)
+    : false;
 
   const isDeleting =
     gaslessDeleteCommentMutation.isPending ||
@@ -179,9 +180,9 @@ export function CommentGasless({
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <CommentAuthorAvatar author={comment.author} />
+          <CommentAuthorAvatar author={enrichedAuthor} />
           <div className="text-xs text-gray-500">
-            {getCommentAuthorNameOrAddress(comment.author)} •{" "}
+            {getCommentAuthorNameOrAddress(enrichedAuthor)} •{" "}
             {formatDate(comment.timestamp)}
           </div>
         </div>

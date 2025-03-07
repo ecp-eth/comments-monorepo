@@ -1,16 +1,20 @@
-import type { CommentType } from "@/lib/types";
+import type { AuthorType } from "@/lib/types";
 import { getCommentAuthorNameOrAddress } from "./helpers";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { blo } from "blo";
+import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 
 type CommentAuthorAvatarProps = {
-  author: CommentType["author"];
+  author: AuthorType;
 };
 
 export function CommentAuthorAvatar({ author }: CommentAuthorAvatarProps) {
-  const name = author.ens?.name ?? author.farcaster?.displayName;
-  const nameOrAddress = getCommentAuthorNameOrAddress(author);
-  const avatarUrl = author.ens?.avatarUrl ?? author.farcaster?.pfpUrl;
+  const enrichedAuthor = useEnrichedAuthor(author);
+  const name =
+    enrichedAuthor.ens?.name ?? enrichedAuthor.farcaster?.displayName;
+  const nameOrAddress = getCommentAuthorNameOrAddress(enrichedAuthor);
+  const avatarUrl =
+    enrichedAuthor.ens?.avatarUrl ?? enrichedAuthor.farcaster?.pfpUrl;
 
   return (
     <Avatar className="h-6 w-6">
