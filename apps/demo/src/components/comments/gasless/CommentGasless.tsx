@@ -57,7 +57,10 @@ interface CommentProps {
     pendingCommentOperation: PendingCommentOperationSchemaType
   ) => void;
   onDelete?: (id: Hex) => void;
+<<<<<<< HEAD
   level?: number;
+=======
+>>>>>>> cc31bf1 (feat: optimistic posting/deleting/replying for gasless)
 }
 
 export function CommentGasless({
@@ -65,7 +68,10 @@ export function CommentGasless({
   onReply,
   onDelete,
   isAppSignerApproved: submitIfApproved,
+<<<<<<< HEAD
   level = 0
+=======
+>>>>>>> cc31bf1 (feat: optimistic posting/deleting/replying for gasless)
 }: CommentProps) {
   const { address } = useAccount();
   const [isReplying, setIsReplying] = useState(false);

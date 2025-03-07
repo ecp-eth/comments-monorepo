@@ -119,7 +119,7 @@ export async function POST(
         return new JSONResponse(
           PreparedSignedGaslessDeleteCommentApprovedResponseSchema,
           {
-            txHash,
+            txHash
           }
         );
       } catch (error) {
