@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vocs dev -p 3004",
-    "build": "vocs build",
+    "build": "pnpm run ref:gen:all && vocs build",
     "preview": "vocs preview",
     "ref:gen:demo:blog": "cp ../apps/embed-demo-blog/README.md pages/demos/blog/index.mdx",
     "ref:gen:demo:demo": "cp ../apps/demo/README.md pages/demos/custom-integration/index.mdx",
