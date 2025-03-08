@@ -2,6 +2,22 @@
 
 This documentation site is built using [Vocs](https://vocs.dev), a modern documentation framework powered by [Vite](https://vitejs.dev/).
 
+## Running the docs locally
+
+1. ensure you have `.env.local` and created variables according to `.env.example` in the `docs` folder.
+2. install dependencies
+
+```bash
+pnpm install
+```
+
+3. run the docs
+
+```bash
+pnpm run dev
+```
+
+
 ## Generating references
 
 ### SDK
