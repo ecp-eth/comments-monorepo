@@ -19,6 +19,7 @@ import type { Hex } from "@ecp.eth/sdk/schemas";
 import type { SignTypedDataParameters } from "viem";
 import { bigintReplacer } from "@/lib/utils";
 import { chain } from "@/lib/wagmi";
+import { CommentBoxAuthor } from "../CommentBoxAuthor";
 
 const chainId = chain.id;
 
@@ -219,9 +220,7 @@ export function CommentBoxGasless({
         className="w-full p-2 border border-gray-300 rounded"
         disabled={isLoading}
       />
-      {address && (
-        <div className="text-xs text-gray-500">Publishing as {address}</div>
-      )}
+      {address && <CommentBoxAuthor address={address}></CommentBoxAuthor>}
       <div className="flex items-center text-sm text-gray-500">
         <Button
           type="submit"

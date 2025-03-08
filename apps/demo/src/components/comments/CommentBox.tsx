@@ -16,15 +16,12 @@ import {
   SignCommentResponseSchema,
 } from "@/lib/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
-import { getCommentAuthorNameOrAddress } from "./helpers";
-import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import {
   postCommentAsAuthorViaCommentsV1,
   postCommentViaYoink,
 } from "@/lib/contract";
 import { publicEnv } from "@/publicEnv";
-import { AuthorType } from "@/lib/types";
-import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
+import { CommentBoxAuthor } from "./CommentBoxAuthor";
 
 interface CommentBoxProps {
   onSubmit: (pendingComment: PendingCommentOperationSchemaType) => void;
@@ -172,18 +169,4 @@ export function CommentBox({
   );
 }
 
-function CommentBoxAuthor(author: AuthorType) {
-  const enrichedAuthor = useEnrichedAuthor(author);
 
-  return (
-    <div
-      className="flex flex-row gap-2 items-center"
-      title={`Publishing as ${getCommentAuthorNameOrAddress(enrichedAuthor)}`}
-    >
-      <CommentAuthorAvatar author={enrichedAuthor} />
-      <div className="text-xs text-gray-500">
-        {getCommentAuthorNameOrAddress(enrichedAuthor)}
-      </div>
-    </div>
-  );
-}
