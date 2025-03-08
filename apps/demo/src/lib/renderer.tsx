@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 export function renderCommentContent(content: string) {
   return content
     .split("\n")
@@ -5,6 +7,8 @@ export function renderCommentContent(content: string) {
       return <>{line}</>;
     })
     .reduce((nodes, lineNode, index) => {
-      return [...nodes, lineNode, <br key={`line-${index}`} />];
+      nodes.push(<Fragment key={`line-${index}`}>{lineNode}</Fragment>) ;
+      nodes.push(<br key={`line-break-${index}`} />)
+      return nodes;
     }, [] as React.ReactNode[]);
 }
