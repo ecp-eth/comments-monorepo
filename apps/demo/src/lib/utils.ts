@@ -5,6 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function abbreviateAddressForDisplay(address: string): string {
+  if (!address) return "";
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
 export function formatDate(timestamp: number | Date | string): string {
   const date = new Date(timestamp);
   return date.toLocaleString("en-US", {

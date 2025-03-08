@@ -15,19 +15,24 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-4xl mx-auto flex justify-end p-2 gap-2">
-        <Link
-          className="text-sm font-semibold"
-          href="https://docs.ethcomments.xyz"
-        >
-          Documentation
-        </Link>
-        <Link
-          className="text-sm font-semibold"
-          href="https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo"
-        >
-          Github
-        </Link>
+      <div className="max-w-4xl mx-auto flex flex-row justify-between items-center py-2">
+        <div className="flex flex-row gap-3">
+          <Link
+            className="text-sm font-semibold"
+            href="https://docs.ethcomments.xyz"
+          >
+            Documentation
+          </Link>
+          <Link
+            className="text-sm font-semibold"
+            href="https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo"
+          >
+            Github
+          </Link>
+        </div>
+        {/* when the user hasn't connect we already have a ConnectButton in the middle of the comment section
+        so let's hide this one when that's the case */}
+        {address && <ConnectButton />}
       </div>
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow">
         <div className="flex justify-between items-center mb-6">
@@ -42,7 +47,7 @@ export default function Home() {
           </div>
         </div>
         {!address ? (
-          <div className="text-center py-8">
+          <div className="flex justify-center py-8">
             <ConnectButton />
           </div>
         ) : isGasless ? (
