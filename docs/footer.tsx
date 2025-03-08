@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { CommentsEmbed } from "@ecp.eth/sdk/react";
+import { publicEnv } from "./publicEnv";
 
 /**
  * A custom footer component that renders a comments embed.
@@ -17,7 +18,7 @@ export default function Footer() {
 
   return (
     <CommentsEmbed
-      embedUri={hasEnvObject(meta, 'VITE_ECP_ETH_EMBED_URL') ? meta.env.VITE_ECP_ETH_EMBED_URL : undefined}
+      embedUri={publicEnv.VITE_ECP_ETH_EMBED_URL}
       uri={`${window.location.origin}/${window.location.pathname}`}
       containerProps={{
         style: {
@@ -131,22 +132,4 @@ function useSyncRootElColorScheme(colorScheme: 'light' | 'dark' | undefined) {
  */
 function getVocsColorScheme(): 'light' | 'dark' {
   return document.documentElement.className.includes('dark') ? 'dark' : 'light'
-}
-
-/**
- * Type safe way to checks if the parent object has an env property with the given key
- * @param parent - The parent object to check
- * @param key - The key to check for in the env property
- * @returns true if the parent object has an env property with the given key
- */
-function hasEnvObject<ENV_NAME extends string>(parent: unknown, key: ENV_NAME): parent is { env: { [key in ENV_NAME]: string } } {
-  return (
-    typeof parent === 'object' && 
-    parent != null && 
-    'env' in parent &&
-    typeof parent.env === 'object' &&
-    parent.env != null &&
-    key in parent.env &&
-    typeof (parent.env as Record<string, unknown>)[key] === 'string'
-  ) 
 }
