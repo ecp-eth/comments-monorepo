@@ -22,3 +22,8 @@ export function bigintReplacer(key: string, value: unknown) {
   }
   return value;
 }
+
+export function abbreviateAddressForDisplay(address: string): string {
+  if (!address) return "";
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
