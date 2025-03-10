@@ -521,4 +521,61 @@ paths:
                       - fid
                 required:
                   - address
+  /api/spam-accounts/{address}:
+    delete:
+      tags:
+        - comments
+      description: >-
+        Removes account from spammer list, futher comments from this account
+        will be indexed
+      parameters:
+        - schema:
+            description: The address of the spammer
+          required: true
+          name: address
+          in: path
+      responses:
+        '204':
+          description: When spammer was deleted from the list
+        '404':
+          description: When spammer was not found in the list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                required:
+                  - message
+  /api/spam-accounts:
+    post:
+      tags:
+        - comments
+      description: >-
+        Marks account as spammer, futher comments from this account won't be
+        indexed
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  description: The address of the spammer
+              required:
+                - address
+      responses:
+        '200':
+          description: An object with author address and ENS and Farcaster data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    description: The address of the spammer
+                required:
+                  - address
 webhooks: {}

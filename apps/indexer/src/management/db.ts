@@ -1,6 +1,6 @@
 import { Kysely, PostgresDialect, WithSchemaPlugin } from "kysely";
 import { env } from "../env";
-import { Pool } from "pg";
+import pg from "pg";
 import { IndexerSchemaDB } from "./migrations";
 
 const SCHEMA_NAME = "ecp_indexer_schema";
@@ -14,7 +14,7 @@ export function getIndexerDb(): Kysely<IndexerSchemaDB> {
 
   db = new Kysely({
     dialect: new PostgresDialect({
-      pool: new Pool({
+      pool: new pg.Pool({
         connectionString: env.DATABASE_URL,
         max: 10,
       }),
