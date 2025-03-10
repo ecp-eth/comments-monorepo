@@ -143,3 +143,19 @@ export function markCommentAsDeleted(
 
   return clonedData;
 }
+
+/**
+ * Create a markdown style quotation from a comment's content
+ * 
+ * Example:
+ * 
+ * > This is a comment
+ * > 
+ * > It has multiple lines
+ * 
+ * @param comment 
+ * @returns 
+ */
+export function createQuotationFromComment(comment: Comment): string {
+  return '> ' + comment.content.split('\n').join('\n > ') + '\n\n'
+}
