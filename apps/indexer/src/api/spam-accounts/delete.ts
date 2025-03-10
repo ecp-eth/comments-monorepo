@@ -1,6 +1,6 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
-  DeleteSpammerNotFoundResponseSchema,
+  APIErrorResponseSchema,
   DeleteSpammerParamSchema,
 } from "../../lib/schemas";
 import { getIndexerDb } from "../../management/db";
@@ -20,10 +20,26 @@ const deleteSpammer = createRoute({
     204: {
       description: "When spammer was deleted from the list",
     },
+    400: {
+      content: {
+        "application/json": {
+          schema: APIErrorResponseSchema,
+        },
+      },
+      description: "When request is not valid",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: APIErrorResponseSchema,
+        },
+      },
+      description: "When request is not authenticated",
+    },
     404: {
       content: {
         "application/json": {
-          schema: DeleteSpammerNotFoundResponseSchema,
+          schema: APIErrorResponseSchema,
         },
       },
       description: "When spammer was not found in the list",

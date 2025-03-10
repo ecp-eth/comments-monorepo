@@ -22,15 +22,6 @@ export const DeleteSpammerParamSchema = z.object({
 });
 
 /**
- * Response schema for marking an account as spammer.
- */
-export const DeleteSpammerNotFoundResponseSchema = z.object({
-  message: z.string().openapi({
-    description: "Error message",
-  }),
-});
-
-/**
  * Request body schema for marking an account as spammer.
  */
 export const PostSpammerBodySchema = z.object({
@@ -45,6 +36,24 @@ export const PostSpammerBodySchema = z.object({
 export const PostSpammerResponseSchema = z.object({
   address: HexSchema.openapi({
     description: "The address of the spammer",
+  }),
+});
+
+/**
+ * Path params schema for deleting a comment.
+ */
+export const DeleteCommentParamSchema = z.object({
+  commentId: HexSchema.openapi({
+    description: "The ID of the comment to delete",
+  }),
+});
+
+/**
+ * Response schema for an API error.
+ */
+export const APIErrorResponseSchema = z.object({
+  message: z.string().openapi({
+    description: "The error message",
   }),
 });
 
