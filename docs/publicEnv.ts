@@ -3,7 +3,18 @@
 import { z } from "zod";
 
 export const publicEnvSchema = z.object({
-  VITE_ECP_ETH_EMBED_URL: z.string().url().optional(),
+  VITE_ECP_ETH_EMBED_URL: z.coerce
+    .string()
+    // had to do transform because empty env var in vite is considered as
+    // empty string, like below:
+    //
+    // ```
+    // VITE_ECP_ETH_EMBED_URL=
+    // ```
+    .transform((val) =>
+      z.string().url().safeParse(val).success ? val : undefined
+    )
+    .optional(),
 });
 
 export const publicEnv = publicEnvSchema.parse({
