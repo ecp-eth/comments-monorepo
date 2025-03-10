@@ -46,9 +46,7 @@ export function Comments() {
 Be careful when choosing the value for the `uri` property. The `uri` serves as a unique identifier to locate comments:
 
 1. If your web page is dynamic and accepts query parameters, you should carefully consider which parameters are necessary to locate the correct comments
-and include them in the `uri` property. As a general rule:
-    1. include query parameters that affect the page content.
-    2. arrange them in alphabetical order.
+   and include them in the `uri` property. As a general rule: 1. include query parameters that affect the page content. 2. arrange them in alphabetical order.
 2. If you are rendering the `CommentsEmbed` with server-side rendering (SSR), you do not have access to the `window` object.
 
 The `uri` must be a unique string that follows the [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) standard.
@@ -67,16 +65,16 @@ There are different approaches you can access the indexer data:
 
 ### SDK functions
 
-You can use functions from `@ecp.eth/sdk` to make accessing the indexer data easier. 
+You can use functions from `@ecp.eth/sdk` to make accessing the indexer data easier.
 Here are a few examples:
 
 #### Fetch comments
 
 ```ts
-import { fetchComments } from '@ecp.eth/sdk'
+import { fetchComments } from "@ecp.eth/sdk";
 
 async function main() {
-  console.log('fetching comments...')
+  console.log("fetching comments...");
 
   const comments = await fetchComments({
     // the url of indexer api
@@ -91,7 +89,7 @@ async function main() {
   );
 }
 
-main()
+main();
 ```
 
 The response is a list of comments and pagination information:
@@ -139,25 +137,23 @@ The response is a list of comments and pagination information:
 #### Fetch replies
 
 ```ts
-import { fetchCommentReplies } from '@ecp.eth/sdk'
+import { fetchCommentReplies } from "@ecp.eth/sdk";
 
 async function main() {
-  console.log('fetching replies...')
+  console.log("fetching replies...");
 
   // fetch replies for a comment based on its id
   const replies = await fetchCommentReplies({
     // the url of embed api
     apiUrl: "https://embed.ethcomments.xyz",
-    commentId: "0xdce24de208a5e15b6b9b7e7c1ccdc5c08d8a7d8ab20c37c60e1d96a2aa1f9941"
+    commentId:
+      "0xdce24de208a5e15b6b9b7e7c1ccdc5c08d8a7d8ab20c37c60e1d96a2aa1f9941",
   });
 
-  console.log(
-    "here is a list of replies",
-    replies
-  );
+  console.log("here is a list of replies", replies);
 }
 
-main()
+main();
 ```
 
 ##### API reference
@@ -169,34 +165,38 @@ main()
 
 The Rest API endpoints are available at `https://api.ethcomments.xyz/**/*`.
 
-See [Rest API Reference](/idxer-reference/restful) for more details.
+See [Rest API Reference](/indexer-reference/restful) for more details.
 
 ### Direct GraphQL access
 
 The GraphQL API is available at `https://api.ethcomments.xyz/graphql`.
 
-You can query the data using [your favorite GraphQL client](https://github.com/chentsulin/awesome-graphql), 
+You can query the data using [your favorite GraphQL client](https://github.com/chentsulin/awesome-graphql),
 or simply visit the GraphQL playground at https://api.ethcomments.xyz/ to try it out.
 
 #### Example queries
 
 Query a comment by its ID:
+
 ```graphql
 query {
-  comment (id: "0xc4f012eaaa9285b0ffa7df432a7eb8f17145c34cfd50de688273b2b7df6bef08") {
+  comment(
+    id: "0xc4f012eaaa9285b0ffa7df432a7eb8f17145c34cfd50de688273b2b7df6bef08"
+  ) {
     content
   }
 }
 ```
 
 Filter comments by `targetUri` and limit the number of results:
+
 ```graphql
 query {
   comments(where: { targetUri: "https://demo.ethcomments.xyz" }, limit: 10) {
-    # pagination info        
+    # pagination info
     pageInfo {
-      startCursor,
-      endCursor,
+      startCursor
+      endCursor
       hasNextPage
       hasPreviousPage
     }
@@ -255,10 +255,10 @@ The schema is located at `comments-monorepo/apps/indexer/ponder.schema.ts`.
 ```
 import { createClient, sql } from "@ponder/client";
 import * as schema from "./schema";
- 
+
 // create a ponder client with specified schema
 const client = createClient("https://api.ethcomments.xyz/sql", { schema });
- 
+
 // query the database for comments
 const result = await client.db.select()
   .from(schema.comment)
@@ -327,14 +327,14 @@ Let's create a function that signs comments for the app server. Here's the funct
 
 ```typescript
 type sign = (
-  authorAddress: Hex, 
-  chain: Chain, 
-  content: string, 
+  authorAddress: Hex,
+  chain: Chain,
+  content: string,
   targetUri: string
 ) => Promise<{
-    signature: Hex
-    commentData: CommentData
-  }>
+  signature: Hex;
+  commentData: CommentData;
+}>;
 ```
 
 In the function body, we will start with retrieving the `nonce`.
@@ -342,7 +342,7 @@ Each author and app signer pair has a unique nonce that increments with each com
 ensuring replay protection. We can use the `getNonce` function from the SDK to retrieve the nonce:
 
 ```typescript
-import { getNonce } from '@ecp.eth/sdk'
+import { getNonce } from "@ecp.eth/sdk";
 
 const nonce = await getNonce({
   author: authorAddress,
@@ -384,7 +384,7 @@ const signature = await appSigner.signTypedData(typedCommentData);
 return {
   signature,
   commentData,
-}
+};
 ```
 
 Now we finished the App Server signing process, let's see how the author posting the comment.
@@ -405,24 +405,29 @@ usually the App Server is deployed by a different party to keep the private key 
 However, to demonstrate the flow in this example, we'll directly call the `sign` function from the `AppServer` instance.
 
 ```typescript
-const appSignedComment = await this.appServer.sign(authorSigner.address, anvil, content, targetUri)
+const appSignedComment = await this.appServer.sign(
+  authorSigner.address,
+  anvil,
+  content,
+  targetUri
+);
 ```
 
 Then we call the function on the contract to post the comment, and wait for the transaction to be mined:
 
 ```typescript
-const tx = await commentsContract.write.postCommentAsAuthor([
-  appSignedComment.commentData,
-  appSignedComment.signature
-], {
-  account: walletClient.account
-})
+const tx = await commentsContract.write.postCommentAsAuthor(
+  [appSignedComment.commentData, appSignedComment.signature],
+  {
+    account: walletClient.account,
+  }
+);
 
 const receipt = await waitForTransactionReceipt(walletClient, {
-  hash: tx
-})
+  hash: tx,
+});
 
-return receipt
+return receipt;
 ```
 
 #### Put everything together
@@ -430,18 +435,30 @@ return receipt
 Here is the complete example, with everything put together:
 
 ```typescript
-import { http, createWalletClient, getContract, Hex, Chain, hashTypedData } from 'viem'
-import { anvil } from 'viem/chains'
-import { waitForTransactionReceipt } from 'viem/actions';
-import { COMMENTS_V1_ADDRESS, createCommentData, createCommentTypedData, getNonce } from '@ecp.eth/sdk'
-import { CommentsV1Abi } from '@ecp.eth/sdk/abis'
-import { privateKeyToAccount } from 'viem/accounts'
+import {
+  http,
+  createWalletClient,
+  getContract,
+  Hex,
+  Chain,
+  hashTypedData,
+} from "viem";
+import { anvil } from "viem/chains";
+import { waitForTransactionReceipt } from "viem/actions";
+import {
+  COMMENTS_V1_ADDRESS,
+  createCommentData,
+  createCommentTypedData,
+  getNonce,
+} from "@ecp.eth/sdk";
+import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
+import { privateKeyToAccount } from "viem/accounts";
 
 // we started a local anvil node for this example,
 // anvil is a local ethereum node that is used for testing and development.
-// run `pnpm i && pnpm run dev` in /packages/protocol/ to start the node 
+// run `pnpm i && pnpm run dev` in /packages/protocol/ to start the node
 // with deployed contract
-const transport = http('http://localhost:8545')
+const transport = http("http://localhost:8545");
 
 /**
  * The class simulate the app server that signs the comment.
@@ -449,8 +466,9 @@ const transport = http('http://localhost:8545')
  * and the app signing process should be hide away from the client.
  */
 class AppServer {
-  private readonly appSignerPrivateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
-  private readonly appSigner = privateKeyToAccount(this.appSignerPrivateKey)
+  private readonly appSignerPrivateKey =
+    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+  private readonly appSigner = privateKeyToAccount(this.appSignerPrivateKey);
 
   /**
    * Sign the comment data as the app server
@@ -460,9 +478,14 @@ class AppServer {
    * @param targetUri - The URI of the target of the comment
    * @returns The signed comment data
    */
-  async sign(authorAddress: Hex, chain: Chain, content: string, targetUri: string) {
-    const appSigner = this.appSigner
-  
+  async sign(
+    authorAddress: Hex,
+    chain: Chain,
+    content: string,
+    targetUri: string
+  ) {
+    const appSigner = this.appSigner;
+
     // we must retrieve the nonce from the contract for signing,
     // a unique nonce will be assigned per author per appSigner by the contract
     // if the nonce doesn't match, the verification of the signature later on contract
@@ -503,58 +526,67 @@ class AppServer {
  * The class simulate the author who posts the comment from client side
  */
 class Author {
-  private readonly authorPrivateKey = '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
-  private readonly authorSigner = privateKeyToAccount(this.authorPrivateKey)
+  private readonly authorPrivateKey =
+    "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
+  private readonly authorSigner = privateKeyToAccount(this.authorPrivateKey);
   // Create wallet client for interacting with the contract
   private readonly walletClient = createWalletClient({
     chain: anvil,
     transport,
-    account: this.authorSigner
-  })
+    account: this.authorSigner,
+  });
   // Get contract instance
   private readonly commentsContract = getContract({
     address: COMMENTS_V1_ADDRESS,
     abi: CommentsV1Abi,
-    client: this.walletClient
-  })
+    client: this.walletClient,
+  });
 
   constructor(private appServer: AppServer) {}
 
   async postComment(content: string, targetUri: string) {
-    const authorSigner = this.authorSigner
-    const walletClient = this.walletClient
-    const commentsContract = this.commentsContract
+    const authorSigner = this.authorSigner;
+    const walletClient = this.walletClient;
+    const commentsContract = this.commentsContract;
 
-    // we post the comment data over to app server, 
+    // we post the comment data over to app server,
     // to get the app server signed comment data
-    const appSignedComment = await this.appServer.sign(authorSigner.address, anvil, content, targetUri)
-   
-    // post comment data and app signature so the contract can verify the comment is authorized by the app
-    const tx = await commentsContract.write.postCommentAsAuthor([
-      appSignedComment.commentData,
-      appSignedComment.signature
-    ], {
-      // postCommentAsAuthor transaction will be executed by author signer so the author will have to pay.
-      account: walletClient.account
-    })
-  
-    const receipt = await waitForTransactionReceipt(walletClient, {
-      hash: tx
-    })
+    const appSignedComment = await this.appServer.sign(
+      authorSigner.address,
+      anvil,
+      content,
+      targetUri
+    );
 
-    return receipt
-  } 
+    // post comment data and app signature so the contract can verify the comment is authorized by the app
+    const tx = await commentsContract.write.postCommentAsAuthor(
+      [appSignedComment.commentData, appSignedComment.signature],
+      {
+        // postCommentAsAuthor transaction will be executed by author signer so the author will have to pay.
+        account: walletClient.account,
+      }
+    );
+
+    const receipt = await waitForTransactionReceipt(walletClient, {
+      hash: tx,
+    });
+
+    return receipt;
+  }
 }
 
 (async () => {
-  const author = new Author(new AppServer())
-  console.log('author is posting the comment and paying for the gas...')
+  const author = new Author(new AppServer());
+  console.log("author is posting the comment and paying for the gas...");
   const receipt = await author.postComment(
-    "Somebody successfully finished the tutorial!", 
+    "Somebody successfully finished the tutorial!",
     "https://demo.ethcomments.xyz"
-  )
-  console.log('author has posted the comment and the transaction is mined, transaction hash: ', receipt.transactionHash)
-})()
+  );
+  console.log(
+    "author has posted the comment and the transaction is mined, transaction hash: ",
+    receipt.transactionHash
+  );
+})();
 ```
 
 See [Protocol API Reference](/protocol-reference/CommentsV1) for more functions and details.

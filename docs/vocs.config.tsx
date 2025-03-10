@@ -106,11 +106,11 @@ export default defineConfig({
         },
         {
           text: "Indexer Reference",
-          link: "/idxer-reference/",
+          link: "/indexer-reference/",
           items: [
             {
               text: "RESTful API",
-              link: "/idxer-reference/restful",
+              link: "/indexer-reference/restful",
             },
             {
               text: "GraphQL API",
