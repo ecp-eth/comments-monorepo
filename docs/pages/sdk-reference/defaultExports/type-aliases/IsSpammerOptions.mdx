@@ -1,0 +1,49 @@
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [defaultExports](/sdk-reference/defaultExports/index.mdx) / IsSpammerOptions
+
+# Type Alias: IsSpammerOptions
+
+> **IsSpammerOptions**: `object`
+
+Defined in: [packages/sdk/src/api.ts:315](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L315)
+
+The options for `isSpammer()`
+
+## Type declaration
+
+### address
+
+> **address**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
+
+Author's address
+
+### apiUrl?
+
+> `optional` **apiUrl**: `string`
+
+URL on which /api/authors/$address endpoint will be called
+
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+### retries?
+
+> `optional` **retries**: `number`
+
+Number of times to retry the signing operation in case of failure.
+
+#### Default
+
+```ts
+3
+```
+
+### signal?
+
+> `optional` **signal**: `AbortSignal`

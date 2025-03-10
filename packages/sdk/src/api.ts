@@ -309,7 +309,10 @@ const IsSpammerOptionsSchema = z.object({
   retries: z.number().int().positive().default(3),
 });
 
-type IsSpammerOptions = {
+/**
+ * The options for `isSpammer()`
+ */
+export type IsSpammerOptions = {
   /**
    * Author's address
    */

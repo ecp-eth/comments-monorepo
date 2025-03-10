@@ -533,8 +533,23 @@ paths:
           name: address
           in: path
       responses:
-        '204':
+        '200':
           description: When address is marked as spammer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    description: The address of the spammer
+                  createdAt:
+                    type:
+                      - string
+                      - 'null'
+                    description: The date the spammer was added
+                required:
+                  - address
+                  - createdAt
         '400':
           description: When request is not valid
           content:
