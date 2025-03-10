@@ -101,6 +101,29 @@ export default defineConfig({
       ],
     },
     {
+      text: "Indexer",
+      items: [
+        {
+          text: "Admin CLI",
+          link: "/indexer/admin-cli",
+          items: [
+            {
+              text: "API Key Management",
+              link: "/indexer/admin-cli-api-key-management",
+            },
+            {
+              text: "Spammers",
+              link: "/indexer/admin-cli-spammers",
+            },
+          ],
+        },
+        {
+          text: "Spam Prevention",
+          link: "/indexer/spam-prevention",
+        },
+      ],
+    },
+    {
       text: "Reference",
       items: [
         {

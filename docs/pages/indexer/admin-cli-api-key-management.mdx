@@ -1,0 +1,95 @@
+# Admin CLI - API Key Management
+
+The Admin CLI provides tools to manage API keys for the indexer service. API keys are used to authenticate requests to protected endpoints of the indexer.
+
+## Prerequisites
+
+- Node.js installed
+- Access to the indexer database
+- Checked out the [Comments mono repository](https://github.com/ecp-eth/comments-monorepo)
+
+## Database Connection
+
+All commands require a database connection. You can provide the database URL in two ways:
+
+1. Set the `DATABASE_URL` environment variable
+2. Use the `-d` or `--db-url` option with each command
+
+## Commands
+
+### Adding a New API Key
+
+To add a new API key, use the following command:
+
+```bash
+bin/admin.js auth accounts add <name>
+```
+
+Replace `<name>` with a descriptive name for the API key.
+
+Example:
+
+```bash
+bin/admin.js auth accounts add "production-api-key"
+```
+
+The command will output:
+
+- ID: Unique identifier for the API key
+- Name: The name you provided
+- Private key: The private key (store this securely)
+- Public key: The public key
+
+⚠️ **Important**: Save the private key immediately after creation. It will not be shown again.
+
+### Listing API Keys
+
+To list all existing API keys:
+
+```bash
+bin/admin.js auth accounts list
+```
+
+This will display a table with:
+
+- ID: The unique identifier
+- Created at: Timestamp of creation
+- Last used at: Timestamp of last usage
+
+### Deleting an API Key
+
+To delete an API key:
+
+```bash
+bin/admin.js auth accounts delete <id>
+```
+
+Replace `<id>` with the ID of the API key you want to delete.
+
+Example:
+
+```bash
+bin/admin.js auth accounts delete abc123def456
+```
+
+## Using API Keys
+
+When making requests to protected endpoints, you'll need to include the API key in the request headers:
+
+- `X-API-Key`: The API key ID
+- `X-API-Timestamp`: Current timestamp in milliseconds
+- `X-API-Signature`: A signature generated using the private key
+
+The signature is created by:
+
+1. Concatenating the HTTP method, path, timestamp, and request body
+2. Converting the string to bytes
+3. Signing the bytes with the private key using Ed25519
+
+## Security Best Practices
+
+1. Store private keys securely and never share them
+2. Use descriptive names for API keys to track their purpose
+3. Regularly rotate API keys
+4. Delete unused API keys
+5. Use different API keys for different environments (development, staging, production)

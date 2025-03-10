@@ -1,0 +1,83 @@
+# Admin CLI - Spammers Management
+
+The Spammers Management CLI allows you to manage spam accounts in the indexer service. This functionality requires proper authentication using API keys.
+
+## Prerequisites
+
+Before using the spammers management commands, you need:
+
+- [An API key ID](/indexer/admin-cli-api-key-management)
+- The corresponding private key
+- Access to the indexer service
+- Checked out the [Comments mono repository](https://github.com/ecp-eth/comments-monorepo)
+
+## Commands
+
+### Add Spammer
+
+Adds a new address to the spam accounts list.
+
+```bash
+bin/admin.js spammers add <address> -i <api-key-id> -k <private-key> [--url <indexer-url>]
+```
+
+**Arguments:**
+
+- `address` - The Ethereum address to mark as a spammer (must be a valid hex address)
+
+**Options:**
+
+- `-i, --id <id>` - The ID of the API key to use (required)
+- `-k, --private-key <key>` - The private key of the API key (required)
+- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
+
+**Example:**
+
+```bash
+bin/admin.js spammers add 0x1234...5678 -i your-api-key-id -k your-private-key
+```
+
+### Remove Spammer
+
+Removes an address from the spam accounts list.
+
+```bash
+bin/admin.js spammers remove <address> -i <api-key-id> -k <private-key> [--url <indexer-url>]
+```
+
+**Arguments:**
+
+- `address` - The Ethereum address to remove from the spam accounts list
+
+**Options:**
+
+- `-i, --id <id>` - The ID of the API key to use (required)
+- `-k, --private-key <key>` - The private key of the API key (required)
+- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
+
+**Example:**
+
+```bash
+bin/admin.js spammers remove 0x1234...5678 -i your-api-key-id -k your-private-key
+```
+
+## Error Handling
+
+If any command fails, the CLI will:
+
+1. Display an error message with details about the failure
+2. Exit with a non-zero status code
+
+Common error scenarios include:
+
+- Invalid API key or private key
+- Invalid address format
+- Network connectivity issues
+- Server-side errors
+
+## Security Notes
+
+- Keep your API private keys secure and never share them
+- Use environment variables or secure key management systems to store sensitive credentials
+- The CLI uses Ed25519 signatures for authentication
+- All requests are timestamped to prevent replay attacks
