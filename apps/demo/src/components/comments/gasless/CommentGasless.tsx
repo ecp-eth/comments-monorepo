@@ -65,14 +65,16 @@ export function CommentGasless({
   onReply,
   onDelete,
   isAppSignerApproved: submitIfApproved,
-  level = 0
+  level = 0,
 }: CommentProps) {
-  const { address } = useAccount();
+  const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
   const onDeleteRef = useFreshRef(onDelete);
   const enrichedAuthor = useEnrichedAuthor(comment.author);
 
-  const handleReply = (pendingCommentOperation: PendingCommentOperationSchemaType) => {
+  const handleReply = (
+    pendingCommentOperation: PendingCommentOperationSchemaType
+  ) => {
     onReply?.(pendingCommentOperation);
     setIsReplying(false);
   };
@@ -81,7 +83,7 @@ export function CommentGasless({
   // user approval for signature for each interaction
   const deletePriorApprovedCommentMutation = useMutation({
     mutationFn: async () => {
-      if (!address) {
+      if (!connectedAddress) {
         throw new Error("No address found");
       }
 
@@ -90,13 +92,14 @@ export function CommentGasless({
       }
 
       const result = await gaslessDeleteComment({
-        author: address,
+        author: connectedAddress,
         commentId: comment.id,
         submitIfApproved: true,
       });
 
-      return PreparedSignedGaslessDeleteCommentApprovedResponseSchema.parse(result)
-        .txHash;
+      return PreparedSignedGaslessDeleteCommentApprovedResponseSchema.parse(
+        result
+      ).txHash;
     },
   });
 
@@ -104,12 +107,12 @@ export function CommentGasless({
   // will require user interaction for signature
   const deletePriorNotApprovedCommentMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
-      if (!address) {
+      if (!connectedAddress) {
         throw new Error("No address found");
       }
 
       const result = await gaslessDeleteComment({
-        author: address,
+        author: connectedAddress,
         commentId: comment.id,
         submitIfApproved: false,
       });
@@ -178,8 +181,8 @@ export function CommentGasless({
     }
   }, [receipt?.status, onDeleteRef, comment.id]);
 
-  const isAuthor = address
-    ? getAddress(address) === getAddress(enrichedAuthor.address)
+  const isAuthor = connectedAddress
+    ? getAddress(connectedAddress) === getAddress(enrichedAuthor.address)
     : false;
 
   const isDeleting =
@@ -215,14 +218,16 @@ export function CommentGasless({
         )}
       </div>
       <div className="mb-2">{comment.content}</div>
-      <div className="text-xs text-gray-500 mb-2">
-        <button
-          onClick={() => setIsReplying(!isReplying)}
-          className="mr-2 hover:underline"
-        >
-          reply
-        </button>
-      </div>
+      {connectedAddress && (
+        <div className="text-xs text-gray-500 mb-2">
+          <button
+            onClick={() => setIsReplying(!isReplying)}
+            className="mr-2 hover:underline"
+          >
+            reply
+          </button>
+        </div>
+      )}
       {isReplying && (
         <CommentBoxGasless
           onSubmit={handleReply}

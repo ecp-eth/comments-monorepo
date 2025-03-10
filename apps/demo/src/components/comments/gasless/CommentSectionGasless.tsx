@@ -24,7 +24,7 @@ import { publicEnv } from "@/publicEnv";
 import { useOptimisticCommentingManager } from "@/hooks/useOptimisticCommentingManager";
 
 export function CommentSectionGasless() {
-  const { address } = useAccount();
+  const { address: connectedAddress } = useAccount();
   const [page, setPage] = useState(0);
   const pageSize = 10;
   const [currentUrl, setCurrentUrl] = useState<string>("");
@@ -35,14 +35,14 @@ export function CommentSectionGasless() {
   const removeApprovalContract = useWriteContract();
 
   const getApprovalQuery = useQuery({
-    enabled: !!address,
-    queryKey: ["approval", address],
+    enabled: !!connectedAddress,
+    queryKey: ["approval", connectedAddress],
     queryFn: async () => {
-      if (!address) {
+      if (!connectedAddress) {
         throw new Error("No address found");
       }
 
-      const response = await fetch(`/api/approval?author=${address}`);
+      const response = await fetch(`/api/approval?author=${connectedAddress}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch approvals");
@@ -197,7 +197,7 @@ export function CommentSectionGasless() {
                 if (
                   !getApprovalQuery.data ||
                   !getApprovalQuery.data.approved ||
-                  !address
+                  !connectedAddress
                 ) {
                   throw new Error("No data found");
                 }
@@ -219,18 +219,20 @@ export function CommentSectionGasless() {
         )
       )}
 
-      <CommentBoxGasless
-        onSubmit={async (pendingCommentOperation) => {
-          // take the user to first page so they can see the comment posted
-          setPage(0);
+      {connectedAddress && (
+        <CommentBoxGasless
+          onSubmit={async (pendingCommentOperation) => {
+            // take the user to first page so they can see the comment posted
+            setPage(0);
 
-          insertPendingCommentOperation(pendingCommentOperation);
+            insertPendingCommentOperation(pendingCommentOperation);
 
-          // trigger a refetch
-          refetch();
-        }}
-        isAppSignerApproved={getApprovalQuery.data?.approved}
-      />
+            // trigger a refetch
+            refetch();
+          }}
+          isAppSignerApproved={getApprovalQuery.data?.approved}
+        />
+      )}
       {data?.results.map((comment) => (
         <CommentGasless
           key={comment.id}
