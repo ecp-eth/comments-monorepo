@@ -30,13 +30,7 @@ export default function Home() {
             Github
           </Link>
         </div>
-        {/* when the user hasn't connect we already have a ConnectButton in the middle of the comment section
-        so let's hide this one when that's the case */}
-        {address && <ConnectButton />}
-      </div>
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Comments</h1>
+        <div className="flex flex-row gap-3">
           <div className="flex items-center space-x-2">
             <Switch
               id="gasless-mode"
@@ -45,7 +39,12 @@ export default function Home() {
             />
             <Label htmlFor="gasless-mode">Gasless Mode</Label>
           </div>
+          {/* when the user hasn't connect we already have a ConnectButton in the middle of the comment section
+        so let's hide this one when that's the case */}
+          {address && <ConnectButton />}
         </div>
+      </div>
+      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow">
         {!address ? (
           <div className="flex justify-center py-8">
             <ConnectButton />

@@ -8,5 +8,4 @@ export function renderCommentContent(content: string) {
       nodes.push(<Fragment key={`line-${index}`}>{line}</Fragment>) ;
       nodes.push(<br key={`line-break-${index}`} />)
       return nodes;
-    })
-}
+    })}
