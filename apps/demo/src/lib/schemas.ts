@@ -62,12 +62,13 @@ export type PreparedSignedGaslessPostCommentNotApprovedSchemaType = z.infer<
   typeof PreparedSignedGaslessPostCommentNotApprovedResponseSchema
 >;
 
-export const PreparedGaslessPostCommentOperationApprovedResponseSchema = z.object({
-  txHash: HexSchema,
-  id: HexSchema,
-  appSignature: HexSchema,
-  commentData: CommentDataSchema,
-});
+export const PreparedGaslessPostCommentOperationApprovedResponseSchema =
+  z.object({
+    txHash: HexSchema,
+    id: HexSchema,
+    appSignature: HexSchema,
+    commentData: CommentDataSchema,
+  });
 
 export type PreparedGaslessPostCommentOperationApprovedSchemaType = z.infer<
   typeof PreparedGaslessPostCommentOperationApprovedResponseSchema

@@ -9,10 +9,7 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { bigintReplacer } from "@/lib/utils";
-import {
-  chain,
-  transport,
-} from "@/lib/wagmi";
+import { chain, transport } from "@/lib/wagmi";
 import {
   COMMENTS_V1_ADDRESS,
   CommentsV1Abi,
@@ -55,9 +52,7 @@ export async function POST(
     );
   }
 
-  const account = privateKeyToAccount(
-    env.APP_SIGNER_PRIVATE_KEY
-  );
+  const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
 
   const commentData = createCommentData({
     content,
