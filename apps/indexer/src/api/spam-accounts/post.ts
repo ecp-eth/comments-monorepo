@@ -4,10 +4,12 @@ import {
   PostSpammerResponseSchema,
 } from "../../lib/schemas";
 import { getIndexerDb } from "../../management/db";
+import { authMiddleware } from "../../middleware/auth";
 
 const postSpammer = createRoute({
   method: "post",
   path: "/api/spam-accounts",
+  middleware: [authMiddleware()],
   tags: ["comments"],
   description:
     "Marks account as spammer, futher comments from this account won't be indexed",

@@ -4,10 +4,12 @@ import {
   DeleteSpammerParamSchema,
 } from "../../lib/schemas";
 import { getIndexerDb } from "../../management/db";
+import { authMiddleware } from "../../middleware/auth";
 
-const postSpammer = createRoute({
-  method: "post",
+const deleteSpammer = createRoute({
+  method: "delete",
   path: "/api/spam-accounts/{address}",
+  middleware: [authMiddleware()],
   tags: ["comments"],
   description:
     "Removes account from spammer list, futher comments from this account will be indexed",
@@ -30,7 +32,7 @@ const postSpammer = createRoute({
 });
 
 export function setupDeleteSpammer(app: OpenAPIHono) {
-  app.openapi(postSpammer, async (c) => {
+  app.openapi(deleteSpammer, async (c) => {
     const { address } = c.req.valid("param");
     const db = getIndexerDb();
 

@@ -299,12 +299,18 @@ importers:
       '@neynar/nodejs-sdk':
         specifier: ^2.13.1
         version: 2.13.1(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      '@noble/ed25519':
+        specifier: ^2.2.3
+        version: 2.2.3
       '@sentry/node':
         specifier: ^9.3.0
         version: 9.3.0
       '@sentry/profiling-node':
         specifier: ^9.3.0
         version: 9.3.0
+      commander:
+        specifier: ^13.1.0
+        version: 13.1.0
       dataloader:
         specifier: ^2.2.3
         version: 2.2.3
@@ -1727,6 +1733,9 @@ packages:
   '@noble/curves@1.8.1':
     resolution: {integrity: sha512-warwspo+UYUPep0Q+vtdVB4Ugn8GGQj8iyB3gnRWsztmUHTI3S1nhdiWNsPUGL0vud7JlRRk1XEu7Lq1KGTnMQ==}
     engines: {node: ^14.21.3 || >=16}
+
+  '@noble/ed25519@2.2.3':
+    resolution: {integrity: sha512-iHV8eI2mRcUmOx159QNrU8vTpQ/Xm70yJ2cTk3Trc86++02usfqFoNl6x0p3JN81ZDS/1gx6xiK0OwrgqCT43g==}
 
   '@noble/hashes@1.4.0':
     resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
@@ -4257,6 +4266,10 @@ packages:
 
   commander@12.1.0:
     resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
+    engines: {node: '>=18'}
+
+  commander@13.1.0:
+    resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
     engines: {node: '>=18'}
 
   commander@2.20.3:
@@ -11001,6 +11014,8 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.7.1
 
+  '@noble/ed25519@2.2.3': {}
+
   '@noble/hashes@1.4.0': {}
 
   '@noble/hashes@1.7.1': {}
@@ -14583,6 +14598,8 @@ snapshots:
   command-exists@1.2.9: {}
 
   commander@12.1.0: {}
+
+  commander@13.1.0: {}
 
   commander@2.20.3: {}
 

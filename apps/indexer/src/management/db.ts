@@ -20,7 +20,7 @@ export function getIndexerDb(): Kysely<IndexerSchemaDB> {
       }),
     }),
     plugins: [new WithSchemaPlugin(SCHEMA_NAME)],
-    log: console.log,
+    ...(process.env.NODE_ENV === "development" && { log: console.log }),
   });
 
   return db;
