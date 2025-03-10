@@ -10,7 +10,8 @@ import { randomBytes } from "crypto";
 import { getPublicKeyAsync, signAsync, utils } from "@noble/ed25519";
 import pg from "pg";
 import { z } from "zod";
-import { HexSchema } from "@ecp.eth/sdk/schemas";
+
+const HexSchema = z.string().regex(/^0x[0-9a-fA-F]+$/);
 
 /**
  * Validates a URL option.
