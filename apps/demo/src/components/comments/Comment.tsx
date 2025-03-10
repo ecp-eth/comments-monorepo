@@ -111,14 +111,16 @@ export function Comment({
         )}
       </div>
       <div className="mb-2">{renderCommentContent(comment.content)}</div>
-      <div className="text-xs text-gray-500 mb-2">
-        <button
-          onClick={() => setIsReplying(!isReplying)}
-          className="mr-2 hover:underline"
-        >
-          reply
-        </button>
-      </div>
+      {connectedAddress && (
+        <div className="text-xs text-gray-500 mb-2">
+          <button
+            onClick={() => setIsReplying(!isReplying)}
+            className="mr-2 hover:underline"
+          >
+            reply
+          </button>
+        </div>
+      )}
       {isReplying && (
         <CommentBox
           onSubmit={handleReply}

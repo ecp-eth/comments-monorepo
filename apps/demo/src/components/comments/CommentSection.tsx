@@ -7,8 +7,10 @@ import { Comment } from "./Comment";
 import { CommentBox } from "./CommentBox";
 import { publicEnv } from "@/publicEnv";
 import { useOptimisticCommentingManager } from "@/hooks/useOptimisticCommentingManager";
+import { useAccount } from "wagmi";
 
 export function CommentSection() {
+  const { address: connectedAddress } = useAccount();
   const [page, setPage] = useState(0);
   const pageSize = 10;
   const [currentUrl, setCurrentUrl] = useState<string>("");
@@ -43,19 +45,21 @@ export function CommentSection() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-8">
+    <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
-      <CommentBox
-        onSubmit={async (pendingCommentOperation) => {
-          // take the user to first page so they can see the comment posted
-          setPage(0);
+      {connectedAddress && (
+        <CommentBox
+          onSubmit={async (pendingCommentOperation) => {
+            // take the user to first page so they can see the comment posted
+            setPage(0);
 
-          insertPendingCommentOperation(pendingCommentOperation);
+            insertPendingCommentOperation(pendingCommentOperation);
 
-          // trigger a refetch
-          refetch();
-        }}
-      />
+            // trigger a refetch
+            refetch();
+          }}
+        />
+      )}
       {data?.results.map((comment) => (
         <Comment
           key={comment.id}
