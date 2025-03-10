@@ -3,12 +3,10 @@ import { Fragment } from "react";
 export function renderCommentContent(content: string) {
   return content
     .split("\n")
-    .map((line) => {
-      return <>{line}</>;
-    })
-    .reduce((nodes, lineNode, index) => {
-      nodes.push(<Fragment key={`line-${index}`}>{lineNode}</Fragment>) ;
+    .flatMap((line, index) => {
+      const nodes: React.ReactNode[] = [];
+      nodes.push(<Fragment key={`line-${index}`}>{line}</Fragment>) ;
       nodes.push(<br key={`line-break-${index}`} />)
       return nodes;
-    }, [] as React.ReactNode[]);
+    })
 }
