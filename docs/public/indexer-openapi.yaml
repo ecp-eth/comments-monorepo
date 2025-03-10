@@ -474,4 +474,51 @@ paths:
                 required:
                   - results
                   - pagination
+  /api/authors/{authorAddress}:
+    get:
+      tags:
+        - comments
+      description: Retrieve author ENS / Farcaster data
+      parameters:
+        - schema:
+            description: The author's address
+          required: true
+          name: authorAddress
+          in: path
+      responses:
+        '200':
+          description: An object with author address and ENS and Farcaster data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address: {}
+                  ens:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      avatarUrl:
+                        type:
+                          - string
+                          - 'null'
+                    required:
+                      - name
+                      - avatarUrl
+                  farcaster:
+                    type: object
+                    properties:
+                      fid:
+                        type: integer
+                      pfpUrl:
+                        type: string
+                      displayName:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                      - fid
+                required:
+                  - address
 webhooks: {}
