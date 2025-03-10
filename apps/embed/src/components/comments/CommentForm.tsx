@@ -18,6 +18,8 @@ import {
 import { MAX_COMMENT_LENGTH } from "@/lib/constants";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "./helpers";
+import { useTextAreaAutoVerticalResize } from "@/hooks/useTextAreaAutoVerticalResize";
+import { useTextAreaAutoFocus } from "@/hooks/useTextAreaAutoFocus";
 
 export type OnSubmitSuccessFunction = (
   params: PendingCommentOperationSchemaType
@@ -31,6 +33,7 @@ interface CommentBoxProps {
   onSubmitSuccess: OnSubmitSuccessFunction;
   placeholder?: string;
   parentId?: Hex;
+  initialContent?: string;
 }
 
 export function CommentForm({
@@ -38,13 +41,16 @@ export function CommentForm({
   onSubmitSuccess,
   placeholder = "What are your thoughts?",
   parentId,
+  initialContent
 }: CommentBoxProps) {
   const { targetUri } = useEmbedConfig();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(initialContent ?? "");
+  useTextAreaAutoVerticalResize(textAreaRef)
+  useTextAreaAutoFocus(textAreaRef)
 
   const postCommentContract = useWriteContract();
 
@@ -112,7 +118,7 @@ export function CommentForm({
         onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "w-full p-2",
+          "w-full p-2 min-h-[70px] max-h-[400px] resize-vertical",
           submitCommentMutation.error &&
             submitCommentMutation.error instanceof
               SubmitCommentMutationValidationError &&

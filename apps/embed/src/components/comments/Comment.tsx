@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import never from "never";
 import { CommentForm } from "./CommentForm";
 import { cn, formatDate } from "@/lib/utils";
 import {
@@ -43,7 +44,10 @@ import { Button } from "../ui/button";
 import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
 import { CommentText } from "./CommentText";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
-import { getCommentAuthorNameOrAddress } from "./helpers";
+import {
+  createQuotationFromComment,
+  getCommentAuthorNameOrAddress,
+} from "./helpers";
 
 export type OnDeleteComment = (id: Hex) => void;
 export type OnPostCommentSuccess = (transactionHash: Hex) => void;
@@ -276,7 +280,6 @@ export function Comment({
       </div>
       <div className="mb-2">
         <CommentActionOrStatus
-          areRepliesAllowed={areRepliesAllowed}
           comment={comment}
           hasAccountConnected={!!connectedAddress}
           isDeleting={isDeleting}
@@ -291,13 +294,22 @@ export function Comment({
       {isReplying && (
         <div className="mb-2">
           <CommentForm
+            initialContent={
+              areRepliesAllowed ? undefined 
+                : createQuotationFromComment(comment)
+            }
             onLeftEmpty={() => setIsReplying(false)}
             onSubmitSuccess={(pendingOperation) => {
               setIsReplying(false);
               handleCommentSubmitted(pendingOperation);
             }}
             placeholder="What are your thoughts?"
-            parentId={comment.id}
+            parentId={
+              areRepliesAllowed
+                ? comment.id
+                : (comment.parentId ??
+                  never("parentId is required for comment depth > 0"))
+            }
           />
         </div>
       )}
@@ -324,7 +336,6 @@ export function Comment({
 
 function CommentActionOrStatus({
   comment,
-  areRepliesAllowed,
   hasAccountConnected,
   isDeleting,
   isPosting,
@@ -335,7 +346,6 @@ function CommentActionOrStatus({
   onRetryPostClick,
 }: {
   comment: CommentType;
-  areRepliesAllowed: boolean;
   hasAccountConnected: boolean;
   isDeleting: boolean;
   isPosting: boolean;
@@ -387,7 +397,7 @@ function CommentActionOrStatus({
     );
   }
 
-  if (comment.pendingOperation || !areRepliesAllowed || !hasAccountConnected) {
+  if (comment.pendingOperation || !hasAccountConnected) {
     return null;
   }
 
