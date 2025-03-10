@@ -95,8 +95,10 @@ export function Comment({
   const commentRef = useFreshRef(comment);
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
-  const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
   const areRepliesAllowed = depth < 2;
+  const submitTargetCommentId = areRepliesAllowed ? comment.id : (comment.parentId ?? never("parentId is required for comment depth > 0"));
+  const submitTargetQueryKey = useMemo(() => ["comments", submitTargetCommentId], [submitTargetCommentId]);
+  const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
 
   const repliesQuery = useInfiniteQuery({
     enabled: areRepliesAllowed,
@@ -148,11 +150,11 @@ export function Comment({
     return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
   }, [repliesQuery.data?.pages]);
 
-  const handleCommentSubmitted = useHandleCommentSubmitted({ queryKey });
+  const handleCommentSubmitted = useHandleCommentSubmitted({ queryKey: submitTargetQueryKey });
   const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
-    queryKey,
+    queryKey: submitTargetQueryKey,
   });
-  const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
+  const handleRetryPostComment = useHandleRetryPostComment({ queryKey: submitTargetQueryKey });
   const handleCommentDeleted = useHandleCommentDeleted({ queryKey });
 
   const retryPostMutation = useMutation({
@@ -304,12 +306,7 @@ export function Comment({
               handleCommentSubmitted(pendingOperation);
             }}
             placeholder="What are your thoughts?"
-            parentId={
-              areRepliesAllowed
-                ? comment.id
-                : (comment.parentId ??
-                  never("parentId is required for comment depth > 0"))
-            }
+            parentId={submitTargetCommentId}
           />
         </div>
       )}
