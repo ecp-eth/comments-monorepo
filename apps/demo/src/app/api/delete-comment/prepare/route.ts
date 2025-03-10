@@ -3,16 +3,13 @@ import { JSONResponse } from "@/lib/json-response";
 import {
   BadRequestResponseSchema,
   InternalServerErrorResponseSchema,
-  PreparedGaslessCommentOperationApprovedResponseSchema,
+  PreparedSignedGaslessDeleteCommentApprovedResponseSchema,
   PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema,
   PrepareGaslessCommentDeletionRequestBodySchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { bigintReplacer } from "@/lib/utils";
-import {
-  chain,
-  transport,
-} from "@/lib/wagmi";
+import { chain, transport } from "@/lib/wagmi";
 import {
   COMMENTS_V1_ADDRESS,
   CommentsV1Abi,
@@ -28,7 +25,7 @@ export async function POST(
   JSONResponse<
     | typeof BadRequestResponseSchema
     | typeof InternalServerErrorResponseSchema
-    | typeof PreparedGaslessCommentOperationApprovedResponseSchema
+    | typeof PreparedSignedGaslessDeleteCommentApprovedResponseSchema
     | typeof PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema
   >
 > {
@@ -120,7 +117,7 @@ export async function POST(
         });
 
         return new JSONResponse(
-          PreparedGaslessCommentOperationApprovedResponseSchema,
+          PreparedSignedGaslessDeleteCommentApprovedResponseSchema,
           {
             txHash,
           }

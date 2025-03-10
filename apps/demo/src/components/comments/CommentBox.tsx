@@ -15,7 +15,7 @@ import {
   PendingCommentOperationSchemaType,
   SignCommentResponseSchema,
 } from "@/lib/schemas";
-import { useFreshRef } from "@/lib/hooks";
+import { useFreshRef } from "@/hooks/useFreshRef";
 import { getCommentAuthorNameOrAddress } from "./helpers";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import {

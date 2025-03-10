@@ -4,7 +4,7 @@ import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   useAccount,
   useWaitForTransactionReceipt,
@@ -21,12 +21,16 @@ import {
 import type { SignTypedDataParameters } from "viem";
 import { bigintReplacer } from "@/lib/utils";
 import { publicEnv } from "@/publicEnv";
+import { useOptimisticCommentingManager } from "@/hooks/useOptimisticCommentingManager";
 
 export function CommentSectionGasless() {
   const { address } = useAccount();
   const [page, setPage] = useState(0);
   const pageSize = 10;
   const [currentUrl, setCurrentUrl] = useState<string>("");
+  const queryKeyPrefix = useMemo(() => ["comments", currentUrl], [currentUrl]);
+  const { insertPendingCommentOperation, deletePendingCommentOperation } =
+    useOptimisticCommentingManager([...queryKeyPrefix, 0]);
 
   const removeApprovalContract = useWriteContract();
 
@@ -216,18 +220,31 @@ export function CommentSectionGasless() {
       )}
 
       <CommentBoxGasless
-        onSubmit={() => refetch()}
-        isApproved={getApprovalQuery.data?.approved}
+        onSubmit={async (pendingCommentOperation) => {
+          // take the user to first page so they can see the comment posted
+          setPage(0);
+
+          insertPendingCommentOperation(pendingCommentOperation);
+
+          // trigger a refetch
+          refetch();
+        }}
+        isAppSignerApproved={getApprovalQuery.data?.approved}
       />
       {data?.results.map((comment) => (
         <CommentGasless
           key={comment.id}
           comment={comment}
-          onReply={() => refetch()}
-          onDelete={() => {
+          onReply={(pendingCommentOperation) => {
+            insertPendingCommentOperation(pendingCommentOperation);
+
             refetch();
           }}
-          submitIfApproved={getApprovalQuery.data?.approved ?? false}
+          onDelete={(id) => {
+            deletePendingCommentOperation(id);
+            refetch();
+          }}
+          isAppSignerApproved={getApprovalQuery.data?.approved ?? false}
         />
       ))}
       {data?.pagination.hasMore && (

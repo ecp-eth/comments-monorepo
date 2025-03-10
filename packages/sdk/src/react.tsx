@@ -39,13 +39,16 @@ const { compressToURI } = lz;
  * @param props
  * @returns
  */
-export function useGaslessTransaction(props: {
+export function useGaslessTransaction<
+  VariablesType extends object | undefined,
+  ReturnValueType,
+>(props: {
   prepareSignTypedDataParams: () => Promise<
     | SignTypedDataParameters
     | {
         signTypedDataParams: SignTypedDataParameters;
         /** Miscellaneous data passed to be passed to sendSignedData */
-        variables?: object;
+        variables: VariablesType;
       }
   >;
   signTypedData?: (
@@ -54,8 +57,8 @@ export function useGaslessTransaction(props: {
   sendSignedData: (args: {
     signature: Hex;
     /** Miscellaneous data passed from prepareSignTypedDataParams */
-    variables?: object;
-  }) => Promise<Hex>;
+    variables: VariablesType;
+  }) => Promise<ReturnValueType>;
 }) {
   const { signTypedDataAsync } = useSignTypedData();
 
@@ -69,9 +72,13 @@ export function useGaslessTransaction(props: {
           ? prepareResult.signTypedDataParams
           : prepareResult
       );
+
       const signedData = await props.sendSignedData({
         signature,
-        variables: "variables" in prepareResult ? prepareResult.variables : {},
+        variables:
+          "variables" in prepareResult
+            ? prepareResult.variables
+            : (undefined as VariablesType),
       });
       return signedData;
     },

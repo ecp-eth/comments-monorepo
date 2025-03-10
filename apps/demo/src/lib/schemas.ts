@@ -31,6 +31,15 @@ export type PrepareGaslessCommentDeletionRequestBodySchemaType = z.infer<
   typeof PrepareGaslessCommentDeletionRequestBodySchema
 >;
 
+export const PreparedSignedGaslessDeleteCommentApprovedResponseSchema =
+  z.object({
+    txHash: HexSchema,
+  });
+
+export type PreparedSignedGaslessDeleteCommentApprovedSchemaType = z.infer<
+  typeof PreparedSignedGaslessDeleteCommentApprovedResponseSchema
+>;
+
 export const PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema =
   z.object({
     signTypedDataParams: DeleteCommentTypedDataSchema,
@@ -44,24 +53,30 @@ export type PreparedSignedGaslessDeleteCommentNotApprovedSchemaType = z.infer<
 export const PreparedSignedGaslessPostCommentNotApprovedResponseSchema =
   z.object({
     signTypedDataParams: AddCommentTypedDataSchema,
+    id: HexSchema,
     appSignature: HexSchema,
+    commentData: CommentDataSchema,
   });
 
 export type PreparedSignedGaslessPostCommentNotApprovedSchemaType = z.infer<
   typeof PreparedSignedGaslessPostCommentNotApprovedResponseSchema
 >;
 
-export const PreparedGaslessCommentOperationApprovedResponseSchema = z.object({
-  txHash: HexSchema,
-});
+export const PreparedGaslessPostCommentOperationApprovedResponseSchema =
+  z.object({
+    txHash: HexSchema,
+    id: HexSchema,
+    appSignature: HexSchema,
+    commentData: CommentDataSchema,
+  });
 
-export type PreparedGaslessCommentOperationApprovedSchemaType = z.infer<
-  typeof PreparedGaslessCommentOperationApprovedResponseSchema
+export type PreparedGaslessPostCommentOperationApprovedSchemaType = z.infer<
+  typeof PreparedGaslessPostCommentOperationApprovedResponseSchema
 >;
 
 export const PrepareGaslessDeleteCommentOperationResponseSchema = z.union([
   PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema,
-  PreparedGaslessCommentOperationApprovedResponseSchema,
+  PreparedSignedGaslessDeleteCommentApprovedResponseSchema,
 ]);
 
 export type PrepareGaslessDeleteCommentOperationResponseSchemaType = z.infer<
@@ -208,9 +223,12 @@ export const PendingOperationSchema = z
 
 export type PendingOperationSchemaType = z.infer<typeof PendingOperationSchema>;
 
-export const IndexerAPICommentWithPendingOperationSchema = IndexerAPICommentWithRepliesSchema.extend(PendingOperationSchema.shape)
+export const IndexerAPICommentWithPendingOperationSchema =
+  IndexerAPICommentWithRepliesSchema.extend(PendingOperationSchema.shape);
 
-export type IndexerAPICommentWithPendingOperationSchemaType = z.infer<typeof IndexerAPICommentWithPendingOperationSchema>
+export type IndexerAPICommentWithPendingOperationSchemaType = z.infer<
+  typeof IndexerAPICommentWithPendingOperationSchema
+>;
 
 export const IndexerAPIListCommentsWithPendingOperationsSchema = z.object({
   results: z.array(

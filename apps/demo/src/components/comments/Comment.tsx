@@ -20,7 +20,7 @@ import { CommentBox } from "./CommentBox";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "./helpers";
 import type { CommentType } from "@/lib/types";
-import { useFreshRef } from "@/lib/hooks";
+import { useFreshRef } from "@/hooks/useFreshRef";
 import { PendingCommentOperationSchemaType } from "@/lib/schemas";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 
