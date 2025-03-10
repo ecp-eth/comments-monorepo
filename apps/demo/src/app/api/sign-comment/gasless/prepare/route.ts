@@ -15,6 +15,7 @@ import {
   CommentsV1Abi,
   createCommentData,
   createCommentTypedData,
+  isSpammer,
 } from "@ecp.eth/sdk";
 import { createWalletClient, hashTypedData, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -67,6 +68,19 @@ export async function POST(
           ),
         },
       }
+    );
+  }
+
+  if (
+    await isSpammer({
+      address: author,
+      apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+    })
+  ) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { author: ["Spammer"] },
+      { status: 400 }
     );
   }
 

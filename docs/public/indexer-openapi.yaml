@@ -522,6 +522,43 @@ paths:
                 required:
                   - address
   /api/spam-accounts/{address}:
+    get:
+      tags:
+        - comments
+      description: Check if an address is marked as spammer
+      parameters:
+        - schema:
+            description: The address of the spammer
+          required: true
+          name: address
+          in: path
+      responses:
+        '204':
+          description: When address is marked as spammer
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: When address is not marked as spammer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
     delete:
       tags:
         - comments
@@ -537,6 +574,30 @@ paths:
       responses:
         '204':
           description: When spammer was deleted from the list
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: When request is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
         '404':
           description: When spammer was not found in the list
           content:
@@ -546,7 +607,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    description: Error message
+                    description: The error message
                 required:
                   - message
   /api/spam-accounts:
@@ -578,4 +639,40 @@ paths:
                     description: The address of the spammer
                 required:
                   - address
+        '400':
+          description: When request data is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: When request is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '409':
+          description: When account is already marked as spammer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
 webhooks: {}

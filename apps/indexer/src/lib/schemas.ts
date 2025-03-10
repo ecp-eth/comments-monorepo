@@ -22,6 +22,15 @@ export const DeleteSpammerParamSchema = z.object({
 });
 
 /**
+ * Path params schema for checking if an address is marked as spammer.
+ */
+export const GetSpammerParamSchema = z.object({
+  address: HexSchema.openapi({
+    description: "The address of the spammer",
+  }),
+});
+
+/**
  * Request body schema for marking an account as spammer.
  */
 export const PostSpammerBodySchema = z.object({

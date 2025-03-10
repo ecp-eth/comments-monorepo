@@ -301,3 +301,72 @@ export async function fetchAuthorData(
 
   return Effect.runPromise(repeatableTask, { signal });
 }
+
+const IsSpammerOptionsSchema = z.object({
+  address: HexSchema,
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  signal: z.instanceof(AbortSignal).optional(),
+  retries: z.number().int().positive().default(3),
+});
+
+type IsSpammerOptions = {
+  /**
+   * Author's address
+   */
+  address: Hex;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+  /**
+   * URL on which /api/authors/$address endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  signal?: AbortSignal;
+};
+
+/**
+ * Checks if an address is marked as a spammer.
+ *
+ * @param options - The options for checking if an address is a spammer
+ * @returns A promise that resolves to `true` if the address is marked as a spammer, `false` otherwise
+ */
+export async function isSpammer(options: IsSpammerOptions): Promise<boolean> {
+  const { address, apiUrl, retries, signal } =
+    IsSpammerOptionsSchema.parse(options);
+
+  const isSpammerTask = Effect.retry(
+    Effect.tryPromise(async (signal) => {
+      const url = new URL(`/api/spam-accounts/${address}`, apiUrl);
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        signal,
+        cache: "no-cache",
+      });
+
+      console.log(url, response.status);
+
+      if (response.status === 204) {
+        return true;
+      }
+
+      if (response.status === 404) {
+        return false;
+      }
+
+      throw new Error(
+        `Failed to check if address is spammer: ${response.statusText} (${response.status})`
+      );
+    }),
+    {
+      times: retries,
+    }
+  );
+
+  return Effect.runPromise(isSpammerTask, { signal });
+}

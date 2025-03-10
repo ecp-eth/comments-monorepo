@@ -4,8 +4,8 @@ import {
   PostSpammerBodySchema,
   PostSpammerResponseSchema,
 } from "../../lib/schemas";
-import { getIndexerDb } from "../../management/db";
 import { authMiddleware } from "../../middleware/auth";
+import { addSpammer } from "../../management/services/spammers";
 
 const postSpammer = createRoute({
   method: "post",
@@ -62,14 +62,8 @@ const postSpammer = createRoute({
 export function setupMarkAuthorAsSpammer(app: OpenAPIHono) {
   app.openapi(postSpammer, async (c) => {
     const { address } = c.req.valid("json");
-    const db = getIndexerDb();
 
-    const result = await db
-      .insertInto("spam_accounts")
-      .values({ account: address })
-      .onConflict((oc) => oc.column("account").doNothing())
-      .returningAll()
-      .executeTakeFirst();
+    const result = await addSpammer(address);
 
     if (!result) {
       return c.json(

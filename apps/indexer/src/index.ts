@@ -7,8 +7,8 @@ import {
 } from "./lib/utils";
 import { processTransactionsBlock } from "./lib/process-transactions-block";
 import { isProfane } from "./lib/profanity-detection";
-import { isSpammer } from "./lib/is-spammer";
 import { initializeManagement } from "./management";
+import { isSpammer } from "./management/services/spammers";
 
 await initializeManagement();
 

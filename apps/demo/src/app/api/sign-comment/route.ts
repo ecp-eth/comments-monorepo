@@ -6,7 +6,11 @@ import {
   SignCommentResponseSchema,
 } from "@/lib/schemas";
 import { bigintReplacer } from "@/lib/utils";
-import { createCommentData, createCommentTypedData } from "@ecp.eth/sdk";
+import {
+  createCommentData,
+  createCommentTypedData,
+  isSpammer,
+} from "@ecp.eth/sdk";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
@@ -42,7 +46,6 @@ export async function POST(
     );
   }
 
-  // Apply rate limiter
   const rateLimitResult = await signCommentRateLimiter.isRateLimited(author);
 
   if (!rateLimitResult.success) {
@@ -60,9 +63,20 @@ export async function POST(
     );
   }
 
-  const account = privateKeyToAccount(
-    env.APP_SIGNER_PRIVATE_KEY
-  );
+  if (
+    await isSpammer({
+      address: author,
+      apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+    })
+  ) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { author: ["Spammer"] },
+      { status: 400 }
+    );
+  }
+
+  const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
 
   const commentData = createCommentData({
     content,

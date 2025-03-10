@@ -9,7 +9,7 @@ import {
   getCachedGetBlockRpcResponseSkipStatus,
   markCachedGetBlockRpcResponseAsSkipped,
 } from "./ponder-rpc-results-cache";
-import { isSpammer } from "./is-spammer";
+import { isSpammer } from "../management/services/spammers";
 
 class InvalidAppSignatureError extends Error {}
 
