@@ -13,6 +13,42 @@ export const GetAuthorParamsSchema = z.object({
 });
 
 /**
+ * Response schema for resolving an author ENS / Farcaster data.
+ */
+export const DeleteSpammerParamSchema = z.object({
+  address: HexSchema.openapi({
+    description: "The address of the spammer",
+  }),
+});
+
+/**
+ * Response schema for marking an account as spammer.
+ */
+export const DeleteSpammerNotFoundResponseSchema = z.object({
+  message: z.string().openapi({
+    description: "Error message",
+  }),
+});
+
+/**
+ * Request body schema for marking an account as spammer.
+ */
+export const PostSpammerBodySchema = z.object({
+  address: HexSchema.openapi({
+    description: "The address of the spammer",
+  }),
+});
+
+/**
+ * Response schema for marking an account as spammer.
+ */
+export const PostSpammerResponseSchema = z.object({
+  address: HexSchema.openapi({
+    description: "The address of the spammer",
+  }),
+});
+
+/**
  * Query string schema for getting a list of comments.
  */
 export const GetCommentsQuerySchema = z.object({

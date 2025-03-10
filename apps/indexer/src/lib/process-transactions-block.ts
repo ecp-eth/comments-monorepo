@@ -9,6 +9,7 @@ import {
   getCachedGetBlockRpcResponseSkipStatus,
   markCachedGetBlockRpcResponseAsSkipped,
 } from "./ponder-rpc-results-cache";
+import { isSpammer } from "./is-spammer";
 
 class InvalidAppSignatureError extends Error {}
 
@@ -54,6 +55,10 @@ export async function processTransactionsBlock({
     try {
       const { commentData, authorSignature, appSignature } =
         decodeCommentSuffixData(`0x${input.encodedCommentData}`);
+
+      if (await isSpammer(commentData.author)) {
+        return;
+      }
 
       const commentTypedData = createCommentTypedData({
         chainId: context.network.chainId,

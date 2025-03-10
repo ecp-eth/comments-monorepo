@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const EnvSchema = z.object({
-  DATABASE_URL: z.string().optional(),
+  DATABASE_URL: z.string(),
   NEYNAR_API_KEY: z.string(),
   SENTRY_DSN: z.string().optional(),
 });

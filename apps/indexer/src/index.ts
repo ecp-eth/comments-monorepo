@@ -7,11 +7,19 @@ import {
 } from "./lib/utils";
 import { processTransactionsBlock } from "./lib/process-transactions-block";
 import { isProfane } from "./lib/profanity-detection";
+import { isSpammer } from "./lib/is-spammer";
+import { initializeManagement } from "./management";
+
+await initializeManagement();
 
 ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
   const targetUri = transformCommentTargetUri(event.args.commentData.targetUri);
 
   if (isProfane(event.args.commentData.content)) {
+    return;
+  }
+
+  if (await isSpammer(event.args.commentData.author)) {
     return;
   }
 
