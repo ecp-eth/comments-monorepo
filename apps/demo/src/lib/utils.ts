@@ -21,6 +21,12 @@ export function formatDate(timestamp: number | Date | string): string {
   });
 }
 
+/**
+ * Used as a JSON replacer to convert BigInts to strings
+ * @param key 
+ * @param value 
+ * @returns 
+ */
 export function bigintReplacer(key: string, value: unknown) {
   if (typeof value === "bigint") {
     return value.toString();

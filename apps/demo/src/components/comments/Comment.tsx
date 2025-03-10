@@ -24,6 +24,7 @@ import { useFreshRef } from "@/hooks/useFreshRef";
 import { PendingCommentOperationSchemaType } from "@/lib/schemas";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 import { publicEnv } from "@/publicEnv";
+import { renderCommentContent } from "@/lib/renderer";
 
 interface CommentProps {
   comment: CommentType;
@@ -109,7 +110,7 @@ export function Comment({
           </DropdownMenu>
         )}
       </div>
-      <div className="mb-2">{comment.content}</div>
+      <div className="mb-2">{renderCommentContent(comment.content)}</div>
       <div className="text-xs text-gray-500 mb-2">
         <button
           onClick={() => setIsReplying(!isReplying)}
