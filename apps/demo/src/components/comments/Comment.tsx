@@ -23,6 +23,7 @@ import type { CommentType } from "@/lib/types";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import { PendingCommentOperationSchemaType } from "@/lib/schemas";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
+import { publicEnv } from "@/publicEnv";
 
 interface CommentProps {
   comment: CommentType;
@@ -30,9 +31,15 @@ interface CommentProps {
     pendingCommentOperation: PendingCommentOperationSchemaType
   ) => void;
   onDelete?: (id: Hex) => void;
+  level?: number;
 }
 
-export function Comment({ comment, onReply, onDelete }: CommentProps) {
+export function Comment({
+  comment,
+  onReply,
+  onDelete,
+  level = 0,
+}: CommentProps) {
   const onDeleteRef = useFreshRef(onDelete);
   const { address: connectedAddress } = useAccount();
   const enrichedAuthor = useEnrichedAuthor(comment.author);
@@ -115,7 +122,12 @@ export function Comment({ comment, onReply, onDelete }: CommentProps) {
         <CommentBox
           onSubmit={handleReply}
           placeholder="What are your thoughts?"
-          parentId={comment.id}
+          parentId={
+            level >= publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF &&
+            comment.parentId
+              ? comment.parentId
+              : comment.id
+          }
         />
       )}
       {"replies" in comment &&
@@ -125,6 +137,7 @@ export function Comment({ comment, onReply, onDelete }: CommentProps) {
             comment={reply}
             onReply={onReply}
             onDelete={onDelete}
+            level={level + 1}
           />
         ))}
     </div>

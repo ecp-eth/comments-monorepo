@@ -8,6 +8,7 @@ export const publicEnvSchema = z.object({
   NEXT_PUBLIC_WC_PROJECT_ID: z.string().nonempty(),
   NEXT_PUBLIC_COMMENTS_INDEXER_URL: z.string().url(),
   NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS: HexSchema.optional(),
+  NEXT_PUBLIC_REPLY_DEPTH_CUTOFF: z.coerce.number().int().min(1).default(1),
 });
 
 export const publicEnv = publicEnvSchema.parse({
@@ -17,4 +18,5 @@ export const publicEnv = publicEnvSchema.parse({
   NEXT_PUBLIC_WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
   NEXT_PUBLIC_COMMENTS_INDEXER_URL: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS,
+  NEXT_PUBLIC_REPLY_DEPTH_CUTOFF: process.env.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF,
 });

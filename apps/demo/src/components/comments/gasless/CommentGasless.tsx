@@ -28,6 +28,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 import { Hex } from "@ecp.eth/sdk/schemas";
+import { publicEnv } from "@/publicEnv";
 
 async function gaslessDeleteComment(
   params: PrepareGaslessCommentDeletionRequestBodySchemaType
@@ -56,6 +57,7 @@ interface CommentProps {
     pendingCommentOperation: PendingCommentOperationSchemaType
   ) => void;
   onDelete?: (id: Hex) => void;
+  level?: number;
 }
 
 export function CommentGasless({
@@ -63,6 +65,7 @@ export function CommentGasless({
   onReply,
   onDelete,
   isAppSignerApproved: submitIfApproved,
+  level = 0
 }: CommentProps) {
   const { address } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
@@ -224,7 +227,12 @@ export function CommentGasless({
         <CommentBoxGasless
           onSubmit={handleReply}
           placeholder="What are your thoughts?"
-          parentId={comment.id}
+          parentId={
+            level >= publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF &&
+            comment.parentId
+              ? comment.parentId
+              : comment.id
+          }
           isAppSignerApproved={submitIfApproved}
         />
       )}
@@ -236,6 +244,7 @@ export function CommentGasless({
             onReply={onReply}
             onDelete={onDelete}
             isAppSignerApproved={submitIfApproved}
+            level={level + 1}
           />
         ))}
     </div>
