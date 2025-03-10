@@ -2,8 +2,9 @@ import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIErrorResponseSchema,
   GetSpammerParamSchema,
+  GetSpammerResponseSchema,
 } from "../../lib/schemas";
-import { isSpammer } from "../../management/services/spammers";
+import { getSpammer } from "../../management/services/spammers";
 
 const isSpammerRoute = createRoute({
   method: "get",
@@ -14,8 +15,13 @@ const isSpammerRoute = createRoute({
     params: GetSpammerParamSchema,
   },
   responses: {
-    204: {
+    200: {
       description: "When address is marked as spammer",
+      content: {
+        "application/json": {
+          schema: GetSpammerResponseSchema,
+        },
+      },
     },
     400: {
       content: {
@@ -39,9 +45,16 @@ const isSpammerRoute = createRoute({
 export function setupGetSpammer(app: OpenAPIHono) {
   app.openapi(isSpammerRoute, async (c) => {
     const { address } = c.req.valid("param");
+    const spammer = await getSpammer(address);
 
-    if (await isSpammer(address)) {
-      return c.newResponse(null, 204);
+    if (spammer) {
+      return c.json(
+        {
+          address: spammer.account,
+          createdAt: spammer.created_at,
+        },
+        200
+      );
     }
 
     return c.json(

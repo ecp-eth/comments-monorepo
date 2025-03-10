@@ -1,5 +1,6 @@
 import { getAddress, Hex } from "viem";
 import { getIndexerDb } from "../db";
+import type { SpamAccountSelect } from "../migrations";
 
 function normalizeAddress(address: Hex): Hex {
   return getAddress(address);
@@ -30,7 +31,9 @@ export async function removeSpammer(address: Hex): Promise<boolean> {
   return !!result;
 }
 
-export async function isSpammer(address: Hex): Promise<boolean> {
+export async function getSpammer(
+  address: Hex
+): Promise<SpamAccountSelect | undefined> {
   const db = getIndexerDb();
 
   const spammer = await db
@@ -40,5 +43,5 @@ export async function isSpammer(address: Hex): Promise<boolean> {
     .limit(1)
     .executeTakeFirst();
 
-  return !!spammer;
+  return spammer;
 }

@@ -1,8 +1,15 @@
-import { Kysely, type MigrationProvider } from "kysely";
+import {
+  Generated,
+  Kysely,
+  Selectable,
+  sql,
+  type MigrationProvider,
+} from "kysely";
 import type { Hex } from "viem";
 
 export type SpamAccountsTable = {
   account: Hex;
+  created_at: Generated<Date>;
 };
 
 export type ApiKeysTable = {
@@ -18,6 +25,8 @@ export type IndexerSchemaDB = {
   api_keys: ApiKeysTable;
 };
 
+export type SpamAccountSelect = Selectable<SpamAccountsTable>;
+
 class StaticMigrationsProvider implements MigrationProvider {
   async getMigrations() {
     return {
@@ -26,6 +35,9 @@ class StaticMigrationsProvider implements MigrationProvider {
           await db.schema
             .createTable("spam_accounts")
             .addColumn("account", "text", (col) => col.primaryKey())
+            .addColumn("created_at", "timestamp", (col) =>
+              col.notNull().defaultTo(sql`now()`)
+            )
             .execute();
         },
         down: async (db: Kysely<IndexerSchemaDB>) => {

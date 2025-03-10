@@ -30,6 +30,15 @@ export const GetSpammerParamSchema = z.object({
   }),
 });
 
+export const GetSpammerResponseSchema = z.object({
+  address: HexSchema.openapi({
+    description: "The address of the spammer",
+  }),
+  createdAt: z.coerce.date().openapi({
+    description: "The date the spammer was added",
+  }),
+});
+
 /**
  * Request body schema for marking an account as spammer.
  */

@@ -349,9 +349,7 @@ export async function isSpammer(options: IsSpammerOptions): Promise<boolean> {
         cache: "no-cache",
       });
 
-      console.log(url, response.status);
-
-      if (response.status === 204) {
+      if (response.status === 200) {
         return true;
       }
 
