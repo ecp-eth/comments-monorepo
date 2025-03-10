@@ -1,4 +1,5 @@
 import { TRUNCATE_COMMENT_LENGTH } from "@/lib/constants";
+import { renderCommentContent } from "@/lib/renderer";
 import { useState } from "react";
 
 function truncateText(text: string, maxLength: number): string {
@@ -17,7 +18,7 @@ export function CommentText({ text }: { text: string }) {
 
   return (
     <>
-      {shownText}
+      {renderCommentContent(shownText)}
       {isTruncated ? (
         <>
           {" "}

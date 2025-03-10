@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { CommentsEmbed } from "@ecp.eth/sdk/react";
+import { publicEnv } from "./publicEnv";
 
 /**
  * A custom footer component that renders a comments embed.
  * @returns
  */
 export default function Footer() {
+  const meta = import.meta
   const isMounted = useIsMounted()
   const vocsTheme = useVocsColorScheme()
 
@@ -16,6 +18,7 @@ export default function Footer() {
 
   return (
     <CommentsEmbed
+      embedUri={publicEnv.VITE_ECP_ETH_EMBED_URL}
       uri={`${window.location.origin}/${window.location.pathname}`}
       containerProps={{
         style: {
@@ -109,6 +112,10 @@ function useVocsColorScheme() {
   return theme
 }
 
+/**
+ * Sync the color scheme with root element
+ * @param colorScheme - The color scheme to sync
+ */
 function useSyncRootElColorScheme(colorScheme: 'light' | 'dark' | undefined) {
   useEffect(() => {
     if (!colorScheme) {

@@ -202,4 +202,7 @@ export default defineConfig({
       ]
     ],
   },
+  vite: {
+    envPrefix: 'VITE_'
+  }
 });
