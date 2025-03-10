@@ -3,13 +3,18 @@ import type {
   PendingCommentOperationSchemaType,
   CommentPageSchemaType,
 } from "@/lib/schemas";
+import { abbreviateAddressForDisplay } from "@/lib/utils";
 import type { InfiniteData } from "@tanstack/react-query";
 import type { Hex } from "viem";
 
 export function getCommentAuthorNameOrAddress(
   author: Comment["author"]
 ): string {
-  return author.ens?.name ?? author.farcaster?.displayName ?? author.address;
+  return (
+    author.ens?.name ??
+    author.farcaster?.displayName ??
+    abbreviateAddressForDisplay(author.address)
+  );
 }
 
 export function deletePendingCommentByTransactionHash(
