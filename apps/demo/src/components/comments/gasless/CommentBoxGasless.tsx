@@ -220,7 +220,7 @@ export function CommentBoxGasless({
         className="w-full p-2 border border-gray-300 rounded"
         disabled={isLoading}
       />
-      {address && <CommentBoxAuthor address={address}></CommentBoxAuthor>}
+      {address && <CommentBoxAuthor address={address} />}
       <div className="flex items-center text-sm text-gray-500">
         <Button
           type="submit"
