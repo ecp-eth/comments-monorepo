@@ -3,7 +3,7 @@
  * It is created using the CREATE2 opcode so should be identical across chains if no collisions occur.
  */
 export const COMMENTS_V1_ADDRESS =
-  "0x4b2fdb900fd003e30919e612d75046823b879554" as const;
+  "0xC7f0A5d16C05862292796cFB363e83d8d7c4a694" as const;
 
 /**
  * The default `embedUri` for the CommentsEmbed component.
