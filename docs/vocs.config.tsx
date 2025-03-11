@@ -50,7 +50,12 @@ export default defineConfig({
             },
             {
               text: "Contract Interaction",
-              link: "/integration-options/contract-interactions/post-as-author",
+              items: [
+                {
+                  text: "Post comment as author",
+                  link: "/integration-options/contract-interactions/post-as-author",
+                },
+              ],
             },
           ],
         },
