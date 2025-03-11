@@ -1,5 +1,12 @@
 # @ecp.eth/sdk
 
+## 0.0.9
+
+### Patch Changes
+
+- 3d1276e: feat: updated useGaslessTransaction in sdk to generic class to make it typed better (infer types from input)
+- dd294a6: feat: add api helper to fetch comment author data
+
 ## 0.0.8
 
 ### Patch Changes
