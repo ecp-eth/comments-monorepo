@@ -14,9 +14,14 @@ See [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_AD
 
 ### Post the comment as author
 
-To show how to interact with the contract, we will create a simple example that simulates the author posting the comment and signed by app server.
+We will start by create a simple example that simulates the author posting the a comment that is signed by app server.
 
-- The author will post according to the [post comment flow](/post-comment-flow#1-author-pays-gas), and eventually pay for the gas.
+The ECP supports 4 types of comment posting flows, each with their own pros and cons.
+You may want to read more about the [post comment flows](/post-comment-flows) for more details.
+
+Here we will show the most basic flow:
+
+- The author will post and pay for the gas see ["author pays gas"](/post-comment-flows#1-author-pays-gas), and eventually pay for the gas.
 - The app server will authorize the post by signing the comment data.
 
 ::::steps
@@ -342,7 +347,7 @@ See [Protocol API Reference](/protocol-reference/CommentsV1) for more functions 
 
 #### Next Steps
 
-- Check out **gasless** [post comment flows](/post-comment-flow)
+- Check out **gasless** [post comment flows](/post-comment-flows)
 
 ### Best Practices
 

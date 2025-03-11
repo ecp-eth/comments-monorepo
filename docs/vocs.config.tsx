@@ -68,8 +68,8 @@ export default defineConfig({
           link: "/dual-signature-system",
         },
         {
-          text: "Post comment flow",
-          link: "/post-comment-flow",
+          text: "Post comment flows",
+          link: "/post-comment-flows",
         },
       ],
     },
