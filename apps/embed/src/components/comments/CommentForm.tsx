@@ -41,7 +41,7 @@ export function CommentForm({
   onSubmitSuccess,
   placeholder = "What are your thoughts?",
   parentId,
-  initialContent
+  initialContent,
 }: CommentBoxProps) {
   const { targetUri } = useEmbedConfig();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -49,8 +49,10 @@ export function CommentForm({
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const [content, setContent] = useState(initialContent ?? "");
-  useTextAreaAutoVerticalResize(textAreaRef)
-  useTextAreaAutoFocus(textAreaRef)
+  useTextAreaAutoVerticalResize(textAreaRef);
+  // do not auto focus on top level comment box, only for replies
+  // auto focusing on top level comment box will cause unwanted scroll
+  useTextAreaAutoFocus(textAreaRef, parentId != null);
 
   const postCommentContract = useWriteContract();
 
