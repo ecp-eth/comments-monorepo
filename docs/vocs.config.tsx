@@ -79,15 +79,24 @@ export default defineConfig({
       ],
     },
     {
-      text: "Advanced Topics",
+      text: "Indexing",
+      items: [
+        {
+          text: "Ponder Indexer",
+          link: "/indexer-reference/",
+        },
+        {
+          text: "Alt Indexers: Index Supply",
+          link: "/index-supply",
+        },
+      ],
+    },
+    {
+      text: "Advanced",
       items: [
         {
           text: "Test with Anvil",
           link: "/test-with-anvil",
-        },
-        {
-          text: "Index Supply",
-          link: "/index-supply",
         },
       ],
     },
