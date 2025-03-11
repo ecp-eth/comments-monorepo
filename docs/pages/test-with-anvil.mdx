@@ -1,0 +1,23 @@
+# Test with Anvil
+
+Anvil is a local Ethereum node that is used for testing and development.
+It comes with `foundry` and is a perfect tool for local testing and development.
+
+You can get started by installing `foundryup` which is a tool to install [`foundry`](https://book.getfoundry.sh/getting-started/installation).
+
+Once you have `foundry` installed, you can start the anvil node by running:
+
+```bash
+anvil
+```
+
+Then you can deploy our CommentsV1 contract to the anvil node by running:
+
+```bash
+cd packages/protocol
+forge script script/Dev.s.sol:DevScript --rpc-url http://localhost:8545 --broadcast
+```
+
+**Please note that every time anvil shuts down, it will reset the blockchain state. You will need to re-deploy the contract.**
+
+You can also combine above 2 steps by running `pnpm run dev` in `/packages/protocol/`,

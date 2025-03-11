@@ -39,19 +39,18 @@ export default defineConfig({
         },
         {
           text: "Integration Options",
-          link: "/integration-options",
           items: [
             {
               text: "React Component Library",
-              link: "/integration-options#1-react-component-library",
+              link: "/integration-options/react-component-library",
             },
             {
               text: "Index API",
-              link: "/integration-options#2-indexer-api",
+              link: "/integration-options/indexer-api",
             },
             {
               text: "Contract Interaction",
-              link: "/integration-options#4-contract-interaction",
+              link: "/integration-options/contract-interactions",
             },
           ],
         },
@@ -75,13 +74,17 @@ export default defineConfig({
       ],
     },
     {
-      text: "Alternative Indexers",
+      text: "Advanced Topics",
       items: [
+        {
+          text: "Test with Anvil",
+          link: "/test-with-anvil",
+        },
         {
           text: "Index Supply",
           link: "/index-supply",
-        }
-      ]
+        },
+      ],
     },
     {
       text: "Reference",
@@ -115,7 +118,7 @@ export default defineConfig({
             {
               text: "GraphQL API",
               link: "https://api.ethcomments.xyz/graphql",
-            }
+            },
           ],
         },
         {
@@ -129,7 +132,7 @@ export default defineConfig({
       items: [
         {
           text: "Custom Integration",
-          link: '/demos/custom-integration',
+          link: "/demos/custom-integration",
           collapsed: true,
           items: [
             {
@@ -140,11 +143,11 @@ export default defineConfig({
               text: "Source Code",
               link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo",
             },
-          ]
+          ],
         },
         {
           text: "Blog with <CommentsEmbed />",
-          link: '/demos/blog',
+          link: "/demos/blog",
           collapsed: true,
           items: [
             {
@@ -155,7 +158,7 @@ export default defineConfig({
               text: "Source Code",
               link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/embed-demo-blog",
             },
-          ]
+          ],
         },
       ],
     },
@@ -175,12 +178,12 @@ export default defineConfig({
             },
           ],
         },
-      ]
+      ],
     },
     {
       text: "Contact",
       link: "https://t.me/davidfurlong",
-    }
+    },
   ],
   topNav: [
     { text: "Github", link: "https://github.com/ecp-eth/comments-monorepo" },
@@ -199,10 +202,10 @@ export default defineConfig({
             },
           },
         },
-      ]
+      ],
     ],
   },
   vite: {
-    envPrefix: 'VITE_'
-  }
+    envPrefix: "VITE_",
+  },
 });
