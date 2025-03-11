@@ -52,7 +52,7 @@ export function CommentForm({
   useTextAreaAutoVerticalResize(textAreaRef);
   // do not auto focus on top level comment box, only for replies
   // auto focusing on top level comment box will cause unwanted scroll
-  useTextAreaAutoFocus(textAreaRef, true);
+  useTextAreaAutoFocus(textAreaRef, parentId != null);
 
   const postCommentContract = useWriteContract();
 
