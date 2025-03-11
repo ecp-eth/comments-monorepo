@@ -75,13 +75,13 @@ export default defineConfig({
       ],
     },
     {
-      text: "Alternative Indexers",
+      text: "Advanced Topics",
       items: [
         {
-          text: "Index Supply",
+          text: "Alt Indexer: Index Supply",
           link: "/index-supply",
-        }
-      ]
+        },
+      ],
     },
     {
       text: "Reference",
@@ -115,7 +115,7 @@ export default defineConfig({
             {
               text: "GraphQL API",
               link: "https://api.ethcomments.xyz/graphql",
-            }
+            },
           ],
         },
         {
@@ -129,7 +129,7 @@ export default defineConfig({
       items: [
         {
           text: "Custom Integration",
-          link: '/demos/custom-integration',
+          link: "/demos/custom-integration",
           collapsed: true,
           items: [
             {
@@ -140,11 +140,11 @@ export default defineConfig({
               text: "Source Code",
               link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo",
             },
-          ]
+          ],
         },
         {
           text: "Blog with <CommentsEmbed />",
-          link: '/demos/blog',
+          link: "/demos/blog",
           collapsed: true,
           items: [
             {
@@ -155,7 +155,7 @@ export default defineConfig({
               text: "Source Code",
               link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/embed-demo-blog",
             },
-          ]
+          ],
         },
       ],
     },
@@ -175,12 +175,12 @@ export default defineConfig({
             },
           ],
         },
-      ]
+      ],
     },
     {
       text: "Contact",
       link: "https://t.me/davidfurlong",
-    }
+    },
   ],
   topNav: [
     { text: "Github", link: "https://github.com/ecp-eth/comments-monorepo" },
@@ -199,10 +199,10 @@ export default defineConfig({
             },
           },
         },
-      ]
+      ],
     ],
   },
   vite: {
-    envPrefix: 'VITE_'
-  }
+    envPrefix: "VITE_",
+  },
 });
