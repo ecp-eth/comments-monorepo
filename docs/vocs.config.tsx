@@ -46,7 +46,7 @@ export default defineConfig({
               link: "/integration-options#1-react-component-library",
             },
             {
-              text: "Index API",
+              text: "Indexer API",
               link: "/integration-options#2-indexer-api",
             },
             {
