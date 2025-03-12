@@ -20,6 +20,7 @@ import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "./helpers";
 import { useTextAreaAutoVerticalResize } from "@/hooks/useTextAreaAutoVerticalResize";
 import { useTextAreaAutoFocus } from "@/hooks/useTextAreaAutoFocus";
+import { useConnectAccount } from "@/hooks/useConnectAccount";
 
 export type OnSubmitSuccessFunction = (
   params: PendingCommentOperationSchemaType
@@ -43,11 +44,12 @@ export function CommentForm({
   parentId,
   initialContent,
 }: CommentBoxProps) {
+  const { address } = useAccount();
+  const connectAccount = useConnectAccount();
+  const { switchChainAsync } = useSwitchChain();
   const { targetUri } = useEmbedConfig();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
-  const { address } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
   const [content, setContent] = useState(initialContent ?? "");
   useTextAreaAutoVerticalResize(textAreaRef);
   // do not auto focus on top level comment box, only for replies
@@ -61,6 +63,8 @@ export function CommentForm({
       e: React.FormEvent
     ): Promise<PendingCommentOperationSchemaType> => {
       e.preventDefault();
+
+      const address = await connectAccount();
 
       return submitCommentMutationFunction({
         address,
@@ -133,7 +137,7 @@ export function CommentForm({
         {address && <CommentFormAuthor address={address} />}
         <Button
           type="submit"
-          disabled={isSubmitting || !address || !isContentValid}
+          disabled={isSubmitting || !isContentValid}
           size="sm"
         >
           {isSubmitting ? "Posting..." : "Comment"}
