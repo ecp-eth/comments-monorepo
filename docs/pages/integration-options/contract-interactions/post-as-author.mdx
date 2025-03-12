@@ -287,7 +287,7 @@ const transport = http("http://localhost:8545");
 /**
  * The function simulates the author who posts the comment from client side
  */
-async function postComment(
+async function postCommentAsAuthor(
   appServer: AppServer,
   content: string,
   targetUri: string
@@ -342,7 +342,7 @@ const server = new AppServer();
 
 console.log("author is posting the comment...");
 
-const receipt = await postComment(
+const receipt = await postCommentAsAuthor(
   server,
   "Somebody successfully finished the tutorial!",
   "https://demo.ethcomments.xyz"
