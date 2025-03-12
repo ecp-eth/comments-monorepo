@@ -14,6 +14,7 @@ import {
   PreparedSignedGaslessPostCommentNotApprovedResponseSchema,
   PreparedSignedGaslessPostCommentNotApprovedSchemaType,
   PendingCommentOperationSchemaType,
+  BadRequestResponseSchema,
 } from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import type { SignTypedDataParameters } from "viem";
@@ -21,6 +22,8 @@ import { bigintReplacer } from "@/lib/utils";
 import { chain } from "@/lib/wagmi";
 import { CommentBoxAuthor } from "../CommentBoxAuthor";
 import { useConnectAccount } from "@/hooks/useConnectAccount";
+import { RateLimitedError, InvalidCommentError } from "../errors";
+import { CommentFormErrors } from "../CommentFormErrors";
 
 const chainId = chain.id;
 
@@ -151,11 +154,13 @@ export function CommentBoxGasless({
 
       if (!response.ok) {
         if (response.status === 429) {
-          throw new Error("You are posting too frequently");
+          throw new RateLimitedError();
         }
 
         if (response.status === 400) {
-          throw new Error(await response.text());
+          throw new InvalidCommentError(
+            BadRequestResponseSchema.parse(await response.json())
+          );
         }
 
         throw new Error("Failed to post comment");
@@ -228,6 +233,9 @@ export function CommentBoxGasless({
         disabled={isLoading}
       />
       {address && <CommentBoxAuthor address={address} />}
+      {submitMutation.error && (
+        <CommentFormErrors error={submitMutation.error} />
+      )}
       <div className="flex items-center text-sm text-gray-500">
         <Button
           type="submit"

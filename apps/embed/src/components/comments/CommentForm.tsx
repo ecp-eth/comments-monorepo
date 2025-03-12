@@ -11,10 +11,7 @@ import { useEmbedConfig } from "../EmbedConfigProvider";
 import type { PendingCommentOperationSchemaType } from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { cn } from "@/lib/utils";
-import {
-  submitCommentMutationFunction,
-  SubmitCommentMutationValidationError,
-} from "./queries";
+import { submitCommentMutationFunction } from "./queries";
 import { MAX_COMMENT_LENGTH } from "@/lib/constants";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "./helpers";
@@ -23,6 +20,8 @@ import { useTextAreaAutoFocus } from "@/hooks/useTextAreaAutoFocus";
 import { useConnectAccount } from "@/hooks/useConnectAccount";
 import { useAccountModal } from "@rainbow-me/rainbowkit";
 import { publicEnv } from "@/publicEnv";
+import { CommentFormErrors } from "./CommentFormErrors";
+import { InvalidCommentError } from "./errors";
 
 export type OnSubmitSuccessFunction = (
   params: PendingCommentOperationSchemaType
@@ -97,10 +96,7 @@ export function CommentForm({
   });
 
   useEffect(() => {
-    if (
-      submitCommentMutation.error instanceof
-      SubmitCommentMutationValidationError
-    ) {
+    if (submitCommentMutation.error instanceof InvalidCommentError) {
       textAreaRef.current?.focus();
     }
   }, [submitCommentMutation.error]);
@@ -128,8 +124,7 @@ export function CommentForm({
         className={cn(
           "w-full p-2 min-h-[70px] max-h-[400px] resize-vertical",
           submitCommentMutation.error &&
-            submitCommentMutation.error instanceof
-              SubmitCommentMutationValidationError &&
+            submitCommentMutation.error instanceof InvalidCommentError &&
             "border-destructive focus-visible:border-destructive"
         )}
         disabled={isSubmitting}
@@ -146,9 +141,7 @@ export function CommentForm({
         </Button>
       </div>
       {submitCommentMutation.error && (
-        <div className="text-xs text-destructive">
-          {submitCommentMutation.error.message}
-        </div>
+        <CommentFormErrors error={submitCommentMutation.error} />
       )}
     </form>
   );

@@ -1,17 +1,20 @@
-import { MAX_COMMENT_LENGTH } from "@/lib/constants";
 import {
   SignCommentResponseClientSchema,
   type SignCommentResponseClientSchemaType,
   type PendingCommentOperationSchemaType,
   type SignCommentPayloadRequestSchemaType,
+  SignCommentPayloadRequestSchema,
 } from "@/lib/schemas";
 import { publicEnv } from "@/publicEnv";
 import { fetchAuthorData } from "@ecp.eth/sdk";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
+import {
+  RateLimitedError,
+  CommentFormSubmitError,
+  InvalidCommentError,
+} from "./errors";
 
 export class SubmitCommentMutationError extends Error {}
-
-export class SubmitCommentMutationValidationError extends Error {}
 
 type SubmitCommentParams = {
   address: Hex | undefined;
@@ -40,39 +43,35 @@ export async function submitCommentMutationFunction({
     console.error(e);
     return undefined;
   });
-  const content = commentRequest.content.trim();
 
-  if (!content) {
-    throw new SubmitCommentMutationValidationError("Comment cannot be empty.");
+  const parseResult = SignCommentPayloadRequestSchema.safeParse({
+    ...commentRequest,
+    author: address,
+  });
+
+  if (!parseResult.success) {
+    throw new InvalidCommentError(parseResult.error.flatten().fieldErrors);
   }
 
-  if (content.length > MAX_COMMENT_LENGTH) {
-    throw new SubmitCommentMutationValidationError(
-      `Comment cannot be longer than ${MAX_COMMENT_LENGTH} characters.`
-    );
-  }
+  const commentData = parseResult.data;
 
-  const chain = await switchChainAsync(commentRequest.chainId);
+  const chain = await switchChainAsync(commentData.chainId);
 
   const response = await fetch("/api/sign-comment", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      ...commentRequest,
-      author: address,
-      chainId: chain.id,
-    } satisfies SignCommentPayloadRequestSchemaType),
+    body: JSON.stringify(commentData),
   });
 
   if (!response.ok) {
     if (response.status === 429) {
-      throw new SubmitCommentMutationError("You are posting too frequently.");
+      throw new RateLimitedError();
     }
 
     if (response.status === 400) {
-      throw new SubmitCommentMutationError(await response.text());
+      throw new CommentFormSubmitError(await response.json());
     }
 
     throw new SubmitCommentMutationError(

@@ -12,7 +12,9 @@ import {
 } from "wagmi";
 import { chain } from "../../lib/wagmi";
 import {
-  PendingCommentOperationSchemaType,
+  BadRequestResponseSchema,
+  type PendingCommentOperationSchemaType,
+  SignCommentRequestBodySchema,
   SignCommentResponseSchema,
 } from "@/lib/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
@@ -23,6 +25,9 @@ import {
 import { publicEnv } from "@/publicEnv";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { useConnectAccount } from "@/hooks/useConnectAccount";
+import { z } from "zod";
+import { InvalidCommentError, RateLimitedError } from "./errors";
+import { CommentFormErrors } from "./CommentFormErrors";
 
 interface CommentBoxProps {
   onSubmit: (pendingComment: PendingCommentOperationSchemaType) => void;
@@ -68,22 +73,26 @@ export function CommentBox({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            content,
-            targetUri: window.location.href,
-            parentId,
-            author: address,
-            chainId,
-          }),
+          body: JSON.stringify(
+            SignCommentRequestBodySchema.parse({
+              content,
+              targetUri: window.location.href,
+              parentId,
+              author: address,
+              chainId,
+            })
+          ),
         });
 
         if (!response.ok) {
           if (response.status === 429) {
-            throw new Error("You are posting too frequently");
+            throw new RateLimitedError();
           }
 
           if (response.status === 400) {
-            throw new Error(await response.text());
+            throw new InvalidCommentError(
+              BadRequestResponseSchema.parse(await response.json())
+            );
           }
 
           throw new Error("Failed to sign comment");
@@ -116,6 +125,14 @@ export function CommentBox({
           txHash,
           response: signCommentResponse,
         };
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          throw new InvalidCommentError(
+            e.flatten().fieldErrors as Record<string, string[]>
+          );
+        }
+
+        throw e;
       } finally {
         setFormState("idle");
       }
@@ -151,9 +168,7 @@ export function CommentBox({
       />
       {address && <CommentBoxAuthor address={address} />}
       {submitMutation.error && (
-        <div className="text-xs text-red-500">
-          {submitMutation.error.message}
-        </div>
+        <CommentFormErrors error={submitMutation.error} />
       )}
       <div className="flex items-center gap-2 text-sm text-gray-500">
         <Button

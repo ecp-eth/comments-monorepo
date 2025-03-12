@@ -14,8 +14,17 @@ import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
 
 export async function POST(req: Request) {
-  const { content, targetUri, parentId, chainId, author } =
-    SignCommentPayloadRequestSchema.parse(await req.json());
+  const parseResult = SignCommentPayloadRequestSchema.safeParse(
+    await req.json()
+  );
+
+  if (!parseResult.success) {
+    return Response.json(parseResult.error.flatten().fieldErrors, {
+      status: 400,
+    });
+  }
+
+  const { content, targetUri, parentId, chainId, author } = parseResult.data;
 
   const rateLimiterResult = await signCommentRateLimiter.isRateLimited(author);
 

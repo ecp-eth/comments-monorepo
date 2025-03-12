@@ -17,7 +17,7 @@ export const PrepareSignedGaslessCommentRequestBodySchema = z.object({
     .string()
     .trim()
     .nonempty()
-    .refine((val) => !isProfane(val), "Comment contains profanity"),*/
+    .refine((val) => !isProfane(val), "Comment contains profanity"), */
   targetUri: z.string().url(),
   parentId: HexSchema.optional(),
   author: HexSchema,
