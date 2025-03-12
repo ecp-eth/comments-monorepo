@@ -1,15 +1,31 @@
 # ECP Indexer
 
-The ECP (Ethereum Comments Protocol) Indexer is a service that indexes and processes comments from the Ethereum blockchain according to the Ethereum Comments Protocol specification. It provides REST API endpoints that allow clients to efficiently query and access the indexed comment data.
+The ECP (Ethereum Comments Protocol) Indexer is a [Ponder](https://ponder.sh/) based service that indexes and processes comments from the EVM-compatible blockchains. It provides REST API endpoints that allow clients to efficiently query and access the indexed comment data.
 
 ## Overview
 
-The ECP Indexer monitors Ethereum events for comment-related activities and processes them into a queryable database. It supports the following features:
+The ECP Indexer utilise [Ponder](https://ponder.sh/) to monitor CommentV1 contract events for comment-related activities and processes them into a queryable database. It supports the following features:
 
 - Indexes comments from ECP-compatible smart contracts
 - Processes comment metadata and content
 - Maintains relationships between comments (replies, threads)
 - Provides REST API endpoints for querying indexed comments
+
+### Authentication
+
+The API is currently free to use and does not require authentication.
+
+### Rate Limiting
+
+If you are an enterprise user of the API please consider self hosting - we may throttle this API.
+
+### Links
+
+- The API endpoints: https://api.ethcomments.xyz/
+- [Restful API reference and playground](https://docs.ethcomments.xyz/indexer-reference/restful)
+- OpenAPI spec: https://docs.ethcomments.xyz/indexer-openapi.yaml
+- GraphQL references and playground: https://api.ethcomments.xyz/graphql
+- Source code: https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer
 
 ## Getting Started
 
