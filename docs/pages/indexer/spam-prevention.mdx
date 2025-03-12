@@ -11,7 +11,7 @@ The demo and embed applications implement two basic levels of spam prevention:
    - Comments are rate-limited per author address
    - When rate limit is exceeded, requests return a 429 status code with a `Retry-After` header
 
-2. **Content Filtering**
+2. **Content Filtering (Opt in)**
    - Basic profanity detection using the `obscenity` library
    - Comments containing profane words are rejected
    - This is a simple implementation and can be enhanced with more sophisticated content filtering
@@ -22,11 +22,11 @@ The indexer service implements additional spam prevention measures:
 
 1. **Spammer Address Detection**
 
-   - Maintains a list of known spammer addresses
-   - Comments from addresses marked as spammers are not indexer
+   - Maintains a list of known spammer addresses that you can mark in order to hide them from your app
+   - Comments from addresses marked as spammers are not indexed
    - Spammers can be managed using the [Admin CLI](/indexer/admin-cli-spammers)
 
-2. **Content Validation**
+2. **Content Validation (Opt in)**
    - Implements basic profanity detection
    - Can be extended with more advanced content analysis
 

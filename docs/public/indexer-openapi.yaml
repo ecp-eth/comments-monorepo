@@ -578,8 +578,8 @@ paths:
       tags:
         - comments
       description: >-
-        Removes account from spammer list, futher comments from this account
-        will be indexed
+        Removes account from spammer list, newer comments from this account will
+        be indexed
       parameters:
         - schema:
             description: The address of the spammer
@@ -630,7 +630,7 @@ paths:
       tags:
         - comments
       description: >-
-        Marks account as spammer, futher comments from this account won't be
+        Marks account as spammer, newer comments from this account won't be
         indexed
       requestBody:
         content:

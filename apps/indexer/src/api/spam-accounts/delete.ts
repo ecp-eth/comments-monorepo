@@ -12,7 +12,7 @@ const deleteSpammer = createRoute({
   middleware: [authMiddleware()],
   tags: ["comments"],
   description:
-    "Removes account from spammer list, futher comments from this account will be indexed",
+    "Removes account from spammer list, newer comments from this account will be indexed",
   request: {
     params: DeleteSpammerParamSchema,
   },

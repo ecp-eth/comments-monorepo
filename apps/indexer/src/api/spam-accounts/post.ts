@@ -13,7 +13,7 @@ const postSpammer = createRoute({
   middleware: [authMiddleware()],
   tags: ["comments"],
   description:
-    "Marks account as spammer, futher comments from this account won't be indexed",
+    "Marks account as spammer, newer comments from this account won't be indexed",
   request: {
     body: {
       content: {

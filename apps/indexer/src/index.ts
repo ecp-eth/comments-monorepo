@@ -6,7 +6,7 @@ import {
   transformCommentTargetUri,
 } from "./lib/utils";
 import { processTransactionsBlock } from "./lib/process-transactions-block";
-import { isProfane } from "./lib/profanity-detection";
+// import { isProfane } from "./lib/profanity-detection";
 import { initializeManagement } from "./management";
 import { getSpammer } from "./management/services/spammers";
 
@@ -15,9 +15,11 @@ await initializeManagement();
 ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
   const targetUri = transformCommentTargetUri(event.args.commentData.targetUri);
 
+  // uncomment to enable basic profanity detection
+  /* 
   if (isProfane(event.args.commentData.content)) {
     return;
-  }
+  }*/
 
   if (await getSpammer(event.args.commentData.author)) {
     return;
