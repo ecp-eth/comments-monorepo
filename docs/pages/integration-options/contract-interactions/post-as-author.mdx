@@ -191,9 +191,9 @@ to create a `wallet client` which allows us to sign and send transaction to the 
 To create an `account`, for simplicity and demostration purpose, we will use a hard coded private key:
 
 ```typescript
-private readonly authorPrivateKey =
-    "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
-private readonly authorSigner = privateKeyToAccount(this.authorPrivateKey);
+const authorPrivateKey =
+  "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
+const authorSigner = privateKeyToAccount(authorPrivateKey);
 ```
 
 Please note that in real scenario, you probably want to connect to a user's wallet app, such as MetaMask or Rainbow, to sign and send the transaction.
@@ -208,10 +208,10 @@ However, we will go with what we've got so far: combining `transport` and `accou
 
 ```typescript
 // Create wallet client for interacting with the contract
-private readonly walletClient = createWalletClient({
+const walletClient = createWalletClient({
   chain: anvil,
   transport,
-  account: this.authorSigner,
+  account: authorSigner,
 });
 ```
 
@@ -219,10 +219,10 @@ We will use the wallet client later in the tutorial.
 
 #### Simulate the Author posting the comment
 
-The signature for the function to create on author side is self-explanatory:
+This is the function signature for the author to post the comment:
 
 ```typescript
-type postComment(content: string, targetUri: string) => Promise<TransactionReceipt>
+type postComment(appServer: AppServer, content: string, targetUri: string) => Promise<TransactionReceipt>
 ```
 
 We will start by sending the comment data to the App Server for signing.
@@ -233,7 +233,7 @@ usually the App Server is deployed by a different party to keep the private key 
 However, to demonstrate the flow in this example, we'll directly call the `sign` function from the `AppServer` instance.
 
 ```typescript
-const appSignedComment = await this.appServer.sign(
+const appSignedComment = await appServer.sign(
   authorSigner.address,
   anvil,
   content,
@@ -244,6 +244,13 @@ const appSignedComment = await this.appServer.sign(
 Then we call the function on the contract to post the comment, and wait for the transaction to be mined:
 
 ```typescript
+// Get contract instance
+const commentsContract = getContract({
+  address: COMMENTS_V1_ADDRESS,
+  abi: CommentsV1Abi,
+  client: walletClient,
+});
+
 const tx = await commentsContract.write.postCommentAsAuthor(
   [appSignedComment.commentData, appSignedComment.signature],
   {
@@ -278,74 +285,73 @@ import { AppServer } from "./appServer";
 const transport = http("http://localhost:8545");
 
 /**
- * The class simulate the author who posts the comment from client side
+ * The function simulates the author who posts the comment from client side
  */
-class Author {
-  private readonly authorPrivateKey =
+async function postComment(
+  appServer: AppServer,
+  content: string,
+  targetUri: string
+) {
+  const authorPrivateKey =
     "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
-  private readonly authorSigner = privateKeyToAccount(this.authorPrivateKey);
+  const authorSigner = privateKeyToAccount(authorPrivateKey);
   // Create wallet client for interacting with the contract
-  private readonly walletClient = createWalletClient({
+  const walletClient = createWalletClient({
     chain: anvil,
     transport,
-    account: this.authorSigner,
+    account: authorSigner,
   });
+
+  // to begin with, we post the comment data over to app server,
+  // to get the app server signed comment data
+  const appSignedComment = await appServer.sign(
+    authorSigner.address,
+    anvil,
+    content,
+    targetUri
+  );
+
   // Get contract instance
-  private readonly commentsContract = getContract({
+  const commentsContract = getContract({
     address: COMMENTS_V1_ADDRESS,
     abi: CommentsV1Abi,
-    client: this.walletClient,
+    client: walletClient,
   });
 
-  constructor(private appServer: AppServer) {}
+  // post comment data and app signature so the contract can verify the comment is authorized by the app
+  const tx = await commentsContract.write.postCommentAsAuthor(
+    [appSignedComment.commentData, appSignedComment.signature],
+    {
+      // postCommentAsAuthor transaction will be executed by author signer so the author will have to pay.
+      account: walletClient.account,
+    }
+  );
 
-  async postComment(content: string, targetUri: string) {
-    const authorSigner = this.authorSigner;
-    const walletClient = this.walletClient;
-    const commentsContract = this.commentsContract;
+  const receipt = await waitForTransactionReceipt(walletClient, {
+    hash: tx,
+  });
 
-    // to begin with, we post the comment data over to app server,
-    // to get the app server signed comment data
-    const appSignedComment = await this.appServer.sign(
-      authorSigner.address,
-      anvil,
-      content,
-      targetUri
-    );
-
-    // post comment data and app signature so the contract can verify the comment is authorized by the app
-    const tx = await commentsContract.write.postCommentAsAuthor(
-      [appSignedComment.commentData, appSignedComment.signature],
-      {
-        // postCommentAsAuthor transaction will be executed by author signer so the author will have to pay.
-        account: walletClient.account,
-      }
-    );
-
-    const receipt = await waitForTransactionReceipt(walletClient, {
-      hash: tx,
-    });
-
-    return receipt;
-  }
+  return receipt;
 }
 ```
 
 and let's test the example:
 
 ```typescript
-(async () => {
-  const author = new Author(new AppServer());
-  console.log("author is posting the comment and paying for the gas...");
-  const receipt = await author.postComment(
-    "Somebody successfully finished the tutorial!",
-    "https://demo.ethcomments.xyz"
-  );
-  console.log(
-    "author has posted the comment and the transaction is mined, transaction hash: ",
-    receipt.transactionHash
-  );
-})();
+const server = new AppServer();
+
+console.log("author is posting the comment...");
+
+const receipt = await postComment(
+  server,
+  "Somebody successfully finished the tutorial!",
+  "https://demo.ethcomments.xyz"
+);
+
+console.log(
+  "author has posted the comment and the transaction is mined, transaction hash: ",
+  receipt.transactionHash
+);
 ```
 
 #### Congratulations! You've completed the tutorial!
