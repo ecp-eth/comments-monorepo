@@ -17,6 +17,8 @@ contract DevScript is Script {
         // Deploy contract
         protocol = new YoinkProtocol();
 
+        console.log("YoinkProtocol deployed at", address(protocol));
+
         vm.stopBroadcast();
     }
 }

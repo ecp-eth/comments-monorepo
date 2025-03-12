@@ -24,7 +24,8 @@ export const postCommentViaYoink = async (
   });
 
   return await writeContractAsync({
-    address: publicEnv.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS ??
+    address:
+      publicEnv.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS ??
       never("Yoink contract address is not set"),
     abi: parseAbi(["function yoink()"]),
     functionName: "yoink",
