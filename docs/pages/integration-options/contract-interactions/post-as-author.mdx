@@ -90,7 +90,7 @@ const commentData = createCommentData({
 [`createCommentData()`](/sdk-reference/defaultExports/functions/createCommentData) also accepts 2 extra options which are worth mentioning:
 
 - `deadline` - you want to avoid setting a `deadline` that is too long to expire, deadline plays a important role here for preventing replay attack. Longer expiry of `deadline` increases the security risk.
-- `salt` a random value to make each comment unique, its uniqueness is essential for generating comment hash which is also used as `commentId`.
+- `salt` - a random value to make each comment unique, its uniqueness is essential for generating comment hash which is also used as `commentId`.
 
 Create a typed data structure from `commentData` according to EIP-712:
 
