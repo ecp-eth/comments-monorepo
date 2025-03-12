@@ -1,0 +1,221 @@
+# Integration Options
+
+## Indexer API
+
+The indexer is a service that indexes comments from the CommentsV1 smart contract,
+it provides a REST API, GraphQL API and a Ponder client access for retrieving comments and replies.
+
+There are different approaches you can access the indexer data:
+
+### SDK functions
+
+You can use functions from `@ecp.eth/sdk` to make accessing the indexer data easier.
+Here are a few examples:
+
+#### Fetch comments
+
+```ts
+import { fetchComments } from "@ecp.eth/sdk";
+
+async function main() {
+  console.log("fetching comments...");
+
+  const comments = await fetchComments({
+    // the url of indexer api
+    apiUrl: "https://api.ethcomments.xyz",
+    // the uri of commeting target
+    targetUri: "https://demo.ethcomments.xyz",
+  });
+
+  console.log(
+    "here is a list of comments for https://demo.ethcomments.xyz",
+    comments
+  );
+}
+
+main();
+```
+
+The response is a list of comments and pagination information:
+
+```json
+{
+  results: [
+    {
+      author: {
+        "address": "0x8d25687829d6b85d9e0020b8c89e3ca24de20a89",
+        "ens": {
+          "name": "stephancill.eth",
+          "avatarUrl": "https://euc.li/stephancill.eth"
+        },
+        "farcaster": {
+          "fid": 1689,
+          "pfpUrl": "https://images.colorino.site/19c754968a5a0d6e5b554a3aa8107d5fe973a88550080f7b1713e3c33989ffa0.png",
+          "displayName": "Stephan",
+          "username": "stephancill"
+        }
+      },
+      appSigner: "0xe86a6df8ead873600050fb669e7bc8d3b8587f3d",
+      chainId: 8453,
+      content: "hello world",
+      deletedAt: null,
+      id: "0xdce24de208a5e15b6b9b7e7c1ccdc5c08d8a7d8ab20c37c60e1d96a2aa1f9941",
+      logIndex: 369,
+      metadata: "",
+      parentId: null,
+      targetUri: "https://demo.ethcomments.xyz",
+      txHash: "0x0894eea21a4256a2eeba425fd003afd954d7407d34f99aa4f6462df8de87f111",
+      timestamp: "2025-02-12T10:47:03.000Z",
+      replies: [Object]
+    }
+  ],
+  pagination: { limit: 50, offset: 0, hasMore: false }
+}
+```
+
+##### API reference
+
+- [`fetchComments`](/sdk-reference/defaultExports/functions/fetchComments)
+- [`FetchCommentsOptions`](/sdk-reference/defaultExports/type-aliases/FetchCommentsOptions)
+
+#### Fetch replies
+
+```ts
+import { fetchCommentReplies } from "@ecp.eth/sdk";
+
+async function main() {
+  console.log("fetching replies...");
+
+  // fetch replies for a comment based on its id
+  const replies = await fetchCommentReplies({
+    // the url of embed api
+    apiUrl: "https://embed.ethcomments.xyz",
+    commentId:
+      "0xdce24de208a5e15b6b9b7e7c1ccdc5c08d8a7d8ab20c37c60e1d96a2aa1f9941",
+  });
+
+  console.log("here is a list of replies", replies);
+}
+
+main();
+```
+
+##### API reference
+
+- [`fetchCommentReplies`](/sdk-reference/defaultExports/functions/fetchCommentReplies)
+- [`FetchCommentRepliesOptions`](/sdk-reference/defaultExports/type-aliases/FetchCommentRepliesOptions)
+
+### Rest API
+
+The Rest API endpoints are available at `https://api.ethcomments.xyz/**/*`.
+
+See [Rest API Reference](/indexer-reference/restful) for more details.
+
+### Direct GraphQL access
+
+The GraphQL API is available at `https://api.ethcomments.xyz/graphql`.
+
+You can query the data using [your favorite GraphQL client](https://github.com/chentsulin/awesome-graphql),
+or simply visit the GraphQL playground at https://api.ethcomments.xyz/ to try it out.
+
+#### Example queries
+
+Query a comment by its ID:
+
+```graphql
+query {
+  comment(
+    id: "0xc4f012eaaa9285b0ffa7df432a7eb8f17145c34cfd50de688273b2b7df6bef08"
+  ) {
+    content
+  }
+}
+```
+
+Filter comments by `targetUri` and limit the number of results:
+
+```graphql
+query {
+  comments(where: { targetUri: "https://demo.ethcomments.xyz" }, limit: 10) {
+    # pagination info
+    pageInfo {
+      startCursor
+      endCursor
+      hasNextPage
+      hasPreviousPage
+    }
+
+    # comment details
+    items {
+      id
+      content
+    }
+
+    # total number of comments filtered by targetUri
+    totalCount
+  }
+}
+```
+
+### Direct database access via ponder client
+
+Ponder access is available at `https://api.ethcomments.xyz/sql`, it allows you to query the indexer database directly.
+
+You can use direct database access for quick investigations and debugging, but this approach is not recommended for production use since the database schema may change without notice. Changes to the schema could break your queries and affect application stability.
+
+#### Install `ponder` and `@ponder/client`
+
+:::code-group
+
+```bash [npm]
+npm install ponder @ponder/client
+```
+
+```bash [yarn]
+yarn add ponder @ponder/client
+```
+
+```bash [pnpm]
+pnpm add ponder @ponder/client
+
+```
+
+:::
+
+`ponder` package is required by the schema file.
+
+#### Get a copy of the database schema
+
+We are currently working on determining the best way to distribute the database schema. In the meantime, you can obtain it by cloning our repository:
+
+```bash
+git clone https://github.com/ecp-eth/comments-monorepo.git
+```
+
+The schema is located at `comments-monorepo/apps/indexer/ponder.schema.ts`.
+
+#### Create a ponder client and query
+
+```
+import { createClient, sql } from "@ponder/client";
+import * as schema from "./schema";
+
+// create a ponder client with specified schema
+const client = createClient("https://api.ethcomments.xyz/sql", { schema });
+
+// query the database for comments
+const result = await client.db.select()
+  .from(schema.comment)
+  // filter comments by target uri
+  .where(sql`${schema.comment.targetUri} = 'https://demo.ethcomments.xyz'`)
+  // limit the result to 10
+  .limit(10);
+
+console.log(result)
+```
+
+See detailed explanation of ponder client at [Ponder client](https://ponder.sh/docs/query/client).
+
+#### Next Steps
+
+- Check out how to [interact with the contract](/integration-options/contract-interactions/)
