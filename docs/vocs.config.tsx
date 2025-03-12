@@ -80,6 +80,10 @@ export default defineConfig({
           text: "Post comment flows",
           link: "/post-comment-flows",
         },
+        {
+          text: "Choose an appropriate targetUri",
+          link: "/target-uri-rules",
+        },
       ],
     },
     {
