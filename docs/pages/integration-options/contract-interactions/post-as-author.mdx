@@ -47,19 +47,6 @@ pnpm add viem "@ecp.eth/sdk"
 
 :::
 
-#### Get access to the blockchain with RPC endpoint
-
-RPC endpoint is the entry point to interact with the blockchain, you can get a free RPC endpoint from [Infura](https://infura.io/), [Alchemy](https://www.alchemy.com/), or [Reown](https://docs.reown.com/advanced/providers/ethereum).
-
-Alternatively, if you don't want to mess with real world assets, you can also use [Anvil](https://book.getfoundry.sh/anvil/) to create a simulated blockchain.
-See [Test with Anvil](/test-with-anvil) for more details.
-
-Once you have the RPC endpoint URI, you can create a `transport` for `viem`:
-
-```typescript
-const transport = http(rpcEndpointURI);
-```
-
 #### Simulate the App Server signing the post
 
 For the app to sign and authorize posting, we will need the following information:
@@ -118,9 +105,83 @@ return {
 };
 ```
 
-Now we finished the App Server signing process, let's see how the author posting the comment.
+Here is the complete module of the app server class:
 
-**Note**: Do not expose the app signer's private key in the client side in real scenario, here we simplified the setup and is only for demostration purpose
+```typescript
+import { Hex, Chain } from "viem";
+import { createCommentData, createCommentTypedData } from "@ecp.eth/sdk";
+import { privateKeyToAccount } from "viem/accounts";
+
+/**
+ * The class simulate the app server that signs the comment.
+ * However in real scenario, the app server is deployed by a different party,
+ * and the communication was done via HTTP or other transport.
+ * The app signing process should be hide away from the client.
+ */
+export class AppServer {
+  private readonly appSignerPrivateKey =
+    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+  private readonly appSigner = privateKeyToAccount(this.appSignerPrivateKey);
+
+  /**
+   * Sign the comment data as the app server
+   * @param authorAddress - The address of the author of the comment
+   * @param chain - The chain on which the comment is being posted
+   * @param content - The content of the comment
+   * @param targetUri - The URI of the target of the comment
+   * @returns The signed comment data
+   */
+  async sign(
+    authorAddress: Hex,
+    chain: Chain,
+    content: string,
+    targetUri: string
+  ) {
+    const appSigner = this.appSigner;
+
+    // create comment data
+    const commentData = createCommentData({
+      content,
+      targetUri,
+      // we are posting a top level comment, so no parentId
+      parentId: undefined,
+      author: authorAddress,
+      appSigner: appSigner.address,
+    });
+
+    // create a typed data according to EIP-712 for signing
+    const typedCommentData = createCommentTypedData({
+      commentData,
+      chainId: chain.id,
+    });
+
+    const signature = await appSigner.signTypedData(typedCommentData);
+
+    return {
+      signature,
+      commentData,
+    };
+  }
+}
+```
+
+**Note**: Do not expose the app signer's private key in the client side in real scenario,
+here we simplified the setup and this is only for demostration purpose
+
+Now we finished the App Server, let's see how the client side (author) posts the comment.
+
+#### Get access to the blockchain with RPC endpoint
+
+RPC endpoint is the entry point to interact with the blockchain, you can get a free RPC endpoint from [Infura](https://infura.io/), [Alchemy](https://www.alchemy.com/), or [Reown](https://docs.reown.com/advanced/providers/ethereum).
+
+Alternatively, if you don't want to mess with real world assets, you can also use [Anvil](https://book.getfoundry.sh/anvil/) to create a simulated blockchain.
+See [Test with Anvil](/test-with-anvil) for more details.
+
+Once you have the RPC endpoint URI, you can create a `transport` for `viem`:
+
+```typescript
+const transport = http(rpcEndpointURI);
+```
 
 #### Create wallet client for signing the transaction
 
@@ -202,75 +263,19 @@ return receipt;
 Here is the complete example, with everything put together:
 
 ```typescript
-import { http, createWalletClient, getContract, Hex, Chain } from "viem";
+import { http, createWalletClient, getContract } from "viem";
 import { anvil } from "viem/chains";
 import { waitForTransactionReceipt } from "viem/actions";
-import {
-  COMMENTS_V1_ADDRESS,
-  createCommentData,
-  createCommentTypedData,
-} from "@ecp.eth/sdk";
+import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { privateKeyToAccount } from "viem/accounts";
+import { AppServer } from "./appServer";
 
 // we use a local anvil node for this example,
 // anvil is a local ethereum node that is used for testing and development.
 // run `pnpm i && pnpm run dev` in `/packages/protocol/` to start the node,
 // the script will also deploy the contract to the node
 const transport = http("http://localhost:8545");
-
-/**
- * The class simulate the app server that signs the comment.
- * In real scenario, the client side post the data to the server,
- * and the app signing process should be hide away from the client.
- */
-class AppServer {
-  private readonly appSignerPrivateKey =
-    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-  private readonly appSigner = privateKeyToAccount(this.appSignerPrivateKey);
-
-  /**
-   * Sign the comment data as the app server
-   * @param authorAddress - The address of the author of the comment
-   * @param chain - The chain on which the comment is being posted
-   * @param content - The content of the comment
-   * @param targetUri - The URI of the target of the comment
-   * @returns The signed comment data
-   */
-  async sign(
-    authorAddress: Hex,
-    chain: Chain,
-    content: string,
-    targetUri: string
-  ) {
-    const appSigner = this.appSigner;
-
-    // create comment data
-    const commentData = createCommentData({
-      content,
-      targetUri,
-      // we are posting a top level comment, so no parentId
-      parentId: undefined,
-      author: authorAddress,
-      appSigner: appSigner.address,
-    });
-
-    // create a typed data according to EIP-712 for signing
-    const typedCommentData = createCommentTypedData({
-      commentData,
-      chainId: chain.id,
-    });
-
-    const signature = await appSigner.signTypedData(typedCommentData);
-    // const hash = hashTypedData(typedCommentData);
-
-    return {
-      signature,
-      // hash,
-      commentData,
-    };
-  }
-}
 
 /**
  * The class simulate the author who posts the comment from client side
@@ -324,7 +329,11 @@ class Author {
     return receipt;
   }
 }
+```
 
+and let's test the example:
+
+```typescript
 (async () => {
   const author = new Author(new AppServer());
   console.log("author is posting the comment and paying for the gas...");
@@ -339,21 +348,9 @@ class Author {
 })();
 ```
 
-See [Protocol API Reference](/protocol-reference/CommentsV1) for more functions and details.
-
-See [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) for implementations of:
-
-1. The other post comment flows.
-2. Request permission from the user for gasless posting.
-3. Deleting comments.
-
 #### Congratulations! You've completed the tutorial!
 
 ::::
-
-#### Next Steps
-
-- Check out **gasless** [post comment flows](/post-comment-flows)
 
 ### Best Practices
 
@@ -364,3 +361,12 @@ See [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/mai
 1. Keep private keys secure and never expose them in client-side code
 1. While the contract doesn't impose rate limits, consider implementing application-level rate limiting to prevent spam and manage gas costs effectively.
 1. Consider anti-spam measures
+
+#### Next Steps
+
+- Check out **gasless** [post comment flows](/post-comment-flows)
+- See [Protocol API Reference](/protocol-reference/CommentsV1) for more functions and details.
+- See [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) for implementations of:
+  1. The other post comment flows.
+  2. Request permission from the user for gasless posting.
+  3. Deleting comments.
