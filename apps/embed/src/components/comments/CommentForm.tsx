@@ -140,7 +140,7 @@ export function CommentForm({
           disabled={isSubmitting || !isContentValid}
           size="sm"
         >
-          {isSubmitting ? "Posting..." : "Comment"}
+          {isSubmitting ? "Please check your wallet to sign" : "Comment"}
         </Button>
       </div>
       {submitCommentMutation.error && (
