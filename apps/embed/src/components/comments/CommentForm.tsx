@@ -21,6 +21,7 @@ import { getCommentAuthorNameOrAddress } from "./helpers";
 import { useTextAreaAutoVerticalResize } from "@/hooks/useTextAreaAutoVerticalResize";
 import { useTextAreaAutoFocus } from "@/hooks/useTextAreaAutoFocus";
 import { useConnectAccount } from "@/hooks/useConnectAccount";
+import { useAccountModal } from "@rainbow-me/rainbowkit";
 
 export type OnSubmitSuccessFunction = (
   params: PendingCommentOperationSchemaType
@@ -153,6 +154,7 @@ export function CommentForm({
 }
 
 function CommentFormAuthor({ address }: { address: Hex }) {
+  const { openAccountModal } = useAccountModal();
   const queryResult = useQuery({
     queryKey: ["author", address],
     queryFn: () => {
@@ -172,6 +174,16 @@ function CommentFormAuthor({ address }: { address: Hex }) {
       <div className="flex-grow text-xs text-muted-foreground truncate">
         {getCommentAuthorNameOrAddress(queryResult.data ?? { address })}
       </div>
+
+      {openAccountModal && (
+        <button
+          className="text-blue-500 text-xs"
+          onClick={() => openAccountModal()}
+          type="button"
+        >
+          edit
+        </button>
+      )}
     </div>
   );
 }
