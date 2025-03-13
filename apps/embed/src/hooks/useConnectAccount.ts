@@ -24,7 +24,6 @@ export function useConnectAccount() {
     onConnect(data) {
       if (deferredRef.current) {
         deferredRef.current.resolve(data.address);
-        deferredRef.current = null;
       }
     },
   });
