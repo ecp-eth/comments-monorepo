@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, formatDateRelative } from "@/lib/utils";
 import { type Comment as CommentType } from "@/lib/schemas";
 import Link from "next/link";
 import { CommentText } from "./CommentText";
@@ -21,7 +21,9 @@ export function CommentByAuthor({ comment }: CommentByAuthorProps) {
           <div className="flex flex-col justify-center gap-1">
             <div className="text-xs text-muted-foreground">
               {getCommentAuthorNameOrAddress(comment.author)} •{" "}
-              {formatDate(comment.timestamp)}
+              <span title={formatDate(comment.timestamp)}>
+                {formatDateRelative(comment.timestamp)}
+              </span>
             </div>
             <div className="text-xs text-muted-foreground">
               <Link

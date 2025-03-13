@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import never from "never";
 import { CommentForm } from "./CommentForm";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, formatDateRelative } from "@/lib/utils";
 import {
   Loader2Icon,
   MessageCircleWarningIcon,
@@ -96,8 +96,13 @@ export function Comment({
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
   const areRepliesAllowed = depth < 2;
-  const submitTargetCommentId = areRepliesAllowed ? comment.id : (comment.parentId ?? never("parentId is required for comment depth > 0"));
-  const submitTargetQueryKey = useMemo(() => ["comments", submitTargetCommentId], [submitTargetCommentId]);
+  const submitTargetCommentId = areRepliesAllowed
+    ? comment.id
+    : (comment.parentId ?? never("parentId is required for comment depth > 0"));
+  const submitTargetQueryKey = useMemo(
+    () => ["comments", submitTargetCommentId],
+    [submitTargetCommentId]
+  );
   const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
 
   const repliesQuery = useInfiniteQuery({
@@ -150,11 +155,15 @@ export function Comment({
     return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
   }, [repliesQuery.data?.pages]);
 
-  const handleCommentSubmitted = useHandleCommentSubmitted({ queryKey: submitTargetQueryKey });
+  const handleCommentSubmitted = useHandleCommentSubmitted({
+    queryKey: submitTargetQueryKey,
+  });
   const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
     queryKey: submitTargetQueryKey,
   });
-  const handleRetryPostComment = useHandleRetryPostComment({ queryKey: submitTargetQueryKey });
+  const handleRetryPostComment = useHandleRetryPostComment({
+    queryKey: submitTargetQueryKey,
+  });
   const handleCommentDeleted = useHandleCommentDeleted({ queryKey });
 
   const retryPostMutation = useMutation({
@@ -246,7 +255,9 @@ export function Comment({
           <CommentAuthorAvatar author={comment.author} />
           <div className="text-xs text-muted-foreground">
             {getCommentAuthorNameOrAddress(comment.author)} •{" "}
-            {formatDate(comment.timestamp)}
+            <span title={formatDate(comment.timestamp)}>
+              {formatDateRelative(comment.timestamp)}
+            </span>
           </div>
         </div>
         {isAuthor && !comment.pendingOperation && !comment.deletedAt && (
@@ -297,7 +308,8 @@ export function Comment({
         <div className="mb-2">
           <CommentForm
             initialContent={
-              areRepliesAllowed ? undefined 
+              areRepliesAllowed
+                ? undefined
                 : createQuotationFromComment(comment)
             }
             onLeftEmpty={() => setIsReplying(false)}

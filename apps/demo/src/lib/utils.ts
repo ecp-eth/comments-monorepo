@@ -21,11 +21,22 @@ export function formatDate(timestamp: number | Date | string): string {
   });
 }
 
+export function formatDateRelative(timestamp: number | Date): string {
+  const date = new Date(timestamp);
+  const diffInMs = date.getTime() - Date.now();
+  const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24));
+
+  return new Intl.RelativeTimeFormat("en-US", { numeric: "auto" }).format(
+    diffInDays,
+    "day"
+  );
+}
+
 /**
  * Used as a JSON replacer to convert BigInts to strings
- * @param key 
- * @param value 
- * @returns 
+ * @param key
+ * @param value
+ * @returns
  */
 export function bigintReplacer(key: string, value: unknown) {
   if (typeof value === "bigint") {
