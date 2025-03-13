@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { MoreVertical } from "lucide-react";
@@ -102,7 +103,9 @@ export function Comment({
           </DropdownMenu>
         )}
       </div>
-      <div className="mb-2">{renderCommentContent(comment.content)}</div>
+      <div className={cn("mb-2", comment.deletedAt && "text-muted-foreground")}>
+        {renderCommentContent(comment.content)}
+      </div>
       {connectedAddress && (
         <div className="text-xs text-gray-500 mb-2">
           <button
