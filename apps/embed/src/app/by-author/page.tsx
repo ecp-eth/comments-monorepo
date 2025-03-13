@@ -78,6 +78,7 @@ export default async function EmbedCommentsByAuthorPage({
                     },
                   ],
                 }}
+                currentTimestamp={Date.now()}
               />
             </Providers>
           </div>

@@ -29,7 +29,7 @@ type CommentSectionProps = {
 
 export function CommentSection({ initialData }: CommentSectionProps) {
   useAutoBodyMinHeight();
-  const { targetUri } = useEmbedConfig();
+  const { targetUri, currentTimestamp } = useEmbedConfig();
   const queryKey = useMemo(() => ["comments", targetUri], [targetUri]);
 
   const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
@@ -107,6 +107,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
           onDelete={handleCommentDeleted}
           onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
+          currentTimestamp={currentTimestamp}
         />
       ))}
       {hasNextPage && (

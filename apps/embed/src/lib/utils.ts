@@ -1,5 +1,7 @@
+import { publicEnv } from "@/publicEnv";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { AuthorType } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -16,9 +18,12 @@ export function formatDate(timestamp: number | Date): string {
   });
 }
 
-export function formatDateRelative(timestamp: number | Date): string {
+export function formatDateRelative(
+  timestamp: number | Date,
+  now: number
+): string {
   const date = new Date(timestamp);
-  const diffInMs = date.getTime() - Date.now();
+  const diffInMs = date.getTime() - now;
   const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24));
 
   // implement content negotiation and use the Accept-Language header to determine the locale
@@ -39,4 +44,17 @@ export function bigintReplacer(key: string, value: unknown) {
 export function abbreviateAddressForDisplay(address: string): string {
   if (!address) return "";
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+export function formatAuthorLink(author: AuthorType): string | null {
+  if (!publicEnv.NEXT_PUBLIC_COMMENT_AUTHOR_URL) {
+    return null;
+  }
+
+  const url = publicEnv.NEXT_PUBLIC_COMMENT_AUTHOR_URL.replace(
+    "{address}",
+    author.address
+  );
+
+  return URL.canParse(url) ? url : null;
 }

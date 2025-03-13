@@ -19,11 +19,16 @@ type CommentSectionReadonlyProps = {
     CommentPageSchemaType,
     { offset: number; limit: number }
   >;
+  /**
+   * Used to calculate relative time in comments.
+   */
+  currentTimestamp: number;
 };
 
 export function CommentSectionReadonly({
   initialData,
   author,
+  currentTimestamp,
 }: CommentSectionReadonlyProps) {
   const queryKey = useMemo(() => ["comments-by-author", author], [author]);
 
@@ -83,7 +88,11 @@ export function CommentSectionReadonly({
       <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
       {results.length === 0 && <NoCommentsScreen />}
       {results.map((comment) => (
-        <CommentByAuthor comment={comment} key={comment.id} />
+        <CommentByAuthor
+          comment={comment}
+          key={comment.id}
+          currentTimestamp={currentTimestamp}
+        />
       ))}
       {hasNextPage && (
         <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
