@@ -45,16 +45,7 @@ export default function Home() {
         </div>
       </div>
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow">
-        {!address && (
-          <div className="flex justify-center py-8">
-            <ConnectButton />
-          </div>
-        )}
-        {isGasless ? (
-          <CommentSectionGasless />
-        ) : (
-          <CommentSection />
-        )}
+        {isGasless ? <CommentSectionGasless /> : <CommentSection />}
       </div>
     </main>
   );

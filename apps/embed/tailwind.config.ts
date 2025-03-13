@@ -53,6 +53,7 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        "account-edit-link": "var(--account-edit-link)",
         popover: {
           DEFAULT: "var(--popover)",
           foreground: "var(--popover-foreground)",
@@ -92,7 +93,7 @@ export default {
       spacing: {
         "root-padding-vertical": "var(--theme-root-padding-vertical)",
         "root-padding-horizontal": "var(--theme-root-padding-horizontal)",
-      }
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

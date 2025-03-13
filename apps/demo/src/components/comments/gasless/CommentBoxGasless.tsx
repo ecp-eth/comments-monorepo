@@ -20,6 +20,7 @@ import type { SignTypedDataParameters } from "viem";
 import { bigintReplacer } from "@/lib/utils";
 import { chain } from "@/lib/wagmi";
 import { CommentBoxAuthor } from "../CommentBoxAuthor";
+import { useConnectAccount } from "@/hooks/useConnectAccount";
 
 const chainId = chain.id;
 
@@ -66,7 +67,9 @@ async function prepareSignedGaslessComment(
   const data = await response.json();
 
   if (submitIfApproved) {
-    return PreparedGaslessPostCommentOperationApprovedResponseSchema.parse(data);
+    return PreparedGaslessPostCommentOperationApprovedResponseSchema.parse(
+      data
+    );
   }
 
   return PreparedSignedGaslessPostCommentNotApprovedResponseSchema.parse(data);
@@ -85,6 +88,7 @@ export function CommentBoxGasless({
   parentId,
   isAppSignerApproved: isApproved = false,
 }: CommentBoxProps) {
+  const connectAccount = useConnectAccount();
   const onSubmitRef = useFreshRef(onSubmit);
   const { address } = useAccount();
   const [content, setContent] = useState("");
@@ -93,9 +97,7 @@ export function CommentBoxGasless({
   // user approval for signature for each interaction
   const postPriorApprovedCommentMutation = useMutation({
     mutationFn: async () => {
-      if (!address) {
-        throw new Error("No address");
-      }
+      const address = await connectAccount();
 
       return prepareSignedGaslessComment(
         // tell the server to submit right away after preparation of the comment data,
@@ -115,10 +117,7 @@ export function CommentBoxGasless({
   // will require user interaction for signature
   const postPriorNotApprovedSubmitMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
-      if (!address) {
-        throw new Error("No address");
-      }
-
+      const address = await connectAccount();
       const data = await prepareSignedGaslessComment(false, {
         content,
         targetUri: window.location.href,
@@ -154,7 +153,7 @@ export function CommentBoxGasless({
         throw new Error("Failed to post comment");
       }
 
-      const { txHash} = GaslessPostCommentResponseSchema.parse(
+      const { txHash } = GaslessPostCommentResponseSchema.parse(
         await response.json()
       );
 
@@ -170,7 +169,7 @@ export function CommentBoxGasless({
     mutationFn: async (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (!content.trim() || !address) {
+      if (!content.trim()) {
         return;
       }
 
@@ -224,8 +223,8 @@ export function CommentBoxGasless({
       <div className="flex items-center text-sm text-gray-500">
         <Button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-          disabled={isLoading || !content.trim() || !address}
+          className="px-4 py-2 rounded"
+          disabled={isLoading || !content.trim()}
         >
           {isLoading ? "Posting..." : "Comment"}
         </Button>

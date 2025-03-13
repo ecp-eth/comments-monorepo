@@ -219,20 +219,18 @@ export function CommentSectionGasless() {
         )
       )}
 
-      {connectedAddress && (
-        <CommentBoxGasless
-          onSubmit={async (pendingCommentOperation) => {
-            // take the user to first page so they can see the comment posted
-            setPage(0);
+      <CommentBoxGasless
+        onSubmit={async (pendingCommentOperation) => {
+          // take the user to first page so they can see the comment posted
+          setPage(0);
 
-            insertPendingCommentOperation(pendingCommentOperation);
+          insertPendingCommentOperation(pendingCommentOperation);
 
-            // trigger a refetch
-            refetch();
-          }}
-          isAppSignerApproved={getApprovalQuery.data?.approved}
-        />
-      )}
+          // trigger a refetch
+          refetch();
+        }}
+        isAppSignerApproved={getApprovalQuery.data?.approved}
+      />
       {data?.results.map((comment) => (
         <CommentGasless
           key={comment.id}

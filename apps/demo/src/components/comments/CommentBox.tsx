@@ -22,6 +22,7 @@ import {
 } from "@/lib/contract";
 import { publicEnv } from "@/publicEnv";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
+import { useConnectAccount } from "@/hooks/useConnectAccount";
 
 interface CommentBoxProps {
   onSubmit: (pendingComment: PendingCommentOperationSchemaType) => void;
@@ -35,6 +36,7 @@ export function CommentBox({
   parentId,
 }: CommentBoxProps) {
   const onSubmitRef = useFreshRef(onSubmit);
+  const connectAccount = useConnectAccount();
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const [content, setContent] = useState("");
@@ -48,7 +50,9 @@ export function CommentBox({
       formData: FormData
     ): Promise<PendingCommentOperationSchemaType | undefined> => {
       try {
-        if (!content.trim() || !address) {
+        const address = await connectAccount();
+
+        if (!content.trim()) {
           return;
         }
 
@@ -124,7 +128,7 @@ export function CommentBox({
   }, [receipt?.status, onSubmitRef, submitMutation.data]);
 
   const isLoading = isReceiptLoading || submitMutation.isPending;
-  const submitDisabled = isLoading || !address || !content.trim();
+  const submitDisabled = isLoading || !content.trim();
 
   return (
     <form action={submitMutation.mutate} className="mb-4 flex flex-col gap-2">
@@ -134,10 +138,10 @@ export function CommentBox({
         onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder}
         className="w-full p-2 border border-gray-300 rounded"
-        disabled={isLoading || !address}
+        disabled={isLoading}
         required
       />
-      {address && <CommentBoxAuthor address={address}></CommentBoxAuthor>}
+      {address && <CommentBoxAuthor address={address} />}
       {submitMutation.error && (
         <div className="text-xs text-red-500">
           {submitMutation.error.message}
@@ -168,5 +172,3 @@ export function CommentBox({
     </form>
   );
 }
-
-

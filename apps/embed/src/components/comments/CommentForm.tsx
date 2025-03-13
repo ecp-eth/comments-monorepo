@@ -20,6 +20,8 @@ import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "./helpers";
 import { useTextAreaAutoVerticalResize } from "@/hooks/useTextAreaAutoVerticalResize";
 import { useTextAreaAutoFocus } from "@/hooks/useTextAreaAutoFocus";
+import { useConnectAccount } from "@/hooks/useConnectAccount";
+import { useAccountModal } from "@rainbow-me/rainbowkit";
 
 export type OnSubmitSuccessFunction = (
   params: PendingCommentOperationSchemaType
@@ -43,11 +45,12 @@ export function CommentForm({
   parentId,
   initialContent,
 }: CommentBoxProps) {
+  const { address } = useAccount();
+  const connectAccount = useConnectAccount();
+  const { switchChainAsync } = useSwitchChain();
   const { targetUri } = useEmbedConfig();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
-  const { address } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
   const [content, setContent] = useState(initialContent ?? "");
   useTextAreaAutoVerticalResize(textAreaRef);
   // do not auto focus on top level comment box, only for replies
@@ -61,6 +64,8 @@ export function CommentForm({
       e: React.FormEvent
     ): Promise<PendingCommentOperationSchemaType> => {
       e.preventDefault();
+
+      const address = await connectAccount();
 
       return submitCommentMutationFunction({
         address,
@@ -133,10 +138,10 @@ export function CommentForm({
         {address && <CommentFormAuthor address={address} />}
         <Button
           type="submit"
-          disabled={isSubmitting || !address || !isContentValid}
+          disabled={isSubmitting || !isContentValid}
           size="sm"
         >
-          {isSubmitting ? "Posting..." : "Comment"}
+          {isSubmitting ? "Please check your wallet to sign" : "Comment"}
         </Button>
       </div>
       {submitCommentMutation.error && (
@@ -149,6 +154,7 @@ export function CommentForm({
 }
 
 function CommentFormAuthor({ address }: { address: Hex }) {
+  const { openAccountModal } = useAccountModal();
   const queryResult = useQuery({
     queryKey: ["author", address],
     queryFn: () => {
@@ -168,6 +174,16 @@ function CommentFormAuthor({ address }: { address: Hex }) {
       <div className="flex-grow text-xs text-muted-foreground truncate">
         {getCommentAuthorNameOrAddress(queryResult.data ?? { address })}
       </div>
+
+      {openAccountModal && (
+        <button
+          className="text-account-edit-link text-xs"
+          onClick={() => openAccountModal()}
+          type="button"
+        >
+          edit
+        </button>
+      )}
     </div>
   );
 }

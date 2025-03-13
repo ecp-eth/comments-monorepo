@@ -8,6 +8,7 @@ import { CommentBox } from "./CommentBox";
 import { publicEnv } from "@/publicEnv";
 import { useOptimisticCommentingManager } from "@/hooks/useOptimisticCommentingManager";
 import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export function CommentSection() {
   const { address: connectedAddress } = useAccount();
@@ -47,19 +48,17 @@ export function CommentSection() {
   return (
     <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
-      {connectedAddress && (
-        <CommentBox
-          onSubmit={async (pendingCommentOperation) => {
-            // take the user to first page so they can see the comment posted
-            setPage(0);
+      <CommentBox
+        onSubmit={async (pendingCommentOperation) => {
+          // take the user to first page so they can see the comment posted
+          setPage(0);
 
-            insertPendingCommentOperation(pendingCommentOperation);
+          insertPendingCommentOperation(pendingCommentOperation);
 
-            // trigger a refetch
-            refetch();
-          }}
-        />
-      )}
+          // trigger a refetch
+          refetch();
+        }}
+      />
       {data?.results.map((comment) => (
         <Comment
           key={comment.id}

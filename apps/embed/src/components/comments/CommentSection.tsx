@@ -1,11 +1,9 @@
 "use client";
 
 import { type InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useMemo } from "react";
 import { Comment } from "./Comment";
 import { CommentForm } from "./CommentForm";
-import { useAccount } from "wagmi";
 import { useEmbedConfig } from "../EmbedConfigProvider";
 import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
@@ -31,7 +29,6 @@ type CommentSectionProps = {
 export function CommentSection({ initialData }: CommentSectionProps) {
   useAutoBodyMinHeight();
   const { targetUri } = useEmbedConfig();
-  const account = useAccount();
   const queryKey = useMemo(() => ["comments", targetUri], [targetUri]);
 
   const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
@@ -99,12 +96,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
-      <div className="mb-4 relative">
-        {!account.address && (
-          <div className="flex items-center justify-center absolute -top-1 -left-1 -bottom-1 -right-1 border rounded-md backdrop-blur-sm z-10">
-            <ConnectButton />
-          </div>
-        )}
+      <div className="mb-4">
         <CommentForm onSubmitSuccess={handleCommentSubmitted} />
       </div>
       {results.map((comment) => (

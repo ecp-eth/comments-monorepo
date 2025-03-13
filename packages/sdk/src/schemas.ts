@@ -1,6 +1,6 @@
 /**
  * Ethereum Comments Protocol SDK zod schemas
- * 
+ *
  * @module
  */
 import { z } from "zod";
@@ -79,6 +79,9 @@ const CSSFontFamilySchema = z
 export const EmbedConfigThemePaletteSchema = z.object({
   background: CSSColorSchema.optional(),
   foreground: CSSColorSchema.optional().describe('Text on "background" color'),
+  "account-edit-link": CSSColorSchema.optional().describe(
+    'Color used by "edit" button in comment form when a wallet is connected'
+  ),
   primary: CSSColorSchema.optional().describe('"primary" background color'),
   "primary-foreground": CSSColorSchema.optional().describe(
     'Text on "primary" background'
@@ -248,12 +251,13 @@ export type IndexerAPIPaginationSchemaType = z.infer<
   typeof IndexerAPIPaginationSchema
 >;
 
-export const IndexerAPICommentWithRepliesSchema = IndexerAPICommentSchema.extend({
-  replies: z.object({
-    results: z.array(IndexerAPICommentSchema),
-    pagination: IndexerAPIPaginationSchema,
-  }),
-});
+export const IndexerAPICommentWithRepliesSchema =
+  IndexerAPICommentSchema.extend({
+    replies: z.object({
+      results: z.array(IndexerAPICommentSchema),
+      pagination: IndexerAPIPaginationSchema,
+    }),
+  });
 
 export type IndexerAPICommentWithRepliesSchemaType = z.infer<
   typeof IndexerAPICommentWithRepliesSchema

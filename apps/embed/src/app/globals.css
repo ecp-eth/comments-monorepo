@@ -17,6 +17,7 @@ body {
   .theme-root {
     --background: var(--light-theme-background, white);
     --foreground: var(--light-theme-foreground, hsl(0 0% 3.9%));
+    --account-edit-link: var(--light-theme-account-edit-link, rgb(59 130 246));
     --popover: var(--light-theme-background, white);
     --popover-foreground: var(--light-theme-foreground, hsl(0 0% 3.9%));
     --primary: var(--light-theme-primary, hsl(0 0% 9%));
@@ -49,6 +50,7 @@ body {
     .theme-root:not(.light) {
       --background: var(--dark-theme-background, hsl(0 0% 3.9%));
       --foreground: var(--dark-theme-foreground, hsl(0 0% 98%));
+      --account-edit-link: var(--dark-theme-account-edit-link, rgb(59 130 246));
       --popover: var(--dark-theme-background, hsl(0 0% 3.9%));
       --popover-foreground: var(--dark-theme-foreground, hsl(0 0% 98%));
       --primary: var(--dark-theme-primary, hsl(0 0% 98%));
@@ -106,7 +108,8 @@ body {
   * {
     @apply border-border;
   }
-  html, body {
+  html,
+  body {
     margin: 0;
     padding: 0;
     background: transparent;
