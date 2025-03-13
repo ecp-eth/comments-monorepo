@@ -4,10 +4,20 @@ import { GetAuthorParamsSchema } from "../../lib/schemas";
 import { ensDataResolver } from "../../lib/ens-data-resolver";
 import { farcasterDataResolver } from "../../lib/farcaster-data-resolver";
 import { formatAuthor } from "../../lib/response-formatters";
+import { rateLimiter } from "hono-rate-limiter";
+import { generateRateLimiterKey } from "../../lib/rate-limiter-key-generator";
+
+const rateLimiterMiddleware = rateLimiter({
+  standardHeaders: "draft-6",
+  windowMs: 60 * 1000,
+  limit: 30,
+  keyGenerator: generateRateLimiterKey,
+});
 
 const getAuthor = createRoute({
   method: "get",
   path: "/api/authors/{authorAddress}",
+  middleware: [rateLimiterMiddleware],
   tags: ["comments"],
   description: "Retrieve author ENS / Farcaster data",
   request: {
