@@ -6,9 +6,14 @@ import {
   SignCommentResponseSchema,
 } from "@/lib/schemas";
 import { bigintReplacer } from "@/lib/utils";
-import { createCommentData, createCommentTypedData } from "@ecp.eth/sdk";
+import {
+  createCommentData,
+  createCommentTypedData,
+  isMuted,
+} from "@ecp.eth/sdk";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import { signCommentRateLimiter } from "@/services/rate-limiter";
 
 export async function POST(
   req: Request
@@ -41,9 +46,37 @@ export async function POST(
     );
   }
 
-  const account = privateKeyToAccount(
-    env.APP_SIGNER_PRIVATE_KEY
-  );
+  const rateLimitResult = await signCommentRateLimiter.isRateLimited(author);
+
+  if (!rateLimitResult.success) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { author: ["Too many requests"] },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(
+            Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+          ),
+        },
+      }
+    );
+  }
+
+  if (
+    await isMuted({
+      address: author,
+      apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+    })
+  ) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { author: ["Muted"] },
+      { status: 400 }
+    );
+  }
+
+  const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
 
   const commentData = createCommentData({
     content,

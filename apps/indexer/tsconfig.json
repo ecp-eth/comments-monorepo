@@ -19,8 +19,10 @@
     "target": "ES2022",
 
     // Skip type checking for node modules
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": true
   },
-  "include": ["./**/*.ts"],
+  "include": ["./**/*.ts", "./bin/*.js"],
   "exclude": ["node_modules"]
 }

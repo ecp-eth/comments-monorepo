@@ -301,3 +301,73 @@ export async function fetchAuthorData(
 
   return Effect.runPromise(repeatableTask, { signal });
 }
+
+const isMutedOptionsSchema = z.object({
+  address: HexSchema,
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  signal: z.instanceof(AbortSignal).optional(),
+  retries: z.number().int().positive().default(3),
+});
+
+/**
+ * The options for `isMuted()`
+ */
+export type IsMutedOptions = {
+  /**
+   * Author's address
+   */
+  address: Hex;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+  /**
+   * URL on which /api/muted-accounts/$address endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  signal?: AbortSignal;
+};
+
+/**
+ * Checks if an address is marked as a muted.
+ *
+ * @param options - The options for checking if an address is muted
+ * @returns A promise that resolves to `true` if the address is marked as muted, `false` otherwise
+ */
+export async function isMuted(options: IsMutedOptions): Promise<boolean> {
+  const { address, apiUrl, retries, signal } =
+    isMutedOptionsSchema.parse(options);
+
+  const isMutedTask = Effect.retry(
+    Effect.tryPromise(async (signal) => {
+      const url = new URL(`/api/muted-accounts/${address}`, apiUrl);
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        signal,
+        cache: "no-cache",
+      });
+
+      if (response.status === 200) {
+        return true;
+      }
+
+      if (response.status === 404) {
+        return false;
+      }
+
+      throw new Error(
+        `Failed to check if address is muted: ${response.statusText} (${response.status})`
+      );
+    }),
+    {
+      times: retries,
+    }
+  );
+
+  return Effect.runPromise(isMutedTask, { signal });
+}

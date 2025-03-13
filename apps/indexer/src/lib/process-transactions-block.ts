@@ -9,6 +9,7 @@ import {
   getCachedGetBlockRpcResponseSkipStatus,
   markCachedGetBlockRpcResponseAsSkipped,
 } from "./ponder-rpc-results-cache";
+import { getMutedAccount } from "../management/services/muted-accounts";
 
 class InvalidAppSignatureError extends Error {}
 
@@ -54,6 +55,10 @@ export async function processTransactionsBlock({
     try {
       const { commentData, authorSignature, appSignature } =
         decodeCommentSuffixData(`0x${input.encodedCommentData}`);
+
+      if (await getMutedAccount(commentData.author)) {
+        return;
+      }
 
       const commentTypedData = createCommentTypedData({
         chainId: context.network.chainId,

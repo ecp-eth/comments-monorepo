@@ -13,6 +13,75 @@ export const GetAuthorParamsSchema = z.object({
 });
 
 /**
+ * Path params schema for unmuting an account.
+ */
+export const DeleteMutedAccountParamSchema = z.object({
+  address: HexSchema.openapi({
+    description: "The address of the muted account",
+  }),
+});
+
+/**
+ * Path params schema for checking if an address is marked as muted.
+ */
+export const GetMutedAccountParamSchema = z.object({
+  address: HexSchema.openapi({
+    description: "The address of the muted account",
+  }),
+});
+
+/**
+ * Response schema for checking if an address is marked as muted.
+ */
+export const GetMutedAccountResponseSchema = z.object({
+  address: HexSchema.openapi({
+    description: "The address of the muted account",
+  }),
+  createdAt: z.coerce.date().openapi({
+    description: "The date the account was muted",
+  }),
+});
+
+/**
+ * Request body schema for marking an account as muted.
+ */
+export const PostMutedAccountBodySchema = z.object({
+  address: HexSchema.openapi({
+    description: "The address of the muted account",
+  }),
+  reason: z.string().optional().openapi({
+    description: "The reason for muting the account",
+  }),
+});
+
+/**
+ * Response schema for marking an account as muted.
+ */
+export const PostMutedAccountResponseSchema = z.object({
+  address: HexSchema.openapi({
+    description: "The address of the muted account",
+  }),
+});
+
+/**
+ * Path params schema for deleting a comment.
+ */
+export const DeleteCommentParamSchema = z.object({
+  commentId: HexSchema.openapi({
+    description: "The ID of the comment to delete",
+  }),
+});
+
+/**
+ * Response schema for an API error.
+ */
+export const APIErrorResponseSchema = z.object({
+  message: z.string().openapi({
+    description: "The error message",
+  }),
+});
+
+/**
  * Query string schema for getting a list of comments.
  */
 export const GetCommentsQuerySchema = z.object({

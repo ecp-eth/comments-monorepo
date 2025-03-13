@@ -4,8 +4,18 @@ import { cors } from "hono/cors";
 import { client, graphql } from "ponder";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import setupRestAPI from "./setupRestAPI";
+import { HTTPException } from "hono/http-exception";
 
 const app = new OpenAPIHono();
+
+app.onError((err) => {
+  if (err instanceof HTTPException) {
+    // Get the custom response
+    return err.getResponse();
+  }
+
+  return Response.json({ message: "Internal server error" }, { status: 500 });
+});
 
 app.use("/sql/*", client({ db, schema }));
 app.use("/", graphql({ db, schema }));

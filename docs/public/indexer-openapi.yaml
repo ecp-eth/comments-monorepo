@@ -521,4 +521,176 @@ paths:
                       - fid
                 required:
                   - address
+  /api/muted-accounts/{address}:
+    get:
+      tags:
+        - comments
+      description: Check if an address is marked as muted
+      parameters:
+        - schema:
+            description: The address of the muted account
+          required: true
+          name: address
+          in: path
+      responses:
+        '200':
+          description: When address is marked as muted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    description: The address of the muted account
+                  createdAt:
+                    type:
+                      - string
+                      - 'null'
+                    description: The date the account was muted
+                required:
+                  - address
+                  - createdAt
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: When address is not marked as muted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+    delete:
+      tags:
+        - comments
+      description: >-
+        Removes account from muted list, newer comments from this account will
+        be indexed
+      parameters:
+        - schema:
+            description: The address of the muted account
+          required: true
+          name: address
+          in: path
+      responses:
+        '204':
+          description: When muted account was unmuted
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: When request is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: When muted account was not found in the list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/muted-accounts:
+    post:
+      tags:
+        - comments
+      description: >-
+        Marks account as muted, newer comments from this account won't be
+        indexed
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  description: The address of the muted account
+                reason:
+                  type: string
+                  description: The reason for muting the account
+              required:
+                - address
+      responses:
+        '200':
+          description: An object with muted account address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    description: The address of the muted account
+                required:
+                  - address
+        '400':
+          description: When request data is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: When request is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '409':
+          description: When account is already marked as muted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
 webhooks: {}

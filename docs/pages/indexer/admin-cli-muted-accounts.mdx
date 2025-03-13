@@ -1,0 +1,84 @@
+# Admin CLI - Muted Accounts Management
+
+The Muted Accounts Management CLI allows you to mute and unmute accounts in the indexer service. This functionality requires proper authentication using API keys.
+
+## Prerequisites
+
+Before using the muted accounts management commands, you need:
+
+- [An API key ID](/indexer/admin-cli-api-key-management)
+- The corresponding private key
+- Access to the indexer service
+- Checked out the [Comments mono repository](https://github.com/ecp-eth/comments-monorepo)
+
+## Commands
+
+### Muting an account
+
+Adds a new address to the muted accounts list.
+
+```bash
+bin/admin.js muted-accounts mute <address> -i <api-key-id> -k <private-key> [--url <indexer-url>]
+```
+
+**Arguments:**
+
+- `address` - The Ethereum address to mark as muted (must be a valid hex address)
+
+**Options:**
+
+- `-i, --id <id>` - The ID of the API key to use (required)
+- `-k, --private-key <key>` - The private key of the API key (required)
+- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
+- `-r, --reason <reason>` - The reason for muting the account (optional)
+
+**Example:**
+
+```bash
+bin/admin.js muted-accounts mute 0x1234...5678 -i your-api-key-id -k your-private-key
+```
+
+### Unmuting an account
+
+Removes an address from the muted accounts list.
+
+```bash
+bin/admin.js muted-accounts unmute <address> -i <api-key-id> -k <private-key> [--url <indexer-url>]
+```
+
+**Arguments:**
+
+- `address` - The Ethereum address to remove from the muted accounts list
+
+**Options:**
+
+- `-i, --id <id>` - The ID of the API key to use (required)
+- `-k, --private-key <key>` - The private key of the API key (required)
+- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
+
+**Example:**
+
+```bash
+bin/admin.js muted-accounts unmute 0x1234...5678 -i your-api-key-id -k your-private-key
+```
+
+## Error Handling
+
+If any command fails, the CLI will:
+
+1. Display an error message with details about the failure
+2. Exit with a non-zero status code
+
+Common error scenarios include:
+
+- Invalid API key or private key
+- Invalid address format
+- Network connectivity issues
+- Server-side errors
+
+## Security Notes
+
+- Keep your API private keys secure and never share them
+- Use environment variables or secure key management systems to store sensitive credentials
+- The CLI uses Ed25519 signatures for authentication
+- All requests are timestamped to prevent replay attacks

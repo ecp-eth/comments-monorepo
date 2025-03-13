@@ -21,6 +21,8 @@ ${JSON.stringify(this.validationError.flatten(), null, 2)}
 const ServerEnvSchema = z
   .object({
     APP_SIGNER_PRIVATE_KEY: HexSchema,
+    KV_REST_API_URL: z.string().url().optional(),
+    KV_REST_API_TOKEN: z.string().optional(),
     SENTRY_ORG: z.string().optional(),
     SENTRY_PROJECT: z.string().optional(),
     SENTRY_AUTH_TOKEN: z.string().optional(),

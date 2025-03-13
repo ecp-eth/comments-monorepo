@@ -15,9 +15,11 @@ import {
   CommentsV1Abi,
   createCommentData,
   createCommentTypedData,
+  isMuted,
 } from "@ecp.eth/sdk";
 import { createWalletClient, hashTypedData, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import { signCommentRateLimiter } from "@/services/rate-limiter";
 
 export async function POST(
   req: Request
@@ -48,6 +50,36 @@ export async function POST(
     return new JSONResponse(
       BadRequestResponseSchema,
       { targetUri: ["Invalid target URL"] },
+      { status: 400 }
+    );
+  }
+
+  const rateLimitResult = await signCommentRateLimiter.isRateLimited(author);
+
+  if (!rateLimitResult.success) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { author: ["Too many requests"] },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(
+            Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+          ),
+        },
+      }
+    );
+  }
+
+  if (
+    await isMuted({
+      address: author,
+      apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+    })
+  ) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { author: ["Muted"] },
       { status: 400 }
     );
   }

@@ -6,9 +6,24 @@ import {
   transformCommentTargetUri,
 } from "./lib/utils";
 import { processTransactionsBlock } from "./lib/process-transactions-block";
+// import { isProfane } from "./lib/profanity-detection";
+import { initializeManagement } from "./management";
+import { getMutedAccount } from "./management/services/muted-accounts";
+
+await initializeManagement();
 
 ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
   const targetUri = transformCommentTargetUri(event.args.commentData.targetUri);
+
+  // uncomment to enable basic profanity detection
+  /* 
+  if (isProfane(event.args.commentData.content)) {
+    return;
+  }*/
+
+  if (await getMutedAccount(event.args.commentData.author)) {
+    return;
+  }
 
   await context.db.insert(schema.comment).values({
     id: event.args.commentId,
