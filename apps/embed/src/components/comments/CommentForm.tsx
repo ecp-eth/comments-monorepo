@@ -113,7 +113,7 @@ export function CommentForm({
   return (
     <form
       onSubmit={submitCommentMutation.mutate}
-      className={cn("flex flex-col gap-2", !address && "opacity-20")}
+      className="flex flex-col gap-2"
     >
       <Textarea
         onBlur={() => {
