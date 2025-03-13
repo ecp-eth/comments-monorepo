@@ -581,7 +581,13 @@ function GeneratedURL({
   }
 
   try {
-    const url = createCommentsEmbedURL(embedUri, { targetUri: uri }, config);
+    const url = createCommentsEmbedURL(
+      embedUri,
+      { targetUri: uri },
+      JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
+        ? config
+        : undefined
+    );
     const snippet = `<iframe
   src="${url}"
   style="width: 100%; height: 600px; border: none;"
@@ -641,7 +647,13 @@ function CommentsEmbedPreview({
 
   try {
     // this just validates the config
-    createCommentsEmbedURL(embedUri, { targetUri: uri }, config);
+    createCommentsEmbedURL(
+      embedUri,
+      { targetUri: uri },
+      JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
+        ? config
+        : undefined
+    );
 
     return <CommentsEmbed uri={uri} embedUri={embedUri} config={config} />;
   } catch (e) {
