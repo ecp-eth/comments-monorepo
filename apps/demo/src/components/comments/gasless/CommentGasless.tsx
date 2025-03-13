@@ -4,15 +4,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { bigintReplacer, formatDate, formatDateRelative } from "@/lib/utils";
+import { bigintReplacer } from "@/lib/utils";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 import { MoreVertical } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { getAddress, SignTypedDataParameters } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
-import { CommentAuthorAvatar } from "../CommentAuthorAvatar";
-import { getCommentAuthorNameOrAddress } from "../helpers";
 import type { CommentType } from "@/lib/types";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import {
@@ -29,6 +27,7 @@ import { useMutation } from "@tanstack/react-query";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 import { Hex } from "@ecp.eth/sdk/schemas";
 import { publicEnv } from "@/publicEnv";
+import { CommentAuthor } from "../CommentAuthor";
 
 async function gaslessDeleteComment(
   params: PrepareGaslessCommentDeletionRequestBodySchemaType
@@ -193,15 +192,7 @@ export function CommentGasless({
   return (
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <CommentAuthorAvatar author={enrichedAuthor} />
-          <div className="text-xs text-gray-500">
-            {getCommentAuthorNameOrAddress(enrichedAuthor)} •{" "}
-            <span title={formatDate(comment.timestamp)}>
-              {formatDateRelative(comment.timestamp)}
-            </span>
-          </div>
-        </div>
+        <CommentAuthor author={enrichedAuthor} timestamp={comment.timestamp} />
         {isAuthor && !comment.deletedAt && (
           <DropdownMenu>
             <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">

@@ -5,7 +5,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatDate, formatDateRelative } from "@/lib/utils";
 import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { MoreVertical } from "lucide-react";
@@ -17,14 +16,13 @@ import {
   useWriteContract,
 } from "wagmi";
 import { CommentBox } from "./CommentBox";
-import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
-import { getCommentAuthorNameOrAddress } from "./helpers";
 import type { CommentType } from "@/lib/types";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import { PendingCommentOperationSchemaType } from "@/lib/schemas";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 import { publicEnv } from "@/publicEnv";
 import { renderCommentContent } from "@/lib/renderer";
+import { CommentAuthor } from "./CommentAuthor";
 
 interface CommentProps {
   comment: CommentType;
@@ -79,15 +77,7 @@ export function Comment({
   return (
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <CommentAuthorAvatar author={enrichedAuthor} />
-          <div className="text-xs text-gray-500">
-            {getCommentAuthorNameOrAddress(enrichedAuthor)} •{" "}
-            <span title={formatDate(comment.timestamp)}>
-              {formatDateRelative(comment.timestamp)}
-            </span>
-          </div>
-        </div>
+        <CommentAuthor author={enrichedAuthor} timestamp={comment.timestamp} />
         {isAuthor && !comment.deletedAt && (
           <DropdownMenu>
             <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">

@@ -1,5 +1,6 @@
 import { HexSchema } from "@ecp.eth/sdk/schemas";
 import { z } from "zod";
+import { publicEnvSchema } from "./publicEnv";
 
 class InvalidServerEnvVariablesError extends Error {
   constructor(private validationError: z.ZodError) {
@@ -17,16 +18,14 @@ ${JSON.stringify(this.validationError.flatten(), null, 2)}
   }
 }
 
-const ServerEnvSchema = z.object({
-  APP_SIGNER_PRIVATE_KEY: HexSchema,
-  NEXT_PUBLIC_APP_SIGNER_ADDRESS: HexSchema,
-  NEXT_PUBLIC_COMMENTS_INDEXER_URL: z.string().url(),
-  NEXT_PUBLIC_WC_PROJECT_ID: z.string(),
-  SENTRY_ORG: z.string().optional(),
-  SENTRY_PROJECT: z.string().optional(),
-  NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
-  SENTRY_AUTH_TOKEN: z.string().optional(),
-});
+const ServerEnvSchema = z
+  .object({
+    APP_SIGNER_PRIVATE_KEY: HexSchema,
+    SENTRY_ORG: z.string().optional(),
+    SENTRY_PROJECT: z.string().optional(),
+    SENTRY_AUTH_TOKEN: z.string().optional(),
+  })
+  .merge(publicEnvSchema);
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

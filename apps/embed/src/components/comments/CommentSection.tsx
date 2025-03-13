@@ -18,6 +18,7 @@ import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { fetchComments } from "@ecp.eth/sdk";
 import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
+import { publicEnv } from "@/publicEnv";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -41,8 +42,8 @@ export function CommentSection({ initialData }: CommentSectionProps) {
       },
       queryFn: async ({ pageParam, signal }) => {
         const response = await fetchComments({
-          appSigner: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-          apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+          appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+          apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           targetUri,
           limit: pageParam.limit,
           offset: pageParam.offset,

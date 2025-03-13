@@ -5,6 +5,7 @@ import {
   type PendingCommentOperationSchemaType,
   type SignCommentPayloadRequestSchemaType,
 } from "@/lib/schemas";
+import { publicEnv } from "@/publicEnv";
 import { fetchAuthorData } from "@ecp.eth/sdk";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
 
@@ -34,7 +35,7 @@ export async function submitCommentMutationFunction({
   // ignore errors here, we don't want to block the comment submission
   const resolvedAuthor = await fetchAuthorData({
     address,
-    apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+    apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   }).catch((e) => {
     console.error(e);
     return undefined;
