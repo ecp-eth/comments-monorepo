@@ -490,6 +490,10 @@ function GeneratedURL({
   const [copied, setCopied] = React.useState(false);
   const timeoutRef = React.useRef<any>(null);
 
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   try {
     const url = createCommentsEmbedURL(embedUri, { targetUri: uri }, config);
 
@@ -540,6 +544,10 @@ function CommentsEmbedPreview({
   uri: string;
   config: EmbedConfigSchemaType;
 }) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   try {
     // this just validates the config
     createCommentsEmbedURL(embedUri, { targetUri: uri }, config);
