@@ -230,7 +230,7 @@ export function Comment({
   useEffect(() => {
     if (postingCommentTxReceipt.data?.status === "success") {
       onPostSuccessRef.current?.(postingCommentTxReceipt.data.transactionHash);
-      toast("Comment posted");
+      toast.success("Comment posted");
     }
   }, [onPostSuccessRef, postingCommentTxReceipt.data]);
 

@@ -1,4 +1,3 @@
-import { Hex } from "@ecp.eth/sdk/schemas";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,80 +5,244 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import { COMMENTS_V1_ADDRESS, fetchCommentReplies } from "@ecp.eth/sdk";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { MoreVertical } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  Loader2Icon,
+  MessageCircleWarningIcon,
+  MoreVertical,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAddress } from "viem";
 import {
   useAccount,
+  useSwitchChain,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
 import { CommentBox } from "./CommentBox";
-import type { CommentType } from "@/lib/types";
 import { useFreshRef } from "@/hooks/useFreshRef";
-import { PendingCommentOperationSchemaType } from "@/lib/schemas";
-import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
+import { CommentPageSchema } from "@/lib/schemas";
 import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "./CommentAuthor";
 import { CommentText } from "./CommentText";
+import type {
+  OnDeleteComment,
+  OnPostCommentSuccess,
+  OnRetryPostComment,
+} from "./types";
+import type { Comment as CommentType } from "@/lib/schemas";
+import {
+  useHandleCommentDeleted,
+  useHandleCommentPostedSuccessfully,
+  useHandleCommentSubmitted,
+  useHandleRetryPostComment,
+} from "./hooks";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { submitCommentMutationFunction } from "./queries";
+import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
+import never from "never";
+import { toast } from "sonner";
 
 interface CommentProps {
+  /**
+   * @default 1
+   */
+  depth?: number;
   comment: CommentType;
-  onReply?: (
-    pendingCommentOperation: PendingCommentOperationSchemaType
-  ) => void;
-  onDelete?: (id: Hex) => void;
+  onDelete?: OnDeleteComment;
+  /**
+   * Called when comment is successfully posted to the blockchain.
+   *
+   * This is called only if comment is pending.
+   */
+  onPostSuccess: OnPostCommentSuccess;
+  /**
+   * Called when comment posting to blockchain failed and the transaction has been reverted
+   * and user pressed retry.
+   */
+  onRetryPost: OnRetryPostComment;
   level?: number;
 }
 
 export function Comment({
+  depth = 1,
   comment,
-  onReply,
+  onPostSuccess,
+  onRetryPost,
   onDelete,
   level = 0,
 }: CommentProps) {
+  const { address } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const { writeContractAsync } = useWriteContract();
+  const onPostSuccessRef = useFreshRef(onPostSuccess);
   const onDeleteRef = useFreshRef(onDelete);
+  /**
+   * Prevents infinite cycle when delete comment transaction succeeded
+   * because comment is updated to be redacted
+   */
+  const commentRef = useFreshRef(comment);
   const { address: connectedAddress } = useAccount();
-  const enrichedAuthor = useEnrichedAuthor(comment.author);
   const [isReplying, setIsReplying] = useState(false);
+  const areRepliesAllowed = depth < 2;
+  const submitTargetCommentId = areRepliesAllowed
+    ? comment.id
+    : (comment.parentId ?? never("parentId is required for comment depth > 0"));
+  const submitTargetQueryKey = useMemo(
+    () => ["comments", submitTargetCommentId],
+    [submitTargetCommentId]
+  );
+  const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
 
-  const handleReply = (
-    pendingCommentOperation: PendingCommentOperationSchemaType
-  ) => {
-    onReply?.(pendingCommentOperation);
-    setIsReplying(false);
-  };
+  const repliesQuery = useInfiniteQuery({
+    enabled: areRepliesAllowed,
+    queryKey,
+    initialData: comment.replies
+      ? {
+          pages: [comment.replies],
+          pageParams: [
+            {
+              offset: comment.replies.pagination.offset,
+              limit: comment.replies.pagination.limit,
+            },
+          ],
+        }
+      : undefined,
+    initialPageParam: {
+      offset: comment.replies?.pagination.offset ?? 0,
+      limit:
+        comment.replies?.pagination.limit ??
+        MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+    },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    queryFn: async ({ pageParam, signal }) => {
+      const response = await fetchCommentReplies({
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        offset: pageParam.offset,
+        limit: pageParam.limit,
+        commentId: comment.id,
+        signal,
+      });
 
-  const {
-    data: deleteTxHash,
-    writeContract,
-    isPending: isDeleteSigPending,
-  } = useWriteContract();
-  const { data: deleteTxReceipt, isFetching: isDeleteTxPending } =
-    useWaitForTransactionReceipt({
-      hash: deleteTxHash,
-      confirmations: 1,
+      return CommentPageSchema.parse(response);
+    },
+    getNextPageParam(lastPage) {
+      if (!lastPage.pagination.hasMore) {
+        return;
+      }
+
+      return {
+        offset: lastPage.pagination.offset + lastPage.pagination.limit,
+        limit: lastPage.pagination.limit,
+      };
+    },
+  });
+
+  const replies = useMemo(() => {
+    return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
+  }, [repliesQuery.data?.pages]);
+
+  const handleCommentSubmitted = useHandleCommentSubmitted({
+    queryKey: submitTargetQueryKey,
+  });
+  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
+    queryKey: submitTargetQueryKey,
+  });
+  const handleRetryPostComment = useHandleRetryPostComment({
+    queryKey: submitTargetQueryKey,
+  });
+  const handleCommentDeleted = useHandleCommentDeleted({ queryKey });
+
+  const retryPostMutation = useMutation({
+    mutationFn: async () => {
+      if (!comment.pendingOperation) {
+        throw new Error("No pending operation to retry");
+      }
+
+      return submitCommentMutationFunction({
+        address,
+        commentRequest: {
+          chainId: comment.pendingOperation.chainId,
+          content: comment.pendingOperation.response.data.content,
+          parentId: comment.pendingOperation.response.data.parentId,
+          targetUri: comment.pendingOperation.response.data.targetUri,
+        },
+        switchChainAsync(chainId) {
+          return switchChainAsync({ chainId });
+        },
+        writeContractAsync(params) {
+          return writeContractAsync({
+            abi: CommentsV1Abi,
+            address: COMMENTS_V1_ADDRESS,
+            functionName: "postCommentAsAuthor",
+            args: [params.data, params.signature],
+          });
+        },
+      });
+    },
+    onSuccess(newPendingOperation) {
+      onRetryPost(comment, newPendingOperation);
+    },
+  });
+
+  const deleteCommentContract = useWriteContract();
+
+  const deleteCommentTransactionReceipt = useWaitForTransactionReceipt({
+    hash: deleteCommentContract.data,
+  });
+
+  const handleDeleteClick = useCallback(() => {
+    deleteCommentContract.writeContract({
+      address: COMMENTS_V1_ADDRESS,
+      abi: CommentsV1Abi,
+      functionName: "deleteCommentAsAuthor",
+      args: [comment.id],
     });
+  }, [comment.id, deleteCommentContract]);
 
   useEffect(() => {
-    if (deleteTxReceipt?.status === "success") {
-      onDeleteRef.current?.(comment.id);
+    if (deleteCommentTransactionReceipt.data?.status === "success") {
+      onDeleteRef.current?.(commentRef.current.id);
     }
-  }, [comment.id, deleteTxReceipt?.status, onDeleteRef]);
+  }, [deleteCommentTransactionReceipt.data?.status, commentRef, onDeleteRef]);
 
-  const isAuthor = connectedAddress
-    ? getAddress(connectedAddress) === getAddress(enrichedAuthor.address)
-    : false;
+  const postingCommentTxReceipt = useWaitForTransactionReceipt({
+    hash: comment.pendingOperation?.txHash,
+    chainId: comment.pendingOperation?.chainId,
+  });
 
-  const isDeleting = isDeleteSigPending || isDeleteTxPending;
+  useEffect(() => {
+    if (postingCommentTxReceipt.data?.status === "success") {
+      onPostSuccessRef.current?.(postingCommentTxReceipt.data.transactionHash);
+      toast.success("Comment posted");
+    }
+  }, [onPostSuccessRef, postingCommentTxReceipt.data]);
+
+  const isAuthor =
+    connectedAddress && comment.author
+      ? getAddress(connectedAddress) === getAddress(comment.author.address)
+      : false;
+
+  const isDeleting =
+    deleteCommentTransactionReceipt.isFetching ||
+    deleteCommentContract.isPending;
+  const didDeletingFailed =
+    !isDeleting &&
+    (deleteCommentTransactionReceipt.data?.status === "reverted" ||
+      deleteCommentContract.isError);
+
+  const isPosting = postingCommentTxReceipt.isFetching;
+  const didPostingFailed =
+    !isPosting && postingCommentTxReceipt.data?.status === "reverted";
 
   return (
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
-        <CommentAuthor author={enrichedAuthor} timestamp={comment.timestamp} />
-        {isAuthor && !comment.deletedAt && (
+        <CommentAuthor author={comment.author} timestamp={comment.timestamp} />
+        {isAuthor && !comment.deletedAt && !comment.pendingOperation && (
           <DropdownMenu>
             <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">
               <MoreVertical className="h-4 w-4" />
@@ -87,14 +250,7 @@ export function Comment({
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 className="text-red-600 cursor-pointer"
-                onClick={() => {
-                  writeContract({
-                    address: COMMENTS_V1_ADDRESS,
-                    abi: CommentsV1Abi,
-                    functionName: "deleteCommentAsAuthor",
-                    args: [comment.id],
-                  });
-                }}
+                onClick={handleDeleteClick}
                 disabled={isDeleting}
               >
                 Delete
@@ -105,25 +261,32 @@ export function Comment({
       </div>
       <div
         className={cn(
-          "mb-2 break-all",
+          "mb-2 break-all text-foreground",
           comment.deletedAt && "text-muted-foreground"
         )}
       >
         <CommentText text={comment.content} />
       </div>
-      {connectedAddress && (
-        <div className="text-xs text-gray-500 mb-2">
-          <button
-            onClick={() => setIsReplying(!isReplying)}
-            className="mr-2 hover:underline"
-          >
-            reply
-          </button>
-        </div>
-      )}
+      <div className="mb-2">
+        <CommentActionOrStatus
+          comment={comment}
+          hasAccountConnected={!!connectedAddress}
+          isDeleting={isDeleting}
+          isPosting={isPosting}
+          deletingFailed={didDeletingFailed}
+          postingFailed={didPostingFailed}
+          onRetryDeleteClick={handleDeleteClick}
+          onReplyClick={() => setIsReplying((prev) => !prev)}
+          onRetryPostClick={retryPostMutation.mutate}
+        />
+      </div>
       {isReplying && (
         <CommentBox
-          onSubmit={handleReply}
+          onLeftEmpty={() => setIsReplying(false)}
+          onSubmitSuccess={(pendingOperation) => {
+            setIsReplying(false);
+            handleCommentSubmitted(pendingOperation);
+          }}
           placeholder="What are your thoughts?"
           parentId={
             level >= publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF &&
@@ -133,16 +296,127 @@ export function Comment({
           }
         />
       )}
-      {"replies" in comment &&
-        comment.replies.results?.map((reply) => (
-          <Comment
-            key={reply.id}
-            comment={reply}
-            onReply={onReply}
-            onDelete={onDelete}
-            level={level + 1}
-          />
-        ))}
+      {replies.map((reply) => (
+        <Comment
+          depth={depth + 1}
+          key={reply.id}
+          comment={reply}
+          onDelete={handleCommentDeleted}
+          onPostSuccess={handleCommentPostedSuccessfully}
+          onRetryPost={handleRetryPostComment}
+        />
+      ))}
+      {repliesQuery.hasNextPage && (
+        <div className="mb-2">
+          <ActionButton onClick={() => repliesQuery.fetchNextPage()}>
+            show more replies
+          </ActionButton>
+        </div>
+      )}
     </div>
+  );
+}
+
+function CommentActionOrStatus({
+  comment,
+  hasAccountConnected,
+  isDeleting,
+  isPosting,
+  postingFailed,
+  deletingFailed,
+  onReplyClick,
+  onRetryDeleteClick,
+  onRetryPostClick,
+}: {
+  comment: CommentType;
+  hasAccountConnected: boolean;
+  isDeleting: boolean;
+  isPosting: boolean;
+  postingFailed: boolean;
+  deletingFailed: boolean;
+  onReplyClick: () => void;
+  onRetryDeleteClick: () => void;
+  onRetryPostClick: () => void;
+}) {
+  if (postingFailed) {
+    return (
+      <div className="flex items-center gap-1 text-xs text-destructive">
+        <MessageCircleWarningIcon className="w-3 h-3" />
+        <span>
+          Could not post the comment.{" "}
+          <RetryButton onClick={onRetryPostClick}>Retry</RetryButton>
+        </span>
+      </div>
+    );
+  }
+
+  if (deletingFailed) {
+    return (
+      <div className="flex items-center gap-1 text-xs text-destructive">
+        <MessageCircleWarningIcon className="w-3 h-3" />
+        <span>
+          Could not delete the comment.{" "}
+          <RetryButton onClick={onRetryDeleteClick}>Retry</RetryButton>
+        </span>
+      </div>
+    );
+  }
+
+  if (isDeleting) {
+    return (
+      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        <Loader2Icon className="w-3 h-3 animate-spin" />
+        <span>Deleting...</span>
+      </div>
+    );
+  }
+
+  if (isPosting) {
+    return (
+      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        <Loader2Icon className="w-3 h-3 animate-spin" />
+        <span>Posting...</span>
+      </div>
+    );
+  }
+
+  if (comment.pendingOperation || !hasAccountConnected) {
+    return null;
+  }
+
+  return <ActionButton onClick={onReplyClick}>reply</ActionButton>;
+}
+
+type RetryButtonProps = {
+  onClick: () => void;
+  children: React.ReactNode;
+};
+
+function RetryButton({ children, onClick }: RetryButtonProps) {
+  return (
+    <button
+      className="inline-flex items-center justify-center font-semibold transition-colors rounded-md hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      onClick={onClick}
+      type="button"
+    >
+      {children}
+    </button>
+  );
+}
+
+type ActionButtonProps = {
+  onClick: () => void;
+  children: React.ReactNode;
+};
+
+function ActionButton({ children, onClick }: ActionButtonProps) {
+  return (
+    <button
+      className="inline-flex items-center justify-center transition-colors text-muted-foreground text-xs rounded-md hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      onClick={onClick}
+      type="button"
+    >
+      {children}
+    </button>
   );
 }
