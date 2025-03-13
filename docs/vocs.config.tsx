@@ -77,12 +77,12 @@ export default defineConfig({
           link: "/dual-signature-system",
         },
         {
-          text: "Post comment flows",
-          link: "/post-comment-flows",
+          text: "Comment Data",
+          link: "/comment-data-props",
         },
         {
-          text: "Choose an appropriate targetUri",
-          link: "/target-uri-rules",
+          text: "Post comment flows",
+          link: "/post-comment-flows",
         },
       ],
     },

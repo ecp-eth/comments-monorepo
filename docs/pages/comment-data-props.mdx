@@ -1,0 +1,58 @@
+# Comment Data
+
+`Comment Data` is a term used to describe the essential information of a comment, the data structure is referenced in many places within this project.
+
+Here we will go through the properties of `Comment Data`, and have a detailed look at each property.
+
+## `content`
+
+The comment content stores plain text content of the comment.
+
+- Please use `\n` for line breaks. (Most browsers will normalize the line breaks to `\n` regardless of the OS).
+
+## `metadata`
+
+The `metadata` property is used to store additional information in JSON format about the comment.
+
+- Must be a valid JSON string (RFC 8259)[https://datatracker.ietf.org/doc/html/rfc8259].
+- Please be mindful that storing large amount of data on chain will increase the cost of the transaction.
+
+## `targetUri`
+
+It serves as a unique identifier to locate comments.
+
+Be careful when choosing the value for the `targetUri` property as inconsistent `targetUri` will result in some comments missing from the indexer response.
+
+- It must be a unique string that follows the [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) standard.
+- If your web page is dynamic and accepts query parameters, you should carefully consider which parameters are necessary to locate the correct comments. As a general rule:
+
+  1.  Include query parameters that affect the page content into the `targetUri`.
+  1.  Arrange them in consistent order.
+
+## `parentId`
+
+The `parentId` property is used to store the parent comment id.
+
+- If the comment is a reply to a comment, set the `parentId` to the id of the parent comment.
+- If the comment is a top level comment, leave it `undefined`.
+
+## `author`
+
+The `author` property is used to store the author's address. It is the address of the account that created and owns the comment.
+
+## `appSigner`
+
+The `appSigner` property is used to store the app signer's address.
+
+## `salt`
+
+The `salt` property is a randomly generated 32 bytes data.
+
+- It is used as part of the hashing process to generate a unique comment id.
+
+## `deadline`
+
+The deadline is a timestamp in seconds since epoch. Posting a comment with expired deadline will result in the transaction being reverted.
+
+- Must be a future timestamp.
+- It is used to prevent replay attacks, so ensure it is not be set to a value too large.

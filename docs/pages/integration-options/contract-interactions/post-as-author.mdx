@@ -23,7 +23,7 @@ You may want to read more about the [post comment flows](/post-comment-flows) fo
 
 ### Demo Dependencies
 
-Here is a quick run down of the dependencies used in the demo app:
+Here is a quick run down of some of the dependencies used in the demo app:
 
 1. `@ecp.eth/sdk` - for comment data creation, retrieving and interaction with the indexer.
 1. `wagmi` - for react based wallet connection
@@ -42,15 +42,7 @@ Now let's go through the steps to post a comment!
 
 #### Collect the comment data and send it to server for signing
 
-We will start by collecting the comment data and send it to the server for signing:
-
-The comment data includes:
-
-- `content`: the comment content
-- `targetUri`: the target URI of the comment, see [rules for choosing an appropriate `targetUri`](/target-uri-rules)
-- `parentId`: the parent comment id, for replying to a comment, leave it undefined for a top level comment
-- `author`: the author's wallet address
-- `chainId`: the target chain id
+We will start by collecting the [comment data](/comment-data-props) and send it to the server for signing:
 
 The comment data is sent to the server for signing:
 
