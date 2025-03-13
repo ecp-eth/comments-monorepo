@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatDateRelative } from "@/lib/utils";
 import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { MoreVertical } from "lucide-react";
@@ -83,7 +83,9 @@ export function Comment({
           <CommentAuthorAvatar author={enrichedAuthor} />
           <div className="text-xs text-gray-500">
             {getCommentAuthorNameOrAddress(enrichedAuthor)} •{" "}
-            {formatDate(comment.timestamp)}
+            <span title={formatDate(comment.timestamp)}>
+              {formatDateRelative(comment.timestamp)}
+            </span>
           </div>
         </div>
         {isAuthor && !comment.deletedAt && (

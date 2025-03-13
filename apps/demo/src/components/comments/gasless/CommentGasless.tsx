@@ -4,7 +4,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { bigintReplacer, formatDate } from "@/lib/utils";
+import { bigintReplacer, formatDate, formatDateRelative } from "@/lib/utils";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 import { MoreVertical } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -197,7 +197,9 @@ export function CommentGasless({
           <CommentAuthorAvatar author={enrichedAuthor} />
           <div className="text-xs text-gray-500">
             {getCommentAuthorNameOrAddress(enrichedAuthor)} •{" "}
-            {formatDate(comment.timestamp)}
+            <span title={formatDate(comment.timestamp)}>
+              {formatDateRelative(comment.timestamp)}
+            </span>
           </div>
         </div>
         {isAuthor && !comment.deletedAt && (
