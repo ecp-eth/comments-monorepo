@@ -94,7 +94,7 @@ export default defineConfig({
           link: "/indexer-reference/",
         },
         {
-          text: "Alt Indexers: Index Supply",
+          text: "Index Supply",
           link: "/index-supply",
         },
       ],
