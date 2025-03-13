@@ -582,9 +582,14 @@ function GeneratedURL({
 
   try {
     const url = createCommentsEmbedURL(embedUri, { targetUri: uri }, config);
+    const snippet = `<iframe
+  src="${url}"
+  style="width: 100%; height: 600px; border: none;"
+  title="Comments"
+></iframe>`;
 
     const copyToClipboard = () => {
-      navigator.clipboard.writeText(url);
+      navigator.clipboard.writeText(snippet);
       setCopied(true);
 
       clearTimeout(timeoutRef.current);
@@ -592,17 +597,17 @@ function GeneratedURL({
     };
 
     return (
-      <div className="flex gap-2">
-        <input
-          type="text"
+      <div className="flex flex-col gap-2">
+        <textarea
           readOnly
-          value={url}
-          className="flex-1 p-2 border rounded cursor-pointer text-input-text bg-input border-input-border"
+          value={snippet}
+          className="flex-1 p-2 border rounded cursor-pointer text-input-text bg-input border-input-border font-mono text-sm"
           onClick={copyToClipboard}
+          rows={6}
         />
         <button
           onClick={copyToClipboard}
-          className="px-4 py-2 rounded transition-colors"
+          className="px-4 py-2 rounded transition-colors ml-auto"
           type="button"
         >
           <span className="block w-[7ch] truncate">
