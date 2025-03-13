@@ -1,5 +1,7 @@
 # Spam Prevention
 
+> **Important Note**: The protocol itself does not perform any moderation. Each application (demo, embed, or custom implementations) is responsible for implementing their own moderation strategies using the tools provided below or through their own mechanisms.
+
 This document outlines the spam prevention mechanisms implemented across different components of the system.
 
 ## Apps (Demo & Embed)
@@ -20,11 +22,11 @@ The demo and embed applications implement two basic levels of spam prevention:
 
 The indexer service implements additional spam prevention measures:
 
-1. **Spammer Address Detection**
+1. **Muted Address Detection**
 
-   - Maintains a list of known spammer addresses that you can mark in order to hide them from your app
-   - Comments from addresses marked as spammers are not indexed
-   - Spammers can be managed using the [Admin CLI](/indexer/admin-cli-spammers)
+   - Maintains a list of known muted addresses that you can mark in order to hide them from your app
+   - Comments from addresses marked as muted are not indexed
+   - Muted accounts can be managed using the [Admin CLI](/indexer/admin-cli-muted-accounts)
 
 2. **Content Validation (Opt in)**
    - Implements basic profanity detection

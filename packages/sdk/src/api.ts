@@ -302,7 +302,7 @@ export async function fetchAuthorData(
   return Effect.runPromise(repeatableTask, { signal });
 }
 
-const IsSpammerOptionsSchema = z.object({
+const isMutedOptionsSchema = z.object({
   address: HexSchema,
   apiUrl: z.string().url().default(INDEXER_API_URL),
   signal: z.instanceof(AbortSignal).optional(),
@@ -310,9 +310,9 @@ const IsSpammerOptionsSchema = z.object({
 });
 
 /**
- * The options for `isSpammer()`
+ * The options for `isMuted()`
  */
-export type IsSpammerOptions = {
+export type IsMutedOptions = {
   /**
    * Author's address
    */
@@ -324,7 +324,7 @@ export type IsSpammerOptions = {
    */
   retries?: number;
   /**
-   * URL on which /api/authors/$address endpoint will be called
+   * URL on which /api/muted-accounts/$address endpoint will be called
    *
    * @default "https://api.ethcomments.xyz"
    */
@@ -333,18 +333,18 @@ export type IsSpammerOptions = {
 };
 
 /**
- * Checks if an address is marked as a spammer.
+ * Checks if an address is marked as a muted.
  *
- * @param options - The options for checking if an address is a spammer
- * @returns A promise that resolves to `true` if the address is marked as a spammer, `false` otherwise
+ * @param options - The options for checking if an address is muted
+ * @returns A promise that resolves to `true` if the address is marked as muted, `false` otherwise
  */
-export async function isSpammer(options: IsSpammerOptions): Promise<boolean> {
+export async function isMuted(options: IsMutedOptions): Promise<boolean> {
   const { address, apiUrl, retries, signal } =
-    IsSpammerOptionsSchema.parse(options);
+    isMutedOptionsSchema.parse(options);
 
-  const isSpammerTask = Effect.retry(
+  const isMutedTask = Effect.retry(
     Effect.tryPromise(async (signal) => {
-      const url = new URL(`/api/spam-accounts/${address}`, apiUrl);
+      const url = new URL(`/api/muted-accounts/${address}`, apiUrl);
 
       const response = await fetch(url.toString(), {
         method: "GET",
@@ -361,7 +361,7 @@ export async function isSpammer(options: IsSpammerOptions): Promise<boolean> {
       }
 
       throw new Error(
-        `Failed to check if address is spammer: ${response.statusText} (${response.status})`
+        `Failed to check if address is muted: ${response.statusText} (${response.status})`
       );
     }),
     {
@@ -369,5 +369,5 @@ export async function isSpammer(options: IsSpammerOptions): Promise<boolean> {
     }
   );
 
-  return Effect.runPromise(isSpammerTask, { signal });
+  return Effect.runPromise(isMutedTask, { signal });
 }

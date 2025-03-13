@@ -1,24 +1,24 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIErrorResponseSchema,
-  PostSpammerBodySchema,
-  PostSpammerResponseSchema,
+  PostMutedAccountBodySchema,
+  PostMutedAccountResponseSchema,
 } from "../../lib/schemas";
 import { authMiddleware } from "../../middleware/auth";
-import { addSpammer } from "../../management/services/spammers";
+import { muteAccount } from "../../management/services/muted-accounts";
 
-const postSpammer = createRoute({
+const postMutedAccountRoute = createRoute({
   method: "post",
-  path: "/api/spam-accounts",
+  path: "/api/muted-accounts",
   middleware: [authMiddleware()],
   tags: ["comments"],
   description:
-    "Marks account as spammer, newer comments from this account won't be indexed",
+    "Marks account as muted, newer comments from this account won't be indexed",
   request: {
     body: {
       content: {
         "application/json": {
-          schema: PostSpammerBodySchema,
+          schema: PostMutedAccountBodySchema,
         },
       },
     },
@@ -27,10 +27,10 @@ const postSpammer = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: PostSpammerResponseSchema,
+          schema: PostMutedAccountResponseSchema,
         },
       },
-      description: "An object with author address and ENS and Farcaster data",
+      description: "An object with muted account address",
     },
     400: {
       content: {
@@ -54,21 +54,21 @@ const postSpammer = createRoute({
           schema: APIErrorResponseSchema,
         },
       },
-      description: "When account is already marked as spammer",
+      description: "When account is already marked as muted",
     },
   },
 });
 
-export function setupMarkAuthorAsSpammer(app: OpenAPIHono) {
-  app.openapi(postSpammer, async (c) => {
-    const { address } = c.req.valid("json");
+export function setupMarkAuthorAsMuted(app: OpenAPIHono) {
+  app.openapi(postMutedAccountRoute, async (c) => {
+    const { address, reason } = c.req.valid("json");
 
-    const result = await addSpammer(address);
+    const result = await muteAccount(address, reason);
 
     if (!result) {
       return c.json(
         {
-          message: "Account is already marked as spammer",
+          message: "Account is already marked as muted",
         },
         409
       );

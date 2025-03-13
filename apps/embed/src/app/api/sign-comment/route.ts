@@ -7,7 +7,7 @@ import { bigintReplacer } from "@/lib/utils";
 import {
   createCommentData,
   createCommentTypedData,
-  isSpammer,
+  isMuted,
 } from "@ecp.eth/sdk";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -45,14 +45,14 @@ export async function POST(req: Request) {
   }
 
   if (
-    await isSpammer({
+    await isMuted({
       address: author,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
     })
   ) {
     return Response.json(
       {
-        error: "Spammer",
+        error: "Muted",
       },
       {
         status: 403,

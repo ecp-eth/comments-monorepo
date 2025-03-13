@@ -8,7 +8,7 @@ import {
 import { processTransactionsBlock } from "./lib/process-transactions-block";
 // import { isProfane } from "./lib/profanity-detection";
 import { initializeManagement } from "./management";
-import { getSpammer } from "./management/services/spammers";
+import { getMutedAccount } from "./management/services/muted-accounts";
 
 await initializeManagement();
 
@@ -21,7 +21,7 @@ ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
     return;
   }*/
 
-  if (await getSpammer(event.args.commentData.author)) {
+  if (await getMutedAccount(event.args.commentData.author)) {
     return;
   }
 

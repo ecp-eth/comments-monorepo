@@ -7,9 +7,10 @@ import {
 } from "kysely";
 import type { Hex } from "viem";
 
-export type SpamAccountsTable = {
+export type MutedAccountsTable = {
   account: Hex;
   created_at: Generated<Date>;
+  reason: string | null;
 };
 
 export type ApiKeysTable = {
@@ -21,11 +22,11 @@ export type ApiKeysTable = {
 };
 
 export type IndexerSchemaDB = {
-  spam_accounts: SpamAccountsTable;
+  muted_accounts: MutedAccountsTable;
   api_keys: ApiKeysTable;
 };
 
-export type SpamAccountSelect = Selectable<SpamAccountsTable>;
+export type MutedAccountSelect = Selectable<MutedAccountsTable>;
 
 class StaticMigrationsProvider implements MigrationProvider {
   async getMigrations() {
@@ -33,15 +34,16 @@ class StaticMigrationsProvider implements MigrationProvider {
       "2025_03_07_16_00_00_initial": {
         up: async (db: Kysely<IndexerSchemaDB>) => {
           await db.schema
-            .createTable("spam_accounts")
+            .createTable("muted_accounts")
             .addColumn("account", "text", (col) => col.primaryKey())
             .addColumn("created_at", "timestamp", (col) =>
               col.notNull().defaultTo(sql`now()`)
             )
+            .addColumn("reason", "text")
             .execute();
         },
         down: async (db: Kysely<IndexerSchemaDB>) => {
-          await db.schema.dropTable("spam_accounts").execute();
+          await db.schema.dropTable("muted_accounts").execute();
         },
       },
       "2025_03_10_09_20_00_auth_keys": {

@@ -1,10 +1,10 @@
-# Admin CLI - Spammers Management
+# Admin CLI - Muted Accounts Management
 
-The Spammers Management CLI allows you to manage spam accounts in the indexer service. This functionality requires proper authentication using API keys.
+The Muted Accounts Management CLI allows you to mute and unmute accounts in the indexer service. This functionality requires proper authentication using API keys.
 
 ## Prerequisites
 
-Before using the spammers management commands, you need:
+Before using the muted accounts management commands, you need:
 
 - [An API key ID](/indexer/admin-cli-api-key-management)
 - The corresponding private key
@@ -13,17 +13,42 @@ Before using the spammers management commands, you need:
 
 ## Commands
 
-### Add Spammer
+### Muting an account
 
-Adds a new address to the spam accounts list.
+Adds a new address to the muted accounts list.
 
 ```bash
-bin/admin.js spammers add <address> -i <api-key-id> -k <private-key> [--url <indexer-url>]
+bin/admin.js muted-accounts mute <address> -i <api-key-id> -k <private-key> [--url <indexer-url>]
 ```
 
 **Arguments:**
 
-- `address` - The Ethereum address to mark as a spammer (must be a valid hex address)
+- `address` - The Ethereum address to mark as muted (must be a valid hex address)
+
+**Options:**
+
+- `-i, --id <id>` - The ID of the API key to use (required)
+- `-k, --private-key <key>` - The private key of the API key (required)
+- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
+- `-r, --reason <reason>` - The reason for muting the account (optional)
+
+**Example:**
+
+```bash
+bin/admin.js muted-accounts mute 0x1234...5678 -i your-api-key-id -k your-private-key
+```
+
+### Unmuting an account
+
+Removes an address from the muted accounts list.
+
+```bash
+bin/admin.js muted-accounts unmute <address> -i <api-key-id> -k <private-key> [--url <indexer-url>]
+```
+
+**Arguments:**
+
+- `address` - The Ethereum address to remove from the muted accounts list
 
 **Options:**
 
@@ -34,31 +59,7 @@ bin/admin.js spammers add <address> -i <api-key-id> -k <private-key> [--url <ind
 **Example:**
 
 ```bash
-bin/admin.js spammers add 0x1234...5678 -i your-api-key-id -k your-private-key
-```
-
-### Remove Spammer
-
-Removes an address from the spam accounts list.
-
-```bash
-bin/admin.js spammers remove <address> -i <api-key-id> -k <private-key> [--url <indexer-url>]
-```
-
-**Arguments:**
-
-- `address` - The Ethereum address to remove from the spam accounts list
-
-**Options:**
-
-- `-i, --id <id>` - The ID of the API key to use (required)
-- `-k, --private-key <key>` - The private key of the API key (required)
-- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
-
-**Example:**
-
-```bash
-bin/admin.js spammers remove 0x1234...5678 -i your-api-key-id -k your-private-key
+bin/admin.js muted-accounts unmute 0x1234...5678 -i your-api-key-id -k your-private-key
 ```
 
 ## Error Handling

@@ -112,8 +112,8 @@ export default defineConfig({
               link: "/indexer/admin-cli-api-key-management",
             },
             {
-              text: "Spammers",
-              link: "/indexer/admin-cli-spammers",
+              text: "Muted Accounts",
+              link: "/indexer/admin-cli-muted-accounts",
             },
           ],
         },

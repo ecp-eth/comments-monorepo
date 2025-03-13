@@ -1,24 +1,24 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIErrorResponseSchema,
-  DeleteSpammerParamSchema,
+  DeleteMutedAccountParamSchema,
 } from "../../lib/schemas";
-import { removeSpammer } from "../../management/services/spammers";
+import { unmuteAccount } from "../../management/services/muted-accounts";
 import { authMiddleware } from "../../middleware/auth";
 
-const deleteSpammer = createRoute({
+const unmuteAccountRoute = createRoute({
   method: "delete",
-  path: "/api/spam-accounts/{address}",
+  path: "/api/muted-accounts/{address}",
   middleware: [authMiddleware()],
   tags: ["comments"],
   description:
-    "Removes account from spammer list, newer comments from this account will be indexed",
+    "Removes account from muted list, newer comments from this account will be indexed",
   request: {
-    params: DeleteSpammerParamSchema,
+    params: DeleteMutedAccountParamSchema,
   },
   responses: {
     204: {
-      description: "When spammer was deleted from the list",
+      description: "When muted account was unmuted",
     },
     400: {
       content: {
@@ -42,21 +42,21 @@ const deleteSpammer = createRoute({
           schema: APIErrorResponseSchema,
         },
       },
-      description: "When spammer was not found in the list",
+      description: "When muted account was not found in the list",
     },
   },
 });
 
-export function setupDeleteSpammer(app: OpenAPIHono) {
-  app.openapi(deleteSpammer, async (c) => {
+export function setupUnmuteAccount(app: OpenAPIHono) {
+  app.openapi(unmuteAccountRoute, async (c) => {
     const { address } = c.req.valid("param");
 
-    const result = await removeSpammer(address);
+    const result = await unmuteAccount(address);
 
     if (!result) {
       return c.json(
         {
-          message: "Spammer not found",
+          message: "Muted account not found",
         },
         404
       );

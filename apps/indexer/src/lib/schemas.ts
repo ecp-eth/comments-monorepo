@@ -13,47 +13,53 @@ export const GetAuthorParamsSchema = z.object({
 });
 
 /**
- * Response schema for resolving an author ENS / Farcaster data.
+ * Path params schema for unmuting an account.
  */
-export const DeleteSpammerParamSchema = z.object({
+export const DeleteMutedAccountParamSchema = z.object({
   address: HexSchema.openapi({
-    description: "The address of the spammer",
+    description: "The address of the muted account",
   }),
 });
 
 /**
- * Path params schema for checking if an address is marked as spammer.
+ * Path params schema for checking if an address is marked as muted.
  */
-export const GetSpammerParamSchema = z.object({
+export const GetMutedAccountParamSchema = z.object({
   address: HexSchema.openapi({
-    description: "The address of the spammer",
+    description: "The address of the muted account",
   }),
 });
 
-export const GetSpammerResponseSchema = z.object({
+/**
+ * Response schema for checking if an address is marked as muted.
+ */
+export const GetMutedAccountResponseSchema = z.object({
   address: HexSchema.openapi({
-    description: "The address of the spammer",
+    description: "The address of the muted account",
   }),
   createdAt: z.coerce.date().openapi({
-    description: "The date the spammer was added",
+    description: "The date the account was muted",
   }),
 });
 
 /**
- * Request body schema for marking an account as spammer.
+ * Request body schema for marking an account as muted.
  */
-export const PostSpammerBodySchema = z.object({
+export const PostMutedAccountBodySchema = z.object({
   address: HexSchema.openapi({
-    description: "The address of the spammer",
+    description: "The address of the muted account",
+  }),
+  reason: z.string().optional().openapi({
+    description: "The reason for muting the account",
   }),
 });
 
 /**
- * Response schema for marking an account as spammer.
+ * Response schema for marking an account as muted.
  */
-export const PostSpammerResponseSchema = z.object({
+export const PostMutedAccountResponseSchema = z.object({
   address: HexSchema.openapi({
-    description: "The address of the spammer",
+    description: "The address of the muted account",
   }),
 });
 

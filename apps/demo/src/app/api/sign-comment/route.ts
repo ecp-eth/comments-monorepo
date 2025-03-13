@@ -9,7 +9,7 @@ import { bigintReplacer } from "@/lib/utils";
 import {
   createCommentData,
   createCommentTypedData,
-  isSpammer,
+  isMuted,
 } from "@ecp.eth/sdk";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -64,14 +64,14 @@ export async function POST(
   }
 
   if (
-    await isSpammer({
+    await isMuted({
       address: author,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
     })
   ) {
     return new JSONResponse(
       BadRequestResponseSchema,
-      { author: ["Spammer"] },
+      { author: ["Muted"] },
       { status: 400 }
     );
   }

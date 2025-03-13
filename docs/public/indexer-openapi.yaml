@@ -521,32 +521,32 @@ paths:
                       - fid
                 required:
                   - address
-  /api/spam-accounts/{address}:
+  /api/muted-accounts/{address}:
     get:
       tags:
         - comments
-      description: Check if an address is marked as spammer
+      description: Check if an address is marked as muted
       parameters:
         - schema:
-            description: The address of the spammer
+            description: The address of the muted account
           required: true
           name: address
           in: path
       responses:
         '200':
-          description: When address is marked as spammer
+          description: When address is marked as muted
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   address:
-                    description: The address of the spammer
+                    description: The address of the muted account
                   createdAt:
                     type:
                       - string
                       - 'null'
-                    description: The date the spammer was added
+                    description: The date the account was muted
                 required:
                   - address
                   - createdAt
@@ -563,7 +563,7 @@ paths:
                 required:
                   - message
         '404':
-          description: When address is not marked as spammer
+          description: When address is not marked as muted
           content:
             application/json:
               schema:
@@ -578,17 +578,17 @@ paths:
       tags:
         - comments
       description: >-
-        Removes account from spammer list, newer comments from this account will
+        Removes account from muted list, newer comments from this account will
         be indexed
       parameters:
         - schema:
-            description: The address of the spammer
+            description: The address of the muted account
           required: true
           name: address
           in: path
       responses:
         '204':
-          description: When spammer was deleted from the list
+          description: When muted account was unmuted
         '400':
           description: When request is not valid
           content:
@@ -614,7 +614,7 @@ paths:
                 required:
                   - message
         '404':
-          description: When spammer was not found in the list
+          description: When muted account was not found in the list
           content:
             application/json:
               schema:
@@ -625,12 +625,12 @@ paths:
                     description: The error message
                 required:
                   - message
-  /api/spam-accounts:
+  /api/muted-accounts:
     post:
       tags:
         - comments
       description: >-
-        Marks account as spammer, newer comments from this account won't be
+        Marks account as muted, newer comments from this account won't be
         indexed
       requestBody:
         content:
@@ -639,19 +639,22 @@ paths:
               type: object
               properties:
                 address:
-                  description: The address of the spammer
+                  description: The address of the muted account
+                reason:
+                  type: string
+                  description: The reason for muting the account
               required:
                 - address
       responses:
         '200':
-          description: An object with author address and ENS and Farcaster data
+          description: An object with muted account address
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   address:
-                    description: The address of the spammer
+                    description: The address of the muted account
                 required:
                   - address
         '400':
@@ -679,7 +682,7 @@ paths:
                 required:
                   - message
         '409':
-          description: When account is already marked as spammer
+          description: When account is already marked as muted
           content:
             application/json:
               schema:

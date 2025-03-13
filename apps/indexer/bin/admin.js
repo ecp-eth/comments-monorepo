@@ -138,8 +138,8 @@ authAccount
     await db.destroy();
   });
 
-const spammers = new Command("spammers")
-  .description("Manage spammers")
+const mutedAccounts = new Command("muted-accounts")
+  .description("Manage muted accounts")
   .requiredOption("-i, --id <id>", "The ID of the API key to use")
   .requiredOption("-k, --private-key <key>", "The private key of the API key")
   .option(
@@ -149,12 +149,13 @@ const spammers = new Command("spammers")
     "https://api.ethcomments.xyz"
   );
 
-program.addCommand(spammers);
+program.addCommand(mutedAccounts);
 
-spammers
-  .command("add")
-  .description("Add a new spammer")
-  .argument("<address>", "The address of the spammer", (val) => {
+mutedAccounts
+  .command("mute")
+  .description("Mutes account")
+  .option("-r, --reason <reason>", "The reason for muting the account")
+  .argument("<address>", "The address of the account", (val) => {
     const parsed = HexSchema.safeParse(val);
 
     if (!parsed.success) {
@@ -164,17 +165,17 @@ spammers
     return parsed.data;
   })
   .action(async (address) => {
-    const { id, privateKey, url } = spammers.opts();
+    const { id, privateKey, url, reason } = mutedAccounts.opts();
 
     try {
-      const body = JSON.stringify({ address });
+      const body = JSON.stringify({ address, reason });
       const timestamp = Date.now().toString();
       const message = new TextEncoder().encode(
-        `POST/api/spam-accounts${timestamp}${body}`
+        `POST/api/muted-accounts${timestamp}${body}`
       );
       const signature = await signAsync(message, privateKey);
 
-      const response = await fetch(`${url}/api/spam-accounts`, {
+      const response = await fetch(`${url}/api/muted-accounts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -187,32 +188,32 @@ spammers
 
       if (!response.ok) {
         const error = await response.json();
-        console.error("Failed to add spammer:", error);
+        console.error("Failed to mute account:", error);
         process.exit(1);
       }
 
-      console.log("Successfully added spammer:", address);
+      console.log("Successfully muted account:", address);
     } catch (error) {
-      console.error("Failed to add spammer:", error);
+      console.error("Failed to mute account:", error);
       process.exit(1);
     }
   });
 
-spammers
-  .command("remove")
-  .description("Remove a spammer")
-  .argument("<address>", "The address of the spammer")
+mutedAccounts
+  .command("unmute")
+  .description("Unmutes account")
+  .argument("<address>", "The address of the muted account")
   .action(async (address) => {
-    const { id, privateKey, url } = spammers.opts();
+    const { id, privateKey, url } = mutedAccounts.opts();
 
     try {
       const timestamp = Date.now().toString();
       const message = new TextEncoder().encode(
-        `DELETE/api/spam-accounts/${address}${timestamp}`
+        `DELETE/api/muted-accounts/${address}${timestamp}`
       );
       const signature = await signAsync(message, privateKey);
 
-      const response = await fetch(`${url}/api/spam-accounts/${address}`, {
+      const response = await fetch(`${url}/api/muted-accounts/${address}`, {
         method: "DELETE",
         headers: {
           "X-API-Key": id,
@@ -223,13 +224,13 @@ spammers
 
       if (!response.ok) {
         const error = await response.json();
-        console.error("Failed to remove spammer:", error);
+        console.error("Failed to unmute account:", error);
         process.exit(1);
       }
 
-      console.log("Successfully removed spammer:", address);
+      console.log("Successfully unmuted account:", address);
     } catch (error) {
-      console.error("Failed to remove spammer:", error);
+      console.error("Failed to unmute account:", error);
       process.exit(1);
     }
   });
