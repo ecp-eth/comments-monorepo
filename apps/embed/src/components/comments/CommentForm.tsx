@@ -177,7 +177,7 @@ function CommentFormAuthor({ address }: { address: Hex }) {
 
       {openAccountModal && (
         <button
-          className="text-blue-500 text-xs"
+          className="text-account-edit-link text-xs"
           onClick={() => openAccountModal()}
           type="button"
         >
