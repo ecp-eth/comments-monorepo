@@ -72,6 +72,10 @@ interface CommentProps {
    * and user pressed retry.
    */
   onRetryPost: OnRetryPostComment;
+  /**
+   * Used to calculate relative time in comments.
+   */
+  currentTimestamp: number;
 }
 
 export function Comment({
@@ -80,6 +84,7 @@ export function Comment({
   onDelete,
   onPostSuccess,
   onRetryPost,
+  currentTimestamp,
 }: CommentProps) {
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
@@ -249,7 +254,11 @@ export function Comment({
   return (
     <div className="mb-4 border-l-2 border-muted pl-4">
       <div className="flex justify-between items-center mb-2">
-        <CommentAuthor author={comment.author} timestamp={comment.timestamp} />
+        <CommentAuthor
+          author={comment.author}
+          timestamp={comment.timestamp}
+          currentTimestamp={currentTimestamp}
+        />
         {isAuthor && !comment.pendingOperation && !comment.deletedAt && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -320,6 +329,7 @@ export function Comment({
           onDelete={handleCommentDeleted}
           onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
+          currentTimestamp={currentTimestamp}
         />
       ))}
       {repliesQuery.hasNextPage && (

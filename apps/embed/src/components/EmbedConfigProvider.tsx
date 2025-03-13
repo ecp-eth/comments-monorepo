@@ -4,10 +4,15 @@ import { createContext, useContext } from "react";
 
 export type Config = {
   targetUri: string;
+  /**
+   * Used to calculate relative time in comments.
+   */
+  currentTimestamp: number;
 };
 
 const configContext = createContext<Config>({
   targetUri: "",
+  currentTimestamp: Date.now(),
 });
 
 type EmbedConfigProviderProps = {

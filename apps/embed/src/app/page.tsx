@@ -20,7 +20,7 @@ const SearchParamsSchema = z.object({
           return JSON.parse(decompressFromURI(value));
         }
       } catch (err) {
-        console.warn('failed to parse config', err)
+        console.warn("failed to parse config", err);
       }
     }, EmbedConfigSchema)
     .optional(),
@@ -68,7 +68,9 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
         <main className="p-0 bg-background text-foreground font-default px-root-padding-horizontal py-root-padding-vertical">
           <div className="max-w-4xl mx-auto">
             <Providers>
-              <EmbedConfigProvider value={{ targetUri }}>
+              <EmbedConfigProvider
+                value={{ targetUri, currentTimestamp: Date.now() }}
+              >
                 <CommentSection
                   initialData={{
                     pages: [comments],
