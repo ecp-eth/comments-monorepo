@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import never from "never";
 import { CommentForm } from "./CommentForm";
-import { cn, formatDate, formatDateRelative } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
   Loader2Icon,
   MessageCircleWarningIcon,
@@ -43,11 +43,9 @@ import {
 import { Button } from "../ui/button";
 import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
 import { CommentText } from "./CommentText";
-import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
-import {
-  createQuotationFromComment,
-  getCommentAuthorNameOrAddress,
-} from "./helpers";
+import { createQuotationFromComment } from "./helpers";
+import { publicEnv } from "@/publicEnv";
+import { CommentAuthor } from "./CommentAuthor";
 
 export type OnDeleteComment = (id: Hex) => void;
 export type OnPostCommentSuccess = (transactionHash: Hex) => void;
@@ -129,8 +127,8 @@ export function Comment({
     refetchOnWindowFocus: false,
     queryFn: async ({ pageParam, signal }) => {
       const response = await fetchCommentReplies({
-        apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         offset: pageParam.offset,
         limit: pageParam.limit,
         commentId: comment.id,
@@ -251,15 +249,7 @@ export function Comment({
   return (
     <div className="mb-4 border-l-2 border-muted pl-4">
       <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2">
-          <CommentAuthorAvatar author={comment.author} />
-          <div className="text-xs text-muted-foreground">
-            {getCommentAuthorNameOrAddress(comment.author)} •{" "}
-            <span title={formatDate(comment.timestamp)}>
-              {formatDateRelative(comment.timestamp)}
-            </span>
-          </div>
-        </div>
+        <CommentAuthor author={comment.author} timestamp={comment.timestamp} />
         {isAuthor && !comment.pendingOperation && !comment.deletedAt && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

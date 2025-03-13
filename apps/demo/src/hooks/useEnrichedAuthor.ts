@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
  * Return author data enriched with ens and farcaster data (if they are not already provided)
  * @param author
  */
-export default function useEnrichedAuthor(author: AuthorType) {
+export default function useEnrichedAuthor(author: AuthorType): AuthorType {
   const { address } = author;
   const { data: authorData } = useQuery({
     queryKey: ["author", address],

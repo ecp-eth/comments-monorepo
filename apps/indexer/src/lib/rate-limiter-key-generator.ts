@@ -14,7 +14,5 @@ export function generateRateLimiterKey(c: Context): string {
 
   const key = `${connInfo.remote.address}:${connInfo.remote.port}:${c.req.header("User-Agent")}:${c.req.header("Accept-Language")}`;
 
-  console.log(key);
-
   return h64ToString(key);
 }

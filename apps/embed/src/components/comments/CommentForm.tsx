@@ -22,6 +22,7 @@ import { useTextAreaAutoVerticalResize } from "@/hooks/useTextAreaAutoVerticalRe
 import { useTextAreaAutoFocus } from "@/hooks/useTextAreaAutoFocus";
 import { useConnectAccount } from "@/hooks/useConnectAccount";
 import { useAccountModal } from "@rainbow-me/rainbowkit";
+import { publicEnv } from "@/publicEnv";
 
 export type OnSubmitSuccessFunction = (
   params: PendingCommentOperationSchemaType
@@ -160,7 +161,7 @@ function CommentFormAuthor({ address }: { address: Hex }) {
     queryFn: () => {
       return fetchAuthorData({
         address,
-        apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       });
     },
   });

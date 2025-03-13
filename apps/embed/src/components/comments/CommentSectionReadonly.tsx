@@ -11,6 +11,7 @@ import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { CommentByAuthor } from "./CommentByAuthor";
 import { NoCommentsScreen } from "../NoCommentsScreen";
+import { publicEnv } from "@/publicEnv";
 
 type CommentSectionReadonlyProps = {
   author: Hex;
@@ -36,8 +37,8 @@ export function CommentSectionReadonly({
       },
       queryFn: async ({ pageParam, signal }) => {
         const response = await fetchComments({
-          appSigner: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-          apiUrl: process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+          appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+          apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           author,
           limit: pageParam.limit,
           offset: pageParam.offset,
