@@ -22,8 +22,8 @@ import { useFreshRef } from "@/hooks/useFreshRef";
 import { PendingCommentOperationSchemaType } from "@/lib/schemas";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 import { publicEnv } from "@/publicEnv";
-import { renderCommentContent } from "@/lib/renderer";
 import { CommentAuthor } from "./CommentAuthor";
+import { CommentText } from "./CommentText";
 
 interface CommentProps {
   comment: CommentType;
@@ -103,8 +103,13 @@ export function Comment({
           </DropdownMenu>
         )}
       </div>
-      <div className={cn("mb-2", comment.deletedAt && "text-muted-foreground")}>
-        {renderCommentContent(comment.content)}
+      <div
+        className={cn(
+          "mb-2 break-all",
+          comment.deletedAt && "text-muted-foreground"
+        )}
+      >
+        <CommentText text={comment.content} />
       </div>
       {connectedAddress && (
         <div className="text-xs text-gray-500 mb-2">

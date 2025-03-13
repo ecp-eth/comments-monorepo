@@ -1,0 +1,2 @@
+export const TRUNCATE_COMMENT_LENGTH = 200;
+export const TRUNCATE_COMMENT_LINES = 5;

@@ -28,7 +28,7 @@ import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 import { Hex } from "@ecp.eth/sdk/schemas";
 import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "../CommentAuthor";
-import { renderCommentContent } from "@/lib/renderer";
+import { CommentText } from "../CommentText";
 
 async function gaslessDeleteComment(
   params: PrepareGaslessCommentDeletionRequestBodySchemaType
@@ -211,8 +211,13 @@ export function CommentGasless({
           </DropdownMenu>
         )}
       </div>
-      <div className={cn("mb-2", comment.deletedAt && "text-muted-foreground")}>
-        {renderCommentContent(comment.content)}
+      <div
+        className={cn(
+          "mb-2 break-all",
+          comment.deletedAt && "text-muted-foreground"
+        )}
+      >
+        <CommentText text={comment.content} />
       </div>
       {connectedAddress && (
         <div className="text-xs text-gray-500 mb-2">
