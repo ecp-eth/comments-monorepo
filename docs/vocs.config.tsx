@@ -56,8 +56,16 @@ export default defineConfig({
                   link: "/integration-options/contract-interactions/post-as-author",
                 },
                 {
+                  text: "Post comment (app pays gas)",
+                  link: "/integration-options/contract-interactions/post-as-gas-covered",
+                },
+                {
                   text: "Post comment in transaction",
                   link: "/integration-options/contract-interactions/post-in-any-transaction",
+                },
+                {
+                  text: "Request Prior Approval",
+                  link: "/integration-options/contract-interactions/request-prior-approval",
                 },
               ],
             },

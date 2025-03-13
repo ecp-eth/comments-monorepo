@@ -1,0 +1,334 @@
+# Integration Options
+
+## Contract Interaction
+
+### Post comment with gas paid by the app
+
+In certain situations, you may want to offer a gasless experience to your users where your app pays for the gas fees. This is useful for:
+
+- Reducing friction for new users
+- Providing a better user experience
+- Supporting users who don't have ETH for gas
+- Testing and development environments
+
+In this document we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of posting a comment with gas covered by the app server.
+
+### How it works
+
+The user can choose between grant permission to the app upfront, or approve and sign the transaction on each action.
+
+- The detailed flow charts can be found in the [Post Comment Flows](http://localhost:3004/post-comment-flows#2-gasless-transaction-submitter-pays-gas).
+- For how to request and prior permission and approval, see [Request Prior Approval](/integration-options/contract-interactions/request-prior-approval).
+
+Assuming the user has already granted permission, the flow is straightforward:
+
+1. The author collects the required comment data and sends it to the app server
+1. The app server then signs the comment data using the app signer's private key, this produce `appSignature`.
+1. Post the comment by calling `postComment` method on the contract with above `appSignature`.
+
+However if the user has not granted permission, the flow will be slightly more complicatd:
+
+1. The author creates a comment and sends it to the app server
+1. The app server signs the comment data
+1. The author also signs the comment data with their wallet
+1. The author post back the signed comment data to app server
+1. The app server submits and pays for the transaction
+
+For dependencies and test environment setup, please refer to previous [examples in this section](/integration-options/contract-interactions). For detailed explanation of the flow, see the [Post Comment Flows](/post-comment-flows#4-appending-comment-to-a-transaction-author-pays-gas).
+
+### Prior Approved User
+
+Now let's illustrate the steps for the case when the user has already granted permission.
+
+::::steps
+
+#### Collect comment data and request app signature
+
+First, the client collects the required [comment data](/comment-data-props) and send it to the app server:
+
+```typescript
+return prepareSignedGaslessComment(
+  // tell the server to submit right away after preparation of the comment data,
+  // if the app is previously approved
+  true,
+  {
+    content,
+    targetUri: window.location.href,
+    parentId,
+    author: address,
+  }
+);
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx#L100-L110)_
+
+The `prepareSignedGaslessComment` function sends the comment data to server side:
+
+```typescript
+const response = await fetch("/api/sign-comment/gasless/prepare", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    ...body,
+    submitIfApproved,
+  } satisfies PrepareSignedGaslessCommentRequestBodySchemaType),
+});
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx#L51-L60)_
+
+_Although `prepareSignedGaslessComment` is named with `prepare`, it also submits the transaction right away if the app is previously approved._
+
+#### App server signs the comment data
+
+The server then creates and signs the comment data like always:
+
+```typescript
+const commentData = createCommentData({
+  content,
+  targetUri,
+  parentId,
+  author,
+  appSigner: account.address,
+});
+```
+
+🧑‍💻 _[/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts#L57-L63)_
+
+Create the typed data according to the [EIP-712](https://eips.ethereum.org/EIPS/eip-712) standard, and sign it with the app's private key:
+
+```typescript
+const typedCommentData = createCommentTypedData({
+  commentData,
+  chainId: chain.id,
+});
+
+const signature = await account.signTypedData(typedCommentData);
+```
+
+🧑‍💻 _[/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts#L65-L71)_
+
+#### (Optional) Ensure the app signer is indeed approved by the user
+
+You may want to double check to ensure the app signer is indeed approved by the user.
+This is an optimisation step to avoid wasting gas on a transaction that will be reverted.
+
+```typescript
+const isApproved = await walletClient.readContract({
+  address: COMMENTS_V1_ADDRESS,
+  abi: CommentsV1Abi,
+  functionName: "isApproved",
+  args: [author, account.address],
+});
+```
+
+if `isApproved` is `false`, you can fail the action early with an appropriate http error.
+
+🧑‍💻 _[/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts#L82-L87)_
+
+#### App server submits the signed comment data
+
+Finally, call `postComment` on the contract to post the comment, with the app signature:
+
+```typescript
+const txHash = await walletClient.writeContract({
+  abi: CommentsV1Abi,
+  address: COMMENTS_V1_ADDRESS,
+  functionName: "postComment",
+  args: [commentData, "0x", signature],
+});
+```
+
+🧑‍💻 _[/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts#L82-L87)_
+
+The 2nd parameter `0x` tells the contract that there is no author signature.
+
+#### Wait for the transaction to be confirmed
+
+Once the transaction is submitted, you can wait for it to be confirmed. In the demo app this is done on the client side:
+
+```typescript
+const { data: receipt, isLoading: isReceiptLoading } =
+  useWaitForTransactionReceipt({
+    hash: submitMutation.data?.txHash,
+  });
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx#L183-L186)_
+
+#### That's it for prior approved user!
+
+::::
+
+### User has not granted approval (user approves on each action)
+
+Now let's go through the steps when the user has not priorly approved.
+
+::::steps
+
+#### Collect comment data and request app signature
+
+Same as always, get user comment and post it to app server:
+
+```typescript
+const data = await prepareSignedGaslessComment(false, {
+  content,
+  targetUri: window.location.href,
+  parentId,
+  author: address,
+});
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx#L122C1-L127C10)_
+
+#### App server create comment data and signs
+
+Simliar to the previous section, the app server will create the comment data and sign it:
+
+```typescript
+const commentData = createCommentData({
+  content,
+  targetUri,
+  parentId,
+  author,
+  appSigner: account.address,
+});
+
+const typedCommentData = createCommentTypedData({
+  commentData,
+  chainId: chain.id,
+});
+
+const signature = await account.signTypedData(typedCommentData);
+```
+
+🧑‍💻 _[/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts#L57C3-L70C67)_
+
+What's the difference is that the app server will not proceed ahead and submit the transaction.
+Because the user previously did not approve the app, we will need the author to sign the comment data,
+then post the signed comment back to the app server.
+
+#### Author signs the comment data
+
+The signing of the comment data is automatically handled by the `useGaslessTransaction` hook:
+
+```typescript
+const postPriorNotApprovedSubmitMutation = useGaslessTransaction({
+  // ...
+});
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx#L116C1-L116C69)_
+
+The hook is a helper function that help you to repeat the pattern of `prepare typed data` → `sign typed data` → `submit transaction`.
+By default it also automatically invokes `wagmi`'s `signTypedData` to sign the typed data returned from `prepareSignTypedDataParams`.
+
+Feel free to reuse the helper function to implement your own signing logic.
+
+#### Author post back the signed comment data to app server
+
+The app server will then submit the signed comment data to the contract:
+
+```typescript
+const response = await fetch("/api/sign-comment/gasless", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(
+    {
+      ...variables,
+      authorSignature: signature,
+    },
+    bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+  ),
+});
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx#L139-L151)_
+
+#### App server submits the signed comment data
+
+In case of attacker utilise the endpoint to drain the gas, you may want to double check the app signature is valid before submitting the transaction:
+
+```typescript
+// Check that signature is from the app signer
+const appSigner = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+
+// Can be any account with funds for gas on desired chain
+const submitterAccount = await resolveSubmitterAccount();
+
+const walletClient = createWalletClient({
+  account: submitterAccount,
+  chain,
+  transport,
+}).extend(publicActions);
+
+const isAppSignatureValid = await walletClient.verifyTypedData({
+  ...signTypedDataParams,
+  signature: appSignature,
+  address: appSigner.address,
+});
+
+if (!isAppSignatureValid) {
+  console.log("verifying app signature failed", {
+    ...signTypedDataParams,
+    signature: appSignature,
+    address: appSigner.address,
+  });
+
+  return new JSONResponse(
+    BadRequestResponseSchema,
+    { signature: ["Invalid app signature"] },
+    { status: 400 }
+  );
+}
+```
+
+🧑‍💻 _[/apps/demo/src/app/api/sign-comment/gasless/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/gasless/route.ts#L42C1-L74C4)_
+
+Now, let's finally submit the transaction to the chain:
+
+```typescript
+const txHash = await walletClient.writeContract({
+  abi: CommentsV1Abi,
+  address: COMMENTS_V1_ADDRESS,
+  functionName: "postComment",
+  args: [
+    {
+      appSigner: signTypedDataParams.message.appSigner,
+      author: signTypedDataParams.message.author,
+      content: signTypedDataParams.message.content,
+      metadata: signTypedDataParams.message.metadata,
+      parentId: signTypedDataParams.message.parentId,
+      targetUri: signTypedDataParams.message.targetUri,
+      deadline: signTypedDataParams.message.deadline,
+      salt: signTypedDataParams.message.salt,
+    },
+    authorSignature,
+    appSignature,
+  ],
+});
+```
+
+🧑‍💻 _[/apps/demo/src/app/api/sign-comment/gasless/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/gasless/route.ts#L77-L95)_
+
+#### All done!
+
+::::
+
+### Best Practices
+
+1. Implement proper error handling for both client and server
+2. Monitor gas costs and implement rate limiting
+3. Keep the app signer's private key secure
+4. Consider implementing anti-spam measures
+5. Add proper validation for comment content and target URIs
+
+#### Next Steps
+
+- Learn about [pre-approved gasless posting](/post-comment-flows#2-app-pays-gas-pre-approved)
+- See [Protocol API Reference](/protocol-reference/CommentsV1) for more details
+- Check out the [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo)
