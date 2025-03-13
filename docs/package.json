@@ -21,6 +21,7 @@
     "@theguild/remark-mermaid": "^0.2.0",
     "acorn": "^8.14.0",
     "hono": "^4.6.20",
+    "lucide-react": "^0.474.0",
     "react": "~19.0.0",
     "react-dom": "~19.0.0",
     "remark-codesandbox": "^0.10.1",

@@ -369,6 +369,9 @@ importers:
       hono:
         specifier: ^4.6.20
         version: 4.6.20
+      lucide-react:
+        specifier: ^0.474.0
+        version: 0.474.0(react@19.0.0)
       react:
         specifier: ~19.0.0
         version: 19.0.0
