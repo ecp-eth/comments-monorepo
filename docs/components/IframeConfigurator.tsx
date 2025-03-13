@@ -211,7 +211,7 @@ export default function IframeConfigurator() {
             type="text"
             value={uri}
             onChange={(e) => setUri(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
             placeholder="https://example.com"
           />
         </div>
@@ -228,7 +228,7 @@ export default function IframeConfigurator() {
             type="text"
             value={embedUri}
             onChange={(e) => setEmbedUri(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
             placeholder="https://embed.ethcomments.xyz"
           />
         </div>
@@ -252,7 +252,7 @@ export default function IframeConfigurator() {
                 },
               }))
             }
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
           >
             <option>Auto</option>
             <option value="light">Light</option>
@@ -261,8 +261,8 @@ export default function IframeConfigurator() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Light Theme Colors</h3>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-md font-medium">Light Theme Colors</h3>
             {COLOR_FIELDS.map(({ key, label }) => (
               <div key={`light-${key}`}>
                 <label
@@ -284,8 +284,8 @@ export default function IframeConfigurator() {
             ))}
           </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Dark Theme Colors</h3>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-md font-medium">Dark Theme Colors</h3>
             {COLOR_FIELDS.map(({ key, label }) => (
               <div key={`dark-${key}`}>
                 <label
@@ -308,8 +308,8 @@ export default function IframeConfigurator() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Font Settings</h3>
+        <div className="flex flex-col gap-4">
+          <h3 className="text-md font-medium">Font Settings</h3>
 
           <div>
             <label
@@ -330,7 +330,7 @@ export default function IframeConfigurator() {
                   type === "system" ? "Geist, Arial, Helvetica, sans-serif" : ""
                 );
               }}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
             >
               <option value="system">System Font</option>
               <option value="google">Google Font</option>
@@ -351,7 +351,7 @@ export default function IframeConfigurator() {
                 id="google-font-input"
                 value={config.theme?.font?.fontFamily?.google || ""}
                 onChange={(e) => updateFontFamily("google", e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
               >
                 <option value="">Select a font</option>
                 {Object.values(EmbedConfigSupportedFont.enum).map((font) => (
@@ -378,13 +378,13 @@ export default function IframeConfigurator() {
                 type="text"
                 value={config.theme?.font?.fontFamily?.system || ""}
                 onChange={(e) => updateFontFamily("system", e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
                 placeholder="Geist, Arial, Helvetica, sans-serif"
               />
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <h4 className="text-md font-medium">Font Sizes</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {FONT_SIZE_FIELDS.map(({ key, label }) => (
@@ -405,7 +405,7 @@ export default function IframeConfigurator() {
                         onChange={(e) =>
                           updateFontSize(key, "size", e.target.value)
                         }
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
                         placeholder="1rem"
                       />
                     </div>
@@ -425,7 +425,7 @@ export default function IframeConfigurator() {
                         onChange={(e) =>
                           updateFontSize(key, "lineHeight", e.target.value)
                         }
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
                         placeholder="1.5"
                       />
                     </div>
@@ -436,8 +436,8 @@ export default function IframeConfigurator() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Other Settings</h3>
+        <div className="flex flex-col gap-4">
+          <h3 className="text-md font-medium">Other Settings</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {OTHER_FIELDS.map(({ key, label }) => (
               <div key={key}>
@@ -452,7 +452,7 @@ export default function IframeConfigurator() {
                   type="text"
                   value={config.theme?.other?.[key] || ""}
                   onChange={(e) => updateOther(key, e.target.value)}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
                   placeholder="0.5rem"
                 />
               </div>
@@ -461,13 +461,13 @@ export default function IframeConfigurator() {
         </div>
       </div>
 
-      <div className="border rounded-lg p-4">
-        <h3 className="text-lg font-medium !mb-4">Generated URL</h3>
+      <div className="border border-iframe-configurator-section-border rounded-iframe-configurator-section p-4">
+        <h3 className="text-md font-medium !mb-4">Generated URL</h3>
         <GeneratedURL config={debouncedConfig} embedUri={embedUri} uri={uri} />
       </div>
 
-      <div className="border rounded-lg p-4">
-        <h3 className="text-lg font-medium !mb-4">Preview</h3>
+      <div className="border border-iframe-configurator-section-border rounded-iframe-configurator-section p-4">
+        <h3 className="text-md font-medium !mb-4">Preview</h3>
         <CommentsEmbedPreview
           embedUri={embedUri}
           uri={uri}
@@ -511,7 +511,7 @@ function GeneratedURL({
           type="text"
           readOnly
           value={url}
-          className="flex-1 p-2 border rounded bg-gray-50 cursor-pointer"
+          className="flex-1 p-2 border rounded cursor-pointer text-input-text bg-input border-input-border"
           onClick={copyToClipboard}
         />
         <button
