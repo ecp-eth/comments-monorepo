@@ -1,0 +1,67 @@
+import IframeConfigurator from "../../components/IframeConfigurator";
+
+# Integration Options
+
+## Iframe Embedding
+
+The iframe embedding option allows you to integrate comments into any website without requiring React or any other JavaScript framework. This is ideal for static websites or platforms where you can't modify the JavaScript code.
+
+### Using the Configurator
+
+The configurator below provides a visual interface to customize your comments section. You can:
+
+1. Enter your page URI
+2. Customize the appearance using the visual controls
+3. Copy the generated iframe code
+4. See a live preview of how your comments will look
+
+<IframeConfigurator />
+
+### Basic Implementation
+
+After configuring your comments section using the configurator above, you'll get a code snippet that looks like this:
+
+```html
+<iframe
+  src="https://embed.ethcomments.xyz?uri=YOUR_PAGE_URI&config=YOUR_CONFIG"
+  style="width: 100%; height: 600px; border: none;"
+  title="Comments"
+></iframe>
+```
+
+### URI Guidelines
+
+When entering your page URI in the configurator, follow these guidelines:
+
+- Must be a valid URL following [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986)
+- Include query parameters that affect page content
+- Arrange query parameters alphabetically
+- Ensure the URI uniquely identifies the content being commented on
+
+### Dynamic Height Support
+
+If you want the iframe to automatically adjust its height based on content, add this JavaScript code:
+
+```html
+<script>
+  window.addEventListener("message", function (event) {
+    if (event.origin === "https://embed.ethcomments.xyz") {
+      if (event.data.type === "@ecp.eth/sdk/embed/resize") {
+        document.getElementById("comments-iframe").style.height =
+          event.data.height + "px";
+      }
+    }
+  });
+</script>
+```
+
+### Security Best Practices
+
+- Always use HTTPS for the iframe source
+- Consider adding `sandbox` attribute if you need to restrict iframe capabilities
+- Verify the origin of resize messages as shown in the dynamic height example
+
+### Next Steps
+
+- Check out how to retrieve comments and replies using [indexer API](/integration-options/indexer-api)
+- Learn about [React Component Library](/integration-options/react-component-library) for React applications

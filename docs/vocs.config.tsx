@@ -41,6 +41,10 @@ export default defineConfig({
           text: "Integration Options",
           items: [
             {
+              text: "Embed Comments",
+              link: "/integration-options/embed-comments",
+            },
+            {
               text: "React Component Library",
               link: "/integration-options/react-component-library",
             },
