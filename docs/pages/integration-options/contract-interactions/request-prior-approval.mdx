@@ -1,0 +1,175 @@
+# Integration Options
+
+## Contract Interaction
+
+### Request Approval
+
+Requesting prior approval for a contract interaction allows the app to post/delete comments on behalf of the user,
+without the need for the user to sign each transaction.
+
+This delivers a smoother frictionless user experience and reduce the barrier for the user to interact with the app.
+
+The steps are fairly straightforward as follows:
+
+1. generate typed approval data
+1. author signs the approval data
+1. somebody submits the approval data with the author's signature to blockchain
+
+### Who pays for the gas?
+
+It is up to you to choose who pays for the gas and make the transaction. However, if you do want to cover the gas for the users,
+ensure there are measures in place to prevent somebody from draining the balance of the app signer. A few options are:
+
+1. Make the users pay a small amount of price to create a barrier to spammers and prove their intent is genuine.
+1. Use activity data of the author's address to ensure their credibility.
+1. Use a trusted party to score the author's address.
+
+Now let's look at the code implementation in the demo app:
+
+::::steps
+
+#### App server checks if user has already granted approval
+
+The demo app check the user approval on the `/api/approval` endpoint:
+
+```typescript
+// Check approval on chain and get nonce (multicall3 if available, otherwise read contracts)
+const [{ result: isApproved }, { result: nonce }] = chain.contracts?.multicall3
+  ? await publicClient.multicall({
+      contracts: [
+        {
+          address: COMMENTS_V1_ADDRESS,
+          abi: CommentsV1Abi,
+          functionName: "isApproved",
+          args: [authorAddress, account.address],
+        },
+        {
+          address: COMMENTS_V1_ADDRESS,
+          abi: CommentsV1Abi,
+          functionName: "nonces",
+          args: [authorAddress, account.address],
+        },
+      ],
+    })
+  : (
+      await Promise.all([
+        publicClient.readContract({
+          address: COMMENTS_V1_ADDRESS,
+          abi: CommentsV1Abi,
+          functionName: "isApproved",
+          args: [authorAddress, account.address],
+        }),
+        publicClient.readContract({
+          address: COMMENTS_V1_ADDRESS,
+          abi: CommentsV1Abi,
+          functionName: "nonces",
+          args: [authorAddress, account.address],
+        }),
+      ])
+    ).map((result) => ({ result }));
+```
+
+🧑‍💻 _[/apps/demo/src/app/api/approval/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/approval/route.ts#L61-L94)_
+
+In above code snippet some optimization was done:
+
+- It also retrieve the nonce which will be used later.
+- If the chain supports [`multicall3`](https://github.com/EthereumClassicDAO/multicall3) it calls mulitple functions of the same contract in one shot to avoid roundtrips.
+
+#### Construct approval data
+
+The app server constructs the approval data and return it to the client:
+
+```typescript
+// Construct approval data
+const typedApprovalData = createApprovalTypedData({
+  author: authorAddress,
+  appSigner: account.address,
+  chainId: chain.id,
+  nonce: nonce as bigint,
+});
+```
+
+🧑‍💻 _[/apps/demo/src/app/api/approval/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/approval/route.ts#L112-L119)_
+
+#### Author signs the approval data
+
+The author gets the typed approval data returned from server, then signs the approval data,
+in the demo app this is done via the [`useGaslessTransaction`](/sdk-reference/react/functions/useGaslessTransaction) hook:
+
+```typescript
+const approveGaslessTransactionsMutation = useGaslessTransaction({
+  async prepareSignTypedDataParams() {
+    if (!getApprovalQuery.data) {
+      throw new Error("No approval data found");
+    }
+
+    if (getApprovalQuery.data.approved) {
+      throw new Error("Already approved");
+    }
+
+    return {
+      signTypedDataParams: getApprovalQuery.data
+        .signTypedDataParams as unknown as SignTypedDataParameters,
+      variables: getApprovalQuery.data,
+    };
+  },
+  // ...
+});
+```
+
+Then the author posts back the signed approval data to the app server.
+
+```typescript
+const approveGaslessTransactionsMutation = useGaslessTransaction({
+  // ...
+  async sendSignedData({ signature, variables }) {
+    const response = await fetch("/api/approval", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(
+        {
+          ...variables,
+          authorSignature: signature,
+        },
+        bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+      ),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to post approval signature");
+    }
+
+    return ChangeApprovalStatusResponseSchema.parse(await response.json())
+      .txHash;
+  },
+});
+```
+
+#### The server submits the transaction and pay for the gas
+
+The server finally submits the transaction to the blockchain and pay for the gas.
+Note that the nonce previously retrieved is also included in the transaction data:
+
+```typescript
+const txHash = await walletClient.writeContract({
+  abi: CommentsV1Abi,
+  address: COMMENTS_V1_ADDRESS,
+  functionName: "addApproval",
+  args: [
+    signTypedDataParams.message.author,
+    signTypedDataParams.message.appSigner,
+    signTypedDataParams.message.nonce,
+    signTypedDataParams.message.deadline,
+    authorSignature,
+  ],
+});
+```
+
+🧑‍💻 _[/apps/demo/src/app/api/approval/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/approval/route.ts#L191-L202)_
+
+#### Congrats! You are all set!
+
+::::

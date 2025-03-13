@@ -26,7 +26,7 @@ Assuming the user has already granted permission, the flow is straightforward:
 1. The app server then signs the comment data using the app signer's private key, this produce `appSignature`.
 1. Post the comment by calling `postComment` method on the contract with above `appSignature`.
 
-However if the user has not granted permission, the flow will be slightly more complicatd:
+However, if the user has not granted permission, the flow will be slightly more complicated:
 
 1. The author creates a comment and sends it to the app server
 1. The app server signs the comment data
@@ -44,7 +44,7 @@ Now let's illustrate the steps for the case when the user has already granted pe
 
 #### Collect comment data and request app signature
 
-First, the client collects the required [comment data](/comment-data-props) and send it to the app server:
+First, the client collects the required [comment data](/comment-data-props) and sends it to the app server:
 
 ```typescript
 return prepareSignedGaslessComment(
@@ -206,13 +206,13 @@ const signature = await account.signTypedData(typedCommentData);
 
 🧑‍💻 _[/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts#L57C3-L70C67)_
 
-What's the difference is that the app server will not proceed ahead and submit the transaction.
-Because the user previously did not approve the app, we will need the author to sign the comment data,
+The difference is that the app server will not proceed to submit the transaction.
+Since the user has not previously approved the app, we will need the author to sign the comment data,
 then post the signed comment back to the app server.
 
 #### Author signs the comment data
 
-The signing of the comment data is automatically handled by the `useGaslessTransaction` hook:
+The signing of the comment data is automatically handled by the [`useGaslessTransaction`](/sdk-reference/react/functions/useGaslessTransaction) hook:
 
 ```typescript
 const postPriorNotApprovedSubmitMutation = useGaslessTransaction({
@@ -251,7 +251,7 @@ const response = await fetch("/api/sign-comment/gasless", {
 
 #### App server submits the signed comment data
 
-In case of attacker utilise the endpoint to drain the gas, you may want to double check the app signature is valid before submitting the transaction:
+In case an attacker tries to utilize the endpoint to drain gas, you may want to double check that the app signature is valid before submitting the transaction:
 
 ```typescript
 // Check that signature is from the app signer
