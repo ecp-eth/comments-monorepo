@@ -264,13 +264,7 @@ export default function IframeConfigurator() {
           <div className="flex flex-col gap-4">
             <h3 className="text-md font-medium">Light Theme Colors</h3>
             {COLOR_FIELDS.map(({ key, label }) => (
-              <div key={`light-${key}`}>
-                <label
-                  className="block text-sm font-medium mb-1"
-                  htmlFor={`light-${key}-input`}
-                >
-                  {label}
-                </label>
+              <div className="flex gap-2 items-center" key={`light-${key}`}>
                 <input
                   id={`light-${key}-input`}
                   type="color"
@@ -278,8 +272,14 @@ export default function IframeConfigurator() {
                   onChange={(e) =>
                     updateThemeColor("light", key, e.target.value)
                   }
-                  className="w-full h-10"
+                  className="w-8 h-8 cursor-pointer"
                 />
+                <label
+                  className="block text-sm font-medium mb-1"
+                  htmlFor={`light-${key}-input`}
+                >
+                  {label}
+                </label>
               </div>
             ))}
           </div>
@@ -287,13 +287,7 @@ export default function IframeConfigurator() {
           <div className="flex flex-col gap-4">
             <h3 className="text-md font-medium">Dark Theme Colors</h3>
             {COLOR_FIELDS.map(({ key, label }) => (
-              <div key={`dark-${key}`}>
-                <label
-                  className="block text-sm font-medium mb-1"
-                  htmlFor={`dark-${key}-input`}
-                >
-                  {label}
-                </label>
+              <div className="flex gap-2 items-center" key={`dark-${key}`}>
                 <input
                   id={`dark-${key}-input`}
                   type="color"
@@ -301,8 +295,14 @@ export default function IframeConfigurator() {
                   onChange={(e) =>
                     updateThemeColor("dark", key, e.target.value)
                   }
-                  className="w-full h-10"
+                  className="w-8 h-8 cursor-pointer"
                 />
+                <label
+                  className="block text-sm font-medium mb-1"
+                  htmlFor={`dark-${key}-input`}
+                >
+                  {label}
+                </label>
               </div>
             ))}
           </div>
