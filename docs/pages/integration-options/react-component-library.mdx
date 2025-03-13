@@ -44,6 +44,7 @@ export function Comments() {
 ```
 
 - Please note that if you are rendering the `CommentsEmbed` with server-side rendering (SSR), you do not have access to the `window` object.
+  Instead, you may want to construct the `uri` out of the `HttpRequest` object of your server-side framework.
 - Please also read the `targetUri` carefully in [Comment Data](/comment-data-props) for choosing an appropriate `uri`.
 
 #### API reference
