@@ -1,2 +1,4 @@
+export const COMMENTS_PER_PAGE = 2;
+export const MAX_INITIAL_REPLIES_ON_PARENT_COMMENT = 2;
 export const TRUNCATE_COMMENT_LENGTH = 200;
 export const TRUNCATE_COMMENT_LINES = 5;

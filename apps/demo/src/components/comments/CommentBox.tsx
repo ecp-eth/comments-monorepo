@@ -2,22 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import {
-  useAccount,
-  useSwitchChain,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useEffect, useRef, useState } from "react";
+import { useAccount, useSwitchChain, useWriteContract } from "wagmi";
 import { chain } from "../../lib/wagmi";
-import {
-  BadRequestResponseSchema,
-  type PendingCommentOperationSchemaType,
-  SignCommentRequestBodySchema,
-  SignCommentResponseSchema,
-} from "@/lib/schemas";
-import { useFreshRef } from "@/hooks/useFreshRef";
+import { type PendingCommentOperationSchemaType } from "@/lib/schemas";
 import {
   postCommentAsAuthorViaCommentsV1,
   postCommentViaYoink,
@@ -26,21 +14,30 @@ import { publicEnv } from "@/publicEnv";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { useConnectAccount } from "@/hooks/useConnectAccount";
 import { z } from "zod";
-import { InvalidCommentError, RateLimitedError } from "./errors";
+import { InvalidCommentError } from "./errors";
 import { CommentFormErrors } from "./CommentFormErrors";
+import { submitCommentMutationFunction } from "./queries";
+import type { OnSubmitCommentSuccessFunction } from "./types";
+import { useFreshRef } from "@/hooks/useFreshRef";
 
 interface CommentBoxProps {
-  onSubmit: (pendingComment: PendingCommentOperationSchemaType) => void;
+  /**
+   * Called when user blurred text area with empty content
+   */
+  onLeftEmpty?: () => void;
   placeholder?: string;
   parentId?: Hex;
+  onSubmitSuccess: OnSubmitCommentSuccessFunction;
 }
 
 export function CommentBox({
-  onSubmit,
   placeholder = "What are your thoughts?",
   parentId,
+  onSubmitSuccess,
+  onLeftEmpty,
 }: CommentBoxProps) {
-  const onSubmitRef = useFreshRef(onSubmit);
+  const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const connectAccount = useConnectAccount();
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
@@ -50,81 +47,50 @@ export function CommentBox({
     "idle"
   );
 
-  const submitMutation = useMutation({
+  const submitCommentMutation = useMutation({
     mutationFn: async (
       formData: FormData
     ): Promise<PendingCommentOperationSchemaType | undefined> => {
       try {
         const address = await connectAccount();
 
-        if (!content.trim()) {
-          return;
-        }
-
-        const chainId = chain.id;
         const submitAction = formData.get("action") as "post" | "yoink";
 
         setFormState(submitAction === "post" ? "posting" : "yoinking");
 
-        await switchChainAsync({ chainId });
-
-        const response = await fetch("/api/sign-comment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const result = await submitCommentMutationFunction({
+          address,
+          commentRequest: {
+            chainId: chain.id,
+            content,
+            targetUri: window.location.href,
+            parentId,
           },
-          body: JSON.stringify(
-            SignCommentRequestBodySchema.parse({
-              content,
-              targetUri: window.location.href,
-              parentId,
-              author: address,
-              chainId,
-            })
-          ),
-        });
-
-        if (!response.ok) {
-          if (response.status === 429) {
-            throw new RateLimitedError();
-          }
-
-          if (response.status === 400) {
-            throw new InvalidCommentError(
-              BadRequestResponseSchema.parse(await response.json())
-            );
-          }
-
-          throw new Error("Failed to sign comment");
-        }
-
-        const signCommentResponse = SignCommentResponseSchema.parse(
-          await response.json()
-        );
-        const { data: commentData, signature: appSignature } =
-          signCommentResponse;
-        const txHash =
-          submitAction === "yoink"
-            ? await postCommentViaYoink(
+          switchChainAsync(chainId) {
+            return switchChainAsync({ chainId });
+          },
+          writeContractAsync(params) {
+            if (submitAction === "yoink") {
+              return postCommentViaYoink(
                 {
-                  commentData,
-                  appSignature,
-                },
-                writeContractAsync
-              )
-            : await postCommentAsAuthorViaCommentsV1(
-                {
-                  commentData,
-                  appSignature,
+                  appSignature: params.signature,
+                  commentData: params.data,
                 },
                 writeContractAsync
               );
+            }
 
-        return {
-          chainId,
-          txHash,
-          response: signCommentResponse,
-        };
+            return postCommentAsAuthorViaCommentsV1(
+              {
+                appSignature: params.signature,
+                commentData: params.data,
+              },
+              writeContractAsync
+            );
+          },
+        });
+
+        return result;
       } catch (e) {
         if (e instanceof z.ZodError) {
           throw new InvalidCommentError(
@@ -137,38 +103,46 @@ export function CommentBox({
         setFormState("idle");
       }
     },
+    onSuccess(params) {
+      setContent("");
+      submitCommentMutation.reset();
+      onSubmitSuccessRef.current(params);
+    },
   });
 
-  const { data: receipt, isLoading: isReceiptLoading } =
-    useWaitForTransactionReceipt({
-      hash: submitMutation.data?.txHash,
-    });
-
   useEffect(() => {
-    if (receipt?.status === "success" && submitMutation.data) {
-      toast.success("Comment posted");
-      onSubmitRef.current?.(submitMutation.data);
-      setContent("");
+    if (submitCommentMutation.error instanceof InvalidCommentError) {
+      textAreaRef.current?.focus();
     }
-  }, [receipt?.status, onSubmitRef, submitMutation.data]);
+  }, [submitCommentMutation.error]);
 
-  const isLoading = isReceiptLoading || submitMutation.isPending;
-  const submitDisabled = isLoading || !content.trim();
+  const isSubmitting = submitCommentMutation.isPending;
+  const trimmedContent = content.trim();
+  const isContentValid = trimmedContent.length > 0;
 
   return (
-    <form action={submitMutation.mutate} className="mb-4 flex flex-col gap-2">
+    <form
+      action={submitCommentMutation.mutate}
+      className="mb-4 flex flex-col gap-2"
+    >
       <Textarea
+        onBlur={() => {
+          if (!content && !isSubmitting) {
+            onLeftEmpty?.();
+          }
+        }}
         name="comment"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder}
         className="w-full p-2 border border-gray-300 rounded"
-        disabled={isLoading}
+        disabled={isSubmitting}
         required
+        ref={textAreaRef}
       />
       {address && <CommentBoxAuthor address={address} />}
-      {submitMutation.error && (
-        <CommentFormErrors error={submitMutation.error} />
+      {submitCommentMutation.error && (
+        <CommentFormErrors error={submitCommentMutation.error} />
       )}
       <div className="flex items-center gap-2 text-sm text-gray-500">
         <Button
@@ -176,7 +150,7 @@ export function CommentBox({
           value="post"
           type="submit"
           className="px-4 py-2 rounded"
-          disabled={submitDisabled}
+          disabled={isSubmitting || !isContentValid}
         >
           {formState === "posting" ? "Posting..." : "Comment"}
         </Button>
@@ -186,7 +160,7 @@ export function CommentBox({
             value="yoink"
             type="submit"
             className="bg-purple-500 text-white px-4 py-2 rounded"
-            disabled={submitDisabled}
+            disabled={isSubmitting || !isContentValid}
           >
             {formState === "yoinking" ? "Yoinking..." : "Yoink with comment"}
           </Button>
