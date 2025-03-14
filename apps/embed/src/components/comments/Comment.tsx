@@ -280,7 +280,7 @@ export function Comment({
       </div>
       <div
         className={cn(
-          "mb-2 text-foreground",
+          "mb-2 text-foreground break-all",
           comment.deletedAt && "text-muted-foreground"
         )}
       >
