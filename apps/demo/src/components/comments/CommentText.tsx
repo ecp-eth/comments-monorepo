@@ -25,7 +25,7 @@ function truncateText(text: string, maxLength: number): string {
 }
 
 export function CommentText({ text }: { text: string }) {
-  const [shownText, setShownText] = useState(
+  const [shownText, setShownText] = useState(() =>
     truncateText(text, TRUNCATE_COMMENT_LENGTH)
   );
   const isTruncated = text.length > shownText.length;
