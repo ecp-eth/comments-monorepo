@@ -50,7 +50,7 @@ export function CommentBox({
   const submitCommentMutation = useMutation({
     mutationFn: async (
       formData: FormData
-    ): Promise<PendingCommentOperationSchemaType | undefined> => {
+    ): Promise<PendingCommentOperationSchemaType> => {
       try {
         const address = await connectAccount();
 
