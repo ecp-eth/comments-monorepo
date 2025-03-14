@@ -2,16 +2,16 @@
 
 ## Contract Interaction
 
-### Post the comment as author
+### Post the comment as the author
 
-In this document we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of posting a comment as the author.
+In this document, we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of posting a comment as the author.
 
-The ECP supports 4 types of comment posting flows, each with their own pros and cons.
+The ECP supports 4 types of comment posting flows, each with its pros and cons.
 
 Here we will discuss [the simplest flow](/post-comment-flows#1-author-pays-gas):
 
 - The author posts and pays for gas, see ["author pays for the gas"](/post-comment-flows#1-author-pays-gas).
-- The app server authorises the post by signing the comment data.
+- The app server authorizes the post by signing the comment data.
 
 You may want to read more about the [post comment flows](/post-comment-flows) for more details.
 
@@ -22,9 +22,9 @@ You may want to read more about the [post comment flows](/post-comment-flows) fo
 
 ### Demo Dependencies
 
-Here is a quick run down of some of the dependencies used in the demo app:
+Here is a quick rundown of some of the dependencies used in the demo app:
 
-1. `@ecp.eth/sdk` - for comment data creation, retrieving and interaction with the indexer.
+1. `@ecp.eth/sdk` - for comment data creation, retrieving, and interaction with the indexer.
 1. `wagmi` - for react based wallet connection
 1. `viem` - for contract interaction
 1. `@rainbow-me/rainbowkit` - for wallet connection UI
@@ -32,14 +32,14 @@ Here is a quick run down of some of the dependencies used in the demo app:
 
 ### Test environment
 
-- We use [Anvil](https://book.getfoundry.sh/anvil/) for local testing and development, follow the steps in [Test with Anvil](/test-with-anvil) to setup the environment.
-- You may want to setup indexer locally as well, see [Indexer](/indexer-reference/) for more details.
+- We use [Anvil](https://book.getfoundry.sh/anvil/) for local testing and development, follow the steps in [Test with Anvil](/test-with-anvil) to set up the environment.
+- You may want to set up an indexer locally as well, see [Indexer](/indexer-reference/) for more details.
 
 Now let's go through the steps to post a comment!
 
 ::::steps
 
-#### Collect the comment data and send it to server for signing
+#### Collect the comment data and send it to the server for signing
 
 We will start by collecting the [comment data](/comment-data-props) and send it to the server for signing:
 
@@ -63,7 +63,7 @@ const response = await fetch("/api/sign-comment", {
 
 🧑‍💻 _[/apps/demo/src/components/comments/CommentBox.tsx#L62](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/CommentBox.tsx#L62)_
 
-#### App Server signs the comment data
+#### The App Server signs the comment data
 
 Once the data reaches the app server, it creates a `CommentData` object using `createCommentData` from `@ecp.eth/sdk`:
 
@@ -80,7 +80,7 @@ const commentData = createCommentData({
 
 [`createCommentData()`](/sdk-reference/defaultExports/functions/createCommentData) also accepts 2 extra options which are worth mentioning:
 
-- `deadline` - you want to avoid setting a `deadline` that is too long to expire, deadline plays a important role here for preventing replay attack. Longer expiry of `deadline` increases the security risk.
+- `deadline` - you want to avoid setting a `deadline` that is too long to expire, deadline plays an important role here in preventing a replay attacks. The longer expiry of `deadline` increases the security risk.
 - `salt` - a random value to make each comment unique, its uniqueness is essential for generating comment hash which is also used as `commentId`.
 
 Create a typed data structure from `commentData` according to EIP-712:
@@ -107,16 +107,16 @@ return {
 
 **Note**:
 
-- Do not expose the app signer's private key in the client side.
-  In the demo we store the private key in environment variable `APP_SIGNER_PRIVATE_KEY`.
+- Do not expose the app signer's private key on the client side.
+  In the demo, we store the private key in the environment variable `APP_SIGNER_PRIVATE_KEY`.
   Next.JS ensures that the environment variable without `NEXT_PUBLIC_` prefix is only available on the server side.
 
-Now that we have finished server side signing, let's move on to the client side.
+Now that we have finished server-side signing, let's move on to the client side.
 
 #### The Author signs and sends the transaction
 
 In the demo, we use a combination of `wagmi` and `rainbowkit` to connect the user wallet and send the transaction to the contract.
-You can find out how it was setup in the `providers` component:
+You can find out how it was set up in the `providers` component:
 
 ```tsx
 <QueryClientProvider client={queryClient}>
