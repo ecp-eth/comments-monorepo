@@ -1,4 +1,4 @@
-import type { Hex } from "viem";
+import { type Hex } from "viem";
 import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
@@ -10,6 +10,7 @@ import {
   farcasterDataResolver,
   ResolvedFarcasterData,
 } from "./farcaster-data-resolver";
+import { getCommentCursor } from "@ecp.eth/sdk";
 
 type CommentFromDB = CommentSelectType & { replies?: CommentSelectType[] };
 
@@ -19,21 +20,21 @@ type CommentFromDB = CommentSelectType & { replies?: CommentSelectType[] };
 export async function resolveUserDataAndFormatListCommentsResponse({
   comments,
   limit,
-  offset,
   replyLimit,
+  previousComment,
 }: {
   comments: CommentFromDB[];
   limit: number;
-  offset: number;
   replyLimit: number;
+  previousComment: CommentSelectType | undefined;
 }): Promise<IndexerAPIListCommentsSchemaType> {
   if (comments.length === 0) {
     return {
       results: [],
       pagination: {
         limit,
-        offset,
-        hasMore: false,
+        hasPrevious: false,
+        hasNext: false,
       },
     };
   }
@@ -58,8 +59,20 @@ export async function resolveUserDataAndFormatListCommentsResponse({
       farcasterDataResolver.loadMany([...authorIds]),
     ]);
 
+  const nextComment = comments[comments.length - 1];
+  const results = comments.slice(0, limit);
+  const startComment = results[0];
+  const endComment = results[results.length - 1];
+
+  console.log({
+    startComment,
+    endComment,
+    previousComment,
+    nextComment,
+  });
+
   return {
-    results: comments.slice(0, limit).map((comment) => {
+    results: results.map((comment) => {
       const replies = comment.replies ?? [];
       const resolvedAuthorEnsData = resolveUserData(
         resolvedAuthorsEnsData,
@@ -70,6 +83,10 @@ export async function resolveUserDataAndFormatListCommentsResponse({
         comment.author
       );
 
+      const slicedReplies = replies.slice(0, replyLimit);
+      const startReply = slicedReplies[0];
+      const endReply = slicedReplies[slicedReplies.length - 1];
+
       return {
         ...formatComment(comment),
         author: formatAuthor(
@@ -78,7 +95,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
           resolvedAuthorFarcasterData
         ),
         replies: {
-          results: replies.slice(0, replyLimit).map((reply) => {
+          results: slicedReplies.map((reply) => {
             const resolvedAuthorEnsData = resolveUserData(
               resolvedAuthorsEnsData,
               reply.author
@@ -99,25 +116,37 @@ export async function resolveUserDataAndFormatListCommentsResponse({
               replies: {
                 results: [],
                 pagination: {
-                  offset: 0,
                   limit: 0,
-                  hasMore: false,
+                  hasNext: false,
+                  hasPrevious: false,
                 },
               },
             };
           }),
           pagination: {
-            offset: 0,
             limit: replyLimit,
-            hasMore: replies.length > replyLimit,
+            hasNext: replies.length > replyLimit,
+            hasPrevious: false,
+            startCursor: startReply
+              ? getCommentCursor(startReply.id as Hex, startReply.timestamp)
+              : undefined,
+            endCursor: endReply
+              ? getCommentCursor(endReply.id as Hex, endReply.timestamp)
+              : undefined,
           },
         },
       };
     }),
     pagination: {
       limit,
-      offset,
-      hasMore: comments.length > limit,
+      hasNext: nextComment !== endComment,
+      hasPrevious: !!previousComment,
+      startCursor: startComment
+        ? getCommentCursor(startComment.id as Hex, startComment.timestamp)
+        : undefined,
+      endCursor: endComment
+        ? getCommentCursor(endComment.id as Hex, endComment.timestamp)
+        : undefined,
     },
   };
 }
@@ -142,6 +171,7 @@ function formatComment(comment: CommentSelectType) {
     ...comment,
     id: HexSchema.parse(comment.id),
     content: comment.deletedAt ? "[deleted]" : comment.content,
+    cursor: getCommentCursor(comment.id as Hex, comment.timestamp),
   };
 }
 

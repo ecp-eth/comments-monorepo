@@ -28,6 +28,7 @@ import {
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
 } from "../hooks";
+import type { Hex } from "@ecp.eth/sdk/schemas";
 
 export function CommentSectionGasless() {
   const { address: connectedAddress } = useAccount();
@@ -106,7 +107,7 @@ export function CommentSectionGasless() {
     useInfiniteQuery({
       queryKey,
       initialPageParam: {
-        offset: 0,
+        cursor: undefined as Hex | undefined,
         limit: COMMENTS_PER_PAGE,
       },
       queryFn: ({ pageParam, signal }) => {
@@ -114,7 +115,7 @@ export function CommentSectionGasless() {
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
           targetUri: currentUrl,
-          offset: pageParam.offset,
+          cursor: pageParam.cursor,
           limit: pageParam.limit,
           signal,
         });
@@ -123,12 +124,12 @@ export function CommentSectionGasless() {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
-        if (!lastPage.pagination.hasMore) {
+        if (!lastPage.pagination.hasNext) {
           return;
         }
 
         return {
-          offset: lastPage.pagination.offset + lastPage.pagination.limit,
+          cursor: lastPage.pagination.endCursor,
           limit: lastPage.pagination.limit,
         };
       },

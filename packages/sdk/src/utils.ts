@@ -7,6 +7,7 @@ import {
   Hex,
   numberToHex,
   padHex,
+  stringToHex,
   Transport,
 } from "viem";
 import { http } from "wagmi";
@@ -39,7 +40,7 @@ import {
  * @returns True if the hex string is zero, false otherwise
  */
 export function isZeroHex(hex: `0x${string}`) {
-  return hex.replace(/0/g,'') === 'x'
+  return hex.replace(/0/g, "") === "x";
 }
 
 /**
@@ -321,4 +322,14 @@ export function createDeleteCommentTypedData({
         deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
     },
   });
+}
+
+/**
+ * Get the cursor for a comment
+ * @param commentId The ID of the comment
+ * @param timestamp The timestamp of the comment
+ * @returns The cursor for the comment
+ */
+export function getCommentCursor(commentId: Hex, timestamp: Date): Hex {
+  return stringToHex(`${timestamp.getTime()}:${commentId}`);
 }

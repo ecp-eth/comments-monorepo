@@ -5,10 +5,11 @@ import {
   DeleteCommentTypedDataSchema,
   HexSchema,
   IndexerAPICommentWithRepliesSchema,
-  IndexerAPIPaginationSchema,
   IndexerAPICommentSchema,
   type IndexerAPICommentSchemaType,
   IndexerAPIAuthorDataSchema,
+  IndexerAPICursorPaginationSchemaType,
+  IndexerAPICursorPaginationSchema,
 } from "@ecp.eth/sdk/schemas";
 import { z } from "zod";
 // import { isProfane } from "./profanity-detection";
@@ -274,7 +275,7 @@ export const IndexerAPIListCommentsWithPendingOperationsSchema = z.object({
   results: z.array(
     IndexerAPICommentWithRepliesSchema.extend(PendingOperationSchema.shape)
   ),
-  pagination: IndexerAPIPaginationSchema,
+  pagination: IndexerAPICursorPaginationSchema,
 });
 
 export type IndexerAPIListCommentsWithPendingOperationsSchemaType = z.infer<
@@ -285,11 +286,7 @@ type CommentSchemaType = IndexerAPICommentSchemaType & {
   pendingOperation?: PendingCommentOperationSchemaType;
   replies?: {
     results: CommentSchemaType[];
-    pagination: {
-      limit: number;
-      offset: number;
-      hasMore: boolean;
-    };
+    pagination: IndexerAPICursorPaginationSchemaType;
   };
 };
 
@@ -298,11 +295,7 @@ export const CommentSchema: z.ZodType<CommentSchemaType> =
     replies: z
       .object({
         results: z.lazy(() => CommentSchema.array()),
-        pagination: z.object({
-          limit: z.number(),
-          offset: z.number(),
-          hasMore: z.boolean(),
-        }),
+        pagination: IndexerAPICursorPaginationSchema,
       })
       .optional(),
     pendingOperation: PendingCommentOperationSchema.optional(),
@@ -312,11 +305,7 @@ export type Comment = z.infer<typeof CommentSchema>;
 
 export const CommentPageSchema = z.object({
   results: CommentSchema.array(),
-  pagination: z.object({
-    limit: z.number(),
-    offset: z.number(),
-    hasMore: z.boolean(),
-  }),
+  pagination: IndexerAPICursorPaginationSchema,
 });
 
 export type CommentPageSchemaType = z.infer<typeof CommentPageSchema>;

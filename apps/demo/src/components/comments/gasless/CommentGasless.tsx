@@ -98,14 +98,14 @@ export function CommentGasless({
           pages: [comment.replies],
           pageParams: [
             {
-              offset: comment.replies.pagination.offset,
+              cursor: comment.replies.pagination.endCursor,
               limit: comment.replies.pagination.limit,
             },
           ],
         }
       : undefined,
     initialPageParam: {
-      offset: comment.replies?.pagination.offset ?? 0,
+      cursor: comment.replies?.pagination.endCursor,
       limit:
         comment.replies?.pagination.limit ??
         MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
@@ -116,7 +116,7 @@ export function CommentGasless({
       const response = await fetchCommentReplies({
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        offset: pageParam.offset,
+        cursor: pageParam.cursor,
         limit: pageParam.limit,
         commentId: comment.id,
         signal,
@@ -125,12 +125,12 @@ export function CommentGasless({
       return CommentPageSchema.parse(response);
     },
     getNextPageParam(lastPage) {
-      if (!lastPage.pagination.hasMore) {
+      if (!lastPage.pagination.hasNext) {
         return;
       }
 
       return {
-        offset: lastPage.pagination.offset + lastPage.pagination.limit,
+        cursor: lastPage.pagination.endCursor,
         limit: lastPage.pagination.limit,
       };
     },
