@@ -6,6 +6,14 @@
 
 We will use code snippets from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of deleting a comment.
 
+### The Contract
+
+- For latest contract address, see [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS).
+- Use [`deleteComment()`](/protocol-reference/CommentsV1#deletecommentbytes32-commentid-address-author-address-appsigner-uint256-nonce-uint256-deadline-bytes-authorsignature-bytes-appsignature-external) method to delete a comment with a author signature.
+- Use [`deleteCommentAsAuthor()`](/protocol-reference/CommentsV1#deletecommentasauthorbytes32-commentid-external) method to delete a comment provided that it was called by the author.
+
+/apps/demo/src/components/comments/Comment.tsx#L91
+
 #### 1. Prepare the Delete Operation
 
 First, make a request to prepare the delete operation. This will generate the necessary typed data and signatures:
