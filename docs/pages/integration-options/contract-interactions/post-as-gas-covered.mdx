@@ -14,6 +14,11 @@ In certain situations, you may want to offer a frictionless experience to your u
 In this document we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo)
 to illustrate the process of posting a comment with gas covered by the app server.
 
+### The Contract
+
+- For latest contract address, see [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS).
+- We will call [`postComment()`](/protocol-reference/CommentsV1#postcommentstruct-commentsv1commentdata-commentdata-bytes-authorsignature-bytes-appsignature-external) method to post the comment.
+
 ### How it works
 
 The user can choose between grant permission to the app upfront, or approve and sign the transaction on each action.

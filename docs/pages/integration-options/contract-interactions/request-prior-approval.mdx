@@ -15,6 +15,12 @@ The steps are fairly straightforward as follows:
 1. author signs the approval data
 1. submit the approval data with the author's signature to blockchain
 
+### The Contract
+
+- For latest contract address, see [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS).
+- Use [`addApproval()`](http://localhost:3004/protocol-reference/CommentsV1#addapprovaladdress-author-address-appsigner-uint256-nonce-uint256-deadline-bytes-signature-external) method to approve an app provided that the author has signed request.
+- Use [`addApprovalAsAuthor()`](http://localhost:3004/protocol-reference/CommentsV1#addapprovalasauthoraddress-appsigner-external) method to approve an app provided that it was called by the author.
+
 ### Who pays for the gas?
 
 It is up to you to choose who pays for the gas and makes the transaction. However, if you want to cover the gas for the users,
