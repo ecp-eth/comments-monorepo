@@ -4,37 +4,38 @@
 
 ### Post comment with gas paid by the app
 
-In certain situations, you may want to offer a gasless experience to your users where your app pays for the gas fees. This is useful for:
+In certain situations, you may want to offer a frictionless experience to your users where your app pays for the gas fees. This is useful for:
 
 - Reducing friction for new users
 - Providing a better user experience
 - Supporting users who don't have ETH for gas
 - Testing and development environments
 
-In this document we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of posting a comment with gas covered by the app server.
+In this document we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo)
+to illustrate the process of posting a comment with gas covered by the app server.
 
 ### How it works
 
 The user can choose between grant permission to the app upfront, or approve and sign the transaction on each action.
 
 - The detailed flow charts can be found in the [Post Comment Flows](http://localhost:3004/post-comment-flows#2-gasless-transaction-submitter-pays-gas).
-- For how to request and prior permission and approval, see [Request Prior Approval](/integration-options/contract-interactions/request-prior-approval).
+- For request prior permission and approval, see [Request Prior Approval](/integration-options/contract-interactions/request-prior-approval).
 
-Assuming the user has already granted permission, the flow is straightforward:
+Assuming the user has granted permission, the flow is straightforward:
 
 1. The author collects the required comment data and sends it to the app server
 1. The app server then signs the comment data using the app signer's private key, this produce `appSignature`.
-1. Post the comment by calling `postComment` method on the contract with above `appSignature`.
+1. Post the comment by calling `postComment()` method on the contract with the `appSignature`.
 
 However, if the user has not granted permission, the flow will be slightly more complicated:
 
 1. The author creates a comment and sends it to the app server
 1. The app server signs the comment data
-1. The author also signs the comment data with their wallet
+1. The author counter signs the comment data with their wallet
 1. The author post back the signed comment data to app server
 1. The app server submits and pays for the transaction
 
-For dependencies and test environment setup, please refer to previous [examples in this section](/integration-options/contract-interactions). For detailed explanation of the flow, see the [Post Comment Flows](/post-comment-flows#4-appending-comment-to-a-transaction-author-pays-gas).
+For dependencies and test environment setup, please refer to previous [examples in Contract Interactions](/integration-options/contract-interactions). For detailed explanation of the flow, see the [Post Comment Flows](/post-comment-flows#4-appending-comment-to-a-transaction-author-pays-gas).
 
 ### Prior Approved User
 
@@ -79,7 +80,7 @@ const response = await fetch("/api/sign-comment/gasless/prepare", {
 
 🧑‍💻 _[/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/gasless/CommentBoxGasless.tsx#L51-L60)_
 
-_Although `prepareSignedGaslessComment` is named with `prepare`, it also submits the transaction right away if the app is previously approved._
+Endpoint at `/api/sign-comment/gasless/prepare` will also submit the transaction if the app has been previously approved.
 
 #### App server signs the comment data
 
@@ -113,7 +114,7 @@ const signature = await account.signTypedData(typedCommentData);
 #### (Optional) Ensure the app signer is indeed approved by the user
 
 You may want to double check to ensure the app signer is indeed approved by the user.
-This is an optimisation step to avoid wasting gas on a transaction that will be reverted.
+This is a necessary optimisation to avoid wasting gas on a transaction that will be reverted.
 
 ```typescript
 const isApproved = await walletClient.readContract({
@@ -124,7 +125,7 @@ const isApproved = await walletClient.readContract({
 });
 ```
 
-if `isApproved` is `false`, you can fail the action early with an appropriate http error.
+And fail early with an appropriate http error if not approved.
 
 🧑‍💻 _[/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts#L82-L87)_
 
@@ -143,7 +144,7 @@ const txHash = await walletClient.writeContract({
 
 🧑‍💻 _[/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/gasless/prepare/route.ts#L82-L87)_
 
-The 2nd parameter `0x` tells the contract that there is no author signature.
+_The 2nd parameter `0x` tells the contract that there is no author signature._
 
 #### Wait for the transaction to be confirmed
 
@@ -251,7 +252,7 @@ const response = await fetch("/api/sign-comment/gasless", {
 
 #### App server submits the signed comment data
 
-In case an attacker tries to utilize the endpoint to drain gas, you may want to double check that the app signature is valid before submitting the transaction:
+To avoid attackers try to utilize the endpoint to drain gas, you may want to double check that the app signature is valid before submitting the transaction:
 
 ```typescript
 // Check that signature is from the app signer

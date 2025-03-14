@@ -13,12 +13,12 @@ The steps are fairly straightforward as follows:
 
 1. generate typed approval data
 1. author signs the approval data
-1. somebody submits the approval data with the author's signature to blockchain
+1. submit the approval data with the author's signature to blockchain
 
 ### Who pays for the gas?
 
-It is up to you to choose who pays for the gas and make the transaction. However, if you do want to cover the gas for the users,
-ensure there are measures in place to prevent somebody from draining the balance of the app signer. A few options are:
+It is up to you to choose who pays for the gas and makes the transaction. However, if you want to cover the gas for the users,
+ensure there are measures in place to prevent somebody from draining the balance of the app signer. A few potential options are:
 
 1. Make the users pay a small amount of price to create a barrier to spammers and prove their intent is genuine.
 1. Use activity data of the author's address to ensure their credibility.
@@ -30,7 +30,7 @@ Now let's look at the code implementation in the demo app:
 
 #### App server checks if user has already granted approval
 
-The demo app check the user approval on the `/api/approval` endpoint:
+The demo app checks the user's approval by requesting the `/api/approval` endpoint:
 
 ```typescript
 // Check approval on chain and get nonce (multicall3 if available, otherwise read contracts)
@@ -73,7 +73,7 @@ const [{ result: isApproved }, { result: nonce }] = chain.contracts?.multicall3
 
 In above code snippet some optimization was done:
 
-- It also retrieve the nonce which will be used later.
+- It also retrieve the `nonce` which will be used later.
 - If the chain supports [`multicall3`](https://github.com/EthereumClassicDAO/multicall3) it calls mulitple functions of the same contract in one shot to avoid roundtrips.
 
 #### Construct approval data
@@ -151,7 +151,7 @@ const approveGaslessTransactionsMutation = useGaslessTransaction({
 #### The server submits the transaction and pay for the gas
 
 The server finally submits the transaction to the blockchain and pay for the gas.
-Note that the nonce previously retrieved is also included in the transaction data:
+Note that the `nonce` previously retrieved is also included in the transaction data:
 
 ```typescript
 const txHash = await walletClient.writeContract({
