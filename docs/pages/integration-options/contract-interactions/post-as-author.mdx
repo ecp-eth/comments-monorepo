@@ -4,11 +4,6 @@
 
 In certain situations, such as bot development or custom integrations, you may want to directly interact with the CommentsV1 smart contract.
 
-### Contract and the methods used in this document
-
-- For latest contract address, see [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS).
-- We will call [`postCommentAsAuthor`](/protocol-reference/CommentsV1#postcommentasauthorstruct-commentsv1commentdata-commentdata-bytes-appsignature-external) method to post the comment.
-
 ### Post the comment as author
 
 In this document we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of posting a comment as the author.
@@ -21,6 +16,11 @@ Here we will discuss [the simplest flow](/post-comment-flows#1-author-pays-gas):
 - The app server authorises the post by signing the comment data.
 
 You may want to read more about the [post comment flows](/post-comment-flows) for more details.
+
+### Contract and the methods used in this document
+
+- For latest contract address, see [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS).
+- We will call [`postCommentAsAuthor`](/protocol-reference/CommentsV1#postcommentasauthorstruct-commentsv1commentdata-commentdata-bytes-appsignature-external) method to post the comment.
 
 ### Demo Dependencies
 
