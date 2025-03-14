@@ -86,6 +86,34 @@ export function useGaslessTransaction<
 }
 
 /**
+ * Creates a URL for the comments embed iframe.
+ *
+ * @param embedUri - The URI of the comments embed iframe page.
+ * @param param - The target URI or author address to embed comments for.
+ * @param config - The configuration for the comments embed.
+ * @returns The URL for the comments embed iframe.
+ */
+export function createCommentsEmbedURL(
+  embedUri: string,
+  param: { targetUri: string } | { author: Hex },
+  config?: EmbedConfigSchemaType
+): string {
+  const url = new URL(embedUri);
+
+  if ("targetUri" in param) {
+    url.searchParams.set("targetUri", param.targetUri);
+  } else {
+    url.searchParams.set("author", param.author);
+  }
+
+  if (config && EmbedConfigSchema.parse(config)) {
+    url.searchParams.set("config", compressToURI(JSON.stringify(config)));
+  }
+
+  return url.toString();
+}
+
+/**
  * The props for `<CommentsEmbed />` component.
  */
 export type CommentsEmbedProps = {
@@ -138,15 +166,7 @@ export function CommentsEmbed({
   config,
 }: CommentsEmbedProps) {
   const iframeUri = useMemo(() => {
-    const url = new URL(embedUri);
-
-    url.searchParams.set("targetUri", uri);
-
-    if (config && EmbedConfigSchema.parse(config)) {
-      url.searchParams.set("config", compressToURI(JSON.stringify(config)));
-    }
-
-    return url.toString();
+    return createCommentsEmbedURL(embedUri, { targetUri: uri }, config);
   }, [embedUri, uri, config]);
 
   return (
@@ -208,15 +228,7 @@ export function CommentsByAuthorEmbed({
   iframeProps,
 }: CommentsByAuthorEmbedProps) {
   const iframeUri = useMemo(() => {
-    const url = new URL(embedUri);
-
-    url.searchParams.set("author", author);
-
-    if (config && EmbedConfigSchema.parse(config)) {
-      url.searchParams.set("config", compressToURI(JSON.stringify(config)));
-    }
-
-    return url.toString();
+    return createCommentsEmbedURL(embedUri, { author }, config);
   }, [embedUri, author, config]);
 
   return (

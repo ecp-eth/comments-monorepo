@@ -8,6 +8,8 @@ import { DOMAIN_NAME, DOMAIN_VERSION } from "./eip712.js";
 import { COMMENTS_V1_ADDRESS } from "./constants.js";
 import { EmbedConfigSupportedFont } from "./schemas.fonts.js";
 
+export { EmbedConfigSupportedFont };
+
 export const HexSchema = z.custom<`0x${string}`>(
   (value) =>
     z
@@ -66,7 +68,7 @@ const CSSColorSchema = z
 
 const CSSSizeSchema = z
   .string()
-  .regex(/^([0-9]*\.[0-9]+|[0-9]+)(px|em|rem|vh|vw|vmin|vmax|%)$/)
+  .regex(/^([0-9]*\.[0-9]+|[0-9]+)(px|em|rem|vh|vw|vmin|vmax|%)?$/)
   .max(10)
   .describe("Valid CSS size value");
 

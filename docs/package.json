@@ -21,12 +21,14 @@
     "@theguild/remark-mermaid": "^0.2.0",
     "acorn": "^8.14.0",
     "hono": "^4.6.20",
+    "lucide-react": "^0.474.0",
     "react": "~19.0.0",
     "react-dom": "~19.0.0",
     "remark-codesandbox": "^0.10.1",
     "swagger-ui-react": "^5.20.0",
     "typedoc-plugin-markdown": "^4.4.2",
     "typedoc-plugin-zod": "^1.3.1",
+    "use-debounce": "^10.0.4",
     "vocs": "1.0.5",
     "zod": "^3.24.1"
   },
@@ -37,6 +39,7 @@
     "js-yaml": "^4.1.0",
     "solc": "^0.8.13",
     "solidity-docgen": "~0.5.17",
+    "tailwindcss": "^4.0.13",
     "tsx": "^4.19.3",
     "typedoc": "^0.27.7",
     "vite": "^6.2.1"
