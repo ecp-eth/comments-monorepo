@@ -160,6 +160,10 @@ export function Comment({
         throw new Error("No pending operation to retry");
       }
 
+      if (comment.pendingOperation.type !== "nongasless") {
+        throw new Error("Only non-gasless comments can be retried");
+      }
+
       return submitCommentMutationFunction({
         address,
         commentRequest: {

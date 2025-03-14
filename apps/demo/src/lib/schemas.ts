@@ -69,7 +69,8 @@ export const PreparedSignedGaslessPostCommentNotApprovedResponseSchema =
     signTypedDataParams: AddCommentTypedDataSchema,
     id: HexSchema,
     appSignature: HexSchema,
-    commentData: CommentDataSchema,
+    commentData: CommentDataWithIdSchema,
+    chainId: z.number(),
   });
 
 export type PreparedSignedGaslessPostCommentNotApprovedSchemaType = z.infer<
@@ -81,7 +82,8 @@ export const PreparedGaslessPostCommentOperationApprovedResponseSchema =
     txHash: HexSchema,
     id: HexSchema,
     appSignature: HexSchema,
-    commentData: CommentDataSchema,
+    commentData: CommentDataWithIdSchema,
+    chainId: z.number(),
   });
 
 export type PreparedGaslessPostCommentOperationApprovedSchemaType = z.infer<
@@ -238,6 +240,7 @@ export const PendingCommentOperationSchema = z
     chainId: z.number().positive().int(),
     response: SignCommentResponseClientSchema,
     resolvedAuthor: IndexerAPIAuthorDataSchema.optional(),
+    type: z.enum(["gasless-not-approved", "gasless-preapproved", "nongasless"]),
   })
   .describe(
     "Contains information about pending operation so we can show that in comment list"
