@@ -1,0 +1,135 @@
+# Integration Options
+
+## Contract Interaction
+
+### Delete a comment
+
+We will use code snippets from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of deleting a comment.
+
+#### 1. Prepare the Delete Operation
+
+First, make a request to prepare the delete operation. This will generate the necessary typed data and signatures:
+
+```typescript
+// Make a POST request to /api/delete-comment/prepare
+const response = await fetch("/api/delete-comment/prepare", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    author: authorAddress,
+    commentId: commentIdToDelete,
+    submitIfApproved: true, // Set to true to auto-submit if user is already approved
+  }),
+});
+
+const data = await response.json();
+```
+
+The prepare endpoint will:
+
+1. Generate the typed data for deletion
+2. Sign it with the app signer
+3. If `submitIfApproved` is true and the user is approved, submit the transaction directly
+4. Otherwise, return the signed data for the user to sign
+
+#### 2. Handle the Response
+
+The prepare endpoint will return one of two responses:
+
+```typescript
+// If user is approved and submitIfApproved=true:
+{
+  txHash: `0x${string}` // The transaction hash of the submitted deletion
+}
+
+// If user needs to sign:
+{
+  signTypedDataParams: TypedData, // The typed data to be signed
+  appSignature: `0x${string}`, // The app signer's signature
+}
+```
+
+#### 3. Get User Signature
+
+If the user needs to sign (not already approved), have them sign the typed data:
+
+```typescript
+// Using wagmi hooks
+const { signTypedData } = useSignTypedData();
+
+const authorSignature = await signTypedData(signTypedDataParams);
+```
+
+#### 4. Submit the Delete Transaction
+
+Finally, submit the delete transaction with both signatures:
+
+```typescript
+const deleteResponse = await fetch("/api/delete-comment", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    signTypedDataParams,
+    appSignature,
+    authorSignature,
+  }),
+});
+
+const { txHash } = await deleteResponse.json();
+```
+
+The server will verify both signatures and submit the transaction to delete the comment.
+
+#### Implementation Details
+
+The server-side implementation in the demo app shows how to:
+
+1. Verify signatures
+2. Submit the transaction using a submitter account
+3. Handle errors appropriately
+
+Here's the relevant server code:
+
+```typescript:apps/demo/src/app/api/delete-comment/route.ts
+// ... existing code ...
+try {
+  const txHash = await walletClient.writeContract({
+    abi: CommentsV1Abi,
+    address: COMMENTS_V1_ADDRESS,
+    functionName: "deleteComment",
+    args: [
+      signTypedDataParams.message.commentId,
+      signTypedDataParams.message.author,
+      signTypedDataParams.message.appSigner,
+      signTypedDataParams.message.nonce,
+      signTypedDataParams.message.deadline,
+      authorSignature,
+      appSignature,
+    ],
+  });
+
+  return new JSONResponse(DeleteCommentResponseSchema, { txHash });
+} catch (error) {
+  console.error(error);
+
+  return new JSONResponse(
+    InternalServerErrorResponseSchema,
+    { error: "Failed to delete comment" },
+    { status: 500 }
+  );
+}
+// ... existing code ...
+```
+
+This implementation ensures that:
+
+- Both the app signer and user have signed the deletion
+- The signatures are valid
+- The transaction is submitted properly
+- Errors are handled appropriately
+
+For a complete working example, refer to the [demo app source code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo).

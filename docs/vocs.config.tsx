@@ -67,6 +67,10 @@ export default defineConfig({
                   text: "Request Prior Approval",
                   link: "/integration-options/contract-interactions/request-prior-approval",
                 },
+                {
+                  text: "Delete comment",
+                  link: "/integration-options/contract-interactions/delete-comment",
+                },
               ],
             },
           ],
