@@ -19,11 +19,12 @@ import { fetchComments } from "@ecp.eth/sdk";
 import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { publicEnv } from "@/publicEnv";
+import type { Hex } from "@ecp.eth/sdk/schemas";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
     CommentPageSchemaType,
-    { offset: number; limit: number }
+    { cursor: Hex | undefined; limit: number }
   >;
 };
 
@@ -37,7 +38,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
       queryKey,
       initialData,
       initialPageParam: {
-        offset: 0,
+        cursor: undefined as Hex | undefined,
         limit: COMMENTS_PER_PAGE,
       },
       queryFn: async ({ pageParam, signal }) => {
@@ -46,7 +47,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           targetUri,
           limit: pageParam.limit,
-          offset: pageParam.offset,
+          cursor: pageParam.cursor,
           signal,
         });
 
@@ -55,12 +56,12 @@ export function CommentSection({ initialData }: CommentSectionProps) {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
-        if (!lastPage.pagination.hasMore) {
+        if (!lastPage.pagination.hasNext) {
           return;
         }
 
         return {
-          offset: lastPage.pagination.offset + lastPage.pagination.limit,
+          cursor: lastPage.pagination.endCursor,
           limit: lastPage.pagination.limit,
         };
       },

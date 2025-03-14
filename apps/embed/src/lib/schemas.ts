@@ -5,6 +5,8 @@ import {
   IndexerAPICommentSchema,
   type IndexerAPICommentSchemaType,
   IndexerAPIAuthorDataSchema,
+  IndexerAPICursorPaginationSchema,
+  type IndexerAPICursorPaginationSchemaType,
 } from "@ecp.eth/sdk/schemas";
 import { MAX_COMMENT_LENGTH } from "./constants";
 // import { isProfane } from "./profanity-detection";
@@ -45,11 +47,7 @@ type CommentSchemaType = IndexerAPICommentSchemaType & {
   pendingOperation?: PendingCommentOperationSchemaType;
   replies?: {
     results: CommentSchemaType[];
-    pagination: {
-      limit: number;
-      offset: number;
-      hasMore: boolean;
-    };
+    pagination: IndexerAPICursorPaginationSchemaType;
   };
 };
 
@@ -58,11 +56,7 @@ export const CommentSchema: z.ZodType<CommentSchemaType> =
     replies: z
       .object({
         results: z.lazy(() => CommentSchema.array()),
-        pagination: z.object({
-          limit: z.number(),
-          offset: z.number(),
-          hasMore: z.boolean(),
-        }),
+        pagination: IndexerAPICursorPaginationSchema,
       })
       .optional(),
     pendingOperation: PendingCommentOperationSchema.optional(),
@@ -72,11 +66,7 @@ export type Comment = z.infer<typeof CommentSchema>;
 
 export const CommentPageSchema = z.object({
   results: CommentSchema.array(),
-  pagination: z.object({
-    limit: z.number(),
-    offset: z.number(),
-    hasMore: z.boolean(),
-  }),
+  pagination: IndexerAPICursorPaginationSchema,
 });
 
 export type CommentPageSchemaType = z.infer<typeof CommentPageSchema>;

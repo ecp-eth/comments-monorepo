@@ -17,7 +17,10 @@ type CommentSectionReadonlyProps = {
   author: Hex;
   initialData?: InfiniteData<
     CommentPageSchemaType,
-    { offset: number; limit: number }
+    {
+      cursor: Hex | undefined;
+      limit: number;
+    }
   >;
   /**
    * Used to calculate relative time in comments.
@@ -37,7 +40,7 @@ export function CommentSectionReadonly({
       queryKey,
       initialData,
       initialPageParam: {
-        offset: 0,
+        cursor: undefined as Hex | undefined,
         limit: COMMENTS_PER_PAGE,
       },
       queryFn: async ({ pageParam, signal }) => {
@@ -46,7 +49,7 @@ export function CommentSectionReadonly({
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           author,
           limit: pageParam.limit,
-          offset: pageParam.offset,
+          cursor: pageParam.cursor,
           signal,
         });
 
@@ -55,12 +58,12 @@ export function CommentSectionReadonly({
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
-        if (!lastPage.pagination.hasMore) {
+        if (!lastPage.pagination.hasNext) {
           return;
         }
 
         return {
-          offset: lastPage.pagination.offset + lastPage.pagination.limit,
+          cursor: lastPage.pagination.endCursor,
           limit: lastPage.pagination.limit,
         };
       },

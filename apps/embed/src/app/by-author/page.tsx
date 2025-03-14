@@ -58,7 +58,6 @@ export default async function EmbedCommentsByAuthorPage({
       appSigner: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       author,
-      offset: 0,
       limit: COMMENTS_PER_PAGE,
     });
 
@@ -74,7 +73,7 @@ export default async function EmbedCommentsByAuthorPage({
                   pageParams: [
                     {
                       limit: comments.pagination.limit,
-                      offset: comments.pagination.offset,
+                      cursor: comments.pagination.endCursor,
                     },
                   ],
                 }}

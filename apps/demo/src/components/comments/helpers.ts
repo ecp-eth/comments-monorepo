@@ -63,7 +63,6 @@ export function insertPendingCommentToPage(
     author: pendingOperation.resolvedAuthor ?? {
       address: response.data.author,
     },
-    // @todo is there a better way to do this? do we even need a cursor here?
     cursor: getCommentCursor(response.data.id, new Date()),
     deletedAt: null,
     logIndex: 0,

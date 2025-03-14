@@ -4,6 +4,7 @@ import type {
   CommentPageSchemaType,
 } from "@/lib/schemas";
 import { abbreviateAddressForDisplay } from "@/lib/utils";
+import { getCommentCursor } from "@ecp.eth/sdk";
 import type { InfiniteData } from "@tanstack/react-query";
 import type { Hex } from "viem";
 
@@ -61,6 +62,7 @@ export function insertPendingCommentToPage(
     author: pendingOperation.resolvedAuthor ?? {
       address: response.data.author,
     },
+    cursor: getCommentCursor(response.data.id, new Date()),
     deletedAt: null,
     logIndex: 0,
     txHash,
@@ -69,9 +71,9 @@ export function insertPendingCommentToPage(
     replies: {
       results: [],
       pagination: {
-        hasMore: false,
+        hasPrevious: false,
+        hasNext: false,
         limit: 0,
-        offset: 0,
       },
     },
     pendingOperation,
