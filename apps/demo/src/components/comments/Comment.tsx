@@ -43,10 +43,6 @@ import { CommentActionButton } from "./CommentActionButton";
 import { CommentActionOrStatus } from "./CommentActionOrStatus";
 
 interface CommentProps {
-  /**
-   * @default 1
-   */
-  depth?: number;
   comment: CommentType;
   onDelete?: OnDeleteComment;
   /**
@@ -64,7 +60,6 @@ interface CommentProps {
 }
 
 export function Comment({
-  depth = 1,
   comment,
   onPostSuccess,
   onRetryPost,
@@ -83,7 +78,7 @@ export function Comment({
   const commentRef = useFreshRef(comment);
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
-  const areRepliesAllowed = depth < 2;
+  const areRepliesAllowed = level < publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF;
   const submitTargetCommentId = areRepliesAllowed
     ? comment.id
     : (comment.parentId ?? never("parentId is required for comment depth > 0"));
@@ -273,6 +268,7 @@ export function Comment({
         <CommentActionOrStatus
           comment={comment}
           hasAccountConnected={!!connectedAddress}
+          hasRepliesAllowed={areRepliesAllowed}
           isDeleting={isDeleting}
           isPosting={isPosting}
           deletingFailed={didDeletingFailed}
@@ -300,7 +296,7 @@ export function Comment({
       )}
       {replies.map((reply) => (
         <Comment
-          depth={depth + 1}
+          level={level + 1}
           key={reply.id}
           comment={reply}
           onDelete={handleCommentDeleted}

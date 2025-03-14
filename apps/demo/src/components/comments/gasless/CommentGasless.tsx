@@ -46,10 +46,6 @@ import { toast } from "sonner";
 import never from "never";
 
 interface CommentProps {
-  /**
-   * @default 1
-   */
-  depth?: number;
   isAppSignerApproved: boolean;
   comment: CommentType;
   onDelete?: OnDeleteComment;
@@ -68,7 +64,6 @@ interface CommentProps {
 }
 
 export function CommentGasless({
-  depth = 1,
   comment,
   onPostSuccess,
   onRetryPost,
@@ -85,7 +80,7 @@ export function CommentGasless({
    * because comment is updated to be redacted
    */
   const commentRef = useFreshRef(comment);
-  const areRepliesAllowed = depth < 2;
+  const areRepliesAllowed = level < publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF;
   const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
   const submitTargetCommentId = areRepliesAllowed
     ? comment.id
@@ -335,6 +330,7 @@ export function CommentGasless({
         <CommentActionOrStatus
           comment={comment}
           hasAccountConnected={!!connectedAddress}
+          hasRepliesAllowed={areRepliesAllowed}
           isDeleting={isDeleting}
           isPosting={isPosting}
           deletingFailed={didDeletingFailed}
