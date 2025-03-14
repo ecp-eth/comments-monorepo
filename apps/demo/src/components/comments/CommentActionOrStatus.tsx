@@ -5,6 +5,7 @@ import type { Comment as CommentType } from "@/lib/schemas";
 export function CommentActionOrStatus({
   comment,
   hasAccountConnected,
+  hasRepliesAllowed,
   isDeleting,
   isPosting,
   postingFailed,
@@ -15,6 +16,7 @@ export function CommentActionOrStatus({
 }: {
   comment: CommentType;
   hasAccountConnected: boolean;
+  hasRepliesAllowed: boolean;
   isDeleting: boolean;
   isPosting: boolean;
   postingFailed: boolean;
@@ -65,7 +67,7 @@ export function CommentActionOrStatus({
     );
   }
 
-  if (comment.pendingOperation || !hasAccountConnected) {
+  if (comment.pendingOperation || !hasAccountConnected || !hasRepliesAllowed) {
     return null;
   }
 
