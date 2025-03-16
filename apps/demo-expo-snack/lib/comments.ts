@@ -1,6 +1,12 @@
 import { bigintReplacer } from "./utils";
 import { fetchAPI } from "./fetch";
-import { SignCommentRequestBodySchemaType } from "./schema";
+import {
+  SignCommentRequestBodySchemaType,
+  SignCommentResponseSchema,
+} from "./schemas";
+import { throwResponseError, throwResponseSchemaError } from "./errors";
+
+HexSchema;
 
 export const postComment = async (
   comment: SignCommentRequestBodySchemaType
@@ -13,5 +19,19 @@ export const postComment = async (
     body: JSON.stringify(comment, bigintReplacer),
   });
 
-  console.log(await signingResponse.json());
+  if (!signingResponse.ok) {
+    await throwResponseError(signingResponse);
+  }
+
+  const parsed = SignCommentResponseSchema.safeParse(
+    await signingResponse.json()
+  );
+
+  if (!parsed.success) {
+    throwResponseSchemaError(parsed.error);
+  }
+
+  const { signature } = parsed.data;
+
+  console.log(signature);
 };

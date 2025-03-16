@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "api:schema:sync": "scripts/syncAPISchemas.sh"
   },
   "dependencies": {
     "@chakrahq/react-native-side-menu": "^1.3.4",
