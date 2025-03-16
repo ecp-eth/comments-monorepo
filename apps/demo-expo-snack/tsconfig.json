@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "strictNullChecks": true
+  },
+  "extends": "expo/tsconfig.base"
+}
