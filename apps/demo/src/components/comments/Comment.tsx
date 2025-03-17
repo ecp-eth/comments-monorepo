@@ -1,15 +1,6 @@
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import { COMMENTS_V1_ADDRESS, fetchCommentReplies } from "@ecp.eth/sdk";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { MoreVertical } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { getAddress } from "viem";
+import { useCallback, useEffect, useMemo } from "react";
 import {
   useAccount,
   useSwitchChain,
@@ -18,8 +9,6 @@ import {
 } from "wagmi";
 import { CommentBox } from "./CommentBox";
 import { publicEnv } from "@/publicEnv";
-import { CommentAuthor } from "./CommentAuthor";
-import { CommentText } from "./CommentText";
 import type {
   OnDeleteComment,
   OnRetryPostComment,
@@ -40,8 +29,7 @@ import {
 } from "@/lib/constants";
 import never from "never";
 import { toast } from "sonner";
-import { CommentActionButton } from "./CommentActionButton";
-import { CommentActionOrStatus } from "./CommentActionOrStatus";
+import { CommentShared } from "./CommentShared";
 
 interface CommentProps {
   comment: CommentType;
@@ -69,8 +57,6 @@ export function Comment({
    * because comment is updated to be redacted
    */
   const commentRef = useFreshRef(comment);
-  const { address: connectedAddress } = useAccount();
-  const [isReplying, setIsReplying] = useState(false);
   const areRepliesAllowed = level < publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF;
   const submitTargetCommentId = areRepliesAllowed
     ? comment.id
@@ -143,10 +129,6 @@ export function Comment({
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
-
-  const replies = useMemo(() => {
-    return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
-  }, [repliesQuery.data?.pages]);
 
   const handleCommentSubmitted = useHandleCommentSubmitted({
     queryKey: submitTargetQueryKey,
@@ -224,11 +206,6 @@ export function Comment({
     }
   }, [postingCommentTxReceipt.data]);
 
-  const isAuthor =
-    connectedAddress && comment.author
-      ? getAddress(connectedAddress) === getAddress(comment.author.address)
-      : false;
-
   const isDeleting =
     deleteCommentTransactionReceipt.isFetching ||
     deleteCommentContract.isPending;
@@ -242,87 +219,25 @@ export function Comment({
     !isPosting && postingCommentTxReceipt.data?.status === "reverted";
 
   return (
-    <div className="mb-4 border-l-2 border-gray-200 pl-4">
-      <div className="flex justify-between items-center">
-        <CommentAuthor author={comment.author} timestamp={comment.timestamp} />
-        {isAuthor && !comment.deletedAt && !comment.pendingOperation && (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">
-              <MoreVertical className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="text-red-600 cursor-pointer"
-                onClick={handleDeleteClick}
-                disabled={isDeleting}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-      <div
-        className={cn(
-          "mb-2 break-all text-foreground",
-          comment.deletedAt && "text-muted-foreground"
-        )}
-      >
-        <CommentText text={comment.content} />
-      </div>
-      <div className="mb-2">
-        <CommentActionOrStatus
-          comment={comment}
-          hasAccountConnected={!!connectedAddress}
-          hasRepliesAllowed={areRepliesAllowed}
-          isDeleting={isDeleting}
-          isPosting={isPosting}
-          deletingFailed={didDeletingFailed}
-          postingFailed={didPostingFailed}
-          onRetryDeleteClick={handleDeleteClick}
-          onReplyClick={() => setIsReplying((prev) => !prev)}
-          onRetryPostClick={retryPostMutation.mutate}
-        />
-      </div>
-      {isReplying && (
-        <CommentBox
-          onLeftEmpty={() => setIsReplying(false)}
-          onSubmitSuccess={(pendingOperation) => {
-            setIsReplying(false);
-            handleCommentSubmitted(pendingOperation);
-          }}
-          placeholder="What are your thoughts?"
-          parentId={
-            level >= publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF &&
-            comment.parentId
-              ? comment.parentId
-              : comment.id
-          }
-        />
-      )}
-      {hasNewComments && (
-        <div className="mb-2">
-          <CommentActionButton onClick={() => fetchNewComments()}>
-            show new replies
-          </CommentActionButton>
-        </div>
-      )}
-      {replies.map((reply) => (
-        <Comment
-          level={level + 1}
-          key={`${reply.id}-${reply.deletedAt}`}
-          comment={reply}
-          onDelete={handleCommentDeleted}
-          onRetryPost={handleRetryPostComment}
-        />
-      ))}
-      {repliesQuery.hasNextPage && (
-        <div className="mb-2">
-          <CommentActionButton onClick={() => repliesQuery.fetchNextPage()}>
-            show more replies
-          </CommentActionButton>
-        </div>
-      )}
-    </div>
+    <CommentShared
+      areRepliesAllowed={areRepliesAllowed}
+      comment={comment}
+      didDeletingFailed={didDeletingFailed}
+      didPostingFailed={didPostingFailed}
+      isDeleting={isDeleting}
+      isPosting={isPosting}
+      hasNewReplies={hasNewComments}
+      fetchNewReplies={fetchNewComments}
+      onReplyDelete={handleCommentDeleted}
+      onReplyPost={handleRetryPostComment}
+      onRetryDeleteClick={handleDeleteClick}
+      onRetryPostClick={retryPostMutation.mutate}
+      onReplySubmitSuccess={handleCommentSubmitted}
+      repliesQuery={repliesQuery}
+      level={level}
+      ReplyComponent={Comment}
+      ReplyFormComponent={CommentBox}
+      onDeleteClick={handleDeleteClick}
+    />
   );
 }

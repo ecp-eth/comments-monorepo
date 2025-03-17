@@ -1,25 +1,13 @@
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { getAddress } from "viem";
+import { useCallback, useEffect, useMemo } from "react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/publicEnv";
-import { CommentAuthor } from "../CommentAuthor";
-import { CommentText } from "../CommentText";
-import { CommentActionOrStatus } from "../CommentActionOrStatus";
 import {
   MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
 import { fetchCommentReplies } from "@ecp.eth/sdk";
-import { CommentActionButton } from "../CommentActionButton";
 import {
   useHandleCommentDeleted,
   useHandleCommentSubmitted,
@@ -35,12 +23,12 @@ import type {
 } from "@ecp.eth/shared/types";
 import { toast } from "sonner";
 import never from "never";
-import { cn } from "@/lib/utils";
+import { CommentShared } from "../CommentShared";
+import { useCommentGaslessContext } from "./CommentGaslessProvider";
 
 interface CommentProps {
-  isAppSignerApproved: boolean;
   comment: CommentType;
-  onDelete?: OnDeleteComment;
+  onDelete: OnDeleteComment;
   /**
    * Called when comment posting to blockchain failed and the transaction has been reverted
    * and user pressed retry.
@@ -53,11 +41,10 @@ export function CommentGasless({
   comment,
   onRetryPost,
   onDelete,
-  isAppSignerApproved: submitIfApproved,
   level = 0,
 }: CommentProps) {
+  const { isApproved: submitIfApproved } = useCommentGaslessContext();
   const { address: connectedAddress } = useAccount();
-  const [isReplying, setIsReplying] = useState(false);
   const onDeleteRef = useFreshRef(onDelete);
   /**
    * Prevents infinite cycle when delete comment transaction succeeded
@@ -210,15 +197,6 @@ export function CommentGasless({
     }
   }, [postingCommentTxReceipt.data]);
 
-  const isAuthor =
-    connectedAddress && comment.author
-      ? getAddress(connectedAddress) === getAddress(comment.author.address)
-      : false;
-
-  const replies = useMemo(() => {
-    return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
-  }, [repliesQuery.data?.pages]);
-
   const isDeleting =
     deleteCommentMutation.isPending ||
     deleteCommentTransactionReceipt.isFetching;
@@ -228,89 +206,25 @@ export function CommentGasless({
     !isPosting && postingCommentTxReceipt.data?.status === "reverted";
 
   return (
-    <div className="mb-4 border-l-2 border-gray-200 pl-4">
-      <div className="flex justify-between items-center">
-        <CommentAuthor author={comment.author} timestamp={comment.timestamp} />
-        {isAuthor && !comment.deletedAt && !comment.pendingOperation && (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">
-              <MoreVertical className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="text-red-600 cursor-pointer"
-                onClick={handleDeleteClick}
-                disabled={isDeleting}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-      <div
-        className={cn(
-          "mb-2 break-all text-foreground",
-          comment.deletedAt && "text-muted-foreground"
-        )}
-      >
-        <CommentText text={comment.content} />
-      </div>
-      <div className="mb-2">
-        <CommentActionOrStatus
-          comment={comment}
-          hasAccountConnected={!!connectedAddress}
-          hasRepliesAllowed={areRepliesAllowed}
-          isDeleting={isDeleting}
-          isPosting={isPosting}
-          deletingFailed={didDeletingFailed}
-          postingFailed={didPostingFailed}
-          onRetryDeleteClick={handleDeleteClick}
-          onReplyClick={() => setIsReplying((prev) => !prev)}
-          onRetryPostClick={retryPostMutation.mutate}
-        />
-      </div>
-      {isReplying && (
-        <CommentBoxGasless
-          onLeftEmpty={() => setIsReplying(false)}
-          onSubmitSuccess={(pendingOperation) => {
-            setIsReplying(false);
-            handleCommentSubmitted(pendingOperation);
-          }}
-          placeholder="What are your thoughts?"
-          parentId={
-            level >= publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF &&
-            comment.parentId
-              ? comment.parentId
-              : comment.id
-          }
-          isAppSignerApproved={submitIfApproved}
-        />
-      )}
-      {hasNewComments && (
-        <div className="mb-2">
-          <CommentActionButton onClick={() => fetchNewComments()}>
-            show new replies
-          </CommentActionButton>
-        </div>
-      )}
-      {replies.map((reply) => (
-        <CommentGasless
-          key={`${reply.id}-${reply.deletedAt}`}
-          comment={reply}
-          onDelete={handleCommentDeleted}
-          onRetryPost={handleRetryPostComment}
-          isAppSignerApproved={submitIfApproved}
-          level={level + 1}
-        />
-      ))}
-      {repliesQuery.hasNextPage && (
-        <div className="mb-2">
-          <CommentActionButton onClick={() => repliesQuery.fetchNextPage()}>
-            show more replies
-          </CommentActionButton>
-        </div>
-      )}
-    </div>
+    <CommentShared
+      areRepliesAllowed={areRepliesAllowed}
+      comment={comment}
+      didDeletingFailed={didDeletingFailed}
+      didPostingFailed={didPostingFailed}
+      isDeleting={isDeleting}
+      isPosting={isPosting}
+      hasNewReplies={hasNewComments}
+      fetchNewReplies={fetchNewComments}
+      onReplyDelete={handleCommentDeleted}
+      onReplyPost={handleRetryPostComment}
+      onRetryDeleteClick={handleDeleteClick}
+      onRetryPostClick={retryPostMutation.mutate}
+      onReplySubmitSuccess={handleCommentSubmitted}
+      repliesQuery={repliesQuery}
+      level={level}
+      ReplyComponent={CommentGasless}
+      ReplyFormComponent={CommentBoxGasless}
+      onDeleteClick={handleDeleteClick}
+    />
   );
 }
