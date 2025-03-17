@@ -4,12 +4,12 @@
 
 ### Post comment in any Ethereum transaction
 
-In certain cases, you may want to attach a comment to an Ethereum transaction. This is useful for:
+Sometimes, you might want to attach a comment directly to a transaction -- without the need for an additional transaction or smart contract integration. This can be useful for:
 
-- Saving gas cost by including the comment in the transaction calldata
-- Adding comments to NFT mints
+- Reducing gas costs by embedding the comment in the transaction calldata
+- Adding notes to NFT mints
 - Commenting on token transfers
-- Adding context to any smart contract interaction
+- Providing context for any smart contract interaction
 
 In this document, we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo)
 to illustrate the process of posting a comment as part of any transaction.
