@@ -37,7 +37,7 @@ export default function Home() {
               checked={isGasless}
               onCheckedChange={setIsGasless}
             />
-            <Label htmlFor="gasless-mode">Comment allowance approval</Label>
+            <Label htmlFor="gasless-mode">Gas Sponsored Transactions</Label>
           </div>
           {/* when the user hasn't connect we already have a ConnectButton in the middle of the comment section
         so let's hide this one when that's the case */}
