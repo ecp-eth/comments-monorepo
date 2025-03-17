@@ -1,0 +1,134 @@
+# Integration Options
+
+## Contract Interaction
+
+### Post comment in any Ethereum transaction
+
+Sometimes, you might want to attach a comment directly to a transaction -- without the need for an additional transaction or smart contract integration. This can be useful for:
+
+- Reducing gas costs by embedding the comment in the transaction calldata
+- Adding notes to NFT mints
+- Commenting on token transfers
+- Providing context for any smart contract interaction
+
+In this document, we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo)
+to illustrate the process of posting a comment as part of any transaction.
+
+### The Contract
+
+- For latest contract address, see [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS).
+
+### How it works
+
+The demo app uses a test contract with the method `yoink()` to illustrate how to include a comment in a transaction.
+For a detailed explanation of the flow, see the [Post Comment Flows](/post-comment-flows#4-appending-comment-to-a-transaction-author-pays-gas).
+
+1. The author creates a signed comment data by sending it to the app server for signing.
+1. The author encodes the signed comment data into a hex string.
+1. The author calls the `yoink()` method on the contract and passes the encoded comment data as calldata suffix.
+1. Once the transaction is broadcasted, the comment in calldata will then be indexed by our ponder indexer.
+
+For dependencies and test environment setup, please refer to previous [examples in this section](/integration-options/contract-interactions).
+
+#### Test contract
+
+The test contract source code is available in the [test-protocol package](https://github.com/ecp-eth/comments-monorepo/tree/main/packages/test-protocol).
+
+Should you want to deploy your test contract, follow the steps in the [README file](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/test-protocol/README.md),
+then update the address used for the demo app in the `.env` files:
+
+```
+NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS=
+```
+
+🧑‍💻 _[/apps/demo/.env.example#L62](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/.env.example#L43)_
+
+Read more about testing with a local anvil node in [Test with Anvil](/test-with-anvil).
+
+**FYI:** If you are testing the comment posting integration, contract deployment is not strictly required:
+
+When no contract is deployed at the target address, the transaction that invokes the function will still succeed, but no code will be executed.
+The indexer will still capture the successful transaction as long as it contains the [ECP delimiter](/sdk-reference/defaultExports/variables/COMMENT_CALLDATA_SUFFIX_DELIMITER) in the calldata.
+
+Now let's get started with the code!
+
+::::steps
+
+#### Get the comment data signed by the app server
+
+As all previous examples, the author will start by collecting the required
+[comment data](/comment-data-props) and send it to the app server for signing:
+
+```typescript
+const response = await fetch("/api/sign-comment", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    content,
+    targetUri: window.location.href,
+    parentId,
+    author: address,
+    chainId,
+  }),
+});
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/CommentBox.tsx#L62](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/CommentBox.tsx#L62)_
+
+#### Encode the comment data
+
+Next, we want to encode signed comment data into hex using `encodeAbiParameters` with the ABI definition of the comment data,
+luckily we have a helper function `createCommentSuffixData` from the SDKto do just that:
+
+```typescript
+const commentDataSuffix = createCommentSuffixData({
+  commentData,
+  appSignature,
+});
+```
+
+🧑‍💻 _[/apps/demo/src/lib/contract.ts#L21-L24](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/lib/contract.ts#L21-L24)_
+
+#### Include a comment in your transaction
+
+Now you can create the test contract instance and include the encoded comment data in your transaction's data field:
+
+```typescript
+return await writeContractAsync({
+  address:
+    publicEnv.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS ??
+    never("Yoink contract address is not set"),
+  abi: parseAbi(["function yoink()"]),
+  functionName: "yoink",
+  args: [],
+  dataSuffix: commentDataSuffix,
+});
+```
+
+🧑‍💻 _[/apps/demo/src/lib/contract.ts#L26-L33](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/lib/contract.ts#L26-L33)_
+
+and wait for the transaction to be mined:
+
+```typescript
+const { data: receipt, isLoading: isReceiptLoading } =
+  useWaitForTransactionReceipt({
+    hash: submitMutation.data?.txHash,
+  });
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/CommentBox.tsx#L113-L116](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/CommentBox.tsx#L113-L116)_
+
+The comments indexer will scan transactions for valid comment data and index any comments it finds, making them available through the indexer API.
+
+#### Testing the integration
+
+You can verify your integration by:
+
+1. Checking the indexer API (or [deploy indexer locally](/indexer-reference)) to see if the comment was indexed
+1. Viewing the comment on your app's UI
+
+#### Congrats! You've completed the tutorial!
+
+::::

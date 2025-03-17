@@ -56,8 +56,12 @@ export default defineConfig({
               text: "Contract Interaction",
               items: [
                 {
-                  text: "Post comment as author",
+                  text: "Post comment (author pays gas)",
                   link: "/integration-options/contract-interactions/post-as-author",
+                },
+                {
+                  text: "Post comment in transaction",
+                  link: "/integration-options/contract-interactions/post-in-any-transaction",
                 },
               ],
             },
@@ -77,6 +81,10 @@ export default defineConfig({
           link: "/dual-signature-system",
         },
         {
+          text: "Comment Data",
+          link: "/comment-data-props",
+        },
+        {
           text: "Post comment flows",
           link: "/post-comment-flows",
         },
@@ -90,7 +98,7 @@ export default defineConfig({
           link: "/indexer-reference/",
         },
         {
-          text: "Alt Indexers: Index Supply",
+          text: "Index Supply",
           link: "/index-supply",
         },
       ],
