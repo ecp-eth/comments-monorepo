@@ -43,10 +43,12 @@ NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS=
 
 🧑‍💻 _[/apps/demo/.env.example#L62](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/.env.example#L43)_
 
-**Note:** Test contract deployment is not strictly needed for testing as currently, the indexer will just scan all transactions with the [ECP delimiter](/sdk-reference/defaultExports/variables/COMMENT_CALLDATA_SUFFIX_DELIMITER),
-and index the comment data if it finds one. So even if the test contract is not deployed, everything will still work as long as the transaction is broadcasted to the network.
-
 Read more about testing with a local anvil node in [Test with Anvil](/test-with-anvil).
+
+**FYI:** If you are testing the comment posting integration, contract deployment is not strictly required:
+
+When no contract is deployed at the target address, the transaction that invokes the function will still succeed, but no code will be executed.
+The indexer will still capture the successful transaction as long as it contains the [ECP delimiter](/sdk-reference/defaultExports/variables/COMMENT_CALLDATA_SUFFIX_DELIMITER) in the calldata.
 
 Now let's get started with the code!
 
