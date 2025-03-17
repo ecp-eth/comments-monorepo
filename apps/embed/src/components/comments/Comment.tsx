@@ -37,7 +37,6 @@ import { toast } from "sonner";
 import { submitCommentMutationFunction } from "./queries";
 import {
   useHandleCommentDeleted,
-  useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
@@ -50,7 +49,6 @@ import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "./CommentAuthor";
 
 export type OnDeleteComment = (id: Hex) => void;
-export type OnPostCommentSuccess = (transactionHash: Hex) => void;
 export type OnRetryPostComment = (
   comment: CommentType,
   newPendingOperation: PendingCommentOperationSchemaType
@@ -63,12 +61,6 @@ interface CommentProps {
    */
   depth?: number;
   onDelete?: OnDeleteComment;
-  /**
-   * Called when comment is successfully posted to the blockchain.
-   *
-   * This is called only if comment is pending.
-   */
-  onPostSuccess: OnPostCommentSuccess;
   /**
    * Called when comment posting to blockchain failed and the transaction has been reverted
    * and user pressed retry.
@@ -84,14 +76,12 @@ export function Comment({
   depth = 1,
   comment,
   onDelete,
-  onPostSuccess,
   onRetryPost,
   currentTimestamp,
 }: CommentProps) {
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
-  const onPostSuccessRef = useFreshRef(onPostSuccess);
   const onDeleteRef = useFreshRef(onDelete);
   /**
    * Prevents infinite cycle when delete comment transaction succeeded
@@ -181,9 +171,6 @@ export function Comment({
   const handleCommentSubmitted = useHandleCommentSubmitted({
     queryKey: submitTargetQueryKey,
   });
-  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
-    queryKey: submitTargetQueryKey,
-  });
   const handleRetryPostComment = useHandleRetryPostComment({
     queryKey: submitTargetQueryKey,
   });
@@ -249,10 +236,9 @@ export function Comment({
 
   useEffect(() => {
     if (postingCommentTxReceipt.data?.status === "success") {
-      onPostSuccessRef.current?.(postingCommentTxReceipt.data.transactionHash);
       toast.success("Comment posted");
     }
-  }, [onPostSuccessRef, postingCommentTxReceipt.data]);
+  }, [postingCommentTxReceipt.data]);
 
   const isAuthor =
     connectedAddress && comment.author
@@ -355,7 +341,6 @@ export function Comment({
           key={reply.id}
           comment={reply}
           onDelete={handleCommentDeleted}
-          onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
           currentTimestamp={currentTimestamp}
         />

@@ -102,40 +102,6 @@ export function mergeNewComments(
   };
 }
 
-export function deletePendingCommentByTransactionHash(
-  queryData: InfiniteData<
-    CommentPageSchemaType,
-    ListCommentsQueryPageParamsSchemaType
-  >,
-  transactionHash: string
-): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
-  const clonedData = structuredClone(queryData);
-
-  function deleteComment(page: CommentPageSchemaType): boolean {
-    for (const comment of page.results) {
-      if (comment.pendingOperation?.txHash === transactionHash) {
-        delete comment.pendingOperation;
-
-        return true;
-      }
-
-      if (comment.replies && deleteComment(comment.replies)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  for (const page of clonedData.pages) {
-    if (deleteComment(page)) {
-      return clonedData;
-    }
-  }
-
-  return clonedData;
-}
-
 export function insertPendingCommentToPage(
   queryData: InfiniteData<
     CommentPageSchemaType,

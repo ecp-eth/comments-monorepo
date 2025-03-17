@@ -10,13 +10,8 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
+import type { OnDeleteComment, OnRetryPostComment } from "./Comment";
 import {
-  OnDeleteComment,
-  OnPostCommentSuccess,
-  OnRetryPostComment,
-} from "./Comment";
-import {
-  deletePendingCommentByTransactionHash,
   hasNewComments,
   mergeNewComments,
   insertPendingCommentToPage,
@@ -172,38 +167,6 @@ export function useHandleCommentSubmitted({
           const queryData = ListCommentsQueryDataSchema.parse(oldData);
 
           return insertPendingCommentToPage(queryData, pendingOperation);
-        }
-      );
-    },
-    [client, queryKey]
-  );
-}
-
-export function useHandleCommentPostedSuccessfully({
-  queryKey,
-}: {
-  queryKey: QueryKey;
-}): OnPostCommentSuccess {
-  const client = useQueryClient();
-
-  return useCallback(
-    (transactionHash) => {
-      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-        queryKey,
-        (oldData) => {
-          if (!oldData) {
-            return oldData;
-          }
-
-          return oldData;
-
-          const queryData = ListCommentsQueryDataSchema.parse(oldData);
-
-          // do nothing for now, we will use the new comments checker hook to mark the comment as not pending
-          return deletePendingCommentByTransactionHash(
-            queryData,
-            transactionHash
-          );
         }
       );
     },

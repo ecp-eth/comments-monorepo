@@ -9,7 +9,6 @@ import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
 import {
   useHandleCommentDeleted,
-  useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
@@ -95,9 +94,6 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   const handleCommentSubmitted = useHandleCommentSubmitted({
     queryKey,
   });
-  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
-    queryKey,
-  });
   const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
 
   const results = useMemo(() => {
@@ -138,7 +134,6 @@ export function CommentSection({ initialData }: CommentSectionProps) {
           comment={comment}
           key={comment.id}
           onDelete={handleCommentDeleted}
-          onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
           currentTimestamp={currentTimestamp}
         />
