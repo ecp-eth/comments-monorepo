@@ -5,6 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  CommentPageSchema,
   CommentPageSchemaType,
   type Comment as CommentType,
 } from "@/lib/schemas";
@@ -25,8 +26,15 @@ import { useAccount } from "wagmi";
 import {
   DefinedUseInfiniteQueryResult,
   InfiniteData,
+  useInfiniteQuery,
 } from "@tanstack/react-query";
 import { publicEnv } from "@/publicEnv";
+import {
+  MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
+import { fetchCommentReplies } from "@ecp.eth/sdk";
+import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 
 type CommentFormProps = {
   /**
@@ -57,8 +65,6 @@ type CommentSharedProps = {
   didDeletingFailed: boolean;
   isPosting: boolean;
   didPostingFailed: boolean;
-  hasNewReplies: boolean;
-  fetchNewReplies: () => void;
   onDeleteClick: () => void;
   onReplySubmitSuccess: OnSubmitSuccessFunction;
   onRetryDeleteClick: () => void;
@@ -67,9 +73,6 @@ type CommentSharedProps = {
   onReplyPost: OnRetryPostComment;
   ReplyComponent: React.ComponentType<CommentProps>;
   ReplyFormComponent: React.ComponentType<CommentFormProps>;
-  repliesQuery: DefinedUseInfiniteQueryResult<
-    InfiniteData<CommentPageSchemaType>
-  >;
 };
 
 export function CommentShared({
@@ -80,8 +83,6 @@ export function CommentShared({
   isPosting,
   didPostingFailed,
   level,
-  hasNewReplies,
-  fetchNewReplies,
   onDeleteClick,
   onReplySubmitSuccess,
   onReplyDelete,
@@ -90,10 +91,74 @@ export function CommentShared({
   onRetryPostClick,
   ReplyComponent,
   ReplyFormComponent,
-  repliesQuery,
 }: CommentSharedProps) {
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
+
+  const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
+
+  const repliesQuery = useInfiniteQuery({
+    enabled: areRepliesAllowed,
+    queryKey,
+    initialData: comment.replies
+      ? {
+          pages: [comment.replies],
+          pageParams: [
+            {
+              cursor: comment.replies.pagination.endCursor,
+              limit: comment.replies.pagination.limit,
+            },
+          ],
+        }
+      : undefined,
+    initialPageParam: {
+      cursor: comment.replies?.pagination.endCursor,
+      limit:
+        comment.replies?.pagination.limit ??
+        MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+    },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    queryFn: async ({ pageParam, signal }) => {
+      const response = await fetchCommentReplies({
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        cursor: pageParam.cursor,
+        limit: pageParam.limit,
+        commentId: comment.id,
+        signal,
+      });
+
+      return CommentPageSchema.parse(response);
+    },
+    getNextPageParam(lastPage) {
+      if (!lastPage.pagination.hasNext) {
+        return;
+      }
+
+      return {
+        cursor: lastPage.pagination.endCursor,
+        limit: lastPage.pagination.limit,
+      };
+    },
+  });
+
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    queryData: repliesQuery.data,
+    queryKey,
+    fetchComments({ cursor, signal }) {
+      return fetchCommentReplies({
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        commentId: comment.id,
+        cursor,
+        limit: 10,
+        sort: "asc",
+        signal,
+      });
+    },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
+  });
 
   const isAuthor =
     connectedAddress && comment.author
@@ -165,9 +230,9 @@ export function CommentShared({
           }
         />
       )}
-      {hasNewReplies && (
+      {hasNewComments && (
         <div className="mb-2">
-          <CommentActionButton onClick={() => fetchNewReplies()}>
+          <CommentActionButton onClick={() => fetchNewComments()}>
             show new replies
           </CommentActionButton>
         </div>

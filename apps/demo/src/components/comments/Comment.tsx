@@ -1,4 +1,4 @@
-import { COMMENTS_V1_ADDRESS, fetchCommentReplies } from "@ecp.eth/sdk";
+import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { useCallback, useEffect, useMemo } from "react";
 import {
@@ -17,16 +17,11 @@ import {
   useHandleCommentDeleted,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
-  useNewCommentsChecker,
   useFreshRef,
 } from "@ecp.eth/shared/hooks";
-import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { type Comment as CommentType } from "@/lib/schemas";
+import { useMutation } from "@tanstack/react-query";
 import { submitCommentMutationFunction } from "./queries";
-import {
-  MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
-  NEW_COMMENTS_CHECK_INTERVAL,
-} from "@/lib/constants";
 import never from "never";
 import { toast } from "sonner";
 import { CommentShared } from "./CommentShared";
@@ -66,69 +61,6 @@ export function Comment({
     [submitTargetCommentId]
   );
   const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
-
-  const repliesQuery = useInfiniteQuery({
-    enabled: areRepliesAllowed,
-    queryKey,
-    initialData: comment.replies
-      ? {
-          pages: [comment.replies],
-          pageParams: [
-            {
-              cursor: comment.replies.pagination.endCursor,
-              limit: comment.replies.pagination.limit,
-            },
-          ],
-        }
-      : undefined,
-    initialPageParam: {
-      cursor: comment.replies?.pagination.endCursor,
-      limit:
-        comment.replies?.pagination.limit ??
-        MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
-    },
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    queryFn: async ({ pageParam, signal }) => {
-      const response = await fetchCommentReplies({
-        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        cursor: pageParam.cursor,
-        limit: pageParam.limit,
-        commentId: comment.id,
-        signal,
-      });
-
-      return CommentPageSchema.parse(response);
-    },
-    getNextPageParam(lastPage) {
-      if (!lastPage.pagination.hasNext) {
-        return;
-      }
-
-      return {
-        cursor: lastPage.pagination.endCursor,
-        limit: lastPage.pagination.limit,
-      };
-    },
-  });
-
-  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
-    queryData: repliesQuery.data,
-    queryKey,
-    fetchComments({ cursor, signal }) {
-      return fetchCommentReplies({
-        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        commentId: comment.id,
-        cursor,
-        limit: 10,
-        sort: "asc",
-        signal,
-      });
-    },
-    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
-  });
 
   const handleCommentSubmitted = useHandleCommentSubmitted({
     queryKey: submitTargetQueryKey,
@@ -226,14 +158,11 @@ export function Comment({
       didPostingFailed={didPostingFailed}
       isDeleting={isDeleting}
       isPosting={isPosting}
-      hasNewReplies={hasNewComments}
-      fetchNewReplies={fetchNewComments}
       onReplyDelete={handleCommentDeleted}
       onReplyPost={handleRetryPostComment}
       onRetryDeleteClick={handleDeleteClick}
       onRetryPostClick={retryPostMutation.mutate}
       onReplySubmitSuccess={handleCommentSubmitted}
-      repliesQuery={repliesQuery}
       level={level}
       ReplyComponent={Comment}
       ReplyFormComponent={CommentBox}

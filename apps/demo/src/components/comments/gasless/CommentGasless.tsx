@@ -1,22 +1,16 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/publicEnv";
-import {
-  MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
-  NEW_COMMENTS_CHECK_INTERVAL,
-} from "@/lib/constants";
-import { fetchCommentReplies } from "@ecp.eth/sdk";
 import {
   useHandleCommentDeleted,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
-  useNewCommentsChecker,
   useFreshRef,
 } from "@ecp.eth/shared/hooks";
 import { useDeleteGaslessComment, useSubmitGaslessComment } from "../hooks";
-import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
+import { type Comment as CommentType } from "@/lib/schemas";
 import type {
   OnDeleteComment,
   OnRetryPostComment,
@@ -60,69 +54,6 @@ export function CommentGasless({
     () => ["comments", submitTargetCommentId],
     [submitTargetCommentId]
   );
-
-  const repliesQuery = useInfiniteQuery({
-    enabled: areRepliesAllowed,
-    queryKey,
-    initialData: comment.replies
-      ? {
-          pages: [comment.replies],
-          pageParams: [
-            {
-              cursor: comment.replies.pagination.endCursor,
-              limit: comment.replies.pagination.limit,
-            },
-          ],
-        }
-      : undefined,
-    initialPageParam: {
-      cursor: comment.replies?.pagination.endCursor,
-      limit:
-        comment.replies?.pagination.limit ??
-        MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
-    },
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    queryFn: async ({ pageParam, signal }) => {
-      const response = await fetchCommentReplies({
-        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        cursor: pageParam.cursor,
-        limit: pageParam.limit,
-        commentId: comment.id,
-        signal,
-      });
-
-      return CommentPageSchema.parse(response);
-    },
-    getNextPageParam(lastPage) {
-      if (!lastPage.pagination.hasNext) {
-        return;
-      }
-
-      return {
-        cursor: lastPage.pagination.endCursor,
-        limit: lastPage.pagination.limit,
-      };
-    },
-  });
-
-  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
-    queryData: repliesQuery.data,
-    queryKey,
-    fetchComments({ cursor, signal }) {
-      return fetchCommentReplies({
-        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        commentId: comment.id,
-        cursor,
-        limit: 10,
-        sort: "asc",
-        signal,
-      });
-    },
-    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
-  });
 
   const handleCommentSubmitted = useHandleCommentSubmitted({
     queryKey: submitTargetQueryKey,
@@ -213,14 +144,11 @@ export function CommentGasless({
       didPostingFailed={didPostingFailed}
       isDeleting={isDeleting}
       isPosting={isPosting}
-      hasNewReplies={hasNewComments}
-      fetchNewReplies={fetchNewComments}
       onReplyDelete={handleCommentDeleted}
       onReplyPost={handleRetryPostComment}
       onRetryDeleteClick={handleDeleteClick}
       onRetryPostClick={retryPostMutation.mutate}
       onReplySubmitSuccess={handleCommentSubmitted}
-      repliesQuery={repliesQuery}
       level={level}
       ReplyComponent={CommentGasless}
       ReplyFormComponent={CommentBoxGasless}
