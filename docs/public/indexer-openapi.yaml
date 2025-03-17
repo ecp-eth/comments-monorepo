@@ -25,6 +25,23 @@ paths:
           name: appSigner
           in: query
         - schema:
+            type: object
+            properties:
+              timestamp:
+                type:
+                  - string
+                  - 'null'
+              id: {}
+            required:
+              - timestamp
+              - id
+            description: >-
+              Non inclusive cursor from which to fetch the comments based on
+              sort
+          required: false
+          name: cursor
+          in: query
+        - schema:
             type: integer
             minimum: 1
             maximum: 100
@@ -32,16 +49,6 @@ paths:
             description: The number of comments to return
           required: false
           name: limit
-          in: query
-        - schema:
-            type:
-              - integer
-              - 'null'
-            minimum: 0
-            default: 0
-            description: The offset of the comments to return
-          required: false
-          name: offset
           in: query
         - schema:
             type: string
@@ -128,6 +135,7 @@ paths:
                             - string
                             - 'null'
                         txHash: {}
+                        cursor: {}
                         replies:
                           type: object
                           properties:
@@ -191,6 +199,7 @@ paths:
                                       - string
                                       - 'null'
                                   txHash: {}
+                                  cursor: {}
                                 required:
                                   - appSigner
                                   - author
@@ -204,19 +213,22 @@ paths:
                                   - targetUri
                                   - timestamp
                                   - txHash
+                                  - cursor
                             pagination:
                               type: object
                               properties:
                                 limit:
                                   type: integer
-                                offset:
-                                  type: integer
-                                hasMore:
+                                hasNext:
                                   type: boolean
+                                hasPrevious:
+                                  type: boolean
+                                startCursor: {}
+                                endCursor: {}
                               required:
                                 - limit
-                                - offset
-                                - hasMore
+                                - hasNext
+                                - hasPrevious
                           required:
                             - results
                             - pagination
@@ -233,20 +245,23 @@ paths:
                         - targetUri
                         - timestamp
                         - txHash
+                        - cursor
                         - replies
                   pagination:
                     type: object
                     properties:
                       limit:
                         type: integer
-                      offset:
-                        type: integer
-                      hasMore:
+                      hasNext:
                         type: boolean
+                      hasPrevious:
+                        type: boolean
+                      startCursor: {}
+                      endCursor: {}
                     required:
                       - limit
-                      - offset
-                      - hasMore
+                      - hasNext
+                      - hasPrevious
                 required:
                   - results
                   - pagination
@@ -271,6 +286,23 @@ paths:
           name: appSigner
           in: query
         - schema:
+            type: object
+            properties:
+              timestamp:
+                type:
+                  - string
+                  - 'null'
+              id: {}
+            required:
+              - timestamp
+              - id
+            description: >-
+              Non inclusive cursor from which to fetch the comments based on
+              sort
+          required: false
+          name: cursor
+          in: query
+        - schema:
             type: integer
             minimum: 1
             maximum: 100
@@ -278,16 +310,6 @@ paths:
             description: The number of comments to return
           required: false
           name: limit
-          in: query
-        - schema:
-            type:
-              - integer
-              - 'null'
-            minimum: 0
-            default: 0
-            description: The offset of the comments to return
-          required: false
-          name: offset
           in: query
         - schema:
             type: string
@@ -365,6 +387,7 @@ paths:
                             - string
                             - 'null'
                         txHash: {}
+                        cursor: {}
                       required:
                         - appSigner
                         - author
@@ -378,19 +401,22 @@ paths:
                         - targetUri
                         - timestamp
                         - txHash
+                        - cursor
                   pagination:
                     type: object
                     properties:
                       limit:
                         type: integer
-                      offset:
-                        type: integer
-                      hasMore:
+                      hasNext:
                         type: boolean
+                      hasPrevious:
+                        type: boolean
+                      startCursor: {}
+                      endCursor: {}
                     required:
                       - limit
-                      - offset
-                      - hasMore
+                      - hasNext
+                      - hasPrevious
                 required:
                   - results
                   - pagination

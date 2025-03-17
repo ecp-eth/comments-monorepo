@@ -8,7 +8,7 @@
 
 > **FetchCommentRepliesOptions**: `object`
 
-Defined in: [packages/sdk/src/api.ts:143](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L143)
+Defined in: [packages/sdk/src/api.ts:144](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L144)
 
 The options for `fetchCommentReplies()`
 
@@ -38,6 +38,12 @@ Filters only to comments sent using this app signer key.
 
 The ID of the comment to fetch replies for
 
+### cursor?
+
+> `optional` **cursor**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
+
+The cursor to fetch comments from
+
 ### limit?
 
 > `optional` **limit**: `number`
@@ -46,16 +52,6 @@ The ID of the comment to fetch replies for
 
 ```ts
 50
-```
-
-### offset?
-
-> `optional` **offset**: `number`
-
-#### Default
-
-```ts
-0
 ```
 
 ### retries?

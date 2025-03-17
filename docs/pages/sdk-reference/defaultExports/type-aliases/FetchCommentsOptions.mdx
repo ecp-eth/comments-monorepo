@@ -38,6 +38,12 @@ Filter comments sent using this app signer key.
 
 Filter comments by author
 
+### cursor?
+
+> `optional` **cursor**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
+
+The cursor to fetch comments from
+
 ### limit?
 
 > `optional` **limit**: `number`
@@ -48,18 +54,6 @@ The number of comments to fetch
 
 ```ts
 50
-```
-
-### offset?
-
-> `optional` **offset**: `number`
-
-The offset of the comments to fetch
-
-#### Default
-
-```ts
-0
 ```
 
 ### retries?
