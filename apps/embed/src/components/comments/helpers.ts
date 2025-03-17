@@ -2,6 +2,8 @@ import type {
   Comment,
   PendingCommentOperationSchemaType,
   CommentPageSchemaType,
+  ListCommentsQueryPageParamsSchemaType,
+  PendingComment,
 } from "@/lib/schemas";
 import { abbreviateAddressForDisplay } from "@/lib/utils";
 import { getCommentCursor } from "@ecp.eth/sdk";
@@ -18,10 +20,95 @@ export function getCommentAuthorNameOrAddress(
   );
 }
 
+export function hasNewComments(
+  oldQueryData: InfiniteData<CommentPageSchemaType>,
+  newCommentsPage: CommentPageSchemaType
+) {
+  if (newCommentsPage.results.length === 0) {
+    return false;
+  }
+
+  const pendingComments: Set<PendingComment["id"]> = new Set(
+    oldQueryData.pages.flatMap((page) =>
+      page.results
+        .filter(
+          (comment): comment is PendingComment => !!comment.pendingOperation
+        )
+        .map((comment) => comment.id)
+    )
+  );
+
+  for (const newComment of newCommentsPage.results) {
+    if (!pendingComments.has(newComment.id)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function mergeNewComments(
+  oldQueryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
+  newCommentsPage: CommentPageSchemaType
+): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
+  if (newCommentsPage.results.length === 0) {
+    return oldQueryData;
+  }
+
+  const pendingComments: Map<PendingComment["id"], { pageIndex: number }> =
+    new Map(
+      oldQueryData.pages.flatMap((page, pageIndex) =>
+        page.results
+          .filter(
+            (comment): comment is PendingComment => !!comment.pendingOperation
+          )
+          .map((comment) => [comment.id, { pageIndex }])
+      )
+    );
+
+  for (const newComment of newCommentsPage.results) {
+    if (pendingComments.has(newComment.id)) {
+      const { pageIndex } = pendingComments.get(newComment.id)!;
+
+      oldQueryData.pages[pageIndex].results = oldQueryData.pages[
+        pageIndex
+      ].results.filter((comment) => comment.id !== newComment.id);
+    }
+  }
+
+  return {
+    pages: [
+      {
+        results: newCommentsPage.results.slice().reverse(),
+        pagination: {
+          ...newCommentsPage.pagination,
+          // new comments is using reverse ordering therefore we have to swap the start and end cursors
+          // so it matches the old query data ordering
+          startCursor: newCommentsPage.pagination.endCursor,
+          endCursor: newCommentsPage.pagination.startCursor,
+        },
+      },
+      ...oldQueryData.pages,
+    ],
+    pageParams: [
+      {
+        limit: newCommentsPage.pagination.limit,
+      },
+      ...oldQueryData.pageParams,
+    ],
+  };
+}
+
 export function deletePendingCommentByTransactionHash(
-  queryData: InfiniteData<CommentPageSchemaType>,
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
   transactionHash: string
-): InfiniteData<CommentPageSchemaType> {
+): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   const clonedData = structuredClone(queryData);
 
   function deleteComment(page: CommentPageSchemaType): boolean {
@@ -50,9 +137,12 @@ export function deletePendingCommentByTransactionHash(
 }
 
 export function insertPendingCommentToPage(
-  queryData: InfiniteData<CommentPageSchemaType>,
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
   pendingOperation: PendingCommentOperationSchemaType
-): InfiniteData<CommentPageSchemaType> {
+): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   const clonedData = structuredClone(queryData);
 
   const { response, txHash, chainId } = pendingOperation;
@@ -83,10 +173,13 @@ export function insertPendingCommentToPage(
 }
 
 export function replaceCommentPendingOperationByComment(
-  queryData: InfiniteData<CommentPageSchemaType>,
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
   comment: Comment,
   newPendingOperation: PendingCommentOperationSchemaType
-): InfiniteData<CommentPageSchemaType> {
+): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   const clonedData = structuredClone(queryData);
 
   function replaceComment(page: CommentPageSchemaType): boolean {
@@ -115,9 +208,12 @@ export function replaceCommentPendingOperationByComment(
 }
 
 export function markCommentAsDeleted(
-  queryData: InfiniteData<CommentPageSchemaType>,
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
   commentId: Hex
-): InfiniteData<CommentPageSchemaType> {
+): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   const clonedData = structuredClone(queryData);
 
   function markComment(page: CommentPageSchemaType): boolean {

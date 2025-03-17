@@ -28,6 +28,7 @@ import {
   CommentPageSchema,
   type PendingCommentOperationSchemaType,
   type Comment as CommentType,
+  ListCommentsQueryPageParamsSchemaType,
 } from "@/lib/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
@@ -39,6 +40,7 @@ import {
   useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
+  useNewCommentsChecker,
 } from "./hooks";
 import { Button } from "../ui/button";
 import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
@@ -111,6 +113,12 @@ export function Comment({
   const repliesQuery = useInfiniteQuery({
     enabled: areRepliesAllowed,
     queryKey,
+    initialPageParam: {
+      cursor: comment.replies?.pagination.endCursor,
+      limit:
+        comment.replies?.pagination.limit ??
+        MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+    } as ListCommentsQueryPageParamsSchemaType,
     initialData: comment.replies
       ? {
           pages: [comment.replies],
@@ -122,12 +130,6 @@ export function Comment({
           ],
         }
       : undefined,
-    initialPageParam: {
-      cursor: comment.replies?.pagination.endCursor,
-      limit:
-        comment.replies?.pagination.limit ??
-        MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
-    },
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async ({ pageParam, signal }) => {
@@ -142,7 +144,9 @@ export function Comment({
 
       return CommentPageSchema.parse(response);
     },
-    getNextPageParam(lastPage) {
+    getNextPageParam(
+      lastPage
+    ): ListCommentsQueryPageParamsSchemaType | undefined {
       if (!lastPage.pagination.hasNext) {
         return;
       }
@@ -151,6 +155,22 @@ export function Comment({
         cursor: lastPage.pagination.endCursor,
         limit: lastPage.pagination.limit,
       };
+    },
+  });
+
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    queryData: repliesQuery.data,
+    queryKey,
+    fetchComments({ cursor, signal }) {
+      return fetchCommentReplies({
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        commentId: comment.id,
+        cursor,
+        limit: 10,
+        sort: "asc",
+        signal,
+      });
     },
   });
 
@@ -320,6 +340,13 @@ export function Comment({
             placeholder="What are your thoughts?"
             parentId={submitTargetCommentId}
           />
+        </div>
+      )}
+      {hasNewComments && (
+        <div className="mb-2">
+          <ActionButton onClick={() => fetchNewComments()}>
+            show new replies
+          </ActionButton>
         </div>
       )}
       {replies.map((reply) => (

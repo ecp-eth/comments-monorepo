@@ -12,19 +12,23 @@ import {
   useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
+  useNewCommentsChecker,
 } from "./hooks";
 import { Button } from "../ui/button";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { fetchComments } from "@ecp.eth/sdk";
-import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
+import {
+  CommentPageSchema,
+  ListCommentsQueryPageParamsSchemaType,
+  type CommentPageSchemaType,
+} from "@/lib/schemas";
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { publicEnv } from "@/publicEnv";
-import type { Hex } from "@ecp.eth/sdk/schemas";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
     CommentPageSchemaType,
-    { cursor: Hex | undefined; limit: number }
+    ListCommentsQueryPageParamsSchemaType
   >;
 };
 
@@ -38,9 +42,9 @@ export function CommentSection({ initialData }: CommentSectionProps) {
       queryKey,
       initialData,
       initialPageParam: {
-        cursor: undefined as Hex | undefined,
+        cursor: undefined,
         limit: COMMENTS_PER_PAGE,
-      },
+      } as ListCommentsQueryPageParamsSchemaType,
       queryFn: async ({ pageParam, signal }) => {
         const response = await fetchComments({
           appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
@@ -55,7 +59,9 @@ export function CommentSection({ initialData }: CommentSectionProps) {
       },
       refetchOnMount: false,
       refetchOnWindowFocus: false,
-      getNextPageParam(lastPage) {
+      getNextPageParam(
+        lastPage
+      ): ListCommentsQueryPageParamsSchemaType | undefined {
         if (!lastPage.pagination.hasNext) {
           return;
         }
@@ -66,6 +72,22 @@ export function CommentSection({ initialData }: CommentSectionProps) {
         };
       },
     });
+
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    queryData: data,
+    queryKey,
+    fetchComments(options) {
+      return fetchComments({
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        targetUri,
+        limit: COMMENTS_PER_PAGE,
+        cursor: options.cursor,
+        signal: options.signal,
+        sort: "asc",
+      });
+    },
+  });
 
   const handleCommentDeleted = useHandleCommentDeleted({
     queryKey,
@@ -101,6 +123,16 @@ export function CommentSection({ initialData }: CommentSectionProps) {
       <div className="mb-4">
         <CommentForm onSubmitSuccess={handleCommentSubmitted} />
       </div>
+      {hasNewComments && (
+        <Button
+          className="mb-4"
+          onClick={() => fetchNewComments()}
+          variant="secondary"
+          size="sm"
+        >
+          Load new comments
+        </Button>
+      )}
       {results.map((comment) => (
         <Comment
           comment={comment}
@@ -112,8 +144,13 @@ export function CommentSection({ initialData }: CommentSectionProps) {
         />
       ))}
       {hasNextPage && (
-        <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
-          Load More
+        <Button
+          className="mb-4"
+          onClick={() => fetchNextPage()}
+          variant="secondary"
+          size="sm"
+        >
+          Load more
         </Button>
       )}
     </div>
