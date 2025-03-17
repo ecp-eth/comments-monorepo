@@ -4,57 +4,43 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { bigintReplacer, cn } from "@/lib/utils";
-import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 import { MoreVertical } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getAddress, SignTypedDataParameters } from "viem";
+import { getAddress } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
-import type { Comment as CommentType } from "@/lib/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
-import {
-  CommentPageSchema,
-  DeleteCommentResponseSchema,
-  PreparedSignedGaslessDeleteCommentNotApprovedSchemaType,
-} from "@/lib/schemas";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "../CommentAuthor";
 import { CommentText } from "../CommentText";
 import { CommentActionOrStatus } from "../CommentActionOrStatus";
-import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
+import {
+  MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
 import { fetchCommentReplies } from "@ecp.eth/sdk";
 import { CommentActionButton } from "../CommentActionButton";
 import {
-  deletePriorApprovedCommentMutationFunction,
-  deletePriorNotApprovedCommentMutationFunction,
-} from "../queries";
-import {
   useHandleCommentDeleted,
-  useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
-  useSubmitGaslessComment,
-} from "../hooks";
+  useNewCommentsChecker,
+} from "@ecp.eth/shared/hooks";
+import { useDeleteGaslessComment, useSubmitGaslessComment } from "../hooks";
+import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
 import type {
   OnDeleteComment,
-  OnPostCommentSuccess,
   OnRetryPostComment,
-} from "../types";
+} from "@ecp.eth/shared/types";
 import { toast } from "sonner";
 import never from "never";
+import { cn } from "@/lib/utils";
 
 interface CommentProps {
   isAppSignerApproved: boolean;
   comment: CommentType;
   onDelete?: OnDeleteComment;
-  /**
-   * Called when comment is successfully posted to the blockchain.
-   *
-   * This is called only if comment is pending.
-   */
-  onPostSuccess: OnPostCommentSuccess;
   /**
    * Called when comment posting to blockchain failed and the transaction has been reverted
    * and user pressed retry.
@@ -65,7 +51,6 @@ interface CommentProps {
 
 export function CommentGasless({
   comment,
-  onPostSuccess,
   onRetryPost,
   onDelete,
   isAppSignerApproved: submitIfApproved,
@@ -73,7 +58,6 @@ export function CommentGasless({
 }: CommentProps) {
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
-  const onPostSuccessRef = useFreshRef(onPostSuccess);
   const onDeleteRef = useFreshRef(onDelete);
   /**
    * Prevents infinite cycle when delete comment transaction succeeded
@@ -98,14 +82,14 @@ export function CommentGasless({
           pages: [comment.replies],
           pageParams: [
             {
-              offset: comment.replies.pagination.offset,
+              cursor: comment.replies.pagination.endCursor,
               limit: comment.replies.pagination.limit,
             },
           ],
         }
       : undefined,
     initialPageParam: {
-      offset: comment.replies?.pagination.offset ?? 0,
+      cursor: comment.replies?.pagination.endCursor,
       limit:
         comment.replies?.pagination.limit ??
         MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
@@ -116,7 +100,7 @@ export function CommentGasless({
       const response = await fetchCommentReplies({
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        offset: pageParam.offset,
+        cursor: pageParam.cursor,
         limit: pageParam.limit,
         commentId: comment.id,
         signal,
@@ -125,21 +109,35 @@ export function CommentGasless({
       return CommentPageSchema.parse(response);
     },
     getNextPageParam(lastPage) {
-      if (!lastPage.pagination.hasMore) {
+      if (!lastPage.pagination.hasNext) {
         return;
       }
 
       return {
-        offset: lastPage.pagination.offset + lastPage.pagination.limit,
+        cursor: lastPage.pagination.endCursor,
         limit: lastPage.pagination.limit,
       };
     },
   });
 
-  const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey: submitTargetQueryKey,
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    queryData: repliesQuery.data,
+    queryKey,
+    fetchComments({ cursor, signal }) {
+      return fetchCommentReplies({
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        commentId: comment.id,
+        cursor,
+        limit: 10,
+        sort: "asc",
+        signal,
+      });
+    },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
-  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
+
+  const handleCommentSubmitted = useHandleCommentSubmitted({
     queryKey: submitTargetQueryKey,
   });
   const handleRetryPostComment = useHandleRetryPostComment({
@@ -171,97 +169,35 @@ export function CommentGasless({
     },
   });
 
-  // delete a comment that was previously approved, so not need for
-  // user approval for signature for each interaction
-  const deletePriorApprovedCommentMutation = useMutation({
-    mutationFn: async () => {
-      if (!connectedAddress) {
-        throw new Error("No address found");
-      }
-
-      if (!submitIfApproved) {
-        throw new Error("Not approved");
-      }
-
-      const result = await deletePriorApprovedCommentMutationFunction({
-        address: connectedAddress,
-        commentId: comment.id,
-      });
-
-      return result.txHash;
-    },
+  const deleteCommentMutation = useDeleteGaslessComment({
+    connectedAddress,
   });
 
-  // delete a comment that was previously NOT approved,
-  // will require user interaction for signature
-  const deletePriorNotApprovedCommentMutation = useGaslessTransaction({
-    async prepareSignTypedDataParams() {
-      if (!connectedAddress) {
-        throw new Error("No address found");
-      }
-
-      const data = await deletePriorNotApprovedCommentMutationFunction({
-        address: connectedAddress,
-        commentId: comment.id,
-      });
-
-      return {
-        signTypedDataParams:
-          data.signTypedDataParams as unknown as SignTypedDataParameters,
-        variables: data,
-      } satisfies {
-        signTypedDataParams: SignTypedDataParameters;
-        variables: PreparedSignedGaslessDeleteCommentNotApprovedSchemaType;
-      };
-    },
-    async sendSignedData({ signature, variables }) {
-      const response = await fetch("/api/delete-comment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(
-          {
-            ...variables,
-            authorSignature: signature,
-          },
-          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
-        ),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to post approval signature");
-      }
-
-      const data = DeleteCommentResponseSchema.parse(await response.json());
-
-      return data.txHash;
-    },
-  });
+  const { mutate: deleteComment, reset: resetDeleteCommentMutation } =
+    deleteCommentMutation;
 
   const handleDeleteClick = useCallback(() => {
-    if (submitIfApproved) {
-      deletePriorApprovedCommentMutation.mutate();
-    } else {
-      deletePriorNotApprovedCommentMutation.mutate();
-    }
-  }, [
-    submitIfApproved,
-    deletePriorApprovedCommentMutation,
-    deletePriorNotApprovedCommentMutation,
-  ]);
+    deleteComment({
+      comment,
+      submitIfApproved,
+    });
+  }, [comment, deleteComment, submitIfApproved]);
 
   const deleteCommentTransactionReceipt = useWaitForTransactionReceipt({
-    hash:
-      deletePriorNotApprovedCommentMutation.data ||
-      deletePriorApprovedCommentMutation.data,
+    hash: deleteCommentMutation.data,
   });
 
   useEffect(() => {
     if (deleteCommentTransactionReceipt.data?.status === "success") {
       onDeleteRef.current?.(commentRef.current.id);
+      resetDeleteCommentMutation();
     }
-  }, [deleteCommentTransactionReceipt.data?.status, commentRef, onDeleteRef]);
+  }, [
+    deleteCommentTransactionReceipt.data?.status,
+    commentRef,
+    onDeleteRef,
+    resetDeleteCommentMutation,
+  ]);
 
   const postingCommentTxReceipt = useWaitForTransactionReceipt({
     hash: comment.pendingOperation?.txHash,
@@ -270,10 +206,9 @@ export function CommentGasless({
 
   useEffect(() => {
     if (postingCommentTxReceipt.data?.status === "success") {
-      onPostSuccessRef.current?.(postingCommentTxReceipt.data.transactionHash);
       toast.success("Comment posted");
     }
-  }, [onPostSuccessRef, postingCommentTxReceipt.data]);
+  }, [postingCommentTxReceipt.data]);
 
   const isAuthor =
     connectedAddress && comment.author
@@ -285,14 +220,9 @@ export function CommentGasless({
   }, [repliesQuery.data?.pages]);
 
   const isDeleting =
-    deletePriorNotApprovedCommentMutation.isPending ||
-    deletePriorApprovedCommentMutation.isPending ||
+    deleteCommentMutation.isPending ||
     deleteCommentTransactionReceipt.isFetching;
-  const didDeletingFailed =
-    !isDeleting &&
-    (deletePriorApprovedCommentMutation.isError ||
-      deletePriorNotApprovedCommentMutation.isError);
-
+  const didDeletingFailed = !isDeleting && deleteCommentMutation.isError;
   const isPosting = postingCommentTxReceipt.isFetching;
   const didPostingFailed =
     !isPosting && postingCommentTxReceipt.data?.status === "reverted";
@@ -357,12 +287,18 @@ export function CommentGasless({
           isAppSignerApproved={submitIfApproved}
         />
       )}
+      {hasNewComments && (
+        <div className="mb-2">
+          <CommentActionButton onClick={() => fetchNewComments()}>
+            show new replies
+          </CommentActionButton>
+        </div>
+      )}
       {replies.map((reply) => (
         <CommentGasless
-          key={reply.id}
+          key={`${reply.id}-${reply.deletedAt}`}
           comment={reply}
           onDelete={handleCommentDeleted}
-          onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
           isAppSignerApproved={submitIfApproved}
           level={level + 1}

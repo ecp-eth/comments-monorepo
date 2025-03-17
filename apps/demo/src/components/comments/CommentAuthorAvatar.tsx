@@ -1,5 +1,5 @@
 import type { AuthorType } from "@/lib/types";
-import { getCommentAuthorNameOrAddress } from "./helpers";
+import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { blo } from "blo";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";

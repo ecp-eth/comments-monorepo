@@ -19,15 +19,19 @@ import {
   GetApprovalStatusSchema,
 } from "@/lib/schemas";
 import type { SignTypedDataParameters } from "viem";
-import { bigintReplacer } from "@/lib/utils";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
-import { COMMENTS_PER_PAGE } from "@/lib/constants";
+import {
+  COMMENTS_PER_PAGE,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
 import {
   useHandleCommentDeleted,
-  useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
-} from "../hooks";
+  useNewCommentsChecker,
+} from "@ecp.eth/shared/hooks";
+import type { Hex } from "@ecp.eth/sdk/schemas";
 
 export function CommentSectionGasless() {
   const { address: connectedAddress } = useAccount();
@@ -106,7 +110,7 @@ export function CommentSectionGasless() {
     useInfiniteQuery({
       queryKey,
       initialPageParam: {
-        offset: 0,
+        cursor: undefined as Hex | undefined,
         limit: COMMENTS_PER_PAGE,
       },
       queryFn: ({ pageParam, signal }) => {
@@ -114,7 +118,7 @@ export function CommentSectionGasless() {
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
           targetUri: currentUrl,
-          offset: pageParam.offset,
+          cursor: pageParam.cursor,
           limit: pageParam.limit,
           signal,
         });
@@ -123,24 +127,38 @@ export function CommentSectionGasless() {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
-        if (!lastPage.pagination.hasMore) {
+        if (!lastPage.pagination.hasNext) {
           return;
         }
 
         return {
-          offset: lastPage.pagination.offset + lastPage.pagination.limit,
+          cursor: lastPage.pagination.endCursor,
           limit: lastPage.pagination.limit,
         };
       },
     });
 
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    queryData: data,
+    queryKey,
+    fetchComments({ cursor, signal }) {
+      return fetchComments({
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        targetUri: currentUrl,
+        limit: COMMENTS_PER_PAGE,
+        cursor,
+        sort: "asc",
+        signal,
+      });
+    },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
+  });
+
   const handleCommentDeleted = useHandleCommentDeleted({
     queryKey,
   });
   const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey,
-  });
-  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
     queryKey,
   });
   const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
@@ -258,11 +276,20 @@ export function CommentSectionGasless() {
         onSubmitSuccess={handleCommentSubmitted}
         isAppSignerApproved={getApprovalQuery.data?.approved}
       />
+      {hasNewComments && (
+        <Button
+          className="mb-4"
+          onClick={() => fetchNewComments()}
+          variant="secondary"
+          size="sm"
+        >
+          Load new comments
+        </Button>
+      )}
       {results.map((comment) => (
         <CommentGasless
-          key={comment.id}
+          key={`${comment.id}-${comment.deletedAt}`}
           comment={comment}
-          onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
           onDelete={handleCommentDeleted}
           isAppSignerApproved={getApprovalQuery.data?.approved ?? false}

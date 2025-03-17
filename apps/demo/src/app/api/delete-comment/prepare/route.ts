@@ -8,7 +8,7 @@ import {
   PrepareGaslessCommentDeletionRequestBodySchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
-import { bigintReplacer } from "@/lib/utils";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { chain, transport } from "@/lib/wagmi";
 import {
   COMMENTS_V1_ADDRESS,
@@ -119,7 +119,7 @@ export async function POST(
         return new JSONResponse(
           PreparedSignedGaslessDeleteCommentApprovedResponseSchema,
           {
-            txHash
+            txHash,
           }
         );
       } catch (error) {

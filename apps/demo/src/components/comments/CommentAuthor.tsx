@@ -1,8 +1,11 @@
 import type { AuthorType } from "@/lib/types";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
-import { getCommentAuthorNameOrAddress } from "./helpers";
-import { formatDate, formatDateRelative } from "@/lib/utils";
+import {
+  getCommentAuthorNameOrAddress,
+  formatDate,
+  formatDateRelative,
+} from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
 import Link from "next/link";
 
@@ -42,7 +45,7 @@ export function CommentAuthor({ author, timestamp }: CommentAuthorProps) {
         )}{" "}
         •{" "}
         <span title={formatDate(timestamp)}>
-          {formatDateRelative(timestamp)}
+          {formatDateRelative(timestamp, Date.now())}
         </span>
       </div>
     </div>

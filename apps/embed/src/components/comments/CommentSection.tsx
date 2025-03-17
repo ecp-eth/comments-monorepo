@@ -9,21 +9,28 @@ import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
 import {
   useHandleCommentDeleted,
-  useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
-} from "./hooks";
+  useNewCommentsChecker,
+} from "@ecp.eth/shared/hooks";
 import { Button } from "../ui/button";
-import { COMMENTS_PER_PAGE } from "@/lib/constants";
+import {
+  COMMENTS_PER_PAGE,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
 import { fetchComments } from "@ecp.eth/sdk";
-import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
+import {
+  type ListCommentsQueryPageParamsSchemaType,
+  type CommentPageSchemaType,
+  CommentPageSchema,
+} from "@ecp.eth/shared/schemas";
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { publicEnv } from "@/publicEnv";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
     CommentPageSchemaType,
-    { offset: number; limit: number }
+    ListCommentsQueryPageParamsSchemaType
   >;
 };
 
@@ -37,16 +44,16 @@ export function CommentSection({ initialData }: CommentSectionProps) {
       queryKey,
       initialData,
       initialPageParam: {
-        offset: 0,
+        cursor: undefined,
         limit: COMMENTS_PER_PAGE,
-      },
+      } as ListCommentsQueryPageParamsSchemaType,
       queryFn: async ({ pageParam, signal }) => {
         const response = await fetchComments({
           appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           targetUri,
           limit: pageParam.limit,
-          offset: pageParam.offset,
+          cursor: pageParam.cursor,
           signal,
         });
 
@@ -54,25 +61,41 @@ export function CommentSection({ initialData }: CommentSectionProps) {
       },
       refetchOnMount: false,
       refetchOnWindowFocus: false,
-      getNextPageParam(lastPage) {
-        if (!lastPage.pagination.hasMore) {
+      getNextPageParam(
+        lastPage
+      ): ListCommentsQueryPageParamsSchemaType | undefined {
+        if (!lastPage.pagination.hasNext) {
           return;
         }
 
         return {
-          offset: lastPage.pagination.offset + lastPage.pagination.limit,
+          cursor: lastPage.pagination.endCursor,
           limit: lastPage.pagination.limit,
         };
       },
     });
 
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    queryData: data,
+    queryKey,
+    fetchComments(options) {
+      return fetchComments({
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        targetUri,
+        limit: COMMENTS_PER_PAGE,
+        cursor: options.cursor,
+        signal: options.signal,
+        sort: "asc",
+      });
+    },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
+  });
+
   const handleCommentDeleted = useHandleCommentDeleted({
     queryKey,
   });
   const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey,
-  });
-  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
     queryKey,
   });
   const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
@@ -100,19 +123,28 @@ export function CommentSection({ initialData }: CommentSectionProps) {
       <div className="mb-4">
         <CommentForm onSubmitSuccess={handleCommentSubmitted} />
       </div>
+      {hasNewComments && (
+        <Button
+          className="mb-4"
+          onClick={() => fetchNewComments()}
+          variant="secondary"
+          size="sm"
+        >
+          Load new comments
+        </Button>
+      )}
       {results.map((comment) => (
         <Comment
           comment={comment}
           key={comment.id}
           onDelete={handleCommentDeleted}
-          onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
           currentTimestamp={currentTimestamp}
         />
       ))}
       {hasNextPage && (
         <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
-          Load More
+          Load more
         </Button>
       )}
     </div>

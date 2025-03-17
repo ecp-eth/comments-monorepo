@@ -1,154 +1,27 @@
 import {
   BadRequestResponseSchema,
+  DeleteCommentResponseSchema,
   GaslessPostCommentResponseSchema,
-  GaslessPostCommentResponseSchemaType,
-  ListCommentsQueryDataSchema,
-  PendingCommentOperationSchemaType,
-  PreparedSignedGaslessPostCommentNotApprovedSchemaType,
-  type ListCommentsQueryDataSchemaType,
+  PreparedSignedGaslessDeleteCommentNotApprovedSchemaType,
+  type GaslessPostCommentResponseSchemaType,
+  type PendingCommentOperationSchemaType,
+  type PreparedSignedGaslessPostCommentNotApprovedSchemaType,
+  type Comment,
 } from "@/lib/schemas";
-import {
-  type QueryKey,
-  useMutation,
-  UseMutationOptions,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { useCallback } from "react";
-import {
-  deletePendingCommentByTransactionHash,
-  insertPendingCommentToPage,
-  markCommentAsDeleted,
-  replaceCommentPendingOperationByComment,
-} from "./helpers";
-import {
-  OnDeleteComment,
-  OnPostCommentSuccess,
-  OnSubmitCommentSuccessFunction,
-  OnRetryPostComment,
-} from "./types";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 import { useConnectAccount } from "@/hooks/useConnectAccount";
 import {
-  PreparedGaslessPostCommentOperationApprovedResult,
+  deletePriorApprovedCommentMutationFunction,
+  deletePriorNotApprovedCommentMutationFunction,
   prepareSignedGaslessComment,
 } from "./queries";
-import { bigintReplacer } from "@/lib/utils";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { InvalidCommentError, RateLimitedError } from "./errors";
 import type { Hex, SignTypedDataParameters } from "viem";
 import { fetchAuthorData } from "@ecp.eth/sdk";
 import { publicEnv } from "@/publicEnv";
-import { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/schemas";
-
-export function useHandleCommentDeleted({
-  queryKey,
-}: {
-  queryKey: QueryKey;
-}): OnDeleteComment {
-  const client = useQueryClient();
-
-  return useCallback(
-    (commentId) => {
-      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-        queryKey,
-        (oldData) => {
-          if (!oldData) {
-            return oldData;
-          }
-
-          const queryData = ListCommentsQueryDataSchema.parse(oldData);
-
-          return markCommentAsDeleted(queryData, commentId);
-        }
-      );
-    },
-    [client, queryKey]
-  );
-}
-
-export function useHandleCommentSubmitted({
-  queryKey,
-}: {
-  queryKey: QueryKey;
-}): OnSubmitCommentSuccessFunction {
-  const client = useQueryClient();
-
-  return useCallback(
-    (pendingOperation) => {
-      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-        queryKey,
-        (oldData) => {
-          if (!oldData) {
-            return oldData;
-          }
-
-          const queryData = ListCommentsQueryDataSchema.parse(oldData);
-
-          return insertPendingCommentToPage(queryData, pendingOperation);
-        }
-      );
-    },
-    [client, queryKey]
-  );
-}
-
-export function useHandleCommentPostedSuccessfully({
-  queryKey,
-}: {
-  queryKey: QueryKey;
-}): OnPostCommentSuccess {
-  const client = useQueryClient();
-
-  return useCallback(
-    (transactionHash) => {
-      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-        queryKey,
-        (oldData) => {
-          if (!oldData) {
-            return oldData;
-          }
-
-          const queryData = ListCommentsQueryDataSchema.parse(oldData);
-
-          return deletePendingCommentByTransactionHash(
-            queryData,
-            transactionHash
-          );
-        }
-      );
-    },
-    [client, queryKey]
-  );
-}
-
-export function useHandleRetryPostComment({
-  queryKey,
-}: {
-  queryKey: QueryKey;
-}): OnRetryPostComment {
-  const client = useQueryClient();
-
-  return useCallback(
-    (comment, newPendingOperation) => {
-      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-        queryKey,
-        (oldData) => {
-          if (!oldData) {
-            return oldData;
-          }
-
-          const queryData = ListCommentsQueryDataSchema.parse(oldData);
-
-          return replaceCommentPendingOperationByComment(
-            queryData,
-            comment,
-            newPendingOperation
-          );
-        }
-      );
-    },
-    [client, queryKey]
-  );
-}
+import type { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/schemas";
 
 type SubmitGaslessCommentVariables = {
   isApproved: boolean;
@@ -305,6 +178,120 @@ export function useSubmitGaslessComment(
         resolvedAuthor,
         type: "gasless-not-approved",
       };
+    },
+  });
+}
+
+/**
+ * Deletes a comment that was previously approved, so not need for
+ * user approval for signature on each transaction
+ */
+export function useDeletePriorApprovedCommentMutation({
+  connectedAddress,
+}: {
+  connectedAddress: Hex | undefined;
+}) {
+  return useMutation({
+    mutationFn: async (comment: Comment) => {
+      if (!connectedAddress) {
+        throw new Error("No connected address");
+      }
+
+      const result = await deletePriorApprovedCommentMutationFunction({
+        address: connectedAddress,
+        commentId: comment.id,
+      });
+
+      return result.txHash;
+    },
+  });
+}
+
+/**
+ * Delete a comment that without prior approval, this will require user interaction for signature
+ */
+export function useDeletePriorNotApprovedCommentMutation({
+  connectedAddress,
+}: {
+  connectedAddress: Hex | undefined;
+}) {
+  return useGaslessTransaction({
+    async prepareSignTypedDataParams(comment: Comment) {
+      if (!connectedAddress) {
+        throw new Error("No address found");
+      }
+
+      const data = await deletePriorNotApprovedCommentMutationFunction({
+        address: connectedAddress,
+        commentId: comment.id,
+      });
+
+      return {
+        signTypedDataParams:
+          data.signTypedDataParams as unknown as SignTypedDataParameters,
+        variables: data,
+      } satisfies {
+        signTypedDataParams: SignTypedDataParameters;
+        variables: PreparedSignedGaslessDeleteCommentNotApprovedSchemaType;
+      };
+    },
+    async sendSignedData({ signature, variables }) {
+      const response = await fetch("/api/delete-comment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          {
+            ...variables,
+            authorSignature: signature,
+          },
+          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+        ),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to post approval signature");
+      }
+
+      const data = DeleteCommentResponseSchema.parse(await response.json());
+
+      return data.txHash;
+    },
+  });
+}
+
+export function useDeleteGaslessComment({
+  connectedAddress,
+}: {
+  connectedAddress: Hex | undefined;
+}) {
+  const deletePriorApprovedComment = useDeletePriorApprovedCommentMutation({
+    connectedAddress,
+  });
+
+  const deletePriorNotApprovedComment =
+    useDeletePriorNotApprovedCommentMutation({
+      connectedAddress,
+    });
+
+  return useMutation({
+    mutationFn: async ({
+      comment,
+      submitIfApproved,
+    }: {
+      comment: Comment;
+      submitIfApproved: boolean;
+    }) => {
+      if (!connectedAddress) {
+        throw new Error("No connected address");
+      }
+
+      if (submitIfApproved) {
+        return deletePriorApprovedComment.mutateAsync(comment);
+      }
+
+      return deletePriorNotApprovedComment.mutateAsync(comment);
     },
   });
 }

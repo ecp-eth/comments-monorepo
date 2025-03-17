@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { CommentFormErrors } from "../CommentFormErrors";
-import type { OnSubmitCommentSuccessFunction } from "../types";
+import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import { useSubmitGaslessComment } from "../hooks";
 import { InvalidCommentError } from "../errors";
 import { CommentBoxAuthor } from "../CommentBoxAuthor";
@@ -16,7 +16,7 @@ interface CommentBoxProps {
    */
   onLeftEmpty?: () => void;
   isAppSignerApproved?: boolean;
-  onSubmitSuccess: OnSubmitCommentSuccessFunction;
+  onSubmitSuccess: OnSubmitSuccessFunction;
   placeholder?: string;
   parentId?: Hex;
 }

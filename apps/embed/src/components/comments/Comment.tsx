@@ -26,9 +26,10 @@ import { getAddress } from "viem";
 import { COMMENTS_V1_ADDRESS, fetchCommentReplies } from "@ecp.eth/sdk";
 import {
   CommentPageSchema,
-  type PendingCommentOperationSchemaType,
   type Comment as CommentType,
-} from "@/lib/schemas";
+  type ListCommentsQueryPageParamsSchemaType,
+  type PendingCommentOperationSchemaType,
+} from "@ecp.eth/shared/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
@@ -36,19 +37,21 @@ import { toast } from "sonner";
 import { submitCommentMutationFunction } from "./queries";
 import {
   useHandleCommentDeleted,
-  useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
-} from "./hooks";
+  useNewCommentsChecker,
+} from "@ecp.eth/shared/hooks";
 import { Button } from "../ui/button";
-import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
+import {
+  MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
 import { CommentText } from "./CommentText";
-import { createQuotationFromComment } from "./helpers";
+import { createQuotationFromComment } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "./CommentAuthor";
 
 export type OnDeleteComment = (id: Hex) => void;
-export type OnPostCommentSuccess = (transactionHash: Hex) => void;
 export type OnRetryPostComment = (
   comment: CommentType,
   newPendingOperation: PendingCommentOperationSchemaType
@@ -61,12 +64,6 @@ interface CommentProps {
    */
   depth?: number;
   onDelete?: OnDeleteComment;
-  /**
-   * Called when comment is successfully posted to the blockchain.
-   *
-   * This is called only if comment is pending.
-   */
-  onPostSuccess: OnPostCommentSuccess;
   /**
    * Called when comment posting to blockchain failed and the transaction has been reverted
    * and user pressed retry.
@@ -82,14 +79,12 @@ export function Comment({
   depth = 1,
   comment,
   onDelete,
-  onPostSuccess,
   onRetryPost,
   currentTimestamp,
 }: CommentProps) {
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
-  const onPostSuccessRef = useFreshRef(onPostSuccess);
   const onDeleteRef = useFreshRef(onDelete);
   /**
    * Prevents infinite cycle when delete comment transaction succeeded
@@ -111,30 +106,30 @@ export function Comment({
   const repliesQuery = useInfiniteQuery({
     enabled: areRepliesAllowed,
     queryKey,
+    initialPageParam: {
+      cursor: comment.replies?.pagination.endCursor,
+      limit:
+        comment.replies?.pagination.limit ??
+        MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+    } as ListCommentsQueryPageParamsSchemaType,
     initialData: comment.replies
       ? {
           pages: [comment.replies],
           pageParams: [
             {
-              offset: comment.replies.pagination.offset,
+              cursor: comment.replies.pagination.endCursor,
               limit: comment.replies.pagination.limit,
             },
           ],
         }
       : undefined,
-    initialPageParam: {
-      offset: comment.replies?.pagination.offset ?? 0,
-      limit:
-        comment.replies?.pagination.limit ??
-        MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
-    },
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async ({ pageParam, signal }) => {
       const response = await fetchCommentReplies({
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        offset: pageParam.offset,
+        cursor: pageParam.cursor,
         limit: pageParam.limit,
         commentId: comment.id,
         signal,
@@ -142,16 +137,35 @@ export function Comment({
 
       return CommentPageSchema.parse(response);
     },
-    getNextPageParam(lastPage) {
-      if (!lastPage.pagination.hasMore) {
+    getNextPageParam(
+      lastPage
+    ): ListCommentsQueryPageParamsSchemaType | undefined {
+      if (!lastPage.pagination.hasNext) {
         return;
       }
 
       return {
-        offset: lastPage.pagination.offset + lastPage.pagination.limit,
+        cursor: lastPage.pagination.endCursor,
         limit: lastPage.pagination.limit,
       };
     },
+  });
+
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    queryData: repliesQuery.data,
+    queryKey,
+    fetchComments({ cursor, signal }) {
+      return fetchCommentReplies({
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        commentId: comment.id,
+        cursor,
+        limit: 10,
+        sort: "asc",
+        signal,
+      });
+    },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
   const replies = useMemo(() => {
@@ -159,9 +173,6 @@ export function Comment({
   }, [repliesQuery.data?.pages]);
 
   const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey: submitTargetQueryKey,
-  });
-  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
     queryKey: submitTargetQueryKey,
   });
   const handleRetryPostComment = useHandleRetryPostComment({
@@ -229,10 +240,9 @@ export function Comment({
 
   useEffect(() => {
     if (postingCommentTxReceipt.data?.status === "success") {
-      onPostSuccessRef.current?.(postingCommentTxReceipt.data.transactionHash);
       toast.success("Comment posted");
     }
-  }, [onPostSuccessRef, postingCommentTxReceipt.data]);
+  }, [postingCommentTxReceipt.data]);
 
   const isAuthor =
     connectedAddress && comment.author
@@ -322,13 +332,19 @@ export function Comment({
           />
         </div>
       )}
+      {hasNewComments && (
+        <div className="mb-2">
+          <ActionButton onClick={() => fetchNewComments()}>
+            show new replies
+          </ActionButton>
+        </div>
+      )}
       {replies.map((reply) => (
         <Comment
           depth={depth + 1}
           key={reply.id}
           comment={reply}
           onDelete={handleCommentDeleted}
-          onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
           currentTimestamp={currentTimestamp}
         />

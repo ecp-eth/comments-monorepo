@@ -4,12 +4,13 @@ import {
   CommentDataSchema,
   DeleteCommentTypedDataSchema,
   HexSchema,
-  IndexerAPICommentWithRepliesSchema,
-  IndexerAPIPaginationSchema,
-  IndexerAPICommentSchema,
-  type IndexerAPICommentSchemaType,
   IndexerAPIAuthorDataSchema,
+  IndexerAPICommentSchema,
+  IndexerAPICommentSchemaType,
+  IndexerAPICursorPaginationSchema,
+  IndexerAPICursorPaginationSchemaType,
 } from "@ecp.eth/sdk/schemas";
+import { PendingCommentOperationSchema as PendingCommentOperationSchemaShared } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 // import { isProfane } from "./profanity-detection";
 
@@ -234,62 +235,20 @@ export const ApproveResponseSchema = z.object({
   txHash: HexSchema,
 });
 
-export const PendingCommentOperationSchema = z
-  .object({
-    txHash: HexSchema,
-    chainId: z.number().positive().int(),
-    response: SignCommentResponseClientSchema,
-    resolvedAuthor: IndexerAPIAuthorDataSchema.optional(),
+export const PendingCommentOperationSchema =
+  PendingCommentOperationSchemaShared.extend({
     type: z.enum(["gasless-not-approved", "gasless-preapproved", "nongasless"]),
-  })
-  .describe(
-    "Contains information about pending operation so we can show that in comment list"
-  );
+  });
 
 export type PendingCommentOperationSchemaType = z.infer<
   typeof PendingCommentOperationSchema
->;
-
-/**
- * A object with an attached property to indicate the parent object is a pending operation
- */
-export const PendingOperationSchema = z
-  .object({
-    pendingType: z.enum(["insert", "delete"]).optional(),
-  })
-  .describe(
-    "A object with an attached property to indicate the parent object is a pending operation"
-  );
-
-export type PendingOperationSchemaType = z.infer<typeof PendingOperationSchema>;
-
-export const IndexerAPICommentWithPendingOperationSchema =
-  IndexerAPICommentWithRepliesSchema.extend(PendingOperationSchema.shape);
-
-export type IndexerAPICommentWithPendingOperationSchemaType = z.infer<
-  typeof IndexerAPICommentWithPendingOperationSchema
->;
-
-export const IndexerAPIListCommentsWithPendingOperationsSchema = z.object({
-  results: z.array(
-    IndexerAPICommentWithRepliesSchema.extend(PendingOperationSchema.shape)
-  ),
-  pagination: IndexerAPIPaginationSchema,
-});
-
-export type IndexerAPIListCommentsWithPendingOperationsSchemaType = z.infer<
-  typeof IndexerAPIListCommentsWithPendingOperationsSchema
 >;
 
 type CommentSchemaType = IndexerAPICommentSchemaType & {
   pendingOperation?: PendingCommentOperationSchemaType;
   replies?: {
     results: CommentSchemaType[];
-    pagination: {
-      limit: number;
-      offset: number;
-      hasMore: boolean;
-    };
+    pagination: IndexerAPICursorPaginationSchemaType;
   };
 };
 
@@ -298,11 +257,7 @@ export const CommentSchema: z.ZodType<CommentSchemaType> =
     replies: z
       .object({
         results: z.lazy(() => CommentSchema.array()),
-        pagination: z.object({
-          limit: z.number(),
-          offset: z.number(),
-          hasMore: z.boolean(),
-        }),
+        pagination: IndexerAPICursorPaginationSchema,
       })
       .optional(),
     pendingOperation: PendingCommentOperationSchema.optional(),
@@ -310,22 +265,13 @@ export const CommentSchema: z.ZodType<CommentSchemaType> =
 
 export type Comment = z.infer<typeof CommentSchema>;
 
+export type PendingComment = Omit<Comment, "pendingOperation"> & {
+  pendingOperation: PendingCommentOperationSchemaType;
+};
+
 export const CommentPageSchema = z.object({
   results: CommentSchema.array(),
-  pagination: z.object({
-    limit: z.number(),
-    offset: z.number(),
-    hasMore: z.boolean(),
-  }),
+  pagination: IndexerAPICursorPaginationSchema,
 });
 
 export type CommentPageSchemaType = z.infer<typeof CommentPageSchema>;
-
-export const ListCommentsQueryDataSchema = z.object({
-  pages: CommentPageSchema.array(),
-  pageParams: z.unknown().array(),
-});
-
-export type ListCommentsQueryDataSchemaType = z.infer<
-  typeof ListCommentsQueryDataSchema
->;

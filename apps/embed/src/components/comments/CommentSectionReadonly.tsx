@@ -1,24 +1,36 @@
 "use client";
 
-import { type InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
+import {
+  type InfiniteData,
+  useInfiniteQuery,
+  useQuery,
+} from "@tanstack/react-query";
 import { useMemo } from "react";
 import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
 import { Button } from "../ui/button";
-import { COMMENTS_PER_PAGE } from "@/lib/constants";
+import {
+  COMMENTS_PER_PAGE,
+  NEW_COMMENTS_BY_AUTHOR_CHECK_INTERVAL,
+} from "@/lib/constants";
 import { fetchComments } from "@ecp.eth/sdk";
-import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
+import {
+  type CommentPageSchemaType,
+  CommentPageSchema,
+} from "@ecp.eth/shared/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { CommentByAuthor } from "./CommentByAuthor";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { publicEnv } from "@/publicEnv";
 
+type QueryData = InfiniteData<
+  CommentPageSchemaType,
+  { cursor: Hex | undefined; limit: number }
+>;
+
 type CommentSectionReadonlyProps = {
   author: Hex;
-  initialData?: InfiniteData<
-    CommentPageSchemaType,
-    { offset: number; limit: number }
-  >;
+  initialData?: QueryData;
   /**
    * Used to calculate relative time in comments.
    */
@@ -37,7 +49,7 @@ export function CommentSectionReadonly({
       queryKey,
       initialData,
       initialPageParam: {
-        offset: 0,
+        cursor: undefined as Hex | undefined,
         limit: COMMENTS_PER_PAGE,
       },
       queryFn: async ({ pageParam, signal }) => {
@@ -46,7 +58,7 @@ export function CommentSectionReadonly({
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           author,
           limit: pageParam.limit,
-          offset: pageParam.offset,
+          cursor: pageParam.cursor,
           signal,
         });
 
@@ -55,16 +67,65 @@ export function CommentSectionReadonly({
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
-        if (!lastPage.pagination.hasMore) {
+        if (!lastPage.pagination.hasNext) {
           return;
         }
 
         return {
-          offset: lastPage.pagination.offset + lastPage.pagination.limit,
+          cursor: lastPage.pagination.endCursor,
           limit: lastPage.pagination.limit,
         };
       },
     });
+
+  // check for new comments
+  useQuery({
+    enabled: !!data,
+    queryKey: ["comments-by-author-new-comments-check", author],
+    queryFn: async ({ client, signal }) => {
+      const newComments = await fetchComments({
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        author,
+        limit: 20,
+        cursor: data?.pages[0].pagination.startCursor,
+        sort: "asc",
+        signal,
+      });
+
+      if (newComments.results.length === 0) {
+        return newComments;
+      }
+
+      client.setQueryData<QueryData>(queryKey, (oldData): QueryData => {
+        if (!oldData) {
+          return {
+            pages: [newComments],
+            pageParams: [
+              {
+                cursor: newComments.pagination.endCursor,
+                limit: newComments.pagination.limit,
+              },
+            ],
+          };
+        }
+
+        return {
+          pages: [newComments, ...oldData.pages],
+          pageParams: [
+            {
+              cursor: newComments.pagination.endCursor,
+              limit: newComments.pagination.limit,
+            },
+            ...oldData.pageParams,
+          ],
+        };
+      });
+
+      return newComments;
+    },
+    refetchInterval: NEW_COMMENTS_BY_AUTHOR_CHECK_INTERVAL,
+  });
 
   const results = useMemo(() => {
     return data?.pages.flatMap((page) => page.results) ?? [];

@@ -2,6 +2,7 @@ import { HexSchema, IndexerAPIPaginationSchema } from "@ecp.eth/sdk/schemas";
 import { z } from "@hono/zod-openapi";
 import { normalizeUrl } from "./utils";
 import { COMMENT_CALLDATA_SUFFIX_DELIMITER } from "@ecp.eth/sdk";
+import { hexToString } from "viem";
 
 /**
  * Path params schema for resolving an author ENS / Farcaster data.
@@ -81,6 +82,39 @@ export const APIErrorResponseSchema = z.object({
   }),
 });
 
+const CommentCursorSchema = z.object({
+  timestamp: z.coerce.date(),
+  id: HexSchema,
+});
+
+export type CommentCursorSchemaType = z.infer<typeof CommentCursorSchema>;
+
+/**
+ * Schema for parsing a comment cursor from input.
+ */
+export const InputCommentCursorSchema = z.preprocess((value, ctx) => {
+  try {
+    const parsed = HexSchema.parse(value);
+    const hex = hexToString(parsed);
+    const [timestamp, id] = z
+      .tuple([z.coerce.number().positive(), HexSchema])
+      .parse(hex.split(":"));
+
+    return {
+      timestamp,
+      id,
+    };
+  } catch {
+    ctx.addIssue({
+      code: "custom",
+      message: "Invalid comment cursor",
+      path: ["cursor"],
+    });
+
+    return z.NEVER;
+  }
+}, CommentCursorSchema);
+
 /**
  * Query string schema for getting a list of comments.
  */
@@ -89,13 +123,14 @@ export const GetCommentsQuerySchema = z.object({
   appSigner: HexSchema.optional().openapi({
     description: "The address of the app signer",
   }),
+  cursor: InputCommentCursorSchema.optional().openapi({
+    description:
+      "Non inclusive cursor from which to fetch the comments based on sort",
+  }),
   // zod-openapi plugin doesn't automatically infer the minimum value from `int().positive()`
   // so use min(1) for better compatibility
   limit: z.coerce.number().int().min(1).max(100).default(50).openapi({
     description: "The number of comments to return",
-  }),
-  offset: z.coerce.number().int().min(0).default(0).openapi({
-    description: "The offset of the comments to return",
   }),
   targetUri: z
     .string()

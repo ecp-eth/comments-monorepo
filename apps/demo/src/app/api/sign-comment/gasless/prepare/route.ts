@@ -8,7 +8,7 @@ import {
   PrepareSignedGaslessCommentRequestBodySchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
-import { bigintReplacer } from "@/lib/utils";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { chain, transport } from "@/lib/wagmi";
 import {
   COMMENTS_V1_ADDRESS,
