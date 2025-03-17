@@ -77,6 +77,10 @@ export default defineConfig({
           link: "/dual-signature-system",
         },
         {
+          text: "Comment Data",
+          link: "/comment-data-props",
+        },
+        {
           text: "Post comment flows",
           link: "/post-comment-flows",
         },
@@ -90,7 +94,7 @@ export default defineConfig({
           link: "/indexer-reference/",
         },
         {
-          text: "Alt Indexers: Index Supply",
+          text: "Index Supply",
           link: "/index-supply",
         },
       ],
