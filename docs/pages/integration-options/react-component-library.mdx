@@ -43,13 +43,9 @@ export function Comments() {
 }
 ```
 
-Be careful when choosing the value for the `uri` property. The `uri` serves as a unique identifier to locate comments:
-
-1. If your web page is dynamic and accepts query parameters, you should carefully consider which parameters are necessary to locate the correct comments
-   and include them in the `uri` property. As a general rule: 1. include query parameters that affect the page content. 2. arrange them in alphabetical order.
-2. If you are rendering the `CommentsEmbed` with server-side rendering (SSR), you do not have access to the `window` object.
-
-The `uri` must be a unique string that follows the [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) standard.
+- Please note that if you are rendering the `CommentsEmbed` with server-side rendering (SSR), you do not have access to the `window` object.
+  Instead, you may want to construct the `uri` out of the `HttpRequest` object of your server-side framework.
+- Please also read the `targetUri` carefully in [Comment Data](/comment-data-props) for choosing an appropriate `uri`.
 
 #### API reference
 
