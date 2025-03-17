@@ -185,6 +185,7 @@ const FetchCommentRepliesOptionSchema = z.object({
   cursor: HexSchema.optional(),
   limit: z.number().int().positive().default(50),
   signal: z.instanceof(AbortSignal).optional(),
+  sort: z.enum(["asc", "desc"]).default("desc"),
 });
 
 /**
@@ -195,13 +196,14 @@ const FetchCommentRepliesOptionSchema = z.object({
 export async function fetchCommentReplies(
   options: FetchCommentRepliesOptions
 ): Promise<IndexerAPIListCommentRepliesSchemaType> {
-  const { apiUrl, commentId, limit, cursor, retries, appSigner, signal } =
+  const { apiUrl, commentId, limit, cursor, retries, appSigner, signal, sort } =
     FetchCommentRepliesOptionSchema.parse(options);
 
   const fetchRepliesTask = Effect.tryPromise(async (signal) => {
     const url = new URL(`/api/comments/${commentId}/replies`, apiUrl);
 
     url.searchParams.set("limit", limit.toString());
+    url.searchParams.set("sort", sort);
 
     if (appSigner) {
       url.searchParams.set("appSigner", appSigner);
