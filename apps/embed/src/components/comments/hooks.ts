@@ -9,7 +9,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import type { OnDeleteComment, OnRetryPostComment } from "./Comment";
 import {
   hasNewComments,
@@ -73,6 +73,54 @@ export function useNewCommentsChecker({
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
+  const resetQuery = useCallback(() => {
+    client.setQueryData<IndexerAPIListCommentsSchemaType>(
+      newCommentsQueryKey,
+      (oldData) => {
+        if (!oldData) {
+          return oldData;
+        }
+
+        return {
+          results: [],
+          pagination: {
+            hasNext: false,
+            hasPrevious: false,
+            limit: 1,
+          },
+        };
+      }
+    );
+  }, [client, newCommentsQueryKey]);
+
+  useEffect(() => {
+    if (!queryResult.data || !queryData) {
+      return;
+    }
+
+    const newComments = queryResult.data;
+
+    // this also has new comments (not written by us, so let user decide if they want to see them, see fetchNewComments())
+    if (hasNewComments(queryData, queryResult.data)) {
+      return;
+    }
+
+    // remove pending operations and make sure the order of new comments is correct
+    // based on indexer result
+    client.setQueryData<ListCommentsQueryDataSchemaType>(
+      queryKey,
+      (oldData) => {
+        if (!oldData) {
+          return oldData;
+        }
+
+        return mergeNewComments(oldData, newComments);
+      }
+    );
+
+    resetQuery();
+  }, [queryResult.data, queryData, resetQuery, client, queryKey]);
+
   const fetchNewComments = useCallback(() => {
     if (!queryData || !queryResult.data) {
       return;
@@ -91,25 +139,8 @@ export function useNewCommentsChecker({
       }
     );
 
-    // reset current query
-    client.setQueryData<IndexerAPIListCommentsSchemaType>(
-      newCommentsQueryKey,
-      (oldData) => {
-        if (!oldData) {
-          return oldData;
-        }
-
-        return {
-          results: [],
-          pagination: {
-            hasNext: false,
-            hasPrevious: false,
-            limit: 1,
-          },
-        };
-      }
-    );
-  }, [queryData, queryResult.data, client, queryKey, newCommentsQueryKey]);
+    resetQuery();
+  }, [queryData, queryResult.data, client, queryKey, resetQuery]);
 
   return useMemo(() => {
     return {
