@@ -6,14 +6,17 @@ import { useEffect, useMemo, useState } from "react";
 import { Comment } from "./Comment";
 import { CommentBox } from "./CommentBox";
 import { publicEnv } from "@/publicEnv";
-import { COMMENTS_PER_PAGE } from "@/lib/constants";
+import {
+  COMMENTS_PER_PAGE,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
 import { Button } from "../ui/button";
 import {
   useHandleCommentDeleted,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
-} from "./hooks";
+} from "@ecp.eth/shared/hooks";
 import { Hex } from "viem";
 
 export function CommentSection() {
@@ -70,6 +73,7 @@ export function CommentSection() {
         signal,
       });
     },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
   const handleCommentDeleted = useHandleCommentDeleted({

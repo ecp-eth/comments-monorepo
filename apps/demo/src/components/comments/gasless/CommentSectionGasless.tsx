@@ -19,15 +19,18 @@ import {
   GetApprovalStatusSchema,
 } from "@/lib/schemas";
 import type { SignTypedDataParameters } from "viem";
-import { bigintReplacer } from "@/lib/utils";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
-import { COMMENTS_PER_PAGE } from "@/lib/constants";
+import {
+  COMMENTS_PER_PAGE,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
 import {
   useHandleCommentDeleted,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
-} from "../hooks";
+} from "@ecp.eth/shared/hooks";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 
 export function CommentSectionGasless() {
@@ -149,6 +152,7 @@ export function CommentSectionGasless() {
         signal,
       });
     },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
   const handleCommentDeleted = useHandleCommentDeleted({

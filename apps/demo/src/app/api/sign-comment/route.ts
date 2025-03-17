@@ -5,7 +5,7 @@ import {
   SignCommentPayloadRequestSchema,
   SignCommentResponseServerSchema,
 } from "@/lib/schemas";
-import { bigintReplacer } from "@/lib/utils";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import {
   createCommentData,
   createCommentTypedData,

@@ -42,7 +42,10 @@ import {
   useNewCommentsChecker,
 } from "@ecp.eth/shared/hooks";
 import { Button } from "../ui/button";
-import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
+import {
+  MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
 import { CommentText } from "./CommentText";
 import { createQuotationFromComment } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
@@ -162,6 +165,7 @@ export function Comment({
         signal,
       });
     },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
   const replies = useMemo(() => {

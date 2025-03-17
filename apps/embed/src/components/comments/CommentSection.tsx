@@ -14,7 +14,10 @@ import {
   useNewCommentsChecker,
 } from "@ecp.eth/shared/hooks";
 import { Button } from "../ui/button";
-import { COMMENTS_PER_PAGE } from "@/lib/constants";
+import {
+  COMMENTS_PER_PAGE,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
 import { fetchComments } from "@ecp.eth/sdk";
 import {
   type ListCommentsQueryPageParamsSchemaType,
@@ -86,6 +89,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
         sort: "asc",
       });
     },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
   const handleCommentDeleted = useHandleCommentDeleted({

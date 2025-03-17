@@ -4,17 +4,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { bigintReplacer, cn } from "@/lib/utils";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 import { MoreVertical } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAddress, SignTypedDataParameters } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
-import type { Comment as CommentType } from "@/lib/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import {
-  CommentPageSchema,
   DeleteCommentResponseSchema,
   PreparedSignedGaslessDeleteCommentNotApprovedSchemaType,
 } from "@/lib/schemas";
@@ -23,7 +21,10 @@ import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "../CommentAuthor";
 import { CommentText } from "../CommentText";
 import { CommentActionOrStatus } from "../CommentActionOrStatus";
-import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
+import {
+  MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
 import { fetchCommentReplies } from "@ecp.eth/sdk";
 import { CommentActionButton } from "../CommentActionButton";
 import {
@@ -35,11 +36,16 @@ import {
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
-  useSubmitGaslessComment,
-} from "../hooks";
-import type { OnDeleteComment, OnRetryPostComment } from "../types";
+} from "@ecp.eth/shared/hooks";
+import { useSubmitGaslessComment } from "../hooks";
+import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
+import type {
+  OnDeleteComment,
+  OnRetryPostComment,
+} from "@ecp.eth/shared/types";
 import { toast } from "sonner";
 import never from "never";
+import { cn } from "@/lib/utils";
 
 interface CommentProps {
   isAppSignerApproved: boolean;
@@ -138,6 +144,7 @@ export function CommentGasless({
         signal,
       });
     },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
   const handleCommentSubmitted = useHandleCommentSubmitted({

@@ -17,7 +17,7 @@ import { z } from "zod";
 import { InvalidCommentError } from "./errors";
 import { CommentFormErrors } from "./CommentFormErrors";
 import { submitCommentMutationFunction } from "./queries";
-import type { OnSubmitCommentSuccessFunction } from "./types";
+import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import { useFreshRef } from "@/hooks/useFreshRef";
 
 interface CommentBoxProps {
@@ -27,7 +27,7 @@ interface CommentBoxProps {
   onLeftEmpty?: () => void;
   placeholder?: string;
   parentId?: Hex;
-  onSubmitSuccess: OnSubmitCommentSuccessFunction;
+  onSubmitSuccess: OnSubmitSuccessFunction;
 }
 
 export function CommentBox({

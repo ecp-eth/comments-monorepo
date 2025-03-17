@@ -18,21 +18,26 @@ import {
 } from "wagmi";
 import { CommentBox } from "./CommentBox";
 import { useFreshRef } from "@/hooks/useFreshRef";
-import { CommentPageSchema } from "@/lib/schemas";
 import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "./CommentAuthor";
 import { CommentText } from "./CommentText";
-import type { OnDeleteComment, OnRetryPostComment } from "./types";
-import type { Comment as CommentType } from "@/lib/schemas";
+import type {
+  OnDeleteComment,
+  OnRetryPostComment,
+} from "@ecp.eth/shared/types";
 import {
   useHandleCommentDeleted,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
-} from "./hooks";
+} from "@ecp.eth/shared/hooks";
+import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { submitCommentMutationFunction } from "./queries";
-import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
+import {
+  MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+  NEW_COMMENTS_CHECK_INTERVAL,
+} from "@/lib/constants";
 import never from "never";
 import { toast } from "sonner";
 import { CommentActionButton } from "./CommentActionButton";
@@ -136,6 +141,7 @@ export function Comment({
         signal,
       });
     },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
   const replies = useMemo(() => {

@@ -23,7 +23,7 @@ import {
   CommentFormSubmitError,
   InvalidCommentError,
 } from "./errors";
-import { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/schemas";
+import type { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/schemas";
 
 export class SubmitCommentMutationError extends Error {}
 
