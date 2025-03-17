@@ -4,18 +4,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { bigintReplacer } from "@ecp.eth/shared/helpers";
-import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 import { MoreVertical } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getAddress, SignTypedDataParameters } from "viem";
+import { getAddress } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
 import { useFreshRef } from "@/hooks/useFreshRef";
-import {
-  DeleteCommentResponseSchema,
-  PreparedSignedGaslessDeleteCommentNotApprovedSchemaType,
-} from "@/lib/schemas";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "../CommentAuthor";
@@ -28,16 +22,12 @@ import {
 import { fetchCommentReplies } from "@ecp.eth/sdk";
 import { CommentActionButton } from "../CommentActionButton";
 import {
-  deletePriorApprovedCommentMutationFunction,
-  deletePriorNotApprovedCommentMutationFunction,
-} from "../queries";
-import {
   useHandleCommentDeleted,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
 } from "@ecp.eth/shared/hooks";
-import { useSubmitGaslessComment } from "../hooks";
+import { useDeleteGaslessComment, useSubmitGaslessComment } from "../hooks";
 import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
 import type {
   OnDeleteComment,
@@ -179,97 +169,35 @@ export function CommentGasless({
     },
   });
 
-  // delete a comment that was previously approved, so not need for
-  // user approval for signature for each interaction
-  const deletePriorApprovedCommentMutation = useMutation({
-    mutationFn: async () => {
-      if (!connectedAddress) {
-        throw new Error("No address found");
-      }
-
-      if (!submitIfApproved) {
-        throw new Error("Not approved");
-      }
-
-      const result = await deletePriorApprovedCommentMutationFunction({
-        address: connectedAddress,
-        commentId: comment.id,
-      });
-
-      return result.txHash;
-    },
+  const deleteCommentMutation = useDeleteGaslessComment({
+    connectedAddress,
   });
 
-  // delete a comment that was previously NOT approved,
-  // will require user interaction for signature
-  const deletePriorNotApprovedCommentMutation = useGaslessTransaction({
-    async prepareSignTypedDataParams() {
-      if (!connectedAddress) {
-        throw new Error("No address found");
-      }
-
-      const data = await deletePriorNotApprovedCommentMutationFunction({
-        address: connectedAddress,
-        commentId: comment.id,
-      });
-
-      return {
-        signTypedDataParams:
-          data.signTypedDataParams as unknown as SignTypedDataParameters,
-        variables: data,
-      } satisfies {
-        signTypedDataParams: SignTypedDataParameters;
-        variables: PreparedSignedGaslessDeleteCommentNotApprovedSchemaType;
-      };
-    },
-    async sendSignedData({ signature, variables }) {
-      const response = await fetch("/api/delete-comment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(
-          {
-            ...variables,
-            authorSignature: signature,
-          },
-          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
-        ),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to post approval signature");
-      }
-
-      const data = DeleteCommentResponseSchema.parse(await response.json());
-
-      return data.txHash;
-    },
-  });
+  const { mutate: deleteComment, reset: resetDeleteCommentMutation } =
+    deleteCommentMutation;
 
   const handleDeleteClick = useCallback(() => {
-    if (submitIfApproved) {
-      deletePriorApprovedCommentMutation.mutate();
-    } else {
-      deletePriorNotApprovedCommentMutation.mutate();
-    }
-  }, [
-    submitIfApproved,
-    deletePriorApprovedCommentMutation,
-    deletePriorNotApprovedCommentMutation,
-  ]);
+    deleteComment({
+      comment,
+      submitIfApproved,
+    });
+  }, [comment, deleteComment, submitIfApproved]);
 
   const deleteCommentTransactionReceipt = useWaitForTransactionReceipt({
-    hash:
-      deletePriorNotApprovedCommentMutation.data ||
-      deletePriorApprovedCommentMutation.data,
+    hash: deleteCommentMutation.data,
   });
 
   useEffect(() => {
     if (deleteCommentTransactionReceipt.data?.status === "success") {
       onDeleteRef.current?.(commentRef.current.id);
+      resetDeleteCommentMutation();
     }
-  }, [deleteCommentTransactionReceipt.data?.status, commentRef, onDeleteRef]);
+  }, [
+    deleteCommentTransactionReceipt.data?.status,
+    commentRef,
+    onDeleteRef,
+    resetDeleteCommentMutation,
+  ]);
 
   const postingCommentTxReceipt = useWaitForTransactionReceipt({
     hash: comment.pendingOperation?.txHash,
@@ -292,14 +220,9 @@ export function CommentGasless({
   }, [repliesQuery.data?.pages]);
 
   const isDeleting =
-    deletePriorNotApprovedCommentMutation.isPending ||
-    deletePriorApprovedCommentMutation.isPending ||
+    deleteCommentMutation.isPending ||
     deleteCommentTransactionReceipt.isFetching;
-  const didDeletingFailed =
-    !isDeleting &&
-    (deletePriorApprovedCommentMutation.isError ||
-      deletePriorNotApprovedCommentMutation.isError);
-
+  const didDeletingFailed = !isDeleting && deleteCommentMutation.isError;
   const isPosting = postingCommentTxReceipt.isFetching;
   const didPostingFailed =
     !isPosting && postingCommentTxReceipt.data?.status === "reverted";
@@ -373,7 +296,7 @@ export function CommentGasless({
       )}
       {replies.map((reply) => (
         <CommentGasless
-          key={reply.id}
+          key={`${reply.id}-${reply.deletedAt}`}
           comment={reply}
           onDelete={handleCommentDeleted}
           onRetryPost={handleRetryPostComment}

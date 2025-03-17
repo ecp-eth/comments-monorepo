@@ -17,7 +17,7 @@ import {
   useHandleRetryPostComment,
   useNewCommentsChecker,
 } from "@ecp.eth/shared/hooks";
-import { Hex } from "viem";
+import type { Hex } from "viem";
 
 export function CommentSection() {
   const [currentUrl, setCurrentUrl] = useState<string>("");
@@ -112,7 +112,7 @@ export function CommentSection() {
       )}
       {results.map((comment) => (
         <Comment
-          key={comment.id}
+          key={`${comment.id}-${comment.deletedAt}`}
           comment={comment}
           onRetryPost={handleRetryPostComment}
           onDelete={handleCommentDeleted}

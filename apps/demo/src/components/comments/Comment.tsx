@@ -310,7 +310,7 @@ export function Comment({
       {replies.map((reply) => (
         <Comment
           level={level + 1}
-          key={reply.id}
+          key={`${reply.id}-${reply.deletedAt}`}
           comment={reply}
           onDelete={handleCommentDeleted}
           onRetryPost={handleRetryPostComment}

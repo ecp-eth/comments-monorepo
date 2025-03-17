@@ -288,7 +288,7 @@ export function CommentSectionGasless() {
       )}
       {results.map((comment) => (
         <CommentGasless
-          key={comment.id}
+          key={`${comment.id}-${comment.deletedAt}`}
           comment={comment}
           onRetryPost={handleRetryPostComment}
           onDelete={handleCommentDeleted}
