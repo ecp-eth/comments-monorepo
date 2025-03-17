@@ -303,6 +303,10 @@ export const CommentSchema: z.ZodType<CommentSchemaType> =
 
 export type Comment = z.infer<typeof CommentSchema>;
 
+export type PendingComment = Omit<Comment, "pendingOperation"> & {
+  pendingOperation: PendingCommentOperationSchemaType;
+};
+
 export const CommentPageSchema = z.object({
   results: CommentSchema.array(),
   pagination: IndexerAPICursorPaginationSchema,
@@ -310,9 +314,18 @@ export const CommentPageSchema = z.object({
 
 export type CommentPageSchemaType = z.infer<typeof CommentPageSchema>;
 
+export const ListCommentsQueryPageParamsSchema = z.object({
+  cursor: HexSchema.optional(),
+  limit: z.number().positive().int(),
+});
+
+export type ListCommentsQueryPageParamsSchemaType = z.infer<
+  typeof ListCommentsQueryPageParamsSchema
+>;
+
 export const ListCommentsQueryDataSchema = z.object({
   pages: CommentPageSchema.array(),
-  pageParams: z.unknown().array(),
+  pageParams: ListCommentsQueryPageParamsSchema.array(),
 });
 
 export type ListCommentsQueryDataSchemaType = z.infer<

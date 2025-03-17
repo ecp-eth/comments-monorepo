@@ -1,5 +1,6 @@
 import {
   BadRequestResponseSchema,
+  CommentPageSchemaType,
   GaslessPostCommentResponseSchema,
   GaslessPostCommentResponseSchemaType,
   ListCommentsQueryDataSchema,
@@ -8,36 +9,167 @@ import {
   type ListCommentsQueryDataSchemaType,
 } from "@/lib/schemas";
 import {
+  InfiniteData,
   type QueryKey,
   useMutation,
   UseMutationOptions,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import {
-  deletePendingCommentByTransactionHash,
+  hasNewComments,
   insertPendingCommentToPage,
   markCommentAsDeleted,
+  mergeNewComments,
   replaceCommentPendingOperationByComment,
 } from "./helpers";
 import {
   OnDeleteComment,
-  OnPostCommentSuccess,
   OnSubmitCommentSuccessFunction,
   OnRetryPostComment,
 } from "./types";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 import { useConnectAccount } from "@/hooks/useConnectAccount";
-import {
-  PreparedGaslessPostCommentOperationApprovedResult,
-  prepareSignedGaslessComment,
-} from "./queries";
+import { prepareSignedGaslessComment } from "./queries";
 import { bigintReplacer } from "@/lib/utils";
 import { InvalidCommentError, RateLimitedError } from "./errors";
 import type { Hex, SignTypedDataParameters } from "viem";
 import { fetchAuthorData } from "@ecp.eth/sdk";
 import { publicEnv } from "@/publicEnv";
-import { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/schemas";
+import {
+  IndexerAPIAuthorDataSchemaType,
+  IndexerAPIListCommentRepliesSchemaType,
+  IndexerAPIListCommentsSchemaType,
+} from "@ecp.eth/sdk/schemas";
+import { NEW_COMMENTS_CHECK_INTERVAL } from "@/lib/constants";
+
+/**
+ * This hook checks whether there are any new comments on the query given by the `queryKey`.
+ * If there are new comments, it updates the first page pagination info so UI can react to them.
+ */
+export function useNewCommentsChecker({
+  queryKey,
+  queryData,
+  fetchComments: fetchFn,
+}: {
+  /**
+   * Query to update the first page pagination.
+   */
+  queryKey: QueryKey;
+  queryData: InfiniteData<CommentPageSchemaType> | undefined;
+  fetchComments: (options: {
+    cursor: Hex | undefined;
+    signal: AbortSignal;
+  }) => Promise<
+    IndexerAPIListCommentsSchemaType | IndexerAPIListCommentRepliesSchemaType
+  >;
+}): {
+  hasNewComments: boolean;
+  fetchNewComments: () => void;
+} {
+  const client = useQueryClient();
+  const newCommentsQueryKey = useMemo(() => {
+    return [...queryKey, "new-comments-checker"];
+  }, [queryKey]);
+
+  const queryResult = useQuery({
+    enabled: !!queryData,
+    queryKey: newCommentsQueryKey,
+    queryFn: async ({ signal }) => {
+      if (!queryData) {
+        return;
+      }
+
+      const response = await fetchFn({
+        cursor: queryData.pages[0].pagination.startCursor,
+        signal,
+      });
+
+      return response;
+    },
+    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
+  });
+
+  const resetQuery = useCallback(() => {
+    client.setQueryData<IndexerAPIListCommentsSchemaType>(
+      newCommentsQueryKey,
+      (oldData) => {
+        if (!oldData) {
+          return oldData;
+        }
+
+        return {
+          results: [],
+          pagination: {
+            hasNext: false,
+            hasPrevious: false,
+            limit: 1,
+          },
+        };
+      }
+    );
+  }, [client, newCommentsQueryKey]);
+
+  useEffect(() => {
+    if (!queryResult.data || !queryData) {
+      return;
+    }
+
+    const newComments = queryResult.data;
+
+    // this also has new comments (not written by us, so let user decide if they want to see them, see fetchNewComments())
+    if (hasNewComments(queryData, queryResult.data)) {
+      return;
+    }
+
+    // remove pending operations and make sure the order of new comments is correct
+    // based on indexer result
+    client.setQueryData<ListCommentsQueryDataSchemaType>(
+      queryKey,
+      (oldData) => {
+        if (!oldData) {
+          return oldData;
+        }
+
+        return mergeNewComments(oldData, newComments);
+      }
+    );
+
+    resetQuery();
+  }, [queryResult.data, queryData, resetQuery, client, queryKey]);
+
+  const fetchNewComments = useCallback(() => {
+    if (!queryData || !queryResult.data) {
+      return;
+    }
+
+    const newComments = queryResult.data;
+
+    client.setQueryData<ListCommentsQueryDataSchemaType>(
+      queryKey,
+      (oldData) => {
+        if (!oldData) {
+          return;
+        }
+
+        return mergeNewComments(oldData, newComments);
+      }
+    );
+
+    resetQuery();
+  }, [queryData, queryResult.data, client, queryKey, resetQuery]);
+
+  return useMemo(() => {
+    return {
+      hasNewComments:
+        queryData && queryResult.data
+          ? hasNewComments(queryData, queryResult.data)
+          : false,
+      fetchNewComments,
+    };
+  }, [queryData, queryResult.data, fetchNewComments]);
+}
 
 export function useHandleCommentDeleted({
   queryKey,
@@ -84,35 +216,6 @@ export function useHandleCommentSubmitted({
           const queryData = ListCommentsQueryDataSchema.parse(oldData);
 
           return insertPendingCommentToPage(queryData, pendingOperation);
-        }
-      );
-    },
-    [client, queryKey]
-  );
-}
-
-export function useHandleCommentPostedSuccessfully({
-  queryKey,
-}: {
-  queryKey: QueryKey;
-}): OnPostCommentSuccess {
-  const client = useQueryClient();
-
-  return useCallback(
-    (transactionHash) => {
-      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-        queryKey,
-        (oldData) => {
-          if (!oldData) {
-            return oldData;
-          }
-
-          const queryData = ListCommentsQueryDataSchema.parse(oldData);
-
-          return deletePendingCommentByTransactionHash(
-            queryData,
-            transactionHash
-          );
         }
       );
     },

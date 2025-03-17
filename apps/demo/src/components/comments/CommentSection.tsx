@@ -10,9 +10,9 @@ import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { Button } from "../ui/button";
 import {
   useHandleCommentDeleted,
-  useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
+  useNewCommentsChecker,
 } from "./hooks";
 import { Hex } from "viem";
 
@@ -56,13 +56,26 @@ export function CommentSection() {
       },
     });
 
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    queryData: data,
+    queryKey,
+    fetchComments({ cursor, signal }) {
+      return fetchComments({
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        targetUri: currentUrl,
+        limit: COMMENTS_PER_PAGE,
+        cursor,
+        sort: "asc",
+        signal,
+      });
+    },
+  });
+
   const handleCommentDeleted = useHandleCommentDeleted({
     queryKey,
   });
   const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey,
-  });
-  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
     queryKey,
   });
   const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
@@ -83,11 +96,20 @@ export function CommentSection() {
     <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
       <CommentBox onSubmitSuccess={handleCommentSubmitted} />
+      {hasNewComments && (
+        <Button
+          className="mb-4"
+          onClick={() => fetchNewComments()}
+          variant="secondary"
+          size="sm"
+        >
+          Load new comments
+        </Button>
+      )}
       {results.map((comment) => (
         <Comment
           key={comment.id}
           comment={comment}
-          onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
           onDelete={handleCommentDeleted}
         />

@@ -139,12 +139,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
         />
       ))}
       {hasNextPage && (
-        <Button
-          className="mb-4"
-          onClick={() => fetchNextPage()}
-          variant="secondary"
-          size="sm"
-        >
+        <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
           Load more
         </Button>
       )}

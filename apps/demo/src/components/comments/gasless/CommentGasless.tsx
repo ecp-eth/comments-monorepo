@@ -32,16 +32,12 @@ import {
 } from "../queries";
 import {
   useHandleCommentDeleted,
-  useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
+  useNewCommentsChecker,
   useSubmitGaslessComment,
 } from "../hooks";
-import type {
-  OnDeleteComment,
-  OnPostCommentSuccess,
-  OnRetryPostComment,
-} from "../types";
+import type { OnDeleteComment, OnRetryPostComment } from "../types";
 import { toast } from "sonner";
 import never from "never";
 
@@ -49,12 +45,6 @@ interface CommentProps {
   isAppSignerApproved: boolean;
   comment: CommentType;
   onDelete?: OnDeleteComment;
-  /**
-   * Called when comment is successfully posted to the blockchain.
-   *
-   * This is called only if comment is pending.
-   */
-  onPostSuccess: OnPostCommentSuccess;
   /**
    * Called when comment posting to blockchain failed and the transaction has been reverted
    * and user pressed retry.
@@ -65,7 +55,6 @@ interface CommentProps {
 
 export function CommentGasless({
   comment,
-  onPostSuccess,
   onRetryPost,
   onDelete,
   isAppSignerApproved: submitIfApproved,
@@ -73,7 +62,6 @@ export function CommentGasless({
 }: CommentProps) {
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
-  const onPostSuccessRef = useFreshRef(onPostSuccess);
   const onDeleteRef = useFreshRef(onDelete);
   /**
    * Prevents infinite cycle when delete comment transaction succeeded
@@ -136,10 +124,23 @@ export function CommentGasless({
     },
   });
 
-  const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey: submitTargetQueryKey,
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    queryData: repliesQuery.data,
+    queryKey,
+    fetchComments({ cursor, signal }) {
+      return fetchCommentReplies({
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        commentId: comment.id,
+        cursor,
+        limit: 10,
+        sort: "asc",
+        signal,
+      });
+    },
   });
-  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
+
+  const handleCommentSubmitted = useHandleCommentSubmitted({
     queryKey: submitTargetQueryKey,
   });
   const handleRetryPostComment = useHandleRetryPostComment({
@@ -270,10 +271,9 @@ export function CommentGasless({
 
   useEffect(() => {
     if (postingCommentTxReceipt.data?.status === "success") {
-      onPostSuccessRef.current?.(postingCommentTxReceipt.data.transactionHash);
       toast.success("Comment posted");
     }
-  }, [onPostSuccessRef, postingCommentTxReceipt.data]);
+  }, [postingCommentTxReceipt.data]);
 
   const isAuthor =
     connectedAddress && comment.author
@@ -357,12 +357,18 @@ export function CommentGasless({
           isAppSignerApproved={submitIfApproved}
         />
       )}
+      {hasNewComments && (
+        <div className="mb-2">
+          <CommentActionButton onClick={() => fetchNewComments()}>
+            show new replies
+          </CommentActionButton>
+        </div>
+      )}
       {replies.map((reply) => (
         <CommentGasless
           key={reply.id}
           comment={reply}
           onDelete={handleCommentDeleted}
-          onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
           isAppSignerApproved={submitIfApproved}
           level={level + 1}

@@ -24,9 +24,9 @@ import { publicEnv } from "@/publicEnv";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import {
   useHandleCommentDeleted,
-  useHandleCommentPostedSuccessfully,
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
+  useNewCommentsChecker,
 } from "../hooks";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 
@@ -135,13 +135,26 @@ export function CommentSectionGasless() {
       },
     });
 
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    queryData: data,
+    queryKey,
+    fetchComments({ cursor, signal }) {
+      return fetchComments({
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        targetUri: currentUrl,
+        limit: COMMENTS_PER_PAGE,
+        cursor,
+        sort: "asc",
+        signal,
+      });
+    },
+  });
+
   const handleCommentDeleted = useHandleCommentDeleted({
     queryKey,
   });
   const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey,
-  });
-  const handleCommentPostedSuccessfully = useHandleCommentPostedSuccessfully({
     queryKey,
   });
   const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
@@ -259,11 +272,20 @@ export function CommentSectionGasless() {
         onSubmitSuccess={handleCommentSubmitted}
         isAppSignerApproved={getApprovalQuery.data?.approved}
       />
+      {hasNewComments && (
+        <Button
+          className="mb-4"
+          onClick={() => fetchNewComments()}
+          variant="secondary"
+          size="sm"
+        >
+          Load new comments
+        </Button>
+      )}
       {results.map((comment) => (
         <CommentGasless
           key={comment.id}
           comment={comment}
-          onPostSuccess={handleCommentPostedSuccessfully}
           onRetryPost={handleRetryPostComment}
           onDelete={handleCommentDeleted}
           isAppSignerApproved={getApprovalQuery.data?.approved ?? false}
