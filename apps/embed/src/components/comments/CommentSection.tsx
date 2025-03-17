@@ -12,15 +12,15 @@ import {
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
-} from "./hooks";
+} from "@ecp.eth/shared/hooks";
 import { Button } from "../ui/button";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { fetchComments } from "@ecp.eth/sdk";
 import {
-  CommentPageSchema,
-  ListCommentsQueryPageParamsSchemaType,
+  type ListCommentsQueryPageParamsSchemaType,
   type CommentPageSchemaType,
-} from "@/lib/schemas";
+  CommentPageSchema,
+} from "@ecp.eth/shared/schemas";
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { publicEnv } from "@/publicEnv";
 

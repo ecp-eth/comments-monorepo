@@ -2,7 +2,7 @@ import {
   CommentPageSchemaType,
   ListCommentsQueryDataSchema,
   type ListCommentsQueryDataSchemaType,
-} from "@/lib/schemas";
+} from "./schemas.js";
 import {
   InfiniteData,
   type QueryKey,
@@ -10,16 +10,18 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo } from "react";
-import type { OnDeleteComment, OnRetryPostComment } from "./Comment";
+import type {
+  OnDeleteComment,
+  OnRetryPostComment,
+  OnSubmitSuccessFunction,
+} from "./types.js";
 import {
   hasNewComments,
   mergeNewComments,
   insertPendingCommentToPage,
   markCommentAsDeleted,
   replaceCommentPendingOperationByComment,
-} from "./helpers";
-import { OnSubmitSuccessFunction } from "./CommentForm";
-import { NEW_COMMENTS_CHECK_INTERVAL } from "@/lib/constants";
+} from "./helpers.js";
 import type {
   Hex,
   IndexerAPIListCommentRepliesSchemaType,
@@ -34,6 +36,7 @@ export function useNewCommentsChecker({
   queryKey,
   queryData,
   fetchComments: fetchFn,
+  refetchInterval = 60000,
 }: {
   /**
    * Query to update the first page pagination.
@@ -46,6 +49,10 @@ export function useNewCommentsChecker({
   }) => Promise<
     IndexerAPIListCommentsSchemaType | IndexerAPIListCommentRepliesSchemaType
   >;
+  /**
+   * @default 60000
+   */
+  refetchInterval?: number;
 }): {
   hasNewComments: boolean;
   fetchNewComments: () => void;
@@ -59,7 +66,7 @@ export function useNewCommentsChecker({
     enabled: !!queryData,
     queryKey: newCommentsQueryKey,
     queryFn: async ({ signal }) => {
-      if (!queryData) {
+      if (!queryData || !queryData.pages[0]) {
         return;
       }
 
@@ -70,7 +77,7 @@ export function useNewCommentsChecker({
 
       return response;
     },
-    refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
+    refetchInterval,
   });
 
   const resetQuery = useCallback(() => {

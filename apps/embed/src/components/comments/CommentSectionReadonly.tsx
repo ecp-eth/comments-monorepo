@@ -5,7 +5,7 @@ import {
   useInfiniteQuery,
   useQuery,
 } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
 import { Button } from "../ui/button";
@@ -14,7 +14,10 @@ import {
   NEW_COMMENTS_BY_AUTHOR_CHECK_INTERVAL,
 } from "@/lib/constants";
 import { fetchComments } from "@ecp.eth/sdk";
-import { CommentPageSchema, type CommentPageSchemaType } from "@/lib/schemas";
+import {
+  type CommentPageSchemaType,
+  CommentPageSchema,
+} from "@ecp.eth/shared/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { CommentByAuthor } from "./CommentByAuthor";
 import { NoCommentsScreen } from "../NoCommentsScreen";

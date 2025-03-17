@@ -1,17 +1,16 @@
 "use client";
 
 import React from "react";
-import {
-  cn,
-  formatAuthorLink,
-  formatDate,
-  formatDateRelative,
-} from "@/lib/utils";
-import { type Comment as CommentType } from "@/lib/schemas";
+import { cn, formatAuthorLink } from "@/lib/utils";
+import { type Comment as CommentType } from "@ecp.eth/shared/schemas";
 import Link from "next/link";
 import { CommentText } from "./CommentText";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
-import { getCommentAuthorNameOrAddress } from "./helpers";
+import {
+  getCommentAuthorNameOrAddress,
+  formatDate,
+  formatDateRelative,
+} from "@ecp.eth/shared/helpers";
 
 interface CommentByAuthorProps {
   comment: CommentType;

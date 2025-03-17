@@ -4,8 +4,7 @@ import type {
   CommentPageSchemaType,
   ListCommentsQueryPageParamsSchemaType,
   PendingComment,
-} from "@/lib/schemas";
-import { abbreviateAddressForDisplay } from "@/lib/utils";
+} from "./schemas.js";
 import { getCommentCursor } from "@ecp.eth/sdk";
 import type { InfiniteData } from "@tanstack/react-query";
 import type { Hex } from "viem";
@@ -73,9 +72,9 @@ export function mergeNewComments(
     if (pendingComments.has(newComment.id)) {
       const { pageIndex } = pendingComments.get(newComment.id)!;
 
-      oldQueryData.pages[pageIndex].results = oldQueryData.pages[
+      oldQueryData.pages[pageIndex]!.results = oldQueryData.pages[
         pageIndex
-      ].results.filter((comment) => comment.id !== newComment.id);
+      ]!.results.filter((comment) => comment.id !== newComment.id);
     }
   }
 
@@ -110,6 +109,10 @@ export function insertPendingCommentToPage(
   pendingOperation: PendingCommentOperationSchemaType
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   const clonedData = structuredClone(queryData);
+
+  if (!clonedData.pages[0]) {
+    return queryData;
+  }
 
   const { response, txHash, chainId } = pendingOperation;
 
@@ -222,4 +225,45 @@ export function markCommentAsDeleted(
  */
 export function createQuotationFromComment(comment: Comment): string {
   return "> " + comment.content.split("\n").join("\n> ") + "\n\n";
+}
+
+export function abbreviateAddressForDisplay(address: string): string {
+  if (!address) return "";
+
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+export function formatDate(timestamp: number | Date): string {
+  const date = new Date(timestamp);
+
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+export function formatDateRelative(
+  timestamp: number | Date,
+  now: number
+): string {
+  const date = new Date(timestamp);
+  const diffInMs = date.getTime() - now;
+  const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24));
+
+  // implement content negotiation and use the Accept-Language header to determine the locale
+  // for now, we only support English since the UI is not translated
+  return new Intl.RelativeTimeFormat("en-US", { numeric: "auto" }).format(
+    diffInDays,
+    "day"
+  );
+}
+
+export function bigintReplacer(key: string, value: unknown) {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+  return value;
 }

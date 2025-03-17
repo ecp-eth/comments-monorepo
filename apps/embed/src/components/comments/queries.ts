@@ -1,12 +1,14 @@
 import {
-  SignCommentResponseClientSchema,
-  type SignCommentResponseClientSchemaType,
-  type PendingCommentOperationSchemaType,
   type SignCommentPayloadRequestSchemaType,
   SignCommentPayloadRequestSchema,
 } from "@/lib/schemas";
 import { publicEnv } from "@/publicEnv";
 import { fetchAuthorData } from "@ecp.eth/sdk";
+import {
+  SignCommentResponseClientSchema,
+  type PendingCommentOperationSchemaType,
+  type SignCommentResponseClientSchemaType,
+} from "@ecp.eth/shared/schemas";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
 import {
   RateLimitedError,

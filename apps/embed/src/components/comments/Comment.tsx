@@ -26,10 +26,10 @@ import { getAddress } from "viem";
 import { COMMENTS_V1_ADDRESS, fetchCommentReplies } from "@ecp.eth/sdk";
 import {
   CommentPageSchema,
-  type PendingCommentOperationSchemaType,
   type Comment as CommentType,
-  ListCommentsQueryPageParamsSchemaType,
-} from "@/lib/schemas";
+  type ListCommentsQueryPageParamsSchemaType,
+  type PendingCommentOperationSchemaType,
+} from "@ecp.eth/shared/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useFreshRef } from "@/hooks/useFreshRef";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
@@ -40,11 +40,11 @@ import {
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
-} from "./hooks";
+} from "@ecp.eth/shared/hooks";
 import { Button } from "../ui/button";
 import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/lib/constants";
 import { CommentText } from "./CommentText";
-import { createQuotationFromComment } from "./helpers";
+import { createQuotationFromComment } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "./CommentAuthor";
 

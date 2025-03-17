@@ -1,6 +1,6 @@
-import type { Comment } from "@/lib/schemas";
+import { type Comment } from "@ecp.eth/shared/schemas";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { getCommentAuthorNameOrAddress } from "./helpers";
+import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { blo } from "blo";
 
 type CommentAuthorAvatarProps = {
