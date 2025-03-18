@@ -404,10 +404,14 @@ export default function IframeConfigurator() {
             <select
               id="font-family-type-select"
               value={
-                Object.keys(config.theme?.font?.fontFamily || {})[0] || "system"
+                !!config.theme?.font?.fontFamily &&
+                "google" in config.theme?.font?.fontFamily
+                  ? "google"
+                  : "system"
               }
               onChange={(e) => {
                 const type = e.target.value as "system" | "google";
+
                 updateFontFamily(
                   type,
                   type === "system" ? "Geist, Arial, Helvetica, sans-serif" : ""
@@ -420,52 +424,50 @@ export default function IframeConfigurator() {
             </select>
           </div>
 
-          {Object.keys(config.theme?.font?.fontFamily || {}).includes(
-            "google"
-          ) && (
-            <div>
-              <label
-                className="block text-sm font-medium mb-2"
-                htmlFor="google-font-input"
-              >
-                Google Font
-              </label>
-              <select
-                id="google-font-input"
-                value={config.theme?.font?.fontFamily?.google || ""}
-                onChange={(e) => updateFontFamily("google", e.target.value)}
-                className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
-              >
-                <option value="">Select a font</option>
-                {Object.values(EmbedConfigSupportedFont.enum).map((font) => (
-                  <option key={font} value={font}>
-                    {font}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          {!!config.theme?.font?.fontFamily &&
+            "google" in config.theme?.font?.fontFamily && (
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  htmlFor="google-font-input"
+                >
+                  Google Font
+                </label>
+                <select
+                  id="google-font-input"
+                  value={config.theme.font.fontFamily.google}
+                  onChange={(e) => updateFontFamily("google", e.target.value)}
+                  className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
+                >
+                  <option value="">Select a font</option>
+                  {Object.values(EmbedConfigSupportedFont.enum).map((font) => (
+                    <option key={font} value={font}>
+                      {font}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-          {Object.keys(config.theme?.font?.fontFamily || {}).includes(
-            "system"
-          ) && (
-            <div>
-              <label
-                className="block text-sm font-medium mb-2"
-                htmlFor="system-font-input"
-              >
-                System Font
-              </label>
-              <input
-                id="system-font-input"
-                type="text"
-                value={config.theme?.font?.fontFamily?.system || ""}
-                onChange={(e) => updateFontFamily("system", e.target.value)}
-                className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
-                placeholder="Geist, Arial, Helvetica, sans-serif"
-              />
-            </div>
-          )}
+          {!!config.theme?.font?.fontFamily &&
+            "system" in config.theme?.font?.fontFamily && (
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  htmlFor="system-font-input"
+                >
+                  System Font
+                </label>
+                <input
+                  id="system-font-input"
+                  type="text"
+                  value={config.theme?.font?.fontFamily?.system || ""}
+                  onChange={(e) => updateFontFamily("system", e.target.value)}
+                  className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
+                  placeholder="Geist, Arial, Helvetica, sans-serif"
+                />
+              </div>
+            )}
 
           <div className="flex flex-col gap-4">
             <h4 className="text-md font-medium">Font Sizes</h4>
@@ -569,14 +571,14 @@ function GeneratedURL({
   uri,
   config,
 }: {
-  embedUri: string;
+  embedUri: string | undefined;
   uri: string;
   config: EmbedConfigSchemaType;
 }) {
   const [copied, setCopied] = React.useState(false);
   const timeoutRef = React.useRef<any>(null);
 
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" || !embedUri) {
     return null;
   }
 
@@ -637,11 +639,11 @@ function CommentsEmbedPreview({
   uri,
   config,
 }: {
-  embedUri: string;
+  embedUri: string | undefined;
   uri: string;
   config: EmbedConfigSchemaType;
 }) {
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" || !embedUri) {
     return null;
   }
 
