@@ -4,7 +4,6 @@ import {
   CommentDataSchema,
   DeleteCommentTypedDataSchema,
   HexSchema,
-  IndexerAPIAuthorDataSchema,
   IndexerAPICommentSchema,
   IndexerAPICommentSchemaType,
   IndexerAPICursorPaginationSchema,

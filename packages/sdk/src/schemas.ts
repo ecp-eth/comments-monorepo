@@ -244,16 +244,6 @@ export type IndexerAPICommentSchemaType = z.infer<
   typeof IndexerAPICommentSchema
 >;
 
-export const IndexerAPIPaginationSchema = z.object({
-  limit: z.number().int(),
-  offset: z.number().int(),
-  hasMore: z.boolean(),
-});
-
-export type IndexerAPIPaginationSchemaType = z.infer<
-  typeof IndexerAPIPaginationSchema
->;
-
 export const IndexerAPICursorPaginationSchema = z.object({
   limit: z.number().int(),
   hasNext: z.boolean(),
