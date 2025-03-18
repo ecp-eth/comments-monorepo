@@ -1,5 +1,15 @@
 # @ecp.eth/sdk
 
+## 0.0.10
+
+### Patch Changes
+
+- e4f0a84: feat: account-edit-link color
+- edc87c0: feat: cursor pagination
+- 5da9aa5: feat: helpers to create embed URL without the react components
+- edc87c0: fix: pass sort option when fetching comment replies
+- edc87c0: feat: add a way to pass variables to useGaslessTransaction() hook
+
 ## 0.0.9
 
 ### Patch Changes
