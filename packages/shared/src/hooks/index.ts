@@ -1,4 +1,5 @@
-export { useHandleCommentSubmitted } from "./use-handle-comment-submitted.js";
-export { useHandleCommentDeleted } from "./use-handle-comment-deleted.js";
-export { useHandleRetryPostComment } from "./use-handle-retry-post-comment.js";
-export { useNewCommentsChecker } from "./use-new-comments-checker.js";
+export { useHandleCommentSubmitted } from "./useHandleCommentSubmitted.js";
+export { useHandleCommentDeleted } from "./useHandleCommentDeleted.js";
+export { useHandleRetryPostComment } from "./useHandleRetryPostComment.js";
+export { useNewCommentsChecker } from "./useNewCommentsChecker.js";
+export { useFreshRef } from "./useFreshRef.js";
