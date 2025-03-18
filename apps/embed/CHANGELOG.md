@@ -1,5 +1,13 @@
 # @ecp.eth/embed
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies [0a161a5]
+  - @ecp.eth/sdk@0.0.11
+  - @ecp.eth/shared@0.0.2
+
 ## 0.0.7
 
 ### Patch Changes
