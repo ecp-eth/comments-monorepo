@@ -76,7 +76,7 @@ export function Comment({
         throw new Error("No pending operation to retry");
       }
 
-      if (comment.pendingOperation.type !== "nongasless") {
+      if (comment.pendingOperation.type !== "non-gasless") {
         throw new Error("Only non-gasless comments can be retried");
       }
 

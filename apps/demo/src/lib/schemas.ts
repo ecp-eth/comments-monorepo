@@ -4,7 +4,6 @@ import {
   CommentDataSchema,
   DeleteCommentTypedDataSchema,
   HexSchema,
-  IndexerAPIAuthorDataSchema,
   IndexerAPICommentSchema,
   IndexerAPICommentSchemaType,
   IndexerAPICursorPaginationSchema,
@@ -237,7 +236,11 @@ export const ApproveResponseSchema = z.object({
 
 export const PendingCommentOperationSchema =
   PendingCommentOperationSchemaShared.extend({
-    type: z.enum(["gasless-not-approved", "gasless-preapproved", "nongasless"]),
+    type: z.enum([
+      "gasless-not-approved",
+      "gasless-preapproved",
+      "non-gasless",
+    ]),
   });
 
 export type PendingCommentOperationSchemaType = z.infer<
