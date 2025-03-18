@@ -1,5 +1,12 @@
 # @ecp.eth/embed
 
+## 0.0.9
+
+### Patch Changes
+
+- Updated dependencies [eb39507]
+  - @ecp.eth/shared@0.0.3
+
 ## 0.0.8
 
 ### Patch Changes

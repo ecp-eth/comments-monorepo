@@ -1,5 +1,11 @@
 # @ecp.eth/shared
 
+## 0.0.3
+
+### Patch Changes
+
+- eb39507: feat: publish shared code to be consumed by expo
+
 ## 0.0.2
 
 ### Patch Changes
