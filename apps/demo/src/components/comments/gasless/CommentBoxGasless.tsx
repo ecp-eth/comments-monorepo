@@ -85,7 +85,7 @@ export function CommentBoxGasless({
         {address && <CommentBoxAuthor address={address} />}
         <Button
           type="submit"
-          className="px-4 py-2 rounded"
+          className="px-4 py-2 rounded ml-auto"
           disabled={isSubmitting || !isContentValid}
         >
           {isSubmitting ? "Posting..." : "Comment"}
