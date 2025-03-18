@@ -3,17 +3,43 @@
   "version": "0.0.10",
   "type": "module",
   "license": "MIT",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "typings": "./dist/esm/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./abis": "./dist/abis.js",
-    "./react": "./dist/react.js",
-    "./schemas": "./dist/schemas.js",
-    "./types": "./dist/types.js"
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/cjs/index.cjs"
+    },
+    "./abis": {
+      "types": "./dist/esm/abis.d.ts",
+      "import": "./dist/esm/abis.js",
+      "default": "./dist/cjs/abis.cjs"
+    },
+    "./react": {
+      "types": "./dist/esm/react.d.ts",
+      "import": "./dist/esm/react.js",
+      "default": "./dist/cjs/react.cjs"
+    },
+    "./schemas": {
+      "types": "./dist/esm/schemas.d.ts",
+      "import": "./dist/esm/schemas.js",
+      "default": "./dist/cjs/schemas.cjs"
+    },
+    "./types": {
+      "types": "./dist/esm/types.d.ts",
+      "import": "./dist/esm/types.js",
+      "default": "./dist/cjs/types.cjs"
+    }
   },
   "scripts": {
     "check-types": "tsc --noEmit",
     "dev": "tsup --watch",
-    "build": "tsup",
+    "build:cjs": "tsup --format cjs --out-dir dist/cjs",
+    "build:esm": "tsup --format esm --out-dir dist/esm",
+    "build": "rm -rf dist && npm run build:cjs && npm run build:esm",
     "test": "echo 'Add test script here'",
     "lint": "eslint \"./src/**/*.ts\""
   },
