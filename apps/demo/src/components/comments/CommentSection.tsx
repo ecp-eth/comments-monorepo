@@ -7,11 +7,8 @@ import { Comment } from "./Comment";
 import { CommentBox } from "./CommentBox";
 import { publicEnv } from "@/publicEnv";
 import { useOptimisticCommentingManager } from "@/hooks/useOptimisticCommentingManager";
-import { useAccount } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export function CommentSection() {
-  const { address: connectedAddress } = useAccount();
   const [page, setPage] = useState(0);
   const pageSize = 10;
   const [currentUrl, setCurrentUrl] = useState<string>("");
