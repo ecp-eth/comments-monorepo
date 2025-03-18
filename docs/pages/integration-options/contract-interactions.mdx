@@ -145,24 +145,6 @@ await writeContractAsync({
 
 ::::
 
-#### Best Practices
-
-1. Implement proper error handling
-1. Monitor gas costs and adjust gas limits accordingly
-1. Consider implementing retry mechanisms for failed transactions
-1. Keep private keys secure and never expose them in client-side code
-1. While the contract doesn't impose rate limits, consider implementing application-level rate limiting to prevent spam and manage gas costs effectively.
-1. Consider anti-spam measures
-
-##### Additional Resources for Author-Posted Comments
-
-- Check out **gasless** [post comment flows](/post-comment-flows)
-- See [Protocol API Reference](/protocol-reference/CommentsV1) for more functions and details.
-- See [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) for implementations of:
-  1. The other post comment flows.
-  2. Request permission from the user for gasless posting.
-  3. Deleting comments.
-
 ### 2. Post comment in any Ethereum transaction
 
 Sometimes, you might want to attach a comment directly to a transaction -- without the need for an additional transaction or smart contract integration. This can be useful for:
@@ -293,3 +275,21 @@ You can verify your integration by:
 ##### Congrats! You've completed the tutorial!
 
 ::::
+
+### Best Practices
+
+1. Implement proper error handling
+1. Monitor gas costs and adjust gas limits accordingly
+1. Consider implementing retry mechanisms for failed transactions
+1. Keep private keys secure and never expose them in client-side code
+1. While the contract doesn't impose rate limits, consider implementing application-level rate limiting to prevent spam and manage gas costs effectively.
+1. Consider anti-spam measures
+
+### Additional Resources
+
+- Check out **gasless** [post comment flows](/post-comment-flows)
+- See [Protocol API Reference](/protocol-reference/CommentsV1) for more functions and details.
+- See [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) for implementations of:
+  1. The other post comment flows.
+  2. Request permission from the user for gasless posting.
+  3. Deleting comments.
