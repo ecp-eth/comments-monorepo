@@ -9,7 +9,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAddress } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { CommentBoxGasless } from "./CommentBoxGasless";
-import { useFreshRef } from "@/hooks/useFreshRef";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "../CommentAuthor";
@@ -26,6 +25,7 @@ import {
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
+  useFreshRef,
 } from "@ecp.eth/shared/hooks";
 import { useDeleteGaslessComment, useSubmitGaslessComment } from "../hooks";
 import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";

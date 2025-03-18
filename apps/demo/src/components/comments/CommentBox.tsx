@@ -18,7 +18,7 @@ import { InvalidCommentError } from "./errors";
 import { CommentFormErrors } from "./CommentFormErrors";
 import { submitCommentMutationFunction } from "./queries";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
-import { useFreshRef } from "@/hooks/useFreshRef";
+import { useFreshRef } from "@ecp.eth/shared/hooks";
 
 interface CommentBoxProps {
   /**

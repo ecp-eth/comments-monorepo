@@ -17,7 +17,6 @@ import {
   useWriteContract,
 } from "wagmi";
 import { CommentBox } from "./CommentBox";
-import { useFreshRef } from "@/hooks/useFreshRef";
 import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "./CommentAuthor";
 import { CommentText } from "./CommentText";
@@ -30,6 +29,7 @@ import {
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
+  useFreshRef,
 } from "@ecp.eth/shared/hooks";
 import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";

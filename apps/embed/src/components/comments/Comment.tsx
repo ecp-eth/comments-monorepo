@@ -31,7 +31,6 @@ import {
   type PendingCommentOperationSchemaType,
 } from "@ecp.eth/shared/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
-import { useFreshRef } from "@/hooks/useFreshRef";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { submitCommentMutationFunction } from "./queries";
@@ -40,6 +39,7 @@ import {
   useHandleCommentSubmitted,
   useHandleRetryPostComment,
   useNewCommentsChecker,
+  useFreshRef,
 } from "@ecp.eth/shared/hooks";
 import { Button } from "../ui/button";
 import {

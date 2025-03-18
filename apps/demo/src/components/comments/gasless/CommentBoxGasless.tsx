@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
-import { useFreshRef } from "@/hooks/useFreshRef";
+import { useFreshRef } from "@ecp.eth/shared/hooks";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { CommentFormErrors } from "../CommentFormErrors";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";

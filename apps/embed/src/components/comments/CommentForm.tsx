@@ -6,7 +6,7 @@ import { useAccount, useSwitchChain, useWriteContract } from "wagmi";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { chains } from "../../lib/wagmi";
 import { COMMENTS_V1_ADDRESS, fetchAuthorData } from "@ecp.eth/sdk";
-import { useFreshRef } from "@/hooks/useFreshRef";
+import { useFreshRef } from "@ecp.eth/shared/hooks";
 import { useEmbedConfig } from "../EmbedConfigProvider";
 import type { PendingCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
