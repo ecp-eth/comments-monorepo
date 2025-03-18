@@ -1,7 +1,6 @@
 import React from "react";
 import { defineConfig } from "vocs";
 import { remarkMermaid } from "@theguild/remark-mermaid";
-import remarkCodesandbox from "remark-codesandbox";
 
 export default defineConfig({
   title: "Ethereum Comments Protocol",
@@ -238,21 +237,7 @@ export default defineConfig({
     { text: "Github", link: "https://github.com/ecp-eth/comments-monorepo" },
   ],
   markdown: {
-    remarkPlugins: [
-      remarkMermaid,
-      [
-        remarkCodesandbox,
-        {
-          mode: "button",
-          customTemplates: {
-            "ecp-eth-codesandbox-ts": {
-              extends: "file:templates/codesandbox-ts",
-              entry: "src/run.ts",
-            },
-          },
-        },
-      ],
-    ],
+    remarkPlugins: [remarkMermaid],
   },
   vite: {
     envPrefix: "VITE_",
