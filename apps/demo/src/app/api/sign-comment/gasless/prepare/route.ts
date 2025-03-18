@@ -8,7 +8,7 @@ import {
   PrepareSignedGaslessCommentRequestBodySchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
-import { bigintReplacer } from "@/lib/utils";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { chain, transport } from "@/lib/wagmi";
 import {
   COMMENTS_V1_ADDRESS,
@@ -94,9 +94,11 @@ export async function POST(
     appSigner: account.address,
   });
 
+  const chainId = chain.id;
+
   const typedCommentData = createCommentTypedData({
     commentData,
-    chainId: chain.id,
+    chainId,
   });
 
   const signature = await account.signTypedData(typedCommentData);
@@ -150,7 +152,8 @@ export async function POST(
             txHash,
             id: commentId,
             appSignature: signature,
-            commentData,
+            commentData: { ...commentData, id: commentId },
+            chainId,
           },
           {
             jsonReplacer: bigintReplacer,
@@ -174,7 +177,8 @@ export async function POST(
       signTypedDataParams: typedCommentData,
       id: commentId,
       appSignature: signature,
-      commentData,
+      commentData: { ...commentData, id: commentId },
+      chainId,
     },
     {
       jsonReplacer: bigintReplacer,

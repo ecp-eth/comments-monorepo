@@ -59,7 +59,6 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
       appSigner: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       targetUri,
-      offset: 0,
       limit: COMMENTS_PER_PAGE,
     });
 
@@ -77,7 +76,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
                     pageParams: [
                       {
                         limit: comments.pagination.limit,
-                        offset: comments.pagination.offset,
+                        cursor: comments.pagination.endCursor,
                       },
                     ],
                   }}

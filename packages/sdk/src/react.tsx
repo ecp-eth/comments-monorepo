@@ -40,15 +40,16 @@ const { compressToURI } = lz;
  * @returns
  */
 export function useGaslessTransaction<
-  VariablesType extends object | undefined,
-  ReturnValueType,
+  TVariables extends object | undefined,
+  TReturnValue,
+  TInputVariables = void,
 >(props: {
-  prepareSignTypedDataParams: () => Promise<
+  prepareSignTypedDataParams: (variables: TInputVariables) => Promise<
     | SignTypedDataParameters
     | {
         signTypedDataParams: SignTypedDataParameters;
         /** Miscellaneous data passed to be passed to sendSignedData */
-        variables: VariablesType;
+        variables: TVariables;
       }
   >;
   signTypedData?: (
@@ -57,16 +58,17 @@ export function useGaslessTransaction<
   sendSignedData: (args: {
     signature: Hex;
     /** Miscellaneous data passed from prepareSignTypedDataParams */
-    variables: VariablesType;
-  }) => Promise<ReturnValueType>;
+    variables: TVariables;
+  }) => Promise<TReturnValue>;
 }) {
   const { signTypedDataAsync } = useSignTypedData();
 
-  return useMutation({
-    mutationFn: async () => {
+  return useMutation<TReturnValue, Error, TInputVariables>({
+    mutationFn: async (inputVariables) => {
       const signTypedDataFn = props.signTypedData ?? signTypedDataAsync;
 
-      const prepareResult = await props.prepareSignTypedDataParams();
+      const prepareResult =
+        await props.prepareSignTypedDataParams(inputVariables);
       const signature = await signTypedDataFn(
         "signTypedDataParams" in prepareResult
           ? prepareResult.signTypedDataParams
@@ -78,7 +80,7 @@ export function useGaslessTransaction<
         variables:
           "variables" in prepareResult
             ? prepareResult.variables
-            : (undefined as VariablesType),
+            : (undefined as TVariables),
       });
       return signedData;
     },

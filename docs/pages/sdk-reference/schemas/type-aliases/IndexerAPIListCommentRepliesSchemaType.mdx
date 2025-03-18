@@ -8,25 +8,33 @@
 
 > **IndexerAPIListCommentRepliesSchemaType**: `object`
 
-Defined in: [packages/sdk/src/schemas.ts:280](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas.ts#L280)
+Defined in: [packages/sdk/src/schemas.ts:295](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas.ts#L295)
 
 ## Type declaration
 
 ### pagination
 
-> **pagination**: `object` = `IndexerAPIPaginationSchema`
+> **pagination**: `object` = `IndexerAPICursorPaginationSchema`
 
-#### pagination.hasMore
+#### pagination.endCursor?
 
-> **hasMore**: `boolean`
+> `optional` **endCursor**: `` `0x${string}` ``
+
+#### pagination.hasNext
+
+> **hasNext**: `boolean`
+
+#### pagination.hasPrevious
+
+> **hasPrevious**: `boolean`
 
 #### pagination.limit
 
 > **limit**: `number`
 
-#### pagination.offset
+#### pagination.startCursor?
 
-> **offset**: `number`
+> `optional` **startCursor**: `` `0x${string}` ``
 
 ### results
 

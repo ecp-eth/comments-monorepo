@@ -8,7 +8,7 @@
 
 > **IndexerAPICommentWithRepliesSchemaType**: `object`
 
-Defined in: [packages/sdk/src/schemas.ts:262](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas.ts#L262)
+Defined in: [packages/sdk/src/schemas.ts:277](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas.ts#L277)
 
 ## Type declaration
 
@@ -64,6 +64,10 @@ Defined in: [packages/sdk/src/schemas.ts:262](https://github.com/ecp-eth/comment
 
 > **content**: `string`
 
+### cursor
+
+> **cursor**: `` `0x${string}` `` = `HexSchema`
+
 ### deletedAt
 
 > **deletedAt**: `null` \| `Date`
@@ -90,19 +94,27 @@ Defined in: [packages/sdk/src/schemas.ts:262](https://github.com/ecp-eth/comment
 
 #### replies.pagination
 
-> **pagination**: `object` = `IndexerAPIPaginationSchema`
+> **pagination**: `object` = `IndexerAPICursorPaginationSchema`
 
-#### replies.pagination.hasMore
+#### replies.pagination.endCursor?
 
-> **hasMore**: `boolean`
+> `optional` **endCursor**: `` `0x${string}` ``
+
+#### replies.pagination.hasNext
+
+> **hasNext**: `boolean`
+
+#### replies.pagination.hasPrevious
+
+> **hasPrevious**: `boolean`
 
 #### replies.pagination.limit
 
 > **limit**: `number`
 
-#### replies.pagination.offset
+#### replies.pagination.startCursor?
 
-> **offset**: `number`
+> `optional` **startCursor**: `` `0x${string}` ``
 
 #### replies.results
 

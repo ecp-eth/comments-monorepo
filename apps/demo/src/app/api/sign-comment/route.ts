@@ -2,10 +2,10 @@ import { env } from "@/env";
 import { JSONResponse } from "@/lib/json-response";
 import {
   BadRequestResponseSchema,
-  SignCommentRequestBodySchema,
-  SignCommentResponseSchema,
+  SignCommentPayloadRequestSchema,
+  SignCommentResponseServerSchema,
 } from "@/lib/schemas";
-import { bigintReplacer } from "@/lib/utils";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import {
   createCommentData,
   createCommentTypedData,
@@ -19,10 +19,10 @@ export async function POST(
   req: Request
 ): Promise<
   JSONResponse<
-    typeof SignCommentResponseSchema | typeof BadRequestResponseSchema
+    typeof SignCommentResponseServerSchema | typeof BadRequestResponseSchema
   >
 > {
-  const parsedBodyResult = SignCommentRequestBodySchema.safeParse(
+  const parsedBodyResult = SignCommentPayloadRequestSchema.safeParse(
     await req.json()
   );
 
@@ -96,11 +96,11 @@ export async function POST(
   const hash = hashTypedData(typedCommentData);
 
   return new JSONResponse(
-    SignCommentResponseSchema,
+    SignCommentResponseServerSchema,
     {
       signature,
       hash,
-      data: commentData,
+      data: { ...commentData, id: hash },
     },
     {
       jsonReplacer: bigintReplacer,

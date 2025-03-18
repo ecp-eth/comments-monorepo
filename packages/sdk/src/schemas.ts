@@ -237,6 +237,7 @@ export const IndexerAPICommentSchema = z.object({
   targetUri: z.string(),
   timestamp: z.coerce.date(),
   txHash: HexSchema,
+  cursor: HexSchema,
 });
 
 export type IndexerAPICommentSchemaType = z.infer<
@@ -253,11 +254,23 @@ export type IndexerAPIPaginationSchemaType = z.infer<
   typeof IndexerAPIPaginationSchema
 >;
 
+export const IndexerAPICursorPaginationSchema = z.object({
+  limit: z.number().int(),
+  hasNext: z.boolean(),
+  hasPrevious: z.boolean(),
+  startCursor: HexSchema.optional(),
+  endCursor: HexSchema.optional(),
+});
+
+export type IndexerAPICursorPaginationSchemaType = z.infer<
+  typeof IndexerAPICursorPaginationSchema
+>;
+
 export const IndexerAPICommentWithRepliesSchema =
   IndexerAPICommentSchema.extend({
     replies: z.object({
       results: z.array(IndexerAPICommentSchema),
-      pagination: IndexerAPIPaginationSchema,
+      pagination: IndexerAPICursorPaginationSchema,
     }),
   });
 
@@ -267,7 +280,7 @@ export type IndexerAPICommentWithRepliesSchemaType = z.infer<
 
 export const IndexerAPIListCommentsSchema = z.object({
   results: z.array(IndexerAPICommentWithRepliesSchema),
-  pagination: IndexerAPIPaginationSchema,
+  pagination: IndexerAPICursorPaginationSchema,
 });
 
 export type IndexerAPIListCommentsSchemaType = z.infer<
@@ -276,7 +289,7 @@ export type IndexerAPIListCommentsSchemaType = z.infer<
 
 export const IndexerAPIListCommentRepliesSchema = z.object({
   results: z.array(IndexerAPICommentSchema),
-  pagination: IndexerAPIPaginationSchema,
+  pagination: IndexerAPICursorPaginationSchema,
 });
 
 export type IndexerAPIListCommentRepliesSchemaType = z.infer<

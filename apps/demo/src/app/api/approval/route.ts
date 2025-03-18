@@ -9,11 +9,8 @@ import {
   InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
-import { bigintReplacer } from "@/lib/utils";
-import {
-  chain,
-  transport,
-} from "@/lib/wagmi";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
+import { chain, transport } from "@/lib/wagmi";
 import {
   COMMENTS_V1_ADDRESS,
   createApprovalTypedData,
@@ -48,9 +45,7 @@ export async function GET(
     );
   }
 
-  const account = privateKeyToAccount(
-    env.APP_SIGNER_PRIVATE_KEY
-  );
+  const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
 
   const publicClient = createPublicClient({
     chain,
@@ -154,9 +149,7 @@ export async function POST(
     parsedBodyResult.data;
 
   // Check that signature is from the app signer
-  const appSigner = privateKeyToAccount(
-    env.APP_SIGNER_PRIVATE_KEY
-  );
+  const appSigner = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
 
   // Can be any account with funds for gas on desired chain
   const submitterAccount = await resolveSubmitterAccount();
