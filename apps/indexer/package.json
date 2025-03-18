@@ -13,7 +13,8 @@
     "codegen": "ponder codegen",
     "serve": "ponder serve",
     "lint": "eslint \"./src/**/*.ts\"",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "build-id": "node bin/build-id.js"
   },
   "dependencies": {
     "@ecp.eth/sdk": "^0.0.11",
@@ -33,6 +34,7 @@
     "obscenity": "^0.4.3",
     "pg": "^8.11.3",
     "ponder": "^0.9.23",
+    "typescript": "5.7.3",
     "viem": "^2.22.21",
     "xxhash-wasm": "^1.1.0",
     "zod": "^3.24.1"
