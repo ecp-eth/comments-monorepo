@@ -101,6 +101,12 @@ export function mergeNewComments(
   };
 }
 
+/**
+ * Insert a pending comment to the first page of the query data
+ *
+ * This function mutates the queryData argument
+ *
+ */
 export function insertPendingCommentToPage(
   queryData: InfiniteData<
     CommentPageSchemaType,
@@ -108,15 +114,13 @@ export function insertPendingCommentToPage(
   >,
   pendingOperation: PendingCommentOperationSchemaType
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
-  const clonedData = structuredClone(queryData);
-
-  if (!clonedData.pages[0]) {
+  if (!queryData.pages[0]) {
     return queryData;
   }
 
   const { response, txHash, chainId } = pendingOperation;
 
-  clonedData.pages[0].results.unshift({
+  queryData.pages[0].results.unshift({
     ...response.data,
     author: pendingOperation.resolvedAuthor ?? {
       address: response.data.author,
@@ -138,9 +142,15 @@ export function insertPendingCommentToPage(
     pendingOperation,
   });
 
-  return clonedData;
+  return queryData;
 }
 
+/**
+ * Replace a comment's pending operation with a new pending operation
+ *
+ * This function mutates the queryData argument
+ *
+ */
 export function replaceCommentPendingOperationByComment(
   queryData: InfiniteData<
     CommentPageSchemaType,
@@ -149,8 +159,6 @@ export function replaceCommentPendingOperationByComment(
   comment: Comment,
   newPendingOperation: PendingCommentOperationSchemaType
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
-  const clonedData = structuredClone(queryData);
-
   function replaceComment(page: CommentPageSchemaType): boolean {
     for (const c of page.results) {
       if (c.id === comment.id) {
@@ -167,15 +175,25 @@ export function replaceCommentPendingOperationByComment(
     return false;
   }
 
-  for (const page of clonedData.pages) {
+  for (const page of queryData.pages) {
     if (replaceComment(page)) {
-      return clonedData;
+      return queryData;
     }
   }
 
-  return clonedData;
+  return queryData;
 }
 
+/**
+ * Mark a comment as deleted by setting the `deletedAt` field to the current date
+ * and setting the `content` field to "[deleted]"
+ *
+ * This function mutates the queryData argument
+ *
+ * @param queryData
+ * @param commentId
+ * @returns
+ */
 export function markCommentAsDeleted(
   queryData: InfiniteData<
     CommentPageSchemaType,
@@ -183,8 +201,6 @@ export function markCommentAsDeleted(
   >,
   commentId: Hex
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
-  const clonedData = structuredClone(queryData);
-
   function markComment(page: CommentPageSchemaType): boolean {
     for (const comment of page.results) {
       if (comment.id === commentId) {
@@ -202,13 +218,13 @@ export function markCommentAsDeleted(
     return false;
   }
 
-  for (const page of clonedData.pages) {
+  for (const page of queryData.pages) {
     if (markComment(page)) {
-      return clonedData;
+      return queryData;
     }
   }
 
-  return clonedData;
+  return queryData;
 }
 
 /**
