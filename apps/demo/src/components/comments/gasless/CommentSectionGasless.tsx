@@ -32,6 +32,10 @@ import {
   useNewCommentsChecker,
 } from "@ecp.eth/shared/hooks";
 import type { Hex } from "@ecp.eth/sdk/schemas";
+import {
+  CommentGaslessProvider,
+  CommentGaslessProviderContextType,
+} from "./CommentGaslessProvider";
 
 export function CommentSectionGasless() {
   const { address: connectedAddress } = useAccount();
@@ -198,6 +202,14 @@ export function CommentSectionGasless() {
     setCurrentUrl(window.location.href);
   }, []);
 
+  const commentGaslessProviderValue =
+    useMemo<CommentGaslessProviderContextType>(
+      () => ({
+        isApproved: getApprovalQuery.data?.approved ?? false,
+      }),
+      [getApprovalQuery.data?.approved]
+    );
+
   const isApprovalPending =
     approveContractReceipt.isLoading ||
     approveGaslessTransactionsMutation.isPending ||
@@ -219,87 +231,88 @@ export function CommentSectionGasless() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
-      <h2 className="text-lg font-semibold">Comments</h2>
+    <CommentGaslessProvider value={commentGaslessProviderValue}>
+      <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
+        <h2 className="text-lg font-semibold">Comments</h2>
 
-      {!getApprovalQuery.data?.approved &&
-      getApprovalQuery.data?.signTypedDataParams ? (
-        <div className="mb-4">
-          <Button
-            onClick={() => {
-              approveGaslessTransactionsMutation.mutate();
-            }}
-            disabled={isApprovalPending}
-            variant="default"
-          >
-            {isApprovalPending
-              ? "Requesting Approval..."
-              : "Request Approval to Comment"}
-          </Button>
-        </div>
-      ) : (
-        getApprovalQuery.data?.approved && (
-          <div className="flex items-center gap-2">
-            <div className="text-sm text-gray-500">
-              App has approval to post on your behalf.
-            </div>
+        {!getApprovalQuery.data?.approved &&
+        getApprovalQuery.data?.signTypedDataParams ? (
+          <div className="mb-4">
             <Button
-              variant="outline"
-              disabled={!getApprovalQuery.data || isRemovingApproval}
               onClick={() => {
-                if (
-                  !getApprovalQuery.data ||
-                  !getApprovalQuery.data.approved ||
-                  !connectedAddress
-                ) {
-                  throw new Error("No data found");
-                }
-
-                removeApprovalContract.writeContract({
-                  abi: CommentsV1Abi,
-                  address: COMMENTS_V1_ADDRESS,
-                  functionName: "removeApprovalAsAuthor",
-                  args: [getApprovalQuery.data.appSigner],
-                });
+                approveGaslessTransactionsMutation.mutate();
               }}
+              disabled={isApprovalPending}
+              variant="default"
             >
-              <X />
-              <span>
-                {isRemovingApproval ? "Removing..." : "Remove Approval"}
-              </span>
+              {isApprovalPending
+                ? "Requesting Approval..."
+                : "Request Approval to Comment"}
             </Button>
           </div>
-        )
-      )}
+        ) : (
+          getApprovalQuery.data?.approved && (
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-gray-500">
+                App has approval to post on your behalf.
+              </div>
+              <Button
+                variant="outline"
+                disabled={!getApprovalQuery.data || isRemovingApproval}
+                onClick={() => {
+                  if (
+                    !getApprovalQuery.data ||
+                    !getApprovalQuery.data.approved ||
+                    !connectedAddress
+                  ) {
+                    throw new Error("No data found");
+                  }
 
-      <CommentBoxGasless
-        onSubmitSuccess={handleCommentSubmitted}
-        isAppSignerApproved={getApprovalQuery.data?.approved}
-      />
-      {hasNewComments && (
-        <Button
-          className="mb-4"
-          onClick={() => fetchNewComments()}
-          variant="secondary"
-          size="sm"
-        >
-          Load new comments
-        </Button>
-      )}
-      {results.map((comment) => (
-        <CommentGasless
-          key={`${comment.id}-${comment.deletedAt}`}
-          comment={comment}
-          onRetryPost={handleRetryPostComment}
-          onDelete={handleCommentDeleted}
-          isAppSignerApproved={getApprovalQuery.data?.approved ?? false}
+                  removeApprovalContract.writeContract({
+                    abi: CommentsV1Abi,
+                    address: COMMENTS_V1_ADDRESS,
+                    functionName: "removeApprovalAsAuthor",
+                    args: [getApprovalQuery.data.appSigner],
+                  });
+                }}
+              >
+                <X />
+                <span>
+                  {isRemovingApproval ? "Removing..." : "Remove Approval"}
+                </span>
+              </Button>
+            </div>
+          )
+        )}
+
+        <CommentBoxGasless
+          onSubmitSuccess={handleCommentSubmitted}
+          isAppSignerApproved={getApprovalQuery.data?.approved}
         />
-      ))}
-      {hasNextPage && (
-        <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
-          Load More
-        </Button>
-      )}
-    </div>
+        {hasNewComments && (
+          <Button
+            className="mb-4"
+            onClick={() => fetchNewComments()}
+            variant="secondary"
+            size="sm"
+          >
+            Load new comments
+          </Button>
+        )}
+        {results.map((comment) => (
+          <CommentGasless
+            key={`${comment.id}-${comment.deletedAt}`}
+            comment={comment}
+            onRetryPost={handleRetryPostComment}
+            onDelete={handleCommentDeleted}
+          />
+        ))}
+        {hasNextPage && (
+          <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
+            Load More
+          </Button>
+        )}
+      </div>
+    </CommentGaslessProvider>
   );
 }
