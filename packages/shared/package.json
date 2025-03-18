@@ -1,6 +1,5 @@
 {
   "name": "@ecp.eth/shared",
-  "private": true,
   "version": "0.0.2",
   "type": "module",
   "license": "MIT",
@@ -13,8 +12,9 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "dev": "tsup --watch",
-    "build": "tsup",
+    "dev": "tsup --format esm --out-dir dist/esm --watch",
+    "build:cjs": "tsup --format cjs --out-dir dist/cjs",
+    "build:esm": "tsup --format esm --out-dir dist/esm",
     "test": "echo 'Add test script here'",
     "lint": "eslint \"./src/**/*.ts\""
   },
