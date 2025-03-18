@@ -10,7 +10,7 @@ import {
 } from "@/lib/schemas";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
-import { useConnectAccount } from "@/hooks/useConnectAccount";
+import { useConnectAccount } from "@ecp.eth/shared/hooks";
 import {
   deletePriorApprovedCommentMutationFunction,
   deletePriorNotApprovedCommentMutationFunction,
