@@ -142,7 +142,7 @@ export function CommentBox({
       />
       <div className="flex gap-2 justify-between">
         {address && <CommentBoxAuthor address={address} />}
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center ml-auto">
           <Button
             name="action"
             value="post"

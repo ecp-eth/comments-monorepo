@@ -133,6 +133,7 @@ export function CommentForm({
       <div className="flex gap-2 justify-between">
         {address && <CommentFormAuthor address={address} />}
         <Button
+          className="ml-auto"
           type="submit"
           disabled={isSubmitting || !isContentValid}
           size="sm"
