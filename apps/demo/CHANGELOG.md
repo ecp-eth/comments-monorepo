@@ -1,5 +1,12 @@
 # @ecp.eth/demo
 
+## 0.1.11
+
+### Patch Changes
+
+- Updated dependencies [eb39507]
+  - @ecp.eth/shared@0.0.3
+
 ## 0.1.10
 
 ### Patch Changes
