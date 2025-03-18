@@ -2,90 +2,70 @@
 
 ## Contract Interaction
 
-In certain situations, such as bot development or custom integrations, you may want to directly interact with the CommentsV1 smart contract.
+### 1. Post the comment as the author
 
-**Caveat**: Always check if you can achieve the same result by using our [SDK](http://localhost:3004/sdk-reference) or [Indexer API](/integration-options/indexer-api),
-indexer service provides all comment data readily available for consumption, eliminating the need to manually scan the chain.
-This significantly improves performance and reduces complexity in your application.
+In this section, we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of posting a comment as the author.
 
-### Contract Addresses
+The ECP supports 4 types of comment posting flows, each with its pros and cons.
 
-See [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS)
+Here we will discuss [the simplest flow](/post-comment-flows#1-author-pays-gas):
 
-### Post the comment as author
+- The author posts and pays for gas, see ["author pays for the gas"](/post-comment-flows#1-author-pays-gas).
+- The app server authorizes the post by signing the comment data.
 
-We will start by create a simple example that simulates the author posting the a comment that is signed by app server.
-
-The ECP supports 4 types of comment posting flows, each with their own pros and cons.
 You may want to read more about the [post comment flows](/post-comment-flows) for more details.
 
-Here we will show the most basic flow:
+#### The Contract
 
-- The author will post and pay for the gas, see ["author pays gas"](/post-comment-flows#1-author-pays-gas).
-- The app server will authorize the post by signing the comment data.
+- For latest contract address, see [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS).
+- We will call [`postCommentAsAuthor()`](/protocol-reference/CommentsV1#postcommentasauthorstruct-commentsv1commentdata-commentdata-bytes-appsignature-external) method to post the comment.
+
+#### Demo Dependencies
+
+Here is a quick rundown of some of the dependencies used in the demo app:
+
+1. `@ecp.eth/sdk` - for comment data creation, retrieving, and interaction with the indexer.
+1. `wagmi` - for react based wallet connection
+1. `viem` - for contract interaction
+1. `@rainbow-me/rainbowkit` - for wallet connection UI
+1. `@tanstack/react-query` - for data fetching and caching
+
+#### Test environment
+
+- We use [Anvil](https://book.getfoundry.sh/anvil/) for local testing and development, follow the steps in [Test with Anvil](/test-with-anvil) to set up the environment.
+- You may want to set up an indexer locally as well, see [Indexer](/indexer-reference/) for more details.
+
+Now let's go through the steps to post a comment!
 
 ::::steps
 
-#### Install tooling
+##### Collect the comment data and send it to the server for signing
 
-In this example we will use `@ecp.eth/sdk` and `viem` to interact with the contract:
+We will start by collecting the [comment data](/comment-data-props) and send it to the server for signing:
 
-:::code-group
-
-```bash [npm]
-npm install viem "@ecp.eth/sdk"
-```
-
-```bash [yarn]
-yarn add viem "@ecp.eth/sdk"
-```
-
-```bash [pnpm]
-pnpm add viem "@ecp.eth/sdk"
-
-```
-
-:::
-
-#### Get access to the blockchain with RPC endpoint
-
-RPC endpoint is the entry point to interact with the blockchain, you can get a free RPC endpoint from [Infura](https://infura.io/), [Alchemy](https://www.alchemy.com/), or [Reown](https://docs.reown.com/advanced/providers/ethereum).
-
-Alternatively, if you don't want to mess with real world assets, you can also use [Anvil](https://book.getfoundry.sh/anvil/) to create a simulated blockchain.
-See [Test with Anvil](/test-with-anvil) for more details.
-
-Once you have the RPC endpoint URI, you can create a `transport` for `viem`:
+The comment data is sent to the server for signing:
 
 ```typescript
-const transport = http(rpcEndpointURI);
+const response = await fetch("/api/sign-comment", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    content,
+    targetUri: window.location.href,
+    parentId,
+    author: address,
+    chainId,
+  }),
+});
 ```
 
-#### Simulate the App Server signing the post
+🧑‍💻 _[/apps/demo/src/components/comments/CommentBox.tsx#L62](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/CommentBox.tsx#L62)_
 
-For the app to sign and authorize posting, we will need the following information:
+##### The App Server signs the comment data
 
-- The author's address
-- The target chain for posting the comment
-- The comment content
-- The target URI of the comment
-
-Let's create a function that signs comments for the app server. Here's the function signature:
-
-```typescript
-type sign = (
-  authorAddress: Hex,
-  chain: Chain,
-  content: string,
-  targetUri: string
-) => Promise<{
-  signature: Hex;
-  commentData: CommentData;
-}>;
-```
-
-Now let's get the comment data ready for signing...
-
-Frist create a `CommentData` object with the provided info:
+Once the data reaches the app server, it creates a `CommentData` object using `createCommentData` from `@ecp.eth/sdk`:
 
 ```typescript
 const commentData = createCommentData({
@@ -98,7 +78,12 @@ const commentData = createCommentData({
 });
 ```
 
-Then create a typed data structure from `commentData` according to EIP-712:
+[`createCommentData()`](/sdk-reference/defaultExports/functions/createCommentData) also accepts 2 extra options which are worth mentioning:
+
+- `deadline` - you want to avoid setting a `deadline` that is too long to expire, deadline plays an important role here in preventing a replay attacks. The longer expiry of `deadline` increases the security risk.
+- `salt` - a random value to make each comment unique, its uniqueness is essential for generating comment hash which is also used as `commentId`.
+
+Create a typed data structure from `commentData` according to EIP-712:
 
 ```typescript
 const typedCommentData = createCommentTypedData({
@@ -118,243 +103,193 @@ return {
 };
 ```
 
-Now we finished the App Server signing process, let's see how the author posting the comment.
+🧑‍💻 _[/apps/demo/src/app/api/sign-comment/route.ts#L48-L61](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/route.ts#L48-L61)_
 
-**Note**: Do not expose the app signer's private key in the client side in real scenario, here we simplified the setup and is only for demostration purpose
+**Note**:
 
-#### Create wallet client for signing the transaction
+- Do not expose the app signer's private key on the client side.
+  In the demo, we store the private key in the environment variable `APP_SIGNER_PRIVATE_KEY`.
+  Next.JS ensures that the environment variable without `NEXT_PUBLIC_` prefix is only available on the server side.
 
-To interact with the blockchain and the contract, we will create an `account/signer`,
-to create a `wallet client` which allows us to sign and send transaction to the blockchain.
+Now that we have finished server-side signing, let's move on to the client side.
 
-To create an `account`, for simplicity and demostration purpose, we will use a hard coded private key:
+#### The Author signs and sends the transaction
 
-```typescript
-private readonly authorPrivateKey =
-    "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
-private readonly authorSigner = privateKeyToAccount(this.authorPrivateKey);
+In the demo, we use a combination of `wagmi` and `rainbowkit` to connect the user wallet and send the transaction to the contract.
+You can find out how it was set up in the `providers` component:
+
+```tsx
+<QueryClientProvider client={queryClient}>
+  <WagmiProvider config={config}>
+    <RainbowKitProvider>{children}</RainbowKitProvider>
+  </WagmiProvider>
+</QueryClientProvider>
 ```
 
-Please note that in real scenario, you probably want to connect to a user's wallet app, such as MetaMask or Rainbow, to sign and send the transaction.
-To see how to do that, please refer to:
+🧑‍💻 _[/apps/demo/src/app/providers.tsx#L16-L20](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/providers.tsx#L16-L20)_
 
-1. viem's documentation on [JSON RPC accounts](https://viem.sh/docs/clients/wallet#json-rpc-accounts), and
-1. Reown's [Ethereum RPC Provider](https://docs.reown.com/advanced/providers/ethereum)
-1. Or use [Rainbowkit](https://www.rainbowkit.com/docs/custom-wallet-list#walletconnect)
-
-Feel free to explore all possible solutions for your case.
-However, we will go with what we've got so far: combining `transport` and `account/signer` to create a `viem` wallet client:
+Now with the wagmi ready to go, and the comment data and app signature returned from the server, we can now post the comment to the contract:
 
 ```typescript
-// Create wallet client for interacting with the contract
-private readonly walletClient = createWalletClient({
-  chain: anvil,
-  transport,
-  account: this.authorSigner,
+await writeContractAsync({
+  abi: CommentsV1Abi,
+  address: COMMENTS_V1_ADDRESS,
+  functionName: "postCommentAsAuthor",
+  args: [commentData, appSignature],
 });
 ```
 
-We will use the wallet client later in the tutorial.
+🧑‍💻 _[/apps/demo/src/lib/contract.ts#L40-L45](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/lib/contract.ts#L40-L45)_
 
-#### Simulate the Author posting the comment
-
-The signature for the function to create on author side is self-explanatory:
-
-```typescript
-type postComment(content: string, targetUri: string) => Promise<TransactionReceipt>
-```
-
-We will start by sending the comment data to the App Server for signing.
-
-In the real scenario, the client side posts the data to the server via HTTP or whatever transport of your choice,
-usually the App Server is deployed by a different party to keep the private key secure.
-
-However, to demonstrate the flow in this example, we'll directly call the `sign` function from the `AppServer` instance.
-
-```typescript
-const appSignedComment = await this.appServer.sign(
-  authorSigner.address,
-  anvil,
-  content,
-  targetUri
-);
-```
-
-Then we call the function on the contract to post the comment, and wait for the transaction to be mined:
-
-```typescript
-const tx = await commentsContract.write.postCommentAsAuthor(
-  [appSignedComment.commentData, appSignedComment.signature],
-  {
-    account: walletClient.account,
-  }
-);
-
-const receipt = await waitForTransactionReceipt(walletClient, {
-  hash: tx,
-});
-
-return receipt;
-```
-
-#### Put everything together
-
-Here is the complete example, with everything put together:
-
-```typescript
-import { http, createWalletClient, getContract, Hex, Chain } from "viem";
-import { anvil } from "viem/chains";
-import { waitForTransactionReceipt } from "viem/actions";
-import {
-  COMMENTS_V1_ADDRESS,
-  createCommentData,
-  createCommentTypedData,
-} from "@ecp.eth/sdk";
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { privateKeyToAccount } from "viem/accounts";
-
-// we use a local anvil node for this example,
-// anvil is a local ethereum node that is used for testing and development.
-// run `pnpm i && pnpm run dev` in `/packages/protocol/` to start the node,
-// the script will also deploy the contract to the node
-const transport = http("http://localhost:8545");
-
-/**
- * The class simulate the app server that signs the comment.
- * In real scenario, the client side post the data to the server,
- * and the app signing process should be hide away from the client.
- */
-class AppServer {
-  private readonly appSignerPrivateKey =
-    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-  private readonly appSigner = privateKeyToAccount(this.appSignerPrivateKey);
-
-  /**
-   * Sign the comment data as the app server
-   * @param authorAddress - The address of the author of the comment
-   * @param chain - The chain on which the comment is being posted
-   * @param content - The content of the comment
-   * @param targetUri - The URI of the target of the comment
-   * @returns The signed comment data
-   */
-  async sign(
-    authorAddress: Hex,
-    chain: Chain,
-    content: string,
-    targetUri: string
-  ) {
-    const appSigner = this.appSigner;
-
-    // create comment data
-    const commentData = createCommentData({
-      content,
-      targetUri,
-      // we are posting a top level comment, so no parentId
-      parentId: undefined,
-      author: authorAddress,
-      appSigner: appSigner.address,
-    });
-
-    // create a typed data according to EIP-712 for signing
-    const typedCommentData = createCommentTypedData({
-      commentData,
-      chainId: chain.id,
-    });
-
-    const signature = await appSigner.signTypedData(typedCommentData);
-    // const hash = hashTypedData(typedCommentData);
-
-    return {
-      signature,
-      // hash,
-      commentData,
-    };
-  }
-}
-
-/**
- * The class simulate the author who posts the comment from client side
- */
-class Author {
-  private readonly authorPrivateKey =
-    "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
-  private readonly authorSigner = privateKeyToAccount(this.authorPrivateKey);
-  // Create wallet client for interacting with the contract
-  private readonly walletClient = createWalletClient({
-    chain: anvil,
-    transport,
-    account: this.authorSigner,
-  });
-  // Get contract instance
-  private readonly commentsContract = getContract({
-    address: COMMENTS_V1_ADDRESS,
-    abi: CommentsV1Abi,
-    client: this.walletClient,
-  });
-
-  constructor(private appServer: AppServer) {}
-
-  async postComment(content: string, targetUri: string) {
-    const authorSigner = this.authorSigner;
-    const walletClient = this.walletClient;
-    const commentsContract = this.commentsContract;
-
-    // to begin with, we post the comment data over to app server,
-    // to get the app server signed comment data
-    const appSignedComment = await this.appServer.sign(
-      authorSigner.address,
-      anvil,
-      content,
-      targetUri
-    );
-
-    // post comment data and app signature so the contract can verify the comment is authorized by the app
-    const tx = await commentsContract.write.postCommentAsAuthor(
-      [appSignedComment.commentData, appSignedComment.signature],
-      {
-        // postCommentAsAuthor transaction will be executed by author signer so the author will have to pay.
-        account: walletClient.account,
-      }
-    );
-
-    const receipt = await waitForTransactionReceipt(walletClient, {
-      hash: tx,
-    });
-
-    return receipt;
-  }
-}
-
-(async () => {
-  const author = new Author(new AppServer());
-  console.log("author is posting the comment and paying for the gas...");
-  const receipt = await author.postComment(
-    "Somebody successfully finished the tutorial!",
-    "https://demo.ethcomments.xyz"
-  );
-  console.log(
-    "author has posted the comment and the transaction is mined, transaction hash: ",
-    receipt.transactionHash
-  );
-})();
-```
-
-See [Protocol API Reference](/protocol-reference/CommentsV1) for more functions and details.
-
-#### Congratulations! You've completed the tutorial!
+##### Congratulations! You've completed the tutorial!
 
 ::::
 
-#### Next Steps
+### 2. Post comment in any Ethereum transaction
 
-- Check out **gasless** [post comment flows](/post-comment-flows)
+Sometimes, you might want to attach a comment directly to a transaction -- without the need for an additional transaction or smart contract integration. This can be useful for:
+
+- Reducing gas costs by embedding the comment in the transaction calldata
+- Adding notes to NFT mints
+- Commenting on token transfers
+- Providing context for any smart contract interaction
+
+In this document, we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo)
+to illustrate the process of posting a comment as part of any transaction.
+
+#### The Contract
+
+- For latest contract address, see [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS).
+
+#### How it works
+
+The demo app uses a test contract with the method `yoink()` to illustrate how to include a comment in a transaction.
+For a detailed explanation of the flow, see the [Post Comment Flows](/post-comment-flows#4-appending-comment-to-a-transaction-author-pays-gas).
+
+1. The author creates a signed comment data by sending it to the app server for signing.
+1. The author encodes the signed comment data into a hex string.
+1. The author calls the `yoink()` method on the contract and passes the encoded comment data as calldata suffix.
+1. Once the transaction is broadcasted, the comment in calldata will then be indexed by our ponder indexer.
+
+For dependencies and test environment setup, please refer to previous [examples in this section](/integration-options/contract-interactions).
+
+##### Test contract
+
+The test contract source code is available in the [test-protocol package](https://github.com/ecp-eth/comments-monorepo/tree/main/packages/test-protocol).
+
+Should you want to deploy your test contract, follow the steps in the [README file](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/test-protocol/README.md),
+then update the address used for the demo app in the `.env` files:
+
+```
+NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS=
+```
+
+🧑‍💻 _[/apps/demo/.env.example#L62](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/.env.example#L43)_
+
+Read more about testing with a local anvil node in [Test with Anvil](/test-with-anvil).
+
+**FYI:** If you are testing the comment posting integration, contract deployment is not strictly required:
+
+When no contract is deployed at the target address, the transaction that invokes the function will still succeed, but no code will be executed.
+The indexer will still capture the successful transaction as long as it contains the [ECP delimiter](/sdk-reference/defaultExports/variables/COMMENT_CALLDATA_SUFFIX_DELIMITER) in the calldata.
+
+Now let's get started with the code!
+
+::::steps
+
+##### Get the comment data signed by the app server
+
+As all previous examples, the author will start by collecting the required
+[comment data](/comment-data-props) and send it to the app server for signing:
+
+```typescript
+const response = await fetch("/api/sign-comment", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    content,
+    targetUri: window.location.href,
+    parentId,
+    author: address,
+    chainId,
+  }),
+});
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/CommentBox.tsx#L62](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/CommentBox.tsx#L62)_
+
+##### Encode the comment data
+
+Next, we want to encode signed comment data into hex using `encodeAbiParameters` with the ABI definition of the comment data,
+luckily we have a helper function `createCommentSuffixData` from the SDKto do just that:
+
+```typescript
+const commentDataSuffix = createCommentSuffixData({
+  commentData,
+  appSignature,
+});
+```
+
+🧑‍💻 _[/apps/demo/src/lib/contract.ts#L21-L24](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/lib/contract.ts#L21-L24)_
+
+##### Include a comment in your transaction
+
+Now you can create the test contract instance and include the encoded comment data in your transaction's data field:
+
+```typescript
+return await writeContractAsync({
+  address:
+    publicEnv.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS ??
+    never("Yoink contract address is not set"),
+  abi: parseAbi(["function yoink()"]),
+  functionName: "yoink",
+  args: [],
+  dataSuffix: commentDataSuffix,
+});
+```
+
+🧑‍💻 _[/apps/demo/src/lib/contract.ts#L26-L33](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/lib/contract.ts#L26-L33)_
+
+and wait for the transaction to be mined:
+
+```typescript
+const { data: receipt, isLoading: isReceiptLoading } =
+  useWaitForTransactionReceipt({
+    hash: submitMutation.data?.txHash,
+  });
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/CommentBox.tsx#L113-L116](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/CommentBox.tsx#L113-L116)_
+
+The comments indexer will scan transactions for valid comment data and index any comments it finds, making them available through the indexer API.
+
+##### Testing the integration
+
+You can verify your integration by:
+
+1. Checking the indexer API (or [deploy indexer locally](/indexer-reference)) to see if the comment was indexed
+1. Viewing the comment on your app's UI
+
+##### Congrats! You've completed the tutorial!
+
+::::
 
 ### Best Practices
 
-1. Set reasonable deadlines (e.g., 1 hour from current time)
 1. Implement proper error handling
 1. Monitor gas costs and adjust gas limits accordingly
 1. Consider implementing retry mechanisms for failed transactions
 1. Keep private keys secure and never expose them in client-side code
 1. While the contract doesn't impose rate limits, consider implementing application-level rate limiting to prevent spam and manage gas costs effectively.
 1. Consider anti-spam measures
+
+### Additional Resources
+
+- Check out **gasless** [post comment flows](/post-comment-flows)
+- See [Protocol API Reference](/protocol-reference/CommentsV1) for more functions and details.
+- See [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) for implementations of:
+  1. The other post comment flows.
+  2. Request permission from the user for gasless posting.
+  3. Deleting comments.
