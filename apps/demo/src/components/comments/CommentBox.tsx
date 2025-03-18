@@ -12,13 +12,12 @@ import {
 } from "@/lib/contract";
 import { publicEnv } from "@/publicEnv";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
-import { useConnectAccount } from "@/hooks/useConnectAccount";
 import { z } from "zod";
 import { InvalidCommentError } from "./errors";
 import { CommentFormErrors } from "./CommentFormErrors";
 import { submitCommentMutationFunction } from "./queries";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
-import { useFreshRef } from "@ecp.eth/shared/hooks";
+import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 
 interface CommentBoxProps {
   /**
