@@ -140,32 +140,34 @@ export function CommentBox({
         required
         ref={textAreaRef}
       />
-      {address && <CommentBoxAuthor address={address} />}
+      <div className="flex gap-2 justify-between">
+        {address && <CommentBoxAuthor address={address} />}
+        <div className="flex gap-2 items-center">
+          <Button
+            name="action"
+            value="post"
+            type="submit"
+            className="px-4 py-2 rounded"
+            disabled={isSubmitting || !isContentValid}
+          >
+            {formState === "posting" ? "Posting..." : "Comment"}
+          </Button>
+          {publicEnv.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS && (
+            <Button
+              name="action"
+              value="yoink"
+              type="submit"
+              className="bg-purple-500 text-white px-4 py-2 rounded"
+              disabled={isSubmitting || !isContentValid}
+            >
+              {formState === "yoinking" ? "Yoinking..." : "Yoink with comment"}
+            </Button>
+          )}
+        </div>
+      </div>
       {submitCommentMutation.error && (
         <CommentFormErrors error={submitCommentMutation.error} />
       )}
-      <div className="flex items-center gap-2 text-sm text-gray-500">
-        <Button
-          name="action"
-          value="post"
-          type="submit"
-          className="px-4 py-2 rounded"
-          disabled={isSubmitting || !isContentValid}
-        >
-          {formState === "posting" ? "Posting..." : "Comment"}
-        </Button>
-        {publicEnv.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS && (
-          <Button
-            name="action"
-            value="yoink"
-            type="submit"
-            className="bg-purple-500 text-white px-4 py-2 rounded"
-            disabled={isSubmitting || !isContentValid}
-          >
-            {formState === "yoinking" ? "Yoinking..." : "Yoink with comment"}
-          </Button>
-        )}
-      </div>
     </form>
   );
 }

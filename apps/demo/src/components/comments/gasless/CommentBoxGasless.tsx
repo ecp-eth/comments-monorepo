@@ -81,11 +81,8 @@ export function CommentBoxGasless({
         required
         ref={textAreaRef}
       />
-      {address && <CommentBoxAuthor address={address} />}
-      {submitCommentMutation.error && (
-        <CommentFormErrors error={submitCommentMutation.error} />
-      )}
-      <div className="flex items-center text-sm text-gray-500">
+      <div className="flex gap-2 justify-between">
+        {address && <CommentBoxAuthor address={address} />}
         <Button
           type="submit"
           className="px-4 py-2 rounded"
@@ -94,6 +91,9 @@ export function CommentBoxGasless({
           {isSubmitting ? "Posting..." : "Comment"}
         </Button>
       </div>
+      {submitCommentMutation.error && (
+        <CommentFormErrors error={submitCommentMutation.error} />
+      )}
     </form>
   );
 }

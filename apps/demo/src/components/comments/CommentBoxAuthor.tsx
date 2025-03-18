@@ -8,11 +8,11 @@ export function CommentBoxAuthor(author: AuthorType) {
 
   return (
     <div
-      className="flex flex-row gap-2 items-center"
+      className="flex flex-row gap-2 items-center overflow-hidden"
       title={`Publishing as ${getCommentAuthorNameOrAddress(enrichedAuthor)}`}
     >
       <CommentAuthorAvatar author={enrichedAuthor} />
-      <div className="text-xs text-gray-500">
+      <div className="flex-grow text-xs text-gray-500 truncate">
         {getCommentAuthorNameOrAddress(enrichedAuthor)}
       </div>
     </div>
