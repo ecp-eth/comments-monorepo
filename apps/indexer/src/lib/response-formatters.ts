@@ -64,13 +64,6 @@ export async function resolveUserDataAndFormatListCommentsResponse({
   const startComment = results[0];
   const endComment = results[results.length - 1];
 
-  console.log({
-    startComment,
-    endComment,
-    previousComment,
-    nextComment,
-  });
-
   return {
     results: results.map((comment) => {
       const replies = comment.replies ?? [];
