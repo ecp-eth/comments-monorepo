@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.11
+
+### Patch Changes
+
+- 0a161a5: chore: release both cjs and esm modules
+
 ## 0.0.10
 
 ### Patch Changes
