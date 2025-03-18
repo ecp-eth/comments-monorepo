@@ -1,9 +1,14 @@
 import * as React from "react";
-import { CommentsEmbed, createCommentsEmbedURL } from "@ecp.eth/sdk/react";
+import {
+  CommentsEmbed,
+  CommentsByAuthorEmbed,
+  createCommentsEmbedURL,
+} from "@ecp.eth/sdk/react";
 import { useDebounce } from "use-debounce";
 import {
   type EmbedConfigSchemaType,
   EmbedConfigSupportedFont,
+  type Hex,
 } from "@ecp.eth/sdk/schemas";
 import { publicEnv } from "../publicEnv";
 import { Info } from "lucide-react";
@@ -197,15 +202,30 @@ const OTHER_FIELDS = [
 ] as const;
 
 export default function IframeConfigurator() {
+  const [mode, setMode] = React.useState<"post" | "author">("post");
   const [uri, setUri] = React.useState(
     "https://docs.ethcomments.xyz/integration-options/embed-comments"
   );
+  const [author, setAuthor] = React.useState<Hex>(
+    "0x0000000000000000000000000000000000000000"
+  );
   const [embedUri, setEmbedUri] = React.useState(
-    publicEnv.VITE_ECP_ETH_EMBED_URL
+    mode === "post"
+      ? publicEnv.VITE_ECP_ETH_EMBED_URL
+      : publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL
   );
   const [config, setConfig] =
     React.useState<EmbedConfigSchemaType>(DEFAULT_CONFIG);
   const [debouncedConfig] = useDebounce(config, 500);
+
+  // Update embedUri when mode changes
+  React.useEffect(() => {
+    setEmbedUri(
+      mode === "post"
+        ? publicEnv.VITE_ECP_ETH_EMBED_URL
+        : publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL
+    );
+  }, [mode]);
 
   const updateThemeColor = (
     mode: "light" | "dark",
@@ -287,19 +307,56 @@ export default function IframeConfigurator() {
         <div>
           <label
             className="block text-sm font-medium mb-2"
-            htmlFor="target-uri-input"
+            htmlFor="mode-select"
           >
-            Target URI
+            Mode
           </label>
-          <input
-            id="target-uri-input"
-            type="text"
-            value={uri}
-            onChange={(e) => setUri(e.target.value)}
-            className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
-            placeholder="https://example.com"
-          />
+          <select
+            id="mode-select"
+            value={mode}
+            onChange={(e) => setMode(e.target.value as "post" | "author")}
+            className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
+          >
+            <option value="post">Comments on Post</option>
+            <option value="author">Comments by Author</option>
+          </select>
         </div>
+
+        {mode === "post" ? (
+          <div>
+            <label
+              className="block text-sm font-medium mb-2"
+              htmlFor="target-uri-input"
+            >
+              Target URI
+            </label>
+            <input
+              id="target-uri-input"
+              type="text"
+              value={uri}
+              onChange={(e) => setUri(e.target.value)}
+              className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
+              placeholder="https://example.com"
+            />
+          </div>
+        ) : (
+          <div>
+            <label
+              className="block text-sm font-medium mb-2"
+              htmlFor="author-input"
+            >
+              Author Address
+            </label>
+            <input
+              id="author-input"
+              type="text"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value as Hex)}
+              className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
+              placeholder="0x..."
+            />
+          </div>
+        )}
 
         <div>
           <label
@@ -314,7 +371,11 @@ export default function IframeConfigurator() {
             value={embedUri}
             onChange={(e) => setEmbedUri(e.target.value)}
             className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
-            placeholder="https://embed.ethcomments.xyz"
+            placeholder={
+              mode === "post"
+                ? "https://embed.ethcomments.xyz"
+                : "https://embed.ethcomments.xyz/by-author"
+            }
           />
         </div>
 
@@ -551,14 +612,18 @@ export default function IframeConfigurator() {
 
       <div className="border border-iframe-configurator-section-border rounded-iframe-configurator-section p-4">
         <h3 className="text-md font-medium !mb-4">Generated URL</h3>
-        <GeneratedURL config={debouncedConfig} embedUri={embedUri} uri={uri} />
+        <GeneratedURL
+          config={debouncedConfig}
+          embedUri={embedUri}
+          source={mode === "post" ? { targetUri: uri } : { author }}
+        />
       </div>
 
       <div className="border border-iframe-configurator-section-border rounded-iframe-configurator-section p-4">
         <h3 className="text-md font-medium !mb-4">Preview</h3>
         <CommentsEmbedPreview
           embedUri={embedUri}
-          uri={uri}
+          source={mode === "post" ? { targetUri: uri } : { author }}
           config={debouncedConfig}
         />
       </div>
@@ -568,24 +633,24 @@ export default function IframeConfigurator() {
 
 function GeneratedURL({
   embedUri,
-  uri,
   config,
+  source,
 }: {
   embedUri: string | undefined;
-  uri: string;
   config: EmbedConfigSchemaType;
+  source: { targetUri: string } | { author: Hex } | undefined;
 }) {
   const [copied, setCopied] = React.useState(false);
   const timeoutRef = React.useRef<any>(null);
 
-  if (typeof window === "undefined" || !embedUri) {
+  if (typeof window === "undefined" || !embedUri || !source) {
     return null;
   }
 
   try {
     const url = createCommentsEmbedURL(
       embedUri,
-      { targetUri: uri },
+      source,
       JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
         ? config
         : undefined
@@ -636,12 +701,12 @@ function GeneratedURL({
 
 function CommentsEmbedPreview({
   embedUri,
-  uri,
+  source,
   config,
 }: {
   embedUri: string | undefined;
-  uri: string;
   config: EmbedConfigSchemaType;
+  source: { targetUri: string } | { author: Hex };
 }) {
   if (typeof window === "undefined" || !embedUri) {
     return null;
@@ -651,13 +716,25 @@ function CommentsEmbedPreview({
     // this just validates the config
     createCommentsEmbedURL(
       embedUri,
-      { targetUri: uri },
+      source,
       JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
         ? config
         : undefined
     );
 
-    return <CommentsEmbed uri={uri} embedUri={embedUri} config={config} />;
+    return "targetUri" in source ? (
+      <CommentsEmbed
+        uri={source.targetUri}
+        embedUri={embedUri}
+        config={config}
+      />
+    ) : (
+      <CommentsByAuthorEmbed
+        author={source.author}
+        embedUri={embedUri}
+        config={config}
+      />
+    );
   } catch (e) {
     return (
       <div className="flex flex-col gap-2">
