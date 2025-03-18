@@ -7,7 +7,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./helpers": "./dist/helpers.js",
-    "./hooks": "./dist/hooks.js",
+    "./hooks": "./dist/hooks/index.js",
     "./schemas": "./dist/schemas.js",
     "./types": "./dist/types.js"
   },

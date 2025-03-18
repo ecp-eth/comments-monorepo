@@ -1,13 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: [
-    "src/index.ts",
-    "src/helpers.ts",
-    "src/hooks.ts",
-    "src/schemas.ts",
-    "src/types.ts",
-  ],
+  entry: ["src/**/*.ts"],
   splitting: true,
   dts: true,
   format: "esm",

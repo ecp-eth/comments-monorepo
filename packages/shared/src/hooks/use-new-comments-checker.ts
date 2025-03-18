@@ -1,27 +1,15 @@
-import {
+import type {
   CommentPageSchemaType,
-  ListCommentsQueryDataSchema,
-  type ListCommentsQueryDataSchemaType,
-} from "./schemas.js";
+  ListCommentsQueryDataSchemaType,
+} from "../schemas.js";
 import {
-  InfiniteData,
+  type InfiniteData,
   type QueryKey,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo } from "react";
-import type {
-  OnDeleteComment,
-  OnRetryPostComment,
-  OnSubmitSuccessFunction,
-} from "./types.js";
-import {
-  hasNewComments,
-  mergeNewComments,
-  insertPendingCommentToPage,
-  markCommentAsDeleted,
-  replaceCommentPendingOperationByComment,
-} from "./helpers.js";
+import { hasNewComments, mergeNewComments } from "../helpers.js";
 import type {
   Hex,
   IndexerAPIListCommentRepliesSchemaType,
@@ -158,86 +146,4 @@ export function useNewCommentsChecker({
       fetchNewComments,
     };
   }, [queryData, queryResult.data, fetchNewComments]);
-}
-
-export function useHandleCommentDeleted({
-  queryKey,
-}: {
-  queryKey: QueryKey;
-}): OnDeleteComment {
-  const client = useQueryClient();
-
-  return useCallback(
-    (commentId) => {
-      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-        queryKey,
-        (oldData) => {
-          if (!oldData) {
-            return oldData;
-          }
-
-          const queryData = ListCommentsQueryDataSchema.parse(oldData);
-
-          return markCommentAsDeleted(queryData, commentId);
-        }
-      );
-    },
-    [client, queryKey]
-  );
-}
-
-export function useHandleCommentSubmitted({
-  queryKey,
-}: {
-  queryKey: QueryKey;
-}): OnSubmitSuccessFunction {
-  const client = useQueryClient();
-
-  return useCallback(
-    (pendingOperation) => {
-      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-        queryKey,
-        (oldData) => {
-          if (!oldData) {
-            return oldData;
-          }
-
-          const queryData = ListCommentsQueryDataSchema.parse(oldData);
-
-          return insertPendingCommentToPage(queryData, pendingOperation);
-        }
-      );
-    },
-    [client, queryKey]
-  );
-}
-
-export function useHandleRetryPostComment({
-  queryKey,
-}: {
-  queryKey: QueryKey;
-}): OnRetryPostComment {
-  const client = useQueryClient();
-
-  return useCallback(
-    (comment, newPendingOperation) => {
-      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-        queryKey,
-        (oldData) => {
-          if (!oldData) {
-            return oldData;
-          }
-
-          const queryData = ListCommentsQueryDataSchema.parse(oldData);
-
-          return replaceCommentPendingOperationByComment(
-            queryData,
-            comment,
-            newPendingOperation
-          );
-        }
-      );
-    },
-    [client, queryKey]
-  );
 }
