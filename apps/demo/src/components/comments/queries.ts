@@ -108,7 +108,7 @@ export async function submitCommentMutationFunction({
       txHash,
       chainId: chain.id,
       resolvedAuthor,
-      type: "nongasless",
+      type: "non-gasless",
     };
   } catch (e) {
     if (
