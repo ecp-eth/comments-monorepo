@@ -38,6 +38,7 @@ export default defineConfig({
         },
         {
           text: "Integration Options",
+          collapsed: false,
           items: [
             {
               text: "Embed Comments",
@@ -53,16 +54,7 @@ export default defineConfig({
             },
             {
               text: "Contract Interaction",
-              items: [
-                {
-                  text: "Post comment (author pays gas)",
-                  link: "/integration-options/contract-interactions/post-as-author",
-                },
-                {
-                  text: "Post comment in transaction",
-                  link: "/integration-options/contract-interactions/post-in-any-transaction",
-                },
-              ],
+              link: "/integration-options/contract-interactions",
             },
           ],
         },
@@ -117,6 +109,7 @@ export default defineConfig({
         {
           text: "Admin CLI",
           link: "/indexer/admin-cli",
+          collapsed: false,
           items: [
             {
               text: "API Key Management",
@@ -140,6 +133,7 @@ export default defineConfig({
         {
           text: "SDK Reference",
           link: "/sdk-reference",
+          collapsed: true,
           items: [
             {
               text: "Default Exports",
@@ -158,6 +152,7 @@ export default defineConfig({
         {
           text: "Indexer Reference",
           link: "/indexer-reference/",
+          collapsed: true,
           items: [
             {
               text: "RESTful API",
@@ -217,14 +212,14 @@ export default defineConfig({
           text: "Logo Assets",
           link: "/logo-assets",
         },
+      ],
+    },
+    {
+      text: "FAQ",
+      items: [
         {
-          text: "FAQ",
-          items: [
-            {
-              text: "Gas Costs",
-              link: "/gas-costs",
-            },
-          ],
+          text: "Gas Costs",
+          link: "/gas-costs",
         },
       ],
     },
