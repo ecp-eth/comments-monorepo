@@ -19,9 +19,9 @@
       "default": "./dist/cjs/helpers.cjs"
     },
     "./hooks": {
-      "types": "./dist/esm/hooks.d.ts",
-      "import": "./dist/esm/hooks.js",
-      "default": "./dist/cjs/hooks.cjs"
+      "types": "./dist/esm/hooks/index.d.ts",
+      "import": "./dist/esm/hooks/index.js",
+      "default": "./dist/cjs/hooks/index.cjs"
     },
     "./schemas": {
       "types": "./dist/esm/schemas.d.ts",
