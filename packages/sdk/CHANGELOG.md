@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.13
+
+### Patch Changes
+
+- 182ff52: chore: re-release with proxy packages
+
 ## 0.0.12
 
 ### Patch Changes

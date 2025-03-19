@@ -1,5 +1,13 @@
 # @ecp.eth/shared
 
+## 0.0.5
+
+### Patch Changes
+
+- 182ff52: chore: re-release with proxy packages
+- Updated dependencies [182ff52]
+  - @ecp.eth/sdk@0.0.13
+
 ## 0.0.4
 
 ### Patch Changes
