@@ -9,12 +9,15 @@
     "dev:embed": "turbo dev --filter=./apps/embed... --filter=./apps/embed-demo-blog --filter=./apps/indexer --filter=./packages/protocol",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "prepare-publish-sdk": "scripts/prepare-publish-sdk.sh"
+    "pkg:publish": "scripts/publish.sh",
+    "pkg:proxy-pkg:generate": "tsx scripts/generate-proxy-package.ts"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
+    "glob": "^11.0.1",
     "prettier": "^3.4.2",
     "tsup": "^8.3.6",
+    "tsx": "^4.19.3",
     "turbo": "^2.4.0",
     "typescript": "5.7.3"
   },
