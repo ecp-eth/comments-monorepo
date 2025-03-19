@@ -7,7 +7,6 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { CommentBox } from "./CommentBox";
 import { publicEnv } from "@/publicEnv";
 import type {
   OnDeleteComment,
@@ -25,6 +24,7 @@ import { submitCommentMutationFunction } from "./queries";
 import never from "never";
 import { toast } from "sonner";
 import { CommentShared } from "./CommentShared";
+import { CommentDefaultForm } from "./CommentDefaultForm";
 
 interface CommentProps {
   comment: CommentType;
@@ -165,7 +165,7 @@ export function Comment({
       onReplySubmitSuccess={handleCommentSubmitted}
       level={level}
       ReplyComponent={Comment}
-      ReplyFormComponent={CommentBox}
+      ReplyFormComponent={CommentDefaultForm}
       onDeleteClick={handleDeleteClick}
     />
   );

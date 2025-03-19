@@ -4,7 +4,6 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchComments } from "@ecp.eth/sdk";
 import { useEffect, useMemo, useState } from "react";
 import { Comment } from "./Comment";
-import { CommentBox } from "./CommentBox";
 import { publicEnv } from "@/publicEnv";
 import {
   COMMENTS_PER_PAGE,
@@ -18,6 +17,7 @@ import {
   useNewCommentsChecker,
 } from "@ecp.eth/shared/hooks";
 import type { Hex } from "viem";
+import { CommentDefaultForm } from "./CommentDefaultForm";
 
 export function CommentSection() {
   const [currentUrl, setCurrentUrl] = useState<string>("");
@@ -99,7 +99,7 @@ export function CommentSection() {
   return (
     <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
-      <CommentBox onSubmitSuccess={handleCommentSubmitted} />
+      <CommentDefaultForm onSubmitSuccess={handleCommentSubmitted} />
       {hasNewComments && (
         <Button
           className="mb-4"

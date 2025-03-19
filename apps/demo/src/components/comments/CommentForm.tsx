@@ -1,50 +1,60 @@
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { useAccount, useSwitchChain, useWriteContract } from "wagmi";
-import { chain } from "../../lib/wagmi";
+import { useAccount } from "wagmi";
 import { type PendingCommentOperationSchemaType } from "@/lib/schemas";
-import {
-  postCommentAsAuthorViaCommentsV1,
-  postCommentViaYoink,
-} from "@/lib/contract";
-import { publicEnv } from "@/publicEnv";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { z } from "zod";
 import { InvalidCommentError } from "./errors";
 import { CommentFormErrors } from "./CommentFormErrors";
-import { submitCommentMutationFunction } from "./queries";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 
-interface CommentBoxProps {
+type SubmitFunctionParams<TSubmitAction extends string> = {
+  address: Hex;
+  content: string;
+  submitAction: TSubmitAction;
+};
+
+export type OnSubmitFunction<TSubmitAction extends string> = (
+  params: SubmitFunctionParams<TSubmitAction>
+) => Promise<PendingCommentOperationSchemaType>;
+
+type RenderSubmitButtonFunctionParams<TSubmitAction extends string> = {
+  isSubmitting: boolean;
+  isContentValid: boolean;
+  formState: "idle" | TSubmitAction;
+};
+
+export type RenderSubmitButtonFunction<TSubmitAction extends string> = (
+  params: RenderSubmitButtonFunctionParams<TSubmitAction>
+) => React.ReactNode;
+
+interface CommentFormProps<TSubmitAction extends string = string> {
   /**
    * Called when user blurred text area with empty content
    */
   onLeftEmpty?: () => void;
   placeholder?: string;
-  parentId?: Hex;
+  onSubmit: OnSubmitFunction<TSubmitAction>;
   onSubmitSuccess: OnSubmitSuccessFunction;
+  renderSubmitButton: RenderSubmitButtonFunction<TSubmitAction>;
 }
 
-export function CommentBox({
+export function CommentForm<TSubmitAction extends string = string>({
   placeholder = "What are your thoughts?",
-  parentId,
+  onSubmit,
   onSubmitSuccess,
   onLeftEmpty,
-}: CommentBoxProps) {
+  renderSubmitButton,
+}: CommentFormProps<TSubmitAction>) {
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const connectAccount = useConnectAccount();
   const { address } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
   const [content, setContent] = useState("");
-  const { writeContractAsync } = useWriteContract();
-  const [formState, setFormState] = useState<"posting" | "yoinking" | "idle">(
-    "idle"
-  );
+  const [formState, setFormState] = useState<"idle" | TSubmitAction>("idle");
 
   const submitCommentMutation = useMutation({
     mutationFn: async (
@@ -53,40 +63,14 @@ export function CommentBox({
       try {
         const address = await connectAccount();
 
-        const submitAction = formData.get("action") as "post" | "yoink";
+        const submitAction = formData.get("action") as TSubmitAction;
 
-        setFormState(submitAction === "post" ? "posting" : "yoinking");
+        setFormState(submitAction);
 
-        const result = await submitCommentMutationFunction({
+        const result = await onSubmit({
           address,
-          commentRequest: {
-            chainId: chain.id,
-            content,
-            targetUri: window.location.href,
-            parentId,
-          },
-          switchChainAsync(chainId) {
-            return switchChainAsync({ chainId });
-          },
-          writeContractAsync(params) {
-            if (submitAction === "yoink") {
-              return postCommentViaYoink(
-                {
-                  appSignature: params.signature,
-                  commentData: params.data,
-                },
-                writeContractAsync
-              );
-            }
-
-            return postCommentAsAuthorViaCommentsV1(
-              {
-                appSignature: params.signature,
-                commentData: params.data,
-              },
-              writeContractAsync
-            );
-          },
+          content,
+          submitAction,
         });
 
         return result;
@@ -142,26 +126,11 @@ export function CommentBox({
       <div className="flex gap-2 justify-between">
         {address && <CommentBoxAuthor address={address} />}
         <div className="flex gap-2 items-center ml-auto">
-          <Button
-            name="action"
-            value="post"
-            type="submit"
-            className="px-4 py-2 rounded"
-            disabled={isSubmitting || !isContentValid}
-          >
-            {formState === "posting" ? "Posting..." : "Comment"}
-          </Button>
-          {publicEnv.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS && (
-            <Button
-              name="action"
-              value="yoink"
-              type="submit"
-              className="bg-purple-500 text-white px-4 py-2 rounded"
-              disabled={isSubmitting || !isContentValid}
-            >
-              {formState === "yoinking" ? "Yoinking..." : "Yoink with comment"}
-            </Button>
-          )}
+          {renderSubmitButton({
+            isSubmitting,
+            isContentValid,
+            formState,
+          })}
         </div>
       </div>
       {submitCommentMutation.error && (
