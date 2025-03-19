@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 
 const cwd = import.meta.dirname;
-const nodeProcess = exec("anvil --block-time 2", { cwd });
+const nodeProcess = exec("anvil --host 0.0.0.0 --block-time 2", { cwd });
 
 nodeProcess.stdout.on("data", (data) => {
   console.log(data.toString());
