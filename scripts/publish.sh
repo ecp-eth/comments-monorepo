@@ -34,7 +34,7 @@ pnpm changeset version
 
 # sync lock file
 pnpm i
-git add -A && git commit -m "chore: sync lock file"
+git add -A && git commit --amend --no-edit
 
 # ask for confirmation before proceeding
 read -p "Ready to push release branch to ${GIT_REMOTE}? (y/N) " -n 1 -r
