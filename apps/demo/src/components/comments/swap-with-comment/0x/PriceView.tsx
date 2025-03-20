@@ -9,14 +9,28 @@ import {
 } from "wagmi";
 import { erc20Abi, Address, formatUnits, parseUnits } from "viem";
 import {
-  MAINNET_TOKENS,
-  MAINNET_TOKENS_BY_SYMBOL,
+  BASE_TOKENS,
+  BASE_TOKENS_BY_SYMBOL,
   MAX_ALLOWANCE,
   AFFILIATE_FEE,
   FEE_RECIPIENT,
 } from "@/lib/constants";
 import ZeroExLogo from "./white-0x-logo.png";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+import {
+  SwapAPIBadRequestResponseSchema,
+  PriceResponseLiquidityAvailableSchemaType,
+  PriceResponseSchema,
+  PriceRequestQueryParamsSchema,
+} from "./schemas";
+import {
+  SwapAPILiquidityUnavailableError,
+  SwapAPITokenNotSupportedError,
+  SwapAPIInvalidInputError,
+  SwapAPIValidationFailedError,
+  SwapAPIUnknownError,
+} from "./errors";
 
 export const DEFAULT_BUY_TOKEN = (chainId: number) => {
   if (chainId === 1) {
@@ -25,16 +39,12 @@ export const DEFAULT_BUY_TOKEN = (chainId: number) => {
 };
 
 export function PriceView({
-  price,
   taker,
-  setPrice,
   setFinalize,
   chainId,
 }: {
-  price: any;
   taker: Address | undefined;
-  setPrice: (price: any) => void;
-  setFinalize: (finalize: boolean) => void;
+  setFinalize: (price: PriceResponseLiquidityAvailableSchemaType) => void;
   chainId: number;
 }) {
   const [sellToken, setSellToken] = useState("weth");
@@ -42,15 +52,6 @@ export function PriceView({
   const [sellAmount, setSellAmount] = useState("");
   const [buyAmount, setBuyAmount] = useState("");
   const [tradeDirection, setTradeDirection] = useState("sell");
-  const [error, setError] = useState([]);
-  const [buyTokenTax, setBuyTokenTax] = useState({
-    buyTaxBps: "0",
-    sellTaxBps: "0",
-  });
-  const [sellTokenTax, setSellTokenTax] = useState({
-    buyTaxBps: "0",
-    sellTaxBps: "0",
-  });
 
   const handleSellTokenChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setSellToken(e.target.value);
@@ -59,16 +60,9 @@ export function PriceView({
     setBuyToken(e.target.value);
   }
 
-  const tokensByChain = (chainId: number) => {
-    if (chainId === 1) {
-      return MAINNET_TOKENS_BY_SYMBOL;
-    }
-    return MAINNET_TOKENS_BY_SYMBOL;
-  };
-
-  const sellTokenObject = tokensByChain(chainId)[sellToken];
+  const sellTokenObject = BASE_TOKENS_BY_SYMBOL[sellToken];
   console.log("sellTokenObject", sellTokenObject);
-  const buyTokenObject = tokensByChain(chainId)[buyToken];
+  const buyTokenObject = BASE_TOKENS_BY_SYMBOL[buyToken];
 
   const sellTokenDecimals = sellTokenObject.decimals;
   const buyTokenDecimals = buyTokenObject.decimals;
@@ -84,61 +78,82 @@ export function PriceView({
       ? parseUnits(buyAmount, buyTokenDecimals).toString()
       : undefined;
 
-  // Fetch price data and set the buyAmount whenever the sellAmount changes
-  useEffect(() => {
-    const params = {
-      chainId: chainId.toString(),
+  const { data: price } = useQuery({
+    enabled: PriceRequestQueryParamsSchema.safeParse({
+      chainId,
       sellToken: sellTokenObject.address,
       buyToken: buyTokenObject.address,
-      ...(sellAmount && { sellAmount: sellAmount.toString() }),
-      ...(parsedBuyAmount && { buyAmount: parsedBuyAmount.toString() }),
-      ...(taker && { taker: taker.toString() }),
-      swapFeeRecipient: FEE_RECIPIENT,
-      swapFeeBps: AFFILIATE_FEE.toString(),
-      swapFeeToken: buyTokenObject.address,
-      tradeSurplusRecipient: FEE_RECIPIENT,
-    };
+      sellAmount: parsedSellAmount,
+    }).success,
+    queryKey: [
+      "price",
+      sellTokenObject.address,
+      buyTokenObject.address,
+      parsedSellAmount,
+      parsedBuyAmount,
+      taker,
+      chainId,
+    ],
+    queryFn: async ({ signal }) => {
+      const params = {
+        chainId: chainId.toString(),
+        sellToken: sellTokenObject.address,
+        buyToken: buyTokenObject.address,
+        ...(parsedSellAmount && { sellAmount: parsedSellAmount.toString() }),
+        ...(parsedBuyAmount && { buyAmount: parsedBuyAmount.toString() }),
+        ...(taker && { taker: taker.toString() }),
+        swapFeeRecipient: FEE_RECIPIENT,
+        swapFeeBps: AFFILIATE_FEE.toString(),
+        swapFeeToken: buyTokenObject.address,
+        tradeSurplusRecipient: FEE_RECIPIENT,
+      };
 
-    async function main() {
       const response = await fetch(
-        `/api/0x/price?${new URLSearchParams(params).toString()}`
+        `/api/0x/price?${new URLSearchParams(params).toString()}`,
+        { signal }
       );
-      const data = await response.json();
 
-      if (data?.validationErrors?.length > 0) {
-        // error for sellAmount too low
-        setError(data.validationErrors);
-      } else {
-        setError([]);
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        const parsedResponse =
+          SwapAPIBadRequestResponseSchema.safeParse(responseData);
+
+        if (!parsedResponse.success) {
+          throw new SwapAPIUnknownError(responseData);
+        }
+
+        switch (parsedResponse.data.name) {
+          case "INVALID_INPUT":
+            throw new SwapAPIInvalidInputError(parsedResponse.data);
+          case "SWAP_VALIDATION_FAILED":
+            throw new SwapAPIValidationFailedError(parsedResponse.data);
+          case "TOKEN_NOT_SUPPORTED":
+            throw new SwapAPITokenNotSupportedError(parsedResponse.data);
+          default:
+            throw new SwapAPIUnknownError(responseData);
+        }
       }
-      if (data.buyAmount) {
-        setBuyAmount(formatUnits(data.buyAmount, buyTokenDecimals));
-        setPrice(data);
+
+      const priceData = PriceResponseSchema.parse(responseData);
+
+      if (!priceData.liquidityAvailable) {
+        throw new SwapAPILiquidityUnavailableError();
       }
-      // Set token tax information
-      if (data?.tokenMetadata) {
-        setBuyTokenTax(data.tokenMetadata.buyToken);
-        setSellTokenTax(data.tokenMetadata.sellToken);
-      }
+
+      return priceData;
+    },
+    staleTime: 0,
+  });
+
+  useEffect(() => {
+    if (price?.liquidityAvailable) {
+      setBuyAmount(formatUnits(price.buyAmount, buyTokenDecimals));
     }
+  }, [buyTokenDecimals, price]);
 
-    if (sellAmount !== "") {
-      main();
-    }
-  }, [
-    sellTokenObject.address,
-    buyTokenObject.address,
-    parsedSellAmount,
-    parsedBuyAmount,
-    chainId,
-    sellAmount,
-    setPrice,
-    taker,
-    buyTokenDecimals,
-  ]);
-
-  // Hook for fetching balance information for specified token for a specific taker address
-  const { data, isError, isLoading } = useBalance({
+  // Fetch balance information for specified token for a specific taker address
+  const { data } = useBalance({
     address: taker,
     token: sellTokenObject.address,
   });
@@ -151,7 +166,7 @@ export function PriceView({
       : true;
 
   // Helper function to format tax basis points to percentage
-  const formatTax = (taxBps: string) => (parseFloat(taxBps) / 100).toFixed(2);
+  const formatTax = (taxBps: number) => (taxBps / 100).toFixed(2);
 
   return (
     <div>
@@ -195,7 +210,7 @@ export function PriceView({
             <Image
               alt={sellToken}
               className="h-9 w-9 mr-2 rounded-md"
-              src={MAINNET_TOKENS_BY_SYMBOL[sellToken].logoURI}
+              src={BASE_TOKENS_BY_SYMBOL[sellToken].logoURI}
               width={9}
               height={9}
             />
@@ -209,7 +224,7 @@ export function PriceView({
                 onChange={handleSellTokenChange}
               >
                 {/* <option value="">--Choose a token--</option> */}
-                {MAINNET_TOKENS.map((token) => {
+                {BASE_TOKENS.map((token) => {
                   return (
                     <option
                       key={token.address}
@@ -242,7 +257,7 @@ export function PriceView({
             <Image
               alt={buyToken}
               className="h-9 w-9 mr-2 rounded-md"
-              src={MAINNET_TOKENS_BY_SYMBOL[buyToken].logoURI}
+              src={BASE_TOKENS_BY_SYMBOL[buyToken].logoURI}
               width={9}
               height={9}
             />
@@ -253,8 +268,7 @@ export function PriceView({
               className="mr-2 w-50 sm:w-full h-9 rounded-md"
               onChange={(e) => handleBuyTokenChange(e)}
             >
-              {/* <option value="">--Choose a token--</option> */}
-              {MAINNET_TOKENS.map((token) => {
+              {BASE_TOKENS.map((token) => {
                 return (
                   <option
                     key={token.address}
@@ -281,48 +295,40 @@ export function PriceView({
           </section>
 
           {/* Affiliate Fee Display */}
-          <div className="text-slate-400">
-            {price && price.fees.integratorFee.amount
-              ? "Affiliate Fee: " +
-                Number(
-                  formatUnits(
-                    BigInt(price.fees.integratorFee.amount),
-                    MAINNET_TOKENS_BY_SYMBOL[buyToken].decimals
-                  )
-                ) +
-                " " +
-                MAINNET_TOKENS_BY_SYMBOL[buyToken].symbol
-              : null}
-          </div>
+          {price && price.fees?.integratorFee?.amount && (
+            <div className="text-slate-400">
+              Affiliate Fee:{" "}
+              {formatUnits(
+                BigInt(price.fees.integratorFee.amount),
+                BASE_TOKENS_BY_SYMBOL[buyToken].decimals
+              )}{" "}
+              {BASE_TOKENS_BY_SYMBOL[buyToken].symbol}
+            </div>
+          )}
 
           {/* Tax Information Display */}
-          <div className="text-slate-400">
-            {buyTokenTax.buyTaxBps !== "0" && (
-              <p>
-                {MAINNET_TOKENS_BY_SYMBOL[buyToken].symbol +
-                  ` Buy Tax: ${formatTax(buyTokenTax.buyTaxBps)}%`}
-              </p>
-            )}
-            {sellTokenTax.sellTaxBps !== "0" && (
-              <p>
-                {MAINNET_TOKENS_BY_SYMBOL[sellToken].symbol +
-                  ` Sell Tax: ${formatTax(sellTokenTax.sellTaxBps)}%`}
-              </p>
-            )}
-          </div>
+          {(!!price?.tokenMetadata.buyToken ||
+            !!price?.tokenMetadata.sellToken) && (
+            <div className="text-slate-400">
+              {price.tokenMetadata.buyToken.buyTaxBps != null &&
+                price.tokenMetadata.buyToken.buyTaxBps !== 0 && (
+                  <p>
+                    {BASE_TOKENS_BY_SYMBOL[buyToken].symbol +
+                      ` Buy Tax: ${formatTax(price.tokenMetadata.buyToken.buyTaxBps)}%`}
+                  </p>
+                )}
+              {price.tokenMetadata.sellToken.sellTaxBps != null &&
+                price.tokenMetadata.sellToken.sellTaxBps !== 0 && (
+                  <p>
+                    {BASE_TOKENS_BY_SYMBOL[sellToken].symbol +
+                      ` Sell Tax: ${formatTax(price.tokenMetadata.sellToken.sellTaxBps)}%`}
+                  </p>
+                )}
+            </div>
+          )}
         </div>
 
-        {taker ? (
-          <ApproveOrReviewButton
-            sellTokenAddress={sellTokenAddress}
-            taker={taker}
-            onClick={() => {
-              setFinalize(true);
-            }}
-            disabled={inSufficientBalance}
-            price={price}
-          />
-        ) : (
+        {!taker && (
           <ConnectButton.Custom>
             {({
               account,
@@ -413,9 +419,122 @@ export function PriceView({
             }}
           </ConnectButton.Custom>
         )}
+
+        {!!taker && !!price && price?.liquidityAvailable && (
+          <ApproveOrReviewButton
+            sellTokenAddress={sellTokenAddress}
+            taker={taker}
+            onClick={() => {
+              setFinalize(price);
+            }}
+            disabled={inSufficientBalance}
+            price={price}
+          />
+        )}
+
+        {!!taker && !!price && !price?.liquidityAvailable && (
+          <div>
+            <p>No liquidity available for this trade.</p>
+          </div>
+        )}
       </div>
     </div>
   );
+
+  function ApproveButton({
+    taker,
+    sellTokenAddress,
+    spender,
+  }: {
+    taker: Address;
+    sellTokenAddress: Address;
+    spender: Address;
+  }) {
+    const approveContract = useWriteContract();
+
+    const { data } = useSimulateContract({
+      address: sellTokenAddress,
+      abi: erc20Abi,
+      functionName: "approve",
+      args: [spender, MAX_ALLOWANCE],
+    });
+
+    const approvalReceipt = useWaitForTransactionReceipt({
+      hash: approveContract.data,
+    });
+
+    const { data: allowance, refetch } = useReadContract({
+      address: sellTokenAddress,
+      abi: erc20Abi,
+      functionName: "allowance",
+      args: [taker, spender],
+    });
+
+    useEffect(() => {
+      if (data) {
+        refetch();
+      }
+    }, [data, refetch]);
+
+    if (approveContract.error || approvalReceipt.error) {
+      return (
+        <div>
+          Something went wrong:{" "}
+          {
+            (
+              approveContract.error ||
+              approvalReceipt.error ||
+              new Error("unknown error")
+            ).message
+          }
+        </div>
+      );
+    }
+
+    if (allowance === 0n) {
+      return (
+        <button
+          type="button"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+          onClick={async () => {
+            await approveContract.writeContractAsync({
+              abi: erc20Abi,
+              address: sellTokenAddress,
+              functionName: "approve",
+              args: [spender, MAX_ALLOWANCE],
+            });
+            console.log("approving spender to spend sell token");
+            refetch();
+          }}
+        >
+          {approveContract.isPending || approvalReceipt.isLoading
+            ? "Approving…"
+            : "Approve"}
+        </button>
+      );
+    }
+
+    return null;
+  }
+
+  function ReviewButton({
+    disabled,
+    onClick,
+  }: {
+    disabled?: boolean;
+    onClick: () => void;
+  }) {
+    return (
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onClick}
+        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-25"
+      >
+        {disabled ? "Insufficient Balance" : "Review Trade"}
+      </button>
+    );
+  }
 
   function ApproveOrReviewButton({
     taker,
@@ -428,105 +547,20 @@ export function PriceView({
     onClick: () => void;
     sellTokenAddress: Address;
     disabled?: boolean;
-    price: any;
+    price: PriceResponseLiquidityAvailableSchemaType;
   }) {
-    // Define useWriteContract for the 'approve' operation
-    const {
-      data: writeContractResult,
-      writeContractAsync: writeContract,
-      error,
-    } = useWriteContract();
+    const spender = price.issues.allowance?.spender;
 
-    // Determine the spender from price.issues.allowance
-    const spender = price?.issues.allowance.spender;
-
-    // 2. (only if no allowance): write to erc20, approve token allowance for the determined spender
-    const { data } = useSimulateContract({
-      address: sellTokenAddress,
-      abi: erc20Abi,
-      functionName: "approve",
-      args: [spender, MAX_ALLOWANCE],
-    });
-
-    // useWaitForTransactionReceipt to wait for the approval transaction to complete
-    const { data: approvalReceiptData, isLoading: isApproving } =
-      useWaitForTransactionReceipt({
-        hash: writeContractResult,
-      });
-
-    // 1. Read from erc20, check approval for the determined spender to spend sellToken
-    const { data: allowance, refetch } = useReadContract({
-      address: sellTokenAddress,
-      abi: erc20Abi,
-      functionName: "allowance",
-      args: [taker, spender],
-    });
-    console.log("checked spender approval");
-
-    // Call `refetch` when the transaction succeeds
-    useEffect(() => {
-      if (data) {
-        refetch();
-      }
-    }, [data, refetch]);
-
-    // If price.issues.allowance is null, show the Review Trade button
-    if (price?.issues.allowance === null) {
-      return (
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() => {
-            // fetch data, when finished, show quote view
-            onClick();
-          }}
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-25"
-        >
-          {disabled ? "Insufficient Balance" : "Review Trade"}
-        </button>
-      );
-    }
-
-    if (error) {
-      return <div>Something went wrong: {error.message}</div>;
-    }
-
-    if (allowance === 0n) {
-      return (
-        <>
-          <button
-            type="button"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-            onClick={async () => {
-              await writeContract({
-                abi: erc20Abi,
-                address: sellTokenAddress,
-                functionName: "approve",
-                args: [spender, MAX_ALLOWANCE],
-              });
-              console.log("approving spender to spend sell token");
-
-              refetch();
-            }}
-          >
-            {isApproving ? "Approving…" : "Approve"}
-          </button>
-        </>
-      );
+    if (!price?.issues.allowance || !spender) {
+      return <ReviewButton disabled={disabled} onClick={onClick} />;
     }
 
     return (
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={() => {
-          // fetch data, when finished, show quote view
-          onClick();
-        }}
-        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-25"
-      >
-        {disabled ? "Insufficient Balance" : "Review Trade"}
-      </button>
+      <ApproveButton
+        taker={taker}
+        sellTokenAddress={sellTokenAddress}
+        spender={spender}
+      />
     );
   }
 }

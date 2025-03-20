@@ -16,8 +16,11 @@ import { postCommentAsAuthorViaCommentsV1 } from "@/lib/contract";
 import { Button } from "@/components/ui/button";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import { PriceView } from "./0x/PriceView";
-import type { PriceResponse } from "./0x/types";
 import QuoteView from "./0x/QuoteView";
+import type {
+  PriceResponseLiquidityAvailableSchemaType,
+  QuoteResponseLiquidityAvailableSchemaType,
+} from "./0x/schemas";
 
 type CommentFormProps = {
   parentId?: Hex;
@@ -25,9 +28,10 @@ type CommentFormProps = {
 };
 
 export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
-  const [finalize, setFinalize] = useState(false);
-  const [price, setPrice] = useState<PriceResponse | undefined>();
-  const [quote, setQuote] = useState();
+  const [finalizedPrice, setFinalize] =
+    useState<PriceResponseLiquidityAvailableSchemaType | null>(null);
+  const [quote, setQuote] =
+    useState<QuoteResponseLiquidityAvailableSchemaType | null>(null);
   const { address } = useAccount();
   const chainId = useChainId();
   const { switchChainAsync } = useSwitchChain();
@@ -64,19 +68,16 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
 
   return (
     <>
-      {finalize && price ? (
+      {finalizedPrice ? (
         <QuoteView
           taker={address}
-          price={price}
-          quote={quote}
+          price={finalizedPrice}
           setQuote={setQuote}
           chainId={chainId}
         />
       ) : (
         <PriceView
           taker={address}
-          price={price}
-          setPrice={setPrice}
           setFinalize={setFinalize}
           chainId={chainId}
         />

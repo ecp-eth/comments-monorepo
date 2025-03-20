@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   useSignTypedData,
   useSendTransaction,
@@ -15,75 +14,101 @@ import {
   type Hex,
 } from "viem";
 import {
-  MAINNET_TOKENS_BY_ADDRESS,
+  BASE_TOKENS_BY_ADDRESS,
   AFFILIATE_FEE,
   FEE_RECIPIENT,
 } from "@/lib/constants";
 import Image from "next/image";
-import type { PriceResponse, QuoteResponse } from "./types";
+import {
+  PriceResponseLiquidityAvailableSchemaType,
+  QuoteRequestQueryParamsSchema,
+  QuoteResponseLiquidityAvailableSchemaType,
+  QuoteResponseSchema,
+  SwapAPIBadRequestResponseSchema,
+} from "./schemas";
+import { useQuery } from "@tanstack/react-query";
+import {
+  SwapAPILiquidityUnavailableError,
+  SwapAPIUnknownError,
+  SwapAPIInvalidInputError,
+  SwapAPIValidationFailedError,
+  SwapAPITokenNotSupportedError,
+} from "./errors";
 
 export default function QuoteView({
   taker,
   price,
-  quote,
   setQuote,
   chainId,
 }: {
   taker: Address | undefined;
-  price: PriceResponse;
-  quote: QuoteResponse | undefined;
-  setQuote: (price: any) => void;
+  price: PriceResponseLiquidityAvailableSchemaType;
+  setQuote: (quote: QuoteResponseLiquidityAvailableSchemaType) => void;
   chainId: number;
 }) {
-  console.log("price", price);
-
-  const sellTokenInfo = (chainId: number) => {
-    if (chainId === 1) {
-      return MAINNET_TOKENS_BY_ADDRESS[price.sellToken.toLowerCase()];
-    }
-    return MAINNET_TOKENS_BY_ADDRESS[price.sellToken.toLowerCase()];
-  };
-
-  const buyTokenInfo = (chainId: number) => {
-    if (chainId === 1) {
-      return MAINNET_TOKENS_BY_ADDRESS[price.buyToken.toLowerCase()];
-    }
-    return MAINNET_TOKENS_BY_ADDRESS[price.buyToken.toLowerCase()];
-  };
+  const sellTokenInfo = BASE_TOKENS_BY_ADDRESS[price.sellToken.toLowerCase()];
+  const buyTokenInfo = BASE_TOKENS_BY_ADDRESS[price.buyToken.toLowerCase()];
 
   const { signTypedDataAsync } = useSignTypedData();
   const { data: walletClient } = useWalletClient();
 
-  // Fetch quote data
-  useEffect(() => {
-    const params = {
-      chainId: chainId.toString(),
-      sellToken: price.sellToken,
-      buyToken: price.buyToken,
-      sellAmount: price.sellAmount,
-      ...(taker && { taker: taker.toString() }),
-      swapFeeRecipient: FEE_RECIPIENT,
-      swapFeeBps: AFFILIATE_FEE.toString(),
-      swapFeeToken: price.buyToken,
-      tradeSurplusRecipient: FEE_RECIPIENT,
-    };
+  const { data: quote } = useQuery({
+    enabled: QuoteRequestQueryParamsSchema.safeParse({
+      chainId,
+      sellToken: price.sellToken.toString(),
+      buyToken: price.buyToken.toString(),
+      sellAmount: price.sellAmount.toString(),
+      taker,
+    }).success,
+    queryKey: ["quote", price.sellToken, price.buyToken, price.sellAmount],
+    queryFn: async ({ signal }) => {
+      const params = {
+        chainId: chainId.toString(),
+        sellToken: price.sellToken.toString(),
+        buyToken: price.buyToken.toString(),
+        sellAmount: price.sellAmount.toString(),
+        ...(taker && { taker: taker.toString() }),
+        swapFeeRecipient: FEE_RECIPIENT,
+        swapFeeBps: AFFILIATE_FEE.toString(),
+        swapFeeToken: price.buyToken,
+        tradeSurplusRecipient: FEE_RECIPIENT,
+      };
 
-    async function main() {
       const response = await fetch(
-        `/api/0x/quote?${new URLSearchParams(params).toString()}`
+        `/api/0x/quote?${new URLSearchParams(params).toString()}`,
+        { signal }
       );
       const data = await response.json();
-      setQuote(data);
-    }
-    main();
-  }, [
-    chainId,
-    price.sellToken,
-    price.buyToken,
-    price.sellAmount,
-    taker,
-    setQuote,
-  ]);
+
+      if (!response.ok) {
+        const parsedResponse = SwapAPIBadRequestResponseSchema.safeParse(data);
+
+        if (!parsedResponse.success) {
+          throw new SwapAPIUnknownError(data);
+        }
+
+        switch (parsedResponse.data.name) {
+          case "INVALID_INPUT":
+            throw new SwapAPIInvalidInputError(parsedResponse.data);
+          case "SWAP_VALIDATION_FAILED":
+            throw new SwapAPIValidationFailedError(parsedResponse.data);
+          case "TOKEN_NOT_SUPPORTED":
+            throw new SwapAPITokenNotSupportedError(parsedResponse.data);
+          default:
+            throw new SwapAPIUnknownError(data);
+        }
+      }
+
+      const result = QuoteResponseSchema.parse(data);
+
+      if (!result.liquidityAvailable) {
+        throw new SwapAPILiquidityUnavailableError();
+      }
+
+      return result;
+    },
+    staleTime: 0,
+  });
 
   const {
     data: hash,
@@ -104,7 +129,7 @@ export default function QuoteView({
   console.log("quote", quote);
 
   // Helper function to format tax basis points to percentage
-  const formatTax = (taxBps: string) => (parseFloat(taxBps) / 100).toFixed(2);
+  const formatTax = (taxBps: number) => (taxBps / 100).toFixed(2);
 
   return (
     <div className="p-3 mx-auto max-w-screen-sm ">
@@ -113,19 +138,16 @@ export default function QuoteView({
           <div className="text-xl mb-2 text-white">You pay</div>
           <div className="flex items-center text-lg sm:text-3xl text-white">
             <Image
-              alt={sellTokenInfo(chainId).symbol}
+              alt={sellTokenInfo.symbol}
               className="h-9 w-9 mr-2 rounded-md"
-              src={sellTokenInfo(chainId || 1)?.logoURI}
+              src={sellTokenInfo.logoURI}
               width={9}
               height={9}
             />
             <span>
-              {formatUnits(
-                BigInt(quote.sellAmount),
-                sellTokenInfo(chainId).decimals
-              )}
+              {formatUnits(BigInt(quote.sellAmount), sellTokenInfo.decimals)}
             </span>
-            <div className="ml-2">{sellTokenInfo(chainId).symbol}</div>
+            <div className="ml-2">{sellTokenInfo.symbol}</div>
           </div>
         </div>
 
@@ -133,21 +155,14 @@ export default function QuoteView({
           <div className="text-xl mb-2 text-white">You receive</div>
           <div className="flex items-center text-lg sm:text-3xl text-white">
             <img
-              alt={
-                MAINNET_TOKENS_BY_ADDRESS[price.buyToken.toLowerCase()].symbol
-              }
+              alt={buyTokenInfo.symbol}
               className="h-9 w-9 mr-2 rounded-md"
-              src={
-                MAINNET_TOKENS_BY_ADDRESS[price.buyToken.toLowerCase()].logoURI
-              }
+              src={buyTokenInfo.logoURI}
             />
             <span>
-              {formatUnits(
-                BigInt(quote.buyAmount),
-                buyTokenInfo(chainId).decimals
-              )}
+              {formatUnits(BigInt(quote.buyAmount), buyTokenInfo.decimals)}
             </span>
-            <div className="ml-2">{buyTokenInfo(chainId).symbol}</div>
+            <div className="ml-2">{buyTokenInfo.symbol}</div>
           </div>
         </div>
 
@@ -160,28 +175,28 @@ export default function QuoteView({
                 Number(
                   formatUnits(
                     BigInt(quote.fees.integratorFee.amount),
-                    buyTokenInfo(chainId).decimals
+                    buyTokenInfo.decimals
                   )
                 ) +
                 " " +
-                buyTokenInfo(chainId).symbol
+                buyTokenInfo.symbol
               : null}
           </div>
           {/* Tax Information Display */}
           <div className="text-slate-400">
             {quote.tokenMetadata.buyToken.buyTaxBps &&
-              quote.tokenMetadata.buyToken.buyTaxBps !== "0" && (
+              quote.tokenMetadata.buyToken.buyTaxBps !== 0 && (
                 <p>
-                  {buyTokenInfo(chainId).symbol +
+                  {buyTokenInfo.symbol +
                     ` Buy Tax: ${formatTax(
                       quote.tokenMetadata.buyToken.buyTaxBps
                     )}%`}
                 </p>
               )}
             {quote.tokenMetadata.sellToken.sellTaxBps &&
-              quote.tokenMetadata.sellToken.sellTaxBps !== "0" && (
+              quote.tokenMetadata.sellToken.sellTaxBps !== 0 && (
                 <p>
-                  {sellTokenInfo(chainId).symbol +
+                  {sellTokenInfo.symbol +
                     ` Sell Tax: ${formatTax(
                       quote.tokenMetadata.sellToken.sellTaxBps
                     )}%`}

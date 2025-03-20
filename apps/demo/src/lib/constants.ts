@@ -1,4 +1,5 @@
 import type { Address } from "viem";
+import { base } from "viem/chains";
 
 export const COMMENTS_PER_PAGE = 10;
 export const MAX_INITIAL_REPLIES_ON_PARENT_COMMENT = 3;
@@ -15,9 +16,6 @@ export const AFFILIATE_FEE = 100; // 1% affiliate fee. Denoted in Bps.
 // export const FEE_RECIPIENT = "0x75A94931B81d81C7a62b76DC0FcFAC77FbE1e917"; // The ETH address that should receive affiliate fees
 export const FEE_RECIPIENT = "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d"; // The ETH address that should receive affiliate fees
 
-export const MAINNET_EXCHANGE_PROXY =
-  "0xdef1c0ded9bec7f1a1670819833240f027b25eff";
-
 export const MAX_ALLOWANCE =
   115792089237316195423570985008687907853269984665640564039457584007913129639935n;
 
@@ -30,119 +28,35 @@ interface Token {
   logoURI: string;
 }
 
-export const MAINNET_TOKENS: Token[] = [
-  {
-    chainId: 1,
-    name: "Wrapped Ether",
-    symbol: "WETH",
-    decimals: 18,
-    address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    logoURI:
-      "https://raw.githubusercontent.com/maticnetwork/polygon-token-assets/main/assets/tokenAssets/weth.svg",
-  },
-  {
-    chainId: 1,
-    name: "USD Coin",
-    symbol: "USDC",
-    decimals: 6,
-    address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    logoURI:
-      "https://raw.githubusercontent.com/maticnetwork/polygon-token-assets/main/assets/tokenAssets/usdc.svg",
-  },
-  {
-    chainId: 1,
-    name: "Dai - PoS",
-    symbol: "DAI",
-    decimals: 18,
-    address: "0x6b175474e89094c44da98b954eedeac495271d0f",
-    logoURI:
-      "https://raw.githubusercontent.com/maticnetwork/polygon-token-assets/main/assets/tokenAssets/dai.svg",
-  },
-  {
-    chainId: 1,
-    name: "FLOKI",
-    symbol: "FLOKI",
-    decimals: 9,
-    address: "0xcf0c122c6b73ff809c693db761e7baebe62b6a2e",
-    logoURI:
-      "https://raw.githubusercontent.com/trustwallet/assets/c37119334a24f9933f373c6cc028a5bdbad2ecb4/blockchains/ethereum/assets/0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E/logo.png",
-  },
-];
-
-export const MAINNET_TOKENS_BY_SYMBOL: Record<string, Token> = {
+const TOKENS = {
   weth: {
-    chainId: 1,
+    chainId: base.id,
     name: "Wrapped Ether",
     symbol: "WETH",
     decimals: 18,
-    address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    address: "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
     logoURI:
       "https://raw.githubusercontent.com/maticnetwork/polygon-token-assets/main/assets/tokenAssets/weth.svg",
-  },
+  } satisfies Token,
   usdc: {
-    chainId: 1,
+    chainId: base.id,
     name: "USD Coin",
     symbol: "USDC",
     decimals: 6,
-    address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     logoURI:
       "https://raw.githubusercontent.com/maticnetwork/polygon-token-assets/main/assets/tokenAssets/usdc.svg",
-  },
-  dai: {
-    chainId: 1,
-    name: "Dai - PoS",
-    symbol: "DAI",
-    decimals: 18,
-    address: "0x6b175474e89094c44da98b954eedeac495271d0f",
-    logoURI:
-      "https://raw.githubusercontent.com/maticnetwork/polygon-token-assets/main/assets/tokenAssets/dai.svg",
-  },
-  floki: {
-    chainId: 1,
-    name: "FLOKI",
-    symbol: "FLOKI",
-    decimals: 9,
-    address: "0xcf0c122c6b73ff809c693db761e7baebe62b6a2e",
-    logoURI:
-      "https://raw.githubusercontent.com/trustwallet/assets/c37119334a24f9933f373c6cc028a5bdbad2ecb4/blockchains/ethereum/assets/0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E/logo.png",
-  },
+  } satisfies Token,
 };
 
-export const MAINNET_TOKENS_BY_ADDRESS: Record<string, Token> = {
-  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": {
-    chainId: 1,
-    name: "Wrapped Ether",
-    symbol: "WETH",
-    decimals: 18,
-    address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    logoURI:
-      "https://raw.githubusercontent.com/maticnetwork/polygon-token-assets/main/assets/tokenAssets/weth.svg",
-  },
-  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": {
-    chainId: 1,
-    name: "USD Coin",
-    symbol: "USDC",
-    decimals: 6,
-    address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    logoURI:
-      "https://raw.githubusercontent.com/maticnetwork/polygon-token-assets/main/assets/tokenAssets/usdc.svg",
-  },
-  "0x6b175474e89094c44da98b954eedeac495271d0f": {
-    chainId: 1,
-    name: "Dai - PoS",
-    symbol: "DAI",
-    decimals: 18,
-    address: "0x6b175474e89094c44da98b954eedeac495271d0f",
-    logoURI:
-      "https://raw.githubusercontent.com/maticnetwork/polygon-token-assets/main/assets/tokenAssets/dai.svg",
-  },
-  "0xcf0c122c6b73ff809c693db761e7baebe62b6a2e": {
-    chainId: 1,
-    name: "FLOKI",
-    symbol: "FLOKI",
-    decimals: 9,
-    address: "0xcf0c122c6b73ff809c693db761e7baebe62b6a2e",
-    logoURI:
-      "https://raw.githubusercontent.com/trustwallet/assets/c37119334a24f9933f373c6cc028a5bdbad2ecb4/blockchains/ethereum/assets/0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E/logo.png",
-  },
+export const BASE_TOKENS: Token[] = [TOKENS.weth, TOKENS.usdc];
+
+export const BASE_TOKENS_BY_SYMBOL: Record<string, Token> = {
+  weth: TOKENS.weth,
+  usdc: TOKENS.usdc,
+};
+
+export const BASE_TOKENS_BY_ADDRESS: Record<string, Token> = {
+  [TOKENS.weth.address.toLowerCase()]: TOKENS.weth,
+  [TOKENS.usdc.address.toLowerCase()]: TOKENS.usdc,
 };
