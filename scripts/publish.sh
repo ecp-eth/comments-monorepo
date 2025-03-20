@@ -23,8 +23,8 @@ git pull
 COMMIT_HASH=$(git rev-parse --short HEAD)
 RELEASE_BRANCH_NAME="release-${COMMIT_HASH}"
 
-# ensure sdk was built
-turbo run build lint test --filter=./packages/sdk...
+# ensure sdk and shared was built
+turbo run build lint test --filter=./packages/sdk... --filter=./packages/shared...
 
 # we need to create a new branch for the release
 git checkout -b $RELEASE_BRANCH_NAME
