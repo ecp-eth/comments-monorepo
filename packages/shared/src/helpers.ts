@@ -307,5 +307,6 @@ export function formatAuthorLinkWithTemplate(
 
   const url = urlTemplate.replace("{address}", author.address);
 
+  // use zod instead, `URL.canParse` does not work in RN 🤷‍♂️
   return z.string().url().safeParse(url).success ? url : null;
 }
