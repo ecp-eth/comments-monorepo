@@ -23,7 +23,7 @@ git pull
 COMMIT_HASH=$(git rev-parse --short HEAD)
 RELEASE_BRANCH_NAME="release-${COMMIT_HASH}"
 
-# ensure sdk and shared was built
+# ensure sdk and shared were built
 turbo run build lint test --filter=./packages/sdk... --filter=./packages/shared...
 
 # we need to create a new branch for the release
