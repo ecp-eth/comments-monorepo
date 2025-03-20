@@ -3,7 +3,8 @@ import { http } from "wagmi";
 import { anvil, base } from "wagmi/chains";
 import { publicEnv } from "@/publicEnv";
 
-export const chain = base; // publicEnv.NODE_ENV === "development" ? anvil : base;
+// swap works only with base, locally it doesn't work
+export const chain = publicEnv.NODE_ENV === "development" ? anvil : base;
 
 export const transport =
   chain.id === base.id
