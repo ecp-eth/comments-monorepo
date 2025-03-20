@@ -192,7 +192,7 @@ export function CommentShared({
       </div>
       <div
         className={cn(
-          "mb-2 break-all text-foreground",
+          "mb-2 break-words hyphens-auto text-foreground",
           comment.deletedAt && "text-muted-foreground"
         )}
       >
