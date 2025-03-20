@@ -1,6 +1,6 @@
-import type { AuthorType } from "@/lib/types";
 import { publicEnv } from "@/publicEnv";
 import { fetchAuthorData } from "@ecp.eth/sdk";
+import { AuthorType } from "@ecp.eth/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 /**

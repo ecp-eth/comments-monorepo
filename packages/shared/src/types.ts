@@ -1,5 +1,9 @@
 import type { Hex } from "viem";
 import type { Comment, PendingCommentOperationSchemaType } from "./schemas.js";
+import type {
+  IndexerAPICommentSchemaType,
+  IndexerAPICommentWithRepliesSchemaType,
+} from "@ecp.eth/sdk/schemas";
 
 export type OnDeleteComment = (id: Hex) => void;
 export type OnRetryPostComment = (
@@ -10,3 +14,10 @@ export type OnRetryPostComment = (
 export type OnSubmitSuccessFunction = (
   params: PendingCommentOperationSchemaType
 ) => void;
+
+// used only within this module, do not export
+type AllowedCommentTypes =
+  | IndexerAPICommentSchemaType
+  | IndexerAPICommentWithRepliesSchemaType;
+
+export type AuthorType = AllowedCommentTypes["author"];

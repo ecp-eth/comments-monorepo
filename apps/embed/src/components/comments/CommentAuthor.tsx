@@ -1,4 +1,3 @@
-import type { AuthorType } from "@/lib/types";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import {
   getCommentAuthorNameOrAddress,
@@ -7,6 +6,7 @@ import {
 } from "@ecp.eth/shared/helpers";
 import { formatAuthorLink } from "@/lib/utils";
 import Link from "next/link";
+import { AuthorType } from "@ecp.eth/shared/types";
 
 type CommentAuthorProps = {
   author: AuthorType;
