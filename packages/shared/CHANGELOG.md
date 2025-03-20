@@ -1,5 +1,11 @@
 # @ecp.eth/shared
 
+## 0.0.6
+
+### Patch Changes
+
+- a6eac2b: feat: add formatAuthorLinkWithTemplate and AuthorType
+
 ## 0.0.5
 
 ### Patch Changes
