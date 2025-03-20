@@ -9,6 +9,7 @@ import { getCommentCursor } from "@ecp.eth/sdk";
 import type { InfiniteData } from "@tanstack/react-query";
 import type { Hex } from "viem";
 import { AuthorType } from "./types.js";
+import { z } from "zod";
 
 export function getCommentAuthorNameOrAddress(author: AuthorType): string {
   return (
@@ -306,5 +307,5 @@ export function formatAuthorLinkWithTemplate(
 
   const url = urlTemplate.replace("{address}", author.address);
 
-  return URL.canParse(url) ? url : null;
+  return z.string().url().safeParse(url).success ? url : null;
 }
