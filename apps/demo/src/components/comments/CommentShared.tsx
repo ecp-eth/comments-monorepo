@@ -4,11 +4,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  CommentPageSchema,
-  CommentPageSchemaType,
-  type Comment as CommentType,
-} from "@/lib/schemas";
+import { CommentPageSchema, type Comment as CommentType } from "@/lib/schemas";
 import type {
   OnDeleteComment,
   OnRetryPostComment,
@@ -23,11 +19,7 @@ import { MoreVerticalIcon } from "lucide-react";
 import { CommentAuthor } from "./CommentAuthor";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
-import {
-  DefinedUseInfiniteQueryResult,
-  InfiniteData,
-  useInfiniteQuery,
-} from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { publicEnv } from "@/publicEnv";
 import {
   MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,

@@ -9,13 +9,13 @@ import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import { useSubmitGaslessComment } from "../hooks";
 import { InvalidCommentError } from "../errors";
 import { CommentBoxAuthor } from "../CommentBoxAuthor";
+import { useCommentGaslessContext } from "./CommentGaslessProvider";
 
 interface CommentBoxProps {
   /**
    * Called when user blurred text area with empty content
    */
   onLeftEmpty?: () => void;
-  isAppSignerApproved?: boolean;
   onSubmitSuccess: OnSubmitSuccessFunction;
   placeholder?: string;
   parentId?: Hex;
@@ -26,8 +26,8 @@ export function CommentBoxGasless({
   onSubmitSuccess,
   placeholder = "What are your thoughts?",
   parentId,
-  isAppSignerApproved: isApproved = false,
 }: CommentBoxProps) {
+  const { isApproved } = useCommentGaslessContext();
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const { address } = useAccount();
   const [content, setContent] = useState("");
