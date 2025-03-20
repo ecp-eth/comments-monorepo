@@ -1,4 +1,3 @@
-import type { AuthorType } from "@/lib/types";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 import {
@@ -6,21 +5,9 @@ import {
   formatDate,
   formatDateRelative,
 } from "@ecp.eth/shared/helpers";
-import { publicEnv } from "@/publicEnv";
 import Link from "next/link";
-
-function formatAuthorLink(author: AuthorType): string | null {
-  if (!publicEnv.NEXT_PUBLIC_COMMENT_AUTHOR_URL) {
-    return null;
-  }
-
-  const url = publicEnv.NEXT_PUBLIC_COMMENT_AUTHOR_URL.replace(
-    "{address}",
-    author.address
-  );
-
-  return URL.canParse(url) ? url : null;
-}
+import { formatAuthorLink } from "@/lib/utils";
+import { AuthorType } from "@ecp.eth/shared/types";
 
 type CommentAuthorProps = {
   author: AuthorType;

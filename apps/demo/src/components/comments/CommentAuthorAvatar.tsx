@@ -1,8 +1,8 @@
-import type { AuthorType } from "@/lib/types";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { blo } from "blo";
 import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
+import { AuthorType } from "@ecp.eth/shared/types";
 
 type CommentAuthorAvatarProps = {
   author: AuthorType;

@@ -8,10 +8,10 @@ import type {
 import { getCommentCursor } from "@ecp.eth/sdk";
 import type { InfiniteData } from "@tanstack/react-query";
 import type { Hex } from "viem";
+import { AuthorType } from "./types.js";
+import { z } from "zod";
 
-export function getCommentAuthorNameOrAddress(
-  author: Comment["author"]
-): string {
+export function getCommentAuthorNameOrAddress(author: AuthorType): string {
   return (
     author.ens?.name ??
     author.farcaster?.displayName ??
@@ -277,9 +277,36 @@ export function formatDateRelative(
   );
 }
 
+/**
+ * Replaces bigint values with their string representation
+ * usually used in JSON.stringify
+ * @param key
+ * @param value
+ * @returns
+ */
 export function bigintReplacer(key: string, value: unknown) {
   if (typeof value === "bigint") {
     return value.toString();
   }
   return value;
+}
+
+/**
+ * Format an author's link
+ *
+ * @param author
+ * @returns
+ */
+export function formatAuthorLinkWithTemplate(
+  author: AuthorType,
+  urlTemplate?: string
+): string | null {
+  if (!urlTemplate) {
+    return null;
+  }
+
+  const url = urlTemplate.replace("{address}", author.address);
+
+  // use zod instead, `URL.canParse` does not work in RN 🤷‍♂️
+  return z.string().url().safeParse(url).success ? url : null;
 }
