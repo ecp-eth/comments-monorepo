@@ -21,5 +21,7 @@ export async function GET(request: NextRequest) {
 
   console.log("quote api", url.toString());
 
-  return Response.json(data);
+  return Response.json(data, {
+    status: res.status,
+  });
 }

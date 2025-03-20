@@ -21,5 +21,7 @@ export async function GET(request: NextRequest) {
   console.log("price api", url.toString());
   console.log("price data", data);
 
-  return Response.json(data);
+  return Response.json(data, {
+    status: res.status,
+  });
 }
