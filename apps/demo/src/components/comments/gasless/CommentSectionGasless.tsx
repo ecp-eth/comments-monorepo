@@ -44,7 +44,11 @@ export function CommentSectionGasless() {
 
   const removeApprovalContract = useWriteContract();
 
-  const getApprovalQuery = useQuery({
+  const {
+    data: approvalData,
+    isPending: isApprovalQuerying,
+    refetch: refetchApprovalQuery,
+  } = useQuery({
     enabled: !!connectedAddress,
     queryKey: ["approval", connectedAddress],
     queryFn: async () => {
@@ -64,18 +68,18 @@ export function CommentSectionGasless() {
 
   const approveGaslessTransactionsMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
-      if (!getApprovalQuery.data) {
+      if (!approvalData) {
         throw new Error("No approval data found");
       }
 
-      if (getApprovalQuery.data.approved) {
+      if (approvalData.approved) {
         throw new Error("Already approved");
       }
 
       return {
-        signTypedDataParams: getApprovalQuery.data
-          .signTypedDataParams as unknown as SignTypedDataParameters,
-        variables: getApprovalQuery.data,
+        signTypedDataParams:
+          approvalData.signTypedDataParams as unknown as SignTypedDataParameters,
+        variables: approvalData,
       };
     },
     async sendSignedData({ signature, variables }) {
@@ -167,7 +171,6 @@ export function CommentSectionGasless() {
   });
   const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
 
-  const { refetch: refetchApprovalQuery } = getApprovalQuery;
   const { reset: resetApproveGaslessTransactionsMutation } =
     approveGaslessTransactionsMutation;
   const { reset: resetRemoveApprovalContract } = removeApprovalContract;
@@ -205,15 +208,15 @@ export function CommentSectionGasless() {
   const commentGaslessProviderValue =
     useMemo<CommentGaslessProviderContextType>(
       () => ({
-        isApproved: getApprovalQuery.data?.approved ?? false,
+        isApproved: approvalData?.approved ?? false,
       }),
-      [getApprovalQuery.data?.approved]
+      [approvalData?.approved]
     );
 
   const isApprovalPending =
     approveContractReceipt.isLoading ||
     approveGaslessTransactionsMutation.isPending ||
-    getApprovalQuery.isPending;
+    isApprovalQuerying;
 
   const isRemovingApproval =
     removeApprovalContract.isPending || removeApprovalContractReceipt.isLoading;
@@ -235,8 +238,7 @@ export function CommentSectionGasless() {
       <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Comments</h2>
 
-        {!getApprovalQuery.data?.approved &&
-        getApprovalQuery.data?.signTypedDataParams ? (
+        {!approvalData?.approved && approvalData?.signTypedDataParams ? (
           <div className="mb-4">
             <Button
               onClick={() => {
@@ -251,18 +253,18 @@ export function CommentSectionGasless() {
             </Button>
           </div>
         ) : (
-          getApprovalQuery.data?.approved && (
+          approvalData?.approved && (
             <div className="flex items-center gap-2">
               <div className="text-sm text-gray-500">
                 App has approval to post on your behalf.
               </div>
               <Button
                 variant="outline"
-                disabled={!getApprovalQuery.data || isRemovingApproval}
+                disabled={!approvalData || isRemovingApproval}
                 onClick={() => {
                   if (
-                    !getApprovalQuery.data ||
-                    !getApprovalQuery.data.approved ||
+                    !approvalData ||
+                    !approvalData.approved ||
                     !connectedAddress
                   ) {
                     throw new Error("No data found");
@@ -272,7 +274,7 @@ export function CommentSectionGasless() {
                     abi: CommentsV1Abi,
                     address: COMMENTS_V1_ADDRESS,
                     functionName: "removeApprovalAsAuthor",
-                    args: [getApprovalQuery.data.appSigner],
+                    args: [approvalData.appSigner],
                   });
                 }}
               >
@@ -285,10 +287,7 @@ export function CommentSectionGasless() {
           )
         )}
 
-        <CommentBoxGasless
-          onSubmitSuccess={handleCommentSubmitted}
-          isAppSignerApproved={getApprovalQuery.data?.approved}
-        />
+        <CommentBoxGasless onSubmitSuccess={handleCommentSubmitted} />
         {hasNewComments && (
           <Button
             className="mb-4"
