@@ -9,7 +9,7 @@ const nodeProcess = exec(
 nodeProcess.stdout.on("data", (data) => {
   console.log(data.toString());
 
-  if (data.includes("Listening on 127.0.0.1:8545")) {
+  if (data.includes("Listening on 0.0.0.0:8545")) {
     const devProcess = exec(
       "forge script script/Dev.s.sol:DevScript --rpc-url http://localhost:8545 --broadcast",
       { cwd },
