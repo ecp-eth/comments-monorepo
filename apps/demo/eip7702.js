@@ -53,13 +53,13 @@ const account = privateKeyToAccount(YOUR_PRIVATE_KEY);
 const signerAccount = privateKeyToAccount(APP_SIGNER_PRIVATE_KEY);
 const client = createPublicClient({
   chain: anvil,
-  transport: http(),
+  transport: http("http://localhost:8545"),
 });
 
 const walletClient = createWalletClient({
   account,
   chain: anvil,
-  transport: http(),
+  transport: http("http://localhost:8545"),
 }).extend(eip7702Actions());
 
 const authorization = await walletClient.signAuthorization({
