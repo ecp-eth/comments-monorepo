@@ -1,5 +1,12 @@
 # @ecp.eth/embed
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [feca011]
+  - @ecp.eth/shared@0.0.7
+
 ## 0.0.12
 
 ### Patch Changes

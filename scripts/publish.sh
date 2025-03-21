@@ -67,8 +67,8 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo ""
     echo "Or otherwise delete the release branch manually:"
     echo ""
-    echo "  1. run 'git push ${GIT_REMOTE} ${RELEASE_BRANCH_NAME}:' to delete the branch"
-    echo "  2. run 'git branch -D ${RELEASE_BRANCH_NAME}:' to delete the branch"
+    echo "  1. run 'git push ${GIT_REMOTE} :${RELEASE_BRANCH_NAME}' to delete the branch"
+    echo "  2. run 'git branch -D ${RELEASE_BRANCH_NAME}' to delete the branch"
     echo ""
     exit 1
 fi

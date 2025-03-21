@@ -1,5 +1,11 @@
 # @ecp.eth/shared
 
+## 0.0.7
+
+### Patch Changes
+
+- feca011: chore: re-release with correct build
+
 ## 0.0.6
 
 ### Patch Changes
