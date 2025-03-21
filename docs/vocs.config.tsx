@@ -1,6 +1,8 @@
 import React from "react";
 import { defineConfig } from "vocs";
 import { remarkMermaid } from "@theguild/remark-mermaid";
+import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import remarkFindAndReplace from "./plugins/remark-find-replace";
 
 export default defineConfig({
   title: "Ethereum Comments Protocol",
@@ -236,9 +238,23 @@ export default defineConfig({
     { text: "Github", link: "https://github.com/ecp-eth/comments-monorepo" },
   ],
   markdown: {
-    remarkPlugins: [remarkMermaid],
+    remarkPlugins: [
+      remarkMermaid,
+      [
+        remarkFindAndReplace,
+        {
+          replacements: {
+            COMMENTS_V1_ADDRESS: COMMENTS_V1_ADDRESS,
+          },
+        },
+      ],
+    ],
   },
   vite: {
     envPrefix: "VITE_",
+    define: {
+      "import.meta.env.COMMENTS_V1_ADDRESS":
+        JSON.stringify(COMMENTS_V1_ADDRESS),
+    },
   },
 });
