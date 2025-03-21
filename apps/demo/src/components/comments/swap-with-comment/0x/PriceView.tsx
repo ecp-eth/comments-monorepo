@@ -1,5 +1,5 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useEffect, useState, ChangeEvent } from "react";
+import { useEffect, useState, ChangeEvent, useCallback } from "react";
 import {
   useReadContract,
   useBalance,
@@ -7,14 +7,14 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
-import { erc20Abi, Address, formatUnits, parseUnits } from "viem";
+import { Address, formatUnits, parseUnits, maxUint256 } from "viem";
 import {
   BASE_TOKENS,
   BASE_TOKENS_BY_SYMBOL,
-  MAX_ALLOWANCE,
   AFFILIATE_FEE,
   FEE_RECIPIENT,
-} from "@/lib/constants";
+  Token,
+} from "./constants";
 import ZeroExLogo from "./white-0x-logo.png";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
@@ -61,12 +61,10 @@ export function PriceView({
   }
 
   const sellTokenObject = BASE_TOKENS_BY_SYMBOL[sellToken];
-  console.log("sellTokenObject", sellTokenObject);
   const buyTokenObject = BASE_TOKENS_BY_SYMBOL[buyToken];
 
   const sellTokenDecimals = sellTokenObject.decimals;
   const buyTokenDecimals = buyTokenObject.decimals;
-  const sellTokenAddress = sellTokenObject.address;
 
   const parsedSellAmount =
     sellAmount && tradeDirection === "sell"
@@ -158,7 +156,11 @@ export function PriceView({
     token: sellTokenObject.address,
   });
 
-  console.log("taker sellToken balance: ", data);
+  const handleFinalizeClick = useCallback(() => {
+    if (price) {
+      setFinalize(price);
+    }
+  }, [price, setFinalize]);
 
   const inSufficientBalance =
     data && sellAmount
@@ -178,29 +180,11 @@ export function PriceView({
       >
         <a href="https://0x.org/" target="_blank" rel="noopener noreferrer">
           <Image src={ZeroExLogo} alt="Icon" width={50} height={50} />
+          {!taker && <ConnectButton />}
         </a>
-        <ConnectButton />
       </header>
 
-      <div className="container mx-auto p-10">
-        <header className="text-center py-4">
-          <h1 className="text-3xl font-bold">0x Swap Demo</h1>
-        </header>
-
-        <p className="text-md text-center p-4 text-gray-500">
-          Check out the{" "}
-          <u className="underline">
-            <a href="https://0x.org/docs/">0x Docs</a>
-          </u>{" "}
-          and{" "}
-          <u className="underline">
-            <a href="https://github.com/0xProject/0x-examples/tree/main">
-              Code
-            </a>
-          </u>{" "}
-          to build your own
-        </p>
-
+      <div className="container mx-auto">
         <div className="bg-slate-200 dark:bg-slate-800 p-4 rounded-md mb-3">
           <label htmlFor="sell" className="text-gray-300 mb-2 mr-2">
             Sell
@@ -420,19 +404,17 @@ export function PriceView({
           </ConnectButton.Custom>
         )}
 
-        {!!taker && !!price && price?.liquidityAvailable && (
+        {!!taker && !!price && price.liquidityAvailable && (
           <ApproveOrReviewButton
-            sellTokenAddress={sellTokenAddress}
             taker={taker}
-            onClick={() => {
-              setFinalize(price);
-            }}
+            onClick={handleFinalizeClick}
             disabled={inSufficientBalance}
             price={price}
+            sellToken={sellTokenObject}
           />
         )}
 
-        {!!taker && !!price && !price?.liquidityAvailable && (
+        {!!taker && !!price && !price.liquidityAvailable && (
           <div>
             <p>No liquidity available for this trade.</p>
           </div>
@@ -440,127 +422,213 @@ export function PriceView({
       </div>
     </div>
   );
+}
 
-  function ApproveButton({
-    taker,
-    sellTokenAddress,
-    spender,
-  }: {
-    taker: Address;
-    sellTokenAddress: Address;
-    spender: Address;
-  }) {
-    const approveContract = useWriteContract();
+function ApproveButton({
+  disabled,
+  taker,
+  onClick,
+  sellToken,
+  price,
+}: {
+  disabled: boolean | undefined;
+  taker: Address;
+  onClick: () => void;
+  sellToken: Token;
+  price: Omit<PriceResponseLiquidityAvailableSchemaType, "issues"> & {
+    issues: Omit<
+      PriceResponseLiquidityAvailableSchemaType["issues"],
+      "allowance"
+    > & {
+      allowance: {
+        spender: Address;
+      };
+    };
+  };
+}) {
+  const {
+    data: approvalData,
+    writeContractAsync: approveAllowance,
+    error: approveAllowanceError,
+    isPending: isWritingApproval,
+    status: writeContractStatus,
+  } = useWriteContract();
 
-    const { data } = useSimulateContract({
-      address: sellTokenAddress,
-      abi: erc20Abi,
+  console.log(
+    "write contract",
+    writeContractStatus,
+    approvalData,
+    approveAllowanceError
+  );
+
+  const { data, status, error } = useSimulateContract({
+    address: sellToken.address,
+    abi: sellToken.abi,
+    functionName: "approve",
+    args: [price.issues.allowance.spender, maxUint256],
+  });
+
+  console.log("simulate contract", status, data, error);
+
+  const approvalReceipt = useWaitForTransactionReceipt({
+    hash: approvalData,
+  });
+
+  console.log(
+    "approvalReceipt",
+    approvalReceipt.status,
+    approvalReceipt.data,
+    approvalReceipt.error
+  );
+
+  const {
+    data: allowance,
+    isLoading: isLoadingAllowance,
+    refetch: refetchAllowance,
+    status: readContractStatus,
+  } = useReadContract({
+    address: sellToken.address,
+    abi: sellToken.abi,
+    functionName: "allowance",
+    args: [taker, price.issues.allowance.spender],
+  });
+
+  console.log("read contract", readContractStatus, allowance, error);
+
+  const handleApproveClick = useCallback(async () => {
+    if (allowance !== 0n) {
+      return;
+    }
+
+    await approveAllowance({
+      abi: sellToken.abi,
+      address: sellToken.address,
       functionName: "approve",
-      args: [spender, MAX_ALLOWANCE],
-    });
+      args: [price.issues.allowance.spender, maxUint256],
+    })
+      .then((res) => {
+        console.log("approval successful", res);
+      })
+      .catch((e) => {
+        console.error(e);
 
-    const approvalReceipt = useWaitForTransactionReceipt({
-      hash: approveContract.data,
-    });
+        throw e;
+      });
 
-    const { data: allowance, refetch } = useReadContract({
-      address: sellTokenAddress,
-      abi: erc20Abi,
-      functionName: "allowance",
-      args: [taker, spender],
-    });
+    refetchAllowance();
+  }, [
+    allowance,
+    approveAllowance,
+    sellToken.abi,
+    sellToken.address,
+    price.issues.allowance.spender,
+    refetchAllowance,
+  ]);
 
-    useEffect(() => {
-      if (data) {
-        refetch();
-      }
-    }, [data, refetch]);
-
-    if (approveContract.error || approvalReceipt.error) {
-      return (
-        <div>
-          Something went wrong:{" "}
-          {
-            (
-              approveContract.error ||
-              approvalReceipt.error ||
-              new Error("unknown error")
-            ).message
-          }
-        </div>
-      );
+  useEffect(() => {
+    if (data) {
+      refetchAllowance();
     }
+  }, [data, refetchAllowance]);
 
-    if (allowance === 0n) {
-      return (
-        <button
-          type="button"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-          onClick={async () => {
-            await approveContract.writeContractAsync({
-              abi: erc20Abi,
-              address: sellTokenAddress,
-              functionName: "approve",
-              args: [spender, MAX_ALLOWANCE],
-            });
-            console.log("approving spender to spend sell token");
-            refetch();
-          }}
-        >
-          {approveContract.isPending || approvalReceipt.isLoading
-            ? "Approving…"
-            : "Approve"}
-        </button>
-      );
-    }
-
-    return null;
+  if (approveAllowanceError || approvalReceipt.error) {
+    return (
+      <div>
+        Something went wrong:{" "}
+        {
+          (
+            approveAllowanceError ||
+            approvalReceipt.error ||
+            new Error("unknown error")
+          ).message
+        }
+      </div>
+    );
   }
 
-  function ReviewButton({
-    disabled,
-    onClick,
-  }: {
-    disabled?: boolean;
-    onClick: () => void;
-  }) {
+  if (isLoadingAllowance) {
     return (
       <button
-        type="button"
         disabled={disabled}
-        onClick={onClick}
-        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-25"
+        type="button"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
       >
-        {disabled ? "Insufficient Balance" : "Review Trade"}
+        Checking allowance...
       </button>
     );
   }
 
-  function ApproveOrReviewButton({
-    taker,
-    onClick,
-    sellTokenAddress,
-    disabled,
-    price,
-  }: {
-    taker: Address;
-    onClick: () => void;
-    sellTokenAddress: Address;
-    disabled?: boolean;
-    price: PriceResponseLiquidityAvailableSchemaType;
-  }) {
-    const spender = price.issues.allowance?.spender;
-
-    if (!price?.issues.allowance || !spender) {
-      return <ReviewButton disabled={disabled} onClick={onClick} />;
-    }
-
+  if ((allowance as bigint) < price.sellAmount) {
     return (
-      <ApproveButton
-        taker={taker}
-        sellTokenAddress={sellTokenAddress}
-        spender={spender}
-      />
+      <button
+        type="button"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+        onClick={handleApproveClick}
+      >
+        {isWritingApproval || approvalReceipt.isLoading
+          ? "Approving..."
+          : "Approve"}
+      </button>
     );
   }
+
+  return <ReviewButton disabled={disabled} onClick={onClick} />;
+}
+
+function ReviewButton({
+  disabled,
+  onClick,
+}: {
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-25"
+    >
+      {disabled ? "Insufficient Balance" : "Review Trade"}
+    </button>
+  );
+}
+
+function ApproveOrReviewButton({
+  taker,
+  onClick,
+  disabled,
+  price,
+  sellToken,
+}: {
+  taker: Address;
+  onClick: () => void;
+  disabled?: boolean;
+  price: PriceResponseLiquidityAvailableSchemaType;
+  sellToken: Token;
+}) {
+  if (!price?.issues.allowance) {
+    return <ReviewButton disabled={disabled} onClick={onClick} />;
+  }
+
+  return (
+    <ApproveButton
+      disabled={disabled}
+      taker={taker}
+      onClick={onClick}
+      sellToken={sellToken}
+      price={
+        price as Omit<PriceResponseLiquidityAvailableSchemaType, "issues"> & {
+          issues: Omit<
+            PriceResponseLiquidityAvailableSchemaType["issues"],
+            "allowance"
+          > & {
+            allowance: {
+              spender: Address;
+            };
+          };
+        }
+      }
+    />
+  );
 }

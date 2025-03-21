@@ -17,7 +17,7 @@ import {
   BASE_TOKENS_BY_ADDRESS,
   AFFILIATE_FEE,
   FEE_RECIPIENT,
-} from "@/lib/constants";
+} from "./constants";
 import Image from "next/image";
 import {
   PriceResponseLiquidityAvailableSchemaType,
