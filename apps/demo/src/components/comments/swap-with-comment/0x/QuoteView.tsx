@@ -1,18 +1,4 @@
-import {
-  useSignTypedData,
-  useSendTransaction,
-  useWaitForTransactionReceipt,
-  useWalletClient,
-  type BaseError,
-} from "wagmi";
-import {
-  Address,
-  concat,
-  formatUnits,
-  numberToHex,
-  size,
-  type Hex,
-} from "viem";
+import { type Address, formatUnits } from "viem";
 import {
   BASE_TOKENS_BY_ADDRESS,
   AFFILIATE_FEE,
@@ -34,6 +20,7 @@ import {
   SwapAPIValidationFailedError,
   SwapAPITokenNotSupportedError,
 } from "./errors";
+import { useEffect } from "react";
 
 export default function QuoteView({
   taker,
@@ -49,10 +36,7 @@ export default function QuoteView({
   const sellTokenInfo = BASE_TOKENS_BY_ADDRESS[price.sellToken.toLowerCase()];
   const buyTokenInfo = BASE_TOKENS_BY_ADDRESS[price.buyToken.toLowerCase()];
 
-  const { signTypedDataAsync } = useSignTypedData();
-  const { data: walletClient } = useWalletClient();
-
-  const { data: quote } = useQuery({
+  const quoteQuery = useQuery({
     enabled: QuoteRequestQueryParamsSchema.safeParse({
       chainId,
       sellToken: price.sellToken.toString(),
@@ -60,7 +44,12 @@ export default function QuoteView({
       sellAmount: price.sellAmount.toString(),
       taker,
     }).success,
-    queryKey: ["quote", price.sellToken, price.buyToken, price.sellAmount],
+    queryKey: [
+      "quote",
+      price.sellToken,
+      price.buyToken,
+      price.sellAmount.toString(),
+    ],
     queryFn: async ({ signal }) => {
       const params = {
         chainId: chainId.toString(),
@@ -88,7 +77,7 @@ export default function QuoteView({
         }
 
         switch (parsedResponse.data.name) {
-          case "INVALID_INPUT":
+          case "INPUT_INVALID":
             throw new SwapAPIInvalidInputError(parsedResponse.data);
           case "SWAP_VALIDATION_FAILED":
             throw new SwapAPIValidationFailedError(parsedResponse.data);
@@ -110,175 +99,105 @@ export default function QuoteView({
     staleTime: 0,
   });
 
-  const {
-    data: hash,
-    isPending,
-    error,
-    sendTransaction,
-  } = useSendTransaction();
+  useEffect(() => {
+    if (quoteQuery.data) {
+      setQuote(quoteQuery.data);
+    }
+  }, [quoteQuery.data, setQuote]);
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    });
-
-  if (!quote) {
+  if (quoteQuery.isLoading) {
     return <div>Getting best quote...</div>;
   }
 
-  console.log("quote", quote);
+  if (quoteQuery.isError) {
+    return (
+      <div className="text-red-500 text-sm">{quoteQuery.error.message}</div>
+    );
+  }
+
+  if (!quoteQuery.isSuccess) {
+    return null;
+  }
+
+  const quote = quoteQuery.data;
 
   // Helper function to format tax basis points to percentage
   const formatTax = (taxBps: number) => (taxBps / 100).toFixed(2);
 
   return (
-    <div className="p-3 mx-auto max-w-screen-sm ">
+    <div className="">
       <form>
-        <div className="bg-slate-200 dark:bg-slate-800 p-4 rounded-sm mb-3">
-          <div className="text-xl mb-2 text-white">You pay</div>
-          <div className="flex items-center text-lg sm:text-3xl text-white">
+        <div className="flex flex-col gap-2 p-4 border border-gray-300 rounded mb-4">
+          <div className="font-semibold">You pay</div>
+          <div className="flex gap-2 items-center">
             <Image
               alt={sellTokenInfo.symbol}
-              className="h-9 w-9 mr-2 rounded-md"
+              className="h-5 w-5 rounded-md"
               src={sellTokenInfo.logoURI}
-              width={9}
-              height={9}
+              width={16}
+              height={16}
             />
             <span>
               {formatUnits(BigInt(quote.sellAmount), sellTokenInfo.decimals)}
             </span>
-            <div className="ml-2">{sellTokenInfo.symbol}</div>
+            <div>{sellTokenInfo.symbol}</div>
           </div>
         </div>
 
-        <div className="bg-slate-200 dark:bg-slate-800 p-4 rounded-sm mb-3">
-          <div className="text-xl mb-2 text-white">You receive</div>
-          <div className="flex items-center text-lg sm:text-3xl text-white">
-            <img
+        <div className="flex flex-col gap-2 p-4 border border-gray-300 rounded mb-4">
+          <div className="font-semibold">You receive</div>
+          <div className="flex gap-2 items-center">
+            <Image
               alt={buyTokenInfo.symbol}
-              className="h-9 w-9 mr-2 rounded-md"
+              className="h-5 w-5 rounded-md"
               src={buyTokenInfo.logoURI}
+              width={16}
+              height={16}
             />
-            <span>
-              {formatUnits(BigInt(quote.buyAmount), buyTokenInfo.decimals)}
-            </span>
-            <div className="ml-2">{buyTokenInfo.symbol}</div>
+            <span>{formatUnits(quote.buyAmount, buyTokenInfo.decimals)}</span>
+            <div>{buyTokenInfo.symbol}</div>
           </div>
         </div>
 
-        <div className="bg-slate-200 dark:bg-slate-800 p-4 rounded-sm mb-3">
-          <div className="text-slate-400">
+        <div className="flex flex-col gap-2 p-4 border border-gray-300 rounded mb-4">
+          <div className="text-muted-foreground text-sm">
             {quote.fees &&
             quote.fees.integratorFee &&
             quote.fees.integratorFee.amount
               ? "Affiliate Fee: " +
-                Number(
-                  formatUnits(
-                    BigInt(quote.fees.integratorFee.amount),
-                    buyTokenInfo.decimals
-                  )
+                formatUnits(
+                  quote.fees.integratorFee.amount,
+                  buyTokenInfo.decimals
                 ) +
                 " " +
                 buyTokenInfo.symbol
               : null}
           </div>
-          {/* Tax Information Display */}
-          <div className="text-slate-400">
-            {quote.tokenMetadata.buyToken.buyTaxBps &&
-              quote.tokenMetadata.buyToken.buyTaxBps !== 0 && (
-                <p>
-                  {buyTokenInfo.symbol +
-                    ` Buy Tax: ${formatTax(
-                      quote.tokenMetadata.buyToken.buyTaxBps
-                    )}%`}
-                </p>
-              )}
-            {quote.tokenMetadata.sellToken.sellTaxBps &&
-              quote.tokenMetadata.sellToken.sellTaxBps !== 0 && (
-                <p>
-                  {sellTokenInfo.symbol +
-                    ` Sell Tax: ${formatTax(
-                      quote.tokenMetadata.sellToken.sellTaxBps
-                    )}%`}
-                </p>
-              )}
-          </div>
+          {((!!quote.tokenMetadata.buyToken &&
+            quote.tokenMetadata.buyToken.buyTaxBps !== 0) ||
+            (!!quote.tokenMetadata.sellToken &&
+              quote.tokenMetadata.sellToken.sellTaxBps !== 0)) && (
+            <div className="text-muted-foreground text-sm mt-4">
+              {quote.tokenMetadata.buyToken.buyTaxBps != null &&
+                quote.tokenMetadata.buyToken.buyTaxBps !== 0 && (
+                  <p>
+                    {buyTokenInfo.symbol +
+                      ` Buy Tax: ${formatTax(quote.tokenMetadata.buyToken.buyTaxBps)}%`}
+                  </p>
+                )}
+              {quote.tokenMetadata.sellToken.sellTaxBps != null &&
+                quote.tokenMetadata.sellToken.sellTaxBps !== 0 && (
+                  <p>
+                    {sellTokenInfo.symbol +
+                      ` Sell Tax: ${formatTax(
+                        quote.tokenMetadata.sellToken.sellTaxBps
+                      )}%`}
+                  </p>
+                )}
+            </div>
+          )}
         </div>
       </form>
-
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-        disabled={isPending}
-        onClick={async () => {
-          console.log("submitting quote to blockchain");
-          console.log("to", quote.transaction.to);
-          console.log("value", quote.transaction.value);
-
-          // On click, (1) Sign the Permit2 EIP-712 message returned from quote
-          if (quote.permit2?.eip712) {
-            let signature: Hex | undefined;
-            try {
-              signature = await signTypedDataAsync(quote.permit2.eip712);
-              console.log("Signed permit2 message from quote response");
-            } catch (error) {
-              console.error("Error signing permit2 coupon:", error);
-            }
-
-            // (2) Append signature length and signature data to calldata
-
-            if (signature && quote?.transaction?.data) {
-              const signatureLengthInHex = numberToHex(size(signature), {
-                signed: false,
-                size: 32,
-              });
-
-              const transactionData = quote.transaction.data as Hex;
-              const sigLengthHex = signatureLengthInHex as Hex;
-              const sig = signature as Hex;
-
-              quote.transaction.data = concat([
-                transactionData,
-                sigLengthHex,
-                sig,
-              ]);
-            } else {
-              throw new Error("Failed to obtain signature or transaction data");
-            }
-          }
-
-          // (3) Submit the transaction with Permit2 signature
-
-          sendTransaction({
-            account: walletClient?.account.address,
-            gas: quote.transaction.gas
-              ? BigInt(quote?.transaction.gas)
-              : undefined,
-            to: quote.transaction.to,
-            data: quote.transaction.data, // submit
-            value: quote.transaction.value
-              ? BigInt(quote.transaction.value)
-              : undefined, // value is used for native tokens
-            chainId: chainId,
-          });
-        }}
-      >
-        {isPending ? "Confirming..." : "Place Order"}
-      </button>
-      <br></br>
-      <br></br>
-      <br></br>
-      {isConfirming && (
-        <div className="text-center">Waiting for confirmation ⏳ ...</div>
-      )}
-      {isConfirmed && (
-        <div className="text-center">
-          Transaction Confirmed! 🎉{" "}
-          <a href={`https://etherscan.io/tx/${hash}`}>Check Etherscan</a>
-        </div>
-      )}
-      {error && (
-        <div>Error: {(error as BaseError).shortMessage || error.message}</div>
-      )}
     </div>
   );
 }

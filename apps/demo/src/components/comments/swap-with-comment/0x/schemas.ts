@@ -1,6 +1,5 @@
 import { HexSchema } from "@ecp.eth/sdk/schemas";
 import { z } from "zod";
-import { EIP712TypedDataSchema } from "./signature";
 
 const AddressSchema = HexSchema;
 
@@ -25,7 +24,7 @@ export const QuoteRequestQueryParamsSchema =
 const Permit2Schema = z.object({
   type: z.literal("Permit2"),
   hash: HexSchema,
-  eip712: EIP712TypedDataSchema,
+  eip712: z.any(),
 });
 
 const IssuesSchema = z.object({

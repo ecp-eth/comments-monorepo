@@ -266,7 +266,6 @@ export function PriceView({
           </div>
         )}
 
-        {/* Tax Information Display */}
         {((!!price?.tokenMetadata.buyToken &&
           price.tokenMetadata.buyToken.buyTaxBps !== 0) ||
           (!!price?.tokenMetadata.sellToken &&

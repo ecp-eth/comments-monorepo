@@ -1,4 +1,4 @@
-import type { Hex } from "viem";
+import { concat, numberToHex, size, type Hex } from "viem";
 import {
   CommentForm as BaseCommentForm,
   type OnSubmitFunction,
@@ -9,10 +9,10 @@ import { chain } from "@/lib/wagmi";
 import {
   useAccount,
   useChainId,
+  useSendTransaction,
+  useSignTypedData,
   useSwitchChain,
-  useWriteContract,
 } from "wagmi";
-import { postCommentAsAuthorViaCommentsV1 } from "@/lib/contract";
 import { Button } from "@/components/ui/button";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import { PriceView } from "./0x/PriceView";
@@ -21,6 +21,7 @@ import type {
   PriceResponseLiquidityAvailableSchemaType,
   QuoteResponseLiquidityAvailableSchemaType,
 } from "./0x/schemas";
+import { createCommentSuffixData } from "@ecp.eth/sdk";
 
 type CommentFormProps = {
   parentId?: Hex;
@@ -35,10 +36,28 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
   const { address } = useAccount();
   const chainId = useChainId();
   const { switchChainAsync } = useSwitchChain();
-  const { writeContractAsync } = useWriteContract();
+  const { signTypedDataAsync } = useSignTypedData();
+  const { sendTransactionAsync } = useSendTransaction();
 
   const handleSubmitComment = useCallback<OnSubmitFunction<"post">>(
     async ({ address, content }) => {
+      if (!quote) {
+        throw new Error("Quote is not finalized");
+      }
+
+      // (1) Sign the Permit2 EIP-712 message returned from quote
+      const signature = await signTypedDataAsync(quote.permit2.eip712);
+
+      // (2) Append signature length and signature data to calldata
+      const signatureLengthInHex = numberToHex(size(signature), {
+        signed: false,
+        size: 32,
+      });
+
+      const transactionData = quote.transaction.data;
+      const sigLengthHex = signatureLengthInHex;
+      const sig = signature;
+
       const result = await submitCommentMutationFunction({
         address,
         commentRequest: {
@@ -51,19 +70,41 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
           return switchChainAsync({ chainId });
         },
         writeContractAsync(params) {
-          return postCommentAsAuthorViaCommentsV1(
-            {
-              appSignature: params.signature,
-              commentData: params.data,
-            },
-            writeContractAsync
-          );
+          const commentDataSuffix = createCommentSuffixData({
+            commentData: params.data,
+            appSignature: params.signature,
+          });
+
+          quote.transaction.data = concat([
+            transactionData,
+            sigLengthHex,
+            sig,
+            commentDataSuffix,
+          ]);
+
+          return sendTransactionAsync({
+            account: address,
+            to: quote.transaction.to,
+            data: quote.transaction.data,
+            value: quote.transaction.value,
+            chainId,
+          });
         },
       });
 
+      setQuote(null);
+      setFinalize(null);
+
       return result;
     },
-    [parentId, switchChainAsync, writeContractAsync]
+    [
+      chainId,
+      parentId,
+      quote,
+      sendTransactionAsync,
+      signTypedDataAsync,
+      switchChainAsync,
+    ]
   );
 
   return (
@@ -83,7 +124,7 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
         />
       )}
       <BaseCommentForm
-        disabled={!finalizedPrice}
+        disabled={!finalizedPrice || !quote}
         onSubmit={handleSubmitComment}
         onSubmitSuccess={onSubmitSuccess}
         renderSubmitButton={({
@@ -100,7 +141,7 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
               className="px-4 py-2 rounded"
               disabled={disabled || isSubmitting || !isContentValid}
             >
-              {formState === "post" ? "Posting..." : "Swap with comment"}
+              {formState === "post" ? "Posting..." : "Swap"}
             </Button>
           </>
         )}
