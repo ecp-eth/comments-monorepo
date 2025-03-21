@@ -124,8 +124,6 @@ const tx = await walletClient.writeContract({
       },
     ],
   ],
-  // gas here must be somehow computed because it can't compute it automatically
-  gas: parseEther("0.00000000001"),
 });
 
 console.log(tx);
