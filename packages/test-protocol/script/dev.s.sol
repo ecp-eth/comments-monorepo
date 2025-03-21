@@ -3,9 +3,11 @@ pragma solidity ^0.8.28;
 
 import {Script, console} from "forge-std/Script.sol";
 import {YoinkProtocol} from "../src/YoinkProtocol.sol";
+import {BatchCallDelegation} from "../src/BatchCallDelegationProtocol.sol";
 
 contract DevScript is Script {
-    YoinkProtocol public protocol;
+    YoinkProtocol public yoinkProtocol;
+    BatchCallDelegation public batchCallDelegationProtocol;
 
     function setUp() public {}
 
@@ -15,9 +17,11 @@ contract DevScript is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy contract
-        protocol = new YoinkProtocol();
+        yoinkProtocol = new YoinkProtocol();
+        batchCallDelegationProtocol = new BatchCallDelegation();
 
-        console.log("YoinkProtocol deployed at", address(protocol));
+        console.log("YoinkProtocol deployed at", address(yoinkProtocol));
+        console.log("BatchCallDelegation deployed at", address(batchCallDelegationProtocol));
 
         vm.stopBroadcast();
     }
