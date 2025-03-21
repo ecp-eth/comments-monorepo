@@ -197,7 +197,7 @@ export default defineConfig({
           items: [
             {
               text: "Demo",
-              link: "https://demo-blog.ethcomments.xyz/",
+              link: "https://demo-blog.ethcomments.xyz/blog/spaces-vs-tabs",
             },
             {
               text: "Source Code",

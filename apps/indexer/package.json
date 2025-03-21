@@ -32,7 +32,7 @@
     "normalize-url": "^8.0.1",
     "obscenity": "^0.4.3",
     "pg": "^8.11.3",
-    "ponder": "^0.9.23",
+    "ponder": "^0.9.24",
     "viem": "^2.22.21",
     "xxhash-wasm": "^1.1.0",
     "zod": "^3.24.1"
