@@ -139,7 +139,7 @@ export const PriceResponseSchema = z.discriminatedUnion("liquidityAvailable", [
 ]);
 
 export const SwapAPIInvalidInputResponseSchema = z.object({
-  name: z.literal("INVALID_INPUT"),
+  name: z.literal("INPUT_INVALID"),
   message: z.string(),
   data: z.object({
     zid: z.string(),

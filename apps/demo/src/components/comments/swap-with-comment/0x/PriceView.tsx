@@ -71,7 +71,7 @@ export function PriceView({
     ? parseUnits(sellAmount, sellTokenDecimals).toString()
     : undefined;
 
-  const { data: price } = useQuery({
+  const { data: price, error: priceError } = useQuery({
     enabled: PriceRequestQueryParamsSchema.safeParse({
       chainId,
       sellToken: sellTokenObject.address,
@@ -115,7 +115,7 @@ export function PriceView({
         }
 
         switch (parsedResponse.data.name) {
-          case "INVALID_INPUT":
+          case "INPUT_INVALID":
             throw new SwapAPIInvalidInputError(parsedResponse.data);
           case "SWAP_VALIDATION_FAILED":
             throw new SwapAPIValidationFailedError(parsedResponse.data);
@@ -287,6 +287,10 @@ export function PriceView({
                 </p>
               )}
           </div>
+        )}
+
+        {priceError && (
+          <div className="text-red-500 text-sm mt-4">{priceError.message}</div>
         )}
       </div>
 
