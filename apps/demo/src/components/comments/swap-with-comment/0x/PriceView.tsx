@@ -1,5 +1,5 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useEffect, useState, ChangeEvent, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   useReadContract,
   useBalance,
@@ -15,7 +15,6 @@ import {
   FEE_RECIPIENT,
   Token,
 } from "./constants";
-import ZeroExLogo from "./white-0x-logo.png";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -31,6 +30,16 @@ import {
   SwapAPIValidationFailedError,
   SwapAPIUnknownError,
 } from "./errors";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const DEFAULT_BUY_TOKEN = (chainId: number) => {
   if (chainId === 1) {
@@ -51,14 +60,6 @@ export function PriceView({
   const [buyToken, setBuyToken] = useState("usdc");
   const [sellAmount, setSellAmount] = useState("");
   const [buyAmount, setBuyAmount] = useState("");
-  const [tradeDirection, setTradeDirection] = useState("sell");
-
-  const handleSellTokenChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setSellToken(e.target.value);
-  };
-  function handleBuyTokenChange(e: ChangeEvent<HTMLSelectElement>) {
-    setBuyToken(e.target.value);
-  }
 
   const sellTokenObject = BASE_TOKENS_BY_SYMBOL[sellToken];
   const buyTokenObject = BASE_TOKENS_BY_SYMBOL[buyToken];
@@ -66,15 +67,9 @@ export function PriceView({
   const sellTokenDecimals = sellTokenObject.decimals;
   const buyTokenDecimals = buyTokenObject.decimals;
 
-  const parsedSellAmount =
-    sellAmount && tradeDirection === "sell"
-      ? parseUnits(sellAmount, sellTokenDecimals).toString()
-      : undefined;
-
-  const parsedBuyAmount =
-    buyAmount && tradeDirection === "buy"
-      ? parseUnits(buyAmount, buyTokenDecimals).toString()
-      : undefined;
+  const parsedSellAmount = sellAmount
+    ? parseUnits(sellAmount, sellTokenDecimals).toString()
+    : undefined;
 
   const { data: price } = useQuery({
     enabled: PriceRequestQueryParamsSchema.safeParse({
@@ -88,7 +83,6 @@ export function PriceView({
       sellTokenObject.address,
       buyTokenObject.address,
       parsedSellAmount,
-      parsedBuyAmount,
       taker,
       chainId,
     ],
@@ -98,7 +92,6 @@ export function PriceView({
         sellToken: sellTokenObject.address,
         buyToken: buyTokenObject.address,
         ...(parsedSellAmount && { sellAmount: parsedSellAmount.toString() }),
-        ...(parsedBuyAmount && { buyAmount: parsedBuyAmount.toString() }),
         ...(taker && { taker: taker.toString() }),
         swapFeeRecipient: FEE_RECIPIENT,
         swapFeeBps: AFFILIATE_FEE.toString(),
@@ -171,238 +164,134 @@ export function PriceView({
   const formatTax = (taxBps: number) => (taxBps / 100).toFixed(2);
 
   return (
-    <div>
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <a href="https://0x.org/" target="_blank" rel="noopener noreferrer">
-          <Image src={ZeroExLogo} alt="Icon" width={50} height={50} />
-          {!taker && <ConnectButton />}
-        </a>
-      </header>
+    <form>
+      <div className="p-4 border border-gray-300 rounded mb-4">
+        <h2 className="font-semibold mb-2">Swap tokens powered by 0x</h2>
 
-      <div className="container mx-auto">
-        <div className="bg-slate-200 dark:bg-slate-800 p-4 rounded-md mb-3">
-          <label htmlFor="sell" className="text-gray-300 mb-2 mr-2">
-            Sell
+        <Label htmlFor="sell">Sell</Label>
+        <section className="mt-4 flex items-start justify-center">
+          <label htmlFor="sell-select" className="sr-only">
+            Token to sell
           </label>
-          <section className="mt-4 flex items-start justify-center">
-            <label htmlFor="sell-select" className="sr-only"></label>
-            <Image
-              alt={sellToken}
-              className="h-9 w-9 mr-2 rounded-md"
-              src={BASE_TOKENS_BY_SYMBOL[sellToken].logoURI}
-              width={9}
-              height={9}
-            />
+          <Image
+            alt={sellToken}
+            className="h-9 w-9 mr-2 rounded-md"
+            src={BASE_TOKENS_BY_SYMBOL[sellToken].logoURI}
+            width={9}
+            height={9}
+          />
 
-            <div className="h-14 sm:w-full sm:mr-2">
-              <select
-                value={sellToken}
-                name="sell-token-select"
-                id="sell-token-select"
-                className="mr-2 w-50 sm:w-full h-9 rounded-md"
-                onChange={handleSellTokenChange}
-              >
-                {/* <option value="">--Choose a token--</option> */}
+          <div className="h-14 sm:w-full sm:mr-2">
+            <Select
+              onValueChange={(token) => setSellToken(token)}
+              value={sellToken}
+            >
+              <SelectTrigger id="sell-token-select">
+                <SelectValue placeholder="Select token to sell" />
+              </SelectTrigger>
+              <SelectContent>
                 {BASE_TOKENS.map((token) => {
                   return (
-                    <option
+                    <SelectItem
                       key={token.address}
                       value={token.symbol.toLowerCase()}
                     >
                       {token.symbol}
-                    </option>
+                    </SelectItem>
                   );
                 })}
-              </select>
-            </div>
-            <label htmlFor="sell-amount" className="sr-only"></label>
-            <input
-              id="sell-amount"
-              value={sellAmount}
-              className="h-9 rounded-md"
-              style={{ border: "1px solid black" }}
-              type="number"
-              onChange={(e) => {
-                setTradeDirection("sell");
-                setSellAmount(e.target.value);
-              }}
-            />
-          </section>
-          <label htmlFor="buy" className="text-gray-300 mb-2 mr-2">
-            Buy
+              </SelectContent>
+            </Select>
+          </div>
+          <label htmlFor="sell-amount" className="sr-only">
+            Sell amount
           </label>
-          <section className="flex mb-6 mt-4 items-start justify-center">
-            <label htmlFor="buy-token" className="sr-only"></label>
-            <Image
-              alt={buyToken}
-              className="h-9 w-9 mr-2 rounded-md"
-              src={BASE_TOKENS_BY_SYMBOL[buyToken].logoURI}
-              width={9}
-              height={9}
-            />
-            <select
-              name="buy-token-select"
-              id="buy-token-select"
-              value={buyToken}
-              className="mr-2 w-50 sm:w-full h-9 rounded-md"
-              onChange={(e) => handleBuyTokenChange(e)}
-            >
-              {BASE_TOKENS.map((token) => {
-                return (
-                  <option
-                    key={token.address}
-                    value={token.symbol.toLowerCase()}
-                  >
-                    {token.symbol}
-                  </option>
-                );
-              })}
-            </select>
-            <label htmlFor="buy-amount" className="sr-only"></label>
-            <input
-              id="buy-amount"
-              value={buyAmount}
-              className="h-9 rounded-md bg-white cursor-not-allowed"
-              type="number"
-              style={{ border: "1px solid black" }}
-              disabled
-              onChange={(e) => {
-                setTradeDirection("buy");
-                setBuyAmount(e.target.value);
-              }}
-            />
-          </section>
-
-          {/* Affiliate Fee Display */}
-          {price && price.fees?.integratorFee?.amount && (
-            <div className="text-slate-400">
-              Affiliate Fee:{" "}
-              {formatUnits(
-                BigInt(price.fees.integratorFee.amount),
-                BASE_TOKENS_BY_SYMBOL[buyToken].decimals
-              )}{" "}
-              {BASE_TOKENS_BY_SYMBOL[buyToken].symbol}
-            </div>
-          )}
-
-          {/* Tax Information Display */}
-          {(!!price?.tokenMetadata.buyToken ||
-            !!price?.tokenMetadata.sellToken) && (
-            <div className="text-slate-400">
-              {price.tokenMetadata.buyToken.buyTaxBps != null &&
-                price.tokenMetadata.buyToken.buyTaxBps !== 0 && (
-                  <p>
-                    {BASE_TOKENS_BY_SYMBOL[buyToken].symbol +
-                      ` Buy Tax: ${formatTax(price.tokenMetadata.buyToken.buyTaxBps)}%`}
-                  </p>
-                )}
-              {price.tokenMetadata.sellToken.sellTaxBps != null &&
-                price.tokenMetadata.sellToken.sellTaxBps !== 0 && (
-                  <p>
-                    {BASE_TOKENS_BY_SYMBOL[sellToken].symbol +
-                      ` Sell Tax: ${formatTax(price.tokenMetadata.sellToken.sellTaxBps)}%`}
-                  </p>
-                )}
-            </div>
-          )}
-        </div>
-
-        {!taker && (
-          <ConnectButton.Custom>
-            {({
-              account,
-              chain,
-              openAccountModal,
-              openChainModal,
-              openConnectModal,
-              mounted,
-            }) => {
-              const ready = mounted;
-              const connected = ready && account && chain;
-
-              return (
-                <div
-                  {...(!ready && {
-                    "aria-hidden": true,
-                    style: {
-                      opacity: 0,
-                      pointerEvents: "none",
-                      userSelect: "none",
-                    },
-                  })}
-                >
-                  {(() => {
-                    if (!connected) {
-                      return (
-                        <button
-                          className="w-full bg-blue-600 text-white font-semibold p-2 rounded hover:bg-blue-700"
-                          onClick={openConnectModal}
-                          type="button"
-                        >
-                          Connect Wallet
-                        </button>
-                      );
-                    }
-
-                    if (chain.unsupported) {
-                      return (
-                        <button onClick={openChainModal} type="button">
-                          Wrong network
-                        </button>
-                      );
-                    }
-
-                    return (
-                      <div style={{ display: "flex", gap: 12 }}>
-                        <button
-                          onClick={openChainModal}
-                          style={{ display: "flex", alignItems: "center" }}
-                          type="button"
-                        >
-                          {chain.hasIcon && (
-                            <div
-                              style={{
-                                background: chain.iconBackground,
-                                width: 12,
-                                height: 12,
-                                borderRadius: 999,
-                                overflow: "hidden",
-                                marginRight: 4,
-                              }}
-                            >
-                              {chain.iconUrl && (
-                                <Image
-                                  src={chain.iconUrl}
-                                  alt={chain.name ?? "Chain icon"}
-                                  width={12}
-                                  height={12}
-                                  layout="fixed"
-                                />
-                              )}
-                            </div>
-                          )}
-                          {chain.name}
-                        </button>
-
-                        <button onClick={openAccountModal} type="button">
-                          {account.displayName}
-                          {account.displayBalance
-                            ? ` (${account.displayBalance})`
-                            : ""}
-                        </button>
-                      </div>
-                    );
-                  })()}
-                </div>
-              );
+          <Input
+            id="sell-amount"
+            value={sellAmount}
+            type="number"
+            onChange={(e) => {
+              setSellAmount(e.target.value);
             }}
-          </ConnectButton.Custom>
+          />
+        </section>
+        <Label htmlFor="buy">Buy</Label>
+        <section className="flex mt-4 items-start justify-center">
+          <label htmlFor="buy-token" className="sr-only">
+            Token to buy
+          </label>
+          <Image
+            alt={buyToken}
+            className="h-9 w-9 mr-2 rounded-md"
+            src={BASE_TOKENS_BY_SYMBOL[buyToken].logoURI}
+            width={9}
+            height={9}
+          />
+          <div className="h-14 sm:w-full sm:mr-2">
+            <Select
+              onValueChange={(token) => setBuyToken(token)}
+              value={buyToken}
+            >
+              <SelectTrigger id="buy-token-select">
+                <SelectValue placeholder="Select token to buy" />
+              </SelectTrigger>
+              <SelectContent>
+                {BASE_TOKENS.map((token) => {
+                  return (
+                    <SelectItem
+                      key={token.address}
+                      value={token.symbol.toLowerCase()}
+                    >
+                      {token.symbol}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+          <label htmlFor="buy-amount" className="sr-only">
+            Buy amount
+          </label>
+          <Input id="buy-amount" value={buyAmount} type="number" readOnly />
+        </section>
+
+        {price && price.fees?.integratorFee?.amount && (
+          <div className="text-muted-foreground text-sm mt-4">
+            Affiliate Fee:{" "}
+            {formatUnits(
+              BigInt(price.fees.integratorFee.amount),
+              BASE_TOKENS_BY_SYMBOL[buyToken].decimals
+            )}{" "}
+            {BASE_TOKENS_BY_SYMBOL[buyToken].symbol}
+          </div>
         )}
+
+        {/* Tax Information Display */}
+        {((!!price?.tokenMetadata.buyToken &&
+          price.tokenMetadata.buyToken.buyTaxBps !== 0) ||
+          (!!price?.tokenMetadata.sellToken &&
+            price.tokenMetadata.sellToken.sellTaxBps !== 0)) && (
+          <div className="text-muted-foreground text-sm mt-4">
+            {price.tokenMetadata.buyToken.buyTaxBps != null &&
+              price.tokenMetadata.buyToken.buyTaxBps !== 0 && (
+                <p>
+                  {BASE_TOKENS_BY_SYMBOL[buyToken].symbol +
+                    ` Buy Tax: ${formatTax(price.tokenMetadata.buyToken.buyTaxBps)}%`}
+                </p>
+              )}
+            {price.tokenMetadata.sellToken.sellTaxBps != null &&
+              price.tokenMetadata.sellToken.sellTaxBps !== 0 && (
+                <p>
+                  {BASE_TOKENS_BY_SYMBOL[sellToken].symbol +
+                    ` Sell Tax: ${formatTax(price.tokenMetadata.sellToken.sellTaxBps)}%`}
+                </p>
+              )}
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-end">
+        {!taker && <ConnectButton />}
 
         {!!taker && !!price && price.liquidityAvailable && (
           <ApproveOrReviewButton
@@ -415,12 +304,12 @@ export function PriceView({
         )}
 
         {!!taker && !!price && !price.liquidityAvailable && (
-          <div>
+          <div className="text-red-500">
             <p>No liquidity available for this trade.</p>
           </div>
         )}
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -451,49 +340,29 @@ function ApproveButton({
     writeContractAsync: approveAllowance,
     error: approveAllowanceError,
     isPending: isWritingApproval,
-    status: writeContractStatus,
   } = useWriteContract();
 
-  console.log(
-    "write contract",
-    writeContractStatus,
-    approvalData,
-    approveAllowanceError
-  );
-
-  const { data, status, error } = useSimulateContract({
+  const { data } = useSimulateContract({
     address: sellToken.address,
     abi: sellToken.abi,
     functionName: "approve",
     args: [price.issues.allowance.spender, maxUint256],
   });
 
-  console.log("simulate contract", status, data, error);
-
   const approvalReceipt = useWaitForTransactionReceipt({
     hash: approvalData,
   });
-
-  console.log(
-    "approvalReceipt",
-    approvalReceipt.status,
-    approvalReceipt.data,
-    approvalReceipt.error
-  );
 
   const {
     data: allowance,
     isLoading: isLoadingAllowance,
     refetch: refetchAllowance,
-    status: readContractStatus,
   } = useReadContract({
     address: sellToken.address,
     abi: sellToken.abi,
     functionName: "allowance",
     args: [taker, price.issues.allowance.spender],
   });
-
-  console.log("read contract", readContractStatus, allowance, error);
 
   const handleApproveClick = useCallback(async () => {
     if (allowance !== 0n) {
@@ -531,48 +400,47 @@ function ApproveButton({
     }
   }, [data, refetchAllowance]);
 
-  if (approveAllowanceError || approvalReceipt.error) {
-    return (
-      <div>
-        Something went wrong:{" "}
-        {
-          (
-            approveAllowanceError ||
-            approvalReceipt.error ||
-            new Error("unknown error")
-          ).message
-        }
-      </div>
-    );
-  }
-
   if (isLoadingAllowance) {
     return (
-      <button
-        disabled={disabled}
-        type="button"
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-      >
+      <Button disabled={disabled} type="button" variant="secondary">
         Checking allowance...
-      </button>
+      </Button>
     );
   }
 
-  if ((allowance as bigint) < price.sellAmount) {
-    return (
-      <button
-        type="button"
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-        onClick={handleApproveClick}
-      >
-        {isWritingApproval || approvalReceipt.isLoading
-          ? "Approving..."
-          : "Approve"}
-      </button>
-    );
-  }
+  const insufficientAllowance = (allowance as bigint) < price.sellAmount;
 
-  return <ReviewButton disabled={disabled} onClick={onClick} />;
+  return (
+    <div className="flex flex-col gap-2">
+      {(approveAllowanceError || approvalReceipt.error) && (
+        <div className="text-red-500 text-sm">
+          Something went wrong:{" "}
+          {
+            (
+              approveAllowanceError ||
+              approvalReceipt.error ||
+              new Error("unknown error")
+            ).message
+          }
+        </div>
+      )}
+      {insufficientAllowance ? (
+        <Button
+          className="ml-auto"
+          disabled={isWritingApproval || approvalReceipt.isLoading}
+          type="button"
+          onClick={handleApproveClick}
+          variant="secondary"
+        >
+          {isWritingApproval || approvalReceipt.isLoading
+            ? "Approving..."
+            : "Approve"}
+        </Button>
+      ) : (
+        <ReviewButton disabled={disabled} onClick={onClick} />
+      )}
+    </div>
+  );
 }
 
 function ReviewButton({
@@ -583,14 +451,14 @@ function ReviewButton({
   onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
+    <Button
+      className="ml-auto"
       disabled={disabled}
       onClick={onClick}
-      className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-25"
+      variant="secondary"
     >
       {disabled ? "Insufficient Balance" : "Review Trade"}
-    </button>
+    </Button>
   );
 }
 

@@ -83,16 +83,22 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
         />
       )}
       <BaseCommentForm
+        disabled={!finalizedPrice}
         onSubmit={handleSubmitComment}
         onSubmitSuccess={onSubmitSuccess}
-        renderSubmitButton={({ isSubmitting, isContentValid, formState }) => (
+        renderSubmitButton={({
+          isSubmitting,
+          isContentValid,
+          formState,
+          disabled,
+        }) => (
           <>
             <Button
               name="action"
               value="post"
               type="submit"
               className="px-4 py-2 rounded"
-              disabled={isSubmitting || !isContentValid}
+              disabled={disabled || isSubmitting || !isContentValid}
             >
               {formState === "post" ? "Posting..." : "Swap with comment"}
             </Button>

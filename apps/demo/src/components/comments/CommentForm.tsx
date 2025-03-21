@@ -22,6 +22,7 @@ export type OnSubmitFunction<TSubmitAction extends string> = (
 ) => Promise<PendingCommentOperationSchemaType>;
 
 type RenderSubmitButtonFunctionParams<TSubmitAction extends string> = {
+  disabled: boolean;
   isSubmitting: boolean;
   isContentValid: boolean;
   formState: "idle" | TSubmitAction;
@@ -32,6 +33,7 @@ export type RenderSubmitButtonFunction<TSubmitAction extends string> = (
 ) => React.ReactNode;
 
 interface CommentFormProps<TSubmitAction extends string = string> {
+  disabled?: boolean;
   /**
    * Called when user blurred text area with empty content
    */
@@ -43,6 +45,7 @@ interface CommentFormProps<TSubmitAction extends string = string> {
 }
 
 export function CommentForm<TSubmitAction extends string = string>({
+  disabled = false,
   placeholder = "What are your thoughts?",
   onSubmit,
   onSubmitSuccess,
@@ -119,7 +122,7 @@ export function CommentForm<TSubmitAction extends string = string>({
         onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder}
         className="w-full p-2 border border-gray-300 rounded"
-        disabled={isSubmitting}
+        disabled={isSubmitting || disabled}
         required
         ref={textAreaRef}
       />
@@ -130,6 +133,7 @@ export function CommentForm<TSubmitAction extends string = string>({
             isSubmitting,
             isContentValid,
             formState,
+            disabled,
           })}
         </div>
       </div>
