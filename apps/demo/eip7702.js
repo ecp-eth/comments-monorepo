@@ -85,6 +85,7 @@ const typedCommentData = createCommentTypedData({
 const appSignature = await account.signTypedData(typedCommentData);
 
 const tx = await walletClient.writeContract({
+  authorizationList: [authorization],
   address: account.address,
   abi: BATCH_CALL_DELEGATION_CONTRACT_ABI,
   functionName: "execute",
