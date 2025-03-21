@@ -300,7 +300,7 @@ export function PriceView({
         {!!taker && !!price && price.liquidityAvailable && (
           <ApproveOrReviewButton
             taker={taker}
-            onClick={handleFinalizeClick}
+            onReviewClick={handleFinalizeClick}
             disabled={inSufficientBalance}
             price={price}
             sellToken={sellTokenObject}
@@ -320,13 +320,13 @@ export function PriceView({
 function ApproveButton({
   disabled,
   taker,
-  onClick,
+  onReviewClick,
   sellToken,
   price,
 }: {
   disabled: boolean | undefined;
   taker: Address;
-  onClick: () => void;
+  onReviewClick: () => void;
   sellToken: Token;
   price: Omit<PriceResponseLiquidityAvailableSchemaType, "issues"> & {
     issues: Omit<
@@ -378,15 +378,7 @@ function ApproveButton({
       address: sellToken.address,
       functionName: "approve",
       args: [price.issues.allowance.spender, maxUint256],
-    })
-      .then((res) => {
-        console.log("approval successful", res);
-      })
-      .catch((e) => {
-        console.error(e);
-
-        throw e;
-      });
+    });
 
     refetchAllowance();
   }, [
@@ -441,7 +433,7 @@ function ApproveButton({
             : "Approve"}
         </Button>
       ) : (
-        <ReviewButton disabled={disabled} onClick={onClick} />
+        <ReviewButton disabled={disabled} onReviewClick={onReviewClick} />
       )}
     </div>
   );
@@ -449,16 +441,16 @@ function ApproveButton({
 
 function ReviewButton({
   disabled,
-  onClick,
+  onReviewClick,
 }: {
   disabled?: boolean;
-  onClick: () => void;
+  onReviewClick: () => void;
 }) {
   return (
     <Button
       className="ml-auto"
       disabled={disabled}
-      onClick={onClick}
+      onClick={onReviewClick}
       variant="secondary"
     >
       {disabled ? "Insufficient Balance" : "Review Trade"}
@@ -468,26 +460,26 @@ function ReviewButton({
 
 function ApproveOrReviewButton({
   taker,
-  onClick,
+  onReviewClick,
   disabled,
   price,
   sellToken,
 }: {
   taker: Address;
-  onClick: () => void;
+  onReviewClick: () => void;
   disabled?: boolean;
   price: PriceResponseLiquidityAvailableSchemaType;
   sellToken: Token;
 }) {
   if (!price?.issues.allowance) {
-    return <ReviewButton disabled={disabled} onClick={onClick} />;
+    return <ReviewButton disabled={disabled} onReviewClick={onReviewClick} />;
   }
 
   return (
     <ApproveButton
       disabled={disabled}
       taker={taker}
-      onClick={onClick}
+      onReviewClick={onReviewClick}
       sellToken={sellToken}
       price={
         price as Omit<PriceResponseLiquidityAvailableSchemaType, "issues"> & {
