@@ -2,6 +2,23 @@ import { createHash } from "node:crypto";
 import { getDb } from "../db";
 import { toHex } from "viem";
 
+export async function deleteCachedGetBlockRpcResponse(
+  blockNumber: bigint,
+  chainId: number
+) {
+  const db = getDb();
+
+  if (!db) {
+    throw new Error("Database not found");
+  }
+
+  await db
+    .deleteFrom("rpc_request_results")
+    .where("request_hash", "=", createRequestHash(blockNumber))
+    .where("chain_id", "=", chainId)
+    .execute();
+}
+
 /**
  * This function removes cached result from rpc response because we aren't interested in the result anymore
  */

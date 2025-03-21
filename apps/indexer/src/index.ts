@@ -1,6 +1,6 @@
 import { ponder } from "ponder:registry";
 import schema from "ponder:schema";
-import { getAddress } from "viem";
+import { BlockNotFoundError, getAddress } from "viem";
 import {
   transformCommentParentId,
   transformCommentTargetUri,
@@ -9,6 +9,8 @@ import { processTransactionsBlock } from "./lib/process-transactions-block";
 // import { isProfane } from "./lib/profanity-detection";
 import { initializeManagement } from "./management";
 import { getMutedAccount } from "./management/services/muted-accounts";
+import { tryAsync } from "./lib/try-async";
+import { deleteCachedGetBlockRpcResponse } from "./lib/ponder-rpc-results-cache";
 
 await initializeManagement();
 
@@ -92,5 +94,19 @@ ponder.on("CommentsV1:ApprovalRemoved", async ({ event, context }) => {
 });
 
 ponder.on("Transactions:block", async (arg) => {
-  await processTransactionsBlock(arg);
+  await tryAsync(
+    () => {
+      return processTransactionsBlock(arg);
+    },
+    {
+      async onError(error) {
+        if (error instanceof BlockNotFoundError) {
+          await deleteCachedGetBlockRpcResponse(
+            arg.event.block.number,
+            arg.context.network.chainId
+          );
+        }
+      },
+    }
+  );
 });
