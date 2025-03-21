@@ -16,9 +16,22 @@ import {
   createCommentTypedData,
 } from "@ecp.eth/sdk";
 
+/**
+ * Private key of your test wallet
+ */
 const YOUR_PRIVATE_KEY = "0x";
+/**
+ * Check .env.example
+ */
 const BATCH_CALL_DELEGATION_CONTRACT_ADDRESS = "0x";
+/**
+ * Check .env.example
+ */
 const YOINK_CONTRACT_ADDRESS = "0x";
+/**
+ * Check .env file
+ */
+const APP_SIGNER_PRIVATE_KEY = "0x";
 
 const BATCH_CALL_DELEGATION_CONTRACT_ABI = [
   {
