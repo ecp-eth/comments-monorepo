@@ -5,7 +5,7 @@ import {
 } from "../CommentForm";
 import { submitCommentMutationFunction } from "../queries";
 import { useCallback, useState } from "react";
-import { chain } from "@/lib/wagmi";
+// import { chain } from "@/lib/wagmi";
 import {
   useAccount,
   useChainId,
@@ -21,7 +21,7 @@ import type {
   PriceResponseLiquidityAvailableSchemaType,
   QuoteResponseLiquidityAvailableSchemaType,
 } from "./0x/schemas";
-import { createCommentSuffixData } from "@ecp.eth/sdk";
+// import { createCommentSuffixData } from "@ecp.eth/sdk";
 
 type CommentFormProps = {
   parentId?: Hex;
@@ -61,7 +61,6 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
       const result = await submitCommentMutationFunction({
         address,
         commentRequest: {
-          chainId: chain.id,
           content,
           targetUri: window.location.href,
           parentId,
@@ -70,16 +69,17 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
           return switchChainAsync({ chainId });
         },
         writeContractAsync(params) {
-          const commentDataSuffix = createCommentSuffixData({
-            commentData: params.data,
-            appSignature: params.signature,
-          });
+          // TODO: to be replaced with EIP 7702
+          // const commentDataSuffix = createCommentSuffixData({
+          //   commentData: params.data,
+          //   appSignature: params.signature,
+          // });
 
           quote.transaction.data = concat([
             transactionData,
             sigLengthHex,
             sig,
-            commentDataSuffix,
+            // commentDataSuffix,
           ]);
 
           return sendTransactionAsync({

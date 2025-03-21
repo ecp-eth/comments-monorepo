@@ -9,11 +9,15 @@ import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import {
   createCommentData,
   createCommentTypedData,
+  getNonce,
   isMuted,
 } from "@ecp.eth/sdk";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
+import { chain } from "@/lib/wagmi";
+
+const chainId = chain.id;
 
 export async function POST(
   req: Request
@@ -34,8 +38,7 @@ export async function POST(
     );
   }
 
-  const { content, targetUri, parentId, chainId, author } =
-    parsedBodyResult.data;
+  const { content, targetUri, parentId, author } = parsedBodyResult.data;
 
   // Validate target URL is valid
   if (!targetUri.startsWith(env.APP_URL!)) {
@@ -76,14 +79,20 @@ export async function POST(
     );
   }
 
-  const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+  const appSigner = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+  const nonce = await getNonce({
+    author,
+    appSigner: appSigner.address,
+    chain,
+  });
 
   const commentData = createCommentData({
     content,
     targetUri,
     parentId,
     author,
-    appSigner: account.address,
+    appSigner: appSigner.address,
+    nonce,
   });
 
   const typedCommentData = createCommentTypedData({
@@ -91,7 +100,7 @@ export async function POST(
     chainId,
   });
 
-  const signature = await account.signTypedData(typedCommentData);
+  const signature = await appSigner.signTypedData(typedCommentData);
 
   const hash = hashTypedData(typedCommentData);
 

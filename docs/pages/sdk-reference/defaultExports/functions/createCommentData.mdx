@@ -8,7 +8,7 @@
 
 > **createCommentData**(`__namedParameters`): `object`
 
-Defined in: [packages/sdk/src/utils.ts:110](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L110)
+Defined in: [packages/sdk/src/utils.ts:36](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L36)
 
 Create the data structure of a comment
 
@@ -46,17 +46,17 @@ The deadline of the comment submission in seconds since epoch
 
 Metadata about the comment
 
+#### nonce
+
+`bigint`
+
+The current nonce per user per app on the chain
+
 #### parentId?
 
 `` `0x${string}` ``
 
 The ID of the parent comment
-
-#### salt?
-
-`` `0x${string}` ``
-
-Randomly generated salt for creating a unique comment id
 
 #### targetUri?
 
@@ -90,13 +90,13 @@ The data structure of a comment
 
 > **metadata**: `string`
 
+### nonce
+
+> **nonce**: `bigint`
+
 ### parentId
 
 > **parentId**: `` `0x${string}` `` = `HexSchema`
-
-### salt
-
-> **salt**: `` `0x${string}` `` = `HexSchema`
 
 ### targetUri
 

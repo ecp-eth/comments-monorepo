@@ -1,8 +1,4 @@
-import {
-  COMMENTS_V1_ADDRESS,
-  CommentsV1Abi,
-  createCommentSuffixData,
-} from "@ecp.eth/sdk";
+import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { CommentData } from "@ecp.eth/sdk/schemas";
 import { Hex, parseAbi } from "viem";
 import { UseWriteContractReturnType } from "wagmi";
@@ -18,10 +14,11 @@ export const postCommentViaYoink = async (
   { appSignature, commentData }: PostCommentViaContractParams,
   writeContractAsync: UseWriteContractReturnType["writeContractAsync"]
 ) => {
-  const commentDataSuffix = createCommentSuffixData({
-    commentData,
-    appSignature,
-  });
+  // TODO: replace it with EIP-7702
+  // const commentDataSuffix = createCommentSuffixData({
+  //   commentData,
+  //   appSignature,
+  // });
 
   return await writeContractAsync({
     address:
@@ -30,7 +27,7 @@ export const postCommentViaYoink = async (
     abi: parseAbi(["function yoink()"]),
     functionName: "yoink",
     args: [],
-    dataSuffix: commentDataSuffix,
+    // dataSuffix: commentDataSuffix,
   });
 };
 

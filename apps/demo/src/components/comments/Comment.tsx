@@ -25,6 +25,7 @@ import never from "never";
 import { toast } from "sonner";
 import { CommentShared } from "./CommentShared";
 import { CommentDefaultForm } from "./CommentDefaultForm";
+import { postCommentAsAuthorViaCommentsV1 } from "@/lib/contract";
 
 interface CommentProps {
   comment: CommentType;
@@ -83,7 +84,6 @@ export function Comment({
       return submitCommentMutationFunction({
         address,
         commentRequest: {
-          chainId: comment.pendingOperation.chainId,
           content: comment.pendingOperation.response.data.content,
           parentId: comment.pendingOperation.response.data.parentId,
           targetUri: comment.pendingOperation.response.data.targetUri,
@@ -91,13 +91,14 @@ export function Comment({
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        writeContractAsync(params) {
-          return writeContractAsync({
-            abi: CommentsV1Abi,
-            address: COMMENTS_V1_ADDRESS,
-            functionName: "postCommentAsAuthor",
-            args: [params.data, params.signature],
-          });
+        async writeContractAsync({
+          signature: appSignature,
+          data: commentData,
+        }) {
+          return await postCommentAsAuthorViaCommentsV1(
+            { appSignature, commentData },
+            writeContractAsync
+          );
         },
       });
     },

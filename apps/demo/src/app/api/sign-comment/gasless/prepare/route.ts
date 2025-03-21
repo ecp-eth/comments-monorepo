@@ -15,6 +15,7 @@ import {
   CommentsV1Abi,
   createCommentData,
   createCommentTypedData,
+  getNonce,
   isMuted,
 } from "@ecp.eth/sdk";
 import { createWalletClient, hashTypedData, publicActions } from "viem";
@@ -84,14 +85,21 @@ export async function POST(
     );
   }
 
-  const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+  const appSigner = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+
+  const nonce = await getNonce({
+    author,
+    appSigner: appSigner.address,
+    chain: chain,
+  });
 
   const commentData = createCommentData({
     content,
     targetUri,
     parentId,
     author,
-    appSigner: account.address,
+    appSigner: appSigner.address,
+    nonce,
   });
 
   const chainId = chain.id;
@@ -101,7 +109,7 @@ export async function POST(
     chainId,
   });
 
-  const signature = await account.signTypedData(typedCommentData);
+  const signature = await appSigner.signTypedData(typedCommentData);
   const commentId = hashTypedData(typedCommentData);
 
   if (submitIfApproved) {
@@ -117,7 +125,7 @@ export async function POST(
       address: COMMENTS_V1_ADDRESS,
       abi: CommentsV1Abi,
       functionName: "isApproved",
-      args: [author, account.address],
+      args: [author, appSigner.address],
     });
 
     if (isApproved) {
@@ -125,7 +133,7 @@ export async function POST(
       const isAppSignatureValid = await walletClient.verifyTypedData({
         ...typedCommentData,
         signature,
-        address: account.address,
+        address: appSigner.address,
       });
 
       if (!isAppSignatureValid) {

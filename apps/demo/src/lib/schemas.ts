@@ -159,7 +159,6 @@ export const SignCommentPayloadRequestSchema = z.object({
     .refine((val) => !isProfane(val), "Comment contains profanity"), */
   targetUri: z.string().url(),
   parentId: HexSchema.optional(),
-  chainId: z.number(),
 });
 
 export type SignCommentPayloadRequestSchemaType = z.infer<

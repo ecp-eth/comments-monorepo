@@ -83,7 +83,6 @@ export function Comment({
       return submitCommentMutationFunction({
         address,
         commentRequest: {
-          chainId: comment.pendingOperation.chainId,
           content: comment.pendingOperation.response.data.content,
           parentId: comment.pendingOperation.response.data.parentId,
           targetUri: comment.pendingOperation.response.data.targetUri,

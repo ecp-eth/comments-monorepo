@@ -7,10 +7,7 @@ import {
   InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
-import {
-  chain,
-  transport,
-} from "@/lib/wagmi";
+import { chain, transport } from "@/lib/wagmi";
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -40,9 +37,7 @@ export async function POST(
     parsedBodyResult.data;
 
   // Check that signature is from the app signer
-  const appSigner = privateKeyToAccount(
-    env.APP_SIGNER_PRIVATE_KEY
-  );
+  const appSigner = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
 
   // Can be any account with funds for gas on desired chain
   const submitterAccount = await resolveSubmitterAccount();
@@ -87,7 +82,7 @@ export async function POST(
           parentId: signTypedDataParams.message.parentId,
           targetUri: signTypedDataParams.message.targetUri,
           deadline: signTypedDataParams.message.deadline,
-          salt: signTypedDataParams.message.salt,
+          nonce: signTypedDataParams.message.nonce,
         },
         authorSignature,
         appSignature,

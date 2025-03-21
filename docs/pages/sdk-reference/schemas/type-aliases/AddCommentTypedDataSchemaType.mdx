@@ -26,7 +26,7 @@ Defined in: [packages/sdk/src/schemas.ts:373](https://github.com/ecp-eth/comment
 
 #### domain.verifyingContract
 
-> **verifyingContract**: `"0xC7f0A5d16C05862292796cFB363e83d8d7c4a694"`
+> **verifyingContract**: `"0xabD9cE1952992211dEe051Df6ed337fa6efC995d"`
 
 #### domain.version
 
@@ -56,13 +56,13 @@ Defined in: [packages/sdk/src/schemas.ts:373](https://github.com/ecp-eth/comment
 
 > **metadata**: `string`
 
+#### message.nonce
+
+> **nonce**: `bigint`
+
 #### message.parentId
 
 > **parentId**: `` `0x${string}` `` = `HexSchema`
-
-#### message.salt
-
-> **salt**: `` `0x${string}` `` = `HexSchema`
 
 #### message.targetUri
 
@@ -78,4 +78,4 @@ Defined in: [packages/sdk/src/schemas.ts:373](https://github.com/ecp-eth/comment
 
 #### types.AddComment
 
-> **AddComment**: (\{ `name`: `"content"`; `type`: `"string"`; \} \| \{ `name`: `"metadata"`; `type`: `"string"`; \} \| \{ `name`: `"targetUri"`; `type`: `"string"`; \} \| \{ `name`: `"parentId"`; `type`: `"bytes32"`; \} \| \{ `name`: `"author"`; `type`: `"address"`; \} \| \{ `name`: `"appSigner"`; `type`: `"address"`; \} \| \{ `name`: `"salt"`; `type`: `"bytes32"`; \} \| \{ `name`: `"deadline"`; `type`: `"uint256"`; \})[]
+> **AddComment**: (\{ `name`: `"content"`; `type`: `"string"`; \} \| \{ `name`: `"metadata"`; `type`: `"string"`; \} \| \{ `name`: `"targetUri"`; `type`: `"string"`; \} \| \{ `name`: `"parentId"`; `type`: `"bytes32"`; \} \| \{ `name`: `"author"`; `type`: `"address"`; \} \| \{ `name`: `"appSigner"`; `type`: `"address"`; \} \| \{ `name`: `"nonce"`; `type`: `"uint256"`; \} \| \{ `name`: `"deadline"`; `type`: `"uint256"`; \})[]

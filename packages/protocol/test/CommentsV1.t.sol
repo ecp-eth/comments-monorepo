@@ -34,7 +34,8 @@ contract CommentsV1Test is Test {
         view
         returns (CommentsV1.CommentData memory)
     {
-        bytes32 salt = bytes32(uint256(1));
+
+        uint256 nonce = comments.nonces(author, appSigner);
 
         return
             CommentsV1.CommentData({
@@ -44,7 +45,7 @@ contract CommentsV1Test is Test {
                 parentId: bytes32(0),
                 author: author,
                 appSigner: appSigner,
-                salt: salt,
+                nonce: nonce,
                 deadline: block.timestamp + 1 days
             });
     }
@@ -173,6 +174,30 @@ contract CommentsV1Test is Test {
             wrongSignature,
             wrongSignature
         );
+    }
+
+    function test_PostCommentAsAuthor_InvalidNonce() public {
+        CommentsV1.CommentData memory commentData = _createBasicComment();
+        commentData.nonce = commentData.nonce + 1;
+
+        bytes32 commentId = comments.getCommentId(commentData);
+        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+
+        vm.prank(author);
+        vm.expectRevert(CommentsV1.InvalidNonce.selector);
+        comments.postCommentAsAuthor(commentData, appSignature);
+    }
+
+    function test_PostComment_InvalidNonce() public {
+        CommentsV1.CommentData memory commentData = _createBasicComment();
+        commentData.nonce = commentData.nonce + 1;
+
+        bytes32 commentId = comments.getCommentId(commentData);
+        bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+
+        vm.expectRevert(CommentsV1.InvalidNonce.selector);
+        comments.postComment(commentData, authorSignature, appSignature);
     }
 
     function test_AddApprovalAsAuthor() public {

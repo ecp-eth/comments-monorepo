@@ -7,7 +7,7 @@ import type {
 } from "./schemas.js";
 import { getCommentCursor } from "@ecp.eth/sdk";
 import type { InfiniteData } from "@tanstack/react-query";
-import type { Hex } from "viem";
+import type { Chain, Hex } from "viem";
 import { AuthorType } from "./types.js";
 import { z } from "zod";
 
@@ -366,4 +366,16 @@ export function truncateText(
   }
 
   return truncated.slice(0, maxLength).trim() + "...";
+}
+
+export function getChainById(
+  id: number,
+  chains: Readonly<Chain[]>
+): Chain | undefined {
+  for (const [, chain] of Object.entries(chains)) {
+    if (chain.id === id) {
+      return chain;
+    }
+  }
+  return undefined;
 }
