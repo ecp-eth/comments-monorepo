@@ -95,7 +95,7 @@ const typedCommentData = createCommentTypedData({
   chainId: anvil.id,
 });
 
-const appSignature = await account.signTypedData(typedCommentData);
+const appSignature = await signerAccount.signTypedData(typedCommentData);
 
 const tx = await walletClient.writeContract({
   authorizationList: [authorization],
