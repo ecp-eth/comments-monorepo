@@ -1,7 +1,7 @@
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { CommentData } from "@ecp.eth/sdk/schemas";
-import { Hex } from "viem";
-import { UseWriteContractReturnType } from "wagmi";
+import type { Hex } from "viem";
+import type { UseWriteContractReturnType } from "wagmi";
 
 type PostCommentViaContractParams = {
   commentData: CommentData;
