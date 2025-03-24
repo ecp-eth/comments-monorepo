@@ -2,11 +2,11 @@ import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import {
   getCommentAuthorNameOrAddress,
   formatDate,
-  formatDateRelative,
 } from "@ecp.eth/shared/helpers";
 import { formatAuthorLink } from "@/lib/utils";
 import Link from "next/link";
 import { AuthorType } from "@ecp.eth/shared/types";
+import { useCommentRelativeTime } from "@ecp.eth/shared/hooks";
 
 type CommentAuthorProps = {
   author: AuthorType;
@@ -21,6 +21,10 @@ export function CommentAuthor({
 }: CommentAuthorProps) {
   const authorNameOrAddress = getCommentAuthorNameOrAddress(author);
   const authorUrl = formatAuthorLink(author);
+  const commentRelativeTime = useCommentRelativeTime(
+    timestamp,
+    currentTimestamp
+  );
 
   return (
     <div className="flex items-center gap-2">
@@ -33,10 +37,7 @@ export function CommentAuthor({
         ) : (
           <span>{authorNameOrAddress}</span>
         )}{" "}
-        •{" "}
-        <span title={formatDate(timestamp)}>
-          {formatDateRelative(timestamp, currentTimestamp)}
-        </span>
+        • <span title={formatDate(timestamp)}>{commentRelativeTime}</span>
       </div>
     </div>
   );
