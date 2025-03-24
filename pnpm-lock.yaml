@@ -375,6 +375,9 @@ importers:
       '@types/pg':
         specifier: ^8.11.11
         version: 8.11.11
+      eslint:
+        specifier: ^9.19.0
+        version: 9.19.0(jiti@2.4.2)
 
   docs:
     dependencies:
@@ -564,6 +567,9 @@ importers:
       '@types/react':
         specifier: ^19.0.8
         version: 19.0.8
+      eslint:
+        specifier: ^9.19.0
+        version: 9.19.0(jiti@2.4.2)
       react:
         specifier: 18 || 19
         version: 19.0.0
