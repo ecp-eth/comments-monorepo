@@ -32,13 +32,15 @@
     "normalize-url": "^8.0.1",
     "obscenity": "^0.4.3",
     "pg": "^8.11.3",
-    "ponder": "^0.9.23",
+    "ponder": "^0.9.24",
     "viem": "^2.22.21",
     "xxhash-wasm": "^1.1.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@ecp.eth/eslint-config": "workspace:^",
     "@types/node": "^22.13.1",
-    "@types/pg": "^8.11.11"
+    "@types/pg": "^8.11.11",
+    "eslint": "^9.19.0"
   }
 }

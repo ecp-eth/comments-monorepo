@@ -7,7 +7,7 @@ The example showcases how to integrate the Ethereum Comments Protocol into a Nex
 - Customize the comment embed appearance
 - Handle dark/light theme modes
 
-[See it in action](https://demo-blog.ethcomments.xyz/)
+[See it in action](https://demo-blog.ethcomments.xyz/blog/spaces-vs-tabs)
 [Source code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/embed-demo-blog)
 
 ## Installation
