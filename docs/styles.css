@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+:root {
+  --vocs-color_border: #e0e0e0;
+}
+
 @theme {
   --color-input: var(--vocs-color_background3);
   --color-input-border: var(--vocs-color_border);
