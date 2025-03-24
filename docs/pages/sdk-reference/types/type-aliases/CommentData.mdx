@@ -44,6 +44,12 @@ The deadline of the comment submission in seconds since epoch
 
 Metadata about the comment
 
+### nonce
+
+> **nonce**: `bigint`
+
+The nonce for the user per app
+
 ### parentId
 
 > **parentId**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
@@ -53,12 +59,6 @@ id of parent comments if it has one, 0x for no parent comment
 #### Remarks
 
 This zero address (32 bytes of zeros) indicates the comment has no parent and is a top-level comment
-
-### salt
-
-> **salt**: [`Hex`](/sdk-reference/types/type-aliases/Hex.mdx)
-
-Random salt for the comment
 
 ### targetUri
 

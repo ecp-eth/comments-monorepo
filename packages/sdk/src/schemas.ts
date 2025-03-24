@@ -30,7 +30,7 @@ export const CommentDataSchema = z.object({
   parentId: HexSchema,
   author: HexSchema,
   appSigner: HexSchema,
-  salt: HexSchema,
+  nonce: z.coerce.bigint(),
   deadline: z.coerce.bigint(),
 });
 
@@ -363,7 +363,7 @@ export const AddCommentTypedDataSchema = z.object({
         z.object({ name: z.literal("parentId"), type: z.literal("bytes32") }),
         z.object({ name: z.literal("author"), type: z.literal("address") }),
         z.object({ name: z.literal("appSigner"), type: z.literal("address") }),
-        z.object({ name: z.literal("salt"), type: z.literal("bytes32") }),
+        z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
       ])
     ),

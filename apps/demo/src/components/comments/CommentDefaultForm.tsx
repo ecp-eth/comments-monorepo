@@ -2,7 +2,6 @@ import type { Hex } from "viem";
 import { CommentForm, type OnSubmitFunction } from "./CommentForm";
 import { submitCommentMutationFunction } from "./queries";
 import { useCallback } from "react";
-import { chain } from "@/lib/wagmi";
 import { useSwitchChain, useWriteContract } from "wagmi";
 import {
   postCommentAsAuthorViaCommentsV1,
@@ -29,7 +28,6 @@ export function CommentDefaultForm({
       const result = await submitCommentMutationFunction({
         address,
         commentRequest: {
-          chainId: chain.id,
           content,
           targetUri: window.location.href,
           parentId,

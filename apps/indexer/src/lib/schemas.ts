@@ -1,7 +1,6 @@
 import { HexSchema, IndexerAPIPaginationSchema } from "@ecp.eth/sdk/schemas";
 import { z } from "@hono/zod-openapi";
 import { normalizeUrl } from "./utils";
-import { COMMENT_CALLDATA_SUFFIX_DELIMITER } from "@ecp.eth/sdk";
 import { hexToString } from "viem";
 
 /**
@@ -196,26 +195,4 @@ export const GetApprovalSchema = z.object({
 export const GetApprovalsResponseSchema = z.object({
   results: z.array(GetApprovalSchema),
   pagination: IndexerAPIPaginationSchema,
-});
-
-export const BlockTransactionSchema = z.object({
-  input: HexSchema.transform((val, ctx) => {
-    const [, encodedCommentData] = val.split(
-      COMMENT_CALLDATA_SUFFIX_DELIMITER.slice(2)
-    );
-
-    if (!encodedCommentData || encodedCommentData.length === 0) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Transaction does not contain comment data",
-        path: ["input"],
-      });
-
-      return z.NEVER;
-    }
-
-    return {
-      encodedCommentData,
-    };
-  }),
 });

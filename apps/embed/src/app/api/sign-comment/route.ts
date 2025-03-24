@@ -3,15 +3,17 @@ import {
   SignCommentPayloadRequestSchema,
   SignCommentResponseServerSchema,
 } from "@/lib/schemas";
-import { bigintReplacer } from "@ecp.eth/shared/helpers";
+import { bigintReplacer, getChainById } from "@ecp.eth/shared/helpers";
 import {
   createCommentData,
   createCommentTypedData,
+  getNonce,
   isMuted,
 } from "@ecp.eth/sdk";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
+import { chains } from "@/lib/wagmi";
 
 export async function POST(req: Request) {
   const parseResult = SignCommentPayloadRequestSchema.safeParse(
@@ -60,7 +62,24 @@ export async function POST(req: Request) {
     );
   }
 
+  const selectedChain = getChainById(chainId, chains);
+
+  if (!selectedChain) {
+    return Response.json(
+      {
+        error: "Chain not supported",
+      },
+      { status: 400 }
+    );
+  }
+
   const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+
+  const nonce = await getNonce({
+    author,
+    appSigner: account.address,
+    chain: selectedChain,
+  });
 
   const commentData = createCommentData({
     content,
@@ -68,6 +87,7 @@ export async function POST(req: Request) {
     parentId,
     author,
     appSigner: account.address,
+    nonce,
   });
 
   const typedCommentData = createCommentTypedData({

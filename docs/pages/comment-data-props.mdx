@@ -43,10 +43,11 @@ The `author` property is used to store the author's address. It is the address o
 
 The `appSigner` property is used to store the app signer's address.
 
-## `salt`
+## `nonce`
 
-The `salt` property is a randomly generated 32-byte data.
+An integer value that prevents replay attacks, this value is automatically incremented with each action per user per app.
 
+- It is used to prevent replay attacks.
 - It is used as part of the hashing process to generate a unique comment id.
 
 ## `deadline`
@@ -54,5 +55,4 @@ The `salt` property is a randomly generated 32-byte data.
 The deadline is a timestamp in seconds since the epoch. Posting a comment with an expired deadline will result in the transaction being reverted.
 
 - It must be a future timestamp.
-- It is used to prevent replay attacks, so ensure it is not set to a value too large.
 - It provides a guarantee around the timestamp when the user or app countersigned the comment.

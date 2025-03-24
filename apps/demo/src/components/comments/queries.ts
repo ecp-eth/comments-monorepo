@@ -24,6 +24,7 @@ import {
   InvalidCommentError,
 } from "./errors";
 import type { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/schemas";
+import { chain } from "@/lib/wagmi";
 
 export class SubmitCommentMutationError extends Error {}
 
@@ -66,7 +67,11 @@ export async function submitCommentMutationFunction({
 
   const commentData = parseResult.data;
 
-  const chain = await switchChainAsync(commentData.chainId);
+  const switchedChain = await switchChainAsync(chain.id);
+
+  if (switchedChain.id !== chain.id) {
+    throw new SubmitCommentMutationError("Failed to switch chain.");
+  }
 
   const response = await fetch("/api/sign-comment", {
     method: "POST",

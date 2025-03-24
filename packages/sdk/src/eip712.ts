@@ -9,7 +9,7 @@ export const COMMENT_TYPE = {
     { name: "parentId", type: "bytes32" },
     { name: "author", type: "address" },
     { name: "appSigner", type: "address" },
-    { name: "salt", type: "bytes32" },
+    { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
   ],
 } as const;
