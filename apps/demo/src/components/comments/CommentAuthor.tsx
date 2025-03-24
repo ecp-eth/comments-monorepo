@@ -3,11 +3,11 @@ import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
 import {
   getCommentAuthorNameOrAddress,
   formatDate,
-  formatDateRelative,
 } from "@ecp.eth/shared/helpers";
 import Link from "next/link";
 import { formatAuthorLink } from "@/lib/utils";
 import { AuthorType } from "@ecp.eth/shared/types";
+import { useCommentRelativeTime } from "@ecp.eth/shared/hooks";
 
 type CommentAuthorProps = {
   author: AuthorType;
@@ -18,6 +18,7 @@ export function CommentAuthor({ author, timestamp }: CommentAuthorProps) {
   const enrichedAuthor = useEnrichedAuthor(author);
   const authorNameOrAddress = getCommentAuthorNameOrAddress(enrichedAuthor);
   const authorUrl = formatAuthorLink(enrichedAuthor);
+  const commentRelativeTime = useCommentRelativeTime(timestamp, Date.now());
 
   return (
     <div className="flex items-center gap-2">
@@ -30,10 +31,7 @@ export function CommentAuthor({ author, timestamp }: CommentAuthorProps) {
         ) : (
           <span>{authorNameOrAddress}</span>
         )}{" "}
-        •{" "}
-        <span title={formatDate(timestamp)}>
-          {formatDateRelative(timestamp, Date.now())}
-        </span>
+        • <span title={formatDate(timestamp)}>{commentRelativeTime}</span>
       </div>
     </div>
   );

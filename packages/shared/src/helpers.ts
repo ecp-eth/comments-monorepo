@@ -267,14 +267,44 @@ export function formatDateRelative(
 ): string {
   const date = new Date(timestamp);
   const diffInMs = date.getTime() - now;
+  const diffInSeconds = Math.round(diffInMs / 1000);
+  const diffInMinutes = Math.round(diffInMs / (1000 * 60));
+  const diffInHours = Math.round(diffInMs / (1000 * 60 * 60));
   const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24));
+  const diffInWeeks = Math.round(diffInMs / (1000 * 60 * 60 * 24 * 7));
+  const diffInMonths = Math.round(diffInMs / (1000 * 60 * 60 * 24 * 30));
+  const diffInYears = Math.round(diffInMs / (1000 * 60 * 60 * 24 * 365));
 
-  // implement content negotiation and use the Accept-Language header to determine the locale
-  // for now, we only support English since the UI is not translated
-  return new Intl.RelativeTimeFormat("en-US", { numeric: "auto" }).format(
-    diffInDays,
-    "day"
-  );
+  const formatter = new Intl.RelativeTimeFormat("en-US", {
+    numeric: "auto",
+  });
+
+  // use "now" if less than 60 seconds
+  if (Math.abs(diffInSeconds) < 60) {
+    return formatter.format(0, "second");
+  }
+
+  if (Math.abs(diffInMinutes) < 60) {
+    return formatter.format(diffInMinutes, "minute");
+  }
+
+  if (Math.abs(diffInHours) < 24) {
+    return formatter.format(diffInHours, "hour");
+  }
+
+  if (Math.abs(diffInDays) < 7) {
+    return formatter.format(diffInDays, "day");
+  }
+
+  if (Math.abs(diffInWeeks) < 4) {
+    return formatter.format(diffInWeeks, "week");
+  }
+
+  if (Math.abs(diffInMonths) < 12) {
+    return formatter.format(diffInMonths, "month");
+  }
+
+  return formatter.format(diffInYears, "year");
 }
 
 /**
