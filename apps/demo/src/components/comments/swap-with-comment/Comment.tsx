@@ -20,11 +20,11 @@ import {
 } from "@ecp.eth/shared/hooks";
 import { type Comment as CommentType } from "@/lib/schemas";
 import { useMutation } from "@tanstack/react-query";
-import { submitCommentMutationFunction } from "./queries";
+import { submitCommentMutationFunction } from "../queries";
 import never from "never";
 import { toast } from "sonner";
-import { CommentShared } from "./CommentShared";
-import { CommentDefaultForm } from "./CommentDefaultForm";
+import { CommentShared } from "../CommentShared";
+import { CommentDefaultForm } from "../CommentDefaultForm";
 
 interface CommentProps {
   comment: CommentType;

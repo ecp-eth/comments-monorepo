@@ -10,7 +10,6 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { CommentBoxGasless } from "./CommentBoxGasless";
 import { CommentGasless } from "./CommentGasless";
 import { COMMENTS_V1_ADDRESS, fetchComments } from "@ecp.eth/sdk";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
@@ -36,6 +35,7 @@ import {
   CommentGaslessProvider,
   CommentGaslessProviderContextType,
 } from "./CommentGaslessProvider";
+import { CommentGaslessForm } from "./CommentGaslessForm";
 
 export function CommentSectionGasless() {
   const { address: connectedAddress } = useAccount();
@@ -286,8 +286,7 @@ export function CommentSectionGasless() {
             </div>
           )
         )}
-
-        <CommentBoxGasless onSubmitSuccess={handleCommentSubmitted} />
+        <CommentGaslessForm onSubmitSuccess={handleCommentSubmitted} />
         {hasNewComments && (
           <Button
             className="mb-4"

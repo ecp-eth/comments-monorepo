@@ -9,7 +9,7 @@ import {
   COMMENTS_PER_PAGE,
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
   useHandleCommentDeleted,
   useHandleCommentSubmitted,
@@ -17,7 +17,7 @@ import {
   useNewCommentsChecker,
 } from "@ecp.eth/shared/hooks";
 import type { Hex } from "viem";
-import { CommentDefaultForm } from "./CommentDefaultForm";
+import { CommentForm } from "./CommentForm";
 
 export function CommentSection() {
   const [currentUrl, setCurrentUrl] = useState<string>("");
@@ -99,7 +99,7 @@ export function CommentSection() {
   return (
     <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
-      <CommentDefaultForm onSubmitSuccess={handleCommentSubmitted} />
+      <CommentForm onSubmitSuccess={handleCommentSubmitted} />
       {hasNewComments && (
         <Button
           className="mb-4"

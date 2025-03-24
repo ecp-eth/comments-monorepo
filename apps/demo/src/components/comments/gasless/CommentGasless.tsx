@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { CommentBoxGasless } from "./CommentBoxGasless";
 import { useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/publicEnv";
 import {
@@ -19,6 +18,7 @@ import { toast } from "sonner";
 import never from "never";
 import { CommentShared } from "../CommentShared";
 import { useCommentGaslessContext } from "./CommentGaslessProvider";
+import { CommentGaslessForm } from "./CommentGaslessForm";
 
 interface CommentProps {
   comment: CommentType;
@@ -151,7 +151,7 @@ export function CommentGasless({
       onReplySubmitSuccess={handleCommentSubmitted}
       level={level}
       ReplyComponent={CommentGasless}
-      ReplyFormComponent={CommentBoxGasless}
+      ReplyFormComponent={CommentGaslessForm}
       onDeleteClick={handleDeleteClick}
     />
   );

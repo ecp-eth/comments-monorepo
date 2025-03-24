@@ -1,17 +1,19 @@
 "use client";
 
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { CommentSection } from "../components/comments/CommentSection";
-import { CommentSectionGasless } from "../components/comments/gasless/CommentSectionGasless";
+import { CommentSection } from "@/components/comments/CommentSection";
+import { CommentSectionGasless } from "@/components/comments/gasless/CommentSectionGasless";
 import Link from "next/link";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CommentSection as CommentSectionSwapWithComment } from "@/components/comments/swap-with-comment/CommentSection";
+
+type Tab = "default" | "gasless" | "swap";
 
 export default function Home() {
   const { address } = useAccount();
-  const [isGasless, setIsGasless] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("default");
 
   return (
     <main className="min-h-screen bg-gray-100 py-8">
@@ -31,21 +33,30 @@ export default function Home() {
           </Link>
         </div>
         <div className="flex flex-row gap-3">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="gasless-mode"
-              checked={isGasless}
-              onCheckedChange={setIsGasless}
-            />
-            <Label htmlFor="gasless-mode">Gas Sponsored Transactions</Label>
-          </div>
-          {/* when the user hasn't connect we already have a ConnectButton in the middle of the comment section
-        so let's hide this one when that's the case */}
           {address && <ConnectButton />}
         </div>
       </div>
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow">
-        {isGasless ? <CommentSectionGasless /> : <CommentSection />}
+        <Tabs
+          className="mx-auto max-w-2xl w-full flex justify-center"
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as Tab)}
+        >
+          <TabsList className="mx-auto">
+            <TabsTrigger value="default">Default</TabsTrigger>
+            <TabsTrigger value="gasless">
+              Gas Sponsored Transactions
+            </TabsTrigger>
+            <TabsTrigger value="swap">Swap with comment</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        {activeTab === "gasless" ? (
+          <CommentSectionGasless />
+        ) : activeTab === "swap" ? (
+          <CommentSectionSwapWithComment />
+        ) : (
+          <CommentSection />
+        )}
       </div>
     </main>
   );
