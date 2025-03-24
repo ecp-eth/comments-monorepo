@@ -369,6 +369,9 @@ importers:
         specifier: ^3.24.1
         version: 3.24.1
     devDependencies:
+      '@ecp.eth/eslint-config':
+        specifier: workspace:^
+        version: link:../../packages/eslint-config
       '@types/node':
         specifier: ^22.13.1
         version: 22.13.1
