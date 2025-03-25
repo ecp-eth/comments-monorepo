@@ -149,8 +149,12 @@ await writeContractAsync({
 
 ### Post the comment in batch with other transactions
 
-:::warning
+:::danger
 **This guide doesn't work at the moment because it uses experimental features.**
+:::
+
+:::warning
+**This guide doesn't work with Anvil because it uses token swaps. Please use Base chain for testing.**
 :::
 
 In this section, we will walkthrough the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of posting a comment as the author in batch with other transactions to save on gas fees.
@@ -255,7 +259,7 @@ return {
 };
 ```
 
-🧑‍💻 *[/apps/demo/src/app/api/sign-comment/route.ts#L83-L103](https://github.com/ecp-eth/comments-monorepo/blob/3cd058f61c0fb1fbe945167abbe61f33a472b9ff/apps/demo/src/app/api/sign-comment/route.ts#L83-L103)*🧑‍💻 _[/apps/demo/src/app/api/sign-comment/route.ts#L83-L103](https://github.com/ecp-eth/comments-monorepo/blob/3cd058f61c0fb1fbe945167abbe61f33a472b9ff/apps/demo/src/app/api/sign-comment/route.ts#L83-L103)_
+🧑‍💻 _[/apps/demo/src/app/api/sign-comment/route.ts#L83-L103](https://github.com/ecp-eth/comments-monorepo/blob/3cd058f61c0fb1fbe945167abbe61f33a472b9ff/apps/demo/src/app/api/sign-comment/route.ts#L83-L103)_
 
 :::warning
 Do not expose the app signer's private key on the client side.
