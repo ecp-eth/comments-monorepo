@@ -655,6 +655,7 @@ function GeneratedURL({
         ? config
         : undefined
     );
+    const frameSrc = new URL(url).origin;
     const snippet = `<iframe
   src="${url}"
   style="width: 100%; height: 600px; border: none;"
@@ -670,7 +671,7 @@ function GeneratedURL({
     };
 
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <textarea
           readOnly
           value={snippet}
@@ -678,6 +679,24 @@ function GeneratedURL({
           onClick={copyToClipboard}
           rows={6}
         />
+        <div className="flex gap-2 text-sm text-[var(--vocs-color_noteText)] p-2 border border-[var(--vocs-color_noteBorder)] bg-[var(--vocs-color_noteBackground)] rounded-[var(--vocs-borderRadius_4)]">
+          <Info className="mt-0.5 h-[1em] w-[1em]" />
+          <span>
+            Make sure to set the{" "}
+            <code className="vocs_Code">Content-Security-Policy</code> header
+            with <code className="vocs_Code">frame-src</code> allowing{" "}
+            <code className="vocs_Code">{frameSrc}</code>. See{" "}
+            <a
+              className="vocs_Anchor vocs_Link vocs_Link_accent"
+              href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/frame-src"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              CSP frame-src
+            </a>
+            .
+          </span>
+        </div>
         <button
           onClick={copyToClipboard}
           className="px-4 py-2 rounded transition-colors ml-auto"
