@@ -6,7 +6,7 @@
   "scripts": {
     "build:abi": "node ./build-abi.js",
     "test": "forge test",
-    "node": "anvil --block-time 2",
+    "node": "anvil --block-time 2 --hardfork prague",
     "dev": "node dev.js",
     "deploy": "forge script script/CommentsV1.s.sol:CommentsV1Script --verify --broadcast"
   },

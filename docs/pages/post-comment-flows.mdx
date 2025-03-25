@@ -115,10 +115,10 @@ sequenceDiagram
     Indexer-->>Author: Responds with updated comments feed
 ```
 
-### 4. Appending comment to a transaction (author pays gas)
+### 4. Posting comment in batch with other transactions (author pays gas)
 
 This approach is similar to the first one, but with a key difference in how the comment is submitted.
-Instead of submitting the comment as a separate transaction, the comment is appended to an existing transaction as data suffix.
+Instead of submitting the comment as a separate transaction, the comment is batched with other transactions to save on gas fees.
 This can be useful when the author is already interacting with the contract for other purposes,
 such as submitting a vote or transferring tokens.
 
@@ -126,16 +126,45 @@ such as submitting a vote or transferring tokens.
 sequenceDiagram
     actor Author
     participant App server
-    participant Some contract
+    participant Comments Contract
+    participant 3rd party contract
     participant Indexer
 
-    %% Flow 3: Author pays gas
-    Note over Author,Indexer: Flow 1: Author pays gas
+    %% Flow 4: Author pays gas
+    Note over Author,Indexer: Flow 4: Author pays gas
+
     Author->>App server: Post the comment request
+    activate App server
     App server->>App server: Signs the comment request
-    App server-->>Author: Responds comment data and app signature
-    Author->>Some contract: Writes to a contract with a comment data as transaction data suffix.
-    Some contract->>Indexer: Emit some event
-    Indexer->>Indexer: Parses transaction data suffix from the event and stores the comment
+    App server-->>Author: Responds with comment data and app signature
+    deactivate App server
+
+    activate Author
+    activate Author
+    Author-->>Author: Signs authorization for the batch delegation contract
+
+    create participant Batch Delegation Contract (EIP 7702)
+    Author->>Batch Delegation Contract (EIP 7702): Hey, I authorized you to turn me into a smart contract.
+    Batch Delegation Contract (EIP 7702)-->>Author: OK, now you can call execute() function on yourself and I'll execute all calldatas on your behalf.
+    deactivate Author
+
+    activate Author
+    Author->>Author: Constructs calldata for posting the comment and any other transactions
+    Author->>Author: Writes constructed calldata to execute() function on itself attaching the authorization
+    note right of Author: This write operations is handled by Batch Delegation Contract
+
+    activate Batch Delegation Contract (EIP 7702)
+    Author->>Batch Delegation Contract (EIP 7702): Delegate these calldatas on my behalf
+    Batch Delegation Contract (EIP 7702)->>Comments Contract: Execute postCommentAsAuthor() calldata
+    Comments Contract->>Indexer: Emit comment event
+    Indexer->>Indexer: Store the comment
     Indexer-->>Author: Responds with updated comments feed
+
+    Batch Delegation Contract (EIP 7702)->>3rd party contract: Execute a calldata on 3rd party contract
+    deactivate Batch Delegation Contract (EIP 7702)
+    deactivate Author
+
+    destroy Batch Delegation Contract
+
+    deactivate Author
 ```
