@@ -14,7 +14,7 @@ type Tab = "default" | "gasless" | "swap";
 
 export default function Home() {
   const { address } = useAccount();
-  const [activeTab, setActiveTab] = useState<Tab>("swap");
+  const [activeTab, setActiveTab] = useState<Tab>("default");
 
   return (
     <main className="min-h-screen bg-gray-100 py-8">
