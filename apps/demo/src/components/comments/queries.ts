@@ -1,6 +1,4 @@
 import {
-  SignCommentResponseClientSchema,
-  type SignCommentResponseClientSchemaType,
   type PendingCommentOperationSchemaType,
   type SignCommentPayloadRequestSchemaType,
   SignCommentPayloadRequestSchema,
@@ -25,6 +23,10 @@ import {
 } from "./errors";
 import type { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/schemas";
 import { chain } from "@/lib/wagmi";
+import {
+  SignCommentResponseClientSchema,
+  type SignCommentResponseClientSchemaType,
+} from "@ecp.eth/shared/schemas";
 
 export class SubmitCommentMutationError extends Error {}
 

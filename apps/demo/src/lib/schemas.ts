@@ -1,23 +1,21 @@
 import {
   AddApprovalTypedDataSchema,
   AddCommentTypedDataSchema,
-  CommentDataSchema,
   DeleteCommentTypedDataSchema,
   HexSchema,
   IndexerAPICommentSchema,
-  IndexerAPICommentSchemaType,
+  type IndexerAPICommentSchemaType,
   IndexerAPICursorPaginationSchema,
-  IndexerAPICursorPaginationSchemaType,
+  type IndexerAPICursorPaginationSchemaType,
   IndexerAPIExtraSchema,
-  IndexerAPIExtraSchemaType,
+  type IndexerAPIExtraSchemaType,
 } from "@ecp.eth/sdk/schemas";
-import { PendingCommentOperationSchema as PendingCommentOperationSchemaShared } from "@ecp.eth/shared/schemas";
+import {
+  CommentDataWithIdSchema,
+  PendingCommentOperationSchema as PendingCommentOperationSchemaShared,
+} from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 // import { isProfane } from "./profanity-detection";
-
-const CommentDataWithIdSchema = CommentDataSchema.extend({
-  id: HexSchema,
-});
 
 export const PrepareSignedGaslessCommentRequestBodySchema = z.object({
   // replace with following line to enable basic profanity detection
@@ -135,19 +133,6 @@ export const GaslessPostCommentResponseSchema = z.object({
 
 export type GaslessPostCommentResponseSchemaType = z.infer<
   typeof GaslessPostCommentResponseSchema
->;
-
-/**
- * Parses response from API endpoint for usage in client
- */
-export const SignCommentResponseClientSchema = z.object({
-  signature: HexSchema,
-  hash: HexSchema,
-  data: CommentDataWithIdSchema,
-});
-
-export type SignCommentResponseClientSchemaType = z.infer<
-  typeof SignCommentResponseClientSchema
 >;
 
 export const SignCommentPayloadRequestSchema = z.object({

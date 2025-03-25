@@ -13,7 +13,7 @@ import { BATCH_CALL_DELEGATION_CONTRACT_ABI } from "./abis";
 import { eip7702Actions } from "viem/experimental";
 import { publicEnv } from "@/publicEnv";
 import { chain } from "./wagmi";
-import type { SignCommentResponseClientSchemaType } from "./schemas";
+import type { SignCommentResponseClientSchemaType } from "@ecp.eth/shared/schemas";
 
 type PostCommentViaContractParams = {
   commentData: CommentData;
