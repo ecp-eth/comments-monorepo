@@ -5,23 +5,23 @@ import {
 } from "../CommentForm";
 import { submitCommentMutationFunction } from "../queries";
 import { useCallback, useState } from "react";
-// import { chain } from "@/lib/wagmi";
 import {
   useAccount,
   useChainId,
   useSendTransaction,
   useSignTypedData,
   useSwitchChain,
+  useWalletClient,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import { PriceView } from "./0x/PriceView";
-import QuoteView from "./0x/QuoteView";
+import { QuoteView } from "./0x/QuoteView";
 import type {
   PriceResponseLiquidityAvailableSchemaType,
   QuoteResponseLiquidityAvailableSchemaType,
 } from "./0x/schemas";
-// import { createCommentSuffixData } from "@ecp.eth/sdk";
+import { postCommentAsAuthorInBatch } from "@/lib/contract";
 
 type CommentFormProps = {
   parentId?: Hex;
@@ -38,11 +38,16 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
   const { switchChainAsync } = useSwitchChain();
   const { signTypedDataAsync } = useSignTypedData();
   const { sendTransactionAsync } = useSendTransaction();
+  const { data: walletClient } = useWalletClient();
 
   const handleSubmitComment = useCallback<OnSubmitFunction<"post">>(
     async ({ address, content }) => {
       if (!quote) {
         throw new Error("Quote is not finalized");
+      }
+
+      if (!walletClient) {
+        throw new Error("Wallet is not connected");
       }
 
       // (1) Sign the Permit2 EIP-712 message returned from quote
@@ -68,26 +73,21 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        writeContractAsync() {
-          // TODO: to be replaced with EIP 7702
-          // const commentDataSuffix = createCommentSuffixData({
-          //   commentData: params.data,
-          //   appSignature: params.signature,
-          // });
+        writeContractAsync(signedComment) {
+          quote.transaction.data = concat([transactionData, sigLengthHex, sig]);
 
-          quote.transaction.data = concat([
-            transactionData,
-            sigLengthHex,
-            sig,
-            // commentDataSuffix,
-          ]);
-
-          return sendTransactionAsync({
-            account: address,
-            to: quote.transaction.to,
-            data: quote.transaction.data,
-            value: quote.transaction.value,
-            chainId,
+          return postCommentAsAuthorInBatch({
+            args: [
+              [
+                {
+                  to: quote.transaction.to,
+                  data: quote.transaction.data,
+                  value: quote.transaction.value,
+                },
+              ],
+            ],
+            signedComment,
+            walletClient,
           });
         },
       });

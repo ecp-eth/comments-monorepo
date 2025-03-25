@@ -22,7 +22,7 @@ import {
 } from "./errors";
 import { useEffect } from "react";
 
-export default function QuoteView({
+export function QuoteView({
   taker,
   price,
   setQuote,

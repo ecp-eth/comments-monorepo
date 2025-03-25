@@ -9,6 +9,7 @@ export const publicEnvSchema = z.object({
   NEXT_PUBLIC_COMMENTS_INDEXER_URL: z.string().url(),
   NEXT_PUBLIC_REPLY_DEPTH_CUTOFF: z.coerce.number().int().min(1).default(1),
   NEXT_PUBLIC_COMMENT_AUTHOR_URL: z.string().url().optional(),
+  NEXT_PUBLIC_BATCH_CALL_DELEGATION_PROTOCOL_ADDRESS: HexSchema,
 });
 
 export const publicEnv = publicEnvSchema.parse({
@@ -20,4 +21,6 @@ export const publicEnv = publicEnvSchema.parse({
     process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   NEXT_PUBLIC_REPLY_DEPTH_CUTOFF: process.env.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF,
   NEXT_PUBLIC_COMMENT_AUTHOR_URL: process.env.NEXT_PUBLIC_COMMENT_AUTHOR_URL,
+  NEXT_PUBLIC_BATCH_CALL_DELEGATION_PROTOCOL_ADDRESS:
+    process.env.NEXT_PUBLIC_BATCH_CALL_DELEGATION_PROTOCOL_ADDRESS,
 });
