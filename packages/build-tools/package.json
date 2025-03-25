@@ -1,0 +1,25 @@
+{
+  "name": "@ecp.eth/build-tools",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "proxy-package": "./bin/index.js"
+  },
+  "scripts": {
+    "build": "tsup --format esm --out-dir bin/ && chmod +x bin/index.js",
+    "proxy-package": "tsx ./src/index.ts"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "glob": "^11.0.1",
+    "tsup": "^8.3.6",
+    "tsx": "^4.19.3"
+  }
+}

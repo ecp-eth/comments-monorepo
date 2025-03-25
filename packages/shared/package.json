@@ -39,11 +39,12 @@
     "dev": "tsup --format esm --out-dir dist/esm --watch",
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
-    "build": "rm -rf dist && npm run build:cjs && npm run build:esm",
+    "build": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
     "test": "echo 'Add test script here'",
     "lint": "eslint \"./src/**/*.ts\""
   },
   "devDependencies": {
+    "@ecp.eth/build-tools": "workspace:^",
     "@ecp.eth/eslint-config": "workspace:*",
     "@ecp.eth/typescript-config": "workspace:*",
     "@rainbow-me/rainbowkit": "^2.2.3",
@@ -51,8 +52,8 @@
     "@types/react": "^19.0.8",
     "eslint": "^9.19.0",
     "react": "18 || 19",
-    "viem": "^2.22.21",
-    "wagmi": "^2.14.9",
+    "viem": "^2.23.15",
+    "wagmi": "^2.14.15",
     "zod": "^3.24.1"
   },
   "dependencies": {
@@ -62,8 +63,8 @@
     "@rainbow-me/rainbowkit": "^2.2.3",
     "@tanstack/react-query": ">=5.0.0",
     "react": "18 || 19",
-    "viem": "^2.22.21",
-    "wagmi": "^2.14.9",
+    "viem": "^2.23.15",
+    "wagmi": "^2.14.15",
     "zod": "^3.24.1"
   }
 }
