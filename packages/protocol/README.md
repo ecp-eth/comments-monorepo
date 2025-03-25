@@ -52,3 +52,12 @@ Ensure that etherscan API key is set in the `.env` file.
 ```
 pnpm run deploy --rpc-url $RPC_URL
 ```
+
+## Deployed Contracts
+
+| Network | Contract Address |
+| --- | --- |
+| Ethereum Mainnet | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
+| Ethereum Sepolia | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
+| Base | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
+| Base Sepolia | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
