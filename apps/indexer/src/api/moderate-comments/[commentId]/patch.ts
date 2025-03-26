@@ -16,7 +16,7 @@ import {
 import { db } from "../../../db";
 
 const changeCommentModerationStatusRoute = createRoute({
-  method: "post",
+  method: "patch",
   path: "/api/moderate-comments/{commentId}",
   middleware: [authMiddleware()],
   tags: ["comments"],
