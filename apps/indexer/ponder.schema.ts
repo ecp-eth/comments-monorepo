@@ -22,7 +22,7 @@ export const comment = onchainTable(
       })
       .default("pending")
       .notNull(),
-    moderationStatusChangedAt: t.timestamp({ withTimezone: true }),
+    moderationStatusChangedAt: t.timestamp({ withTimezone: true }).notNull(),
   }),
   (table) => ({
     targetUriIdx: index().on(table.targetUri),
