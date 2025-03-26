@@ -8,7 +8,7 @@ import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
   IndexerAPIAuthorDataSchema,
-} from "./schemas.js";
+} from "./schemas/index.js";
 import { INDEXER_API_URL } from "./constants.js";
 import { z } from "zod";
 
