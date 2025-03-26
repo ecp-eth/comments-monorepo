@@ -7,7 +7,6 @@ import { publicEnv } from "./publicEnv";
  * @returns
  */
 export default function Footer() {
-  const meta = import.meta;
   const isMounted = useIsMounted();
   const vocsTheme = useVocsColorScheme();
 
@@ -17,47 +16,50 @@ export default function Footer() {
   }
 
   return (
-    <CommentsEmbed
-      embedUri={publicEnv.VITE_ECP_ETH_EMBED_URL}
-      uri={`${window.location.origin}/${window.location.pathname}`}
-      containerProps={{
-        style: {
-          borderRadius: "var(--vocs-borderRadius_8)",
-          overflow: "hidden",
-        },
-      }}
-      iframeProps={{
-        style: {
-          backgroundColor: "transparent",
-        },
-      }}
-      config={{
-        theme: {
-          mode: vocsTheme,
-          colors: {
-            dark: {
-              background: "transparent",
-              foreground: "#e9e9ea",
-              border: "#444",
+    <div id="ecp-embed-footer" style={{ width: "100%" }}>
+      <CommentsEmbed
+        embedUri={publicEnv.VITE_ECP_ETH_EMBED_URL}
+        uri={`${window.location.origin}/${window.location.pathname}`}
+        containerProps={{
+          style: {
+            borderRadius: "var(--vocs-borderRadius_8)",
+            overflow: "hidden",
+            width: "100%",
+          },
+        }}
+        iframeProps={{
+          style: {
+            backgroundColor: "transparent",
+          },
+        }}
+        config={{
+          theme: {
+            mode: vocsTheme,
+            colors: {
+              dark: {
+                background: "transparent",
+                foreground: "#e9e9ea",
+                border: "#444",
+              },
+              light: {
+                background: "transparent",
+                foreground: "#4c4c4c",
+                border: "#ccc",
+              },
             },
-            light: {
-              background: "transparent",
-              foreground: "#4c4c4c",
-              border: "#ccc",
+            font: {
+              fontFamily: {
+                system:
+                  'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+              },
+            },
+            other: {
+              "root-padding-vertical": "12px",
             },
           },
-          font: {
-            fontFamily: {
-              system:
-                'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-            },
-          },
-          other: {
-            "root-padding-vertical": "12px",
-          },
-        },
-      }}
-    />
+        }}
+      />
+    </div>
   );
 }
 
