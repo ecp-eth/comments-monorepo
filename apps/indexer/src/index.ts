@@ -8,6 +8,7 @@ import {
 // import { isProfane } from "./lib/profanity-detection";
 import { initializeManagement } from "./management";
 import { getMutedAccount } from "./management/services/muted-accounts";
+import { env } from "./env";
 
 await initializeManagement();
 
@@ -24,6 +25,8 @@ ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
     return;
   }
 
+  const timestamp = new Date(Number(event.block.timestamp) * 1000);
+
   await context.db.insert(schema.comment).values({
     id: event.args.commentId,
     content: event.args.commentData.content,
@@ -32,10 +35,14 @@ ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
     parentId: transformCommentParentId(event.args.commentData.parentId),
     author: event.args.commentData.author,
     txHash: event.transaction.hash,
-    timestamp: new Date(Number(event.block.timestamp) * 1000),
+    timestamp,
     chainId: context.network.chainId,
     appSigner: event.args.commentData.appSigner,
     logIndex: event.log.logIndex,
+    ...(!env.MODERATION_ENABLED && {
+      moderationStatus: "approved",
+      moderationStatusChangedAt: timestamp,
+    }),
   });
 });
 

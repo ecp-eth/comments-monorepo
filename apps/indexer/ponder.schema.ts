@@ -16,6 +16,13 @@ export const comment = onchainTable(
     appSigner: t.hex().notNull(),
     txHash: t.hex().notNull(),
     logIndex: t.integer(),
+    moderationStatus: t
+      .text({
+        enum: ["pending", "approved", "rejected"],
+      })
+      .default("pending")
+      .notNull(),
+    moderationStatusChangedAt: t.timestamp({ withTimezone: true }),
   }),
   (table) => ({
     targetUriIdx: index().on(table.targetUri),
@@ -24,6 +31,7 @@ export const comment = onchainTable(
     timestampIdx: index().on(table.timestamp),
     deletedAtIdx: index().on(table.deletedAt),
     authorIdx: index().on(table.author),
+    moderationStatusIdx: index().on(table.moderationStatus),
   })
 );
 

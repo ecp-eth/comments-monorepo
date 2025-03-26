@@ -4,6 +4,10 @@ const EnvSchema = z.object({
   DATABASE_URL: z.string(),
   NEYNAR_API_KEY: z.string(),
   SENTRY_DSN: z.string().optional(),
+  MODERATION_ENABLED: z
+    .enum(["0", "1"])
+    .transform((val) => val === "1")
+    .default("1"),
 });
 
 declare global {
