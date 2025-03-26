@@ -93,6 +93,9 @@ export async function resolveUserDataAndFormatListCommentsResponse({
           resolvedAuthorFarcasterData
         ),
         replies: {
+          extra: {
+            moderationEnabled: env.MODERATION_ENABLED,
+          },
           results: slicedReplies.map((reply) => {
             const resolvedAuthorEnsData = resolveUserData(
               resolvedAuthorsEnsData,

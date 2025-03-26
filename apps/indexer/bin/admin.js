@@ -193,8 +193,9 @@ mutedAccounts
     try {
       const body = JSON.stringify({ address, reason });
       const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/muted-accounts`, url);
 
-      const response = await fetch(`${url}/api/muted-accounts`, {
+      const response = await fetch(endpointUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -203,7 +204,7 @@ mutedAccounts
           "X-API-Signature": await createRequestSignature(
             privateKey,
             "POST",
-            "/api/muted-accounts",
+            endpointUrl.pathname,
             body,
             timestamp
           ),
@@ -233,8 +234,9 @@ mutedAccounts
 
     try {
       const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/muted-accounts/${address}`, url);
 
-      const response = await fetch(`${url}/api/muted-accounts/${address}`, {
+      const response = await fetch(endpointUrl, {
         method: "DELETE",
         headers: {
           "X-API-Key": id,
@@ -242,7 +244,7 @@ mutedAccounts
           "X-API-Signature": await createRequestSignature(
             privateKey,
             "DELETE",
-            `/api/muted-accounts/${address}`,
+            endpointUrl.pathname,
             "",
             timestamp
           ),
@@ -284,24 +286,27 @@ moderateComments
 
     try {
       const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/moderate-comments/${commentId}`, url);
+      const body = JSON.stringify({
+        moderationStatus: "approved",
+      });
 
-      const response = await fetch(
-        `${url}/api/moderate-comments/${commentId}/approve`,
-        {
-          method: "POST",
-          headers: {
-            "X-API-Key": id,
-            "X-API-Timestamp": timestamp.toString(),
-            "X-API-Signature": await createRequestSignature(
-              privateKey,
-              "POST",
-              `/api/moderate-comments/${commentId}/approve`,
-              "",
-              timestamp
-            ),
-          },
-        }
-      );
+      const response = await fetch(endpointUrl, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": id,
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "PATCH",
+            endpointUrl.pathname,
+            body,
+            timestamp
+          ),
+        },
+        body,
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -325,24 +330,27 @@ moderateComments
 
     try {
       const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/moderate-comments/${commentId}`, url);
+      const body = JSON.stringify({
+        moderationStatus: "rejected",
+      });
 
-      const response = await fetch(
-        `${url}/api/moderate-comments/${commentId}/reject`,
-        {
-          method: "POST",
-          headers: {
-            "X-API-Key": id,
-            "X-API-Timestamp": timestamp.toString(),
-            "X-API-Signature": await createRequestSignature(
-              privateKey,
-              "POST",
-              `/api/moderate-comments/${commentId}/reject`,
-              "",
-              timestamp
-            ),
-          },
-        }
-      );
+      const response = await fetch(endpointUrl, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": id,
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "PATCH",
+            endpointUrl.pathname,
+            body,
+            timestamp
+          ),
+        },
+        body,
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -365,15 +373,16 @@ moderateComments
 
     try {
       const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/moderate-comments`, url);
 
-      const response = await fetch(`${url}/api/moderate-comments`, {
+      const response = await fetch(endpointUrl, {
         headers: {
           "X-API-Key": id,
           "X-API-Timestamp": timestamp.toString(),
           "X-API-Signature": await createRequestSignature(
             privateKey,
             "GET",
-            "/api/moderate-comments",
+            endpointUrl.pathname,
             "",
             timestamp
           ),
@@ -398,9 +407,19 @@ moderateComments
 
       for (const comment of result.results) {
         console.group(comment.id);
-        console.table(comment, ["id", "author", "timestamp"]);
+        console.table([
+          {
+            "Comment ID": comment.id,
+            Timestamp: comment.timestamp,
+            "Author (address)": comment.author.address,
+            "Author (ENS)": comment.author.ens?.name,
+            "Author (FC)": comment.author.farcaster?.username,
+          },
+        ]);
 
+        console.log("Content----------");
         console.log(comment.content);
+        console.log("----------");
         console.groupEnd();
       }
     } catch (error) {
