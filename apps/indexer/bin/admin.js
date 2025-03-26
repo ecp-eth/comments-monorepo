@@ -14,6 +14,29 @@ import { z } from "zod";
 const HexSchema = z.string().regex(/^0x[0-9a-fA-F]+$/);
 
 /**
+ * @param {import('viem').Hex} privateKey
+ * @param {string} method
+ * @param {string} path
+ * @param {string} body
+ * @param {number} timestamp
+ * @returns {Promise<string>}
+ */
+async function createRequestSignature(
+  privateKey,
+  method,
+  path,
+  body,
+  timestamp
+) {
+  const message = new TextEncoder().encode(
+    `${method}${path}${timestamp}${body}`
+  );
+  const signature = await signAsync(message, privateKey);
+
+  return Buffer.from(signature).toString("hex");
+}
+
+/**
  * Validates a URL option.
  * @param {string} val - The value to validate.
  * @returns {string} The validated value.
@@ -169,19 +192,21 @@ mutedAccounts
 
     try {
       const body = JSON.stringify({ address, reason });
-      const timestamp = Date.now().toString();
-      const message = new TextEncoder().encode(
-        `POST/api/muted-accounts${timestamp}${body}`
-      );
-      const signature = await signAsync(message, privateKey);
+      const timestamp = Date.now();
 
       const response = await fetch(`${url}/api/muted-accounts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-API-Key": id,
-          "X-API-Timestamp": timestamp,
-          "X-API-Signature": Buffer.from(signature).toString("hex"),
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "POST",
+            "/api/muted-accounts",
+            body,
+            timestamp
+          ),
         },
         body,
       });
@@ -207,18 +232,20 @@ mutedAccounts
     const { id, privateKey, url } = mutedAccounts.opts();
 
     try {
-      const timestamp = Date.now().toString();
-      const message = new TextEncoder().encode(
-        `DELETE/api/muted-accounts/${address}${timestamp}`
-      );
-      const signature = await signAsync(message, privateKey);
+      const timestamp = Date.now();
 
       const response = await fetch(`${url}/api/muted-accounts/${address}`, {
         method: "DELETE",
         headers: {
           "X-API-Key": id,
-          "X-API-Timestamp": timestamp,
-          "X-API-Signature": Buffer.from(signature).toString("hex"),
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "DELETE",
+            `/api/muted-accounts/${address}`,
+            "",
+            timestamp
+          ),
         },
       });
 
@@ -231,6 +258,153 @@ mutedAccounts
       console.log("Successfully unmuted account:", address);
     } catch (error) {
       console.error("Failed to unmute account:", error);
+      process.exit(1);
+    }
+  });
+
+const moderateComments = new Command("moderate-comments")
+  .description("Manage comment moderation")
+  .requiredOption("-i, --id <id>", "The ID of the API key to use")
+  .requiredOption("-k, --private-key <key>", "The private key of the API key")
+  .option(
+    "-u, --url <url>",
+    "The URL of indexer",
+    urlOptionValidator,
+    "https://api.ethcomments.xyz"
+  );
+
+program.addCommand(moderateComments);
+
+moderateComments
+  .command("approve")
+  .description("Approves a pending comment")
+  .argument("<commentId>", "The ID of the comment to approve")
+  .action(async (commentId) => {
+    const { id, privateKey, url } = moderateComments.opts();
+
+    try {
+      const timestamp = Date.now();
+
+      const response = await fetch(
+        `${url}/api/moderate-comments/${commentId}/approve`,
+        {
+          method: "POST",
+          headers: {
+            "X-API-Key": id,
+            "X-API-Timestamp": timestamp.toString(),
+            "X-API-Signature": await createRequestSignature(
+              privateKey,
+              "POST",
+              `/api/moderate-comments/${commentId}/approve`,
+              "",
+              timestamp
+            ),
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to approve comment:", error);
+        process.exit(1);
+      }
+
+      console.log("Successfully approved comment:", commentId);
+    } catch (error) {
+      console.error("Failed to approve comment:", error);
+      process.exit(1);
+    }
+  });
+
+moderateComments
+  .command("reject")
+  .description("Rejects a pending comment")
+  .argument("<commentId>", "The ID of the comment to reject")
+  .action(async (commentId) => {
+    const { id, privateKey, url } = moderateComments.opts();
+
+    try {
+      const timestamp = Date.now();
+
+      const response = await fetch(
+        `${url}/api/moderate-comments/${commentId}/reject`,
+        {
+          method: "POST",
+          headers: {
+            "X-API-Key": id,
+            "X-API-Timestamp": timestamp.toString(),
+            "X-API-Signature": await createRequestSignature(
+              privateKey,
+              "POST",
+              `/api/moderate-comments/${commentId}/reject`,
+              "",
+              timestamp
+            ),
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to reject comment:", error);
+        process.exit(1);
+      }
+
+      console.log("Successfully rejected comment:", commentId);
+    } catch (error) {
+      console.error("Failed to reject comment:", error);
+      process.exit(1);
+    }
+  });
+
+moderateComments
+  .command("list")
+  .description("Lists pending comments")
+  .action(async () => {
+    const { id, privateKey, url } = moderateComments.opts();
+
+    try {
+      const timestamp = Date.now();
+
+      const response = await fetch(`${url}/api/moderate-comments`, {
+        headers: {
+          "X-API-Key": id,
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "GET",
+            "/api/moderate-comments",
+            "",
+            timestamp
+          ),
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to list pending comments:", error);
+        process.exit(1);
+      }
+
+      /**
+       * @type {import('@ecp.eth/sdk/schemas').IndexerAPIListCommentsSchemaType}
+       */
+      const result = await response.json();
+
+      if (!result.extra.moderationEnabled) {
+        console.error("Moderation is not enabled on this instance");
+        process.exit(1);
+      }
+
+      for (const comment of result.results) {
+        console.group(comment.id);
+        console.table(comment, ["id", "author", "timestamp"]);
+
+        console.log(comment.content);
+        console.groupEnd();
+      }
+    } catch (error) {
+      console.error("Failed to list pending comments:", error);
       process.exit(1);
     }
   });
