@@ -31,6 +31,16 @@ export type IndexerAPIAuthorDataSchemaType = z.infer<
   typeof IndexerAPIAuthorDataSchema
 >;
 
+export const IndexerAPICommentModerationStatusSchema = z.enum([
+  "approved",
+  "rejected",
+  "pending",
+]);
+
+export type IndexerAPICommentModerationStatusSchemaType = z.infer<
+  typeof IndexerAPICommentModerationStatusSchema
+>;
+
 export const IndexerAPICommentSchema = z.object({
   appSigner: HexSchema,
   author: IndexerAPIAuthorDataSchema,
@@ -45,6 +55,8 @@ export const IndexerAPICommentSchema = z.object({
   timestamp: z.coerce.date(),
   txHash: HexSchema,
   cursor: HexSchema,
+  moderationStatus: IndexerAPICommentModerationStatusSchema.nullable(),
+  moderationStatusChangedAt: z.coerce.date().nullable(),
 });
 
 export type IndexerAPICommentSchemaType = z.infer<
@@ -102,3 +114,18 @@ export const IndexerAPIListCommentRepliesSchema = z.object({
 export type IndexerAPIListCommentRepliesSchemaType = z.infer<
   typeof IndexerAPIListCommentRepliesSchema
 >;
+
+export const IndexerAPIModerationGetPendingCommentsSchema = z.object({
+  results: z.array(IndexerAPICommentSchema),
+  pagination: IndexerAPICursorPaginationSchema,
+});
+
+export type IndexerAPIModerationGetPendingCommentsSchemaType = z.infer<
+  typeof IndexerAPIModerationGetPendingCommentsSchema
+>;
+
+export const IndexerAPIModerationChangeModerationStatusOnCommentSchema =
+  IndexerAPICommentSchema;
+
+export type IndexerAPIModerationChangeModerationStatusOnCommentSchemaType =
+  z.infer<typeof IndexerAPIModerationChangeModerationStatusOnCommentSchema>;
