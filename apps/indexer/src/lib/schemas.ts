@@ -1,4 +1,8 @@
-import { HexSchema, IndexerAPIPaginationSchema } from "@ecp.eth/sdk/schemas";
+import {
+  HexSchema,
+  IndexerAPICommentModerationStatusSchema,
+  IndexerAPIPaginationSchema,
+} from "@ecp.eth/sdk/schemas";
 import { z } from "@hono/zod-openapi";
 import { normalizeUrl } from "./utils";
 import { hexToString } from "viem";
@@ -195,4 +199,38 @@ export const GetApprovalSchema = z.object({
 export const GetApprovalsResponseSchema = z.object({
   results: z.array(GetApprovalSchema),
   pagination: IndexerAPIPaginationSchema,
+});
+
+/**
+ * Query string schema for getting a list of pending comments.
+ */
+export const GetCommentsPendingModerationQuerySchema = z.object({
+  cursor: InputCommentCursorSchema.optional().openapi({
+    description:
+      "Non inclusive cursor from which to fetch the comments based on sort",
+  }),
+  limit: z.coerce.number().int().min(1).max(100).default(50).openapi({
+    description: "The number of comments to return",
+  }),
+  sort: z.enum(["asc", "desc"]).default("desc").openapi({
+    description: "The sort order of the comments",
+  }),
+});
+
+/**
+ * Path params schema for moderating a comment.
+ */
+export const ChangeModerationStatusOnCommentParamsSchema = z.object({
+  commentId: HexSchema.openapi({
+    description: "The ID of the comment to moderate",
+  }),
+});
+
+/**
+ * Request body schema for changing the moderation status of a comment.
+ */
+export const ChangeModerationStatusOnCommentBodySchema = z.object({
+  moderationStatus: IndexerAPICommentModerationStatusSchema.openapi({
+    description: "The moderation status of the comment",
+  }),
 });

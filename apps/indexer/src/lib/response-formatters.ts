@@ -3,6 +3,7 @@ import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
   HexSchema,
+  IndexerAPIModerationChangeModerationStatusOnCommentSchemaType,
 } from "@ecp.eth/sdk/schemas";
 import { ensDataResolver, type ResolvedEnsData } from "./ens-data-resolver";
 import type { CommentSelectType } from "ponder:schema";
@@ -180,4 +181,22 @@ function resolveUserData<
         item.address.toLowerCase() === lowercasedAddress
     ) ?? null
   );
+}
+
+export async function resolveAuthorDataAndFormatCommentChangeModerationStatusResponse(
+  comment: CommentSelectType
+): Promise<IndexerAPIModerationChangeModerationStatusOnCommentSchemaType> {
+  const [resolvedEnsData, resolvedFarcasterData] = await Promise.all([
+    ensDataResolver.load(comment.author),
+    farcasterDataResolver.load(comment.author),
+  ]);
+
+  return {
+    ...formatComment(comment),
+    author: formatAuthor(
+      comment.author,
+      resolvedEnsData,
+      resolvedFarcasterData
+    ),
+  };
 }
