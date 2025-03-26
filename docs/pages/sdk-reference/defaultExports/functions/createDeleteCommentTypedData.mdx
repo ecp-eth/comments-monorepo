@@ -8,9 +8,12 @@
 
 > **createDeleteCommentTypedData**(`__namedParameters`): `object`
 
-Defined in: [packages/sdk/src/utils.ts:171](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L171)
+Defined in: [packages/sdk/src/utils.ts:175](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L175)
 
 Create the EIP-712 typed data structure for deleting comment
+
+The comment won't be really deleted because of the nature of the blockchain.
+The purpose of this is to mark comment as deleted so indexers can do their logic for deletions.
 
 ## Parameters
 
