@@ -166,6 +166,10 @@ export async function getNonce({
 
 /**
  * Create the EIP-712 typed data structure for deleting comment
+ *
+ * The comment won't be really deleted because of the nature of the blockchain.
+ * The purpose of this is to mark comment as deleted so indexers can do their logic for deletions.
+ *
  * @returns The typed data
  */
 export function createDeleteCommentTypedData({
