@@ -7,7 +7,7 @@ const EnvSchema = z.object({
   MODERATION_ENABLED: z
     .enum(["0", "1"])
     .transform((val) => val === "1")
-    .default("1"),
+    .default("0"),
 });
 
 declare global {
