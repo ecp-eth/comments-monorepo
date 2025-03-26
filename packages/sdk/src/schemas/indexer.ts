@@ -94,6 +94,7 @@ export type IndexerAPIExtraSchemaType = z.infer<typeof IndexerAPIExtraSchema>;
 export const IndexerAPICommentWithRepliesSchema =
   IndexerAPICommentSchema.extend({
     replies: z.object({
+      extra: IndexerAPIExtraSchema,
       results: z.array(IndexerAPICommentSchema),
       pagination: IndexerAPICursorPaginationSchema,
     }),

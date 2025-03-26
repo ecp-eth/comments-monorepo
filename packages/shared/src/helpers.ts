@@ -137,6 +137,7 @@ export function insertPendingCommentToPage(
     moderationStatus: moderationEnabled ? "pending" : "approved",
     moderationStatusChangedAt: new Date(),
     replies: {
+      extra: queryData.pages[0].extra,
       results: [],
       pagination: {
         hasPrevious: false,
@@ -164,7 +165,7 @@ export function replaceCommentPendingOperationByComment(
   comment: Comment,
   newPendingOperation: PendingCommentOperationSchemaType
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
-  function replaceComment(page: Omit<CommentPageSchemaType, "extra">): boolean {
+  function replaceComment(page: CommentPageSchemaType): boolean {
     for (const c of page.results) {
       if (c.id === comment.id) {
         c.pendingOperation = newPendingOperation;
@@ -206,7 +207,7 @@ export function markCommentAsDeleted(
   >,
   commentId: Hex
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
-  function markComment(page: Omit<CommentPageSchemaType, "extra">): boolean {
+  function markComment(page: CommentPageSchemaType): boolean {
     for (const comment of page.results) {
       if (comment.id === commentId) {
         comment.content = "[deleted]";
