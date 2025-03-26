@@ -6,16 +6,16 @@ import { HomePage } from "vocs/components";
 
 <HomePage.Root>
   <div className="flex flex-col items-center justify-center py-4 md:py-8 text-center">
-    <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+    <h1 className="ecp_H1 vocs_Heading">
       Ethereum Comments Protocol
     </h1>
     
-    <p className="mt-4 md:mt-6 text-lg md:text-xl text-gray-600 max-w-2xl">
+    <p className="mt-4 md:mt-6 text-lg md:text-xl max-w-2xl ecp_Paragraph_secondary">
       An open protocol and toolkit for onchain comments.
     </p>
 
-    <div className="mt-6 md:mt-8 text-gray-600 text-left text-sm">
-      <code className="bg-gray-100 px-2 py-1 rounded">npm install @ecp.eth/sdk</code>
+    <div className="mt-6 md:mt-8 text-sm">
+      <code className="px-2 py-1 rounded bg-[var(--vocs-color_background3)] border-[var(--vocs-color_border)]">npm install @ecp.eth/sdk</code>
     </div>
 
     <div className="flex gap-4 mt-8 md:mt-10">
@@ -29,116 +29,118 @@ import { HomePage } from "vocs/components";
 
   </div>
 
-<div className="py-4 md:py-8">
-  <div className="max-w-9xl mx-auto px-4">
-    <h2 className="text-2xl md:text-3xl font-bold mb-8 md:mb-12 pb-4 md:pb-8 text-center">
-      Implementation Options
-    </h2>
+  <section className="py-4 md:py-8">
+    <div>
+      <h2 className="ecp_H2 vocs_Heading">
+        Implementation Options
+      </h2>
 
-    <div className="grid md:grid-cols-3 gap-6 md:gap-2">
-      <div className="gap-2 p-8 rounded-lg border border-gray-300 hover:border-blue-500/50 transition-colors flex flex-col">
-        <h3 className="text-xl font-semibold mb-4">iframe (no code)</h3>
-        <p className="text-gray-600 mb-6 text-sm">
-          Single-line, copy and paste implementation for static sites, blogs, and basic integrations.
-        </p>
-        <div className="mt-auto flex justify-center">
-          <HomePage.Button href="./iframe-integration" variant="accent">
-            Get Started
-          </HomePage.Button>
+      <div className="grid md:grid-cols-3 gap-6 md:gap-2">
+        <div className="gap-2 p-8 rounded-lg border border-gray-300 hover:border-blue-500/50 transition-colors flex flex-col">
+          <h3 className="text-xl font-semibold mb-4">iframe (no code)</h3>
+          <p className="mb-6 text-sm ecp_Paragraph_secondary">
+            Single-line, copy and paste implementation for static sites, blogs, and basic integrations.
+          </p>
+          <div className="mt-auto flex justify-center">
+            <HomePage.Button href="/integration-options/embed-comments" variant="accent">
+              Get Started
+            </HomePage.Button>
+          </div>
+        </div>
+
+        <div className="gap-2 p-8 rounded-lg border border-gray-300 hover:border-blue-500/50 transition-colors flex flex-col">
+          <h3 className="text-xl font-semibold mb-4">TypeScript SDK</h3>
+          <p className="mb-6 text-sm ecp_Paragraph_secondary">
+            Customize your own commenting UI, using an open source Ponder indexer and example code for React and React Native.
+          </p>
+          <div className="mt-auto flex justify-center">
+            <HomePage.Button href="/integration-options/indexer-api" variant="accent">
+              Get Started
+            </HomePage.Button>
+          </div>
+        </div>
+
+        <div className="gap-2 p-8 rounded-lg border border-gray-300 hover:border-blue-500/50 transition-colors flex flex-col">
+          <h3 className="text-xl font-semibold mb-4">Smart Contracts</h3>
+          <p className="mb-6 text-sm ecp_Paragraph_secondary">
+            Direct contract integration for custom implementations and advanced use cases.
+          </p>
+          <div className="mt-auto flex justify-center">
+            <HomePage.Button href="/integration-options/contract-interactions" variant="accent">
+              Get Started
+            </HomePage.Button>
+          </div>
         </div>
       </div>
 
-      <div className="gap-2 p-8 rounded-lg border border-gray-300 hover:border-blue-500/50 transition-colors flex flex-col">
-        <h3 className="text-xl font-semibold mb-4">TypeScript SDK</h3>
-        <p className="text-gray-600 mb-6 text-sm">
-          Customize your own commenting UI, using an open source Ponder indexer and example code for React and React Native.
-        </p>
-        <div className="mt-auto flex justify-center">
-          <HomePage.Button href="./sdk-integration" variant="accent">
-            Get Started
-          </HomePage.Button>
-        </div>
-      </div>
-
-      <div className="gap-2 p-8 rounded-lg border border-gray-300 hover:border-blue-500/50 transition-colors flex flex-col">
-        <h3 className="text-xl font-semibold mb-4">Smart Contracts</h3>
-        <p className="text-gray-600 mb-6 text-sm">
-          Direct contract integration for custom implementations and advanced use cases.
-        </p>
-        <div className="mt-auto flex justify-center">
-          <HomePage.Button href="./contract-integration" variant="accent">
-            Get Started
-          </HomePage.Button>
-        </div>
-      </div>
     </div>
 
-  </div>
-</div>
+  </section>
 
-<div className="py-4 md:py-8 bg-gray-50">
-  <div className="mx-auto px-4">
-    <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-8 text-center">Technical Overview</h2>
+  <section className="py-4 md:py-8 px-4 bg-[var(--vocs-color_background3)] rounded-lg">
+    <div>
+      <h2 className="ecp_H2 vocs_Heading">Technical Overview</h2>
 
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-2">
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-3">Chain Agnostic</h3>
-        <p className="text-gray-600">
-          Identical contract interfaces across all EVM chains. Deploy on your
-          existing chain or index across multiple.
-        </p>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-2">
+        <div className="p-4">
+          <h3 className="text-lg font-semibold mb-3">Chain Agnostic</h3>
+          <p className="ecp_Paragraph_secondary">
+            Identical contract interfaces across all EVM chains. Deploy on your
+            existing chain or index across multiple.
+          </p>
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-lg font-semibold mb-3">Modular Architecture</h3>
+          <p className="ecp_Paragraph_secondary">
+            Integrate specific components without dependencies on a full vertical
+            stack. No vendor lock-in.
+          </p>
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-lg font-semibold mb-3">Infrastructure Layer</h3>
+          <p className="ecp_Paragraph_secondary">
+            Functions as backend infrastructure without user-facing branding
+            requirements or network effects.
+          </p>
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-lg font-semibold mb-3">Contract Stability</h3>
+          <p className="ecp_Paragraph_secondary">
+            Non-upgradeable contracts and standardized interfaces ensure long-term
+            API stability and predictable behavior.
+          </p>
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-lg font-semibold mb-3">EVM Standards</h3>
+          <p className="ecp_Paragraph_secondary">
+            Built on established Ethereum standards and tooling. Compatible with
+            existing infrastructure and wallets.
+          </p>
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-lg font-semibold mb-3">Gas Optimization</h3>
+          <p className="ecp_Paragraph_secondary">
+            Optimized for L2s: ~$0.001 per comment on Base. Optional delegated
+            signing and calldata suffix for UX.
+          </p>
+        </div>
       </div>
 
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-3">Modular Architecture</h3>
-        <p className="text-gray-600">
-          Integrate specific components without dependencies on a full vertical
-          stack. No vendor lock-in.
-        </p>
-      </div>
-
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-3">Infrastructure Layer</h3>
-        <p className="text-gray-600">
-          Functions as backend infrastructure without user-facing branding
-          requirements or network effects.
-        </p>
-      </div>
-
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-3">Contract Stability</h3>
-        <p className="text-gray-600">
-          Non-upgradeable contracts and standardized interfaces ensure long-term
-          API stability and predictable behavior.
-        </p>
-      </div>
-
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-3">EVM Standards</h3>
-        <p className="text-gray-600">
-          Built on established Ethereum standards and tooling. Compatible with
-          existing infrastructure and wallets.
-        </p>
-      </div>
-
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-3">Gas Optimization</h3>
-        <p className="text-gray-600">
-          Optimized for L2s: ~$0.001 per comment on Base. Optional delegated
-          signing and calldata suffix for UX.
-        </p>
-      </div>
     </div>
 
-  </div>
-</div>
+  </section>
 
   <div className="py-4 md:py-8">
     <div className="mx-auto px-4">
-      <div className="rounded-2xl border border-gray-300 p-6 md:p-12 flex flex-col gap-2">
+      <div className="rounded-lg border border-gray-300 p-6 md:p-12 flex flex-col gap-2">
         <div className="max-w-2xl">
-          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-left">Implementation Example</h2>
-          <div className="font-mono text-sm rounded text-left">
+          <h2 className="ecp_H2 vocs_Heading">Integration Example</h2>
+            <div className="font-mono text-sm rounded text-left">
 ```tsx
 import { CommentsEmbed } from '@ecp.eth/sdk/react'
 
@@ -159,17 +161,16 @@ export function Comments() {
 }
 ```
           </div>
-          <HomePage.Button href="./quick-start" variant="accent">
-            View Documentation
-          </HomePage.Button>
+          <div className="my-4 flex flex-row justify-center items-center gap-4">
+            <HomePage.Button href="./quick-start" variant="accent">
+              View Documentation
+            </HomePage.Button>
+            <HomePage.Button href="#ecp-embed-footer" >
+              See it in action 👇
+            </HomePage.Button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </HomePage.Root>
-
-<div className="flex justify-center py-4 md:py-8">
-  <HomePage.Button href="./quick-start" variant="accent" size="lg">
-    Quick Start
-  </HomePage.Button>
-</div>
