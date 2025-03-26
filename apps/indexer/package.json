@@ -7,7 +7,7 @@
     "node": ">=22 <23"
   },
   "scripts": {
-    "dev": "ponder dev",
+    "dev": "ponder dev --schema SCHEMA_RANDOM_NAME",
     "start": "ponder start",
     "db": "ponder db",
     "codegen": "ponder codegen",
@@ -21,10 +21,12 @@
     "@hono/zod-openapi": "^0.18.4",
     "@neynar/nodejs-sdk": "^2.13.1",
     "@noble/ed25519": "^2.2.3",
+    "@ponder/client": "^0.10.5",
     "@sentry/node": "^9.3.0",
     "@sentry/profiling-node": "^9.3.0",
     "commander": "^13.1.0",
     "dataloader": "^2.2.3",
+    "drizzle-orm": "^0.39.3",
     "hono": "^4.5.0",
     "hono-rate-limiter": "^0.4.2",
     "kysely": "^0.26.3",
@@ -32,7 +34,7 @@
     "normalize-url": "^8.0.1",
     "obscenity": "^0.4.3",
     "pg": "^8.11.3",
-    "ponder": "^0.9.24",
+    "ponder": "^0.10.5",
     "viem": "^2.23.15",
     "xxhash-wasm": "^1.1.0",
     "zod": "^3.24.1"
