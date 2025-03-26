@@ -24,9 +24,9 @@
       "default": "./dist/cjs/react.cjs"
     },
     "./schemas": {
-      "types": "./dist/esm/schemas.d.ts",
-      "import": "./dist/esm/schemas.js",
-      "default": "./dist/cjs/schemas.cjs"
+      "types": "./dist/esm/schemas/index.d.ts",
+      "import": "./dist/esm/schemas/index.js",
+      "default": "./dist/cjs/schemas/index.cjs"
     },
     "./types": {
       "types": "./dist/esm/types.d.ts",
