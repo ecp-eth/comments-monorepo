@@ -77,6 +77,7 @@ export function useNewCommentsChecker({
         }
 
         return {
+          extra: oldData.extra,
           results: [],
           pagination: {
             hasNext: false,
