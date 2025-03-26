@@ -47,7 +47,7 @@ export default function Home() {
             <TabsTrigger value="gasless">
               Gas Sponsored Transactions
             </TabsTrigger>
-            <TabsTrigger value="swap">Swap with comment</TabsTrigger>
+            {/* <TabsTrigger value="swap">Swap with comment</TabsTrigger> */}
           </TabsList>
         </Tabs>
         {activeTab === "gasless" ? (
