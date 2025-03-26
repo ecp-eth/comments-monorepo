@@ -7,7 +7,9 @@ export class JSONResponse<TSchema extends z.ZodType> extends Response {
   constructor(
     parser: TSchema,
     data: z.input<TSchema>,
-    init?: ResponseInit & { jsonReplacer?: (key: string, value: any) => any }
+    init?: ResponseInit & {
+      jsonReplacer?: (key: string, value: unknown) => unknown;
+    }
   ) {
     const { jsonReplacer, ...responseInit } = init || {};
 
