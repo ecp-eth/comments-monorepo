@@ -8,3 +8,19 @@
   --radius-iframe-configurator-section: var(--vocs-borderRadius_4);
   --text-iframe-configurator-input: var(--vocs-fontSize_14);
 }
+
+.ecp_H1 {
+  @apply text-4xl font-bold mb-8 text-center;
+}
+
+.ecp_H2 {
+  @apply text-2xl font-bold mb-8 text-center;
+}
+
+.ecp_Paragraph_secondary {
+  @apply text-gray-800;
+}
+
+:root.dark .ecp_Paragraph_secondary {
+  @apply text-gray-400;
+}
