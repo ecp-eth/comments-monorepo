@@ -55,8 +55,8 @@ export const IndexerAPICommentSchema = z.object({
   timestamp: z.coerce.date(),
   txHash: HexSchema,
   cursor: HexSchema,
-  moderationStatus: IndexerAPICommentModerationStatusSchema.nullable(),
-  moderationStatusChangedAt: z.coerce.date().nullable(),
+  moderationStatus: IndexerAPICommentModerationStatusSchema,
+  moderationStatusChangedAt: z.coerce.date(),
 });
 
 export type IndexerAPICommentSchemaType = z.infer<
