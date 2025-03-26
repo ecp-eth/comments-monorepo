@@ -12,6 +12,7 @@ import {
   ResolvedFarcasterData,
 } from "./farcaster-data-resolver";
 import { getCommentCursor } from "@ecp.eth/sdk";
+import { env } from "../env";
 
 type CommentFromDB = CommentSelectType & { replies?: CommentSelectType[] };
 
@@ -36,6 +37,9 @@ export async function resolveUserDataAndFormatListCommentsResponse({
         limit,
         hasPrevious: false,
         hasNext: false,
+      },
+      extra: {
+        moderationEnabled: env.MODERATION_ENABLED,
       },
     };
   }
@@ -141,6 +145,9 @@ export async function resolveUserDataAndFormatListCommentsResponse({
       endCursor: endComment
         ? getCommentCursor(endComment.id as Hex, endComment.timestamp)
         : undefined,
+    },
+    extra: {
+      moderationEnabled: env.MODERATION_ENABLED,
     },
   };
 }

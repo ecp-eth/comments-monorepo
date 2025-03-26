@@ -85,6 +85,12 @@ export type IndexerAPICursorPaginationSchemaType = z.infer<
   typeof IndexerAPICursorPaginationSchema
 >;
 
+export const IndexerAPIExtraSchema = z.object({
+  moderationEnabled: z.boolean(),
+});
+
+export type IndexerAPIExtraSchemaType = z.infer<typeof IndexerAPIExtraSchema>;
+
 export const IndexerAPICommentWithRepliesSchema =
   IndexerAPICommentSchema.extend({
     replies: z.object({
@@ -100,6 +106,7 @@ export type IndexerAPICommentWithRepliesSchemaType = z.infer<
 export const IndexerAPIListCommentsSchema = z.object({
   results: z.array(IndexerAPICommentWithRepliesSchema),
   pagination: IndexerAPICursorPaginationSchema,
+  extra: IndexerAPIExtraSchema,
 });
 
 export type IndexerAPIListCommentsSchemaType = z.infer<
@@ -109,6 +116,7 @@ export type IndexerAPIListCommentsSchemaType = z.infer<
 export const IndexerAPIListCommentRepliesSchema = z.object({
   results: z.array(IndexerAPICommentSchema),
   pagination: IndexerAPICursorPaginationSchema,
+  extra: IndexerAPIExtraSchema,
 });
 
 export type IndexerAPIListCommentRepliesSchemaType = z.infer<

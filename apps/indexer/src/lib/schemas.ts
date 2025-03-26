@@ -123,6 +123,9 @@ export const InputCommentCursorSchema = z.preprocess((value, ctx) => {
  */
 export const GetCommentsQuerySchema = z.object({
   author: HexSchema.optional(),
+  viewer: HexSchema.optional().openapi({
+    description: "The viewer's address",
+  }),
   appSigner: HexSchema.optional().openapi({
     description: "The address of the app signer",
   }),
