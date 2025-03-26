@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "ESNext",
+    "strictNullChecks": true,
+    "jsx": "react-native"
+    // "paths": { "react": ["./node_modules/@types/react"] }
+  },
+  "extends": "expo/tsconfig.base"
+}

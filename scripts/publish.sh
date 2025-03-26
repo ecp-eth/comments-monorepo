@@ -73,9 +73,6 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-# generate proxy packages
-pnpm run pkg:proxy-pkg:generate
-
 if [[ ! $DRY_RUN == "true" ]]; then
     # publish changes
     pnpm changeset publish
@@ -83,9 +80,6 @@ else
     # dry run publish changes
     pnpm changeset publish --dry-run
 fi
-
-# clean up
-git clean -df
 
 if [[ ! $DRY_RUN == "true" ]]; then
     # push tags

@@ -27,12 +27,35 @@ out/
 build
 dist
 
-
 # Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# React Native
+# Expo
+apps/demo-rn-expo/.expo
+apps/demo-rn-expo/web-build
+apps/demo-rn-expo/expo-env.d.ts
+
+# Native
+apps/demo-rn-expo/*.orig.*
+apps/demo-rn-expo/*.jks
+apps/demo-rn-expo/*.p8
+apps/demo-rn-expo/*.p12
+apps/demo-rn-expo/*.key
+apps/demo-rn-expo/*.mobileprovision
+
 # Misc
 .DS_Store
 *.pem
+
+# Proxy packages
+packages/sdk/abis
+packages/sdk/react
+packages/sdk/schemas
+packages/sdk/types
+packages/shared/helpers
+packages/shared/hooks
+packages/shared/schemas
+packages/shared/types

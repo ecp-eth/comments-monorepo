@@ -1,0 +1,2 @@
+export const TRUNCATE_COMMENT_LINES = 4;
+export const COMMENT_BOX_AVERAGE_HEIGHT = 120;
