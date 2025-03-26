@@ -1,34 +1,11 @@
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { CommentData } from "@ecp.eth/sdk/schemas";
-import { Hex, parseAbi } from "viem";
+import { Hex } from "viem";
 import { UseWriteContractReturnType } from "wagmi";
-import never from "never";
-import { publicEnv } from "@/publicEnv";
 
 type PostCommentViaContractParams = {
   commentData: CommentData;
   appSignature: Hex;
-};
-
-export const postCommentViaYoink = async (
-  { appSignature, commentData }: PostCommentViaContractParams,
-  writeContractAsync: UseWriteContractReturnType["writeContractAsync"]
-) => {
-  // TODO: replace it with EIP-7702
-  // const commentDataSuffix = createCommentSuffixData({
-  //   commentData,
-  //   appSignature,
-  // });
-
-  return await writeContractAsync({
-    address:
-      publicEnv.NEXT_PUBLIC_YOINK_CONTRACT_ADDRESS ??
-      never("Yoink contract address is not set"),
-    abi: parseAbi(["function yoink()"]),
-    functionName: "yoink",
-    args: [],
-    // dataSuffix: commentDataSuffix,
-  });
 };
 
 export const postCommentAsAuthorViaCommentsV1 = async (
