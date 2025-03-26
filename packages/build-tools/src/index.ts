@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env npx --yes tsx
 
 /**
  * Proxy Packages (as termed by the wagmi team) are package.json files stored in
