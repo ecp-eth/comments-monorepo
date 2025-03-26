@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { View, Image } from "react-native";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { useEnrichedAuthor } from "../hooks/useEnrichedAuthor";
-import identicon from "../lib/identicon";
 import { AuthorType } from "@ecp.eth/shared/types";
+import { SvgFromUri } from "react-native-svg";
+import { blo } from "blo";
 
 const AVATAR_SIZE = 24;
 
@@ -15,7 +16,7 @@ export function AuthorAvatar({ author }: AuthorAvatarProps) {
   const [isAvatarLoaded, setIsAvatarLoaded] = useState(false);
   const enrichedAuthor = useEnrichedAuthor(author);
   const nameOrAddress = getCommentAuthorNameOrAddress(enrichedAuthor);
-  const fallbackAvatarUrl = identicon(author.address, AVATAR_SIZE);
+  const fallbackAvatarUrl = blo(author.address, AVATAR_SIZE);
   const avatarUrl =
     enrichedAuthor.ens?.avatarUrl ??
     enrichedAuthor.farcaster?.pfpUrl ??
@@ -32,8 +33,8 @@ export function AuthorAvatar({ author }: AuthorAvatarProps) {
         position: "relative",
       }}
     >
-      <Image
-        source={{ uri: fallbackAvatarUrl }}
+      <SvgFromUri
+        uri={fallbackAvatarUrl}
         style={{
           width: AVATAR_SIZE,
           height: AVATAR_SIZE,
@@ -44,7 +45,6 @@ export function AuthorAvatar({ author }: AuthorAvatarProps) {
           bottom: 0,
           zIndex: isAvatarLoaded ? 1 : 2,
         }}
-        resizeMode="cover"
       />
       <Image
         onLoad={() => setIsAvatarLoaded(true)}
