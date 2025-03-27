@@ -103,14 +103,12 @@ export async function POST(req: Request) {
 
   const hash = hashTypedData(typedCommentData);
 
-  return JSONResponse.json(
-    SignCommentResponseServerSchema.parse({
+  return new JSONResponse(
+    SignCommentResponseServerSchema,
+    {
       signature,
       hash,
-      data: {
-        ...commentData,
-        id: hash,
-      },
+      data: { ...commentData, id: hash },
     },
     {
       jsonReplacer: bigintReplacer,
