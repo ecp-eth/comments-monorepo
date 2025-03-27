@@ -33,12 +33,12 @@ program.description("Proxy packages utility").version(buildToolsPkg.version);
 program
   .command("generate")
   .description("Generate proxy packages")
-  .argument("<string>", "The pattern to search for the package")
+  .argument("<glob-pattern>", "The pattern to search for the package")
   .action(async (pattern) => {
     console.log("Generating proxy packages...");
 
     const results = await everyPackage(pattern, async ({ pkg, path }) => {
-      const dir = nodePath.resolve(nodePath.dirname(path));
+      const dir = nodePath.dirname(path);
 
       console.log(`Start processing ${pkg.name} at (${dir})`);
 
@@ -71,7 +71,7 @@ program
 program
   .command("hide")
   .description("Hide generated proxy packages in the project")
-  .argument("<string>", "The pattern to search for the package")
+  .argument("<glob-pattern>", "The pattern to search for the package")
   .action(async (pattern) => {
     console.log("Hiding proxy packages...");
 
