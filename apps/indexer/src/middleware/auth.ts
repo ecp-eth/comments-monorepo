@@ -6,6 +6,26 @@ import { getIndexerDb } from "../management/db";
 
 const MAX_REQUEST_AGE_MS = 1 * 60 * 1000; // 1 minute
 
+/**
+ * Middleware to authenticate requests using API keys and signatures
+ *
+ * @example
+ * ```ts
+ * app.use("*", authMiddleware());
+ * ```
+ *
+ * @example
+ * ```
+ * // Request with signature in query params
+ * GET /api/comments?signature=...&timestamp=...&keyId=...
+ *
+ * // Request with signature in header
+ * GET /api/comments
+ * x-api-signature: ...
+ * x-api-timestamp: ...
+ * x-api-key: ...
+ * ```
+ */
 export function authMiddleware(): MiddlewareHandler {
   const authService = new ManagementAuthService(getIndexerDb());
 
