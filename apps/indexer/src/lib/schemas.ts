@@ -237,3 +237,55 @@ export const ChangeModerationStatusOnCommentBodySchema = z.object({
     description: "The moderation status of the comment",
   }),
 });
+
+/**
+ * Request body schema for approving a comment.
+ */
+export const WebhookRequestBodyApproveCommentSchema = z.object({
+  type: z.literal("approve"),
+  commentId: HexSchema,
+});
+
+export type WebhookRequestBodyApproveCommentSchemaType = z.infer<
+  typeof WebhookRequestBodyApproveCommentSchema
+>;
+
+/**
+ * Request body schema for rejecting a comment.
+ */
+export const WebhookRequestBodyRejectCommentSchema = z.object({
+  type: z.literal("reject"),
+  commentId: HexSchema,
+});
+
+export type WebhookRequestBodyRejectCommentSchemaType = z.infer<
+  typeof WebhookRequestBodyRejectCommentSchema
+>;
+
+const WebhookRequestParamsCommandSchema = z.discriminatedUnion("type", [
+  WebhookRequestBodyApproveCommentSchema,
+  WebhookRequestBodyRejectCommentSchema,
+]);
+
+/**
+ * Request params schema for a webhook request.
+ */
+export const WebhookRequestParamsSchema = z.object({
+  c: z.preprocess((value, ctx) => {
+    try {
+      if (typeof value !== "string") {
+        throw new Error("Invalid webhook request");
+      }
+
+      return JSON.parse(value);
+    } catch {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid webhook request",
+        path: ["c"],
+      });
+
+      return z.NEVER;
+    }
+  }, WebhookRequestParamsCommandSchema),
+});

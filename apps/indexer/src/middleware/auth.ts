@@ -53,6 +53,7 @@ export function authMiddleware(): MiddlewareHandler {
 
     // Prevent replay attacks by checking timestamp
     const requestTimestamp = parseInt(timestamp, 10);
+
     if (isNaN(requestTimestamp)) {
       throw new HTTPException(401, {
         res: Response.json(
@@ -63,6 +64,7 @@ export function authMiddleware(): MiddlewareHandler {
     }
 
     const currentTime = Date.now();
+
     if (Math.abs(currentTime - requestTimestamp) > MAX_REQUEST_AGE_MS) {
       throw new HTTPException(401, {
         res: Response.json({ message: "Request expired" }, { status: 401 }),

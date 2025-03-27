@@ -78,18 +78,10 @@ export function setupChangeCommentModerationStatus(app: OpenAPIHono) {
       return c.json({ message: "Comment moderation status not found" }, 404);
     }
 
-    const [updatedComment] = await db.transaction(async (tx) => {
-      await updateCommentModerationStatus(commentId, moderationStatus);
-
-      return await tx
-        .update(schema.comment)
-        .set({
-          moderationStatus,
-          moderationStatusChangedAt: new Date(),
-        })
-        .where(eq(schema.comment.id, commentId))
-        .returning();
-    });
+    const updatedComment = await updateCommentModerationStatus(
+      commentId,
+      moderationStatus
+    );
 
     if (!updatedComment) {
       return c.json(

@@ -11,6 +11,7 @@ import {
   getCommentModerationStatus,
   insertCommentModerationStatus,
 } from "../management/services/moderation";
+import { notifyCommentPendingModeration } from "../lib/telegram-notifications";
 // import { isProfane } from "../lib/profanity-detection";
 
 const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
@@ -68,6 +69,13 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         event.args.commentId,
         defaultModerationStatus
       );
+
+      await notifyCommentPendingModeration({
+        id: event.args.commentId,
+        authorAddress: event.args.commentData.author,
+        content: event.args.commentData.content,
+        targetUri,
+      });
     }
   });
 

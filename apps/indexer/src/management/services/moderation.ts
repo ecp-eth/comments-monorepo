@@ -1,5 +1,8 @@
 import type { Hex } from "@ecp.eth/sdk/schemas";
+import { eq } from "ponder";
 import { getIndexerDb } from "../db";
+import { db } from "../../db";
+import schema from "ponder:schema";
 
 type ModerationStatus = "pending" | "approved" | "rejected";
 
@@ -22,16 +25,29 @@ export async function updateCommentModerationStatus(
   commentId: string,
   status: ModerationStatus
 ) {
-  const db = getIndexerDb();
+  const indexerDb = getIndexerDb();
 
-  await db
-    .updateTable("comment_moderation_statuses")
-    .set({
-      moderation_status: status,
-      updated_at: new Date(),
-    })
-    .where("comment_id", "=", commentId)
-    .execute();
+  const [updatedComment] = await db.transaction(async (tx) => {
+    await indexerDb
+      .updateTable("comment_moderation_statuses")
+      .set({
+        moderation_status: status,
+        updated_at: new Date(),
+      })
+      .where("comment_id", "=", commentId)
+      .execute();
+
+    return await tx
+      .update(schema.comment)
+      .set({
+        moderationStatus: "approved",
+        moderationStatusChangedAt: new Date(),
+      })
+      .where(eq(schema.comment.id, commentId))
+      .returning();
+  });
+
+  return updatedComment;
 }
 
 export async function getCommentModerationStatus(commentId: Hex) {
