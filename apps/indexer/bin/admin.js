@@ -16,7 +16,7 @@ const HexSchema = z.string().regex(/^0x[0-9a-fA-F]+$/);
 /**
  * @param {import('viem').Hex} privateKey
  * @param {string} method
- * @param {string} path
+ * @param {URL} url
  * @param {string} body
  * @param {number} timestamp
  * @returns {Promise<string>}
@@ -24,12 +24,12 @@ const HexSchema = z.string().regex(/^0x[0-9a-fA-F]+$/);
 async function createRequestSignature(
   privateKey,
   method,
-  path,
+  url,
   body,
   timestamp
 ) {
   const message = new TextEncoder().encode(
-    `${method}${path}${timestamp}${body}`
+    `${method}${url.pathname}${url.searchParams.toString()}${timestamp}${body}`
   );
   const signature = await signAsync(message, privateKey);
 
@@ -204,7 +204,7 @@ mutedAccounts
           "X-API-Signature": await createRequestSignature(
             privateKey,
             "POST",
-            endpointUrl.pathname,
+            endpointUrl,
             body,
             timestamp
           ),
@@ -244,7 +244,7 @@ mutedAccounts
           "X-API-Signature": await createRequestSignature(
             privateKey,
             "DELETE",
-            endpointUrl.pathname,
+            endpointUrl,
             "",
             timestamp
           ),
@@ -300,7 +300,7 @@ moderateComments
           "X-API-Signature": await createRequestSignature(
             privateKey,
             "PATCH",
-            endpointUrl.pathname,
+            endpointUrl,
             body,
             timestamp
           ),
@@ -344,7 +344,7 @@ moderateComments
           "X-API-Signature": await createRequestSignature(
             privateKey,
             "PATCH",
-            endpointUrl.pathname,
+            endpointUrl,
             body,
             timestamp
           ),
@@ -382,7 +382,7 @@ moderateComments
           "X-API-Signature": await createRequestSignature(
             privateKey,
             "GET",
-            endpointUrl.pathname,
+            endpointUrl,
             "",
             timestamp
           ),
