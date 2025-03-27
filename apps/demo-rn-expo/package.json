@@ -1,5 +1,5 @@
 {
-  "license": "0BSD",
+  "name": "@ecp.eth/demo-rn-expo",
   "main": "index.ts",
   "type": "module",
   "scripts": {
