@@ -396,9 +396,13 @@ moderateComments
       }
 
       /**
+       * @type {any}
+       */
+      const rawResponse = await response.json();
+      /**
        * @type {import('@ecp.eth/sdk/schemas').IndexerAPIListCommentsSchemaType}
        */
-      const result = await response.json();
+      const result = rawResponse.results;
 
       if (!result.extra.moderationEnabled) {
         console.error("Moderation is not enabled on this instance");
