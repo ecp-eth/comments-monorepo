@@ -44,9 +44,10 @@ export async function everyPackage<RetType>(
           path: string;
         }>
       >(async (packagePath) => {
+        const resolvedPath = nodePath.resolve(process.cwd(), packagePath);
         return {
-          pkg: await readPackageJson(packagePath),
-          path: packagePath,
+          pkg: await readPackageJson(resolvedPath),
+          path: resolvedPath,
         };
       })
     )
