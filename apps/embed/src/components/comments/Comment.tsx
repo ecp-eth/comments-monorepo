@@ -98,10 +98,13 @@ export function Comment({
     ? comment.id
     : (comment.parentId ?? never("parentId is required for comment depth > 0"));
   const submitTargetQueryKey = useMemo(
-    () => ["comments", submitTargetCommentId],
-    [submitTargetCommentId]
+    () => ["comments", submitTargetCommentId, address],
+    [submitTargetCommentId, address]
   );
-  const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
+  const queryKey = useMemo(
+    () => ["comments", comment.id, address],
+    [comment.id, address]
+  );
 
   const repliesQuery = useInfiniteQuery({
     enabled: areRepliesAllowed,
@@ -133,6 +136,7 @@ export function Comment({
         limit: pageParam.limit,
         commentId: comment.id,
         signal,
+        viewer: address,
       });
 
       return CommentPageSchema.parse(response);
@@ -163,6 +167,7 @@ export function Comment({
         limit: 10,
         sort: "asc",
         signal,
+        viewer: address,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -268,6 +273,7 @@ export function Comment({
           author={comment.author}
           timestamp={comment.timestamp}
           currentTimestamp={currentTimestamp}
+          moderationStatus={comment.moderationStatus}
         />
         {isAuthor && !comment.pendingOperation && !comment.deletedAt && (
           <DropdownMenu>

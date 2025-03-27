@@ -14,10 +14,11 @@ import {
   TooltipContent,
   Tooltip,
 } from "../ui/tooltip";
+import type { IndexerAPICommentModerationStatusSchemaType } from "@ecp.eth/sdk/schemas";
 
 type CommentAuthorProps = {
   author: AuthorType;
-  moderationStatus: "pending" | "approved" | "rejected";
+  moderationStatus: IndexerAPICommentModerationStatusSchemaType;
   timestamp: Date;
 };
 
@@ -58,12 +59,8 @@ function ModerationLabel({ status }: { status: "pending" | "rejected" }) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span
-            className={cn(
-              status === "pending" ? "text-blue-500" : "text-red-500"
-            )}
-          >
-            {status === "pending" ? "Pending moderation" : "Rejected"}
+          <span className={cn(status === "pending" && "text-red-500")}>
+            {status === "pending" ? "pending moderation" : "rejected"}
           </span>
         </TooltipTrigger>
         <TooltipContent>

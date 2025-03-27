@@ -108,9 +108,12 @@ export async function POST(req: Request) {
       signature,
       hash,
       data: {
+        ...commentData,
         id: hash,
-        ...JSON.parse(JSON.stringify(commentData, bigintReplacer)),
       },
-    })
+    },
+    {
+      jsonReplacer: bigintReplacer,
+    }
   );
 }

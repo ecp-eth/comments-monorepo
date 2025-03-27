@@ -1,5 +1,4 @@
 import { EmbedConfigSchema } from "@ecp.eth/sdk/schemas";
-import { fetchComments } from "@ecp.eth/sdk";
 import { decompressFromURI } from "lz-ts";
 import { Toaster } from "@/components/ui/sonner";
 import { EmbedConfigProvider } from "@/components/EmbedConfigProvider";
@@ -7,8 +6,6 @@ import { CommentSection } from "@/components/comments/CommentSection";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
 import { Providers } from "./providers";
-import { COMMENTS_PER_PAGE } from "@/lib/constants";
-import { env } from "@/env";
 import { ApplyTheme } from "@/components/ApplyTheme";
 
 const SearchParamsSchema = z.object({
@@ -55,12 +52,15 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
   const { targetUri, config } = parseSearchParamsResult.data;
 
   try {
-    const comments = await fetchComments({
+    // at the moment we don't use server-side comments fetching because we don't know the address of the viewer
+    // which causes issues with the feed
+
+    /* const comments = await fetchComments({
       appSigner: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       targetUri,
       limit: COMMENTS_PER_PAGE,
-    });
+    });*/
 
     return (
       <ApplyTheme config={config}>
@@ -71,7 +71,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
                 value={{ targetUri, currentTimestamp: Date.now() }}
               >
                 <CommentSection
-                  initialData={{
+                /* initialData={{
                     pages: [comments],
                     pageParams: [
                       {
@@ -79,7 +79,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
                         cursor: comments.pagination.endCursor,
                       },
                     ],
-                  }}
+                  }}*/
                 />
               </EmbedConfigProvider>
             </Providers>
