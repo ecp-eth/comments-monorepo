@@ -529,6 +529,9 @@ importers:
       acorn:
         specifier: ^8.14.0
         version: 8.14.1
+      decimal.js:
+        specifier: ^10.5.0
+        version: 10.5.0
       hono:
         specifier: ^4.6.20
         version: 4.7.4
