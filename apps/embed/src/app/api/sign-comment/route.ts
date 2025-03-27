@@ -3,7 +3,11 @@ import {
   SignCommentPayloadRequestSchema,
   SignCommentResponseServerSchema,
 } from "@/lib/schemas";
-import { bigintReplacer, getChainById } from "@ecp.eth/shared/helpers";
+import {
+  bigintReplacer,
+  getChainById,
+  JSONResponse,
+} from "@ecp.eth/shared/helpers";
 import {
   createCommentData,
   createCommentTypedData,
@@ -99,7 +103,7 @@ export async function POST(req: Request) {
 
   const hash = hashTypedData(typedCommentData);
 
-  return Response.json(
+  return JSONResponse.json(
     SignCommentResponseServerSchema.parse({
       signature,
       hash,
