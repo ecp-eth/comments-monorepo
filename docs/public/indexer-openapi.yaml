@@ -20,6 +20,11 @@ paths:
           name: author
           in: query
         - schema:
+            description: The viewer's address
+          required: false
+          name: viewer
+          in: query
+        - schema:
             description: The address of the app signer
           required: false
           name: appSigner
@@ -59,7 +64,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: &ref_0
+            enum: &ref_1
               - asc
               - desc
             default: desc
@@ -136,9 +141,26 @@ paths:
                             - 'null'
                         txHash: {}
                         cursor: {}
+                        moderationStatus:
+                          type: string
+                          enum: &ref_0
+                            - approved
+                            - rejected
+                            - pending
+                        moderationStatusChangedAt:
+                          type:
+                            - string
+                            - 'null'
                         replies:
                           type: object
                           properties:
+                            extra:
+                              type: object
+                              properties:
+                                moderationEnabled:
+                                  type: boolean
+                              required:
+                                - moderationEnabled
                             results:
                               type: array
                               items:
@@ -200,6 +222,13 @@ paths:
                                       - 'null'
                                   txHash: {}
                                   cursor: {}
+                                  moderationStatus:
+                                    type: string
+                                    enum: *ref_0
+                                  moderationStatusChangedAt:
+                                    type:
+                                      - string
+                                      - 'null'
                                 required:
                                   - appSigner
                                   - author
@@ -214,6 +243,8 @@ paths:
                                   - timestamp
                                   - txHash
                                   - cursor
+                                  - moderationStatus
+                                  - moderationStatusChangedAt
                             pagination:
                               type: object
                               properties:
@@ -230,6 +261,7 @@ paths:
                                 - hasNext
                                 - hasPrevious
                           required:
+                            - extra
                             - results
                             - pagination
                       required:
@@ -246,6 +278,8 @@ paths:
                         - timestamp
                         - txHash
                         - cursor
+                        - moderationStatus
+                        - moderationStatusChangedAt
                         - replies
                   pagination:
                     type: object
@@ -262,9 +296,17 @@ paths:
                       - limit
                       - hasNext
                       - hasPrevious
+                  extra:
+                    type: object
+                    properties:
+                      moderationEnabled:
+                        type: boolean
+                    required:
+                      - moderationEnabled
                 required:
                   - results
                   - pagination
+                  - extra
   /api/comments/{commentId}/replies:
     get:
       tags:
@@ -279,6 +321,11 @@ paths:
         - schema: {}
           required: false
           name: author
+          in: query
+        - schema:
+            description: The viewer's address
+          required: false
+          name: viewer
           in: query
         - schema:
             description: The address of the app signer
@@ -313,7 +360,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_0
+            enum: *ref_1
             default: desc
             description: The sort order of the comments
           required: false
@@ -388,6 +435,13 @@ paths:
                             - 'null'
                         txHash: {}
                         cursor: {}
+                        moderationStatus:
+                          type: string
+                          enum: *ref_0
+                        moderationStatusChangedAt:
+                          type:
+                            - string
+                            - 'null'
                       required:
                         - appSigner
                         - author
@@ -402,6 +456,8 @@ paths:
                         - timestamp
                         - txHash
                         - cursor
+                        - moderationStatus
+                        - moderationStatusChangedAt
                   pagination:
                     type: object
                     properties:
@@ -417,9 +473,17 @@ paths:
                       - limit
                       - hasNext
                       - hasPrevious
+                  extra:
+                    type: object
+                    properties:
+                      moderationEnabled:
+                        type: boolean
+                    required:
+                      - moderationEnabled
                 required:
                   - results
                   - pagination
+                  - extra
   /api/approvals:
     get:
       tags:
@@ -709,6 +773,449 @@ paths:
                   - message
         '409':
           description: When account is already marked as muted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/moderate-comments:
+    get:
+      tags:
+        - comments
+      description: Get a list of comments pending moderation
+      parameters:
+        - schema:
+            type: object
+            properties:
+              timestamp:
+                type:
+                  - string
+                  - 'null'
+              id: {}
+            required:
+              - timestamp
+              - id
+            description: >-
+              Non inclusive cursor from which to fetch the comments based on
+              sort
+          required: false
+          name: cursor
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+            description: The number of comments to return
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+            description: The sort order of the comments
+          required: false
+          name: sort
+          in: query
+      responses:
+        '200':
+          description: List of pending comments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        appSigner: {}
+                        author:
+                          type: object
+                          properties:
+                            address: {}
+                            ens:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                avatarUrl:
+                                  type:
+                                    - string
+                                    - 'null'
+                              required:
+                                - name
+                                - avatarUrl
+                            farcaster:
+                              type: object
+                              properties:
+                                fid:
+                                  type: integer
+                                pfpUrl:
+                                  type: string
+                                displayName:
+                                  type: string
+                                username:
+                                  type: string
+                              required:
+                                - fid
+                          required:
+                            - address
+                        id: {}
+                        content:
+                          type: string
+                        chainId:
+                          type: integer
+                        deletedAt:
+                          type:
+                            - string
+                            - 'null'
+                        logIndex:
+                          type:
+                            - integer
+                            - 'null'
+                        metadata:
+                          type: string
+                        parentId: {}
+                        targetUri:
+                          type: string
+                        timestamp:
+                          type:
+                            - string
+                            - 'null'
+                        txHash: {}
+                        cursor: {}
+                        moderationStatus:
+                          type: string
+                          enum: *ref_0
+                        moderationStatusChangedAt:
+                          type:
+                            - string
+                            - 'null'
+                      required:
+                        - appSigner
+                        - author
+                        - id
+                        - content
+                        - chainId
+                        - deletedAt
+                        - logIndex
+                        - metadata
+                        - parentId
+                        - targetUri
+                        - timestamp
+                        - txHash
+                        - cursor
+                        - moderationStatus
+                        - moderationStatusChangedAt
+                  pagination:
+                    type: object
+                    properties:
+                      limit:
+                        type: integer
+                      hasNext:
+                        type: boolean
+                      hasPrevious:
+                        type: boolean
+                      startCursor: {}
+                      endCursor: {}
+                    required:
+                      - limit
+                      - hasNext
+                      - hasPrevious
+                required:
+                  - results
+                  - pagination
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: When user is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/moderate-comments/{commentId}:
+    patch:
+      tags:
+        - comments
+      description: Change the moderation status of a comment
+      parameters:
+        - schema:
+            description: The ID of the comment to moderate
+          required: true
+          name: commentId
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                moderationStatus:
+                  type: string
+                  enum: *ref_0
+                  description: The moderation status of the comment
+              required:
+                - moderationStatus
+      responses:
+        '200':
+          description: Comment with moderation status changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  appSigner: {}
+                  author:
+                    type: object
+                    properties:
+                      address: {}
+                      ens:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          avatarUrl:
+                            type:
+                              - string
+                              - 'null'
+                        required:
+                          - name
+                          - avatarUrl
+                      farcaster:
+                        type: object
+                        properties:
+                          fid:
+                            type: integer
+                          pfpUrl:
+                            type: string
+                          displayName:
+                            type: string
+                          username:
+                            type: string
+                        required:
+                          - fid
+                    required:
+                      - address
+                  id: {}
+                  content:
+                    type: string
+                  chainId:
+                    type: integer
+                  deletedAt:
+                    type:
+                      - string
+                      - 'null'
+                  logIndex:
+                    type:
+                      - integer
+                      - 'null'
+                  metadata:
+                    type: string
+                  parentId: {}
+                  targetUri:
+                    type: string
+                  timestamp:
+                    type:
+                      - string
+                      - 'null'
+                  txHash: {}
+                  cursor: {}
+                  moderationStatus:
+                    type: string
+                    enum: *ref_0
+                  moderationStatusChangedAt:
+                    type:
+                      - string
+                      - 'null'
+                required:
+                  - appSigner
+                  - author
+                  - id
+                  - content
+                  - chainId
+                  - deletedAt
+                  - logIndex
+                  - metadata
+                  - parentId
+                  - targetUri
+                  - timestamp
+                  - txHash
+                  - cursor
+                  - moderationStatus
+                  - moderationStatusChangedAt
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: When user is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: When comment is not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+    get:
+      tags:
+        - comments
+      description: Get a comment by ID with its moderation status
+      parameters:
+        - schema:
+            description: The ID of the comment to moderate
+          required: true
+          name: commentId
+          in: path
+      responses:
+        '200':
+          description: Comment found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  appSigner: {}
+                  author:
+                    type: object
+                    properties:
+                      address: {}
+                      ens:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          avatarUrl:
+                            type:
+                              - string
+                              - 'null'
+                        required:
+                          - name
+                          - avatarUrl
+                      farcaster:
+                        type: object
+                        properties:
+                          fid:
+                            type: integer
+                          pfpUrl:
+                            type: string
+                          displayName:
+                            type: string
+                          username:
+                            type: string
+                        required:
+                          - fid
+                    required:
+                      - address
+                  id: {}
+                  content:
+                    type: string
+                  chainId:
+                    type: integer
+                  deletedAt:
+                    type:
+                      - string
+                      - 'null'
+                  logIndex:
+                    type:
+                      - integer
+                      - 'null'
+                  metadata:
+                    type: string
+                  parentId: {}
+                  targetUri:
+                    type: string
+                  timestamp:
+                    type:
+                      - string
+                      - 'null'
+                  txHash: {}
+                  cursor: {}
+                  moderationStatus:
+                    type: string
+                    enum: *ref_0
+                  moderationStatusChangedAt:
+                    type:
+                      - string
+                      - 'null'
+                required:
+                  - appSigner
+                  - author
+                  - id
+                  - content
+                  - chainId
+                  - deletedAt
+                  - logIndex
+                  - metadata
+                  - parentId
+                  - targetUri
+                  - timestamp
+                  - txHash
+                  - cursor
+                  - moderationStatus
+                  - moderationStatusChangedAt
+        '401':
+          description: When user is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: When comment is not found
           content:
             application/json:
               schema:

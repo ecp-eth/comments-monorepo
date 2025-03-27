@@ -8,6 +8,11 @@ const EnvSchema = z.object({
     .enum(["0", "1"])
     .transform((val) => val === "1")
     .default("0"),
+  // this one is more of an internal flag so we can compile the indexer for docs
+  SKIP_DRIZZLE_SCHEMA_DETECTION: z
+    .enum(["0", "1"])
+    .transform((val) => val === "1")
+    .default("0"),
 });
 
 declare global {

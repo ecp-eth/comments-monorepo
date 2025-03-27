@@ -21,13 +21,15 @@ function assertDrizzleSchemaSymbolSupported(
   }
 }
 
-// this is really a hack but we need to somehow check that we are able to use proper pg schema
-assertDrizzleSchemaSymbolSupported(table);
+if (!env.SKIP_DRIZZLE_SCHEMA_DETECTION) {
+  // this is really a hack but we need to somehow check that we are able to use proper pg schema
+  assertDrizzleSchemaSymbolSupported(table);
 
-if (!(table.Schema in schema.approvals) || !schema.approvals[table.Schema]) {
-  throw new Error(
-    "Schema is not set on the table this will cause the drizzle to load from public schema"
-  );
+  if (!(table.Schema in schema.approvals) || !schema.approvals[table.Schema]) {
+    throw new Error(
+      "Schema is not set on the table this will cause the drizzle to load from public schema"
+    );
+  }
 }
 
 /**

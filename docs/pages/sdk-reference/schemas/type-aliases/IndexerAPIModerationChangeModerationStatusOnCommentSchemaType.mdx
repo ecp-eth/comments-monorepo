@@ -2,13 +2,13 @@
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [schemas](/sdk-reference/schemas/index.mdx) / IndexerAPICommentWithRepliesSchemaType
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [schemas](/sdk-reference/schemas/index.mdx) / IndexerAPIModerationChangeModerationStatusOnCommentSchemaType
 
-# Type Alias: IndexerAPICommentWithRepliesSchemaType
+# Type Alias: IndexerAPIModerationChangeModerationStatusOnCommentSchemaType
 
-> **IndexerAPICommentWithRepliesSchemaType**: `object`
+> **IndexerAPIModerationChangeModerationStatusOnCommentSchemaType**: `object`
 
-Defined in: [packages/sdk/src/schemas/indexer.ts:103](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L103)
+Defined in: [packages/sdk/src/schemas/indexer.ts:139](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L139)
 
 ## Type declaration
 
@@ -95,46 +95,6 @@ Defined in: [packages/sdk/src/schemas/indexer.ts:103](https://github.com/ecp-eth
 ### parentId
 
 > **parentId**: `null` \| `` `0x${string}` ``
-
-### replies
-
-> **replies**: `object`
-
-#### replies.extra
-
-> **extra**: `object` = `IndexerAPIExtraSchema`
-
-#### replies.extra.moderationEnabled
-
-> **moderationEnabled**: `boolean`
-
-#### replies.pagination
-
-> **pagination**: `object` = `IndexerAPICursorPaginationSchema`
-
-#### replies.pagination.endCursor?
-
-> `optional` **endCursor**: `` `0x${string}` ``
-
-#### replies.pagination.hasNext
-
-> **hasNext**: `boolean`
-
-#### replies.pagination.hasPrevious
-
-> **hasPrevious**: `boolean`
-
-#### replies.pagination.limit
-
-> **limit**: `number`
-
-#### replies.pagination.startCursor?
-
-> `optional` **startCursor**: `` `0x${string}` ``
-
-#### replies.results
-
-> **results**: `object`[]
 
 ### targetUri
 

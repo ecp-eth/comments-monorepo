@@ -8,7 +8,7 @@
 
 > **FetchCommentRepliesOptions**: `object`
 
-Defined in: [packages/sdk/src/api.ts:144](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L144)
+Defined in: [packages/sdk/src/api.ts:154](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L154)
 
 The options for `fetchCommentReplies()`
 
@@ -79,3 +79,9 @@ Number of times to retry the signing operation in case of failure.
 ```ts
 "desc"
 ```
+
+### viewer?
+
+> `optional` **viewer**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
+
+The viewer's address. This is useful when the content moderation is enabled on the indexer.
