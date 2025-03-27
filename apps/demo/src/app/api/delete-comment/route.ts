@@ -1,5 +1,4 @@
 import { env } from "@/env";
-import { JSONResponse } from "@/lib/json-response";
 import {
   BadRequestResponseSchema,
   DeleteCommentRequestBodySchema,
@@ -7,11 +6,9 @@ import {
   InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
-import {
-  chain,
-  transport,
-} from "@/lib/wagmi";
+import { chain, transport } from "@/lib/wagmi";
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
+import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
