@@ -8,6 +8,7 @@ import { setupUnmuteAccount } from "./muted-accounts/delete";
 import { setupGetMutedAccount } from "./muted-accounts/get";
 import { setupGetPendingModerationComments } from "./moderate-comments/get";
 import { setupChangeCommentModerationStatus } from "./moderate-comments/[commentId]/patch";
+import { setupGetComment } from "./moderate-comments/[commentId]/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetComments(app);
@@ -19,4 +20,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupMarkAuthorAsMuted(app);
   setupGetPendingModerationComments(app);
   setupChangeCommentModerationStatus(app);
+  setupGetComment(app);
+
+  return app;
 }
