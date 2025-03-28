@@ -402,7 +402,7 @@ moderateComments
       /**
        * @type {import('@ecp.eth/sdk/schemas').IndexerAPIListCommentsSchemaType}
        */
-      const result = rawResponse.results;
+      const result = rawResponse;
 
       if (!result.extra.moderationEnabled) {
         console.error("Moderation is not enabled on this instance");
