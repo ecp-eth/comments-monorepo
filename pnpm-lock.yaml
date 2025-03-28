@@ -711,10 +711,6 @@ importers:
         version: 3.24.1
 
   packages/shared:
-    dependencies:
-      '@ecp.eth/sdk':
-        specifier: workspace:*
-        version: link:../sdk
     devDependencies:
       '@ecp.eth/build-tools':
         specifier: workspace:^
@@ -722,6 +718,9 @@ importers:
       '@ecp.eth/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@ecp.eth/sdk':
+        specifier: workspace:*
+        version: link:../sdk
       '@ecp.eth/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
