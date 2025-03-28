@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { CommentsEmbed } from "@ecp.eth/sdk/react";
 import { publicEnv } from "./publicEnv";
+import { useIsMounted } from "./hooks/useIsMounted";
 
 /**
  * A custom footer component that renders a comments embed.
@@ -61,21 +62,6 @@ export default function Footer() {
       />
     </div>
   );
-}
-
-/**
- * A hook that returns true if the component is mounted.
- * useful in the context to avoid rendering components on SSR.
- * @returns true if the component is mounted
- */
-function useIsMounted() {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  return isMounted;
 }
 
 function useVocsColorScheme() {

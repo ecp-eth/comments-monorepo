@@ -701,13 +701,6 @@ function GeneratedURL({
 
     return (
       <div className="flex flex-col gap-4">
-        <textarea
-          readOnly
-          value={snippet}
-          className="flex-1 p-2 border rounded cursor-pointer text-input-text bg-input border-input-border font-mono text-sm"
-          onClick={copyToClipboard}
-          rows={6}
-        />
         <div className="flex gap-2 text-sm text-[var(--vocs-color_noteText)] p-2 border border-[var(--vocs-color_noteBorder)] bg-[var(--vocs-color_noteBackground)] rounded-[var(--vocs-borderRadius_4)]">
           <Info className="mt-0.5 h-[1em] w-[1em]" />
           <span>
@@ -726,9 +719,16 @@ function GeneratedURL({
             .
           </span>
         </div>
+        <textarea
+          readOnly
+          value={snippet}
+          className="flex-1 p-2 border rounded cursor-pointer text-input-text bg-input border-input-border font-mono text-sm"
+          onClick={copyToClipboard}
+          rows={6}
+        />
         <button
           onClick={copyToClipboard}
-          className="px-4 py-2 rounded block"
+          className="px-4 py-2 border rounded block m-auto"
           type="button"
         >
           <span className="block w-[7ch] truncate">
