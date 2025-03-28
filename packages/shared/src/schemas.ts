@@ -6,6 +6,8 @@ import {
   type IndexerAPICommentSchemaType,
   IndexerAPICursorPaginationSchema,
   type IndexerAPICursorPaginationSchemaType,
+  IndexerAPIExtraSchema,
+  type IndexerAPIExtraSchemaType,
 } from "@ecp.eth/sdk/schemas";
 import { z } from "zod";
 
@@ -44,6 +46,7 @@ export type PendingCommentOperationSchemaType = z.infer<
 type CommentSchemaType = IndexerAPICommentSchemaType & {
   pendingOperation?: PendingCommentOperationSchemaType;
   replies?: {
+    extra: IndexerAPIExtraSchemaType;
     results: CommentSchemaType[];
     pagination: IndexerAPICursorPaginationSchemaType;
   };
@@ -53,6 +56,7 @@ export const CommentSchema: z.ZodType<CommentSchemaType> =
   IndexerAPICommentSchema.extend({
     replies: z
       .object({
+        extra: IndexerAPIExtraSchema,
         results: z.lazy(() => CommentSchema.array()),
         pagination: IndexerAPICursorPaginationSchema,
       })
@@ -67,6 +71,7 @@ export type PendingComment = Omit<Comment, "pendingOperation"> & {
 };
 
 export const CommentPageSchema = z.object({
+  extra: IndexerAPIExtraSchema,
   results: CommentSchema.array(),
   pagination: IndexerAPICursorPaginationSchema,
 });

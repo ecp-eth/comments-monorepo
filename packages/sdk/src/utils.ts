@@ -18,7 +18,7 @@ import {
   type DeleteCommentTypedDataSchemaType,
   AddApprovalTypedDataSchema,
   type AddApprovalTypedDataSchemaType,
-} from "./schemas.js";
+} from "./schemas/index.js";
 
 /**
  * Check if a hex string is zero

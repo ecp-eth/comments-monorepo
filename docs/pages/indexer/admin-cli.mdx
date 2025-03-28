@@ -1,9 +1,47 @@
 # Admin CLI
 
-The Indexer provides an admin CLI tool (`bin/admin.js`) for managing various aspects of a indexer instance.
+The Indexer provides an admin CLI tool (`bin/admin.js`) for managing various aspects of an indexer instance. This tool requires proper authentication using API keys.
+
+## Prerequisites
+
+Before using the admin CLI commands, you need:
+
+- Access to the indexer service
+- Checked out the [Comments mono repository](https://github.com/ecp-eth/comments-monorepo)
 
 ## Usage
+
+To see available commands and their descriptions:
 
 ```bash
 bin/admin.js help
 ```
+
+## Common Options
+
+Most admin CLI commands require the following options:
+
+- `-i, --id <id>` - The ID of the API key to use (required)
+- `-k, --private-key <key>` - The private key of the API key (required)
+- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
+
+## Error Handling
+
+If any command fails, the CLI will:
+
+1. Display an error message with details about the failure
+2. Exit with a non-zero status code
+
+Common error scenarios include:
+
+- Invalid API key or private key
+- Network connectivity issues
+- Server-side errors
+- Invalid command arguments
+
+## Security Notes
+
+- Keep your API private keys secure and never share them
+- Use environment variables or secure key management systems to store sensitive credentials
+- The CLI uses Ed25519 signatures for authentication
+- All requests are timestamped to prevent replay attacks

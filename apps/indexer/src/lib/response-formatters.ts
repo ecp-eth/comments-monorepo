@@ -3,6 +3,7 @@ import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
   HexSchema,
+  IndexerAPIModerationChangeModerationStatusOnCommentSchemaType,
 } from "@ecp.eth/sdk/schemas";
 import { ensDataResolver, type ResolvedEnsData } from "./ens-data-resolver";
 import type { CommentSelectType } from "ponder:schema";
@@ -11,6 +12,7 @@ import {
   ResolvedFarcasterData,
 } from "./farcaster-data-resolver";
 import { getCommentCursor } from "@ecp.eth/sdk";
+import { env } from "../env";
 
 type CommentFromDB = CommentSelectType & { replies?: CommentSelectType[] };
 
@@ -35,6 +37,9 @@ export async function resolveUserDataAndFormatListCommentsResponse({
         limit,
         hasPrevious: false,
         hasNext: false,
+      },
+      extra: {
+        moderationEnabled: env.MODERATION_ENABLED,
       },
     };
   }
@@ -88,6 +93,9 @@ export async function resolveUserDataAndFormatListCommentsResponse({
           resolvedAuthorFarcasterData
         ),
         replies: {
+          extra: {
+            moderationEnabled: env.MODERATION_ENABLED,
+          },
           results: slicedReplies.map((reply) => {
             const resolvedAuthorEnsData = resolveUserData(
               resolvedAuthorsEnsData,
@@ -141,6 +149,9 @@ export async function resolveUserDataAndFormatListCommentsResponse({
         ? getCommentCursor(endComment.id as Hex, endComment.timestamp)
         : undefined,
     },
+    extra: {
+      moderationEnabled: env.MODERATION_ENABLED,
+    },
   };
 }
 
@@ -180,4 +191,22 @@ function resolveUserData<
         item.address.toLowerCase() === lowercasedAddress
     ) ?? null
   );
+}
+
+export async function resolveAuthorDataAndFormatCommentChangeModerationStatusResponse(
+  comment: CommentSelectType
+): Promise<IndexerAPIModerationChangeModerationStatusOnCommentSchemaType> {
+  const [resolvedEnsData, resolvedFarcasterData] = await Promise.all([
+    ensDataResolver.load(comment.author),
+    farcasterDataResolver.load(comment.author),
+  ]);
+
+  return {
+    ...formatComment(comment),
+    author: formatAuthor(
+      comment.author,
+      resolvedEnsData,
+      resolvedFarcasterData
+    ),
+  };
 }

@@ -8,7 +8,7 @@
 
 > **IndexerAPICommentWithRepliesSchemaType**: `object`
 
-Defined in: [packages/sdk/src/schemas.ts:277](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas.ts#L277)
+Defined in: [packages/sdk/src/schemas/indexer.ts:103](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L103)
 
 ## Type declaration
 
@@ -84,6 +84,14 @@ Defined in: [packages/sdk/src/schemas.ts:277](https://github.com/ecp-eth/comment
 
 > **metadata**: `string`
 
+### moderationStatus
+
+> **moderationStatus**: `"approved"` \| `"rejected"` \| `"pending"` = `IndexerAPICommentModerationStatusSchema`
+
+### moderationStatusChangedAt
+
+> **moderationStatusChangedAt**: `Date`
+
 ### parentId
 
 > **parentId**: `null` \| `` `0x${string}` ``
@@ -91,6 +99,14 @@ Defined in: [packages/sdk/src/schemas.ts:277](https://github.com/ecp-eth/comment
 ### replies
 
 > **replies**: `object`
+
+#### replies.extra
+
+> **extra**: `object` = `IndexerAPIExtraSchema`
+
+#### replies.extra.moderationEnabled
+
+> **moderationEnabled**: `boolean`
 
 #### replies.pagination
 

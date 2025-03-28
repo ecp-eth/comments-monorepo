@@ -4,17 +4,42 @@ import { HTTPException } from "hono/http-exception";
 import { ManagementAuthService } from "../management/services/auth";
 import { getIndexerDb } from "../management/db";
 
+const MAX_REQUEST_AGE_MS = 1 * 60 * 1000; // 1 minute
+
+/**
+ * Middleware to authenticate requests using API keys and signatures
+ *
+ * @example
+ * ```ts
+ * app.use("*", authMiddleware());
+ * ```
+ *
+ * @example
+ * ```
+ * // Request with signature in query params
+ * GET /api/comments?signature=...&timestamp=...&keyId=...
+ *
+ * // Request with signature in header
+ * GET /api/comments
+ * x-api-signature: ...
+ * x-api-timestamp: ...
+ * x-api-key: ...
+ * ```
+ */
 export function authMiddleware(): MiddlewareHandler {
   const authService = new ManagementAuthService(getIndexerDb());
 
   return async (c: Context, next) => {
-    const signature = c.req.header("x-api-signature");
-    const timestamp = c.req.header("x-api-timestamp");
-    const keyId = c.req.header("x-api-key");
+    // Try to get signature from header first, then from query params
+    const signature =
+      c.req.header("x-api-signature") || c.req.query("signature");
+    const timestamp =
+      c.req.header("x-api-timestamp") || c.req.query("timestamp");
+    const keyId = c.req.header("x-api-key") || c.req.query("keyId");
 
     if (!signature || !timestamp || !keyId) {
       throw new HTTPException(401, {
-        message: "Missing authentication headers",
+        message: "Missing authentication parameters",
       });
     }
 
@@ -27,7 +52,20 @@ export function authMiddleware(): MiddlewareHandler {
     }
 
     // Prevent replay attacks by checking timestamp
-    if (isTimestampTooOld(timestamp)) {
+    const requestTimestamp = parseInt(timestamp, 10);
+
+    if (isNaN(requestTimestamp)) {
+      throw new HTTPException(401, {
+        res: Response.json(
+          { message: "Invalid timestamp format" },
+          { status: 401 }
+        ),
+      });
+    }
+
+    const currentTime = Date.now();
+
+    if (Math.abs(currentTime - requestTimestamp) > MAX_REQUEST_AGE_MS) {
       throw new HTTPException(401, {
         res: Response.json({ message: "Request expired" }, { status: 401 }),
       });
@@ -49,25 +87,23 @@ export function authMiddleware(): MiddlewareHandler {
   };
 }
 
-function isTimestampTooOld(timestamp: string): boolean {
-  const requestTime = parseInt(timestamp, 10);
-  const currentTime = Date.now();
-  const oneMinute = 1 * 60 * 1000; // 1 minute in milliseconds
-
-  return Math.abs(currentTime - requestTime) > oneMinute;
-}
-
 async function createSignatureMessage(
   req: HonoRequest,
   timestamp: string
 ): Promise<Uint8Array> {
   const method = req.method;
-  const path = new URL(req.url).pathname;
+  const url = new URL(req.url);
+  const path = url.pathname;
   let body = "";
 
   if (method === "POST" || method === "PUT" || method === "PATCH") {
     body = await req.text();
   }
 
-  return new TextEncoder().encode(`${method}${path}${timestamp}${body}`);
+  // Include query parameters in signature to prevent parameter tampering
+  const queryString = url.searchParams.toString();
+
+  return new TextEncoder().encode(
+    `${method}${path}${queryString}${timestamp}${body}`
+  );
 }

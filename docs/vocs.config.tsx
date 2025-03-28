@@ -94,6 +94,10 @@ export default defineConfig({
               text: "Muted Accounts",
               link: "/indexer/admin-cli-muted-accounts",
             },
+            {
+              text: "Comments Premoderation",
+              link: "/indexer/admin-cli-comments-premoderation",
+            },
           ],
         },
         {

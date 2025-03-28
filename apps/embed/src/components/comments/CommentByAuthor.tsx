@@ -11,6 +11,7 @@ import {
   formatDate,
   formatDateRelative,
 } from "@ecp.eth/shared/helpers";
+import { useCommentRelativeTime } from "@ecp.eth/shared/hooks";
 
 interface CommentByAuthorProps {
   comment: CommentType;
@@ -26,6 +27,10 @@ export function CommentByAuthor({
 }: CommentByAuthorProps) {
   const authorNameOrAddress = getCommentAuthorNameOrAddress(comment.author);
   const authorUrl = formatAuthorLink(comment.author);
+  const commentRelativeTime = useCommentRelativeTime(
+    comment.timestamp,
+    currentTimestamp
+  );
 
   return (
     <div className="mb-4 border-l-2 border-muted pl-4">
@@ -47,7 +52,7 @@ export function CommentByAuthor({
               )}{" "}
               •{" "}
               <span title={formatDate(comment.timestamp)}>
-                {formatDateRelative(comment.timestamp, currentTimestamp)}
+                {commentRelativeTime}
               </span>
             </div>
             <div className="text-xs text-muted-foreground">

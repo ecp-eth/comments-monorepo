@@ -29,8 +29,16 @@ The indexer service implements additional spam prevention measures:
    - Muted accounts can be managed using the [Admin CLI](/indexer/admin-cli-muted-accounts)
 
 2. **Content Validation (Opt in)**
+
    - Implements basic profanity detection
    - Can be extended with more advanced content analysis
+
+3. **Comment Premoderation (Opt in)**
+
+   - Comments can be configured to require moderator approval before appearing in the feed
+   - When enabled, new comments are initially hidden and only become visible after explicit approval
+   - Moderators can approve or reject comments through the [Admin CLI](/indexer/admin-cli-comments-premoderation) or directly through [Indexer API](/indexer-reference/restful)
+   - This provides an additional layer of control over content quality and spam prevention
 
 ## Recommendations
 

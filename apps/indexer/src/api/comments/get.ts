@@ -6,6 +6,7 @@ import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response-formatters";
 import { GetCommentsQuerySchema } from "../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../lib/constants";
+import { env } from "../../env";
 
 const getCommentsRoute = createRoute({
   method: "get",
@@ -35,17 +36,34 @@ const getCommentsRoute = createRoute({
  */
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { author, targetUri, appSigner, sort, limit, cursor } =
+    const { author, targetUri, appSigner, sort, limit, cursor, viewer } =
       c.req.valid("query");
+
+    const sharedConditions = [
+      author ? eq(schema.comment.author, author) : undefined,
+      isNull(schema.comment.parentId),
+      targetUri ? eq(schema.comment.targetUri, targetUri) : undefined,
+      appSigner ? eq(schema.comment.appSigner, appSigner) : undefined,
+    ];
+
+    if (env.MODERATION_ENABLED) {
+      if (viewer) {
+        sharedConditions.push(
+          or(
+            eq(schema.comment.moderationStatus, "approved"),
+            eq(schema.comment.author, viewer)
+          )
+        );
+      } else {
+        sharedConditions.push(eq(schema.comment.moderationStatus, "approved"));
+      }
+    }
 
     const hasPreviousCommentsQuery = cursor
       ? db.query.comment
           .findFirst({
             where: and(
-              author ? eq(schema.comment.author, author) : undefined,
-              isNull(schema.comment.parentId),
-              targetUri ? eq(schema.comment.targetUri, targetUri) : undefined,
-              appSigner ? eq(schema.comment.appSigner, appSigner) : undefined,
+              ...sharedConditions,
               // use opposite order for asc and desc
               ...(sort === "asc"
                 ? [
@@ -86,10 +104,7 @@ export default (app: OpenAPIHono) => {
         },
       },
       where: and(
-        author ? eq(schema.comment.author, author) : undefined,
-        isNull(schema.comment.parentId),
-        targetUri ? eq(schema.comment.targetUri, targetUri) : undefined,
-        appSigner ? eq(schema.comment.appSigner, appSigner) : undefined,
+        ...sharedConditions,
         ...(sort === "desc" && !!cursor
           ? [
               or(

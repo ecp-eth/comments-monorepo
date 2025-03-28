@@ -8,7 +8,7 @@ import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
   IndexerAPIAuthorDataSchema,
-} from "./schemas.js";
+} from "./schemas/index.js";
 import { INDEXER_API_URL } from "./constants.js";
 import { z } from "zod";
 
@@ -24,6 +24,10 @@ export type FetchCommentsOptions = {
    * Filter comments by author
    */
   author?: Hex;
+  /**
+   * The viewer's address. This is useful when the content moderation is enabled on the indexer.
+   */
+  viewer?: Hex;
   /**
    * URL on which /api/comments endpoint will be called
    *
@@ -69,6 +73,7 @@ const FetchCommentsOptionsSchema = z.object({
   cursor: HexSchema.optional(),
   limit: z.number().int().positive().default(50),
   signal: z.instanceof(AbortSignal).optional(),
+  viewer: HexSchema.optional(),
 });
 
 /**
@@ -89,6 +94,7 @@ export async function fetchComments(
     targetUri,
     appSigner,
     signal,
+    viewer,
   } = FetchCommentsOptionsSchema.parse(options);
 
   const fetchCommentsTask = Effect.tryPromise(async (signal) => {
@@ -111,6 +117,10 @@ export async function fetchComments(
 
     if (cursor) {
       url.searchParams.set("cursor", cursor);
+    }
+
+    if (viewer) {
+      url.searchParams.set("viewer", viewer);
     }
 
     const response = await fetch(url.toString(), {
@@ -146,6 +156,10 @@ export type FetchCommentRepliesOptions = {
    * The ID of the comment to fetch replies for
    */
   commentId: Hex;
+  /**
+   * The viewer's address. This is useful when the content moderation is enabled on the indexer.
+   */
+  viewer?: Hex;
   /**
    * URL on which /api/comments/$commentId/replies endpoint will be called
    *
@@ -183,6 +197,7 @@ const FetchCommentRepliesOptionSchema = z.object({
   appSigner: HexSchema.optional(),
   retries: z.number().int().positive().default(3),
   cursor: HexSchema.optional(),
+  viewer: HexSchema.optional(),
   limit: z.number().int().positive().default(50),
   signal: z.instanceof(AbortSignal).optional(),
   sort: z.enum(["asc", "desc"]).default("desc"),
@@ -196,8 +211,17 @@ const FetchCommentRepliesOptionSchema = z.object({
 export async function fetchCommentReplies(
   options: FetchCommentRepliesOptions
 ): Promise<IndexerAPIListCommentRepliesSchemaType> {
-  const { apiUrl, commentId, limit, cursor, retries, appSigner, signal, sort } =
-    FetchCommentRepliesOptionSchema.parse(options);
+  const {
+    apiUrl,
+    commentId,
+    limit,
+    cursor,
+    retries,
+    appSigner,
+    signal,
+    sort,
+    viewer,
+  } = FetchCommentRepliesOptionSchema.parse(options);
 
   const fetchRepliesTask = Effect.tryPromise(async (signal) => {
     const url = new URL(`/api/comments/${commentId}/replies`, apiUrl);
@@ -211,6 +235,10 @@ export async function fetchCommentReplies(
 
     if (cursor) {
       url.searchParams.set("cursor", cursor);
+    }
+
+    if (viewer) {
+      url.searchParams.set("viewer", viewer);
     }
 
     const response = await fetch(url.toString(), {

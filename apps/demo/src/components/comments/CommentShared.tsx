@@ -87,7 +87,10 @@ export function CommentShared({
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
 
-  const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
+  const queryKey = useMemo(
+    () => ["comments", comment.id, connectedAddress],
+    [comment.id, connectedAddress]
+  );
 
   const repliesQuery = useInfiniteQuery({
     enabled: areRepliesAllowed,
@@ -119,6 +122,7 @@ export function CommentShared({
         limit: pageParam.limit,
         commentId: comment.id,
         signal,
+        viewer: connectedAddress,
       });
 
       return CommentPageSchema.parse(response);
@@ -147,6 +151,7 @@ export function CommentShared({
         limit: 10,
         sort: "asc",
         signal,
+        viewer: connectedAddress,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -164,7 +169,11 @@ export function CommentShared({
   return (
     <div className="mb-4 border-l-2 border-gray-200 pl-4">
       <div className="flex justify-between items-center">
-        <CommentAuthor author={comment.author} timestamp={comment.timestamp} />
+        <CommentAuthor
+          author={comment.author}
+          moderationStatus={comment.moderationStatus}
+          timestamp={comment.timestamp}
+        />
         {isAuthor && !comment.deletedAt && !comment.pendingOperation && (
           <DropdownMenu>
             <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">

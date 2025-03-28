@@ -81,6 +81,7 @@ export function mergeNewComments(
   return {
     pages: [
       {
+        extra: newCommentsPage.extra,
         results: newCommentsPage.results.slice().reverse(),
         pagination: {
           ...newCommentsPage.pagination,
@@ -120,6 +121,8 @@ export function insertPendingCommentToPage(
 
   const { response, txHash, chainId } = pendingOperation;
 
+  const moderationEnabled = queryData.pages[0].extra.moderationEnabled;
+
   queryData.pages[0].results.unshift({
     ...response.data,
     author: pendingOperation.resolvedAuthor ?? {
@@ -131,7 +134,10 @@ export function insertPendingCommentToPage(
     txHash,
     chainId,
     timestamp: new Date(),
+    moderationStatus: moderationEnabled ? "pending" : "approved",
+    moderationStatusChangedAt: new Date(),
     replies: {
+      extra: queryData.pages[0].extra,
       results: [],
       pagination: {
         hasPrevious: false,

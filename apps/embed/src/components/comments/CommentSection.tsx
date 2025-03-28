@@ -26,6 +26,7 @@ import {
 } from "@ecp.eth/shared/schemas";
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { publicEnv } from "@/publicEnv";
+import { useAccount } from "wagmi";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -36,8 +37,13 @@ type CommentSectionProps = {
 
 export function CommentSection({ initialData }: CommentSectionProps) {
   useAutoBodyMinHeight();
+
+  const { address } = useAccount();
   const { targetUri, currentTimestamp } = useEmbedConfig();
-  const queryKey = useMemo(() => ["comments", targetUri], [targetUri]);
+  const queryKey = useMemo(
+    () => ["comments", targetUri, address],
+    [targetUri, address]
+  );
 
   const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
@@ -55,6 +61,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
           limit: pageParam.limit,
           cursor: pageParam.cursor,
           signal,
+          viewer: address,
         });
 
         return CommentPageSchema.parse(response);
@@ -87,6 +94,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
         cursor: options.cursor,
         signal: options.signal,
         sort: "asc",
+        viewer: address,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,

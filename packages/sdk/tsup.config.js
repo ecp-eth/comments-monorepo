@@ -5,7 +5,7 @@ export default defineConfig({
     "src/index.ts",
     "src/abis.ts",
     "src/react.tsx",
-    "src/schemas.ts",
+    "src/schemas/index.ts",
     "src/types.ts",
   ],
   splitting: true,
