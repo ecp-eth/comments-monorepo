@@ -19,12 +19,22 @@ export function notifyCommentPendingModeration(
 ) {
   return tryAsync(
     async () => {
-      if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHANNEL_ID) {
+      if (!env.MODERATION_ENABLED || !env.MODERATION_ENABLE_NOTIFICATIONS) {
+        console.warn(
+          "Moderation notifications are disabled, skipping notification"
+        );
+        return;
+      }
+
+      if (
+        !env.MODERATION_TELEGRAM_BOT_TOKEN ||
+        !env.MODERATION_TELEGRAM_CHANNEL_ID
+      ) {
         console.warn("Telegram configuration missing, skipping notification");
         return;
       }
 
-      const indexerUrl = new URL("/api/webhook", env.INDEXER_URL);
+      const indexerUrl = new URL("/api/webhook", env.MODERATION_INDEXER_URL);
 
       const approveBody: WebhookRequestBodyApproveCommentSchemaType = {
         type: "approve",
@@ -66,14 +76,14 @@ Reject URI: ${rejectUri}
 `;
 
       const response = await fetch(
-        `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+        `https://api.telegram.org/bot${env.MODERATION_TELEGRAM_BOT_TOKEN}/sendMessage`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            chat_id: env.TELEGRAM_CHANNEL_ID,
+            chat_id: env.MODERATION_TELEGRAM_CHANNEL_ID,
             text: message,
             parse_mode: "Markdown",
             link_preview_options: {

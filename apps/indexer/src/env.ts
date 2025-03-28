@@ -1,42 +1,46 @@
 import { z } from "zod";
 
+const moderationNotificationsEnabledSchema = z.object({
+  MODERATION_TELEGRAM_BOT_TOKEN: z.string().min(1),
+  MODERATION_TELEGRAM_CHANNEL_ID: z.string().min(1),
+  MODERATION_INDEXER_URL: z.string().url(),
+});
+
 const EnvSchema = z
   .object({
-    DATABASE_URL: z.string(),
-    NEYNAR_API_KEY: z.string(),
+    DATABASE_URL: z.string().url(),
+    NEYNAR_API_KEY: z.string().min(1),
     SENTRY_DSN: z.string().optional(),
-    MODERATION_ENABLED: z
-      .enum(["0", "1"])
-      .transform((val) => val === "1")
-      .default("0"),
+
     // this one is more of an internal flag so we can compile the indexer for docs
     SKIP_DRIZZLE_SCHEMA_DETECTION: z
       .enum(["0", "1"])
       .transform((val) => val === "1")
       .default("0"),
-    // Telegram configuration
-    TELEGRAM_BOT_TOKEN: z.string().optional(),
-    TELEGRAM_CHANNEL_ID: z.string().optional(),
-    INDEXER_URL: z.string().url(),
     WEBHOOK_SECRET: z.string().min(1),
+    MODERATION_ENABLED: z
+      .enum(["0", "1"])
+      .default("0")
+      .transform((val) => val === "1"),
+    MODERATION_ENABLE_NOTIFICATIONS: z
+      .enum(["0", "1"])
+      .default("0")
+      .transform((val) => val === "1"),
+    MODERATION_TELEGRAM_BOT_TOKEN: z.string().optional(),
+    MODERATION_TELEGRAM_CHANNEL_ID: z.string().optional(),
+    MODERATION_INDEXER_URL: z.string().url().optional(),
   })
   .superRefine((vars, ctx) => {
-    // validate webhook configuration
-    if (vars.TELEGRAM_BOT_TOKEN || vars.TELEGRAM_CHANNEL_ID) {
-      const webhookSchema = z.object({
-        TELEGRAM_BOT_TOKEN: z.string(),
-        TELEGRAM_CHANNEL_ID: z.string(),
-      });
-
-      const result = webhookSchema.safeParse(vars);
+    if (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) {
+      const result = moderationNotificationsEnabledSchema.safeParse(vars);
 
       if (!result.success) {
         result.error.issues.forEach((issue) => {
           ctx.addIssue(issue);
         });
-      }
 
-      return true;
+        return z.NEVER;
+      }
     }
 
     return true;
