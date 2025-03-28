@@ -5,6 +5,16 @@ import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
 import remarkFindAndReplace from "./plugins/remark-find-replace";
 
 export default defineConfig({
+  theme: {
+    variables: {
+      color: {
+        border: {
+          light: "#E5E7EB",
+          dark: "#374151",
+        },
+      },
+    },
+  },
   title: "Ethereum Comments Protocol",
   description:
     "A decentralized protocol for adding comments to any Ethereum address or transaction",
