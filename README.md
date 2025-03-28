@@ -4,9 +4,12 @@ A protocol for commenting built on Ethereum.
 
 ## Deployments
 
-| Network | Block Number | Address                                    |
-| ------- | ------------ | ------------------------------------------ |
-| Base    | 26637776     | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
+| Network          | Contract Address                           |
+| ---------------- | ------------------------------------------ |
+| Ethereum Mainnet | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
+| Ethereum Sepolia | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
+| Base             | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
+| Base Sepolia     | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
 
 ## Packages
 
