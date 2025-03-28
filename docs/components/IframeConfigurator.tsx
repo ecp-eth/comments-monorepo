@@ -12,6 +12,7 @@ import {
 } from "@ecp.eth/sdk/schemas";
 import { publicEnv } from "../publicEnv";
 import { Info } from "lucide-react";
+import { useIsMounted } from "../hooks/useIsMounted";
 
 const DEFAULT_CONFIG: EmbedConfigSchemaType = {
   theme: {
@@ -669,6 +670,7 @@ function GeneratedURL({
   config: EmbedConfigSchemaType;
   source: { targetUri: string } | { author: Hex } | undefined;
 }) {
+  useIsMounted();
   const [copied, setCopied] = React.useState(false);
   const timeoutRef = React.useRef<any>(null);
 
