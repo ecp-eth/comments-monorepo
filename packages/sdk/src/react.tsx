@@ -42,8 +42,9 @@ const { compressToURI } = lz;
 export function useGaslessTransaction<
   TVariables extends object | undefined,
   TReturnValue,
-  TSignTypedDataParams extends SignTypedDataParameters,
   TInputVariables = void,
+  TSignTypedDataParams extends
+    SignTypedDataParameters = SignTypedDataParameters,
 >(props: {
   prepareSignTypedDataParams: (variables: TInputVariables) => Promise<
     | TSignTypedDataParams

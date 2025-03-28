@@ -176,36 +176,6 @@ export const SignCommentResponseServerSchema = z.object({
   data: CommentDataWithIdSchema,
 });
 
-// FIXME: remove if not used
-export const GetApprovalStatusNotApprovedSchema = z.object({
-  approved: z.literal(false),
-  appSignature: HexSchema,
-  signTypedDataParams: AddApprovalTypedDataSchema,
-});
-
-export type GetApprovalStatusNotApprovedSchemaType = z.infer<
-  typeof GetApprovalStatusNotApprovedSchema
->;
-
-export const GetApprovalStatusApprovedSchema = z.object({
-  approved: z.literal(true),
-  appSigner: HexSchema,
-});
-
-export type GetApprovalStatusApprovedSchemaType = z.infer<
-  typeof GetApprovalStatusApprovedSchema
->;
-
-// FIXME: remove if not used
-export const GetApprovalStatusSchema = z.union([
-  GetApprovalStatusNotApprovedSchema,
-  GetApprovalStatusApprovedSchema,
-]);
-
-export type GetApprovalStatusSchemaType = z.infer<
-  typeof GetApprovalStatusSchema
->;
-
 export const ChangeApprovalStatusRequestBodySchema = z.object({
   signTypedDataParams: AddApprovalTypedDataSchema,
   authorSignature: HexSchema,
