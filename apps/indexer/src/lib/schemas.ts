@@ -1,4 +1,8 @@
-import { HexSchema, IndexerAPIPaginationSchema } from "@ecp.eth/sdk/schemas";
+import {
+  HexSchema,
+  IndexerAPICommentModerationStatusSchema,
+  IndexerAPIPaginationSchema,
+} from "@ecp.eth/sdk/schemas";
 import { z } from "@hono/zod-openapi";
 import { normalizeUrl } from "./utils";
 import { hexToString } from "viem";
@@ -119,6 +123,9 @@ export const InputCommentCursorSchema = z.preprocess((value, ctx) => {
  */
 export const GetCommentsQuerySchema = z.object({
   author: HexSchema.optional(),
+  viewer: HexSchema.optional().openapi({
+    description: "The viewer's address",
+  }),
   appSigner: HexSchema.optional().openapi({
     description: "The address of the app signer",
   }),
@@ -195,4 +202,90 @@ export const GetApprovalSchema = z.object({
 export const GetApprovalsResponseSchema = z.object({
   results: z.array(GetApprovalSchema),
   pagination: IndexerAPIPaginationSchema,
+});
+
+/**
+ * Query string schema for getting a list of pending comments.
+ */
+export const GetCommentsPendingModerationQuerySchema = z.object({
+  cursor: InputCommentCursorSchema.optional().openapi({
+    description:
+      "Non inclusive cursor from which to fetch the comments based on sort",
+  }),
+  limit: z.coerce.number().int().min(1).max(100).default(50).openapi({
+    description: "The number of comments to return",
+  }),
+  sort: z.enum(["asc", "desc"]).default("desc").openapi({
+    description: "The sort order of the comments",
+  }),
+});
+
+/**
+ * Path params schema for moderating a comment.
+ */
+export const ChangeModerationStatusOnCommentParamsSchema = z.object({
+  commentId: HexSchema.openapi({
+    description: "The ID of the comment to moderate",
+  }),
+});
+
+/**
+ * Request body schema for changing the moderation status of a comment.
+ */
+export const ChangeModerationStatusOnCommentBodySchema = z.object({
+  moderationStatus: IndexerAPICommentModerationStatusSchema.openapi({
+    description: "The moderation status of the comment",
+  }),
+});
+
+/**
+ * Request body schema for approving a comment.
+ */
+export const WebhookRequestBodyApproveCommentSchema = z.object({
+  type: z.literal("approve"),
+  commentId: HexSchema,
+});
+
+export type WebhookRequestBodyApproveCommentSchemaType = z.infer<
+  typeof WebhookRequestBodyApproveCommentSchema
+>;
+
+/**
+ * Request body schema for rejecting a comment.
+ */
+export const WebhookRequestBodyRejectCommentSchema = z.object({
+  type: z.literal("reject"),
+  commentId: HexSchema,
+});
+
+export type WebhookRequestBodyRejectCommentSchemaType = z.infer<
+  typeof WebhookRequestBodyRejectCommentSchema
+>;
+
+const WebhookRequestParamsCommandSchema = z.discriminatedUnion("type", [
+  WebhookRequestBodyApproveCommentSchema,
+  WebhookRequestBodyRejectCommentSchema,
+]);
+
+/**
+ * Request params schema for a webhook request.
+ */
+export const WebhookRequestParamsSchema = z.object({
+  c: z.preprocess((value, ctx) => {
+    try {
+      if (typeof value !== "string") {
+        throw new Error("Invalid webhook request");
+      }
+
+      return JSON.parse(value);
+    } catch {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid webhook request",
+        path: ["c"],
+      });
+
+      return z.NEVER;
+    }
+  }, WebhookRequestParamsCommandSchema),
 });

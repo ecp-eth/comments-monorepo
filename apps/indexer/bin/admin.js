@@ -14,6 +14,29 @@ import { z } from "zod";
 const HexSchema = z.string().regex(/^0x[0-9a-fA-F]+$/);
 
 /**
+ * @param {import('viem').Hex} privateKey
+ * @param {string} method
+ * @param {URL} url
+ * @param {string} body
+ * @param {number} timestamp
+ * @returns {Promise<string>}
+ */
+async function createRequestSignature(
+  privateKey,
+  method,
+  url,
+  body,
+  timestamp
+) {
+  const message = new TextEncoder().encode(
+    `${method}${url.pathname}${url.searchParams.toString()}${timestamp}${body}`
+  );
+  const signature = await signAsync(message, privateKey);
+
+  return Buffer.from(signature).toString("hex");
+}
+
+/**
  * Validates a URL option.
  * @param {string} val - The value to validate.
  * @returns {string} The validated value.
@@ -169,19 +192,22 @@ mutedAccounts
 
     try {
       const body = JSON.stringify({ address, reason });
-      const timestamp = Date.now().toString();
-      const message = new TextEncoder().encode(
-        `POST/api/muted-accounts${timestamp}${body}`
-      );
-      const signature = await signAsync(message, privateKey);
+      const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/muted-accounts`, url);
 
-      const response = await fetch(`${url}/api/muted-accounts`, {
+      const response = await fetch(endpointUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-API-Key": id,
-          "X-API-Timestamp": timestamp,
-          "X-API-Signature": Buffer.from(signature).toString("hex"),
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "POST",
+            endpointUrl,
+            body,
+            timestamp
+          ),
         },
         body,
       });
@@ -207,18 +233,21 @@ mutedAccounts
     const { id, privateKey, url } = mutedAccounts.opts();
 
     try {
-      const timestamp = Date.now().toString();
-      const message = new TextEncoder().encode(
-        `DELETE/api/muted-accounts/${address}${timestamp}`
-      );
-      const signature = await signAsync(message, privateKey);
+      const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/muted-accounts/${address}`, url);
 
-      const response = await fetch(`${url}/api/muted-accounts/${address}`, {
+      const response = await fetch(endpointUrl, {
         method: "DELETE",
         headers: {
           "X-API-Key": id,
-          "X-API-Timestamp": timestamp,
-          "X-API-Signature": Buffer.from(signature).toString("hex"),
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "DELETE",
+            endpointUrl,
+            "",
+            timestamp
+          ),
         },
       });
 
@@ -231,6 +260,174 @@ mutedAccounts
       console.log("Successfully unmuted account:", address);
     } catch (error) {
       console.error("Failed to unmute account:", error);
+      process.exit(1);
+    }
+  });
+
+const moderateComments = new Command("moderate-comments")
+  .description("Manage comment moderation")
+  .requiredOption("-i, --id <id>", "The ID of the API key to use")
+  .requiredOption("-k, --private-key <key>", "The private key of the API key")
+  .option(
+    "-u, --url <url>",
+    "The URL of indexer",
+    urlOptionValidator,
+    "https://api.ethcomments.xyz"
+  );
+
+program.addCommand(moderateComments);
+
+moderateComments
+  .command("approve")
+  .description("Approves a pending comment")
+  .argument("<commentId>", "The ID of the comment to approve")
+  .action(async (commentId) => {
+    const { id, privateKey, url } = moderateComments.opts();
+
+    try {
+      const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/moderate-comments/${commentId}`, url);
+      const body = JSON.stringify({
+        moderationStatus: "approved",
+      });
+
+      const response = await fetch(endpointUrl, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": id,
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "PATCH",
+            endpointUrl,
+            body,
+            timestamp
+          ),
+        },
+        body,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to approve comment:", error);
+        process.exit(1);
+      }
+
+      console.log("Successfully approved comment:", commentId);
+    } catch (error) {
+      console.error("Failed to approve comment:", error);
+      process.exit(1);
+    }
+  });
+
+moderateComments
+  .command("reject")
+  .description("Rejects a pending comment")
+  .argument("<commentId>", "The ID of the comment to reject")
+  .action(async (commentId) => {
+    const { id, privateKey, url } = moderateComments.opts();
+
+    try {
+      const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/moderate-comments/${commentId}`, url);
+      const body = JSON.stringify({
+        moderationStatus: "rejected",
+      });
+
+      const response = await fetch(endpointUrl, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": id,
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "PATCH",
+            endpointUrl,
+            body,
+            timestamp
+          ),
+        },
+        body,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to reject comment:", error);
+        process.exit(1);
+      }
+
+      console.log("Successfully rejected comment:", commentId);
+    } catch (error) {
+      console.error("Failed to reject comment:", error);
+      process.exit(1);
+    }
+  });
+
+moderateComments
+  .command("list")
+  .description("Lists pending comments")
+  .action(async () => {
+    const { id, privateKey, url } = moderateComments.opts();
+
+    try {
+      const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/moderate-comments`, url);
+
+      const response = await fetch(endpointUrl, {
+        headers: {
+          "X-API-Key": id,
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "GET",
+            endpointUrl,
+            "",
+            timestamp
+          ),
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to list pending comments:", error);
+        process.exit(1);
+      }
+
+      /**
+       * @type {any}
+       */
+      const rawResponse = await response.json();
+      /**
+       * @type {import('@ecp.eth/sdk/schemas').IndexerAPIListCommentsSchemaType}
+       */
+      const result = rawResponse.results;
+
+      if (!result.extra.moderationEnabled) {
+        console.error("Moderation is not enabled on this instance");
+        process.exit(1);
+      }
+
+      for (const comment of result.results) {
+        console.group(comment.id);
+        console.table([
+          {
+            "Comment ID": comment.id,
+            Timestamp: comment.timestamp,
+            "Author (address)": comment.author.address,
+            "Author (ENS)": comment.author.ens?.name,
+            "Author (FC)": comment.author.farcaster?.username,
+          },
+        ]);
+
+        console.log("Content----------");
+        console.log(comment.content);
+        console.log("----------");
+        console.groupEnd();
+      }
+    } catch (error) {
+      console.error("Failed to list pending comments:", error);
       process.exit(1);
     }
   });

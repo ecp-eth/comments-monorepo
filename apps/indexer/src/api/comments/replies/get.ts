@@ -9,6 +9,7 @@ import {
   GetCommentRepliesParamSchema,
 } from "../../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../../lib/constants";
+import { env } from "../../../env";
 
 const getCommentsRoute = createRoute({
   method: "get",
@@ -34,16 +35,33 @@ const getCommentsRoute = createRoute({
 
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { appSigner, sort, limit, cursor } = c.req.valid("query");
+    const { appSigner, sort, limit, cursor, viewer } = c.req.valid("query");
     const { commentId } = c.req.valid("param");
+
+    const sharedConditions = [
+      eq(schema.comment.parentId, commentId),
+      appSigner ? eq(schema.comment.appSigner, appSigner) : undefined,
+    ];
+
+    if (env.MODERATION_ENABLED) {
+      if (viewer) {
+        sharedConditions.push(
+          or(
+            eq(schema.comment.moderationStatus, "approved"),
+            eq(schema.comment.author, viewer)
+          )
+        );
+      } else {
+        sharedConditions.push(eq(schema.comment.moderationStatus, "approved"));
+      }
+    }
 
     // use reverse order to find previous reply
     const previousReplyQuery = cursor
       ? db.query.comment
           .findFirst({
             where: and(
-              eq(schema.comment.parentId, commentId),
-              appSigner ? eq(schema.comment.appSigner, appSigner) : undefined,
+              ...sharedConditions,
               ...(sort === "asc"
                 ? [
                     or(
@@ -77,8 +95,7 @@ export default (app: OpenAPIHono) => {
 
     const repliesQuery = db.query.comment.findMany({
       where: and(
-        eq(schema.comment.parentId, commentId),
-        appSigner ? eq(schema.comment.appSigner, appSigner) : undefined,
+        ...sharedConditions,
         ...(sort === "desc" && !!cursor
           ? [
               or(

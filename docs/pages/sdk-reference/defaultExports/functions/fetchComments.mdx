@@ -6,9 +6,9 @@
 
 # Function: fetchComments()
 
-> **fetchComments**(`options`): `Promise`\<\{ `pagination`: \{ `endCursor`: `` `0x${string}` ``; `hasNext`: `boolean`; `hasPrevious`: `boolean`; `limit`: `number`; `startCursor`: `` `0x${string}` ``; \}; `results`: `object`[]; \}\>
+> **fetchComments**(`options`): `Promise`\<\{ `extra`: \{ `moderationEnabled`: `boolean`; \}; `pagination`: \{ `endCursor`: `` `0x${string}` ``; `hasNext`: `boolean`; `hasPrevious`: `boolean`; `limit`: `number`; `startCursor`: `` `0x${string}` ``; \}; `results`: `object`[]; \}\>
 
-Defined in: [packages/sdk/src/api.ts:79](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L79)
+Defined in: [packages/sdk/src/api.ts:84](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L84)
 
 Fetch comments from the Indexer API
 
@@ -20,6 +20,6 @@ Fetch comments from the Indexer API
 
 ## Returns
 
-`Promise`\<\{ `pagination`: \{ `endCursor`: `` `0x${string}` ``; `hasNext`: `boolean`; `hasPrevious`: `boolean`; `limit`: `number`; `startCursor`: `` `0x${string}` ``; \}; `results`: `object`[]; \}\>
+`Promise`\<\{ `extra`: \{ `moderationEnabled`: `boolean`; \}; `pagination`: \{ `endCursor`: `` `0x${string}` ``; `hasNext`: `boolean`; `hasPrevious`: `boolean`; `limit`: `number`; `startCursor`: `` `0x${string}` ``; \}; `results`: `object`[]; \}\>
 
 A promise that resolves comments fetched from the Indexer API

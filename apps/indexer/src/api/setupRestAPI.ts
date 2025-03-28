@@ -6,6 +6,10 @@ import { setupGetAuthor } from "./authors/get";
 import { setupMarkAuthorAsMuted } from "./muted-accounts/post";
 import { setupUnmuteAccount } from "./muted-accounts/delete";
 import { setupGetMutedAccount } from "./muted-accounts/get";
+import { setupGetPendingModerationComments } from "./moderate-comments/get";
+import { setupChangeCommentModerationStatus } from "./moderate-comments/[commentId]/patch";
+import { setupGetComment } from "./moderate-comments/[commentId]/get";
+import { setupWebhook } from "./webhook/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetComments(app);
@@ -15,4 +19,10 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupGetMutedAccount(app);
   setupUnmuteAccount(app);
   setupMarkAuthorAsMuted(app);
+  setupGetPendingModerationComments(app);
+  setupChangeCommentModerationStatus(app);
+  setupGetComment(app);
+  setupWebhook(app);
+
+  return app;
 }

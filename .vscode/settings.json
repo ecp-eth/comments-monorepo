@@ -3,5 +3,15 @@
     {
       "mode": "auto"
     }
-  ]
+  ],
+  "files.exclude": {
+    "packages/sdk/abis": true,
+    "packages/sdk/react": true,
+    "packages/sdk/schemas": true,
+    "packages/sdk/types": true,
+    "packages/shared/helpers": true,
+    "packages/shared/hooks": true,
+    "packages/shared/schemas": true,
+    "packages/shared/types": true
+  }
 }

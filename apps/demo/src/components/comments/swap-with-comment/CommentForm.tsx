@@ -68,7 +68,7 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        writeContractAsync(params) {
+        writeContractAsync() {
           // TODO: to be replaced with EIP 7702
           // const commentDataSuffix = createCommentSuffixData({
           //   commentData: params.data,

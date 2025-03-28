@@ -57,7 +57,7 @@ sequenceDiagram
     participant Indexer
 
     %% Flow 3: Author pays gas
-    Note over Author,Indexer: Flow 2: Sumbmitter pays gas
+    Note over Author,Indexer: Flow 2: Submitter pays gas
     Author->>App server: Post the comment request
     App server->>App server: Signs the comment request
     App server-->>Author: Responds comment data and appSignature

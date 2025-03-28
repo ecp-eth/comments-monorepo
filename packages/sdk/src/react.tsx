@@ -17,11 +17,11 @@ import {
   EmbedConfigSchema,
   EmbedResizedEventSchema,
   type EmbedConfigSchemaType,
-} from "./schemas.js";
+} from "./schemas/index.js";
 import * as lz from "lz-ts";
 
 // also export the type for generating docs correctly
-export type { EmbedConfigSchemaType } from "./schemas.js";
+export type { EmbedConfigSchemaType } from "./schemas/index.js";
 
 const { compressToURI } = lz;
 

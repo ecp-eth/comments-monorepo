@@ -25,13 +25,14 @@
     "PRIVY_SECRET",
     "PRIVY_AUTHORIZATION_KEY",
     "PRIVY_WALLET_ADDRESS",
-    "PRIVY_WALLET_ID"
+    "PRIVY_WALLET_ID",
+    "WEBHOOK_SECRET"
   ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "bin/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]

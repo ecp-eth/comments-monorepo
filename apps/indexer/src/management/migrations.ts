@@ -21,9 +21,17 @@ export type ApiKeysTable = {
   last_used_at: Date | null;
 };
 
+export type CommentModerationStatusesTable = {
+  comment_id: string;
+  created_at: Generated<Date>;
+  updated_at: Generated<Date>;
+  moderation_status: "pending" | "approved" | "rejected";
+};
+
 export type IndexerSchemaDB = {
   muted_accounts: MutedAccountsTable;
   api_keys: ApiKeysTable;
+  comment_moderation_statuses: CommentModerationStatusesTable;
 };
 
 export type MutedAccountSelect = Selectable<MutedAccountsTable>;
@@ -59,6 +67,31 @@ class StaticMigrationsProvider implements MigrationProvider {
         },
         down: async (db: Kysely<IndexerSchemaDB>) => {
           await db.schema.dropTable("api_keys").execute();
+        },
+      },
+      "2025_03_26_10_52_00_comments_moderation": {
+        up: async (db: Kysely<IndexerSchemaDB>) => {
+          await db.schema
+            .createTable("comment_moderation_statuses")
+            .addColumn("comment_id", "text", (col) => col.primaryKey())
+            .addColumn("created_at", "timestamptz", (col) =>
+              col.notNull().defaultTo(sql`now()`)
+            )
+            .addColumn("updated_at", "timestamptz", (col) =>
+              col.notNull().defaultTo(sql`now()`)
+            )
+            .addColumn("moderation_status", "text", (col) =>
+              col
+                .notNull()
+                .defaultTo("pending")
+                .check(
+                  sql`moderation_status IN ('pending', 'approved', 'rejected')`
+                )
+            )
+            .execute();
+        },
+        down: async (db: Kysely<IndexerSchemaDB>) => {
+          await db.schema.dropTable("comment_moderation_statuses").execute();
         },
       },
     };

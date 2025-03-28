@@ -28,37 +28,28 @@ export default defineConfig({
   },
   sidebar: [
     {
-      text: "Introduction",
-      link: "/",
+      text: "Quick Start",
+      link: "/quick-start",
     },
+
     {
-      text: "Getting Started",
+      text: "Integration Options",
       items: [
         {
-          text: "Quick Start",
-          link: "/quick-start",
+          text: "Typescript SDK",
+          link: "/integration-options/indexer-api",
         },
         {
-          text: "Integration Options",
-          collapsed: false,
-          items: [
-            {
-              text: "Embed Comments",
-              link: "/integration-options/embed-comments",
-            },
-            {
-              text: "React Component Library",
-              link: "/integration-options/react-component-library",
-            },
-            {
-              text: "Index API",
-              link: "/integration-options/indexer-api",
-            },
-            {
-              text: "Contract Interaction",
-              link: "/integration-options/contract-interactions",
-            },
-          ],
+          text: "React Components",
+          link: "/integration-options/react-component-library",
+        },
+        {
+          text: "iframe Embed (no code)",
+          link: "/integration-options/embed-comments",
+        },
+        {
+          text: "Smart Contracts",
+          link: "/integration-options/contract-interactions",
         },
       ],
     },
@@ -89,30 +80,12 @@ export default defineConfig({
         {
           text: "Ponder Indexer",
           link: "/indexer-reference/",
-        },
-        {
-          text: "Index Supply",
-          link: "/index-supply",
-        },
-      ],
-    },
-    {
-      text: "Advanced",
-      items: [
-        {
-          text: "Test with Anvil",
-          link: "/test-with-anvil",
-        },
-      ],
-    },
-    {
-      text: "Indexer",
-      items: [
-        {
-          text: "Admin CLI",
-          link: "/indexer/admin-cli",
-          collapsed: false,
+          collapsed: true,
           items: [
+            {
+              text: "Admin CLI",
+              link: "/indexer/admin-cli",
+            },
             {
               text: "API Key Management",
               link: "/indexer/admin-cli-api-key-management",
@@ -121,57 +94,28 @@ export default defineConfig({
               text: "Muted Accounts",
               link: "/indexer/admin-cli-muted-accounts",
             },
+            {
+              text: "Comments Premoderation",
+              link: "/indexer/admin-cli-comments-premoderation",
+            },
           ],
         },
         {
-          text: "Spam Prevention",
-          link: "/indexer/spam-prevention",
+          text: "Index Supply",
+          link: "/index-supply",
         },
       ],
     },
-    {
-      text: "Reference",
-      items: [
-        {
-          text: "SDK Reference",
-          link: "/sdk-reference",
-          collapsed: true,
-          items: [
-            {
-              text: "Default Exports",
-              link: "/sdk-reference/defaultExports/",
-            },
-            {
-              text: "Types Module",
-              link: "/sdk-reference/types/",
-            },
-            {
-              text: "React Module",
-              link: "/sdk-reference/react/",
-            },
-          ],
-        },
-        {
-          text: "Indexer Reference",
-          link: "/indexer-reference/",
-          collapsed: true,
-          items: [
-            {
-              text: "RESTful API",
-              link: "/indexer-reference/restful",
-            },
-            {
-              text: "GraphQL API",
-              link: "https://api.ethcomments.xyz/graphql",
-            },
-          ],
-        },
-        {
-          text: "Protocol Reference",
-          link: "/protocol-reference/CommentsV1",
-        },
-      ],
-    },
+    // {
+    //   text: "Advanced",
+    //   items: [
+    //     {
+    //       text: "Test with Anvil",
+    //       link: "/test-with-anvil",
+    //     },
+    //   ],
+    // },
+
     {
       text: "Demos & Examples",
       items: [
@@ -218,11 +162,6 @@ export default defineConfig({
           text: "Contract",
           link: "/contract",
         },
-      ],
-    },
-    {
-      text: "FAQ",
-      items: [
         {
           text: "Gas Costs",
           link: "/gas-costs",
@@ -230,12 +169,59 @@ export default defineConfig({
       ],
     },
     {
-      text: "Contact",
-      link: "https://t.me/davidfurlong",
+      text: "Reference",
+      items: [
+        {
+          text: "SDK Reference",
+          link: "/sdk-reference",
+          collapsed: true,
+          items: [
+            {
+              text: "Default Exports",
+              link: "/sdk-reference/defaultExports/",
+            },
+            {
+              text: "Types Module",
+              link: "/sdk-reference/types/",
+            },
+            {
+              text: "React Module",
+              link: "/sdk-reference/react/",
+            },
+          ],
+        },
+        {
+          text: "Indexer Reference",
+          link: "/indexer-reference/",
+          collapsed: true,
+          items: [
+            {
+              text: "RESTful API",
+              link: "/indexer-reference/restful",
+            },
+            {
+              text: "GraphQL API",
+              link: "https://api.ethcomments.xyz/graphql",
+            },
+          ],
+        },
+        {
+          text: "Protocol Reference",
+          link: "/protocol-reference/CommentsV1",
+        },
+      ],
     },
   ],
   topNav: [
     { text: "Github", link: "https://github.com/ecp-eth/comments-monorepo" },
+    {
+      text: "Support",
+      link: "https://t.me/+LkTGo4MdO_1lZDlk",
+    },
+    {
+      text: "Contact",
+      link: "https://t.me/davidfurlong",
+    },
   ],
   markdown: {
     remarkPlugins: [

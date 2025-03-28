@@ -1,11 +1,10 @@
 import { env } from "@/env";
-import { JSONResponse } from "@/lib/json-response";
 import {
   BadRequestResponseSchema,
   SignCommentPayloadRequestSchema,
   SignCommentResponseServerSchema,
 } from "@/lib/schemas";
-import { bigintReplacer } from "@ecp.eth/shared/helpers";
+import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import {
   createCommentData,
   createCommentTypedData,

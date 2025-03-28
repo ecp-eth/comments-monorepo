@@ -3,21 +3,30 @@ import {
   getCommentAuthorNameOrAddress,
   formatDate,
 } from "@ecp.eth/shared/helpers";
-import { formatAuthorLink } from "@/lib/utils";
+import { cn, formatAuthorLink } from "@/lib/utils";
 import Link from "next/link";
 import { AuthorType } from "@ecp.eth/shared/types";
 import { useCommentRelativeTime } from "@ecp.eth/shared/hooks";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
+import type { IndexerAPICommentModerationStatusSchemaType } from "@ecp.eth/sdk/schemas";
 
 type CommentAuthorProps = {
   author: AuthorType;
   timestamp: Date;
   currentTimestamp: number;
+  moderationStatus: IndexerAPICommentModerationStatusSchemaType;
 };
 
 export function CommentAuthor({
   author,
   timestamp,
   currentTimestamp,
+  moderationStatus,
 }: CommentAuthorProps) {
   const authorNameOrAddress = getCommentAuthorNameOrAddress(author);
   const authorUrl = formatAuthorLink(author);
@@ -37,8 +46,34 @@ export function CommentAuthor({
         ) : (
           <span>{authorNameOrAddress}</span>
         )}{" "}
+        {moderationStatus !== "approved" && (
+          <>
+            • <ModerationLabel status={moderationStatus} />{" "}
+          </>
+        )}
         • <span title={formatDate(timestamp)}>{commentRelativeTime}</span>
       </div>
     </div>
+  );
+}
+
+function ModerationLabel({ status }: { status: "pending" | "rejected" }) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className={cn(status === "rejected" && "text-destructive")}>
+            {status === "pending" ? "pending moderation" : "rejected"}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>
+            {status === "pending"
+              ? "Your comment is pending moderation. At the moment it is visible only to you."
+              : "Your comment was rejected. Comment is visible only to you."}
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

@@ -1,60 +1,38 @@
-import {
-  type ColumnType,
-  Kysely,
-  PostgresDialect,
-  WithSchemaPlugin,
-} from "kysely";
-import { Pool } from "pg";
+import * as schema from "../ponder.schema";
+import * as drizzleTable from "drizzle-orm/table";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { env } from "./env";
 
-// taken from ponder/src/sync-store/encoding.ts
-export type RpcRequestResultsTable = {
-  request: string;
-  /**
-   * This is computed column using md5(request) as hash
-   */
-  request_hash: ColumnType<string, undefined>;
-  chain_id: number;
-  block_number: ColumnType<
-    string | undefined,
-    string | bigint | undefined,
-    string | bigint | undefined
-  >;
-  result: string;
-};
+const table = drizzleTable;
 
-let db:
-  | Kysely<{
-      rpc_request_results: RpcRequestResultsTable;
-    }>
-  | null
-  | undefined = undefined;
-
-export function getDb(): Kysely<{
-  rpc_request_results: RpcRequestResultsTable;
-}> | null {
-  if (db !== undefined) {
-    return db;
+function assertDrizzleSchemaSymbolSupported(
+  tableExport: unknown
+): asserts tableExport is typeof drizzleTable & {
+  readonly Schema: unique symbol;
+  trololo: boolean;
+} {
+  if (
+    typeof tableExport !== "object" ||
+    tableExport === null ||
+    !("Schema" in tableExport) ||
+    !tableExport.Schema
+  ) {
+    throw new Error("Schema symbol is not exported from drizzle-orm/table");
   }
-
-  const connectionString =
-    process.env.PRIVATE_DATABASE_URL || process.env.DATABASE_URL;
-
-  if (!connectionString) {
-    console.log("PGlite is not supported for rpc resuts cache clearing");
-    db = null;
-
-    return db;
-  }
-
-  db = new Kysely({
-    dialect: new PostgresDialect({
-      pool: new Pool({
-        connectionString,
-        max: 5,
-      }),
-    }),
-    plugins: [new WithSchemaPlugin("ponder_sync")],
-  });
-
-  return db;
 }
+
+if (!env.SKIP_DRIZZLE_SCHEMA_DETECTION) {
+  // this is really a hack but we need to somehow check that we are able to use proper pg schema
+  assertDrizzleSchemaSymbolSupported(table);
+
+  if (!(table.Schema in schema.approvals) || !schema.approvals[table.Schema]) {
+    throw new Error(
+      "Schema is not set on the table this will cause the drizzle to load from public schema"
+    );
+  }
+}
+
+/**
+ * This is a db client that allows us to write into onchain tables.
+ */
+export const db = drizzle(env.DATABASE_URL, { schema, casing: "snake_case" });

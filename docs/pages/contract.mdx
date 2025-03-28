@@ -10,6 +10,7 @@ The Comments Protocol is a smart contract that enables users to post and manage 
   - [Ethereum Sepolia](https://sepolia.etherscan.io/address/%COMMENTS_V1_ADDRESS)
   - [Base](https://basescan.org/address/%COMMENTS_V1_ADDRESS)
   - [Base Sepolia](https://sepolia.basescan.org/address/%COMMENTS_V1_ADDRESS)
+- **Contract Explorer:** [View on Basescan](https://basescan.org/address/%COMMENTS_V1_ADDRESS#code)
 - **Contract ABI:** [View ABI Documentation](/protocol-reference/CommentsV1)
 
 ## Features
@@ -24,11 +25,13 @@ The Comments Protocol is a smart contract that enables users to post and manage 
 
 The contract provides several key functions:
 
-- `postCommentAsAuthor`: Post a comment directly from the author's address
-- `postComment`: Post a comment with both author and app signer signatures
-- `deleteCommentAsAuthor`: Delete a comment when called by the author
-- `deleteComment`: Delete a comment with signature verification
-- `addApprovalAsAuthor`: Approve an app signer directly
-- `removeApprovalAsAuthor`: Remove an app signer approval directly
+| Function                 | Description                                               | Note                                                          |
+| ------------------------ | --------------------------------------------------------- | ------------------------------------------------------------- |
+| `postCommentAsAuthor`    | Post a comment directly from the author's address         |                                                               |
+| `postComment`            | Post a comment with both author and app signer signatures |                                                               |
+| `deleteCommentAsAuthor`  | Delete a comment when called by the author                | ⚠️ Comment data remains on blockchain, only marked as deleted |
+| `deleteComment`          | Delete a comment with signature verification              | ⚠️ Comment data remains on blockchain, only marked as deleted |
+| `addApprovalAsAuthor`    | Approve an app signer directly                            |                                                               |
+| `removeApprovalAsAuthor` | Remove an app signer approval directly                    |                                                               |
 
 For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/CommentsV1).

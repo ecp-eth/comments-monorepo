@@ -1,0 +1,120 @@
+# Admin CLI - Comments Premoderation
+
+The Comments Premoderation CLI allows you to manage comment moderation in the indexer service. This functionality requires proper authentication using API keys and is disabled by default.
+
+## Prerequisites
+
+Before using the comments premoderation commands, you need:
+
+- [An API key ID](/indexer/admin-cli-api-key-management)
+- The corresponding private key
+- Access to the indexer service
+- Checked out the [Comments mono repository](https://github.com/ecp-eth/comments-monorepo)
+
+## Enabling Premoderation
+
+Comment premoderation is disabled by default. To enable it, you need to set the `MODERATION_ENABLED` environment variable to `1` in your indexer service configuration.
+
+## Commands
+
+### Listing Pending Comments
+
+Lists all comments that are pending moderation.
+
+```bash
+bin/admin.js moderate-comments list -i <api-key-id> -k <private-key> [--url <indexer-url>]
+```
+
+**Options:**
+
+- `-i, --id <id>` - The ID of the API key to use (required)
+- `-k, --private-key <key>` - The private key of the API key (required)
+- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
+
+**Example Output:**
+
+```
+comment-id-123
+┌───────────────────────────────────────────────────────────────┐
+│ (index)          │ Value                                      │
+├──────────────────┼────────────────────────────────────────────┤
+│ Comment ID       │ comment-id-123                             │
+│ Timestamp        │ 2024-03-20T10:30:00Z                       │
+│ Author (address) │ 0x1234...5678                              │
+│ Author (ENS)     │ example.eth                                │
+│ Author (FC)      │ example                                    │
+└──────────────────┴────────────────────────────────────────────┘
+Content----------
+This is the comment content that needs moderation.
+----------
+```
+
+### Approving a Comment
+
+Approves a pending comment, making it visible to users.
+
+```bash
+bin/admin.js moderate-comments approve <comment-id> -i <api-key-id> -k <private-key> [--url <indexer-url>]
+```
+
+**Arguments:**
+
+- `comment-id` - The ID of the comment to approve
+
+**Options:**
+
+- `-i, --id <id>` - The ID of the API key to use (required)
+- `-k, --private-key <key>` - The private key of the API key (required)
+- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
+
+**Example:**
+
+```bash
+bin/admin.js moderate-comments approve comment-id-123 -i your-api-key-id -k your-private-key
+```
+
+### Rejecting a Comment
+
+Rejects a pending comment, preventing it from being displayed.
+
+```bash
+bin/admin.js moderate-comments reject <comment-id> -i <api-key-id> -k <private-key> [--url <indexer-url>]
+```
+
+**Arguments:**
+
+- `comment-id` - The ID of the comment to reject
+
+**Options:**
+
+- `-i, --id <id>` - The ID of the API key to use (required)
+- `-k, --private-key <key>` - The private key of the API key (required)
+- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
+
+**Example:**
+
+```bash
+bin/admin.js moderate-comments reject comment-id-123 -i your-api-key-id -k your-private-key
+```
+
+## Error Handling
+
+If any command fails, the CLI will:
+
+1. Display an error message with details about the failure
+2. Exit with a non-zero status code
+
+Common error scenarios include:
+
+- Invalid API key or private key
+- Invalid comment ID
+- Network connectivity issues
+- Server-side errors
+- Moderation not enabled on the instance
+
+## Security Notes
+
+- Keep your API private keys secure and never share them
+- Use environment variables or secure key management systems to store sensitive credentials
+- The CLI uses Ed25519 signatures for authentication
+- All requests are timestamped to prevent replay attacks
