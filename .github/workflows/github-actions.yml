@@ -97,6 +97,7 @@ jobs:
       NEXT_PUBLIC_WC_PROJECT_ID: "test-project-id"
       SUBMITTER_PRIVATE_KEY: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
       APP_URL: "http://localhost:3000"
+      WEBHOOK_SECRET: "secret"
     strategy:
       matrix:
         node: [22]
