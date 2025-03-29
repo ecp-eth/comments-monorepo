@@ -1,6 +1,13 @@
 import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
-import { createWalletClient, publicActions } from "viem";
+import {
+  createPublicClient,
+  createWalletClient,
+  hashMessage,
+  hashTypedData,
+  publicActions,
+  recoverAddress,
+} from "viem";
 import {
   ApproveResponseSchema,
   BadRequestResponseSchema,
@@ -9,6 +16,8 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { chain, transport } from "@/lib/wagmi";
+import { privateKeyToAccount } from "viem/accounts";
+import { env } from "@/env";
 
 export async function POST(
   req: Request
@@ -32,6 +41,75 @@ export async function POST(
   }
 
   const { signTypedDataParams, authorSignature } = parsedBodyResult.data;
+
+  const hash = hashTypedData(signTypedDataParams);
+  const authorAddress = await recoverAddress({
+    hash,
+    signature: authorSignature,
+  });
+  const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+  const publicClient = createPublicClient({
+    chain,
+    transport,
+  });
+
+  // double check to avoid wasting gas on incorrect or unnecessary request
+  // Check approval on chain and get nonce (multicall3 if available,
+  // otherwise read contracts)
+  const [{ result: isApproved }, { result: nonce }] = chain.contracts
+    ?.multicall3
+    ? await publicClient.multicall({
+        contracts: [
+          {
+            address: COMMENTS_V1_ADDRESS,
+            abi: CommentsV1Abi,
+            functionName: "isApproved",
+            args: [authorAddress, account.address],
+          },
+          {
+            address: COMMENTS_V1_ADDRESS,
+            abi: CommentsV1Abi,
+            functionName: "nonces",
+            args: [authorAddress, account.address],
+          },
+        ],
+      })
+    : (
+        await Promise.all([
+          publicClient.readContract({
+            address: COMMENTS_V1_ADDRESS,
+            abi: CommentsV1Abi,
+            functionName: "isApproved",
+            args: [authorAddress, account.address],
+          }),
+          publicClient.readContract({
+            address: COMMENTS_V1_ADDRESS,
+            abi: CommentsV1Abi,
+            functionName: "nonces",
+            args: [authorAddress, account.address],
+          }),
+        ])
+      ).map((result) => ({ result }));
+
+  if (isApproved) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { signTypedDataParams: ["Already approved"] },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  if (nonce !== signTypedDataParams.message.nonce) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { signTypedDataParams: ["Incorrect nonce"] },
+      {
+        status: 400,
+      }
+    );
+  }
 
   // Can be any account with funds for gas on desired chain
   const submitterAccount = await resolveSubmitterAccount();
