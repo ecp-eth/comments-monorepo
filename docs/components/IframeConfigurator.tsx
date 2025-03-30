@@ -303,8 +303,6 @@ export default function IframeConfigurator() {
     }));
   };
 
-  console.log("rendering", mode);
-
   return (
     <div className="space-y-8 border border-input-border rounded-iframe-configurator-section p-4">
       <div className="space-y-6">
@@ -313,7 +311,7 @@ export default function IframeConfigurator() {
             className="block text-sm font-medium mb-2"
             htmlFor="mode-select"
           >
-            Mode
+            Mode {mode}
           </label>
           <select
             id="mode-select"
