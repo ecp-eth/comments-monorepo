@@ -303,6 +303,8 @@ export default function IframeConfigurator() {
     }));
   };
 
+  console.log("rendering", mode);
+
   return (
     <div className="space-y-8 border border-input-border rounded-iframe-configurator-section p-4">
       <div className="space-y-6">
@@ -316,7 +318,7 @@ export default function IframeConfigurator() {
           <select
             id="mode-select"
             value={mode}
-            onChange={(e) => setMode(e.target.value as "post" | "author")}
+            onChange={(e) => setMode(e.target.value as typeof mode)}
             className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
           >
             <option value="post">Show comments by web page</option>
@@ -677,7 +679,7 @@ function GeneratedURL({
   if (typeof window === "undefined" || !embedUri || !source) {
     return (
       <div>
-        Loading... ${!embedUri} ${!source}
+        Loading... {!embedUri} {!source}
       </div>
     );
   }
