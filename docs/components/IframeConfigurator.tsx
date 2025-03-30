@@ -675,7 +675,11 @@ function GeneratedURL({
   const timeoutRef = React.useRef<any>(null);
 
   if (typeof window === "undefined" || !embedUri || !source) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        Loading... ${!embedUri} ${!source}
+      </div>
+    );
   }
 
   try {
