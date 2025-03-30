@@ -2,7 +2,7 @@
 
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { Button } from "@/components/ui/button";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -11,13 +11,16 @@ import {
   useWriteContract,
 } from "wagmi";
 import { CommentGasless } from "./CommentGasless";
-import { COMMENTS_V1_ADDRESS, fetchComments } from "@ecp.eth/sdk";
+import {
+  COMMENTS_V1_ADDRESS,
+  createApprovalTypedData,
+  fetchComments,
+} from "@ecp.eth/sdk";
 import { useGaslessTransaction } from "@ecp.eth/sdk/react";
 import {
+  ChangeApprovalStatusRequestBodySchemaType,
   ChangeApprovalStatusResponseSchema,
-  GetApprovalStatusSchema,
 } from "@/lib/schemas";
-import type { SignTypedDataParameters } from "viem";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
 import {
@@ -36,9 +39,11 @@ import {
   CommentGaslessProviderContextType,
 } from "./CommentGaslessProvider";
 import { CommentGaslessForm } from "./CommentGaslessForm";
+import { useApprovalStatus } from "@/hooks/useApprovalStatus";
+import { chain } from "@/lib/wagmi";
 
 export function CommentSectionGasless() {
-  const { address: connectedAddress } = useAccount();
+  const account = useAccount();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(() => ["comments", currentUrl], [currentUrl]);
 
@@ -48,27 +53,11 @@ export function CommentSectionGasless() {
     data: approvalData,
     isPending: isApprovalQuerying,
     refetch: refetchApprovalQuery,
-  } = useQuery({
-    enabled: !!connectedAddress,
-    queryKey: ["approval", connectedAddress],
-    queryFn: async () => {
-      if (!connectedAddress) {
-        throw new Error("No address found");
-      }
-
-      const response = await fetch(`/api/approval?author=${connectedAddress}`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch approvals");
-      }
-
-      return GetApprovalStatusSchema.parse(await response.json());
-    },
-  });
+  } = useApprovalStatus();
 
   const approveGaslessTransactionsMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
-      if (!approvalData) {
+      if (!approvalData || !account.address) {
         throw new Error("No approval data found");
       }
 
@@ -76,13 +65,22 @@ export function CommentSectionGasless() {
         throw new Error("Already approved");
       }
 
+      const signTypedDataParams = await createApprovalTypedData({
+        author: account.address,
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        chainId: chain.id,
+        nonce: approvalData.nonce,
+      });
+
       return {
-        signTypedDataParams:
-          approvalData.signTypedDataParams as unknown as SignTypedDataParameters,
+        signTypedDataParams: {
+          ...signTypedDataParams,
+          account: account.address,
+        },
         variables: approvalData,
       };
     },
-    async sendSignedData({ signature, variables }) {
+    async sendSignedData({ signature, signTypedDataParams }) {
       const response = await fetch("/api/approval", {
         method: "POST",
         headers: {
@@ -90,9 +88,9 @@ export function CommentSectionGasless() {
         },
         body: JSON.stringify(
           {
-            ...variables,
+            signTypedDataParams,
             authorSignature: signature,
-          },
+          } satisfies ChangeApprovalStatusRequestBodySchemaType,
           bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
         ),
       });
@@ -238,7 +236,7 @@ export function CommentSectionGasless() {
       <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Comments</h2>
 
-        {!approvalData?.approved && approvalData?.signTypedDataParams ? (
+        {!approvalData?.approved ? (
           <div className="mb-4">
             <Button
               onClick={() => {
@@ -265,7 +263,7 @@ export function CommentSectionGasless() {
                   if (
                     !approvalData ||
                     !approvalData.approved ||
-                    !connectedAddress
+                    !account.address
                   ) {
                     throw new Error("No data found");
                   }
@@ -274,7 +272,7 @@ export function CommentSectionGasless() {
                     abi: CommentsV1Abi,
                     address: COMMENTS_V1_ADDRESS,
                     functionName: "removeApprovalAsAuthor",
-                    args: [approvalData.appSigner],
+                    args: [publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS],
                   });
                 }}
               >

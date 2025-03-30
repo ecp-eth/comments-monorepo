@@ -1,5 +1,5 @@
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
-import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
+import { useEnrichedAuthor } from "@/hooks/useEnrichedAuthor";
 import {
   getCommentAuthorNameOrAddress,
   formatDate,

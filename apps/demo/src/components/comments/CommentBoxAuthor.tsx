@@ -1,4 +1,4 @@
-import useEnrichedAuthor from "@/hooks/useEnrichedAuthor";
+import { useEnrichedAuthor } from "@/hooks/useEnrichedAuthor";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { AuthorType } from "@ecp.eth/shared/types";
