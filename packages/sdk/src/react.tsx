@@ -93,6 +93,13 @@ export function useGaslessTransaction<
   });
 }
 
+type CreateCommentsEmbedURLParams = {
+  embedUri: string;
+  param: { targetUri: string } | { author: Hex };
+  config?: EmbedConfigSchemaType;
+  disablePromotion?: boolean;
+};
+
 /**
  * Creates a URL for the comments embed iframe.
  *
@@ -101,17 +108,22 @@ export function useGaslessTransaction<
  * @param config - The configuration for the comments embed.
  * @returns The URL for the comments embed iframe.
  */
-export function createCommentsEmbedURL(
-  embedUri: string,
-  param: { targetUri: string } | { author: Hex },
-  config?: EmbedConfigSchemaType
-): string {
+export function createCommentsEmbedURL({
+  embedUri,
+  param,
+  config,
+  disablePromotion,
+}: CreateCommentsEmbedURLParams): string {
   const url = new URL(embedUri);
 
   if ("targetUri" in param) {
     url.searchParams.set("targetUri", param.targetUri);
   } else {
     url.searchParams.set("author", param.author);
+  }
+
+  if (disablePromotion) {
+    url.searchParams.set("disablePromotion", "1");
   }
 
   if (config && EmbedConfigSchema.parse(config)) {
@@ -145,6 +157,12 @@ export type CommentsEmbedProps = {
    * Allows to pass custom configuration to the embed iframe.
    */
   config?: EmbedConfigSchemaType;
+  /**
+   * Hide powered by ECP link
+   *
+   * @default false
+   */
+  disablePromotion?: boolean;
 };
 
 /**
@@ -172,10 +190,16 @@ export function CommentsEmbed({
   containerProps,
   iframeProps,
   config,
+  disablePromotion,
 }: CommentsEmbedProps) {
   const iframeUri = useMemo(() => {
-    return createCommentsEmbedURL(embedUri, { targetUri: uri }, config);
-  }, [embedUri, uri, config]);
+    return createCommentsEmbedURL({
+      embedUri,
+      param: { targetUri: uri },
+      config,
+      disablePromotion,
+    });
+  }, [embedUri, uri, config, disablePromotion]);
 
   return (
     <CommentsEmbedInternal
@@ -207,6 +231,12 @@ export type CommentsByAuthorEmbedProps = {
    * Allows to pass custom configuration to the embed iframe.
    */
   config?: EmbedConfigSchemaType;
+  /**
+   * Hide powered by ECP link
+   *
+   * @default false
+   */
+  disablePromotion?: boolean;
 };
 
 /**
@@ -234,10 +264,16 @@ export function CommentsByAuthorEmbed({
   config,
   containerProps,
   iframeProps,
+  disablePromotion,
 }: CommentsByAuthorEmbedProps) {
   const iframeUri = useMemo(() => {
-    return createCommentsEmbedURL(embedUri, { author }, config);
-  }, [embedUri, author, config]);
+    return createCommentsEmbedURL({
+      embedUri,
+      param: { author },
+      config,
+      disablePromotion,
+    });
+  }, [embedUri, author, config, disablePromotion]);
 
   return (
     <CommentsEmbedInternal

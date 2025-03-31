@@ -18,6 +18,7 @@ import {
 } from "@ecp.eth/shared/hooks";
 import type { Hex } from "viem";
 import { CommentForm } from "./CommentForm";
+import { CommentSectionWrapper } from "../CommentSectionWrapper";
 
 export function CommentSection() {
   const [currentUrl, setCurrentUrl] = useState<string>("");
@@ -97,7 +98,7 @@ export function CommentSection() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
+    <CommentSectionWrapper>
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
       <CommentForm onSubmitSuccess={handleCommentSubmitted} />
       {hasNewComments && (
@@ -123,6 +124,6 @@ export function CommentSection() {
           Load More
         </Button>
       )}
-    </div>
+    </CommentSectionWrapper>
   );
 }

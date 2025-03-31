@@ -8,11 +8,16 @@ export type Config = {
    * Used to calculate relative time in comments.
    */
   currentTimestamp: number;
+  /**
+   * Hide powered by ECP link
+   */
+  disablePromotion: boolean;
 };
 
 const configContext = createContext<Config>({
   targetUri: "",
   currentTimestamp: Date.now(),
+  disablePromotion: false,
 });
 
 type EmbedConfigProviderProps = {

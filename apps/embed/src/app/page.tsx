@@ -10,6 +10,11 @@ import { ApplyTheme } from "@/components/ApplyTheme";
 
 const SearchParamsSchema = z.object({
   targetUri: z.string().url(),
+  disablePromotion: z
+    .enum(["0", "1"])
+    .default("0")
+    .optional()
+    .transform((val) => val === "1"),
   config: z
     .preprocess((value) => {
       try {
@@ -49,7 +54,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
     );
   }
 
-  const { targetUri, config } = parseSearchParamsResult.data;
+  const { targetUri, config, disablePromotion } = parseSearchParamsResult.data;
 
   try {
     // at the moment we don't use server-side comments fetching because we don't know the address of the viewer
@@ -64,11 +69,15 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
 
     return (
       <ApplyTheme config={config}>
-        <main className="p-0 bg-background text-foreground font-default px-root-padding-horizontal py-root-padding-vertical">
+        <main className="p-0 text-foreground font-default px-root-padding-horizontal py-root-padding-vertical">
           <div className="max-w-4xl mx-auto">
             <Providers>
               <EmbedConfigProvider
-                value={{ targetUri, currentTimestamp: Date.now() }}
+                value={{
+                  targetUri,
+                  currentTimestamp: Date.now(),
+                  disablePromotion,
+                }}
               >
                 <CommentSection
                 /* initialData={{

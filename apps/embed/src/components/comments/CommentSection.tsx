@@ -27,6 +27,7 @@ import {
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { publicEnv } from "@/publicEnv";
 import { useAccount } from "wagmi";
+import { PoweredBy } from "./PoweredBy";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -39,7 +40,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   useAutoBodyMinHeight();
 
   const { address } = useAccount();
-  const { targetUri, currentTimestamp } = useEmbedConfig();
+  const { targetUri, currentTimestamp, disablePromotion } = useEmbedConfig();
   const queryKey = useMemo(
     () => ["comments", targetUri, address],
     [targetUri, address]
@@ -155,6 +156,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
           Load more
         </Button>
       )}
+      {!disablePromotion && <PoweredBy className="mt-4" />}
     </div>
   );
 }
