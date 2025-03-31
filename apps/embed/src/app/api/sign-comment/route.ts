@@ -17,7 +17,7 @@ import {
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
-import { chains } from "@/lib/wagmi";
+import { supportedChains } from "@/lib/wagmi";
 
 export async function POST(req: Request) {
   const parseResult = SignCommentPayloadRequestSchema.safeParse(
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const selectedChain = getChainById(chainId, chains);
+  const selectedChain = getChainById(chainId, supportedChains);
 
   if (!selectedChain) {
     return Response.json(

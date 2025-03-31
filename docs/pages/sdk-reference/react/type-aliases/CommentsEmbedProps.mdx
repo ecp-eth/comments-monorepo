@@ -8,17 +8,23 @@
 
 > **CommentsEmbedProps**: `object`
 
-Defined in: [packages/sdk/src/react.tsx:153](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L153)
+Defined in: [packages/sdk/src/react.tsx:149](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L149)
 
 The props for `<CommentsEmbed />` component.
 
 ## Type declaration
 
-### config?
+### chainId?
 
-> `optional` **config**: [`EmbedConfigSchemaType`](/sdk-reference/react/type-aliases/EmbedConfigSchemaType.mdx)
+> `optional` **chainId**: [`EmbedConfigSupportedChainIdsSchemaType`](/sdk-reference/schemas/type-aliases/EmbedConfigSupportedChainIdsSchemaType.mdx)
 
-Allows to pass custom configuration to the embed iframe.
+The chain id to use for posting comments.
+
+#### Default
+
+```ts
+8453
+```
 
 ### containerProps?
 
@@ -49,6 +55,12 @@ URL of the comments embed iframe page. This page is rendered in the iframe.
 > `optional` **iframeProps**: `React.IframeHTMLAttributes`\<`HTMLIFrameElement`\>
 
 Allows to pass custom props to iframe
+
+### theme?
+
+> `optional` **theme**: [`EmbedConfigThemeSchemaType`](/sdk-reference/schemas/type-aliases/EmbedConfigThemeSchemaType.mdx)
+
+Allows to customise the theme of the embed iframe.
 
 ### uri
 

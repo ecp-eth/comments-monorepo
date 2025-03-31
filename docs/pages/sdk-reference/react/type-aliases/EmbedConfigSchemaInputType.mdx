@@ -2,17 +2,36 @@
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [react](/sdk-reference/react/index.mdx) / EmbedConfigSchemaType
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [react](/sdk-reference/react/index.mdx) / EmbedConfigSchemaInputType
 
-# Type Alias: EmbedConfigSchemaType
+# Type Alias: EmbedConfigSchemaInputType
 
-> **EmbedConfigSchemaType**: `object`
+> **EmbedConfigSchemaInputType**: `object`
 
-Defined in: [packages/sdk/src/schemas/embed.ts:162](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/embed.ts#L162)
+Defined in: [packages/sdk/src/schemas/embed.ts:230](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/embed.ts#L230)
 
 Custom configuration for `<CommentEmbed />` component.
 
 ## Type declaration
+
+### chainId?
+
+> `optional` **chainId**: `1` \| `8453` \| `11155111` \| `31337` = `EmbedConfigSupportedChainIdsSchema`
+
+The id of the chain to post the comments to.
+We don't filter chain id when fetching comments.
+
+#### Default
+
+```ts
+8453
+```
+
+### disablePromotion?
+
+> `optional` **disablePromotion**: `boolean`
+
+Hide powered by ECP link
 
 ### theme?
 

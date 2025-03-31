@@ -15,13 +15,18 @@ import {
 } from "./constants.js";
 import {
   EmbedConfigSchema,
+  EmbedConfigSupportedChainIdsSchemaType,
+  EmbedConfigThemeSchemaType,
   EmbedResizedEventSchema,
-  type EmbedConfigSchemaType,
+  type EmbedConfigSchemaInputType,
 } from "./schemas/index.js";
 import * as lz from "lz-ts";
 
 // also export the type for generating docs correctly
-export type { EmbedConfigSchemaType } from "./schemas/index.js";
+export type {
+  EmbedConfigSchemaInputType,
+  EmbedConfigSchemaOutputType,
+} from "./schemas/index.js";
 
 const { compressToURI } = lz;
 
@@ -108,11 +113,7 @@ export type CreateCommentsEmbedURLParams = {
   /**
    * The configuration for the comments embed.
    */
-  config?: EmbedConfigSchemaType;
-  /**
-   * Hide powered by ECP link
-   */
-  disablePromotion?: boolean;
+  config?: EmbedConfigSchemaInputType;
 };
 
 /**
@@ -126,7 +127,6 @@ export function createCommentsEmbedURL({
   embedUri,
   source,
   config,
-  disablePromotion,
 }: CreateCommentsEmbedURLParams): string {
   const url = new URL(embedUri);
 
@@ -134,10 +134,6 @@ export function createCommentsEmbedURL({
     url.searchParams.set("targetUri", source.targetUri);
   } else {
     url.searchParams.set("author", source.author);
-  }
-
-  if (disablePromotion) {
-    url.searchParams.set("disablePromotion", "1");
   }
 
   if (config && EmbedConfigSchema.parse(config)) {
@@ -168,15 +164,21 @@ export type CommentsEmbedProps = {
    */
   iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
   /**
-   * Allows to pass custom configuration to the embed iframe.
+   * Allows to customise the theme of the embed iframe.
    */
-  config?: EmbedConfigSchemaType;
+  theme?: EmbedConfigThemeSchemaType;
   /**
    * Hide powered by ECP link
    *
    * @default false
    */
   disablePromotion?: boolean;
+  /**
+   * The chain id to use for posting comments.
+   *
+   * @default 8453
+   */
+  chainId?: EmbedConfigSupportedChainIdsSchemaType;
 };
 
 /**
@@ -203,17 +205,21 @@ export function CommentsEmbed({
   uri,
   containerProps,
   iframeProps,
-  config,
+  theme,
   disablePromotion,
+  chainId,
 }: CommentsEmbedProps) {
   const iframeUri = useMemo(() => {
     return createCommentsEmbedURL({
       embedUri,
       source: { targetUri: uri },
-      config,
-      disablePromotion,
+      config: {
+        theme,
+        disablePromotion,
+        chainId,
+      },
     });
-  }, [embedUri, uri, config, disablePromotion]);
+  }, [embedUri, uri, theme, disablePromotion, chainId]);
 
   return (
     <CommentsEmbedInternal
@@ -242,15 +248,21 @@ export type CommentsByAuthorEmbedProps = {
    */
   iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
   /**
-   * Allows to pass custom configuration to the embed iframe.
+   * Allows to customise the theme of the embed iframe.
    */
-  config?: EmbedConfigSchemaType;
+  theme?: EmbedConfigThemeSchemaType;
   /**
    * Hide powered by ECP link
    *
    * @default false
    */
   disablePromotion?: boolean;
+  /**
+   * The chain id to use for posting comments.
+   *
+   * @default 8453
+   */
+  chainId?: EmbedConfigSupportedChainIdsSchemaType;
 };
 
 /**
@@ -275,19 +287,23 @@ export type CommentsByAuthorEmbedProps = {
 export function CommentsByAuthorEmbed({
   embedUri = COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL,
   author,
-  config,
+  theme,
   containerProps,
   iframeProps,
   disablePromotion,
+  chainId,
 }: CommentsByAuthorEmbedProps) {
   const iframeUri = useMemo(() => {
     return createCommentsEmbedURL({
       embedUri,
       source: { author },
-      config,
-      disablePromotion,
+      config: {
+        theme,
+        disablePromotion,
+        chainId,
+      },
     });
-  }, [embedUri, author, config, disablePromotion]);
+  }, [embedUri, author, theme, disablePromotion, chainId]);
 
   return (
     <CommentsEmbedInternal

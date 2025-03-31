@@ -26,7 +26,7 @@ export default function Page() {
               process.env.NEXT_PUBLIC_ECP_ETH_EMBED_COMMENTS_BY_AUTHOR_URL!
             }
             author={process.env.NEXT_PUBLIC_AUTHOR_ADDRESS as Hex}
-            config={commentsEmbedTheme}
+            theme={commentsEmbedTheme}
           />
         </div>
       )}

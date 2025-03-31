@@ -1,31 +1,17 @@
-import { EmbedConfigSchema, HexSchema } from "@ecp.eth/sdk/schemas";
+import { HexSchema } from "@ecp.eth/sdk/schemas";
 import { fetchComments } from "@ecp.eth/sdk";
-import { decompressFromURI } from "lz-ts";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
 import { Providers } from "../providers";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { env } from "@/env";
-import { ApplyTheme } from "@/components/ApplyTheme";
 import { CommentSectionReadonly } from "@/components/comments/CommentSectionReadonly";
+import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
 
 const SearchParamsSchema = z.object({
   author: HexSchema,
-  disablePromotion: z
-    .enum(["0", "1"])
-    .default("0")
-    .optional()
-    .transform((val) => val === "1"),
-  config: z
-    .preprocess((value) => {
-      try {
-        if (typeof value === "string") {
-          return JSON.parse(decompressFromURI(value));
-        }
-      } catch {}
-    }, EmbedConfigSchema)
-    .optional(),
+  config: EmbedConfigFromSearchParamsSchema,
 });
 
 type EmbedPageProps = {
@@ -56,7 +42,7 @@ export default async function EmbedCommentsByAuthorPage({
     );
   }
 
-  const { author, config, disablePromotion } = parseSearchParamsResult.data;
+  const { author, config } = parseSearchParamsResult.data;
 
   try {
     const comments = await fetchComments({
@@ -67,29 +53,31 @@ export default async function EmbedCommentsByAuthorPage({
     });
 
     return (
-      <ApplyTheme config={config}>
+      <Providers
+        config={{
+          author,
+          currentTimestamp: Date.now(),
+          ...config,
+        }}
+      >
         <main className="min-h-screen p-0 font-default">
           <div className="max-w-4xl mx-auto">
-            <Providers>
-              <CommentSectionReadonly
-                author={author}
-                initialData={{
-                  pages: [comments],
-                  pageParams: [
-                    {
-                      limit: comments.pagination.limit,
-                      cursor: comments.pagination.endCursor,
-                    },
-                  ],
-                }}
-                currentTimestamp={Date.now()}
-                disablePromotion={disablePromotion}
-              />
-            </Providers>
+            <CommentSectionReadonly
+              author={author}
+              initialData={{
+                pages: [comments],
+                pageParams: [
+                  {
+                    limit: comments.pagination.limit,
+                    cursor: comments.pagination.endCursor,
+                  },
+                ],
+              }}
+            />
           </div>
         </main>
         <Toaster />
-      </ApplyTheme>
+      </Providers>
     );
   } catch (e) {
     console.error(e);

@@ -9,9 +9,16 @@ import { getCommentCursor } from "@ecp.eth/sdk";
 import type { InfiniteData } from "@tanstack/react-query";
 import { clsx, type ClassValue } from "clsx";
 import type { Chain, Hex } from "viem";
-import { AuthorType } from "./types.js";
+import { http } from "wagmi";
+import * as allChains from "wagmi/chains";
+import type { AuthorType, ProcessEnvNetwork } from "./types.js";
 import { z } from "zod";
 import { twMerge } from "tailwind-merge";
+
+function parseURL(url: string) {
+  // use zod instead, `URL.canParse` does not work in RN 🤷‍♂️
+  return z.string().url().safeParse(url).success ? url : null;
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -349,8 +356,7 @@ export function formatAuthorLinkWithTemplate(
 
   const url = urlTemplate.replace("{address}", author.address);
 
-  // use zod instead, `URL.canParse` does not work in RN 🤷‍♂️
-  return z.string().url().safeParse(url).success ? url : null;
+  return parseURL(url);
 }
 
 /**
@@ -380,10 +386,16 @@ export function truncateText(
   return truncated.slice(0, maxLength).trim() + "...";
 }
 
-export function getChainById(
+/**
+ * Get a chain by id
+ * @param id
+ * @param chains
+ * @returns
+ */
+export function getChainById<TChain extends Chain>(
   id: number,
-  chains: Readonly<Chain[]>
-): Chain | undefined {
+  chains: Readonly<TChain[]>
+): TChain | undefined {
   for (const [, chain] of Object.entries(chains)) {
     if (chain.id === id) {
       return chain;
@@ -392,6 +404,9 @@ export function getChainById(
   return undefined;
 }
 
+/**
+ * A typed json response
+ */
 export class JSONResponse<TSchema extends z.ZodType> extends Response {
   // branded type so it doesn't allow to assign a different schema
   private __outputType!: z.output<TSchema>;
@@ -413,4 +428,31 @@ export class JSONResponse<TSchema extends z.ZodType> extends Response {
       },
     });
   }
+}
+
+export function getNetworkFromProcessEnv(
+  prefix: string,
+  processEnv: object
+): Record<number, ProcessEnvNetwork> {
+  const urlEnvName = prefix + "RPC_URL_";
+  const networks = Object.entries(processEnv).reduce(
+    (acc, [key, value]) => {
+      if (!key.startsWith(urlEnvName)) {
+        return acc;
+      }
+
+      const chainId = parseInt(key.replace(urlEnvName, ""));
+
+      acc[chainId] = {
+        chainId,
+        chain: getChainById(chainId, Object.values(allChains))!,
+        transport: http(value),
+      };
+
+      return acc;
+    },
+    {} as Record<number, ProcessEnvNetwork>
+  );
+
+  return networks;
 }

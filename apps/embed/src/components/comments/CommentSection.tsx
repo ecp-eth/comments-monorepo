@@ -4,7 +4,10 @@ import { type InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Comment } from "./Comment";
 import { CommentForm } from "./CommentForm";
-import { useEmbedConfig } from "../EmbedConfigProvider";
+import {
+  EmbedConfigProviderByTargetURIConfig,
+  useEmbedConfig,
+} from "../EmbedConfigProvider";
 import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
 import {
@@ -40,7 +43,8 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   useAutoBodyMinHeight();
 
   const { address } = useAccount();
-  const { targetUri, currentTimestamp, disablePromotion } = useEmbedConfig();
+  const { targetUri, currentTimestamp, disablePromotion } =
+    useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
     () => ["comments", targetUri, address],
     [targetUri, address]

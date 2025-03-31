@@ -4,10 +4,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useRef, useState } from "react";
 import { useAccount, useSwitchChain, useWriteContract } from "wagmi";
 import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { chains } from "../../lib/wagmi";
 import { COMMENTS_V1_ADDRESS, fetchAuthorData } from "@ecp.eth/sdk";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
-import { useEmbedConfig } from "../EmbedConfigProvider";
+import {
+  EmbedConfigProviderByTargetURIConfig,
+  useEmbedConfig,
+} from "../EmbedConfigProvider";
 import type { PendingCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import { cn } from "@/lib/utils";
@@ -47,7 +49,8 @@ export function CommentForm({
   const { address } = useAccount();
   const connectAccount = useConnectAccount();
   const { switchChainAsync } = useSwitchChain();
-  const { targetUri } = useEmbedConfig();
+  const { targetUri, chainId } =
+    useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const [content, setContent] = useState(initialContent ?? "");
@@ -69,7 +72,7 @@ export function CommentForm({
       return submitCommentMutationFunction({
         address,
         commentRequest: {
-          chainId: chains[0].id,
+          chainId,
           content,
           targetUri,
           parentId,

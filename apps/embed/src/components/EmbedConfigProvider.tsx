@@ -1,9 +1,14 @@
 "use client";
 
+import {
+  EmbedConfigSchema,
+  EmbedConfigSchemaOutputType,
+  Hex,
+} from "@ecp.eth/sdk/schemas";
 import { createContext, useContext } from "react";
+import { zeroAddress } from "viem";
 
-export type Config = {
-  targetUri: string;
+export type EmbedConfigProviderBaseConfig = EmbedConfigSchemaOutputType & {
   /**
    * Used to calculate relative time in comments.
    */
@@ -14,26 +19,44 @@ export type Config = {
   disablePromotion: boolean;
 };
 
-const configContext = createContext<Config>({
-  targetUri: "",
+export type EmbedConfigProviderByAuthorConfig =
+  EmbedConfigProviderBaseConfig & {
+    author: Hex;
+  };
+
+export type EmbedConfigProviderByTargetURIConfig =
+  EmbedConfigProviderBaseConfig & {
+    targetUri: string;
+  };
+
+const configContext = createContext<
+  EmbedConfigProviderByTargetURIConfig | EmbedConfigProviderByAuthorConfig
+>({
   currentTimestamp: Date.now(),
-  disablePromotion: false,
+  author: zeroAddress,
+  targetUri: "",
+  ...EmbedConfigSchema.parse({}),
 });
 
-type EmbedConfigProviderProps = {
-  value: Config;
+type EmbedConfigProviderProps<TConfig extends EmbedConfigProviderBaseConfig> = {
+  value: EmbedConfigProviderBaseConfig & TConfig;
   children: React.ReactNode;
 };
 
-export function EmbedConfigProvider({
-  value,
-  children,
-}: EmbedConfigProviderProps) {
+export function EmbedConfigProvider<
+  TConfig extends
+    | EmbedConfigProviderByTargetURIConfig
+    | EmbedConfigProviderByAuthorConfig,
+>({ value, children }: EmbedConfigProviderProps<TConfig>) {
   return (
     <configContext.Provider value={value}>{children}</configContext.Provider>
   );
 }
 
-export function useEmbedConfig() {
-  return useContext(configContext);
+export function useEmbedConfig<
+  TConfig extends
+    | EmbedConfigProviderByTargetURIConfig
+    | EmbedConfigProviderByAuthorConfig,
+>() {
+  return useContext(configContext) as TConfig;
 }
