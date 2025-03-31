@@ -27,7 +27,7 @@ import {
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { publicEnv } from "@/publicEnv";
 import { useAccount } from "wagmi";
-import { PoweredBy } from "./PoweredBy";
+import { PoweredBy } from "@ecp.eth/shared/components";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<

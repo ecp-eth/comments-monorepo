@@ -93,10 +93,25 @@ export function useGaslessTransaction<
   });
 }
 
+/**
+ * Parameters for `createCommentsEmbedURL`
+ */
 type CreateCommentsEmbedURLParams = {
+  /**
+   * The URI of the comments embed iframe page.
+   */
   embedUri: string;
-  param: { targetUri: string } | { author: Hex };
+  /**
+   * The target URI or author address to embed comments for.
+   */
+  source: { targetUri: string } | { author: Hex };
+  /**
+   * The configuration for the comments embed.
+   */
   config?: EmbedConfigSchemaType;
+  /**
+   * Hide powered by ECP link
+   */
   disablePromotion?: boolean;
 };
 
@@ -104,22 +119,22 @@ type CreateCommentsEmbedURLParams = {
  * Creates a URL for the comments embed iframe.
  *
  * @param embedUri - The URI of the comments embed iframe page.
- * @param param - The target URI or author address to embed comments for.
+ * @param source - The target URI or author address to embed comments for.
  * @param config - The configuration for the comments embed.
  * @returns The URL for the comments embed iframe.
  */
 export function createCommentsEmbedURL({
   embedUri,
-  param,
+  source,
   config,
   disablePromotion,
 }: CreateCommentsEmbedURLParams): string {
   const url = new URL(embedUri);
 
-  if ("targetUri" in param) {
-    url.searchParams.set("targetUri", param.targetUri);
+  if ("targetUri" in source) {
+    url.searchParams.set("targetUri", source.targetUri);
   } else {
-    url.searchParams.set("author", param.author);
+    url.searchParams.set("author", source.author);
   }
 
   if (disablePromotion) {
@@ -195,7 +210,7 @@ export function CommentsEmbed({
   const iframeUri = useMemo(() => {
     return createCommentsEmbedURL({
       embedUri,
-      param: { targetUri: uri },
+      source: { targetUri: uri },
       config,
       disablePromotion,
     });
@@ -269,7 +284,7 @@ export function CommentsByAuthorEmbed({
   const iframeUri = useMemo(() => {
     return createCommentsEmbedURL({
       embedUri,
-      param: { author },
+      source: { author },
       config,
       disablePromotion,
     });

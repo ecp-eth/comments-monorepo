@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Logo } from "./Logo";
-import { cn } from "@/lib/utils";
+import { Logo } from "./Logo.js";
+import { cn } from "../helpers.js";
 
 type PoweredByProps = {
   className?: string;

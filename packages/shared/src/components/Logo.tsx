@@ -1,11 +1,10 @@
-import { cn } from "@/lib/utils";
-import * as React from "react";
-import { SVGProps } from "react";
+import type { SVGProps } from "react";
+import { cn } from "../helpers.js";
 
 export function Logo({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
-      className={cn("text-[#000] dark:text-[#fff]", className)}
+      className={cn("text-foreground", className)}
       xmlns="http://www.w3.org/2000/svg"
       width={2022}
       height={1865}

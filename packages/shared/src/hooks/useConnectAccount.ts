@@ -10,7 +10,7 @@ type Deferred = {
   resolve: (account: Hex) => void;
   reject: (error: Error) => void;
   promise?: Promise<Hex>;
-  timeout: number;
+  timeout: NodeJS.Timeout;
 };
 
 /**

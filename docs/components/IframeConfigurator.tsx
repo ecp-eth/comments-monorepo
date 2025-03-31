@@ -706,7 +706,7 @@ function GeneratedURL({
   try {
     const url = createCommentsEmbedURL({
       embedUri,
-      param: source,
+      source,
       config:
         JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
           ? config
@@ -795,7 +795,7 @@ function CommentsEmbedPreview({
     // this just validates the config
     createCommentsEmbedURL({
       embedUri,
-      param: source,
+      source,
       config:
         JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
           ? config

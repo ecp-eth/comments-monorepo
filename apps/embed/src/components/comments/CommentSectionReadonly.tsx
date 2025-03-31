@@ -22,7 +22,7 @@ import type { Hex } from "@ecp.eth/sdk/schemas";
 import { CommentByAuthor } from "./CommentByAuthor";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { publicEnv } from "@/publicEnv";
-import { PoweredBy } from "./PoweredBy";
+import { PoweredBy } from "@ecp.eth/shared/components";
 
 type QueryData = InfiniteData<
   CommentPageSchemaType,

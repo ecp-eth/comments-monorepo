@@ -5,7 +5,7 @@ import { SVGProps } from "react";
 export function Logo({ className, ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
-      className={cn("text-text-foreground", className)}
+      className={cn("text-foreground", className)}
       xmlns="http://www.w3.org/2000/svg"
       width={2022}
       height={1865}

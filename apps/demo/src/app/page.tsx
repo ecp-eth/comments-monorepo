@@ -8,7 +8,7 @@ import { CommentSectionGasless } from "@/components/comments/gasless/CommentSect
 import Link from "next/link";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CommentSection as CommentSectionSwapWithComment } from "@/components/comments/swap-with-comment/CommentSection";
-import { PoweredBy } from "@/components/PoweredBy";
+import { PoweredBy } from "@ecp.eth/shared/components";
 
 type Tab = "default" | "gasless" | "swap";
 
