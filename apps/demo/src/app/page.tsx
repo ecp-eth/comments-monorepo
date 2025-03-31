@@ -8,6 +8,7 @@ import { CommentSectionGasless } from "@/components/comments/gasless/CommentSect
 import Link from "next/link";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CommentSection as CommentSectionSwapWithComment } from "@/components/comments/swap-with-comment/CommentSection";
+import { PoweredBy } from "@ecp.eth/shared/components";
 
 type Tab = "default" | "gasless" | "swap";
 
@@ -50,13 +51,16 @@ export default function Home() {
             {/* <TabsTrigger value="swap">Swap with comment</TabsTrigger> */}
           </TabsList>
         </Tabs>
-        {activeTab === "gasless" ? (
-          <CommentSectionGasless />
-        ) : activeTab === "swap" ? (
-          <CommentSectionSwapWithComment />
-        ) : (
-          <CommentSection />
-        )}
+        <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
+          {activeTab === "gasless" ? (
+            <CommentSectionGasless />
+          ) : activeTab === "swap" ? (
+            <CommentSectionSwapWithComment />
+          ) : (
+            <CommentSection />
+          )}
+          <PoweredBy />
+        </div>
       </div>
     </main>
   );

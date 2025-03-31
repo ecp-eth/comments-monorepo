@@ -19,6 +19,7 @@ import {
 import type { Hex } from "viem";
 import { CommentDefaultForm } from "./CommentDefaultForm";
 import { useAccount } from "wagmi";
+import { CommentSectionWrapper } from "./CommentSectionWrapper";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
@@ -104,7 +105,7 @@ export function CommentSection() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
+    <CommentSectionWrapper>
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
       <CommentDefaultForm onSubmitSuccess={handleCommentSubmitted} />
       {hasNewComments && (
@@ -130,6 +131,6 @@ export function CommentSection() {
           Load More
         </Button>
       )}
-    </div>
+    </CommentSectionWrapper>
   );
 }

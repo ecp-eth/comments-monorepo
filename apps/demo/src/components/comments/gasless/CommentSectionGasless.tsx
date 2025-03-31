@@ -41,6 +41,7 @@ import {
 import { CommentGaslessForm } from "./CommentGaslessForm";
 import { useApprovalStatus } from "@/hooks/useApprovalStatus";
 import { chain } from "@/lib/wagmi";
+import { CommentSectionWrapper } from "../CommentSectionWrapper";
 
 export function CommentSectionGasless() {
   const account = useAccount();
@@ -233,7 +234,7 @@ export function CommentSectionGasless() {
 
   return (
     <CommentGaslessProvider value={commentGaslessProviderValue}>
-      <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
+      <CommentSectionWrapper>
         <h2 className="text-lg font-semibold">Comments</h2>
 
         {!approvalData?.approved ? (
@@ -308,7 +309,7 @@ export function CommentSectionGasless() {
             Load More
           </Button>
         )}
-      </div>
+      </CommentSectionWrapper>
     </CommentGaslessProvider>
   );
 }

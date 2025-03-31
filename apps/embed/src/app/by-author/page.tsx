@@ -12,6 +12,11 @@ import { CommentSectionReadonly } from "@/components/comments/CommentSectionRead
 
 const SearchParamsSchema = z.object({
   author: HexSchema,
+  disablePromotion: z
+    .enum(["0", "1"])
+    .default("0")
+    .optional()
+    .transform((val) => val === "1"),
   config: z
     .preprocess((value) => {
       try {
@@ -51,7 +56,7 @@ export default async function EmbedCommentsByAuthorPage({
     );
   }
 
-  const { author, config } = parseSearchParamsResult.data;
+  const { author, config, disablePromotion } = parseSearchParamsResult.data;
 
   try {
     const comments = await fetchComments({
@@ -63,7 +68,7 @@ export default async function EmbedCommentsByAuthorPage({
 
     return (
       <ApplyTheme config={config}>
-        <main className="min-h-screen p-0 bg-background font-default">
+        <main className="min-h-screen p-0 font-default">
           <div className="max-w-4xl mx-auto">
             <Providers>
               <CommentSectionReadonly
@@ -78,6 +83,7 @@ export default async function EmbedCommentsByAuthorPage({
                   ],
                 }}
                 currentTimestamp={Date.now()}
+                disablePromotion={disablePromotion}
               />
             </Providers>
           </div>

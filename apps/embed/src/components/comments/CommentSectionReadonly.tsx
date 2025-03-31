@@ -22,6 +22,7 @@ import type { Hex } from "@ecp.eth/sdk/schemas";
 import { CommentByAuthor } from "./CommentByAuthor";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { publicEnv } from "@/publicEnv";
+import { PoweredBy } from "@ecp.eth/shared/components";
 
 type QueryData = InfiniteData<
   CommentPageSchemaType,
@@ -35,12 +36,17 @@ type CommentSectionReadonlyProps = {
    * Used to calculate relative time in comments.
    */
   currentTimestamp: number;
+  /**
+   * Hide powered by ECP link
+   */
+  disablePromotion?: boolean;
 };
 
 export function CommentSectionReadonly({
   initialData,
   author,
   currentTimestamp,
+  disablePromotion,
 }: CommentSectionReadonlyProps) {
   const queryKey = useMemo(() => ["comments-by-author", author], [author]);
 
@@ -160,6 +166,7 @@ export function CommentSectionReadonly({
           Load More
         </Button>
       )}
+      {!disablePromotion && <PoweredBy className="mt-4" />}
     </div>
   );
 }

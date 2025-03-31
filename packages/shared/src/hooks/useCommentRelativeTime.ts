@@ -23,7 +23,7 @@ export function useCommentRelativeTime(
     }
 
     // Set up interval based on the time difference
-    let interval: number;
+    let interval: NodeJS.Timeout;
 
     if (diffInSeconds < 60) {
       // Update every second if less than a minute

@@ -217,6 +217,9 @@ export default function IframeConfigurator() {
   );
   const [config, setConfig] =
     React.useState<EmbedConfigSchemaType>(DEFAULT_CONFIG);
+  const [disablePromotion, setDisablePromotion] = React.useState<"0" | "1">(
+    "0"
+  );
   const [debouncedConfig] = useDebounce(config, 500);
 
   // Update embedUri when mode changes
@@ -396,6 +399,26 @@ export default function IframeConfigurator() {
                 <option>Auto</option>
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                htmlFor="disable-promotion-select"
+              >
+                Hide "Powered by ECP" link
+              </label>
+              <select
+                id="disable-promotion-select"
+                value={disablePromotion}
+                onChange={(e) => {
+                  setDisablePromotion(e.target.value as "0" | "1");
+                }}
+                className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
+              >
+                <option value="0">No</option>
+                <option value="1">Yes</option>
               </select>
             </div>
 
@@ -644,6 +667,7 @@ export default function IframeConfigurator() {
             config={debouncedConfig}
             embedUri={embedUri}
             source={mode === "post" ? { targetUri: uri } : { author }}
+            disablePromotion={disablePromotion}
           />
         </div>
 
@@ -653,6 +677,7 @@ export default function IframeConfigurator() {
             embedUri={embedUri}
             source={mode === "post" ? { targetUri: uri } : { author }}
             config={debouncedConfig}
+            disablePromotion={disablePromotion}
           />
         </div>
       </>
@@ -664,10 +689,12 @@ function GeneratedURL({
   embedUri,
   config,
   source,
+  disablePromotion,
 }: {
   embedUri: string | undefined;
   config: EmbedConfigSchemaType;
   source: { targetUri: string } | { author: Hex } | undefined;
+  disablePromotion: "0" | "1";
 }) {
   const [copied, setCopied] = React.useState(false);
   const timeoutRef = React.useRef<any>(null);
@@ -677,13 +704,15 @@ function GeneratedURL({
   }
 
   try {
-    const url = createCommentsEmbedURL(
+    const url = createCommentsEmbedURL({
       embedUri,
       source,
-      JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
-        ? config
-        : undefined
-    );
+      config:
+        JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
+          ? config
+          : undefined,
+      disablePromotion: disablePromotion === "1",
+    });
     const frameSrc = new URL(url).origin;
     const snippet = `<iframe
   src="${url}"
@@ -751,10 +780,12 @@ function CommentsEmbedPreview({
   embedUri,
   source,
   config,
+  disablePromotion,
 }: {
   embedUri: string | undefined;
   config: EmbedConfigSchemaType;
   source: { targetUri: string } | { author: Hex };
+  disablePromotion: "0" | "1";
 }) {
   if (typeof window === "undefined" || !embedUri) {
     return null;
@@ -762,25 +793,28 @@ function CommentsEmbedPreview({
 
   try {
     // this just validates the config
-    createCommentsEmbedURL(
+    createCommentsEmbedURL({
       embedUri,
       source,
-      JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
-        ? config
-        : undefined
-    );
+      config:
+        JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
+          ? config
+          : undefined,
+    });
 
     return "targetUri" in source ? (
       <CommentsEmbed
         uri={source.targetUri}
         embedUri={embedUri}
         config={config}
+        disablePromotion={disablePromotion === "1"}
       />
     ) : (
       <CommentsByAuthorEmbed
         author={source.author}
         embedUri={embedUri}
         config={config}
+        disablePromotion={disablePromotion === "1"}
       />
     );
   } catch (e) {

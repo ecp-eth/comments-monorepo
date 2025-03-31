@@ -7,9 +7,15 @@ import type {
 } from "./schemas.js";
 import { getCommentCursor } from "@ecp.eth/sdk";
 import type { InfiniteData } from "@tanstack/react-query";
+import { clsx, type ClassValue } from "clsx";
 import type { Chain, Hex } from "viem";
 import { AuthorType } from "./types.js";
 import { z } from "zod";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export function getCommentAuthorNameOrAddress(author: AuthorType): string {
   return (
