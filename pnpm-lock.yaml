@@ -439,7 +439,7 @@ importers:
   apps/indexer:
     dependencies:
       '@ecp.eth/sdk':
-        specifier: ^0.0.13
+        specifier: workspace:*
         version: link:../../packages/sdk
       '@hono/node-server':
         specifier: ^1.13.8
@@ -506,7 +506,7 @@ importers:
         version: 3.24.1
     devDependencies:
       '@ecp.eth/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/eslint-config
       '@types/node':
         specifier: ^22.13.1

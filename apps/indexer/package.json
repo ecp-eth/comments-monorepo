@@ -16,7 +16,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@ecp.eth/sdk": "^0.0.13",
+    "@ecp.eth/sdk": "workspace:*",
     "@hono/node-server": "^1.13.8",
     "@hono/zod-openapi": "^0.18.4",
     "@neynar/nodejs-sdk": "^2.13.1",
@@ -40,7 +40,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@ecp.eth/eslint-config": "workspace:^",
+    "@ecp.eth/eslint-config": "workspace:*",
     "@types/node": "^22.13.1",
     "@types/pg": "^8.11.11",
     "eslint": "^9.19.0"
