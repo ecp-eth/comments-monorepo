@@ -29,7 +29,7 @@ const { compressToURI } = lz;
  * A hook for repeat gasless transaction pattern
  *
  * Gasless transaction typically requires 3 steps:
- * 1. prepare typed data to be passed to `signTypedData`, typicall this is also created from server side with an app signature.
+ * 1. prepare typed data to be passed to `signTypedData`, typically this is also created from server side with an app signature.
  * 2. sign typed data on client side
  * 3. send the dual signed data to server
  *
