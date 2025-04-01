@@ -6,7 +6,7 @@
 
 # Function: useGaslessTransaction()
 
-> **useGaslessTransaction**\<`TVariables`, `TReturnValue`, `TInputVariables`\>(`props`): `UseMutationResult`\<`TReturnValue`, `Error`, `TInputVariables`, `unknown`\>
+> **useGaslessTransaction**\<`TVariables`, `TReturnValue`, `TInputVariables`, `TSignTypedDataParams`\>(`props`): `UseMutationResult`\<`TReturnValue`, `Error`, `TInputVariables`, `unknown`\>
 
 Defined in: [packages/sdk/src/react.tsx:42](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L42)
 
@@ -27,13 +27,15 @@ This hook abstracts these steps and help with the repetition of the pattern.
 
 • **TInputVariables** = `void`
 
+• **TSignTypedDataParams** *extends* `SignTypedDataParameters` = `SignTypedDataParameters`
+
 ## Parameters
 
 ### props
 
 #### prepareSignTypedDataParams
 
-(`variables`) => `Promise`\<`SignTypedDataParameters` \| \{ `signTypedDataParams`: `SignTypedDataParameters`; `variables`: `TVariables`; \}\>
+(`variables`) => `Promise`\<`TSignTypedDataParams` \| \{ `signTypedDataParams`: `TSignTypedDataParams`; `variables`: `TVariables`; \}\>
 
 #### sendSignedData
 

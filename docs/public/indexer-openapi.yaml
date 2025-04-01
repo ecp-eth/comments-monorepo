@@ -1226,4 +1226,60 @@ paths:
                     description: The error message
                 required:
                   - message
+  /api/webhook:
+    get:
+      description: Webhook to receive commands
+      parameters:
+        - schema:
+            oneOf:
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - approve
+                  commentId: {}
+                required:
+                  - type
+                  - commentId
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - reject
+                  commentId: {}
+                required:
+                  - type
+                  - commentId
+          required: true
+          name: c
+          in: query
+      responses:
+        '204':
+          description: When webhook request is valid
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: When request signature is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
 webhooks: {}
