@@ -22,7 +22,17 @@ app.use("/", graphql({ db, schema }));
 app.use("/graphql", graphql({ db, schema }));
 
 // all apis are cors: * enabled
-app.use("/api/*", cors());
+app.use(
+  "/api/*",
+  cors({
+    origin: "*",
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowHeaders: ["*"],
+    exposeHeaders: ["*"],
+    credentials: true,
+    maxAge: 86400,
+  })
+);
 
 // The OpenAPI documentation will be available at /docs
 app.doc("/docs", {
