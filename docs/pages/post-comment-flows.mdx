@@ -3,7 +3,7 @@
 There are several approaches to posting a comment, each with its own pros and cons.
 
 In this article, we are going through these different flows and we will mention different roles in the system.
-It is recommanded to finish the [architecture overview](/architecture-overview) and [dual signature system](/dual-signature-system) first.
+It is recommended to finish the [architecture overview](/architecture-overview) and [dual signature system](/dual-signature-system) first.
 
 ### 1. Author pays gas
 
@@ -12,7 +12,6 @@ The simplest approach is having the author pay the gas fee directly. The process
 1. The author creates a post comment request containing the comment details
 2. The app server signs this request using its `appSigner` to authorize the post action
 3. The app server returns the signature to the author
-4. The author submits and pays for the transaction on-chain
 
 This provides a direct path for posting comments, though it requires the author to have funds for gas fees.
 
@@ -23,7 +22,7 @@ sequenceDiagram
     participant Contract
     participant Indexer
 
-    %% Flow 3: Author pays gas
+    %% Flow 1: Author pays gas
     Note over Author,Indexer: Flow 1: Author pays gas
     Author->>App server: Post the comment request
     App server->>App server: Signs the comment request
@@ -56,7 +55,7 @@ sequenceDiagram
     participant Contract
     participant Indexer
 
-    %% Flow 3: Author pays gas
+    %% Flow 2: Submitter pays gas
     Note over Author,Indexer: Flow 2: Submitter pays gas
     Author->>App server: Post the comment request
     App server->>App server: Signs the comment request
@@ -87,8 +86,7 @@ sequenceDiagram
     participant Contract
     participant Indexer
 
-    %% Flow 3: Author pays gas
-
+    %% Flow 3: Gasless transaction with prior approval
     Note over Author,Indexer: Author approves app signer
     Author->>App server: Request to approve app signer
     App server->>Contract: Check if the author has approved the app signer
@@ -112,30 +110,5 @@ sequenceDiagram
     App server->>Contract: CommentV1.postComment(commentData, authorSignature, appSignature)
     Contract->>Indexer: Emit comment event
     Indexer->>Indexer: Store the comment
-    Indexer-->>Author: Responds with updated comments feed
-```
-
-### 4. Appending comment to a transaction (author pays gas)
-
-This approach is similar to the first one, but with a key difference in how the comment is submitted.
-Instead of submitting the comment as a separate transaction, the comment is appended to an existing transaction as data suffix.
-This can be useful when the author is already interacting with the contract for other purposes,
-such as submitting a vote or transferring tokens.
-
-```mermaid
-sequenceDiagram
-    actor Author
-    participant App server
-    participant Some contract
-    participant Indexer
-
-    %% Flow 3: Author pays gas
-    Note over Author,Indexer: Flow 1: Author pays gas
-    Author->>App server: Post the comment request
-    App server->>App server: Signs the comment request
-    App server-->>Author: Responds comment data and app signature
-    Author->>Some contract: Writes to a contract with a comment data as transaction data suffix.
-    Some contract->>Indexer: Emit some event
-    Indexer->>Indexer: Parses transaction data suffix from the event and stores the comment
     Indexer-->>Author: Responds with updated comments feed
 ```

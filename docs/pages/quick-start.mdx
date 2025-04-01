@@ -43,9 +43,9 @@ npm install @ecp.eth/sdk wagmi
 Render `<CommentsEmbed />` component with a unique url for current page.
 
 ```tsx
-import { CommentsEmbed } from '@ecp.eth/sdk/react'
+import { CommentsEmbed } from "@ecp.eth/sdk/react";
 
-const baseOrigin = 'https://blog.example.com'
+const baseOrigin = "https://blog.example.com";
 
 export function Comments() {
   return (
@@ -53,13 +53,10 @@ export function Comments() {
       <h3>Comments</h3>
       <CommentsEmbed
         // the uri for commenting
-        uri={new URL(
-          window.location.pathname,
-          baseOrigin
-        ).toString()}
+        uri={new URL(window.location.pathname, baseOrigin).toString()}
       />
-    </div>`
-  )
+    </div>
+  );
 }
 ```
 

@@ -6,9 +6,9 @@ The React component library provides pre-built, customizable UI components for s
 This is the recommended approach for most web applications.
 
 ```tsx
-import { CommentsEmbed } from '@ecp.eth/sdk/react'
+import { CommentsEmbed } from "@ecp.eth/sdk/react";
 
-const baseOrigin = 'https://blog.example.com'
+const baseOrigin = "https://blog.example.com";
 
 export function Comments() {
   return (
@@ -16,30 +16,27 @@ export function Comments() {
       <h3>Comments</h3>
       <CommentsEmbed
         // the uri for commenting
-        uri={new URL(
-          window.location.pathname,
-          baseOrigin
-        ).toString()}
+        uri={new URL(window.location.pathname, baseOrigin).toString()}
         // the config object allows you to customize the CommentsEmbed's appearance
         config={{
           theme: {
             // mode controls which theme to use, it can be 'light' or 'dark'
-            mode: 'light',
+            mode: "light",
             colors: {
               dark: {
-                background: 'black',
-                foreground: '#e9e9ea',
+                background: "black",
+                foreground: "#e9e9ea",
               },
               light: {
-                background: 'white',
-                foreground: '#4c4c4c',
+                background: "white",
+                foreground: "#4c4c4c",
               },
             },
           },
         }}
       />
-    </div>`
-  )
+    </div>
+  );
 }
 ```
 
