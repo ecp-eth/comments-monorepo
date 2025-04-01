@@ -96,7 +96,7 @@ export function useGaslessTransaction<
 /**
  * Parameters for `createCommentsEmbedURL`
  */
-type CreateCommentsEmbedURLParams = {
+export type CreateCommentsEmbedURLParams = {
   /**
    * The URI of the comments embed iframe page.
    */
@@ -118,9 +118,8 @@ type CreateCommentsEmbedURLParams = {
 /**
  * Creates a URL for the comments embed iframe.
  *
- * @param embedUri - The URI of the comments embed iframe page.
- * @param source - The target URI or author address to embed comments for.
- * @param config - The configuration for the comments embed.
+ * @param options
+ *
  * @returns The URL for the comments embed iframe.
  */
 export function createCommentsEmbedURL({
