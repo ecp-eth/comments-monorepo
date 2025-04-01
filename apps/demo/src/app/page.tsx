@@ -14,7 +14,7 @@ type Tab = "default" | "gasless" | "swap";
 
 export default function Home() {
   const { address } = useAccount();
-  const [activeTab, setActiveTab] = useState<Tab>("default");
+  const [activeTab, setActiveTab] = useState<Tab>("swap");
 
   return (
     <main className="min-h-screen bg-gray-100 py-8">
@@ -48,7 +48,7 @@ export default function Home() {
             <TabsTrigger value="gasless">
               Gas Sponsored Transactions
             </TabsTrigger>
-            {/* <TabsTrigger value="swap">Swap with comment</TabsTrigger> */}
+            <TabsTrigger value="swap">Swap with comment</TabsTrigger>
           </TabsList>
         </Tabs>
         <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
