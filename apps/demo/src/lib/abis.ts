@@ -25,4 +25,4 @@ export const BATCH_CALL_DELEGATION_CONTRACT_ABI = [
     outputs: [],
     stateMutability: "payable",
   },
-];
+] as const;

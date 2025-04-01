@@ -78,13 +78,11 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
 
           return postCommentAsAuthorInBatch({
             args: [
-              [
-                {
-                  to: quote.transaction.to,
-                  data: quote.transaction.data,
-                  value: quote.transaction.value,
-                },
-              ],
+              {
+                to: quote.transaction.to,
+                data: quote.transaction.data,
+                value: quote.transaction.value,
+              },
             ],
             signedComment,
             walletClient,
@@ -104,6 +102,7 @@ export function CommentForm({ parentId, onSubmitSuccess }: CommentFormProps) {
       sendTransactionAsync,
       signTypedDataAsync,
       switchChainAsync,
+      walletClient,
     ]
   );
 

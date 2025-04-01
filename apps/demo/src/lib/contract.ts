@@ -10,7 +10,6 @@ import {
 } from "viem";
 import type { UseWriteContractReturnType } from "wagmi";
 import { BATCH_CALL_DELEGATION_CONTRACT_ABI } from "./abis";
-import { eip7702Actions } from "viem/experimental";
 import { publicEnv } from "@/publicEnv";
 import { chain } from "./wagmi";
 import type { SignCommentResponseClientSchemaType } from "@ecp.eth/shared/schemas";
@@ -41,7 +40,7 @@ export async function postCommentAsAuthorInBatch({
     typeof BATCH_CALL_DELEGATION_CONTRACT_ABI,
     "payable",
     "execute"
-  >;
+  >[number];
   signedComment: SignCommentResponseClientSchemaType;
   walletClient: WalletClient<any, any, Account>;
 }) {
@@ -70,25 +69,24 @@ export async function sendBatchedTransaction({
     typeof BATCH_CALL_DELEGATION_CONTRACT_ABI,
     "payable",
     "execute"
-  >;
+  >[number];
   walletClient: WalletClient<any, any, Account>;
 }): Promise<WriteContractReturnType> {
-  const eip7702wallet = walletClient.extend(eip7702Actions());
+  const wallet = walletClient;
 
-  await eip7702wallet.switchChain({ id: chain.id });
+  await wallet.switchChain({ id: chain.id });
 
-  // uses current account, that is json-rpc account
-  // therefore at the moment this is not working since viem doesn't support it
-  const authorization = await eip7702wallet.signAuthorization({
+  const authorization = await wallet.signAuthorization({
     contractAddress:
       publicEnv.NEXT_PUBLIC_BATCH_CALL_DELEGATION_PROTOCOL_ADDRESS,
+    executor: "self",
   });
 
   return await walletClient.writeContract({
-    address: eip7702wallet.account.address,
+    address: wallet.account.address,
     abi: BATCH_CALL_DELEGATION_CONTRACT_ABI,
     functionName: "execute",
-    args,
+    args: [args],
     chain,
     authorizationList: [authorization],
   });
