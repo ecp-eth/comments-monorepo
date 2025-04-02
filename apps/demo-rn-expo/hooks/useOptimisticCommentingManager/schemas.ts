@@ -1,7 +1,6 @@
 import {
   HexSchema,
   IndexerAPICommentWithRepliesSchema,
-  IndexerAPICursorPaginationSchema,
   IndexerAPIListCommentRepliesSchema,
   IndexerAPIListCommentsSchema,
 } from "@ecp.eth/sdk/schemas";
@@ -43,10 +42,10 @@ export type IndexerAPICommentWithPendingOperationSchemaType = z.infer<
 >;
 
 export const IndexerAPIListCommentsWithPendingOperationsSchema = z.object({
+  ...IndexerAPIListCommentsSchema.shape,
   results: z.array(
     IndexerAPICommentWithRepliesSchema.extend(PendingOperationSchema.shape)
   ),
-  pagination: IndexerAPICursorPaginationSchema,
 });
 
 export type IndexerAPIListCommentsWithPendingOperationsSchemaType = z.infer<

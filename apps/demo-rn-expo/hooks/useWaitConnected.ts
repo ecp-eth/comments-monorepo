@@ -9,8 +9,8 @@ export default function useWaitConnected() {
   const { address } = useAccount();
 
   const { open } = useAppKit();
-  const waitConnectedPromise = useRef<Deferred<Hex>>();
-  const waitAppForegroundPromise = useRef<Deferred<void>>();
+  const waitConnectedPromise = useRef<Deferred<Hex> | null>(null);
+  const waitAppForegroundPromise = useRef<Deferred<void> | null>(null);
 
   useAppForegroundedEffect(() => {
     waitAppForegroundPromise.current?.resolve();

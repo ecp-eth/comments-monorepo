@@ -242,8 +242,11 @@ function createIndexerAPICommentDataFromPendingCommentOperation(
         hasNext: false,
         hasPrevious: false,
       },
+      extra: { moderationEnabled: false },
     },
     pendingType,
+    moderationStatus: "approved",
+    moderationStatusChangedAt: new Date(),
   };
 }
 
