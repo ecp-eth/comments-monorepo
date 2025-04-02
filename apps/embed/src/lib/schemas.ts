@@ -33,14 +33,12 @@ export const SignCommentResponseServerSchema = z.object({
   data: CommentDataWithIdSchema,
 });
 
-export const EmbedConfigFromSearchParamsSchema = z
-  .preprocess((value) => {
-    try {
-      if (typeof value === "string") {
-        return JSON.parse(decompressFromURI(value));
-      }
-    } catch (err) {
-      console.warn("failed to parse config", err);
+export const EmbedConfigFromSearchParamsSchema = z.preprocess((value) => {
+  try {
+    if (typeof value === "string") {
+      return JSON.parse(decompressFromURI(value));
     }
-  }, EmbedConfigSchema)
-  .default({});
+  } catch (err) {
+    console.warn("failed to parse config", err);
+  }
+}, EmbedConfigSchema.default({}));
