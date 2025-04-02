@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import { WatchDocumentResize } from "@/components/WatchDocumentResize";
+import { ApplyCSSSelectorTags } from "@/components/ApplyCSSSelectorTags";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- need to be like this to preload the font
 const geistSans = Geist({
@@ -20,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="has-parent-window has-not-parent-window">
       <head>
         <meta name="color-scheme" content="dark light" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body className="antialiased bg-background">
         {children}
         <WatchDocumentResize />
+        <ApplyCSSSelectorTags />
       </body>
     </html>
   );

@@ -108,6 +108,7 @@ body {
   * {
     @apply border-border;
   }
+
   html,
   body {
     margin: 0;
@@ -119,5 +120,9 @@ body {
      * scrollHeight measurement.
      */
     overflow: hidden;
+  }
+
+  .has-not-parent-window {
+    overflow: auto;
   }
 }
