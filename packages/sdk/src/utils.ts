@@ -55,7 +55,7 @@ export function createCommentData({
   author: `0x${string}`;
   /** The address of the app signer */
   appSigner: `0x${string}`;
-  /** The current nonce per user per app on the chain */
+  /** The current nonce for the user per app on the chain */
   nonce: bigint;
   /** The deadline of the comment submission in seconds since epoch */
   deadline?: bigint;

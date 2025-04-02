@@ -167,7 +167,7 @@ export type FetchCommentRepliesOptions = {
    */
   apiUrl?: string;
   /**
-   * Filters only to comments sent using this app signer key.
+   * Filters to only comments sent using this app signer key.
    */
   appSigner?: Hex;
   /**

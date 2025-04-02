@@ -29,7 +29,7 @@ const { compressToURI } = lz;
  * A hook for repeat gasless transaction pattern
  *
  * Gasless transaction typically requires 3 steps:
- * 1. prepare typed data to be passed to `signTypedData`, typicall this is also created from server side with an app signature.
+ * 1. prepare typed data to be passed to `signTypedData`, typically this is also created from server side with an app signature.
  * 2. sign typed data on client side
  * 3. send the dual signed data to server
  *
@@ -96,7 +96,7 @@ export function useGaslessTransaction<
 /**
  * Parameters for `createCommentsEmbedURL`
  */
-type CreateCommentsEmbedURLParams = {
+export type CreateCommentsEmbedURLParams = {
   /**
    * The URI of the comments embed iframe page.
    */
@@ -118,9 +118,8 @@ type CreateCommentsEmbedURLParams = {
 /**
  * Creates a URL for the comments embed iframe.
  *
- * @param embedUri - The URI of the comments embed iframe page.
- * @param source - The target URI or author address to embed comments for.
- * @param config - The configuration for the comments embed.
+ * @param options
+ *
  * @returns The URL for the comments embed iframe.
  */
 export function createCommentsEmbedURL({
