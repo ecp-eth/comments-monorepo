@@ -197,7 +197,7 @@ export type CommentsEmbedProps = {
  * @example
  * ```tsx
  * // force dark theme
- * <CommentsEmbed uri="https://my-blog.tld/article/use-comments" config={{ theme: { mode: 'dark' }}} />
+ * <CommentsEmbed uri="https://my-blog.tld/article/use-comments" theme={{ mode: 'dark' }} />
  * ```
  */
 export function CommentsEmbed({
