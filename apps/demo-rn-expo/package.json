@@ -7,7 +7,7 @@
     "android": "expo start --android --port 3005",
     "ios": "expo start --ios --port 3005",
     "web": "expo start --web --port 3005",
-    "typecheck": "tsc --noEmit",
+    "check-types": "tsc --noEmit",
     "lint": "eslint \"./**/*.{ts,tsx}\"",
     "api:schema:sync": "scripts/syncAPISchemas.sh"
   },
