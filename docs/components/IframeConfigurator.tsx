@@ -6,14 +6,14 @@ import {
 } from "@ecp.eth/sdk/react";
 import { useDebounce } from "use-debounce";
 import {
-  type EmbedConfigSchemaType,
+  type EmbedConfigSchemaInputType,
   EmbedConfigSupportedFont,
   type Hex,
 } from "@ecp.eth/sdk/schemas";
 import { publicEnv } from "../publicEnv";
 import { Info } from "lucide-react";
 
-const DEFAULT_CONFIG: EmbedConfigSchemaType = {
+const DEFAULT_CONFIG: EmbedConfigSchemaInputType = {
   theme: {
     colors: {
       light: {
@@ -216,10 +216,7 @@ export default function IframeConfigurator() {
       : publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL
   );
   const [config, setConfig] =
-    React.useState<EmbedConfigSchemaType>(DEFAULT_CONFIG);
-  const [disablePromotion, setDisablePromotion] = React.useState<"0" | "1">(
-    "0"
-  );
+    React.useState<EmbedConfigSchemaInputType>(DEFAULT_CONFIG);
   const [debouncedConfig] = useDebounce(config, 500);
 
   // Update embedUri when mode changes
@@ -411,9 +408,12 @@ export default function IframeConfigurator() {
               </label>
               <select
                 id="disable-promotion-select"
-                value={disablePromotion}
+                value={config.disablePromotion ? "1" : "0"}
                 onChange={(e) => {
-                  setDisablePromotion(e.target.value as "0" | "1");
+                  setConfig((prev) => ({
+                    ...prev,
+                    disablePromotion: e.target.value === "1",
+                  }));
                 }}
                 className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
               >
@@ -667,7 +667,6 @@ export default function IframeConfigurator() {
             config={debouncedConfig}
             embedUri={embedUri}
             source={mode === "post" ? { targetUri: uri } : { author }}
-            disablePromotion={disablePromotion}
           />
         </div>
 
@@ -677,7 +676,6 @@ export default function IframeConfigurator() {
             embedUri={embedUri}
             source={mode === "post" ? { targetUri: uri } : { author }}
             config={debouncedConfig}
-            disablePromotion={disablePromotion}
           />
         </div>
       </>
@@ -689,12 +687,10 @@ function GeneratedURL({
   embedUri,
   config,
   source,
-  disablePromotion,
 }: {
   embedUri: string | undefined;
-  config: EmbedConfigSchemaType;
+  config: EmbedConfigSchemaInputType;
   source: { targetUri: string } | { author: Hex } | undefined;
-  disablePromotion: "0" | "1";
 }) {
   const [copied, setCopied] = React.useState(false);
   const timeoutRef = React.useRef<any>(null);
@@ -711,7 +707,6 @@ function GeneratedURL({
         JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
           ? config
           : undefined,
-      disablePromotion: disablePromotion === "1",
     });
     const frameSrc = new URL(url).origin;
     const snippet = `<iframe
@@ -780,12 +775,10 @@ function CommentsEmbedPreview({
   embedUri,
   source,
   config,
-  disablePromotion,
 }: {
   embedUri: string | undefined;
-  config: EmbedConfigSchemaType;
+  config: EmbedConfigSchemaInputType;
   source: { targetUri: string } | { author: Hex };
-  disablePromotion: "0" | "1";
 }) {
   if (typeof window === "undefined" || !embedUri) {
     return null;
@@ -806,15 +799,15 @@ function CommentsEmbedPreview({
       <CommentsEmbed
         uri={source.targetUri}
         embedUri={embedUri}
-        config={config}
-        disablePromotion={disablePromotion === "1"}
+        theme={config.theme}
+        disablePromotion={config.disablePromotion}
       />
     ) : (
       <CommentsByAuthorEmbed
         author={source.author}
         embedUri={embedUri}
-        config={config}
-        disablePromotion={disablePromotion === "1"}
+        theme={config.theme}
+        disablePromotion={config.disablePromotion}
       />
     );
   } catch (e) {

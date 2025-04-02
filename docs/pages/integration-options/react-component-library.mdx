@@ -18,8 +18,8 @@ export function Comments() {
         // the uri for commenting
         uri={new URL(window.location.pathname, baseOrigin).toString()}
         // the config object allows you to customize the CommentsEmbed's appearance
-        config={{
-          theme: {
+        theme={{
+          {
             // mode controls which theme to use, it can be 'light' or 'dark'
             mode: "light",
             colors: {
@@ -48,7 +48,7 @@ export function Comments() {
 
 - [`CommentsEmbed`](/sdk-reference/react/functions/CommentsEmbed)
 - [`CommentsEmbedProps`](/sdk-reference/react/type-aliases/CommentsEmbedProps)
-- [`EmbedConfigSchemaType`](/sdk-reference/react/type-aliases/EmbedConfigSchemaType) - detailed customization options
+- [`EmbedConfigThemeSchema`](/sdk-reference/schemas/variables/EmbedConfigThemeSchema) - detailed theme customization options
 
 #### Next Steps
 

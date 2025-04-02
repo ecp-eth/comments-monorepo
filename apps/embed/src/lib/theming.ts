@@ -1,8 +1,8 @@
-import type { EmbedConfigSchemaType } from "@ecp.eth/sdk/schemas";
+import type { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/schemas";
 import { CSSProperties } from "react";
 
 export function createThemeCSSVariables(
-  config: EmbedConfigSchemaType | undefined
+  config: EmbedConfigSchemaOutputType | undefined
 ): CSSProperties {
   const variables: Record<string, string> = {};
 

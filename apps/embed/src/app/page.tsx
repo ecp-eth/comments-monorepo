@@ -1,31 +1,13 @@
-import { EmbedConfigSchema } from "@ecp.eth/sdk/schemas";
-import { decompressFromURI } from "lz-ts";
 import { Toaster } from "@/components/ui/sonner";
-import { EmbedConfigProvider } from "@/components/EmbedConfigProvider";
 import { CommentSection } from "@/components/comments/CommentSection";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
 import { Providers } from "./providers";
-import { ApplyTheme } from "@/components/ApplyTheme";
+import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
 
 const SearchParamsSchema = z.object({
   targetUri: z.string().url(),
-  disablePromotion: z
-    .enum(["0", "1"])
-    .default("0")
-    .optional()
-    .transform((val) => val === "1"),
-  config: z
-    .preprocess((value) => {
-      try {
-        if (typeof value === "string") {
-          return JSON.parse(decompressFromURI(value));
-        }
-      } catch (err) {
-        console.warn("failed to parse config", err);
-      }
-    }, EmbedConfigSchema)
-    .optional(),
+  config: EmbedConfigFromSearchParamsSchema,
 });
 
 type EmbedPageProps = {
@@ -54,7 +36,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
     );
   }
 
-  const { targetUri, config, disablePromotion } = parseSearchParamsResult.data;
+  const { targetUri, config } = parseSearchParamsResult.data;
 
   try {
     // at the moment we don't use server-side comments fetching because we don't know the address of the viewer
@@ -68,19 +50,17 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
     });*/
 
     return (
-      <ApplyTheme config={config}>
+      <Providers
+        config={{
+          targetUri,
+          currentTimestamp: Date.now(),
+          ...config,
+        }}
+      >
         <main className="p-0 text-foreground font-default px-root-padding-horizontal py-root-padding-vertical">
           <div className="max-w-4xl mx-auto">
-            <Providers>
-              <EmbedConfigProvider
-                value={{
-                  targetUri,
-                  currentTimestamp: Date.now(),
-                  disablePromotion,
-                }}
-              >
-                <CommentSection
-                /* initialData={{
+            <CommentSection
+            /* initialData={{
                     pages: [comments],
                     pageParams: [
                       {
@@ -89,13 +69,11 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
                       },
                     ],
                   }}*/
-                />
-              </EmbedConfigProvider>
-            </Providers>
+            />
           </div>
         </main>
         <Toaster />
-      </ApplyTheme>
+      </Providers>
     );
   } catch (e) {
     console.error(e);

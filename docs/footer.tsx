@@ -33,30 +33,28 @@ export default function Footer() {
             backgroundColor: "transparent",
           },
         }}
-        config={{
-          theme: {
-            mode: vocsTheme,
-            colors: {
-              dark: {
-                background: "transparent",
-                foreground: "#e9e9ea",
-                border: "#444",
-              },
-              light: {
-                background: "transparent",
-                foreground: "#4c4c4c",
-                border: "#ccc",
-              },
+        theme={{
+          mode: vocsTheme,
+          colors: {
+            dark: {
+              background: "transparent",
+              foreground: "#e9e9ea",
+              border: "#444",
             },
-            font: {
-              fontFamily: {
-                system:
-                  'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-              },
+            light: {
+              background: "transparent",
+              foreground: "#4c4c4c",
+              border: "#ccc",
             },
-            other: {
-              "root-padding-vertical": "12px",
+          },
+          font: {
+            fontFamily: {
+              system:
+                'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
             },
+          },
+          other: {
+            "root-padding-vertical": "12px",
           },
         }}
       />

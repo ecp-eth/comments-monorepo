@@ -112,7 +112,7 @@ export default async function Blog({
           `/blog/${post.slug}`,
           process.env.NEXT_PUBLIC_URL!
         ).toString()}
-        config={commentsEmbedTheme}
+        theme={commentsEmbedTheme}
       />
     </section>
   );

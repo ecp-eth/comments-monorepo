@@ -23,6 +23,10 @@ import { CommentByAuthor } from "./CommentByAuthor";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { publicEnv } from "@/publicEnv";
 import { PoweredBy } from "@ecp.eth/shared/components";
+import {
+  EmbedConfigProviderByAuthorConfig,
+  useEmbedConfig,
+} from "../EmbedConfigProvider";
 
 type QueryData = InfiniteData<
   CommentPageSchemaType,
@@ -32,22 +36,14 @@ type QueryData = InfiniteData<
 type CommentSectionReadonlyProps = {
   author: Hex;
   initialData?: QueryData;
-  /**
-   * Used to calculate relative time in comments.
-   */
-  currentTimestamp: number;
-  /**
-   * Hide powered by ECP link
-   */
-  disablePromotion?: boolean;
 };
 
 export function CommentSectionReadonly({
   initialData,
   author,
-  currentTimestamp,
-  disablePromotion,
 }: CommentSectionReadonlyProps) {
+  const { currentTimestamp, disablePromotion } =
+    useEmbedConfig<EmbedConfigProviderByAuthorConfig>();
   const queryKey = useMemo(() => ["comments-by-author", author], [author]);
 
   const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =

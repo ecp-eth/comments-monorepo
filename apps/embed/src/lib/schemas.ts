@@ -1,7 +1,8 @@
 import { z } from "zod";
-import { HexSchema } from "@ecp.eth/sdk/schemas";
+import { EmbedConfigSchema, HexSchema } from "@ecp.eth/sdk/schemas";
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { MAX_COMMENT_LENGTH } from "./constants";
+import { decompressFromURI } from "lz-ts";
 // import { isProfane } from "./profanity-detection";
 
 export const SignCommentPayloadRequestSchema = z.object({
@@ -31,3 +32,15 @@ export const SignCommentResponseServerSchema = z.object({
   hash: HexSchema,
   data: CommentDataWithIdSchema,
 });
+
+export const EmbedConfigFromSearchParamsSchema = z
+  .preprocess((value) => {
+    try {
+      if (typeof value === "string") {
+        return JSON.parse(decompressFromURI(value));
+      }
+    } catch (err) {
+      console.warn("failed to parse config", err);
+    }
+  }, EmbedConfigSchema)
+  .default({});

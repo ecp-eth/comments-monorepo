@@ -1,8 +1,9 @@
 import { createThemeCSSVariables } from "@/lib/theming";
 import { cn } from "@/lib/utils";
-import { EmbedConfigSchemaType } from "@ecp.eth/sdk/schemas";
+import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/schemas";
+import { useEmbedConfig } from "./EmbedConfigProvider";
 
-function LinkGoogleFont({ config }: { config?: EmbedConfigSchemaType }) {
+function LinkGoogleFont({ config }: { config: EmbedConfigSchemaOutputType }) {
   const fontFamily = config?.theme?.font?.fontFamily;
 
   if (!fontFamily || !("google" in fontFamily) || !fontFamily.google) {
@@ -21,11 +22,12 @@ function LinkGoogleFont({ config }: { config?: EmbedConfigSchemaType }) {
 }
 
 type ApplyThemeProps = {
-  config: EmbedConfigSchemaType | undefined;
   children: React.ReactNode;
 };
 
-export function ApplyTheme({ config, children }: ApplyThemeProps) {
+export function ApplyTheme({ children }: ApplyThemeProps) {
+  const config = useEmbedConfig();
+
   return (
     <>
       <LinkGoogleFont config={config} />

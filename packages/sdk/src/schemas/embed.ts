@@ -3,6 +3,33 @@ import { EmbedConfigSupportedFont } from "./embed.fonts.js";
 
 export { EmbedConfigSupportedFont };
 
+/**
+ * non-invasive, type safe check for node env
+ * @returns true if the environment is "development"
+ */
+function isNodeEnvDev(): boolean {
+  if (
+    !("process" in globalThis) ||
+    typeof (globalThis as Record<string, unknown>).process !== "object"
+  ) {
+    return false;
+  }
+
+  const process = (globalThis as Record<string, unknown>).process;
+
+  return (
+    "process" in globalThis &&
+    typeof (globalThis as Record<string, unknown>).process === "object" &&
+    typeof process === "object" &&
+    process != null &&
+    "env" in process &&
+    typeof process.env === "object" &&
+    process.env != null &&
+    "NODE_ENV" in process.env &&
+    process.env.NODE_ENV === "development"
+  );
+}
+
 const CSSTransparentColorSchema = z
   .literal("transparent")
   .describe("Valid CSS transparent color value");
@@ -132,6 +159,9 @@ export const EmbedConfigFontSchema = z
 
 export type EmbedConfigFontSchemaType = z.infer<typeof EmbedConfigFontSchema>;
 
+/**
+ * The zod schema for embed theme configuration
+ */
 export const EmbedConfigThemeSchema = z.object({
   mode: z
     .enum(["light", "dark"])
@@ -144,7 +174,34 @@ export const EmbedConfigThemeSchema = z.object({
   other: EmbedConfigThemeOtherSchema.optional(),
 });
 
+/**
+ * The type for embed theme configuration
+ */
 export type EmbedConfigThemeSchemaType = z.infer<typeof EmbedConfigThemeSchema>;
+
+/**
+ * The zod schema for supported chain ids
+ */
+export const EmbedConfigSupportedChainIdsSchema = z
+  .union([
+    // ethereum mainnet
+    z.literal(1),
+    // base
+    z.literal(8453),
+    // ethereum sepolia
+    z.literal(11155111),
+    // anvil
+    z.literal(31337),
+  ])
+  .optional()
+  .default(isNodeEnvDev() ? 31337 : 8453);
+
+/**
+ * The type for supported chain ids
+ */
+export type EmbedConfigSupportedChainIdsSchemaType = z.infer<
+  typeof EmbedConfigSupportedChainIdsSchema
+>;
 
 /**
  * The zod schema for `EmbedConfigSchemaType`
@@ -154,12 +211,24 @@ export const EmbedConfigSchema = z.object({
    * The theme of the embed. currently support `light` and `dark`.
    */
   theme: EmbedConfigThemeSchema.optional(),
+  /**
+   * The id of the chain to post the comments to.
+   * We don't filter chain id when fetching comments.
+   *
+   * @default 8453
+   */
+  chainId: EmbedConfigSupportedChainIdsSchema,
+  /**
+   * Hide powered by ECP link
+   */
+  disablePromotion: z.boolean().default(false),
 });
 
 /**
  * Custom configuration for `<CommentEmbed />` component.
  */
-export type EmbedConfigSchemaType = z.infer<typeof EmbedConfigSchema>;
+export type EmbedConfigSchemaInputType = z.input<typeof EmbedConfigSchema>;
+export type EmbedConfigSchemaOutputType = z.output<typeof EmbedConfigSchema>;
 
 export const EmbedResizedEventSchema = z.object({
   type: z.literal("@ecp.eth/sdk/embed/resize"),
