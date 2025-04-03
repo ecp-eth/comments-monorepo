@@ -46,13 +46,16 @@ export function CommentGasless({
    */
   const commentRef = useFreshRef(comment);
   const areRepliesAllowed = level < publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF;
-  const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
+  const queryKey = useMemo(
+    () => ["comments", comment.id, connectedAddress],
+    [comment.id, connectedAddress]
+  );
   const submitTargetCommentId = areRepliesAllowed
     ? comment.id
     : (comment.parentId ?? never("parentId is required for comment depth > 0"));
   const submitTargetQueryKey = useMemo(
-    () => ["comments", submitTargetCommentId],
-    [submitTargetCommentId]
+    () => ["comments", submitTargetCommentId, connectedAddress],
+    [submitTargetCommentId, connectedAddress]
   );
 
   const handleCommentSubmitted = useHandleCommentSubmitted({
