@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,6 +6,8 @@
 
 # Type Alias: IndexerAPICommentModerationStatusSchemaType
 
-> **IndexerAPICommentModerationStatusSchemaType**: `"approved"` \| `"rejected"` \| `"pending"`
+```ts
+type IndexerAPICommentModerationStatusSchemaType = z.infer<typeof IndexerAPICommentModerationStatusSchema>;
+```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:40](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L40)

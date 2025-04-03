@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,6 +6,132 @@
 
 # Variable: IndexerAPICommentSchema
 
-> `const` **IndexerAPICommentSchema**: `ZodObject`\<[`IndexerAPICommentSchemaType`](/sdk-reference/schemas/type-aliases/IndexerAPICommentSchemaType.mdx)\>
+```ts
+const IndexerAPICommentSchema: ZodObject<{
+  appSigner: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  author: ZodObject<{
+     address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     ens: ZodOptional<ZodObject<{
+        avatarUrl: ZodNullable<ZodString>;
+        name: ZodString;
+      }, "strip", ZodTypeAny, {
+        avatarUrl: null | string;
+        name: string;
+      }, {
+        avatarUrl: null | string;
+        name: string;
+     }>>;
+     farcaster: ZodOptional<ZodObject<{
+        displayName: ZodOptional<ZodString>;
+        fid: ZodNumber;
+        pfpUrl: ZodOptional<ZodString>;
+        username: ZodOptional<ZodString>;
+      }, "strip", ZodTypeAny, {
+        displayName: string;
+        fid: number;
+        pfpUrl: string;
+        username: string;
+      }, {
+        displayName: string;
+        fid: number;
+        pfpUrl: string;
+        username: string;
+     }>>;
+   }, "strip", ZodTypeAny, {
+     address: `0x${string}`;
+     ens: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster: {
+        displayName: string;
+        fid: number;
+        pfpUrl: string;
+        username: string;
+     };
+   }, {
+     address: `0x${string}`;
+     ens: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster: {
+        displayName: string;
+        fid: number;
+        pfpUrl: string;
+        username: string;
+     };
+  }>;
+  chainId: ZodNumber;
+  content: ZodString;
+  cursor: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  deletedAt: ZodNullable<ZodDate>;
+  id: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  logIndex: ZodNullable<ZodNumber>;
+  metadata: ZodString;
+  moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
+  moderationStatusChangedAt: ZodDate;
+  parentId: ZodNullable<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
+  targetUri: ZodString;
+  timestamp: ZodDate;
+  txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+}, "strip", ZodTypeAny, {
+  appSigner: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster: {
+        displayName: string;
+        fid: number;
+        pfpUrl: string;
+        username: string;
+     };
+  };
+  chainId: number;
+  content: string;
+  cursor: `0x${string}`;
+  deletedAt: null | Date;
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: string;
+  moderationStatus: "approved" | "rejected" | "pending";
+  moderationStatusChangedAt: Date;
+  parentId: null | `0x${string}`;
+  targetUri: string;
+  timestamp: Date;
+  txHash: `0x${string}`;
+}, {
+  appSigner: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster: {
+        displayName: string;
+        fid: number;
+        pfpUrl: string;
+        username: string;
+     };
+  };
+  chainId: number;
+  content: string;
+  cursor: `0x${string}`;
+  deletedAt: null | Date;
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: string;
+  moderationStatus: "approved" | "rejected" | "pending";
+  moderationStatusChangedAt: Date;
+  parentId: null | `0x${string}`;
+  targetUri: string;
+  timestamp: Date;
+  txHash: `0x${string}`;
+}>;
+```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:44](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L44)

@@ -3,11 +3,12 @@
   "fileExtension": ".mdx",
   "gitRevision": "main",
 
+  "useCodeBlocks": true,
   "expandParameters": false,
   "expandObjects": false,
   "indexFormat": "table",
   "typeDeclarationVisibility": "verbose",
   "outputFileStrategy": "members",
   "entryFileName": "index.mdx",
-  "mergeReadme": true,
+  "mergeReadme": true
 }

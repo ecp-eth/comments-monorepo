@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,6 +6,312 @@
 
 # Variable: IndexerAPIListCommentsSchema
 
-> `const` **IndexerAPIListCommentsSchema**: `ZodObject`\<[`IndexerAPIListCommentsSchemaType`](/sdk-reference/schemas/type-aliases/IndexerAPIListCommentsSchemaType.mdx)\>
+```ts
+const IndexerAPIListCommentsSchema: ZodObject<{
+  extra: ZodObject<{
+     moderationEnabled: ZodBoolean;
+   }, "strip", ZodTypeAny, {
+     moderationEnabled: boolean;
+   }, {
+     moderationEnabled: boolean;
+  }>;
+  pagination: ZodObject<{
+     endCursor: ZodOptional<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
+     hasNext: ZodBoolean;
+     hasPrevious: ZodBoolean;
+     limit: ZodNumber;
+     startCursor: ZodOptional<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
+   }, "strip", ZodTypeAny, {
+     endCursor: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor: `0x${string}`;
+   }, {
+     endCursor: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor: `0x${string}`;
+  }>;
+  results: ZodArray<ZodObject<extendShape<{
+     appSigner: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     author: ZodObject<{
+        address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+        ens: ZodOptional<ZodObject<{
+           avatarUrl: ...;
+           name: ...;
+         }, "strip", ZodTypeAny, {
+           avatarUrl: ...;
+           name: ...;
+         }, {
+           avatarUrl: ...;
+           name: ...;
+        }>>;
+        farcaster: ZodOptional<ZodObject<{
+           displayName: ...;
+           fid: ...;
+           pfpUrl: ...;
+           username: ...;
+         }, "strip", ZodTypeAny, {
+           displayName: ...;
+           fid: ...;
+           pfpUrl: ...;
+           username: ...;
+         }, {
+           displayName: ...;
+           fid: ...;
+           pfpUrl: ...;
+           username: ...;
+        }>>;
+      }, "strip", ZodTypeAny, {
+        address: `0x${string}`;
+        ens: {
+           avatarUrl: ... | ...;
+           name: string;
+        };
+        farcaster: {
+           displayName: ... | ...;
+           fid: number;
+           pfpUrl: ... | ...;
+           username: ... | ...;
+        };
+      }, {
+        address: `0x${string}`;
+        ens: {
+           avatarUrl: ... | ...;
+           name: string;
+        };
+        farcaster: {
+           displayName: ... | ...;
+           fid: number;
+           pfpUrl: ... | ...;
+           username: ... | ...;
+        };
+     }>;
+     chainId: ZodNumber;
+     content: ZodString;
+     cursor: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     deletedAt: ZodNullable<ZodDate>;
+     id: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     logIndex: ZodNullable<ZodNumber>;
+     metadata: ZodString;
+     moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
+     moderationStatusChangedAt: ZodDate;
+     parentId: ZodNullable<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
+     targetUri: ZodString;
+     timestamp: ZodDate;
+     txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+   }, {
+     replies: ZodObject<{
+        extra: ZodObject<{
+           moderationEnabled: ZodBoolean;
+         }, "strip", ZodTypeAny, {
+           moderationEnabled: boolean;
+         }, {
+           moderationEnabled: boolean;
+        }>;
+        pagination: ZodObject<{
+           endCursor: ZodOptional<...>;
+           hasNext: ZodBoolean;
+           hasPrevious: ZodBoolean;
+           limit: ZodNumber;
+           startCursor: ZodOptional<...>;
+         }, "strip", ZodTypeAny, {
+           endCursor: ... | ...;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor: ... | ...;
+         }, {
+           endCursor: ... | ...;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor: ... | ...;
+        }>;
+        results: ZodArray<ZodObject<{
+           appSigner: ...;
+           author: ...;
+           chainId: ...;
+           content: ...;
+           cursor: ...;
+           deletedAt: ...;
+           id: ...;
+           logIndex: ...;
+           metadata: ...;
+           moderationStatus: ...;
+           moderationStatusChangedAt: ...;
+           parentId: ...;
+           targetUri: ...;
+           timestamp: ...;
+           txHash: ...;
+         }, "strip", ZodTypeAny, {
+           appSigner: ...;
+           author: ...;
+           chainId: ...;
+           content: ...;
+           cursor: ...;
+           deletedAt: ...;
+           id: ...;
+           logIndex: ...;
+           metadata: ...;
+           moderationStatus: ...;
+           moderationStatusChangedAt: ...;
+           parentId: ...;
+           targetUri: ...;
+           timestamp: ...;
+           txHash: ...;
+         }, {
+           appSigner: ...;
+           author: ...;
+           chainId: ...;
+           content: ...;
+           cursor: ...;
+           deletedAt: ...;
+           id: ...;
+           logIndex: ...;
+           metadata: ...;
+           moderationStatus: ...;
+           moderationStatusChangedAt: ...;
+           parentId: ...;
+           targetUri: ...;
+           timestamp: ...;
+           txHash: ...;
+        }>, "many">;
+      }, "strip", ZodTypeAny, {
+        extra: {
+           moderationEnabled: boolean;
+        };
+        pagination: {
+           endCursor: `0x${(...)}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor: `0x${(...)}`;
+        };
+        results: object[];
+      }, {
+        extra: {
+           moderationEnabled: boolean;
+        };
+        pagination: {
+           endCursor: `0x${(...)}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor: `0x${(...)}`;
+        };
+        results: object[];
+     }>;
+   }>, "strip", ZodTypeAny, {
+     appSigner: `0x${string}`;
+     author: {
+        address: `0x${string}`;
+        ens: {
+           avatarUrl: null | string;
+           name: string;
+        };
+        farcaster: {
+           displayName: string;
+           fid: number;
+           pfpUrl: string;
+           username: string;
+        };
+     };
+     chainId: number;
+     content: string;
+     cursor: `0x${string}`;
+     deletedAt: null | Date;
+     id: `0x${string}`;
+     logIndex: null | number;
+     metadata: string;
+     moderationStatus: "approved" | "rejected" | "pending";
+     moderationStatusChangedAt: Date;
+     parentId: null | `0x${string}`;
+     replies: {
+        extra: {
+           moderationEnabled: boolean;
+        };
+        pagination: {
+           endCursor: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor: `0x${string}`;
+        };
+        results: object[];
+     };
+     targetUri: string;
+     timestamp: Date;
+     txHash: `0x${string}`;
+   }, {
+     appSigner: `0x${string}`;
+     author: {
+        address: `0x${string}`;
+        ens: {
+           avatarUrl: null | string;
+           name: string;
+        };
+        farcaster: {
+           displayName: string;
+           fid: number;
+           pfpUrl: string;
+           username: string;
+        };
+     };
+     chainId: number;
+     content: string;
+     cursor: `0x${string}`;
+     deletedAt: null | Date;
+     id: `0x${string}`;
+     logIndex: null | number;
+     metadata: string;
+     moderationStatus: "approved" | "rejected" | "pending";
+     moderationStatusChangedAt: Date;
+     parentId: null | `0x${string}`;
+     replies: {
+        extra: {
+           moderationEnabled: boolean;
+        };
+        pagination: {
+           endCursor: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor: `0x${string}`;
+        };
+        results: object[];
+     };
+     targetUri: string;
+     timestamp: Date;
+     txHash: `0x${string}`;
+  }>, "many">;
+}, "strip", ZodTypeAny, {
+  extra: {
+     moderationEnabled: boolean;
+  };
+  pagination: {
+     endCursor: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor: `0x${string}`;
+  };
+  results: object[];
+}, {
+  extra: {
+     moderationEnabled: boolean;
+  };
+  pagination: {
+     endCursor: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor: `0x${string}`;
+  };
+  results: object[];
+}>;
+```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:107](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L107)

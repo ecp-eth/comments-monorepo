@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,40 +6,8 @@
 
 # Type Alias: CommentData
 
-> **CommentData**: `object`
+```ts
+type CommentData = z.infer<typeof CommentDataSchema>;
+```
 
-Defined in: [packages/sdk/src/schemas/core.ts:27](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/core.ts#L27)
-
-## Type declaration
-
-### appSigner
-
-> **appSigner**: `` `0x${string}` `` = `HexSchema`
-
-### author
-
-> **author**: `` `0x${string}` `` = `HexSchema`
-
-### content
-
-> **content**: `string`
-
-### deadline
-
-> **deadline**: `bigint`
-
-### metadata
-
-> **metadata**: `string`
-
-### nonce
-
-> **nonce**: `bigint`
-
-### parentId
-
-> **parentId**: `` `0x${string}` `` = `HexSchema`
-
-### targetUri
-
-> **targetUri**: `string`
+Defined in: [packages/sdk/src/schemas/core.ts:31](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/core.ts#L31)

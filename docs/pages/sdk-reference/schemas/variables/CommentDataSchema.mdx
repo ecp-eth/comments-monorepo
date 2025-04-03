@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,6 +6,41 @@
 
 # Variable: CommentDataSchema
 
-> `const` **CommentDataSchema**: `ZodObject`\<[`CommentData`](/sdk-reference/schemas/type-aliases/CommentData.mdx)\>
+```ts
+const CommentDataSchema: ZodObject<{
+  appSigner: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  author: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  content: ZodString;
+  deadline: ZodBigInt;
+  metadata: ZodString;
+  nonce: ZodBigInt;
+  parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  targetUri: ZodString;
+}, "strip", ZodTypeAny, {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: string;
+}, {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: string;
+}>;
+```
 
-Defined in: [packages/sdk/src/schemas/core.ts:16](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/core.ts#L16)
+Defined in: [packages/sdk/src/schemas/core.ts:20](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/core.ts#L20)
+
+The data structure of a comment. For details, see [CommentData](/comment-data-props).
+
+## See
+
+[CommentData](/comment-data-props)

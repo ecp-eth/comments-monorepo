@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,7 +6,9 @@
 
 # Variable: ADD\_APPROVAL\_TYPE
 
-> `const` **ADD\_APPROVAL\_TYPE**: `object`
+```ts
+const ADD_APPROVAL_TYPE: object;
+```
 
 Defined in: [packages/sdk/src/eip712.ts:27](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/eip712.ts#L27)
 
@@ -14,4 +16,18 @@ Defined in: [packages/sdk/src/eip712.ts:27](https://github.com/ecp-eth/comments-
 
 ### AddApproval
 
-> `readonly` **AddApproval**: readonly \[\{ `name`: `"author"`; `type`: `"address"`; \}, \{ `name`: `"appSigner"`; `type`: `"address"`; \}, \{ `name`: `"nonce"`; `type`: `"uint256"`; \}, \{ `name`: `"deadline"`; `type`: `"uint256"`; \}\]
+```ts
+readonly AddApproval: readonly [{
+  name: "author";
+  type: "address";
+}, {
+  name: "appSigner";
+  type: "address";
+}, {
+  name: "nonce";
+  type: "uint256";
+}, {
+  name: "deadline";
+  type: "uint256";
+}];
+```

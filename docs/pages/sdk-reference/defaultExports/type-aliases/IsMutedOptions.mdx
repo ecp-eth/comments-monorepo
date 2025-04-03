@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,23 +6,35 @@
 
 # Type Alias: IsMutedOptions
 
-> **IsMutedOptions**: `object`
+```ts
+type IsMutedOptions = object;
+```
 
 Defined in: [packages/sdk/src/api.ts:348](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L348)
 
 The options for `isMuted()`
 
-## Type declaration
+## Properties
 
 ### address
 
-> **address**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
+```ts
+address: Hex;
+```
+
+Defined in: [packages/sdk/src/api.ts:352](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L352)
 
 Author's address
 
+***
+
 ### apiUrl?
 
-> `optional` **apiUrl**: `string`
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/api.ts:364](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L364)
 
 URL on which /api/muted-accounts/$address endpoint will be called
 
@@ -32,9 +44,15 @@ URL on which /api/muted-accounts/$address endpoint will be called
 "https://api.ethcomments.xyz"
 ```
 
+***
+
 ### retries?
 
-> `optional` **retries**: `number`
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/api.ts:358](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L358)
 
 Number of times to retry the signing operation in case of failure.
 
@@ -44,6 +62,12 @@ Number of times to retry the signing operation in case of failure.
 3
 ```
 
+***
+
 ### signal?
 
-> `optional` **signal**: `AbortSignal`
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/api.ts:365](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L365)

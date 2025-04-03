@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,28 +6,52 @@
 
 # Type Alias: CreateCommentsEmbedURLParams
 
-> **CreateCommentsEmbedURLParams**: `object`
+```ts
+type CreateCommentsEmbedURLParams = object;
+```
 
 Defined in: [packages/sdk/src/react.tsx:104](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L104)
 
 Parameters for `createCommentsEmbedURL`
 
-## Type declaration
+## Properties
 
 ### config?
 
-> `optional` **config**: [`EmbedConfigSchemaInputType`](/sdk-reference/react/type-aliases/EmbedConfigSchemaInputType.mdx)
+```ts
+optional config: EmbedConfigSchemaInputType;
+```
+
+Defined in: [packages/sdk/src/react.tsx:116](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L116)
 
 The configuration for the comments embed.
 
+***
+
 ### embedUri
 
-> **embedUri**: `string`
+```ts
+embedUri: string;
+```
+
+Defined in: [packages/sdk/src/react.tsx:108](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L108)
 
 The URI of the comments embed iframe page.
 
+***
+
 ### source
 
-> **source**: \{ `targetUri`: `string`; \} \| \{ `author`: `Hex`; \}
+```ts
+source: 
+  | {
+  targetUri: string;
+}
+  | {
+  author: Hex;
+};
+```
+
+Defined in: [packages/sdk/src/react.tsx:112](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L112)
 
 The target URI or author address to embed comments for.

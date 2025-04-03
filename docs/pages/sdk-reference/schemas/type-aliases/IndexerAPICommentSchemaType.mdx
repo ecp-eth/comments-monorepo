@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,104 +6,8 @@
 
 # Type Alias: IndexerAPICommentSchemaType
 
-> **IndexerAPICommentSchemaType**: `object`
+```ts
+type IndexerAPICommentSchemaType = z.infer<typeof IndexerAPICommentSchema>;
+```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:62](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L62)
-
-## Type declaration
-
-### appSigner
-
-> **appSigner**: `` `0x${string}` `` = `HexSchema`
-
-### author
-
-> **author**: `object` = `IndexerAPIAuthorDataSchema`
-
-#### author.address
-
-> **address**: `` `0x${string}` `` = `HexSchema`
-
-#### author.ens?
-
-> `optional` **ens**: `object`
-
-#### author.ens.avatarUrl
-
-> **avatarUrl**: `null` \| `string`
-
-#### author.ens.name
-
-> **name**: `string`
-
-#### author.farcaster?
-
-> `optional` **farcaster**: `object`
-
-#### author.farcaster.displayName?
-
-> `optional` **displayName**: `string`
-
-#### author.farcaster.fid
-
-> **fid**: `number`
-
-#### author.farcaster.pfpUrl?
-
-> `optional` **pfpUrl**: `string`
-
-#### author.farcaster.username?
-
-> `optional` **username**: `string`
-
-### chainId
-
-> **chainId**: `number`
-
-### content
-
-> **content**: `string`
-
-### cursor
-
-> **cursor**: `` `0x${string}` `` = `HexSchema`
-
-### deletedAt
-
-> **deletedAt**: `null` \| `Date`
-
-### id
-
-> **id**: `` `0x${string}` `` = `HexSchema`
-
-### logIndex
-
-> **logIndex**: `null` \| `number`
-
-### metadata
-
-> **metadata**: `string`
-
-### moderationStatus
-
-> **moderationStatus**: `"approved"` \| `"rejected"` \| `"pending"` = `IndexerAPICommentModerationStatusSchema`
-
-### moderationStatusChangedAt
-
-> **moderationStatusChangedAt**: `Date`
-
-### parentId
-
-> **parentId**: `null` \| `` `0x${string}` ``
-
-### targetUri
-
-> **targetUri**: `string`
-
-### timestamp
-
-> **timestamp**: `Date`
-
-### txHash
-
-> **txHash**: `` `0x${string}` `` = `HexSchema`

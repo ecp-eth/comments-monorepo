@@ -31,7 +31,7 @@ export function isZeroHex(hex: `0x${string}`) {
 
 /**
  * Create the data structure of a comment
- * @return {CommentData} The data structure of a comment
+ * @return {@link schemas!CommentData | CommentData} The data structure of a comment
  */
 export function createCommentData({
   content,

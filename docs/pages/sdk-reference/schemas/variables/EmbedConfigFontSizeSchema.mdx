@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,6 +6,17 @@
 
 # Variable: EmbedConfigFontSizeSchema
 
-> `const` **EmbedConfigFontSizeSchema**: `ZodObject`\<\{ `lineHeight`: `ZodOptional`\<`ZodOptional`\<`ZodString`\>\>; `size`: `ZodOptional`\<`ZodOptional`\<`ZodString`\>\>; \}, `"strip"`, `ZodTypeAny`, \{ `lineHeight`: `string`; `size`: `string`; \}, \{ `lineHeight`: `string`; `size`: `string`; \}\>
+```ts
+const EmbedConfigFontSizeSchema: ZodObject<{
+  lineHeight: ZodOptional<ZodOptional<ZodString>>;
+  size: ZodOptional<ZodOptional<ZodString>>;
+}, "strip", ZodTypeAny, {
+  lineHeight: string;
+  size: string;
+}, {
+  lineHeight: string;
+  size: string;
+}>;
+```
 
 Defined in: [packages/sdk/src/schemas/embed.ts:128](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/embed.ts#L128)

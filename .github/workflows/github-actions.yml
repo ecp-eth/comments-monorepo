@@ -122,6 +122,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build the project
+        env:
+          # workaround heap allocation issue due to upgrade of libs used by typedoc
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: pnpm build
 
       - name: Lint
