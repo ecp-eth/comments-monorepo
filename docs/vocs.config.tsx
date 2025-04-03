@@ -198,6 +198,10 @@ export default defineConfig({
               text: "React Module",
               link: "/sdk-reference/react/",
             },
+            {
+              text: "Zod Schemas",
+              link: "/sdk-reference/schemas/",
+            },
           ],
         },
         {

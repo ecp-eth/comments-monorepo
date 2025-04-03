@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,6 +6,23 @@
 
 # Variable: IndexerAPIFarcasterDataSchema
 
-> `const` **IndexerAPIFarcasterDataSchema**: `ZodObject`\<[`IndexerAPIFarcasterDataSchemaType`](/sdk-reference/schemas/type-aliases/IndexerAPIFarcasterDataSchemaType.mdx)\>
+```ts
+const IndexerAPIFarcasterDataSchema: ZodObject<{
+  displayName: ZodOptional<ZodString>;
+  fid: ZodNumber;
+  pfpUrl: ZodOptional<ZodString>;
+  username: ZodOptional<ZodString>;
+}, "strip", ZodTypeAny, {
+  displayName: string;
+  fid: number;
+  pfpUrl: string;
+  username: string;
+}, {
+  displayName: string;
+  fid: number;
+  pfpUrl: string;
+  username: string;
+}>;
+```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:13](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L13)

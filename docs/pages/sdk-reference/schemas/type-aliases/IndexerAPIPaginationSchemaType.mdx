@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,20 +6,8 @@
 
 # Type Alias: IndexerAPIPaginationSchemaType
 
-> **IndexerAPIPaginationSchemaType**: `object`
+```ts
+type IndexerAPIPaginationSchemaType = z.infer<typeof IndexerAPIPaginationSchema>;
+```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:72](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L72)
-
-## Type declaration
-
-### hasMore
-
-> **hasMore**: `boolean`
-
-### limit
-
-> **limit**: `number`
-
-### offset
-
-> **offset**: `number`

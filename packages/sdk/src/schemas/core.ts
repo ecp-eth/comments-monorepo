@@ -13,6 +13,10 @@ export const HexSchema = z.custom<`0x${string}`>(
  */
 export type Hex = z.infer<typeof HexSchema>;
 
+/**
+ * The data structure of a comment. For details, see [CommentData](/comment-data-props).
+ * @see [CommentData](/comment-data-props)
+ */
 export const CommentDataSchema = z.object({
   content: z.string(),
   metadata: z.string(),
@@ -24,4 +28,4 @@ export const CommentDataSchema = z.object({
   deadline: z.coerce.bigint(),
 });
 
-export type CommentData = z.infer<typeof CommentDataSchema>;
+export type CommentData = {} & z.infer<typeof CommentDataSchema>;

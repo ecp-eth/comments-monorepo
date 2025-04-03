@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,6 +6,14 @@
 
 # Variable: EmbedGetDimensionsEventSchema
 
-> `const` **EmbedGetDimensionsEventSchema**: `ZodObject`\<[`EmbedGetDimensionsEventSchemaType`](/sdk-reference/schemas/type-aliases/EmbedGetDimensionsEventSchemaType.mdx)\>
+```ts
+const EmbedGetDimensionsEventSchema: ZodObject<{
+  type: ZodLiteral<"@ecp.eth/sdk/embed/get-dimensions">;
+}, "strip", ZodTypeAny, {
+  type: "@ecp.eth/sdk/embed/get-dimensions";
+}, {
+  type: "@ecp.eth/sdk/embed/get-dimensions";
+}>;
+```
 
 Defined in: [packages/sdk/src/schemas/embed.ts:242](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/embed.ts#L242)

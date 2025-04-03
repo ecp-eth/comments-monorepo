@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,64 +6,8 @@
 
 # Type Alias: DeleteCommentTypedDataSchemaType
 
-> **DeleteCommentTypedDataSchemaType**: `object`
+```ts
+type DeleteCommentTypedDataSchemaType = z.infer<typeof DeleteCommentTypedDataSchema>;
+```
 
 Defined in: [packages/sdk/src/schemas/contract.ts:34](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/contract.ts#L34)
-
-## Type declaration
-
-### domain
-
-> **domain**: `object`
-
-#### domain.chainId
-
-> **chainId**: `number`
-
-#### domain.name
-
-> **name**: `"Comments"`
-
-#### domain.verifyingContract
-
-> **verifyingContract**: `"0xabD9cE1952992211dEe051Df6ed337fa6efC995d"`
-
-#### domain.version
-
-> **version**: `"1"`
-
-### message
-
-> **message**: `object`
-
-#### message.appSigner
-
-> **appSigner**: `` `0x${string}` `` = `HexSchema`
-
-#### message.author
-
-> **author**: `` `0x${string}` `` = `HexSchema`
-
-#### message.commentId
-
-> **commentId**: `` `0x${string}` `` = `HexSchema`
-
-#### message.deadline
-
-> **deadline**: `bigint`
-
-#### message.nonce
-
-> **nonce**: `bigint`
-
-### primaryType
-
-> **primaryType**: `"DeleteComment"`
-
-### types
-
-> **types**: `object`
-
-#### types.DeleteComment
-
-> **DeleteComment**: (\{ `name`: `"commentId"`; `type`: `"bytes32"`; \} \| \{ `name`: `"author"`; `type`: `"address"`; \} \| \{ `name`: `"appSigner"`; `type`: `"address"`; \} \| \{ `name`: `"nonce"`; `type`: `"uint256"`; \} \| \{ `name`: `"deadline"`; `type`: `"uint256"`; \})[]

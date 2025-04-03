@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,9 +6,11 @@
 
 # Function: createApprovalTypedData()
 
-> **createApprovalTypedData**(`__namedParameters`): `object`
+```ts
+function createApprovalTypedData(__namedParameters): object;
+```
 
-Defined in: [packages/sdk/src/utils.ts:105](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L105)
+Defined in: [packages/sdk/src/utils.ts:107](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L107)
 
 Create the EIP-712 typed data structure for approving comment
 
@@ -44,52 +46,94 @@ The typed data
 
 ### domain
 
-> **domain**: `object`
+```ts
+domain: object;
+```
 
 #### domain.chainId
 
-> **chainId**: `number`
+```ts
+chainId: number;
+```
 
 #### domain.name
 
-> **name**: `"Comments"`
+```ts
+name: "Comments";
+```
 
 #### domain.verifyingContract
 
-> **verifyingContract**: `"0xabD9cE1952992211dEe051Df6ed337fa6efC995d"`
+```ts
+verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+```
 
 #### domain.version
 
-> **version**: `"1"`
+```ts
+version: "1";
+```
 
 ### message
 
-> **message**: `object`
+```ts
+message: object;
+```
 
 #### message.appSigner
 
-> **appSigner**: `` `0x${string}` `` = `HexSchema`
+```ts
+appSigner: `0x${string}` = HexSchema;
+```
 
 #### message.author
 
-> **author**: `` `0x${string}` `` = `HexSchema`
+```ts
+author: `0x${string}` = HexSchema;
+```
 
 #### message.deadline
 
-> **deadline**: `bigint`
+```ts
+deadline: bigint;
+```
 
 #### message.nonce
 
-> **nonce**: `bigint`
+```ts
+nonce: bigint;
+```
 
 ### primaryType
 
-> **primaryType**: `"AddApproval"`
+```ts
+primaryType: "AddApproval";
+```
 
 ### types
 
-> **types**: `object`
+```ts
+types: object;
+```
 
 #### types.AddApproval
 
-> **AddApproval**: (\{ `name`: `"author"`; `type`: `"address"`; \} \| \{ `name`: `"appSigner"`; `type`: `"address"`; \} \| \{ `name`: `"nonce"`; `type`: `"uint256"`; \} \| \{ `name`: `"deadline"`; `type`: `"uint256"`; \})[]
+```ts
+AddApproval: (
+  | {
+  name: "author";
+  type: "address";
+}
+  | {
+  name: "appSigner";
+  type: "address";
+}
+  | {
+  name: "nonce";
+  type: "uint256";
+}
+  | {
+  name: "deadline";
+  type: "uint256";
+})[];
+```

@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,6 +6,213 @@
 
 # Variable: DeleteCommentTypedDataSchema
 
-> `const` **DeleteCommentTypedDataSchema**: `ZodObject`\<[`DeleteCommentTypedDataSchemaType`](/sdk-reference/schemas/type-aliases/DeleteCommentTypedDataSchemaType.mdx)\>
+```ts
+const DeleteCommentTypedDataSchema: ZodObject<{
+  domain: ZodObject<{
+     chainId: ZodNumber;
+     name: ZodLiteral<"Comments">;
+     verifyingContract: ZodLiteral<"0xabD9cE1952992211dEe051Df6ed337fa6efC995d">;
+     version: ZodLiteral<"1">;
+   }, "strip", ZodTypeAny, {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+     version: "1";
+   }, {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+     version: "1";
+  }>;
+  message: ZodObject<{
+     appSigner: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     author: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     commentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     deadline: ZodBigInt;
+     nonce: ZodBigInt;
+   }, "strip", ZodTypeAny, {
+     appSigner: `0x${string}`;
+     author: `0x${string}`;
+     commentId: `0x${string}`;
+     deadline: bigint;
+     nonce: bigint;
+   }, {
+     appSigner: `0x${string}`;
+     author: `0x${string}`;
+     commentId: `0x${string}`;
+     deadline: bigint;
+     nonce: bigint;
+  }>;
+  primaryType: ZodLiteral<"DeleteComment">;
+  types: ZodObject<{
+     DeleteComment: ZodArray<ZodUnion<[ZodObject<{
+        name: ZodLiteral<"commentId">;
+        type: ZodLiteral<"bytes32">;
+      }, "strip", ZodTypeAny, {
+        name: "commentId";
+        type: "bytes32";
+      }, {
+        name: "commentId";
+        type: "bytes32";
+      }>, ZodObject<{
+        name: ZodLiteral<"author">;
+        type: ZodLiteral<"address">;
+      }, "strip", ZodTypeAny, {
+        name: "author";
+        type: "address";
+      }, {
+        name: "author";
+        type: "address";
+      }>, ZodObject<{
+        name: ZodLiteral<"appSigner">;
+        type: ZodLiteral<"address">;
+      }, "strip", ZodTypeAny, {
+        name: "appSigner";
+        type: "address";
+      }, {
+        name: "appSigner";
+        type: "address";
+      }>, ZodObject<{
+        name: ZodLiteral<"nonce">;
+        type: ZodLiteral<"uint256">;
+      }, "strip", ZodTypeAny, {
+        name: "nonce";
+        type: "uint256";
+      }, {
+        name: "nonce";
+        type: "uint256";
+      }>, ZodObject<{
+        name: ZodLiteral<"deadline">;
+        type: ZodLiteral<"uint256">;
+      }, "strip", ZodTypeAny, {
+        name: "deadline";
+        type: "uint256";
+      }, {
+        name: "deadline";
+        type: "uint256";
+     }>]>, "many">;
+   }, "strip", ZodTypeAny, {
+     DeleteComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "appSigner";
+        type: "address";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+     })[];
+   }, {
+     DeleteComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "appSigner";
+        type: "address";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+     })[];
+  }>;
+}, "strip", ZodTypeAny, {
+  domain: {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+     version: "1";
+  };
+  message: {
+     appSigner: `0x${string}`;
+     author: `0x${string}`;
+     commentId: `0x${string}`;
+     deadline: bigint;
+     nonce: bigint;
+  };
+  primaryType: "DeleteComment";
+  types: {
+     DeleteComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "appSigner";
+        type: "address";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+     })[];
+  };
+}, {
+  domain: {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+     version: "1";
+  };
+  message: {
+     appSigner: `0x${string}`;
+     author: `0x${string}`;
+     commentId: `0x${string}`;
+     deadline: bigint;
+     nonce: bigint;
+  };
+  primaryType: "DeleteComment";
+  types: {
+     DeleteComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "appSigner";
+        type: "address";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+     })[];
+  };
+}>;
+```
 
 Defined in: [packages/sdk/src/schemas/contract.ts:6](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/contract.ts#L6)

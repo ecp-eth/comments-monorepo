@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,76 +6,8 @@
 
 # Type Alias: AddCommentTypedDataSchemaType
 
-> **AddCommentTypedDataSchemaType**: `object`
+```ts
+type AddCommentTypedDataSchemaType = z.infer<typeof AddCommentTypedDataSchema>;
+```
 
 Defined in: [packages/sdk/src/schemas/contract.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/contract.ts#L63)
-
-## Type declaration
-
-### domain
-
-> **domain**: `object`
-
-#### domain.chainId
-
-> **chainId**: `number`
-
-#### domain.name
-
-> **name**: `"Comments"`
-
-#### domain.verifyingContract
-
-> **verifyingContract**: `"0xabD9cE1952992211dEe051Df6ed337fa6efC995d"`
-
-#### domain.version
-
-> **version**: `"1"`
-
-### message
-
-> **message**: `object` = `CommentDataSchema`
-
-#### message.appSigner
-
-> **appSigner**: `` `0x${string}` `` = `HexSchema`
-
-#### message.author
-
-> **author**: `` `0x${string}` `` = `HexSchema`
-
-#### message.content
-
-> **content**: `string`
-
-#### message.deadline
-
-> **deadline**: `bigint`
-
-#### message.metadata
-
-> **metadata**: `string`
-
-#### message.nonce
-
-> **nonce**: `bigint`
-
-#### message.parentId
-
-> **parentId**: `` `0x${string}` `` = `HexSchema`
-
-#### message.targetUri
-
-> **targetUri**: `string`
-
-### primaryType
-
-> **primaryType**: `"AddComment"`
-
-### types
-
-> **types**: `object`
-
-#### types.AddComment
-
-> **AddComment**: (\{ `name`: `"content"`; `type`: `"string"`; \} \| \{ `name`: `"metadata"`; `type`: `"string"`; \} \| \{ `name`: `"targetUri"`; `type`: `"string"`; \} \| \{ `name`: `"parentId"`; `type`: `"bytes32"`; \} \| \{ `name`: `"author"`; `type`: `"address"`; \} \| \{ `name`: `"appSigner"`; `type`: `"address"`; \} \| \{ `name`: `"nonce"`; `type`: `"uint256"`; \} \| \{ `name`: `"deadline"`; `type`: `"uint256"`; \})[]

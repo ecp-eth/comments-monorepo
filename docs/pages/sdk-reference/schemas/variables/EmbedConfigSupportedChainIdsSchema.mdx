@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,7 +6,9 @@
 
 # Variable: EmbedConfigSupportedChainIdsSchema
 
-> `const` **EmbedConfigSupportedChainIdsSchema**: `ZodDefault`\<[`EmbedConfigSupportedChainIdsSchemaType`](/sdk-reference/schemas/type-aliases/EmbedConfigSupportedChainIdsSchemaType.mdx)\>
+```ts
+const EmbedConfigSupportedChainIdsSchema: ZodDefault<ZodOptional<ZodUnion<[ZodLiteral<1>, ZodLiteral<8453>, ZodLiteral<11155111>, ZodLiteral<31337>]>>>;
+```
 
 Defined in: [packages/sdk/src/schemas/embed.ts:185](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/embed.ts#L185)
 

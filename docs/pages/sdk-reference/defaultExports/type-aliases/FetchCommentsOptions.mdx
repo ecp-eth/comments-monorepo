@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,17 +6,23 @@
 
 # Type Alias: FetchCommentsOptions
 
-> **FetchCommentsOptions**: `object`
+```ts
+type FetchCommentsOptions = object;
+```
 
 Defined in: [packages/sdk/src/api.ts:18](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L18)
 
 The options for `fetchComments()`
 
-## Type declaration
+## Properties
 
 ### apiUrl?
 
-> `optional` **apiUrl**: `string`
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/api.ts:36](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L36)
 
 URL on which /api/comments endpoint will be called
 
@@ -26,27 +32,51 @@ URL on which /api/comments endpoint will be called
 "https://api.ethcomments.xyz"
 ```
 
+***
+
 ### appSigner?
 
-> `optional` **appSigner**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
+```ts
+optional appSigner: Hex;
+```
+
+Defined in: [packages/sdk/src/api.ts:40](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L40)
 
 Filter comments sent using this app signer key.
 
+***
+
 ### author?
 
-> `optional` **author**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
+```ts
+optional author: Hex;
+```
+
+Defined in: [packages/sdk/src/api.ts:26](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L26)
 
 Filter comments by author
 
+***
+
 ### cursor?
 
-> `optional` **cursor**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
+```ts
+optional cursor: Hex;
+```
+
+Defined in: [packages/sdk/src/api.ts:50](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L50)
 
 The cursor to fetch comments from
 
+***
+
 ### limit?
 
-> `optional` **limit**: `number`
+```ts
+optional limit: number;
+```
+
+Defined in: [packages/sdk/src/api.ts:62](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L62)
 
 The number of comments to fetch
 
@@ -56,9 +86,15 @@ The number of comments to fetch
 50
 ```
 
+***
+
 ### retries?
 
-> `optional` **retries**: `number`
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/api.ts:46](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L46)
 
 Number of times to retry the signing operation in case of failure.
 
@@ -68,13 +104,25 @@ Number of times to retry the signing operation in case of failure.
 3
 ```
 
+***
+
 ### signal?
 
-> `optional` **signal**: `AbortSignal`
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/api.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L63)
+
+***
 
 ### sort?
 
-> `optional` **sort**: `"asc"` \| `"desc"`
+```ts
+optional sort: "asc" | "desc";
+```
+
+Defined in: [packages/sdk/src/api.ts:56](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L56)
 
 The sort order, either `asc` or `desc`
 
@@ -84,14 +132,26 @@ The sort order, either `asc` or `desc`
 "desc"
 ```
 
+***
+
 ### targetUri?
 
-> `optional` **targetUri**: `string`
+```ts
+optional targetUri: string;
+```
+
+Defined in: [packages/sdk/src/api.ts:22](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L22)
 
 The target URI to fetch comments for
 
+***
+
 ### viewer?
 
-> `optional` **viewer**: [`Hex`](/sdk-reference/schemas/type-aliases/Hex.mdx)
+```ts
+optional viewer: Hex;
+```
+
+Defined in: [packages/sdk/src/api.ts:30](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L30)
 
 The viewer's address. This is useful when the content moderation is enabled on the indexer.

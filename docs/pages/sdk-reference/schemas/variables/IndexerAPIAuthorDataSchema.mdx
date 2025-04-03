@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,6 +6,60 @@
 
 # Variable: IndexerAPIAuthorDataSchema
 
-> `const` **IndexerAPIAuthorDataSchema**: `ZodObject`\<[`IndexerAPIAuthorDataSchemaType`](/sdk-reference/schemas/type-aliases/IndexerAPIAuthorDataSchemaType.mdx)\>
+```ts
+const IndexerAPIAuthorDataSchema: ZodObject<{
+  address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  ens: ZodOptional<ZodObject<{
+     avatarUrl: ZodNullable<ZodString>;
+     name: ZodString;
+   }, "strip", ZodTypeAny, {
+     avatarUrl: null | string;
+     name: string;
+   }, {
+     avatarUrl: null | string;
+     name: string;
+  }>>;
+  farcaster: ZodOptional<ZodObject<{
+     displayName: ZodOptional<ZodString>;
+     fid: ZodNumber;
+     pfpUrl: ZodOptional<ZodString>;
+     username: ZodOptional<ZodString>;
+   }, "strip", ZodTypeAny, {
+     displayName: string;
+     fid: number;
+     pfpUrl: string;
+     username: string;
+   }, {
+     displayName: string;
+     fid: number;
+     pfpUrl: string;
+     username: string;
+  }>>;
+}, "strip", ZodTypeAny, {
+  address: `0x${string}`;
+  ens: {
+     avatarUrl: null | string;
+     name: string;
+  };
+  farcaster: {
+     displayName: string;
+     fid: number;
+     pfpUrl: string;
+     username: string;
+  };
+}, {
+  address: `0x${string}`;
+  ens: {
+     avatarUrl: null | string;
+     name: string;
+  };
+  farcaster: {
+     displayName: string;
+     fid: number;
+     pfpUrl: string;
+     username: string;
+  };
+}>;
+```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:24](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L24)

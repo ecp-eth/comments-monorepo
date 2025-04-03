@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -6,6 +6,14 @@
 
 # Variable: IndexerAPIExtraSchema
 
-> `const` **IndexerAPIExtraSchema**: `ZodObject`\<[`IndexerAPIExtraSchemaType`](/sdk-reference/schemas/type-aliases/IndexerAPIExtraSchemaType.mdx)\>
+```ts
+const IndexerAPIExtraSchema: ZodObject<{
+  moderationEnabled: ZodBoolean;
+}, "strip", ZodTypeAny, {
+  moderationEnabled: boolean;
+}, {
+  moderationEnabled: boolean;
+}>;
+```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:88](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L88)
