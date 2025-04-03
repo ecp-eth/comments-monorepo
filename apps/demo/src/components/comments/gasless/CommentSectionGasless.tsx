@@ -44,9 +44,12 @@ import { chain } from "@/lib/wagmi";
 import { CommentSectionWrapper } from "../CommentSectionWrapper";
 
 export function CommentSectionGasless() {
-  const account = useAccount();
+  const { address: viewer } = useAccount();
   const [currentUrl, setCurrentUrl] = useState<string>("");
-  const queryKey = useMemo(() => ["comments", currentUrl], [currentUrl]);
+  const queryKey = useMemo(
+    () => ["comments", currentUrl, viewer],
+    [currentUrl, viewer]
+  );
 
   const removeApprovalContract = useWriteContract();
 
@@ -58,7 +61,7 @@ export function CommentSectionGasless() {
 
   const approveGaslessTransactionsMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
-      if (!approvalData || !account.address) {
+      if (!approvalData || !viewer) {
         throw new Error("No approval data found");
       }
 
@@ -67,7 +70,7 @@ export function CommentSectionGasless() {
       }
 
       const signTypedDataParams = await createApprovalTypedData({
-        author: account.address,
+        author: viewer,
         appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         chainId: chain.id,
         nonce: approvalData.nonce,
@@ -76,7 +79,7 @@ export function CommentSectionGasless() {
       return {
         signTypedDataParams: {
           ...signTypedDataParams,
-          account: account.address,
+          account: viewer,
         },
         variables: approvalData,
       };
@@ -128,6 +131,7 @@ export function CommentSectionGasless() {
           cursor: pageParam.cursor,
           limit: pageParam.limit,
           signal,
+          viewer,
         });
       },
       enabled: !!currentUrl,
@@ -157,6 +161,7 @@ export function CommentSectionGasless() {
         cursor,
         sort: "asc",
         signal,
+        viewer,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -261,11 +266,7 @@ export function CommentSectionGasless() {
                 variant="outline"
                 disabled={!approvalData || isRemovingApproval}
                 onClick={() => {
-                  if (
-                    !approvalData ||
-                    !approvalData.approved ||
-                    !account.address
-                  ) {
+                  if (!approvalData || !approvalData.approved || !viewer) {
                     throw new Error("No data found");
                   }
 
