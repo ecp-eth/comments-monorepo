@@ -19,10 +19,15 @@ import {
 import type { Hex } from "viem";
 import { CommentForm } from "./CommentForm";
 import { CommentSectionWrapper } from "../CommentSectionWrapper";
+import { useAccount } from "wagmi";
 
 export function CommentSection() {
+  const { address: viewer } = useAccount();
   const [currentUrl, setCurrentUrl] = useState<string>("");
-  const queryKey = useMemo(() => ["comments", currentUrl], [currentUrl]);
+  const queryKey = useMemo(
+    () => ["comments", currentUrl, viewer],
+    [currentUrl, viewer]
+  );
 
   useEffect(() => {
     setCurrentUrl(window.location.href);
@@ -43,6 +48,7 @@ export function CommentSection() {
           cursor: pageParam.cursor,
           limit: pageParam.limit,
           signal,
+          viewer,
         });
       },
       enabled: !!currentUrl,
@@ -72,6 +78,7 @@ export function CommentSection() {
         cursor,
         sort: "asc",
         signal,
+        viewer,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
