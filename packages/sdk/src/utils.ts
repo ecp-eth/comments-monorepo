@@ -19,7 +19,6 @@ import {
   AddApprovalTypedDataSchema,
   type AddApprovalTypedDataSchemaType,
 } from "./schemas/index.js";
-export { CommentDataSchema, type CommentData } from "./schemas/index.js";
 
 /**
  * Check if a hex string is zero
@@ -33,7 +32,6 @@ export function isZeroHex(hex: `0x${string}`) {
 /**
  * Create the data structure of a comment
  * @return {@link schemas!CommentData | CommentData} The data structure of a comment
- * @preventInline schemas!CommentData
  */
 export function createCommentData({
   content,

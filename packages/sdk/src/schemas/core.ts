@@ -28,4 +28,4 @@ export const CommentDataSchema = z.object({
   deadline: z.coerce.bigint(),
 });
 
-export type CommentData = {} & z.infer<typeof CommentDataSchema>;
+export type CommentData = z.infer<typeof CommentDataSchema>;
