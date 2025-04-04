@@ -10,6 +10,7 @@ A protocol for commenting built on Ethereum.
 | Ethereum Sepolia | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
 | Base             | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
 | Base Sepolia     | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
+| World Chain      | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
 
 ## Packages
 
