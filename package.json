@@ -10,7 +10,8 @@
     "dev:embed": "turbo dev --filter=./apps/embed... --filter=./apps/embed-demo-blog --filter=./apps/indexer --filter=./packages/protocol",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "pkg:publish": "scripts/publish.sh"
+    "pkg:publish": "scripts/publish.sh",
+    "postinstall": "node scripts/fix-sentry-opentelemetry.js"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
