@@ -76,7 +76,7 @@ The cursor to fetch comments from
 optional limit: number;
 ```
 
-Defined in: [packages/sdk/src/api.ts:62](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L62)
+Defined in: [packages/sdk/src/api.ts:69](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L69)
 
 The number of comments to fetch
 
@@ -84,6 +84,25 @@ The number of comments to fetch
 
 ```ts
 50
+```
+
+***
+
+### mode?
+
+```ts
+optional mode: "nested" | "flat";
+```
+
+Defined in: [packages/sdk/src/api.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L63)
+
+The mode to fetch comments in by default it returns only the first level of comments.
+If flat is used it will return all comments sorted by timestamp in descending order.
+
+#### Default
+
+```ts
+"nested"
 ```
 
 ***
@@ -112,7 +131,7 @@ Number of times to retry the signing operation in case of failure.
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/api.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L63)
+Defined in: [packages/sdk/src/api.ts:70](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L70)
 
 ***
 
