@@ -8,7 +8,7 @@ export const comment = onchainTable(
     metadata: t.text().notNull(),
     targetUri: t.text().notNull(),
     parentId: t.hex(),
-    rootCommentId: t.hex().notNull(),
+    rootCommentId: t.hex(),
     author: t.hex().notNull(),
     timestamp: t.timestamp({ withTimezone: true }).notNull(),
     deletedAt: t.timestamp({ withTimezone: true }),
@@ -68,5 +68,15 @@ export const commentRelations = relations(comment, ({ one, many }) => ({
     relationName: "comment_replies",
     fields: [comment.parentId],
     references: [comment.id],
+  }),
+  // Each root comment may have one root parent commen, referenced by rootCommentId
+  rootParent: one(comment, {
+    relationName: "comment_root_replies",
+    fields: [comment.rootCommentId],
+    references: [comment.id],
+  }),
+  // Each root comment may have many replies that reference it no matter the depth
+  flatReplies: many(comment, {
+    relationName: "comment_root_replies",
   }),
 }));

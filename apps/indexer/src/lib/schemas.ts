@@ -149,12 +149,17 @@ export const GetCommentsQuerySchema = z.object({
   sort: z.enum(["asc", "desc"]).default("desc").openapi({
     description: "The sort order of the comments",
   }),
+  mode: z.enum(["nested", "flat"]).default("nested").openapi({
+    description:
+      "The mode to fetch comments in. Nested will return only the first level of comments. Flat will return all replies sorted by timestamp in descending order.",
+  }),
 });
 
 /**
  * Query string schema for getting a list of comment with replies.
  */
 export const GetCommentRepliesQuerySchema = GetCommentsQuerySchema.omit({
+  mode: true,
   targetUri: true,
 });
 

@@ -7,6 +7,7 @@ import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response
 import { GetCommentsQuerySchema } from "../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../lib/constants";
 import { env } from "../../env";
+import type { SQL } from "drizzle-orm";
 
 const getCommentsRoute = createRoute({
   method: "get",
@@ -36,7 +37,7 @@ const getCommentsRoute = createRoute({
  */
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { author, targetUri, appSigner, sort, limit, cursor, viewer } =
+    const { author, targetUri, appSigner, sort, limit, cursor, viewer, mode } =
       c.req.valid("query");
 
     const sharedConditions = [
@@ -96,13 +97,38 @@ export default (app: OpenAPIHono) => {
           .execute()
       : undefined;
 
+    const repliesConditions: (SQL<unknown> | undefined)[] = [];
+
+    if (env.MODERATION_ENABLED) {
+      if (viewer) {
+        repliesConditions.push(
+          or(
+            eq(schema.comment.moderationStatus, "approved"),
+            eq(schema.comment.author, viewer)
+          )
+        );
+      } else {
+        repliesConditions.push(eq(schema.comment.moderationStatus, "approved"));
+      }
+    }
+
     const commentsQuery = db.query.comment.findMany({
-      with: {
-        replies: {
-          orderBy: desc(schema.comment.timestamp),
-          limit: REPLIES_PER_COMMENT + 1,
-        },
-      },
+      with:
+        mode === "flat"
+          ? {
+              flatReplies: {
+                where: and(...repliesConditions),
+                orderBy: desc(schema.comment.timestamp),
+                limit: REPLIES_PER_COMMENT + 1,
+              },
+            }
+          : {
+              replies: {
+                where: and(...repliesConditions),
+                orderBy: desc(schema.comment.timestamp),
+                limit: REPLIES_PER_COMMENT + 1,
+              },
+            },
       where: and(
         ...sharedConditions,
         ...(sort === "desc" && !!cursor

@@ -43,14 +43,11 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     );
 
     const parentId = transformCommentParentId(event.args.commentData.parentId);
-    let rootCommentId: Hex;
+    let rootCommentId: Hex | null = null;
 
     if (parentId) {
       rootCommentId =
-        (await getRootCommentId(parentId, context.db.sql)) ??
-        event.args.commentId;
-    } else {
-      rootCommentId = event.args.commentId;
+        (await getRootCommentId(parentId, context.db.sql)) ?? null;
     }
 
     await context.db.insert(schema.comment).values({

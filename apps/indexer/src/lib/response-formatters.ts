@@ -14,7 +14,10 @@ import {
 import { getCommentCursor } from "@ecp.eth/sdk";
 import { env } from "../env";
 
-type CommentFromDB = CommentSelectType & { replies?: CommentSelectType[] };
+type CommentFromDB = CommentSelectType & {
+  replies?: CommentSelectType[];
+  flatReplies?: CommentSelectType[];
+};
 
 /**
  * This function resolves ENS and Farcaster user data of comment authors and formats the response for API
@@ -70,74 +73,76 @@ export async function resolveUserDataAndFormatListCommentsResponse({
   const endComment = results[results.length - 1];
 
   return {
-    results: results.map((comment) => {
-      const replies = comment.replies ?? [];
-      const resolvedAuthorEnsData = resolveUserData(
-        resolvedAuthorsEnsData,
-        comment.author
-      );
-      const resolvedAuthorFarcasterData = resolveUserData(
-        resolvedAuthorsFarcasterData,
-        comment.author
-      );
+    results: results.map(
+      ({ replies: nestedReplies, flatReplies, ...comment }) => {
+        const replies = nestedReplies ?? flatReplies ?? [];
+        const resolvedAuthorEnsData = resolveUserData(
+          resolvedAuthorsEnsData,
+          comment.author
+        );
+        const resolvedAuthorFarcasterData = resolveUserData(
+          resolvedAuthorsFarcasterData,
+          comment.author
+        );
 
-      const slicedReplies = replies.slice(0, replyLimit);
-      const startReply = slicedReplies[0];
-      const endReply = slicedReplies[slicedReplies.length - 1];
+        const slicedReplies = replies.slice(0, replyLimit);
+        const startReply = slicedReplies[0];
+        const endReply = slicedReplies[slicedReplies.length - 1];
 
-      return {
-        ...formatComment(comment),
-        author: formatAuthor(
-          comment.author,
-          resolvedAuthorEnsData,
-          resolvedAuthorFarcasterData
-        ),
-        replies: {
-          extra: {
-            moderationEnabled: env.MODERATION_ENABLED,
-          },
-          results: slicedReplies.map((reply) => {
-            const resolvedAuthorEnsData = resolveUserData(
-              resolvedAuthorsEnsData,
-              reply.author
-            );
-            const resolvedAuthorFarcasterData = resolveUserData(
-              resolvedAuthorsFarcasterData,
-              reply.author
-            );
+        return {
+          ...formatComment(comment),
+          author: formatAuthor(
+            comment.author,
+            resolvedAuthorEnsData,
+            resolvedAuthorFarcasterData
+          ),
+          replies: {
+            extra: {
+              moderationEnabled: env.MODERATION_ENABLED,
+            },
+            results: slicedReplies.map((reply) => {
+              const resolvedAuthorEnsData = resolveUserData(
+                resolvedAuthorsEnsData,
+                reply.author
+              );
+              const resolvedAuthorFarcasterData = resolveUserData(
+                resolvedAuthorsFarcasterData,
+                reply.author
+              );
 
-            return {
-              ...formatComment(reply),
-              author: formatAuthor(
-                reply.author,
-                resolvedAuthorEnsData,
-                resolvedAuthorFarcasterData
-              ),
-              // do not go deeper than first level of replies
-              replies: {
-                results: [],
-                pagination: {
-                  limit: 0,
-                  hasNext: false,
-                  hasPrevious: false,
+              return {
+                ...formatComment(reply),
+                author: formatAuthor(
+                  reply.author,
+                  resolvedAuthorEnsData,
+                  resolvedAuthorFarcasterData
+                ),
+                // do not go deeper than first level of replies
+                replies: {
+                  results: [],
+                  pagination: {
+                    limit: 0,
+                    hasNext: false,
+                    hasPrevious: false,
+                  },
                 },
-              },
-            };
-          }),
-          pagination: {
-            limit: replyLimit,
-            hasNext: replies.length > replyLimit,
-            hasPrevious: false,
-            startCursor: startReply
-              ? getCommentCursor(startReply.id as Hex, startReply.timestamp)
-              : undefined,
-            endCursor: endReply
-              ? getCommentCursor(endReply.id as Hex, endReply.timestamp)
-              : undefined,
+              };
+            }),
+            pagination: {
+              limit: replyLimit,
+              hasNext: replies.length > replyLimit,
+              hasPrevious: false,
+              startCursor: startReply
+                ? getCommentCursor(startReply.id as Hex, startReply.timestamp)
+                : undefined,
+              endCursor: endReply
+                ? getCommentCursor(endReply.id as Hex, endReply.timestamp)
+                : undefined,
+            },
           },
-        },
-      };
-    }),
+        };
+      }
+    ),
     pagination: {
       limit,
       hasNext: nextComment !== endComment,

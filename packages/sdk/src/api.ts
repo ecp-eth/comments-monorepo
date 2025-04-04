@@ -55,6 +55,13 @@ export type FetchCommentsOptions = {
    */
   sort?: "asc" | "desc";
   /**
+   * The mode to fetch comments in by default it returns only the first level of comments.
+   * If flat is used it will return all comments sorted by timestamp in descending order.
+   *
+   * @default "nested"
+   */
+  mode?: "nested" | "flat";
+  /**
    * The number of comments to fetch
    *
    * @default 50
@@ -73,6 +80,7 @@ const FetchCommentsOptionsSchema = z.object({
   cursor: HexSchema.optional(),
   limit: z.number().int().positive().default(50),
   signal: z.instanceof(AbortSignal).optional(),
+  mode: z.enum(["nested", "flat"]).optional(),
   viewer: HexSchema.optional(),
 });
 
@@ -95,6 +103,7 @@ export async function fetchComments(
     appSigner,
     signal,
     viewer,
+    mode,
   } = FetchCommentsOptionsSchema.parse(options);
 
   const fetchCommentsTask = Effect.tryPromise(async (signal) => {
@@ -121,6 +130,10 @@ export async function fetchComments(
 
     if (viewer) {
       url.searchParams.set("viewer", viewer);
+    }
+
+    if (mode) {
+      url.searchParams.set("mode", mode);
     }
 
     const response = await fetch(url.toString(), {
