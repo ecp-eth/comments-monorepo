@@ -1,5 +1,12 @@
 import { index, onchainTable, relations } from "ponder";
 
+// Custom type for addresses that supports both Ethereum (40 chars) and World (64 chars) addresses
+const addressType = (t: any) =>
+  t
+    .text()
+    .notNull()
+    .regex(/^(0x)?([0-9a-fA-F]{40}|[0-9a-fA-F]{64})$/);
+
 export const comment = onchainTable(
   "comment",
   (t) => ({
@@ -8,12 +15,11 @@ export const comment = onchainTable(
     metadata: t.text().notNull(),
     targetUri: t.text().notNull(),
     parentId: t.hex(),
-    author: t.hex().notNull(),
-    // https://github.com/ponder-sh/ponder/issues/1240
+    author: addressType(t),
     timestamp: t.timestamp({ withTimezone: true }).notNull(),
     deletedAt: t.timestamp({ withTimezone: true }),
     chainId: t.integer().notNull(),
-    appSigner: t.hex().notNull(),
+    appSigner: addressType(t),
     txHash: t.hex().notNull(),
     logIndex: t.integer(),
     moderationStatus: t
@@ -42,8 +48,8 @@ export const approvals = onchainTable(
   "approvals",
   (t) => ({
     id: t.text().primaryKey(),
-    author: t.hex().notNull(),
-    appSigner: t.hex().notNull(),
+    author: addressType(t),
+    appSigner: addressType(t),
     chainId: t.integer().notNull(),
     txHash: t.hex().notNull(),
     logIndex: t.integer().notNull(),
