@@ -58,10 +58,13 @@ export function Comment({
     ? comment.id
     : (comment.parentId ?? never("parentId is required for comment depth > 0"));
   const submitTargetQueryKey = useMemo(
-    () => ["comments", submitTargetCommentId],
-    [submitTargetCommentId]
+    () => ["comments", submitTargetCommentId, address],
+    [submitTargetCommentId, address]
   );
-  const queryKey = useMemo(() => ["comments", comment.id], [comment.id]);
+  const queryKey = useMemo(
+    () => ["comments", comment.id, address],
+    [comment.id, address]
+  );
 
   const handleCommentSubmitted = useHandleCommentSubmitted({
     queryKey: submitTargetQueryKey,
