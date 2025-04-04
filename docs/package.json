@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "env-cmd -f .env.local vocs dev -p 3004",
-    "build": "pnpm run ref:gen:all && vocs build",
+    "build": "pnpm run ref:gen:all && NODE_OPTIONS=\"--max-old-space-size=4096\" vocs build",
     "preview": "vocs preview",
     "check-types": "tsc --noEmit",
     "ref:gen:demo:blog": "cp ../apps/embed-demo-blog/README.md pages/demos/blog/index.mdx",
@@ -42,7 +42,7 @@
     "env-cmd": "^10.1.0",
     "escape-string-regexp": "^5.0.0",
     "js-yaml": "^4.1.0",
-    "solc": "^0.8.13",
+    "solc": "^0.8.29",
     "solidity-docgen": "~0.5.17",
     "tailwindcss": "^4.0.13",
     "tsx": "^4.19.3",
