@@ -169,6 +169,7 @@ export function Comment({
       ReplyComponent={Comment}
       ReplyFormComponent={CommentDefaultForm}
       onDeleteClick={handleDeleteClick}
+      replyToCommentId={submitTargetCommentId}
     />
   );
 }

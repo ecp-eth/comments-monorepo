@@ -156,6 +156,7 @@ export function CommentGasless({
       ReplyComponent={CommentGasless}
       ReplyFormComponent={CommentGaslessForm}
       onDeleteClick={handleDeleteClick}
+      replyToCommentId={submitTargetCommentId}
     />
   );
 }
