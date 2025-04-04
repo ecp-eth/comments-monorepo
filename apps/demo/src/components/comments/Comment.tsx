@@ -53,7 +53,7 @@ export function Comment({
    * because comment is updated to be redacted
    */
   const commentRef = useFreshRef(comment);
-  const areRepliesAllowed = level < publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF;
+  const areRepliesAllowed = level < 3;
   const submitTargetCommentId = areRepliesAllowed
     ? comment.id
     : (comment.parentId ?? never("parentId is required for comment depth > 0"));
@@ -171,6 +171,7 @@ export function Comment({
       ReplyComponent={Comment}
       ReplyFormComponent={CommentDefaultForm}
       onDeleteClick={handleDeleteClick}
+      replyToCommentId={submitTargetCommentId}
     />
   );
 }

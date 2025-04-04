@@ -12,6 +12,8 @@ import {
   insertCommentModerationStatus,
 } from "../management/services/moderation";
 import { notifyCommentPendingModeration } from "../lib/telegram-notifications";
+import { getRootCommentId } from "../lib/replies";
+import { Hex } from "@ecp.eth/sdk/types";
 // import { isProfane } from "../lib/profanity-detection";
 
 const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
@@ -40,12 +42,24 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       event.args.commentId
     );
 
+    const parentId = transformCommentParentId(event.args.commentData.parentId);
+    let rootCommentId: Hex;
+
+    if (parentId) {
+      rootCommentId =
+        (await getRootCommentId(parentId, context.db.sql)) ??
+        event.args.commentId;
+    } else {
+      rootCommentId = event.args.commentId;
+    }
+
     await context.db.insert(schema.comment).values({
       id: event.args.commentId,
       content: event.args.commentData.content,
       metadata: event.args.commentData.metadata,
       targetUri,
-      parentId: transformCommentParentId(event.args.commentData.parentId),
+      parentId,
+      rootCommentId,
       author: event.args.commentData.author,
       txHash: event.transaction.hash,
       timestamp,

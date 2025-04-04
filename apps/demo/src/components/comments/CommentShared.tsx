@@ -65,6 +65,7 @@ type CommentSharedProps = {
   onReplyPost: OnRetryPostComment;
   ReplyComponent: React.ComponentType<CommentProps>;
   ReplyFormComponent: React.ComponentType<CommentFormProps>;
+  replyToCommentId: Hex;
 };
 
 export function CommentShared({
@@ -83,6 +84,7 @@ export function CommentShared({
   onRetryPostClick,
   ReplyComponent,
   ReplyFormComponent,
+  replyToCommentId,
 }: CommentSharedProps) {
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
@@ -223,12 +225,7 @@ export function CommentShared({
             onReplySubmitSuccess(pendingOperation);
           }}
           placeholder="What are your thoughts?"
-          parentId={
-            level >= publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF &&
-            comment.parentId
-              ? comment.parentId
-              : comment.id
-          }
+          parentId={replyToCommentId}
         />
       )}
       {hasNewComments && (

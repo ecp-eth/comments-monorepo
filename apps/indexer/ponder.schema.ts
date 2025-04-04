@@ -8,6 +8,7 @@ export const comment = onchainTable(
     metadata: t.text().notNull(),
     targetUri: t.text().notNull(),
     parentId: t.hex(),
+    rootCommentId: t.hex().notNull(),
     author: t.hex().notNull(),
     timestamp: t.timestamp({ withTimezone: true }).notNull(),
     deletedAt: t.timestamp({ withTimezone: true }),
@@ -31,6 +32,7 @@ export const comment = onchainTable(
     deletedAtIdx: index().on(table.deletedAt),
     authorIdx: index().on(table.author),
     moderationStatusIdx: index().on(table.moderationStatus),
+    rootCommentIdIdx: index().on(table.rootCommentId),
   })
 );
 

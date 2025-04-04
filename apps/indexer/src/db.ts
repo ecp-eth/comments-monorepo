@@ -9,7 +9,6 @@ function assertDrizzleSchemaSymbolSupported(
   tableExport: unknown
 ): asserts tableExport is typeof drizzleTable & {
   readonly Schema: unique symbol;
-  trololo: boolean;
 } {
   if (
     typeof tableExport !== "object" ||
