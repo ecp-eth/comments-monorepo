@@ -10,23 +10,21 @@ import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import { env } from "../env";
 
 // Initialize Sentry
-if (env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: env.SENTRY_DSN,
-    integrations: [
-      // Enable profiling integration
-      nodeProfilingIntegration(),
-    ],
-    // Set tracesSampleRate to 1.0 to capture 100%
-    // of transactions for performance monitoring.
-    // We recommend adjusting this value in production
-    tracesSampleRate: 1.0,
-    // Set profilesSampleRate to 1.0 to profile 100%
-    // of sampled transactions.
-    // We recommend adjusting this value in production
-    profilesSampleRate: 1.0,
-  });
-}
+Sentry.init({
+  dsn: env.SENTRY_DSN,
+  integrations: [
+    // Enable profiling integration
+    nodeProfilingIntegration(),
+  ],
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+  // Set profilesSampleRate to 1.0 to profile 100%
+  // of sampled transactions.
+  // We recommend adjusting this value in production
+  profilesSampleRate: 1.0,
+});
 
 const app = new OpenAPIHono();
 
@@ -54,14 +52,12 @@ app.onError((err, c) => {
   }
 
   // Capture error in Sentry
-  if (env.SENTRY_DSN) {
-    Sentry.captureException(err, {
-      extra: {
-        path: c.req.path,
-        method: c.req.method,
-      },
-    });
-  }
+  Sentry.captureException(err, {
+    extra: {
+      path: c.req.path,
+      method: c.req.method,
+    },
+  });
 
   return Response.json({ message: "Internal server error" }, { status: 500 });
 });
