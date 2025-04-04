@@ -5,7 +5,7 @@ const addressType = (t: any) =>
   t
     .text()
     .notNull()
-    .regex(/^(0x)?([0-9a-fA-F]{40}|[0-9a-fA-F]{64})$/);
+    .pattern(/^(0x)?([0-9a-fA-F]{40}|[0-9a-fA-F]{64})$/);
 
 export const comment = onchainTable(
   "comment",
