@@ -47,16 +47,22 @@ export default (app: OpenAPIHono) => {
       appSigner ? eq(schema.comment.appSigner, appSigner) : undefined,
     ];
 
+    const repliesConditions: (SQL<unknown> | undefined)[] = [];
+
     if (env.MODERATION_ENABLED) {
+      const approvedComments = eq(schema.comment.moderationStatus, "approved");
+
       if (viewer) {
-        sharedConditions.push(
-          or(
-            eq(schema.comment.moderationStatus, "approved"),
-            eq(schema.comment.author, viewer)
-          )
+        const approvedOrViewersComments = or(
+          approvedComments,
+          eq(schema.comment.author, viewer)
         );
+
+        sharedConditions.push(approvedOrViewersComments);
+        repliesConditions.push(approvedOrViewersComments);
       } else {
-        sharedConditions.push(eq(schema.comment.moderationStatus, "approved"));
+        sharedConditions.push(approvedComments);
+        repliesConditions.push(approvedComments);
       }
     }
 
@@ -97,38 +103,14 @@ export default (app: OpenAPIHono) => {
           .execute()
       : undefined;
 
-    const repliesConditions: (SQL<unknown> | undefined)[] = [];
-
-    if (env.MODERATION_ENABLED) {
-      if (viewer) {
-        repliesConditions.push(
-          or(
-            eq(schema.comment.moderationStatus, "approved"),
-            eq(schema.comment.author, viewer)
-          )
-        );
-      } else {
-        repliesConditions.push(eq(schema.comment.moderationStatus, "approved"));
-      }
-    }
-
     const commentsQuery = db.query.comment.findMany({
-      with:
-        mode === "flat"
-          ? {
-              flatReplies: {
-                where: and(...repliesConditions),
-                orderBy: desc(schema.comment.timestamp),
-                limit: REPLIES_PER_COMMENT + 1,
-              },
-            }
-          : {
-              replies: {
-                where: and(...repliesConditions),
-                orderBy: desc(schema.comment.timestamp),
-                limit: REPLIES_PER_COMMENT + 1,
-              },
-            },
+      with: {
+        [mode === "flat" ? "flatReplies" : "replies"]: {
+          where: and(...repliesConditions),
+          orderBy: desc(schema.comment.timestamp),
+          limit: REPLIES_PER_COMMENT + 1,
+        },
+      },
       where: and(
         ...sharedConditions,
         ...(sort === "desc" && !!cursor
