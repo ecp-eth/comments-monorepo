@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { ponder as Ponder } from "ponder:registry";
 import {
   transformCommentParentId,
@@ -12,7 +13,6 @@ import {
   insertCommentModerationStatus,
 } from "../management/services/moderation";
 import { notifyCommentPendingModeration } from "../lib/telegram-notifications";
-import { getRootCommentId } from "../lib/replies";
 import { Hex } from "@ecp.eth/sdk/types";
 // import { isProfane } from "../lib/profanity-detection";
 
@@ -36,21 +36,47 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
     const timestamp = new Date(Number(event.block.timestamp) * 1000);
 
+    const parentId = transformCommentParentId(event.args.commentData.parentId);
+    let rootCommentId: Hex = event.args.commentId;
+
+    if (parentId) {
+      const parentComment = await context.db.find(schema.comments, {
+        id: parentId,
+      });
+
+      if (!parentComment) {
+        Sentry.captureMessage(
+          `Parent comment not found for commentId: ${event.args.commentId}, parentId: ${parentId}`,
+          {
+            level: "warning",
+            extra: {
+              commentId: event.args.commentId,
+              parentId,
+              targetUri,
+              appSigner: event.args.commentData.appSigner,
+              chainId: context.network.chainId,
+              author: event.args.commentData.author,
+              txHash: event.transaction.hash,
+              logIndex: event.log.logIndex,
+              timestamp,
+              parentCommentId: event.args.commentData.parentId,
+            },
+          }
+        );
+
+        return;
+      }
+
+      rootCommentId = parentComment.rootCommentId;
+    }
+
     // We need to check if the comment already has a moderation status
     // this is useful during the reindex process
     const moderationStatus = await getCommentModerationStatus(
       event.args.commentId
     );
 
-    const parentId = transformCommentParentId(event.args.commentData.parentId);
-    let rootCommentId: Hex | null = null;
-
-    if (parentId) {
-      rootCommentId =
-        (await getRootCommentId(parentId, context.db.sql)) ?? null;
-    }
-
-    await context.db.insert(schema.comment).values({
+    await context.db.insert(schema.comments).values({
       id: event.args.commentId,
       content: event.args.commentData.content,
       metadata: event.args.commentData.metadata,
@@ -91,7 +117,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   });
 
   ponder.on("CommentsV1:CommentDeleted", async ({ event, context }) => {
-    const existingComment = await context.db.find(schema.comment, {
+    const existingComment = await context.db.find(schema.comments, {
       id: event.args.commentId,
     });
 
@@ -100,7 +126,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       getAddress(existingComment.author) === getAddress(event.args.author)
     ) {
       await context.db
-        .update(schema.comment, {
+        .update(schema.comments, {
           id: event.args.commentId,
         })
         .set({

@@ -96,8 +96,8 @@ export async function updateCommentModerationStatus(
       throw new CommentAlreadyInStatusError(status);
     }
 
-    const comment = await tx.query.comment.findFirst({
-      where: eq(schema.comment.id, commentId),
+    const comment = await tx.query.comments.findFirst({
+      where: eq(schema.comments.id, commentId),
     });
 
     if (!comment) {
@@ -114,12 +114,12 @@ export async function updateCommentModerationStatus(
       .execute();
 
     return await tx
-      .update(schema.comment)
+      .update(schema.comments)
       .set({
         moderationStatus: status,
         moderationStatusChangedAt: new Date(),
       })
-      .where(eq(schema.comment.id, comment.id))
+      .where(eq(schema.comments.id, comment.id))
       .returning();
   });
 

@@ -1,14 +1,14 @@
 import { index, onchainTable, relations } from "ponder";
 
-export const comment = onchainTable(
-  "comment",
+export const comments = onchainTable(
+  "comments",
   (t) => ({
-    id: t.text().primaryKey(),
+    id: t.hex().primaryKey(),
     content: t.text().notNull(),
     metadata: t.text().notNull(),
     targetUri: t.text().notNull(),
     parentId: t.hex(),
-    rootCommentId: t.hex(),
+    rootCommentId: t.hex().notNull(),
     author: t.hex().notNull(),
     timestamp: t.timestamp({ withTimezone: true }).notNull(),
     deletedAt: t.timestamp({ withTimezone: true }),
@@ -36,8 +36,8 @@ export const comment = onchainTable(
   })
 );
 
-export type CommentSelectType = typeof comment.$inferSelect;
-export type CommentInsertType = typeof comment.$inferInsert;
+export type CommentSelectType = typeof comments.$inferSelect;
+export type CommentInsertType = typeof comments.$inferInsert;
 
 export const approvals = onchainTable(
   "approvals",
@@ -58,25 +58,25 @@ export const approvals = onchainTable(
   })
 );
 
-export const commentRelations = relations(comment, ({ one, many }) => ({
+export const commentRelations = relations(comments, ({ one, many }) => ({
   // Each comment may have many response comments (children) that reference it.
-  replies: many(comment, {
+  replies: many(comments, {
     relationName: "comment_replies",
   }),
   // Each comment may have one parent comment, referenced by parentId.
-  parent: one(comment, {
+  parent: one(comments, {
     relationName: "comment_replies",
-    fields: [comment.parentId],
-    references: [comment.id],
+    fields: [comments.parentId],
+    references: [comments.id],
   }),
   // Each comment may have one root comment, referenced by rootCommentId
-  rootParent: one(comment, {
+  rootParent: one(comments, {
     relationName: "comment_root_replies",
-    fields: [comment.rootCommentId],
-    references: [comment.id],
+    fields: [comments.rootCommentId],
+    references: [comments.id],
   }),
   // Each root comment may have many descendant replies that reference it, regardless of the depth
-  flatReplies: many(comment, {
+  flatReplies: many(comments, {
     relationName: "comment_root_replies",
   }),
 }));
