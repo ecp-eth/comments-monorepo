@@ -51,6 +51,7 @@ export const IndexerAPICommentSchema = z.object({
   logIndex: z.number().int().nullable(),
   metadata: z.string(),
   parentId: HexSchema.nullable(),
+  rootCommentId: HexSchema,
   targetUri: z.string(),
   timestamp: z.coerce.date(),
   txHash: HexSchema,
