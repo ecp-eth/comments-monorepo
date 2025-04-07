@@ -14,28 +14,35 @@ Implements EIP-712 for typed structured data hashing and signing
 ### `CommentData`
 
 
-- **content:** string
+- **content:** (string) The actual text content of the comment
 
 
-- **metadata:** string
+
+- **metadata:** (string) Additional JSON metadata for the comment
 
 
-- **targetUri:** string
+
+- **targetUri:** (string) the URI about which the comment is being made
 
 
-- **parentId:** bytes32
+
+- **parentId:** (bytes32) The ID of the parent comment if this is a reply, otherwise bytes32(0)
 
 
-- **author:** address
+
+- **author:** (address) The address of the comment author
 
 
-- **appSigner:** address
+
+- **appSigner:** (address) The address of the application signer that authorized this comment
 
 
-- **nonce:** uint256
+
+- **nonce:** (uint256) The nonce for the comment
 
 
-- **deadline:** uint256
+- **deadline:** (uint256) Timestamp after which the signatures for this comment become invalid
+
 
 
 
