@@ -43,7 +43,7 @@
     "escape-string-regexp": "^5.0.0",
     "js-yaml": "^4.1.0",
     "solc": "^0.8.29",
-    "solidity-docgen": "~0.5.17",
+    "@ecp.eth/solidity-docgen": "~0.5.19",
     "tailwindcss": "^4.0.13",
     "tsx": "^4.19.3",
     "typedoc": "^0.28.1",
