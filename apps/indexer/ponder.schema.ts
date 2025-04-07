@@ -69,13 +69,13 @@ export const commentRelations = relations(comment, ({ one, many }) => ({
     fields: [comment.parentId],
     references: [comment.id],
   }),
-  // Each root comment may have one root parent commen, referenced by rootCommentId
+  // Each comment may have one root comment, referenced by rootCommentId
   rootParent: one(comment, {
     relationName: "comment_root_replies",
     fields: [comment.rootCommentId],
     references: [comment.id],
   }),
-  // Each root comment may have many replies that reference it no matter the depth
+  // Each root comment may have many descendant replies that reference it, regardless of the depth
   flatReplies: many(comment, {
     relationName: "comment_root_replies",
   }),
