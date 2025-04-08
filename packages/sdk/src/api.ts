@@ -242,6 +242,7 @@ export async function fetchCommentReplies(
     signal,
     sort,
     viewer,
+    mode,
   } = FetchCommentRepliesOptionSchema.parse(options);
 
   const fetchRepliesTask = Effect.tryPromise(async (signal) => {
@@ -260,6 +261,10 @@ export async function fetchCommentReplies(
 
     if (viewer) {
       url.searchParams.set("viewer", viewer);
+    }
+
+    if (mode) {
+      url.searchParams.set("mode", mode);
     }
 
     const response = await fetch(url.toString(), {
