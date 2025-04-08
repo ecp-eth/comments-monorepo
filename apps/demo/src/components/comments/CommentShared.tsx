@@ -46,13 +46,11 @@ type CommentProps = {
    */
   onRetryPost: OnRetryPostComment;
   onDelete: OnDeleteComment;
-  level: number;
+  rootComment: CommentType;
 };
 
 type CommentSharedProps = {
   comment: CommentType;
-  level: number;
-  areRepliesAllowed: boolean;
   isDeleting: boolean;
   didDeletingFailed: boolean;
   isPosting: boolean;
@@ -65,17 +63,15 @@ type CommentSharedProps = {
   onReplyPost: OnRetryPostComment;
   ReplyComponent: React.ComponentType<CommentProps>;
   ReplyFormComponent: React.ComponentType<CommentFormProps>;
-  replyToCommentId: Hex;
+  rootComment: CommentType;
 };
 
 export function CommentShared({
-  areRepliesAllowed,
   comment,
   isDeleting,
   didDeletingFailed,
   isPosting,
   didPostingFailed,
-  level,
   onDeleteClick,
   onReplySubmitSuccess,
   onReplyDelete,
@@ -84,7 +80,7 @@ export function CommentShared({
   onRetryPostClick,
   ReplyComponent,
   ReplyFormComponent,
-  replyToCommentId,
+  rootComment,
 }: CommentSharedProps) {
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
@@ -95,7 +91,9 @@ export function CommentShared({
   );
 
   const repliesQuery = useInfiniteQuery({
-    enabled: areRepliesAllowed,
+    // we don't need to load the replies of reply because we are using flattened mode
+    // so load replies of the root comment only
+    enabled: rootComment.id === comment.id,
     queryKey,
     initialData: comment.replies
       ? {
@@ -122,9 +120,10 @@ export function CommentShared({
         appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         cursor: pageParam.cursor,
         limit: pageParam.limit,
-        commentId: comment.id,
+        commentId: rootComment.id,
         signal,
         viewer: connectedAddress,
+        mode: "flat",
       });
 
       return CommentPageSchema.parse(response);
@@ -142,18 +141,21 @@ export function CommentShared({
   });
 
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    // only check new comments for the root comment
+    enabled: rootComment.id === comment.id,
     queryData: repliesQuery.data,
     queryKey,
     fetchComments({ cursor, signal }) {
       return fetchCommentReplies({
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        commentId: comment.id,
+        commentId: rootComment.id,
         cursor,
         limit: 10,
         sort: "asc",
         signal,
         viewer: connectedAddress,
+        mode: "flat",
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -205,7 +207,6 @@ export function CommentShared({
         <CommentActionOrStatus
           comment={comment}
           hasAccountConnected={!!connectedAddress}
-          hasRepliesAllowed={areRepliesAllowed}
           isDeleting={isDeleting}
           isPosting={isPosting}
           deletingFailed={didDeletingFailed}
@@ -225,7 +226,7 @@ export function CommentShared({
             onReplySubmitSuccess(pendingOperation);
           }}
           placeholder="What are your thoughts?"
-          parentId={replyToCommentId}
+          parentId={comment.id}
         />
       )}
       {hasNewComments && (
@@ -241,7 +242,7 @@ export function CommentShared({
           comment={reply}
           onDelete={onReplyDelete}
           onRetryPost={onReplyPost}
-          level={level + 1}
+          rootComment={rootComment}
         />
       ))}
       {repliesQuery.hasNextPage && (

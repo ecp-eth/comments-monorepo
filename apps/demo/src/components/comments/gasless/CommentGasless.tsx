@@ -15,7 +15,6 @@ import type {
   OnRetryPostComment,
 } from "@ecp.eth/shared/types";
 import { toast } from "sonner";
-import never from "never";
 import { CommentShared } from "../CommentShared";
 import { useCommentGaslessContext } from "./CommentGaslessProvider";
 import { CommentGaslessForm } from "./CommentGaslessForm";
@@ -28,14 +27,14 @@ interface CommentProps {
    * and user pressed retry.
    */
   onRetryPost: OnRetryPostComment;
-  level?: number;
+  rootComment: CommentType;
 }
 
 export function CommentGasless({
   comment,
   onRetryPost,
   onDelete,
-  level = 0,
+  rootComment,
 }: CommentProps) {
   const { isApproved: submitIfApproved } = useCommentGaslessContext();
   const { address: connectedAddress } = useAccount();
@@ -45,17 +44,13 @@ export function CommentGasless({
    * because comment is updated to be redacted
    */
   const commentRef = useFreshRef(comment);
-  const areRepliesAllowed = level < publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF;
   const queryKey = useMemo(
     () => ["comments", comment.id, connectedAddress],
     [comment.id, connectedAddress]
   );
-  const submitTargetCommentId = areRepliesAllowed
-    ? comment.id
-    : (comment.parentId ?? never("parentId is required for comment depth > 0"));
   const submitTargetQueryKey = useMemo(
-    () => ["comments", submitTargetCommentId, connectedAddress],
-    [submitTargetCommentId, connectedAddress]
+    () => ["comments", rootComment.id, connectedAddress],
+    [rootComment.id, connectedAddress]
   );
 
   const handleCommentSubmitted = useHandleCommentSubmitted({
@@ -141,7 +136,6 @@ export function CommentGasless({
 
   return (
     <CommentShared
-      areRepliesAllowed={areRepliesAllowed}
       comment={comment}
       didDeletingFailed={didDeletingFailed}
       didPostingFailed={didPostingFailed}
@@ -152,11 +146,10 @@ export function CommentGasless({
       onRetryDeleteClick={handleDeleteClick}
       onRetryPostClick={retryPostMutation.mutate}
       onReplySubmitSuccess={handleCommentSubmitted}
-      level={level}
       ReplyComponent={CommentGasless}
       ReplyFormComponent={CommentGaslessForm}
       onDeleteClick={handleDeleteClick}
-      replyToCommentId={submitTargetCommentId}
+      rootComment={rootComment}
     />
   );
 }

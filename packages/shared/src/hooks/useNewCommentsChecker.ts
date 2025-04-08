@@ -21,11 +21,18 @@ import type {
  * If there are new comments, it updates the first page pagination info so UI can react to them.
  */
 export function useNewCommentsChecker({
+  enabled = true,
   queryKey,
   queryData,
   fetchComments: fetchFn,
   refetchInterval = 60000,
 }: {
+  /**
+   * Whether to enable the new comments checker.
+   *
+   * @default true
+   */
+  enabled?: boolean;
   /**
    * Query to update the first page pagination.
    */
@@ -51,7 +58,7 @@ export function useNewCommentsChecker({
   }, [queryKey]);
 
   const queryResult = useQuery({
-    enabled: !!queryData,
+    enabled: !!queryData && enabled,
     queryKey: newCommentsQueryKey,
     queryFn: async ({ signal }) => {
       if (!queryData || !queryData.pages[0]) {

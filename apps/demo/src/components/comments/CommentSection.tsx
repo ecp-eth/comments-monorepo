@@ -49,6 +49,7 @@ export function CommentSection() {
           limit: pageParam.limit,
           signal,
           viewer,
+          mode: "flat",
         });
       },
       enabled: !!currentUrl,
@@ -79,6 +80,7 @@ export function CommentSection() {
         sort: "asc",
         signal,
         viewer,
+        mode: "flat",
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -124,6 +126,7 @@ export function CommentSection() {
           comment={comment}
           onRetryPost={handleRetryPostComment}
           onDelete={handleCommentDeleted}
+          rootComment={comment}
         />
       ))}
       {hasNextPage && (

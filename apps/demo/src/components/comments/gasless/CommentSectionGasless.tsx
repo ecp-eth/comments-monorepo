@@ -132,6 +132,7 @@ export function CommentSectionGasless() {
           limit: pageParam.limit,
           signal,
           viewer,
+          mode: "flat",
         });
       },
       enabled: !!currentUrl,
@@ -162,6 +163,7 @@ export function CommentSectionGasless() {
         sort: "asc",
         signal,
         viewer,
+        mode: "flat",
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -303,6 +305,7 @@ export function CommentSectionGasless() {
             comment={comment}
             onRetryPost={handleRetryPostComment}
             onDelete={handleCommentDeleted}
+            rootComment={comment}
           />
         ))}
         {hasNextPage && (
