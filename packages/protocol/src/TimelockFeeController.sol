@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./interfaces/IFeeCollector.sol";
 import "./interfaces/ITimelockFeeController.sol";
 import "./interfaces/ICommentTypes.sol";
@@ -44,6 +45,8 @@ abstract contract TimelockFeeController is Ownable, ReentrancyGuard, ITimelockFe
 
     /// @notice Error thrown when fee collector address is zero
     error InvalidFeeCollectorAddress();
+    /// @notice Error thrown when fee collector does not implement required interface
+    error InvalidFeeCollectorInterface();
     /// @notice Error thrown when trying to execute changes before timelock expires
     error TimelockDeadlineNotReached();
     /// @notice Error thrown when fee collection operation fails
@@ -91,6 +94,11 @@ abstract contract TimelockFeeController is Ownable, ReentrancyGuard, ITimelockFe
     ) external onlyOwner {
         if (feeCollectorAddress == address(0)) revert InvalidFeeCollectorAddress();
         
+        // Validate that the collector implements IFeeCollector interface
+        if (!IERC165(feeCollectorAddress).supportsInterface(type(IFeeCollector).interfaceId)) {
+            revert InvalidFeeCollectorInterface();
+        }
+
         // Cancel any existing pending change
         if (pendingChange.exists) {
             emit FeeCollectorChangeCancelled(pendingChange.collector, pendingChange.enabled);

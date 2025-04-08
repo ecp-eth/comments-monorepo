@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./ICommentTypes.sol";
 
-interface IFeeCollector {
+interface IFeeCollector is IERC165 {
     /// @notice Collect fees for a comment
     /// @param commentData The comment data for fee collection
     /// @return success Whether the fee collection was successful
