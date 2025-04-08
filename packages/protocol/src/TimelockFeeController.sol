@@ -32,13 +32,34 @@ abstract contract TimelockFeeController is Ownable, ITimelockFeeController {
     // Pending change storage
     PendingFeeCollectorChange public pendingChange;
 
+    // Emergency pause state
+    bool public paused;
+
     error InvalidFeeConfiguration();
     error DeadlineNotReached();
     error FeeCollectionFailed();
+    error SystemPaused();
+
+    event FeesystemPaused(address indexed owner);
+    event FeesystemUnpaused(address indexed owner);
 
     /// @notice Constructor that sets the owner of the contract
     /// @param initialOwner The address that will own the contract
-    constructor(address initialOwner) Ownable(initialOwner) {}
+    constructor(address initialOwner) Ownable(initialOwner) {
+        paused = false;
+    }
+
+    /// @notice Pause fee collection in case of emergency
+    function pause() external onlyOwner {
+        paused = true;
+        emit FeesystemPaused(msg.sender);
+    }
+
+    /// @notice Unpause fee collection
+    function unpause() external onlyOwner {
+        paused = false;
+        emit FeesystemUnpaused(msg.sender);
+    }
 
     /// @notice Schedule a change to the fee collector configuration
     /// @param collector Address of the new fee collector contract
@@ -108,8 +129,8 @@ abstract contract TimelockFeeController is Ownable, ITimelockFeeController {
     /// @dev Delegates fee collection to the configured collector if enabled
     /// @param commentData The comment data to collect fees for
     function _collectFee(ICommentTypes.CommentData memory commentData) internal virtual {
-        // If fee collection is disabled or no collector is set, return immediately
-        if (!feeCollectorConfig.enabled || address(feeCollectorConfig.collector) == address(0)) {
+        // If system is paused or fee collection is disabled or no collector is set, return immediately
+        if (paused || !feeCollectorConfig.enabled || address(feeCollectorConfig.collector) == address(0)) {
             return;
         }
 
