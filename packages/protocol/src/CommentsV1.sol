@@ -68,13 +68,15 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
     error SignatureDeadlineReached(uint256 deadline, uint256 currentTime);
     /// @notice Error thrown when caller is not authorized
     error NotAuthorized(address caller, address requiredCaller);
+    /// @notice Error thrown when CAIP-10 URI format is invalid
+    error InvalidCAIP10Format();
 
     string public constant name = "Comments";
     string public constant version = "1";
     bytes32 public immutable DOMAIN_SEPARATOR;
     bytes32 public constant COMMENT_TYPEHASH =
         keccak256(
-            "AddComment(string content,string metadata,string targetUri,bytes32 parentId,address author,address appSigner,uint256 nonce,uint256 deadline)"
+            "AddComment(string content,string metadata,string targetUri,address author,address appSigner,uint256 nonce,uint256 deadline)"
         );
     bytes32 public constant DELETE_COMMENT_TYPEHASH =
         keccak256(
@@ -159,15 +161,6 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
 
         bytes32 commentId = getCommentId(commentData);
 
-        // Set thread ID - if it's a reply, use parent's thread ID, otherwise use comment ID as new thread
-        bytes32 threadId;
-        if (commentData.parentId != bytes32(0)) {
-            require(commentExists[commentData.parentId], "Parent comment does not exist");
-            threadId = comments[commentData.parentId].threadId;
-        } else {
-            threadId = commentId;
-        }
-
         if (
             !SignatureChecker.isValidSignatureNow(
                 commentData.appSigner,
@@ -192,8 +185,6 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
                 content: commentData.content,
                 metadata: commentData.metadata,
                 targetUri: commentData.targetUri,
-                parentId: commentData.parentId,
-                threadId: threadId,
                 author: commentData.author,
                 appSigner: commentData.appSigner,
                 nonce: commentData.nonce,
@@ -499,7 +490,6 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
                 keccak256(bytes(commentData.content)),
                 keccak256(bytes(commentData.metadata)),
                 keccak256(bytes(commentData.targetUri)),
-                commentData.parentId,
                 commentData.author,
                 commentData.appSigner,
                 commentData.nonce,
