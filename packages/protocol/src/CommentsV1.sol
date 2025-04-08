@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interfaces/IFeeCollector.sol";
+import "./interfaces/ICommentTypes.sol";
 
 /// @title CommentsV1 - A decentralized comments system
-/// @notice This contract allows users to post and manage comments with optional app-signer approval
+/// @notice This contract allows users to post and manage comments with optional app-signer approval and fee collection
 /// @dev Implements EIP-712 for typed structured data hashing and signing
-contract CommentsV1 {
+contract CommentsV1 is Ownable, ICommentTypes {
     /// @notice Emitted when a new comment is added
     /// @param commentId Unique identifier of the comment
     /// @param author Address of the comment author
@@ -40,25 +43,13 @@ contract CommentsV1 {
     error InvalidNonce();
     error DeadlineReached();
     error NotAuthorized();
+    error FeeCollectionFailed();
+    error InvalidFeeConfiguration();
 
-    /// @notice Struct containing all data for a comment
-    /// @param content The actual text content of the comment
-    /// @param metadata Additional JSON metadata for the comment
-    /// @param targetUri the URI about which the comment is being made
-    /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
-    /// @param author The address of the comment author
-    /// @param appSigner The address of the application signer that authorized this comment
-    /// @param deadline Timestamp after which the signatures for this comment become invalid
-    /// @param nonce The nonce for the comment
-    struct CommentData {
-        string content;
-        string metadata;
-        string targetUri;
-        bytes32 parentId;
-        address author;
-        address appSigner;
-        uint256 nonce;
-        uint256 deadline;
+    /// @notice Struct containing fee collector configuration
+    struct FeeCollectorConfig {
+        IFeeCollector collector;
+        bool enabled;
     }
 
     string public constant name = "Comments";
@@ -81,10 +72,16 @@ contract CommentsV1 {
             "RemoveApproval(address author,address appSigner,uint256 nonce,uint256 deadline)"
         );
 
+    // Replace the old FeeConfig with FeeCollectorConfig
+    FeeCollectorConfig public feeCollectorConfig;
+
+    // On-chain storage mappings
+    mapping(bytes32 => CommentData) public comments;
+    mapping(bytes32 => bool) public commentExists;
     mapping(address => mapping(address => bool)) public isApproved;
     mapping(address => mapping(address => uint256)) public nonces;
 
-    constructor() {
+    constructor() Ownable(msg.sender) {
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256(
@@ -98,13 +95,63 @@ contract CommentsV1 {
         );
     }
 
+    /// @notice Sets the fee collector configuration
+    /// @param collector Address of the fee collector contract
+    /// @param enabled Whether fee collection is enabled
+    function setFeeCollector(
+        address collector,
+        bool enabled
+    ) external onlyOwner {
+        if (collector == address(0)) revert InvalidFeeConfiguration();
+        
+        feeCollectorConfig = FeeCollectorConfig({
+            collector: IFeeCollector(collector),
+            enabled: enabled
+        });
+    }
+
+    /// @notice Internal function to handle fee collection
+    /// @dev Delegates fee collection to the configured collector if enabled
+    function _collectFee(CommentData memory commentData) internal {
+        // If fee collection is disabled or no collector is set, return immediately
+        if (!feeCollectorConfig.enabled || address(feeCollectorConfig.collector) == address(0)) {
+            return;
+        }
+
+        // Get parent comment author if this is a reply
+        address parentCommentAuthor = address(0);
+        if (commentData.parentId != bytes32(0)) {
+            parentCommentAuthor = comments[commentData.parentId].author;
+        }
+
+        // Create fee context with all relevant information
+        IFeeCollector.FeeContext memory context = IFeeCollector.FeeContext({
+            payer: msg.sender,
+            author: commentData.author,
+            appSigner: commentData.appSigner,
+            threadId: commentData.threadId,
+            parentCommentId: commentData.parentId,
+            parentCommentAuthor: parentCommentAuthor,
+            commentId: getCommentId(commentData)
+        });
+
+        // Delegate fee collection to the collector
+        bool success = feeCollectorConfig.collector.collectFee{value: msg.value}(
+            context,
+            commentData, // Pass the complete comment data
+            "" // No extra data for now
+        );
+        
+        if (!success) revert FeeCollectionFailed();
+    }
+
     /// @notice Posts a comment directly from the author's address
     /// @param commentData The comment data struct containing content and metadata
     /// @param appSignature Signature from the app signer authorizing the comment
     function postCommentAsAuthor(
         CommentData calldata commentData,
         bytes calldata appSignature
-    ) external {
+    ) external payable {
         _postComment(commentData, bytes(""), appSignature);
     }
 
@@ -116,7 +163,7 @@ contract CommentsV1 {
         CommentData calldata commentData,
         bytes calldata authorSignature,
         bytes calldata appSignature
-    ) external {
+    ) external payable {
         _postComment(commentData, authorSignature, appSignature);
     }
 
@@ -140,9 +187,20 @@ contract CommentsV1 {
             revert InvalidNonce();
         }
 
+        _collectFee(commentData);
+
         nonces[commentData.author][commentData.appSigner]++;
 
         bytes32 commentId = getCommentId(commentData);
+
+        // Set thread ID - if it's a reply, use parent's thread ID, otherwise use comment ID as new thread
+        bytes32 threadId;
+        if (commentData.parentId != bytes32(0)) {
+            require(commentExists[commentData.parentId], "Parent comment does not exist");
+            threadId = comments[commentData.parentId].threadId;
+        } else {
+            threadId = commentId;
+        }
 
         if (
             !SignatureChecker.isValidSignatureNow(
@@ -163,6 +221,20 @@ contract CommentsV1 {
                 authorSignature
             )
         ) {
+            // Store comment data on-chain
+            comments[commentId] = CommentData({
+                content: commentData.content,
+                metadata: commentData.metadata,
+                targetUri: commentData.targetUri,
+                parentId: commentData.parentId,
+                threadId: threadId,
+                author: commentData.author,
+                appSigner: commentData.appSigner,
+                nonce: commentData.nonce,
+                deadline: commentData.deadline
+            });
+            commentExists[commentId] = true;
+
             emit CommentAdded(
                 commentId,
                 commentData.author,
@@ -178,6 +250,8 @@ contract CommentsV1 {
     /// @notice Deletes a comment when called by the author directly
     /// @param commentId The unique identifier of the comment to delete
     function deleteCommentAsAuthor(bytes32 commentId) external {
+        require(commentExists[commentId], "Comment does not exist");
+        require(comments[commentId].author == msg.sender, "Not comment author");
         _deleteComment(commentId, msg.sender);
     }
 
@@ -240,6 +314,9 @@ contract CommentsV1 {
     /// @param commentId The unique identifier of the comment to delete
     /// @param author The address of the comment author
     function _deleteComment(bytes32 commentId, address author) internal {
+        require(commentExists[commentId], "Comment does not exist");
+        delete comments[commentId];
+        commentExists[commentId] = false;
         emit CommentDeleted(commentId, author);
     }
 
@@ -469,4 +546,15 @@ contract CommentsV1 {
                 abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash)
             );
     }
+
+    /// @notice Get comment data by ID
+    /// @param commentId The comment ID to query
+    /// @return The comment data struct
+    function getComment(bytes32 commentId) external view returns (CommentData memory) {
+        require(commentExists[commentId], "Comment does not exist");
+        return comments[commentId];
+    }
+
+    // Function to receive ETH
+    receive() external payable {}
 }
