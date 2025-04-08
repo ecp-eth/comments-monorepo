@@ -54,7 +54,7 @@ export default defineConfig({
           link: "/integration-options/react-component-library",
         },
         {
-          text: "iframe Embed (no code)",
+          text: "Iframe Embed (no code)",
           link: "/integration-options/embed-comments",
         },
         {
