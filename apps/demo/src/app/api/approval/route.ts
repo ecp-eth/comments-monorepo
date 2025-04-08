@@ -3,7 +3,6 @@ import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import {
   createPublicClient,
   createWalletClient,
-  hashMessage,
   hashTypedData,
   publicActions,
   recoverAddress,
@@ -18,6 +17,7 @@ import { resolveSubmitterAccount } from "@/lib/submitter";
 import { chain, transport } from "@/lib/wagmi";
 import { privateKeyToAccount } from "viem/accounts";
 import { env } from "@/env";
+import { getApprovalStatusAndNonce } from "@/lib/contract";
 
 export async function POST(
   req: Request
@@ -56,40 +56,11 @@ export async function POST(
   // double check to avoid wasting gas on incorrect or unnecessary request
   // Check approval on chain and get nonce (multicall3 if available,
   // otherwise read contracts)
-  const [{ result: isApproved }, { result: nonce }] = chain.contracts
-    ?.multicall3
-    ? await publicClient.multicall({
-        contracts: [
-          {
-            address: COMMENTS_V1_ADDRESS,
-            abi: CommentsV1Abi,
-            functionName: "isApproved",
-            args: [authorAddress, account.address],
-          },
-          {
-            address: COMMENTS_V1_ADDRESS,
-            abi: CommentsV1Abi,
-            functionName: "nonces",
-            args: [authorAddress, account.address],
-          },
-        ],
-      })
-    : (
-        await Promise.all([
-          publicClient.readContract({
-            address: COMMENTS_V1_ADDRESS,
-            abi: CommentsV1Abi,
-            functionName: "isApproved",
-            args: [authorAddress, account.address],
-          }),
-          publicClient.readContract({
-            address: COMMENTS_V1_ADDRESS,
-            abi: CommentsV1Abi,
-            functionName: "nonces",
-            args: [authorAddress, account.address],
-          }),
-        ])
-      ).map((result) => ({ result }));
+  const [{ result: isApproved }, { result: nonce }] =
+    await getApprovalStatusAndNonce<typeof transport, typeof chain>(
+      publicClient,
+      authorAddress
+    );
 
   if (isApproved) {
     return new JSONResponse(
