@@ -43,7 +43,7 @@ contract MaliciousFeeCollector is IFeeCollector {
 
 // Add this mock contract after the MaliciousFeeCollector contract
 contract NonFeeCollector is IERC165 {
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+    function supportsInterface(bytes4 /* interfaceId */) external pure returns (bool) {
         return false;
     }
 }
@@ -87,7 +87,7 @@ contract TimelockFeeControllerTest is Test {
         });
     }
 
-    function test_InitialState() public {
+    function test_InitialState() public view {
         (IFeeCollector collector, bool enabled) = controller.feeCollectorConfig();
         assertEq(address(collector), address(0));
         assertFalse(enabled);
@@ -224,5 +224,96 @@ contract TimelockFeeControllerTest is Test {
     function test_ReentrancyProtection() public {
         // Note: The nonReentrant modifier is already tested by OpenZeppelin
         // but we could add specific tests if needed
+    }
+
+    function test_MultipleFeeCollectorChanges() public {
+        // Schedule first change
+        controller.scheduleFeeCollectorChange(address(noFeeCollector), true);
+        vm.warp(block.timestamp + controller.CHANGE_DELAY());
+        controller.executeFeeCollectorChange();
+
+        // Verify first change
+        (IFeeCollector collector, bool enabled) = controller.feeCollectorConfig();
+        assertEq(address(collector), address(noFeeCollector));
+        assertTrue(enabled);
+
+        // Schedule second change
+        controller.scheduleFeeCollectorChange(address(maliciousFeeCollector), true);
+        vm.warp(block.timestamp + controller.CHANGE_DELAY());
+        controller.executeFeeCollectorChange();
+
+        // Verify second change
+        (collector, enabled) = controller.feeCollectorConfig();
+        assertEq(address(collector), address(maliciousFeeCollector));
+        assertTrue(enabled);
+    }
+
+    function test_ExecuteCancelledChange() public {
+        // Schedule and cancel a change
+        controller.scheduleFeeCollectorChange(address(noFeeCollector), true);
+        controller.cancelFeeCollectorChange();
+
+        // Try to execute the cancelled change
+        vm.warp(block.timestamp + controller.CHANGE_DELAY());
+        vm.expectRevert(abi.encodeWithSelector(TimelockFeeController.NoPendingFeeCollectorChange.selector));
+        controller.executeFeeCollectorChange();
+    }
+
+    function test_ScheduleWhilePending() public {
+        // Schedule first change
+        controller.scheduleFeeCollectorChange(address(noFeeCollector), true);
+        
+        // Schedule second change while first is pending
+        // This should succeed but cancel the first change
+        vm.expectEmit(true, true, true, true);
+        emit FeeCollectorChangeCancelled(address(noFeeCollector), true);
+        
+        controller.scheduleFeeCollectorChange(address(maliciousFeeCollector), true);
+
+        // Verify new pending change
+        (
+            address collector,
+            bool enabled,
+            uint256 effectiveTime,
+            bool exists
+        ) = controller.getPendingFeeCollectorChange();
+
+        assertEq(collector, address(maliciousFeeCollector));
+        assertTrue(enabled);
+        assertEq(effectiveTime, block.timestamp + controller.CHANGE_DELAY());
+        assertTrue(exists);
+    }
+
+    function test_FeeCollection_WhenDisabled() public {
+        // Setup fee collector but disabled
+        controller.scheduleFeeCollectorChange(address(noFeeCollector), false);
+        vm.warp(block.timestamp + controller.CHANGE_DELAY());
+        controller.executeFeeCollectorChange();
+
+        // Try to collect fee
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
+        uint256 initialBalance = address(noFeeCollector).balance;
+        
+        controller.exposed_collectFee{value: 0.1 ether}(commentData);
+        
+        // Verify no fee was collected
+        assertEq(address(noFeeCollector).balance, initialBalance);
+    }
+
+    function test_FeeCollection_WhenEnabled() public {
+        // Setup fee collector and enable it
+        controller.scheduleFeeCollectorChange(address(noFeeCollector), true);
+        vm.warp(block.timestamp + controller.CHANGE_DELAY());
+        controller.executeFeeCollectorChange();
+
+        // Try to collect fee
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
+        uint256 initialBalance = address(noFeeCollector).balance;
+        uint256 feeAmount = 0.1 ether;
+        
+        controller.exposed_collectFee{value: feeAmount}(commentData);
+        
+        // Verify fee was collected
+        assertEq(address(noFeeCollector).balance, initialBalance + feeAmount);
     }
 } 
