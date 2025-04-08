@@ -267,7 +267,7 @@ export function Comment({
     !isPosting && postingCommentTxReceipt.data?.status === "reverted";
 
   return (
-    <div className="mb-4 border-l-2 border-muted pl-4">
+    <div className={cn("mb-4 border-muted", depth > 1 && "border-l-2 pl-4")}>
       <div className="flex justify-between items-center mb-2">
         <CommentAuthor
           author={comment.author}
