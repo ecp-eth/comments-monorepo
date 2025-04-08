@@ -11,6 +11,23 @@ import "./TimelockFeeController.sol";
 /// @title CommentsV1 - A decentralized comments system
 /// @notice This contract allows users to post and manage comments with optional app-signer approval and fee collection
 /// @dev Implements EIP-712 for typed structured data hashing and signing
+/// @dev Security Model:
+/// 1. Authentication:
+///    - Comments can be posted directly by authors or via signatures
+///    - App signers must be approved by authors
+///    - All signatures follow EIP-712 for better security
+/// 2. Authorization:
+///    - Only comment authors can delete their comments
+///    - App signer approvals can be revoked at any time
+///    - Nonce system prevents signature replay attacks
+/// 3. Fee Collection:
+///    - Protected against reentrancy
+///    - Fees are collected before state changes
+///    - Fee collector changes require 48-hour timelock
+/// 4. Data Integrity:
+///    - Thread IDs are immutable once set
+///    - Parent-child relationships are verified
+///    - Comment IDs are cryptographically secure
 contract CommentsV1 is ICommentTypes, TimelockFeeController {
     /// @notice Emitted when a new comment is added
     /// @param commentId Unique identifier of the comment
@@ -39,12 +56,18 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
     /// @param appSigner Address being unapproved
     event ApprovalRemoved(address indexed author, address indexed appSigner);
 
-    error InvalidAuthor();
+    /// @notice Error thrown when author address is invalid
+    error InvalidAuthorAddress();
+    /// @notice Error thrown when app signature verification fails
     error InvalidAppSignature();
+    /// @notice Error thrown when author signature verification fails
     error InvalidAuthorSignature();
-    error InvalidNonce();
-    error DeadlineReached();
-    error NotAuthorized();
+    /// @notice Error thrown when nonce is invalid
+    error InvalidNonce(address author, address appSigner, uint256 expected, uint256 provided);
+    /// @notice Error thrown when deadline has passed
+    error SignatureDeadlineReached(uint256 deadline, uint256 currentTime);
+    /// @notice Error thrown when caller is not authorized
+    error NotAuthorized(address caller, address requiredCaller);
 
     string public constant name = "Comments";
     string public constant version = "1";
@@ -72,6 +95,8 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
     mapping(address => mapping(address => bool)) public isApproved;
     mapping(address => mapping(address => uint256)) public nonces;
 
+    /// @notice Constructor initializes the contract with the deployer as owner
+    /// @dev Sets up EIP-712 domain separator and initializes fee controller
     constructor() TimelockFeeController(msg.sender) {
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
@@ -118,14 +143,14 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
         bytes memory appSignature
     ) internal {
         if (block.timestamp > commentData.deadline) {
-            revert DeadlineReached();
+            revert SignatureDeadlineReached(commentData.deadline, block.timestamp);
         }
 
         if (
             nonces[commentData.author][commentData.appSigner] !=
             commentData.nonce
         ) {
-            revert InvalidNonce();
+            revert InvalidNonce(commentData.author, commentData.appSigner, nonces[commentData.author][commentData.appSigner], commentData.nonce);
         }
 
         _collectFee(commentData);
@@ -185,7 +210,7 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
             return;
         }
 
-        revert NotAuthorized();
+        revert NotAuthorized(msg.sender, commentData.author);
     }
 
     /// @notice Deletes a comment when called by the author directly
@@ -210,11 +235,11 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
         bytes calldata appSignature
     ) external {
         if (block.timestamp > deadline) {
-            revert DeadlineReached();
+            revert SignatureDeadlineReached(deadline, block.timestamp);
         }
 
         if (nonces[author][appSigner] != nonce) {
-            revert InvalidNonce();
+            revert InvalidNonce(author, appSigner, nonces[author][appSigner], nonce);
         }
 
         nonces[author][appSigner]++;
@@ -248,7 +273,7 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
             return;
         }
 
-        revert NotAuthorized();
+        revert NotAuthorized(msg.sender, author);
     }
 
     /// @notice Internal function to handle comment deletion logic
@@ -303,11 +328,11 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
         bytes calldata signature
     ) external {
         if (block.timestamp > deadline) {
-            revert DeadlineReached();
+            revert SignatureDeadlineReached(deadline, block.timestamp);
         }
 
         if (nonces[author][appSigner] != nonce) {
-            revert InvalidNonce();
+            revert InvalidNonce(author, appSigner, nonces[author][appSigner], nonce);
         }
 
         nonces[author][appSigner]++;
@@ -346,11 +371,11 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
         bytes calldata signature
     ) external {
         if (block.timestamp > deadline) {
-            revert DeadlineReached();
+            revert SignatureDeadlineReached(deadline, block.timestamp);
         }
 
         if (nonces[author][appSigner] != nonce) {
-            revert InvalidNonce();
+            revert InvalidNonce(author, appSigner, nonces[author][appSigner], nonce);
         }
 
         nonces[author][appSigner]++;
@@ -495,7 +520,4 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
         require(commentExists[commentId], "Comment does not exist");
         return comments[commentId];
     }
-
-    // Function to receive ETH
-    receive() external payable {}
 }
