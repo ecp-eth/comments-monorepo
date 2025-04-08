@@ -118,28 +118,9 @@ contract CommentsV1 is Ownable, ICommentTypes {
             return;
         }
 
-        // Get parent comment author if this is a reply
-        address parentCommentAuthor = address(0);
-        if (commentData.parentId != bytes32(0)) {
-            parentCommentAuthor = comments[commentData.parentId].author;
-        }
-
-        // Create fee context with all relevant information
-        IFeeCollector.FeeContext memory context = IFeeCollector.FeeContext({
-            payer: msg.sender,
-            author: commentData.author,
-            appSigner: commentData.appSigner,
-            threadId: commentData.threadId,
-            parentCommentId: commentData.parentId,
-            parentCommentAuthor: parentCommentAuthor,
-            commentId: getCommentId(commentData)
-        });
-
         // Delegate fee collection to the collector
         bool success = feeCollectorConfig.collector.collectFee{value: msg.value}(
-            context,
-            commentData, // Pass the complete comment data
-            "" // No extra data for now
+            commentData
         );
         
         if (!success) revert FeeCollectionFailed();
