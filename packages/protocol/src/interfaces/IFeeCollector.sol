@@ -4,24 +4,26 @@ pragma solidity ^0.8.20;
 import "./ICommentTypes.sol";
 
 interface IFeeCollector {
-    /// @notice Collect fee for a comment operation
-    /// @param commentData The complete comment data being posted
+    /// @notice Collect fees for a comment
+    /// @param commentData The comment data for fee collection
+    /// @return success Whether the fee collection was successful
     function collectFee(
         ICommentTypes.CommentData calldata commentData
-    ) external payable returns (bool);
-    
-    /// @notice Get the required fee amount for a given context
-    /// @param commentData The complete comment data being posted
+    ) external payable returns (bool success);
+
+    /// @notice Get the required fee amount for a comment
+    /// @param commentData The comment data to calculate fee for
+    /// @return The fee amount in wei
     function getFeeAmount(
         ICommentTypes.CommentData calldata commentData
     ) external view returns (uint256);
 
-    /// @notice Get the current balance of fees available to withdraw for an address
-    /// @param account The address to check the balance for
-    /// @return The amount of fees available to withdraw
+    /// @notice Get the balance of fees collected for an address
+    /// @param account The address to check balance for
+    /// @return The balance in wei
     function getBalance(address account) external view returns (uint256);
 
-    /// @notice Withdraw accumulated fees
+    /// @notice Withdraw collected fees
     /// @return success Whether the withdrawal was successful
-    function withdraw() external returns (bool);
+    function withdraw() external returns (bool success);
 } 

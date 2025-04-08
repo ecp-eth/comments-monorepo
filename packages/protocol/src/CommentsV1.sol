@@ -5,11 +5,13 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IFeeCollector.sol";
 import "./interfaces/ICommentTypes.sol";
+import "./interfaces/ITimelockFeeController.sol";
+import "./TimelockFeeController.sol";
 
 /// @title CommentsV1 - A decentralized comments system
 /// @notice This contract allows users to post and manage comments with optional app-signer approval and fee collection
 /// @dev Implements EIP-712 for typed structured data hashing and signing
-contract CommentsV1 is Ownable, ICommentTypes {
+contract CommentsV1 is ICommentTypes, TimelockFeeController {
     /// @notice Emitted when a new comment is added
     /// @param commentId Unique identifier of the comment
     /// @param author Address of the comment author
@@ -43,14 +45,6 @@ contract CommentsV1 is Ownable, ICommentTypes {
     error InvalidNonce();
     error DeadlineReached();
     error NotAuthorized();
-    error FeeCollectionFailed();
-    error InvalidFeeConfiguration();
-
-    /// @notice Struct containing fee collector configuration
-    struct FeeCollectorConfig {
-        IFeeCollector collector;
-        bool enabled;
-    }
 
     string public constant name = "Comments";
     string public constant version = "1";
@@ -72,16 +66,13 @@ contract CommentsV1 is Ownable, ICommentTypes {
             "RemoveApproval(address author,address appSigner,uint256 nonce,uint256 deadline)"
         );
 
-    // Replace the old FeeConfig with FeeCollectorConfig
-    FeeCollectorConfig public feeCollectorConfig;
-
     // On-chain storage mappings
     mapping(bytes32 => CommentData) public comments;
     mapping(bytes32 => bool) public commentExists;
     mapping(address => mapping(address => bool)) public isApproved;
     mapping(address => mapping(address => uint256)) public nonces;
 
-    constructor() Ownable(msg.sender) {
+    constructor() TimelockFeeController(msg.sender) {
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256(
@@ -93,37 +84,6 @@ contract CommentsV1 is Ownable, ICommentTypes {
                 address(this)
             )
         );
-    }
-
-    /// @notice Sets the fee collector configuration
-    /// @param collector Address of the fee collector contract
-    /// @param enabled Whether fee collection is enabled
-    function setFeeCollector(
-        address collector,
-        bool enabled
-    ) external onlyOwner {
-        if (collector == address(0)) revert InvalidFeeConfiguration();
-        
-        feeCollectorConfig = FeeCollectorConfig({
-            collector: IFeeCollector(collector),
-            enabled: enabled
-        });
-    }
-
-    /// @notice Internal function to handle fee collection
-    /// @dev Delegates fee collection to the configured collector if enabled
-    function _collectFee(CommentData memory commentData) internal {
-        // If fee collection is disabled or no collector is set, return immediately
-        if (!feeCollectorConfig.enabled || address(feeCollectorConfig.collector) == address(0)) {
-            return;
-        }
-
-        // Delegate fee collection to the collector
-        bool success = feeCollectorConfig.collector.collectFee{value: msg.value}(
-            commentData
-        );
-        
-        if (!success) revert FeeCollectionFailed();
     }
 
     /// @notice Posts a comment directly from the author's address
