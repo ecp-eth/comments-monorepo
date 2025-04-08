@@ -159,7 +159,6 @@ export const GetCommentsQuerySchema = z.object({
  * Query string schema for getting a list of comment with replies.
  */
 export const GetCommentRepliesQuerySchema = GetCommentsQuerySchema.omit({
-  mode: true,
   targetUri: true,
 });
 

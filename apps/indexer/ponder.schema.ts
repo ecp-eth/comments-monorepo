@@ -8,7 +8,7 @@ export const comments = onchainTable(
     metadata: t.text().notNull(),
     targetUri: t.text().notNull(),
     parentId: t.hex(),
-    rootCommentId: t.hex().notNull(),
+    commentPath: t.hex().array().notNull().default([]),
     author: t.hex().notNull(),
     timestamp: t.timestamp({ withTimezone: true }).notNull(),
     deletedAt: t.timestamp({ withTimezone: true }),
@@ -32,7 +32,7 @@ export const comments = onchainTable(
     deletedAtIdx: index().on(table.deletedAt),
     authorIdx: index().on(table.author),
     moderationStatusIdx: index().on(table.moderationStatus),
-    rootCommentIdIdx: index().on(table.rootCommentId),
+    commentPathIdx: index().using("gin", table.commentPath),
   })
 );
 
@@ -68,15 +68,5 @@ export const commentRelations = relations(comments, ({ one, many }) => ({
     relationName: "comment_replies",
     fields: [comments.parentId],
     references: [comments.id],
-  }),
-  // Each comment may have one root comment, referenced by rootCommentId
-  rootParent: one(comments, {
-    relationName: "comment_root_replies",
-    fields: [comments.rootCommentId],
-    references: [comments.id],
-  }),
-  // Each root comment may have many descendant replies that reference it, regardless of the depth
-  flatReplies: many(comments, {
-    relationName: "comment_root_replies",
   }),
 }));

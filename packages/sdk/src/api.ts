@@ -198,6 +198,13 @@ export type FetchCommentRepliesOptions = {
    */
   sort?: "asc" | "desc";
   /**
+   * The mode to fetch replies in by default it returns only the first level of replies.
+   * If flat is used it will return all replies sorted by timestamp in descending order.
+   *
+   * @default "nested"
+   */
+  mode?: "nested" | "flat";
+  /**
    * @default 50
    */
   limit?: number;
@@ -214,6 +221,7 @@ const FetchCommentRepliesOptionSchema = z.object({
   limit: z.number().int().positive().default(50),
   signal: z.instanceof(AbortSignal).optional(),
   sort: z.enum(["asc", "desc"]).default("desc"),
+  mode: z.enum(["nested", "flat"]).optional(),
 });
 
 /**

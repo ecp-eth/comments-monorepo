@@ -1,6 +1,7 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, asc, desc, eq, gt, lt, or } from "ponder";
+import { arrayOverlaps } from "drizzle-orm";
 import { IndexerAPIListCommentRepliesSchema } from "@ecp.eth/sdk/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../../lib/response-formatters";
@@ -35,24 +36,31 @@ const getCommentsRoute = createRoute({
 
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { appSigner, sort, limit, cursor, viewer } = c.req.valid("query");
+    const { appSigner, sort, limit, cursor, mode, viewer } =
+      c.req.valid("query");
     const { commentId } = c.req.valid("param");
 
     const sharedConditions = [
-      eq(schema.comments.parentId, commentId),
       appSigner ? eq(schema.comments.appSigner, appSigner) : undefined,
     ];
 
+    if (mode === "flat") {
+      sharedConditions.push(
+        arrayOverlaps(schema.comments.commentPath, [commentId])
+      );
+    } else {
+      sharedConditions.push(eq(schema.comments.parentId, commentId));
+    }
+
     if (env.MODERATION_ENABLED) {
+      const onlyApproved = eq(schema.comments.moderationStatus, "approved");
+
       if (viewer) {
         sharedConditions.push(
-          or(
-            eq(schema.comments.moderationStatus, "approved"),
-            eq(schema.comments.author, viewer)
-          )
+          or(onlyApproved, eq(schema.comments.author, viewer))
         );
       } else {
-        sharedConditions.push(eq(schema.comments.moderationStatus, "approved"));
+        sharedConditions.push(onlyApproved);
       }
     }
 
@@ -139,7 +147,10 @@ export default (app: OpenAPIHono) => {
         replyLimit: REPLIES_PER_COMMENT,
       });
 
-    return c.json(formattedComments, 200);
+    return c.json(
+      IndexerAPIListCommentRepliesSchema.parse(formattedComments),
+      200
+    );
   });
 
   return app;

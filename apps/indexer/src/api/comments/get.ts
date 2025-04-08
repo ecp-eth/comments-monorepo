@@ -1,13 +1,18 @@
 import { db } from "ponder:api";
-import schema from "ponder:schema";
-import { and, asc, desc, eq, gt, isNull, lt, or } from "ponder";
-import { IndexerAPIListCommentsSchema } from "@ecp.eth/sdk/schemas";
+import schema, { CommentSelectType } from "ponder:schema";
+import { and, asc, desc, eq, gt, isNull, lt, or, sql } from "ponder";
+import { type Hex, IndexerAPIListCommentsSchema } from "@ecp.eth/sdk/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response-formatters";
 import { GetCommentsQuerySchema } from "../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../lib/constants";
 import { env } from "../../env";
 import type { SQL } from "drizzle-orm";
+import type { SnakeCasedProperties } from "type-fest";
+
+type RawQueryResultSelectType = SnakeCasedProperties<
+  typeof schema.comments.$inferSelect
+>;
 
 const getCommentsRoute = createRoute({
   method: "get",
@@ -66,6 +71,14 @@ export default (app: OpenAPIHono) => {
       }
     }
 
+    if (mode === "flat") {
+      repliesConditions.push(
+        sql`${schema.comments.commentPath} && ARRAY[rc.id]`
+      );
+    } else {
+      repliesConditions.push(eq(schema.comments.parentId, sql`rc.id`));
+    }
+
     const hasPreviousCommentsQuery = cursor
       ? db.query.comments
           .findFirst({
@@ -103,61 +116,145 @@ export default (app: OpenAPIHono) => {
           .execute()
       : undefined;
 
-    const commentsQuery = db.query.comments.findMany({
-      with: {
-        [mode === "flat" ? "flatReplies" : "replies"]: {
-          where: and(...repliesConditions),
-          orderBy: desc(schema.comments.timestamp),
-          limit: REPLIES_PER_COMMENT + 1,
-        },
-      },
-      where: and(
-        ...sharedConditions,
-        ...(sort === "desc" && !!cursor
-          ? [
-              or(
-                and(
-                  eq(schema.comments.timestamp, cursor.timestamp),
-                  lt(schema.comments.id, cursor.id)
+    const commentsQuery = db.execute<RawQueryResultSelectType>(
+      sql`
+      WITH root_comments AS (
+        SELECT * FROM ${schema.comments}
+        WHERE ${and(
+          ...sharedConditions,
+          ...(sort === "desc" && !!cursor
+            ? [
+                or(
+                  and(
+                    eq(schema.comments.timestamp, cursor.timestamp),
+                    lt(schema.comments.id, cursor.id)
+                  ),
+                  lt(schema.comments.timestamp, cursor.timestamp)
                 ),
-                lt(schema.comments.timestamp, cursor.timestamp)
-              ),
-            ]
-          : []),
-        ...(sort === "asc" && !!cursor
-          ? [
-              or(
-                and(
-                  eq(schema.comments.timestamp, cursor.timestamp),
-                  gt(schema.comments.id, cursor.id)
+              ]
+            : []),
+          ...(sort === "asc" && !!cursor
+            ? [
+                or(
+                  and(
+                    eq(schema.comments.timestamp, cursor.timestamp),
+                    gt(schema.comments.id, cursor.id)
+                  ),
+                  gt(schema.comments.timestamp, cursor.timestamp)
                 ),
-                gt(schema.comments.timestamp, cursor.timestamp)
-              ),
-            ]
-          : [])
-      ),
-      orderBy:
-        sort === "desc"
-          ? [desc(schema.comments.timestamp), desc(schema.comments.id)]
-          : [asc(schema.comments.timestamp), asc(schema.comments.id)],
-      limit: limit + 1,
-    });
+              ]
+            : [])
+        )}
+        ORDER BY ${sort === "desc" ? sql`${schema.comments.timestamp} DESC, ${schema.comments.id} DESC` : sql`${schema.comments.timestamp} ASC, ${schema.comments.id} ASC`}
+        LIMIT ${limit + 1}
+      )
+      
+      SELECT * FROM root_comments
+      UNION ALL 
+      SELECT replies.* FROM root_comments rc
+      JOIN LATERAL (
+        SELECT * FROM ${schema.comments}
+        WHERE ${and(...repliesConditions)}
+        ORDER BY ${sort === "desc" ? sql`${schema.comments.timestamp} DESC, ${schema.comments.id} DESC` : sql`${schema.comments.timestamp} ASC, ${schema.comments.id} ASC`}
+        LIMIT ${REPLIES_PER_COMMENT + 1}
+      ) AS replies ON (true)
+    `
+    );
 
     const [comments, previousComment] = await Promise.all([
-      commentsQuery.execute(),
+      commentsQuery,
       hasPreviousCommentsQuery,
     ]);
 
     const formattedComments =
       await resolveUserDataAndFormatListCommentsResponse({
-        comments,
+        comments: convertUnionToCommentsWithReplies(comments.rows),
         limit,
         previousComment,
         replyLimit: REPLIES_PER_COMMENT,
       });
 
-    return c.json(formattedComments, 200);
+    return c.json(IndexerAPIListCommentsSchema.parse(formattedComments), 200);
   });
 
   return app;
 };
+
+function convertUnionToCommentsWithReplies(
+  comments: RawQueryResultSelectType[]
+): (CommentSelectType & { replies: CommentSelectType[] })[] {
+  const repliesByRootCommentId: Record<Hex, CommentSelectType[]> = {};
+  const rootComments: (CommentSelectType & { replies: CommentSelectType[] })[] =
+    [];
+
+  function normalizeId(id: CommentSelectType["id"]): Hex {
+    return id.toLowerCase() as Hex;
+  }
+
+  function getReplies(id: CommentSelectType["id"]): CommentSelectType[] {
+    const normalizedId = normalizeId(id);
+
+    return (repliesByRootCommentId[normalizedId] =
+      repliesByRootCommentId[normalizedId] ?? []);
+  }
+
+  for (const rootComment of comments) {
+    const formattedComment = formatCommentData(rootComment);
+
+    if (formattedComment.commentPath.length === 0) {
+      const replies = getReplies(formattedComment.id);
+
+      rootComments.push({
+        ...formattedComment,
+        replies,
+      });
+    } else {
+      const [rootCommentId] = formattedComment.commentPath;
+
+      if (!rootCommentId) {
+        throw new Error("Root comment not found");
+      }
+
+      const replies = getReplies(rootCommentId);
+
+      replies.push(formattedComment);
+    }
+  }
+
+  return rootComments;
+}
+
+/**
+ * Fixes the comment's data because we are using raw query and drizzle is not parsing those automatically
+ */
+function formatCommentData(
+  comment: RawQueryResultSelectType
+): CommentSelectType {
+  return {
+    id: comment.id,
+    appSigner: comment.app_signer,
+    author: comment.author,
+    chainId: comment.chain_id,
+    content: comment.content,
+    deletedAt:
+      comment.deleted_at && !(comment.deleted_at instanceof Date)
+        ? new Date(comment.deleted_at)
+        : comment.deleted_at,
+    moderationStatus: comment.moderation_status,
+    moderationStatusChangedAt:
+      comment.moderation_status_changed_at &&
+      !(comment.moderation_status_changed_at instanceof Date)
+        ? new Date(comment.moderation_status_changed_at)
+        : comment.moderation_status_changed_at,
+    commentPath: comment.comment_path,
+    metadata: comment.metadata,
+    parentId: comment.parent_id,
+    targetUri: comment.target_uri,
+    timestamp:
+      comment.timestamp && !(comment.timestamp instanceof Date)
+        ? new Date(comment.timestamp)
+        : comment.timestamp,
+    txHash: comment.tx_hash,
+    logIndex: comment.log_index,
+  };
+}
