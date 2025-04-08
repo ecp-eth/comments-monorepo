@@ -171,7 +171,12 @@ export function CommentShared({
   }, [repliesQuery.data?.pages]);
 
   return (
-    <div className={cn("mb-4 border-gray-200", level > 0 && "border-l-2 pl-4")}>
+    <div
+      className={cn(
+        "mb-4 border-gray-200",
+        rootComment.id !== comment.id && "border-l-2 pl-4"
+      )}
+    >
       <div className="flex justify-between items-center">
         <CommentAuthor
           author={comment.author}
