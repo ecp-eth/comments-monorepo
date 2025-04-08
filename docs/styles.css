@@ -28,3 +28,15 @@
 :root.dark .ecp_Paragraph_secondary {
   @apply text-gray-400;
 }
+
+.vocs_Content svg[role="graphics-document document"] foreignObject {
+  overflow: visible;
+}
+
+.vocs_Content
+  svg[role="graphics-document document"]
+  foreignObject
+  .nodeLabel
+  .fa {
+  margin-left: -2px;
+}

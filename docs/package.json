@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@ecp.eth/sdk": "workspace:*",
-    "@theguild/remark-mermaid": "^0.2.0",
+    "@theguild/remark-mermaid": "^0.3.0",
     "acorn": "^8.14.0",
     "decimal.js": "^10.5.0",
     "hono": "^4.6.20",
