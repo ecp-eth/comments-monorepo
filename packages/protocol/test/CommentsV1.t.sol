@@ -1,11 +1,24 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
 import {CommentsV1} from "../src/CommentsV1.sol";
-import {NoFeeCollector} from "../src/NoFeeCollector.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
-import {IFeeCollector} from "../src/interfaces/IFeeCollector.sol";
+import {IHook} from "../src/interfaces/IHook.sol";
+
+contract NoHook is IHook {
+    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+        return interfaceId == type(IHook).interfaceId;
+    }
+
+    function beforeComment(ICommentTypes.CommentData calldata) external payable returns (bool) {
+        return true;
+    }
+
+    function afterComment(ICommentTypes.CommentData calldata) external pure returns (bool) {
+        return true;
+    }
+}
 
 contract CommentsV1Test is Test {
     event CommentAdded(
@@ -19,7 +32,7 @@ contract CommentsV1Test is Test {
     event ApprovalRemoved(address indexed approver, address indexed approved);
 
     CommentsV1 public comments;
-    NoFeeCollector public noFeeCollector;
+    NoHook public noHook;
 
     // Test accounts
     address public owner;
@@ -35,36 +48,29 @@ contract CommentsV1Test is Test {
         appSigner = vm.addr(appSignerPrivateKey);
 
         comments = new CommentsV1();
-        noFeeCollector = new NoFeeCollector();
+        noHook = new NoHook();
 
         // Setup private keys for signing
         vm.deal(author, 100 ether);
         vm.deal(appSigner, 100 ether);
     }
 
-    function _createBasicComment()
-        internal
-        view
-        returns (ICommentTypes.CommentData memory)
-    {
+    function _createBasicCommentData() internal view returns (ICommentTypes.CommentData memory) {
         uint256 nonce = comments.nonces(author, appSigner);
 
-        return
-            ICommentTypes.CommentData({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "https://example.com",
-                parentId: bytes32(0),
-                threadId: bytes32(0),
-                author: author,
-                appSigner: appSigner,
-                nonce: nonce,
-                deadline: block.timestamp + 1 days
-            });
+        return ICommentTypes.CommentData({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "https://example.com",
+            author: author,
+            appSigner: appSigner,
+            nonce: nonce,
+            deadline: block.timestamp + 1 days
+        });
     }
 
     function test_PostCommentAsAuthor() public {
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.appSigner = appSigner;
 
         // Generate app signature
@@ -77,7 +83,7 @@ contract CommentsV1Test is Test {
     }
 
     function test_PostCommentAsAuthor_InvalidAuthor() public {
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.appSigner = appSigner;
 
         bytes32 commentId = comments.getCommentId(commentData);
@@ -91,7 +97,7 @@ contract CommentsV1Test is Test {
     }
 
     function test_PostComment() public {
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.appSigner = appSigner;
 
         bytes32 commentId = comments.getCommentId(commentData);
@@ -102,7 +108,7 @@ contract CommentsV1Test is Test {
     }
 
     function test_PostComment_InvalidAppSignature() public {
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.appSigner = appSigner;
 
         bytes32 commentId = comments.getCommentId(commentData);
@@ -115,7 +121,7 @@ contract CommentsV1Test is Test {
 
     function test_DeleteCommentAsAuthor() public {
         // Create and post a comment first
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
 
@@ -131,7 +137,7 @@ contract CommentsV1Test is Test {
 
     function test_DeleteComment() public {
         // Create and post a comment first
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
@@ -191,7 +197,7 @@ contract CommentsV1Test is Test {
     }
 
     function test_PostCommentAsAuthor_InvalidNonce() public {
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.nonce = commentData.nonce + 1;
 
         bytes32 commentId = comments.getCommentId(commentData);
@@ -209,7 +215,7 @@ contract CommentsV1Test is Test {
     }
 
     function test_PostComment_InvalidNonce() public {
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.nonce = commentData.nonce + 1;
 
         bytes32 commentId = comments.getCommentId(commentData);
@@ -255,7 +261,7 @@ contract CommentsV1Test is Test {
         comments.addApprovalAsAuthor(appSigner);
 
         // Create and post comment
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
 
@@ -264,7 +270,7 @@ contract CommentsV1Test is Test {
     }
 
     function test_PostComment_WithoutApproval() public {
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
 
@@ -374,7 +380,7 @@ contract CommentsV1Test is Test {
     }
 
     function test_DeleteComment_InvalidNonce() public {
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
 
@@ -419,7 +425,7 @@ contract CommentsV1Test is Test {
         comments.addApprovalAsAuthor(appSigner);
 
         // Create and post a comment
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
 
@@ -453,29 +459,30 @@ contract CommentsV1Test is Test {
     }
 
     function test_PostComment_WithFeeCollection() public {
-        // Setup fee collector
-        comments.scheduleFeeCollectorChange(address(noFeeCollector), true);
+        // Setup hook
+        comments.scheduleHookChange(address(noHook), false);
         vm.warp(block.timestamp + 48 hours);
-        comments.executeFeeCollectorChange();
+        comments.executeHookChange();
 
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
 
         // Post comment with fee
         vm.prank(author);
+        vm.deal(author, 1 ether);
         comments.postComment{value: 0.1 ether}(commentData, authorSignature, appSignature);
     }
 
     function test_PostComment_WithInvalidFee() public {
         // Setup fee collector that requires 1 ether
         MaliciousFeeCollector maliciousCollector = new MaliciousFeeCollector();
-        comments.scheduleFeeCollectorChange(address(maliciousCollector), true);
+        comments.scheduleHookChange(address(maliciousCollector), true);
         vm.warp(block.timestamp + 48 hours);
-        comments.executeFeeCollectorChange();
+        comments.executeHookChange();
 
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
@@ -488,7 +495,7 @@ contract CommentsV1Test is Test {
 
     function test_PostComment_WithThreading() public {
         // Post parent comment
-        ICommentTypes.CommentData memory parentComment = _createBasicComment();
+        ICommentTypes.CommentData memory parentComment = _createBasicCommentData();
         bytes32 parentId = comments.getCommentId(parentComment);
         bytes memory parentAuthorSig = _signEIP712(authorPrivateKey, parentId);
         bytes memory parentAppSig = _signEIP712(appSignerPrivateKey, parentId);
@@ -496,8 +503,7 @@ contract CommentsV1Test is Test {
         comments.postComment(parentComment, parentAuthorSig, parentAppSig);
 
         // Post reply comment
-        ICommentTypes.CommentData memory replyComment = _createBasicComment();
-        replyComment.parentId = parentId;
+        ICommentTypes.CommentData memory replyComment = _createBasicCommentData();
         replyComment.nonce = comments.nonces(author, appSigner); // Update nonce
         
         bytes32 replyId = comments.getCommentId(replyComment);
@@ -508,23 +514,11 @@ contract CommentsV1Test is Test {
 
         // Verify thread relationship
         ICommentTypes.CommentData memory storedReply = comments.getComment(replyId);
-        assertEq(storedReply.threadId, comments.getComment(parentId).threadId);
-    }
-
-    function test_PostComment_InvalidParent() public {
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
-        commentData.parentId = bytes32(uint256(1)); // Non-existent parent
-
-        bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
-
-        vm.expectRevert("Parent comment does not exist");
-        comments.postComment(commentData, authorSignature, appSignature);
+        assertEq(storedReply.targetUri, comments.getComment(parentId).targetUri);
     }
 
     function test_PostComment_ExpiredDeadline() public {
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.deadline = block.timestamp - 1; // Expired deadline
 
         bytes32 commentId = comments.getCommentId(commentData);
@@ -549,7 +543,7 @@ contract CommentsV1Test is Test {
 
     function test_DeleteComment_NotAuthor() public {
         // First create a comment
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
@@ -570,7 +564,7 @@ contract CommentsV1Test is Test {
         assertTrue(comments.isApproved(author, appSigner));
 
         // Post comment without author signature (using approval)
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
 
@@ -594,7 +588,7 @@ contract CommentsV1Test is Test {
         uint256 initialNonce = comments.nonces(author, appSigner);
 
         // Post comment
-        ICommentTypes.CommentData memory commentData = _createBasicComment();
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
@@ -614,6 +608,22 @@ contract CommentsV1Test is Test {
         comments.postComment(commentData, authorSignature, appSignature);
     }
 
+    function test_PostComment_WithFeeCollectionDisabled() public {
+        // Setup hook
+        comments.scheduleHookChange(address(noHook), false);
+        vm.warp(block.timestamp + 48 hours);
+        comments.executeHookChange();
+
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
+        bytes32 commentId = comments.getCommentId(commentData);
+        bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+
+        // Post comment without fee
+        vm.prank(author);
+        comments.postComment(commentData, authorSignature, appSignature);
+    }
+
     // Helper function to sign EIP-712 messages
     function _signEIP712(
         uint256 privateKey,
@@ -625,24 +635,16 @@ contract CommentsV1Test is Test {
 }
 
 // Mock malicious fee collector that reverts on collection
-contract MaliciousFeeCollector is IFeeCollector {
+contract MaliciousFeeCollector is IHook {
     function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
-        return interfaceId == type(IFeeCollector).interfaceId;
+        return interfaceId == type(IHook).interfaceId;
     }
 
-    function collectFee(ICommentTypes.CommentData calldata) external payable returns (bool) {
+    function beforeComment(ICommentTypes.CommentData calldata) external payable returns (bool) {
         revert("Malicious revert");
     }
 
-    function getFeeAmount(ICommentTypes.CommentData calldata) external pure returns (uint256) {
-        return 1 ether;
-    }
-
-    function getBalance(address) external pure returns (uint256) {
-        return 0;
-    }
-
-    function withdraw() external pure returns (bool) {
+    function afterComment(ICommentTypes.CommentData calldata) external pure returns (bool) {
         return true;
     }
 }
