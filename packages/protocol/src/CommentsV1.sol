@@ -1,15 +1,15 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IHook.sol";
 import "./interfaces/ICommentTypes.sol";
-import "./interfaces/ITimelockHookController.sol";
-import "./TimelockHookController.sol";
+import "./interfaces/IChannelManager.sol";
+import "./ChannelManager.sol";
 
 /// @title CommentsV1 - A decentralized comments system
-/// @notice This contract allows users to post and manage comments with optional app-signer approval and hooks
+/// @notice This contract allows users to post and manage comments with optional app-signer approval and channel-specific hooks
 /// @dev Implements EIP-712 for typed structured data hashing and signing
 /// @dev Security Model:
 /// 1. Authentication:
@@ -22,13 +22,13 @@ import "./TimelockHookController.sol";
 ///    - Nonce system prevents signature replay attacks
 /// 3. Hook System:
 ///    - Protected against reentrancy
-///    - Hooks are executed before and after comment operations
-///    - Hook changes require 48-hour timelock
+///    - Channel-specific hooks are executed before and after comment operations
+///    - Channel owners control their hooks
 /// 4. Data Integrity:
 ///    - Thread IDs are immutable once set
 ///    - Parent-child relationships are verified
 ///    - Comment IDs are cryptographically secure
-contract CommentsV1 is ICommentTypes, TimelockHookController {
+contract CommentsV1 is ICommentTypes {
     /// @notice Emitted when a new comment is added
     /// @param commentId Unique identifier of the comment
     /// @param author Address of the comment author
@@ -70,13 +70,19 @@ contract CommentsV1 is ICommentTypes, TimelockHookController {
     error NotAuthorized(address caller, address requiredCaller);
     /// @notice Error thrown when CAIP-10 URI format is invalid
     error InvalidCAIP10Format();
+    /// @notice Error thrown when channel does not exist
+    error ChannelDoesNotExist();
+    /// @notice Error thrown when channel is archived
+    error ChannelIsArchived();
+    /// @notice Error thrown when channel hook execution fails
+    error ChannelHookExecutionFailed();
 
     string public constant name = "Comments";
     string public constant version = "1";
     bytes32 public immutable DOMAIN_SEPARATOR;
     bytes32 public constant COMMENT_TYPEHASH =
         keccak256(
-            "AddComment(string content,string metadata,string targetUri,address author,address appSigner,uint256 nonce,uint256 deadline)"
+            "AddComment(string content,string metadata,string targetUri,address author,address appSigner,uint256 channelId,uint256 nonce,uint256 deadline)"
         );
     bytes32 public constant DELETE_COMMENT_TYPEHASH =
         keccak256(
@@ -97,9 +103,13 @@ contract CommentsV1 is ICommentTypes, TimelockHookController {
     mapping(address => mapping(address => bool)) public isApproved;
     mapping(address => mapping(address => uint256)) public nonces;
 
-    /// @notice Constructor initializes the contract with the deployer as owner
-    /// @dev Sets up EIP-712 domain separator and initializes fee controller
-    constructor() TimelockHookController(msg.sender) {
+    // Channel manager reference
+    ChannelManager public immutable channelManager;
+
+    /// @notice Constructor initializes the contract with the deployer as owner and channel manager
+    /// @dev Sets up EIP-712 domain separator
+    constructor(address _channelManager) {
+        channelManager = ChannelManager(_channelManager);
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256(
@@ -155,6 +165,13 @@ contract CommentsV1 is ICommentTypes, TimelockHookController {
             revert InvalidNonce(commentData.author, commentData.appSigner, nonces[commentData.author][commentData.appSigner], commentData.nonce);
         }
 
+        if (!channelManager.channelExists(commentData.channelId)) {
+            revert ChannelDoesNotExist();
+        }
+
+        (, , , , bool isArchived, , ) = channelManager.getChannel(commentData.channelId);
+        if (isArchived) revert ChannelIsArchived();
+
         nonces[commentData.author][commentData.appSigner]++;
 
         bytes32 commentId = getCommentId(commentData);
@@ -178,7 +195,15 @@ contract CommentsV1 is ICommentTypes, TimelockHookController {
                 authorSignature
             )
         ) {
-            _executeBeforeCommentHook(commentData, commentId);
+            // Execute channel-specific hooks before comment
+            bool hookSuccess = channelManager.executeHooks{value: msg.value}(
+                commentData.channelId,
+                commentData,
+                msg.sender,
+                commentId,
+                true
+            );
+            if (!hookSuccess) revert ChannelHookExecutionFailed();
 
             // Store comment data on-chain
             comments[commentId] = CommentData({
@@ -187,12 +212,21 @@ contract CommentsV1 is ICommentTypes, TimelockHookController {
                 targetUri: commentData.targetUri,
                 author: commentData.author,
                 appSigner: commentData.appSigner,
+                channelId: commentData.channelId,
                 nonce: commentData.nonce,
                 deadline: commentData.deadline
             });
             commentExists[commentId] = true;
 
-            _executeAfterCommentHook(commentData, commentId);
+            // Execute channel-specific hooks after comment
+            hookSuccess = channelManager.executeHooks(
+                commentData.channelId,
+                commentData,
+                msg.sender,
+                commentId,
+                false
+            );
+            if (!hookSuccess) revert ChannelHookExecutionFailed();
 
             emit CommentAdded(
                 commentId,
@@ -494,6 +528,7 @@ contract CommentsV1 is ICommentTypes, TimelockHookController {
                 keccak256(bytes(commentData.targetUri)),
                 commentData.author,
                 commentData.appSigner,
+                commentData.channelId,
                 commentData.nonce,
                 commentData.deadline
             )
