@@ -17,16 +17,28 @@ The `metadata` property stores additional data that shouldn't be shown to the us
 
 ## `targetUri`
 
-It serves as a unique identifier to locate comments.
+It serves as a unique identifier for locating comments.
 
 Be careful when choosing the value for the `targetUri` property as an inconsistent `targetUri` will result in some comments missing from the indexer response.
 
-- It must be a unique string that follows the [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) standard.
+- Any URIs, as long as it is a unique string that follows the [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) standard.
 - If your web page is dynamic and accepts query parameters, you should carefully consider which parameters are necessary to locate the correct comments. As a general rule:
 
   1. Normalize the URL, e.g. using [`normalize-url`](https://www.npmjs.com/package/normalize-url).
   1. Sort the query parameters using `sortQueryParameters` from [`normalize-url`](https://www.npmjs.com/package/normalize-url).
   1. Do not include query parameters unrelated to page content, such as tracking or feature flags.
+
+### App/Chain Agnostic URIs
+
+Whenver possible, it is recommended to use app or chain agnostic URIs, e.g. [CAIP-19](https://github.com/ChainAgnostic/namespaces/blob/main/eip155/caip19.md) specification for referencing onchain or offchain assets.
+This ensures the reference is consistent and maximal compatibility across different applications and chains.
+
+Example (NFT and collection):
+
+```
+chain://eip155:1/erc721:0xa723a8a69d9b8cf0bc93b92f9cb41532c1a27f8f/11
+chain://eip155:1/erc721:0xa723a8a69d9b8cf0bc93b92f9cb41532c1a27f8f
+```
 
 ## `parentId`
 
