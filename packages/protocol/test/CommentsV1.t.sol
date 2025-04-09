@@ -5,6 +5,7 @@ import {Test, console} from "forge-std/Test.sol";
 import {CommentsV1} from "../src/CommentsV1.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {IHook} from "../src/interfaces/IHook.sol";
+import {ChannelManager} from "../src/ChannelManager.sol";
 
 contract NoHook is IHook {
     function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
@@ -13,7 +14,8 @@ contract NoHook is IHook {
 
     function beforeComment(
         ICommentTypes.CommentData calldata,
-        address
+        address,
+        bytes32
     ) external payable returns (bool) {
         return true;
     }
@@ -40,6 +42,7 @@ contract CommentsV1Test is Test {
 
     CommentsV1 public comments;
     NoHook public noHook;
+    ChannelManager public channelManager;
 
     // Test accounts
     address public owner;
@@ -54,8 +57,9 @@ contract CommentsV1Test is Test {
         author = vm.addr(authorPrivateKey);
         appSigner = vm.addr(appSignerPrivateKey);
 
-        comments = new CommentsV1();
         noHook = new NoHook();
+        channelManager = new ChannelManager(address(this));
+        comments = new CommentsV1(address(channelManager));
 
         // Setup private keys for signing
         vm.deal(author, 100 ether);
@@ -68,6 +72,7 @@ contract CommentsV1Test is Test {
         return ICommentTypes.CommentData({
             content: "Test comment",
             metadata: "{}",
+            channelId: 0,
             targetUri: "https://example.com",
             author: author,
             appSigner: appSigner,
@@ -466,12 +471,17 @@ contract CommentsV1Test is Test {
     }
 
     function test_PostComment_WithFeeCollection() public {
-        // Setup hook
-        comments.scheduleHookChange(address(noHook), false);
-        vm.warp(block.timestamp + 48 hours);
-        comments.executeHookChange();
+        // Register and enable hook globally
+        channelManager.registerHook(address(noHook));
+        channelManager.setHookGloballyEnabled(address(noHook), true);
+
+        // Create a channel with the hook
+        address[] memory hooks = new address[](1);
+        hooks[0] = address(noHook);
+        uint256 channelId = channelManager.createChannel("Test Channel", "Test Description", "{}", false, hooks);
 
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
+        commentData.channelId = channelId;
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
@@ -485,11 +495,16 @@ contract CommentsV1Test is Test {
     function test_PostComment_WithInvalidFee() public {
         // Setup fee collector that requires 1 ether
         MaliciousFeeCollector maliciousCollector = new MaliciousFeeCollector();
-        comments.scheduleHookChange(address(maliciousCollector), true);
-        vm.warp(block.timestamp + 48 hours);
-        comments.executeHookChange();
+        channelManager.registerHook(address(maliciousCollector));
+        channelManager.setHookGloballyEnabled(address(maliciousCollector), true);
+
+        // Create a channel with the hook
+        address[] memory hooks = new address[](1);
+        hooks[0] = address(maliciousCollector);
+        uint256 channelId = channelManager.createChannel("Test Channel", "Test Description", "{}", false, hooks);
 
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
+        commentData.channelId = channelId;
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
@@ -617,11 +632,16 @@ contract CommentsV1Test is Test {
 
     function test_PostComment_WithFeeCollectionDisabled() public {
         // Setup hook
-        comments.scheduleHookChange(address(noHook), false);
-        vm.warp(block.timestamp + 48 hours);
-        comments.executeHookChange();
+        channelManager.registerHook(address(noHook));
+        channelManager.setHookGloballyEnabled(address(noHook), false);
+
+        // Create channel with hook
+        address[] memory hooks = new address[](1);
+        hooks[0] = address(noHook);
+        uint256 channelId = channelManager.createChannel("Test Channel", "Test Description", "{}", false, hooks);
 
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
+        commentData.channelId = channelId;
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
@@ -649,7 +669,8 @@ contract MaliciousFeeCollector is IHook {
 
     function beforeComment(
         ICommentTypes.CommentData calldata,
-        address
+        address,
+        bytes32
     ) external payable returns (bool) {
         revert("Malicious revert");
     }
