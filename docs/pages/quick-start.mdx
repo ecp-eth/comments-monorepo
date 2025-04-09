@@ -53,7 +53,7 @@ export function Comments() {
       <h3>Comments</h3>
       <CommentsEmbed
         // the uri for commenting
-        uri={new URL(window.location.pathname, baseOrigin).toString()}
+        uri={new URL(window.location.pathname, baseOrigin)}
       />
     </div>
   );

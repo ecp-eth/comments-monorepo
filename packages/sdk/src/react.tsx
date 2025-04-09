@@ -150,7 +150,7 @@ export type CommentsEmbedProps = {
   /**
    * URL of the page to embed comments for. Comments for this uri are rendered in iframe's page.
    */
-  uri: string;
+  uri: string | URL;
   /**
    * URL of the comments embed iframe page. This page is rendered in the iframe.
    */
@@ -212,7 +212,7 @@ export function CommentsEmbed({
   const iframeUri = useMemo(() => {
     return createCommentsEmbedURL({
       embedUri,
-      source: { targetUri: uri },
+      source: { targetUri: uri.toString() },
       config: {
         theme,
         disablePromotion,
