@@ -3,13 +3,13 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./interfaces/IFeeCollector.sol";
+import "./interfaces/IHook.sol";
 import "./interfaces/ICommentTypes.sol";
-import "./interfaces/ITimelockFeeController.sol";
-import "./TimelockFeeController.sol";
+import "./interfaces/ITimelockHookController.sol";
+import "./TimelockHookController.sol";
 
 /// @title CommentsV1 - A decentralized comments system
-/// @notice This contract allows users to post and manage comments with optional app-signer approval and fee collection
+/// @notice This contract allows users to post and manage comments with optional app-signer approval and hooks
 /// @dev Implements EIP-712 for typed structured data hashing and signing
 /// @dev Security Model:
 /// 1. Authentication:
@@ -20,15 +20,15 @@ import "./TimelockFeeController.sol";
 ///    - Only comment authors can delete their comments
 ///    - App signer approvals can be revoked at any time
 ///    - Nonce system prevents signature replay attacks
-/// 3. Fee Collection:
+/// 3. Hook System:
 ///    - Protected against reentrancy
-///    - Fees are collected before state changes
-///    - Fee collector changes require 48-hour timelock
+///    - Hooks are executed before and after comment operations
+///    - Hook changes require 48-hour timelock
 /// 4. Data Integrity:
 ///    - Thread IDs are immutable once set
 ///    - Parent-child relationships are verified
 ///    - Comment IDs are cryptographically secure
-contract CommentsV1 is ICommentTypes, TimelockFeeController {
+contract CommentsV1 is ICommentTypes, TimelockHookController {
     /// @notice Emitted when a new comment is added
     /// @param commentId Unique identifier of the comment
     /// @param author Address of the comment author
@@ -99,7 +99,7 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
 
     /// @notice Constructor initializes the contract with the deployer as owner
     /// @dev Sets up EIP-712 domain separator and initializes fee controller
-    constructor() TimelockFeeController(msg.sender) {
+    constructor() TimelockHookController(msg.sender) {
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256(
@@ -155,7 +155,7 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
             revert InvalidNonce(commentData.author, commentData.appSigner, nonces[commentData.author][commentData.appSigner], commentData.nonce);
         }
 
-        _collectFee(commentData);
+        _executeBeforeCommentHook(commentData);
 
         nonces[commentData.author][commentData.appSigner]++;
 
@@ -191,6 +191,8 @@ contract CommentsV1 is ICommentTypes, TimelockFeeController {
                 deadline: commentData.deadline
             });
             commentExists[commentId] = true;
+
+            _executeAfterCommentHook(commentData);
 
             emit CommentAdded(
                 commentId,
