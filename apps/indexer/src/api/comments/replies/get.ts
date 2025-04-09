@@ -1,13 +1,13 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { and, asc, desc, eq, gt, lt, or } from "ponder";
-import { arrayOverlaps } from "drizzle-orm";
+import { and, asc, desc, eq, gt, lt, or, isNull } from "ponder";
 import { IndexerAPIListCommentRepliesSchema } from "@ecp.eth/sdk/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../../lib/response-formatters";
 import {
   GetCommentRepliesQuerySchema,
   GetCommentRepliesParamSchema,
+  APIErrorResponseSchema,
 } from "../../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../../lib/constants";
 import { env } from "../../../env";
@@ -31,9 +31,16 @@ const getCommentsRoute = createRoute({
       },
       description: "Retrieve specific comment with its replies",
     },
+    400: {
+      content: {
+        "application/json": {
+          schema: APIErrorResponseSchema,
+        },
+      },
+      description: "When request is not valid",
+    },
   },
 });
-
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
     const { appSigner, sort, limit, cursor, mode, viewer } =
@@ -45,9 +52,23 @@ export default (app: OpenAPIHono) => {
     ];
 
     if (mode === "flat") {
-      sharedConditions.push(
-        arrayOverlaps(schema.comments.commentPath, [commentId])
-      );
+      const rootComment = await db.query.comments.findFirst({
+        where: and(
+          eq(schema.comments.id, commentId),
+          isNull(schema.comments.rootCommentId)
+        ),
+      });
+
+      if (!rootComment) {
+        return c.json(
+          {
+            message: "Flat mode is not supported for non-root comments",
+          },
+          400
+        );
+      }
+
+      sharedConditions.push(eq(schema.comments.rootCommentId, rootComment.id));
     } else {
       sharedConditions.push(eq(schema.comments.parentId, commentId));
     }

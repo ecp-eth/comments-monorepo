@@ -37,7 +37,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     const timestamp = new Date(Number(event.block.timestamp) * 1000);
 
     const parentId = transformCommentParentId(event.args.commentData.parentId);
-    let commentPath: Hex[] = [];
+    let rootCommentId: Hex | null = null;
 
     if (parentId) {
       const parentComment = await context.db.find(schema.comments, {
@@ -67,8 +67,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         return;
       }
 
-      // comment path always contains only parent ids
-      commentPath = [...parentComment.commentPath, parentComment.id];
+      // if parent comment doesn't have a root comment id then it is a root comment itself
+      rootCommentId = parentComment.rootCommentId ?? parentComment.id;
     }
 
     // We need to check if the comment already has a moderation status
@@ -83,7 +83,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       metadata: event.args.commentData.metadata,
       targetUri,
       parentId,
-      commentPath,
+      rootCommentId,
       author: event.args.commentData.author,
       txHash: event.transaction.hash,
       timestamp,
