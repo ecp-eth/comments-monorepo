@@ -3,23 +3,18 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchComments } from "@ecp.eth/sdk";
 import { useEffect, useMemo, useState } from "react";
-import { Comment } from "./Comment";
 import { publicEnv } from "@/publicEnv";
 import {
   COMMENTS_PER_PAGE,
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import {
-  useHandleCommentDeleted,
-  useHandleCommentSubmitted,
-  useHandleRetryPostComment,
-  useNewCommentsChecker,
-} from "@ecp.eth/shared/hooks";
+import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import type { Hex } from "viem";
 import { CommentForm } from "./CommentForm";
-import { CommentSectionWrapper } from "../CommentSectionWrapper";
+import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { useAccount } from "wagmi";
+import { CommentItem } from "../core/CommentItem";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
@@ -86,14 +81,6 @@ export function CommentSection() {
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
-  const handleCommentDeleted = useHandleCommentDeleted({
-    queryKey,
-  });
-  const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey,
-  });
-  const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
-
   const results = useMemo(() => {
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
@@ -109,7 +96,7 @@ export function CommentSection() {
   return (
     <CommentSectionWrapper>
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
-      <CommentForm onSubmitSuccess={handleCommentSubmitted} />
+      <CommentForm queryKey={queryKey} />
       {hasNewComments && (
         <Button
           className="mb-4"
@@ -121,12 +108,10 @@ export function CommentSection() {
         </Button>
       )}
       {results.map((comment) => (
-        <Comment
+        <CommentItem
           key={`${comment.id}-${comment.deletedAt}`}
           comment={comment}
-          onRetryPost={handleRetryPostComment}
-          onDelete={handleCommentDeleted}
-          rootComment={comment}
+          connectedAddress={viewer}
         />
       ))}
       {hasNextPage && (

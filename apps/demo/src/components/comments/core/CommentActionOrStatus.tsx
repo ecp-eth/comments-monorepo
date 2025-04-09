@@ -1,29 +1,30 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import { CommentActionButton } from "./CommentActionButton";
-import { type Comment as CommentType } from "@ecp.eth/shared/schemas";
+import type { Comment } from "@/lib/schemas";
 
 export function CommentActionOrStatus({
   comment,
   hasAccountConnected,
-  isDeleting,
-  isPosting,
-  postingFailed,
-  deletingFailed,
   onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
 }: {
-  comment: CommentType;
+  comment: Comment;
   hasAccountConnected: boolean;
-  isDeleting: boolean;
-  isPosting: boolean;
-  postingFailed: boolean;
-  deletingFailed: boolean;
   onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
 }) {
-  if (postingFailed) {
+  const isDeleting = comment.pendingOperation?.action === "delete";
+  const isPosting = comment.pendingOperation?.action === "post";
+  const didDeletingFailed =
+    comment.pendingOperation?.action === "delete" &&
+    comment.pendingOperation.state.status === "error";
+  const didPostingFailed =
+    comment.pendingOperation?.action === "post" &&
+    comment.pendingOperation.state.status === "error";
+
+  if (didPostingFailed) {
     return (
       <div className="flex items-center gap-1 text-xs text-destructive">
         <MessageCircleWarningIcon className="w-3 h-3" />
@@ -35,7 +36,7 @@ export function CommentActionOrStatus({
     );
   }
 
-  if (deletingFailed) {
+  if (didDeletingFailed) {
     return (
       <div className="flex items-center gap-1 text-xs text-destructive">
         <MessageCircleWarningIcon className="w-3 h-3" />

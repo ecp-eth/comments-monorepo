@@ -1,79 +1,79 @@
 import { Textarea } from "@/components/ui/textarea";
-import type { Hex } from "@ecp.eth/sdk/schemas";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
-import { type PendingCommentOperationSchemaType } from "@/lib/schemas";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { z } from "zod";
 import { InvalidCommentError } from "./errors";
 import { CommentFormErrors } from "./CommentFormErrors";
-import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
+import { useCommentActions } from "./CommentActionsContext";
+import type { QueryKey } from "@tanstack/react-query";
+import type { Hex } from "viem";
+import { Button } from "@/components/ui/button";
+import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 
-type SubmitFunctionParams<TSubmitAction extends string> = {
-  address: Hex;
-  content: string;
-  submitAction: TSubmitAction;
-};
-
-export type OnSubmitFunction<TSubmitAction extends string> = (
-  params: SubmitFunctionParams<TSubmitAction>
-) => Promise<PendingCommentOperationSchemaType>;
-
-type RenderSubmitButtonFunctionParams<TSubmitAction extends string> = {
-  disabled: boolean;
-  isSubmitting: boolean;
-  isContentValid: boolean;
-  formState: "idle" | TSubmitAction;
-};
-
-export type RenderSubmitButtonFunction<TSubmitAction extends string> = (
-  params: RenderSubmitButtonFunctionParams<TSubmitAction>
-) => React.ReactNode;
-
-interface CommentFormProps<TSubmitAction extends string = string> {
+export interface CommentFormProps<TExtraSubmitData = unknown> {
   disabled?: boolean;
   /**
    * Called when user blurred text area with empty content
    */
   onLeftEmpty?: () => void;
+  onSubmitSuccess?: OnSubmitSuccessFunction;
+  /**
+   * Extra data to be passed to post comment
+   */
+  extra?: TExtraSubmitData;
   placeholder?: string;
-  onSubmit: OnSubmitFunction<TSubmitAction>;
-  onSubmitSuccess: OnSubmitSuccessFunction;
-  renderSubmitButton: RenderSubmitButtonFunction<TSubmitAction>;
+  queryKey: QueryKey;
+  parentId?: Hex;
+  /**
+   * @default "Post"
+   */
+  submitIdleLabel?: string;
+  /**
+   * @default "Posting..."
+   */
+  submitPendingLabel?: string;
 }
 
-export function CommentForm<TSubmitAction extends string = string>({
+export function CommentForm<TExtraSubmitData = unknown>({
   disabled = false,
   placeholder = "What are your thoughts?",
-  onSubmit,
-  onSubmitSuccess,
   onLeftEmpty,
-  renderSubmitButton,
-}: CommentFormProps<TSubmitAction>) {
-  const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
+  queryKey,
+  parentId,
+  submitIdleLabel = "Post",
+  submitPendingLabel = "Posting...",
+  onSubmitSuccess,
+  extra,
+}: CommentFormProps<TExtraSubmitData>) {
+  const { postComment } = useCommentActions<TExtraSubmitData>();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const connectAccount = useConnectAccount();
   const { address } = useAccount();
   const [content, setContent] = useState("");
-  const [formState, setFormState] = useState<"idle" | TSubmitAction>("idle");
+  const [formState, setFormState] = useState<"idle" | "post">("idle");
+  const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
 
   const submitCommentMutation = useMutation({
-    mutationFn: async (
-      formData: FormData
-    ): Promise<PendingCommentOperationSchemaType> => {
+    mutationFn: async (formData: FormData): Promise<void> => {
       try {
-        const address = await connectAccount();
+        const author = await connectAccount();
 
-        const submitAction = formData.get("action") as TSubmitAction;
+        const submitAction = formData.get("action") as "post";
 
         setFormState(submitAction);
 
-        const result = await onSubmit({
-          address,
-          content,
-          submitAction,
+        const result = await postComment({
+          comment: {
+            author,
+            content,
+            parentId,
+            targetUri: window.location.href,
+          },
+          queryKey,
+          extra,
         });
 
         return result;
@@ -89,10 +89,10 @@ export function CommentForm<TSubmitAction extends string = string>({
         setFormState("idle");
       }
     },
-    onSuccess(params) {
+    onSuccess() {
       setContent("");
       submitCommentMutation.reset();
-      onSubmitSuccessRef.current(params);
+      onSubmitSuccessRef.current?.();
     },
   });
 
@@ -129,12 +129,15 @@ export function CommentForm<TSubmitAction extends string = string>({
       <div className="flex gap-2 justify-between">
         {address && <CommentBoxAuthor address={address} />}
         <div className="flex gap-2 items-center ml-auto">
-          {renderSubmitButton({
-            isSubmitting,
-            isContentValid,
-            formState,
-            disabled,
-          })}
+          <Button
+            name="action"
+            value="post"
+            type="submit"
+            className="px-4 py-2 rounded"
+            disabled={isSubmitting || !isContentValid}
+          >
+            {formState === "post" ? submitPendingLabel : submitIdleLabel}
+          </Button>
         </div>
       </div>
       {submitCommentMutation.error && (

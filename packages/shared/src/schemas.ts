@@ -28,16 +28,65 @@ export type SignCommentResponseClientSchemaType = z.infer<
   typeof SignCommentResponseClientSchema
 >;
 
-export const PendingCommentOperationSchema = z
-  .object({
-    txHash: HexSchema,
-    chainId: z.number().positive().int(),
-    response: SignCommentResponseClientSchema,
-    resolvedAuthor: IndexerAPIAuthorDataSchema.optional(),
-  })
-  .describe(
-    "Contains information about pending operation so we can show that in comment list"
-  );
+export const PendingOperationTypeSchema = z.enum([
+  "gasless-not-approved",
+  "gasless-preapproved",
+  "non-gasless",
+]);
+
+export type PendingOperationTypeSchemaType = z.infer<
+  typeof PendingOperationTypeSchema
+>;
+
+export const PendingPostCommentOperationSchema = z.object({
+  type: PendingOperationTypeSchema,
+  action: z.literal("post"),
+  txHash: HexSchema,
+  chainId: z.number().positive().int(),
+  response: SignCommentResponseClientSchema,
+  resolvedAuthor: IndexerAPIAuthorDataSchema.optional(),
+  // we don't have success status because in that case there is no pending operation anymore
+  state: z.discriminatedUnion("status", [
+    z.object({
+      status: z.literal("pending"),
+    }),
+    z.object({
+      status: z.literal("error"),
+      error: z.instanceof(Error),
+    }),
+  ]),
+});
+
+export type PendingPostCommentOperationSchemaType = z.infer<
+  typeof PendingPostCommentOperationSchema
+>;
+
+export const PendingDeleteCommentOperationSchema = z.object({
+  type: PendingOperationTypeSchema,
+  action: z.literal("delete"),
+  commentId: HexSchema,
+  txHash: HexSchema,
+  chainId: z.number().positive().int(),
+  // we don't have success status because in that case there is no pending operation anymore
+  state: z.discriminatedUnion("status", [
+    z.object({
+      status: z.literal("pending"),
+    }),
+    z.object({
+      status: z.literal("error"),
+      error: z.instanceof(Error),
+    }),
+  ]),
+});
+
+export type PendingDeleteCommentOperationSchemaType = z.infer<
+  typeof PendingDeleteCommentOperationSchema
+>;
+
+export const PendingCommentOperationSchema = z.discriminatedUnion("action", [
+  PendingPostCommentOperationSchema,
+  PendingDeleteCommentOperationSchema,
+]);
 
 export type PendingCommentOperationSchemaType = z.infer<
   typeof PendingCommentOperationSchema

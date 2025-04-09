@@ -5,13 +5,16 @@ import {
   DeleteCommentTypedDataSchema,
   HexSchema,
   IndexerAPICommentSchema,
-  IndexerAPICommentSchemaType,
+  type IndexerAPICommentSchemaType,
   IndexerAPICursorPaginationSchema,
-  IndexerAPICursorPaginationSchemaType,
+  type IndexerAPICursorPaginationSchemaType,
   IndexerAPIExtraSchema,
-  IndexerAPIExtraSchemaType,
+  type IndexerAPIExtraSchemaType,
 } from "@ecp.eth/sdk/schemas";
-import { PendingCommentOperationSchema as PendingCommentOperationSchemaShared } from "@ecp.eth/shared/schemas";
+import {
+  PendingCommentOperationSchema,
+  type PendingCommentOperationSchemaType,
+} from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 // import { isProfane } from "./profanity-detection";
 
@@ -205,19 +208,6 @@ export const InternalServerErrorResponseSchema = z.object({
 export const ApproveResponseSchema = z.object({
   txHash: HexSchema,
 });
-
-export const PendingCommentOperationSchema =
-  PendingCommentOperationSchemaShared.extend({
-    type: z.enum([
-      "gasless-not-approved",
-      "gasless-preapproved",
-      "non-gasless",
-    ]),
-  });
-
-export type PendingCommentOperationSchemaType = z.infer<
-  typeof PendingCommentOperationSchema
->;
 
 type CommentSchemaType = IndexerAPICommentSchemaType & {
   pendingOperation?: PendingCommentOperationSchemaType;
