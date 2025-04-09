@@ -12,22 +12,31 @@ import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
 contract TestTimelockHookController is TimelockHookController {
     constructor(address initialOwner) TimelockHookController(initialOwner) {}
 
-    function exposed_beforeCommentHook(ICommentTypes.CommentData memory commentData) external payable {
-        _executeBeforeCommentHook(commentData);
+    function exposed_beforeCommentHook(ICommentTypes.CommentData memory commentData, bytes32 commentId) external payable {
+        _executeBeforeCommentHook(commentData, commentId);
     }
 }
 
 // Mock malicious hook that reverts on hook execution
+/* solhint-disable-next-line */
 contract MaliciousHook is IHook {
     function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
         return interfaceId == type(IHook).interfaceId;
     }
 
-    function beforeComment(ICommentTypes.CommentData calldata) external payable returns (bool) {
+    function beforeComment(
+        ICommentTypes.CommentData calldata,
+        address,
+        bytes32
+    ) external payable returns (bool) {
         revert("Malicious revert");
     }
 
-    function afterComment(ICommentTypes.CommentData calldata) external pure returns (bool) {
+    function afterComment(
+        ICommentTypes.CommentData calldata,
+        address,
+        bytes32
+    ) external pure returns (bool) {
         revert("Malicious revert");
     }
 }
@@ -39,16 +48,25 @@ contract NonHook is IERC165 {
     }
 }
 
+// solhint-disable-next-line contract-name-camelcase
 contract NoHook is IHook {
     function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
         return interfaceId == type(IHook).interfaceId;
     }
 
-    function beforeComment(ICommentTypes.CommentData calldata) external payable returns (bool) {
+    function beforeComment(
+        ICommentTypes.CommentData calldata,
+        address,
+        bytes32
+    ) external payable returns (bool) {
         return true;
     }
 
-    function afterComment(ICommentTypes.CommentData calldata) external pure returns (bool) {
+    function afterComment(
+        ICommentTypes.CommentData calldata,
+        address,
+        bytes32
+    ) external pure returns (bool) {
         return true;
     }
 }
@@ -190,7 +208,7 @@ contract TimelockHookControllerTest is Test {
 
         // Try to execute hook
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
-        controller.exposed_beforeCommentHook(commentData);
+        controller.exposed_beforeCommentHook(commentData, bytes32(0));
         // Should not revert, but also not execute hook
     }
 
@@ -203,7 +221,7 @@ contract TimelockHookControllerTest is Test {
         // Try to execute hook
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         vm.expectRevert("Malicious revert");
-        controller.exposed_beforeCommentHook{value: 1 ether}(commentData);
+        controller.exposed_beforeCommentHook{value: 1 ether}(commentData, bytes32(0));
     }
 
     function test_OnlyOwnerFunctions() public {
@@ -297,7 +315,7 @@ contract TimelockHookControllerTest is Test {
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         uint256 initialBalance = address(noHook).balance;
         
-        controller.exposed_beforeCommentHook{value: 0.1 ether}(commentData);
+        controller.exposed_beforeCommentHook{value: 0.1 ether}(commentData, bytes32(0));
         
         // Verify no hook was executed
         assertEq(address(noHook).balance, initialBalance);
@@ -314,7 +332,7 @@ contract TimelockHookControllerTest is Test {
         uint256 initialBalance = address(noHook).balance;
         uint256 feeAmount = 0.1 ether;
         
-        controller.exposed_beforeCommentHook{value: feeAmount}(commentData);
+        controller.exposed_beforeCommentHook{value: feeAmount}(commentData, bytes32(0));
         
         // Verify hook was executed
         assertEq(address(noHook).balance, initialBalance + feeAmount);

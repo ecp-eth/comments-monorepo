@@ -167,27 +167,29 @@ abstract contract TimelockHookController is Ownable, ReentrancyGuard, ITimelockH
     /// 2. Execute the beforeComment hook
     /// 3. Verify successful execution
     /// @param commentData The comment data to execute hooks for
-    function _executeBeforeCommentHook(ICommentTypes.CommentData memory commentData) internal nonReentrant {
+    /// @param commentId The unique identifier of the comment being processed
+    function _executeBeforeCommentHook(ICommentTypes.CommentData memory commentData, bytes32 commentId) internal nonReentrant {
         // If system is paused or hook execution is disabled or no hook is set, return immediately
         if (paused || !hookConfig.enabled || address(hookConfig.hook) == address(0)) {
             return;
         }
 
         // Execute the beforeComment hook
-        bool success = hookConfig.hook.beforeComment{value: msg.value}(commentData);
+        bool success = hookConfig.hook.beforeComment{value: msg.value}(commentData, msg.sender, commentId);
         if (!success) revert HookExecutionFailed(address(hookConfig.hook));
     }
 
     /// @notice Internal function to handle after comment hook execution
     /// @param commentData The comment data to execute hooks for
-    function _executeAfterCommentHook(ICommentTypes.CommentData memory commentData) internal nonReentrant {
+    /// @param commentId The unique identifier of the processed comment
+    function _executeAfterCommentHook(ICommentTypes.CommentData memory commentData, bytes32 commentId) internal nonReentrant {
         // If system is paused or hook execution is disabled or no hook is set, return immediately
         if (paused || !hookConfig.enabled || address(hookConfig.hook) == address(0)) {
             return;
         }
 
         // Execute the afterComment hook
-        bool success = hookConfig.hook.afterComment(commentData);
+        bool success = hookConfig.hook.afterComment(commentData, msg.sender, commentId);
         if (!success) revert HookExecutionFailed(address(hookConfig.hook));
     }
 } 

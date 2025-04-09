@@ -155,8 +155,6 @@ contract CommentsV1 is ICommentTypes, TimelockHookController {
             revert InvalidNonce(commentData.author, commentData.appSigner, nonces[commentData.author][commentData.appSigner], commentData.nonce);
         }
 
-        _executeBeforeCommentHook(commentData);
-
         nonces[commentData.author][commentData.appSigner]++;
 
         bytes32 commentId = getCommentId(commentData);
@@ -180,6 +178,8 @@ contract CommentsV1 is ICommentTypes, TimelockHookController {
                 authorSignature
             )
         ) {
+            _executeBeforeCommentHook(commentData, commentId);
+
             // Store comment data on-chain
             comments[commentId] = CommentData({
                 content: commentData.content,
@@ -192,7 +192,7 @@ contract CommentsV1 is ICommentTypes, TimelockHookController {
             });
             commentExists[commentId] = true;
 
-            _executeAfterCommentHook(commentData);
+            _executeAfterCommentHook(commentData, commentId);
 
             emit CommentAdded(
                 commentId,
