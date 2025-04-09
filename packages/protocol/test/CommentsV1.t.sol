@@ -11,11 +11,18 @@ contract NoHook is IHook {
         return interfaceId == type(IHook).interfaceId;
     }
 
-    function beforeComment(ICommentTypes.CommentData calldata) external payable returns (bool) {
+    function beforeComment(
+        ICommentTypes.CommentData calldata,
+        address
+    ) external payable returns (bool) {
         return true;
     }
 
-    function afterComment(ICommentTypes.CommentData calldata) external pure returns (bool) {
+    function afterComment(
+        ICommentTypes.CommentData calldata,
+        address,
+        bytes32
+    ) external pure returns (bool) {
         return true;
     }
 }
@@ -640,11 +647,18 @@ contract MaliciousFeeCollector is IHook {
         return interfaceId == type(IHook).interfaceId;
     }
 
-    function beforeComment(ICommentTypes.CommentData calldata) external payable returns (bool) {
+    function beforeComment(
+        ICommentTypes.CommentData calldata,
+        address
+    ) external payable returns (bool) {
         revert("Malicious revert");
     }
 
-    function afterComment(ICommentTypes.CommentData calldata) external pure returns (bool) {
+    function afterComment(
+        ICommentTypes.CommentData calldata,
+        address,
+        bytes32
+    ) external pure returns (bool) {
         return true;
     }
 }
