@@ -33,10 +33,24 @@
   overflow: visible;
 }
 
+/*
+  Fix text in mermaid graph being cropped when awesome font is used
+*/
 .vocs_Content
   svg[role="graphics-document document"]
   foreignObject
   .nodeLabel
   .fa {
   margin-left: -2px;
+}
+
+/*
+  Fix horizontal scrollbar appearing when screen is narrowed
+  The issue also raised with a PR in vocs repo: https://github.com/wevm/vocs/pull/263/files
+  but it doesn't seem going to be merged in any time soon
+*/
+.vocs_Sidebar_footer {
+  padding: var(--vocs-space_8) 0 var(--vocs-space_16);
+  margin-left: 0;
+  margin-right: 0;
 }
