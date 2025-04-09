@@ -10,7 +10,7 @@
 type FetchCommentRepliesOptions = object;
 ```
 
-Defined in: [packages/sdk/src/api.ts:154](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L154)
+Defined in: [packages/sdk/src/api.ts:167](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L167)
 
 The options for `fetchCommentReplies()`
 
@@ -22,7 +22,7 @@ The options for `fetchCommentReplies()`
 optional apiUrl: string;
 ```
 
-Defined in: [packages/sdk/src/api.ts:168](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L168)
+Defined in: [packages/sdk/src/api.ts:181](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L181)
 
 URL on which /api/comments/$commentId/replies endpoint will be called
 
@@ -40,7 +40,7 @@ URL on which /api/comments/$commentId/replies endpoint will be called
 optional appSigner: Hex;
 ```
 
-Defined in: [packages/sdk/src/api.ts:172](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L172)
+Defined in: [packages/sdk/src/api.ts:185](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L185)
 
 Filters to only comments sent using this app signer key.
 
@@ -52,7 +52,7 @@ Filters to only comments sent using this app signer key.
 commentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/api.ts:158](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L158)
+Defined in: [packages/sdk/src/api.ts:171](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L171)
 
 The ID of the comment to fetch replies for
 
@@ -64,7 +64,7 @@ The ID of the comment to fetch replies for
 optional cursor: Hex;
 ```
 
-Defined in: [packages/sdk/src/api.ts:182](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L182)
+Defined in: [packages/sdk/src/api.ts:195](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L195)
 
 The cursor to fetch comments from
 
@@ -76,7 +76,7 @@ The cursor to fetch comments from
 optional limit: number;
 ```
 
-Defined in: [packages/sdk/src/api.ts:190](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L190)
+Defined in: [packages/sdk/src/api.ts:203](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L203)
 
 #### Default
 
@@ -92,7 +92,7 @@ Defined in: [packages/sdk/src/api.ts:190](https://github.com/ecp-eth/comments-mo
 optional retries: number;
 ```
 
-Defined in: [packages/sdk/src/api.ts:178](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L178)
+Defined in: [packages/sdk/src/api.ts:191](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L191)
 
 Number of times to retry the signing operation in case of failure.
 
@@ -110,7 +110,7 @@ Number of times to retry the signing operation in case of failure.
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/api.ts:191](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L191)
+Defined in: [packages/sdk/src/api.ts:204](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L204)
 
 ***
 
@@ -120,7 +120,7 @@ Defined in: [packages/sdk/src/api.ts:191](https://github.com/ecp-eth/comments-mo
 optional sort: "asc" | "desc";
 ```
 
-Defined in: [packages/sdk/src/api.ts:186](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L186)
+Defined in: [packages/sdk/src/api.ts:199](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L199)
 
 #### Default
 
@@ -136,6 +136,6 @@ Defined in: [packages/sdk/src/api.ts:186](https://github.com/ecp-eth/comments-mo
 optional viewer: Hex;
 ```
 
-Defined in: [packages/sdk/src/api.ts:162](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L162)
+Defined in: [packages/sdk/src/api.ts:175](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L175)
 
 The viewer's address. This is useful when the content moderation is enabled on the indexer.

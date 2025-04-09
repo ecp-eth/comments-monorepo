@@ -51,8 +51,8 @@ export function setupGetComment(app: OpenAPIHono) {
   app.openapi(getCommentRoute, async (c) => {
     const { commentId } = c.req.valid("param");
 
-    const comment = await db.query.comment.findFirst({
-      where: eq(schema.comment.id, commentId),
+    const comment = await db.query.comments.findFirst({
+      where: eq(schema.comments.id, commentId),
     });
 
     if (!comment) {

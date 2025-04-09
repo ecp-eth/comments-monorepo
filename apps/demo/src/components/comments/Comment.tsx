@@ -7,7 +7,6 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { publicEnv } from "@/publicEnv";
 import type {
   OnDeleteComment,
   OnRetryPostComment,
@@ -21,7 +20,6 @@ import {
 import { type Comment as CommentType } from "@/lib/schemas";
 import { useMutation } from "@tanstack/react-query";
 import { submitCommentMutationFunction } from "./queries";
-import never from "never";
 import { toast } from "sonner";
 import { CommentShared } from "./CommentShared";
 import { CommentDefaultForm } from "./CommentDefaultForm";
@@ -35,14 +33,14 @@ interface CommentProps {
    * and user pressed retry.
    */
   onRetryPost: OnRetryPostComment;
-  level?: number;
+  rootComment: CommentType;
 }
 
 export function Comment({
   comment,
   onRetryPost,
   onDelete,
-  level = 0,
+  rootComment,
 }: CommentProps) {
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
@@ -53,13 +51,9 @@ export function Comment({
    * because comment is updated to be redacted
    */
   const commentRef = useFreshRef(comment);
-  const areRepliesAllowed = level < publicEnv.NEXT_PUBLIC_REPLY_DEPTH_CUTOFF;
-  const submitTargetCommentId = areRepliesAllowed
-    ? comment.id
-    : (comment.parentId ?? never("parentId is required for comment depth > 0"));
   const submitTargetQueryKey = useMemo(
-    () => ["comments", submitTargetCommentId, address],
-    [submitTargetCommentId, address]
+    () => ["comments", rootComment.id, address],
+    [rootComment.id, address]
   );
   const queryKey = useMemo(
     () => ["comments", comment.id, address],
@@ -156,7 +150,6 @@ export function Comment({
 
   return (
     <CommentShared
-      areRepliesAllowed={areRepliesAllowed}
       comment={comment}
       didDeletingFailed={didDeletingFailed}
       didPostingFailed={didPostingFailed}
@@ -167,10 +160,10 @@ export function Comment({
       onRetryDeleteClick={handleDeleteClick}
       onRetryPostClick={retryPostMutation.mutate}
       onReplySubmitSuccess={handleCommentSubmitted}
-      level={level}
       ReplyComponent={Comment}
       ReplyFormComponent={CommentDefaultForm}
       onDeleteClick={handleDeleteClick}
+      rootComment={rootComment}
     />
   );
 }

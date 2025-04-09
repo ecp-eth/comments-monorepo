@@ -12,6 +12,7 @@ import { env } from "../env";
 // Initialize Sentry
 Sentry.init({
   dsn: env.SENTRY_DSN,
+  debug: !env.SENTRY_DSN,
   integrations: [
     // Enable profiling integration
     nodeProfilingIntegration(),

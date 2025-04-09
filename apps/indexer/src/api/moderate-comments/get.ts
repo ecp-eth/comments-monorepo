@@ -52,19 +52,19 @@ export function setupGetPendingModerationComments(app: OpenAPIHono) {
     const { cursor, limit, sort } = c.req.valid("query");
 
     const hasPreviousCommentsQuery = cursor
-      ? db.query.comment
+      ? db.query.comments
           .findFirst({
             where: and(
-              eq(schema.comment.moderationStatus, "pending"),
+              eq(schema.comments.moderationStatus, "pending"),
               // use opposite order for asc and desc
               ...(sort === "asc"
                 ? [
                     or(
                       and(
-                        eq(schema.comment.timestamp, cursor.timestamp),
-                        lt(schema.comment.id, cursor.id)
+                        eq(schema.comments.timestamp, cursor.timestamp),
+                        lt(schema.comments.id, cursor.id)
                       ),
-                      lt(schema.comment.timestamp, cursor.timestamp)
+                      lt(schema.comments.timestamp, cursor.timestamp)
                     ),
                   ]
                 : []),
@@ -72,33 +72,33 @@ export function setupGetPendingModerationComments(app: OpenAPIHono) {
                 ? [
                     or(
                       and(
-                        eq(schema.comment.timestamp, cursor.timestamp),
-                        gt(schema.comment.id, cursor.id)
+                        eq(schema.comments.timestamp, cursor.timestamp),
+                        gt(schema.comments.id, cursor.id)
                       ),
-                      gt(schema.comment.timestamp, cursor.timestamp)
+                      gt(schema.comments.timestamp, cursor.timestamp)
                     ),
                   ]
                 : [])
             ),
             orderBy:
               sort === "desc"
-                ? [asc(schema.comment.timestamp), asc(schema.comment.id)]
-                : [desc(schema.comment.timestamp), desc(schema.comment.id)],
+                ? [asc(schema.comments.timestamp), asc(schema.comments.id)]
+                : [desc(schema.comments.timestamp), desc(schema.comments.id)],
           })
           .execute()
       : undefined;
 
-    const commentsQuery = db.query.comment.findMany({
+    const commentsQuery = db.query.comments.findMany({
       where: and(
-        eq(schema.comment.moderationStatus, "pending"),
+        eq(schema.comments.moderationStatus, "pending"),
         ...(sort === "desc" && !!cursor
           ? [
               or(
                 and(
-                  eq(schema.comment.timestamp, cursor.timestamp),
-                  lt(schema.comment.id, cursor.id)
+                  eq(schema.comments.timestamp, cursor.timestamp),
+                  lt(schema.comments.id, cursor.id)
                 ),
-                lt(schema.comment.timestamp, cursor.timestamp)
+                lt(schema.comments.timestamp, cursor.timestamp)
               ),
             ]
           : []),
@@ -106,18 +106,18 @@ export function setupGetPendingModerationComments(app: OpenAPIHono) {
           ? [
               or(
                 and(
-                  eq(schema.comment.timestamp, cursor.timestamp),
-                  gt(schema.comment.id, cursor.id)
+                  eq(schema.comments.timestamp, cursor.timestamp),
+                  gt(schema.comments.id, cursor.id)
                 ),
-                gt(schema.comment.timestamp, cursor.timestamp)
+                gt(schema.comments.timestamp, cursor.timestamp)
               ),
             ]
           : [])
       ),
       orderBy:
         sort === "desc"
-          ? [desc(schema.comment.timestamp), desc(schema.comment.id)]
-          : [asc(schema.comment.timestamp), asc(schema.comment.id)],
+          ? [desc(schema.comments.timestamp), desc(schema.comments.id)]
+          : [asc(schema.comments.timestamp), asc(schema.comments.id)],
       limit: limit + 1,
     });
 

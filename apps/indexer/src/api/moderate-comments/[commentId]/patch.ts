@@ -4,16 +4,10 @@ import {
   ChangeModerationStatusOnCommentParamsSchema,
   ChangeModerationStatusOnCommentBodySchema,
 } from "../../../lib/schemas";
-import schema from "ponder:schema";
-import { eq } from "ponder";
 import { authMiddleware } from "../../../middleware/auth";
 import { IndexerAPIModerationChangeModerationStatusOnCommentSchema } from "@ecp.eth/sdk/schemas";
 import { resolveAuthorDataAndFormatCommentChangeModerationStatusResponse } from "../../../lib/response-formatters";
-import {
-  getCommentModerationStatus,
-  updateCommentModerationStatus,
-} from "../../../management/services/moderation";
-import { db } from "../../../db";
+import { updateCommentModerationStatus } from "../../../management/services/moderation";
 
 const changeCommentModerationStatusRoute = createRoute({
   method: "patch",
@@ -71,12 +65,6 @@ export function setupChangeCommentModerationStatus(app: OpenAPIHono) {
   app.openapi(changeCommentModerationStatusRoute, async (c) => {
     const { commentId } = c.req.valid("param");
     const { moderationStatus } = c.req.valid("json");
-
-    const commentModerationStatus = await getCommentModerationStatus(commentId);
-
-    if (!commentModerationStatus) {
-      return c.json({ message: "Comment moderation status not found" }, 404);
-    }
 
     const updatedComment = await updateCommentModerationStatus(
       commentId,

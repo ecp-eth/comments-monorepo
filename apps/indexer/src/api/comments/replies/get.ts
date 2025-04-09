@@ -1,12 +1,13 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { and, asc, desc, eq, gt, lt, or } from "ponder";
+import { and, asc, desc, eq, gt, lt, or, isNull } from "ponder";
 import { IndexerAPIListCommentRepliesSchema } from "@ecp.eth/sdk/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../../lib/response-formatters";
 import {
   GetCommentRepliesQuerySchema,
   GetCommentRepliesParamSchema,
+  APIErrorResponseSchema,
 } from "../../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../../lib/constants";
 import { env } from "../../../env";
@@ -30,35 +31,63 @@ const getCommentsRoute = createRoute({
       },
       description: "Retrieve specific comment with its replies",
     },
+    400: {
+      content: {
+        "application/json": {
+          schema: APIErrorResponseSchema,
+        },
+      },
+      description: "When request is not valid",
+    },
   },
 });
-
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { appSigner, sort, limit, cursor, viewer } = c.req.valid("query");
+    const { appSigner, sort, limit, cursor, mode, viewer } =
+      c.req.valid("query");
     const { commentId } = c.req.valid("param");
 
     const sharedConditions = [
-      eq(schema.comment.parentId, commentId),
-      appSigner ? eq(schema.comment.appSigner, appSigner) : undefined,
+      appSigner ? eq(schema.comments.appSigner, appSigner) : undefined,
     ];
 
+    if (mode === "flat") {
+      const rootComment = await db.query.comments.findFirst({
+        where: and(
+          eq(schema.comments.id, commentId),
+          isNull(schema.comments.rootCommentId)
+        ),
+      });
+
+      if (!rootComment) {
+        return c.json(
+          {
+            message: "Flat mode is not supported for non-root comments",
+          },
+          400
+        );
+      }
+
+      sharedConditions.push(eq(schema.comments.rootCommentId, rootComment.id));
+    } else {
+      sharedConditions.push(eq(schema.comments.parentId, commentId));
+    }
+
     if (env.MODERATION_ENABLED) {
+      const onlyApproved = eq(schema.comments.moderationStatus, "approved");
+
       if (viewer) {
         sharedConditions.push(
-          or(
-            eq(schema.comment.moderationStatus, "approved"),
-            eq(schema.comment.author, viewer)
-          )
+          or(onlyApproved, eq(schema.comments.author, viewer))
         );
       } else {
-        sharedConditions.push(eq(schema.comment.moderationStatus, "approved"));
+        sharedConditions.push(onlyApproved);
       }
     }
 
     // use reverse order to find previous reply
     const previousReplyQuery = cursor
-      ? db.query.comment
+      ? db.query.comments
           .findFirst({
             where: and(
               ...sharedConditions,
@@ -66,10 +95,10 @@ export default (app: OpenAPIHono) => {
                 ? [
                     or(
                       and(
-                        eq(schema.comment.timestamp, cursor.timestamp),
-                        lt(schema.comment.id, cursor.id)
+                        eq(schema.comments.timestamp, cursor.timestamp),
+                        lt(schema.comments.id, cursor.id)
                       ),
-                      lt(schema.comment.timestamp, cursor.timestamp)
+                      lt(schema.comments.timestamp, cursor.timestamp)
                     ),
                   ]
                 : []),
@@ -77,33 +106,33 @@ export default (app: OpenAPIHono) => {
                 ? [
                     or(
                       and(
-                        eq(schema.comment.timestamp, cursor.timestamp),
-                        gt(schema.comment.id, cursor.id)
+                        eq(schema.comments.timestamp, cursor.timestamp),
+                        gt(schema.comments.id, cursor.id)
                       ),
-                      gt(schema.comment.timestamp, cursor.timestamp)
+                      gt(schema.comments.timestamp, cursor.timestamp)
                     ),
                   ]
                 : [])
             ),
             orderBy:
               sort === "desc"
-                ? [asc(schema.comment.timestamp), asc(schema.comment.id)]
-                : [desc(schema.comment.timestamp), desc(schema.comment.id)],
+                ? [asc(schema.comments.timestamp), asc(schema.comments.id)]
+                : [desc(schema.comments.timestamp), desc(schema.comments.id)],
           })
           .execute()
       : undefined;
 
-    const repliesQuery = db.query.comment.findMany({
+    const repliesQuery = db.query.comments.findMany({
       where: and(
         ...sharedConditions,
         ...(sort === "desc" && !!cursor
           ? [
               or(
                 and(
-                  eq(schema.comment.timestamp, cursor.timestamp),
-                  lt(schema.comment.id, cursor.id)
+                  eq(schema.comments.timestamp, cursor.timestamp),
+                  lt(schema.comments.id, cursor.id)
                 ),
-                lt(schema.comment.timestamp, cursor.timestamp)
+                lt(schema.comments.timestamp, cursor.timestamp)
               ),
             ]
           : []),
@@ -111,18 +140,18 @@ export default (app: OpenAPIHono) => {
           ? [
               or(
                 and(
-                  eq(schema.comment.timestamp, cursor.timestamp),
-                  gt(schema.comment.id, cursor.id)
+                  eq(schema.comments.timestamp, cursor.timestamp),
+                  gt(schema.comments.id, cursor.id)
                 ),
-                gt(schema.comment.timestamp, cursor.timestamp)
+                gt(schema.comments.timestamp, cursor.timestamp)
               ),
             ]
           : [])
       ),
       orderBy:
         sort === "desc"
-          ? [desc(schema.comment.timestamp), desc(schema.comment.id)]
-          : [asc(schema.comment.timestamp), asc(schema.comment.id)],
+          ? [desc(schema.comments.timestamp), desc(schema.comments.id)]
+          : [asc(schema.comments.timestamp), asc(schema.comments.id)],
       limit: limit + 1,
     });
 
@@ -139,7 +168,10 @@ export default (app: OpenAPIHono) => {
         replyLimit: REPLIES_PER_COMMENT,
       });
 
-    return c.json(formattedComments, 200);
+    return c.json(
+      IndexerAPIListCommentRepliesSchema.parse(formattedComments),
+      200
+    );
   });
 
   return app;

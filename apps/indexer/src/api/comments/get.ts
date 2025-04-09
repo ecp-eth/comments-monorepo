@@ -7,6 +7,7 @@ import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response
 import { GetCommentsQuerySchema } from "../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../lib/constants";
 import { env } from "../../env";
+import type { SQL } from "drizzle-orm";
 
 const getCommentsRoute = createRoute({
   method: "get",
@@ -36,31 +37,37 @@ const getCommentsRoute = createRoute({
  */
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { author, targetUri, appSigner, sort, limit, cursor, viewer } =
+    const { author, targetUri, appSigner, sort, limit, cursor, viewer, mode } =
       c.req.valid("query");
 
     const sharedConditions = [
-      author ? eq(schema.comment.author, author) : undefined,
-      isNull(schema.comment.parentId),
-      targetUri ? eq(schema.comment.targetUri, targetUri) : undefined,
-      appSigner ? eq(schema.comment.appSigner, appSigner) : undefined,
+      author ? eq(schema.comments.author, author) : undefined,
+      isNull(schema.comments.parentId),
+      targetUri ? eq(schema.comments.targetUri, targetUri) : undefined,
+      appSigner ? eq(schema.comments.appSigner, appSigner) : undefined,
     ];
 
+    const repliesConditions: (SQL<unknown> | undefined)[] = [];
+
     if (env.MODERATION_ENABLED) {
+      const approvedComments = eq(schema.comments.moderationStatus, "approved");
+
       if (viewer) {
-        sharedConditions.push(
-          or(
-            eq(schema.comment.moderationStatus, "approved"),
-            eq(schema.comment.author, viewer)
-          )
+        const approvedOrViewersComments = or(
+          approvedComments,
+          eq(schema.comments.author, viewer)
         );
+
+        sharedConditions.push(approvedOrViewersComments);
+        repliesConditions.push(approvedOrViewersComments);
       } else {
-        sharedConditions.push(eq(schema.comment.moderationStatus, "approved"));
+        sharedConditions.push(approvedComments);
+        repliesConditions.push(approvedComments);
       }
     }
 
     const hasPreviousCommentsQuery = cursor
-      ? db.query.comment
+      ? db.query.comments
           .findFirst({
             where: and(
               ...sharedConditions,
@@ -69,10 +76,10 @@ export default (app: OpenAPIHono) => {
                 ? [
                     or(
                       and(
-                        eq(schema.comment.timestamp, cursor.timestamp),
-                        lt(schema.comment.id, cursor.id)
+                        eq(schema.comments.timestamp, cursor.timestamp),
+                        lt(schema.comments.id, cursor.id)
                       ),
-                      lt(schema.comment.timestamp, cursor.timestamp)
+                      lt(schema.comments.timestamp, cursor.timestamp)
                     ),
                   ]
                 : []),
@@ -80,26 +87,27 @@ export default (app: OpenAPIHono) => {
                 ? [
                     or(
                       and(
-                        eq(schema.comment.timestamp, cursor.timestamp),
-                        gt(schema.comment.id, cursor.id)
+                        eq(schema.comments.timestamp, cursor.timestamp),
+                        gt(schema.comments.id, cursor.id)
                       ),
-                      gt(schema.comment.timestamp, cursor.timestamp)
+                      gt(schema.comments.timestamp, cursor.timestamp)
                     ),
                   ]
                 : [])
             ),
             orderBy:
               sort === "desc"
-                ? [asc(schema.comment.timestamp), asc(schema.comment.id)]
-                : [desc(schema.comment.timestamp), desc(schema.comment.id)],
+                ? [asc(schema.comments.timestamp), asc(schema.comments.id)]
+                : [desc(schema.comments.timestamp), desc(schema.comments.id)],
           })
           .execute()
       : undefined;
 
-    const commentsQuery = db.query.comment.findMany({
+    const commentsQuery = db.query.comments.findMany({
       with: {
-        replies: {
-          orderBy: desc(schema.comment.timestamp),
+        [mode === "flat" ? "flatReplies" : "replies"]: {
+          where: and(...repliesConditions),
+          orderBy: [desc(schema.comments.timestamp), desc(schema.comments.id)],
           limit: REPLIES_PER_COMMENT + 1,
         },
       },
@@ -109,10 +117,10 @@ export default (app: OpenAPIHono) => {
           ? [
               or(
                 and(
-                  eq(schema.comment.timestamp, cursor.timestamp),
-                  lt(schema.comment.id, cursor.id)
+                  eq(schema.comments.timestamp, cursor.timestamp),
+                  lt(schema.comments.id, cursor.id)
                 ),
-                lt(schema.comment.timestamp, cursor.timestamp)
+                lt(schema.comments.timestamp, cursor.timestamp)
               ),
             ]
           : []),
@@ -120,23 +128,23 @@ export default (app: OpenAPIHono) => {
           ? [
               or(
                 and(
-                  eq(schema.comment.timestamp, cursor.timestamp),
-                  gt(schema.comment.id, cursor.id)
+                  eq(schema.comments.timestamp, cursor.timestamp),
+                  gt(schema.comments.id, cursor.id)
                 ),
-                gt(schema.comment.timestamp, cursor.timestamp)
+                gt(schema.comments.timestamp, cursor.timestamp)
               ),
             ]
           : [])
       ),
       orderBy:
         sort === "desc"
-          ? [desc(schema.comment.timestamp), desc(schema.comment.id)]
-          : [asc(schema.comment.timestamp), asc(schema.comment.id)],
+          ? [desc(schema.comments.timestamp), desc(schema.comments.id)]
+          : [asc(schema.comments.timestamp), asc(schema.comments.id)],
       limit: limit + 1,
     });
 
     const [comments, previousComment] = await Promise.all([
-      commentsQuery.execute(),
+      commentsQuery,
       hasPreviousCommentsQuery,
     ]);
 
@@ -148,7 +156,7 @@ export default (app: OpenAPIHono) => {
         replyLimit: REPLIES_PER_COMMENT,
       });
 
-    return c.json(formattedComments, 200);
+    return c.json(IndexerAPIListCommentsSchema.parse(formattedComments), 200);
   });
 
   return app;

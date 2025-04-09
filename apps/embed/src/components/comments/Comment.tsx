@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import never from "never";
 import { CommentForm } from "./CommentForm";
 import { cn } from "@/lib/utils";
 import {
@@ -47,7 +46,6 @@ import {
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
 import { CommentText } from "./CommentText";
-import { createQuotationFromComment } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
 import { CommentAuthor } from "./CommentAuthor";
 
@@ -59,10 +57,6 @@ export type OnRetryPostComment = (
 
 interface CommentProps {
   comment: CommentType;
-  /**
-   * @default 1
-   */
-  depth?: number;
   onDelete?: OnDeleteComment;
   /**
    * Called when comment posting to blockchain failed and the transaction has been reverted
@@ -73,14 +67,15 @@ interface CommentProps {
    * Used to calculate relative time in comments.
    */
   currentTimestamp: number;
+  rootComment: CommentType;
 }
 
 export function Comment({
-  depth = 1,
   comment,
   onDelete,
   onRetryPost,
   currentTimestamp,
+  rootComment,
 }: CommentProps) {
   const { address } = useAccount();
   const { switchChainAsync } = useSwitchChain();
@@ -93,13 +88,9 @@ export function Comment({
   const commentRef = useFreshRef(comment);
   const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
-  const areRepliesAllowed = depth < 2;
-  const submitTargetCommentId = areRepliesAllowed
-    ? comment.id
-    : (comment.parentId ?? never("parentId is required for comment depth > 0"));
   const submitTargetQueryKey = useMemo(
-    () => ["comments", submitTargetCommentId, address],
-    [submitTargetCommentId, address]
+    () => ["comments", rootComment.id, address],
+    [rootComment.id, address]
   );
   const queryKey = useMemo(
     () => ["comments", comment.id, address],
@@ -107,7 +98,9 @@ export function Comment({
   );
 
   const repliesQuery = useInfiniteQuery({
-    enabled: areRepliesAllowed,
+    // only fetch replies for the root comment
+    // we are using flattened replies
+    enabled: rootComment.id === comment.id,
     queryKey,
     initialPageParam: {
       cursor: comment.replies?.pagination.endCursor,
@@ -156,6 +149,7 @@ export function Comment({
   });
 
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    enabled: rootComment.id === comment.id,
     queryData: repliesQuery.data,
     queryKey,
     fetchComments({ cursor, signal }) {
@@ -267,7 +261,12 @@ export function Comment({
     !isPosting && postingCommentTxReceipt.data?.status === "reverted";
 
   return (
-    <div className={cn("mb-4 border-muted", depth > 1 && "border-l-2 pl-4")}>
+    <div
+      className={cn(
+        "mb-4 border-muted",
+        rootComment.id !== comment.id && "border-l-2 pl-4"
+      )}
+    >
       <div className="flex justify-between items-center mb-2">
         <CommentAuthor
           author={comment.author}
@@ -310,7 +309,6 @@ export function Comment({
         <CommentActionOrStatus
           comment={comment}
           hasAccountConnected={!!connectedAddress}
-          hasRepliesAllowed={areRepliesAllowed}
           isDeleting={isDeleting}
           isPosting={isPosting}
           deletingFailed={didDeletingFailed}
@@ -323,18 +321,13 @@ export function Comment({
       {isReplying && (
         <div className="mb-2">
           <CommentForm
-            initialContent={
-              areRepliesAllowed
-                ? undefined
-                : createQuotationFromComment(comment)
-            }
             onLeftEmpty={() => setIsReplying(false)}
             onSubmitSuccess={(pendingOperation) => {
               setIsReplying(false);
               handleCommentSubmitted(pendingOperation);
             }}
             placeholder="What are your thoughts?"
-            parentId={submitTargetCommentId}
+            parentId={rootComment.id}
           />
         </div>
       )}
@@ -347,12 +340,12 @@ export function Comment({
       )}
       {replies.map((reply) => (
         <Comment
-          depth={depth + 1}
           key={reply.id}
           comment={reply}
           onDelete={handleCommentDeleted}
           onRetryPost={handleRetryPostComment}
           currentTimestamp={currentTimestamp}
+          rootComment={rootComment}
         />
       ))}
       {repliesQuery.hasNextPage && (
@@ -369,7 +362,6 @@ export function Comment({
 function CommentActionOrStatus({
   comment,
   hasAccountConnected,
-  hasRepliesAllowed,
   isDeleting,
   isPosting,
   postingFailed,
@@ -380,7 +372,6 @@ function CommentActionOrStatus({
 }: {
   comment: CommentType;
   hasAccountConnected: boolean;
-  hasRepliesAllowed: boolean;
   isDeleting: boolean;
   isPosting: boolean;
   postingFailed: boolean;
@@ -431,7 +422,7 @@ function CommentActionOrStatus({
     );
   }
 
-  if (comment.pendingOperation || !hasAccountConnected || !hasRepliesAllowed) {
+  if (comment.pendingOperation || !hasAccountConnected) {
     return null;
   }
 

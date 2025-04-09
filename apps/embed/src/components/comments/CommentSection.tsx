@@ -67,6 +67,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
           cursor: pageParam.cursor,
           signal,
           viewer: address,
+          mode: "flat",
         });
 
         return CommentPageSchema.parse(response);
@@ -100,6 +101,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
         signal: options.signal,
         sort: "asc",
         viewer: address,
+        mode: "flat",
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -153,6 +155,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
           onDelete={handleCommentDeleted}
           onRetryPost={handleRetryPostComment}
           currentTimestamp={currentTimestamp}
+          rootComment={comment}
         />
       ))}
       {hasNextPage && (
