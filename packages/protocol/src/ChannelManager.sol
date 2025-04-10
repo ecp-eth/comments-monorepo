@@ -88,8 +88,8 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         _nextTokenId = 0;
         _safeMint(initialOwner, _nextTokenId);
 
-        channels[_nextTokenId].name = "Default Channel";
-        channels[_nextTokenId].description = "Default channel created at contract deployment";
+        channels[_nextTokenId].name = "Home";
+        channels[_nextTokenId].description = "The Default channel";
         channels[_nextTokenId].metadata = "{}";
         channels[_nextTokenId].owner = initialOwner;
         channels[_nextTokenId].isPrivate = false;
