@@ -6,8 +6,8 @@ import type {
   OnRetryPostComment,
 } from "../../core/CommentActionsContext";
 import type { Hex } from "viem";
-import { useConnectorClient } from "wagmi";
-import { getChainId, waitForTransactionReceipt } from "viem/actions";
+import { waitForTransactionReceipt, getChainId } from "@wagmi/core";
+import { useConfig } from "wagmi";
 import {
   useCommentDeletion,
   useCommentRetrySubmission,
@@ -30,7 +30,7 @@ export function useGaslessCommentActions({
   connectedAddress,
   hasApproval,
 }: UseGaslessCommentActionsProps): CommentActionsContextType {
-  const { data: client } = useConnectorClient();
+  const wagmiConfig = useConfig();
   const deleteCommentMutation = useGaslessDeleteComment({
     connectedAddress,
   });
@@ -41,16 +41,12 @@ export function useGaslessCommentActions({
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {
-        if (!client) {
-          throw new Error("No connector client");
-        }
-
         const txHash = await deleteCommentMutation.mutateAsync({
           comment: params.comment,
           submitIfApproved: hasApproval,
         });
 
-        const chainId = await getChainId(client);
+        const chainId = getChainId(wagmiConfig);
 
         const pendingOperation: PendingDeleteCommentOperationSchemaType = {
           action: "delete",
@@ -68,7 +64,7 @@ export function useGaslessCommentActions({
 
         params.onStart?.();
 
-        const receipt = await waitForTransactionReceipt(client, {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
@@ -91,16 +87,12 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [client, deleteCommentMutation, hasApproval, commentDeletion]
+    [wagmiConfig, deleteCommentMutation, hasApproval, commentDeletion]
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(
     async (params) => {
       const { comment } = params;
-
-      if (!client) {
-        throw new Error("No connector client");
-      }
 
       if (!comment.pendingOperation) {
         throw new Error("No pending operation to retry");
@@ -129,7 +121,7 @@ export function useGaslessCommentActions({
 
         params.onStart?.();
 
-        const receipt = await waitForTransactionReceipt(client, {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
@@ -152,15 +144,11 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [client, submitCommentMutation]
+    [wagmiConfig, submitCommentMutation]
   );
 
   const postComment = useCallback<OnPostComment>(
     async (params) => {
-      if (!client) {
-        throw new Error("No connector client");
-      }
-
       const pendingOperation = await submitCommentMutation.mutateAsync({
         content: params.comment.content,
         isApproved: hasApproval,
@@ -176,7 +164,7 @@ export function useGaslessCommentActions({
 
         params.onStart?.();
 
-        const receipt = await waitForTransactionReceipt(client, {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
@@ -199,7 +187,7 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [client, hasApproval, commentSubmission]
+    [wagmiConfig, hasApproval, commentSubmission]
   );
 
   return useMemo(

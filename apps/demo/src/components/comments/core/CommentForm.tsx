@@ -80,6 +80,7 @@ export function CommentForm<TExtraSubmitData = unknown>({
         setFormState(submitAction);
 
         const result = await postComment({
+          address: author,
           comment: {
             author,
             content,

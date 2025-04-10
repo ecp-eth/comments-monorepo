@@ -6,8 +6,8 @@ import type {
   OnRetryPostComment,
 } from "../../core/CommentActionsContext";
 import type { Hex } from "viem";
-import { useConnectorClient, useWriteContract, useSwitchChain } from "wagmi";
-import { waitForTransactionReceipt, writeContract } from "viem/actions";
+import { waitForTransactionReceipt } from "@wagmi/core";
+import { useWriteContract, useSwitchChain, useConfig } from "wagmi";
 import {
   useCommentDeletion,
   useCommentRetrySubmission,
@@ -26,7 +26,7 @@ type UseCommentActionsProps = {
 export function useCommentActions({
   connectedAddress,
 }: UseCommentActionsProps): CommentActionsContextType {
-  const { data: client } = useConnectorClient();
+  const wagmiConfig = useConfig();
   const { writeContractAsync } = useWriteContract();
   const { switchChainAsync } = useSwitchChain();
   const commentDeletion = useCommentDeletion();
@@ -35,11 +35,7 @@ export function useCommentActions({
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {
-        if (!client) {
-          throw new Error("No connector client");
-        }
-
-        const txHash = await writeContract(client, {
+        const txHash = await writeContractAsync({
           address: COMMENTS_V1_ADDRESS,
           abi: CommentsV1Abi,
           functionName: "deleteCommentAsAuthor",
@@ -62,7 +58,7 @@ export function useCommentActions({
 
         params.onStart?.();
 
-        const receipt = await waitForTransactionReceipt(client, {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
@@ -85,16 +81,12 @@ export function useCommentActions({
         throw e;
       }
     },
-    [client, commentDeletion]
+    [wagmiConfig, commentDeletion]
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(
     async (params) => {
       const { comment } = params;
-
-      if (!client) {
-        throw new Error("No connector client");
-      }
 
       if (!comment.pendingOperation) {
         throw new Error("No pending operation to retry");
@@ -136,7 +128,7 @@ export function useCommentActions({
 
         params.onStart?.();
 
-        const receipt = await waitForTransactionReceipt(client, {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
@@ -159,19 +151,15 @@ export function useCommentActions({
         throw e;
       }
     },
-    [client]
+    [wagmiConfig, connectedAddress, commentRetrySubmission]
   );
 
   const postComment = useCallback<OnPostComment>(
     async (params) => {
-      if (!client) {
-        throw new Error("No connector client");
-      }
-
       const { comment } = params;
 
       const pendingOperation = await submitCommentMutationFunction({
-        address: connectedAddress,
+        address: params.address,
         commentRequest: {
           content: comment.content,
           parentId: comment.parentId ?? undefined,
@@ -198,7 +186,7 @@ export function useCommentActions({
 
         params.onStart?.();
 
-        const receipt = await waitForTransactionReceipt(client, {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
@@ -221,7 +209,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [client, commentSubmission]
+    [wagmiConfig, commentSubmission]
   );
 
   return useMemo(

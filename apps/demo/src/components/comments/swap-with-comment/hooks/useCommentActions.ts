@@ -7,12 +7,12 @@ import type {
 } from "../../core/CommentActionsContext";
 import { concat, numberToHex, size, type Hex } from "viem";
 import {
-  useConnectorClient,
   useSendTransaction,
   useSwitchChain,
   useSignTypedData,
+  useConfig,
 } from "wagmi";
-import { waitForTransactionReceipt, writeContract } from "viem/actions";
+import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
 import {
   useCommentDeletion,
   useCommentSubmission,
@@ -27,14 +27,8 @@ export type SwapWithCommentExtra = {
   quote: QuoteResponseLiquidityAvailableSchemaType;
 };
 
-type UseCommentActionsProps = {
-  connectedAddress: Hex | undefined;
-};
-
-export function useCommentActions({
-  connectedAddress,
-}: UseCommentActionsProps): CommentActionsContextType<SwapWithCommentExtra> {
-  const { data: client } = useConnectorClient();
+export function useCommentActions(): CommentActionsContextType<SwapWithCommentExtra> {
+  const wagmiConfig = useConfig();
   const { sendTransactionAsync } = useSendTransaction();
   const { switchChainAsync } = useSwitchChain();
   const { signTypedDataAsync } = useSignTypedData();
@@ -43,11 +37,7 @@ export function useCommentActions({
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {
-        if (!client) {
-          throw new Error("No connector client");
-        }
-
-        const txHash = await writeContract(client, {
+        const txHash = await writeContract(wagmiConfig, {
           address: COMMENTS_V1_ADDRESS,
           abi: CommentsV1Abi,
           functionName: "deleteCommentAsAuthor",
@@ -70,7 +60,7 @@ export function useCommentActions({
 
         params.onStart?.();
 
-        const receipt = await waitForTransactionReceipt(client, {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
@@ -93,21 +83,17 @@ export function useCommentActions({
         throw e;
       }
     },
-    [client, commentDeletion]
+    [wagmiConfig, commentDeletion]
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(async () => {
     throw new Error(
       "Retrying post with swapping is not possible at the moment."
     );
-  }, [client]);
+  }, []);
 
   const postComment = useCallback<OnPostComment<SwapWithCommentExtra>>(
     async (params) => {
-      if (!client) {
-        throw new Error("No connector client");
-      }
-
       const { comment } = params;
 
       if (!params.extra) {
@@ -130,7 +116,7 @@ export function useCommentActions({
       const sig = signature;
 
       const pendingOperation = await submitCommentMutationFunction({
-        address: connectedAddress,
+        address: params.address,
         commentRequest: {
           content: comment.content,
           parentId: comment.parentId ?? undefined,
@@ -154,7 +140,7 @@ export function useCommentActions({
           ]);
 
           return sendTransactionAsync({
-            account: connectedAddress,
+            account: params.address,
             to: quote.transaction.to,
             data: quote.transaction.data,
             value: quote.transaction.value,
@@ -171,7 +157,7 @@ export function useCommentActions({
 
         params.onStart?.();
 
-        const receipt = await waitForTransactionReceipt(client, {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
@@ -194,7 +180,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [client, commentSubmission]
+    [wagmiConfig, commentSubmission]
   );
 
   return useMemo(

@@ -28,6 +28,7 @@ export type OnRetryPostCommentParams = {
 };
 
 export type OnPostCommentParams<TExtra = unknown> = {
+  address: Hex;
   comment: {
     author: Hex;
     parentId: Hex | undefined;
