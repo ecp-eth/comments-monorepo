@@ -23,6 +23,13 @@ export interface CommentFormProps<TExtraSubmitData = unknown> {
    * Called when user blurred text area with empty content
    */
   onLeftEmpty?: () => void;
+  /**
+   * Called when transaction was created but not yet processed.
+   */
+  onSubmitStart?: () => void;
+  /**
+   * Called when transaction was created and also successfully processed.
+   */
   onSubmitSuccess?: OnSubmitSuccessFunction;
   /**
    * Extra data to be passed to post comment
@@ -50,6 +57,7 @@ export function CommentForm<TExtraSubmitData = unknown>({
   parentId,
   submitIdleLabel = "Post",
   submitPendingLabel = "Posting...",
+  onSubmitStart,
   onSubmitSuccess,
   extra,
 }: CommentFormProps<TExtraSubmitData>) {
@@ -60,6 +68,7 @@ export function CommentForm<TExtraSubmitData = unknown>({
   const [content, setContent] = useState("");
   const [formState, setFormState] = useState<"idle" | "post">("idle");
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
+  const onSubmitStartRef = useFreshRef(onSubmitStart);
 
   const submitCommentMutation = useMutation({
     mutationFn: async (formData: FormData): Promise<void> => {
@@ -79,6 +88,9 @@ export function CommentForm<TExtraSubmitData = unknown>({
           },
           queryKey,
           extra,
+          onStart: () => {
+            onSubmitStartRef.current?.();
+          },
         });
 
         return result;

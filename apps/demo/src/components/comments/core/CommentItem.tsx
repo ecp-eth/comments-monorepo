@@ -129,7 +129,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
           onLeftEmpty={() => {
             setIsReplying(false);
           }}
-          onSubmitSuccess={() => {
+          onSubmitStart={() => {
             setIsReplying(false);
           }}
           placeholder="What are your thoughts?"

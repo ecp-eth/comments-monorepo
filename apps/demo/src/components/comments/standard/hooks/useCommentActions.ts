@@ -59,6 +59,8 @@ export function useCommentActions({
           pendingOperation,
         });
 
+        params.onStart?.();
+
         const receipt = await waitForTransactionReceipt(client, {
           hash: txHash,
           timeout: TX_RECEIPT_TIMEOUT,
@@ -131,6 +133,8 @@ export function useCommentActions({
           pendingOperation,
         });
 
+        params.onStart?.();
+
         const receipt = await waitForTransactionReceipt(client, {
           hash: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
@@ -190,6 +194,8 @@ export function useCommentActions({
           ...params,
           pendingOperation,
         });
+
+        params.onStart?.();
 
         const receipt = await waitForTransactionReceipt(client, {
           hash: pendingOperation.txHash,

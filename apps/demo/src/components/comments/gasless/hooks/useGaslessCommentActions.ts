@@ -65,6 +65,8 @@ export function useGaslessCommentActions({
           pendingOperation,
         });
 
+        params.onStart?.();
+
         const receipt = await waitForTransactionReceipt(client, {
           hash: txHash,
           timeout: TX_RECEIPT_TIMEOUT,
@@ -124,6 +126,8 @@ export function useGaslessCommentActions({
           pendingOperation,
         });
 
+        params.onStart?.();
+
         const receipt = await waitForTransactionReceipt(client, {
           hash: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
@@ -168,6 +172,8 @@ export function useGaslessCommentActions({
           ...params,
           pendingOperation,
         });
+
+        params.onStart?.();
 
         const receipt = await waitForTransactionReceipt(client, {
           hash: pendingOperation.txHash,

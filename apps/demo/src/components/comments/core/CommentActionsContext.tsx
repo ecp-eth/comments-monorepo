@@ -9,6 +9,10 @@ export type OnDeleteCommentParams = {
    * Query key to a query where comment is stored
    */
   queryKey: QueryKey;
+  /**
+   * Called when transaction was created.
+   */
+  onStart?: () => void;
 };
 
 export type OnRetryPostCommentParams = {
@@ -17,6 +21,10 @@ export type OnRetryPostCommentParams = {
    * Query key to a query where comment is stored
    */
   queryKey: QueryKey;
+  /**
+   * Called when transaction was created.
+   */
+  onStart?: () => void;
 };
 
 export type OnPostCommentParams<TExtra = unknown> = {
@@ -31,6 +39,10 @@ export type OnPostCommentParams<TExtra = unknown> = {
    */
   queryKey: QueryKey;
   extra?: TExtra;
+  /**
+   * Called when transaction was created.
+   */
+  onStart?: () => void;
 };
 
 export type OnDeleteComment = (params: OnDeleteCommentParams) => Promise<void>;
