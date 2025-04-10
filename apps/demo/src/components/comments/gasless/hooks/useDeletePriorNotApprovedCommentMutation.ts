@@ -5,7 +5,7 @@ import {
   type PreparedSignedGaslessDeleteCommentNotApprovedSchemaType,
 } from "@/lib/schemas";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
-import type { Comment } from "@/lib/schemas";
+import type { Comment } from "@ecp.eth/shared/schemas";
 import { deletePriorNotApprovedCommentMutationFunction } from "../queries";
 
 /**

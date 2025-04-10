@@ -8,9 +8,11 @@ import type {
 import type { Hex } from "viem";
 import { useConnectorClient, useWriteContract, useSwitchChain } from "wagmi";
 import { waitForTransactionReceipt, writeContract } from "viem/actions";
-import { useCommentDeletion } from "../../core/hooks/useCommentDeletion";
-import { useCommentRetrySubmission } from "../../core/hooks/useCommentRetrySubmission";
-import { useCommentSubmission } from "../../core/hooks/useCommentSubmission";
+import {
+  useCommentDeletion,
+  useCommentRetrySubmission,
+  useCommentSubmission,
+} from "@ecp.eth/shared/hooks";
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { submitCommentMutationFunction } from "../queries";
 import { postCommentAsAuthorViaCommentsV1 } from "@/lib/contract";

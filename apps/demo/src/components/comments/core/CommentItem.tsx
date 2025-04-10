@@ -2,7 +2,10 @@ import {
   MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
-import { type Comment as CommentType, CommentPageSchema } from "@/lib/schemas";
+import {
+  type Comment as CommentType,
+  CommentPageSchema,
+} from "@ecp.eth/shared/schemas";
 import { cn } from "@/lib/utils";
 import { publicEnv } from "@/publicEnv";
 import { fetchCommentReplies } from "@ecp.eth/sdk";

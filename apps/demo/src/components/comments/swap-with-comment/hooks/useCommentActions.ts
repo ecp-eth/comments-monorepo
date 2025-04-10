@@ -13,8 +13,10 @@ import {
   useSignTypedData,
 } from "wagmi";
 import { waitForTransactionReceipt, writeContract } from "viem/actions";
-import { useCommentDeletion } from "../../core/hooks/useCommentDeletion";
-import { useCommentSubmission } from "../../core/hooks/useCommentSubmission";
+import {
+  useCommentDeletion,
+  useCommentSubmission,
+} from "@ecp.eth/shared/hooks";
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { submitCommentMutationFunction } from "../../standard/queries";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";

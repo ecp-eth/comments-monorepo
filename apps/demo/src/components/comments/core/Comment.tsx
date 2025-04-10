@@ -4,7 +4,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { type Comment as CommentType } from "@/lib/schemas";
+import { type Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { getAddress } from "viem";
 import { CommentText } from "./CommentText";
 import { CommentActionOrStatus } from "./CommentActionOrStatus";

@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import type { Hex } from "viem";
-import type { Comment } from "@/lib/schemas";
+import type { Comment } from "@ecp.eth/shared/schemas";
 import { deletePriorApprovedCommentMutationFunction } from "../queries";
 
 /**

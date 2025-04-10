@@ -1,4 +1,4 @@
-import type { Comment as CommentType } from "@/lib/schemas";
+import type { Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { Comment } from "./Comment";
 import { useCallback, useState } from "react";
 import type { QueryKey } from "@tanstack/react-query";

@@ -2,7 +2,7 @@ import type { Hex } from "viem";
 import { useDeletePriorApprovedCommentMutation } from "./useDeletePriorApprovedCommentMutation";
 import { useDeletePriorNotApprovedCommentMutation } from "./useDeletePriorNotApprovedCommentMutation";
 import { useMutation } from "@tanstack/react-query";
-import type { Comment } from "@/lib/schemas";
+import type { Comment } from "@ecp.eth/shared/schemas";
 
 export function useGaslessDeleteComment({
   connectedAddress,

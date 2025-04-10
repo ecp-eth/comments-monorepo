@@ -2,12 +2,12 @@ import {
   markPendingPostCommentAsFailed,
   markCommentAsReposting,
   markPendingPostCommentAsPosted,
-} from "@ecp.eth/shared/helpers";
+} from "../helpers.js";
 import {
   ListCommentsQueryDataSchema,
   type ListCommentsQueryDataSchemaType,
   type PendingPostCommentOperationSchemaType,
-} from "@ecp.eth/shared/schemas";
+} from "../schemas.js";
 import { type QueryKey, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useMemo } from "react";

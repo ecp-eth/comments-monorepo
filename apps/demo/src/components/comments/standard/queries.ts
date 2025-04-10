@@ -1,9 +1,11 @@
 import {
-  SignCommentResponseClientSchema,
-  type SignCommentResponseClientSchemaType,
   type SignCommentPayloadRequestSchemaType,
   SignCommentPayloadRequestSchema,
 } from "@/lib/schemas";
+import {
+  SignCommentResponseClientSchema,
+  type SignCommentResponseClientSchemaType,
+} from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
 import { fetchAuthorData } from "@ecp.eth/sdk";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";

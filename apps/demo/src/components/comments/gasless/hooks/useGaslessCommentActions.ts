@@ -8,9 +8,11 @@ import type {
 import type { Hex } from "viem";
 import { useConnectorClient } from "wagmi";
 import { getChainId, waitForTransactionReceipt } from "viem/actions";
-import { useCommentDeletion } from "../../core/hooks/useCommentDeletion";
-import { useCommentRetrySubmission } from "../../core/hooks/useCommentRetrySubmission";
-import { useCommentSubmission } from "../../core/hooks/useCommentSubmission";
+import {
+  useCommentDeletion,
+  useCommentRetrySubmission,
+  useCommentSubmission,
+} from "@ecp.eth/shared/hooks";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { useGaslessSubmitComment } from "./useGaslessSubmitComment";
 import { useGaslessDeleteComment } from "./useGaslessDeleteComment";

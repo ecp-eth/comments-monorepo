@@ -5,12 +5,12 @@ import {
   ListCommentsQueryDataSchema,
   type PendingDeleteCommentOperationSchemaType,
   type ListCommentsQueryDataSchemaType,
-} from "@ecp.eth/shared/schemas";
+} from "../schemas.js";
 import {
   markCommentAsDeleted,
   markCommentAsDeleting,
   markCommentDeletionAsFailed,
-} from "@ecp.eth/shared/helpers";
+} from "../helpers.js";
 import type { Hex } from "viem";
 
 type OnCommentDeletionStartParams = {

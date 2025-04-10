@@ -1,6 +1,6 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import { CommentActionButton } from "./CommentActionButton";
-import type { Comment } from "@/lib/schemas";
+import type { Comment } from "@ecp.eth/shared/schemas";
 
 export function CommentActionOrStatus({
   comment,

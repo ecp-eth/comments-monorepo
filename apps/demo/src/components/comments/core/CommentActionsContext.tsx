@@ -1,4 +1,4 @@
-import type { Comment } from "@/lib/schemas";
+import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 import type { Hex } from "viem";
