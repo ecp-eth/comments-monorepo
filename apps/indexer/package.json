@@ -43,6 +43,7 @@
     "@ecp.eth/eslint-config": "workspace:*",
     "@types/node": "^22.13.1",
     "@types/pg": "^8.11.11",
-    "eslint": "^9.19.0"
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0"
   }
 }

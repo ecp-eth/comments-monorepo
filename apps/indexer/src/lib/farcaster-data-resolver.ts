@@ -9,7 +9,7 @@ import {
 import { Address, getAddress, type Hex } from "viem";
 import DataLoader from "dataloader";
 import { LRUCache } from "lru-cache";
-import { BulkUsersByAddressResponse, User } from "@neynar/nodejs-sdk/build/api";
+import { User } from "@neynar/nodejs-sdk/build/api";
 
 if (!process.env.NEYNAR_API_KEY) {
   throw new Error("NEYNAR_API_KEY is required");
