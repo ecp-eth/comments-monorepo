@@ -3,9 +3,11 @@ pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
 import {CommentsV1} from "../src/CommentsV1.sol";
+import {ChannelManager} from "../src/ChannelManager.sol";
 
 contract DevScript is Script {
     CommentsV1 public comments;
+    ChannelManager public channelManager;
 
     function setUp() public {}
 
@@ -18,9 +20,11 @@ contract DevScript is Script {
         address fundAddress = vm.envAddress("FUND_ADDRESS");
         payable(fundAddress).transfer(1 ether);
 
-        // Deploy contract
-        comments = new CommentsV1{salt: bytes32(0)}();
+        // Deploy contracts
+        channelManager = new ChannelManager{salt: bytes32(0)}(msg.sender);
+        comments = new CommentsV1{salt: bytes32(0)}(address(channelManager));
 
+        console.log("ChannelManager deployed at", address(channelManager));
         console.log("CommentsV1 deployed at", address(comments));
 
         vm.stopBroadcast();

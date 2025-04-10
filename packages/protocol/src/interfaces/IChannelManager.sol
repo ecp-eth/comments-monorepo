@@ -76,7 +76,7 @@ interface IChannelManager {
         string calldata metadata,
         bool isPrivate,
         address[] calldata hooks
-    ) external returns (uint256);
+    ) external payable returns (uint256 channelId);
 
     /// @notice Updates an existing channel's configuration
     /// @param channelId The unique identifier of the channel
@@ -154,4 +154,8 @@ interface IChannelManager {
     /// @param channelId Unique identifier of the channel
     /// @return exists Whether the channel exists
     function channelExists(uint256 channelId) external view returns (bool);
+
+    /// @notice Registers a new hook in the global registry
+    /// @param hook The address of the hook to register
+    function registerHook(address hook) external payable;
 } 
