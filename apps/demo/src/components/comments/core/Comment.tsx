@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { type Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { getAddress } from "viem";
-import { CommentText } from "./CommentText";
+import { CommentText } from "@ecp.eth/shared/components";
 import { CommentActionOrStatus } from "./CommentActionOrStatus";
 import { MoreVerticalIcon } from "lucide-react";
 import { CommentAuthor } from "./CommentAuthor";
