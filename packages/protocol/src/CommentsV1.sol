@@ -82,7 +82,7 @@ contract CommentsV1 is ICommentTypes {
     bytes32 public immutable DOMAIN_SEPARATOR;
     bytes32 public constant COMMENT_TYPEHASH =
         keccak256(
-            "AddComment(string content,string metadata,string targetUri,address author,address appSigner,uint256 channelId,uint256 nonce,uint256 deadline)"
+            "AddComment(string content,string metadata,string targetUri,string commentType,address author,address appSigner,uint256 channelId,uint256 nonce,uint256 deadline)"
         );
     bytes32 public constant DELETE_COMMENT_TYPEHASH =
         keccak256(
@@ -210,6 +210,7 @@ contract CommentsV1 is ICommentTypes {
                 content: commentData.content,
                 metadata: commentData.metadata,
                 targetUri: commentData.targetUri,
+                commentType: commentData.commentType,
                 author: commentData.author,
                 appSigner: commentData.appSigner,
                 channelId: commentData.channelId,
@@ -526,6 +527,7 @@ contract CommentsV1 is ICommentTypes {
                 keccak256(bytes(commentData.content)),
                 keccak256(bytes(commentData.metadata)),
                 keccak256(bytes(commentData.targetUri)),
+                keccak256(bytes(commentData.commentType)),
                 commentData.author,
                 commentData.appSigner,
                 commentData.channelId,
