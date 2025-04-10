@@ -2,16 +2,14 @@ import { waitForTransactionReceipt } from "@wagmi/core";
 import { fetchAPI } from "./fetch";
 import { Hex, TransactionReceipt } from "viem";
 import { CommentData } from "@ecp.eth/sdk/schemas";
-import {
-  SignCommentPayloadRequestSchemaType,
-  SignCommentResponseClientSchema,
-} from "./generated/schemas";
+import { SignCommentPayloadRequestSchemaType } from "./generated/schemas";
 import {
   deleteCommentAsAuthorViaCommentsV1,
   postCommentAsAuthorViaCommentsV1,
 } from "./contracts";
 import { chain, config } from "../wagmi.config";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
+import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 
 const chainId = chain.id;
 

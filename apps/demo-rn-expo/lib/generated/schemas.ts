@@ -4,21 +4,12 @@
 import {
   AddApprovalTypedDataSchema,
   AddCommentTypedDataSchema,
-  CommentDataSchema,
   DeleteCommentTypedDataSchema,
   HexSchema,
-  IndexerAPICommentSchema,
-  IndexerAPICommentSchemaType,
-  IndexerAPICursorPaginationSchema,
-  IndexerAPICursorPaginationSchemaType,
 } from "@ecp.eth/sdk/schemas";
-import { PendingCommentOperationSchema as PendingCommentOperationSchemaShared } from "@ecp.eth/shared/schemas";
+import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 // import { isProfane } from "./profanity-detection";
-
-const CommentDataWithIdSchema = CommentDataSchema.extend({
-  id: HexSchema,
-});
 
 export const PrepareSignedGaslessCommentRequestBodySchema = z.object({
   // replace with following line to enable basic profanity detection
@@ -138,19 +129,6 @@ export type GaslessPostCommentResponseSchemaType = z.infer<
   typeof GaslessPostCommentResponseSchema
 >;
 
-/**
- * Parses response from API endpoint for usage in client
- */
-export const SignCommentResponseClientSchema = z.object({
-  signature: HexSchema,
-  hash: HexSchema,
-  data: CommentDataWithIdSchema,
-});
-
-export type SignCommentResponseClientSchemaType = z.infer<
-  typeof SignCommentResponseClientSchema
->;
-
 export const SignCommentPayloadRequestSchema = z.object({
   author: HexSchema,
   // replace with following line to enable basic profanity detection
@@ -177,37 +155,8 @@ export const SignCommentResponseServerSchema = z.object({
   data: CommentDataWithIdSchema,
 });
 
-export const GetApprovalStatusNotApprovedSchema = z.object({
-  approved: z.literal(false),
-  appSignature: HexSchema,
-  signTypedDataParams: AddApprovalTypedDataSchema,
-});
-
-export type GetApprovalStatusNotApprovedSchemaType = z.infer<
-  typeof GetApprovalStatusNotApprovedSchema
->;
-
-export const GetApprovalStatusApprovedSchema = z.object({
-  approved: z.literal(true),
-  appSigner: HexSchema,
-});
-
-export type GetApprovalStatusApprovedSchemaType = z.infer<
-  typeof GetApprovalStatusApprovedSchema
->;
-
-export const GetApprovalStatusSchema = z.union([
-  GetApprovalStatusNotApprovedSchema,
-  GetApprovalStatusApprovedSchema,
-]);
-
-export type GetApprovalStatusSchemaType = z.infer<
-  typeof GetApprovalStatusSchema
->;
-
 export const ChangeApprovalStatusRequestBodySchema = z.object({
   signTypedDataParams: AddApprovalTypedDataSchema,
-  appSignature: HexSchema,
   authorSignature: HexSchema,
 });
 
@@ -235,48 +184,3 @@ export const InternalServerErrorResponseSchema = z.object({
 export const ApproveResponseSchema = z.object({
   txHash: HexSchema,
 });
-
-export const PendingCommentOperationSchema =
-  PendingCommentOperationSchemaShared.extend({
-    type: z.enum([
-      "gasless-not-approved",
-      "gasless-preapproved",
-      "non-gasless",
-    ]),
-  });
-
-export type PendingCommentOperationSchemaType = z.infer<
-  typeof PendingCommentOperationSchema
->;
-
-type CommentSchemaType = IndexerAPICommentSchemaType & {
-  pendingOperation?: PendingCommentOperationSchemaType;
-  replies?: {
-    results: CommentSchemaType[];
-    pagination: IndexerAPICursorPaginationSchemaType;
-  };
-};
-
-export const CommentSchema: z.ZodType<CommentSchemaType> =
-  IndexerAPICommentSchema.extend({
-    replies: z
-      .object({
-        results: z.lazy(() => CommentSchema.array()),
-        pagination: IndexerAPICursorPaginationSchema,
-      })
-      .optional(),
-    pendingOperation: PendingCommentOperationSchema.optional(),
-  });
-
-export type Comment = z.infer<typeof CommentSchema>;
-
-export type PendingComment = Omit<Comment, "pendingOperation"> & {
-  pendingOperation: PendingCommentOperationSchemaType;
-};
-
-export const CommentPageSchema = z.object({
-  results: CommentSchema.array(),
-  pagination: IndexerAPICursorPaginationSchema,
-});
-
-export type CommentPageSchemaType = z.infer<typeof CommentPageSchema>;
