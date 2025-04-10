@@ -10,7 +10,8 @@
     "check-types": "tsc --noEmit",
     "ref:gen:demo:blog": "cp ../apps/embed-demo-blog/README.md pages/demos/blog/index.mdx",
     "ref:gen:demo:demo": "cp ../apps/demo/README.md pages/demos/custom-integration/index.mdx",
-    "ref:gen:demo": "pnpm run ref:gen:demo:blog && pnpm run ref:gen:demo:demo",
+    "ref:gen:demo:react-native": "cp ../apps/demo-rn-expo/README.md pages/demos/react-native-integration/index.mdx",
+    "ref:gen:demo": "pnpm run ref:gen:demo:blog && pnpm run ref:gen:demo:demo && pnpm run ref:gen:demo:react-native",
     "ref:gen:sdk": "typedoc --tsconfig ../packages/sdk/tsconfig.json --out pages/sdk-reference/ --entryPoints ../packages/sdk/src/index.ts ../packages/sdk/src/types.ts ../packages/sdk/src/react.tsx ../packages/sdk/src/schemas/index.ts --publicPath /sdk-reference/",
     "ref:gen:protocol": "solidity-docgen -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen",
     "ref:gen:indexer:index": "cp ../apps/indexer/README.md pages/indexer-reference/index.mdx",
@@ -46,7 +47,7 @@
     "@ecp.eth/solidity-docgen": "~0.5.19",
     "tailwindcss": "^4.0.13",
     "tsx": "^4.19.3",
-    "typedoc": "^0.28.1",
+    "typedoc": "^0.28.2",
     "unist-util-visit": "^5.0.0",
     "vite": "^6.2.1"
   }

@@ -2,19 +2,232 @@
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [schemas](/sdk-reference/schemas/index.mdx) / EmbedConfigFontSchemaType
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [react](/sdk-reference/react/index.mdx) / EmbedConfigSchemaInputType
 
-# Type Alias: EmbedConfigFontSchemaType
+# Type Alias: EmbedConfigSchemaInputType
 
 ```ts
-type EmbedConfigFontSchemaType = object;
+type EmbedConfigSchemaInputType = object;
 ```
 
-Defined in: [packages/sdk/src/schemas/embed.ts:160](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/embed.ts#L160)
+Defined in: [packages/sdk/src/schemas/embed.ts:230](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/embed.ts#L230)
+
+Custom configuration for `<CommentEmbed />` component.
 
 ## Type declaration
 
-### fontFamily?
+### chainId?
+
+```ts
+optional chainId: 1 | 8453 | 11155111 | 31337 = EmbedConfigSupportedChainIdsSchema;
+```
+
+The id of the chain to post the comments to.
+We don't filter chain id when fetching comments.
+
+#### Default
+
+```ts
+8453
+```
+
+### disablePromotion?
+
+```ts
+optional disablePromotion: boolean;
+```
+
+Hide powered by ECP link
+
+### theme?
+
+```ts
+optional theme: object;
+```
+
+The theme of the embed. currently support `light` and `dark`.
+
+#### theme.colors?
+
+```ts
+optional colors: object;
+```
+
+#### theme.colors.dark?
+
+```ts
+optional dark: object;
+```
+
+#### theme.colors.dark.account-edit-link?
+
+```ts
+optional account-edit-link: string;
+```
+
+#### theme.colors.dark.background?
+
+```ts
+optional background: string;
+```
+
+#### theme.colors.dark.border?
+
+```ts
+optional border: string;
+```
+
+#### theme.colors.dark.border-focus?
+
+```ts
+optional border-focus: string;
+```
+
+#### theme.colors.dark.destructive?
+
+```ts
+optional destructive: string;
+```
+
+#### theme.colors.dark.destructive-foreground?
+
+```ts
+optional destructive-foreground: string;
+```
+
+#### theme.colors.dark.foreground?
+
+```ts
+optional foreground: string;
+```
+
+#### theme.colors.dark.muted-foreground?
+
+```ts
+optional muted-foreground: string;
+```
+
+#### theme.colors.dark.primary?
+
+```ts
+optional primary: string;
+```
+
+#### theme.colors.dark.primary-foreground?
+
+```ts
+optional primary-foreground: string;
+```
+
+#### theme.colors.dark.ring?
+
+```ts
+optional ring: string;
+```
+
+#### theme.colors.dark.secondary?
+
+```ts
+optional secondary: string;
+```
+
+#### theme.colors.dark.secondary-foreground?
+
+```ts
+optional secondary-foreground: string;
+```
+
+#### theme.colors.light?
+
+```ts
+optional light: object;
+```
+
+#### theme.colors.light.account-edit-link?
+
+```ts
+optional account-edit-link: string;
+```
+
+#### theme.colors.light.background?
+
+```ts
+optional background: string;
+```
+
+#### theme.colors.light.border?
+
+```ts
+optional border: string;
+```
+
+#### theme.colors.light.border-focus?
+
+```ts
+optional border-focus: string;
+```
+
+#### theme.colors.light.destructive?
+
+```ts
+optional destructive: string;
+```
+
+#### theme.colors.light.destructive-foreground?
+
+```ts
+optional destructive-foreground: string;
+```
+
+#### theme.colors.light.foreground?
+
+```ts
+optional foreground: string;
+```
+
+#### theme.colors.light.muted-foreground?
+
+```ts
+optional muted-foreground: string;
+```
+
+#### theme.colors.light.primary?
+
+```ts
+optional primary: string;
+```
+
+#### theme.colors.light.primary-foreground?
+
+```ts
+optional primary-foreground: string;
+```
+
+#### theme.colors.light.ring?
+
+```ts
+optional ring: string;
+```
+
+#### theme.colors.light.secondary?
+
+```ts
+optional secondary: string;
+```
+
+#### theme.colors.light.secondary-foreground?
+
+```ts
+optional secondary-foreground: string;
+```
+
+#### theme.font?
+
+```ts
+optional font: object;
+```
+
+#### theme.font.fontFamily?
 
 ```ts
 optional fontFamily: 
@@ -1760,116 +1973,146 @@ optional fontFamily:
 };
 ```
 
-### sizes?
+#### theme.font.sizes?
 
 ```ts
 optional sizes: object;
 ```
 
-#### sizes.base?
+#### theme.font.sizes.base?
 
 ```ts
 optional base: object = EmbedConfigFontSizeSchema;
 ```
 
-#### sizes.base.lineHeight?
+#### theme.font.sizes.base.lineHeight?
 
 ```ts
 optional lineHeight: string;
 ```
 
-#### sizes.base.size?
+#### theme.font.sizes.base.size?
 
 ```ts
 optional size: string;
 ```
 
-#### sizes.empty-screen-title?
+#### theme.font.sizes.empty-screen-title?
 
 ```ts
 optional empty-screen-title: object = EmbedConfigFontSizeSchema;
 ```
 
-#### sizes.empty-screen-title.lineHeight?
+#### theme.font.sizes.empty-screen-title.lineHeight?
 
 ```ts
 optional lineHeight: string;
 ```
 
-#### sizes.empty-screen-title.size?
+#### theme.font.sizes.empty-screen-title.size?
 
 ```ts
 optional size: string;
 ```
 
-#### sizes.error-screen-title?
+#### theme.font.sizes.error-screen-title?
 
 ```ts
 optional error-screen-title: object = EmbedConfigFontSizeSchema;
 ```
 
-#### sizes.error-screen-title.lineHeight?
+#### theme.font.sizes.error-screen-title.lineHeight?
 
 ```ts
 optional lineHeight: string;
 ```
 
-#### sizes.error-screen-title.size?
+#### theme.font.sizes.error-screen-title.size?
 
 ```ts
 optional size: string;
 ```
 
-#### sizes.headline?
+#### theme.font.sizes.headline?
 
 ```ts
 optional headline: object = EmbedConfigFontSizeSchema;
 ```
 
-#### sizes.headline.lineHeight?
+#### theme.font.sizes.headline.lineHeight?
 
 ```ts
 optional lineHeight: string;
 ```
 
-#### sizes.headline.size?
+#### theme.font.sizes.headline.size?
 
 ```ts
 optional size: string;
 ```
 
-#### sizes.sm?
+#### theme.font.sizes.sm?
 
 ```ts
 optional sm: object = EmbedConfigFontSizeSchema;
 ```
 
-#### sizes.sm.lineHeight?
+#### theme.font.sizes.sm.lineHeight?
 
 ```ts
 optional lineHeight: string;
 ```
 
-#### sizes.sm.size?
+#### theme.font.sizes.sm.size?
 
 ```ts
 optional size: string;
 ```
 
-#### sizes.xs?
+#### theme.font.sizes.xs?
 
 ```ts
 optional xs: object = EmbedConfigFontSizeSchema;
 ```
 
-#### sizes.xs.lineHeight?
+#### theme.font.sizes.xs.lineHeight?
 
 ```ts
 optional lineHeight: string;
 ```
 
-#### sizes.xs.size?
+#### theme.font.sizes.xs.size?
 
 ```ts
 optional size: string;
+```
+
+#### theme.mode?
+
+```ts
+optional mode: "light" | "dark";
+```
+
+#### theme.other?
+
+```ts
+optional other: object;
+```
+
+#### theme.other.radius?
+
+```ts
+optional radius: string;
+```
+
+#### theme.other.root-padding-horizontal?
+
+```ts
+optional root-padding-horizontal: string;
+```
+
+#### theme.other.root-padding-vertical?
+
+```ts
+optional root-padding-vertical: string;
 ```
