@@ -37,6 +37,7 @@ export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
       />
       {isReplying && (
         <CommentForm
+          autoFocus
           onLeftEmpty={() => {
             setIsReplying(false);
           }}

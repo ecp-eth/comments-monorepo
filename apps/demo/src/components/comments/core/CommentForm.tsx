@@ -14,6 +14,10 @@ import { Button } from "@/components/ui/button";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 
 export interface CommentFormProps<TExtraSubmitData = unknown> {
+  /**
+   * @default false
+   */
+  autoFocus?: boolean;
   disabled?: boolean;
   /**
    * Called when user blurred text area with empty content
@@ -38,6 +42,7 @@ export interface CommentFormProps<TExtraSubmitData = unknown> {
 }
 
 export function CommentForm<TExtraSubmitData = unknown>({
+  autoFocus,
   disabled = false,
   placeholder = "What are your thoughts?",
   onLeftEmpty,
@@ -112,6 +117,7 @@ export function CommentForm<TExtraSubmitData = unknown>({
       className="mb-4 flex flex-col gap-2"
     >
       <Textarea
+        autoFocus={autoFocus}
         onBlur={() => {
           if (!content && !isSubmitting) {
             onLeftEmpty?.();

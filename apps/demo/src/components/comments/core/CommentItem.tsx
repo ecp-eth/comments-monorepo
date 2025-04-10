@@ -123,6 +123,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
       />
       {isReplying && (
         <CommentForm
+          autoFocus
           onLeftEmpty={() => {
             setIsReplying(false);
           }}
