@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "bin": {
-    "proxy-package": "./bin/index.js"
+    "proxy-package": "./bin/proxy-package.js"
   },
   "scripts": {
-    "proxy-package": "tsx ./src/index.ts"
+    "proxy-package": "tsx ./src/proxy-package.ts"
   },
   "dependencies": {
     "chalk": "^5.4.1",
