@@ -75,6 +75,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
             metadata: "{}",
             channelId: 0,
             targetUri: "https://example.com",
+            commentType: "comment",
             author: author,
             appSigner: appSigner,
             nonce: nonce,
