@@ -15,7 +15,7 @@ import {
 } from "@ecp.eth/shared/hooks";
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { submitCommentMutationFunction } from "../queries";
-import { postCommentAsAuthorViaCommentsV1 } from "@/lib/contract";
+import { postCommentAsAuthorViaCommentsV1 } from "@ecp.eth/shared/helpers";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 

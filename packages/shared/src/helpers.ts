@@ -6,15 +6,20 @@ import type {
   PendingDeleteCommentOperationSchemaType,
   PendingPostCommentOperationSchemaType,
 } from "./schemas.js";
-import { getCommentCursor } from "@ecp.eth/sdk";
+import {
+  COMMENTS_V1_ADDRESS,
+  CommentsV1Abi,
+  getCommentCursor,
+} from "@ecp.eth/sdk";
 import type { InfiniteData } from "@tanstack/react-query";
 import { clsx, type ClassValue } from "clsx";
 import type { Chain, Hex } from "viem";
-import { http } from "wagmi";
+import { http, type UseWriteContractReturnType } from "wagmi";
 import * as allChains from "wagmi/chains";
 import type { AuthorType, ProcessEnvNetwork } from "./types.js";
 import { z } from "zod";
 import { twMerge } from "tailwind-merge";
+import type { CommentData } from "@ecp.eth/sdk/schemas";
 
 function parseURL(url: string) {
   // use zod instead, `URL.canParse` does not work in RN 🤷‍♂️
@@ -600,4 +605,21 @@ export function getNetworkFromProcessEnv(
   );
 
   return networks;
+}
+
+type PostCommentViaContractParams = {
+  commentData: CommentData;
+  appSignature: Hex;
+};
+
+export async function postCommentAsAuthorViaCommentsV1(
+  { appSignature, commentData }: PostCommentViaContractParams,
+  writeContractAsync: UseWriteContractReturnType["writeContractAsync"]
+) {
+  return await writeContractAsync({
+    abi: CommentsV1Abi,
+    address: COMMENTS_V1_ADDRESS,
+    functionName: "postCommentAsAuthor",
+    args: [commentData, appSignature],
+  });
 }
