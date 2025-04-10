@@ -4,3 +4,4 @@ export const TRUNCATE_COMMENT_LENGTH = 200;
 export const TRUNCATE_COMMENT_LINES = 5;
 export const NEW_COMMENTS_BY_AUTHOR_CHECK_INTERVAL = 60000; // 1 minute
 export const NEW_COMMENTS_CHECK_INTERVAL = 30000; // 30 seconds
+export const TX_RECEIPT_TIMEOUT = 1000 * 60 * 2; // 2 minutes

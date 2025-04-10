@@ -17,8 +17,7 @@ import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { submitCommentMutationFunction } from "../queries";
 import { postCommentAsAuthorViaCommentsV1 } from "@/lib/contract";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-
-const TX_RECEIPT_TIMEOUT = 1000 * 60 * 2; // 2 minutes
+import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 
 type UseCommentActionsProps = {
   connectedAddress: Hex | undefined;

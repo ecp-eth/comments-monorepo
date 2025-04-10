@@ -21,8 +21,7 @@ import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { submitCommentMutationFunction } from "../../standard/queries";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import type { QuoteResponseLiquidityAvailableSchemaType } from "../0x/schemas";
-
-const TX_RECEIPT_TIMEOUT = 1000 * 60 * 2; // 2 minutes
+import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 
 export type SwapWithCommentExtra = {
   quote: QuoteResponseLiquidityAvailableSchemaType;

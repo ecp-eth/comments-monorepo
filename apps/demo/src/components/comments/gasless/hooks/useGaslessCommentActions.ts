@@ -16,8 +16,7 @@ import {
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { useGaslessSubmitComment } from "./useGaslessSubmitComment";
 import { useGaslessDeleteComment } from "./useGaslessDeleteComment";
-
-const TX_RECEIPT_TIMEOUT = 1000 * 60 * 2; // 2 minutes
+import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 
 type UseGaslessCommentActionsProps = {
   connectedAddress: Hex | undefined;
