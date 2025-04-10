@@ -15,8 +15,12 @@ export function CommentActionOrStatus({
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
 }) {
-  const isDeleting = comment.pendingOperation?.action === "delete";
-  const isPosting = comment.pendingOperation?.action === "post";
+  const isDeleting =
+    comment.pendingOperation?.action === "delete" &&
+    comment.pendingOperation.state.status === "pending";
+  const isPosting =
+    comment.pendingOperation?.action === "post" &&
+    comment.pendingOperation.state.status === "pending";
   const didDeletingFailed =
     comment.pendingOperation?.action === "delete" &&
     comment.pendingOperation.state.status === "error";

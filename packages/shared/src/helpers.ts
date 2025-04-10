@@ -50,7 +50,8 @@ export function hasNewComments(
     oldQueryData.pages.flatMap((page) =>
       page.results
         .filter(
-          (comment): comment is PendingComment => !!comment.pendingOperation
+          (comment): comment is PendingComment =>
+            comment.pendingOperation?.action === "post"
         )
         .map((comment) => comment.id)
     )
@@ -81,7 +82,8 @@ export function mergeNewComments(
       oldQueryData.pages.flatMap((page, pageIndex) =>
         page.results
           .filter(
-            (comment): comment is PendingComment => !!comment.pendingOperation
+            (comment): comment is PendingComment =>
+              comment.pendingOperation?.action === "post"
           )
           .map((comment) => [comment.id, { pageIndex }])
       )
@@ -323,7 +325,12 @@ export function markPendingPostCommentAsPosted(
         isSameHex(comment.id, commentId) &&
         comment.pendingOperation?.action === "post"
       ) {
-        comment.pendingOperation = undefined;
+        comment.pendingOperation = {
+          ...comment.pendingOperation,
+          state: {
+            status: "success",
+          },
+        };
 
         return queryData;
       }
@@ -396,7 +403,15 @@ export function markCommentAsDeleted(
       if (comment.id === commentId) {
         comment.content = "[deleted]";
         comment.deletedAt = new Date();
-        comment.pendingOperation = undefined;
+
+        if (comment.pendingOperation?.action === "delete") {
+          comment.pendingOperation = {
+            ...comment.pendingOperation,
+            state: {
+              status: "success",
+            },
+          };
+        }
 
         return true;
       }

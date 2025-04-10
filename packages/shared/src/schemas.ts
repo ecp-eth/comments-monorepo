@@ -45,10 +45,12 @@ export const PendingPostCommentOperationSchema = z.object({
   chainId: z.number().positive().int(),
   response: SignCommentResponseClientSchema,
   resolvedAuthor: IndexerAPIAuthorDataSchema.optional(),
-  // we don't have success status because in that case there is no pending operation anymore
   state: z.discriminatedUnion("status", [
     z.object({
       status: z.literal("pending"),
+    }),
+    z.object({
+      status: z.literal("success"),
     }),
     z.object({
       status: z.literal("error"),
@@ -67,10 +69,12 @@ export const PendingDeleteCommentOperationSchema = z.object({
   commentId: HexSchema,
   txHash: HexSchema,
   chainId: z.number().positive().int(),
-  // we don't have success status because in that case there is no pending operation anymore
   state: z.discriminatedUnion("status", [
     z.object({
       status: z.literal("pending"),
+    }),
+    z.object({
+      status: z.literal("success"),
     }),
     z.object({
       status: z.literal("error"),
