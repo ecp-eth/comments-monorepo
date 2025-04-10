@@ -47,22 +47,25 @@ export function Comment({
           moderationStatus={comment.moderationStatus}
           timestamp={comment.timestamp}
         />
-        {isAuthor && !comment.deletedAt && !comment.pendingOperation && (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">
-              <MoreVerticalIcon className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="text-red-600 cursor-pointer"
-                onClick={onDeleteClick}
-                disabled={isDeleting}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        {isAuthor &&
+          !comment.deletedAt &&
+          (!comment.pendingOperation ||
+            comment.pendingOperation.state.status === "success") && (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">
+                <MoreVerticalIcon className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="text-red-600 cursor-pointer"
+                  onClick={onDeleteClick}
+                  disabled={isDeleting}
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
       </div>
       <div
         className={cn(

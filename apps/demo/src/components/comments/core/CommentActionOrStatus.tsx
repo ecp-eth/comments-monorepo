@@ -70,7 +70,11 @@ export function CommentActionOrStatus({
     );
   }
 
-  if (comment.pendingOperation || !hasAccountConnected) {
+  if (
+    (comment.pendingOperation &&
+      comment.pendingOperation.state.status !== "success") ||
+    !hasAccountConnected
+  ) {
     return null;
   }
 
