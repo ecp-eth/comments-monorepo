@@ -6,6 +6,7 @@ import {CommentsV1} from "../src/CommentsV1.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {IHook} from "../src/interfaces/IHook.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract NoHook is IHook {
     function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
@@ -29,7 +30,7 @@ contract NoHook is IHook {
     }
 }
 
-contract CommentsV1Test is Test {
+contract CommentsV1Test is Test, IERC721Receiver {
     event CommentAdded(
         bytes32 indexed commentId,
         address indexed author,
@@ -646,9 +647,19 @@ contract CommentsV1Test is Test {
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
 
-        // Post comment without fee
+        // Expect revert when posting comment with disabled hook
         vm.prank(author);
+        vm.expectRevert(abi.encodeWithSelector(ChannelManager.HookDisabledGlobally.selector));
         comments.postComment(commentData, authorSignature, appSignature);
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external pure returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 
     // Helper function to sign EIP-712 messages
