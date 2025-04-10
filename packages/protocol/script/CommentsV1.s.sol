@@ -15,11 +15,14 @@ contract CommentsV1Script is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        // Deploy ChannelManager first
-        channelManager = new ChannelManager{salt: bytes32(0)}(msg.sender);
+        // Deploy CommentsV1 first
+        comments = new CommentsV1{salt: bytes32(uint256(0))}(address(0)); // Temporary zero address for channelManager
         
-        // Deploy CommentsV1 with ChannelManager address
-        comments = new CommentsV1{salt: bytes32(0)}(address(channelManager));
+        // Deploy ChannelManager with CommentsV1 address
+        channelManager = new ChannelManager{salt: bytes32(uint256(0))}(msg.sender, address(comments));
+        
+        // Update CommentsV1 with correct ChannelManager address
+        comments = new CommentsV1{salt: bytes32(uint256(1))}(address(channelManager));
 
         console.log("ChannelManager deployed at", address(channelManager));
         console.log("CommentsV1 deployed at", address(comments));

@@ -3,6 +3,8 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "./interfaces/IHook.sol";
 import "./interfaces/ICommentTypes.sol";
 import "./interfaces/IChannelManager.sol";
@@ -28,7 +30,7 @@ import "./ChannelManager.sol";
 ///    - Thread IDs are immutable once set
 ///    - Parent-child relationships are verified
 ///    - Comment IDs are cryptographically secure
-contract CommentsV1 is ICommentTypes {
+contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     /// @notice Emitted when a new comment is added
     /// @param commentId Unique identifier of the comment
     /// @param author Address of the comment author
@@ -153,7 +155,7 @@ contract CommentsV1 is ICommentTypes {
         CommentData calldata commentData,
         bytes memory authorSignature,
         bytes memory appSignature
-    ) internal {
+    ) internal nonReentrant {
         if (block.timestamp > commentData.deadline) {
             revert SignatureDeadlineReached(commentData.deadline, block.timestamp);
         }
