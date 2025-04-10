@@ -232,7 +232,7 @@ export function insertPendingCommentToPage(
       pagination: {
         hasPrevious: false,
         hasNext: false,
-        limit: 0,
+        limit: 3,
       },
     },
     pendingOperation,
