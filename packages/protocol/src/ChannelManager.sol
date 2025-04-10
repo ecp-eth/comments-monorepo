@@ -72,9 +72,13 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     uint16 private hookTransactionFeePercentage; // In basis points (1% = 100)
     uint256 private accumulatedFees;
 
+    address public commentsContract;
+    
+    error UnauthorizedCaller();
+
     /// @notice Constructor sets the contract owner and initializes ERC721
     /// @param initialOwner The address that will own the contract
-    constructor(address initialOwner) 
+    constructor(address initialOwner, address _commentsContract) 
         Ownable(initialOwner) 
         ERC721("ECP Channel", "ECPC") 
     {
@@ -89,13 +93,20 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         _safeMint(initialOwner, _nextTokenId);
 
         channels[_nextTokenId].name = "Home";
-        channels[_nextTokenId].description = "The Default channel";
+        channels[_nextTokenId].description = "Any kind of content";
         channels[_nextTokenId].metadata = "{}";
         channels[_nextTokenId].owner = initialOwner;
         channels[_nextTokenId].isPrivate = false;
         channels[_nextTokenId].isArchived = false;
 
         _nextTokenId++;
+
+        commentsContract = _commentsContract;
+    }
+
+    modifier onlyCommentsContract() {
+        if (msg.sender != commentsContract) revert UnauthorizedCaller();
+        _;
     }
 
     /// @notice Sets the fee for creating a new channel (only owner)
@@ -399,7 +410,7 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         address caller,
         bytes32 commentId,
         bool isBeforeHook
-    ) public payable returns (bool success) {
+    ) public payable onlyCommentsContract returns (bool success) {
         if (!_channelExists(channelId)) revert ChannelDoesNotExist();
 
         ChannelConfig storage channel = channels[channelId];
@@ -414,7 +425,7 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         if (!registeredHooks[hookAddress]) revert HookNotRegistered();
         if (!globallyEnabledHooks[hookAddress]) revert HookDisabledGlobally();
         if (!channel.hookEnabled[hookAddress]) {
-            return true;
+            return true; // Skip execution if hook is disabled at channel level
         }
 
         // Calculate and deduct protocol fee if there's a payment
@@ -426,11 +437,14 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
             accumulatedFees += protocolFee;
         }
 
+        // Execute the appropriate hook function
         if (isBeforeHook) {
-            return hook.beforeComment{value: hookValue}(commentData, caller, commentId);
+            success = hook.beforeComment{value: hookValue}(commentData, caller, commentId);
         } else {
-            return hook.afterComment(commentData, caller, commentId);
+            success = hook.afterComment(commentData, caller, commentId);
         }
+
+        return success;
     }
 
     /// @notice Check if a channel exists
@@ -443,5 +457,11 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @notice Fallback function to receive ETH
     receive() external payable {
         accumulatedFees += msg.value;
+    }
+
+    /// @notice Updates the comments contract address (only owner)
+    /// @param _commentsContract The new comments contract address
+    function updateCommentsContract(address _commentsContract) external onlyOwner {
+        commentsContract = _commentsContract;
     }
 } 

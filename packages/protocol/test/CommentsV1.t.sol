@@ -59,8 +59,10 @@ contract CommentsV1Test is Test, IERC721Receiver {
         appSigner = vm.addr(appSignerPrivateKey);
 
         noHook = new NoHook();
-        channelManager = new ChannelManager(address(this));
-        comments = new CommentsV1(address(channelManager));
+        comments = new CommentsV1(address(0)); // First deploy with zero address
+        channelManager = new ChannelManager(address(this), address(comments));
+        comments = new CommentsV1(address(channelManager)); // Redeploy with correct address
+        channelManager.updateCommentsContract(address(comments)); // Update the comments contract address
 
         // Setup private keys for signing
         vm.deal(author, 100 ether);
