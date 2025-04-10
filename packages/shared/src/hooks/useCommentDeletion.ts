@@ -61,38 +61,44 @@ export function useCommentDeletion(): CommentDeletionAPI {
     [client]
   );
 
-  const success = useCallback<OnCommentDeletionSuccess>((params) => {
-    client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-      params.queryKey,
-      (data) => {
-        const queryData = ListCommentsQueryDataSchema.parse(data);
+  const success = useCallback<OnCommentDeletionSuccess>(
+    (params) => {
+      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
+        params.queryKey,
+        (data) => {
+          const queryData = ListCommentsQueryDataSchema.parse(data);
 
-        return markCommentAsDeleted(
-          queryData,
-          params.pendingOperation.commentId
-        );
-      }
-    );
+          return markCommentAsDeleted(
+            queryData,
+            params.pendingOperation.commentId
+          );
+        }
+      );
 
-    toast.success("Comment deleted");
-  }, []);
+      toast.success("Comment deleted");
+    },
+    [client]
+  );
 
-  const error = useCallback<OnCommentDeletionError>((params) => {
-    client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
-      params.queryKey,
-      (data) => {
-        const queryData = ListCommentsQueryDataSchema.parse(data);
+  const error = useCallback<OnCommentDeletionError>(
+    (params) => {
+      client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
+        params.queryKey,
+        (data) => {
+          const queryData = ListCommentsQueryDataSchema.parse(data);
 
-        return markCommentDeletionAsFailed(
-          queryData,
-          params.commentId,
-          params.error
-        );
-      }
-    );
+          return markCommentDeletionAsFailed(
+            queryData,
+            params.commentId,
+            params.error
+          );
+        }
+      );
 
-    toast.error("Failed to delete comment");
-  }, []);
+      toast.error("Failed to delete comment");
+    },
+    [client]
+  );
 
   return useMemo(
     () => ({
