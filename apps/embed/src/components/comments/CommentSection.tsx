@@ -2,7 +2,6 @@
 
 import { type InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { Comment } from "./Comment";
 import { CommentForm } from "./CommentForm";
 import {
   EmbedConfigProviderByTargetURIConfig,
@@ -10,12 +9,7 @@ import {
 } from "../EmbedConfigProvider";
 import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
-import {
-  useHandleCommentDeleted,
-  useHandleCommentSubmitted,
-  useHandleRetryPostComment,
-  useNewCommentsChecker,
-} from "@ecp.eth/shared/hooks";
+import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import { Button } from "../ui/button";
 import {
   COMMENTS_PER_PAGE,
@@ -31,6 +25,8 @@ import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { publicEnv } from "@/publicEnv";
 import { useAccount } from "wagmi";
 import { PoweredBy } from "@ecp.eth/shared/components";
+import { CommentItem } from "./CommentItem";
+import { createRootCommentsQueryKey } from "./queries";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -43,10 +39,10 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   useAutoBodyMinHeight();
 
   const { address } = useAccount();
-  const { targetUri, currentTimestamp, disablePromotion } =
+  const { targetUri, disablePromotion } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
-    () => ["comments", targetUri, address],
+    () => createRootCommentsQueryKey(address, targetUri),
     [targetUri, address]
   );
 
@@ -107,14 +103,6 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
-  const handleCommentDeleted = useHandleCommentDeleted({
-    queryKey,
-  });
-  const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey,
-  });
-  const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
-
   const results = useMemo(() => {
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
@@ -136,7 +124,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     <div className="max-w-2xl mx-auto">
       <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
       <div className="mb-4">
-        <CommentForm onSubmitSuccess={handleCommentSubmitted} />
+        <CommentForm />
       </div>
       {hasNewComments && (
         <Button
@@ -149,13 +137,10 @@ export function CommentSection({ initialData }: CommentSectionProps) {
         </Button>
       )}
       {results.map((comment) => (
-        <Comment
+        <CommentItem
           comment={comment}
           key={comment.id}
-          onDelete={handleCommentDeleted}
-          onRetryPost={handleRetryPostComment}
-          currentTimestamp={currentTimestamp}
-          rootComment={comment}
+          connectedAddress={address}
         />
       ))}
       {hasNextPage && (

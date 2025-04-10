@@ -319,6 +319,9 @@ importers:
       '@upstash/redis':
         specifier: ^1.34.5
         version: 1.34.5
+      '@wagmi/core':
+        specifier: ^2.16.7
+        version: 2.16.7(@tanstack/query-core@5.69.0)(@types/react@19.0.11)(react@19.0.0)(typescript@5.8.2)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.26.0(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.1))
       blo:
         specifier: ^1.2.0
         version: 1.2.0

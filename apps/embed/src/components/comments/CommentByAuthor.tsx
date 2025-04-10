@@ -4,14 +4,13 @@ import React from "react";
 import { cn, formatAuthorLink } from "@/lib/utils";
 import { type Comment as CommentType } from "@ecp.eth/shared/schemas";
 import Link from "next/link";
-import { CommentText } from "./CommentText";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import {
   getCommentAuthorNameOrAddress,
   formatDate,
-  formatDateRelative,
 } from "@ecp.eth/shared/helpers";
 import { useCommentRelativeTime } from "@ecp.eth/shared/hooks";
+import { CommentText } from "@ecp.eth/shared/components";
 
 interface CommentByAuthorProps {
   comment: CommentType;

@@ -2,19 +2,33 @@ import {
   type SignCommentPayloadRequestSchemaType,
   SignCommentPayloadRequestSchema,
 } from "@/lib/schemas";
-import { publicEnv } from "@/publicEnv";
-import { fetchAuthorData } from "@ecp.eth/sdk";
 import {
   SignCommentResponseClientSchema,
-  type PendingCommentOperationSchemaType,
   type SignCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
+import { publicEnv } from "@/publicEnv";
+import { fetchAuthorData } from "@ecp.eth/sdk";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
 import {
   RateLimitedError,
   CommentFormSubmitError,
   InvalidCommentError,
 } from "./errors";
+import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
+
+export function createRootCommentsQueryKey(
+  address: Hex | undefined,
+  targetUri: string
+) {
+  return ["comments", address, targetUri];
+}
+
+export function createCommentRepliesQueryKey(
+  address: Hex | undefined,
+  commentId: Hex
+) {
+  return ["comments", address, commentId];
+}
 
 export class SubmitCommentMutationError extends Error {}
 
@@ -22,9 +36,10 @@ type SubmitCommentParams = {
   address: Hex | undefined;
   commentRequest: Omit<SignCommentPayloadRequestSchemaType, "author">;
   switchChainAsync: (chainId: number) => Promise<Chain>;
-  writeContractAsync: (
-    params: SignCommentResponseClientSchemaType
-  ) => Promise<Hex>;
+  writeContractAsync: (params: {
+    signCommentResponse: SignCommentResponseClientSchemaType;
+    chainId: number;
+  }) => Promise<Hex>;
 };
 
 export async function submitCommentMutationFunction({
@@ -32,7 +47,7 @@ export async function submitCommentMutationFunction({
   commentRequest,
   switchChainAsync,
   writeContractAsync,
-}: SubmitCommentParams): Promise<PendingCommentOperationSchemaType> {
+}: SubmitCommentParams): Promise<PendingPostCommentOperationSchemaType> {
   if (!address) {
     throw new SubmitCommentMutationError("Wallet not connected.");
   }
@@ -57,7 +72,11 @@ export async function submitCommentMutationFunction({
 
   const commentData = parseResult.data;
 
-  const chain = await switchChainAsync(commentData.chainId);
+  const switchedChain = await switchChainAsync(commentData.chainId);
+
+  if (switchedChain.id !== commentData.chainId) {
+    throw new SubmitCommentMutationError("Failed to switch chain.");
+  }
 
   const response = await fetch("/api/sign-comment", {
     method: "POST",
@@ -92,13 +111,19 @@ export async function submitCommentMutationFunction({
   }
 
   try {
-    const txHash = await writeContractAsync(signedCommentResult.data);
+    const txHash = await writeContractAsync({
+      signCommentResponse: signedCommentResult.data,
+      chainId: commentData.chainId,
+    });
 
     return {
-      response: signedCommentResult.data,
       txHash,
-      chainId: chain.id,
       resolvedAuthor,
+      response: signedCommentResult.data,
+      type: "non-gasless",
+      action: "post",
+      state: { status: "pending" },
+      chainId: commentData.chainId,
     };
   } catch (e) {
     if (
