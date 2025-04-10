@@ -15,12 +15,13 @@ import { CommentForm } from "./CommentForm";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { useAccount } from "wagmi";
 import { CommentItem } from "../core/CommentItem";
+import { createRootCommentsQueryKey } from "../core/queries";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
-    () => ["comments", currentUrl, viewer],
+    () => createRootCommentsQueryKey(viewer, currentUrl),
     [currentUrl, viewer]
   );
 
@@ -96,7 +97,7 @@ export function CommentSection() {
   return (
     <CommentSectionWrapper>
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
-      <CommentForm queryKey={queryKey} />
+      <CommentForm />
       {hasNewComments && (
         <Button
           className="mb-4"

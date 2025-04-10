@@ -17,12 +17,13 @@ import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { CommentItem } from "../core/CommentItem";
 import { useCommentActions } from "./hooks/useCommentActions";
 import { CommentActionsProvider } from "../core/CommentActionsContext";
+import { createRootCommentsQueryKey } from "../core/queries";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
-    () => ["comments", currentUrl, viewer],
+    () => createRootCommentsQueryKey(viewer, currentUrl),
     [currentUrl, viewer]
   );
 
@@ -103,7 +104,7 @@ export function CommentSection() {
     <CommentActionsProvider value={commentActions}>
       <CommentSectionWrapper>
         <h2 className="text-lg font-semibold mb-4">Comments</h2>
-        <CommentForm queryKey={queryKey} />
+        <CommentForm />
         {hasNewComments && (
           <Button
             className="mb-4"

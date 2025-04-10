@@ -46,7 +46,6 @@ export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
           }}
           placeholder="What are your thoughts?"
           parentId={comment.id}
-          queryKey={queryKey}
         />
       )}
     </div>

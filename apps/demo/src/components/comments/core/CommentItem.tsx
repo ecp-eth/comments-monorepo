@@ -18,6 +18,10 @@ import { Comment } from "./Comment";
 import { useCommentActions } from "./CommentActionsContext";
 import { CommentForm } from "./CommentForm";
 import { ReplyItem } from "./ReplyItem";
+import {
+  createCommentRepliesQueryKey,
+  createRootCommentsQueryKey,
+} from "./queries";
 
 type CommentItemProps = {
   connectedAddress: Hex | undefined;
@@ -27,8 +31,12 @@ type CommentItemProps = {
 export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   const { deleteComment, retryPostComment } = useCommentActions();
   const [isReplying, setIsReplying] = useState(false);
+  const rootQueryKey = useMemo(
+    () => createRootCommentsQueryKey(connectedAddress, window.location.href),
+    [connectedAddress]
+  );
   const queryKey = useMemo(
-    () => ["comments", comment.id, connectedAddress],
+    () => createCommentRepliesQueryKey(connectedAddress, comment.id),
     [comment.id, connectedAddress]
   );
 
@@ -37,11 +45,11 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   }, []);
 
   const onDeleteClick = useCallback(() => {
-    deleteComment({ comment, queryKey });
+    deleteComment({ comment, queryKey: rootQueryKey });
   }, [comment, deleteComment, queryKey]);
 
   const onRetryPostClick = useCallback(() => {
-    retryPostComment({ comment, queryKey });
+    retryPostComment({ comment, queryKey: rootQueryKey });
   }, [comment, retryPostComment, queryKey]);
 
   const repliesQuery = useInfiniteQuery({
@@ -137,7 +145,6 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
           }}
           placeholder="What are your thoughts?"
           parentId={comment.id}
-          queryKey={queryKey}
         />
       )}
       {hasNewComments && (

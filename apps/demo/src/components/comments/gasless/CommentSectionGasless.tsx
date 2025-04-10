@@ -39,12 +39,13 @@ import { useGaslessCommentActions } from "./hooks/useGaslessCommentActions";
 import { CommentActionsProvider } from "../core/CommentActionsContext";
 import { CommentItem } from "../core/CommentItem";
 import { CommentForm } from "../core/CommentForm";
+import { createRootCommentsQueryKey } from "../core/queries";
 
 export function CommentSectionGasless() {
   const { address: viewer } = useAccount();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
-    () => ["comments", currentUrl, viewer],
+    () => createRootCommentsQueryKey(viewer, currentUrl),
     [currentUrl, viewer]
   );
 
@@ -283,7 +284,7 @@ export function CommentSectionGasless() {
               </div>
             )
           )}
-          <CommentForm queryKey={queryKey} />
+          <CommentForm />
           {hasNewComments && (
             <Button
               className="mb-4"

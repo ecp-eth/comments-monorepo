@@ -12,6 +12,10 @@ import type { QueryKey } from "@tanstack/react-query";
 import type { Hex } from "viem";
 import { Button } from "@/components/ui/button";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
+import {
+  createCommentRepliesQueryKey,
+  createRootCommentsQueryKey,
+} from "./queries";
 
 export interface CommentFormProps<TExtraSubmitData = unknown> {
   /**
@@ -36,7 +40,6 @@ export interface CommentFormProps<TExtraSubmitData = unknown> {
    */
   extra?: TExtraSubmitData;
   placeholder?: string;
-  queryKey: QueryKey;
   parentId?: Hex;
   /**
    * @default "Post"
@@ -53,7 +56,6 @@ export function CommentForm<TExtraSubmitData = unknown>({
   disabled = false,
   placeholder = "What are your thoughts?",
   onLeftEmpty,
-  queryKey,
   parentId,
   submitIdleLabel = "Post",
   submitPendingLabel = "Posting...",
@@ -78,6 +80,14 @@ export function CommentForm<TExtraSubmitData = unknown>({
         const submitAction = formData.get("action") as "post";
 
         setFormState(submitAction);
+
+        let queryKey: QueryKey;
+
+        if (parentId) {
+          queryKey = createCommentRepliesQueryKey(author, parentId);
+        } else {
+          queryKey = createRootCommentsQueryKey(author, window.location.href);
+        }
 
         const result = await postComment({
           address: author,
