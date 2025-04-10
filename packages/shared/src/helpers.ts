@@ -1,6 +1,5 @@
 import type {
   Comment,
-  PendingCommentOperationSchemaType,
   CommentPageSchemaType,
   ListCommentsQueryPageParamsSchemaType,
   PendingComment,
@@ -334,47 +333,6 @@ export function markPendingPostCommentAsPosted(
 
         return queryData;
       }
-    }
-  }
-
-  return queryData;
-}
-
-/**
- * Replace a comment's pending operation with a new pending operation
- *
- * This function mutates the queryData argument
- *
- * @deprecated remove
- *
- */
-export function replaceCommentPendingOperationByComment(
-  queryData: InfiniteData<
-    CommentPageSchemaType,
-    ListCommentsQueryPageParamsSchemaType
-  >,
-  comment: Comment,
-  newPendingOperation: PendingCommentOperationSchemaType
-): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
-  function replaceComment(page: CommentPageSchemaType): boolean {
-    for (const c of page.results) {
-      if (c.id === comment.id) {
-        c.pendingOperation = newPendingOperation;
-
-        return true;
-      }
-
-      if (c.replies && replaceComment(c.replies)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  for (const page of queryData.pages) {
-    if (replaceComment(page)) {
-      return queryData;
     }
   }
 
