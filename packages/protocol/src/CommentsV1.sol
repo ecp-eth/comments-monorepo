@@ -109,7 +109,7 @@ contract CommentsV1 is ICommentTypes {
     /// @notice Constructor initializes the contract with the deployer as owner and channel manager
     /// @dev Sets up EIP-712 domain separator
     constructor(address _channelManager) {
-        channelManager = ChannelManager(_channelManager);
+        channelManager = ChannelManager(payable(_channelManager));
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256(

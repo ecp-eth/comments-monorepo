@@ -5,6 +5,7 @@ import {Test, console} from "forge-std/Test.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
 import {IHook} from "../src/interfaces/IHook.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 // Mock hook contract for testing
 contract MockHook is IHook {
@@ -42,7 +43,7 @@ contract InvalidHook {
     }
 }
 
-contract ChannelManagerTest is Test {
+contract ChannelManagerTest is Test, IERC721Receiver {
     ChannelManager public channelManager;
     MockHook public mockHook;
     InvalidHook public invalidHook;
@@ -258,6 +259,7 @@ contract ChannelManagerTest is Test {
             targetUri: "https://example.com",
             author: user1,
             appSigner: user2,
+            channelId: channelId,
             nonce: 0,
             deadline: block.timestamp + 1 days
         });
@@ -291,10 +293,11 @@ contract ChannelManagerTest is Test {
         ));
     }
 
-    function testFail_CreateChannelWithInvalidHook() public {
+    function test_RevertWhen_CreatingChannelWithInvalidHook() public {
         address[] memory hooks = new address[](1);
         hooks[0] = address(invalidHook);
         
+        vm.expectRevert(abi.encodeWithSelector(ChannelManager.InvalidHookInterface.selector));
         channelManager.createChannel(
             "Test Channel",
             "Description",
@@ -304,7 +307,7 @@ contract ChannelManagerTest is Test {
         );
     }
 
-    function testFail_AddInvalidHook() public {
+    function test_RevertWhen_AddingUnregisteredHook() public {
         uint256 channelId = channelManager.createChannel(
             "Test Channel",
             "Description",
@@ -313,10 +316,21 @@ contract ChannelManagerTest is Test {
             new address[](0)
         );
 
-        channelManager.addHook(channelId, address(invalidHook));
+        // Create a new valid hook but don't register it
+        MockHook unregisteredHook = new MockHook();
+
+        // Try to add an unregistered hook
+        vm.expectRevert(abi.encodeWithSelector(ChannelManager.HookNotRegistered.selector));
+        channelManager.addHook(channelId, address(unregisteredHook));
     }
 
-    function testFail_NonOwnerUpdateChannel() public {
+    function test_RevertWhen_RegisteringInvalidHook() public {
+        // Try to register the invalid hook
+        vm.expectRevert(abi.encodeWithSelector(ChannelManager.InvalidHookInterface.selector));
+        channelManager.registerHook{value: 0.1 ether}(address(invalidHook));
+    }
+
+    function test_RevertWhen_NonOwnerUpdatesChannel() public {
         uint256 channelId = channelManager.createChannel(
             "Test Channel",
             "Description",
@@ -326,6 +340,7 @@ contract ChannelManagerTest is Test {
         );
 
         vm.prank(user1);
+        vm.expectRevert(abi.encodeWithSelector(ChannelManager.NotChannelOwner.selector));
         channelManager.updateChannel(
             channelId,
             "New Name",
@@ -396,6 +411,7 @@ contract ChannelManagerTest is Test {
             targetUri: "https://example.com",
             author: user1,
             appSigner: user2,
+            channelId: channelId,
             nonce: 0,
             deadline: block.timestamp + 1 days
         });
@@ -408,5 +424,14 @@ contract ChannelManagerTest is Test {
             bytes32(0),
             true
         );
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external pure returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 } 
