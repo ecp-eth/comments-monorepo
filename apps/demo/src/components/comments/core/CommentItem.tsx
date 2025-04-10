@@ -42,6 +42,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   }, [comment, retryPostComment, queryKey]);
 
   const repliesQuery = useInfiniteQuery({
+    enabled: comment.pendingOperation?.action !== "post",
     queryKey,
     initialData: comment.replies
       ? {
@@ -89,6 +90,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   });
 
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    enabled: comment.pendingOperation?.action !== "post",
     queryData: repliesQuery.data,
     queryKey,
     fetchComments({ cursor, signal }) {
