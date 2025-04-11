@@ -6,6 +6,7 @@ import {CommentsV1} from "../src/CommentsV1.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {IHook} from "../src/interfaces/IHook.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
+import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract NoHook is IHook {
@@ -149,6 +150,10 @@ contract CommentsV1Test is Test, IERC721Receiver {
         vm.expectEmit(true, true, true, true);
         emit CommentDeleted(commentId, author);
         comments.deleteCommentAsAuthor(commentId);
+
+        // Verify comment is deleted
+        vm.expectRevert("Comment does not exist");
+        comments.getComment(commentId);
     }
 
     function test_DeleteComment() public {
@@ -187,20 +192,28 @@ contract CommentsV1Test is Test, IERC721Receiver {
     }
 
     function test_DeleteComment_InvalidSignature() public {
-        bytes32 commentId = bytes32(uint256(1)); // Any comment ID
+        // First create a comment
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
+        bytes32 commentId = comments.getCommentId(commentData);
+        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+
+        vm.prank(author);
+        comments.postCommentAsAuthor(commentData, appSignature);
+
+        // Try to delete with wrong signature
+        uint256 nonce = comments.nonces(author, appSigner);
+        uint256 deadline = block.timestamp + 1 days;
         bytes32 deleteHash = comments.getDeleteCommentHash(
             commentId,
             author,
             appSigner,
-            comments.nonces(author, appSigner),
-            block.timestamp + 1 days
+            nonce,
+            deadline
         );
         bytes memory wrongSignature = _signEIP712(wrongPrivateKey, deleteHash); // Wrong signer
 
-        uint256 nonce = comments.nonces(author, appSigner);
-        uint256 deadline = block.timestamp + 1 days;
-
-        vm.expectRevert(abi.encodeWithSelector(CommentsV1.NotAuthorized.selector, address(this), author));
+        vm.prank(address(0xdead));
+        vm.expectRevert(abi.encodeWithSelector(CommentsV1.NotAuthorized.selector, address(0xdead), author));
         comments.deleteComment(
             commentId,
             author,
@@ -210,6 +223,9 @@ contract CommentsV1Test is Test, IERC721Receiver {
             wrongSignature,
             wrongSignature
         );
+
+        // Verify comment still exists
+        assertTrue(comments.commentExists(commentId));
     }
 
     function test_PostCommentAsAuthor_InvalidNonce() public {
@@ -476,13 +492,13 @@ contract CommentsV1Test is Test, IERC721Receiver {
 
     function test_PostComment_WithFeeCollection() public {
         // Register and enable hook globally
-        channelManager.registerHook(address(noHook));
+        channelManager.registerHook{value: 0.02 ether}(address(noHook));
         channelManager.setHookGloballyEnabled(address(noHook), true);
 
         // Create a channel with the hook
         address[] memory hooks = new address[](1);
         hooks[0] = address(noHook);
-        uint256 channelId = channelManager.createChannel("Test Channel", "Test Description", "{}", false, hooks);
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}("Test Channel", "Test Description", "{}", false, hooks);
 
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.channelId = channelId;
@@ -499,13 +515,13 @@ contract CommentsV1Test is Test, IERC721Receiver {
     function test_PostComment_WithInvalidFee() public {
         // Setup fee collector that requires 1 ether
         MaliciousFeeCollector maliciousCollector = new MaliciousFeeCollector();
-        channelManager.registerHook(address(maliciousCollector));
+        channelManager.registerHook{value: 0.02 ether}(address(maliciousCollector));
         channelManager.setHookGloballyEnabled(address(maliciousCollector), true);
 
         // Create a channel with the hook
         address[] memory hooks = new address[](1);
         hooks[0] = address(maliciousCollector);
-        uint256 channelId = channelManager.createChannel("Test Channel", "Test Description", "{}", false, hooks);
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}("Test Channel", "Test Description", "{}", false, hooks);
 
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.channelId = channelId;
@@ -636,13 +652,13 @@ contract CommentsV1Test is Test, IERC721Receiver {
 
     function test_PostComment_WithFeeCollectionDisabled() public {
         // Setup hook
-        channelManager.registerHook(address(noHook));
+        channelManager.registerHook{value: 0.02 ether}(address(noHook));
         channelManager.setHookGloballyEnabled(address(noHook), false);
 
         // Create channel with hook
         address[] memory hooks = new address[](1);
         hooks[0] = address(noHook);
-        uint256 channelId = channelManager.createChannel("Test Channel", "Test Description", "{}", false, hooks);
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}("Test Channel", "Test Description", "{}", false, hooks);
 
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.channelId = channelId;
@@ -652,7 +668,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
 
         // Expect revert when posting comment with disabled hook
         vm.prank(author);
-        vm.expectRevert(abi.encodeWithSelector(ChannelManager.HookDisabledGlobally.selector));
+        vm.expectRevert(abi.encodeWithSelector(IChannelManager.HookDisabledGlobally.selector));
         comments.postComment(commentData, authorSignature, appSignature);
     }
 
