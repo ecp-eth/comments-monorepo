@@ -13,22 +13,9 @@ import {
   RateLimitedError,
   CommentFormSubmitError,
   InvalidCommentError,
-} from "./errors";
+} from "../core/errors";
+import { chain } from "@/lib/wagmi";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-
-export function createRootCommentsQueryKey(
-  address: Hex | undefined,
-  targetUri: string
-) {
-  return ["comments", address, targetUri];
-}
-
-export function createCommentRepliesQueryKey(
-  address: Hex | undefined,
-  commentId: Hex
-) {
-  return ["comments", address, commentId];
-}
 
 export class SubmitCommentMutationError extends Error {}
 
@@ -72,9 +59,9 @@ export async function submitCommentMutationFunction({
 
   const commentData = parseResult.data;
 
-  const switchedChain = await switchChainAsync(commentData.chainId);
+  const switchedChain = await switchChainAsync(chain.id);
 
-  if (switchedChain.id !== commentData.chainId) {
+  if (switchedChain.id !== chain.id) {
     throw new SubmitCommentMutationError("Failed to switch chain.");
   }
 
@@ -113,7 +100,7 @@ export async function submitCommentMutationFunction({
   try {
     const txHash = await writeContractAsync({
       signCommentResponse: signedCommentResult.data,
-      chainId: commentData.chainId,
+      chainId: chain.id,
     });
 
     return {
@@ -123,7 +110,7 @@ export async function submitCommentMutationFunction({
       type: "non-gasless",
       action: "post",
       state: { status: "pending" },
-      chainId: commentData.chainId,
+      chainId: chain.id,
     };
   } catch (e) {
     if (

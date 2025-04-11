@@ -26,7 +26,7 @@
     "@reown/appkit-wagmi-react-native": "^1.2.2",
     "@tanstack/query-core": "^5.68.0",
     "@tanstack/react-query": "^5.69.0",
-    "@wagmi/core": "^2.16.5",
+    "@wagmi/core": "^2.16.7",
     "@walletconnect/react-native-compat": "^2.19.1",
     "blo": "^1.2.0",
     "expo": "53.0.0-canary-20250320-7a205d3",
@@ -45,8 +45,8 @@
     "react-native-safe-area-context": "^5.2.0",
     "react-native-svg": "^15.11.2",
     "react-native-toast-message": "^2.2.1",
-    "viem": "^2.22.21",
-    "wagmi": "^2.14.15",
+    "viem": "^2.26.0",
+    "wagmi": "^2.14.16",
     "zod": "^3.24.1"
   },
   "devDependencies": {

@@ -3,7 +3,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { CommentSection } from "@/components/comments/CommentSection";
+import { CommentSection } from "@/components/comments/standard/CommentSection";
 import { CommentSectionGasless } from "@/components/comments/gasless/CommentSectionGasless";
 import Link from "next/link";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";

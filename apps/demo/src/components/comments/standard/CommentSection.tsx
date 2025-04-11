@@ -3,29 +3,27 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchComments } from "@ecp.eth/sdk";
 import { useEffect, useMemo, useState } from "react";
-import { Comment } from "./Comment";
 import { publicEnv } from "@/publicEnv";
 import {
   COMMENTS_PER_PAGE,
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
-import { Button } from "../ui/button";
-import {
-  useHandleCommentDeleted,
-  useHandleCommentSubmitted,
-  useHandleRetryPostComment,
-  useNewCommentsChecker,
-} from "@ecp.eth/shared/hooks";
+import { Button } from "@/components/ui/button";
+import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import type { Hex } from "viem";
-import { CommentDefaultForm } from "./CommentDefaultForm";
+import { CommentForm } from "../core/CommentForm";
 import { useAccount } from "wagmi";
-import { CommentSectionWrapper } from "./CommentSectionWrapper";
+import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
+import { CommentItem } from "../core/CommentItem";
+import { useCommentActions } from "./hooks/useCommentActions";
+import { CommentActionsProvider } from "../core/CommentActionsContext";
+import { createRootCommentsQueryKey } from "../core/queries";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
-    () => ["comments", currentUrl, viewer],
+    () => createRootCommentsQueryKey(viewer, currentUrl),
     [currentUrl, viewer]
   );
 
@@ -86,13 +84,9 @@ export function CommentSection() {
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
-  const handleCommentDeleted = useHandleCommentDeleted({
-    queryKey,
+  const commentActions = useCommentActions({
+    connectedAddress: viewer,
   });
-  const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey,
-  });
-  const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
 
   const results = useMemo(() => {
     return data?.pages.flatMap((page) => page.results) ?? [];
@@ -107,33 +101,33 @@ export function CommentSection() {
   }
 
   return (
-    <CommentSectionWrapper>
-      <h2 className="text-lg font-semibold mb-4">Comments</h2>
-      <CommentDefaultForm onSubmitSuccess={handleCommentSubmitted} />
-      {hasNewComments && (
-        <Button
-          className="mb-4"
-          onClick={() => fetchNewComments()}
-          variant="secondary"
-          size="sm"
-        >
-          Load new comments
-        </Button>
-      )}
-      {results.map((comment) => (
-        <Comment
-          key={`${comment.id}-${comment.deletedAt}`}
-          comment={comment}
-          onRetryPost={handleRetryPostComment}
-          onDelete={handleCommentDeleted}
-          rootComment={comment}
-        />
-      ))}
-      {hasNextPage && (
-        <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
-          Load More
-        </Button>
-      )}
-    </CommentSectionWrapper>
+    <CommentActionsProvider value={commentActions}>
+      <CommentSectionWrapper>
+        <h2 className="text-lg font-semibold mb-4">Comments</h2>
+        <CommentForm />
+        {hasNewComments && (
+          <Button
+            className="mb-4"
+            onClick={() => fetchNewComments()}
+            variant="secondary"
+            size="sm"
+          >
+            Load new comments
+          </Button>
+        )}
+        {results.map((comment) => (
+          <CommentItem
+            key={`${comment.id}-${comment.deletedAt}`}
+            comment={comment}
+            connectedAddress={viewer}
+          />
+        ))}
+        {hasNextPage && (
+          <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
+            Load More
+          </Button>
+        )}
+      </CommentSectionWrapper>
+    </CommentActionsProvider>
   );
 }

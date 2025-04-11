@@ -10,7 +10,6 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { CommentGasless } from "./CommentGasless";
 import {
   COMMENTS_V1_ADDRESS,
   createApprovalTypedData,
@@ -27,27 +26,26 @@ import {
   COMMENTS_PER_PAGE,
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
-import {
-  useHandleCommentDeleted,
-  useHandleCommentSubmitted,
-  useHandleRetryPostComment,
-  useNewCommentsChecker,
-} from "@ecp.eth/shared/hooks";
+import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import {
   CommentGaslessProvider,
   CommentGaslessProviderContextType,
 } from "./CommentGaslessProvider";
-import { CommentGaslessForm } from "./CommentGaslessForm";
 import { useApprovalStatus } from "@/hooks/useApprovalStatus";
 import { chain } from "@/lib/wagmi";
-import { CommentSectionWrapper } from "../CommentSectionWrapper";
+import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
+import { useGaslessCommentActions } from "./hooks/useGaslessCommentActions";
+import { CommentActionsProvider } from "../core/CommentActionsContext";
+import { CommentItem } from "../core/CommentItem";
+import { CommentForm } from "../core/CommentForm";
+import { createRootCommentsQueryKey } from "../core/queries";
 
 export function CommentSectionGasless() {
   const { address: viewer } = useAccount();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
-    () => ["comments", currentUrl, viewer],
+    () => createRootCommentsQueryKey(viewer, currentUrl),
     [currentUrl, viewer]
   );
 
@@ -169,13 +167,10 @@ export function CommentSectionGasless() {
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
-  const handleCommentDeleted = useHandleCommentDeleted({
-    queryKey,
+  const gaslessCommentActions = useGaslessCommentActions({
+    connectedAddress: viewer,
+    hasApproval: !!approvalData?.approved,
   });
-  const handleCommentSubmitted = useHandleCommentSubmitted({
-    queryKey,
-  });
-  const handleRetryPostComment = useHandleRetryPostComment({ queryKey });
 
   const { reset: resetApproveGaslessTransactionsMutation } =
     approveGaslessTransactionsMutation;
@@ -240,80 +235,84 @@ export function CommentSectionGasless() {
   }
 
   return (
-    <CommentGaslessProvider value={commentGaslessProviderValue}>
-      <CommentSectionWrapper>
-        <h2 className="text-lg font-semibold">Comments</h2>
+    <CommentActionsProvider value={gaslessCommentActions}>
+      <CommentGaslessProvider value={commentGaslessProviderValue}>
+        <CommentSectionWrapper>
+          <h2 className="text-lg font-semibold">Comments</h2>
 
-        {!approvalData?.approved ? (
-          <div className="mb-4">
-            <Button
-              onClick={() => {
-                approveGaslessTransactionsMutation.mutate();
-              }}
-              disabled={isApprovalPending}
-              variant="default"
-            >
-              {isApprovalPending
-                ? "Requesting Approval..."
-                : "Request Approval to Comment"}
-            </Button>
-          </div>
-        ) : (
-          approvalData?.approved && (
-            <div className="flex items-center gap-2">
-              <div className="text-sm text-gray-500">
-                App has approval to post on your behalf.
-              </div>
+          {!approvalData?.approved ? (
+            <div className="mb-4">
               <Button
-                variant="outline"
-                disabled={!approvalData || isRemovingApproval}
                 onClick={() => {
-                  if (!approvalData || !approvalData.approved || !viewer) {
-                    throw new Error("No data found");
-                  }
-
-                  removeApprovalContract.writeContract({
-                    abi: CommentsV1Abi,
-                    address: COMMENTS_V1_ADDRESS,
-                    functionName: "removeApprovalAsAuthor",
-                    args: [publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS],
-                  });
+                  approveGaslessTransactionsMutation.mutate();
                 }}
+                disabled={isApprovalPending}
+                variant="default"
               >
-                <X />
-                <span>
-                  {isRemovingApproval ? "Removing..." : "Remove Approval"}
-                </span>
+                {isApprovalPending
+                  ? "Requesting Approval..."
+                  : "Request Approval to Comment"}
               </Button>
             </div>
-          )
-        )}
-        <CommentGaslessForm onSubmitSuccess={handleCommentSubmitted} />
-        {hasNewComments && (
-          <Button
-            className="mb-4"
-            onClick={() => fetchNewComments()}
-            variant="secondary"
-            size="sm"
-          >
-            Load new comments
-          </Button>
-        )}
-        {results.map((comment) => (
-          <CommentGasless
-            key={`${comment.id}-${comment.deletedAt}`}
-            comment={comment}
-            onRetryPost={handleRetryPostComment}
-            onDelete={handleCommentDeleted}
-            rootComment={comment}
-          />
-        ))}
-        {hasNextPage && (
-          <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
-            Load More
-          </Button>
-        )}
-      </CommentSectionWrapper>
-    </CommentGaslessProvider>
+          ) : (
+            approvalData?.approved && (
+              <div className="flex items-center gap-2">
+                <div className="text-sm text-gray-500">
+                  App has approval to post on your behalf.
+                </div>
+                <Button
+                  variant="outline"
+                  disabled={!approvalData || isRemovingApproval}
+                  onClick={() => {
+                    if (!approvalData || !approvalData.approved || !viewer) {
+                      throw new Error("No data found");
+                    }
+
+                    removeApprovalContract.writeContract({
+                      abi: CommentsV1Abi,
+                      address: COMMENTS_V1_ADDRESS,
+                      functionName: "removeApprovalAsAuthor",
+                      args: [publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS],
+                    });
+                  }}
+                >
+                  <X />
+                  <span>
+                    {isRemovingApproval ? "Removing..." : "Remove Approval"}
+                  </span>
+                </Button>
+              </div>
+            )
+          )}
+          <CommentForm />
+          {hasNewComments && (
+            <Button
+              className="mb-4"
+              onClick={() => fetchNewComments()}
+              variant="secondary"
+              size="sm"
+            >
+              Load new comments
+            </Button>
+          )}
+          {results.map((comment) => (
+            <CommentItem
+              key={`${comment.id}-${comment.deletedAt}`}
+              comment={comment}
+              connectedAddress={viewer}
+            />
+          ))}
+          {hasNextPage && (
+            <Button
+              onClick={() => fetchNextPage()}
+              variant="secondary"
+              size="sm"
+            >
+              Load More
+            </Button>
+          )}
+        </CommentSectionWrapper>
+      </CommentGaslessProvider>
+    </CommentActionsProvider>
   );
 }

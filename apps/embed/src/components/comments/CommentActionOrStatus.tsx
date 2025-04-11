@@ -1,29 +1,37 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
+import type { Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { CommentActionButton } from "./CommentActionButton";
-import { type Comment as CommentType } from "@ecp.eth/shared/schemas";
+import { RetryButton } from "./RetryButton";
+
+interface CommentActionOrStatusProps {
+  comment: CommentType;
+  hasAccountConnected: boolean;
+  onReplyClick: () => void;
+  onRetryDeleteClick: () => void;
+  onRetryPostClick: () => void;
+}
 
 export function CommentActionOrStatus({
   comment,
   hasAccountConnected,
-  isDeleting,
-  isPosting,
-  postingFailed,
-  deletingFailed,
   onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
-}: {
-  comment: CommentType;
-  hasAccountConnected: boolean;
-  isDeleting: boolean;
-  isPosting: boolean;
-  postingFailed: boolean;
-  deletingFailed: boolean;
-  onReplyClick: () => void;
-  onRetryDeleteClick: () => void;
-  onRetryPostClick: () => void;
-}) {
-  if (postingFailed) {
+}: CommentActionOrStatusProps) {
+  const isDeleting =
+    comment.pendingOperation?.action === "delete" &&
+    comment.pendingOperation.state.status === "pending";
+  const isPosting =
+    comment.pendingOperation?.action === "post" &&
+    comment.pendingOperation.state.status === "pending";
+  const didDeletingFailed =
+    comment.pendingOperation?.action === "delete" &&
+    comment.pendingOperation.state.status === "error";
+  const didPostingFailed =
+    comment.pendingOperation?.action === "post" &&
+    comment.pendingOperation.state.status === "error";
+
+  if (didPostingFailed) {
     return (
       <div className="flex items-center gap-1 text-xs text-destructive">
         <MessageCircleWarningIcon className="w-3 h-3" />
@@ -35,7 +43,7 @@ export function CommentActionOrStatus({
     );
   }
 
-  if (deletingFailed) {
+  if (didDeletingFailed) {
     return (
       <div className="flex items-center gap-1 text-xs text-destructive">
         <MessageCircleWarningIcon className="w-3 h-3" />
@@ -71,22 +79,5 @@ export function CommentActionOrStatus({
 
   return (
     <CommentActionButton onClick={onReplyClick}>reply</CommentActionButton>
-  );
-}
-
-type RetryButtonProps = {
-  onClick: () => void;
-  children: React.ReactNode;
-};
-
-function RetryButton({ children, onClick }: RetryButtonProps) {
-  return (
-    <button
-      className="inline-flex items-center justify-center font-semibold transition-colors rounded-md hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-      onClick={onClick}
-      type="button"
-    >
-      {children}
-    </button>
   );
 }

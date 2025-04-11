@@ -1,19 +1,25 @@
 import type {
   Comment,
-  PendingCommentOperationSchemaType,
   CommentPageSchemaType,
   ListCommentsQueryPageParamsSchemaType,
   PendingComment,
+  PendingDeleteCommentOperationSchemaType,
+  PendingPostCommentOperationSchemaType,
 } from "./schemas.js";
-import { getCommentCursor } from "@ecp.eth/sdk";
+import {
+  COMMENTS_V1_ADDRESS,
+  CommentsV1Abi,
+  getCommentCursor,
+} from "@ecp.eth/sdk";
 import type { InfiniteData } from "@tanstack/react-query";
 import { clsx, type ClassValue } from "clsx";
 import type { Chain, Hex } from "viem";
-import { http } from "wagmi";
+import { http, type UseWriteContractReturnType } from "wagmi";
 import * as allChains from "wagmi/chains";
 import type { AuthorType, ProcessEnvNetwork } from "./types.js";
 import { z } from "zod";
 import { twMerge } from "tailwind-merge";
+import type { CommentData } from "@ecp.eth/sdk/schemas";
 
 function parseURL(url: string) {
   // use zod instead, `URL.canParse` does not work in RN 🤷‍♂️
@@ -22,6 +28,10 @@ function parseURL(url: string) {
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function isSameHex(a: Hex, b: Hex) {
+  return a.toLowerCase() === b.toLowerCase();
 }
 
 export function getCommentAuthorNameOrAddress(author: AuthorType): string {
@@ -44,7 +54,8 @@ export function hasNewComments(
     oldQueryData.pages.flatMap((page) =>
       page.results
         .filter(
-          (comment): comment is PendingComment => !!comment.pendingOperation
+          (comment): comment is PendingComment =>
+            comment.pendingOperation?.action === "post"
         )
         .map((comment) => comment.id)
     )
@@ -75,7 +86,8 @@ export function mergeNewComments(
       oldQueryData.pages.flatMap((page, pageIndex) =>
         page.results
           .filter(
-            (comment): comment is PendingComment => !!comment.pendingOperation
+            (comment): comment is PendingComment =>
+              comment.pendingOperation?.action === "post"
           )
           .map((comment) => [comment.id, { pageIndex }])
       )
@@ -116,6 +128,75 @@ export function mergeNewComments(
 }
 
 /**
+ * Mark a comment as deleting by setting the `pendingOperation` field to a pending delete operation
+ *
+ * This function mutates the queryData argument
+ */
+export function markCommentAsDeleting(
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
+  pendingOperation: PendingDeleteCommentOperationSchemaType
+): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
+  for (const page of queryData.pages) {
+    for (const comment of page.results) {
+      if (isSameHex(comment.id, pendingOperation.commentId)) {
+        comment.pendingOperation = {
+          action: "delete",
+          type: pendingOperation.type,
+          txHash: pendingOperation.txHash,
+          chainId: pendingOperation.chainId,
+          commentId: pendingOperation.commentId,
+          state: {
+            status: "pending",
+          },
+        };
+
+        return queryData;
+      }
+    }
+  }
+
+  return queryData;
+}
+
+/**
+ * Mark a comment's pending delete operation as failed
+ *
+ * This function mutates the queryData argument
+ */
+export function markCommentDeletionAsFailed(
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
+  commentId: Hex,
+  error: Error
+): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
+  for (const page of queryData.pages) {
+    for (const comment of page.results) {
+      if (
+        isSameHex(comment.id, commentId) &&
+        comment.pendingOperation?.action === "delete"
+      ) {
+        comment.pendingOperation = {
+          ...comment.pendingOperation,
+          state: {
+            status: "error",
+            error,
+          },
+        };
+
+        return queryData;
+      }
+    }
+  }
+
+  return queryData;
+}
+
+/**
  * Insert a pending comment to the first page of the query data
  *
  * This function mutates the queryData argument
@@ -126,7 +207,7 @@ export function insertPendingCommentToPage(
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  pendingOperation: PendingCommentOperationSchemaType
+  pendingOperation: PendingPostCommentOperationSchemaType
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   if (!queryData.pages[0]) {
     return queryData;
@@ -155,7 +236,7 @@ export function insertPendingCommentToPage(
       pagination: {
         hasPrevious: false,
         hasNext: false,
-        limit: 0,
+        limit: 3,
       },
     },
     pendingOperation,
@@ -165,38 +246,98 @@ export function insertPendingCommentToPage(
 }
 
 /**
- * Replace a comment's pending operation with a new pending operation
+ * Mark a comment's pending post operation as pending
  *
  * This function mutates the queryData argument
- *
  */
-export function replaceCommentPendingOperationByComment(
+export function markCommentAsReposting(
   queryData: InfiniteData<
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  comment: Comment,
-  newPendingOperation: PendingCommentOperationSchemaType
+  pendingOperation: PendingPostCommentOperationSchemaType
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
-  function replaceComment(page: CommentPageSchemaType): boolean {
-    for (const c of page.results) {
-      if (c.id === comment.id) {
-        c.pendingOperation = newPendingOperation;
+  for (const page of queryData.pages) {
+    for (const comment of page.results) {
+      if (isSameHex(comment.id, pendingOperation.response.data.id)) {
+        comment.pendingOperation = {
+          ...pendingOperation,
+          action: "post",
+          state: {
+            status: "pending",
+          },
+        };
 
-        return true;
-      }
-
-      if (c.replies && replaceComment(c.replies)) {
-        return true;
+        return queryData;
       }
     }
-
-    return false;
   }
 
+  return queryData;
+}
+
+/**
+ * Mark a pending post comment as failed
+ *
+ * This function mutates the queryData argument
+ */
+export function markPendingPostCommentAsFailed(
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
+  commentId: Hex,
+  error: Error
+): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   for (const page of queryData.pages) {
-    if (replaceComment(page)) {
-      return queryData;
+    for (const comment of page.results) {
+      if (
+        isSameHex(comment.id, commentId) &&
+        comment.pendingOperation?.action === "post"
+      ) {
+        comment.pendingOperation = {
+          ...comment.pendingOperation,
+          state: {
+            status: "error",
+            error,
+          },
+        };
+
+        return queryData;
+      }
+    }
+  }
+
+  return queryData;
+}
+
+/**
+ * Mark a pending post comment as posted
+ *
+ * This function mutates the queryData argument
+ */
+export function markPendingPostCommentAsPosted(
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
+  commentId: Hex
+) {
+  for (const page of queryData.pages) {
+    for (const comment of page.results) {
+      if (
+        isSameHex(comment.id, commentId) &&
+        comment.pendingOperation?.action === "post"
+      ) {
+        comment.pendingOperation = {
+          ...comment.pendingOperation,
+          state: {
+            status: "success",
+          },
+        };
+
+        return queryData;
+      }
     }
   }
 
@@ -225,6 +366,15 @@ export function markCommentAsDeleted(
       if (comment.id === commentId) {
         comment.content = "[deleted]";
         comment.deletedAt = new Date();
+
+        if (comment.pendingOperation?.action === "delete") {
+          comment.pendingOperation = {
+            ...comment.pendingOperation,
+            state: {
+              status: "success",
+            },
+          };
+        }
 
         return true;
       }
@@ -455,4 +605,21 @@ export function getNetworkFromProcessEnv(
   );
 
   return networks;
+}
+
+type PostCommentViaContractParams = {
+  commentData: CommentData;
+  appSignature: Hex;
+};
+
+export async function postCommentAsAuthorViaCommentsV1(
+  { appSignature, commentData }: PostCommentViaContractParams,
+  writeContractAsync: UseWriteContractReturnType["writeContractAsync"]
+) {
+  return await writeContractAsync({
+    abi: CommentsV1Abi,
+    address: COMMENTS_V1_ADDRESS,
+    functionName: "postCommentAsAuthor",
+    args: [commentData, appSignature],
+  });
 }

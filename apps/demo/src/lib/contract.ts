@@ -1,28 +1,9 @@
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
-import { CommentData } from "@ecp.eth/sdk/schemas";
-import { Address, Chain, Hex, PublicClient, Transport } from "viem";
-import { UseWriteContractReturnType } from "wagmi";
+import { Address, Chain, PublicClient, Transport } from "viem";
 import { chain } from "@/lib/wagmi";
 import { publicEnv } from "@/publicEnv";
 
-type PostCommentViaContractParams = {
-  commentData: CommentData;
-  appSignature: Hex;
-};
-
-export const postCommentAsAuthorViaCommentsV1 = async (
-  { appSignature, commentData }: PostCommentViaContractParams,
-  writeContractAsync: UseWriteContractReturnType["writeContractAsync"]
-) => {
-  return await writeContractAsync({
-    abi: CommentsV1Abi,
-    address: COMMENTS_V1_ADDRESS,
-    functionName: "postCommentAsAuthor",
-    args: [commentData, appSignature],
-  });
-};
-
-export const getApprovalStatusAndNonce = async <
+export async function getApprovalStatusAndNonce<
   TTransport extends Transport,
   TChain extends Chain,
   TPublicClient extends PublicClient<TTransport, TChain> = PublicClient<
@@ -32,7 +13,7 @@ export const getApprovalStatusAndNonce = async <
 >(
   publicClient: TPublicClient,
   connectedAddress: Address
-): Promise<[{ result: boolean }, { result: bigint }]> => {
+): Promise<[{ result: boolean }, { result: bigint }]> {
   return (
     chain.contracts?.multicall3
       ? await publicClient.multicall({
@@ -80,4 +61,4 @@ export const getApprovalStatusAndNonce = async <
           ])
         ).map((result) => ({ result }))
   ) as [{ result: boolean }, { result: bigint }];
-};
+}

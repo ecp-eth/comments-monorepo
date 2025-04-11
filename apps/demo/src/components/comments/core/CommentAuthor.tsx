@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
   TooltipContent,
   Tooltip,
-} from "../ui/tooltip";
+} from "@/components/ui/tooltip";
 import type { IndexerAPICommentModerationStatusSchemaType } from "@ecp.eth/sdk/schemas";
 
 type CommentAuthorProps = {
