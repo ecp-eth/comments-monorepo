@@ -6,6 +6,7 @@ import {ChannelManager} from "../src/ChannelManager.sol";
 import {CommentsV1} from "../src/CommentsV1.sol";
 import {IHook} from "../src/interfaces/IHook.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
+import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 // Mock hook contract for testing
@@ -82,7 +83,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         channelManager.updateCommentsContract(commentsContract);
 
         // Register the mock hook
-        channelManager.registerHook(address(mockHook));
+        channelManager.registerHook{value: 0.02 ether}(address(mockHook));
         // Enable the hook globally
         channelManager.setHookGloballyEnabled(address(mockHook), true);
 
@@ -97,7 +98,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         bool isPrivate = false;
         address[] memory hooks = new address[](0);
 
-        uint256 channelId = channelManager.createChannel(
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             name,
             description,
             metadata,
@@ -133,7 +134,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         address[] memory hooks = new address[](1);
         hooks[0] = address(mockHook);
 
-        uint256 channelId = channelManager.createChannel(
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             name,
             description,
             metadata,
@@ -149,7 +150,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
     function test_UpdateChannel() public {
         // First create a channel
-        uint256 channelId = channelManager.createChannel(
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             "Initial Name",
             "Initial Description",
             "{}",
@@ -191,7 +192,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
     function test_AddHook() public {
         // Create channel without hook
-        uint256 channelId = channelManager.createChannel(
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             "Test Channel",
             "Description",
             "{}",
@@ -213,7 +214,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         address[] memory hooks = new address[](1);
         hooks[0] = address(mockHook);
         
-        uint256 channelId = channelManager.createChannel(
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             "Test Channel",
             "Description",
             "{}",
@@ -234,7 +235,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         address[] memory hooks = new address[](1);
         hooks[0] = address(mockHook);
         
-        uint256 channelId = channelManager.createChannel(
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             "Test Channel",
             "Description",
             "{}",
@@ -256,7 +257,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         address[] memory hooks = new address[](1);
         hooks[0] = address(mockHook);
         
-        uint256 channelId = channelManager.createChannel(
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             "Test Channel",
             "Description",
             "{}",
@@ -284,7 +285,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             commentData,
             user1,
             bytes32(0),
-            true
+            IChannelManager.HookPhase.Before
         ));
 
         // Test afterComment hook
@@ -294,7 +295,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             commentData,
             user1,
             bytes32(0),
-            false
+            IChannelManager.HookPhase.After
         ));
 
         // Test with hook returning false
@@ -305,7 +306,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             commentData,
             user1,
             bytes32(0),
-            true
+            IChannelManager.HookPhase.Before
         ));
     }
 
@@ -313,8 +314,8 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         address[] memory hooks = new address[](1);
         hooks[0] = address(invalidHook);
         
-        vm.expectRevert(abi.encodeWithSelector(ChannelManager.InvalidHookInterface.selector));
-        channelManager.createChannel(
+        vm.expectRevert(abi.encodeWithSelector(IChannelManager.InvalidHookInterface.selector));
+        channelManager.createChannel{value: 0.02 ether}(
             "Test Channel",
             "Description",
             "{}",
@@ -324,7 +325,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
     }
 
     function test_RevertWhen_AddingUnregisteredHook() public {
-        uint256 channelId = channelManager.createChannel(
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             "Test Channel",
             "Description",
             "{}",
@@ -336,18 +337,18 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         MockHook unregisteredHook = new MockHook();
 
         // Try to add an unregistered hook
-        vm.expectRevert(abi.encodeWithSelector(ChannelManager.HookNotRegistered.selector));
+        vm.expectRevert(abi.encodeWithSelector(IChannelManager.HookNotRegistered.selector));
         channelManager.addHook(channelId, address(unregisteredHook));
     }
 
     function test_RevertWhen_RegisteringInvalidHook() public {
         // Try to register the invalid hook
-        vm.expectRevert(abi.encodeWithSelector(ChannelManager.InvalidHookInterface.selector));
+        vm.expectRevert(abi.encodeWithSelector(IChannelManager.InvalidHookInterface.selector));
         channelManager.registerHook{value: 0.1 ether}(address(invalidHook));
     }
 
     function test_RevertWhen_NonOwnerUpdatesChannel() public {
-        uint256 channelId = channelManager.createChannel(
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             "Test Channel",
             "Description",
             "{}",
@@ -356,7 +357,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         );
 
         vm.prank(user1);
-        vm.expectRevert(abi.encodeWithSelector(ChannelManager.NotChannelOwner.selector));
+        vm.expectRevert(abi.encodeWithSelector(IChannelManager.NotChannelOwner.selector));
         channelManager.updateChannel(
             channelId,
             "New Name",
@@ -369,7 +370,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
     function test_TransferChannel() public {
         // Create channel
-        uint256 channelId = channelManager.createChannel(
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             "Test Channel",
             "Description",
             "{}",
@@ -400,7 +401,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         MockHook newHook = new MockHook();
         
         // Register the new hook
-        channelManager.registerHook(address(newHook));
+        channelManager.registerHook{value: 0.02 ether}(address(newHook));
         
         // Test initial hook registration status
         (bool registered, bool enabled) = channelManager.getHookStatus(address(newHook));
