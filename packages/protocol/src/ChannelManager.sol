@@ -46,8 +46,6 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     uint256 private accumulatedFees;
 
     address public commentsContract;
-    
-    error UnauthorizedCaller();
 
     /// @notice Generates a unique channel ID based on input parameters
     /// @param creator The address creating the channel
@@ -77,6 +75,9 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         Ownable(initialOwner) 
         ERC721("ECP Channel", "ECPC") 
     {
+        if (initialOwner == address(0)) revert ZeroAddress();
+        if (_commentsContract == address(0)) revert ZeroAddress();
+
         // Initialize fees with safe defaults
         channelCreationFee = 0.02 ether;
         hookRegistrationFee = 0.02 ether;
@@ -143,6 +144,8 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @param recipient The address to receive the fees
     /// @return amount The amount withdrawn
     function withdrawFees(address recipient) external onlyOwner nonReentrant() returns (uint256 amount) {
+        if (recipient == address(0)) revert ZeroAddress();
+        
         amount = accumulatedFees;
         accumulatedFees = 0;
         
@@ -224,6 +227,7 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         bool isPrivate,
         address[] calldata hooks
     ) external payable returns (uint256 channelId) {
+        if (msg.sender == address(0)) revert ZeroAddress();
         if (msg.value < channelCreationFee) revert InsufficientFee();
 
         // Generate channel ID using the internal function
@@ -413,7 +417,7 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         address caller,
         bytes32 commentId,
         HookPhase phase
-    ) external payable onlyCommentsContract returns (bool success) {
+    ) external payable onlyCommentsContract returns (bool) {
         if (!_channelExists(channelId)) revert IChannelManager.ChannelDoesNotExist();
 
         ChannelConfig storage channel = channels[channelId];
@@ -440,14 +444,33 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
             accumulatedFees += protocolFee;
         }
 
-        // Execute the appropriate hook function
+        // Execute the appropriate hook function based on phase
         if (phase == HookPhase.Before) {
-            success = hook.beforeComment{value: hookValue}(commentData, caller, commentId);
+            bool success;
+            try hook.beforeComment{value: hookValue}(commentData, caller, commentId) returns (bool result) {
+                success = result;
+            } catch Error(string memory reason) {
+                // Propagate the error message
+                revert(reason);
+            } catch {
+                revert IChannelManager.ChannelHookExecutionFailed();
+            }
+            if (!success) revert IChannelManager.ChannelHookExecutionFailed();
+            return true;
         } else {
-            success = hook.afterComment(commentData, caller, commentId);
+            // After phase - don't revert on failure
+            bool success = true;
+            try hook.afterComment(commentData, caller, commentId) returns (bool result) {
+                success = result;
+            } catch {
+                emit HookExecutionFailed(channelId, hookAddress, phase);
+                return true;
+            }
+            if (!success) {
+                emit HookExecutionFailed(channelId, hookAddress, phase);
+            }
+            return success;
         }
-
-        return success;
     }
 
     /// @notice Check if a channel exists
@@ -465,6 +488,7 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @notice Updates the comments contract address (only owner)
     /// @param _commentsContract The new comments contract address
     function updateCommentsContract(address _commentsContract) external onlyOwner {
+        if (_commentsContract == address(0)) revert ZeroAddress();
         commentsContract = _commentsContract;
     }
 
