@@ -28,14 +28,16 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "swagger-ui-react": "^5.20.5",
-    "typedoc-plugin-markdown": "^4.6.1",
+    "typedoc-plugin-markdown": "~4.4.2",
     "typedoc-plugin-zod": "^1.4.0",
+    "typescript": "^5.8.2",
     "use-debounce": "^10.0.4",
     "vocs": "^1.0.11",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@ecp.eth/indexer": "workspace:*",
+    "@ecp.eth/solidity-docgen": "~0.5.19",
     "@hono/zod-openapi": "^0.18.4",
     "@types/react": "^19.0.11",
     "@types/react-dom": "^19.0.4",
@@ -44,10 +46,9 @@
     "escape-string-regexp": "^5.0.0",
     "js-yaml": "^4.1.0",
     "solc": "^0.8.29",
-    "@ecp.eth/solidity-docgen": "~0.5.19",
     "tailwindcss": "^4.0.13",
     "tsx": "^4.19.3",
-    "typedoc": "^0.28.2",
+    "typedoc": "~0.27.9",
     "unist-util-visit": "^5.0.0",
     "vite": "^6.2.1"
   }
