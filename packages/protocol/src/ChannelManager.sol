@@ -15,8 +15,7 @@ import "./interfaces/IFeeManager.sol";
 /// @dev Implements channel management with the following security features:
 /// 1. Access Control:
 ///    - Only channel owners (NFT holders) can modify their channels
-///    - Channel owners can add/remove hooks
-///    - Channel owners can enable/disable hooks
+///    - Channel owners can set and manage hooks
 /// 2. Hook System:
 ///    - Each channel can have one hook
 ///    - Hooks must implement IHook interface
@@ -91,9 +90,6 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         channels[0].name = "Home";
         channels[0].description = "Any kind of content";
         channels[0].metadata = "{}";
-        channels[0].owner = initialOwner;
-        channels[0].isPrivate = false;
-        channels[0].isArchived = false;
 
         commentsContract = _commentsContract;
     }
@@ -217,15 +213,13 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @param name The name of the channel
     /// @param description The description of the channel
     /// @param metadata The channel metadata (arbitrary JSON)
-    /// @param isPrivate Whether the channel is private
-    /// @param hooks Array of hook addresses to add to the channel
+    /// @param hook The address of the hook to add to the channel
     /// @return channelId The unique identifier of the created channel
     function createChannel(
         string calldata name,
         string calldata description,
         string calldata metadata,
-        bool isPrivate,
-        address[] calldata hooks
+        address hook
     ) external payable returns (uint256 channelId) {
         if (msg.sender == address(0)) revert ZeroAddress();
         if (msg.value < channelCreationFee) revert InsufficientFee();
@@ -241,9 +235,6 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         channels[channelId].name = name;
         channels[channelId].description = description;
         channels[channelId].metadata = metadata;
-        channels[channelId].owner = msg.sender;
-        channels[channelId].isPrivate = isPrivate;
-        channels[channelId].isArchived = false;
 
         accumulatedFees += channelCreationFee;
         if (msg.value > channelCreationFee) {
@@ -252,24 +243,20 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
             require(success, "Refund failed");
         }
 
-        // Add hooks if provided
-        if (hooks.length > 0) {
-            require(hooks.length == 1, "Only one hook allowed");
-            address hook = hooks[0];
-            if (hook == address(0)) revert IChannelManager.InvalidHookAddress();
-            
-            // Validate that the hook implements IHook interface
+        // Add hook if provided
+        if (hook != address(0)) {
+            if (!registeredHooks[hook]) revert HookNotRegistered();
             if (!IERC165(hook).supportsInterface(type(IHook).interfaceId)) {
-                revert IChannelManager.InvalidHookInterface();
+                revert InvalidHookInterface();
             }
 
-            channels[channelId].hooks.push(IHook(hook));
-            channels[channelId].hookEnabled[hook] = true;
+            channels[channelId].hook = IHook(hook);
 
-            emit IChannelManager.HookAdded(channelId, hook);
-            emit IChannelManager.HookStatusUpdated(channelId, hook, true);
+            emit HookSet(channelId, hook);
+            emit HookStatusUpdated(channelId, hook, true);
         }
 
+        emit ChannelCreated(channelId, name, metadata);
         return channelId;
     }
 
@@ -278,84 +265,38 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @param name The new name of the channel
     /// @param description The new description of the channel
     /// @param metadata The new metadata
-    /// @param isPrivate Whether the channel is private
-    /// @param isArchived Whether the channel is archived
     function updateChannel(
         uint256 channelId,
         string calldata name,
         string calldata description,
-        string calldata metadata,
-        bool isPrivate,
-        bool isArchived
+        string calldata metadata
     ) external {
         if (!_channelExists(channelId)) revert ChannelDoesNotExist();
-        if (ownerOf(channelId) != msg.sender) revert NotChannelOwner();
+        if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
 
         channels[channelId].name = name;
         channels[channelId].description = description;
         channels[channelId].metadata = metadata;
-        channels[channelId].isPrivate = isPrivate;
-        channels[channelId].isArchived = isArchived;
-        channels[channelId].owner = msg.sender; // Update owner to current NFT owner
 
-        emit ChannelUpdated(channelId, name, description, metadata, isPrivate, isArchived);
+        emit ChannelUpdated(channelId, name, description, metadata);
     }
 
-    /// @notice Adds a hook to a channel
+    /// @notice Sets the hook for a channel
     /// @param channelId The unique identifier of the channel
     /// @param hook The address of the hook contract
-    function addHook(uint256 channelId, address hook) external {
-        if (!_channelExists(channelId)) revert IChannelManager.ChannelDoesNotExist();
-        if (ownerOf(channelId) != msg.sender) revert IChannelManager.NotChannelOwner();
-        if (hook == address(0)) revert IChannelManager.InvalidHookAddress();
-        if (!registeredHooks[hook]) revert IChannelManager.HookNotRegistered();
+    function setHook(uint256 channelId, address hook) external {
+        if (!_channelExists(channelId)) revert ChannelDoesNotExist();
+        if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
         
-        // Check if channel already has a hook
-        if (channels[channelId].hooks.length > 0) {
-            revert IChannelManager.ChannelAlreadyHasHook();
+        if (hook != address(0)) {
+            if (!registeredHooks[hook]) revert HookNotRegistered();
+            channels[channelId].hook = IHook(hook);
+        } else {
+            delete channels[channelId].hook; // Properly reset to default value
         }
 
-        channels[channelId].hooks.push(IHook(hook));
-        channels[channelId].hookEnabled[hook] = true;
-
-        emit IChannelManager.HookAdded(channelId, hook);
-        emit IChannelManager.HookStatusUpdated(channelId, hook, true);
-    }
-
-    /// @notice Removes a hook from a channel
-    /// @param channelId The unique identifier of the channel
-    /// @param hook The address of the hook contract
-    function removeHook(uint256 channelId, address hook) external {
-        if (!_channelExists(channelId)) revert IChannelManager.ChannelDoesNotExist();
-        if (ownerOf(channelId) != msg.sender) revert IChannelManager.NotChannelOwner();
-
-        // Check if the hook exists and is the only hook
-        if (channels[channelId].hooks.length != 1 || address(channels[channelId].hooks[0]) != hook) {
-            revert IChannelManager.HookNotFound();
-        }
-
-        delete channels[channelId].hooks[0];
-        channels[channelId].hooks.pop();
-        channels[channelId].hookEnabled[hook] = false;
-
-        emit IChannelManager.HookRemoved(channelId, hook);
-    }
-
-    /// @notice Updates a hook's enabled status
-    /// @param channelId The unique identifier of the channel
-    /// @param hook The address of the hook contract
-    /// @param enabled Whether the hook should be enabled
-    function setHookEnabled(uint256 channelId, address hook, bool enabled) external {
-        if (!_channelExists(channelId)) revert IChannelManager.ChannelDoesNotExist();
-        if (ownerOf(channelId) != msg.sender) revert IChannelManager.NotChannelOwner();
-
-        // Check if the hook exists and is the only hook
-        if (channels[channelId].hooks.length != 1 || address(channels[channelId].hooks[0]) != hook) {
-            revert IChannelManager.HookNotFound();
-        }
-
-        channels[channelId].hookEnabled[hook] = enabled;
-        emit IChannelManager.HookStatusUpdated(channelId, hook, enabled);
+        emit HookSet(channelId, hook);
+        emit HookStatusUpdated(channelId, hook, hook != address(0));
     }
 
     /// @notice Gets a channel's configuration
@@ -363,46 +304,24 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @return name The name of the channel
     /// @return description The description of the channel
     /// @return metadata The channel metadata
-    /// @return owner The address of the channel owner
-    /// @return isPrivate Whether the channel is private
-    /// @return isArchived Whether the channel is archived
-    /// @return hooks Array of hook addresses for the channel
+    /// @return hook The address of the channel's hook
     function getChannel(uint256 channelId) external view returns (
         string memory name,
         string memory description,
         string memory metadata,
-        address owner,
-        bool isPrivate,
-        bool isArchived,
-        address[] memory hooks
+        address hook
     ) {
-        if (!_channelExists(channelId)) revert IChannelManager.ChannelDoesNotExist();
+        if (!_channelExists(channelId)) revert ChannelDoesNotExist();
 
         ChannelConfig storage channel = channels[channelId];
-        address[] memory hooksArray = new address[](channel.hooks.length);
-        for (uint i = 0; i < channel.hooks.length; i++) {
-            hooksArray[i] = address(channel.hooks[i]);
-        }
-        
         return (
             channel.name,
             channel.description,
             channel.metadata,
-            ownerOf(channelId), // Use NFT owner
-            channel.isPrivate,
-            channel.isArchived,
-            hooksArray
+            address(channel.hook)
         );
     }
 
-    /// @notice Checks if a hook is enabled for a channel
-    /// @param channelId The unique identifier of the channel
-    /// @param hook The address of the hook contract
-    /// @return enabled Whether the hook is enabled
-    function isHookEnabled(uint256 channelId, address hook) external view returns (bool enabled) {
-        if (!_channelExists(channelId)) revert IChannelManager.ChannelDoesNotExist();
-        return channels[channelId].hookEnabled[hook];
-    }
 
     /// @notice Public function to execute hook for a channel
     /// @param channelId The unique identifier of the channel
@@ -418,22 +337,18 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         bytes32 commentId,
         HookPhase phase
     ) external payable onlyCommentsContract returns (bool) {
-        if (!_channelExists(channelId)) revert IChannelManager.ChannelDoesNotExist();
+        if (!_channelExists(channelId)) revert ChannelDoesNotExist();
 
         ChannelConfig storage channel = channels[channelId];
-        if (channel.hooks.length == 0) {
+        address hookAddress = address(channel.hook);
+        
+        if (hookAddress == address(0)) {
             return true;
         }
 
-        IHook hook = channel.hooks[0];
-        address hookAddress = address(hook);
-        
         // Check both global and channel-specific enablement
-        if (!registeredHooks[hookAddress]) revert IChannelManager.HookNotRegistered();
-        if (!globallyEnabledHooks[hookAddress]) revert IChannelManager.HookDisabledGlobally();
-        if (!channel.hookEnabled[hookAddress]) {
-            return true; // Skip execution if hook is disabled at channel level
-        }
+        if (!registeredHooks[hookAddress]) revert HookNotRegistered();
+        if (!globallyEnabledHooks[hookAddress]) revert HookDisabledGlobally();
 
         // Calculate and deduct protocol fee if there's a payment
         uint256 protocolFee = 0;
@@ -447,20 +362,20 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         // Execute the appropriate hook function based on phase
         if (phase == HookPhase.Before) {
             bool success;
-            try hook.beforeComment{value: hookValue}(commentData, caller, commentId) returns (bool result) {
+            try channel.hook.beforeComment{value: hookValue}(commentData, caller, commentId) returns (bool result) {
                 success = result;
             } catch Error(string memory reason) {
                 // Propagate the error message
                 revert(reason);
             } catch {
-                revert IChannelManager.ChannelHookExecutionFailed();
+                revert ChannelHookExecutionFailed();
             }
-            if (!success) revert IChannelManager.ChannelHookExecutionFailed();
+            if (!success) revert ChannelHookExecutionFailed();
             return true;
         } else {
             // After phase - don't revert on failure
             bool success = true;
-            try hook.afterComment(commentData, caller, commentId) returns (bool result) {
+            try channel.hook.afterComment(commentData, caller, commentId) returns (bool result) {
                 success = result;
             } catch {
                 emit HookExecutionFailed(channelId, hookAddress, phase);
