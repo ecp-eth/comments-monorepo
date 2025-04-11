@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](../../index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
@@ -7,7 +7,63 @@
 # Type Alias: IndexerAPIListCommentsSchemaType
 
 ```ts
-type IndexerAPIListCommentsSchemaType = z.infer<typeof IndexerAPIListCommentsSchema>;
+type IndexerAPIListCommentsSchemaType = object;
 ```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:113](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L113)
+
+## Type declaration
+
+### extra
+
+```ts
+extra: object = IndexerAPIExtraSchema;
+```
+
+#### extra.moderationEnabled
+
+```ts
+moderationEnabled: boolean;
+```
+
+### pagination
+
+```ts
+pagination: object = IndexerAPICursorPaginationSchema;
+```
+
+#### pagination.endCursor?
+
+```ts
+optional endCursor: `0x${string}`;
+```
+
+#### pagination.hasNext
+
+```ts
+hasNext: boolean;
+```
+
+#### pagination.hasPrevious
+
+```ts
+hasPrevious: boolean;
+```
+
+#### pagination.limit
+
+```ts
+limit: number;
+```
+
+#### pagination.startCursor?
+
+```ts
+optional startCursor: `0x${string}`;
+```
+
+### results
+
+```ts
+results: object[];
+```

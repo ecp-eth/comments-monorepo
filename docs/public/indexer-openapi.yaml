@@ -74,7 +74,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum:
+            enum: &ref_2
               - nested
               - flat
             default: nested
@@ -379,6 +379,17 @@ paths:
           required: false
           name: sort
           in: query
+        - schema:
+            type: string
+            enum: *ref_2
+            default: nested
+            description: >-
+              The mode to fetch comments in. Nested will return only the first
+              level of comments. Flat will return all replies sorted by
+              timestamp in descending order.
+          required: false
+          name: mode
+          in: query
       responses:
         '200':
           description: Retrieve specific comment with its replies
@@ -497,6 +508,18 @@ paths:
                   - results
                   - pagination
                   - extra
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
   /api/approvals:
     get:
       tags:

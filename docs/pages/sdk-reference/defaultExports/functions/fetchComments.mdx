@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](../../index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
@@ -10,16 +10,16 @@
 function fetchComments(options): Promise<{
   extra: {
      moderationEnabled: boolean;
-  };
+    };
   pagination: {
      endCursor: `0x${string}`;
      hasNext: boolean;
      hasPrevious: boolean;
      limit: number;
      startCursor: `0x${string}`;
-  };
+    };
   results: object[];
-}>;
+}>
 ```
 
 Defined in: [packages/sdk/src/api.ts:92](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L92)
@@ -37,15 +37,15 @@ Fetch comments from the Indexer API
 `Promise`\<\{
   `extra`: \{
      `moderationEnabled`: `boolean`;
-  \};
+    \};
   `pagination`: \{
      `endCursor`: `` `0x${string}` ``;
      `hasNext`: `boolean`;
      `hasPrevious`: `boolean`;
      `limit`: `number`;
      `startCursor`: `` `0x${string}` ``;
-  \};
+    \};
   `results`: `object`[];
-\}\>
+ \}\>
 
 A promise that resolves comments fetched from the Indexer API

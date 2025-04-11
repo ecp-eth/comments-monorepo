@@ -2,6 +2,7 @@
 
 This is a [Next.js](https://nextjs.org) project that demonstrates core functionality of the Ethereum Comments Protocol:
 
+- Custom commenting UI (React)
 - Core protocol implementation
 - Comment creation and retrieval
 - Wallet integration
@@ -26,11 +27,10 @@ Next, run the development server:
 
 ```bash
 npm run dev
-#or 
+# or
 pnpm dev
 # or
 yarn dev
 ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
-

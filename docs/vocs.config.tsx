@@ -116,21 +116,11 @@ export default defineConfig({
         },
       ],
     },
-    // {
-    //   text: "Advanced",
-    //   items: [
-    //     {
-    //       text: "Test with Anvil",
-    //       link: "/test-with-anvil",
-    //     },
-    //   ],
-    // },
-
     {
       text: "Demos & Examples",
       items: [
         {
-          text: "Custom Integration",
+          text: "React Custom Integration",
           link: "/demos/custom-integration",
           collapsed: true,
           items: [
@@ -141,6 +131,17 @@ export default defineConfig({
             {
               text: "Source Code",
               link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo",
+            },
+          ],
+        },
+        {
+          text: "React Native Integration",
+          link: "/demos/react-native-integration",
+          collapsed: true,
+          items: [
+            {
+              text: "Source Code",
+              link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo-rn-expo",
             },
           ],
         },

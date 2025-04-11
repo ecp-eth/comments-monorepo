@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](../../index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
@@ -7,7 +7,39 @@
 # Type Alias: IndexerAPICursorPaginationSchemaType
 
 ```ts
-type IndexerAPICursorPaginationSchemaType = z.infer<typeof IndexerAPICursorPaginationSchema>;
+type IndexerAPICursorPaginationSchemaType = object;
 ```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:84](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L84)
+
+## Type declaration
+
+### endCursor?
+
+```ts
+optional endCursor: `0x${string}`;
+```
+
+### hasNext
+
+```ts
+hasNext: boolean;
+```
+
+### hasPrevious
+
+```ts
+hasPrevious: boolean;
+```
+
+### limit
+
+```ts
+limit: number;
+```
+
+### startCursor?
+
+```ts
+optional startCursor: `0x${string}`;
+```

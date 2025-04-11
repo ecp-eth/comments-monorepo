@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](../../index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
@@ -7,7 +7,7 @@
 # Function: useGaslessTransaction()
 
 ```ts
-function useGaslessTransaction<TVariables, TReturnValue, TInputVariables, TSignTypedDataParams>(props): UseMutationResult<TReturnValue, Error, TInputVariables, unknown>;
+function useGaslessTransaction<TVariables, TReturnValue, TInputVariables, TSignTypedDataParams>(props): UseMutationResult<TReturnValue, Error, TInputVariables, unknown>
 ```
 
 Defined in: [packages/sdk/src/react.tsx:47](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L47)
@@ -23,21 +23,13 @@ This hook abstracts these steps and help with the repetition of the pattern.
 
 ## Type Parameters
 
-### TVariables
+• **TVariables** *extends* `undefined` \| `object`
 
-`TVariables` *extends* `undefined` \| `object`
+• **TReturnValue**
 
-### TReturnValue
+• **TInputVariables** = `void`
 
-`TReturnValue`
-
-### TInputVariables
-
-`TInputVariables` = `void`
-
-### TSignTypedDataParams
-
-`TSignTypedDataParams` *extends* `SignTypedDataParameters` = `SignTypedDataParameters`
+• **TSignTypedDataParams** *extends* `SignTypedDataParameters` = `SignTypedDataParameters`
 
 ## Parameters
 
@@ -50,7 +42,7 @@ This hook abstracts these steps and help with the repetition of the pattern.
   \| \{
   `signTypedDataParams`: `TSignTypedDataParams`;
   `variables`: `TVariables`;
-\}\>
+ \}\>
 
 #### sendSignedData
 

@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](../../index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
@@ -7,7 +7,63 @@
 # Type Alias: CommentData
 
 ```ts
-type CommentData = z.infer<typeof CommentDataSchema>;
+type CommentData = object;
 ```
 
 Defined in: [packages/sdk/src/schemas/core.ts:31](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/core.ts#L31)
+
+The data structure of a comment. For details, see [CommentData](/comment-data-props).
+
+## Type declaration
+
+### appSigner
+
+```ts
+appSigner: `0x${string}` = HexSchema;
+```
+
+### author
+
+```ts
+author: `0x${string}` = HexSchema;
+```
+
+### content
+
+```ts
+content: string;
+```
+
+### deadline
+
+```ts
+deadline: bigint;
+```
+
+### metadata
+
+```ts
+metadata: string;
+```
+
+### nonce
+
+```ts
+nonce: bigint;
+```
+
+### parentId
+
+```ts
+parentId: `0x${string}` = HexSchema;
+```
+
+### targetUri
+
+```ts
+targetUri: string;
+```
+
+## See
+
+[CommentData](/comment-data-props)

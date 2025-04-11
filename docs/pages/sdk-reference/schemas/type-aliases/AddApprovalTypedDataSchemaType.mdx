@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](../../index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
@@ -7,7 +7,103 @@
 # Type Alias: AddApprovalTypedDataSchemaType
 
 ```ts
-type AddApprovalTypedDataSchemaType = z.infer<typeof AddApprovalTypedDataSchema>;
+type AddApprovalTypedDataSchemaType = object;
 ```
 
 Defined in: [packages/sdk/src/schemas/contract.ts:93](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/contract.ts#L93)
+
+## Type declaration
+
+### domain
+
+```ts
+domain: object;
+```
+
+#### domain.chainId
+
+```ts
+chainId: number;
+```
+
+#### domain.name
+
+```ts
+name: "Comments";
+```
+
+#### domain.verifyingContract
+
+```ts
+verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+```
+
+#### domain.version
+
+```ts
+version: "1";
+```
+
+### message
+
+```ts
+message: object;
+```
+
+#### message.appSigner
+
+```ts
+appSigner: `0x${string}` = HexSchema;
+```
+
+#### message.author
+
+```ts
+author: `0x${string}` = HexSchema;
+```
+
+#### message.deadline
+
+```ts
+deadline: bigint;
+```
+
+#### message.nonce
+
+```ts
+nonce: bigint;
+```
+
+### primaryType
+
+```ts
+primaryType: "AddApproval";
+```
+
+### types
+
+```ts
+types: object;
+```
+
+#### types.AddApproval
+
+```ts
+AddApproval: (
+  | {
+  name: "author";
+  type: "address";
+ }
+  | {
+  name: "appSigner";
+  type: "address";
+ }
+  | {
+  name: "nonce";
+  type: "uint256";
+ }
+  | {
+  name: "deadline";
+  type: "uint256";
+ })[];
+```

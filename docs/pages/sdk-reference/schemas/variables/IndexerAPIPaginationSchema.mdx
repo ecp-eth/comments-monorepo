@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](../../index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
@@ -7,19 +7,7 @@
 # Variable: IndexerAPIPaginationSchema
 
 ```ts
-const IndexerAPIPaginationSchema: ZodObject<{
-  hasMore: ZodBoolean;
-  limit: ZodNumber;
-  offset: ZodNumber;
-}, "strip", ZodTypeAny, {
-  hasMore: boolean;
-  limit: number;
-  offset: number;
-}, {
-  hasMore: boolean;
-  limit: number;
-  offset: number;
-}>;
+const IndexerAPIPaginationSchema: ZodObject<IndexerAPIPaginationSchemaType>;
 ```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:66](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L66)

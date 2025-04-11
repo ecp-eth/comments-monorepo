@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](../../index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
@@ -7,7 +7,51 @@
 # Type Alias: IndexerAPIModerationGetPendingCommentsSchemaType
 
 ```ts
-type IndexerAPIModerationGetPendingCommentsSchemaType = z.infer<typeof IndexerAPIModerationGetPendingCommentsSchema>;
+type IndexerAPIModerationGetPendingCommentsSchemaType = object;
 ```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:132](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L132)
+
+## Type declaration
+
+### pagination
+
+```ts
+pagination: object = IndexerAPICursorPaginationSchema;
+```
+
+#### pagination.endCursor?
+
+```ts
+optional endCursor: `0x${string}`;
+```
+
+#### pagination.hasNext
+
+```ts
+hasNext: boolean;
+```
+
+#### pagination.hasPrevious
+
+```ts
+hasPrevious: boolean;
+```
+
+#### pagination.limit
+
+```ts
+limit: number;
+```
+
+#### pagination.startCursor?
+
+```ts
+optional startCursor: `0x${string}`;
+```
+
+### results
+
+```ts
+results: object[];
+```

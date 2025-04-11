@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](../../index.mdx)
+[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
 
 ***
 
@@ -7,7 +7,63 @@
 # Type Alias: IndexerAPIAuthorDataSchemaType
 
 ```ts
-type IndexerAPIAuthorDataSchemaType = z.infer<typeof IndexerAPIAuthorDataSchema>;
+type IndexerAPIAuthorDataSchemaType = object;
 ```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:30](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L30)
+
+## Type declaration
+
+### address
+
+```ts
+address: `0x${string}` = HexSchema;
+```
+
+### ens?
+
+```ts
+optional ens: object;
+```
+
+#### ens.avatarUrl
+
+```ts
+avatarUrl: null | string;
+```
+
+#### ens.name
+
+```ts
+name: string;
+```
+
+### farcaster?
+
+```ts
+optional farcaster: object;
+```
+
+#### farcaster.displayName?
+
+```ts
+optional displayName: string;
+```
+
+#### farcaster.fid
+
+```ts
+fid: number;
+```
+
+#### farcaster.pfpUrl?
+
+```ts
+optional pfpUrl: string;
+```
+
+#### farcaster.username?
+
+```ts
+optional username: string;
+```
