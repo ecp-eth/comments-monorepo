@@ -102,7 +102,8 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
             name,
             description,
             metadata,
-            block.timestamp
+            block.timestamp,
+            block.chainid
         )));
     }
 
@@ -112,9 +113,9 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         Ownable(initialOwner) 
         ERC721("ECP Channel", "ECPC") 
     {
-        // Initialize fees
-        channelCreationFee = 0.01 ether;
-        hookRegistrationFee = 0;
+        // Initialize fees with safe defaults
+        channelCreationFee = 0.02 ether;
+        hookRegistrationFee = 0.02 ether;
         // 10% fee on hook revenue
         hookTransactionFeePercentage = 1000;
         accumulatedFees = 0;
