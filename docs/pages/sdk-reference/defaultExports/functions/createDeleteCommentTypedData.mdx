@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -7,7 +7,45 @@
 # Function: createDeleteCommentTypedData()
 
 ```ts
-function createDeleteCommentTypedData(__namedParameters): object
+function createDeleteCommentTypedData(__namedParameters): {
+  domain: {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+     version: "1";
+  };
+  message: {
+     appSigner: `0x${string}`;
+     author: `0x${string}`;
+     commentId: `0x${string}`;
+     deadline: bigint;
+     nonce: bigint;
+  };
+  primaryType: "DeleteComment";
+  types: {
+     DeleteComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "appSigner";
+        type: "address";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+     })[];
+  };
+};
 ```
 
 Defined in: [packages/sdk/src/utils.ts:175](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L175)
@@ -47,14 +85,59 @@ The purpose of this is to mark comment as deleted so indexers can do their logic
 
 ## Returns
 
-`object`
+```ts
+{
+  domain: {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+     version: "1";
+  };
+  message: {
+     appSigner: `0x${string}`;
+     author: `0x${string}`;
+     commentId: `0x${string}`;
+     deadline: bigint;
+     nonce: bigint;
+  };
+  primaryType: "DeleteComment";
+  types: {
+     DeleteComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "appSigner";
+        type: "address";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+     })[];
+  };
+}
+```
 
 The typed data
 
 ### domain
 
 ```ts
-domain: object;
+domain: {
+  chainId: number;
+  name: "Comments";
+  verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+  version: "1";
+};
 ```
 
 #### domain.chainId
@@ -84,7 +167,13 @@ version: "1";
 ### message
 
 ```ts
-message: object;
+message: {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  commentId: `0x${string}`;
+  deadline: bigint;
+  nonce: bigint;
+};
 ```
 
 #### message.appSigner
@@ -126,7 +215,29 @@ primaryType: "DeleteComment";
 ### types
 
 ```ts
-types: object;
+types: {
+  DeleteComment: (
+     | {
+     name: "commentId";
+     type: "bytes32";
+   }
+     | {
+     name: "author";
+     type: "address";
+   }
+     | {
+     name: "appSigner";
+     type: "address";
+   }
+     | {
+     name: "nonce";
+     type: "uint256";
+   }
+     | {
+     name: "deadline";
+     type: "uint256";
+  })[];
+};
 ```
 
 #### types.DeleteComment
@@ -136,21 +247,21 @@ DeleteComment: (
   | {
   name: "commentId";
   type: "bytes32";
- }
+}
   | {
   name: "author";
   type: "address";
- }
+}
   | {
   name: "appSigner";
   type: "address";
- }
+}
   | {
   name: "nonce";
   type: "uint256";
- }
+}
   | {
   name: "deadline";
   type: "uint256";
- })[];
+})[];
 ```

@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -7,7 +7,33 @@
 # Variable: COMMENT\_TYPE
 
 ```ts
-const COMMENT_TYPE: object;
+const COMMENT_TYPE: {
+  AddComment: readonly [{
+     name: "content";
+     type: "string";
+   }, {
+     name: "metadata";
+     type: "string";
+   }, {
+     name: "targetUri";
+     type: "string";
+   }, {
+     name: "parentId";
+     type: "bytes32";
+   }, {
+     name: "author";
+     type: "address";
+   }, {
+     name: "appSigner";
+     type: "address";
+   }, {
+     name: "nonce";
+     type: "uint256";
+   }, {
+     name: "deadline";
+     type: "uint256";
+  }];
+};
 ```
 
 Defined in: [packages/sdk/src/eip712.ts:4](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/eip712.ts#L4)
@@ -20,26 +46,26 @@ Defined in: [packages/sdk/src/eip712.ts:4](https://github.com/ecp-eth/comments-m
 readonly AddComment: readonly [{
   name: "content";
   type: "string";
- }, {
+}, {
   name: "metadata";
   type: "string";
- }, {
+}, {
   name: "targetUri";
   type: "string";
- }, {
+}, {
   name: "parentId";
   type: "bytes32";
- }, {
+}, {
   name: "author";
   type: "address";
- }, {
+}, {
   name: "appSigner";
   type: "address";
- }, {
+}, {
   name: "nonce";
   type: "uint256";
- }, {
+}, {
   name: "deadline";
   type: "uint256";
- }];
+}];
 ```

@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -7,7 +7,16 @@
 # Function: createCommentData()
 
 ```ts
-function createCommentData(__namedParameters): object
+function createCommentData(__namedParameters): {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: string;
+};
 ```
 
 Defined in: [packages/sdk/src/utils.ts:36](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L36)
@@ -68,7 +77,18 @@ The URI of the page the comment is about
 
 ## Returns
 
-`object`
+```ts
+{
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: string;
+}
+```
 
 [CommentData](/sdk-reference/schemas/type-aliases/CommentData.mdx) The data structure of a comment
 

@@ -1,11 +1,12 @@
 {
   "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-zod"],
-  "fileExtension": ".mdx",
   "gitRevision": "main",
 
+  "fileExtension": ".mdx",
   "useCodeBlocks": true,
   "expandParameters": false,
-  "expandObjects": false,
+  // must be true to show details of IndexerAPICommentSchemaType.results[]
+  "expandObjects": true,
   "indexFormat": "table",
   "typeDeclarationVisibility": "verbose",
   "outputFileStrategy": "members",

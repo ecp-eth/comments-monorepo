@@ -28,8 +28,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "swagger-ui-react": "^5.20.5",
-    "typedoc-plugin-markdown": "~4.4.2",
-    "typedoc-plugin-zod": "^1.4.0",
+    "typedoc-plugin-markdown": "~4.6.2",
+    "typedoc-plugin-zod": "^1.4.1",
     "typescript": "^5.8.2",
     "use-debounce": "^10.0.4",
     "vocs": "^1.0.11",
@@ -48,7 +48,7 @@
     "solc": "^0.8.29",
     "tailwindcss": "^4.0.13",
     "tsx": "^4.19.3",
-    "typedoc": "~0.27.9",
+    "typedoc": "~0.28.2",
     "unist-util-visit": "^5.0.0",
     "vite": "^6.2.1"
   }

@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -7,7 +7,44 @@
 # Type Alias: IndexerAPIModerationGetPendingCommentsSchemaType
 
 ```ts
-type IndexerAPIModerationGetPendingCommentsSchemaType = object;
+type IndexerAPIModerationGetPendingCommentsSchemaType = {
+  pagination: {
+     endCursor: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor: `0x${string}`;
+  };
+  results: {
+     appSigner: `0x${string}`;
+     author: {
+        address: `0x${string}`;
+        ens: {
+           avatarUrl: null | string;
+           name: string;
+        };
+        farcaster: {
+           displayName: string;
+           fid: number;
+           pfpUrl: string;
+           username: string;
+        };
+     };
+     chainId: number;
+     content: string;
+     cursor: `0x${string}`;
+     deletedAt: null | Date;
+     id: `0x${string}`;
+     logIndex: null | number;
+     metadata: string;
+     moderationStatus: "approved" | "rejected" | "pending";
+     moderationStatusChangedAt: Date;
+     parentId: null | `0x${string}`;
+     targetUri: string;
+     timestamp: Date;
+     txHash: `0x${string}`;
+  }[];
+};
 ```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:132](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L132)
@@ -17,7 +54,13 @@ Defined in: [packages/sdk/src/schemas/indexer.ts:132](https://github.com/ecp-eth
 ### pagination
 
 ```ts
-pagination: object = IndexerAPICursorPaginationSchema;
+pagination: {
+  endCursor: `0x${string}`;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  limit: number;
+  startCursor: `0x${string}`;
+} = IndexerAPICursorPaginationSchema;
 ```
 
 #### pagination.endCursor?
@@ -53,5 +96,33 @@ optional startCursor: `0x${string}`;
 ### results
 
 ```ts
-results: object[];
+results: {
+  appSigner: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster: {
+        displayName: string;
+        fid: number;
+        pfpUrl: string;
+        username: string;
+     };
+  };
+  chainId: number;
+  content: string;
+  cursor: `0x${string}`;
+  deletedAt: null | Date;
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: string;
+  moderationStatus: "approved" | "rejected" | "pending";
+  moderationStatusChangedAt: Date;
+  parentId: null | `0x${string}`;
+  targetUri: string;
+  timestamp: Date;
+  txHash: `0x${string}`;
+}[];
 ```

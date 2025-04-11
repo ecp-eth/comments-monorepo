@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -7,7 +7,60 @@
 # Type Alias: AddCommentTypedDataSchemaType
 
 ```ts
-type AddCommentTypedDataSchemaType = object;
+type AddCommentTypedDataSchemaType = {
+  domain: {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+     version: "1";
+  };
+  message: {
+     appSigner: `0x${string}`;
+     author: `0x${string}`;
+     content: string;
+     deadline: bigint;
+     metadata: string;
+     nonce: bigint;
+     parentId: `0x${string}`;
+     targetUri: string;
+  };
+  primaryType: "AddComment";
+  types: {
+     AddComment: (
+        | {
+        name: "content";
+        type: "string";
+      }
+        | {
+        name: "metadata";
+        type: "string";
+      }
+        | {
+        name: "targetUri";
+        type: "string";
+      }
+        | {
+        name: "parentId";
+        type: "bytes32";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "appSigner";
+        type: "address";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+     })[];
+  };
+};
 ```
 
 Defined in: [packages/sdk/src/schemas/contract.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/contract.ts#L63)
@@ -17,7 +70,12 @@ Defined in: [packages/sdk/src/schemas/contract.ts:63](https://github.com/ecp-eth
 ### domain
 
 ```ts
-domain: object;
+domain: {
+  chainId: number;
+  name: "Comments";
+  verifyingContract: "0xabD9cE1952992211dEe051Df6ed337fa6efC995d";
+  version: "1";
+};
 ```
 
 #### domain.chainId
@@ -47,7 +105,16 @@ version: "1";
 ### message
 
 ```ts
-message: object = CommentDataSchema;
+message: {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: string;
+} = CommentDataSchema;
 ```
 
 #### message.appSigner
@@ -107,7 +174,41 @@ primaryType: "AddComment";
 ### types
 
 ```ts
-types: object;
+types: {
+  AddComment: (
+     | {
+     name: "content";
+     type: "string";
+   }
+     | {
+     name: "metadata";
+     type: "string";
+   }
+     | {
+     name: "targetUri";
+     type: "string";
+   }
+     | {
+     name: "parentId";
+     type: "bytes32";
+   }
+     | {
+     name: "author";
+     type: "address";
+   }
+     | {
+     name: "appSigner";
+     type: "address";
+   }
+     | {
+     name: "nonce";
+     type: "uint256";
+   }
+     | {
+     name: "deadline";
+     type: "uint256";
+  })[];
+};
 ```
 
 #### types.AddComment
@@ -117,33 +218,33 @@ AddComment: (
   | {
   name: "content";
   type: "string";
- }
+}
   | {
   name: "metadata";
   type: "string";
- }
+}
   | {
   name: "targetUri";
   type: "string";
- }
+}
   | {
   name: "parentId";
   type: "bytes32";
- }
+}
   | {
   name: "author";
   type: "address";
- }
+}
   | {
   name: "appSigner";
   type: "address";
- }
+}
   | {
   name: "nonce";
   type: "uint256";
- }
+}
   | {
   name: "deadline";
   type: "uint256";
- })[];
+})[];
 ```
