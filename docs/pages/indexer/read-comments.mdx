@@ -1,0 +1,120 @@
+# Read Comments from the Indexer
+
+To accommodate different use cases, the ECP offers multiple ways to read comments from the indexer.
+
+## Typescript SDK
+
+The Typescript SDK provides a set of functions to read comments and replies from the indexer.
+
+See [Typescript SDK](/integration-options/typescript-sdk) for more details.
+
+## REST API
+
+The REST API endpoints are available at `https://api.ethcomments.xyz/**/*`.
+
+See [REST API Reference](/indexer-reference/restful) for more details.
+
+## Direct GraphQL access
+
+The GraphQL API is available at `https://api.ethcomments.xyz/graphql`.
+
+You can query the data using [your favorite GraphQL client](https://github.com/chentsulin/awesome-graphql),
+or simply visit the GraphQL playground at https://api.ethcomments.xyz/ to try it out.
+
+### Example queries
+
+Query a comment by its ID:
+
+```graphql
+query {
+  comment(
+    id: "0xc4f012eaaa9285b0ffa7df432a7eb8f17145c34cfd50de688273b2b7df6bef08"
+  ) {
+    content
+  }
+}
+```
+
+Filter comments by `targetUri` and limit the number of results:
+
+```graphql
+query {
+  comments(where: { targetUri: "https://demo.ethcomments.xyz" }, limit: 10) {
+    # pagination info
+    pageInfo {
+      startCursor
+      endCursor
+      hasNextPage
+      hasPreviousPage
+    }
+
+    # comment details
+    items {
+      id
+      content
+    }
+
+    # total number of comments filtered by targetUri
+    totalCount
+  }
+}
+```
+
+## Direct database access via ponder client
+
+Ponder access is available at `https://api.ethcomments.xyz/sql`, it allows you to query the indexer database directly.
+
+You can use direct database access for quick investigations and debugging, but this approach is not recommended for production use since the database schema may change without notice. Changes to the schema could break your queries and affect application stability.
+
+### Install `ponder` and `@ponder/client`
+
+:::code-group
+
+```bash [npm]
+npm install ponder @ponder/client
+```
+
+```bash [yarn]
+yarn add ponder @ponder/client
+```
+
+```bash [pnpm]
+pnpm add ponder @ponder/client
+
+```
+
+:::
+
+`ponder` package is required by the schema file.
+
+### Get a copy of the database schema
+
+We are currently working on determining the best way to distribute the database schema. In the meantime, you can obtain it by cloning our repository:
+
+```bash
+git clone https://github.com/ecp-eth/comments-monorepo.git
+```
+
+The schema is located at `comments-monorepo/apps/indexer/ponder.schema.ts`.
+
+### Create a ponder client and query
+
+```
+import { createClient, sql } from "@ponder/client";
+import * as schema from "./schema";
+
+// create a ponder client with specified schema
+const client = createClient("https://api.ethcomments.xyz/sql", { schema });
+
+// query the database for comments
+const result = await client.db.select()
+  .from(schema.comment)
+  // filter comments by target uri
+  .where(sql`${schema.comment.targetUri} = 'https://demo.ethcomments.xyz'`)
+  // limit the result to 10
+  .limit(10);
+
+console.log(result)
+```
+
+See detailed explanation of ponder client at [Ponder client](https://ponder.sh/docs/query/client).

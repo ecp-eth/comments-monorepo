@@ -47,7 +47,7 @@ export default defineConfig({
       items: [
         {
           text: "Typescript SDK",
-          link: "/integration-options/indexer-api",
+          link: "/integration-options/typescript-sdk",
         },
         {
           text: "React Components",
@@ -92,6 +92,10 @@ export default defineConfig({
           link: "/indexer-reference/",
           collapsed: true,
           items: [
+            {
+              text: "Read Comments from the Indexer",
+              link: "/indexer/read-comments",
+            },
             {
               text: "Admin CLI",
               link: "/indexer/admin-cli",
