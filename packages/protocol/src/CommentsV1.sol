@@ -175,9 +175,6 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
             revert ChannelDoesNotExist();
         }
 
-        (, , , , bool isArchived, , ) = channelManager.getChannel(commentData.channelId);
-        if (isArchived) revert ChannelIsArchived();
-
         nonces[commentData.author][commentData.appSigner]++;
 
         bytes32 commentId = getCommentId(commentData);

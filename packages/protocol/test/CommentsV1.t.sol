@@ -496,12 +496,12 @@ contract CommentsV1Test is Test, IERC721Receiver {
         channelManager.setHookGloballyEnabled(address(noHook), true);
 
         // Create a channel with the hook
-        address[] memory hooks = new address[](1);
-        hooks[0] = address(noHook);
-        uint256 channelId = channelManager.createChannel{value: 0.02 ether}("Test Channel", "Test Description", "{}", false, hooks);
+        address[] memory hooks1 = new address[](1);
+        hooks1[0] = address(noHook);
+        uint256 channelId1 = channelManager.createChannel{value: 0.02 ether}("Test Channel", "Test Description", "{}", address(noHook));
 
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
-        commentData.channelId = channelId;
+        commentData.channelId = channelId1;
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
@@ -519,12 +519,12 @@ contract CommentsV1Test is Test, IERC721Receiver {
         channelManager.setHookGloballyEnabled(address(maliciousCollector), true);
 
         // Create a channel with the hook
-        address[] memory hooks = new address[](1);
-        hooks[0] = address(maliciousCollector);
-        uint256 channelId = channelManager.createChannel{value: 0.02 ether}("Test Channel", "Test Description", "{}", false, hooks);
+        address[] memory hooks2 = new address[](1);
+        hooks2[0] = address(maliciousCollector);
+        uint256 channelId2 = channelManager.createChannel{value: 0.02 ether}("Test Channel", "Test Description", "{}", address(maliciousCollector));
 
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
-        commentData.channelId = channelId;
+        commentData.channelId = channelId2;
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
@@ -656,12 +656,17 @@ contract CommentsV1Test is Test, IERC721Receiver {
         channelManager.setHookGloballyEnabled(address(noHook), false);
 
         // Create channel with hook
-        address[] memory hooks = new address[](1);
-        hooks[0] = address(noHook);
-        uint256 channelId = channelManager.createChannel{value: 0.02 ether}("Test Channel", "Test Description", "{}", false, hooks);
+        address[] memory hooks3 = new address[](1);
+        hooks3[0] = address(noHook);
+        uint256 channelId3 = channelManager.createChannel{value: 0.02 ether}(
+            "Test Channel",
+            "Test Description",
+            "{}",
+            address(noHook)
+        );
 
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
-        commentData.channelId = channelId;
+        commentData.channelId = channelId3;
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
         bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
