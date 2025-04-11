@@ -9,11 +9,11 @@ interface IFeeManager {
     
     /// @notice Emitted when channel creation fee is updated
     /// @param newFee The new fee amount in wei
-    event ChannelCreationFeeUpdated(uint256 newFee);
+    event ChannelCreationFeeUpdated(uint96 newFee);
     
     /// @notice Emitted when hook registration fee is updated
     /// @param newFee The new fee amount in wei
-    event HookRegistrationFeeUpdated(uint256 newFee);
+    event HookRegistrationFeeUpdated(uint96 newFee);
     
     /// @notice Emitted when hook transaction fee percentage is updated
     /// @param newFeePercentage The new fee percentage (in basis points, 1% = 100)
@@ -26,11 +26,11 @@ interface IFeeManager {
     
     /// @notice Sets the fee for creating a new channel
     /// @param fee The fee amount in wei
-    function setChannelCreationFee(uint256 fee) external;
+    function setChannelCreationFee(uint96 fee) external;
     
     /// @notice Sets the fee for registering a new hook
     /// @param fee The fee amount in wei
-    function setHookRegistrationFee(uint256 fee) external;
+    function setHookRegistrationFee(uint96 fee) external;
     
     /// @notice Sets the fee percentage taken from hook transactions
     /// @param feePercentage The fee percentage in basis points (1% = 100)
@@ -38,11 +38,11 @@ interface IFeeManager {
     
     /// @notice Gets the current channel creation fee
     /// @return fee The current fee in wei
-    function getChannelCreationFee() external view returns (uint256 fee);
+    function getChannelCreationFee() external view returns (uint96 fee);
     
     /// @notice Gets the current hook registration fee
     /// @return fee The current fee in wei
-    function getHookRegistrationFee() external view returns (uint256 fee);
+    function getHookRegistrationFee() external view returns (uint96 fee);
     
     /// @notice Gets the current hook transaction fee percentage
     /// @return feePercentage The current fee percentage in basis points
