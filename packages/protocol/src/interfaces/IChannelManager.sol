@@ -46,6 +46,18 @@ interface IChannelManager {
     error ChannelAlreadyExists();
     /// @notice Error thrown when base URI is invalid
     error InvalidBaseURI();
+    /// @notice Error thrown when address is zero
+    error ZeroAddress();
+    /// @notice Error thrown when unauthorized caller tries to access function
+    error UnauthorizedCaller();
+    /// @notice Error thrown when hook execution fails
+    error ChannelHookExecutionFailed();
+
+    /// @notice Emitted when a hook execution fails
+    /// @param channelId The unique identifier of the channel
+    /// @param hook The address of the hook that failed
+    /// @param phase The phase in which the hook failed
+    event HookExecutionFailed(uint256 indexed channelId, address indexed hook, HookPhase phase);
 
     /// @notice Emitted when a hook is registered in the global registry
     /// @param hook The address of the registered hook

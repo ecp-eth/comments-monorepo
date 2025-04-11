@@ -78,6 +78,10 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     error ChannelIsArchived();
     /// @notice Error thrown when channel hook execution fails
     error ChannelHookExecutionFailed();
+    /// @notice Error thrown when signature length is invalid
+    error InvalidSignatureLength();
+    /// @notice Error thrown when signature s value is invalid
+    error InvalidSignatureS();
 
     string public constant name = "Comments";
     string public constant version = "1";
@@ -178,24 +182,30 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
 
         bytes32 commentId = getCommentId(commentData);
 
-        if (
-            !SignatureChecker.isValidSignatureNow(
+        // Validate signatures if present
+        if (appSignature.length > 0) {
+            _validateSignature(appSignature);
+            if (!SignatureChecker.isValidSignatureNow(
                 commentData.appSigner,
                 commentId,
                 appSignature
-            )
-        ) {
-            revert InvalidAppSignature();
+            )) {
+                revert InvalidAppSignature();
+            }
+        }
+
+        if (authorSignature.length > 0) {
+            _validateSignature(authorSignature);
         }
 
         if (
             msg.sender == commentData.author ||
             isApproved[commentData.author][commentData.appSigner] ||
-            SignatureChecker.isValidSignatureNow(
+            (authorSignature.length > 0 && SignatureChecker.isValidSignatureNow(
                 commentData.author,
                 commentId,
                 authorSignature
-            )
+            ))
         ) {
             // Execute channel-specific hooks before comment
             bool hookSuccess = channelManager.executeHooks{value: msg.value}(
@@ -541,5 +551,23 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     function getComment(bytes32 commentId) external view returns (CommentData memory) {
         require(commentExists[commentId], "Comment does not exist");
         return comments[commentId];
+    }
+
+    /// @notice Validates a signature against malleability
+    /// @dev Ensures signature follows EIP-2098 and has valid s value
+    /// @param signature The signature to validate
+    function _validateSignature(bytes memory signature) internal pure {
+        if (signature.length != 65) revert InvalidSignatureLength();
+        
+        // Extract s value from signature
+        uint256 s;
+        assembly {
+            s := mload(add(signature, 0x40))
+        }
+        
+        // Ensure s is in lower half of curve's order
+        if (s > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
+            revert InvalidSignatureS();
+        }
     }
 }
