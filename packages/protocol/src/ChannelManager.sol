@@ -120,22 +120,15 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         hookTransactionFeePercentage = 1000;
         accumulatedFees = 0;
 
-        // Create default channel using hash of "home"
-        uint256 homeChannelId = _generateChannelId(
-            initialOwner,
-            "Home",
-            "Any kind of content",
-            "{}"
-        );
-        
-        _safeMint(initialOwner, homeChannelId);
+        // Create default channel with ID 0
+        _safeMint(initialOwner, 0);
 
-        channels[homeChannelId].name = "Home";
-        channels[homeChannelId].description = "Any kind of content";
-        channels[homeChannelId].metadata = "{}";
-        channels[homeChannelId].owner = initialOwner;
-        channels[homeChannelId].isPrivate = false;
-        channels[homeChannelId].isArchived = false;
+        channels[0].name = "Home";
+        channels[0].description = "Any kind of content";
+        channels[0].metadata = "{}";
+        channels[0].owner = initialOwner;
+        channels[0].isPrivate = false;
+        channels[0].isArchived = false;
 
         commentsContract = _commentsContract;
     }
