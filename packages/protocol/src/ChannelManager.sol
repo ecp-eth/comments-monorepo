@@ -47,6 +47,10 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     error HookDisabledGlobally();
     /// @notice Error thrown when insufficient fee is provided
     error InsufficientFee();
+    /// @notice Error thrown when channel already exists
+    error ChannelAlreadyExists();
+    /// @notice Error thrown when base URI is invalid
+    error InvalidBaseURI();
 
     /// @notice Emitted when a hook is registered in the global registry
     /// @param hook The address of the registered hook
@@ -57,14 +61,19 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @param enabled Whether the hook is enabled globally
     event HookGlobalStatusUpdated(address indexed hook, bool enabled);
 
+    /// @notice Emitted when the base URI for NFT metadata is updated
+    /// @param baseURI The new base URI
+    event BaseURIUpdated(string baseURI);
+
     // Mapping from channel ID to channel configuration
     mapping(uint256 => ChannelConfig) private channels;
-    // Counter for channel/token IDs
-    uint256 private _nextTokenId;
 
     // Global hook registry
     mapping(address => bool) private registeredHooks;
     mapping(address => bool) private globallyEnabledHooks;
+
+    // Base URI for NFT metadata
+    string private baseURIValue;
 
     // Fee configuration
     uint256 private channelCreationFee;
@@ -76,6 +85,27 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     
     error UnauthorizedCaller();
 
+    /// @notice Generates a unique channel ID based on input parameters
+    /// @param creator The address creating the channel
+    /// @param name The name of the channel
+    /// @param description The description of the channel
+    /// @param metadata The channel metadata
+    /// @return channelId The generated channel ID
+    function _generateChannelId(
+        address creator,
+        string memory name,
+        string memory description,
+        string memory metadata
+    ) internal view returns (uint256) {
+        return uint256(keccak256(abi.encodePacked(
+            creator,
+            name,
+            description,
+            metadata,
+            block.timestamp
+        )));
+    }
+
     /// @notice Constructor sets the contract owner and initializes ERC721
     /// @param initialOwner The address that will own the contract
     constructor(address initialOwner, address _commentsContract) 
@@ -85,21 +115,26 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         // Initialize fees
         channelCreationFee = 0.01 ether;
         hookRegistrationFee = 0;
-        hookTransactionFeePercentage = 0;
+        // 10% fee on hook revenue
+        hookTransactionFeePercentage = 1000;
         accumulatedFees = 0;
 
-        // Create default channel 0
-        _nextTokenId = 0;
-        _safeMint(initialOwner, _nextTokenId);
+        // Create default channel using hash of "home"
+        uint256 homeChannelId = _generateChannelId(
+            initialOwner,
+            "Home",
+            "Any kind of content",
+            "{}"
+        );
+        
+        _safeMint(initialOwner, homeChannelId);
 
-        channels[_nextTokenId].name = "Home";
-        channels[_nextTokenId].description = "Any kind of content";
-        channels[_nextTokenId].metadata = "{}";
-        channels[_nextTokenId].owner = initialOwner;
-        channels[_nextTokenId].isPrivate = false;
-        channels[_nextTokenId].isArchived = false;
-
-        _nextTokenId++;
+        channels[homeChannelId].name = "Home";
+        channels[homeChannelId].description = "Any kind of content";
+        channels[homeChannelId].metadata = "{}";
+        channels[homeChannelId].owner = initialOwner;
+        channels[homeChannelId].isPrivate = false;
+        channels[homeChannelId].isArchived = false;
 
         commentsContract = _commentsContract;
     }
@@ -212,7 +247,7 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         return _ownerOf(channelId) != address(0);
     }
 
-    /// @notice Creates a new channel as an NFT
+    /// @notice Creates a new channel as an NFT with a hash-based ID
     /// @param name The name of the channel
     /// @param description The description of the channel
     /// @param metadata The channel metadata (arbitrary JSON)
@@ -228,7 +263,12 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     ) external payable returns (uint256 channelId) {
         if (msg.value < channelCreationFee) revert InsufficientFee();
 
-        channelId = _nextTokenId++;
+        // Generate channel ID using the internal function
+        channelId = _generateChannelId(msg.sender, name, description, metadata);
+
+        // Ensure channel ID doesn't already exist
+        if (_channelExists(channelId)) revert ChannelAlreadyExists();
+
         _safeMint(msg.sender, channelId);
 
         channels[channelId].name = name;
@@ -463,5 +503,19 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @param _commentsContract The new comments contract address
     function updateCommentsContract(address _commentsContract) external onlyOwner {
         commentsContract = _commentsContract;
+    }
+
+    /// @notice Sets the base URI for NFT metadata
+    /// @param baseURI_ The new base URI
+    function setBaseURI(string calldata baseURI_) external onlyOwner {
+        if (bytes(baseURI_).length == 0) revert InvalidBaseURI();
+        baseURIValue = baseURI_;
+        emit BaseURIUpdated(baseURI_);
+    }
+
+    /// @notice Returns the base URI for token metadata
+    /// @dev Internal function that overrides ERC721's _baseURI()
+    function _baseURI() internal view virtual override returns (string memory) {
+        return baseURIValue;
     }
 } 
