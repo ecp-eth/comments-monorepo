@@ -106,7 +106,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     mapping(address => mapping(address => uint256)) public nonces;
 
     // Channel manager reference
-    ChannelManager public immutable channelManager;
+    IChannelManager public immutable channelManager;
 
     /// @notice Constructor initializes the contract with the deployer as owner and channel manager
     /// @dev Sets up EIP-712 domain separator
@@ -203,22 +203,12 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
                 commentData,
                 msg.sender,
                 commentId,
-                true
+                IChannelManager.HookPhase.Before
             );
             if (!hookSuccess) revert ChannelHookExecutionFailed();
 
             // Store comment data on-chain
-            comments[commentId] = CommentData({
-                content: commentData.content,
-                metadata: commentData.metadata,
-                targetUri: commentData.targetUri,
-                commentType: commentData.commentType,
-                author: commentData.author,
-                appSigner: commentData.appSigner,
-                channelId: commentData.channelId,
-                nonce: commentData.nonce,
-                deadline: commentData.deadline
-            });
+            comments[commentId] = commentData;
             commentExists[commentId] = true;
 
             // Execute channel-specific hooks after comment
@@ -227,7 +217,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
                 commentData,
                 msg.sender,
                 commentId,
-                false
+                IChannelManager.HookPhase.After
             );
             if (!hookSuccess) revert ChannelHookExecutionFailed();
 
@@ -272,6 +262,8 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
             revert InvalidNonce(author, appSigner, nonces[author][appSigner], nonce);
         }
 
+        require(commentExists[commentId], "Comment does not exist");
+
         nonces[author][appSigner]++;
 
         bytes32 deleteHash = getDeleteCommentHash(
@@ -310,7 +302,6 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     /// @param commentId The unique identifier of the comment to delete
     /// @param author The address of the comment author
     function _deleteComment(bytes32 commentId, address author) internal {
-        require(commentExists[commentId], "Comment does not exist");
         delete comments[commentId];
         commentExists[commentId] = false;
         emit CommentDeleted(commentId, author);
