@@ -11,7 +11,7 @@ interface ICommentTypes {
     /// @param appSigner The address of the application signer that authorized this comment
     /// @param deadline Timestamp after which the signatures for this comment become invalid
     /// @param nonce The nonce for the comment
-    /// @param forumId The forum ID associated with the comment
+    /// @param channelId The channel ID associated with the comment
     /// @param commentType The type of the comment (e.g. "question", "answer", "feedback", etc.)
     struct CommentData {
         string content;
