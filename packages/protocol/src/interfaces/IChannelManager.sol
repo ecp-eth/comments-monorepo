@@ -15,24 +15,19 @@ interface IChannelManager {
         string name;
         string description;
         string metadata;  // Arbitrary JSON metadata
-        address owner;
-        bool isPrivate;
-        bool isArchived;
-        IHook[] hooks;
-        mapping(address => bool) hookEnabled;
+        IHook hook;      // Single hook for the channel
+        bool hookEnabled;
     }
 
-     /// @notice Error thrown when channel does not exist
+    /// @notice Error thrown when channel does not exist
     error ChannelDoesNotExist();
-    /// @notice Error thrown when caller is not the channel owner
-    error NotChannelOwner();
     /// @notice Error thrown when hook address is invalid
     error InvalidHookAddress();
     /// @notice Error thrown when hook does not implement required interface
     error InvalidHookInterface();
     /// @notice Error thrown when channel already has a hook
     error ChannelAlreadyHasHook();
-    /// @notice Error thrown when hook is not added to channel
+    /// @notice Error thrown when hook is not found
     error HookNotFound();
     /// @notice Error thrown when hook is not registered
     error HookNotRegistered();
@@ -75,12 +70,10 @@ interface IChannelManager {
     /// @notice Emitted when a new channel is created
     /// @param channelId The unique identifier of the channel
     /// @param name The name of the channel
-    /// @param owner The address of the channel owner
     /// @param metadata The channel metadata
     event ChannelCreated(
         uint256 indexed channelId, 
-        string name, 
-        address indexed owner,
+        string name,
         string metadata
     );
 
@@ -89,26 +82,17 @@ interface IChannelManager {
     /// @param name The new name of the channel
     /// @param description The new description of the channel
     /// @param metadata The new metadata
-    /// @param isPrivate Whether the channel is private
-    /// @param isArchived Whether the channel is archived
     event ChannelUpdated(
         uint256 indexed channelId,
         string name,
         string description,
-        string metadata,
-        bool isPrivate,
-        bool isArchived
+        string metadata
     );
 
-    /// @notice Emitted when a hook is added to a channel
+    /// @notice Emitted when a hook is set for a channel
     /// @param channelId The unique identifier of the channel
     /// @param hook The address of the hook contract
-    event HookAdded(uint256 indexed channelId, address indexed hook);
-
-    /// @notice Emitted when a hook is removed from a channel
-    /// @param channelId The unique identifier of the channel
-    /// @param hook The address of the hook contract
-    event HookRemoved(uint256 indexed channelId, address indexed hook);
+    event HookSet(uint256 indexed channelId, address indexed hook);
 
     /// @notice Emitted when a hook's enabled status is updated
     /// @param channelId The unique identifier of the channel
@@ -120,15 +104,13 @@ interface IChannelManager {
     /// @param name The name of the channel
     /// @param description The description of the channel
     /// @param metadata The channel metadata (arbitrary JSON)
-    /// @param isPrivate Whether the channel is private
-    /// @param hooks Array of hook addresses to add to the channel
+    /// @param hook Address of the hook to add to the channel
     /// @return channelId The unique identifier of the created channel
     function createChannel(
         string calldata name,
         string calldata description,
         string calldata metadata,
-        bool isPrivate,
-        address[] calldata hooks
+        address hook
     ) external payable returns (uint256 channelId);
 
     /// @notice Updates an existing channel's configuration
@@ -136,59 +118,51 @@ interface IChannelManager {
     /// @param name The new name of the channel
     /// @param description The new description of the channel
     /// @param metadata The new metadata
-    /// @param isPrivate Whether the channel is private
-    /// @param isArchived Whether the channel is archived
     function updateChannel(
         uint256 channelId,
         string calldata name,
         string calldata description,
-        string calldata metadata,
-        bool isPrivate,
-        bool isArchived
+        string calldata metadata
     ) external;
 
-    /// @notice Adds a hook to a channel
+    /// @notice Sets the hook for a channel
     /// @param channelId The unique identifier of the channel
     /// @param hook The address of the hook contract
-    function addHook(uint256 channelId, address hook) external;
-
-    /// @notice Removes a hook from a channel
-    /// @param channelId The unique identifier of the channel
-    /// @param hook The address of the hook contract
-    function removeHook(uint256 channelId, address hook) external;
-
-    /// @notice Updates a hook's enabled status
-    /// @param channelId The unique identifier of the channel
-    /// @param hook The address of the hook contract
-    /// @param enabled Whether the hook should be enabled
-    function setHookEnabled(uint256 channelId, address hook, bool enabled) external;
+    function setHook(uint256 channelId, address hook) external;
 
     /// @notice Gets a channel's configuration
     /// @param channelId The unique identifier of the channel
     /// @return name The name of the channel
     /// @return description The description of the channel
     /// @return metadata The channel metadata
-    /// @return owner The address of the channel owner
-    /// @return isPrivate Whether the channel is private
-    /// @return isArchived Whether the channel is archived
-    /// @return hooks Array of hook addresses for the channel
+    /// @return hook The address of the channel's hook
     function getChannel(uint256 channelId) external view returns (
         string memory name,
         string memory description,
         string memory metadata,
-        address owner,
-        bool isPrivate,
-        bool isArchived,
-        address[] memory hooks
+        address hook
     );
 
-    /// @notice Checks if a hook is enabled for a channel
-    /// @param channelId The unique identifier of the channel
-    /// @param hook The address of the hook contract
-    /// @return enabled Whether the hook is enabled
-    function isHookEnabled(uint256 channelId, address hook) external view returns (bool enabled);
+    /// @notice Enables or disables a hook globally (only owner)
+    /// @param hook The address of the hook
+    /// @param enabled Whether to enable or disable the hook
+    function setHookGloballyEnabled(address hook, bool enabled) external;
 
-    /// @notice Executes hooks for a channel
+    /// @notice Checks if a hook is registered and globally enabled
+    /// @param hook The address of the hook
+    /// @return registered Whether the hook is registered
+    /// @return enabled Whether the hook is globally enabled
+    function getHookStatus(address hook) external view returns (bool registered, bool enabled);
+
+    /// @notice Updates the comments contract address (only owner)
+    /// @param _commentsContract The new comments contract address
+    function updateCommentsContract(address _commentsContract) external;
+
+    /// @notice Sets the base URI for NFT metadata
+    /// @param baseURI_ The new base URI
+    function setBaseURI(string calldata baseURI_) external;
+
+    /// @notice Executes hook for a channel
     /// @param channelId Unique identifier of the channel
     /// @param commentData Comment data to process
     /// @param caller Address that initiated the transaction
