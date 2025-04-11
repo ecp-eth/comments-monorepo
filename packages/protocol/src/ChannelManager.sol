@@ -39,8 +39,8 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     string private baseURIValue;
 
     // Fee configuration
-    uint256 private channelCreationFee;
-    uint256 private hookRegistrationFee;
+    uint96 private channelCreationFee;
+    uint96 private hookRegistrationFee;
     uint16 private hookTransactionFeePercentage; // In basis points (1% = 100)
     uint256 private accumulatedFees;
 
@@ -101,14 +101,14 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
 
     /// @notice Sets the fee for creating a new channel (only owner)
     /// @param fee The fee amount in wei
-    function setChannelCreationFee(uint256 fee) external onlyOwner {
+    function setChannelCreationFee(uint96 fee) external onlyOwner {
         channelCreationFee = fee;
         emit IFeeManager.ChannelCreationFeeUpdated(fee);
     }
 
     /// @notice Sets the fee for registering a new hook (only owner)
     /// @param fee The fee amount in wei
-    function setHookRegistrationFee(uint256 fee) external onlyOwner {
+    function setHookRegistrationFee(uint96 fee) external onlyOwner {
         hookRegistrationFee = fee;
         emit IFeeManager.HookRegistrationFeeUpdated(fee);
     }
@@ -122,12 +122,12 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     }
 
     /// @notice Gets the current channel creation fee
-    function getChannelCreationFee() external view returns (uint256) {
+    function getChannelCreationFee() external view returns (uint96) {
         return channelCreationFee;
     }
 
     /// @notice Gets the current hook registration fee
-    function getHookRegistrationFee() external view returns (uint256) {
+    function getHookRegistrationFee() external view returns (uint96) {
         return hookRegistrationFee;
     }
 
