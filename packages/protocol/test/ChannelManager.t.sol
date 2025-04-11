@@ -301,13 +301,14 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         // Test with hook returning false
         mockHook.setShouldReturnTrue(false);
         vm.prank(commentsContract);
-        assertFalse(channelManager.executeHooks(
+        vm.expectRevert(IChannelManager.ChannelHookExecutionFailed.selector);
+        channelManager.executeHooks(
             channelId,
             commentData,
             user1,
             bytes32(0),
             IChannelManager.HookPhase.Before
-        ));
+        );
     }
 
     function test_RevertWhen_CreatingChannelWithInvalidHook() public {
