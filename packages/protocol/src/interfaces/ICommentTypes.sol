@@ -6,7 +6,7 @@ interface ICommentTypes {
     /// @notice Struct containing all comment data
     /// @param content The actual text content of the comment
     /// @param metadata Additional JSON metadata for the comment
-    /// @param targetUri the URI about which the comment is being made, for replies uses CAIP-10 format: eip155:${chainId}/${contractAddress}/${commentId}
+    /// @param targetUri the URI about which the comment is being made, for replies uses an extended CAIP-2 format: eip155:${chainId}/${contractAddress}/${commentId}
     /// @param author The address of the comment author
     /// @param appSigner The address of the application signer that authorized this comment
     /// @param deadline Timestamp after which the signatures for this comment become invalid

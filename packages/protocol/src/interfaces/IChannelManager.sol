@@ -185,4 +185,9 @@ interface IChannelManager {
     /// @notice Registers a new hook in the global registry
     /// @param hook The address of the hook to register
     function registerHook(address hook) external payable;
+
+    /// @notice Gets the owner of a channel
+    /// @param channelId The unique identifier of the channel
+    /// @return owner The address of the channel owner
+    function getChannelOwner(uint256 channelId) external view returns (address);
 } 
