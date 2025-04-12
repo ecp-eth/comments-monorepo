@@ -70,12 +70,8 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     error SignatureDeadlineReached(uint256 deadline, uint256 currentTime);
     /// @notice Error thrown when caller is not authorized
     error NotAuthorized(address caller, address requiredCaller);
-    /// @notice Error thrown when CAIP-10 URI format is invalid
-    error InvalidCAIP10Format();
     /// @notice Error thrown when channel does not exist
     error ChannelDoesNotExist();
-    /// @notice Error thrown when channel is archived
-    error ChannelIsArchived();
     /// @notice Error thrown when channel hook execution fails
     error ChannelHookExecutionFailed();
     /// @notice Error thrown when signature length is invalid
