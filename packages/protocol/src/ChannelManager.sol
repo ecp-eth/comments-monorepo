@@ -391,8 +391,19 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @notice Check if a channel exists
     /// @param channelId The channel ID to check
     /// @return bool Whether the channel exists
-    function channelExists(uint256 channelId) external view returns (bool) {
-        return _channelExists(channelId);
+    function channelExists(uint256 channelId) public view returns (bool) {
+        try this.ownerOf(channelId) returns (address) {
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    /// @notice Gets the owner of a channel
+    /// @param channelId The unique identifier of the channel
+    /// @return owner The address of the channel owner
+    function getChannelOwner(uint256 channelId) external view returns (address) {
+        return ownerOf(channelId);
     }
 
     /// @notice Fallback function to receive ETH
