@@ -8,11 +8,11 @@
 
 ```ts
 type EmbedConfigFontSchemaType = {
-  fontFamily:   | {
+  fontFamily?:   | {
      system: string;
    }
      | {
-     google:   | "ABeeZee"
+     google?:   | "ABeeZee"
         | "ADLaM_Display"
         | "AR_One_Sans"
         | "Abel"
@@ -1748,30 +1748,30 @@ type EmbedConfigFontSchemaType = {
         | "Zilla_Slab"
         | "Zilla_Slab_Highlight";
    };
-  sizes: {
-     base: {
-        lineHeight: string;
-        size: string;
+  sizes?: {
+     base?: {
+        lineHeight?: string;
+        size?: string;
      };
-     empty-screen-title: {
-        lineHeight: string;
-        size: string;
+     empty-screen-title?: {
+        lineHeight?: string;
+        size?: string;
      };
-     error-screen-title: {
-        lineHeight: string;
-        size: string;
+     error-screen-title?: {
+        lineHeight?: string;
+        size?: string;
      };
-     headline: {
-        lineHeight: string;
-        size: string;
+     headline?: {
+        lineHeight?: string;
+        size?: string;
      };
-     sm: {
-        lineHeight: string;
-        size: string;
+     sm?: {
+        lineHeight?: string;
+        size?: string;
      };
-     xs: {
-        lineHeight: string;
-        size: string;
+     xs?: {
+        lineHeight?: string;
+        size?: string;
      };
   };
 };
@@ -1789,7 +1789,7 @@ optional fontFamily:
   system: string;
 }
   | {
-  google:   | "ABeeZee"
+  google?:   | "ABeeZee"
      | "ADLaM_Display"
      | "AR_One_Sans"
      | "Abel"
@@ -3531,29 +3531,29 @@ optional fontFamily:
 
 ```ts
 optional sizes: {
-  base: {
-     lineHeight: string;
-     size: string;
+  base?: {
+     lineHeight?: string;
+     size?: string;
   };
-  empty-screen-title: {
-     lineHeight: string;
-     size: string;
+  empty-screen-title?: {
+     lineHeight?: string;
+     size?: string;
   };
-  error-screen-title: {
-     lineHeight: string;
-     size: string;
+  error-screen-title?: {
+     lineHeight?: string;
+     size?: string;
   };
-  headline: {
-     lineHeight: string;
-     size: string;
+  headline?: {
+     lineHeight?: string;
+     size?: string;
   };
-  sm: {
-     lineHeight: string;
-     size: string;
+  sm?: {
+     lineHeight?: string;
+     size?: string;
   };
-  xs: {
-     lineHeight: string;
-     size: string;
+  xs?: {
+     lineHeight?: string;
+     size?: string;
   };
 };
 ```
@@ -3562,8 +3562,8 @@ optional sizes: {
 
 ```ts
 optional base: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -3583,8 +3583,8 @@ optional size: string;
 
 ```ts
 optional empty-screen-title: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -3604,8 +3604,8 @@ optional size: string;
 
 ```ts
 optional error-screen-title: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -3625,8 +3625,8 @@ optional size: string;
 
 ```ts
 optional headline: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -3646,8 +3646,8 @@ optional size: string;
 
 ```ts
 optional sm: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -3667,8 +3667,8 @@ optional size: string;
 
 ```ts
 optional xs: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 

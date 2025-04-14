@@ -11,11 +11,11 @@ const EmbedConfigFontSizeSchema: ZodObject<{
   lineHeight: ZodOptional<ZodOptional<ZodString>>;
   size: ZodOptional<ZodOptional<ZodString>>;
 }, "strip", ZodTypeAny, {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 }, {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 }>;
 ```
 

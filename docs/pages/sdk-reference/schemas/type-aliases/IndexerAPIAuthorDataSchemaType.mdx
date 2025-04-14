@@ -9,15 +9,15 @@
 ```ts
 type IndexerAPIAuthorDataSchemaType = {
   address: `0x${string}`;
-  ens: {
+  ens?: {
      avatarUrl: null | string;
      name: string;
   };
-  farcaster: {
-     displayName: string;
+  farcaster?: {
+     displayName?: string;
      fid: number;
-     pfpUrl: string;
-     username: string;
+     pfpUrl?: string;
+     username?: string;
   };
 };
 ```
@@ -57,10 +57,10 @@ name: string;
 
 ```ts
 optional farcaster: {
-  displayName: string;
+  displayName?: string;
   fid: number;
-  pfpUrl: string;
-  username: string;
+  pfpUrl?: string;
+  username?: string;
 };
 ```
 

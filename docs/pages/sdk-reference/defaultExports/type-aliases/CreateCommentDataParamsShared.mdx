@@ -11,8 +11,8 @@ type CreateCommentDataParamsShared = {
   appSigner: `0x${string}`;
   author: `0x${string}`;
   content: string;
-  deadline: bigint;
-  metadata: object;
+  deadline?: bigint;
+  metadata?: object;
   nonce: bigint;
 };
 ```

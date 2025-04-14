@@ -10,7 +10,7 @@
 function isMuted(options): Promise<boolean>;
 ```
 
-Defined in: [packages/sdk/src/api.ts:400](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L400)
+Defined in: [packages/sdk/src/api.ts:401](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/api.ts#L401)
 
 Checks if an address is marked as a muted on the indexer of your choice.
 
@@ -18,9 +18,43 @@ Checks if an address is marked as a muted on the indexer of your choice.
 
 ### options
 
-[`IsMutedOptions`](/sdk-reference/defaultExports/type-aliases/IsMutedOptions.mdx)
-
 The options for checking if an address is muted
+
+#### address
+
+`` `0x${string}` `` = `HexSchema`
+
+Author's address
+
+#### apiUrl?
+
+`string` = `...`
+
+URL on which /api/muted-accounts/$address endpoint will be called
+
+**Default**
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+#### retries?
+
+`number` = `...`
+
+Number of times to retry the signing operation in case of failure.
+
+**Default**
+
+```ts
+3
+```
+
+#### signal?
+
+`AbortSignal` = `...`
+
+Abort signal for requests
 
 ## Returns
 
