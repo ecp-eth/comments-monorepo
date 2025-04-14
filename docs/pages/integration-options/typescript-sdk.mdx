@@ -10,23 +10,19 @@ Here are a few examples:
 ```ts
 import { fetchComments } from "@ecp.eth/sdk";
 
-async function main() {
-  console.log("fetching comments...");
+console.log("fetching comments...");
 
-  const comments = await fetchComments({
-    // the url of indexer api
-    apiUrl: "https://api.ethcomments.xyz",
-    // the uri of commenting target
-    targetUri: "https://demo.ethcomments.xyz",
-  });
+const comments = await fetchComments({
+  // the url of indexer api
+  apiUrl: "https://api.ethcomments.xyz",
+  // the uri of commenting target
+  targetUri: "https://demo.ethcomments.xyz",
+});
 
-  console.log(
-    "here is a list of comments for https://demo.ethcomments.xyz",
-    comments
-  );
-}
-
-main();
+console.log(
+  "here is a list of comments for https://demo.ethcomments.xyz",
+  comments
+);
 ```
 
 The response is a list of comments and pagination information, see [`IndexerAPIListCommentsSchemaType`](/sdk-reference/schemas/type-aliases/IndexerAPIListCommentsSchemaType).
