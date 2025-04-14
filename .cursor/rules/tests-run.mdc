@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Running protocol tests
+
+- to run tests for the protocol, run `cd /Users/davidfurlong/Projects/active/comments-monorepo/packages/protocol && pnpm run test -vvv`. If you run tests and try to fix them, automatically try to run them again to validate the fixes. Do this in a loop until the tests run successfully. Do not change build settings like optimizer runs or via-ir.

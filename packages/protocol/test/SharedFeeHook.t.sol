@@ -1,456 +1,454 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "forge-std/Test.sol";
-import "../src/interfaces/IHook.sol";
-import "../src/interfaces/ICommentTypes.sol";
-import "../src/interfaces/IChannelManager.sol";
-import "../src/CommentsV1.sol";
-import "../src/ChannelManager.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "forge-std/console.sol";
+import {Test, console} from "forge-std/Test.sol";
+import {ChannelManager} from "../src/ChannelManager.sol";
+import {CommentsV1} from "../src/CommentsV1.sol";
+import {IHook} from "../src/interfaces/IHook.sol";
+import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
+import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {TestUtils} from "./utils.sol";
 
 /// @title SharedFeeHook - A hook that splits comment fees between channel owners and parent comment authors
 /// @notice This hook charges 0.001 ETH per comment and splits it between channel owners and parent comment authors
-contract SharedFeeHook is IHook, ReentrancyGuard {
-    using Strings for string;
+contract SharedFeeHook is IHook {
+    using SafeERC20 for IERC20;
 
-    uint256 public constant COMMENT_FEE = 0.001 ether;
-    uint256 public constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
-    uint256 public constant HOOK_FEE = 900000000000000; // 0.0009 ether (after 10% protocol fee)
-    uint256 public constant TOTAL_FEE_WITH_PROTOCOL = 0.001 ether; // Total fee including protocol fee
-
+    // Token used for fee payment
+    IERC20 public immutable paymentToken;
     IChannelManager public immutable channelManager;
-    CommentsV1 public immutable comments;
     
-    mapping(address => uint256) public pendingWithdrawals;
+    // Fee configuration
+    uint256 public feeAmount; // Fixed fee amount per comment
+    uint256 public constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
+    
+    // Fee recipients and their shares
+    struct Recipient {
+        address addr;
+        uint256 share; // Share in basis points (1/100 of a percent)
+    }
+    
+    Recipient[] public recipients;
+    uint256 public totalShares;
+    uint256 public totalFeesCollected;
 
-    event FeeDistributed(
-        bytes32 indexed commentId,
-        address indexed channelOwner,
-        uint256 channelOwnerShare,
-        address parentAuthor,
-        uint256 parentAuthorShare,
-        address parentAppSigner,
-        uint256 parentAppSignerShare,
-        address appSigner,
-        uint256 appSignerShare
-    );
-    event FeesWithdrawn(address indexed user, uint256 amount);
+    event FeeCollected(address indexed author, uint256 amount);
+    event FeeDistributed(address indexed recipient, uint256 amount);
+    event FeeAmountUpdated(uint256 newAmount);
+    event RecipientAdded(address indexed recipient, uint256 share);
+    event RecipientRemoved(address indexed recipient);
+    event RecipientShareUpdated(address indexed recipient, uint256 newShare);
 
-    constructor(address _channelManager, address _comments) {
+    constructor(
+        address _paymentToken, 
+        uint256 _feeAmount,
+        address _channelManager
+    ) {
+        require(_paymentToken != address(0), "Invalid token address");
+        require(_channelManager != address(0), "Invalid channel manager");
+        require(_feeAmount > 0, "Invalid fee amount");
+        
+        paymentToken = IERC20(_paymentToken);
+        feeAmount = _feeAmount;
         channelManager = IChannelManager(_channelManager);
-        comments = CommentsV1(_comments);
     }
 
     function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
         return interfaceId == type(IHook).interfaceId;
     }
 
-    /// @notice Called before a comment is posted to verify and collect the fee
     function beforeComment(
+        ICommentTypes.CommentData calldata commentData,
+        address,
+        bytes32
+    ) external payable returns (bool) {
+        // Calculate protocol fee
+        uint256 protocolFee = (feeAmount * PROTOCOL_FEE_PERCENTAGE) / 10000;
+        uint256 hookFee = feeAmount - protocolFee;
+        
+        // Transfer tokens from author
+        paymentToken.safeTransferFrom(commentData.author, address(this), hookFee);
+        paymentToken.safeTransferFrom(commentData.author, address(channelManager), protocolFee);
+        
+        totalFeesCollected += hookFee;
+        emit FeeCollected(commentData.author, hookFee);
+        
+        // Distribute fees to recipients
+        _distributeFees(hookFee);
+        
+        return true;
+    }
+
+    function afterComment(
         ICommentTypes.CommentData calldata,
         address,
         bytes32
-    ) external payable override returns (bool) {
-        require(msg.value >= HOOK_FEE, "Insufficient fee");
+    ) external pure returns (bool) {
         return true;
     }
 
-    /// @notice Called after a comment is posted to distribute the fee
-    function afterComment(
-        ICommentTypes.CommentData calldata commentData,
-        address,
-        bytes32 commentId
-    ) external override returns (bool success) {
-
-        // Parse target URI to determine if this is a reply
-        (bool isReply, address parentAuthor, address parentAppSigner) = parseTargetUri(commentData.targetUri);
-
-        // Get channel owner
-        address channelOwner = channelManager.getChannelOwner(commentData.channelId);
-
-        if (isReply) {
-            _distributeReplyFees(commentId, channelOwner, parentAuthor, parentAppSigner, commentData.appSigner);
-        } else {
-            _distributeTopLevelFees(commentId, channelOwner, commentData.appSigner);
-        }
-
-        return true;
-    }
-
-    /// @notice Distribute fees for a reply comment
-    function _distributeReplyFees(
-        bytes32 commentId,
-        address channelOwner,
-        address parentAuthor,
-        address parentAppSigner,
-        address appSigner
-    ) internal {
-        uint256 quarterShare = HOOK_FEE / 4;
+    function addRecipient(address _recipient, uint256 _share) external {
+        require(_recipient != address(0), "Invalid recipient address");
+        require(_share > 0, "Invalid share");
         
-        pendingWithdrawals[channelOwner] += quarterShare;
-        pendingWithdrawals[parentAuthor] += quarterShare;
-        pendingWithdrawals[parentAppSigner] += quarterShare;
-        pendingWithdrawals[appSigner] += quarterShare;
-
-        emit FeeDistributed(
-            commentId,
-            channelOwner,
-            quarterShare,
-            parentAuthor,
-            quarterShare,
-            parentAppSigner,
-            quarterShare,
-            appSigner,
-            quarterShare
-        );
-    }
-
-    /// @notice Distribute fees for a top-level comment
-    function _distributeTopLevelFees(
-        bytes32 commentId,
-        address channelOwner,
-        address appSigner
-    ) internal {
-        uint256 channelOwnerShare = (HOOK_FEE * 50) / 100;
-        uint256 appSignerShare = HOOK_FEE - channelOwnerShare;
-
-        pendingWithdrawals[channelOwner] += channelOwnerShare;
-        pendingWithdrawals[appSigner] += appSignerShare;
-
-        emit FeeDistributed(
-            commentId,
-            channelOwner,
-            channelOwnerShare,
-            address(0),
-            0,
-            address(0),
-            0,
-            appSigner,
-            appSignerShare
-        );
-    }
-
-    /// @notice Parse CAIP URL and get all parent comment authors and app signers recursively
-    /// @param targetUri CAIP URL in format eip155:${chainId}/${contractAddress}/${commentId}
-    function getParentAuthorsAndSigners(string memory targetUri) internal view returns (address[] memory authors, address[] memory appSigners) {
-        address[] memory authorsTemp = new address[](10); // Max depth of 10
-        address[] memory signersTemp = new address[](10); // Max depth of 10
-        uint256 count = 0;
-
-        string memory currentUri = targetUri;
-        while (bytes(currentUri).length > 0 && count < 10) {
-            (bool isReply, address author, address signer) = parseTargetUri(currentUri);
-            if (!isReply) break;
-
-            authorsTemp[count] = author;
-            signersTemp[count] = signer;
-            count++;
-            
-            // Get the parent comment's targetUri from the comment
-            (, , string memory parentUri, , , , , ,) = comments.comments(bytes32(uint256(keccak256(bytes(currentUri)))));
-            currentUri = parentUri;
+        // Check if recipient already exists
+        for (uint i = 0; i < recipients.length; i++) {
+            require(recipients[i].addr != _recipient, "Recipient already exists");
         }
-
-        // Create correctly sized arrays with only valid entries
-        authors = new address[](count);
-        appSigners = new address[](count);
-        for (uint256 i = 0; i < count; i++) {
-            authors[i] = authorsTemp[i];
-            appSigners[i] = signersTemp[i];
-        }
-        return (authors, appSigners);
+        
+        recipients.push(Recipient(_recipient, _share));
+        totalShares += _share;
+        
+        emit RecipientAdded(_recipient, _share);
     }
 
-    /// @notice Parse a CAIP URL into commentId and parent URI
-    function parseTargetUri(string memory uri) internal view returns (bool isReply, address parentAuthor, address parentAppSigner) {
-        // Split the URI into parts
-        bytes memory uriBytes = bytes(uri);
-        if (uriBytes.length == 0) return (false, address(0), address(0));
-
-        // Find the last '/' to get the commentId
-        int256 lastSlash = -1;
-        for (uint256 i = 0; i < uriBytes.length; i++) {
-            if (uriBytes[i] == "/") {
-                lastSlash = int256(i);
+    function removeRecipient(address _recipient) external {
+        for (uint i = 0; i < recipients.length; i++) {
+            if (recipients[i].addr == _recipient) {
+                totalShares -= recipients[i].share;
+                
+                // Move the last element to the current position and pop
+                recipients[i] = recipients[recipients.length - 1];
+                recipients.pop();
+                
+                emit RecipientRemoved(_recipient);
+                return;
             }
         }
-        if (lastSlash == -1) return (false, address(0), address(0));
-
-        // Extract the commentId
-        string memory commentIdHex = substring(uri, uint256(lastSlash) + 1, uriBytes.length);
-        
-        bytes32 commentId = bytes32(Strings.parseHexUint(commentIdHex));
-
-        // Get the parent comment's author and app signer
-        (, , , , address author, address appSigner, , ,) = comments.comments(commentId);
-        return (true, author, appSigner);
+        revert("Recipient not found");
     }
 
-    /// @notice Extract substring from string
-    function substring(string memory str, uint256 startIndex, uint256 endIndex) internal pure returns (string memory) {
-        bytes memory strBytes = bytes(str);
-        bytes memory result = new bytes(endIndex - startIndex);
-        for (uint256 i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = strBytes[i];
+    function updateRecipientShare(address _recipient, uint256 _newShare) external {
+        require(_newShare > 0, "Invalid share");
+        
+        for (uint i = 0; i < recipients.length; i++) {
+            if (recipients[i].addr == _recipient) {
+                totalShares = totalShares - recipients[i].share + _newShare;
+                recipients[i].share = _newShare;
+                
+                emit RecipientShareUpdated(_recipient, _newShare);
+                return;
+            }
         }
-        return string(result);
+        revert("Recipient not found");
     }
 
-    /// @notice Withdraw accumulated fees
-    function withdraw() external nonReentrant {
-        uint256 amount = pendingWithdrawals[msg.sender];
-        require(amount > 0, "No fees to withdraw");
+    function updateFeeAmount(uint256 _newFeeAmount) external {
+        require(_newFeeAmount > 0, "Invalid fee amount");
+        feeAmount = _newFeeAmount;
+        emit FeeAmountUpdated(_newFeeAmount);
+    }
+
+    function _distributeFees(uint256 _amount) internal {
+        if (recipients.length == 0) return;
         
-        pendingWithdrawals[msg.sender] = 0;
-        (bool success,) = msg.sender.call{value: amount}("");
-        require(success, "Transfer failed");
-
-        emit FeesWithdrawn(msg.sender, amount);
+        for (uint i = 0; i < recipients.length; i++) {
+            uint256 shareAmount = (_amount * recipients[i].share) / totalShares;
+            if (shareAmount > 0) {
+                paymentToken.safeTransfer(recipients[i].addr, shareAmount);
+                emit FeeDistributed(recipients[i].addr, shareAmount);
+            }
+        }
     }
 
-    /// @notice Allow contract to receive ETH
+    // Allow receiving ETH in case it's sent by mistake
     receive() external payable {}
 }
 
-contract SharedFeeHookTest is Test, IERC721Receiver {
-    using Strings for string;
+// Mock ERC20 token for testing
+contract MockERC20 is IERC20 {
+    mapping(address => uint256) private _balances;
+    mapping(address => mapping(address => uint256)) private _allowances;
+    uint256 private _totalSupply;
+    string private _name;
+    string private _symbol;
 
-    CommentsV1 public comments;
-    ChannelManager public channelManager;
-    SharedFeeHook public hook;
-    bytes32 public channelId;
-    address public owner;
-
-    address public channelOwner = address(0x1);
-    address public commenter1 = address(0x2);
-    address public commenter2 = address(0x3);
-    address public commenter3 = address(0x4);
-    address public appSigner1 = address(0x5);
-    address public appSigner2 = address(0x6);
-    uint256 public initialBalance;
-    uint256 constant SIGNER_PK = 0x123;
-    uint256 constant COMMENTER1_PK = 0x456;
-    uint256 constant COMMENTER2_PK = 0x789;
-    uint256 constant COMMENTER3_PK = 0xabc;
-    uint256 constant COMMENT_FEE = 0.001 ether;
-    uint256 constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
-    uint256 constant HOOK_FEE = 900000000000000; // 0.0009 ether (after 10% protocol fee)
-    uint256 constant TOTAL_FEE_WITH_PROTOCOL = 0.001 ether; // Total fee including protocol fee
-
-    event CommentAdded(
-        bytes32 indexed commentId,
-        address indexed author,
-        address indexed appSigner,
-        ICommentTypes.CommentData commentData
-    );
-
-    function _deployContracts() internal {
-        comments = new CommentsV1(address(0)); // First deploy with zero address
-        channelManager = new ChannelManager(address(this), address(comments));
-        comments = new CommentsV1(address(channelManager)); // Redeploy with correct address
-        channelManager.updateCommentsContract(address(comments)); // Update the comments contract address
-        hook = new SharedFeeHook(address(channelManager), address(comments));
+    constructor(string memory name_, string memory symbol_) {
+        _name = name_;
+        _symbol = symbol_;
     }
 
-    function _setupChannel() internal {
-        vm.prank(channelOwner);
-        vm.deal(channelOwner, 1 ether);
-        uint256 channelIdUint = channelManager.createChannel{value: 0.02 ether}(
-            "test-channel",
-            "Test Channel",
-            "",
-            address(0)
-        );
-        channelId = bytes32(channelIdUint);
-        channelManager.registerHook{value: 0.02 ether}(address(hook));
-        channelManager.setHookGloballyEnabled(address(hook), true);
-        vm.prank(channelOwner);
-        channelManager.setHook(uint256(channelId), address(hook));
+    function name() public view returns (string memory) {
+        return _name;
     }
 
-    /// @notice Extract substring from string
-    function substring(string memory str, uint256 startIndex, uint256 endIndex) internal pure returns (string memory) {
-        bytes memory strBytes = bytes(str);
-        bytes memory result = new bytes(endIndex - startIndex);
-        for (uint256 i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = strBytes[i];
+    function symbol() public view returns (string memory) {
+        return _symbol;
+    }
+
+    function decimals() public pure returns (uint8) {
+        return 18;
+    }
+
+    function totalSupply() public view override returns (uint256) {
+        return _totalSupply;
+    }
+
+    function balanceOf(address account) public view override returns (uint256) {
+        return _balances[account];
+    }
+
+    function transfer(address to, uint256 amount) public override returns (bool) {
+        address owner = msg.sender;
+        _transfer(owner, to, amount);
+        return true;
+    }
+
+    function allowance(address owner, address spender) public view override returns (uint256) {
+        return _allowances[owner][spender];
+    }
+
+    function approve(address spender, uint256 amount) public override returns (bool) {
+        address owner = msg.sender;
+        _approve(owner, spender, amount);
+        return true;
+    }
+
+    function transferFrom(address from, address to, uint256 amount) public override returns (bool) {
+        address spender = msg.sender;
+        _spendAllowance(from, spender, amount);
+        _transfer(from, to, amount);
+        return true;
+    }
+
+    function mint(address to, uint256 amount) public {
+        _mint(to, amount);
+    }
+
+    function _transfer(address from, address to, uint256 amount) internal {
+        require(from != address(0), "ERC20: transfer from the zero address");
+        require(to != address(0), "ERC20: transfer to the zero address");
+
+        uint256 fromBalance = _balances[from];
+        require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
+        unchecked {
+            _balances[from] = fromBalance - amount;
+            _balances[to] += amount;
         }
-        return string(result);
     }
 
-    function _createCommentData(
-        address commenter,
-        bytes32 parentId,
-        address appSigner
-    ) internal view returns (ICommentTypes.CommentData memory) {
-        // Convert parentId to hex string without 0x prefix
-        string memory parentIdHex = parentId == bytes32(0) ? "" : toHexString(uint256(parentId));
-        // Remove 0x prefix if present
-        if (bytes(parentIdHex).length > 0 && bytes(parentIdHex)[0] == 0x30 && bytes(parentIdHex)[1] == 0x78) {
-            parentIdHex = substring(parentIdHex, 2, bytes(parentIdHex).length);
+    function _mint(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: mint to the zero address");
+
+        _totalSupply += amount;
+        unchecked {
+            _balances[account] += amount;
         }
-        string memory targetUri = parentId == bytes32(0) ? "" : string(abi.encodePacked("eip155:1/", toHexString(uint256(uint160(address(comments)))), "/", parentIdHex));
-        return ICommentTypes.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: targetUri,
-            commentType: "comment",
-            author: commenter,
-            appSigner: appSigner,
-            channelId: uint256(channelId),
-            nonce: comments.nonces(commenter, appSigner),
-            deadline: block.timestamp + 1 days
-        });
     }
 
-    function toHexString(uint256 value) internal pure returns (string memory) {
-        bytes memory buffer = new bytes(64); // Fixed length for bytes32
-        for (uint256 i = 0; i < 64; i++) {
-            uint8 digit = uint8(value & 0xf);
-            if (digit < 10) {
-                buffer[63 - i] = bytes1(uint8(48 + digit));
-            } else {
-                buffer[63 - i] = bytes1(uint8(87 + digit));
+    function _approve(address owner, address spender, uint256 amount) internal {
+        require(owner != address(0), "ERC20: approve from the zero address");
+        require(spender != address(0), "ERC20: approve to the zero address");
+
+        _allowances[owner][spender] = amount;
+    }
+
+    function _spendAllowance(address owner, address spender, uint256 amount) internal {
+        uint256 currentAllowance = allowance(owner, spender);
+        if (currentAllowance != type(uint256).max) {
+            require(currentAllowance >= amount, "ERC20: insufficient allowance");
+            unchecked {
+                _approve(owner, spender, currentAllowance - amount);
             }
-            value = value >> 4;
         }
-        return string(buffer);
     }
+}
 
-    function toHexString(address addr) internal pure returns (string memory) {
-        return toHexString(uint256(uint160(addr)));
-    }
+contract SharedFeeHookTest is Test, IERC721Receiver {
+    using TestUtils for string;
+    
+    ChannelManager public channelManager;
+    SharedFeeHook public feeHook;
+    CommentsV1 public comments;
+    MockERC20 public paymentToken;
+    address public commentsContract;
 
-    function toHexString(bytes32 value) internal pure returns (string memory) {
-        return toHexString(uint256(value));
-    }
+    address public owner;
+    address public user1;
+    address public user2;
+    address public recipient1;
+    address public recipient2;
+    address public recipient3;
 
-    function _generateApprovalSignature(
-        address commenter,
-        uint256
-    ) internal view returns (bytes memory) {
-        bytes32 hash = comments.getAddApprovalHash(
-            commenter,
-            address(this),
-            comments.nonces(commenter, address(this)),
-            block.timestamp + 1 days
-        );
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(SIGNER_PK, hash);
-        return abi.encodePacked(r, s, v);
-    }
+    uint256 user1PrivateKey;
+    uint256 user2PrivateKey;
+
+    // Protocol fee is 10% by default
+    uint256 constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
+    uint256 constant FEE_AMOUNT = 100e18; // 100 tokens per comment
+    uint256 constant INITIAL_TOKEN_BALANCE = 1000e18; // 1000 tokens
+
+    event FeeCollected(address indexed author, uint256 amount);
+    event FeeDistributed(address indexed recipient, uint256 amount);
 
     function setUp() public {
         owner = address(this);
+        (user1, user1PrivateKey) = makeAddrAndKey("user1");
+        (user2, user2PrivateKey) = makeAddrAndKey("user2");
+        recipient1 = makeAddr("recipient1");
+        recipient2 = makeAddr("recipient2");
+        recipient3 = makeAddr("recipient3");
 
-        _deployContracts();
-        _setupChannel();
+        // Deploy mock token
+        paymentToken = new MockERC20("Test Token", "TEST");
 
-        // Set up initial balances
-        vm.deal(commenter1, 1 ether);
-        vm.deal(commenter2, 1 ether);
-        vm.deal(commenter3, 1 ether);
+        // Deploy CommentsV1 first with zero address
+        comments = new CommentsV1(address(0));
+        
+        // Deploy ChannelManager with CommentsV1 address
+        channelManager = new ChannelManager(owner, address(comments));
+        
+        // Deploy final CommentsV1 with correct address
+        comments = new CommentsV1(address(channelManager));
+        commentsContract = address(comments);
+        channelManager.updateCommentsContract(commentsContract);
 
-        // Add approvals for all commenters with both app signers
-        vm.prank(commenter1);
-        comments.addApprovalAsAuthor(appSigner1);
-        vm.prank(commenter1);
-        comments.addApprovalAsAuthor(appSigner2);
+        // Deploy fee hook with correct channelManager address
+        feeHook = new SharedFeeHook(
+            address(paymentToken),
+            FEE_AMOUNT,
+            address(channelManager)
+        );
 
-        vm.prank(commenter2);
-        comments.addApprovalAsAuthor(appSigner1);
-        vm.prank(commenter2);
-        comments.addApprovalAsAuthor(appSigner2);
+        // Register the fee hook
+        channelManager.registerHook{value: 0.02 ether}(address(feeHook));
+        // Enable the hook globally
+        channelManager.setHookGloballyEnabled(address(feeHook), true);
 
-        vm.prank(commenter3);
-        comments.addApprovalAsAuthor(appSigner1);
-        vm.prank(commenter3);
-        comments.addApprovalAsAuthor(appSigner2);
+        // Setup token balances and approvals
+        paymentToken.mint(user1, INITIAL_TOKEN_BALANCE);
+        paymentToken.mint(user2, INITIAL_TOKEN_BALANCE);
+        vm.prank(user1);
+        paymentToken.approve(address(feeHook), type(uint256).max);
+        vm.prank(user2);
+        paymentToken.approve(address(feeHook), type(uint256).max);
+
+        // Add recipients with different shares
+        feeHook.addRecipient(recipient1, 5000); // 50%
+        feeHook.addRecipient(recipient2, 3000); // 30%
+        feeHook.addRecipient(recipient3, 2000); // 20%
     }
 
-    function testTopLevelComment() public {
-        // Set up test data
-        ICommentTypes.CommentData memory commentData = _createCommentData(commenter1, bytes32(0), appSigner1);
-        
-        // Set initial balance
-        initialBalance = address(hook).balance;
-
-        // Make comment with total fee (including protocol fee)
-        vm.prank(commenter1);
-        comments.postCommentAsAuthor{value: TOTAL_FEE_WITH_PROTOCOL}(commentData, "");
-
-        // Verify comment was added and hook received the fee after protocol fee deduction
-        assertEq(address(hook).balance, initialBalance + HOOK_FEE);
-
-        // Verify fee distribution: 50% to channel owner, 50% to app signers
-        uint256 channelOwnerShare = (HOOK_FEE * 50) / 100;
-        uint256 appSignerShare = HOOK_FEE - channelOwnerShare;
-        
-        assertEq(hook.pendingWithdrawals(channelOwner), channelOwnerShare);
-        assertEq(hook.pendingWithdrawals(appSigner1), appSignerShare);
-        assertEq(hook.pendingWithdrawals(appSigner2), 0);
+    function _signAppSignature(
+        ICommentTypes.CommentData memory commentData
+    ) internal view returns (bytes memory) {
+        bytes32 digest = comments.getCommentId(commentData);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
+        return abi.encodePacked(r, s, v);
     }
 
-    function testInsufficientFee() public {
-        // Set up test data
-        ICommentTypes.CommentData memory commentData = _createCommentData(commenter1, bytes32(0), appSigner1);
-        
-        // Make comment with insufficient fee
-        vm.prank(commenter1);
-        vm.expectRevert("Insufficient fee");
-        comments.postCommentAsAuthor{value: 0.0005 ether}(commentData, "");
+    function test_FeeHookCollectsAndDistributesCorrectly() public {
+        // Create channel with fee hook
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
+            "Fee Channel",
+            "Pay tokens to comment",
+            "{}",
+            address(feeHook)
+        );
+
+        // Create comment data using direct construction
+        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            appSigner: user2,
+            channelId: channelId,
+            nonce: comments.nonces(user1, user2),
+            deadline: block.timestamp + 1 days
+        });
+
+        bytes memory appSignature = _signAppSignature(commentData);
+
+        uint256 hookBalanceBefore = paymentToken.balanceOf(address(feeHook));
+        uint256 user1BalanceBefore = paymentToken.balanceOf(user1);
+        uint256 recipient1BalanceBefore = paymentToken.balanceOf(recipient1);
+        uint256 recipient2BalanceBefore = paymentToken.balanceOf(recipient2);
+        uint256 recipient3BalanceBefore = paymentToken.balanceOf(recipient3);
+
+        // Post comment as user1
+        vm.prank(user1);
+        comments.postCommentAsAuthor(commentData, appSignature);
+
+        // Calculate expected fees
+        uint256 expectedHookFee = FEE_AMOUNT - (FEE_AMOUNT * PROTOCOL_FEE_PERCENTAGE / 10000);
+        uint256 expectedRecipient1Share = (expectedHookFee * 5000) / 10000;
+        uint256 expectedRecipient2Share = (expectedHookFee * 3000) / 10000;
+        uint256 expectedRecipient3Share = (expectedHookFee * 2000) / 10000;
+
+        // Check that the hook received the correct token amount
+        assertEq(paymentToken.balanceOf(address(feeHook)) - hookBalanceBefore, 0); // Should be 0 as fees are distributed immediately
+        // Check that user1 paid the total fee
+        assertEq(user1BalanceBefore - paymentToken.balanceOf(user1), FEE_AMOUNT);
+        // Check that recipients received their shares
+        assertEq(paymentToken.balanceOf(recipient1) - recipient1BalanceBefore, expectedRecipient1Share);
+        assertEq(paymentToken.balanceOf(recipient2) - recipient2BalanceBefore, expectedRecipient2Share);
+        assertEq(paymentToken.balanceOf(recipient3) - recipient3BalanceBefore, expectedRecipient3Share);
     }
 
-    function testReplyComment() public {
-        // First create a parent comment
-        ICommentTypes.CommentData memory parentData = _createCommentData(commenter1, bytes32(0), appSigner1);
+    function test_AddAndRemoveRecipients() public {
+        address newRecipient = makeAddr("newRecipient");
         
-        vm.prank(commenter1);
-        bytes32 parentId = comments.getCommentId(parentData);
-        comments.postCommentAsAuthor{value: TOTAL_FEE_WITH_PROTOCOL}(parentData, "");
-
-        // Now create a reply
-        ICommentTypes.CommentData memory replyData = _createCommentData(commenter2, parentId, appSigner2);
+        // Add a new recipient
+        feeHook.addRecipient(newRecipient, 1000); // 10%
         
-
-        initialBalance = address(hook).balance;
-
-        // Post reply with total fee (including protocol fee)
-        vm.prank(commenter2);
-        comments.postCommentAsAuthor{value: TOTAL_FEE_WITH_PROTOCOL}(replyData, "");
-
-        // Debug log the hook balance and fee amount
-        console.log("Hook balance after reply:", address(hook).balance);
-        console.log("Hook fee amount:", HOOK_FEE);
-
-        // Verify fee distribution after protocol fee deduction
-        assertEq(address(hook).balance, initialBalance + HOOK_FEE);
-
-        // Calculate expected shares (25% each)
-        uint256 quarterShare = HOOK_FEE / 4;
+        // Check that the recipient was added
+        (address addr, uint256 share) = feeHook.recipients(3);
+        assertEq(addr, newRecipient);
+        assertEq(share, 1000);
+        assertEq(feeHook.totalShares(), 11000); // 5000 + 3000 + 2000 + 1000
         
-        // Debug log the balances
-        console.log("Channel owner balance:", hook.pendingWithdrawals(channelOwner));
-        console.log("Parent author balance:", hook.pendingWithdrawals(commenter1));
-        console.log("Parent app signer balance:", hook.pendingWithdrawals(appSigner1));
-        console.log("Current app signer balance:", hook.pendingWithdrawals(appSigner2));
+        // Remove a recipient
+        feeHook.removeRecipient(recipient2);
         
-        // Verify distribution:
-        // Channel owner: 50% of fee for top level comment plus 25% for reply
-        // Commenter1: 25% from reply to their comment
-        // AppSigner1: 50% of fee for top leve comment, plus 25% for reply
-        // - 25% to current app signer for a reply (appSigner2)
-        assertEq(hook.pendingWithdrawals(channelOwner), 3 * quarterShare);
-        assertEq(hook.pendingWithdrawals(commenter1), quarterShare);
-        assertEq(hook.pendingWithdrawals(appSigner1), 3 * quarterShare);
-        assertEq(hook.pendingWithdrawals(appSigner2), quarterShare);
+        // Check that the recipient was removed
+        (addr, share) = feeHook.recipients(1);
+        assertEq(addr, newRecipient); // The newRecipient should be at position 1 after removing recipient2
+        assertEq(feeHook.totalShares(), 8000); // 5000 + 2000 + 1000
     }
 
-    // Add IERC721Receiver implementation at the end of the contract
+    function test_UpdateRecipientShare() public {
+        // Update recipient share
+        feeHook.updateRecipientShare(recipient1, 6000); // Change from 50% to 60%
+        
+        // Check that the share was updated
+        (address addr, uint256 share) = feeHook.recipients(0);
+        assertEq(addr, recipient1);
+        assertEq(share, 6000);
+        assertEq(feeHook.totalShares(), 11000); // 6000 + 3000 + 2000
+    }
+
+    function test_UpdateFeeAmount() public {
+        uint256 newFeeAmount = 200e18; // 200 tokens per comment
+        
+        // Update fee amount
+        feeHook.updateFeeAmount(newFeeAmount);
+        
+        // Check that the fee amount was updated
+        assertEq(feeHook.feeAmount(), newFeeAmount);
+    }
+
+    function test_RevertWhen_AddingDuplicateRecipient() public {
+        vm.expectRevert("Recipient already exists");
+        feeHook.addRecipient(recipient1, 1000);
+    }
+
+    function test_RevertWhen_RemovingNonExistentRecipient() public {
+        address nonExistentRecipient = makeAddr("nonExistent");
+        vm.expectRevert("Recipient not found");
+        feeHook.removeRecipient(nonExistentRecipient);
+    }
+
+    function test_RevertWhen_UpdatingNonExistentRecipient() public {
+        address nonExistentRecipient = makeAddr("nonExistent");
+        vm.expectRevert("Recipient not found");
+        feeHook.updateRecipientShare(nonExistentRecipient, 1000);
+    }
+
     function onERC721Received(
         address,
         address,

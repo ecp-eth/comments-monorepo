@@ -8,6 +8,7 @@ import {IHook} from "../src/interfaces/IHook.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {TestUtils} from "./utils.sol";
 
 // Mock hook contract for testing
 contract MockHook is IHook {
@@ -46,6 +47,8 @@ contract InvalidHook {
 }
 
 contract ChannelManagerTest is Test, IERC721Receiver {
+    using TestUtils for string;
+    
     ChannelManager public channelManager;
     MockHook public mockHook;
     InvalidHook public invalidHook;
@@ -188,16 +191,16 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             address(mockHook)
         );
 
-        // Create comment data
+        // Create comment data using direct construction
         ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
             content: "Test comment",
             metadata: "{}",
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: user1,
             appSigner: user2,
             channelId: channelId,
-            nonce: 0,
+            nonce: CommentsV1(commentsContract).nonces(user1, user2),
             deadline: block.timestamp + 1 days
         });
 

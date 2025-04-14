@@ -367,8 +367,11 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
             } catch Error(string memory reason) {
                 // Propagate the error message
                 revert(reason);
-            } catch {
-                revert ChannelHookExecutionFailed();
+            } catch (bytes memory returnData) {
+                // Propagate custom errors
+                assembly {
+                    revert(add(returnData, 0x20), mload(returnData))
+                }
             }
             if (!success) revert ChannelHookExecutionFailed();
             return true;
