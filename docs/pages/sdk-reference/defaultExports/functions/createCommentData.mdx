@@ -19,7 +19,7 @@ function createCommentData(__namedParameters): {
 };
 ```
 
-Defined in: [packages/sdk/src/utils.ts:36](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L36)
+Defined in: [packages/sdk/src/utils.ts:77](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/utils.ts#L77)
 
 Create the data structure of a comment
 
@@ -27,53 +27,7 @@ Create the data structure of a comment
 
 ### \_\_namedParameters
 
-#### appSigner
-
-`` `0x${string}` ``
-
-The address of the app signer
-
-#### author
-
-`` `0x${string}` ``
-
-The address of the author of the comment
-
-#### content
-
-`string`
-
-The content of the comment
-
-#### deadline?
-
-`bigint`
-
-The deadline of the comment submission in seconds since epoch
-
-#### metadata?
-
-`object`
-
-Metadata about the comment
-
-#### nonce
-
-`bigint`
-
-The current nonce for the user per app on the chain
-
-#### parentId?
-
-`` `0x${string}` ``
-
-The ID of the parent comment
-
-#### targetUri?
-
-`string`
-
-The URI of the page the comment is about
+[`CreateCommentDataParams`](/sdk-reference/defaultExports/type-aliases/CreateCommentDataParams.mdx)
 
 ## Returns
 

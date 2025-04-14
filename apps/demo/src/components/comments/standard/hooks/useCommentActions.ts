@@ -13,7 +13,7 @@ import {
   useCommentRetrySubmission,
   useCommentSubmission,
 } from "@ecp.eth/shared/hooks";
-import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
+import { COMMENTS_V1_ADDRESS, CommentsV1Abi, isZeroHex } from "@ecp.eth/sdk";
 import { submitCommentMutationFunction } from "../queries";
 import { postCommentAsAuthorViaCommentsV1 } from "@ecp.eth/shared/helpers";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
@@ -104,8 +104,13 @@ export function useCommentActions({
         address: connectedAddress,
         commentRequest: {
           content: comment.content,
-          parentId: comment.parentId ?? undefined,
-          targetUri: comment.targetUri,
+          ...(comment.parentId
+            ? {
+                parentId: comment.parentId,
+              }
+            : {
+                targetUri: comment.targetUri,
+              }),
         },
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
@@ -162,8 +167,14 @@ export function useCommentActions({
         address: params.address,
         commentRequest: {
           content: comment.content,
-          parentId: comment.parentId ?? undefined,
-          targetUri: comment.targetUri,
+          ...("parentId" in comment
+            ? {
+                parentId: comment.parentId,
+                targetUri: "",
+              }
+            : {
+                targetUri: comment.targetUri,
+              }),
         },
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });

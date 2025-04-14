@@ -42,17 +42,8 @@ export async function POST(
     );
   }
 
-  const { content, targetUri, parentId, author, submitIfApproved } =
-    parsedBodyResult.data;
-
-  // Validate target URL is valid
-  if (!targetUri.startsWith(env.APP_URL)) {
-    return new JSONResponse(
-      BadRequestResponseSchema,
-      { targetUri: ["Invalid target URL"] },
-      { status: 400 }
-    );
-  }
+  const passedCommentData = parsedBodyResult.data;
+  const { author, content, submitIfApproved } = passedCommentData;
 
   const rateLimitResult = await signCommentRateLimiter.isRateLimited(author);
 
@@ -94,11 +85,16 @@ export async function POST(
 
   const commentData = createCommentData({
     content,
-    targetUri,
-    parentId,
     author,
     appSigner: appSigner.address,
     nonce,
+    ...("parentId" in passedCommentData
+      ? {
+          parentId: passedCommentData.parentId,
+        }
+      : {
+          targetUri: passedCommentData.targetUri,
+        }),
   });
 
   const chainId = chain.id;

@@ -5,7 +5,7 @@ import { MAX_COMMENT_LENGTH } from "./constants";
 import { decompressFromURI } from "lz-ts";
 // import { isProfane } from "./profanity-detection";
 
-export const SignCommentPayloadRequestSchema = z.object({
+const sharedCommentSchema = z.object({
   author: HexSchema,
   // replace with following line to enable basic profanity detection
   content: z.string().trim().nonempty().max(MAX_COMMENT_LENGTH),
@@ -15,10 +15,17 @@ export const SignCommentPayloadRequestSchema = z.object({
     .nonempty()
     .max(MAX_COMMENT_LENGTH)
     .refine((val) => !isProfane(val), "Comment contains profanity"), */
-  targetUri: z.string().url(),
-  parentId: HexSchema.optional(),
   chainId: z.number(),
 });
+
+export const SignCommentPayloadRequestSchema = z.union([
+  sharedCommentSchema.extend({
+    targetUri: z.string().url(),
+  }),
+  sharedCommentSchema.extend({
+    parentId: HexSchema,
+  }),
+]);
 
 export type SignCommentPayloadRequestSchemaType = z.infer<
   typeof SignCommentPayloadRequestSchema

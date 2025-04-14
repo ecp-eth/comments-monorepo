@@ -30,7 +30,8 @@ export async function POST(req: Request) {
     });
   }
 
-  const { content, targetUri, parentId, chainId, author } = parseResult.data;
+  const passedCommentData = parseResult.data;
+  const { content, author, chainId } = passedCommentData;
 
   const rateLimiterResult = await signCommentRateLimiter.isRateLimited(author);
 
@@ -87,11 +88,16 @@ export async function POST(req: Request) {
 
   const commentData = createCommentData({
     content,
-    targetUri,
-    parentId,
     author,
     appSigner: account.address,
     nonce,
+    ...("parentId" in passedCommentData
+      ? {
+          parentId: passedCommentData.parentId,
+        }
+      : {
+          targetUri: passedCommentData.targetUri,
+        }),
   });
 
   const typedCommentData = createCommentTypedData({

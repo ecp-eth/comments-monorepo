@@ -62,8 +62,13 @@ export function useRetryPostComment({
         commentRequest: {
           chainId: comment.pendingOperation.chainId,
           content: comment.content,
-          parentId: comment.parentId ?? undefined,
-          targetUri: comment.targetUri,
+          ...(comment.parentId
+            ? {
+                parentId: comment.parentId,
+              }
+            : {
+                targetUri: comment.targetUri,
+              }),
         },
         switchChainAsync(chainId) {
           switchChain(client, { id: chainId });

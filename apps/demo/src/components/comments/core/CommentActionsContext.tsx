@@ -29,12 +29,18 @@ export type OnRetryPostCommentParams = {
 
 export type OnPostCommentParams<TExtra = unknown> = {
   address: Hex;
-  comment: {
-    author: Hex;
-    parentId: Hex | undefined;
-    content: string;
-    targetUri: string;
-  };
+  comment:
+    | {
+        // reply doesn't need targetUri
+        author: Hex;
+        parentId: Hex;
+        content: string;
+      }
+    | {
+        author: Hex;
+        content: string;
+        targetUri: string;
+      };
   /**
    * Query key to a query where comment is stored
    */

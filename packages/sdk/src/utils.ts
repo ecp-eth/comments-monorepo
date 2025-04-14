@@ -1,7 +1,7 @@
 import { Chain, createPublicClient, Hex, stringToHex, Transport } from "viem";
 import { http } from "wagmi";
 import { CommentsV1Abi } from "./abis.js";
-import { COMMENTS_V1_ADDRESS } from "./constants.js";
+import { COMMENTS_V1_ADDRESS, EMPTY_PARENT_ID } from "./constants.js";
 import {
   ADD_APPROVAL_TYPE,
   COMMENT_TYPE,
@@ -30,27 +30,13 @@ export function isZeroHex(hex: `0x${string}`) {
 }
 
 /**
- * Create the data structure of a comment
- * @return {@link schemas!CommentData | CommentData} The data structure of a comment
+ * The shared parameters for creating a comment
  */
-export function createCommentData({
-  content,
-  targetUri,
-  metadata,
-  parentId,
-  author,
-  appSigner,
-  nonce,
-  deadline,
-}: {
+export type CreateCommentDataParamsShared = {
   /** The content of the comment */
   content: string;
   /** Metadata about the comment */
   metadata?: object;
-  /** The URI of the page the comment is about */
-  targetUri?: string;
-  /** The ID of the parent comment */
-  parentId?: `0x${string}`;
   /** The address of the author of the comment */
   author: `0x${string}`;
   /** The address of the app signer */
@@ -59,14 +45,49 @@ export function createCommentData({
   nonce: bigint;
   /** The deadline of the comment submission in seconds since epoch */
   deadline?: bigint;
-}): CommentData {
+};
+
+/**
+ * The parameters for creating a root comment
+ */
+export type CreateCommentDataParamsRoot = CreateCommentDataParamsShared & {
+  /** The URI of the page the comment is about */
+  targetUri: string;
+};
+
+/**
+ * The parameters for creating a reply comment
+ */
+export type CreateCommentDataParamsReply = CreateCommentDataParamsShared & {
+  /** The ID of the parent comment */
+  parentId: `0x${string}`;
+};
+
+/**
+ * The parameters for creating a comment
+ */
+export type CreateCommentDataParams =
+  | CreateCommentDataParamsRoot
+  | CreateCommentDataParamsReply;
+
+/**
+ * Create the data structure of a comment
+ * @return {@link schemas!CommentData | CommentData} The data structure of a comment
+ */
+export function createCommentData({
+  content,
+  metadata,
+  author,
+  appSigner,
+  nonce,
+  deadline,
+  ...params
+}: CreateCommentDataParams): CommentData {
   return CommentDataSchema.parse({
     content,
     metadata: metadata ? JSON.stringify(metadata) : "",
-    targetUri: targetUri ?? "",
-    parentId:
-      parentId ??
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
+    targetUri: "parentId" in params ? "" : params.targetUri,
+    parentId: "parentId" in params ? params.parentId : EMPTY_PARENT_ID,
     author,
     appSigner,
     nonce,
