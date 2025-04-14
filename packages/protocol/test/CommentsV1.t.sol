@@ -76,13 +76,14 @@ contract CommentsV1Test is Test, IERC721Receiver {
         return ICommentTypes.CommentData({
             content: "Test comment",
             metadata: "{}",
-            channelId: 0,
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: author,
             appSigner: appSigner,
+            channelId: 0,
             nonce: nonce,
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
         });
     }
 
@@ -225,7 +226,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
         );
 
         // Verify comment still exists
-        assertTrue(comments.commentExists(commentId));
+        assertTrue(comments.getComment(commentId).author != address(0));
     }
 
     function test_PostCommentAsAuthor_InvalidNonce() public {
@@ -547,6 +548,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
         // Post reply comment
         ICommentTypes.CommentData memory replyComment = _createBasicCommentData();
         replyComment.nonce = comments.nonces(author, appSigner); // Update nonce
+        replyComment.parentId = parentId; // Set parent ID for reply
         
         bytes32 replyId = comments.getCommentId(replyComment);
         bytes memory replyAuthorSig = _signEIP712(authorPrivateKey, replyId);
@@ -556,7 +558,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
 
         // Verify thread relationship
         ICommentTypes.CommentData memory storedReply = comments.getComment(replyId);
-        assertEq(storedReply.targetUri, comments.getComment(parentId).targetUri);
+        assertEq(storedReply.parentId, parentId, "Reply should have correct parent ID");
     }
 
     function test_PostComment_ExpiredDeadline() public {
@@ -674,6 +676,58 @@ contract CommentsV1Test is Test, IERC721Receiver {
         // Expect revert when posting comment with disabled hook
         vm.prank(author);
         vm.expectRevert(abi.encodeWithSelector(IChannelManager.HookDisabledGlobally.selector));
+        comments.postComment(commentData, authorSignature, appSignature);
+    }
+
+    function test_PostComment_ReplyToDeletedComment() public {
+        // Post parent comment
+        ICommentTypes.CommentData memory parentComment = _createBasicCommentData();
+        bytes32 parentId = comments.getCommentId(parentComment);
+        bytes memory parentAuthorSig = _signEIP712(authorPrivateKey, parentId);
+        bytes memory parentAppSig = _signEIP712(appSignerPrivateKey, parentId);
+
+        comments.postComment(parentComment, parentAuthorSig, parentAppSig);
+
+        // Delete the parent comment
+        vm.prank(author);
+        comments.deleteCommentAsAuthor(parentId);
+
+        // Post reply to deleted comment
+        ICommentTypes.CommentData memory replyComment = _createBasicCommentData();
+        replyComment.nonce = comments.nonces(author, appSigner); // Update nonce
+        replyComment.parentId = parentId; // Set parent ID for reply
+        
+        bytes32 replyId = comments.getCommentId(replyComment);
+        bytes memory replyAuthorSig = _signEIP712(authorPrivateKey, replyId);
+        bytes memory replyAppSig = _signEIP712(appSignerPrivateKey, replyId);
+
+        // This should succeed even though parent is deleted
+        comments.postComment(replyComment, replyAuthorSig, replyAppSig);
+
+        // Verify reply was created with correct parent ID
+        ICommentTypes.CommentData memory storedReply = comments.getComment(replyId);
+        assertEq(storedReply.parentId, parentId, "Reply should have correct parent ID");
+    }
+
+    function test_PostComment_CannotHaveBothParentIdAndTargetUri() public {
+        // First create a parent comment
+        ICommentTypes.CommentData memory parentComment = _createBasicCommentData();
+        bytes32 parentId = comments.getCommentId(parentComment);
+        bytes memory parentAuthorSig = _signEIP712(authorPrivateKey, parentId);
+        bytes memory parentAppSig = _signEIP712(appSignerPrivateKey, parentId);
+        comments.postComment(parentComment, parentAuthorSig, parentAppSig);
+
+        // Create a comment with both parentId and targetUri set
+        ICommentTypes.CommentData memory commentData = _createBasicCommentData();
+        commentData.parentId = parentId; // Set the parent ID to the existing comment
+        commentData.targetUri = "https://example.com"; // Set a non-empty targetUri
+
+        bytes32 commentId = comments.getCommentId(commentData);
+        bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+
+        // Expect revert when trying to post comment with both parentId and targetUri
+        vm.expectRevert(abi.encodeWithSelector(CommentsV1.InvalidCommentReference.selector, "Parent comment and targetUri cannot both be set"));
         comments.postComment(commentData, authorSignature, appSignature);
     }
 

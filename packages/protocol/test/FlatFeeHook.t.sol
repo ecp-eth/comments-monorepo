@@ -163,7 +163,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
         });
 
         bytes memory appSignature = _signAppSignature(commentData);
@@ -202,7 +203,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
         });
 
         bytes memory appSignature = _signAppSignature(commentData);
@@ -243,7 +245,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
         });
 
         bytes memory appSignature = _signAppSignature(commentData);
@@ -273,7 +276,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
         });
 
         // Make a few comments to collect fees
