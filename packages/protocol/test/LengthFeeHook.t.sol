@@ -79,7 +79,7 @@ contract LengthFeeHook is IHook {
         ICommentTypes.CommentData calldata,
         address,
         bytes32
-    ) external returns (bool) {
+    ) pure external returns (bool) {
         return true;
     }
 
