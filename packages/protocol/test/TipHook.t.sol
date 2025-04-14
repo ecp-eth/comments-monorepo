@@ -27,7 +27,7 @@ contract TipHook is IHook, ERC165 {
     error NotAReplyComment();
     error NoTipAmount();
     error TipTransferFailed();
-    error InvalidTipSyntax();
+    error InvalidTipSyntax(string);
     error TipAmountMismatch();
 
   
@@ -83,8 +83,7 @@ contract TipHook is IHook, ERC165 {
                 revert TipTransferFailed();
             }
         } else if (msg.value > 0) {
-            // If ETH was sent but no valid tip mention was found
-            revert InvalidTipSyntax();
+            revert InvalidTipSyntax("ETH was sent but no valid tip mention was found");
         } else {
            console.log("No tip amount found");
         }
@@ -113,7 +112,6 @@ contract TipHook is IHook, ERC165 {
     function parseTipMention(string memory content) public view returns (TipInfo memory) {
         bytes memory contentBytes = bytes(content);
         string memory addrString = TestUtils.toHexString(address(this));
-        console.log("addrString", addrString, content);
         bytes memory addrBytes = bytes(addrString);
         
         // Look for "!" pattern followed by the address
@@ -122,38 +120,22 @@ contract TipHook is IHook, ERC165 {
             if (i + addrBytes.length >= contentBytes.length) continue;
             
             if (contentBytes[i] == '!') {
-                // Compare target address
-                bool matchFound = true;
-                uint256 addrStart = i + 1;
-                
-                // Skip "0x" if present
-                if (addrStart + 2 < contentBytes.length && 
-                    contentBytes[addrStart] == '0' && 
-                    contentBytes[addrStart + 1] == 'x') {
-                    addrStart += 2;
-                }
-                
-                for (uint j = 0; j < addrBytes.length; j++) {
-                    if (addrStart + j >= contentBytes.length || contentBytes[addrStart + j] != addrBytes[j]) {
-                        matchFound = false;
-                        break;
-                    }
-                }
+                // Check if address matches
+                (bool matchFound, uint256 addrStart) = checkAddressMatch(contentBytes, i, addrBytes);
                 
                 // If address matches, look for amount
                 if (matchFound && addrStart + addrBytes.length < contentBytes.length) {
                     uint256 currentPos = addrStart + addrBytes.length;
                     
                     // Skip whitespace
-                    while (currentPos < contentBytes.length && contentBytes[currentPos] == ' ') {
-                        currentPos++;
-                    }
+                    currentPos = skipWhitespace(contentBytes, currentPos);
                     
                     // Try to parse the tip amount
                     if (currentPos < contentBytes.length) {
-                        TipInfo memory result = parseTipAmount(contentBytes, currentPos);
-                        if (result.found) {
-                            return result;
+                        // Find and parse the tip amount
+                        TipInfo memory tipInfo = findAndParseTipAmount(contentBytes, currentPos);
+                        if (tipInfo.found) {
+                            return tipInfo;
                         }
                     }
                 }
@@ -162,131 +144,83 @@ contract TipHook is IHook, ERC165 {
         return TipInfo(false, 0);
     }
     
-    // Helper function to parse tip amount from the content bytes starting at the specified position
-    function parseTipAmount(bytes memory contentBytes, uint256 startPos) internal pure returns (TipInfo memory) {
-        uint256 currentPos = startPos;
+    // Helper function to check if the address matches
+    function checkAddressMatch(bytes memory contentBytes, uint256 i, bytes memory addrBytes) internal pure returns (bool matchFound, uint256 addrStart) {
+        matchFound = true;
+        addrStart = i + 1;
         
-        // Parse the number before "ETH"
-        uint256 startNum = currentPos;
-        uint256 decimalsCount = 0;
-        bool hasDecimals = false;
-        bool hasStartedNumber = false;
-        uint256 wholeNumber = 0;
-        uint256 fractionalPart = 0;
-        uint256 currentDecimals = 0;
-        
-        while (currentPos < contentBytes.length) {
-            bytes1 currentChar = contentBytes[currentPos];
-            
-            // Check for valid number characters
-            if (uint8(currentChar) >= 0x30 && uint8(currentChar) <= 0x39) { // ASCII '0' to '9'
-                hasStartedNumber = true;
-                if (hasDecimals) {
-                    fractionalPart = fractionalPart * 10 + (uint8(currentChar) - 0x30); // ASCII '0' is 48
-                    currentDecimals++;
-                } else {
-                    wholeNumber = wholeNumber * 10 + (uint8(currentChar) - 0x30); // ASCII '0' is 48
-                }
-                currentPos++;
-            } else if (currentChar == 0x2e && !hasDecimals && hasStartedNumber) { // 0x2e is '.'
-                hasDecimals = true;
-                currentPos++;
-            } else if (currentChar == 0x20 || currentChar == 0x45) { // 0x20 is space, 0x45 is 'E'
-                // Allow both space and 'E' as separators
+        for (uint j = 0; j < addrBytes.length; j++) {
+            if (addrStart + j >= contentBytes.length || contentBytes[addrStart + j] != addrBytes[j]) {
+                matchFound = false;
                 break;
-            } else {
-                return TipInfo(false, 0); // Invalid character found
             }
         }
         
-        // Skip any remaining whitespace
-        while (currentPos < contentBytes.length && contentBytes[currentPos] == 0x20) { // 0x20 is space
-            currentPos++;
-        }
-        
-        // Check for "ETH" suffix
-        if (currentPos + 2 >= contentBytes.length) {
-            return TipInfo(false, 0); // Not enough characters for "ETH"
-        }
-        
-        if (contentBytes[currentPos] != 0x45 || // 'E'
-            contentBytes[currentPos + 1] != 0x54 || // 'T'
-            contentBytes[currentPos + 2] != 0x48) { // 'H'
-            return TipInfo(false, 0); // Invalid "ETH" suffix
-        }
-        
-        // Ensure we have a valid number to parse
-        if (!hasStartedNumber) {
-            return TipInfo(false, 0); // No valid number found
-        }
-        
-        // For whole numbers, we need to ensure we're not treating them as decimals
-        if (!hasDecimals) {
-            decimalsCount = 0;
-        }
-        
-        return parseAndConvertAmount(contentBytes, startNum, currentPos);
+        return (matchFound, addrStart);
     }
     
-    // Helper function to parse and convert the amount to wei
-    function parseAndConvertAmount(
-        bytes memory contentBytes,
-        uint256 startNum,
-        uint256 endPos
-    ) internal pure returns (TipInfo memory) {
-        uint256 weiAmount;
-        
-        if (endPos < startNum) {
-            return TipInfo(false, 0); // Invalid range
+    // Helper function to skip whitespace
+    function skipWhitespace(bytes memory contentBytes, uint256 currentPos) internal pure returns (uint256) {
+        while (currentPos < contentBytes.length && contentBytes[currentPos] == ' ') {
+            currentPos++;
         }
-        
-        if (endPos == startNum) {
-            // Handle case where there's no number after the "ETH"
-            weiAmount = 0;
-        } else {
-            // Convert the parsed number to wei
-            uint256 wholeNumber = 0;
-            uint256 fractionalPart = 0;
-            uint256 currentDecimals = 0;
-            uint256 currentPos = startNum;
-            
-            // Parse whole number part
-            while (currentPos < endPos && contentBytes[currentPos] != 0x2e) { // 0x2e is '.'
-                uint8 digit = uint8(contentBytes[currentPos]) - 0x30; // 0x30 is '0'
-                wholeNumber = wholeNumber * 10 + digit;
-                currentPos++;
-            }
-            
-            // Parse fractional part if present
-            if (currentPos < endPos && contentBytes[currentPos] == 0x2e) { // 0x2e is '.'
-                currentPos++; // Skip decimal point
-                while (currentPos < endPos) {
-                    uint8 currentByte = uint8(contentBytes[currentPos]);
-                    if (currentByte >= 0x30 && currentByte <= 0x39) { // ASCII '0' to '9'
-                        uint8 digit = currentByte - 0x30; // 0x30 is '0'
-                        fractionalPart = fractionalPart * 10 + digit;
-                        currentDecimals++;
-                        currentPos++;
-                    } else {
-                        break;
-                    }
+        return currentPos;
+    }
+    
+    // Helper function to find and parse the tip amount
+    function findAndParseTipAmount(bytes memory contentBytes, uint256 currentPos) internal pure returns (TipInfo memory) {
+        // Find the end position by looking for "ETH" suffix
+        uint256 endPos = currentPos;
+        while (endPos < contentBytes.length) {
+            // Check for "ETH" suffix
+            if (isEthSuffix(contentBytes, endPos)) {
+                // Found "ETH" suffix, parse the amount
+                (bool found, uint256 amount) = TestUtils.parseAndConvertAmount(contentBytes, currentPos, endPos);
+                if (found) {
+                    return TipInfo(true, amount);
                 }
             }
+            endPos++;
+        }
+        return TipInfo(false, 0);
+    }
+    
+    // Helper function to check if the current position has an "ETH" suffix
+    function isEthSuffix(bytes memory contentBytes, uint256 pos) internal pure returns (bool) {
+        if (pos + 2 >= contentBytes.length) return false;
+        
+        // Convert current character to uppercase for case-insensitive comparison
+        bytes1 c = contentBytes[pos];
+        if (c >= 0x61 && c <= 0x7a) c = bytes1(uint8(c) - 0x20);
+        
+        // Check for "ETH" suffix
+        if (c == 0x45) { // 'E'
+            bytes1 t = contentBytes[pos + 1];
+            bytes1 h = contentBytes[pos + 2];
             
-            // Convert to wei
-            if (fractionalPart == 0 && currentDecimals == 0) {
-                weiAmount = wholeNumber * 1 ether;
-            } else {
-                weiAmount = (wholeNumber * 1 ether) + (fractionalPart * 1 ether) / (10 ** currentDecimals);
+            // Convert to uppercase if lowercase
+            if (t >= 0x61 && t <= 0x7a) t = bytes1(uint8(t) - 0x20);
+            if (h >= 0x61 && h <= 0x7a) h = bytes1(uint8(h) - 0x20);
+            
+            if (t == 0x54 && h == 0x48) { // 'T' and 'H'
+                return true;
             }
         }
-        
-        return TipInfo(true, weiAmount);
+        return false;
+    }
+    
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external pure returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 }
 
 
-contract TipHookTest is Test, IERC721Receiver {
+abstract contract TipHookTest is Test, IERC721Receiver {
     using TestUtils for string;
     
     ChannelManager public channelManager;
@@ -362,9 +296,6 @@ contract TipHookTest is Test, IERC721Receiver {
 
         // --- Reply Comment Setup (With Tip Mention) ---
         uint256 tipAmount = 0.1 ether;
-        // Calculate total amount needed to send to result in the desired tip amount after protocol fee
-        // To get 0.1 ETH after 10% fee, we need to send approximately 0.111111... ETH
-        uint256 totalPaidAmount = tipAmount * TestUtils.getFeeMultiplier(1000);
 
         ICommentTypes.CommentData memory replyCommentData = ICommentTypes.CommentData({
             content: string(abi.encodePacked("Reply with tip !", TestUtils.toHexString(address(tipHook)), " 0.1 ETH")),
@@ -381,11 +312,11 @@ contract TipHookTest is Test, IERC721Receiver {
         
         // --- Post Reply Comment (With Correct Tip Amount) ---
         vm.prank(user2);
-        comments.postCommentAsAuthor{value: totalPaidAmount}(replyCommentData, "");
+        comments.postCommentAsAuthor{value: tipAmount}(replyCommentData, "");
         console.log("user1 address:", user1);
         console.log("tipAmount", tipAmount, initialBalance, user1.balance);
-        // The parent author should receive the tip amount after the 10% protocol fee is deducted
-        assertEq(user1.balance, initialBalance + tipAmount, "Tip should be transferred to parent author after protocol fee");
+        // The parent author should receive the tip amount
+        assertEq(user1.balance, initialBalance + tipAmount, "Tip should be transferred to parent author");
     }
     
     /// @notice Test that hook reverts when sent ETH amount doesn't match mentioned amount
@@ -513,27 +444,17 @@ contract TipHookTest is Test, IERC721Receiver {
         assertEq(user1.balance, initialBalance, "Balance should not change without tip mention");
     }
     
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
-        return IERC721Receiver.onERC721Received.selector;
-    }
-
-    
     /// @notice Test suite for the parseTipMention function
     function testParseTipMention() public view {
        
         // Test case 1: Valid tip with space between number and ETH
-        string memory validTipWithSpace = string(abi.encodePacked("!0x", TestUtils.toHexString(address(tipHook)), " 0.1 ETH"));
+        string memory validTipWithSpace = string(abi.encodePacked("!", TestUtils.toHexString(address(tipHook)), " 0.1 ETH"));
         TipInfo memory result = tipHook.parseTipMention(validTipWithSpace);
         assertTrue(result.found, "Should find valid tip with space");
         assertEq(result.amount, 0.1 ether, "Should parse 0.1 ETH correctly");
         
         // Test case 2: Valid tip with no space between number and ETH
-        string memory validTipNoSpace = string(abi.encodePacked("!0x", TestUtils.toHexString(address(tipHook)), " 0.1ETH"));
+        string memory validTipNoSpace = string(abi.encodePacked("!", TestUtils.toHexString(address(tipHook)), " 0.1ETH"));
         result = tipHook.parseTipMention(validTipNoSpace);
         assertTrue(result.found, "Should find valid tip without space");
         assertEq(result.amount, 0.1 ether, "Should parse 0.1ETH correctly");

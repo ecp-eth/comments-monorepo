@@ -720,7 +720,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
         // Create a comment with both parentId and targetUri set
         ICommentTypes.CommentData memory commentData = _createBasicCommentData();
         commentData.parentId = parentId; // Set the parent ID to the existing comment
-        commentData.targetUri = "https://example.com"; // Set a non-empty targetUri
+        commentData.targetUri = "https://example.com"; // Set a non-empty targetUri in lowercase
 
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
