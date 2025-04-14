@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -7,7 +7,38 @@
 # Type Alias: EmbedConfigThemeColorsSchemaType
 
 ```ts
-type EmbedConfigThemeColorsSchemaType = object;
+type EmbedConfigThemeColorsSchemaType = {
+  dark: {
+     account-edit-link: string;
+     background: string;
+     border: string;
+     border-focus: string;
+     destructive: string;
+     destructive-foreground: string;
+     foreground: string;
+     muted-foreground: string;
+     primary: string;
+     primary-foreground: string;
+     ring: string;
+     secondary: string;
+     secondary-foreground: string;
+  };
+  light: {
+     account-edit-link: string;
+     background: string;
+     border: string;
+     border-focus: string;
+     destructive: string;
+     destructive-foreground: string;
+     foreground: string;
+     muted-foreground: string;
+     primary: string;
+     primary-foreground: string;
+     ring: string;
+     secondary: string;
+     secondary-foreground: string;
+  };
+};
 ```
 
 Defined in: [packages/sdk/src/schemas/embed.ts:114](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/embed.ts#L114)
@@ -17,7 +48,21 @@ Defined in: [packages/sdk/src/schemas/embed.ts:114](https://github.com/ecp-eth/c
 ### dark?
 
 ```ts
-optional dark: object;
+optional dark: {
+  account-edit-link: string;
+  background: string;
+  border: string;
+  border-focus: string;
+  destructive: string;
+  destructive-foreground: string;
+  foreground: string;
+  muted-foreground: string;
+  primary: string;
+  primary-foreground: string;
+  ring: string;
+  secondary: string;
+  secondary-foreground: string;
+};
 ```
 
 #### dark.account-edit-link?
@@ -101,7 +146,21 @@ optional secondary-foreground: string;
 ### light?
 
 ```ts
-optional light: object;
+optional light: {
+  account-edit-link: string;
+  background: string;
+  border: string;
+  border-focus: string;
+  destructive: string;
+  destructive-foreground: string;
+  foreground: string;
+  muted-foreground: string;
+  primary: string;
+  primary-foreground: string;
+  ring: string;
+  secondary: string;
+  secondary-foreground: string;
+};
 ```
 
 #### light.account-edit-link?

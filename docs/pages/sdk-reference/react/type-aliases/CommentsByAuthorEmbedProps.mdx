@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -7,12 +7,20 @@
 # Type Alias: CommentsByAuthorEmbedProps
 
 ```ts
-type CommentsByAuthorEmbedProps = object;
+type CommentsByAuthorEmbedProps = {
+  author: Hex;
+  chainId: EmbedConfigSupportedChainIdsSchemaType;
+  containerProps: React.HTMLAttributes<HTMLDivElement>;
+  disablePromotion: boolean;
+  embedUri: string;
+  iframeProps: React.IframeHTMLAttributes<HTMLIFrameElement>;
+  theme: EmbedConfigThemeSchemaType;
+};
 ```
 
 Defined in: [packages/sdk/src/react.tsx:233](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L233)
 
-## Type declaration
+## Properties
 
 ### author
 
@@ -20,13 +28,19 @@ Defined in: [packages/sdk/src/react.tsx:233](https://github.com/ecp-eth/comments
 author: Hex;
 ```
 
+Defined in: [packages/sdk/src/react.tsx:237](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L237)
+
 The author address to filter comments by
+
+***
 
 ### chainId?
 
 ```ts
 optional chainId: EmbedConfigSupportedChainIdsSchemaType;
 ```
+
+Defined in: [packages/sdk/src/react.tsx:265](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L265)
 
 The chain id to use for posting comments.
 
@@ -36,19 +50,27 @@ The chain id to use for posting comments.
 8453
 ```
 
+***
+
 ### containerProps?
 
 ```ts
 optional containerProps: React.HTMLAttributes<HTMLDivElement>;
 ```
 
+Defined in: [packages/sdk/src/react.tsx:245](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L245)
+
 Allows to pass custom props to iframe's wrapper element
+
+***
 
 ### disablePromotion?
 
 ```ts
 optional disablePromotion: boolean;
 ```
+
+Defined in: [packages/sdk/src/react.tsx:259](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L259)
 
 Hide powered by ECP link
 
@@ -58,13 +80,19 @@ Hide powered by ECP link
 false
 ```
 
+***
+
 ### embedUri?
 
 ```ts
 optional embedUri: string;
 ```
 
+Defined in: [packages/sdk/src/react.tsx:241](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L241)
+
 URL of the comments embed iframe page. This page is rendered in the iframe.
+
+***
 
 ### iframeProps?
 
@@ -72,12 +100,18 @@ URL of the comments embed iframe page. This page is rendered in the iframe.
 optional iframeProps: React.IframeHTMLAttributes<HTMLIFrameElement>;
 ```
 
+Defined in: [packages/sdk/src/react.tsx:249](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L249)
+
 Allows to pass custom props to iframe
+
+***
 
 ### theme?
 
 ```ts
 optional theme: EmbedConfigThemeSchemaType;
 ```
+
+Defined in: [packages/sdk/src/react.tsx:253](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/react.tsx#L253)
 
 Allows to customise the theme of the embed iframe.

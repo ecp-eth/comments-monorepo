@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -11,583 +11,583 @@ const CommentsV1Abi: readonly [{
   inputs: readonly [];
   stateMutability: "nonpayable";
   type: "constructor";
- }, {
+}, {
   inputs: readonly [];
   name: "ADD_APPROVAL_TYPEHASH";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
      type: "bytes32";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [];
   name: "COMMENT_TYPEHASH";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
      type: "bytes32";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [];
   name: "DELETE_COMMENT_TYPEHASH";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
      type: "bytes32";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [];
   name: "DOMAIN_SEPARATOR";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
      type: "bytes32";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [];
   name: "REMOVE_APPROVAL_TYPEHASH";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
      type: "bytes32";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "address";
      name: "author";
      type: "address";
-    }, {
+   }, {
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }, {
+   }, {
      internalType: "uint256";
      name: "nonce";
      type: "uint256";
-    }, {
+   }, {
      internalType: "uint256";
      name: "deadline";
      type: "uint256";
-    }, {
+   }, {
      internalType: "bytes";
      name: "signature";
      type: "bytes";
-    }];
+  }];
   name: "addApproval";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }];
+  }];
   name: "addApprovalAsAuthor";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "bytes32";
      name: "commentId";
      type: "bytes32";
-    }, {
+   }, {
      internalType: "address";
      name: "author";
      type: "address";
-    }, {
+   }, {
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }, {
+   }, {
      internalType: "uint256";
      name: "nonce";
      type: "uint256";
-    }, {
+   }, {
      internalType: "uint256";
      name: "deadline";
      type: "uint256";
-    }, {
+   }, {
      internalType: "bytes";
      name: "authorSignature";
      type: "bytes";
-    }, {
+   }, {
      internalType: "bytes";
      name: "appSignature";
      type: "bytes";
-    }];
+  }];
   name: "deleteComment";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "bytes32";
      name: "commentId";
      type: "bytes32";
-    }];
+  }];
   name: "deleteCommentAsAuthor";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "address";
      name: "author";
      type: "address";
-    }, {
+   }, {
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }, {
+   }, {
      internalType: "uint256";
      name: "nonce";
      type: "uint256";
-    }, {
+   }, {
      internalType: "uint256";
      name: "deadline";
      type: "uint256";
-    }];
+  }];
   name: "getAddApprovalHash";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
      type: "bytes32";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      components: readonly [{
         internalType: "string";
         name: "content";
         type: "string";
-       }, {
+      }, {
         internalType: "string";
         name: "metadata";
         type: "string";
-       }, {
+      }, {
         internalType: "string";
         name: "targetUri";
         type: "string";
-       }, {
+      }, {
         internalType: "bytes32";
         name: "parentId";
         type: "bytes32";
-       }, {
+      }, {
         internalType: "address";
         name: "author";
         type: "address";
-       }, {
+      }, {
         internalType: "address";
         name: "appSigner";
         type: "address";
-       }, {
+      }, {
         internalType: "uint256";
         name: "nonce";
         type: "uint256";
-       }, {
+      }, {
         internalType: "uint256";
         name: "deadline";
         type: "uint256";
-       }];
+     }];
      internalType: "struct CommentsV1.CommentData";
      name: "commentData";
      type: "tuple";
-    }];
+  }];
   name: "getCommentId";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
      type: "bytes32";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "bytes32";
      name: "commentId";
      type: "bytes32";
-    }, {
+   }, {
      internalType: "address";
      name: "author";
      type: "address";
-    }, {
+   }, {
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }, {
+   }, {
      internalType: "uint256";
      name: "nonce";
      type: "uint256";
-    }, {
+   }, {
      internalType: "uint256";
      name: "deadline";
      type: "uint256";
-    }];
+  }];
   name: "getDeleteCommentHash";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
      type: "bytes32";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "address";
      name: "author";
      type: "address";
-    }, {
+   }, {
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }, {
+   }, {
      internalType: "uint256";
      name: "nonce";
      type: "uint256";
-    }, {
+   }, {
      internalType: "uint256";
      name: "deadline";
      type: "uint256";
-    }];
+  }];
   name: "getRemoveApprovalHash";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
      type: "bytes32";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "address";
      name: "";
      type: "address";
-    }, {
+   }, {
      internalType: "address";
      name: "";
      type: "address";
-    }];
+  }];
   name: "isApproved";
   outputs: readonly [{
      internalType: "bool";
      name: "";
      type: "bool";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [];
   name: "name";
   outputs: readonly [{
      internalType: "string";
      name: "";
      type: "string";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "address";
      name: "";
      type: "address";
-    }, {
+   }, {
      internalType: "address";
      name: "";
      type: "address";
-    }];
+  }];
   name: "nonces";
   outputs: readonly [{
      internalType: "uint256";
      name: "";
      type: "uint256";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      components: readonly [{
         internalType: "string";
         name: "content";
         type: "string";
-       }, {
+      }, {
         internalType: "string";
         name: "metadata";
         type: "string";
-       }, {
+      }, {
         internalType: "string";
         name: "targetUri";
         type: "string";
-       }, {
+      }, {
         internalType: "bytes32";
         name: "parentId";
         type: "bytes32";
-       }, {
+      }, {
         internalType: "address";
         name: "author";
         type: "address";
-       }, {
+      }, {
         internalType: "address";
         name: "appSigner";
         type: "address";
-       }, {
+      }, {
         internalType: "uint256";
         name: "nonce";
         type: "uint256";
-       }, {
+      }, {
         internalType: "uint256";
         name: "deadline";
         type: "uint256";
-       }];
+     }];
      internalType: "struct CommentsV1.CommentData";
      name: "commentData";
      type: "tuple";
-    }, {
+   }, {
      internalType: "bytes";
      name: "authorSignature";
      type: "bytes";
-    }, {
+   }, {
      internalType: "bytes";
      name: "appSignature";
      type: "bytes";
-    }];
+  }];
   name: "postComment";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      components: readonly [{
         internalType: "string";
         name: "content";
         type: "string";
-       }, {
+      }, {
         internalType: "string";
         name: "metadata";
         type: "string";
-       }, {
+      }, {
         internalType: "string";
         name: "targetUri";
         type: "string";
-       }, {
+      }, {
         internalType: "bytes32";
         name: "parentId";
         type: "bytes32";
-       }, {
+      }, {
         internalType: "address";
         name: "author";
         type: "address";
-       }, {
+      }, {
         internalType: "address";
         name: "appSigner";
         type: "address";
-       }, {
+      }, {
         internalType: "uint256";
         name: "nonce";
         type: "uint256";
-       }, {
+      }, {
         internalType: "uint256";
         name: "deadline";
         type: "uint256";
-       }];
+     }];
      internalType: "struct CommentsV1.CommentData";
      name: "commentData";
      type: "tuple";
-    }, {
+   }, {
      internalType: "bytes";
      name: "appSignature";
      type: "bytes";
-    }];
+  }];
   name: "postCommentAsAuthor";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "address";
      name: "author";
      type: "address";
-    }, {
+   }, {
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }, {
+   }, {
      internalType: "uint256";
      name: "nonce";
      type: "uint256";
-    }, {
+   }, {
      internalType: "uint256";
      name: "deadline";
      type: "uint256";
-    }, {
+   }, {
      internalType: "bytes";
      name: "signature";
      type: "bytes";
-    }];
+  }];
   name: "removeApproval";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
- }, {
+}, {
   inputs: readonly [{
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }];
+  }];
   name: "removeApprovalAsAuthor";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
- }, {
+}, {
   inputs: readonly [];
   name: "version";
   outputs: readonly [{
      internalType: "string";
      name: "";
      type: "string";
-    }];
+  }];
   stateMutability: "view";
   type: "function";
- }, {
+}, {
   anonymous: false;
   inputs: readonly [{
      indexed: true;
      internalType: "address";
      name: "author";
      type: "address";
-    }, {
+   }, {
      indexed: true;
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }];
+  }];
   name: "ApprovalAdded";
   type: "event";
- }, {
+}, {
   anonymous: false;
   inputs: readonly [{
      indexed: true;
      internalType: "address";
      name: "author";
      type: "address";
-    }, {
+   }, {
      indexed: true;
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }];
+  }];
   name: "ApprovalRemoved";
   type: "event";
- }, {
+}, {
   anonymous: false;
   inputs: readonly [{
      indexed: true;
      internalType: "bytes32";
      name: "commentId";
      type: "bytes32";
-    }, {
+   }, {
      indexed: true;
      internalType: "address";
      name: "author";
      type: "address";
-    }, {
+   }, {
      indexed: true;
      internalType: "address";
      name: "appSigner";
      type: "address";
-    }, {
+   }, {
      components: readonly [{
         internalType: "string";
         name: "content";
         type: "string";
-       }, {
+      }, {
         internalType: "string";
         name: "metadata";
         type: "string";
-       }, {
+      }, {
         internalType: "string";
         name: "targetUri";
         type: "string";
-       }, {
+      }, {
         internalType: "bytes32";
         name: "parentId";
         type: "bytes32";
-       }, {
+      }, {
         internalType: "address";
         name: "author";
         type: "address";
-       }, {
+      }, {
         internalType: "address";
         name: "appSigner";
         type: "address";
-       }, {
+      }, {
         internalType: "uint256";
         name: "nonce";
         type: "uint256";
-       }, {
+      }, {
         internalType: "uint256";
         name: "deadline";
         type: "uint256";
-       }];
+     }];
      indexed: false;
      internalType: "struct CommentsV1.CommentData";
      name: "commentData";
      type: "tuple";
-    }];
+  }];
   name: "CommentAdded";
   type: "event";
- }, {
+}, {
   anonymous: false;
   inputs: readonly [{
      indexed: true;
      internalType: "bytes32";
      name: "commentId";
      type: "bytes32";
-    }, {
+   }, {
      indexed: true;
      internalType: "address";
      name: "author";
      type: "address";
-    }];
+  }];
   name: "CommentDeleted";
   type: "event";
- }, {
+}, {
   inputs: readonly [];
   name: "DeadlineReached";
   type: "error";
- }, {
+}, {
   inputs: readonly [];
   name: "InvalidAppSignature";
   type: "error";
- }, {
+}, {
   inputs: readonly [];
   name: "InvalidAuthor";
   type: "error";
- }, {
+}, {
   inputs: readonly [];
   name: "InvalidAuthorSignature";
   type: "error";
- }, {
+}, {
   inputs: readonly [];
   name: "InvalidNonce";
   type: "error";
- }, {
+}, {
   inputs: readonly [];
   name: "NotAuthorized";
   type: "error";
- }];
+}];
 ```
 
 Defined in: [packages/sdk/src/abis.ts:4](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L4)

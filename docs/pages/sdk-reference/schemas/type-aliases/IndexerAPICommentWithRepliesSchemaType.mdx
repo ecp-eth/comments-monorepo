@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -7,7 +7,76 @@
 # Type Alias: IndexerAPICommentWithRepliesSchemaType
 
 ```ts
-type IndexerAPICommentWithRepliesSchemaType = object;
+type IndexerAPICommentWithRepliesSchemaType = {
+  appSigner: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster: {
+        displayName: string;
+        fid: number;
+        pfpUrl: string;
+        username: string;
+     };
+  };
+  chainId: number;
+  content: string;
+  cursor: `0x${string}`;
+  deletedAt: null | Date;
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: string;
+  moderationStatus: "approved" | "rejected" | "pending";
+  moderationStatusChangedAt: Date;
+  parentId: null | `0x${string}`;
+  replies: {
+     extra: {
+        moderationEnabled: boolean;
+     };
+     pagination: {
+        endCursor: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor: `0x${string}`;
+     };
+     results: {
+        appSigner: `0x${string}`;
+        author: {
+           address: `0x${string}`;
+           ens: {
+              avatarUrl: null | string;
+              name: string;
+           };
+           farcaster: {
+              displayName: string;
+              fid: number;
+              pfpUrl: string;
+              username: string;
+           };
+        };
+        chainId: number;
+        content: string;
+        cursor: `0x${string}`;
+        deletedAt: null | Date;
+        id: `0x${string}`;
+        logIndex: null | number;
+        metadata: string;
+        moderationStatus: "approved" | "rejected" | "pending";
+        moderationStatusChangedAt: Date;
+        parentId: null | `0x${string}`;
+        targetUri: string;
+        timestamp: Date;
+        txHash: `0x${string}`;
+     }[];
+  };
+  targetUri: string;
+  timestamp: Date;
+  txHash: `0x${string}`;
+};
 ```
 
 Defined in: [packages/sdk/src/schemas/indexer.ts:103](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/indexer.ts#L103)
@@ -23,7 +92,19 @@ appSigner: `0x${string}` = HexSchema;
 ### author
 
 ```ts
-author: object = IndexerAPIAuthorDataSchema;
+author: {
+  address: `0x${string}`;
+  ens: {
+     avatarUrl: null | string;
+     name: string;
+  };
+  farcaster: {
+     displayName: string;
+     fid: number;
+     pfpUrl: string;
+     username: string;
+  };
+} = IndexerAPIAuthorDataSchema;
 ```
 
 #### author.address
@@ -35,7 +116,10 @@ address: `0x${string}` = HexSchema;
 #### author.ens?
 
 ```ts
-optional ens: object;
+optional ens: {
+  avatarUrl: null | string;
+  name: string;
+};
 ```
 
 #### author.ens.avatarUrl
@@ -53,7 +137,12 @@ name: string;
 #### author.farcaster?
 
 ```ts
-optional farcaster: object;
+optional farcaster: {
+  displayName: string;
+  fid: number;
+  pfpUrl: string;
+  username: string;
+};
 ```
 
 #### author.farcaster.displayName?
@@ -143,13 +232,55 @@ parentId: null | `0x${string}`;
 ### replies
 
 ```ts
-replies: object;
+replies: {
+  extra: {
+     moderationEnabled: boolean;
+  };
+  pagination: {
+     endCursor: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor: `0x${string}`;
+  };
+  results: {
+     appSigner: `0x${string}`;
+     author: {
+        address: `0x${string}`;
+        ens: {
+           avatarUrl: null | string;
+           name: string;
+        };
+        farcaster: {
+           displayName: string;
+           fid: number;
+           pfpUrl: string;
+           username: string;
+        };
+     };
+     chainId: number;
+     content: string;
+     cursor: `0x${string}`;
+     deletedAt: null | Date;
+     id: `0x${string}`;
+     logIndex: null | number;
+     metadata: string;
+     moderationStatus: "approved" | "rejected" | "pending";
+     moderationStatusChangedAt: Date;
+     parentId: null | `0x${string}`;
+     targetUri: string;
+     timestamp: Date;
+     txHash: `0x${string}`;
+  }[];
+};
 ```
 
 #### replies.extra
 
 ```ts
-extra: object = IndexerAPIExtraSchema;
+extra: {
+  moderationEnabled: boolean;
+} = IndexerAPIExtraSchema;
 ```
 
 #### replies.extra.moderationEnabled
@@ -161,7 +292,13 @@ moderationEnabled: boolean;
 #### replies.pagination
 
 ```ts
-pagination: object = IndexerAPICursorPaginationSchema;
+pagination: {
+  endCursor: `0x${string}`;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  limit: number;
+  startCursor: `0x${string}`;
+} = IndexerAPICursorPaginationSchema;
 ```
 
 #### replies.pagination.endCursor?
@@ -197,7 +334,35 @@ optional startCursor: `0x${string}`;
 #### replies.results
 
 ```ts
-results: object[];
+results: {
+  appSigner: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster: {
+        displayName: string;
+        fid: number;
+        pfpUrl: string;
+        username: string;
+     };
+  };
+  chainId: number;
+  content: string;
+  cursor: `0x${string}`;
+  deletedAt: null | Date;
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: string;
+  moderationStatus: "approved" | "rejected" | "pending";
+  moderationStatusChangedAt: Date;
+  parentId: null | `0x${string}`;
+  targetUri: string;
+  timestamp: Date;
+  txHash: `0x${string}`;
+}[];
 ```
 
 ### targetUri

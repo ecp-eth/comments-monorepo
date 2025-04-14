@@ -1,4 +1,4 @@
-[**@ecp.eth/sdk**](/sdk-reference/index.mdx)
+[**@ecp.eth/sdk**](../../index.mdx)
 
 ***
 
@@ -7,14 +7,23 @@
 # Type Alias: CommentData
 
 ```ts
-type CommentData = object;
+type CommentData = {
+  appSigner: Hex;
+  author: Hex;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: Hex;
+  targetUri: string;
+};
 ```
 
 Defined in: [packages/sdk/src/types.ts:15](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L15)
 
 The data structure of a comment to be signed and then passed to the Embed API
 
-## Type declaration
+## Properties
 
 ### appSigner
 
@@ -22,7 +31,11 @@ The data structure of a comment to be signed and then passed to the Embed API
 appSigner: Hex;
 ```
 
+Defined in: [packages/sdk/src/types.ts:41](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L41)
+
 The address of the app signer
+
+***
 
 ### author
 
@@ -30,7 +43,11 @@ The address of the app signer
 author: Hex;
 ```
 
+Defined in: [packages/sdk/src/types.ts:37](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L37)
+
 The address of the author of the comment
+
+***
 
 ### content
 
@@ -38,7 +55,11 @@ The address of the author of the comment
 content: string;
 ```
 
+Defined in: [packages/sdk/src/types.ts:19](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L19)
+
 The content of the comment
+
+***
 
 ### deadline
 
@@ -46,7 +67,11 @@ The content of the comment
 deadline: bigint;
 ```
 
+Defined in: [packages/sdk/src/types.ts:49](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L49)
+
 The deadline of the comment submission in seconds since epoch
+
+***
 
 ### metadata
 
@@ -54,7 +79,11 @@ The deadline of the comment submission in seconds since epoch
 metadata: string;
 ```
 
+Defined in: [packages/sdk/src/types.ts:23](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L23)
+
 Metadata about the comment
+
+***
 
 ### nonce
 
@@ -62,7 +91,11 @@ Metadata about the comment
 nonce: bigint;
 ```
 
+Defined in: [packages/sdk/src/types.ts:45](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L45)
+
 The nonce for the user per app
+
+***
 
 ### parentId
 
@@ -70,16 +103,22 @@ The nonce for the user per app
 parentId: Hex;
 ```
 
+Defined in: [packages/sdk/src/types.ts:33](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L33)
+
 id of parent comments if it has one, 0x for no parent comment
 
 #### Remarks
 
 This zero address (32 bytes of zeros) indicates the comment has no parent and is a top-level comment
 
+***
+
 ### targetUri
 
 ```ts
 targetUri: string;
 ```
+
+Defined in: [packages/sdk/src/types.ts:27](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/types.ts#L27)
 
 Empty string for replies
