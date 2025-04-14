@@ -8,6 +8,7 @@ import {IHook} from "../src/interfaces/IHook.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {TestUtils} from "./utils.sol";
 
 // Fee charging hook contract
 contract FlatFeeHook is IHook {
@@ -82,6 +83,8 @@ contract FlatFeeHook is IHook {
 }
 
 contract FlatFeeHookTest is Test, IERC721Receiver {
+    using TestUtils for string;
+    
     ChannelManager public channelManager;
     FlatFeeHook public feeHook;
     CommentsV1 public comments;
@@ -150,16 +153,16 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             address(feeHook)
         );
 
-        // Create comment data
+        // Create comment data using direct construction
         ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
             content: "Test comment",
             metadata: "{}",
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: user1,
             appSigner: user2,
             channelId: channelId,
-            nonce: 0,
+            nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days
         });
 
@@ -189,16 +192,16 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             address(feeHook)
         );
 
-        // Create comment data
+        // Create comment data using direct construction
         ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
             content: "Test comment",
             metadata: "{}",
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: user1,
             appSigner: user2,
             channelId: channelId,
-            nonce: 0,
+            nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days
         });
 
@@ -230,16 +233,16 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             address(feeHook)
         );
 
-        // Create comment data
+        // Create comment data using direct construction
         ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
             content: "Test comment",
             metadata: "{}",
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: user1,
             appSigner: user2,
             channelId: channelId,
-            nonce: 0,
+            nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days
         });
 
@@ -260,16 +263,16 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             address(feeHook)
         );
 
-        // Create comment data
+        // Create comment data using direct construction
         ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
             content: "Test comment",
             metadata: "{}",
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: user1,
             appSigner: user2,
             channelId: channelId,
-            nonce: 0,
+            nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days
         });
 

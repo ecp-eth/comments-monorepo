@@ -9,6 +9,7 @@ import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {TestUtils} from "./utils.sol";
 
 // Token contract for testing
 contract TestToken is ERC20 {
@@ -51,6 +52,8 @@ contract TokenGatedHook is IHook {
 }
 
 contract TokenGatedHookTest is Test, IERC721Receiver {
+    using TestUtils for string;
+    
     ChannelManager public channelManager;
     TokenGatedHook public tokenGatedHook;
     TestToken public testToken;
@@ -103,16 +106,16 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         // Transfer 1000 tokens to user1
         testToken.transfer(user1, 1000 * 10**18);
 
-        // Create comment data
+        // Create comment data using direct construction
         ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
             content: "Test comment",
             metadata: "{}",
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: user1,
             appSigner: user2,
             channelId: channelId,
-            nonce: 0,
+            nonce: CommentsV1(commentsContract).nonces(user1, user2),
             deadline: block.timestamp + 1 days
         });
 
@@ -139,16 +142,16 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         // Transfer only 999 tokens to user1 (not enough)
         testToken.transfer(user1, 999 * 10**18);
 
-        // Create comment data
+        // Create comment data using direct construction
         ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
             content: "Test comment",
             metadata: "{}",
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: user1,
             appSigner: user2,
             channelId: channelId,
-            nonce: 0,
+            nonce: CommentsV1(commentsContract).nonces(user1, user2),
             deadline: block.timestamp + 1 days
         });
 
@@ -173,16 +176,16 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
             address(tokenGatedHook)
         );
 
-        // Create comment data
+        // Create comment data using direct construction
         ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
             content: "Test comment",
             metadata: "{}",
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: user1,
             appSigner: user2,
             channelId: channelId,
-            nonce: 0,
+            nonce: CommentsV1(commentsContract).nonces(user1, user2),
             deadline: block.timestamp + 1 days
         });
 

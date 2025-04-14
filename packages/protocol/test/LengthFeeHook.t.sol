@@ -10,6 +10,7 @@ import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {TestUtils} from "./utils.sol";
 
 // Fee charging hook contract based on comment length
 contract LengthFeeHook is IHook {
@@ -204,6 +205,8 @@ contract MockERC20 is IERC20 {
 }
 
 contract LengthFeeHookTest is Test, IERC721Receiver {
+    using TestUtils for string;
+    
     ChannelManager public channelManager;
     LengthFeeHook public feeHook;
     CommentsV1 public comments;
@@ -290,16 +293,16 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
         uint256 expectedTotalFee = contentLength * TOKENS_PER_CHARACTER;
         uint256 expectedHookFee = expectedTotalFee - (expectedTotalFee * PROTOCOL_FEE_PERCENTAGE / 10000);
 
-        // Create comment data
+        // Create comment data using direct construction
         ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
             content: content,
             metadata: "{}",
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: user1,
             appSigner: user2,
             channelId: channelId,
-            nonce: 0,
+            nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days
         });
 
@@ -331,16 +334,16 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
 
         string memory content = "Test comment";
         
-        // Create comment data
+        // Create comment data using direct construction
         ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
             content: content,
             metadata: "{}",
-            targetUri: "https://example.com",
+            targetUri: "",
             commentType: "comment",
             author: user1,
             appSigner: user2,
             channelId: channelId,
-            nonce: 0,
+            nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days
         });
 
