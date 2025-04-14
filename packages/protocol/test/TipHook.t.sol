@@ -54,15 +54,15 @@ contract TipHook is IHook, ERC165 {
         address,
         bytes32
     ) external payable returns (bool) {
-        // Extract parent author from targetUri
-        (bool isReply, address parentAuthor, ) = TestUtils.parseTargetUri(commentData.targetUri, comments);
-        
-        // Only process for reply comments
-        if (!isReply || parentAuthor == address(0)) {
+        // Check if this is a reply comment
+        if (commentData.parentId == bytes32(0)) {
             // For non-reply comments, return false if ETH was sent
             // This allows the ChannelManager to handle the revert
             return msg.value == 0;
         }
+
+        // Get the parent comment's author
+        (, , , , address parentAuthor, , , , ,) = comments.comments(commentData.parentId);
 
         // Parse the tip mention and amount
         TipInfo memory tipInfo = parseTipMention(commentData.content);
@@ -248,7 +248,6 @@ contract TipHook is IHook, ERC165 {
             uint256 wholeNumber = 0;
             uint256 fractionalPart = 0;
             uint256 currentDecimals = 0;
-            bool hasDecimals = false;
             uint256 currentPos = startNum;
             
             // Parse whole number part
@@ -350,7 +349,8 @@ contract TipHookTest is Test, IERC721Receiver {
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
         });
         
         // Post parent comment
@@ -361,7 +361,6 @@ contract TipHookTest is Test, IERC721Receiver {
         uint256 initialBalance = user1.balance;
 
         // --- Reply Comment Setup (With Tip Mention) ---
-        string memory replyTargetUri = TestUtils.createReplyTargetUri(parentId, address(comments));
         uint256 tipAmount = 0.1 ether;
         // Calculate total amount needed to send to result in the desired tip amount after protocol fee
         // To get 0.1 ETH after 10% fee, we need to send approximately 0.111111... ETH
@@ -370,13 +369,14 @@ contract TipHookTest is Test, IERC721Receiver {
         ICommentTypes.CommentData memory replyCommentData = ICommentTypes.CommentData({
             content: string(abi.encodePacked("Reply with tip !", TestUtils.toHexString(address(tipHook)), " 0.1 ETH")),
             metadata: "{}",
-            targetUri: replyTargetUri,
+            targetUri: "",
             commentType: "comment",
             author: user2,
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user2, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: parentId
         });
         
         // --- Post Reply Comment (With Correct Tip Amount) ---
@@ -399,7 +399,8 @@ contract TipHookTest is Test, IERC721Receiver {
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
         });
         
         // Post parent comment
@@ -408,17 +409,17 @@ contract TipHookTest is Test, IERC721Receiver {
         bytes32 parentCommentId = comments.getCommentId(parentCommentData);
 
         // --- Reply Comment Setup (With Tip Mention) ---
-        string memory replyTargetUri = TestUtils.createReplyTargetUri(parentCommentId, address(comments));
         ICommentTypes.CommentData memory replyCommentData = ICommentTypes.CommentData({
             content: string(abi.encodePacked("Reply with tip !", TestUtils.toHexString(address(tipHook)), " 0.1ETH")),
             metadata: "{}",
-            targetUri: replyTargetUri,
+            targetUri: "",
             commentType: "comment",
             author: user2,
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user2, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: parentCommentId
         });
         
         // --- Post Reply Comment (With Incorrect Tip Amount) ---
@@ -439,7 +440,8 @@ contract TipHookTest is Test, IERC721Receiver {
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
         });
         
         // Post parent comment
@@ -448,17 +450,17 @@ contract TipHookTest is Test, IERC721Receiver {
         bytes32 parentCommentId = comments.getCommentId(parentCommentData);
 
         // --- Reply Comment Setup (With Invalid Tip Syntax) ---
-        string memory replyTargetUri = TestUtils.createReplyTargetUri(parentCommentId, address(comments));
         ICommentTypes.CommentData memory replyCommentData = ICommentTypes.CommentData({
             content: string(abi.encodePacked("Reply with invalid tip syntax !", TestUtils.toHexString(address(tipHook)), " invalid_amount")),
             metadata: "{}",
-            targetUri: replyTargetUri,
+            targetUri: "",
             commentType: "comment",
             author: user2,
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user2, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: parentCommentId
         });
         
         // --- Post Reply Comment (With Invalid Tip Syntax) ---
@@ -479,7 +481,8 @@ contract TipHookTest is Test, IERC721Receiver {
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
         });
         
         // Post parent comment
@@ -490,17 +493,17 @@ contract TipHookTest is Test, IERC721Receiver {
         uint256 initialBalance = user1.balance;
 
         // --- Reply Comment Setup (No Tip Mention) ---
-        string memory replyTargetUri = TestUtils.createReplyTargetUri(parentCommentId, address(comments));
         ICommentTypes.CommentData memory replyCommentData = ICommentTypes.CommentData({
             content: "Regular reply without tip", // No tip mention
             metadata: "{}",
-            targetUri: replyTargetUri,
+            targetUri: "",
             commentType: "comment",
             author: user2,
             appSigner: user2,
             channelId: channelId,
             nonce: comments.nonces(user2, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: parentCommentId
         });
         
         // --- Post Reply Comment (No Value) ---

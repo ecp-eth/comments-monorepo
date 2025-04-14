@@ -201,7 +201,8 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             appSigner: user2,
             channelId: channelId,
             nonce: CommentsV1(commentsContract).nonces(user1, user2),
-            deadline: block.timestamp + 1 days
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
         });
 
         // Test beforeComment hook

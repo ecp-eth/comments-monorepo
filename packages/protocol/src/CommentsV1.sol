@@ -78,6 +78,10 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     error InvalidSignatureLength();
     /// @notice Error thrown when signature s value is invalid
     error InvalidSignatureS();
+    /// @notice Error thrown when parent comment does not exist
+    error ParentCommentDoesNotExist();
+    /// @notice Error thrown when both parentId and targetUri are set
+    error InvalidCommentReference(string message);
 
     string public constant name = "Comments";
     string public constant version = "1";
@@ -101,9 +105,9 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
 
     // On-chain storage mappings
     mapping(bytes32 => CommentData) public comments;
-    mapping(bytes32 => bool) public commentExists;
     mapping(address => mapping(address => bool)) public isApproved;
     mapping(address => mapping(address => uint256)) public nonces;
+    mapping(bytes32 => bool) public deleted;
 
     // Channel manager reference
     IChannelManager public immutable channelManager;
@@ -160,6 +164,16 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
             revert SignatureDeadlineReached(commentData.deadline, block.timestamp);
         }
 
+        // Validate parentId and targetUri
+        if (commentData.parentId != bytes32(0)) {
+            if (comments[commentData.parentId].author == address(0) && !deleted[commentData.parentId]) {
+                revert ParentCommentDoesNotExist();
+            }
+            if (bytes(commentData.targetUri).length > 0) {
+                revert InvalidCommentReference("Parent comment and targetUri cannot both be set");
+            }
+        }
+
         if (
             nonces[commentData.author][commentData.appSigner] !=
             commentData.nonce
@@ -212,7 +226,6 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
 
             // Store comment data on-chain
             comments[commentId] = commentData;
-            commentExists[commentId] = true;
 
             // Execute channel-specific hooks after comment
             hookSuccess = channelManager.executeHooks(
@@ -239,15 +252,20 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     /// @notice Deletes a comment when called by the author directly
     /// @param commentId The unique identifier of the comment to delete
     function deleteCommentAsAuthor(bytes32 commentId) external {
-        require(commentExists[commentId], "Comment does not exist");
-        require(comments[commentId].author == msg.sender, "Not comment author");
+        CommentData storage comment = comments[commentId];
+        require(comment.author != address(0), "Comment does not exist");
+        require(comment.author == msg.sender, "Not comment author");
         _deleteComment(commentId, msg.sender);
     }
 
     /// @notice Deletes a comment with author signature verification
     /// @param commentId The unique identifier of the comment to delete
     /// @param author The address of the comment author
+    /// @param appSigner The address of the app signer
+    /// @param nonce The current nonce for the author
+    /// @param deadline Timestamp after which the signature becomes invalid
     /// @param authorSignature The signature from the author authorizing deletion (empty if app)
+    /// @param appSignature The signature from the app signer authorizing deletion (empty if author)
     function deleteComment(
         bytes32 commentId,
         address author,
@@ -265,7 +283,8 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
             revert InvalidNonce(author, appSigner, nonces[author][appSigner], nonce);
         }
 
-        require(commentExists[commentId], "Comment does not exist");
+        CommentData storage comment = comments[commentId];
+        require(comment.author != address(0), "Comment does not exist");
 
         nonces[author][appSigner]++;
 
@@ -306,7 +325,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     /// @param author The address of the comment author
     function _deleteComment(bytes32 commentId, address author) internal {
         delete comments[commentId];
-        commentExists[commentId] = false;
+        deleted[commentId] = true;
         emit CommentDeleted(commentId, author);
     }
 
@@ -542,8 +561,9 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     /// @param commentId The comment ID to query
     /// @return The comment data struct
     function getComment(bytes32 commentId) external view returns (CommentData memory) {
-        require(commentExists[commentId], "Comment does not exist");
-        return comments[commentId];
+        CommentData storage comment = comments[commentId];
+        require(comment.author != address(0), "Comment does not exist");
+        return comment;
     }
 
     /// @notice Validates a signature against malleability

@@ -129,42 +129,7 @@ library TestUtils {
         return string(abi.encodePacked("eip155:1/", commentsAddress, "/", parentIdHex));
     }
 
-    /**
-     * @notice Parse a CAIP URL into commentId and parent URI
-     * @param uri The CAIP URL
-     * @param comments The CommentsV1 contract
-     * @return isReply Whether this is a reply
-     * @return parentAuthor The parent comment author
-     * @return parentAppSigner The parent comment app signer
-     */
-    function parseTargetUri(string memory uri, CommentsV1 comments) internal view returns (bool isReply, address parentAuthor, address parentAppSigner) {
-        // Split the URI into parts
-        bytes memory uriBytes = bytes(uri);
-        if (uriBytes.length == 0) return (false, address(0), address(0));
-
-        // Find the last '/' to get the commentId
-        int256 lastSlash = -1;
-        for (uint256 i = 0; i < uriBytes.length; i++) {
-            if (uriBytes[i] == "/") {
-                lastSlash = int256(i);
-            }
-        }
-        if (lastSlash == -1) return (false, address(0), address(0));
-
-        // Extract the commentId
-        string memory commentIdHex = substring(uri, uint256(lastSlash) + 1, uriBytes.length);
-        
-        // Ensure commentIdHex has 0x prefix for parseHexUint
-        if (bytes(commentIdHex).length >= 2 && bytes(commentIdHex)[0] != "0" && bytes(commentIdHex)[1] != "x") {
-            commentIdHex = string(abi.encodePacked("0x", commentIdHex));
-        }
-        
-        bytes32 commentId = bytes32(Strings.parseHexUint(commentIdHex));
-
-        // Get the parent comment's author and app signer
-        (, , , , address author, address appSigner, , ,) = comments.comments(commentId);
-        return (true, author, appSigner);
-    }
+    
 
     /**
      * @notice Calculate the multiplier needed to cover a protocol fee
