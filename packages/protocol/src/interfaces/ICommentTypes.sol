@@ -15,15 +15,20 @@ interface ICommentTypes {
     /// @param deadline Timestamp after which the signatures for this comment become invalid
     /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
     struct CommentData {
-        string content;
-        string metadata;
-        string targetUri;
-        string commentType;
-        address author;
-        address appSigner;
+        // Pack these two addresses together (saves 1 storage slot)
+        address author;     // 20 bytes
+        address appSigner;  // 20 bytes
+    
+        // 32-byte types
         uint256 channelId;
         uint256 nonce;
         uint256 deadline;
         bytes32 parentId;
+    
+        // Dynamic types last (conventional pattern)
+        string content;
+        string metadata;
+        string targetUri;
+        string commentType;
     }
 } 
