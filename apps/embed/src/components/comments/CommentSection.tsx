@@ -30,6 +30,7 @@ import { useAccount } from "wagmi";
 import { PoweredBy } from "@ecp.eth/shared/components";
 import { CommentItem } from "./CommentItem";
 import { createRootCommentsQueryKey } from "./queries";
+import { NoCommentsScreen } from "../NoCommentsScreen";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -41,7 +42,7 @@ type CommentSectionProps = {
 export function CommentSection({ initialData }: CommentSectionProps) {
   useAutoBodyMinHeight();
 
-  const { address, status } = useAccount();
+  const { address } = useAccount();
   const { targetUri, disablePromotion } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
@@ -51,44 +52,51 @@ export function CommentSection({ initialData }: CommentSectionProps) {
 
   const isAccountStatusResolved = useIsAccountStatusResolved();
 
-  const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
-    useInfiniteQuery({
-      enabled: isAccountStatusResolved,
-      queryKey,
-      initialData,
-      initialPageParam: {
-        cursor: undefined,
-        limit: COMMENTS_PER_PAGE,
-      } as ListCommentsQueryPageParamsSchemaType,
-      queryFn: async ({ pageParam, signal }) => {
-        const response = await fetchComments({
-          appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-          apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-          targetUri,
-          limit: pageParam.limit,
-          cursor: pageParam.cursor,
-          signal,
-          viewer: address,
-          mode: "flat",
-        });
+  const {
+    data,
+    isSuccess,
+    isLoading,
+    error,
+    refetch,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    enabled: isAccountStatusResolved,
+    queryKey,
+    initialData,
+    initialPageParam: {
+      cursor: undefined,
+      limit: COMMENTS_PER_PAGE,
+    } as ListCommentsQueryPageParamsSchemaType,
+    queryFn: async ({ pageParam, signal }) => {
+      const response = await fetchComments({
+        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        targetUri,
+        limit: pageParam.limit,
+        cursor: pageParam.cursor,
+        signal,
+        viewer: address,
+        mode: "flat",
+      });
 
-        return CommentPageSchema.parse(response);
-      },
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      getNextPageParam(
-        lastPage
-      ): ListCommentsQueryPageParamsSchemaType | undefined {
-        if (!lastPage.pagination.hasNext) {
-          return;
-        }
+      return CommentPageSchema.parse(response);
+    },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    getNextPageParam(
+      lastPage
+    ): ListCommentsQueryPageParamsSchemaType | undefined {
+      if (!lastPage.pagination.hasNext) {
+        return;
+      }
 
-        return {
-          cursor: lastPage.pagination.endCursor,
-          limit: lastPage.pagination.limit,
-        };
-      },
-    });
+      return {
+        cursor: lastPage.pagination.endCursor,
+        limit: lastPage.pagination.limit,
+      };
+    },
+  });
 
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
     enabled: isAccountStatusResolved,
@@ -114,46 +122,49 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
-  if (error) {
-    return (
-      <ErrorScreen
-        description="Failed to load comments. Please try again."
-        onRetry={() => refetch()}
-      />
-    );
-  }
-
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
       <div className="mb-4">
         <CommentForm />
       </div>
-      {hasNewComments && (
-        <Button
-          className="mb-4"
-          onClick={() => fetchNewComments()}
-          variant="secondary"
-          size="sm"
-        >
-          Load new comments
-        </Button>
-      )}
-      {results.map((comment) => (
-        <CommentItem
-          comment={comment}
-          key={comment.id}
-          connectedAddress={address}
+      {isLoading && <LoadingScreen />}
+      {error && (
+        <ErrorScreen
+          description="Failed to load comments. Please try again."
+          onRetry={() => refetch()}
         />
-      ))}
-      {hasNextPage && (
-        <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
-          Load more
-        </Button>
+      )}
+      {isSuccess && (
+        <>
+          {hasNewComments && (
+            <Button
+              className="mb-4"
+              onClick={() => fetchNewComments()}
+              variant="secondary"
+              size="sm"
+            >
+              Load new comments
+            </Button>
+          )}
+          {results.length === 0 && <NoCommentsScreen />}
+          {results.map((comment) => (
+            <CommentItem
+              comment={comment}
+              key={comment.id}
+              connectedAddress={address}
+            />
+          ))}
+          {hasNextPage && (
+            <Button
+              onClick={() => fetchNextPage()}
+              variant="secondary"
+              size="sm"
+            >
+              Load more
+            </Button>
+          )}
+        </>
       )}
       {!disablePromotion && <PoweredBy className="mt-4" />}
     </div>
