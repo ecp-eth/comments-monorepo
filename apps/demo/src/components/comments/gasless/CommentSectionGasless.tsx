@@ -40,9 +40,11 @@ import { CommentActionsProvider } from "../core/CommentActionsContext";
 import { CommentItem } from "../core/CommentItem";
 import { CommentForm } from "../core/CommentForm";
 import { createRootCommentsQueryKey } from "../core/queries";
+import { useIsAccountStatusResolved } from "@/hooks/useIsAccountStatusResolved";
 
 export function CommentSectionGasless() {
   const { address: viewer } = useAccount();
+  const isAccountStatusResolved = useIsAccountStatusResolved();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
     () => createRootCommentsQueryKey(viewer, currentUrl),
@@ -116,6 +118,7 @@ export function CommentSectionGasless() {
 
   const { data, isLoading, error, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
+      enabled: isAccountStatusResolved && !!currentUrl,
       queryKey,
       initialPageParam: {
         cursor: undefined as Hex | undefined,
@@ -133,7 +136,6 @@ export function CommentSectionGasless() {
           mode: "flat",
         });
       },
-      enabled: !!currentUrl,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
@@ -149,6 +151,7 @@ export function CommentSectionGasless() {
     });
 
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    enabled: isAccountStatusResolved && !!currentUrl,
     queryData: data,
     queryKey,
     fetchComments({ cursor, signal }) {

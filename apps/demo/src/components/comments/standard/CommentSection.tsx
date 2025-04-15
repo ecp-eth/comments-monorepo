@@ -18,9 +18,11 @@ import { CommentItem } from "../core/CommentItem";
 import { useCommentActions } from "./hooks/useCommentActions";
 import { CommentActionsProvider } from "../core/CommentActionsContext";
 import { createRootCommentsQueryKey } from "../core/queries";
+import { useIsAccountStatusResolved } from "@/hooks/useIsAccountStatusResolved";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
+  const isAccountStatusResolved = useIsAccountStatusResolved();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
     () => createRootCommentsQueryKey(viewer, currentUrl),
@@ -33,6 +35,7 @@ export function CommentSection() {
 
   const { data, isLoading, error, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
+      enabled: isAccountStatusResolved && !!currentUrl,
       queryKey,
       initialPageParam: {
         cursor: undefined as Hex | undefined,
@@ -50,7 +53,6 @@ export function CommentSection() {
           mode: "flat",
         });
       },
-      enabled: !!currentUrl,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
@@ -66,6 +68,7 @@ export function CommentSection() {
     });
 
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    enabled: isAccountStatusResolved && !!currentUrl,
     queryData: data,
     queryKey,
     fetchComments({ cursor, signal }) {
