@@ -698,6 +698,9 @@ importers:
       forge-std:
         specifier: github:foundry-rs/forge-std#v1.9.6
         version: https://codeload.github.com/foundry-rs/forge-std/tar.gz/3b20d60d14b343ee4f908cb8079495c07f5e8981
+      solady:
+        specifier: ^0.1.14
+        version: 0.1.16
 
   packages/sdk:
     dependencies:
@@ -9975,6 +9978,9 @@ packages:
   socks@2.8.4:
     resolution: {integrity: sha512-D3YaD0aRxR3mEcqnidIs7ReYJFVzWdd6fXJYUM8ixcQcJRGTka/b3saV0KflYhyVJXKhb947GndU35SxYNResQ==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
+
+  solady@0.1.16:
+    resolution: {integrity: sha512-BTNLkEFO1mbpR/g3Z9DolFbHH5iToQXnYlQHU6TJvWc7PWRuL5OF0x/TsJkNp1Jszj4UAMbJnvF8Sdgb6Ib//w==}
 
   solc@0.6.12:
     resolution: {integrity: sha512-Lm0Ql2G9Qc7yPP2Ba+WNmzw2jwsrd3u4PobHYlSOxaut3TtUbj9+5ZrT6f4DUpNPEoBaFUOEg9Op9C0mk7ge9g==}
@@ -23329,6 +23335,8 @@ snapshots:
     dependencies:
       ip-address: 9.0.5
       smart-buffer: 4.2.0
+
+  solady@0.1.16: {}
 
   solc@0.6.12:
     dependencies:

@@ -12,6 +12,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {TestUtils} from "./utils.sol";
+import {LibString} from "solady/utils/LibString.sol";
 
   struct TipInfo {
         bool found;
@@ -111,7 +112,7 @@ contract TipHook is IHook, ERC165 {
     ///      4. The "ETH" suffix can be directly attached to the number or separated by a space
     function parseTipMention(string memory content) public view returns (TipInfo memory) {
         bytes memory contentBytes = bytes(content);
-        string memory addrString = TestUtils.toHexString(address(this));
+        string memory addrString = LibString.toHexString(uint160(address(this)));
         bytes memory addrBytes = bytes(addrString);
         
         // Look for "!" pattern followed by the address
@@ -222,6 +223,7 @@ contract TipHook is IHook, ERC165 {
 
 abstract contract TipHookTest is Test, IERC721Receiver {
     using TestUtils for string;
+    using LibString for string;
     
     ChannelManager public channelManager;
     TipHook public tipHook;
@@ -298,7 +300,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         uint256 tipAmount = 0.1 ether;
 
         ICommentTypes.CommentData memory replyCommentData = ICommentTypes.CommentData({
-            content: string(abi.encodePacked("Reply with tip !", TestUtils.toHexString(address(tipHook)), " 0.1 ETH")),
+            content: string(abi.encodePacked("Reply with tip !", LibString.toHexString(uint160(address(tipHook))), " 0.1 ETH")),
             metadata: "{}",
             targetUri: "",
             commentType: "comment",
@@ -341,7 +343,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
 
         // --- Reply Comment Setup (With Tip Mention) ---
         ICommentTypes.CommentData memory replyCommentData = ICommentTypes.CommentData({
-            content: string(abi.encodePacked("Reply with tip !", TestUtils.toHexString(address(tipHook)), " 0.1ETH")),
+            content: string(abi.encodePacked("Reply with tip !", LibString.toHexString(uint160(address(tipHook))), " 0.1ETH")),
             metadata: "{}",
             targetUri: "",
             commentType: "comment",
@@ -382,7 +384,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
 
         // --- Reply Comment Setup (With Invalid Tip Syntax) ---
         ICommentTypes.CommentData memory replyCommentData = ICommentTypes.CommentData({
-            content: string(abi.encodePacked("Reply with invalid tip syntax !", TestUtils.toHexString(address(tipHook)), " invalid_amount")),
+            content: string(abi.encodePacked("Reply with invalid tip syntax !", LibString.toHexString(uint160(address(tipHook))), " invalid_amount")),
             metadata: "{}",
             targetUri: "",
             commentType: "comment",
@@ -445,60 +447,60 @@ abstract contract TipHookTest is Test, IERC721Receiver {
     }
     
     /// @notice Test suite for the parseTipMention function
-    function testParseTipMention() public view {
+    function test_parseTipContent() public view {
        
         // Test case 1: Valid tip with space between number and ETH
-        string memory validTipWithSpace = string(abi.encodePacked("!", TestUtils.toHexString(address(tipHook)), " 0.1 ETH"));
+        string memory validTipWithSpace = string(abi.encodePacked("!", LibString.toHexString(uint160(address(tipHook))), " 0.1 ETH"));
         TipInfo memory result = tipHook.parseTipMention(validTipWithSpace);
         assertTrue(result.found, "Should find valid tip with space");
         assertEq(result.amount, 0.1 ether, "Should parse 0.1 ETH correctly");
         
         // Test case 2: Valid tip with no space between number and ETH
-        string memory validTipNoSpace = string(abi.encodePacked("!", TestUtils.toHexString(address(tipHook)), " 0.1ETH"));
+        string memory validTipNoSpace = string(abi.encodePacked("!", LibString.toHexString(uint160(address(tipHook))), " 0.1ETH"));
         result = tipHook.parseTipMention(validTipNoSpace);
         assertTrue(result.found, "Should find valid tip without space");
         assertEq(result.amount, 0.1 ether, "Should parse 0.1ETH correctly");
         
         // Test case 3: Valid tip with whole number
-        string memory wholeNumberTip = string(abi.encodePacked("!", TestUtils.toHexString(address(tipHook)), " 1 ETH"));
+        string memory wholeNumberTip = string(abi.encodePacked("!", LibString.toHexString(uint160(address(tipHook))), " 1 ETH"));
         result = tipHook.parseTipMention(wholeNumberTip);
         assertTrue(result.found, "Should find valid whole number tip");
         assertEq(result.amount, 1 ether, "Should parse 1 ETH correctly");
         
         // Test case 4: Valid tip with decimal number
-        string memory decimalTip = string(abi.encodePacked("!", TestUtils.toHexString(address(tipHook)), " 0.01 ETH"));
+        string memory decimalTip = string(abi.encodePacked("!", LibString.toHexString(uint160(address(tipHook))), " 0.01 ETH"));
         result = tipHook.parseTipMention(decimalTip);
         assertTrue(result.found, "Should find valid decimal tip");
         assertEq(result.amount, 0.01 ether, "Should parse 0.01 ETH correctly");
         
         // Test case 5: Invalid tip - wrong address
-        string memory wrongAddressTip = string(abi.encodePacked("!", TestUtils.toHexString(address(this)), " 0.1 ETH"));
+        string memory wrongAddressTip = string(abi.encodePacked("!", LibString.toHexString(uint160(address(this))), " 0.1 ETH"));
         result = tipHook.parseTipMention(wrongAddressTip);
         assertFalse(result.found, "Should not find tip with wrong address");
         
         // Test case 6: Invalid tip - missing number
-        string memory missingNumberTip = string(abi.encodePacked("!", TestUtils.toHexString(address(tipHook)), " ETH"));
+        string memory missingNumberTip = string(abi.encodePacked("!", LibString.toHexString(uint160(address(tipHook))), " ETH"));
         result = tipHook.parseTipMention(missingNumberTip);
         assertFalse(result.found, "Should not find tip with missing number");
         
         // Test case 7: Invalid tip - invalid number format
-        string memory invalidNumberTip = string(abi.encodePacked("!", TestUtils.toHexString(address(tipHook)), " abc ETH"));
+        string memory invalidNumberTip = string(abi.encodePacked("!", LibString.toHexString(uint160(address(tipHook))), " abc ETH"));
         result = tipHook.parseTipMention(invalidNumberTip);
         assertFalse(result.found, "Should not find tip with invalid number format");
         
         // Test case 8: Invalid tip - missing ETH suffix
-        string memory missingEthSuffixTip = string(abi.encodePacked("!", TestUtils.toHexString(address(tipHook)), " 0.1"));
+        string memory missingEthSuffixTip = string(abi.encodePacked("!", LibString.toHexString(uint160(address(tipHook))), " 0.1"));
         result = tipHook.parseTipMention(missingEthSuffixTip);
         assertFalse(result.found, "Should not find tip with missing ETH suffix");
         
         // Test case 9: Tip mention in the middle of text
-        string memory tipInMiddle = string(abi.encodePacked("Here's a tip ", "!", TestUtils.toHexString(address(tipHook)), " 0.1 ETH", " for you"));
+        string memory tipInMiddle = string(abi.encodePacked("Here's a tip ", "!", LibString.toHexString(uint160(address(tipHook))), " 0.1 ETH", " for you"));
         result = tipHook.parseTipMention(tipInMiddle);
         assertTrue(result.found, "Should find tip mention in the middle of text");
         assertEq(result.amount, 0.1 ether, "Should parse 0.1 ETH correctly from middle of text");
         
         // Test case 10: Multiple tip mentions (should find the first one)
-        string memory multipleTips = string(abi.encodePacked("!", TestUtils.toHexString(address(tipHook)), " 0.1 ETH and another !", TestUtils.toHexString(address(tipHook)), " 0.2 ETH"));
+        string memory multipleTips = string(abi.encodePacked("!", LibString.toHexString(uint160(address(tipHook))), " 0.1 ETH and another !", LibString.toHexString(uint160(address(tipHook))), " 0.2 ETH"));
         result = tipHook.parseTipMention(multipleTips);
         assertTrue(result.found, "Should find first tip mention when multiple exist");
         assertEq(result.amount, 0.1 ether, "Should parse first tip amount correctly");
