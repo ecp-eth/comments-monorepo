@@ -35,10 +35,7 @@ export const getWagmiConfig = (selectedChainId: number) => {
   return getDefaultConfig({
     chains: [selectedChain],
     transports,
-    // at the moment we don't use server side rendered comments so we can disable ssr
-    // that will keep the wagmi provider from being rendered as disconnected and uses
-    // connecting status instead of disconnected.
-    // ssr: false,
+    ssr: true,
     appName: "Comment App",
     projectId: publicEnv.NEXT_PUBLIC_WC_PROJECT_ID,
   });
