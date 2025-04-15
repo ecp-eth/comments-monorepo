@@ -7,6 +7,11 @@ settings:
 overrides:
   '@hono/zod-openapi>@asteasolutions/zod-to-openapi': ^7.3.0
 
+patchedDependencies:
+  typedoc-plugin-markdown:
+    hash: 9ad0800684ec5edb63d732325382e0bbc878f8b3a16a7185ff7d148b6106c15a
+    path: patches/typedoc-plugin-markdown.patch
+
 importers:
 
   .:
@@ -558,7 +563,7 @@ importers:
         version: 5.20.5(@types/react@19.0.11)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       typedoc-plugin-markdown:
         specifier: ~4.6.2
-        version: 4.6.2(typedoc@0.28.2(typescript@5.8.2))
+        version: 4.6.2(patch_hash=9ad0800684ec5edb63d732325382e0bbc878f8b3a16a7185ff7d148b6106c15a)(typedoc@0.28.2(typescript@5.8.2))
       typedoc-plugin-zod:
         specifier: ^1.4.1
         version: 1.4.1(typedoc@0.28.2(typescript@5.8.2))
@@ -24207,7 +24212,7 @@ snapshots:
       possible-typed-array-names: 1.0.0
       reflect.getprototypeof: 1.0.10
 
-  typedoc-plugin-markdown@4.6.2(typedoc@0.28.2(typescript@5.8.2)):
+  typedoc-plugin-markdown@4.6.2(patch_hash=9ad0800684ec5edb63d732325382e0bbc878f8b3a16a7185ff7d148b6106c15a)(typedoc@0.28.2(typescript@5.8.2)):
     dependencies:
       typedoc: 0.28.2(typescript@5.8.2)
 

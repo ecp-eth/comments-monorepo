@@ -12,25 +12,25 @@ function fetchComments(options): Promise<{
      moderationEnabled: boolean;
   };
   pagination: {
-     endCursor: `0x${string}`;
+     endCursor?: `0x${string}`;
      hasNext: boolean;
      hasPrevious: boolean;
      limit: number;
-     startCursor: `0x${string}`;
+     startCursor?: `0x${string}`;
   };
   results: {
      appSigner: `0x${string}`;
      author: {
         address: `0x${string}`;
-        ens: {
+        ens?: {
            avatarUrl: null | string;
            name: string;
         };
-        farcaster: {
-           displayName: string;
+        farcaster?: {
+           displayName?: string;
            fid: number;
-           pfpUrl: string;
-           username: string;
+           pfpUrl?: string;
+           username?: string;
         };
      };
      chainId: number;
@@ -48,25 +48,25 @@ function fetchComments(options): Promise<{
            moderationEnabled: boolean;
         };
         pagination: {
-           endCursor: `0x${string}`;
+           endCursor?: `0x${string}`;
            hasNext: boolean;
            hasPrevious: boolean;
            limit: number;
-           startCursor: `0x${string}`;
+           startCursor?: `0x${string}`;
         };
         results: {
            appSigner: `0x${string}`;
            author: {
               address: `0x${string}`;
-              ens: {
+              ens?: {
                  avatarUrl: ... | ...;
                  name: string;
               };
-              farcaster: {
-                 displayName: ... | ...;
+              farcaster?: {
+                 displayName?: ... | ...;
                  fid: number;
-                 pfpUrl: ... | ...;
-                 username: ... | ...;
+                 pfpUrl?: ... | ...;
+                 username?: ... | ...;
               };
            };
            chainId: number;
@@ -108,25 +108,25 @@ Fetch comments from the Indexer API
      `moderationEnabled`: `boolean`;
   \};
   `pagination`: \{
-     `endCursor`: `` `0x${string}` ``;
+     `endCursor?`: `` `0x${string}` ``;
      `hasNext`: `boolean`;
      `hasPrevious`: `boolean`;
      `limit`: `number`;
-     `startCursor`: `` `0x${string}` ``;
+     `startCursor?`: `` `0x${string}` ``;
   \};
   `results`: \{
      `appSigner`: `` `0x${string}` ``;
      `author`: \{
         `address`: `` `0x${string}` ``;
-        `ens`: \{
+        `ens?`: \{
            `avatarUrl`: `null` \| `string`;
            `name`: `string`;
         \};
-        `farcaster`: \{
-           `displayName`: `string`;
+        `farcaster?`: \{
+           `displayName?`: `string`;
            `fid`: `number`;
-           `pfpUrl`: `string`;
-           `username`: `string`;
+           `pfpUrl?`: `string`;
+           `username?`: `string`;
         \};
      \};
      `chainId`: `number`;
@@ -144,25 +144,25 @@ Fetch comments from the Indexer API
            `moderationEnabled`: `boolean`;
         \};
         `pagination`: \{
-           `endCursor`: `` `0x${string}` ``;
+           `endCursor?`: `` `0x${string}` ``;
            `hasNext`: `boolean`;
            `hasPrevious`: `boolean`;
            `limit`: `number`;
-           `startCursor`: `` `0x${string}` ``;
+           `startCursor?`: `` `0x${string}` ``;
         \};
         `results`: \{
            `appSigner`: `` `0x${string}` ``;
            `author`: \{
               `address`: `` `0x${string}` ``;
-              `ens`: \{
+              `ens?`: \{
                  `avatarUrl`: ... \| ...;
                  `name`: `string`;
               \};
-              `farcaster`: \{
-                 `displayName`: ... \| ...;
+              `farcaster?`: \{
+                 `displayName?`: ... \| ...;
                  `fid`: `number`;
-                 `pfpUrl`: ... \| ...;
-                 `username`: ... \| ...;
+                 `pfpUrl?`: ... \| ...;
+                 `username?`: ... \| ...;
               \};
            \};
            `chainId`: `number`;

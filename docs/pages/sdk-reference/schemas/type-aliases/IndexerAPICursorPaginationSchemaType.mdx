@@ -8,11 +8,11 @@
 
 ```ts
 type IndexerAPICursorPaginationSchemaType = {
-  endCursor: `0x${string}`;
+  endCursor?: `0x${string}`;
   hasNext: boolean;
   hasPrevious: boolean;
   limit: number;
-  startCursor: `0x${string}`;
+  startCursor?: `0x${string}`;
 };
 ```
 

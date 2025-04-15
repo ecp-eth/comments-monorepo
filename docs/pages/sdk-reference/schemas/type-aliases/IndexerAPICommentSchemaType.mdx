@@ -11,15 +11,15 @@ type IndexerAPICommentSchemaType = {
   appSigner: `0x${string}`;
   author: {
      address: `0x${string}`;
-     ens: {
+     ens?: {
         avatarUrl: null | string;
         name: string;
      };
-     farcaster: {
-        displayName: string;
+     farcaster?: {
+        displayName?: string;
         fid: number;
-        pfpUrl: string;
-        username: string;
+        pfpUrl?: string;
+        username?: string;
      };
   };
   chainId: number;
@@ -53,15 +53,15 @@ appSigner: `0x${string}` = HexSchema;
 ```ts
 author: {
   address: `0x${string}`;
-  ens: {
+  ens?: {
      avatarUrl: null | string;
      name: string;
   };
-  farcaster: {
-     displayName: string;
+  farcaster?: {
+     displayName?: string;
      fid: number;
-     pfpUrl: string;
-     username: string;
+     pfpUrl?: string;
+     username?: string;
   };
 } = IndexerAPIAuthorDataSchema;
 ```
@@ -97,10 +97,10 @@ name: string;
 
 ```ts
 optional farcaster: {
-  displayName: string;
+  displayName?: string;
   fid: number;
-  pfpUrl: string;
-  username: string;
+  pfpUrl?: string;
+  username?: string;
 };
 ```
 

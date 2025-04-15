@@ -9,25 +9,25 @@
 ```ts
 type IndexerAPIModerationGetPendingCommentsSchemaType = {
   pagination: {
-     endCursor: `0x${string}`;
+     endCursor?: `0x${string}`;
      hasNext: boolean;
      hasPrevious: boolean;
      limit: number;
-     startCursor: `0x${string}`;
+     startCursor?: `0x${string}`;
   };
   results: {
      appSigner: `0x${string}`;
      author: {
         address: `0x${string}`;
-        ens: {
+        ens?: {
            avatarUrl: null | string;
            name: string;
         };
-        farcaster: {
-           displayName: string;
+        farcaster?: {
+           displayName?: string;
            fid: number;
-           pfpUrl: string;
-           username: string;
+           pfpUrl?: string;
+           username?: string;
         };
      };
      chainId: number;
@@ -55,11 +55,11 @@ Defined in: [packages/sdk/src/schemas/indexer.ts:132](https://github.com/ecp-eth
 
 ```ts
 pagination: {
-  endCursor: `0x${string}`;
+  endCursor?: `0x${string}`;
   hasNext: boolean;
   hasPrevious: boolean;
   limit: number;
-  startCursor: `0x${string}`;
+  startCursor?: `0x${string}`;
 } = IndexerAPICursorPaginationSchema;
 ```
 
@@ -100,15 +100,15 @@ results: {
   appSigner: `0x${string}`;
   author: {
      address: `0x${string}`;
-     ens: {
+     ens?: {
         avatarUrl: null | string;
         name: string;
      };
-     farcaster: {
-        displayName: string;
+     farcaster?: {
+        displayName?: string;
         fid: number;
-        pfpUrl: string;
-        username: string;
+        pfpUrl?: string;
+        username?: string;
      };
   };
   chainId: number;

@@ -8,12 +8,12 @@
 
 ```ts
 type CommentsEmbedProps = {
-  chainId: EmbedConfigSupportedChainIdsSchemaType;
-  containerProps: React.HTMLAttributes<HTMLDivElement>;
-  disablePromotion: boolean;
-  embedUri: string;
-  iframeProps: React.IframeHTMLAttributes<HTMLIFrameElement>;
-  theme: EmbedConfigThemeSchemaType;
+  chainId?: EmbedConfigSupportedChainIdsSchemaType;
+  containerProps?: React.HTMLAttributes<HTMLDivElement>;
+  disablePromotion?: boolean;
+  embedUri?: string;
+  iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
+  theme?: EmbedConfigThemeSchemaType;
   uri: string | URL;
 };
 ```

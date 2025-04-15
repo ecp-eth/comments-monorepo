@@ -361,35 +361,36 @@ export async function fetchAuthorData(
   return Effect.runPromise(repeatableTask, { signal });
 }
 
+/**
+ * The options for `isMuted()`
+ */
 const isMutedOptionsSchema = z.object({
+  /**
+   * Author's address
+   */
   address: HexSchema,
+  /**
+   * URL on which /api/muted-accounts/$address endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
   apiUrl: z.string().url().default(INDEXER_API_URL),
+  /**
+   * Abort signal for requests
+   */
   signal: z.instanceof(AbortSignal).optional(),
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
   retries: z.number().int().positive().default(3),
 });
 
 /**
  * The options for `isMuted()`
  */
-export type IsMutedOptions = {
-  /**
-   * Author's address
-   */
-  address: Hex;
-  /**
-   * Number of times to retry the signing operation in case of failure.
-   *
-   * @default 3
-   */
-  retries?: number;
-  /**
-   * URL on which /api/muted-accounts/$address endpoint will be called
-   *
-   * @default "https://api.ethcomments.xyz"
-   */
-  apiUrl?: string;
-  signal?: AbortSignal;
-};
+export type IsMutedOptions = z.input<typeof isMutedOptionsSchema>;
 
 /**
  * Checks if an address is marked as a muted on the indexer of your choice.

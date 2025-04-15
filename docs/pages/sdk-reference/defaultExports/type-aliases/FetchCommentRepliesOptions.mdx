@@ -8,16 +8,16 @@
 
 ```ts
 type FetchCommentRepliesOptions = {
-  apiUrl: string;
-  appSigner: Hex;
+  apiUrl?: string;
+  appSigner?: Hex;
   commentId: Hex;
-  cursor: Hex;
-  limit: number;
-  mode: "nested" | "flat";
-  retries: number;
-  signal: AbortSignal;
-  sort: "asc" | "desc";
-  viewer: Hex;
+  cursor?: Hex;
+  limit?: number;
+  mode?: "nested" | "flat";
+  retries?: number;
+  signal?: AbortSignal;
+  sort?: "asc" | "desc";
+  viewer?: Hex;
 };
 ```
 

@@ -8,44 +8,44 @@
 
 ```ts
 type EmbedConfigThemeSchemaType = {
-  colors: {
-     dark: {
-        account-edit-link: string;
-        background: string;
-        border: string;
-        border-focus: string;
-        destructive: string;
-        destructive-foreground: string;
-        foreground: string;
-        muted-foreground: string;
-        primary: string;
-        primary-foreground: string;
-        ring: string;
-        secondary: string;
-        secondary-foreground: string;
+  colors?: {
+     dark?: {
+        account-edit-link?: string;
+        background?: string;
+        border?: string;
+        border-focus?: string;
+        destructive?: string;
+        destructive-foreground?: string;
+        foreground?: string;
+        muted-foreground?: string;
+        primary?: string;
+        primary-foreground?: string;
+        ring?: string;
+        secondary?: string;
+        secondary-foreground?: string;
      };
-     light: {
-        account-edit-link: string;
-        background: string;
-        border: string;
-        border-focus: string;
-        destructive: string;
-        destructive-foreground: string;
-        foreground: string;
-        muted-foreground: string;
-        primary: string;
-        primary-foreground: string;
-        ring: string;
-        secondary: string;
-        secondary-foreground: string;
+     light?: {
+        account-edit-link?: string;
+        background?: string;
+        border?: string;
+        border-focus?: string;
+        destructive?: string;
+        destructive-foreground?: string;
+        foreground?: string;
+        muted-foreground?: string;
+        primary?: string;
+        primary-foreground?: string;
+        ring?: string;
+        secondary?: string;
+        secondary-foreground?: string;
      };
   };
-  font: {
-     fontFamily:   | {
+  font?: {
+     fontFamily?:   | {
         system: string;
       }
         | {
-        google:   | "ABeeZee"
+        google?:   | "ABeeZee"
            | "ADLaM_Display"
            | "AR_One_Sans"
            | "Abel"
@@ -1781,38 +1781,38 @@ type EmbedConfigThemeSchemaType = {
            | "Zilla_Slab"
            | "Zilla_Slab_Highlight";
       };
-     sizes: {
-        base: {
-           lineHeight: string;
-           size: string;
+     sizes?: {
+        base?: {
+           lineHeight?: string;
+           size?: string;
         };
-        empty-screen-title: {
-           lineHeight: string;
-           size: string;
+        empty-screen-title?: {
+           lineHeight?: string;
+           size?: string;
         };
-        error-screen-title: {
-           lineHeight: string;
-           size: string;
+        error-screen-title?: {
+           lineHeight?: string;
+           size?: string;
         };
-        headline: {
-           lineHeight: string;
-           size: string;
+        headline?: {
+           lineHeight?: string;
+           size?: string;
         };
-        sm: {
-           lineHeight: string;
-           size: string;
+        sm?: {
+           lineHeight?: string;
+           size?: string;
         };
-        xs: {
-           lineHeight: string;
-           size: string;
+        xs?: {
+           lineHeight?: string;
+           size?: string;
         };
      };
   };
-  mode: "light" | "dark";
-  other: {
-     radius: string;
-     root-padding-horizontal: string;
-     root-padding-vertical: string;
+  mode?: "light" | "dark";
+  other?: {
+     radius?: string;
+     root-padding-horizontal?: string;
+     root-padding-vertical?: string;
   };
 };
 ```
@@ -1827,35 +1827,35 @@ The type for embed theme configuration
 
 ```ts
 optional colors: {
-  dark: {
-     account-edit-link: string;
-     background: string;
-     border: string;
-     border-focus: string;
-     destructive: string;
-     destructive-foreground: string;
-     foreground: string;
-     muted-foreground: string;
-     primary: string;
-     primary-foreground: string;
-     ring: string;
-     secondary: string;
-     secondary-foreground: string;
+  dark?: {
+     account-edit-link?: string;
+     background?: string;
+     border?: string;
+     border-focus?: string;
+     destructive?: string;
+     destructive-foreground?: string;
+     foreground?: string;
+     muted-foreground?: string;
+     primary?: string;
+     primary-foreground?: string;
+     ring?: string;
+     secondary?: string;
+     secondary-foreground?: string;
   };
-  light: {
-     account-edit-link: string;
-     background: string;
-     border: string;
-     border-focus: string;
-     destructive: string;
-     destructive-foreground: string;
-     foreground: string;
-     muted-foreground: string;
-     primary: string;
-     primary-foreground: string;
-     ring: string;
-     secondary: string;
-     secondary-foreground: string;
+  light?: {
+     account-edit-link?: string;
+     background?: string;
+     border?: string;
+     border-focus?: string;
+     destructive?: string;
+     destructive-foreground?: string;
+     foreground?: string;
+     muted-foreground?: string;
+     primary?: string;
+     primary-foreground?: string;
+     ring?: string;
+     secondary?: string;
+     secondary-foreground?: string;
   };
 };
 ```
@@ -1864,19 +1864,19 @@ optional colors: {
 
 ```ts
 optional dark: {
-  account-edit-link: string;
-  background: string;
-  border: string;
-  border-focus: string;
-  destructive: string;
-  destructive-foreground: string;
-  foreground: string;
-  muted-foreground: string;
-  primary: string;
-  primary-foreground: string;
-  ring: string;
-  secondary: string;
-  secondary-foreground: string;
+  account-edit-link?: string;
+  background?: string;
+  border?: string;
+  border-focus?: string;
+  destructive?: string;
+  destructive-foreground?: string;
+  foreground?: string;
+  muted-foreground?: string;
+  primary?: string;
+  primary-foreground?: string;
+  ring?: string;
+  secondary?: string;
+  secondary-foreground?: string;
 };
 ```
 
@@ -1962,19 +1962,19 @@ optional secondary-foreground: string;
 
 ```ts
 optional light: {
-  account-edit-link: string;
-  background: string;
-  border: string;
-  border-focus: string;
-  destructive: string;
-  destructive-foreground: string;
-  foreground: string;
-  muted-foreground: string;
-  primary: string;
-  primary-foreground: string;
-  ring: string;
-  secondary: string;
-  secondary-foreground: string;
+  account-edit-link?: string;
+  background?: string;
+  border?: string;
+  border-focus?: string;
+  destructive?: string;
+  destructive-foreground?: string;
+  foreground?: string;
+  muted-foreground?: string;
+  primary?: string;
+  primary-foreground?: string;
+  ring?: string;
+  secondary?: string;
+  secondary-foreground?: string;
 };
 ```
 
@@ -2060,11 +2060,11 @@ optional secondary-foreground: string;
 
 ```ts
 optional font: {
-  fontFamily:   | {
+  fontFamily?:   | {
      system: string;
    }
      | {
-     google:   | "ABeeZee"
+     google?:   | "ABeeZee"
         | "ADLaM_Display"
         | "AR_One_Sans"
         | "Abel"
@@ -3800,30 +3800,30 @@ optional font: {
         | "Zilla_Slab"
         | "Zilla_Slab_Highlight";
    };
-  sizes: {
-     base: {
-        lineHeight: string;
-        size: string;
+  sizes?: {
+     base?: {
+        lineHeight?: string;
+        size?: string;
      };
-     empty-screen-title: {
-        lineHeight: string;
-        size: string;
+     empty-screen-title?: {
+        lineHeight?: string;
+        size?: string;
      };
-     error-screen-title: {
-        lineHeight: string;
-        size: string;
+     error-screen-title?: {
+        lineHeight?: string;
+        size?: string;
      };
-     headline: {
-        lineHeight: string;
-        size: string;
+     headline?: {
+        lineHeight?: string;
+        size?: string;
      };
-     sm: {
-        lineHeight: string;
-        size: string;
+     sm?: {
+        lineHeight?: string;
+        size?: string;
      };
-     xs: {
-        lineHeight: string;
-        size: string;
+     xs?: {
+        lineHeight?: string;
+        size?: string;
      };
   };
 };
@@ -3837,7 +3837,7 @@ optional fontFamily:
   system: string;
 }
   | {
-  google:   | "ABeeZee"
+  google?:   | "ABeeZee"
      | "ADLaM_Display"
      | "AR_One_Sans"
      | "Abel"
@@ -5579,29 +5579,29 @@ optional fontFamily:
 
 ```ts
 optional sizes: {
-  base: {
-     lineHeight: string;
-     size: string;
+  base?: {
+     lineHeight?: string;
+     size?: string;
   };
-  empty-screen-title: {
-     lineHeight: string;
-     size: string;
+  empty-screen-title?: {
+     lineHeight?: string;
+     size?: string;
   };
-  error-screen-title: {
-     lineHeight: string;
-     size: string;
+  error-screen-title?: {
+     lineHeight?: string;
+     size?: string;
   };
-  headline: {
-     lineHeight: string;
-     size: string;
+  headline?: {
+     lineHeight?: string;
+     size?: string;
   };
-  sm: {
-     lineHeight: string;
-     size: string;
+  sm?: {
+     lineHeight?: string;
+     size?: string;
   };
-  xs: {
-     lineHeight: string;
-     size: string;
+  xs?: {
+     lineHeight?: string;
+     size?: string;
   };
 };
 ```
@@ -5610,8 +5610,8 @@ optional sizes: {
 
 ```ts
 optional base: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -5631,8 +5631,8 @@ optional size: string;
 
 ```ts
 optional empty-screen-title: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -5652,8 +5652,8 @@ optional size: string;
 
 ```ts
 optional error-screen-title: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -5673,8 +5673,8 @@ optional size: string;
 
 ```ts
 optional headline: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -5694,8 +5694,8 @@ optional size: string;
 
 ```ts
 optional sm: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -5715,8 +5715,8 @@ optional size: string;
 
 ```ts
 optional xs: {
-  lineHeight: string;
-  size: string;
+  lineHeight?: string;
+  size?: string;
 } = EmbedConfigFontSizeSchema;
 ```
 
@@ -5742,9 +5742,9 @@ optional mode: "light" | "dark";
 
 ```ts
 optional other: {
-  radius: string;
-  root-padding-horizontal: string;
-  root-padding-vertical: string;
+  radius?: string;
+  root-padding-horizontal?: string;
+  root-padding-vertical?: string;
 };
 ```
 

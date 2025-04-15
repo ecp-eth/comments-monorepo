@@ -27,6 +27,9 @@
   "pnpm": {
     "overrides": {
       "@hono/zod-openapi>@asteasolutions/zod-to-openapi": "^7.3.0"
+    },
+    "patchedDependencies": {
+      "typedoc-plugin-markdown": "patches/typedoc-plugin-markdown.patch"
     }
   }
 }

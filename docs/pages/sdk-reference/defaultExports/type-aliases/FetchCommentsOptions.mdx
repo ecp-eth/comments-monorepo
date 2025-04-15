@@ -8,17 +8,17 @@
 
 ```ts
 type FetchCommentsOptions = {
-  apiUrl: string;
-  appSigner: Hex;
-  author: Hex;
-  cursor: Hex;
-  limit: number;
-  mode: "nested" | "flat";
-  retries: number;
-  signal: AbortSignal;
-  sort: "asc" | "desc";
-  targetUri: string;
-  viewer: Hex;
+  apiUrl?: string;
+  appSigner?: Hex;
+  author?: Hex;
+  cursor?: Hex;
+  limit?: number;
+  mode?: "nested" | "flat";
+  retries?: number;
+  signal?: AbortSignal;
+  sort?: "asc" | "desc";
+  targetUri?: string;
+  viewer?: Hex;
 };
 ```
 
