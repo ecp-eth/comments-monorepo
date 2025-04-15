@@ -20,12 +20,23 @@ export function Providers<
     | EmbedConfigProviderByAuthorConfig,
 >({ children, config }: { children: React.ReactNode; config: TConfig }) {
   const wagmiConfig = useMemo(() => getWagmiConfig(config.chainId), [config]);
+  /**
+   * This is a workaround to fix the issue when using ssr but not having cookies so the wagmi state
+   * is rehydrated after mount which would result in going from disconnected -> connecting -> connected/disconnected
+   * causing queries to be fetched multiple times if the account is connected (queries for disconnected and then the same queries for connected).
+   */
+  const initialState = useMemo(() => {
+    return {
+      ...wagmiConfig.state,
+      status: "connecting" as const,
+    };
+  }, [wagmiConfig.state]);
 
   return (
     <EmbedConfigProvider value={config}>
       <ApplyTheme>
         <QueryClientProvider client={queryClient}>
-          <WagmiProvider config={wagmiConfig}>
+          <WagmiProvider config={wagmiConfig} initialState={initialState}>
             <RainbowKitProvider>{children}</RainbowKitProvider>
           </WagmiProvider>
         </QueryClientProvider>

@@ -9,7 +9,10 @@ import {
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
+import {
+  useNewCommentsChecker,
+  useIsAccountStatusResolved,
+} from "@ecp.eth/shared/hooks";
 import type { Hex } from "viem";
 import { CommentForm } from "./CommentForm";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
@@ -19,6 +22,7 @@ import { createRootCommentsQueryKey } from "../core/queries";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
+  const isAccountStatusResolved = useIsAccountStatusResolved();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
     () => createRootCommentsQueryKey(viewer, currentUrl),
@@ -29,8 +33,9 @@ export function CommentSection() {
     setCurrentUrl(window.location.href);
   }, []);
 
-  const { data, isLoading, error, hasNextPage, fetchNextPage } =
+  const { data, isSuccess, error, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
+      enabled: isAccountStatusResolved && !!currentUrl,
       queryKey,
       initialPageParam: {
         cursor: undefined as Hex | undefined,
@@ -48,7 +53,6 @@ export function CommentSection() {
           mode: "flat",
         });
       },
-      enabled: !!currentUrl,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
@@ -64,6 +68,7 @@ export function CommentSection() {
     });
 
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    enabled: isAccountStatusResolved && !!currentUrl,
     queryData: data,
     queryKey,
     fetchComments({ cursor, signal }) {
@@ -86,39 +91,40 @@ export function CommentSection() {
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
-  if (isLoading) {
-    return <div>Loading comments...</div>;
-  }
-
-  if (error) {
-    return <div>Error loading comments: {(error as Error).message}</div>;
-  }
-
   return (
     <CommentSectionWrapper>
       <h2 className="text-lg font-semibold mb-4">Comments</h2>
       <CommentForm />
-      {hasNewComments && (
-        <Button
-          className="mb-4"
-          onClick={() => fetchNewComments()}
-          variant="secondary"
-          size="sm"
-        >
-          Load new comments
-        </Button>
-      )}
-      {results.map((comment) => (
-        <CommentItem
-          key={`${comment.id}-${comment.deletedAt}`}
-          comment={comment}
-          connectedAddress={viewer}
-        />
-      ))}
-      {hasNextPage && (
-        <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
-          Load More
-        </Button>
+      {error && <div>Error loading comments: {(error as Error).message}</div>}
+      {isSuccess && (
+        <>
+          {hasNewComments && (
+            <Button
+              className="mb-4"
+              onClick={() => fetchNewComments()}
+              variant="secondary"
+              size="sm"
+            >
+              Load new comments
+            </Button>
+          )}
+          {results.map((comment) => (
+            <CommentItem
+              key={`${comment.id}-${comment.deletedAt}`}
+              comment={comment}
+              connectedAddress={viewer}
+            />
+          ))}
+          {hasNextPage && (
+            <Button
+              onClick={() => fetchNextPage()}
+              variant="secondary"
+              size="sm"
+            >
+              Load More
+            </Button>
+          )}
+        </>
       )}
     </CommentSectionWrapper>
   );
