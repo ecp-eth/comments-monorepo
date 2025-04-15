@@ -26,3 +26,11 @@ export const COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL =
  * It is used to fetch comments and replies.
  */
 export const INDEXER_API_URL = "https://api.ethcomments.xyz";
+
+/**
+ * The parent ID for comments that are not replies.
+ *
+ * This is bytes32(0)
+ */
+export const EMPTY_PARENT_ID =
+  "0x0000000000000000000000000000000000000000000000000000000000000000" as const;

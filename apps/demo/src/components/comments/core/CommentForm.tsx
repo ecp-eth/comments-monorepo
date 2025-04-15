@@ -91,12 +91,17 @@ export function CommentForm<TExtraSubmitData = unknown>({
 
         const result = await postComment({
           address: author,
-          comment: {
-            author,
-            content,
-            parentId,
-            targetUri: window.location.href,
-          },
+          comment: parentId
+            ? {
+                author,
+                content,
+                parentId,
+              }
+            : {
+                author,
+                content,
+                targetUri: window.location.href,
+              },
           queryKey,
           extra,
           onStart: () => {

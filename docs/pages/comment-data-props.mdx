@@ -28,6 +28,8 @@ Be careful when choosing the value for the `targetUri` property as an inconsiste
   1. Sort the query parameters using `sortQueryParameters` from [`normalize-url`](https://www.npmjs.com/package/normalize-url).
   1. Do not include query parameters unrelated to page content, such as tracking or feature flags.
 
+- If the comment is a reply to a comment then set the value to `undefined`.
+
 ### App/Chain Agnostic URIs
 
 Whenver possible, it is recommended to use app or chain agnostic URIs, e.g. [CAIP-19](https://github.com/ChainAgnostic/namespaces/blob/main/eip155/caip19.md) specification for referencing onchain or offchain assets.

@@ -37,16 +37,21 @@ export async function POST(
     );
   }
 
-  const { content, targetUri, parentId, author } = parsedBodyResult.data;
+  const passedCommentData = parsedBodyResult.data;
+
+  const { content, author } = passedCommentData;
+
+  // const { content, targetUri, parentId, author } = parsedBodyResult.data;
 
   // Validate target URL is valid
-  if (!targetUri.startsWith(env.APP_URL!)) {
+  // @todo instead check if the request is sent from the same origin?
+  /*  if (!targetUri.startsWith(env.APP_URL!)) {
     return new JSONResponse(
       BadRequestResponseSchema,
       { targetUri: ["Invalid target URL"] },
       { status: 400 }
     );
-  }
+  } */
 
   const rateLimitResult = await signCommentRateLimiter.isRateLimited(author);
 
@@ -87,11 +92,16 @@ export async function POST(
 
   const commentData = createCommentData({
     content,
-    targetUri,
-    parentId,
     author,
     appSigner: appSigner.address,
     nonce,
+    ...("parentId" in passedCommentData
+      ? {
+          parentId: passedCommentData.parentId,
+        }
+      : {
+          targetUri: passedCommentData.targetUri,
+        }),
   });
 
   const typedCommentData = createCommentTypedData({

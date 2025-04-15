@@ -1,5 +1,6 @@
 import {
   CommentDataSchema,
+  refineCommentSchema,
   HexSchema,
   IndexerAPIAuthorDataSchema,
   IndexerAPICommentSchema,
@@ -11,9 +12,11 @@ import {
 } from "@ecp.eth/sdk/schemas";
 import { z } from "zod";
 
-export const CommentDataWithIdSchema = CommentDataSchema.extend({
-  id: HexSchema,
-});
+export const CommentDataWithIdSchema = refineCommentSchema(
+  CommentDataSchema._def.schema.extend({
+    id: HexSchema,
+  })
+);
 
 /**
  * Parses response from API endpoint for usage in client

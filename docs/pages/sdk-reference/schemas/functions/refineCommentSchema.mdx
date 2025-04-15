@@ -1,0 +1,55 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [schemas](/sdk-reference/schemas/index.mdx) / refineCommentSchema
+
+# Function: refineCommentSchema()
+
+```ts
+function refineCommentSchema<TSchemaShape>(schema): ZodEffects<ZodObject<TSchemaShape, UnknownKeysParam, ZodTypeAny, { [k in string | number | symbol]: addQuestionMarks<baseObjectOutputType<TSchemaShape>, any>[k] }, { [k in string | number | symbol]: baseObjectInputType<TSchemaShape>[k] }>, { [k in string | number | symbol]: addQuestionMarks<baseObjectOutputType<TSchemaShape>, any>[k] }, { [k in string | number | symbol]: baseObjectInputType<TSchemaShape>[k] }>;
+```
+
+Defined in: [packages/sdk/src/schemas/core.ts:48](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/schemas/core.ts#L48)
+
+Refines a comment schema to ensure proper validation
+
+This function is useful when you want to extend BaseCommentSchema with extra properties
+and also have a validation on parentId and targetUri
+
+## Type Parameters
+
+### TSchemaShape
+
+`TSchemaShape` *extends* \{
+  `appSigner`: `ZodType`\<`` `0x${string}` ``, `ZodTypeDef`, `` `0x${string}` ``\>;
+  `author`: `ZodType`\<`` `0x${string}` ``, `ZodTypeDef`, `` `0x${string}` ``\>;
+  `content`: `ZodString`;
+  `deadline`: `ZodBigInt`;
+  `metadata`: `ZodString`;
+  `nonce`: `ZodBigInt`;
+  `parentId`: `ZodType`\<`` `0x${string}` ``, `ZodTypeDef`, `` `0x${string}` ``\>;
+  `targetUri`: `ZodString`;
+\}
+
+## Parameters
+
+### schema
+
+`ZodObject`\<`TSchemaShape`\>
+
+## Returns
+
+`ZodEffects`\<`ZodObject`\<`TSchemaShape`, `UnknownKeysParam`, `ZodTypeAny`, \{ \[k in string \| number \| symbol\]: addQuestionMarks\<baseObjectOutputType\<TSchemaShape\>, any\>\[k\] \}, \{ \[k in string \| number \| symbol\]: baseObjectInputType\<TSchemaShape\>\[k\] \}\>, \{ \[k in string \| number \| symbol\]: addQuestionMarks\<baseObjectOutputType\<TSchemaShape\>, any\>\[k\] \}, \{ \[k in string \| number \| symbol\]: baseObjectInputType\<TSchemaShape\>\[k\] \}\>
+
+## Example
+
+```ts
+import { CommentDataSchema, refineCommentSchema } from "@ecp.eth/sdk/schemas";
+
+const ExtendedCommentDataSchema = CommentDataSchema._def.schema.extend({
+  extraProperty: z.string(),
+});
+
+export const ExtendedCommentDataSchema = refineCommentSchema(ExtendedCommentDataSchema);
+```

@@ -27,27 +27,44 @@ export type PreparedGaslessPostCommentOperationNotApprovedResult =
     resolvedAuthor?: IndexerAPIAuthorDataSchemaType;
   };
 
+type PrepareSignedGaslessCommentRequestBodySchemaTypeReply = Omit<
+  Exclude<
+    PrepareSignedGaslessCommentRequestBodySchemaType,
+    {
+      parentId: Hex;
+    }
+  >,
+  "submitIfApproved"
+>;
+
+type PrepareSignedGaslessCommentRequestBodySchemaTypeComment = Omit<
+  Exclude<
+    PrepareSignedGaslessCommentRequestBodySchemaType,
+    {
+      targetUri: string;
+    }
+  >,
+  "submitIfApproved"
+>;
+
 export async function prepareSignedGaslessComment(
   submitIfApproved: true,
-  body: Omit<
-    PrepareSignedGaslessCommentRequestBodySchemaType,
-    "submitIfApproved"
-  >
+  body:
+    | PrepareSignedGaslessCommentRequestBodySchemaTypeReply
+    | PrepareSignedGaslessCommentRequestBodySchemaTypeComment
 ): Promise<PreparedGaslessPostCommentOperationApprovedResult>;
 export async function prepareSignedGaslessComment(
   submitIfApproved: false,
-  body: Omit<
-    PrepareSignedGaslessCommentRequestBodySchemaType,
-    "submitIfApproved"
-  >
+  body:
+    | PrepareSignedGaslessCommentRequestBodySchemaTypeReply
+    | PrepareSignedGaslessCommentRequestBodySchemaTypeComment
 ): Promise<PreparedGaslessPostCommentOperationNotApprovedResult>;
 
 export async function prepareSignedGaslessComment(
   submitIfApproved: boolean,
-  body: Omit<
-    PrepareSignedGaslessCommentRequestBodySchemaType,
-    "submitIfApproved"
-  >
+  body:
+    | PrepareSignedGaslessCommentRequestBodySchemaTypeReply
+    | PrepareSignedGaslessCommentRequestBodySchemaTypeComment
 ): Promise<
   | PreparedGaslessPostCommentOperationApprovedResult
   | PreparedGaslessPostCommentOperationNotApprovedResult

@@ -152,8 +152,13 @@ export function useGaslessCommentActions({
       const pendingOperation = await submitCommentMutation.mutateAsync({
         content: params.comment.content,
         isApproved: hasApproval,
-        targetUri: params.comment.targetUri,
-        parentId: params.comment.parentId ?? undefined,
+        ...("targetUri" in params.comment
+          ? {
+              targetUri: params.comment.targetUri,
+            }
+          : {
+              parentId: params.comment.parentId,
+            }),
       });
 
       try {

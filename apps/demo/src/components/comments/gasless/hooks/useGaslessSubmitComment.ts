@@ -16,19 +16,29 @@ import { InvalidCommentError, RateLimitedError } from "../../core/errors";
 import { fetchAuthorData } from "@ecp.eth/sdk";
 import { publicEnv } from "@/publicEnv";
 
-type SubmitGaslessCommentVariables = {
-  isApproved: boolean;
-  content: string;
-  parentId?: Hex;
-  targetUri: string;
-};
+type SubmitGaslessCommentVariables =
+  | {
+      isApproved: boolean;
+      content: string;
+      targetUri: string;
+    }
+  | {
+      isApproved: boolean;
+      content: string;
+      parentId: Hex;
+    };
 
-type SubmitGaslessCommentVariablesInternal = {
-  author: Hex;
-  content: string;
-  parentId?: Hex;
-  targetUri: string;
-};
+type SubmitGaslessCommentVariablesInternal =
+  | {
+      author: Hex;
+      content: string;
+      targetUri: string;
+    }
+  | {
+      author: Hex;
+      content: string;
+      parentId: Hex;
+    };
 
 type PostPriorNotApprovedResult = GaslessPostCommentResponseSchemaType &
   PreparedSignedGaslessPostCommentNotApprovedSchemaType & {

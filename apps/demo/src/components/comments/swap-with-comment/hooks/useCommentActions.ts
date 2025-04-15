@@ -119,8 +119,13 @@ export function useCommentActions(): CommentActionsContextType<SwapWithCommentEx
         address: params.address,
         commentRequest: {
           content: comment.content,
-          parentId: comment.parentId ?? undefined,
-          targetUri: comment.targetUri,
+          ...("parentId" in comment
+            ? {
+                parentId: comment.parentId,
+              }
+            : {
+                targetUri: comment.targetUri,
+              }),
         },
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });

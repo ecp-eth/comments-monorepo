@@ -11,19 +11,28 @@ import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 // import { isProfane } from "./profanity-detection";
 
-export const PrepareSignedGaslessCommentRequestBodySchema = z.object({
+const sharedCommentSchema = z.object({
+  author: HexSchema,
   // replace with following line to enable basic profanity detection
   content: z.string().trim().nonempty(),
   /* content: z
     .string()
     .trim()
     .nonempty()
+    .max(MAX_COMMENT_LENGTH)
     .refine((val) => !isProfane(val), "Comment contains profanity"), */
-  targetUri: z.string().url(),
-  parentId: HexSchema.optional(),
-  author: HexSchema,
-  submitIfApproved: z.boolean(),
 });
+
+export const PrepareSignedGaslessCommentRequestBodySchema = z.union([
+  sharedCommentSchema.extend({
+    targetUri: z.string().url(),
+    submitIfApproved: z.boolean(),
+  }),
+  sharedCommentSchema.extend({
+    parentId: HexSchema,
+    submitIfApproved: z.boolean(),
+  }),
+]);
 
 export type PrepareSignedGaslessCommentRequestBodySchemaType = z.infer<
   typeof PrepareSignedGaslessCommentRequestBodySchema
@@ -129,18 +138,14 @@ export type GaslessPostCommentResponseSchemaType = z.infer<
   typeof GaslessPostCommentResponseSchema
 >;
 
-export const SignCommentPayloadRequestSchema = z.object({
-  author: HexSchema,
-  // replace with following line to enable basic profanity detection
-  content: z.string().trim().nonempty(),
-  /* content: z
-    .string()
-    .trim()
-    .nonempty()
-    .refine((val) => !isProfane(val), "Comment contains profanity"), */
-  targetUri: z.string().url(),
-  parentId: HexSchema.optional(),
-});
+export const SignCommentPayloadRequestSchema = z.union([
+  sharedCommentSchema.extend({
+    targetUri: z.string().url(),
+  }),
+  sharedCommentSchema.extend({
+    parentId: HexSchema,
+  }),
+]);
 
 export type SignCommentPayloadRequestSchemaType = z.infer<
   typeof SignCommentPayloadRequestSchema

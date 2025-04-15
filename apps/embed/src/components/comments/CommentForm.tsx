@@ -100,8 +100,7 @@ export function CommentForm({
         commentRequest: {
           chainId,
           content,
-          targetUri,
-          parentId,
+          ...(parentId ? { parentId } : { targetUri }),
         },
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
