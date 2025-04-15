@@ -53,14 +53,12 @@ export function CommentSectionGasless() {
 
   const removeApprovalContract = useWriteContract();
 
-  const {
-    data: approvalData,
-    isPending: isApprovalQuerying,
-    refetch: refetchApprovalQuery,
-  } = useApprovalStatus();
+  const approvalStatus = useApprovalStatus();
 
   const approveGaslessTransactionsMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
+      const approvalData = approvalStatus.data;
+
       if (!approvalData || !viewer) {
         throw new Error("No approval data found");
       }
@@ -172,7 +170,7 @@ export function CommentSectionGasless() {
 
   const gaslessCommentActions = useGaslessCommentActions({
     connectedAddress: viewer,
-    hasApproval: !!approvalData?.approved,
+    hasApproval: !!approvalStatus.data?.approved,
   });
 
   const { reset: resetApproveGaslessTransactionsMutation } =
@@ -181,25 +179,25 @@ export function CommentSectionGasless() {
 
   useEffect(() => {
     if (approveContractReceipt.data?.status === "success") {
-      refetchApprovalQuery();
+      approvalStatus.refetch();
       resetApproveGaslessTransactionsMutation();
       removeApprovalContract.reset();
     }
   }, [
     approveContractReceipt.data?.status,
-    refetchApprovalQuery,
+    approvalStatus.refetch,
     removeApprovalContract,
     resetApproveGaslessTransactionsMutation,
   ]);
 
   useEffect(() => {
     if (removeApprovalContractReceipt.data?.status === "success") {
-      refetchApprovalQuery();
+      approvalStatus.refetch();
       resetApproveGaslessTransactionsMutation();
       resetRemoveApprovalContract();
     }
   }, [
-    refetchApprovalQuery,
+    approvalStatus.refetch,
     removeApprovalContractReceipt.data?.status,
     resetApproveGaslessTransactionsMutation,
     resetRemoveApprovalContract,
@@ -212,15 +210,15 @@ export function CommentSectionGasless() {
   const commentGaslessProviderValue =
     useMemo<CommentGaslessProviderContextType>(
       () => ({
-        isApproved: approvalData?.approved ?? false,
+        isApproved: approvalStatus.data?.approved ?? false,
       }),
-      [approvalData?.approved]
+      [approvalStatus.data?.approved]
     );
 
   const isApprovalPending =
     approveContractReceipt.isLoading ||
     approveGaslessTransactionsMutation.isPending ||
-    isApprovalQuerying;
+    approvalStatus.isPending;
 
   const isRemovingApproval =
     removeApprovalContract.isPending || removeApprovalContractReceipt.isLoading;
@@ -243,7 +241,7 @@ export function CommentSectionGasless() {
         <CommentSectionWrapper>
           <h2 className="text-lg font-semibold">Comments</h2>
 
-          {!approvalData?.approved ? (
+          {!!viewer && !approvalStatus.data?.approved && (
             <div className="mb-4">
               <Button
                 onClick={() => {
@@ -257,35 +255,38 @@ export function CommentSectionGasless() {
                   : "Request Approval to Comment"}
               </Button>
             </div>
-          ) : (
-            approvalData?.approved && (
-              <div className="flex items-center gap-2">
-                <div className="text-sm text-gray-500">
-                  App has approval to post on your behalf.
-                </div>
-                <Button
-                  variant="outline"
-                  disabled={!approvalData || isRemovingApproval}
-                  onClick={() => {
-                    if (!approvalData || !approvalData.approved || !viewer) {
-                      throw new Error("No data found");
-                    }
-
-                    removeApprovalContract.writeContract({
-                      abi: CommentsV1Abi,
-                      address: COMMENTS_V1_ADDRESS,
-                      functionName: "removeApprovalAsAuthor",
-                      args: [publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS],
-                    });
-                  }}
-                >
-                  <X />
-                  <span>
-                    {isRemovingApproval ? "Removing..." : "Remove Approval"}
-                  </span>
-                </Button>
+          )}
+          {!!viewer && approvalStatus.data?.approved && (
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-gray-500">
+                App has approval to post on your behalf.
               </div>
-            )
+              <Button
+                variant="outline"
+                disabled={!approvalStatus.data || isRemovingApproval}
+                onClick={() => {
+                  if (
+                    !approvalStatus.data ||
+                    !approvalStatus.data.approved ||
+                    !viewer
+                  ) {
+                    throw new Error("No data found");
+                  }
+
+                  removeApprovalContract.writeContract({
+                    abi: CommentsV1Abi,
+                    address: COMMENTS_V1_ADDRESS,
+                    functionName: "removeApprovalAsAuthor",
+                    args: [publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS],
+                  });
+                }}
+              >
+                <X />
+                <span>
+                  {isRemovingApproval ? "Removing..." : "Remove Approval"}
+                </span>
+              </Button>
+            </div>
           )}
           <CommentForm />
           {hasNewComments && (
