@@ -35,7 +35,7 @@ export function CommentSection() {
     setCurrentUrl(window.location.href);
   }, []);
 
-  const { data, isLoading, error, hasNextPage, fetchNextPage } =
+  const { data, isSuccess, error, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
       enabled: isAccountStatusResolved && !!currentUrl,
       queryKey,
@@ -97,40 +97,41 @@ export function CommentSection() {
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
-  if (isLoading) {
-    return <div>Loading comments...</div>;
-  }
-
-  if (error) {
-    return <div>Error loading comments: {(error as Error).message}</div>;
-  }
-
   return (
     <CommentActionsProvider value={commentActions}>
       <CommentSectionWrapper>
         <h2 className="text-lg font-semibold mb-4">Comments</h2>
         <CommentForm />
-        {hasNewComments && (
-          <Button
-            className="mb-4"
-            onClick={() => fetchNewComments()}
-            variant="secondary"
-            size="sm"
-          >
-            Load new comments
-          </Button>
-        )}
-        {results.map((comment) => (
-          <CommentItem
-            key={`${comment.id}-${comment.deletedAt}`}
-            comment={comment}
-            connectedAddress={viewer}
-          />
-        ))}
-        {hasNextPage && (
-          <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
-            Load More
-          </Button>
+        {error && <div>Error loading comments: {(error as Error).message}</div>}
+        {isSuccess && (
+          <>
+            {hasNewComments && (
+              <Button
+                className="mb-4"
+                onClick={() => fetchNewComments()}
+                variant="secondary"
+                size="sm"
+              >
+                Load new comments
+              </Button>
+            )}
+            {results.map((comment) => (
+              <CommentItem
+                key={`${comment.id}-${comment.deletedAt}`}
+                comment={comment}
+                connectedAddress={viewer}
+              />
+            ))}
+            {hasNextPage && (
+              <Button
+                onClick={() => fetchNextPage()}
+                variant="secondary"
+                size="sm"
+              >
+                Load More
+              </Button>
+            )}
+          </>
         )}
       </CommentSectionWrapper>
     </CommentActionsProvider>
