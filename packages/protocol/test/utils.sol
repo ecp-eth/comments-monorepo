@@ -6,6 +6,7 @@ import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {CommentsV1} from "../src/CommentsV1.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {LibString} from "solady/utils/LibString.sol";
 
 /**
  * @title TestUtils
@@ -13,97 +14,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
  */
 library TestUtils {
     using Strings for string;
-
-    /**
-     * @notice Extract a substring from a string
-     * @param str The input string
-     * @param startIndex The starting index (inclusive)
-     * @param endIndex The ending index (exclusive)
-     * @return The extracted substring
-     */
-    function substring(string memory str, uint256 startIndex, uint256 endIndex) internal pure returns (string memory) {
-        bytes memory strBytes = bytes(str);
-        bytes memory result = new bytes(endIndex - startIndex);
-        for (uint256 i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = strBytes[i];
-        }
-        return string(result);
-    }
-
-    /**
-     * @notice Convert a uint256 to a hex string
-     * @param value The value to convert
-     * @return The hex string representation, prefixed with "0x"
-     */
-    function toHexString(uint256 value) internal pure returns (string memory) {
-        if (value == 0) {
-            return "0x0";
-        }
-        
-        uint256 temp = value;
-        uint256 digits;
-        while (temp != 0) {
-            digits++;
-            temp >>= 4;
-        }
-        
-        bytes memory buffer = new bytes(2 + digits);
-        buffer[0] = "0";
-        buffer[1] = "x";
-        for (uint256 i = buffer.length - 1; i >= 2; i--) {
-            buffer[i] = char(bytes1(uint8(value & 0xf)));
-            value >>= 4;
-        }
-        return string(buffer);
-    }
-
-    /**
-     * @notice Convert an address to a hex string
-     * @param addr The address to convert
-     * @return The hex string representation, prefixed with "0x"
-     */
-    function toHexString(address addr) internal pure returns (string memory) {
-        bytes memory buffer = new bytes(42);
-        buffer[0] = "0";
-        buffer[1] = "x";
-        uint256 value = uint256(uint160(addr));
-        for (uint256 i = 41; i >= 2; i--) {
-            buffer[i] = char(bytes1(uint8(value & 0xf)));
-            value >>= 4;
-        }
-        return string(buffer);
-    }
-
-    /**
-     * @notice Convert a bytes32 to a hex string
-     * @param value The bytes32 to convert
-     * @return The hex string representation, prefixed with "0x"
-     */
-    function toHexString(bytes32 value) internal pure returns (string memory) {
-        bytes memory buffer = new bytes(66);
-        buffer[0] = "0";
-        buffer[1] = "x";
-        for (uint256 i = 0; i < 32; i++) {
-            uint8 b = uint8(value[i]);
-            buffer[2 + i * 2] = char(bytes1(b >> 4));
-            buffer[2 + i * 2 + 1] = char(bytes1(b & 0xf));
-        }
-        return string(buffer);
-    }
-
-    /**
-     * @notice Convert a byte to a character
-     * @param b The byte to convert
-     * @return c The character representation
-     */
-    function char(bytes1 b) internal pure returns (bytes1 c) {
-        uint8 val = uint8(b) & 0xf;
-        if (val <= 9) {
-            return bytes1(uint8(bytes1("0")) + val);
-        } else {
-            return bytes1(uint8(bytes1("a")) + (val - 10));
-        }
-    }
+    using LibString for string;
 
     /**
      * @notice Calculate the multiplier needed to cover a protocol fee
