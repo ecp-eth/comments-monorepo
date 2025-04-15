@@ -38,7 +38,7 @@ type CommentSectionProps = {
 export function CommentSection({ initialData }: CommentSectionProps) {
   useAutoBodyMinHeight();
 
-  const { address } = useAccount();
+  const { address, status } = useAccount();
   const { targetUri, disablePromotion } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
@@ -46,8 +46,12 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     [targetUri, address]
   );
 
+  const isAccountStatusResolved =
+    status === "disconnected" || status === "connected";
+
   const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
+      enabled: isAccountStatusResolved,
       queryKey,
       initialData,
       initialPageParam: {
@@ -85,6 +89,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     });
 
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    enabled: isAccountStatusResolved,
     queryData: data,
     queryKey,
     fetchComments(options) {
