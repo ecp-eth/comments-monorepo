@@ -22,7 +22,7 @@ pnpm install
 2. Create a `.env` file based on the `.env.sample` file:
 
 ```bash
-cp .env.sample .env
+cp .env.example .env
 ```
 
 3. Update the `.env` file with your own values.
