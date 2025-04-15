@@ -26,7 +26,10 @@ import {
   COMMENTS_PER_PAGE,
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
-import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
+import {
+  useNewCommentsChecker,
+  useIsAccountStatusResolved,
+} from "@ecp.eth/shared/hooks";
 import type { Hex } from "@ecp.eth/sdk/schemas";
 import {
   CommentGaslessProvider,
@@ -40,7 +43,6 @@ import { CommentActionsProvider } from "../core/CommentActionsContext";
 import { CommentItem } from "../core/CommentItem";
 import { CommentForm } from "../core/CommentForm";
 import { createRootCommentsQueryKey } from "../core/queries";
-import { useIsAccountStatusResolved } from "@/hooks/useIsAccountStatusResolved";
 
 export function CommentSectionGasless() {
   const { address: viewer } = useAccount();

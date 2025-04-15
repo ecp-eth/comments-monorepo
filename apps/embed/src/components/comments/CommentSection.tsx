@@ -9,7 +9,10 @@ import {
 } from "../EmbedConfigProvider";
 import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
-import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
+import {
+  useIsAccountStatusResolved,
+  useNewCommentsChecker,
+} from "@ecp.eth/shared/hooks";
 import { Button } from "../ui/button";
 import {
   COMMENTS_PER_PAGE,
@@ -46,8 +49,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     [targetUri, address]
   );
 
-  const isAccountStatusResolved =
-    status === "disconnected" || status === "connected";
+  const isAccountStatusResolved = useIsAccountStatusResolved();
 
   const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
     useInfiniteQuery({

@@ -9,7 +9,10 @@ import {
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
+import {
+  useNewCommentsChecker,
+  useIsAccountStatusResolved,
+} from "@ecp.eth/shared/hooks";
 import type { Hex } from "viem";
 import { CommentForm } from "../core/CommentForm";
 import { useAccount } from "wagmi";
@@ -18,7 +21,6 @@ import { CommentItem } from "../core/CommentItem";
 import { useCommentActions } from "./hooks/useCommentActions";
 import { CommentActionsProvider } from "../core/CommentActionsContext";
 import { createRootCommentsQueryKey } from "../core/queries";
-import { useIsAccountStatusResolved } from "@/hooks/useIsAccountStatusResolved";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
