@@ -270,7 +270,7 @@ export function CommentSectionGasless() {
                   removeApprovalContract.writeContract({
                     abi: CommentsV1Abi,
                     address: COMMENTS_V1_ADDRESS,
-                    functionName: "removeApprovalAsAuthor",
+                    functionName: "revokeApprovalAsAuthor",
                     args: [publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS],
                   });
                 }}
