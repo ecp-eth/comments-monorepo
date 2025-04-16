@@ -455,3 +455,56 @@ export async function registerHook(
     txHash,
   };
 }
+
+export type SetHookGloballyEnabledParams = {
+  /**
+   * The address of the hook to set the globally enabled status of
+   */
+  hookAddress: Hex;
+  /**
+   * Whether the hook should be enabled
+   */
+  enabled: boolean;
+  /**
+   * The address of the channel manager
+   */
+  channelManagerAddress?: Hex;
+  writeContract: CreateWriteContractFunction<
+    "nonpayable",
+    "setHookGloballyEnabled"
+  >;
+};
+
+export type SetHookGloballyEnabledResult = {
+  txHash: Hex;
+};
+
+const SetHookGloballyEnabledParamsSchema = z.object({
+  hookAddress: HexSchema,
+  enabled: z.boolean(),
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Enables or disables a hook globally
+ *
+ * @param params - The parameters for enabling or disabling a hook globally
+ * @returns The transaction hash of the set globally enabled status
+ */
+export async function setHookGloballyEnabled(
+  params: SetHookGloballyEnabledParams
+): Promise<SetHookGloballyEnabledResult> {
+  const { hookAddress, enabled, channelManagerAddress } =
+    SetHookGloballyEnabledParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "setHookGloballyEnabled",
+    args: [hookAddress, enabled],
+  });
+
+  return {
+    txHash,
+  };
+}

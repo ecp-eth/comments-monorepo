@@ -6,6 +6,7 @@ import {
   GetChannelParams,
   GetHookStatusParams,
   RegisterHookParams,
+  SetHookGloballyEnabledParams,
   SetHookParams,
   UpdateChannelParams,
   type CreateChannelParams,
@@ -81,6 +82,14 @@ expectAssignable<GetHookStatusParams>({
 
 expectAssignable<RegisterHookParams>({
   hookAddress: "0x0",
+  writeContract(args) {
+    return client.writeContract({ ...args, account: "0x0" });
+  },
+});
+
+expectAssignable<SetHookGloballyEnabledParams>({
+  hookAddress: "0x0",
+  enabled: true,
   writeContract(args) {
     return client.writeContract({ ...args, account: "0x0" });
   },
