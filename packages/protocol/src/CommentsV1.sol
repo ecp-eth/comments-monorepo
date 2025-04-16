@@ -160,6 +160,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
         bytes memory authorSignature,
         bytes memory appSignature
     ) internal nonReentrant {
+        // Validate submitted within deadline
         if (block.timestamp > commentData.deadline) {
             revert SignatureDeadlineReached(commentData.deadline, block.timestamp);
         }
@@ -174,6 +175,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
             }
         }
 
+        // Validate nonce
         if (
             nonces[commentData.author][commentData.appSigner] !=
             commentData.nonce
@@ -181,6 +183,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
             revert InvalidNonce(commentData.author, commentData.appSigner, nonces[commentData.author][commentData.appSigner], commentData.nonce);
         }
 
+        // Validate channel exists
         if (!channelManager.channelExists(commentData.channelId)) {
             revert ChannelDoesNotExist();
         }
