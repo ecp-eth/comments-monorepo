@@ -63,7 +63,7 @@ contract TipHook is IHook, ERC165 {
         }
 
         // Get the parent comment's author
-        (, , , , address parentAuthor, , , , ,) = comments.comments(commentData.parentId);
+        (address parentAuthor, , , , , , , , ,) = comments.comments(commentData.parentId);
 
         // Parse the tip mention and amount
         TipInfo memory tipInfo = parseTipMention(commentData.content);
