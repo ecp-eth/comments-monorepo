@@ -5,19 +5,25 @@ import type { Hex } from "../types.js";
 import { ChannelManagerAbi } from "../abis.js";
 import type {
   AbiStateMutability,
+  ContractFunctionArgs,
   ContractFunctionName,
   ContractFunctionParameters,
+  ReadContractParameters,
+  ReadContractReturnType,
 } from "viem";
+import { isZeroHex } from "../utils.js";
+
+type ChannelManagerAbiType = typeof ChannelManagerAbi;
 
 export type CreateWriteContractFunction<
   TMutability extends AbiStateMutability,
   TFunctionName extends ContractFunctionName<
-    typeof ChannelManagerAbi,
+    ChannelManagerAbiType,
     TMutability
   >,
 > = (
   args: ContractFunctionParameters<
-    typeof ChannelManagerAbi,
+    ChannelManagerAbiType,
     TMutability,
     TFunctionName
   >
@@ -82,6 +88,64 @@ export async function createChannel(
 
   return {
     txHash,
+  };
+}
+
+export type ReadChannelFromContractFunction = (
+  parameters: ReadContractParameters<ChannelManagerAbiType, "getChannel">
+) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getChannel">>;
+
+export type GetChannelParams = {
+  /**
+   * The ID of the channel to get
+   */
+  channelId: bigint;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  readContract: ReadChannelFromContractFunction;
+};
+
+export type GetChannelResult = {
+  name: string;
+  description: string | undefined;
+  metadata: string | undefined;
+  hook: Hex | undefined;
+};
+
+const GetChannelParamsSchema = z.object({
+  channelId: z.bigint(),
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Get a channel
+ *
+ * @param params - The parameters for getting a channel
+ * @throws If the channel does not exist
+ * @returns The channel
+ */
+export async function getChannel(
+  params: GetChannelParams
+): Promise<GetChannelResult> {
+  const { channelId, channelManagerAddress } =
+    GetChannelParamsSchema.parse(params);
+
+  const [name, description, metadata, hook] = await params.readContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "getChannel",
+    args: [channelId],
+  });
+
+  return {
+    name,
+    description: !description ? undefined : description,
+    metadata: !metadata ? undefined : metadata,
+    hook: isZeroHex(hook) ? undefined : hook,
   };
 }
 
