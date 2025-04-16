@@ -154,7 +154,7 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
 
     /// @notice Registers a new hook in the global registry
     /// @param hook The address of the hook to register
-    function registerHook(address hook) external payable nonReentrant() {
+    function registerHook(address hook) external payable nonReentrant {
         if (msg.value < hookRegistrationFee) revert IChannelManager.InsufficientFee();
         
         if (hook == address(0)) revert IChannelManager.InvalidHookAddress();
