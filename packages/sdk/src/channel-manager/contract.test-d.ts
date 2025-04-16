@@ -9,6 +9,7 @@ import {
   GetHookStatusParams,
   GetHookTransactionFeeParams,
   RegisterHookParams,
+  SetBaseURIParams,
   SetChannelCreationFeeParams,
   SetHookGloballyEnabledParams,
   SetHookParams,
@@ -151,6 +152,13 @@ expectAssignable<SetHookTransactionFeeParams>({
 
 expectAssignable<UpdateCommentsContractParams>({
   commentsContract: "0x0",
+  writeContract(args) {
+    return client.writeContract({ ...args, account: "0x0" });
+  },
+});
+
+expectAssignable<SetBaseURIParams>({
+  baseURI: "0x0",
   writeContract(args) {
     return client.writeContract({ ...args, account: "0x0" });
   },
