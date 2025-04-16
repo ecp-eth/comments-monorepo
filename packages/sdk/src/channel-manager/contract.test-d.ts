@@ -15,6 +15,7 @@ import {
   SetHookRegistrationFeeParams,
   SetHookTransactionFeeParams,
   UpdateChannelParams,
+  UpdateCommentsContractParams,
   WithdrawFeesParams,
   type CreateChannelParams,
 } from "./contract.js";
@@ -143,6 +144,13 @@ expectAssignable<SetHookRegistrationFeeParams>({
 
 expectAssignable<SetHookTransactionFeeParams>({
   feePercentage: 1000,
+  writeContract(args) {
+    return client.writeContract({ ...args, account: "0x0" });
+  },
+});
+
+expectAssignable<UpdateCommentsContractParams>({
+  commentsContract: "0x0",
   writeContract(args) {
     return client.writeContract({ ...args, account: "0x0" });
   },
