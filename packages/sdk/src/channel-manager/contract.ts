@@ -847,3 +847,51 @@ export async function withdrawFees(
     txHash,
   };
 }
+
+export type UpdateCommentsContractParams = {
+  /**
+   * The address of the new comments contract
+   */
+  commentsContract: Hex;
+  /**
+   * The address of the channel manager
+   */
+  channelManagerAddress?: Hex;
+  writeContract: CreateWriteContractFunction<
+    "nonpayable",
+    "updateCommentsContract"
+  >;
+};
+
+export type UpdateCommentsContractResult = {
+  txHash: Hex;
+};
+
+const UpdateCommentsContractParamsSchema = z.object({
+  commentsContract: HexSchema,
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Updates the comments contract address
+ *
+ * @param params - The parameters for updating the comments contract address
+ * @returns The transaction hash of the updated comments contract address
+ */
+export async function updateCommentsContract(
+  params: UpdateCommentsContractParams
+): Promise<UpdateCommentsContractResult> {
+  const { commentsContract, channelManagerAddress } =
+    UpdateCommentsContractParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "updateCommentsContract",
+    args: [commentsContract],
+  });
+
+  return {
+    txHash,
+  };
+}
