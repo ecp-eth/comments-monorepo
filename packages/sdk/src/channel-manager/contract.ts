@@ -354,6 +354,56 @@ export async function getChannelCreationFee(
   return { fee };
 }
 
+export type SetChannelCreationFeeParams = {
+  /**
+   * The fee for creating a channel
+   */
+  fee: bigint;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  writeContract: CreateWriteContractFunction<
+    "nonpayable",
+    "setChannelCreationFee"
+  >;
+};
+
+export type SetChannelCreationFeeResult = {
+  txHash: Hex;
+};
+
+const SetChannelCreationFeeParamsSchema = z.object({
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+  fee: z.bigint().min(0n),
+});
+
+/**
+ * Set the creation fee for a channel
+ *
+ * @param params - The parameters for setting the creation fee for a channel
+ * @returns The transaction hash of the set creation fee
+ */
+export async function setChannelCreationFee(
+  params: SetChannelCreationFeeParams
+): Promise<SetChannelCreationFeeResult> {
+  const { channelManagerAddress, fee } =
+    SetChannelCreationFeeParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "setChannelCreationFee",
+    args: [fee],
+  });
+
+  return {
+    txHash,
+  };
+}
+
 export type ReadHookRegistrationFeeFromContractFunction = (
   parameters: ReadContractParameters<
     ChannelManagerAbiType,
