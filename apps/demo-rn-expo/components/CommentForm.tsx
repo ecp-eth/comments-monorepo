@@ -137,16 +137,23 @@ export function CommentForm({
               throw new Error("Address not found");
             }
 
-            console.log("start posting comment...");
+            const commentToPost = replyingComment?.id
+              ? {
+                  content: text,
+                  author: address,
+                  parentId: replyingComment?.id,
+                }
+              : {
+                  content: text,
+                  // in react native app we will have to specify a targetUri that is owned by us
+                  targetUri: publicEnv.EXPO_PUBLIC_TARGET_URI,
+                  author: address,
+                };
+
+            console.log("posting comment: ", commentToPost);
 
             const { txHash, commentData, appSignature, commentId } =
-              await postComment({
-                content: text,
-                // in react native app we will have to specify a targetUri that is owned by us
-                targetUri: publicEnv.EXPO_PUBLIC_TARGET_URI,
-                author: address,
-                parentId: replyingComment?.id,
-              });
+              await postComment(commentToPost);
             setText("");
 
             insertPendingCommentOperation({
