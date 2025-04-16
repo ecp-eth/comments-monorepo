@@ -3,13 +3,23 @@ import { CHANNEL_MANAGER_ADDRESS, ZERO_ADDRESS } from "../constants.js";
 import { HexSchema } from "../schemas/core.js";
 import type { Hex } from "../types.js";
 import { ChannelManagerAbi } from "../abis.js";
-import type { ContractFunctionParameters } from "viem";
+import type {
+  AbiStateMutability,
+  ContractFunctionName,
+  ContractFunctionParameters,
+} from "viem";
 
-type WriteContractFunction = (
+export type CreateWriteContractFunction<
+  TMutability extends AbiStateMutability,
+  TFunctionName extends ContractFunctionName<
+    typeof ChannelManagerAbi,
+    TMutability
+  >,
+> = (
   args: ContractFunctionParameters<
     typeof ChannelManagerAbi,
-    "payable",
-    "createChannel"
+    TMutability,
+    TFunctionName
   >
 ) => Promise<Hex>;
 
@@ -36,7 +46,7 @@ export type CreateChannelParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  writeContract: WriteContractFunction;
+  writeContract: CreateWriteContractFunction<"payable", "createChannel">;
 };
 
 export type CreateChannelResult = {
@@ -68,6 +78,51 @@ export async function createChannel(
     abi: ChannelManagerAbi,
     functionName: "createChannel",
     args: [name, description, metadata, hook],
+  });
+
+  return {
+    txHash,
+  };
+}
+
+export type UpdateChannelParams = {
+  channelId: Hex;
+  name: string;
+  description?: string;
+  metadata?: string;
+  channelManagerAddress?: Hex;
+  writeContract: CreateWriteContractFunction<"nonpayable", "updateChannel">;
+};
+
+export type UpdateChannelResult = {
+  txHash: Hex;
+};
+
+const UpdateChannelParamsSchema = z.object({
+  channelId: z.bigint(),
+  name: z.string().trim().min(1),
+  description: z.string().trim().default(""),
+  metadata: z.string().default(""),
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Update a channel
+ *
+ * @param params - The parameters for updating a channel
+ * @returns The transaction hash of the updated channel
+ */
+export async function updateChannel(
+  params: UpdateChannelParams
+): Promise<UpdateChannelResult> {
+  const { channelId, name, description, metadata, channelManagerAddress } =
+    UpdateChannelParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "updateChannel",
+    args: [channelId, name, description, metadata],
   });
 
   return {
