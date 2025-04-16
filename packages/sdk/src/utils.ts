@@ -1,7 +1,12 @@
 import { Chain, createPublicClient, Hex, stringToHex, Transport } from "viem";
 import { http } from "wagmi";
 import { CommentsV1Abi } from "./abis.js";
-import { COMMENTS_V1_ADDRESS, EMPTY_PARENT_ID } from "./constants.js";
+import {
+  COMMENTS_V1_ADDRESS,
+  DEFAULT_CHANNEL_ID,
+  DEFAULT_COMMENT_TYPE,
+  EMPTY_PARENT_ID,
+} from "./constants.js";
 import {
   ADD_APPROVAL_TYPE,
   COMMENT_TYPE,
@@ -35,12 +40,28 @@ export function isZeroHex(hex: `0x${string}`) {
 export type CreateCommentDataParamsShared = {
   /** The content of the comment */
   content: string;
+  /**
+   * The ID of the channel the comment is being made in
+   *
+   * If not provided, the default channel ID (0) will be used
+   *
+   * @default 0n
+   */
+  channelId?: bigint;
+  /**
+   * The type of the comment
+   *
+   * If not provided, the default comment type (comment) will be used
+   *
+   * @default "comment"
+   */
+  commentType?: string;
   /** Metadata about the comment */
   metadata?: object;
   /** The address of the author of the comment */
-  author: `0x${string}`;
+  author: Hex;
   /** The address of the app signer */
-  appSigner: `0x${string}`;
+  appSigner: Hex;
   /** The current nonce for the user per app on the chain */
   nonce: bigint;
   /** The deadline of the comment submission in seconds since epoch */
@@ -60,7 +81,7 @@ export type CreateCommentDataParamsRoot = CreateCommentDataParamsShared & {
  */
 export type CreateCommentDataParamsReply = CreateCommentDataParamsShared & {
   /** The ID of the parent comment */
-  parentId: `0x${string}`;
+  parentId: Hex;
 };
 
 /**
@@ -81,6 +102,8 @@ export function createCommentData({
   appSigner,
   nonce,
   deadline,
+  channelId = DEFAULT_CHANNEL_ID,
+  commentType = DEFAULT_COMMENT_TYPE,
   ...params
 }: CreateCommentDataParams): CommentData {
   return CommentDataSchema.parse({
@@ -90,6 +113,8 @@ export function createCommentData({
     parentId: "parentId" in params ? params.parentId : EMPTY_PARENT_ID,
     author,
     appSigner,
+    channelId,
+    commentType,
     nonce,
     deadline: deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day
   });
@@ -130,8 +155,8 @@ export function createApprovalTypedData({
   deadline,
   chainId,
 }: {
-  author: `0x${string}`;
-  appSigner: `0x${string}`;
+  author: Hex;
+  appSigner: Hex;
   chainId: number;
   nonce: bigint;
   deadline?: bigint;
@@ -165,8 +190,8 @@ export async function getNonce({
   chain,
   transport,
 }: {
-  author: `0x${string}`;
-  appSigner: `0x${string}`;
+  author: Hex;
+  appSigner: Hex;
   chain: Chain;
   transport?: Transport;
 }) {
@@ -201,10 +226,10 @@ export function createDeleteCommentTypedData({
   nonce,
   deadline,
 }: {
-  commentId: `0x${string}`;
+  commentId: Hex;
   chainId: number;
-  author: `0x${string}`;
-  appSigner: `0x${string}`;
+  author: Hex;
+  appSigner: Hex;
   nonce: bigint;
   deadline?: bigint;
 }): DeleteCommentTypedDataSchemaType {

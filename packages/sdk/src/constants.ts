@@ -6,6 +6,16 @@ export const COMMENTS_V1_ADDRESS =
   "0xabD9cE1952992211dEe051Df6ed337fa6efC995d" as const;
 
 /**
+ * The default channel ID for the CommentsV1 contract.
+ */
+export const DEFAULT_CHANNEL_ID = 0n;
+
+/**
+ * The default comment type for the CommentsV1 contract.
+ */
+export const DEFAULT_COMMENT_TYPE = "comment" as const;
+
+/**
  * The default `embedUri` for the CommentsEmbed component.
  * It runs a service that creates app signatures for requests and
  * submits the transaction to the CommentsV1 contract.

@@ -129,3 +129,6 @@ jobs:
 
       - name: Typecheck
         run: pnpm check-types
+
+      - name: Test
+        run: pnpm test
