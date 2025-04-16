@@ -12,6 +12,7 @@ import {
   SetHookGloballyEnabledParams,
   SetHookParams,
   UpdateChannelParams,
+  WithdrawFeesParams,
   type CreateChannelParams,
 } from "./contract.js";
 import { mainnet } from "viem/chains";
@@ -113,5 +114,12 @@ expectAssignable<GetHookRegistrationFeeParams>({
 expectAssignable<GetHookTransactionFeeParams>({
   readContract(args) {
     return publicClient.readContract(args);
+  },
+});
+
+expectAssignable<WithdrawFeesParams>({
+  recipient: "0x0",
+  writeContract(args) {
+    return client.writeContract({ ...args, account: "0x0" });
   },
 });

@@ -652,3 +652,48 @@ export async function setHookGloballyEnabled(
     txHash,
   };
 }
+
+export type WithdrawFeesParams = {
+  /**
+   * The address of the recipient
+   */
+  recipient: Hex;
+  /**
+   * The address of the channel manager
+   */
+  channelManagerAddress?: Hex;
+  writeContract: CreateWriteContractFunction<"nonpayable", "withdrawFees">;
+};
+
+export type WithdrawFeesResult = {
+  txHash: Hex;
+};
+
+const WithdrawFeesParamsSchema = z.object({
+  recipient: HexSchema,
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Withdraws accumulated fees to a specified address
+ *
+ * @param params - The parameters for withdrawing accumulated fees
+ * @returns The transaction hash of the withdrawal
+ */
+export async function withdrawFees(
+  params: WithdrawFeesParams
+): Promise<WithdrawFeesResult> {
+  const { recipient, channelManagerAddress } =
+    WithdrawFeesParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "withdrawFees",
+    args: [recipient],
+  });
+
+  return {
+    txHash,
+  };
+}
