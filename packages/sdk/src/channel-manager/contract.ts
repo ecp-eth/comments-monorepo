@@ -550,6 +550,56 @@ export async function getHookTransactionFee(
   return { fee };
 }
 
+export type SetHookTransactionFeeParams = {
+  /**
+   * The fee for the hook transaction in basis points (1% = 100)
+   */
+  feePercentage: number;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  writeContract: CreateWriteContractFunction<
+    "nonpayable",
+    "setHookTransactionFee"
+  >;
+};
+
+export type SetHookTransactionFeeResult = {
+  txHash: Hex;
+};
+
+const SetHookTransactionFeeParamsSchema = z.object({
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+  feePercentage: z.number().int().min(0).max(10000),
+});
+
+/**
+ * Set the percentage of the fee for the hook transaction
+ *
+ * @param params - The parameters for setting the fee for the hook transaction
+ * @returns The transaction hash of the set hook transaction fee
+ */
+export async function setHookTransactionFee(
+  params: SetHookTransactionFeeParams
+): Promise<SetHookTransactionFeeResult> {
+  const { channelManagerAddress, feePercentage } =
+    SetHookTransactionFeeParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "setHookTransactionFee",
+    args: [feePercentage],
+  });
+
+  return {
+    txHash,
+  };
+}
+
 export type ReadHookStatusFromContractFunction = (
   parameters: ReadContractParameters<ChannelManagerAbiType, "getHookStatus">
 ) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getHookStatus">>;
