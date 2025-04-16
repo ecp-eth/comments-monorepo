@@ -4,6 +4,7 @@ import {
   ChannelExistsParams,
   GetChannelOwnerParams,
   GetChannelParams,
+  SetHookParams,
   UpdateChannelParams,
   type CreateChannelParams,
 } from "./contract.js";
@@ -58,5 +59,13 @@ expectAssignable<GetChannelOwnerParams>({
   channelId: 1n,
   readContract(args) {
     return publicClient.readContract(args);
+  },
+});
+
+expectAssignable<SetHookParams>({
+  channelId: 1n,
+  hook: "0x0",
+  writeContract(args) {
+    return client.writeContract({ ...args, account: "0x0" });
   },
 });
