@@ -306,6 +306,54 @@ export async function getChannelOwner(
   };
 }
 
+export type ReadChannelCreationFeeFromContractFunction = (
+  parameters: ReadContractParameters<
+    ChannelManagerAbiType,
+    "getChannelCreationFee"
+  >
+) => Promise<
+  ReadContractReturnType<ChannelManagerAbiType, "getChannelCreationFee">
+>;
+
+export type GetChannelCreationFeeParams = {
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  readContract: ReadChannelCreationFeeFromContractFunction;
+};
+
+export type GetChannelCreationFeeResult = {
+  fee: bigint;
+};
+
+const GetChannelCreationFeeParamsSchema = z.object({
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Get the creation fee from channel manager
+ *
+ * @param params - The parameters for getting the creation fee from channel manager
+ * @returns The creation fee from channel manager
+ */
+export async function getChannelCreationFee(
+  params: GetChannelCreationFeeParams
+): Promise<GetChannelCreationFeeResult> {
+  const { channelManagerAddress } =
+    GetChannelCreationFeeParamsSchema.parse(params);
+
+  const fee = await params.readContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "getChannelCreationFee",
+  });
+
+  return { fee };
+}
+
 export type ReadHookStatusFromContractFunction = (
   parameters: ReadContractParameters<ChannelManagerAbiType, "getHookStatus">
 ) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getHookStatus">>;
