@@ -306,6 +306,59 @@ export async function getChannelOwner(
   };
 }
 
+export type ReadHookStatusFromContractFunction = (
+  parameters: ReadContractParameters<ChannelManagerAbiType, "getHookStatus">
+) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getHookStatus">>;
+
+export type GetHookStatusParams = {
+  /**
+   * The address of the hook
+   */
+  hookAddress: Hex;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  readContract: ReadHookStatusFromContractFunction;
+};
+
+export type GetHookStatusResult = {
+  registered: boolean;
+  enabled: boolean;
+};
+
+const GetHookStatusParamsSchema = z.object({
+  hookAddress: HexSchema,
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Get the status of a hook
+ *
+ * @param params - The parameters for getting the status of a hook
+ * @returns The status of the hook
+ */
+export async function getHookStatus(
+  params: GetHookStatusParams
+): Promise<GetHookStatusResult> {
+  const { hookAddress, channelManagerAddress } =
+    GetHookStatusParamsSchema.parse(params);
+
+  const [registered, enabled] = await params.readContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "getHookStatus",
+    args: [hookAddress],
+  });
+
+  return {
+    registered,
+    enabled,
+  };
+}
+
 export type SetHookParams = {
   /**
    * The ID of the channel to set the hook for
