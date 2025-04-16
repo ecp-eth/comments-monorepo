@@ -48,6 +48,7 @@ apps/demo-rn-expo/*.key
 apps/demo-rn-expo/*.mobileprovision
 # let's don't commit ejected expo code for now, waiting for expo v0.53 to be fully released
 apps/demo-rn-expo/ios
+apps/demo-rn-expo/app.json
 
 # Misc
 .DS_Store
