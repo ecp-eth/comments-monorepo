@@ -86,10 +86,27 @@ export async function createChannel(
 }
 
 export type UpdateChannelParams = {
-  channelId: Hex;
+  /**
+   * The ID of the channel to update
+   */
+  channelId: bigint;
+  /**
+   * The name of the channel
+   */
   name: string;
+  /**
+   * The description of the channel
+   */
   description?: string;
+  /**
+   * The metadata of the channel
+   */
   metadata?: string;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
   channelManagerAddress?: Hex;
   writeContract: CreateWriteContractFunction<"nonpayable", "updateChannel">;
 };
