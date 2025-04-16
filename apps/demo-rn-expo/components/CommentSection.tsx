@@ -109,7 +109,11 @@ export function CommentSection({
 
   return (
     <CommentSectionContainer disablePaddingVertical={true}>
-      <ApplyFadeToScrollable>
+      <ApplyFadeToScrollable
+        style={{
+          flex: 1,
+        }}
+      >
         <FlatList
           keyboardShouldPersistTaps="handled"
           data={allComments}

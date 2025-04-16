@@ -20,8 +20,8 @@ createAppKit({
 
 export default function Providers({ children }: PropsWithChildren) {
   return (
-    <ErrorBoundary>
-      <SafeAreaProvider>
+    <SafeAreaProvider>
+      <ErrorBoundary>
         <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>
             <GestureHandlerRootView>{children}</GestureHandlerRootView>
@@ -29,7 +29,7 @@ export default function Providers({ children }: PropsWithChildren) {
             <Toast />
           </QueryClientProvider>
         </WagmiProvider>
-      </SafeAreaProvider>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </SafeAreaProvider>
   );
 }

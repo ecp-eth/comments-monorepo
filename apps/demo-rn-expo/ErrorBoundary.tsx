@@ -1,7 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { Text, View, DevSettings } from "react-native";
-import Button from "./ui/Button";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Button from "./ui/Button";
 
 interface Props {
   children: ReactNode;
