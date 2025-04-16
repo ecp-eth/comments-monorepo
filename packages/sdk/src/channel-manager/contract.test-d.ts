@@ -13,6 +13,7 @@ import {
   SetHookGloballyEnabledParams,
   SetHookParams,
   SetHookRegistrationFeeParams,
+  SetHookTransactionFeeParams,
   UpdateChannelParams,
   WithdrawFeesParams,
   type CreateChannelParams,
@@ -135,6 +136,13 @@ expectAssignable<SetChannelCreationFeeParams>({
 
 expectAssignable<SetHookRegistrationFeeParams>({
   fee: 1n,
+  writeContract(args) {
+    return client.writeContract({ ...args, account: "0x0" });
+  },
+});
+
+expectAssignable<SetHookTransactionFeeParams>({
+  feePercentage: 1000,
   writeContract(args) {
     return client.writeContract({ ...args, account: "0x0" });
   },
