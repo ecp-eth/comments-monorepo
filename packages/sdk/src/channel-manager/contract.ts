@@ -408,3 +408,50 @@ export async function setHook(params: SetHookParams): Promise<SetHookResult> {
     txHash,
   };
 }
+
+export type RegisterHookParams = {
+  /**
+   * The address of the hook to register
+   */
+  hookAddress: Hex;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  writeContract: CreateWriteContractFunction<"payable", "registerHook">;
+};
+
+export type RegisterHookResult = {
+  txHash: Hex;
+};
+
+const RegisterHookParamsSchema = z.object({
+  hookAddress: HexSchema,
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Register a hook into a global registry
+ *
+ * @param params - The parameters for registering a hook
+ * @returns The transaction hash of the registered hook
+ */
+export async function registerHook(
+  params: RegisterHookParams
+): Promise<RegisterHookResult> {
+  const { hookAddress, channelManagerAddress } =
+    RegisterHookParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "registerHook",
+    args: [hookAddress],
+  });
+
+  return {
+    txHash,
+  };
+}
