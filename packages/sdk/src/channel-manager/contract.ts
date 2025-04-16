@@ -354,6 +354,54 @@ export async function getChannelCreationFee(
   return { fee };
 }
 
+export type ReadHookRegistrationFeeFromContractFunction = (
+  parameters: ReadContractParameters<
+    ChannelManagerAbiType,
+    "getHookRegistrationFee"
+  >
+) => Promise<
+  ReadContractReturnType<ChannelManagerAbiType, "getHookRegistrationFee">
+>;
+
+export type GetHookRegistrationFeeParams = {
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  readContract: ReadHookRegistrationFeeFromContractFunction;
+};
+
+export type GetHookRegistrationFeeResult = {
+  fee: bigint;
+};
+
+const GetHookRegistrationFeeParamsSchema = z.object({
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Get the hook registration fee from channel manager
+ *
+ * @param params - The parameters for getting the hook registration fee from channel manager
+ * @returns The hook registration fee from channel manager
+ */
+export async function getHookRegistrationFee(
+  params: GetHookRegistrationFeeParams
+): Promise<GetHookRegistrationFeeResult> {
+  const { channelManagerAddress } =
+    GetHookRegistrationFeeParamsSchema.parse(params);
+
+  const fee = await params.readContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "getHookRegistrationFee",
+  });
+
+  return { fee };
+}
+
 export type ReadHookStatusFromContractFunction = (
   parameters: ReadContractParameters<ChannelManagerAbiType, "getHookStatus">
 ) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getHookStatus">>;

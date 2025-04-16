@@ -5,6 +5,7 @@ import {
   GetChannelCreationFeeParams,
   GetChannelOwnerParams,
   GetChannelParams,
+  GetHookRegistrationFeeParams,
   GetHookStatusParams,
   RegisterHookParams,
   SetHookGloballyEnabledParams,
@@ -97,6 +98,12 @@ expectAssignable<SetHookGloballyEnabledParams>({
 });
 
 expectAssignable<GetChannelCreationFeeParams>({
+  readContract(args) {
+    return publicClient.readContract(args);
+  },
+});
+
+expectAssignable<GetHookRegistrationFeeParams>({
   readContract(args) {
     return publicClient.readContract(args);
   },
