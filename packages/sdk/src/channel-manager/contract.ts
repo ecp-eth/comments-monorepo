@@ -895,3 +895,48 @@ export async function updateCommentsContract(
     txHash,
   };
 }
+
+export type SetBaseURIParams = {
+  /**
+   * The new base URI for NFT metadata
+   */
+  baseURI: string;
+  /**
+   * The address of the channel manager
+   */
+  channelManagerAddress?: Hex;
+  writeContract: CreateWriteContractFunction<"nonpayable", "setBaseURI">;
+};
+
+export type SetBaseURIResult = {
+  txHash: Hex;
+};
+
+const SetBaseURIParamsSchema = z.object({
+  baseURI: z.string().min(1),
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Sets the base URI for NFT metadata
+ *
+ * @param params - The parameters for setting the base URI for NFT metadata
+ * @returns The transaction hash of the set base URI
+ */
+export async function setBaseURI(
+  params: SetBaseURIParams
+): Promise<SetBaseURIResult> {
+  const { baseURI, channelManagerAddress } =
+    SetBaseURIParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "setBaseURI",
+    args: [baseURI],
+  });
+
+  return {
+    txHash,
+  };
+}
