@@ -2,6 +2,7 @@ import { expectAssignable } from "tsd";
 import { createPublicClient, createWalletClient, http } from "viem";
 import {
   ChannelExistsParams,
+  GetChannelOwnerParams,
   GetChannelParams,
   UpdateChannelParams,
   type CreateChannelParams,
@@ -47,6 +48,13 @@ expectAssignable<UpdateChannelParams>({
 });
 
 expectAssignable<ChannelExistsParams>({
+  channelId: 1n,
+  readContract(args) {
+    return publicClient.readContract(args);
+  },
+});
+
+expectAssignable<GetChannelOwnerParams>({
   channelId: 1n,
   readContract(args) {
     return publicClient.readContract(args);

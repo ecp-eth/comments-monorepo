@@ -254,3 +254,54 @@ export async function channelExists(
 
   return exists;
 }
+
+export type ReadChannelOwnerFromContractFunction = (
+  parameters: ReadContractParameters<ChannelManagerAbiType, "getChannelOwner">
+) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getChannelOwner">>;
+
+export type GetChannelOwnerParams = {
+  /**
+   * The ID of the channel to get the owner of
+   */
+  channelId: bigint;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  readContract: ReadChannelOwnerFromContractFunction;
+};
+
+export type GetChannelOwnerResult = {
+  owner: Hex;
+};
+
+const GetChannelOwnerParamsSchema = z.object({
+  channelId: z.bigint(),
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Get the owner of a channel
+ *
+ * @param params - The parameters for getting the owner of a channel
+ * @returns The owner of the channel
+ */
+export async function getChannelOwner(
+  params: GetChannelOwnerParams
+): Promise<GetChannelOwnerResult> {
+  const { channelId, channelManagerAddress } =
+    GetChannelOwnerParamsSchema.parse(params);
+
+  const owner = await params.readContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "getChannelOwner",
+    args: [channelId],
+  });
+
+  return {
+    owner,
+  };
+}
