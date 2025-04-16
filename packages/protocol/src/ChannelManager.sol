@@ -139,7 +139,7 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @notice Withdraws accumulated fees to a specified address (only owner)
     /// @param recipient The address to receive the fees
     /// @return amount The amount withdrawn
-    function withdrawFees(address recipient) external onlyOwner nonReentrant() returns (uint256 amount) {
+    function withdrawFees(address recipient) external onlyOwner nonReentrant returns (uint256 amount) {
         if (recipient == address(0)) revert ZeroAddress();
         
         amount = accumulatedFees;
