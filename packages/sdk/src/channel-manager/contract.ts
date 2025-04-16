@@ -305,3 +305,53 @@ export async function getChannelOwner(
     owner,
   };
 }
+
+export type SetHookParams = {
+  /**
+   * The ID of the channel to set the hook for
+   */
+  channelId: bigint;
+  /**
+   * The address of the hook to set
+   */
+  hook: Hex;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  writeContract: CreateWriteContractFunction<"nonpayable", "setHook">;
+};
+
+export type SetHookResult = {
+  txHash: Hex;
+};
+
+const SetHookParamsSchema = z.object({
+  channelId: z.bigint(),
+  hook: HexSchema,
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Set the hook for a channel
+ *
+ * @param params - The parameters for setting the hook for a channel
+ * @returns The transaction hash of the set hook
+ */
+export async function setHook(params: SetHookParams): Promise<SetHookResult> {
+  const { channelId, hook, channelManagerAddress } =
+    SetHookParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "setHook",
+    args: [channelId, hook],
+  });
+
+  return {
+    txHash,
+  };
+}
