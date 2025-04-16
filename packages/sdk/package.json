@@ -32,6 +32,16 @@
       "types": "./dist/esm/types.d.ts",
       "import": "./dist/esm/types.js",
       "default": "./dist/cjs/types.cjs"
+    },
+    "./channel-manager/contract": {
+      "types": "./dist/esm/channel-manager/contract.d.ts",
+      "import": "./dist/esm/channel-manager/contract.js",
+      "default": "./dist/cjs/channel-manager/contract.cjs"
+    },
+    "./channel-manager/react": {
+      "types": "./dist/esm/channel-manager/react.d.ts",
+      "import": "./dist/esm/channel-manager/react.js",
+      "default": "./dist/cjs/channel-manager/react.cjs"
     }
   },
   "scripts": {

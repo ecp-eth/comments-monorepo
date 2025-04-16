@@ -61,3 +61,5 @@ packages/shared/hooks
 packages/shared/schemas
 packages/shared/types
 packages/shared/components
+packages/sdk/channel-manager/contract
+packages/sdk/channel-manager/react
