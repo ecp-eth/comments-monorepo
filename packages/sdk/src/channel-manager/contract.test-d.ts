@@ -1,6 +1,7 @@
 import { expectAssignable } from "tsd";
 import { createPublicClient, createWalletClient, http } from "viem";
 import {
+  ChannelExistsParams,
   GetChannelParams,
   UpdateChannelParams,
   type CreateChannelParams,
@@ -42,5 +43,12 @@ expectAssignable<UpdateChannelParams>({
       ...args,
       account: "0x0",
     });
+  },
+});
+
+expectAssignable<ChannelExistsParams>({
+  channelId: 1n,
+  readContract(args) {
+    return publicClient.readContract(args);
   },
 });

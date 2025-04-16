@@ -5,7 +5,6 @@ import type { Hex } from "../types.js";
 import { ChannelManagerAbi } from "../abis.js";
 import type {
   AbiStateMutability,
-  ContractFunctionArgs,
   ContractFunctionName,
   ContractFunctionParameters,
   ReadContractParameters,
@@ -209,4 +208,49 @@ export async function updateChannel(
   return {
     txHash,
   };
+}
+
+export type ReadChannelExistsFromContractFunction = (
+  parameters: ReadContractParameters<ChannelManagerAbiType, "channelExists">
+) => Promise<ReadContractReturnType<ChannelManagerAbiType, "channelExists">>;
+
+export type ChannelExistsParams = {
+  /**
+   * The ID of the channel to check
+   */
+  channelId: bigint;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  readContract: ReadChannelExistsFromContractFunction;
+};
+
+const ChannelExistsParamsSchema = z.object({
+  channelId: z.bigint(),
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Check if a channel exists
+ *
+ * @param params - The parameters for checking if a channel exists
+ * @returns Whether the channel exists
+ */
+export async function channelExists(
+  params: ChannelExistsParams
+): Promise<boolean> {
+  const { channelId, channelManagerAddress } =
+    ChannelExistsParamsSchema.parse(params);
+
+  const exists = await params.readContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "channelExists",
+    args: [channelId],
+  });
+
+  return exists;
 }
