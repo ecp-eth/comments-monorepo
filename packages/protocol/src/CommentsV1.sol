@@ -343,7 +343,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     /// @notice Internal function to remove an app signer approval
     /// @param author The address removing approval
     /// @param appSigner The address being unapproved
-    function _removeApproval(address author, address appSigner) internal {
+    function _revokeApproval(address author, address appSigner) internal {
         isApproved[author][appSigner] = false;
         emit ApprovalRemoved(author, appSigner);
     }
@@ -356,8 +356,8 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
 
     /// @notice Removes an app signer approval when called directly by the author
     /// @param appSigner The address to remove approval from
-    function removeApprovalAsAuthor(address appSigner) external {
-        _removeApproval(msg.sender, appSigner);
+    function revokeApprovalAsAuthor(address appSigner) external {
+        _revokeApproval(msg.sender, appSigner);
     }
 
     /// @notice Approves an app signer with signature verification
@@ -443,7 +443,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
             revert InvalidAuthorSignature();
         }
 
-        _removeApproval(author, appSigner);
+        _revokeApproval(author, appSigner);
     }
 
     /// @notice Calculates the EIP-712 hash for a permit

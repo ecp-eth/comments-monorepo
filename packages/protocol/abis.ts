@@ -563,7 +563,7 @@ export const CommentsV1Abi = [
   },
   {
     type: "function",
-    name: "removeApprovalAsAuthor",
+    name: "revokeApprovalAsAuthor",
     inputs: [
       {
         name: "appSigner",

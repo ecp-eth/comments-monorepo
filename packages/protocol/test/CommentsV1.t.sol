@@ -274,7 +274,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
         assertTrue(comments.isApproved(author, appSigner));
     }
 
-    function test_RemoveApprovalAsAuthor() public {
+    function test_revokeApprovalAsAuthor() public {
         // First add approval
         vm.prank(author);
         comments.addApprovalAsAuthor(appSigner);
@@ -283,7 +283,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
         vm.prank(author);
         vm.expectEmit(true, true, true, true);
         emit ApprovalRemoved(author, appSigner);
-        comments.removeApprovalAsAuthor(appSigner);
+        comments.revokeApprovalAsAuthor(appSigner);
 
         assertFalse(comments.isApproved(author, appSigner));
     }
@@ -332,7 +332,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
         assertTrue(comments.isApproved(author, appSigner));
     }
 
-    function test_RemoveApproval_WithSignature() public {
+    function test_revokeApproval_WithSignature() public {
         // First add approval
         vm.prank(author);
         comments.addApprovalAsAuthor(appSigner);
@@ -378,7 +378,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
         comments.addApproval(author, appSigner, wrongNonce, deadline, signature);
     }
 
-    function test_RemoveApproval_InvalidNonce() public {
+    function test_revokeApproval_InvalidNonce() public {
         vm.prank(author);
         comments.addApprovalAsAuthor(appSigner);
 
@@ -616,7 +616,7 @@ contract CommentsV1Test is Test, IERC721Receiver {
 
         // Remove approval
         vm.prank(author);
-        comments.removeApprovalAsAuthor(appSigner);
+        comments.revokeApprovalAsAuthor(appSigner);
         assertFalse(comments.isApproved(author, appSigner));
 
         // Try to post again without approval (should fail)
