@@ -2,6 +2,7 @@ import { expectAssignable } from "tsd";
 import { createPublicClient, createWalletClient, http } from "viem";
 import {
   ChannelExistsParams,
+  GetChannelCreationFeeParams,
   GetChannelOwnerParams,
   GetChannelParams,
   GetHookStatusParams,
@@ -92,5 +93,11 @@ expectAssignable<SetHookGloballyEnabledParams>({
   enabled: true,
   writeContract(args) {
     return client.writeContract({ ...args, account: "0x0" });
+  },
+});
+
+expectAssignable<GetChannelCreationFeeParams>({
+  readContract(args) {
+    return publicClient.readContract(args);
   },
 });
