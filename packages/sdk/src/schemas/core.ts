@@ -24,6 +24,8 @@ const BaseCommentDataSchema = z.object({
   parentId: HexSchema,
   author: HexSchema,
   appSigner: HexSchema,
+  commentType: z.string(),
+  channelId: z.coerce.bigint(),
   nonce: z.coerce.bigint(),
   deadline: z.coerce.bigint(),
 });

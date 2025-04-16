@@ -40,7 +40,7 @@
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
     "build": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
-    "test": "echo 'Add test script here'",
+    "test": "tsd",
     "lint": "eslint \"./src/**/*.ts\""
   },
   "devDependencies": {
@@ -51,6 +51,7 @@
     "@types/react": "^19.0.8",
     "eslint": "^9.19.0",
     "react": "^19.0.0",
+    "tsd": "^0.32.0",
     "viem": "^2.26.0",
     "wagmi": "^2.14.16",
     "zod": "^3.24.1"
@@ -65,5 +66,8 @@
     "viem": "^2.26.0",
     "wagmi": "^2.14.16",
     "zod": "^3.24.1"
+  },
+  "tsd": {
+    "directory": "src"
   }
 }
