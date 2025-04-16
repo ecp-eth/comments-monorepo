@@ -356,7 +356,7 @@ export async function getChannelCreationFee(
 
 export type SetChannelCreationFeeParams = {
   /**
-   * The fee for creating a channel
+   * The fee for creating a channel in wei
    */
   fee: bigint;
   /**
@@ -381,9 +381,9 @@ const SetChannelCreationFeeParamsSchema = z.object({
 });
 
 /**
- * Set the creation fee for a channel
+ * Set the fee for creating a new channel
  *
- * @param params - The parameters for setting the creation fee for a channel
+ * @param params - The parameters for setting the fee for creating a new channel
  * @returns The transaction hash of the set creation fee
  */
 export async function setChannelCreationFee(
@@ -432,10 +432,10 @@ const GetHookRegistrationFeeParamsSchema = z.object({
 });
 
 /**
- * Get the hook registration fee from channel manager
+ * Get the fee for registering a new hook
  *
- * @param params - The parameters for getting the hook registration fee from channel manager
- * @returns The hook registration fee from channel manager
+ * @param params - The parameters for getting the fee for registering a new hook
+ * @returns The fee for registering a new hook
  */
 export async function getHookRegistrationFee(
   params: GetHookRegistrationFeeParams
@@ -450,6 +450,56 @@ export async function getHookRegistrationFee(
   });
 
   return { fee };
+}
+
+export type SetHookRegistrationFeeParams = {
+  /**
+   * The fee for registering a hook in wei
+   */
+  fee: bigint;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  writeContract: CreateWriteContractFunction<
+    "nonpayable",
+    "setHookRegistrationFee"
+  >;
+};
+
+export type SetHookRegistrationFeeResult = {
+  txHash: Hex;
+};
+
+const SetHookRegistrationFeeParamsSchema = z.object({
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+  fee: z.bigint().min(0n),
+});
+
+/**
+ * Set the fee for registering a new hook
+ *
+ * @param params - The parameters for setting the fee for registering a new hook
+ * @returns The transaction hash of the set registration fee
+ */
+export async function setHookRegistrationFee(
+  params: SetHookRegistrationFeeParams
+): Promise<SetHookRegistrationFeeResult> {
+  const { channelManagerAddress, fee } =
+    SetHookRegistrationFeeParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "setHookRegistrationFee",
+    args: [fee],
+  });
+
+  return {
+    txHash,
+  };
 }
 
 export type ReadHookTransactionFeeFromContractFunction = (
