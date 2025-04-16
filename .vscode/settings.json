@@ -13,6 +13,8 @@
     "packages/shared/hooks": true,
     "packages/shared/schemas": true,
     "packages/shared/types": true,
-    "packages/shared/components": true
+    "packages/shared/components": true,
+    "packages/sdk/channel-manager/contract": true,
+    "packages/sdk/channel-manager/react": true
   }
 }
