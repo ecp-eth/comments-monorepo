@@ -4,6 +4,7 @@ import {
   ChannelExistsParams,
   GetChannelOwnerParams,
   GetChannelParams,
+  GetHookStatusParams,
   SetHookParams,
   UpdateChannelParams,
   type CreateChannelParams,
@@ -67,5 +68,12 @@ expectAssignable<SetHookParams>({
   hook: "0x0",
   writeContract(args) {
     return client.writeContract({ ...args, account: "0x0" });
+  },
+});
+
+expectAssignable<GetHookStatusParams>({
+  hookAddress: "0x0",
+  readContract(args) {
+    return publicClient.readContract(args);
   },
 });
