@@ -3,12 +3,8 @@ import { CHANNEL_MANAGER_ADDRESS, ZERO_ADDRESS } from "../constants.js";
 import { HexSchema } from "../schemas/core.js";
 import type { Hex } from "../types.js";
 import { ChannelManagerAbi } from "../abis.js";
-import type { ReadContractParameters, ReadContractReturnType } from "viem";
 import { isZeroHex } from "../utils.js";
-import type {
-  CreateWriteContractFunction,
-  ChannelManagerAbiType,
-} from "./types.js";
+import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 
 export type CreateChannelParams = {
   /**
@@ -28,12 +24,16 @@ export type CreateChannelParams = {
    */
   hook?: Hex;
   /**
+   * The fee for creating the channel this will be paid in the ETH by the caller.
+   */
+  fee?: bigint;
+  /**
    * The address of the channel manager
    *
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<"payable", "createChannel">;
+  writeContract: ContractWriteFunctions["createChannel"];
 };
 
 export type CreateChannelResult = {
@@ -46,6 +46,7 @@ const CreateChannelParamsSchema = z.object({
   metadata: z.string().default(""),
   hook: HexSchema.default(ZERO_ADDRESS),
   channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+  fee: z.bigint().min(0n).optional(),
 });
 
 /**
@@ -57,7 +58,7 @@ const CreateChannelParamsSchema = z.object({
 export async function createChannel(
   params: CreateChannelParams
 ): Promise<CreateChannelResult> {
-  const { name, description, metadata, hook, channelManagerAddress } =
+  const { name, description, metadata, hook, channelManagerAddress, fee } =
     CreateChannelParamsSchema.parse(params);
 
   const txHash = await params.writeContract({
@@ -65,16 +66,13 @@ export async function createChannel(
     abi: ChannelManagerAbi,
     functionName: "createChannel",
     args: [name, description, metadata, hook],
+    value: fee,
   });
 
   return {
     txHash,
   };
 }
-
-export type ReadChannelFromContractFunction = (
-  parameters: ReadContractParameters<ChannelManagerAbiType, "getChannel">
-) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getChannel">>;
 
 export type GetChannelParams = {
   /**
@@ -87,7 +85,7 @@ export type GetChannelParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  readContract: ReadChannelFromContractFunction;
+  readContract: ContractReadFunctions["getChannel"];
 };
 
 export type GetChannelResult = {
@@ -153,7 +151,7 @@ export type UpdateChannelParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<"nonpayable", "updateChannel">;
+  writeContract: ContractWriteFunctions["updateChannel"];
 };
 
 export type UpdateChannelResult = {
@@ -192,10 +190,6 @@ export async function updateChannel(
   };
 }
 
-export type ReadChannelExistsFromContractFunction = (
-  parameters: ReadContractParameters<ChannelManagerAbiType, "channelExists">
-) => Promise<ReadContractReturnType<ChannelManagerAbiType, "channelExists">>;
-
 export type ChannelExistsParams = {
   /**
    * The ID of the channel to check
@@ -207,7 +201,7 @@ export type ChannelExistsParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  readContract: ReadChannelExistsFromContractFunction;
+  readContract: ContractReadFunctions["channelExists"];
 };
 
 const ChannelExistsParamsSchema = z.object({
@@ -237,10 +231,6 @@ export async function channelExists(
   return exists;
 }
 
-export type ReadChannelOwnerFromContractFunction = (
-  parameters: ReadContractParameters<ChannelManagerAbiType, "getChannelOwner">
-) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getChannelOwner">>;
-
 export type GetChannelOwnerParams = {
   /**
    * The ID of the channel to get the owner of
@@ -252,7 +242,7 @@ export type GetChannelOwnerParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  readContract: ReadChannelOwnerFromContractFunction;
+  readContract: ContractReadFunctions["getChannelOwner"];
 };
 
 export type GetChannelOwnerResult = {
@@ -288,15 +278,6 @@ export async function getChannelOwner(
   };
 }
 
-export type ReadChannelCreationFeeFromContractFunction = (
-  parameters: ReadContractParameters<
-    ChannelManagerAbiType,
-    "getChannelCreationFee"
-  >
-) => Promise<
-  ReadContractReturnType<ChannelManagerAbiType, "getChannelCreationFee">
->;
-
 export type GetChannelCreationFeeParams = {
   /**
    * The address of the channel manager
@@ -304,7 +285,7 @@ export type GetChannelCreationFeeParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  readContract: ReadChannelCreationFeeFromContractFunction;
+  readContract: ContractReadFunctions["getChannelCreationFee"];
 };
 
 export type GetChannelCreationFeeResult = {
@@ -331,6 +312,7 @@ export async function getChannelCreationFee(
     address: channelManagerAddress,
     abi: ChannelManagerAbi,
     functionName: "getChannelCreationFee",
+    args: [],
   });
 
   return { fee };
@@ -347,10 +329,7 @@ export type SetChannelCreationFeeParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<
-    "nonpayable",
-    "setChannelCreationFee"
-  >;
+  writeContract: ContractWriteFunctions["setChannelCreationFee"];
 };
 
 export type SetChannelCreationFeeResult = {
@@ -395,7 +374,7 @@ export type WithdrawFeesParams = {
    * The address of the channel manager
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<"nonpayable", "withdrawFees">;
+  writeContract: ContractWriteFunctions["withdrawFees"];
 };
 
 export type WithdrawFeesResult = {
@@ -440,10 +419,7 @@ export type UpdateCommentsContractParams = {
    * The address of the channel manager
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<
-    "nonpayable",
-    "updateCommentsContract"
-  >;
+  writeContract: ContractWriteFunctions["updateCommentsContract"];
 };
 
 export type UpdateCommentsContractResult = {
@@ -488,7 +464,7 @@ export type SetBaseURIParams = {
    * The address of the channel manager
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<"nonpayable", "setBaseURI">;
+  writeContract: ContractWriteFunctions["setBaseURI"];
 };
 
 export type SetBaseURIResult = {

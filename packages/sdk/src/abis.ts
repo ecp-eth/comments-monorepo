@@ -6,7 +6,7 @@ export const CommentsV1Abi = [
     type: "constructor",
     inputs: [
       {
-        name: "_channelManager",
+        name: "initialOwner",
         type: "address",
         internalType: "address",
       },
@@ -588,6 +588,19 @@ export const CommentsV1Abi = [
   },
   {
     type: "function",
+    name: "owner",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "paused",
     inputs: [],
     outputs: [
@@ -779,10 +792,43 @@ export const CommentsV1Abi = [
   },
   {
     type: "function",
+    name: "renounceOwnership",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "revokeApprovalAsAuthor",
     inputs: [
       {
         name: "appSigner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "transferOwnership",
+    inputs: [
+      {
+        name: "newOwner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "updateChannelContract",
+    inputs: [
+      {
+        name: "_channelContract",
         type: "address",
         internalType: "address",
       },
@@ -945,6 +991,25 @@ export const CommentsV1Abi = [
   },
   {
     type: "event",
+    name: "OwnershipTransferred",
+    inputs: [
+      {
+        name: "previousOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "newOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "Paused",
     inputs: [
       {
@@ -1069,6 +1134,28 @@ export const CommentsV1Abi = [
   },
   {
     type: "error",
+    name: "OwnableInvalidOwner",
+    inputs: [
+      {
+        name: "owner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "OwnableUnauthorizedAccount",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+  },
+  {
+    type: "error",
     name: "ParentCommentDoesNotExist",
     inputs: [],
   },
@@ -1093,6 +1180,11 @@ export const CommentsV1Abi = [
       },
     ],
   },
+  {
+    type: "error",
+    name: "ZeroAddress",
+    inputs: [],
+  },
 ] as const;
 
 /**
@@ -1104,11 +1196,6 @@ export const ChannelManagerAbi = [
     inputs: [
       {
         name: "initialOwner",
-        type: "address",
-        internalType: "address",
-      },
-      {
-        name: "_commentsContract",
         type: "address",
         internalType: "address",
       },
@@ -1158,6 +1245,25 @@ export const ChannelManagerAbi = [
   },
   {
     type: "function",
+    name: "calculateHookTransactionFee",
+    inputs: [
+      {
+        name: "value",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "hookValue",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
     name: "channelExists",
     inputs: [
       {
@@ -1174,6 +1280,32 @@ export const ChannelManagerAbi = [
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "collectChannelCreationFee",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint96",
+        internalType: "uint96",
+      },
+    ],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "collectHookRegistrationFee",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint96",
+        internalType: "uint96",
+      },
+    ],
+    stateMutability: "payable",
   },
   {
     type: "function",
