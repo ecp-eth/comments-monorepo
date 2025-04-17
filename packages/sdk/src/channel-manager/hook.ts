@@ -3,15 +3,7 @@ import { CHANNEL_MANAGER_ADDRESS } from "../constants.js";
 import { HexSchema } from "../schemas/core.js";
 import type { Hex } from "../types.js";
 import { ChannelManagerAbi } from "../abis.js";
-import type { ReadContractParameters, ReadContractReturnType } from "viem";
-import type {
-  CreateWriteContractFunction,
-  ChannelManagerAbiType,
-} from "./types.js";
-
-export type ReadHookStatusFromContractFunction = (
-  parameters: ReadContractParameters<ChannelManagerAbiType, "getHookStatus">
-) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getHookStatus">>;
+import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 
 export type GetHookStatusParams = {
   /**
@@ -24,7 +16,7 @@ export type GetHookStatusParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  readContract: ReadHookStatusFromContractFunction;
+  readContract: ContractReadFunctions["getHookStatus"];
 };
 
 export type GetHookStatusResult = {
@@ -77,7 +69,7 @@ export type SetHookParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<"nonpayable", "setHook">;
+  writeContract: ContractWriteFunctions["setHook"];
 };
 
 export type SetHookResult = {
@@ -123,7 +115,7 @@ export type RegisterHookParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<"payable", "registerHook">;
+  writeContract: ContractWriteFunctions["registerHook"];
 };
 
 export type RegisterHookResult = {
@@ -172,10 +164,7 @@ export type SetHookGloballyEnabledParams = {
    * The address of the channel manager
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<
-    "nonpayable",
-    "setHookGloballyEnabled"
-  >;
+  writeContract: ContractWriteFunctions["setHookGloballyEnabled"];
 };
 
 export type SetHookGloballyEnabledResult = {
@@ -212,15 +201,6 @@ export async function setHookGloballyEnabled(
   };
 }
 
-export type ReadHookRegistrationFeeFromContractFunction = (
-  parameters: ReadContractParameters<
-    ChannelManagerAbiType,
-    "getHookRegistrationFee"
-  >
-) => Promise<
-  ReadContractReturnType<ChannelManagerAbiType, "getHookRegistrationFee">
->;
-
 export type GetHookRegistrationFeeParams = {
   /**
    * The address of the channel manager
@@ -228,7 +208,7 @@ export type GetHookRegistrationFeeParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  readContract: ReadHookRegistrationFeeFromContractFunction;
+  readContract: ContractReadFunctions["getHookRegistrationFee"];
 };
 
 export type GetHookRegistrationFeeResult = {
@@ -271,10 +251,7 @@ export type SetHookRegistrationFeeParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<
-    "nonpayable",
-    "setHookRegistrationFee"
-  >;
+  writeContract: ContractWriteFunctions["setHookRegistrationFee"];
 };
 
 export type SetHookRegistrationFeeResult = {
@@ -310,15 +287,6 @@ export async function setHookRegistrationFee(
   };
 }
 
-export type ReadHookTransactionFeeFromContractFunction = (
-  parameters: ReadContractParameters<
-    ChannelManagerAbiType,
-    "getHookTransactionFee"
-  >
-) => Promise<
-  ReadContractReturnType<ChannelManagerAbiType, "getHookTransactionFee">
->;
-
 export type GetHookTransactionFeeParams = {
   /**
    * The address of the channel manager
@@ -326,7 +294,7 @@ export type GetHookTransactionFeeParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  readContract: ReadHookTransactionFeeFromContractFunction;
+  readContract: ContractReadFunctions["getHookTransactionFee"];
 };
 
 export type GetHookTransactionFeeResult = {
@@ -369,10 +337,7 @@ export type SetHookTransactionFeeParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  writeContract: CreateWriteContractFunction<
-    "nonpayable",
-    "setHookTransactionFee"
-  >;
+  writeContract: ContractWriteFunctions["setHookTransactionFee"];
 };
 
 export type SetHookTransactionFeeResult = {

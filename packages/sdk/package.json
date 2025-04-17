@@ -42,6 +42,11 @@
       "types": "./dist/esm/channel-manager/react/index.d.ts",
       "import": "./dist/esm/channel-manager/react/index.js",
       "default": "./dist/cjs/channel-manager/react/index.cjs"
+    },
+    "./comments/contract": {
+      "types": "./dist/esm/comments/contract.d.ts",
+      "import": "./dist/esm/comments/contract.js",
+      "default": "./dist/cjs/comments/contract.cjs"
     }
   },
   "scripts": {
@@ -50,7 +55,10 @@
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
     "build": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
-    "test": "tsd",
+    "test": "pnpm run test:types && pnpm run test:unit",
+    "test:types": "tsd",
+    "test:unit": "node --experimental-strip-types --no-warnings ./scripts/run-tests.ts",
+    "test:unit:watch": "pnpm run test:unit --watch",
     "lint": "eslint \"./src/**/*.ts\""
   },
   "devDependencies": {
@@ -58,8 +66,10 @@
     "@ecp.eth/eslint-config": "workspace:*",
     "@ecp.eth/typescript-config": "workspace:*",
     "@tanstack/react-query": "^5.69.0",
+    "@types/node": "^22.14.1",
     "@types/react": "^19.0.8",
     "eslint": "^9.19.0",
+    "node-resolve-ts": "^1.0.2",
     "react": "^19.0.0",
     "tsd": "^0.32.0",
     "viem": "^2.26.0",

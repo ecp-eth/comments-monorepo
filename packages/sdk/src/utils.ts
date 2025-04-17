@@ -1,4 +1,10 @@
-import { Chain, createPublicClient, Hex, stringToHex, Transport } from "viem";
+import {
+  type Chain,
+  createPublicClient,
+  type Hex,
+  stringToHex,
+  type Transport,
+} from "viem";
 import { http } from "wagmi";
 import { CommentsV1Abi } from "./abis.js";
 import {
