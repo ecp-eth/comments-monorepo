@@ -1,7 +1,4 @@
-import {
-  type QueryKey,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { type QueryKey, useQueryClient } from "@tanstack/react-query";
 import { useDeletingCommentManager } from "./useDeletingCommentManager";
 import { useInsertingCommentManager } from "./useInsertingCommentManager";
 
