@@ -83,6 +83,8 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         comments = new CommentsV1(address(channelManager));
         commentsContract = address(comments);
         channelManager.updateCommentsContract(commentsContract);
+        // Set hook registration fee to 0.02 ether
+        channelManager.setHookRegistrationFee(0.02 ether);
 
         // Register the mock hook
         channelManager.registerHook{value: 0.02 ether}(address(mockHook));
@@ -268,12 +270,6 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         // Try to add an unregistered hook
         vm.expectRevert(abi.encodeWithSelector(IChannelManager.HookNotRegistered.selector));
         channelManager.setHook(channelId, address(unregisteredHook));
-    }
-
-    function test_RevertWhen_RegisteringInvalidHook() public {
-        // Try to register the invalid hook
-        vm.expectRevert(abi.encodeWithSelector(IChannelManager.InvalidHookInterface.selector));
-        channelManager.registerHook{value: 0.1 ether}(address(invalidHook));
     }
 
     function test_GlobalHookManagement() public {

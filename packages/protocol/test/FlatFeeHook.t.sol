@@ -99,8 +99,10 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     uint256 user2PrivateKey;
 
     // Protocol fee is 10% by default
-    uint256 constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
+    uint16 constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
     uint256 constant COMMENT_FEE = 0.001 ether;
+    uint96 constant HOOK_REGISTRATION_FEE = 0.02 ether;
+    uint96 constant CHANNEL_CREATION_FEE = 0.02 ether;
     uint256 constant HOOK_FEE = 900000000000000; // 0.0009 ether (after 10% protocol fee)
     uint256 constant TOTAL_FEE_WITH_PROTOCOL = 0.001 ether; // Total fee including protocol fee
 
@@ -121,14 +123,17 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         
         // Deploy ChannelManager with CommentsV1 address
         channelManager = new ChannelManager(owner, address(comments));
-        
+        // Set protocol fees
+        channelManager.setHookRegistrationFee(HOOK_REGISTRATION_FEE);
+        channelManager.setChannelCreationFee(CHANNEL_CREATION_FEE);
+        channelManager.setHookTransactionFee(PROTOCOL_FEE_PERCENTAGE);
         // Deploy final CommentsV1 with correct address
         comments = new CommentsV1(address(channelManager));
         commentsContract = address(comments);
         channelManager.updateCommentsContract(commentsContract);
 
         // Register the fee hook
-        channelManager.registerHook{value: 0.02 ether}(address(feeHook));
+        channelManager.registerHook{value: HOOK_REGISTRATION_FEE}(address(feeHook));
         // Enable the hook globally
         channelManager.setHookGloballyEnabled(address(feeHook), true);
 
@@ -146,7 +151,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     function test_FeeHookCollectsExactFee() public {
         // Create channel with fee hook
-        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
+        uint256 channelId = channelManager.createChannel{value: CHANNEL_CREATION_FEE}(
             "Fee Channel",
             "Pay 0.001 ETH to comment",
             "{}",
@@ -186,7 +191,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     function test_FeeHookRefundsExcessPaymentExceptProtocolFee() public {
         // Create channel with fee hook
-        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
+        uint256 channelId = channelManager.createChannel{value: CHANNEL_CREATION_FEE}(
             "Fee Channel",
             "Pay 0.001 ETH to comment",
             "{}",
@@ -228,7 +233,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     function test_FeeHookRejectsInsufficientFee() public {
         // Create channel with fee hook
-        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
+        uint256 channelId = channelManager.createChannel{value: CHANNEL_CREATION_FEE}(
             "Fee Channel",
             "Pay 0.001 ETH to comment",
             "{}",
@@ -259,7 +264,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     function test_FeeWithdrawal() public {
         // Create channel with fee hook
-        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
+        uint256 channelId = channelManager.createChannel{value: CHANNEL_CREATION_FEE}(
             "Fee Channel",
             "Pay 0.001 ETH to comment",
             "{}",

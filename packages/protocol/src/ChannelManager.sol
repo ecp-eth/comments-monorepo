@@ -9,25 +9,12 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./interfaces/IHook.sol";
 import "./interfaces/IChannelManager.sol";
 import "./interfaces/IFeeManager.sol";
+import "./ProtocolFees.sol";
 
 /// @title ChannelManager - A contract for managing comment channels and their hooks as NFTs
 /// @notice This contract allows creation and management of channels with configurable hooks, where each channel is an NFT
 /// @dev Implements channel management with the following security features:
-/// 1. Access Control:
-///    - Only channel owners (NFT holders) can modify their channels
-///    - Channel owners can set and manage hooks
-/// 2. Hook System:
-///    - Each channel can have one hook
-///    - Hooks must implement IHook interface
-///    - Hooks can be enabled/disabled
-/// 3. Data Integrity:
-///    - Channel IDs are sequential and match NFT token IDs
-///    - Channel configurations are immutable unless changed by owner
-/// 4. NFT Features:
-///    - Each channel is a unique NFT
-///    - Channels can be transferred between owners
-///    - Supports standard NFT interfaces
-contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuard, ERC721Enumerable {
+contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     // Mapping from channel ID to channel configuration
     mapping(uint256 => ChannelConfig) private channels;
 
@@ -37,12 +24,6 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
 
     // Base URI for NFT metadata
     string private baseURIValue;
-
-    // Fee configuration
-    uint96 private channelCreationFee;
-    uint96 private hookRegistrationFee;
-    uint16 private hookTransactionFeePercentage; // In basis points (1% = 100)
-    uint256 private accumulatedFees;
 
     address public commentsContract;
 
@@ -71,18 +52,11 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @notice Constructor sets the contract owner and initializes ERC721
     /// @param initialOwner The address that will own the contract
     constructor(address initialOwner, address _commentsContract) 
-        Ownable(initialOwner) 
+        ProtocolFees(initialOwner)
         ERC721("ECP Channel", "ECPC") 
     {
         if (initialOwner == address(0)) revert ZeroAddress();
         if (_commentsContract == address(0)) revert ZeroAddress();
-
-        // Initialize fees with safe defaults
-        channelCreationFee = 0.02 ether;
-        hookRegistrationFee = 0.02 ether;
-        // 10% fee on hook revenue
-        hookTransactionFeePercentage = 1000;
-        accumulatedFees = 0;
 
         // Create default channel with ID 0
         _safeMint(initialOwner, 0);
@@ -99,63 +73,10 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         _;
     }
 
-    /// @notice Sets the fee for creating a new channel (only owner)
-    /// @param fee The fee amount in wei
-    function setChannelCreationFee(uint96 fee) external onlyOwner {
-        channelCreationFee = fee;
-        emit IFeeManager.ChannelCreationFeeUpdated(fee);
-    }
-
-    /// @notice Sets the fee for registering a new hook (only owner)
-    /// @param fee The fee amount in wei
-    function setHookRegistrationFee(uint96 fee) external onlyOwner {
-        hookRegistrationFee = fee;
-        emit IFeeManager.HookRegistrationFeeUpdated(fee);
-    }
-
-    /// @notice Sets the fee percentage taken from hook transactions (only owner)
-    /// @param feePercentage The fee percentage in basis points (1% = 100)
-    function setHookTransactionFee(uint16 feePercentage) external onlyOwner {
-        if (feePercentage > 10000) revert InvalidFeePercentage(); // Max 100%
-        hookTransactionFeePercentage = feePercentage;
-        emit IFeeManager.HookTransactionFeeUpdated(feePercentage);
-    }
-
-    /// @notice Gets the current channel creation fee
-    function getChannelCreationFee() external view returns (uint96) {
-        return channelCreationFee;
-    }
-
-    /// @notice Gets the current hook registration fee
-    function getHookRegistrationFee() external view returns (uint96) {
-        return hookRegistrationFee;
-    }
-
-    /// @notice Gets the current hook transaction fee percentage
-    function getHookTransactionFee() external view returns (uint16) {
-        return hookTransactionFeePercentage;
-    }
-
-    /// @notice Withdraws accumulated fees to a specified address (only owner)
-    /// @param recipient The address to receive the fees
-    /// @return amount The amount withdrawn
-    function withdrawFees(address recipient) external onlyOwner nonReentrant returns (uint256 amount) {
-        if (recipient == address(0)) revert ZeroAddress();
-        
-        amount = accumulatedFees;
-        accumulatedFees = 0;
-        
-        (bool success, ) = recipient.call{value: amount}("");
-        require(success, "Fee withdrawal failed");
-        
-        emit IFeeManager.FeesWithdrawn(recipient, amount);
-        return amount;
-    }
-
     /// @notice Registers a new hook in the global registry
     /// @param hook The address of the hook to register
     function registerHook(address hook) external payable nonReentrant {
-        if (msg.value < hookRegistrationFee) revert IChannelManager.InsufficientFee();
+        collectHookRegistrationFee();
         
         if (hook == address(0)) revert IChannelManager.InvalidHookAddress();
         
@@ -172,13 +93,6 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         registeredHooks[hook] = true;
         // Hooks are disabled by default
         globallyEnabledHooks[hook] = false;
-
-        accumulatedFees += hookRegistrationFee;
-        if (msg.value > hookRegistrationFee) {
-            // Refund excess payment
-            (bool success, ) = msg.sender.call{value: msg.value - hookRegistrationFee}("");
-            require(success, "Refund failed");
-        }
 
         emit IChannelManager.HookRegistered(hook);
         emit IChannelManager.HookGlobalStatusUpdated(hook, false);
@@ -222,7 +136,7 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         address hook
     ) external payable returns (uint256 channelId) {
         if (msg.sender == address(0)) revert ZeroAddress();
-        if (msg.value < channelCreationFee) revert InsufficientFee();
+        collectChannelCreationFee();
 
         // Generate channel ID using the internal function
         channelId = _generateChannelId(msg.sender, name, description, metadata);
@@ -235,13 +149,6 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         channels[channelId].name = name;
         channels[channelId].description = description;
         channels[channelId].metadata = metadata;
-
-        accumulatedFees += channelCreationFee;
-        if (msg.value > channelCreationFee) {
-            // Refund excess payment
-            (bool success, ) = msg.sender.call{value: msg.value - channelCreationFee}("");
-            require(success, "Refund failed");
-        }
 
         // Add hook if provided
         if (hook != address(0)) {
@@ -322,7 +229,6 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         );
     }
 
-
     /// @notice Public function to execute hook for a channel
     /// @param channelId The unique identifier of the channel
     /// @param commentData The comment data to process
@@ -350,14 +256,8 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
         if (!registeredHooks[hookAddress]) revert HookNotRegistered();
         if (!globallyEnabledHooks[hookAddress]) revert HookDisabledGlobally();
 
-        // Calculate and deduct protocol fee if there's a payment
-        uint256 protocolFee = 0;
-        uint256 hookValue = msg.value;
-        if (msg.value > 0 && hookTransactionFeePercentage > 0) {
-            protocolFee = (msg.value * hookTransactionFeePercentage) / 10000;
-            hookValue = msg.value - protocolFee;
-            accumulatedFees += protocolFee;
-        }
+        // Calculate hook value after protocol fee
+        uint256 hookValue = calculateHookTransactionFee(msg.value);
 
         // Execute the appropriate hook function based on phase
         if (phase == HookPhase.Before) {
@@ -407,11 +307,6 @@ contract ChannelManager is IChannelManager, IFeeManager, Ownable, ReentrancyGuar
     /// @return owner The address of the channel owner
     function getChannelOwner(uint256 channelId) external view returns (address) {
         return ownerOf(channelId);
-    }
-
-    /// @notice Fallback function to receive ETH
-    receive() external payable {
-        accumulatedFees += msg.value;
     }
 
     /// @notice Updates the comments contract address (only owner)
