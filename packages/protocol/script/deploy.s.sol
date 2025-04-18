@@ -19,9 +19,17 @@ contract DeployScript is Script {
     function run(string calldata envInput) public {
         Env env = getEnv(envInput);
 
+        address ownerAddress = vm.envAddress("CONTRACT_OWNER_ADDRESS");
         uint256 deployerPrivateKey = env == Env.Prod
             ? vm.envUint("PRIVATE_KEY") // Anvil test account private key
             : 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+
+        // by default, foundry runs the script with address 0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38
+        // (although this can be changed by setting --private-key or --sender)
+        // that means `msg.sender` with this in `run()` script function is not the same as the deployer address
+        // we need to set the contract owners to the deployer address initially so that we can call `ownerOnly` functions
+        address deployerAddress = vm.addr(deployerPrivateKey);
+        console.log("Deployer address:", deployerAddress);
 
         vm.startBroadcast(deployerPrivateKey);
 
@@ -32,18 +40,20 @@ contract DeployScript is Script {
         }
 
         // Deploy CommentsV1 first
-        comments = new CommentsV1{salt: bytes32(uint256(0))}(address(0)); // Temporary zero address for channelManager
+        comments = new CommentsV1{salt: bytes32(uint256(0))}(deployerAddress);
 
         // Deploy ChannelManager with CommentsV1 address
         channelManager = new ChannelManager{salt: bytes32(uint256(0))}(
-            msg.sender,
-            address(comments)
+            deployerAddress
         );
 
-        // Update CommentsV1 with correct ChannelManager address
-        comments = new CommentsV1{salt: bytes32(uint256(1))}(
-            address(channelManager)
-        );
+        // Update contract addresses
+        channelManager.updateCommentsContract(address(comments));
+        comments.updateChannelContract(address(channelManager));
+
+        // Set contract owners
+        channelManager.transferOwnership(ownerAddress);
+        comments.transferOwnership(ownerAddress);
 
         console.log("ChannelManager deployed at", address(channelManager));
         console.log("CommentsV1 deployed at", address(comments));

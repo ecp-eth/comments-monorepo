@@ -30,7 +30,7 @@ import "./ChannelManager.sol";
 ///    - Thread IDs are immutable once set
 ///    - Parent-child relationships are verified
 ///    - Comment IDs are cryptographically secure
-contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
+contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
     /// @notice Emitted when a new comment is added
     /// @param commentId Unique identifier of the comment
     /// @param author Address of the comment author
@@ -87,6 +87,8 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     error ParentCommentDoesNotExist();
     /// @notice Error thrown when both parentId and targetUri are set
     error InvalidCommentReference(string message);
+    /// @notice Error thrown when address is zero
+    error ZeroAddress();
 
     string public constant name = "Comments";
     string public constant version = "1";
@@ -115,12 +117,14 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     mapping(bytes32 => bool) public deleted;
 
     // Channel manager reference
-    IChannelManager public immutable channelManager;
+    IChannelManager public channelManager;
 
     /// @notice Constructor initializes the contract with the deployer as owner and channel manager
     /// @dev Sets up EIP-712 domain separator
-    constructor(address _channelManager) {
-        channelManager = ChannelManager(payable(_channelManager));
+    /// @param initialOwner The address that will own the contract
+    constructor(address initialOwner) Ownable(initialOwner) {
+        if (initialOwner == address(0)) revert ZeroAddress();
+
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256(
@@ -605,6 +609,15 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
         CommentData storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
         return comment;
+    }
+
+    /// @notice Updates the channel manager contract address (only owner)
+    /// @param _channelContract The new channel manager contract address
+    function updateChannelContract(
+        address _channelContract
+    ) external onlyOwner {
+        if (_channelContract == address(0)) revert ZeroAddress();
+        channelManager = ChannelManager(payable(_channelContract));
     }
 
     /// @notice Validates a signature against malleability

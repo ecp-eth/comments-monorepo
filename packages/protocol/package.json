@@ -8,7 +8,7 @@
     "test": "forge test -vvv",
     "node": "anvil --block-time 2",
     "dev": "node dev.js",
-    "deploy:dev": "forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"dev\" --rpc-url http://localhost:8545 --broadcast",
+    "deploy:dev": "forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"dev\" --rpc-url http://localhost:8545 --broadcast --force",
     "deploy": " forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"prod\" --rpc-url http://localhost:8545 --broadcast"
   },
   "dependencies": {

@@ -57,11 +57,9 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     /// @notice Constructor sets the contract owner and initializes ERC721
     /// @param initialOwner The address that will own the contract
     constructor(
-        address initialOwner,
-        address _commentsContract
+        address initialOwner
     ) ProtocolFees(initialOwner) ERC721("ECP Channel", "ECPC") {
         if (initialOwner == address(0)) revert ZeroAddress();
-        if (_commentsContract == address(0)) revert ZeroAddress();
 
         // Create default channel with ID 0
         _safeMint(initialOwner, 0);
@@ -69,8 +67,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         channels[0].name = "Home";
         channels[0].description = "Any kind of content";
         channels[0].metadata = "{}";
-
-        commentsContract = _commentsContract;
     }
 
     modifier onlyCommentsContract() {
