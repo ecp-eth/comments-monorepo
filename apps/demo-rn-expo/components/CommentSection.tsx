@@ -28,7 +28,8 @@ type CommentSectionProps = {
   onReply: (comment: IndexerAPICommentSchemaType) => void;
   onViewReplies: (comment: IndexerAPICommentSchemaType) => void;
   onCloseViewReplies: () => void;
-  replyingComment: IndexerAPICommentSchemaType | undefined;
+  replyingComment?: IndexerAPICommentSchemaType;
+  rootComment?: IndexerAPICommentSchemaType;
 };
 
 export function CommentSection({
@@ -36,6 +37,7 @@ export function CommentSection({
   onViewReplies,
   onCloseViewReplies,
   replyingComment,
+  rootComment,
 }: CommentSectionProps) {
   const insets = useSafeAreaInsets();
   const { repliesSectionAnimatedStyle, handleCloseReplies, handleViewReplies } =
@@ -79,7 +81,7 @@ export function CommentSection({
       enabled: true,
     });
 
-  const deletePendingOperations = useDeletePendingOperations(replyingComment);
+  const deletePendingOperations = useDeletePendingOperations(rootComment);
   const { mutateAsync: deleteComment } = useDeleteComment();
 
   if (isLoading) {
@@ -143,9 +145,10 @@ export function CommentSection({
         />
       </ApplyFadeToScrollable>
       <RepliesSection
-        parentComment={replyingComment}
+        rootComment={rootComment}
         animatedStyle={repliesSectionAnimatedStyle}
         onClose={handleCloseReplies}
+        onReply={onReply}
         onDelete={async (comment) => {
           await deleteComment(comment.id);
           deletePendingOperations(comment.id);
@@ -156,14 +159,14 @@ export function CommentSection({
 }
 
 const useDeletePendingOperations = (
-  replyingComment: IndexerAPICommentSchemaType | undefined
+  rootComment?: IndexerAPICommentSchemaType
 ) => {
-  const isReplying = !!replyingComment;
+  const isReplying = !!rootComment;
   const { deletePendingCommentOperation } = useOptimisticCommentingManager([
     "comments",
   ]);
   const { deletePendingCommentOperation: deletePendingReplyOperation } =
-    useOptimisticCommentingManager(["replies", replyingComment?.id]);
+    useOptimisticCommentingManager(["replies", rootComment?.id]);
   return useCallback(
     (commentId: Hex) => {
       deletePendingCommentOperation(commentId);
@@ -171,12 +174,7 @@ const useDeletePendingOperations = (
         deletePendingReplyOperation(commentId);
       }
     },
-    [
-      deletePendingCommentOperation,
-      deletePendingReplyOperation,
-      replyingComment,
-      isReplying,
-    ]
+    [deletePendingCommentOperation, deletePendingReplyOperation, isReplying]
   );
 };
 

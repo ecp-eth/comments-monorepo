@@ -196,8 +196,8 @@ function getParentStructureForInserting(
         if (indexerAPIComment.id === parentId) {
           // narrow type, don't safeParse as it create a new object.
           if (!isIndexerAPICommentWithRepliesSchema(indexerAPIComment)) {
-            // if we hit the depth limit, this will happen, lets quietly return
-            console.warn("optimistical update hits the depth limit");
+            // this is either in non-flat mode we hit the depth limit, or it is flat mode with doesn't have replies prop
+            // if it is latter we simply want to insert the pending comment to the top of cached pages
             return false;
           }
 

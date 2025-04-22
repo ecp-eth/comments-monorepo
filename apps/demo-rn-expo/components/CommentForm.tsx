@@ -33,12 +33,14 @@ const lineHeight = 14 * 1.2;
 type CommentFormProps = {
   justViewingReplies?: boolean;
   replyingComment?: IndexerAPICommentSchemaType;
+  rootComment?: IndexerAPICommentSchemaType;
   onCancelReply: () => void;
 };
 
 export function CommentForm({
   justViewingReplies,
   replyingComment,
+  rootComment,
   onCancelReply,
 }: CommentFormProps) {
   const isReplying = !!replyingComment;
@@ -61,7 +63,7 @@ export function CommentForm({
     reset,
   } = usePostComment();
 
-  const insertPendingOperations = useInsertPendingOperations(replyingComment);
+  const insertPendingOperations = useInsertPendingOperations(rootComment);
   const textIsEmpty = !text || text.trim().length === 0;
   const disabledSubmit = textIsEmpty || isPostingComment || isProcessing;
 
@@ -175,14 +177,14 @@ export function CommentForm({
 }
 
 const useInsertPendingOperations = (
-  replyingComment: IndexerAPICommentSchemaType | undefined
+  rootComment?: IndexerAPICommentSchemaType
 ) => {
-  const isReplying = !!replyingComment;
+  const isReplying = !!rootComment;
   const { insertPendingCommentOperation } = useOptimisticCommentingManager([
     "comments",
   ]);
   const { insertPendingCommentOperation: insertPendingReplyOperation } =
-    useOptimisticCommentingManager(["replies", replyingComment?.id]);
+    useOptimisticCommentingManager(["replies", rootComment?.id]);
   return useCallback(
     (pendingCommentOperation) => {
       insertPendingCommentOperation(pendingCommentOperation);
