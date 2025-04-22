@@ -15,6 +15,10 @@ export function normalizeUrl(url: string) {
 export function transformCommentTargetUri(targetUri: string) {
   let normalizedTargetUri = targetUri.trim().length > 0 ? targetUri : "";
 
+  if (normalizedTargetUri === "") {
+    return normalizedTargetUri;
+  }
+
   try {
     const urlObj = new URL(targetUri);
     normalizedTargetUri = normalizeUrl(urlObj.toString());

@@ -1,7 +1,7 @@
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { fetchAPI } from "./fetch";
 import { Hex, TransactionReceipt } from "viem";
-import { CommentData } from "@ecp.eth/sdk/schemas";
+import { CommentData, IndexerAPICommentSchemaType } from "@ecp.eth/sdk/schemas";
 import { SignCommentPayloadRequestSchemaType } from "./generated/schemas";
 import {
   deleteCommentAsAuthorViaCommentsV1,
@@ -10,6 +10,8 @@ import {
 import { chain, config } from "../wagmi.config";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
+import { QueryClient } from "@tanstack/react-query";
+import { FetchCommentInfinityQuerySchema } from "../hooks/useOptimisticCommentingManager/schemas";
 
 const chainId = chain.id;
 
@@ -65,4 +67,27 @@ export const deleteComment = async ({ commentId }: { commentId: Hex }) => {
   await deleteCommentAsAuthorViaCommentsV1({
     commentId,
   });
+};
+
+export const getParentCommentFromCache = (
+  queryClient: QueryClient,
+  parentCommentId: Hex,
+  rootCommentId: Hex
+): IndexerAPICommentSchemaType | undefined => {
+  const existingCache = queryClient.getQueryData(["replies", rootCommentId]);
+
+  const parsed = FetchCommentInfinityQuerySchema.safeParse(existingCache);
+
+  if (!parsed.success) {
+    console.error(
+      "Failed to parse existing cache data, this is likely a bug. detailed error follows:",
+      parsed.error
+    );
+    console.error(existingCache);
+    return;
+  }
+
+  return parsed.data.pages
+    .flatMap((page) => page.results)
+    .find((comment) => comment.id === parentCommentId);
 };

@@ -21,22 +21,24 @@ import { fetchCommentReplies } from "@ecp.eth/sdk";
 import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
 
 type RepliesSectionProps = {
-  parentComment: IndexerAPICommentSchemaType;
+  rootComment: IndexerAPICommentSchemaType;
   onClose: () => void;
+  onReply: (comment: IndexerAPICommentSchemaType) => void;
   onDelete: (comment: IndexerAPICommentSchemaType) => void;
   animatedStyle?: AnimatedStyle<ViewStyle>;
 };
 
 export function RepliesSectionParentCommentGuard({
-  parentComment,
+  rootComment,
   animatedStyle,
   onClose,
+  onReply,
   onDelete,
   ...props
-}: Omit<RepliesSectionProps, "parentComment"> & {
-  parentComment?: IndexerAPICommentSchemaType;
+}: Omit<RepliesSectionProps, "rootComment"> & {
+  rootComment?: IndexerAPICommentSchemaType;
 }) {
-  if (!parentComment) {
+  if (!rootComment) {
     return (
       <ReplySectionContainer animatedStyle={animatedStyle} onClose={onClose}>
         <ReplySectionTextContainer>
@@ -48,9 +50,10 @@ export function RepliesSectionParentCommentGuard({
 
   return (
     <RepliesSection
-      parentComment={parentComment}
+      rootComment={rootComment}
       animatedStyle={animatedStyle}
       onClose={onClose}
+      onReply={onReply}
       onDelete={onDelete}
       {...props}
     />
@@ -58,14 +61,15 @@ export function RepliesSectionParentCommentGuard({
 }
 
 function RepliesSection({
-  parentComment,
+  rootComment,
   onClose,
+  onReply,
   animatedStyle,
   onDelete,
 }: RepliesSectionProps) {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ["replies", parentComment.id],
+      queryKey: ["replies", rootComment.id],
       initialPageParam: {
         cursor: undefined as Hex | undefined,
         // assuming comment box minimal height is 120, we want to at least fetch enough
@@ -77,9 +81,10 @@ function RepliesSection({
       },
       queryFn: ({ pageParam, signal }) => {
         return fetchCommentReplies({
+          mode: "flat",
           apiUrl: publicEnv.EXPO_PUBLIC_INDEXER_URL,
           appSigner: publicEnv.EXPO_PUBLIC_APP_SIGNER_ADDRESS,
-          commentId: parentComment.id,
+          commentId: rootComment.id,
 
           limit: pageParam.limit,
           cursor: pageParam.cursor,
@@ -135,7 +140,7 @@ function RepliesSection({
           keyboardShouldPersistTaps="handled"
           data={replies}
           renderItem={({ item }) => (
-            <Comment comment={item} onDelete={onDelete} />
+            <Comment comment={item} onDelete={onDelete} onReply={onReply} />
           )}
           keyExtractor={(item) => item.id}
           onEndReached={() => {
