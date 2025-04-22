@@ -21,9 +21,15 @@ export function CommentBottomBar({
   onDelete,
 }: CommentBottomBarProps) {
   const { address: connectedAddress } = useAccount();
-  const hasReplies = isIndexerAPICommentWithRepliesSchemaType(comment);
+  const hasRepliesProp = isIndexerAPICommentWithRepliesSchemaType(comment);
   // FIXME: there is no field to tell us the total number of replies
-  const replyCount = hasReplies ? comment.replies.pagination.limit : 0;
+  const replyCount = hasRepliesProp
+    ? comment.replies.results.reduce(
+        (acc, item) => (item.deletedAt ? acc : acc + 1),
+        0
+      )
+    : 0;
+  const hasReplies = replyCount > 0;
   return (
     <View
       style={{

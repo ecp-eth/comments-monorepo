@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { fetchComments } from "@ecp.eth/sdk";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import {
@@ -37,7 +37,6 @@ export function CommentSection({
   onCloseViewReplies,
   replyingComment,
 }: CommentSectionProps) {
-  const isReplying = !!replyingComment;
   const insets = useSafeAreaInsets();
   const { repliesSectionAnimatedStyle, handleCloseReplies, handleViewReplies } =
     useRepliesAnimation(onViewReplies, onCloseViewReplies, replyingComment);
@@ -79,9 +78,8 @@ export function CommentSection({
       refetchOnWindowFocus: false,
       enabled: true,
     });
-  const { deletePendingCommentOperation } = useOptimisticCommentingManager(
-    isReplying ? ["replies", replyingComment?.id] : ["comments"]
-  );
+
+  const deletePendingOperations = useDeletePendingOperations(replyingComment);
   const { mutateAsync: deleteComment } = useDeleteComment();
 
   if (isLoading) {
@@ -124,7 +122,7 @@ export function CommentSection({
               onViewReplies={handleViewReplies}
               onDelete={async (comment) => {
                 await deleteComment(comment.id);
-                deletePendingCommentOperation(comment.id);
+                deletePendingOperations(comment.id);
               }}
             />
           )}
@@ -150,12 +148,37 @@ export function CommentSection({
         onClose={handleCloseReplies}
         onDelete={async (comment) => {
           await deleteComment(comment.id);
-          deletePendingCommentOperation(comment.id);
+          deletePendingOperations(comment.id);
         }}
       />
     </CommentSectionContainer>
   );
 }
+
+const useDeletePendingOperations = (
+  replyingComment: IndexerAPICommentSchemaType | undefined
+) => {
+  const isReplying = !!replyingComment;
+  const { deletePendingCommentOperation } = useOptimisticCommentingManager([
+    "comments",
+  ]);
+  const { deletePendingCommentOperation: deletePendingReplyOperation } =
+    useOptimisticCommentingManager(["replies", replyingComment?.id]);
+  return useCallback(
+    (commentId: Hex) => {
+      deletePendingCommentOperation(commentId);
+      if (isReplying) {
+        deletePendingReplyOperation(commentId);
+      }
+    },
+    [
+      deletePendingCommentOperation,
+      deletePendingReplyOperation,
+      replyingComment,
+      isReplying,
+    ]
+  );
+};
 
 const useRepliesAnimation = (
   onViewReplies: (comment: IndexerAPICommentSchemaType) => void,

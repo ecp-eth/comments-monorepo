@@ -60,9 +60,8 @@ export function CommentForm({
     error,
     reset,
   } = usePostComment();
-  const { insertPendingCommentOperation } = useOptimisticCommentingManager(
-    isReplying ? ["replies", replyingComment?.id] : ["comments"]
-  );
+
+  const insertPendingOperations = useInsertPendingOperations(replyingComment);
   const textIsEmpty = !text || text.trim().length === 0;
   const disabledSubmit = textIsEmpty || isPostingComment || isProcessing;
 
@@ -117,7 +116,6 @@ export function CommentForm({
             return;
           }
 
-          const isReplying = !!replyingComment;
           setIsProcessing(true);
 
           try {
@@ -156,7 +154,7 @@ export function CommentForm({
               await postComment(commentToPost);
             setText("");
 
-            insertPendingCommentOperation({
+            insertPendingOperations({
               chainId,
               txHash: txHash,
               response: {
@@ -165,10 +163,6 @@ export function CommentForm({
                 hash: commentId,
               },
             });
-
-            if (isReplying && !justViewingReplies) {
-              onCancelReply();
-            }
           } finally {
             setIsProcessing(false);
           }
@@ -179,6 +173,26 @@ export function CommentForm({
     </View>
   );
 }
+
+const useInsertPendingOperations = (
+  replyingComment: IndexerAPICommentSchemaType | undefined
+) => {
+  const isReplying = !!replyingComment;
+  const { insertPendingCommentOperation } = useOptimisticCommentingManager([
+    "comments",
+  ]);
+  const { insertPendingCommentOperation: insertPendingReplyOperation } =
+    useOptimisticCommentingManager(["replies", replyingComment?.id]);
+  return useCallback(
+    (pendingCommentOperation) => {
+      insertPendingCommentOperation(pendingCommentOperation);
+      if (isReplying) {
+        insertPendingReplyOperation(pendingCommentOperation);
+      }
+    },
+    [insertPendingCommentOperation, insertPendingReplyOperation, isReplying]
+  );
+};
 
 type ReplyToCommentProps = {
   comment: IndexerAPICommentSchemaType;
