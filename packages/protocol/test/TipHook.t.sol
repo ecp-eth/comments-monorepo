@@ -289,11 +289,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         user2 = makeAddr("user2");
         user3 = makeAddr("user3");
 
-        // Deploy contracts in correct order
-        comments = new CommentsV1(address(0)); // First deploy with zero address
-        channelManager = new ChannelManager(owner, address(comments)); // Create with initial comments address
-        comments = new CommentsV1(address(channelManager)); // Redeploy with correct address
-        channelManager.updateCommentsContract(address(comments)); // Update the comments contract address
+        (comments, channelManager) = TestUtils.createContracts(owner);
 
         // Deploy TipHook with the CommentsV1 address
         tipHook = new TipHook(address(comments));

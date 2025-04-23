@@ -334,16 +334,7 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
         // Deploy mock token
         paymentToken = new MockERC20("Test Token", "TEST");
 
-        // Deploy CommentsV1 first with zero address
-        comments = new CommentsV1(address(0));
-
-        // Deploy ChannelManager with CommentsV1 address
-        channelManager = new ChannelManager(owner, address(comments));
-
-        // Deploy final CommentsV1 with correct address
-        comments = new CommentsV1(address(channelManager));
-        commentsContract = address(comments);
-        channelManager.updateCommentsContract(commentsContract);
+        (comments, channelManager) = TestUtils.createContracts(owner);
 
         // Deploy fee hook with correct channelManager address
         feeHook = new SharedFeeHook(

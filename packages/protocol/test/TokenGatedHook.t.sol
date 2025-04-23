@@ -56,10 +56,10 @@ contract TokenGatedHook is IHook {
 contract TokenGatedHookTest is Test, IERC721Receiver {
     using TestUtils for string;
 
+    CommentsV1 public comments;
     ChannelManager public channelManager;
     TokenGatedHook public tokenGatedHook;
     TestToken public testToken;
-    address public commentsContract;
 
     address public owner;
     address public user1;
@@ -79,16 +79,7 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
             1000 * 10 ** 18
         );
 
-        // Deploy CommentsV1 first with zero address
-        CommentsV1 comments = new CommentsV1(address(0));
-
-        // Deploy ChannelManager with CommentsV1 address
-        channelManager = new ChannelManager(owner, address(comments));
-
-        // Deploy final CommentsV1 with correct address
-        comments = new CommentsV1(address(channelManager));
-        commentsContract = address(comments);
-        channelManager.updateCommentsContract(commentsContract);
+        (comments, channelManager) = TestUtils.createContracts(owner);
 
         // Register the token gated hook
         channelManager.registerHook{value: 0.02 ether}(address(tokenGatedHook));
@@ -121,13 +112,13 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
                 author: user1,
                 appSigner: user2,
                 channelId: channelId,
-                nonce: CommentsV1(commentsContract).nonces(user1, user2),
+                nonce: comments.nonces(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });
 
         // Test beforeComment hook - should succeed
-        vm.prank(commentsContract);
+        vm.prank(address(comments));
         assertTrue(
             channelManager.executeHooks(
                 channelId,
@@ -161,13 +152,13 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
                 author: user1,
                 appSigner: user2,
                 channelId: channelId,
-                nonce: CommentsV1(commentsContract).nonces(user1, user2),
+                nonce: comments.nonces(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });
 
         // Test beforeComment hook - should fail
-        vm.prank(commentsContract);
+        vm.prank(address(comments));
         vm.expectRevert(IChannelManager.ChannelHookExecutionFailed.selector);
         channelManager.executeHooks(
             channelId,
@@ -197,13 +188,13 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
                 author: user1,
                 appSigner: user2,
                 channelId: channelId,
-                nonce: CommentsV1(commentsContract).nonces(user1, user2),
+                nonce: comments.nonces(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });
 
         // First try without tokens - should fail
-        vm.prank(commentsContract);
+        vm.prank(address(comments));
         vm.expectRevert(IChannelManager.ChannelHookExecutionFailed.selector);
         channelManager.executeHooks(
             channelId,
@@ -217,7 +208,7 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         testToken.transfer(user1, 1000 * 10 ** 18);
 
         // Try again with tokens - should succeed
-        vm.prank(commentsContract);
+        vm.prank(address(comments));
         assertTrue(
             channelManager.executeHooks(
                 channelId,

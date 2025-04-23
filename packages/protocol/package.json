@@ -8,7 +8,8 @@
     "test": "forge test -vvv",
     "node": "anvil --block-time 2",
     "dev": "node dev.js",
-    "deploy": "forge script script/CommentsV1.s.sol:CommentsV1Script --verify --broadcast"
+    "deploy:dev": "forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"dev\" --rpc-url http://localhost:8545 --broadcast --force",
+    "deploy": " forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"prod\" --rpc-url http://localhost:8545 --broadcast"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.3.0",

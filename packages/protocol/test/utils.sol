@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import {Test} from "forge-std/Test.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {CommentsV1} from "../src/CommentsV1.sol";
+import {ChannelManager} from "../src/ChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {LibString} from "solady/utils/LibString.sol";
@@ -201,5 +202,24 @@ library TestUtils {
                 (10 ** decimalsCount);
             return (true, wholePart + fractionalPartInWei);
         }
+    }
+
+    /**
+     * @notice create the Comments and ChannelManager contracts and update the reference addresses accordingly
+     * @param owner The owner of the contracts
+     * @return comments The Comments contract
+     * @return channelManager The ChannelManager contract
+     */
+    function createContracts(
+        address owner
+    ) internal returns (CommentsV1 comments, ChannelManager channelManager) {
+        comments = new CommentsV1(owner);
+        channelManager = new ChannelManager(owner);
+
+        // update contract addresses
+        channelManager.updateCommentsContract(address(comments));
+        comments.updateChannelContract(address(channelManager));
+
+        return (comments, channelManager);
     }
 }
