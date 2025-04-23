@@ -19,11 +19,11 @@ contract LengthFeeHook is IHook {
     // Token used for fee payment
     IERC20 public immutable paymentToken;
     IChannelManager public immutable channelManager;
-    
+
     // Fee configuration
     uint256 public tokensPerCharacter; // Number of tokens (in smallest unit) per character
     uint256 public constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
-    
+
     address public feeCollector;
     uint256 public totalFeesCollected;
 
@@ -32,8 +32,8 @@ contract LengthFeeHook is IHook {
     event TokensPerCharacterUpdated(uint256 newAmount);
 
     constructor(
-        address _feeCollector, 
-        address _paymentToken, 
+        address _feeCollector,
+        address _paymentToken,
         uint256 _tokensPerCharacter,
         address _channelManager
     ) {
@@ -41,14 +41,16 @@ contract LengthFeeHook is IHook {
         require(_paymentToken != address(0), "Invalid token address");
         require(_channelManager != address(0), "Invalid channel manager");
         require(_tokensPerCharacter > 0, "Invalid tokens per character");
-        
+
         feeCollector = _feeCollector;
         paymentToken = IERC20(_paymentToken);
         tokensPerCharacter = _tokensPerCharacter;
         channelManager = IChannelManager(_channelManager);
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) external pure returns (bool) {
         return interfaceId == type(IHook).interfaceId;
     }
 
@@ -60,18 +62,26 @@ contract LengthFeeHook is IHook {
         // Calculate fee based on content length
         uint256 contentLength = bytes(commentData.content).length;
         uint256 totalFee = contentLength * tokensPerCharacter;
-        
+
         // Calculate protocol fee
         uint256 protocolFee = (totalFee * PROTOCOL_FEE_PERCENTAGE) / 10000;
         uint256 hookFee = totalFee - protocolFee;
-        
+
         // Transfer tokens from author
-        paymentToken.safeTransferFrom(commentData.author, address(this), hookFee);
-        paymentToken.safeTransferFrom(commentData.author, address(channelManager), protocolFee);
-        
+        paymentToken.safeTransferFrom(
+            commentData.author,
+            address(this),
+            hookFee
+        );
+        paymentToken.safeTransferFrom(
+            commentData.author,
+            address(channelManager),
+            protocolFee
+        );
+
         totalFeesCollected += hookFee;
         emit FeeCollected(commentData.author, hookFee);
-        
+
         return true;
     }
 
@@ -79,7 +89,7 @@ contract LengthFeeHook is IHook {
         ICommentTypes.CommentData calldata,
         address,
         bytes32
-    ) pure external returns (bool) {
+    ) external pure returns (bool) {
         return true;
     }
 
@@ -138,23 +148,36 @@ contract MockERC20 is IERC20 {
         return _balances[account];
     }
 
-    function transfer(address to, uint256 amount) public override returns (bool) {
+    function transfer(
+        address to,
+        uint256 amount
+    ) public override returns (bool) {
         address owner = msg.sender;
         _transfer(owner, to, amount);
         return true;
     }
 
-    function allowance(address owner, address spender) public view override returns (uint256) {
+    function allowance(
+        address owner,
+        address spender
+    ) public view override returns (uint256) {
         return _allowances[owner][spender];
     }
 
-    function approve(address spender, uint256 amount) public override returns (bool) {
+    function approve(
+        address spender,
+        uint256 amount
+    ) public override returns (bool) {
         address owner = msg.sender;
         _approve(owner, spender, amount);
         return true;
     }
 
-    function transferFrom(address from, address to, uint256 amount) public override returns (bool) {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) public override returns (bool) {
         address spender = msg.sender;
         _spendAllowance(from, spender, amount);
         _transfer(from, to, amount);
@@ -170,7 +193,10 @@ contract MockERC20 is IERC20 {
         require(to != address(0), "ERC20: transfer to the zero address");
 
         uint256 fromBalance = _balances[from];
-        require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
+        require(
+            fromBalance >= amount,
+            "ERC20: transfer amount exceeds balance"
+        );
         unchecked {
             _balances[from] = fromBalance - amount;
             _balances[to] += amount;
@@ -193,10 +219,17 @@ contract MockERC20 is IERC20 {
         _allowances[owner][spender] = amount;
     }
 
-    function _spendAllowance(address owner, address spender, uint256 amount) internal {
+    function _spendAllowance(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal {
         uint256 currentAllowance = allowance(owner, spender);
         if (currentAllowance != type(uint256).max) {
-            require(currentAllowance >= amount, "ERC20: insufficient allowance");
+            require(
+                currentAllowance >= amount,
+                "ERC20: insufficient allowance"
+            );
             unchecked {
                 _approve(owner, spender, currentAllowance - amount);
             }
@@ -206,7 +239,7 @@ contract MockERC20 is IERC20 {
 
 contract LengthFeeHookTest is Test, IERC721Receiver {
     using TestUtils for string;
-    
+
     ChannelManager public channelManager;
     LengthFeeHook public feeHook;
     CommentsV1 public comments;
@@ -240,10 +273,10 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
 
         // Deploy CommentsV1 first with zero address
         comments = new CommentsV1(address(0));
-        
+
         // Deploy ChannelManager with CommentsV1 address
         channelManager = new ChannelManager(owner, address(comments));
-        
+
         // Deploy final CommentsV1 with correct address
         comments = new CommentsV1(address(channelManager));
         commentsContract = address(comments);
@@ -291,21 +324,23 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
         string memory content = "Test comment";
         uint256 contentLength = bytes(content).length;
         uint256 expectedTotalFee = contentLength * TOKENS_PER_CHARACTER;
-        uint256 expectedHookFee = expectedTotalFee - (expectedTotalFee * PROTOCOL_FEE_PERCENTAGE / 10000);
+        uint256 expectedHookFee = expectedTotalFee -
+            ((expectedTotalFee * PROTOCOL_FEE_PERCENTAGE) / 10000);
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: content,
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: content,
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: comments.nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
@@ -317,9 +352,15 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
         comments.postCommentAsAuthor(commentData, appSignature);
 
         // Check that the hook received the correct token amount
-        assertEq(paymentToken.balanceOf(address(feeHook)) - hookBalanceBefore, expectedHookFee);
+        assertEq(
+            paymentToken.balanceOf(address(feeHook)) - hookBalanceBefore,
+            expectedHookFee
+        );
         // Check that user1 paid the total fee
-        assertEq(user1BalanceBefore - paymentToken.balanceOf(user1), expectedTotalFee);
+        assertEq(
+            user1BalanceBefore - paymentToken.balanceOf(user1),
+            expectedTotalFee
+        );
         // Check that the hook recorded the fee
         assertEq(feeHook.totalFeesCollected(), expectedHookFee);
     }
@@ -334,20 +375,21 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
         );
 
         string memory content = "Test comment";
-        
+
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: content,
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: content,
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: comments.nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         // Make a few comments to collect fees
         for (uint i = 0; i < 3; i++) {
@@ -357,8 +399,11 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
             comments.postCommentAsAuthor(commentData, appSignature);
         }
 
-        uint256 feeCollectorBalanceBefore = paymentToken.balanceOf(feeCollector);
-        uint256 expectedFeePerComment = (bytes(content).length * TOKENS_PER_CHARACTER) * (10000 - PROTOCOL_FEE_PERCENTAGE) / 10000;
+        uint256 feeCollectorBalanceBefore = paymentToken.balanceOf(
+            feeCollector
+        );
+        uint256 expectedFeePerComment = ((bytes(content).length *
+            TOKENS_PER_CHARACTER) * (10000 - PROTOCOL_FEE_PERCENTAGE)) / 10000;
 
         // Withdraw fees
         vm.prank(feeCollector);
@@ -367,7 +412,10 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
         feeHook.withdrawFees();
 
         // Check balances
-        assertEq(paymentToken.balanceOf(feeCollector) - feeCollectorBalanceBefore, expectedFeePerComment * 3);
+        assertEq(
+            paymentToken.balanceOf(feeCollector) - feeCollectorBalanceBefore,
+            expectedFeePerComment * 3
+        );
         assertEq(paymentToken.balanceOf(address(feeHook)), 0);
         assertEq(feeHook.totalFeesCollected(), 0);
     }
@@ -387,7 +435,7 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
 
     function test_UpdateTokensPerCharacter() public {
         uint256 newTokensPerCharacter = 2e16;
-        
+
         // Try to update as non-fee collector
         vm.prank(user1);
         vm.expectRevert("Only fee collector");
@@ -407,4 +455,4 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
     ) external pure returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }
-} 
+}

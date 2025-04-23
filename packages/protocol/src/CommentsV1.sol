@@ -65,7 +65,12 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     /// @notice Error thrown when author signature verification fails
     error InvalidAuthorSignature();
     /// @notice Error thrown when nonce is invalid
-    error InvalidNonce(address author, address appSigner, uint256 expected, uint256 provided);
+    error InvalidNonce(
+        address author,
+        address appSigner,
+        uint256 expected,
+        uint256 provided
+    );
     /// @notice Error thrown when deadline has passed
     error SignatureDeadlineReached(uint256 deadline, uint256 currentTime);
     /// @notice Error thrown when caller is not authorized
@@ -162,16 +167,24 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     ) internal nonReentrant {
         // Validate submitted within deadline
         if (block.timestamp > commentData.deadline) {
-            revert SignatureDeadlineReached(commentData.deadline, block.timestamp);
+            revert SignatureDeadlineReached(
+                commentData.deadline,
+                block.timestamp
+            );
         }
 
         // Validate parentId and targetUri
         if (commentData.parentId != bytes32(0)) {
-            if (comments[commentData.parentId].author == address(0) && !deleted[commentData.parentId]) {
+            if (
+                comments[commentData.parentId].author == address(0) &&
+                !deleted[commentData.parentId]
+            ) {
                 revert ParentCommentDoesNotExist();
             }
             if (bytes(commentData.targetUri).length > 0) {
-                revert InvalidCommentReference("Parent comment and targetUri cannot both be set");
+                revert InvalidCommentReference(
+                    "Parent comment and targetUri cannot both be set"
+                );
             }
         }
 
@@ -180,7 +193,12 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
             nonces[commentData.author][commentData.appSigner] !=
             commentData.nonce
         ) {
-            revert InvalidNonce(commentData.author, commentData.appSigner, nonces[commentData.author][commentData.appSigner], commentData.nonce);
+            revert InvalidNonce(
+                commentData.author,
+                commentData.appSigner,
+                nonces[commentData.author][commentData.appSigner],
+                commentData.nonce
+            );
         }
 
         // Validate channel exists
@@ -195,11 +213,13 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
         // Validate signatures if present
         if (appSignature.length > 0) {
             _validateSignature(appSignature);
-            if (!SignatureChecker.isValidSignatureNow(
-                commentData.appSigner,
-                commentId,
-                appSignature
-            )) {
+            if (
+                !SignatureChecker.isValidSignatureNow(
+                    commentData.appSigner,
+                    commentId,
+                    appSignature
+                )
+            ) {
                 revert InvalidAppSignature();
             }
         }
@@ -211,11 +231,12 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
         if (
             msg.sender == commentData.author ||
             isApproved[commentData.author][commentData.appSigner] ||
-            (authorSignature.length > 0 && SignatureChecker.isValidSignatureNow(
-                commentData.author,
-                commentId,
-                authorSignature
-            ))
+            (authorSignature.length > 0 &&
+                SignatureChecker.isValidSignatureNow(
+                    commentData.author,
+                    commentId,
+                    authorSignature
+                ))
         ) {
             // Execute channel-specific hooks before comment
             bool hookSuccess = channelManager.executeHooks{value: msg.value}(
@@ -283,7 +304,12 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
         }
 
         if (nonces[author][appSigner] != nonce) {
-            revert InvalidNonce(author, appSigner, nonces[author][appSigner], nonce);
+            revert InvalidNonce(
+                author,
+                appSigner,
+                nonces[author][appSigner],
+                nonce
+            );
         }
 
         CommentData storage comment = comments[commentId];
@@ -378,7 +404,12 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
         }
 
         if (nonces[author][appSigner] != nonce) {
-            revert InvalidNonce(author, appSigner, nonces[author][appSigner], nonce);
+            revert InvalidNonce(
+                author,
+                appSigner,
+                nonces[author][appSigner],
+                nonce
+            );
         }
 
         nonces[author][appSigner]++;
@@ -421,7 +452,12 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
         }
 
         if (nonces[author][appSigner] != nonce) {
-            revert InvalidNonce(author, appSigner, nonces[author][appSigner], nonce);
+            revert InvalidNonce(
+                author,
+                appSigner,
+                nonces[author][appSigner],
+                nonce
+            );
         }
 
         nonces[author][appSigner]++;
@@ -563,7 +599,9 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     /// @notice Get comment data by ID
     /// @param commentId The comment ID to query
     /// @return The comment data struct
-    function getComment(bytes32 commentId) external view returns (CommentData memory) {
+    function getComment(
+        bytes32 commentId
+    ) external view returns (CommentData memory) {
         CommentData storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
         return comment;
@@ -574,15 +612,18 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable {
     /// @param signature The signature to validate
     function _validateSignature(bytes memory signature) internal pure {
         if (signature.length != 65) revert InvalidSignatureLength();
-        
+
         // Extract s value from signature
         uint256 s;
         assembly {
             s := mload(add(signature, 0x40))
         }
-        
+
         // Ensure s is in lower half of curve's order
-        if (s > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
+        if (
+            s >
+            0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0
+        ) {
             revert InvalidSignatureS();
         }
     }

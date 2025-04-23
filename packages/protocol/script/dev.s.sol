@@ -22,12 +22,17 @@ contract DevScript is Script {
 
         // Deploy CommentsV1 first
         comments = new CommentsV1{salt: bytes32(uint256(0))}(address(0)); // Temporary zero address for channelManager
-        
+
         // Deploy ChannelManager with CommentsV1 address
-        channelManager = new ChannelManager{salt: bytes32(uint256(0))}(msg.sender, address(comments));
-        
+        channelManager = new ChannelManager{salt: bytes32(uint256(0))}(
+            msg.sender,
+            address(comments)
+        );
+
         // Update CommentsV1 with correct ChannelManager address
-        comments = new CommentsV1{salt: bytes32(uint256(1))}(address(channelManager));
+        comments = new CommentsV1{salt: bytes32(uint256(1))}(
+            address(channelManager)
+        );
 
         console.log("ChannelManager deployed at", address(channelManager));
         console.log("CommentsV1 deployed at", address(comments));

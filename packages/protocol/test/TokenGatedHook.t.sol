@@ -14,7 +14,7 @@ import {TestUtils} from "./utils.sol";
 // Token contract for testing
 contract TestToken is ERC20 {
     constructor() ERC20("Test Token", "TEST") {
-        _mint(msg.sender, 1000000 * 10**18); // Mint 1M tokens to deployer
+        _mint(msg.sender, 1000000 * 10 ** 18); // Mint 1M tokens to deployer
     }
 }
 
@@ -28,7 +28,9 @@ contract TokenGatedHook is IHook {
         requiredBalance = _requiredBalance;
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) external pure returns (bool) {
         return interfaceId == type(IHook).interfaceId;
     }
 
@@ -53,7 +55,7 @@ contract TokenGatedHook is IHook {
 
 contract TokenGatedHookTest is Test, IERC721Receiver {
     using TestUtils for string;
-    
+
     ChannelManager public channelManager;
     TokenGatedHook public tokenGatedHook;
     TestToken public testToken;
@@ -70,16 +72,19 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
 
         // Deploy test token
         testToken = new TestToken();
-        
+
         // Deploy token gated hook with 1000 token requirement
-        tokenGatedHook = new TokenGatedHook(address(testToken), 1000 * 10**18);
+        tokenGatedHook = new TokenGatedHook(
+            address(testToken),
+            1000 * 10 ** 18
+        );
 
         // Deploy CommentsV1 first with zero address
         CommentsV1 comments = new CommentsV1(address(0));
-        
+
         // Deploy ChannelManager with CommentsV1 address
         channelManager = new ChannelManager(owner, address(comments));
-        
+
         // Deploy final CommentsV1 with correct address
         comments = new CommentsV1(address(channelManager));
         commentsContract = address(comments);
@@ -104,31 +109,34 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         );
 
         // Transfer 1000 tokens to user1
-        testToken.transfer(user1, 1000 * 10**18);
+        testToken.transfer(user1, 1000 * 10 ** 18);
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: CommentsV1(commentsContract).nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: CommentsV1(commentsContract).nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         // Test beforeComment hook - should succeed
         vm.prank(commentsContract);
-        assertTrue(channelManager.executeHooks(
-            channelId,
-            commentData,
-            user1,
-            bytes32(0),
-            IChannelManager.HookPhase.Before
-        ));
+        assertTrue(
+            channelManager.executeHooks(
+                channelId,
+                commentData,
+                user1,
+                bytes32(0),
+                IChannelManager.HookPhase.Before
+            )
+        );
     }
 
     function test_TokenGatedHookBlocksCommentWithoutEnoughTokens() public {
@@ -141,21 +149,22 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         );
 
         // Transfer only 999 tokens to user1 (not enough)
-        testToken.transfer(user1, 999 * 10**18);
+        testToken.transfer(user1, 999 * 10 ** 18);
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: CommentsV1(commentsContract).nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: CommentsV1(commentsContract).nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         // Test beforeComment hook - should fail
         vm.prank(commentsContract);
@@ -179,18 +188,19 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         );
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: CommentsV1(commentsContract).nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: CommentsV1(commentsContract).nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         // First try without tokens - should fail
         vm.prank(commentsContract);
@@ -204,17 +214,19 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         );
 
         // Transfer 1000 tokens to user1
-        testToken.transfer(user1, 1000 * 10**18);
+        testToken.transfer(user1, 1000 * 10 ** 18);
 
         // Try again with tokens - should succeed
         vm.prank(commentsContract);
-        assertTrue(channelManager.executeHooks(
-            channelId,
-            commentData,
-            user1,
-            bytes32(0),
-            IChannelManager.HookPhase.Before
-        ));
+        assertTrue(
+            channelManager.executeHooks(
+                channelId,
+                commentData,
+                user1,
+                bytes32(0),
+                IChannelManager.HookPhase.Before
+            )
+        );
     }
 
     function onERC721Received(
@@ -225,4 +237,4 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     ) external pure returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }
-} 
+}

@@ -15,7 +15,7 @@ contract FlatFeeHook is IHook {
     uint256 public constant COMMENT_FEE = 0.001 ether;
     uint256 public constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
     uint256 public constant HOOK_FEE = 900000000000000; // 0.0009 ether (after 10% protocol fee)
-    
+
     address public feeCollector;
     uint256 public totalFeesCollected;
     mapping(address => uint256) public pendingRefunds;
@@ -28,7 +28,9 @@ contract FlatFeeHook is IHook {
         feeCollector = _feeCollector;
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) external pure returns (bool) {
         return interfaceId == type(IHook).interfaceId;
     }
 
@@ -38,15 +40,15 @@ contract FlatFeeHook is IHook {
         bytes32
     ) external payable returns (bool) {
         require(msg.value >= HOOK_FEE, "Insufficient fee");
-        
+
         totalFeesCollected += HOOK_FEE;
         emit FeeCollected(commentData.author, HOOK_FEE);
-        
+
         // Store any excess payment for refund in afterComment
         if (msg.value > HOOK_FEE) {
             pendingRefunds[commentData.author] = msg.value - HOOK_FEE;
         }
-        
+
         return true;
     }
 
@@ -84,7 +86,7 @@ contract FlatFeeHook is IHook {
 
 contract FlatFeeHookTest is Test, IERC721Receiver {
     using TestUtils for string;
-    
+
     ChannelManager public channelManager;
     FlatFeeHook public feeHook;
     CommentsV1 public comments;
@@ -120,7 +122,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
         // Deploy CommentsV1 first with zero address
         comments = new CommentsV1(address(0));
-        
+
         // Deploy ChannelManager with CommentsV1 address
         channelManager = new ChannelManager(owner, address(comments));
         // Set protocol fees
@@ -133,7 +135,9 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         channelManager.updateCommentsContract(commentsContract);
 
         // Register the fee hook
-        channelManager.registerHook{value: HOOK_REGISTRATION_FEE}(address(feeHook));
+        channelManager.registerHook{value: HOOK_REGISTRATION_FEE}(
+            address(feeHook)
+        );
         // Enable the hook globally
         channelManager.setHookGloballyEnabled(address(feeHook), true);
 
@@ -151,26 +155,24 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     function test_FeeHookCollectsExactFee() public {
         // Create channel with fee hook
-        uint256 channelId = channelManager.createChannel{value: CHANNEL_CREATION_FEE}(
-            "Fee Channel",
-            "Pay 0.001 ETH to comment",
-            "{}",
-            address(feeHook)
-        );
+        uint256 channelId = channelManager.createChannel{
+            value: CHANNEL_CREATION_FEE
+        }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: comments.nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
@@ -179,7 +181,10 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
         // Post comment as user1 with exact fee plus protocol fee
         vm.prank(user1);
-        comments.postCommentAsAuthor{value: TOTAL_FEE_WITH_PROTOCOL}(commentData, appSignature);
+        comments.postCommentAsAuthor{value: TOTAL_FEE_WITH_PROTOCOL}(
+            commentData,
+            appSignature
+        );
 
         // Check that the hook received the hook fee (after protocol fee)
         assertEq(address(feeHook).balance - hookBalanceBefore, HOOK_FEE);
@@ -191,26 +196,24 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     function test_FeeHookRefundsExcessPaymentExceptProtocolFee() public {
         // Create channel with fee hook
-        uint256 channelId = channelManager.createChannel{value: CHANNEL_CREATION_FEE}(
-            "Fee Channel",
-            "Pay 0.001 ETH to comment",
-            "{}",
-            address(feeHook)
-        );
+        uint256 channelId = channelManager.createChannel{
+            value: CHANNEL_CREATION_FEE
+        }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: comments.nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
@@ -221,76 +224,85 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         uint256 excessAmount = 0.001 ether;
         uint256 totalSent = TOTAL_FEE_WITH_PROTOCOL + excessAmount;
         vm.prank(user1);
-        comments.postCommentAsAuthor{value: totalSent}(commentData, appSignature);
+        comments.postCommentAsAuthor{value: totalSent}(
+            commentData,
+            appSignature
+        );
 
         // Check that the hook received the hook fee (after protocol fee)
         assertEq(address(feeHook).balance - hookBalanceBefore, HOOK_FEE);
         // Check that user1 paid the required fee (including protocol fee)
-        assertEq(user1BalanceBefore - user1.balance, TOTAL_FEE_WITH_PROTOCOL + (excessAmount * PROTOCOL_FEE_PERCENTAGE / 10000));
+        assertEq(
+            user1BalanceBefore - user1.balance,
+            TOTAL_FEE_WITH_PROTOCOL +
+                ((excessAmount * PROTOCOL_FEE_PERCENTAGE) / 10000)
+        );
         // Check that the hook recorded the fee
         assertEq(feeHook.totalFeesCollected(), HOOK_FEE);
     }
 
     function test_FeeHookRejectsInsufficientFee() public {
         // Create channel with fee hook
-        uint256 channelId = channelManager.createChannel{value: CHANNEL_CREATION_FEE}(
-            "Fee Channel",
-            "Pay 0.001 ETH to comment",
-            "{}",
-            address(feeHook)
-        );
+        uint256 channelId = channelManager.createChannel{
+            value: CHANNEL_CREATION_FEE
+        }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: comments.nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
         // Try to post comment with insufficient fee
         vm.prank(user1);
         vm.expectRevert("Insufficient fee");
-        comments.postCommentAsAuthor{value: 0.0005 ether}(commentData, appSignature);
+        comments.postCommentAsAuthor{value: 0.0005 ether}(
+            commentData,
+            appSignature
+        );
     }
 
     function test_FeeWithdrawal() public {
         // Create channel with fee hook
-        uint256 channelId = channelManager.createChannel{value: CHANNEL_CREATION_FEE}(
-            "Fee Channel",
-            "Pay 0.001 ETH to comment",
-            "{}",
-            address(feeHook)
-        );
+        uint256 channelId = channelManager.createChannel{
+            value: CHANNEL_CREATION_FEE
+        }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: comments.nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         // Make a few comments to collect fees
         for (uint i = 0; i < 3; i++) {
             commentData.nonce = i;
             bytes memory appSignature = _signAppSignature(commentData);
             vm.prank(user1);
-            comments.postCommentAsAuthor{value: TOTAL_FEE_WITH_PROTOCOL}(commentData, appSignature);
+            comments.postCommentAsAuthor{value: TOTAL_FEE_WITH_PROTOCOL}(
+                commentData,
+                appSignature
+            );
         }
 
         uint256 feeCollectorBalanceBefore = feeCollector.balance;
@@ -302,7 +314,10 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         feeHook.withdrawFees();
 
         // Check balances
-        assertEq(feeCollector.balance - feeCollectorBalanceBefore, HOOK_FEE * 3);
+        assertEq(
+            feeCollector.balance - feeCollectorBalanceBefore,
+            HOOK_FEE * 3
+        );
         assertEq(address(feeHook).balance, 0);
         assertEq(feeHook.totalFeesCollected(), 0);
     }
@@ -328,4 +343,4 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     ) external pure returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }
-} 
+}
