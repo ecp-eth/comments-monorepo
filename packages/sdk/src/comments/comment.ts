@@ -1,17 +1,45 @@
 import { z } from "zod";
-import { COMMENTS_V1_ADDRESS } from "../constants.js";
+import {
+  COMMENTS_V1_ADDRESS,
+  DEFAULT_CHANNEL_ID,
+  DEFAULT_COMMENT_TYPE,
+  EMPTY_PARENT_ID,
+} from "../constants.js";
 import { HexSchema, type CommentData } from "../schemas/core.js";
 import type { Hex } from "../types.js";
 import { CommentsV1Abi } from "../abis.js";
-import { type ReadContractParameters, type ReadContractReturnType } from "viem";
-import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
-import { createCommentData, type CreateCommentDataParams } from "../utils.js";
+import {
+  stringToHex,
+  type ReadContractParameters,
+  type ReadContractReturnType,
+} from "viem";
+import type {
+  ContractWriteFunctions,
+  ContractReadFunctions,
+  CreateCommentDataParams,
+} from "./types.js";
+import {
+  AddCommentTypedDataSchema,
+  type AddCommentTypedDataSchemaType,
+  type CommentInputData,
+  CommentInputDataSchema,
+  DeleteCommentTypedDataSchema,
+  type DeleteCommentTypedDataSchemaType,
+} from "./schemas.js";
+import {
+  COMMENT_TYPE,
+  DELETE_COMMENT_TYPE,
+  DOMAIN_NAME,
+  DOMAIN_VERSION,
+} from "./eip712.js";
 
 export type PostCommentAsAuthorParams = {
   /**
    * The comment data
+   *
+   * You can obtain this by using the `createCommentData()` function
    */
-  comment: CreateCommentDataParams;
+  comment: CommentInputData;
   /**
    * The app signature
    */
@@ -37,7 +65,7 @@ export type PostCommentAsAuthorResult = {
 
 const PostCommentAsAuthorParamsSchema = z.object({
   // we don't care here because comment is validated internally by createCommentData
-  comment: z.custom<CreateCommentDataParams>(() => true),
+  comment: z.custom<CommentInputData>(() => true),
   appSignature: HexSchema,
   fee: z.bigint().optional(),
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
@@ -54,13 +82,13 @@ export async function postCommentAsAuthor(
 ): Promise<PostCommentAsAuthorResult> {
   const validatedParams = PostCommentAsAuthorParamsSchema.parse(params);
 
-  const { comment, commentsAddress, fee } = validatedParams;
+  const { comment, commentsAddress, fee, appSignature } = validatedParams;
 
   const txHash = await params.writeContract({
     address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "postCommentAsAuthor",
-    args: [createCommentData(comment), params.appSignature],
+    args: [comment, appSignature],
     value: fee,
   });
 
@@ -72,8 +100,10 @@ export async function postCommentAsAuthor(
 export type PostCommentParams = {
   /**
    * The comment data
+   *
+   * You can obtain this by using the `createCommentData()` function
    */
-  comment: CreateCommentDataParams;
+  comment: CommentInputData;
   /**
    * The author signature
    */
@@ -102,7 +132,7 @@ export type PostCommentResult = {
 };
 
 const PostCommentParamsSchema = z.object({
-  comment: z.custom<CreateCommentDataParams>(() => true),
+  comment: z.custom<CommentInputData>(() => true),
   authorSignature: HexSchema,
   appSignature: HexSchema,
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
@@ -125,7 +155,7 @@ export async function postComment(params: PostCommentParams) {
     address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "postComment",
-    args: [createCommentData(comment), authorSignature, appSignature],
+    args: [comment, authorSignature, appSignature],
     value: fee,
   });
 
@@ -292,10 +322,6 @@ export type DeleteCommentParams = {
    */
   commentsAddress?: Hex;
   /**
-   * The author signature
-   */
-  authorSignature: Hex;
-  /**
    * The app signature
    */
   appSignature: Hex;
@@ -312,19 +338,27 @@ const DeleteCommentParamsSchema = z.object({
   nonce: z.bigint(),
   deadline: z.bigint(),
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
-  authorSignature: HexSchema,
   appSignature: HexSchema,
 });
 
 /**
- * Delete a comment with author signature verification
+ * Delete a comment with app signature verification
  *
  * @param params - The parameters for deleting a comment
  * @returns The transaction hash
  */
 export async function deleteComment(params: DeleteCommentParams) {
-  const { commentId, commentsAddress } =
-    DeleteCommentParamsSchema.parse(params);
+  const validatedParams = DeleteCommentParamsSchema.parse(params);
+
+  const {
+    commentId,
+    author,
+    appSigner,
+    nonce,
+    deadline,
+    commentsAddress,
+    appSignature,
+  } = validatedParams;
 
   const txHash = await params.writeContract({
     address: commentsAddress,
@@ -332,12 +366,12 @@ export async function deleteComment(params: DeleteCommentParams) {
     functionName: "deleteComment",
     args: [
       commentId,
-      params.author,
-      params.appSigner,
-      params.nonce,
-      params.deadline,
-      params.authorSignature,
-      params.appSignature,
+      author,
+      appSigner,
+      nonce,
+      deadline,
+      stringToHex(""),
+      appSignature,
     ],
   });
 
@@ -456,4 +490,142 @@ export async function getNonce(params: GetNonceParams): Promise<bigint> {
   });
 
   return nonce;
+}
+
+export type CreateCommentTypedDataParams = {
+  commentData: CommentInputData;
+  chainId: number;
+  /**
+   * The address of the comments contract
+   * @default COMMENTS_V1_ADDRESS
+   */
+  commentsAddress?: Hex;
+};
+
+const CreateCommentTypedDataParamsSchema = z.object({
+  commentData: z.custom<CommentInputData>(() => true),
+  chainId: z.number(),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+});
+
+/**
+ * Create the EIP-712 typed data structure for adding comment
+ * @returns The typed data
+ */
+export function createCommentTypedData(
+  params: CreateCommentTypedDataParams
+): AddCommentTypedDataSchemaType {
+  const validatedParams = CreateCommentTypedDataParamsSchema.parse(params);
+
+  const { commentData, chainId, commentsAddress } = validatedParams;
+
+  return AddCommentTypedDataSchema.parse({
+    domain: {
+      name: DOMAIN_NAME,
+      version: DOMAIN_VERSION,
+      chainId,
+      verifyingContract: commentsAddress,
+    },
+    types: COMMENT_TYPE,
+    primaryType: "AddComment",
+    message: commentData,
+  });
+}
+
+/**
+ * Create the data structure of a comment
+ * @return {@link schemas!CommentData | CommentData} The data structure of a comment
+ *
+ */
+export function createCommentData({
+  content,
+  metadata,
+  author,
+  appSigner,
+  nonce,
+  deadline,
+  channelId = DEFAULT_CHANNEL_ID,
+  commentType = DEFAULT_COMMENT_TYPE,
+  ...params
+}: CreateCommentDataParams): CommentData {
+  return CommentInputDataSchema.parse({
+    content,
+    metadata: metadata ? JSON.stringify(metadata) : "",
+    targetUri: "parentId" in params ? "" : params.targetUri,
+    parentId: "parentId" in params ? params.parentId : EMPTY_PARENT_ID,
+    author,
+    appSigner,
+    channelId,
+    commentType,
+    nonce,
+    deadline: deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day
+  });
+}
+
+export type CreateDeleteCommentTypedDataParams = {
+  commentId: Hex;
+  chainId: number;
+  author: Hex;
+  appSigner: Hex;
+  nonce: bigint;
+  deadline?: bigint;
+  /**
+   * The address of the comments contract
+   * @default COMMENTS_V1_ADDRESS
+   */
+  commentsAddress?: Hex;
+};
+
+const CreateDeleteCommentTypedDataParamsSchema = z.object({
+  commentId: HexSchema,
+  chainId: z.number(),
+  author: HexSchema,
+  appSigner: HexSchema,
+  nonce: z.bigint(),
+  deadline: z.bigint().optional(),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+});
+
+/**
+ * Create the EIP-712 typed data structure for deleting comment
+ *
+ * The comment won't be really deleted because of the nature of the blockchain.
+ * The purpose of this is to mark comment as deleted so indexers can do their logic for deletions.
+ *
+ * @returns The typed data
+ */
+export function createDeleteCommentTypedData(
+  params: CreateDeleteCommentTypedDataParams
+): DeleteCommentTypedDataSchemaType {
+  const validatedParams =
+    CreateDeleteCommentTypedDataParamsSchema.parse(params);
+
+  const {
+    commentId,
+    chainId,
+    author,
+    appSigner,
+    nonce,
+    deadline,
+    commentsAddress,
+  } = validatedParams;
+
+  return DeleteCommentTypedDataSchema.parse({
+    domain: {
+      name: DOMAIN_NAME,
+      version: DOMAIN_VERSION,
+      chainId,
+      verifyingContract: commentsAddress,
+    },
+    types: DELETE_COMMENT_TYPE,
+    primaryType: "DeleteComment",
+    message: {
+      commentId,
+      author,
+      appSigner,
+      nonce,
+      deadline:
+        deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
+    },
+  });
 }

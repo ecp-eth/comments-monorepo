@@ -9,14 +9,18 @@ import type {
   ContractReadFunctions,
   ContractWriteFunctions,
 } from "./types.js";
-import { ADD_APPROVAL_TYPE, REMOVE_APPROVAL_TYPE } from "./eip712.js";
+import {
+  ADD_APPROVAL_TYPE,
+  REMOVE_APPROVAL_TYPE,
+  DOMAIN_NAME,
+  DOMAIN_VERSION,
+} from "./eip712.js";
 import {
   AddApprovalTypedDataSchema,
   RemoveApprovalTypedDataSchema,
   type RemoveApprovalTypedDataSchemaType,
   type AddApprovalTypedDataSchemaType,
 } from "./schemas.js";
-import { DOMAIN_NAME, DOMAIN_VERSION } from "./eip712.js";
 
 export type IsApprovedParams = {
   /**
