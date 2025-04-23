@@ -16,8 +16,8 @@ interface IFeeManager {
     event HookRegistrationFeeUpdated(uint96 newFee);
 
     /// @notice Emitted when hook transaction fee percentage is updated
-    /// @param newFeePercentage The new fee percentage (in basis points, 1% = 100)
-    event HookTransactionFeeUpdated(uint16 newFeePercentage);
+    /// @param newBasisPoints The new fee basis points (1 basis points = 0.01%)
+    event HookTransactionFeeUpdated(uint16 newBasisPoints);
 
     /// @notice Emitted when fees are withdrawn
     /// @param recipient The address receiving the fees
@@ -33,7 +33,7 @@ interface IFeeManager {
     function setHookRegistrationFee(uint96 fee) external;
 
     /// @notice Sets the fee percentage taken from hook transactions
-    /// @param feePercentage The fee percentage in basis points (1% = 100)
+    /// @param feePercentage The fee percentage in basis points (1 basis points = 0.01%)
     function setHookTransactionFee(uint16 feePercentage) external;
 
     /// @notice Gets the current channel creation fee
@@ -45,11 +45,11 @@ interface IFeeManager {
     function getHookRegistrationFee() external view returns (uint96 fee);
 
     /// @notice Gets the current hook transaction fee percentage
-    /// @return feePercentage The current fee percentage in basis points
+    /// @return feeBasisPoints The current fee percentage in basis points (1 basis points = 0.01%)
     function getHookTransactionFee()
         external
         view
-        returns (uint16 feePercentage);
+        returns (uint16 feeBasisPoints);
 
     /// @notice Withdraws accumulated fees to a specified address
     /// @param recipient The address to receive the fees
