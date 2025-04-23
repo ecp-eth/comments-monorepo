@@ -7,7 +7,7 @@ export default defineConfig({
     "src/react.tsx",
     "src/schemas/index.ts",
     "src/types.ts",
-    "src/channel-manager/contract.ts",
+    "src/channel-manager/index.ts",
     "src/channel-manager/react/index.ts",
     "src/comments/contract.ts",
   ],
