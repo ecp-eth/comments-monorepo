@@ -20,17 +20,17 @@ contract SharedFeeHook is IHook {
     // Token used for fee payment
     IERC20 public immutable paymentToken;
     IChannelManager public immutable channelManager;
-    
+
     // Fee configuration
     uint256 public feeAmount; // Fixed fee amount per comment
     uint256 public constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
-    
+
     // Fee recipients and their shares
     struct Recipient {
         address addr;
         uint256 share; // Share in basis points (1/100 of a percent)
     }
-    
+
     Recipient[] public recipients;
     uint256 public totalShares;
     uint256 public totalFeesCollected;
@@ -43,20 +43,22 @@ contract SharedFeeHook is IHook {
     event RecipientShareUpdated(address indexed recipient, uint256 newShare);
 
     constructor(
-        address _paymentToken, 
+        address _paymentToken,
         uint256 _feeAmount,
         address _channelManager
     ) {
         require(_paymentToken != address(0), "Invalid token address");
         require(_channelManager != address(0), "Invalid channel manager");
         require(_feeAmount > 0, "Invalid fee amount");
-        
+
         paymentToken = IERC20(_paymentToken);
         feeAmount = _feeAmount;
         channelManager = IChannelManager(_channelManager);
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) external pure returns (bool) {
         return interfaceId == type(IHook).interfaceId;
     }
 
@@ -68,17 +70,25 @@ contract SharedFeeHook is IHook {
         // Calculate protocol fee
         uint256 protocolFee = (feeAmount * PROTOCOL_FEE_PERCENTAGE) / 10000;
         uint256 hookFee = feeAmount - protocolFee;
-        
+
         // Transfer tokens from author
-        paymentToken.safeTransferFrom(commentData.author, address(this), hookFee);
-        paymentToken.safeTransferFrom(commentData.author, address(channelManager), protocolFee);
-        
+        paymentToken.safeTransferFrom(
+            commentData.author,
+            address(this),
+            hookFee
+        );
+        paymentToken.safeTransferFrom(
+            commentData.author,
+            address(channelManager),
+            protocolFee
+        );
+
         totalFeesCollected += hookFee;
         emit FeeCollected(commentData.author, hookFee);
-        
+
         // Distribute fees to recipients
         _distributeFees(hookFee);
-        
+
         return true;
     }
 
@@ -93,15 +103,18 @@ contract SharedFeeHook is IHook {
     function addRecipient(address _recipient, uint256 _share) external {
         require(_recipient != address(0), "Invalid recipient address");
         require(_share > 0, "Invalid share");
-        
+
         // Check if recipient already exists
         for (uint i = 0; i < recipients.length; i++) {
-            require(recipients[i].addr != _recipient, "Recipient already exists");
+            require(
+                recipients[i].addr != _recipient,
+                "Recipient already exists"
+            );
         }
-        
+
         recipients.push(Recipient(_recipient, _share));
         totalShares += _share;
-        
+
         emit RecipientAdded(_recipient, _share);
     }
 
@@ -109,11 +122,11 @@ contract SharedFeeHook is IHook {
         for (uint i = 0; i < recipients.length; i++) {
             if (recipients[i].addr == _recipient) {
                 totalShares -= recipients[i].share;
-                
+
                 // Move the last element to the current position and pop
                 recipients[i] = recipients[recipients.length - 1];
                 recipients.pop();
-                
+
                 emit RecipientRemoved(_recipient);
                 return;
             }
@@ -121,14 +134,17 @@ contract SharedFeeHook is IHook {
         revert("Recipient not found");
     }
 
-    function updateRecipientShare(address _recipient, uint256 _newShare) external {
+    function updateRecipientShare(
+        address _recipient,
+        uint256 _newShare
+    ) external {
         require(_newShare > 0, "Invalid share");
-        
+
         for (uint i = 0; i < recipients.length; i++) {
             if (recipients[i].addr == _recipient) {
                 totalShares = totalShares - recipients[i].share + _newShare;
                 recipients[i].share = _newShare;
-                
+
                 emit RecipientShareUpdated(_recipient, _newShare);
                 return;
             }
@@ -144,7 +160,7 @@ contract SharedFeeHook is IHook {
 
     function _distributeFees(uint256 _amount) internal {
         if (recipients.length == 0) return;
-        
+
         for (uint i = 0; i < recipients.length; i++) {
             uint256 shareAmount = (_amount * recipients[i].share) / totalShares;
             if (shareAmount > 0) {
@@ -191,23 +207,36 @@ contract MockERC20 is IERC20 {
         return _balances[account];
     }
 
-    function transfer(address to, uint256 amount) public override returns (bool) {
+    function transfer(
+        address to,
+        uint256 amount
+    ) public override returns (bool) {
         address owner = msg.sender;
         _transfer(owner, to, amount);
         return true;
     }
 
-    function allowance(address owner, address spender) public view override returns (uint256) {
+    function allowance(
+        address owner,
+        address spender
+    ) public view override returns (uint256) {
         return _allowances[owner][spender];
     }
 
-    function approve(address spender, uint256 amount) public override returns (bool) {
+    function approve(
+        address spender,
+        uint256 amount
+    ) public override returns (bool) {
         address owner = msg.sender;
         _approve(owner, spender, amount);
         return true;
     }
 
-    function transferFrom(address from, address to, uint256 amount) public override returns (bool) {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) public override returns (bool) {
         address spender = msg.sender;
         _spendAllowance(from, spender, amount);
         _transfer(from, to, amount);
@@ -223,7 +252,10 @@ contract MockERC20 is IERC20 {
         require(to != address(0), "ERC20: transfer to the zero address");
 
         uint256 fromBalance = _balances[from];
-        require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
+        require(
+            fromBalance >= amount,
+            "ERC20: transfer amount exceeds balance"
+        );
         unchecked {
             _balances[from] = fromBalance - amount;
             _balances[to] += amount;
@@ -246,10 +278,17 @@ contract MockERC20 is IERC20 {
         _allowances[owner][spender] = amount;
     }
 
-    function _spendAllowance(address owner, address spender, uint256 amount) internal {
+    function _spendAllowance(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal {
         uint256 currentAllowance = allowance(owner, spender);
         if (currentAllowance != type(uint256).max) {
-            require(currentAllowance >= amount, "ERC20: insufficient allowance");
+            require(
+                currentAllowance >= amount,
+                "ERC20: insufficient allowance"
+            );
             unchecked {
                 _approve(owner, spender, currentAllowance - amount);
             }
@@ -259,7 +298,7 @@ contract MockERC20 is IERC20 {
 
 contract SharedFeeHookTest is Test, IERC721Receiver {
     using TestUtils for string;
-    
+
     ChannelManager public channelManager;
     SharedFeeHook public feeHook;
     CommentsV1 public comments;
@@ -297,10 +336,10 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
 
         // Deploy CommentsV1 first with zero address
         comments = new CommentsV1(address(0));
-        
+
         // Deploy ChannelManager with CommentsV1 address
         channelManager = new ChannelManager(owner, address(comments));
-        
+
         // Deploy final CommentsV1 with correct address
         comments = new CommentsV1(address(channelManager));
         commentsContract = address(comments);
@@ -350,18 +389,19 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
         );
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: comments.nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
@@ -376,36 +416,52 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
         comments.postCommentAsAuthor(commentData, appSignature);
 
         // Calculate expected fees
-        uint256 expectedHookFee = FEE_AMOUNT - (FEE_AMOUNT * PROTOCOL_FEE_PERCENTAGE / 10000);
+        uint256 expectedHookFee = FEE_AMOUNT -
+            ((FEE_AMOUNT * PROTOCOL_FEE_PERCENTAGE) / 10000);
         uint256 expectedRecipient1Share = (expectedHookFee * 5000) / 10000;
         uint256 expectedRecipient2Share = (expectedHookFee * 3000) / 10000;
         uint256 expectedRecipient3Share = (expectedHookFee * 2000) / 10000;
 
         // Check that the hook received the correct token amount
-        assertEq(paymentToken.balanceOf(address(feeHook)) - hookBalanceBefore, 0); // Should be 0 as fees are distributed immediately
+        assertEq(
+            paymentToken.balanceOf(address(feeHook)) - hookBalanceBefore,
+            0
+        ); // Should be 0 as fees are distributed immediately
         // Check that user1 paid the total fee
-        assertEq(user1BalanceBefore - paymentToken.balanceOf(user1), FEE_AMOUNT);
+        assertEq(
+            user1BalanceBefore - paymentToken.balanceOf(user1),
+            FEE_AMOUNT
+        );
         // Check that recipients received their shares
-        assertEq(paymentToken.balanceOf(recipient1) - recipient1BalanceBefore, expectedRecipient1Share);
-        assertEq(paymentToken.balanceOf(recipient2) - recipient2BalanceBefore, expectedRecipient2Share);
-        assertEq(paymentToken.balanceOf(recipient3) - recipient3BalanceBefore, expectedRecipient3Share);
+        assertEq(
+            paymentToken.balanceOf(recipient1) - recipient1BalanceBefore,
+            expectedRecipient1Share
+        );
+        assertEq(
+            paymentToken.balanceOf(recipient2) - recipient2BalanceBefore,
+            expectedRecipient2Share
+        );
+        assertEq(
+            paymentToken.balanceOf(recipient3) - recipient3BalanceBefore,
+            expectedRecipient3Share
+        );
     }
 
     function test_AddAndRemoveRecipients() public {
         address newRecipient = makeAddr("newRecipient");
-        
+
         // Add a new recipient
         feeHook.addRecipient(newRecipient, 1000); // 10%
-        
+
         // Check that the recipient was added
         (address addr, uint256 share) = feeHook.recipients(3);
         assertEq(addr, newRecipient);
         assertEq(share, 1000);
         assertEq(feeHook.totalShares(), 11000); // 5000 + 3000 + 2000 + 1000
-        
+
         // Remove a recipient
         feeHook.removeRecipient(recipient2);
-        
+
         // Check that the recipient was removed
         (addr, share) = feeHook.recipients(1);
         assertEq(addr, newRecipient); // The newRecipient should be at position 1 after removing recipient2
@@ -415,7 +471,7 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
     function test_UpdateRecipientShare() public {
         // Update recipient share
         feeHook.updateRecipientShare(recipient1, 6000); // Change from 50% to 60%
-        
+
         // Check that the share was updated
         (address addr, uint256 share) = feeHook.recipients(0);
         assertEq(addr, recipient1);
@@ -425,10 +481,10 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
 
     function test_UpdateFeeAmount() public {
         uint256 newFeeAmount = 200e18; // 200 tokens per comment
-        
+
         // Update fee amount
         feeHook.updateFeeAmount(newFeeAmount);
-        
+
         // Check that the fee amount was updated
         assertEq(feeHook.feeAmount(), newFeeAmount);
     }
@@ -458,4 +514,4 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
     ) external pure returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }
-} 
+}

@@ -26,4 +26,4 @@ interface IHook is IERC165 {
         address caller,
         bytes32 commentId
     ) external returns (bool success);
-} 
+}
