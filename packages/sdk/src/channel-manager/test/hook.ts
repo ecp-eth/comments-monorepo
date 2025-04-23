@@ -22,10 +22,9 @@ import {
 } from "../hook.js";
 import { createChannel } from "../channel.js";
 import { ChannelManagerAbi } from "../../abis.js";
-import {
-  CHANNEL_MANAGER_ADDRESS,
-  NOOP_HOOK_ADDRESS,
-} from "../../../scripts/constants.js";
+import { deployContracts } from "../../../scripts/test-helpers.js";
+
+const { channelManagerAddress, noopHookAddress } = deployContracts();
 
 // Test account setup
 const testPrivateKey =
@@ -57,7 +56,7 @@ describe("getHookStatus()", () => {
     const status = await getHookStatus({
       hookAddress: TEST_HOOK_ADDRESS,
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.deepEqual(
@@ -71,9 +70,9 @@ describe("getHookStatus()", () => {
 describe("registerHook()", () => {
   it("registers a new hook", async () => {
     const result = await registerHook({
-      hookAddress: NOOP_HOOK_ADDRESS,
+      hookAddress: noopHookAddress,
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
       fee: parseEther("0.02"),
     });
 
@@ -84,9 +83,9 @@ describe("registerHook()", () => {
     assert.equal(receipt.status, "success");
 
     const status = await getHookStatus({
-      hookAddress: NOOP_HOOK_ADDRESS,
+      hookAddress: noopHookAddress,
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.equal(status.registered, true, "hook should be registered");
@@ -96,9 +95,9 @@ describe("registerHook()", () => {
     await assert.rejects(
       () =>
         registerHook({
-          hookAddress: NOOP_HOOK_ADDRESS,
+          hookAddress: noopHookAddress,
           writeContract: client.writeContract,
-          channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+          channelManagerAddress,
           fee: parseEther("0.02"),
         }),
       (err) => {
@@ -118,7 +117,7 @@ describe("setHook()", () => {
       name: "Test channel",
       fee: parseEther("0.02"),
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -138,9 +137,9 @@ describe("setHook()", () => {
   it("sets hook for a channel", async () => {
     const result = await setHook({
       channelId,
-      hook: NOOP_HOOK_ADDRESS,
+      hook: noopHookAddress,
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -159,7 +158,7 @@ describe("setHook()", () => {
           channelId,
           hook: unregisteredHook,
           writeContract: client.writeContract,
-          channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+          channelManagerAddress,
         }),
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);
@@ -173,10 +172,10 @@ describe("setHook()", () => {
 describe("setHookGloballyEnabled()", () => {
   it("enables / disables hook globally", async () => {
     let result = await setHookGloballyEnabled({
-      hookAddress: NOOP_HOOK_ADDRESS,
+      hookAddress: noopHookAddress,
       enabled: true,
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     let receipt = await client.waitForTransactionReceipt({
@@ -187,18 +186,18 @@ describe("setHookGloballyEnabled()", () => {
 
     // Verify the hook is enabled
     let status = await getHookStatus({
-      hookAddress: NOOP_HOOK_ADDRESS,
+      hookAddress: noopHookAddress,
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.equal(status.enabled, true, "hook should be enabled");
 
     result = await setHookGloballyEnabled({
-      hookAddress: NOOP_HOOK_ADDRESS,
+      hookAddress: noopHookAddress,
       enabled: false,
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     receipt = await client.waitForTransactionReceipt({
@@ -209,9 +208,9 @@ describe("setHookGloballyEnabled()", () => {
 
     // Verify the hook is disabled
     status = await getHookStatus({
-      hookAddress: NOOP_HOOK_ADDRESS,
+      hookAddress: noopHookAddress,
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.equal(status.enabled, false, "hook should be disabled");
@@ -222,7 +221,7 @@ describe("getHookRegistrationFee()", () => {
   it("returns the registration fee", async () => {
     const result = await getHookRegistrationFee({
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.ok(typeof result.fee === "bigint", "fee should be a bigint");
@@ -235,7 +234,7 @@ describe("setHookRegistrationFee()", () => {
     const result = await setHookRegistrationFee({
       fee: newFee,
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -247,7 +246,7 @@ describe("setHookRegistrationFee()", () => {
     // Verify the new fee
     const fee = await getHookRegistrationFee({
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.equal(fee.fee, newFee);
@@ -259,7 +258,7 @@ describe("setHookRegistrationFee()", () => {
         setHookRegistrationFee({
           fee: parseEther("0.1"),
           writeContract: client2.writeContract,
-          channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+          channelManagerAddress,
         }),
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);
@@ -274,7 +273,7 @@ describe("getHookTransactionFee()", () => {
   it("returns the transaction fee", async () => {
     const result = await getHookTransactionFee({
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.ok(
@@ -290,7 +289,7 @@ describe("setHookTransactionFee()", () => {
     const result = await setHookTransactionFee({
       feePercentage: newFeePercentage,
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -302,7 +301,7 @@ describe("setHookTransactionFee()", () => {
     // Verify the new fee
     const fee = await getHookTransactionFee({
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.equal(fee.fee, newFeePercentage);
@@ -314,7 +313,7 @@ describe("setHookTransactionFee()", () => {
         setHookTransactionFee({
           feePercentage: 10001, // More than 100%
           writeContract: client.writeContract,
-          channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+          channelManagerAddress,
         }),
       (err) => {
         assert.ok(err instanceof Error);
@@ -329,7 +328,7 @@ describe("setHookTransactionFee()", () => {
         setHookTransactionFee({
           feePercentage: 500,
           writeContract: client2.writeContract,
-          channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+          channelManagerAddress,
         }),
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);

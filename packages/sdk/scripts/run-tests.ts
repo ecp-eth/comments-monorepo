@@ -36,21 +36,6 @@ await Promise.race([
 nodeProcess.stdout?.removeAllListeners();
 nodeProcess.stderr?.removeAllListeners();
 
-// deploy the contracts
-const deployProcess = exec("pnpm run deploy:dev", { cwd });
-
-await new Promise((resolve, reject) => {
-  deployProcess.on("exit", (code) => {
-    if (code !== 0) {
-      console.error(`Deploying contract exited with code ${code}`);
-      reject(new Error(`Deploying contract exited with code ${code}`));
-    } else {
-      console.log("Contracts deployed");
-      resolve(true);
-    }
-  });
-});
-
 process.on("beforeExit", () => {
   if (!nodeProcess.killed) {
     console.log("Killing anvil node");
