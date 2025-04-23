@@ -17,6 +17,10 @@ export type PostCommentAsAuthorParams = {
    */
   appSignature: Hex;
   /**
+   * The fee for the comment
+   */
+  fee?: bigint;
+  /**
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
@@ -35,6 +39,7 @@ const PostCommentAsAuthorParamsSchema = z.object({
   // we don't care here because comment is validated internally by createCommentData
   comment: z.custom<CreateCommentDataParams>(() => true),
   appSignature: HexSchema,
+  fee: z.bigint().optional(),
   commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
 });
 
@@ -49,13 +54,14 @@ export async function postCommentAsAuthor(
 ): Promise<PostCommentAsAuthorResult> {
   const validatedParams = PostCommentAsAuthorParamsSchema.parse(params);
 
-  const { comment, commentsContractAddress } = validatedParams;
+  const { comment, commentsContractAddress, fee } = validatedParams;
 
   const txHash = await params.writeContract({
     address: commentsContractAddress,
     abi: CommentsV1Abi,
     functionName: "postCommentAsAuthor",
     args: [createCommentData(comment), params.appSignature],
+    value: fee,
   });
 
   return {
@@ -77,6 +83,10 @@ export type PostCommentParams = {
    */
   appSignature: Hex;
   /**
+   * The fee for the comment
+   */
+  fee?: bigint;
+  /**
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
@@ -96,6 +106,7 @@ const PostCommentParamsSchema = z.object({
   authorSignature: HexSchema,
   appSignature: HexSchema,
   commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  fee: z.bigint().optional(),
 });
 
 /**
@@ -107,14 +118,20 @@ const PostCommentParamsSchema = z.object({
 export async function postComment(params: PostCommentParams) {
   const validatedParams = PostCommentParamsSchema.parse(params);
 
-  const { comment, authorSignature, appSignature, commentsContractAddress } =
-    validatedParams;
+  const {
+    comment,
+    authorSignature,
+    appSignature,
+    commentsContractAddress,
+    fee,
+  } = validatedParams;
 
   const txHash = await params.writeContract({
     address: commentsContractAddress,
     abi: CommentsV1Abi,
     functionName: "postComment",
     args: [createCommentData(comment), authorSignature, appSignature],
+    value: fee,
   });
 
   return {
