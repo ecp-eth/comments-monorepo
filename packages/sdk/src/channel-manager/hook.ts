@@ -1,11 +1,13 @@
 import { z } from "zod";
 import { CHANNEL_MANAGER_ADDRESS } from "../constants.js";
-import { CommentDataSchema } from "../comments/schemas.js";
+import {
+  CommentInputDataSchema,
+  type CommentInputData,
+} from "../comments/schemas.js";
 import type { Hex } from "../types.js";
 import { ChannelManagerAbi } from "../abis.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 import { HexSchema } from "../schemas/core.js";
-import type { CommentData } from "../comments/types.js";
 
 export type GetHookStatusParams = {
   /**
@@ -389,7 +391,7 @@ export type ExecuteHooksParams = {
   /**
    * The comment data to process
    */
-  commentData: CommentData;
+  commentData: CommentInputData;
   /**
    * The address that initiated the transaction
    */
@@ -421,7 +423,7 @@ export type ExecuteHooksResult = {
 
 const ExecuteHooksParamsSchema = z.object({
   channelId: z.bigint(),
-  commentData: CommentDataSchema,
+  commentData: CommentInputDataSchema,
   caller: HexSchema,
   commentId: HexSchema,
   phase: z.enum(["Before", "After"]),

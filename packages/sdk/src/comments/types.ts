@@ -9,6 +9,60 @@ import type { CommentsV1Abi } from "../abis.js";
 export type CommentsV1AbiType = typeof CommentsV1Abi;
 
 /**
+ * The shared parameters for creating a comment
+ */
+export type CreateCommentDataParamsShared = {
+  /** The content of the comment */
+  content: string;
+  /**
+   * The ID of the channel the comment is being made in
+   *
+   * If not provided, the default channel ID (0) will be used
+   *
+   * @default 0n
+   */
+  channelId?: bigint;
+  /**
+   * The type of the comment
+   *
+   * If not provided, the default comment type (comment) will be used
+   *
+   * @default "comment"
+   */
+  commentType?: string;
+  /** Metadata about the comment */
+  metadata?: object;
+  /** The address of the author of the comment */
+  author: Hex;
+  /** The address of the app signer */
+  appSigner: Hex;
+  /** The current nonce for the user per app on the chain */
+  nonce: bigint;
+  /** The deadline of the comment submission in seconds since epoch */
+  deadline?: bigint;
+};
+
+/**
+ * The parameters for creating a root comment
+ */
+export type CreateRootCommentDataParams = CreateCommentDataParamsShared & {
+  /** The URI of the page the comment is about */
+  targetUri: string;
+};
+
+/**
+ * The parameters for creating a reply comment
+ */
+export type CreateReplyCommentDataParams = CreateCommentDataParamsShared & {
+  /** The ID of the parent comment */
+  parentId: Hex;
+};
+
+export type CreateCommentDataParams =
+  | CreateRootCommentDataParams
+  | CreateReplyCommentDataParams;
+
+/**
  * The data structure of a comment to be signed and then passed to the Embed API
  */
 export type CommentData = {
