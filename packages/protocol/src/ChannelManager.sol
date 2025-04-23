@@ -39,22 +39,27 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         string memory description,
         string memory metadata
     ) internal view returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(
-            creator,
-            name,
-            description,
-            metadata,
-            block.timestamp,
-            block.chainid
-        )));
+        return
+            uint256(
+                keccak256(
+                    abi.encodePacked(
+                        creator,
+                        name,
+                        description,
+                        metadata,
+                        block.timestamp,
+                        block.chainid
+                    )
+                )
+            );
     }
 
     /// @notice Constructor sets the contract owner and initializes ERC721
     /// @param initialOwner The address that will own the contract
-    constructor(address initialOwner, address _commentsContract) 
-        ProtocolFees(initialOwner)
-        ERC721("ECP Channel", "ECPC") 
-    {
+    constructor(
+        address initialOwner,
+        address _commentsContract
+    ) ProtocolFees(initialOwner) ERC721("ECP Channel", "ECPC") {
         if (initialOwner == address(0)) revert ZeroAddress();
         if (_commentsContract == address(0)) revert ZeroAddress();
 
@@ -77,14 +82,17 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     /// @param hook The address of the hook to register
     function registerHook(address hook) external payable nonReentrant {
         collectHookRegistrationFee();
-        
+
         if (hook == address(0)) revert IChannelManager.InvalidHookAddress();
-        
+
         // Check if hook is already registered
-        if (registeredHooks[hook]) revert IChannelManager.HookAlreadyRegistered();
+        if (registeredHooks[hook])
+            revert IChannelManager.HookAlreadyRegistered();
 
         // Validate that the hook implements IHook interface
-        try IERC165(hook).supportsInterface(type(IHook).interfaceId) returns (bool result) {
+        try IERC165(hook).supportsInterface(type(IHook).interfaceId) returns (
+            bool result
+        ) {
             if (!result) revert IChannelManager.InvalidHookInterface();
         } catch {
             revert IChannelManager.InvalidHookInterface();
@@ -101,9 +109,12 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     /// @notice Enables or disables a hook globally (only owner)
     /// @param hook The address of the hook
     /// @param enabled Whether to enable or disable the hook
-    function setHookGloballyEnabled(address hook, bool enabled) external onlyOwner {
+    function setHookGloballyEnabled(
+        address hook,
+        bool enabled
+    ) external onlyOwner {
         if (!registeredHooks[hook]) revert IChannelManager.HookNotRegistered();
-        
+
         globallyEnabledHooks[hook] = enabled;
         emit IChannelManager.HookGlobalStatusUpdated(hook, enabled);
     }
@@ -112,14 +123,18 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     /// @param hook The address of the hook
     /// @return registered Whether the hook is registered
     /// @return enabled Whether the hook is globally enabled
-    function getHookStatus(address hook) external view returns (bool registered, bool enabled) {
+    function getHookStatus(
+        address hook
+    ) external view returns (bool registered, bool enabled) {
         return (registeredHooks[hook], globallyEnabledHooks[hook]);
     }
 
     /// @notice Internal function to check if a channel exists
     /// @param channelId The channel ID to check
     /// @return bool Whether the channel exists
-    function _channelExists(uint256 channelId) internal view virtual returns (bool) {
+    function _channelExists(
+        uint256 channelId
+    ) internal view virtual returns (bool) {
         return _ownerOf(channelId) != address(0);
     }
 
@@ -194,7 +209,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     function setHook(uint256 channelId, address hook) external {
         if (!_channelExists(channelId)) revert ChannelDoesNotExist();
         if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
-        
+
         if (hook != address(0)) {
             if (!registeredHooks[hook]) revert HookNotRegistered();
             channels[channelId].hook = IHook(hook);
@@ -212,12 +227,18 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     /// @return description The description of the channel
     /// @return metadata The channel metadata
     /// @return hook The address of the channel's hook
-    function getChannel(uint256 channelId) external view returns (
-        string memory name,
-        string memory description,
-        string memory metadata,
-        address hook
-    ) {
+    function getChannel(
+        uint256 channelId
+    )
+        external
+        view
+        returns (
+            string memory name,
+            string memory description,
+            string memory metadata,
+            address hook
+        )
+    {
         if (!_channelExists(channelId)) revert ChannelDoesNotExist();
 
         ChannelConfig storage channel = channels[channelId];
@@ -247,7 +268,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
         ChannelConfig storage channel = channels[channelId];
         address hookAddress = address(channel.hook);
-        
+
         if (hookAddress == address(0)) {
             return true;
         }
@@ -262,7 +283,13 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         // Execute the appropriate hook function based on phase
         if (phase == HookPhase.Before) {
             bool success;
-            try channel.hook.beforeComment{value: hookValue}(commentData, caller, commentId) returns (bool result) {
+            try
+                channel.hook.beforeComment{value: hookValue}(
+                    commentData,
+                    caller,
+                    commentId
+                )
+            returns (bool result) {
                 success = result;
             } catch Error(string memory reason) {
                 // Propagate the error message
@@ -278,7 +305,9 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         } else {
             // After phase - don't revert on failure
             bool success = true;
-            try channel.hook.afterComment(commentData, caller, commentId) returns (bool result) {
+            try
+                channel.hook.afterComment(commentData, caller, commentId)
+            returns (bool result) {
                 success = result;
             } catch {
                 emit HookExecutionFailed(channelId, hookAddress, phase);
@@ -305,13 +334,17 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     /// @notice Gets the owner of a channel
     /// @param channelId The unique identifier of the channel
     /// @return owner The address of the channel owner
-    function getChannelOwner(uint256 channelId) external view returns (address) {
+    function getChannelOwner(
+        uint256 channelId
+    ) external view returns (address) {
         return ownerOf(channelId);
     }
 
     /// @notice Updates the comments contract address (only owner)
     /// @param _commentsContract The new comments contract address
-    function updateCommentsContract(address _commentsContract) external onlyOwner {
+    function updateCommentsContract(
+        address _commentsContract
+    ) external onlyOwner {
         if (_commentsContract == address(0)) revert ZeroAddress();
         commentsContract = _commentsContract;
     }
@@ -319,7 +352,8 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     /// @notice Sets the base URI for NFT metadata
     /// @param baseURI_ The new base URI
     function setBaseURI(string calldata baseURI_) external onlyOwner {
-        if (bytes(baseURI_).length == 0) revert IChannelManager.InvalidBaseURI();
+        if (bytes(baseURI_).length == 0)
+            revert IChannelManager.InvalidBaseURI();
         baseURIValue = baseURI_;
         emit IChannelManager.BaseURIUpdated(baseURI_);
     }
@@ -329,4 +363,4 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     function _baseURI() internal view virtual override returns (string memory) {
         return baseURIValue;
     }
-} 
+}

@@ -18,7 +18,9 @@ contract MockHook is IHook {
         shouldReturnTrue = _shouldReturn;
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) external pure returns (bool) {
         return interfaceId == type(IHook).interfaceId;
     }
 
@@ -48,7 +50,7 @@ contract InvalidHook {
 
 contract ChannelManagerTest is Test, IERC721Receiver {
     using TestUtils for string;
-    
+
     ChannelManager public channelManager;
     MockHook public mockHook;
     InvalidHook public invalidHook;
@@ -58,10 +60,23 @@ contract ChannelManagerTest is Test, IERC721Receiver {
     address public user1;
     address public user2;
 
-    event ChannelCreated(uint256 indexed channelId, string name, string metadata);
-    event ChannelUpdated(uint256 indexed channelId, string name, string description, string metadata);
+    event ChannelCreated(
+        uint256 indexed channelId,
+        string name,
+        string metadata
+    );
+    event ChannelUpdated(
+        uint256 indexed channelId,
+        string name,
+        string description,
+        string metadata
+    );
     event HookSet(uint256 indexed channelId, address indexed hook);
-    event HookStatusUpdated(uint256 indexed channelId, address indexed hook, bool enabled);
+    event HookStatusUpdated(
+        uint256 indexed channelId,
+        address indexed hook,
+        bool enabled
+    );
     event HookRegistered(address indexed hook);
     event HookGlobalStatusUpdated(address indexed hook, bool enabled);
 
@@ -75,10 +90,10 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
         // Deploy CommentsV1 first with zero address
         CommentsV1 comments = new CommentsV1(address(0));
-        
+
         // Deploy ChannelManager with CommentsV1 address
         channelManager = new ChannelManager(owner, address(comments));
-        
+
         // Deploy final CommentsV1 with correct address
         comments = new CommentsV1(address(channelManager));
         commentsContract = address(comments);
@@ -132,7 +147,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             address(mockHook)
         );
 
-        (,,,address channelHook) = channelManager.getChannel(channelId);
+        (, , , address channelHook) = channelManager.getChannel(channelId);
         assertEq(channelHook, address(mockHook));
     }
 
@@ -148,7 +163,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         // Update the channel
         string memory newName = "Updated Name";
         string memory newDescription = "Updated Description";
-        string memory newMetadata = "{\"updated\": true}";
+        string memory newMetadata = '{"updated": true}';
 
         channelManager.updateChannel(
             channelId,
@@ -161,6 +176,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             string memory channelName,
             string memory channelDesc,
             string memory channelMeta,
+
         ) = channelManager.getChannel(channelId);
 
         assertEq(channelName, newName);
@@ -180,7 +196,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         // Set hook
         channelManager.setHook(channelId, address(mockHook));
 
-        (,,,address hook) = channelManager.getChannel(channelId);
+        (, , , address hook) = channelManager.getChannel(channelId);
         assertEq(hook, address(mockHook));
     }
 
@@ -194,38 +210,43 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         );
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            appSigner: user2,
-            channelId: channelId,
-            nonce: CommentsV1(commentsContract).nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        ICommentTypes.CommentData memory commentData = ICommentTypes
+            .CommentData({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                appSigner: user2,
+                channelId: channelId,
+                nonce: CommentsV1(commentsContract).nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         // Test beforeComment hook
         vm.prank(commentsContract);
-        assertTrue(channelManager.executeHooks(
-            channelId,
-            commentData,
-            user1,
-            bytes32(0),
-            IChannelManager.HookPhase.Before
-        ));
+        assertTrue(
+            channelManager.executeHooks(
+                channelId,
+                commentData,
+                user1,
+                bytes32(0),
+                IChannelManager.HookPhase.Before
+            )
+        );
 
         // Test afterComment hook
         vm.prank(commentsContract);
-        assertTrue(channelManager.executeHooks(
-            channelId,
-            commentData,
-            user1,
-            bytes32(0),
-            IChannelManager.HookPhase.After
-        ));
+        assertTrue(
+            channelManager.executeHooks(
+                channelId,
+                commentData,
+                user1,
+                bytes32(0),
+                IChannelManager.HookPhase.After
+            )
+        );
 
         // Test with hook returning false
         mockHook.setShouldReturnTrue(false);
@@ -242,12 +263,18 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
     function test_RevertWhen_RegisterInvalidHook() public {
         // Register the invalid hook first
-        vm.expectRevert(abi.encodeWithSelector(IChannelManager.InvalidHookInterface.selector));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IChannelManager.InvalidHookInterface.selector
+            )
+        );
         channelManager.registerHook{value: 0.02 ether}(address(invalidHook));
     }
 
-     function test_RevertWhen_CreatingChannelWithUnregisteredHook() public {
-        vm.expectRevert(abi.encodeWithSelector(IChannelManager.HookNotRegistered.selector));
+    function test_RevertWhen_CreatingChannelWithUnregisteredHook() public {
+        vm.expectRevert(
+            abi.encodeWithSelector(IChannelManager.HookNotRegistered.selector)
+        );
         channelManager.createChannel{value: 0.02 ether}(
             "Test Channel",
             "Description",
@@ -268,28 +295,32 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         MockHook unregisteredHook = new MockHook();
 
         // Try to add an unregistered hook
-        vm.expectRevert(abi.encodeWithSelector(IChannelManager.HookNotRegistered.selector));
+        vm.expectRevert(
+            abi.encodeWithSelector(IChannelManager.HookNotRegistered.selector)
+        );
         channelManager.setHook(channelId, address(unregisteredHook));
     }
 
     function test_GlobalHookManagement() public {
         // Create a new hook for testing global management
         MockHook newHook = new MockHook();
-        
+
         // Register the new hook
         channelManager.registerHook{value: 0.02 ether}(address(newHook));
-        
+
         // Test initial hook registration status
-        (bool registered, bool enabled) = channelManager.getHookStatus(address(newHook));
+        (bool registered, bool enabled) = channelManager.getHookStatus(
+            address(newHook)
+        );
         assertTrue(registered);
         assertFalse(enabled); // Should be disabled by default after registration
-        
+
         // Enable hook globally
         channelManager.setHookGloballyEnabled(address(newHook), true);
         (registered, enabled) = channelManager.getHookStatus(address(newHook));
         assertTrue(registered);
         assertTrue(enabled);
-        
+
         // Disable hook globally
         channelManager.setHookGloballyEnabled(address(newHook), false);
         (registered, enabled) = channelManager.getHookStatus(address(newHook));
@@ -305,4 +336,4 @@ contract ChannelManagerTest is Test, IERC721Receiver {
     ) external pure returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }
-} 
+}

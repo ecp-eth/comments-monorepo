@@ -8,14 +8,17 @@ import "./ICommentTypes.sol";
 /// @notice This interface defines the core functionality for managing channels and their associated hooks
 interface IChannelManager {
     /// @notice Enum defining the phase of hook execution
-    enum HookPhase { Before, After }
+    enum HookPhase {
+        Before,
+        After
+    }
 
     /// @notice Struct containing channel configuration
     struct ChannelConfig {
         string name;
         string description;
-        string metadata;  // Arbitrary JSON metadata
-        IHook hook;      // Single hook for the channel
+        string metadata; // Arbitrary JSON metadata
+        IHook hook; // Single hook for the channel
         bool hookEnabled;
     }
 
@@ -52,7 +55,11 @@ interface IChannelManager {
     /// @param channelId The unique identifier of the channel
     /// @param hook The address of the hook that failed
     /// @param phase The phase in which the hook failed
-    event HookExecutionFailed(uint256 indexed channelId, address indexed hook, HookPhase phase);
+    event HookExecutionFailed(
+        uint256 indexed channelId,
+        address indexed hook,
+        HookPhase phase
+    );
 
     /// @notice Emitted when a hook is registered in the global registry
     /// @param hook The address of the registered hook
@@ -72,7 +79,7 @@ interface IChannelManager {
     /// @param name The name of the channel
     /// @param metadata The channel metadata
     event ChannelCreated(
-        uint256 indexed channelId, 
+        uint256 indexed channelId,
         string name,
         string metadata
     );
@@ -98,7 +105,11 @@ interface IChannelManager {
     /// @param channelId The unique identifier of the channel
     /// @param hook The address of the hook contract
     /// @param enabled Whether the hook is enabled
-    event HookStatusUpdated(uint256 indexed channelId, address indexed hook, bool enabled);
+    event HookStatusUpdated(
+        uint256 indexed channelId,
+        address indexed hook,
+        bool enabled
+    );
 
     /// @notice Creates a new channel
     /// @param name The name of the channel
@@ -136,12 +147,17 @@ interface IChannelManager {
     /// @return description The description of the channel
     /// @return metadata The channel metadata
     /// @return hook The address of the channel's hook
-    function getChannel(uint256 channelId) external view returns (
-        string memory name,
-        string memory description,
-        string memory metadata,
-        address hook
-    );
+    function getChannel(
+        uint256 channelId
+    )
+        external
+        view
+        returns (
+            string memory name,
+            string memory description,
+            string memory metadata,
+            address hook
+        );
 
     /// @notice Enables or disables a hook globally (only owner)
     /// @param hook The address of the hook
@@ -152,7 +168,9 @@ interface IChannelManager {
     /// @param hook The address of the hook
     /// @return registered Whether the hook is registered
     /// @return enabled Whether the hook is globally enabled
-    function getHookStatus(address hook) external view returns (bool registered, bool enabled);
+    function getHookStatus(
+        address hook
+    ) external view returns (bool registered, bool enabled);
 
     /// @notice Updates the comments contract address (only owner)
     /// @param _commentsContract The new comments contract address
@@ -190,4 +208,4 @@ interface IChannelManager {
     /// @param channelId The unique identifier of the channel
     /// @return owner The address of the channel owner
     function getChannelOwner(uint256 channelId) external view returns (address);
-} 
+}

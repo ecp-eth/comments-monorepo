@@ -79,15 +79,17 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
     /// @notice Withdraws accumulated fees to a specified address (only owner)
     /// @param recipient The address to receive the fees
     /// @return amount The amount withdrawn
-    function withdrawFees(address recipient) external onlyOwner nonReentrant returns (uint256 amount) {
+    function withdrawFees(
+        address recipient
+    ) external onlyOwner nonReentrant returns (uint256 amount) {
         if (recipient == address(0)) revert IChannelManager.ZeroAddress();
-        
+
         amount = accumulatedFees;
         accumulatedFees = 0;
-        
+
         (bool success, ) = recipient.call{value: amount}("");
         require(success, "Fee withdrawal failed");
-        
+
         emit IFeeManager.FeesWithdrawn(recipient, amount);
         return amount;
     }
@@ -107,9 +109,12 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
     /// @notice Collects hook transaction fee
     /// @param value The total value sent with the transaction
     /// @return hookValue The amount that should be passed to the hook
-    function calculateHookTransactionFee(uint256 value) public payable returns (uint256 hookValue) {
+    function calculateHookTransactionFee(
+        uint256 value
+    ) public payable returns (uint256 hookValue) {
         if (value > 0 && hookTransactionFeePercentage > 0) {
-            uint256 protocolFee = (value * hookTransactionFeePercentage) / 10000;
+            uint256 protocolFee = (value * hookTransactionFeePercentage) /
+                10000;
             hookValue = value - protocolFee;
             accumulatedFees += protocolFee;
         } else {
@@ -123,24 +128,29 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
     /// @return The amount of fees collected
     function _collectFee(uint96 requiredFee) internal virtual returns (uint96) {
         if (msg.value < requiredFee) revert IChannelManager.InsufficientFee();
-        
+
         accumulatedFees += requiredFee;
-        
+
         if (msg.value > requiredFee) {
             // Refund excess payment
-            (bool success, ) = msg.sender.call{value: msg.value - requiredFee}("");
+            (bool success, ) = msg.sender.call{value: msg.value - requiredFee}(
+                ""
+            );
             require(success, "Refund failed");
         }
-        
+
         return requiredFee;
     }
 
     /// @notice Internal function to calculate and collect protocol fee from hook transactions
     /// @param value The total value sent with the transaction
     /// @return hookValue The amount that should be passed to the hook
-    function _calculateHookFee(uint256 value) internal virtual returns (uint256 hookValue) {
+    function _calculateHookFee(
+        uint256 value
+    ) internal virtual returns (uint256 hookValue) {
         if (value > 0 && hookTransactionFeePercentage > 0) {
-            uint256 protocolFee = (value * hookTransactionFeePercentage) / 10000;
+            uint256 protocolFee = (value * hookTransactionFeePercentage) /
+                10000;
             hookValue = value - protocolFee;
             accumulatedFees += protocolFee;
         } else {
@@ -153,4 +163,4 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
     receive() external payable {
         accumulatedFees += msg.value;
     }
-} 
+}
