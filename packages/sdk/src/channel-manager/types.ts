@@ -20,15 +20,6 @@ export type ContractWriteFunctions = {
       value?: bigint;
     }
   ) => Promise<Hex>;
-  executeHooks: (
-    args: ContractFunctionParameters<
-      ChannelManagerAbiType,
-      "payable",
-      "executeHooks"
-    > & {
-      value?: bigint;
-    }
-  ) => Promise<Hex>;
   registerHook: (
     args: ContractFunctionParameters<
       ChannelManagerAbiType,

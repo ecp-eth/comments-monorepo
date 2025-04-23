@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import {Script, console} from "forge-std/Script.sol";
 import {CommentsV1} from "../src/CommentsV1.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
+import {NoopHook} from "../src/hooks/NoopHook.sol";
 
 contract DeployScript is Script {
     enum Env {
@@ -13,6 +14,7 @@ contract DeployScript is Script {
 
     CommentsV1 public comments;
     ChannelManager public channelManager;
+    NoopHook public noopHook;
 
     function setUp() public {}
 
@@ -37,6 +39,11 @@ contract DeployScript is Script {
             // Fund wallet with real identity for testing
             address fundAddress = vm.envAddress("FUND_ADDRESS");
             payable(fundAddress).transfer(1 ether);
+
+            // Deploy NoopHook
+            noopHook = new NoopHook();
+
+            console.log("NoopHook deployed at", address(noopHook));
         }
 
         // Deploy CommentsV1 first
