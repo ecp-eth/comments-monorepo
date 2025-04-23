@@ -1,4 +1,4 @@
-import test from "node:test";
+import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert";
 import {
   createWalletClient,
@@ -23,11 +23,16 @@ import {
   setBaseURI,
 } from "../channel.js";
 import { ChannelManagerAbi } from "../../abis.js";
+import { CHANNEL_MANAGER_ADDRESS } from "../../../scripts/constants.js";
 
 // Test account setup
 const testPrivateKey =
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // Anvil's first private key
 const account = privateKeyToAccount(testPrivateKey);
+
+const testPrivateKey2 =
+  "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"; // Anvil's second private key
+const account2 = privateKeyToAccount(testPrivateKey2);
 
 // Create wallet client
 const client = createWalletClient({
@@ -36,13 +41,38 @@ const client = createWalletClient({
   account,
 }).extend(publicActions);
 
-test.describe("createChannel()", () => {
-  test("fails on insufficient fee", async () => {
+const client2 = createWalletClient({
+  chain: anvil,
+  transport: http("http://localhost:8545"),
+  account: account2,
+}).extend(publicActions);
+
+async function resetFees() {
+  const creationFee = await setChannelCreationFee({
+    fee: parseEther("0.02"),
+    writeContract: client.writeContract,
+    channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+  });
+
+  const receipt = await client.waitForTransactionReceipt({
+    hash: creationFee.txHash,
+  });
+
+  assert.equal(receipt.status, "success");
+}
+
+beforeEach(async () => {
+  await resetFees();
+});
+
+describe("createChannel()", () => {
+  it("fails on insufficient fee", async () => {
     await assert.rejects(
       () =>
         createChannel({
           name: "Test channel",
           writeContract: client.writeContract,
+          channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
         }),
       (err) => {
         assert.ok(
@@ -59,11 +89,12 @@ test.describe("createChannel()", () => {
     );
   });
 
-  test("creates channel", async () => {
+  it("creates channel", async () => {
     const channel = await createChannel({
       name: "Test channel",
       fee: parseEther("0.02"), // this is default , see ChannelManager.sol
       writeContract: client.writeContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -74,14 +105,15 @@ test.describe("createChannel()", () => {
   });
 });
 
-test.describe("getChannel()", () => {
+describe("getChannel()", () => {
   let channelId: bigint;
 
-  test.before(async () => {
+  beforeEach(async () => {
     const result = await createChannel({
       name: "Test channel",
       fee: parseEther("0.02"),
       writeContract: client.writeContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -101,10 +133,11 @@ test.describe("getChannel()", () => {
     channelId = logs[0]!.args.channelId;
   });
 
-  test("gets channel", async () => {
+  it("gets channel", async () => {
     const channel = await getChannel({
       channelId,
       readContract: client.readContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     assert.deepEqual(channel, {
@@ -116,12 +149,13 @@ test.describe("getChannel()", () => {
   });
 });
 
-test.describe("channelExists()", () => {
-  test("default channel", async () => {
+describe("channelExists()", () => {
+  it("default channel", async () => {
     assert.equal(
       await channelExists({
         channelId: 0n, // default channel id
         readContract: client.readContract,
+        channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
       }),
       true,
       "should return true for default channel id"
@@ -131,6 +165,7 @@ test.describe("channelExists()", () => {
       await channelExists({
         channelId: 10n,
         readContract: client.readContract,
+        channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
       }),
       false,
       "should return false for non-existent channel id"
@@ -138,10 +173,11 @@ test.describe("channelExists()", () => {
   });
 });
 
-test.describe("getChannelCreationFee()", () => {
-  test("default channel", async () => {
+describe("getChannelCreationFee()", () => {
+  it("returns the fee", async () => {
     const fee = await getChannelCreationFee({
       readContract: client.readContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     assert.deepEqual(
@@ -152,14 +188,15 @@ test.describe("getChannelCreationFee()", () => {
   });
 });
 
-test.describe("getChannelOwner()", () => {
+describe("getChannelOwner()", () => {
   let channelId: bigint;
 
-  test.before(async () => {
+  beforeEach(async () => {
     const result = await createChannel({
       name: "Test channel",
       fee: parseEther("0.02"),
       writeContract: client.writeContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -179,24 +216,26 @@ test.describe("getChannelOwner()", () => {
     channelId = logs[0]!.args.channelId;
   });
 
-  test("default channel", async () => {
+  it("default channel", async () => {
     const owner = await getChannelOwner({
       channelId,
       readContract: client.readContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     assert.deepEqual(owner, { owner: account.address });
   });
 });
 
-test.describe("updateChannel()", () => {
+describe("updateChannel()", () => {
   let channelId: bigint;
 
-  test.before(async () => {
+  beforeEach(async () => {
     const result = await createChannel({
       name: "Test channel",
       fee: parseEther("0.02"),
       writeContract: client.writeContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -216,13 +255,14 @@ test.describe("updateChannel()", () => {
     channelId = logs[0]!.args.channelId;
   });
 
-  test("updates channel", async () => {
+  it("updates channel", async () => {
     const result = await updateChannel({
       channelId,
       name: "Updated channel",
       description: "New description",
       metadata: "New metadata",
       writeContract: client.writeContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -235,6 +275,7 @@ test.describe("updateChannel()", () => {
     const channel = await getChannel({
       channelId,
       readContract: client.readContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     assert.deepEqual(channel, {
@@ -246,13 +287,14 @@ test.describe("updateChannel()", () => {
   });
 });
 
-test.describe("setChannelCreationFee()", () => {
-  test("fails if the account is not an owner", async () => {
+describe("setChannelCreationFee()", () => {
+  it("fails if the account is not an owner", async () => {
     await assert.rejects(
       () =>
         setChannelCreationFee({
           fee: parseEther("0.05"),
-          writeContract: client.writeContract,
+          writeContract: client2.writeContract,
+          channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
         }),
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);
@@ -262,11 +304,12 @@ test.describe("setChannelCreationFee()", () => {
     );
   });
 
-  test("sets new fee", async () => {
+  it("sets new fee", async () => {
     const newFee = parseEther("0.05");
     const result = await setChannelCreationFee({
       fee: newFee,
       writeContract: client.writeContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -278,26 +321,29 @@ test.describe("setChannelCreationFee()", () => {
     // Verify the new fee
     const fee = await getChannelCreationFee({
       readContract: client.readContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     assert.deepEqual(fee, { fee: newFee });
   });
 });
 
-test.describe("withdrawFees()", () => {
-  test.before(async () => {
+describe("withdrawFees()", () => {
+  beforeEach(async () => {
     // Create a channel to generate some fees
     await createChannel({
       name: "Fee generation channel",
       fee: parseEther("0.02"),
       writeContract: client.writeContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
   });
 
-  test("withdraws fees", async () => {
+  it("withdraws fees", async () => {
     const result = await withdrawFees({
       recipient: account.address,
       writeContract: client.writeContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -305,15 +351,24 @@ test.describe("withdrawFees()", () => {
     });
 
     assert.equal(receipt.status, "success");
+
+    const logs = parseEventLogs({
+      abi: ChannelManagerAbi,
+      logs: receipt.logs,
+      eventName: "FeesWithdrawn",
+    });
+
+    assert.ok(logs.length > 0, "FeesWithdrawn event should be found");
   });
 });
 
-test.describe("updateCommentsContract()", () => {
-  test("updates comments contract", async () => {
+describe("updateCommentsContract()", () => {
+  it("updates comments contract", async () => {
     const newContractAddress = "0x1234567890123456789012345678901234567890";
     const result = await updateCommentsContract({
       commentsContract: newContractAddress,
       writeContract: client.writeContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -324,12 +379,13 @@ test.describe("updateCommentsContract()", () => {
   });
 });
 
-test.describe("setBaseURI()", () => {
-  test("sets base URI", async () => {
+describe("setBaseURI()", () => {
+  it("sets base URI", async () => {
     const newBaseURI = "https://api.example.com/metadata/";
     const result = await setBaseURI({
       baseURI: newBaseURI,
       writeContract: client.writeContract,
+      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
     });
 
     const receipt = await client.waitForTransactionReceipt({
