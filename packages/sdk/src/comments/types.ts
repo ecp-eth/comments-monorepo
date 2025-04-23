@@ -134,4 +134,32 @@ export type ContractReadFunctions = {
   getComment: (
     args: ContractFunctionParameters<CommentsV1AbiType, "view", "getComment">
   ) => Promise<ReadContractReturnType<CommentsV1AbiType, "getComment">>;
+
+  isApproved: (
+    args: ContractFunctionParameters<CommentsV1AbiType, "view", "isApproved">
+  ) => Promise<ReadContractReturnType<CommentsV1AbiType, "isApproved">>;
+
+  name: (
+    args: ContractFunctionParameters<CommentsV1AbiType, "view", "name">
+  ) => Promise<ReadContractReturnType<CommentsV1AbiType, "name">>;
+
+  version: (
+    args: ContractFunctionParameters<CommentsV1AbiType, "view", "version">
+  ) => Promise<ReadContractReturnType<CommentsV1AbiType, "version">>;
+
+  DOMAIN_SEPARATOR: (
+    args: ContractFunctionParameters<
+      CommentsV1AbiType,
+      "view",
+      "DOMAIN_SEPARATOR"
+    >
+  ) => Promise<ReadContractReturnType<CommentsV1AbiType, "DOMAIN_SEPARATOR">>;
+
+  channelManager: (
+    args: ContractFunctionParameters<
+      CommentsV1AbiType,
+      "view",
+      "channelManager"
+    >
+  ) => Promise<ReadContractReturnType<CommentsV1AbiType, "channelManager">>;
 };

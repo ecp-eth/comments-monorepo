@@ -4,7 +4,54 @@ import { HexSchema } from "../schemas/core.js";
 import type { Hex } from "../types.js";
 import { CommentsV1Abi } from "../abis.js";
 import type { ReadContractParameters, ReadContractReturnType } from "viem";
-import type { CommentsV1AbiType, ContractWriteFunctions } from "./types.js";
+import type {
+  CommentsV1AbiType,
+  ContractReadFunctions,
+  ContractWriteFunctions,
+} from "./types.js";
+
+export type IsApprovedParams = {
+  /**
+   * The author address
+   */
+  author: Hex;
+  /**
+   * The app signer address
+   */
+  appSigner: Hex;
+  /**
+   * The address of the comments contract
+   * @default COMMENTS_V1_ADDRESS
+   */
+  commentsContractAddress?: Hex;
+  readContract: ContractReadFunctions["isApproved"];
+};
+
+const IsApprovedParamsSchema = z.object({
+  author: HexSchema,
+  appSigner: HexSchema,
+  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+});
+
+/**
+ * Checks if an app signer is approved for an author
+ *
+ * @param params - The parameters for checking approval
+ * @returns Whether the app signer is approved
+ */
+export async function isApproved(params: IsApprovedParams): Promise<boolean> {
+  const { author, appSigner, commentsContractAddress } =
+    IsApprovedParamsSchema.parse(params);
+
+  const approved = await params.readContract({
+    address: commentsContractAddress,
+    abi: CommentsV1Abi,
+    functionName: "isApproved",
+    args: [author, appSigner],
+  });
+
+  return approved;
+}
 
 export type AddApprovalAsAuthorParams = {
   /**
