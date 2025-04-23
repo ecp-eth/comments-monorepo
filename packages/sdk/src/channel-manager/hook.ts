@@ -110,6 +110,10 @@ export type RegisterHookParams = {
    */
   hookAddress: Hex;
   /**
+   * The fee for registering the hook
+   */
+  fee?: bigint;
+  /**
    * The address of the channel manager
    *
    * @default CHANNEL_MANAGER_ADDRESS
@@ -124,6 +128,7 @@ export type RegisterHookResult = {
 
 const RegisterHookParamsSchema = z.object({
   hookAddress: HexSchema,
+  fee: z.bigint().min(0n).optional(),
   channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
 });
 
@@ -136,7 +141,7 @@ const RegisterHookParamsSchema = z.object({
 export async function registerHook(
   params: RegisterHookParams
 ): Promise<RegisterHookResult> {
-  const { hookAddress, channelManagerAddress } =
+  const { hookAddress, fee, channelManagerAddress } =
     RegisterHookParamsSchema.parse(params);
 
   const txHash = await params.writeContract({
@@ -144,6 +149,7 @@ export async function registerHook(
     abi: ChannelManagerAbi,
     functionName: "registerHook",
     args: [hookAddress],
+    value: fee,
   });
 
   return {
