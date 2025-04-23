@@ -8,6 +8,7 @@ import {IHook} from "../src/interfaces/IHook.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {TestUtils} from "./utils.sol";
 
 contract NoHook is IHook {
     function supportsInterface(
@@ -62,10 +63,8 @@ contract CommentsV1Test is Test, IERC721Receiver {
         appSigner = vm.addr(appSignerPrivateKey);
 
         noHook = new NoHook();
-        comments = new CommentsV1(address(0)); // First deploy with zero address
-        channelManager = new ChannelManager(address(this), address(comments));
-        comments = new CommentsV1(address(channelManager)); // Redeploy with correct address
-        channelManager.updateCommentsContract(address(comments)); // Update the comments contract address
+
+        (comments, channelManager) = TestUtils.createContracts(owner);
 
         // Setup private keys for signing
         vm.deal(author, 100 ether);

@@ -120,19 +120,12 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         // Deploy fee hook
         feeHook = new FlatFeeHook(feeCollector);
 
-        // Deploy CommentsV1 first with zero address
-        comments = new CommentsV1(address(0));
+        (comments, channelManager) = TestUtils.createContracts(owner);
 
-        // Deploy ChannelManager with CommentsV1 address
-        channelManager = new ChannelManager(owner, address(comments));
         // Set protocol fees
         channelManager.setHookRegistrationFee(HOOK_REGISTRATION_FEE);
         channelManager.setChannelCreationFee(CHANNEL_CREATION_FEE);
         channelManager.setHookTransactionFee(PROTOCOL_FEE_PERCENTAGE);
-        // Deploy final CommentsV1 with correct address
-        comments = new CommentsV1(address(channelManager));
-        commentsContract = address(comments);
-        channelManager.updateCommentsContract(commentsContract);
 
         // Register the fee hook
         channelManager.registerHook{value: HOOK_REGISTRATION_FEE}(
