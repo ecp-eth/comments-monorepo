@@ -8,7 +8,7 @@ const wantsWatchMode = process.argv.includes("--watch");
 
 const cwd = path.resolve(import.meta.dirname, "../../protocol");
 
-const nodeProcess = exec("anvil --host 0.0.0.0 --block-time 2", { cwd });
+const nodeProcess = exec("anvil --host 0.0.0.0 --block-time 1", { cwd });
 const nodeProcessTimeout = AbortSignal.timeout(20_000);
 
 // wait for nodeProcess to output Listening on 0.0.0.0:8545 in stdout
