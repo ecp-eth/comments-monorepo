@@ -63,4 +63,4 @@ packages/shared/types
 packages/shared/components
 packages/sdk/channel-manager
 packages/sdk/channel-manager/react
-packages/sdk/comments/contract
+packages/sdk/comments
