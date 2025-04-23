@@ -9,6 +9,14 @@ import type {
   ContractReadFunctions,
   ContractWriteFunctions,
 } from "./types.js";
+import { ADD_APPROVAL_TYPE, REMOVE_APPROVAL_TYPE } from "./eip712.js";
+import {
+  AddApprovalTypedDataSchema,
+  RemoveApprovalTypedDataSchema,
+  type RemoveApprovalTypedDataSchemaType,
+  type AddApprovalTypedDataSchemaType,
+} from "./schemas.js";
+import { DOMAIN_NAME, DOMAIN_VERSION } from "./eip712.js";
 
 export type IsApprovedParams = {
   /**
@@ -105,11 +113,21 @@ export async function addApprovalAsAuthor(
 }
 
 export type AddApprovalParams = {
-  author: Hex;
-  appSigner: Hex;
-  nonce: bigint;
-  deadline: bigint;
+  /**
+   * The typed data for the approval
+   *
+   * You can obtain this value by using createApprovalTypedData()
+   */
+  typedData: AddApprovalTypedDataSchemaType;
+  /**
+   * Author's signature for typed data
+   */
   signature: Hex;
+  /**
+   * The address of the comments contract
+   *
+   * @default COMMENTS_V1_ADDRESS
+   */
   commentsAddress?: Hex;
   writeContract: ContractWriteFunctions["addApproval"];
 };
@@ -119,10 +137,7 @@ export type AddApprovalResult = {
 };
 
 const AddApprovalParamsSchema = z.object({
-  author: HexSchema,
-  appSigner: HexSchema,
-  nonce: z.bigint(),
-  deadline: z.bigint(),
+  typedData: AddApprovalTypedDataSchema,
   signature: HexSchema,
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["addApproval"]>(() => true),
@@ -137,23 +152,20 @@ const AddApprovalParamsSchema = z.object({
 export async function addApproval(
   params: AddApprovalParams
 ): Promise<AddApprovalResult> {
-  const validatedParams = AddApprovalParamsSchema.parse(params);
-
-  const {
-    author,
-    appSigner,
-    commentsAddress,
-    nonce,
-    deadline,
-    signature,
-    writeContract,
-  } = validatedParams;
+  const { typedData, signature, commentsAddress, writeContract } =
+    AddApprovalParamsSchema.parse(params);
 
   const txHash = await writeContract({
     address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "addApproval",
-    args: [author, appSigner, nonce, deadline, signature],
+    args: [
+      typedData.message.author,
+      typedData.message.appSigner,
+      typedData.message.nonce,
+      typedData.message.deadline,
+      signature,
+    ],
   });
 
   return {
@@ -214,21 +226,11 @@ export async function revokeApprovalAsAuthor(
 
 export type RevokeApprovalParams = {
   /**
-   * The address of the author
+   * The typed data for the removal
+   *
+   * You can obtain this value by using createRemoveApprovalTypedData()
    */
-  author: Hex;
-  /**
-   * The address of the app signer
-   */
-  appSigner: Hex;
-  /**
-   * The current nonce for the author
-   */
-  nonce: bigint;
-  /**
-   * Timestamp after which the signature becomes invalid
-   */
-  deadline: bigint;
+  typedData: RemoveApprovalTypedDataSchemaType;
   /**
    * The signature of the author
    */
@@ -247,10 +249,7 @@ export type RevokeApprovalResult = {
 };
 
 const RevokeApprovalParamsSchema = z.object({
-  author: HexSchema,
-  appSigner: HexSchema,
-  nonce: z.bigint(),
-  deadline: z.bigint(),
+  typedData: RemoveApprovalTypedDataSchema,
   signature: HexSchema,
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["removeApproval"]>(() => true),
@@ -267,21 +266,20 @@ export async function revokeApproval(
 ): Promise<RevokeApprovalResult> {
   const validatedParams = RevokeApprovalParamsSchema.parse(params);
 
-  const {
-    author,
-    appSigner,
-    commentsAddress,
-    nonce,
-    deadline,
-    signature,
-    writeContract,
-  } = validatedParams;
+  const { typedData, signature, commentsAddress, writeContract } =
+    validatedParams;
 
   const txHash = await writeContract({
     address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "removeApproval",
-    args: [author, appSigner, nonce, deadline, signature],
+    args: [
+      typedData.message.author,
+      typedData.message.appSigner,
+      typedData.message.nonce,
+      typedData.message.deadline,
+      signature,
+    ],
   });
 
   return {
@@ -308,8 +306,10 @@ export type GetAddApprovalHashParams = {
   nonce: bigint;
   /**
    * Timestamp after which the signature becomes invalid
+   *
+   * @default 1 day from now
    */
-  deadline: bigint;
+  deadline?: bigint;
   /**
    * The address of the comments contract
    *
@@ -319,15 +319,23 @@ export type GetAddApprovalHashParams = {
   readContract: ReadAddApprovalHashFromContractFunction;
 };
 
+export type GetAddApprovalHashData = {
+  author: Hex;
+  appSigner: Hex;
+  nonce: bigint;
+  deadline: bigint;
+};
+
 export type GetAddApprovalHashResult = {
   hash: Hex;
+  data: GetAddApprovalHashData;
 };
 
 const GetAddApprovalHashParamsSchema = z.object({
   author: HexSchema,
   appSigner: HexSchema,
   nonce: z.bigint(),
-  deadline: z.bigint(),
+  deadline: z.bigint().optional(),
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
 });
 
@@ -343,15 +351,27 @@ export async function getAddApprovalHash(
   const { author, appSigner, nonce, deadline, commentsAddress } =
     GetAddApprovalHashParamsSchema.parse(params);
 
+  let computedDeadline = deadline;
+
+  if (!computedDeadline) {
+    computedDeadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24); // 1 day from now
+  }
+
   const hash = await params.readContract({
     address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "getAddApprovalHash",
-    args: [author, appSigner, nonce, deadline],
+    args: [author, appSigner, nonce, computedDeadline],
   });
 
   return {
     hash,
+    data: {
+      author,
+      appSigner,
+      nonce,
+      deadline: computedDeadline,
+    },
   };
 }
 
@@ -421,4 +441,143 @@ export async function getRemoveApprovalHash(
   return {
     hash,
   };
+}
+
+export type CreateApprovalTypedDataParams = {
+  author: Hex;
+  appSigner: Hex;
+  /**
+   * The chain ID
+   */
+  chainId: number;
+  /**
+   * The current nonce for the author and app signer
+   */
+  nonce: bigint;
+  /**
+   * Timestamp after which the signature becomes invalid
+   */
+  deadline?: bigint;
+  /**
+   * The address of the comments contract
+   */
+  commentsAddress?: Hex;
+};
+
+export type CreateApprovalTypedDataResult = AddApprovalTypedDataSchemaType;
+
+const CreateApprovalTypedDataParamsSchema = z.object({
+  author: HexSchema,
+  appSigner: HexSchema,
+  chainId: z.number(),
+  nonce: z.bigint(),
+  deadline: z.bigint().optional(),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+});
+
+/**
+ * Create the EIP-712 typed data structure for approving comment
+ * @returns The typed data
+ */
+export function createApprovalTypedData(
+  params: CreateApprovalTypedDataParams
+): CreateApprovalTypedDataResult {
+  const validatedParams = CreateApprovalTypedDataParamsSchema.parse(params);
+
+  const { author, appSigner, chainId, nonce, deadline, commentsAddress } =
+    validatedParams;
+
+  return AddApprovalTypedDataSchema.parse({
+    domain: {
+      name: DOMAIN_NAME,
+      version: DOMAIN_VERSION,
+      chainId,
+      verifyingContract: commentsAddress,
+    },
+    types: ADD_APPROVAL_TYPE,
+    primaryType: "AddApproval",
+    message: {
+      author,
+      appSigner,
+      nonce,
+      deadline:
+        deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
+    },
+  });
+}
+
+export type CreateRemoveApprovalTypedDataParams = {
+  /**
+   * The address of the author
+   */
+  author: Hex;
+  /**
+   * The address of the app signer
+   */
+  appSigner: Hex;
+  /**
+   * The chain ID
+   */
+  chainId: number;
+  /**
+   * The current nonce for the author and app signer
+   */
+  nonce: bigint;
+  /**
+   * Timestamp after which the signature becomes invalid
+   */
+  deadline?: bigint;
+  /**
+   * The address of the comments contract
+   */
+  commentsAddress?: Hex;
+};
+
+export type CreateRemoveApprovalTypedDataResult =
+  RemoveApprovalTypedDataSchemaType;
+
+const CreateRemoveApprovalTypedDataParamsSchema = z.object({
+  author: HexSchema,
+  appSigner: HexSchema,
+  chainId: z.number(),
+  nonce: z.bigint(),
+  deadline: z.bigint().optional(),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+});
+
+/**
+ * Create the EIP-712 typed data structure for removing approval
+ * @returns The typed data
+ */
+export function createRemoveApprovalTypedData(
+  params: CreateRemoveApprovalTypedDataParams
+): CreateRemoveApprovalTypedDataResult {
+  const validatedParams =
+    CreateRemoveApprovalTypedDataParamsSchema.parse(params);
+
+  const { author, appSigner, chainId, nonce, deadline, commentsAddress } =
+    validatedParams;
+
+  let computedDeadline = deadline;
+
+  if (!computedDeadline) {
+    computedDeadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24); // 1 day from now
+  }
+
+  return RemoveApprovalTypedDataSchema.parse({
+    domain: {
+      name: DOMAIN_NAME,
+      version: DOMAIN_VERSION,
+      chainId,
+      verifyingContract: commentsAddress,
+    },
+    types: REMOVE_APPROVAL_TYPE,
+    primaryType: "RemoveApproval",
+    message: {
+      author,
+      appSigner,
+      nonce,
+      deadline: computedDeadline,
+    },
+  });
 }
