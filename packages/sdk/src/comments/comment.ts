@@ -24,7 +24,7 @@ export type PostCommentAsAuthorParams = {
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
-  commentsContractAddress?: Hex;
+  commentsAddress?: Hex;
   /**
    * The write contract function
    */
@@ -40,7 +40,7 @@ const PostCommentAsAuthorParamsSchema = z.object({
   comment: z.custom<CreateCommentDataParams>(() => true),
   appSignature: HexSchema,
   fee: z.bigint().optional(),
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
 });
 
 /**
@@ -54,10 +54,10 @@ export async function postCommentAsAuthor(
 ): Promise<PostCommentAsAuthorResult> {
   const validatedParams = PostCommentAsAuthorParamsSchema.parse(params);
 
-  const { comment, commentsContractAddress, fee } = validatedParams;
+  const { comment, commentsAddress, fee } = validatedParams;
 
   const txHash = await params.writeContract({
-    address: commentsContractAddress,
+    address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "postCommentAsAuthor",
     args: [createCommentData(comment), params.appSignature],
@@ -90,7 +90,7 @@ export type PostCommentParams = {
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
-  commentsContractAddress?: Hex;
+  commentsAddress?: Hex;
   /**
    * The write contract function
    */
@@ -105,7 +105,7 @@ const PostCommentParamsSchema = z.object({
   comment: z.custom<CreateCommentDataParams>(() => true),
   authorSignature: HexSchema,
   appSignature: HexSchema,
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
   fee: z.bigint().optional(),
 });
 
@@ -118,16 +118,11 @@ const PostCommentParamsSchema = z.object({
 export async function postComment(params: PostCommentParams) {
   const validatedParams = PostCommentParamsSchema.parse(params);
 
-  const {
-    comment,
-    authorSignature,
-    appSignature,
-    commentsContractAddress,
-    fee,
-  } = validatedParams;
+  const { comment, authorSignature, appSignature, commentsAddress, fee } =
+    validatedParams;
 
   const txHash = await params.writeContract({
-    address: commentsContractAddress,
+    address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "postComment",
     args: [createCommentData(comment), authorSignature, appSignature],
@@ -148,7 +143,7 @@ export type GetCommentParams = {
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
-  commentsContractAddress?: Hex;
+  commentsAddress?: Hex;
   readContract: (
     parameters: ReadContractParameters<typeof CommentsV1Abi, "getComment">
   ) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "getComment">>;
@@ -160,7 +155,7 @@ export type GetCommentResult = {
 
 const GetCommentParamsSchema = z.object({
   commentId: HexSchema,
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
 });
 
 /**
@@ -172,11 +167,10 @@ const GetCommentParamsSchema = z.object({
 export async function getComment(
   params: GetCommentParams
 ): Promise<GetCommentResult> {
-  const { commentId, commentsContractAddress } =
-    GetCommentParamsSchema.parse(params);
+  const { commentId, commentsAddress } = GetCommentParamsSchema.parse(params);
 
   const comment = await params.readContract({
-    address: commentsContractAddress,
+    address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "getComment",
     args: [commentId],
@@ -196,13 +190,13 @@ export type GetCommentIdParams = {
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
-  commentsContractAddress?: Hex;
+  commentsAddress?: Hex;
   readContract: ContractReadFunctions["getCommentId"];
 };
 
 const GetCommentIdParamsSchema = z.object({
   commentData: z.custom<CreateCommentDataParams>(() => true),
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
 });
 
 /**
@@ -212,11 +206,11 @@ const GetCommentIdParamsSchema = z.object({
  * @returns The comment ID
  */
 export async function getCommentId(params: GetCommentIdParams): Promise<Hex> {
-  const { commentData, commentsContractAddress } =
+  const { commentData, commentsAddress } =
     GetCommentIdParamsSchema.parse(params);
 
   const commentId = await params.readContract({
-    address: commentsContractAddress,
+    address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "getCommentId",
     args: [createCommentData(commentData)],
@@ -234,7 +228,7 @@ export type DeleteCommentAsAuthorParams = {
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
-  commentsContractAddress?: Hex;
+  commentsAddress?: Hex;
   writeContract: ContractWriteFunctions["deleteCommentAsAuthor"];
 };
 
@@ -244,7 +238,7 @@ export type DeleteCommentAsAuthorResult = {
 
 const DeleteCommentAsAuthorParamsSchema = z.object({
   commentId: HexSchema,
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
 });
 
 /**
@@ -256,11 +250,11 @@ const DeleteCommentAsAuthorParamsSchema = z.object({
 export async function deleteCommentAsAuthor(
   params: DeleteCommentAsAuthorParams
 ): Promise<DeleteCommentAsAuthorResult> {
-  const { commentId, commentsContractAddress } =
+  const { commentId, commentsAddress } =
     DeleteCommentAsAuthorParamsSchema.parse(params);
 
   const txHash = await params.writeContract({
-    address: commentsContractAddress,
+    address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "deleteCommentAsAuthor",
     args: [commentId],
@@ -296,7 +290,7 @@ export type DeleteCommentParams = {
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
-  commentsContractAddress?: Hex;
+  commentsAddress?: Hex;
   /**
    * The author signature
    */
@@ -317,7 +311,7 @@ const DeleteCommentParamsSchema = z.object({
   appSigner: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint(),
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
   authorSignature: HexSchema,
   appSignature: HexSchema,
 });
@@ -329,11 +323,11 @@ const DeleteCommentParamsSchema = z.object({
  * @returns The transaction hash
  */
 export async function deleteComment(params: DeleteCommentParams) {
-  const { commentId, commentsContractAddress } =
+  const { commentId, commentsAddress } =
     DeleteCommentParamsSchema.parse(params);
 
   const txHash = await params.writeContract({
-    address: commentsContractAddress,
+    address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "deleteComment",
     args: [
@@ -377,7 +371,7 @@ export type GetDeleteCommentHashParams = {
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
-  commentsContractAddress?: Hex;
+  commentsAddress?: Hex;
   readContract: (
     parameters: ReadContractParameters<
       typeof CommentsV1Abi,
@@ -394,7 +388,7 @@ const GetDeleteCommentHashParamsSchema = z.object({
   appSigner: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint(),
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
 });
 
 /**
@@ -406,17 +400,11 @@ const GetDeleteCommentHashParamsSchema = z.object({
 export async function getDeleteCommentHash(
   params: GetDeleteCommentHashParams
 ): Promise<Hex> {
-  const {
-    commentId,
-    author,
-    appSigner,
-    nonce,
-    deadline,
-    commentsContractAddress,
-  } = GetDeleteCommentHashParamsSchema.parse(params);
+  const { commentId, author, appSigner, nonce, deadline, commentsAddress } =
+    GetDeleteCommentHashParamsSchema.parse(params);
 
   const hash = await params.readContract({
-    address: commentsContractAddress,
+    address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "getDeleteCommentHash",
     args: [commentId, author, appSigner, nonce, deadline],
@@ -438,7 +426,7 @@ export type GetNonceParams = {
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
-  commentsContractAddress?: Hex;
+  commentsAddress?: Hex;
   readContract: (
     parameters: ReadContractParameters<typeof CommentsV1Abi, "nonces">
   ) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "nonces">>;
@@ -447,7 +435,7 @@ export type GetNonceParams = {
 const GetNonceParamsSchema = z.object({
   author: HexSchema,
   appSigner: HexSchema,
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
 });
 
 /**
@@ -457,11 +445,11 @@ const GetNonceParamsSchema = z.object({
  * @returns The nonce
  */
 export async function getNonce(params: GetNonceParams): Promise<bigint> {
-  const { author, appSigner, commentsContractAddress } =
+  const { author, appSigner, commentsAddress } =
     GetNonceParamsSchema.parse(params);
 
   const nonce = await params.readContract({
-    address: commentsContractAddress,
+    address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "nonces",
     args: [author, appSigner],
