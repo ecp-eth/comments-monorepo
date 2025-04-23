@@ -43,10 +43,10 @@
       "import": "./dist/esm/channel-manager/react/index.js",
       "default": "./dist/cjs/channel-manager/react/index.cjs"
     },
-    "./comments/contract": {
-      "types": "./dist/esm/comments/contract.d.ts",
-      "import": "./dist/esm/comments/contract.js",
-      "default": "./dist/cjs/comments/contract.cjs"
+    "./comments": {
+      "types": "./dist/esm/comments/index.d.ts",
+      "import": "./dist/esm/comments/index.js",
+      "default": "./dist/cjs/comments/index.cjs"
     }
   },
   "scripts": {

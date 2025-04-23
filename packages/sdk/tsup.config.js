@@ -9,7 +9,7 @@ export default defineConfig({
     "src/types.ts",
     "src/channel-manager/index.ts",
     "src/channel-manager/react/index.ts",
-    "src/comments/contract.ts",
+    "src/comments/index.ts",
   ],
   splitting: true,
   dts: true,
