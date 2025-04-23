@@ -1,9 +1,11 @@
 import { z } from "zod";
 import { CHANNEL_MANAGER_ADDRESS } from "../constants.js";
-import { HexSchema } from "../schemas/core.js";
+import { CommentDataSchema } from "../comments/schemas.js";
 import type { Hex } from "../types.js";
 import { ChannelManagerAbi } from "../abis.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
+import { HexSchema } from "../schemas/core.js";
+import type { CommentData } from "../comments/types.js";
 
 export type GetHookStatusParams = {
   /**
@@ -372,6 +374,92 @@ export async function setHookTransactionFee(
     abi: ChannelManagerAbi,
     functionName: "setHookTransactionFee",
     args: [feePercentage],
+  });
+
+  return {
+    txHash,
+  };
+}
+
+export type ExecuteHooksParams = {
+  /**
+   * The ID of the channel to execute hooks for
+   */
+  channelId: bigint;
+  /**
+   * The comment data to process
+   */
+  commentData: CommentData;
+  /**
+   * The address that initiated the transaction
+   */
+  caller: Hex;
+  /**
+   * The unique identifier of the comment
+   */
+  commentId: Hex;
+  /**
+   * The phase of hook execution (Before or After)
+   */
+  phase: "Before" | "After";
+  /**
+   * The value to send with the transaction
+   */
+  value?: bigint;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  writeContract: ContractWriteFunctions["executeHooks"];
+};
+
+export type ExecuteHooksResult = {
+  txHash: Hex;
+};
+
+const ExecuteHooksParamsSchema = z.object({
+  channelId: z.bigint(),
+  commentData: CommentDataSchema,
+  caller: HexSchema,
+  commentId: HexSchema,
+  phase: z.enum(["Before", "After"]),
+  value: z.bigint().min(0n).optional(),
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Execute hooks for a channel
+ *
+ * @param params - The parameters for executing hooks
+ * @returns The transaction hash of the hook execution
+ */
+export async function executeHooks(
+  params: ExecuteHooksParams
+): Promise<ExecuteHooksResult> {
+  const {
+    channelId,
+    commentData,
+    caller,
+    commentId,
+    phase,
+    value,
+    channelManagerAddress,
+  } = ExecuteHooksParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "executeHooks",
+    args: [
+      channelId,
+      commentData,
+      caller,
+      commentId,
+      phase === "Before" ? 0 : 1,
+    ],
+    value,
   });
 
   return {

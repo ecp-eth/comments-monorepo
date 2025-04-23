@@ -101,6 +101,16 @@ export type ContractWriteFunctions = {
       "withdrawFees"
     >
   ) => Promise<Hex>;
+
+  executeHooks: (
+    args: ContractFunctionParameters<
+      ChannelManagerAbiType,
+      "payable",
+      "executeHooks"
+    > & {
+      value?: bigint;
+    }
+  ) => Promise<Hex>;
 };
 
 export type ContractReadFunctions = {
