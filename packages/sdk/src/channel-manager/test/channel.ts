@@ -23,7 +23,9 @@ import {
   setBaseURI,
 } from "../channel.js";
 import { ChannelManagerAbi } from "../../abis.js";
-import { CHANNEL_MANAGER_ADDRESS } from "../../../scripts/constants.js";
+import { deployContracts } from "../../../scripts/test-helpers.js";
+
+const { channelManagerAddress } = deployContracts();
 
 // Test account setup
 const testPrivateKey =
@@ -51,7 +53,7 @@ async function resetFees() {
   const creationFee = await setChannelCreationFee({
     fee: parseEther("0.02"),
     writeContract: client.writeContract,
-    channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+    channelManagerAddress,
   });
 
   const receipt = await client.waitForTransactionReceipt({
@@ -72,7 +74,7 @@ describe("createChannel()", () => {
         createChannel({
           name: "Test channel",
           writeContract: client.writeContract,
-          channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+          channelManagerAddress,
         }),
       (err) => {
         assert.ok(
@@ -94,7 +96,7 @@ describe("createChannel()", () => {
       name: "Test channel",
       fee: parseEther("0.02"), // this is default , see ChannelManager.sol
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -113,7 +115,7 @@ describe("getChannel()", () => {
       name: "Test channel",
       fee: parseEther("0.02"),
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -137,7 +139,7 @@ describe("getChannel()", () => {
     const channel = await getChannel({
       channelId,
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.deepEqual(channel, {
@@ -155,7 +157,7 @@ describe("channelExists()", () => {
       await channelExists({
         channelId: 0n, // default channel id
         readContract: client.readContract,
-        channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+        channelManagerAddress,
       }),
       true,
       "should return true for default channel id"
@@ -165,7 +167,7 @@ describe("channelExists()", () => {
       await channelExists({
         channelId: 10n,
         readContract: client.readContract,
-        channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+        channelManagerAddress,
       }),
       false,
       "should return false for non-existent channel id"
@@ -177,7 +179,7 @@ describe("getChannelCreationFee()", () => {
   it("returns the fee", async () => {
     const fee = await getChannelCreationFee({
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.deepEqual(
@@ -196,7 +198,7 @@ describe("getChannelOwner()", () => {
       name: "Test channel",
       fee: parseEther("0.02"),
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -220,7 +222,7 @@ describe("getChannelOwner()", () => {
     const owner = await getChannelOwner({
       channelId,
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.deepEqual(owner, { owner: account.address });
@@ -235,7 +237,7 @@ describe("updateChannel()", () => {
       name: "Test channel",
       fee: parseEther("0.02"),
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -262,7 +264,7 @@ describe("updateChannel()", () => {
       description: "New description",
       metadata: "New metadata",
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -275,7 +277,7 @@ describe("updateChannel()", () => {
     const channel = await getChannel({
       channelId,
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.deepEqual(channel, {
@@ -294,7 +296,7 @@ describe("setChannelCreationFee()", () => {
         setChannelCreationFee({
           fee: parseEther("0.05"),
           writeContract: client2.writeContract,
-          channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+          channelManagerAddress,
         }),
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);
@@ -309,7 +311,7 @@ describe("setChannelCreationFee()", () => {
     const result = await setChannelCreationFee({
       fee: newFee,
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -321,7 +323,7 @@ describe("setChannelCreationFee()", () => {
     // Verify the new fee
     const fee = await getChannelCreationFee({
       readContract: client.readContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     assert.deepEqual(fee, { fee: newFee });
@@ -335,7 +337,7 @@ describe("withdrawFees()", () => {
       name: "Fee generation channel",
       fee: parseEther("0.02"),
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
   });
 
@@ -343,7 +345,7 @@ describe("withdrawFees()", () => {
     const result = await withdrawFees({
       recipient: account.address,
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -368,7 +370,7 @@ describe("updateCommentsContract()", () => {
     const result = await updateCommentsContract({
       commentsContract: newContractAddress,
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
@@ -385,7 +387,7 @@ describe("setBaseURI()", () => {
     const result = await setBaseURI({
       baseURI: newBaseURI,
       writeContract: client.writeContract,
-      channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+      channelManagerAddress,
     });
 
     const receipt = await client.waitForTransactionReceipt({
