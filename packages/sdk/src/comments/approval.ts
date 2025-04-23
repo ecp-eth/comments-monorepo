@@ -23,14 +23,14 @@ export type IsApprovedParams = {
    * The address of the comments contract
    * @default COMMENTS_V1_ADDRESS
    */
-  commentsContractAddress?: Hex;
+  commentsAddress?: Hex;
   readContract: ContractReadFunctions["isApproved"];
 };
 
 const IsApprovedParamsSchema = z.object({
   author: HexSchema,
   appSigner: HexSchema,
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
 });
 
 /**
@@ -40,11 +40,11 @@ const IsApprovedParamsSchema = z.object({
  * @returns Whether the app signer is approved
  */
 export async function isApproved(params: IsApprovedParams): Promise<boolean> {
-  const { author, appSigner, commentsContractAddress } =
+  const { author, appSigner, commentsAddress } =
     IsApprovedParamsSchema.parse(params);
 
   const approved = await params.readContract({
-    address: commentsContractAddress,
+    address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "isApproved",
     args: [author, appSigner],

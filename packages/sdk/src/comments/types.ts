@@ -1,4 +1,8 @@
-import type { ContractFunctionParameters, ReadContractReturnType } from "viem";
+import type {
+  ContractFunctionParameters,
+  ReadContractParameters,
+  ReadContractReturnType,
+} from "viem";
 import type { Hex } from "../types.js";
 import type { CommentsV1Abi } from "../abis.js";
 
@@ -148,66 +152,46 @@ export type ContractWriteFunctions = {
 
 export type ContractReadFunctions = {
   getAddApprovalHash: (
-    args: ContractFunctionParameters<
-      CommentsV1AbiType,
-      "view",
-      "getAddApprovalHash"
-    >
+    args: ReadContractParameters<CommentsV1AbiType, "getAddApprovalHash">
   ) => Promise<ReadContractReturnType<CommentsV1AbiType, "getAddApprovalHash">>;
 
   getRemoveApprovalHash: (
-    args: ContractFunctionParameters<
-      CommentsV1AbiType,
-      "view",
-      "getRemoveApprovalHash"
-    >
+    args: ReadContractParameters<CommentsV1AbiType, "getRemoveApprovalHash">
   ) => Promise<
     ReadContractReturnType<CommentsV1AbiType, "getRemoveApprovalHash">
   >;
 
   getDeleteCommentHash: (
-    args: ContractFunctionParameters<
-      CommentsV1AbiType,
-      "view",
-      "getDeleteCommentHash"
-    >
+    args: ReadContractParameters<CommentsV1AbiType, "getDeleteCommentHash">
   ) => Promise<
     ReadContractReturnType<CommentsV1AbiType, "getDeleteCommentHash">
   >;
 
   getCommentId: (
-    args: ContractFunctionParameters<CommentsV1AbiType, "view", "getCommentId">
+    args: ReadContractParameters<CommentsV1AbiType, "getCommentId">
   ) => Promise<ReadContractReturnType<CommentsV1AbiType, "getCommentId">>;
 
   getComment: (
-    args: ContractFunctionParameters<CommentsV1AbiType, "view", "getComment">
+    args: ReadContractParameters<CommentsV1AbiType, "getComment">
   ) => Promise<ReadContractReturnType<CommentsV1AbiType, "getComment">>;
 
   isApproved: (
-    args: ContractFunctionParameters<CommentsV1AbiType, "view", "isApproved">
+    args: ReadContractParameters<CommentsV1AbiType, "isApproved">
   ) => Promise<ReadContractReturnType<CommentsV1AbiType, "isApproved">>;
 
   name: (
-    args: ContractFunctionParameters<CommentsV1AbiType, "view", "name">
+    args: ReadContractParameters<CommentsV1AbiType, "name">
   ) => Promise<ReadContractReturnType<CommentsV1AbiType, "name">>;
 
   version: (
-    args: ContractFunctionParameters<CommentsV1AbiType, "view", "version">
+    args: ReadContractParameters<CommentsV1AbiType, "version">
   ) => Promise<ReadContractReturnType<CommentsV1AbiType, "version">>;
 
   DOMAIN_SEPARATOR: (
-    args: ContractFunctionParameters<
-      CommentsV1AbiType,
-      "view",
-      "DOMAIN_SEPARATOR"
-    >
+    args: ReadContractParameters<CommentsV1AbiType, "DOMAIN_SEPARATOR">
   ) => Promise<ReadContractReturnType<CommentsV1AbiType, "DOMAIN_SEPARATOR">>;
 
   channelManager: (
-    args: ContractFunctionParameters<
-      CommentsV1AbiType,
-      "view",
-      "channelManager"
-    >
+    args: ReadContractParameters<CommentsV1AbiType, "channelManager">
   ) => Promise<ReadContractReturnType<CommentsV1AbiType, "channelManager">>;
 };
