@@ -14,9 +14,9 @@
     "packages/shared/schemas": true,
     "packages/shared/types": true,
     "packages/shared/components": true,
-    "packages/sdk/channel-manager/contract": true,
-    "packages/sdk/channel-manager/react": true,
     "packages/sdk/channel-manager": true,
-    "packages/sdk/comments/contract": true
+    "packages/sdk/channel-manager/*": true,
+    "packages/sdk/comments": true,
+    "packages/sdk/comments/*": true
   }
 }
