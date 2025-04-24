@@ -37,14 +37,26 @@ const getCommentsRoute = createRoute({
  */
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { author, targetUri, appSigner, sort, limit, cursor, viewer, mode } =
-      c.req.valid("query");
+    const {
+      author,
+      targetUri,
+      appSigner,
+      sort,
+      limit,
+      cursor,
+      viewer,
+      mode,
+      channelId,
+      commentType,
+    } = c.req.valid("query");
 
     const sharedConditions = [
       author ? eq(schema.comments.author, author) : undefined,
       isNull(schema.comments.parentId),
       targetUri ? eq(schema.comments.targetUri, targetUri) : undefined,
       appSigner ? eq(schema.comments.appSigner, appSigner) : undefined,
+      channelId != null ? eq(schema.comments.channelId, channelId) : undefined,
+      commentType ? eq(schema.comments.commentType, commentType) : undefined,
     ];
 
     const repliesConditions: (SQL<unknown> | undefined)[] = [];

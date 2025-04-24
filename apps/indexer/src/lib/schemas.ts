@@ -133,6 +133,12 @@ export const GetCommentsQuerySchema = z.object({
     description:
       "Non inclusive cursor from which to fetch the comments based on sort",
   }),
+  channelId: z.coerce.bigint().optional().openapi({
+    description: "The channel ID",
+  }),
+  commentType: z.string().optional().openapi({
+    description: "The comment type",
+  }),
   // zod-openapi plugin doesn't automatically infer the minimum value from `int().positive()`
   // so use min(1) for better compatibility
   limit: z.coerce.number().int().min(1).max(100).default(50).openapi({
