@@ -38,15 +38,20 @@
       "import": "./dist/esm/channel-manager/index.js",
       "default": "./dist/cjs/channel-manager/index.cjs"
     },
-    "./channel-manager/react": {
-      "types": "./dist/esm/channel-manager/react/index.d.ts",
-      "import": "./dist/esm/channel-manager/react/index.js",
-      "default": "./dist/cjs/channel-manager/react/index.cjs"
+    "./channel-manager/*": {
+      "types": "./dist/esm/channel-manager/*.d.ts",
+      "import": "./dist/esm/channel-manager/*.js",
+      "default": "./dist/cjs/channel-manager/*.cjs"
     },
     "./comments": {
       "types": "./dist/esm/comments/index.d.ts",
       "import": "./dist/esm/comments/index.js",
       "default": "./dist/cjs/comments/index.cjs"
+    },
+    "./comments/*": {
+      "types": "./dist/esm/comments/*.d.ts",
+      "import": "./dist/esm/comments/*.js",
+      "default": "./dist/cjs/comments/*.cjs"
     }
   },
   "scripts": {

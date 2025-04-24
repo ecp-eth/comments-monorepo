@@ -62,5 +62,6 @@ packages/shared/schemas
 packages/shared/types
 packages/shared/components
 packages/sdk/channel-manager
-packages/sdk/channel-manager/react
+packages/sdk/channel-manager/*
 packages/sdk/comments
+packages/sdk/comments/*
