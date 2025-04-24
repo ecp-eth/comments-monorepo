@@ -107,6 +107,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         string memory description = "Test Description";
         string memory metadata = "{}";
 
+        uint256 initialBalance = address(channelManager).balance;
         uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             name,
             description,
@@ -125,6 +126,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         assertEq(channelDesc, description);
         assertEq(channelMeta, metadata);
         assertEq(hook, address(0));
+        assertEq(address(channelManager).balance - initialBalance, 0.02 ether);
     }
 
     function test_CreateChannelWithHook() public {
@@ -132,6 +134,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         string memory description = "Test Description";
         string memory metadata = "{}";
 
+        uint256 initialBalance = address(channelManager).balance;
         uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             name,
             description,
@@ -141,6 +144,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
         (, , , address channelHook) = channelManager.getChannel(channelId);
         assertEq(channelHook, address(mockHook));
+        assertEq(address(channelManager).balance - initialBalance, 0.02 ether);
     }
 
     function test_UpdateChannel() public {
@@ -216,17 +220,26 @@ contract ChannelManagerTest is Test, IERC721Receiver {
                 parentId: bytes32(0)
             });
 
+        // add some ether to the comments v1 contract to allow it to call hook with fee
+        vm.deal(address(comments), 10 ether);
+
         // Test beforeComment hook
         vm.prank(address(comments));
-        // assertTrue(
-        channelManager.executeHooks(
-            channelId,
-            commentData,
-            user1,
-            bytes32(0),
-            IChannelManager.HookPhase.Before
+        uint256 initialBalance = address(channelManager).balance;
+        assertTrue(
+            channelManager.executeHooks{value: 0.02 ether}(
+                channelId,
+                commentData,
+                user1,
+                bytes32(0),
+                IChannelManager.HookPhase.Before
+            )
         );
-        // );
+        assertEq(
+            address(channelManager).balance - initialBalance,
+            // 0.02 * 2% = 0.0004
+            0.0004 ether
+        );
 
         // Test afterComment hook
         vm.prank(address(comments));
@@ -298,6 +311,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         MockHook newHook = new MockHook();
 
         // Register the new hook
+        uint256 initialBalance = address(channelManager).balance;
         channelManager.registerHook{value: 0.02 ether}(address(newHook));
 
         // Test initial hook registration status
@@ -318,6 +332,8 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         (registered, enabled) = channelManager.getHookStatus(address(newHook));
         assertTrue(registered);
         assertFalse(enabled);
+
+        assertEq(address(channelManager).balance - initialBalance, 0.02 ether);
     }
 
     function onERC721Received(
