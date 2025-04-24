@@ -93,9 +93,9 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
     string public constant name = "Comments";
     string public constant version = "1";
     bytes32 public immutable DOMAIN_SEPARATOR;
-    bytes32 public constant COMMENT_TYPEHASH =
+    bytes32 public constant ADD_COMMENT_TYPEHASH =
         keccak256(
-            "AddComment(string content,string metadata,string targetUri,string commentType,address author,address appSigner,uint256 channelId,uint256 nonce,uint256 deadline)"
+            "AddComment(string content,string metadata,string targetUri,string commentType,address author,address appSigner,uint256 channelId,uint256 nonce,uint256 deadline,bytes32 parentId)"
         );
     bytes32 public constant DELETE_COMMENT_TYPEHASH =
         keccak256(
@@ -581,7 +581,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
     ) public view returns (bytes32) {
         bytes32 structHash = keccak256(
             abi.encode(
-                COMMENT_TYPEHASH,
+                ADD_COMMENT_TYPEHASH,
                 keccak256(bytes(commentData.content)),
                 keccak256(bytes(commentData.metadata)),
                 keccak256(bytes(commentData.targetUri)),
