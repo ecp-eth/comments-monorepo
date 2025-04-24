@@ -105,10 +105,6 @@ export type PostCommentParams = {
    */
   comment: CommentInputData;
   /**
-   * The author signature
-   */
-  authorSignature: Hex;
-  /**
    * The app signature
    */
   appSignature: Hex;
@@ -133,7 +129,6 @@ export type PostCommentResult = {
 
 const PostCommentParamsSchema = z.object({
   comment: z.custom<CommentInputData>(() => true),
-  authorSignature: HexSchema,
   appSignature: HexSchema,
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
   fee: z.bigint().optional(),
@@ -148,14 +143,13 @@ const PostCommentParamsSchema = z.object({
 export async function postComment(params: PostCommentParams) {
   const validatedParams = PostCommentParamsSchema.parse(params);
 
-  const { comment, authorSignature, appSignature, commentsAddress, fee } =
-    validatedParams;
+  const { comment, appSignature, commentsAddress, fee } = validatedParams;
 
   const txHash = await params.writeContract({
     address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "postComment",
-    args: [comment, authorSignature, appSignature],
+    args: [comment, stringToHex(""), appSignature],
     value: fee,
   });
 
