@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { CustomMDX } from "app/components/mdx";
 import { formatDate, getBlogPosts } from "app/blog/utils";
 import { baseUrl } from "app/sitemap";
-import { CommentsEmbed } from "@ecp.eth/sdk/react";
+import { CommentsEmbed } from "@ecp.eth/sdk/embed/react";
 import { commentsEmbedTheme } from "app/comments-embed-theme";
 
 export async function generateStaticParams() {

@@ -1,4 +1,4 @@
-import { EmbedConfigThemeSchemaType } from "@ecp.eth/sdk/schemas";
+import type { EmbedConfigThemeSchemaType } from "@ecp.eth/sdk/embed/schemas";
 
 export const commentsEmbedTheme: EmbedConfigThemeSchemaType = {
   colors: {
