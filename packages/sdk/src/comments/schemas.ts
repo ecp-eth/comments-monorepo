@@ -2,7 +2,7 @@ import { z } from "zod";
 import { HexSchema } from "../core/schemas.js";
 import { DOMAIN_NAME, DOMAIN_VERSION } from "./eip712.js";
 import { DEFAULT_COMMENT_TYPE, EMPTY_PARENT_ID } from "../constants.js";
-import { CommentData } from "./types.js";
+import type { CommentData } from "./types.js";
 
 /**
  * Comment schema. This is used as output of the functions.

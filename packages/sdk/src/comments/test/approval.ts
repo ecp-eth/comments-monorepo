@@ -20,7 +20,7 @@ import {
   createRemoveApprovalTypedData,
 } from "../approval.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
-import type { Hex } from "../../types.js";
+import type { Hex } from "../../core/schemas.js";
 import { getNonce } from "../comment.js";
 import type {
   AddApprovalTypedDataSchemaType,

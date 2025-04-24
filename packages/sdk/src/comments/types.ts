@@ -4,7 +4,7 @@ import type {
   ReadContractReturnType,
 } from "viem";
 import type { CommentsV1Abi } from "../abis.js";
-import { Hex } from "../core/schemas.js";
+import type { Hex } from "../core/schemas.js";
 
 export type CommentsV1AbiType = typeof CommentsV1Abi;
 

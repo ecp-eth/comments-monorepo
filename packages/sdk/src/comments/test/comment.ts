@@ -25,7 +25,7 @@ import {
 import { addApprovalAsAuthor } from "../approval.js";
 import { CommentsV1Abi } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
-import type { Hex } from "../../types.js";
+import type { Hex } from "../../core/schemas.js";
 import type { CommentData } from "../types.js";
 
 const { commentsAddress } = deployContracts();
@@ -93,7 +93,6 @@ describe("postCommentAsAuthor()", () => {
 });
 
 describe("postComment()", () => {
-  let authorSignature: Hex;
   let appSignature: Hex;
   let commentData: CommentData;
 
@@ -129,14 +128,12 @@ describe("postComment()", () => {
       commentsAddress,
     });
 
-    authorSignature = await client.signTypedData(typedData);
     appSignature = await appSignerClient.signTypedData(typedData);
   });
 
   it("posts a comment with signatures", async () => {
     const result = await postComment({
       comment: commentData,
-      authorSignature,
       appSignature,
       writeContract: appSignerClient.writeContract,
       commentsAddress,
@@ -168,7 +165,6 @@ describe("postComment()", () => {
             nonce,
             targetUri: "https://example.com",
           }),
-          authorSignature: "0x1234", // Invalid signature
           appSignature,
           writeContract: appSignerClient.writeContract,
           commentsAddress,
