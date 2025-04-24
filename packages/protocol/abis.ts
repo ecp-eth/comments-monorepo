@@ -28,7 +28,7 @@ export const CommentsV1Abi = [
   },
   {
     type: "function",
-    name: "COMMENT_TYPEHASH",
+    name: "ADD_COMMENT_TYPEHASH",
     inputs: [],
     outputs: [
       {

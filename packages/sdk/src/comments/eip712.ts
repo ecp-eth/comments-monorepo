@@ -1,18 +1,18 @@
 export const DOMAIN_NAME = "Comments";
 export const DOMAIN_VERSION = "1";
 
-export const COMMENT_TYPE = {
+export const ADD_COMMENT_TYPE = {
   AddComment: [
     { name: "content", type: "string" },
     { name: "metadata", type: "string" },
     { name: "targetUri", type: "string" },
-    // { name: "parentId", type: "bytes32" },
     { name: "commentType", type: "string" },
     { name: "author", type: "address" },
     { name: "appSigner", type: "address" },
     { name: "channelId", type: "uint256" },
     { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
+    { name: "parentId", type: "bytes32" },
   ],
 } as const;
 
