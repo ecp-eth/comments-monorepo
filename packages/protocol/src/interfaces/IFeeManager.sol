@@ -33,8 +33,8 @@ interface IFeeManager {
     function setHookRegistrationFee(uint96 fee) external;
 
     /// @notice Sets the fee percentage taken from hook transactions
-    /// @param feePercentage The fee percentage in basis points (1 basis points = 0.01%)
-    function setHookTransactionFee(uint16 feePercentage) external;
+    /// @param feeBasisPoints The fee percentage in basis points (1 basis point = 0.01%)
+    function setHookTransactionFee(uint16 feeBasisPoints) external;
 
     /// @notice Gets the current channel creation fee
     /// @return fee The current fee in wei
