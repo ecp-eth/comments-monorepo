@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CommentsEmbed } from "@ecp.eth/sdk/react";
+import { CommentsEmbed } from "@ecp.eth/sdk/embed/react";
 import { publicEnv } from "./publicEnv";
 import { useIsMounted } from "./hooks/useIsMounted";
 
