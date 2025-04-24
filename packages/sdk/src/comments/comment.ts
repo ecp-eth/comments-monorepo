@@ -27,7 +27,7 @@ import {
   type DeleteCommentTypedDataSchemaType,
 } from "./schemas.js";
 import {
-  COMMENT_TYPE,
+  ADD_COMMENT_TYPE,
   DELETE_COMMENT_TYPE,
   DOMAIN_NAME,
   DOMAIN_VERSION,
@@ -520,7 +520,7 @@ export function createCommentTypedData(
       chainId,
       verifyingContract: commentsAddress,
     },
-    types: COMMENT_TYPE,
+    types: ADD_COMMENT_TYPE,
     primaryType: "AddComment",
     message: commentData,
   });
