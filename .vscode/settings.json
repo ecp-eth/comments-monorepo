@@ -17,6 +17,16 @@
     "packages/sdk/channel-manager": true,
     "packages/sdk/channel-manager/*": true,
     "packages/sdk/comments": true,
-    "packages/sdk/comments/*": true
+    "packages/sdk/comments/*": true,
+    "packages/sdk/core": true,
+    "packages/sdk/core/*": true,
+    "packages/sdk/embed": true,
+    "packages/sdk/embed/*": true,
+    "packages/sdk/api": true,
+    "packages/sdk/embed/schemas": true,
+    "packages/sdk/indexer": true,
+    "packages/sdk/indexer/*": true,
+    "packages/sdk/channel-manager/react": true,
+    "packages/sdk/comments/react": true
   }
 }

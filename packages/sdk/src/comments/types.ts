@@ -3,8 +3,8 @@ import type {
   ReadContractParameters,
   ReadContractReturnType,
 } from "viem";
-import type { Hex } from "../types.js";
 import type { CommentsV1Abi } from "../abis.js";
+import { Hex } from "../core/schemas.js";
 
 export type CommentsV1AbiType = typeof CommentsV1Abi;
 

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { COMMENTS_V1_ADDRESS } from "../constants.js";
-import { HexSchema } from "../schemas/core.js";
-import type { Hex } from "../types.js";
+import { type Hex, HexSchema } from "../core/schemas.js";
 import { CommentsV1Abi } from "../abis.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 

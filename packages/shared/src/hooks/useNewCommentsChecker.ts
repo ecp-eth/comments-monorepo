@@ -11,10 +11,10 @@ import {
 import { useCallback, useEffect, useMemo } from "react";
 import { hasNewComments, mergeNewComments } from "../helpers.js";
 import type {
-  Hex,
   IndexerAPIListCommentRepliesSchemaType,
   IndexerAPIListCommentsSchemaType,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
+import type { Hex } from "@ecp.eth/sdk/core/schemas";
 
 /**
  * This hook checks whether there are any new comments on the query given by the `queryKey`.

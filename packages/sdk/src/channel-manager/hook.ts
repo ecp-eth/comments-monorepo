@@ -4,10 +4,9 @@ import {
   CommentInputDataSchema,
   type CommentInputData,
 } from "../comments/schemas.js";
-import type { Hex } from "../types.js";
 import { ChannelManagerAbi } from "../abis.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
-import { HexSchema } from "../schemas/core.js";
+import { type Hex, HexSchema } from "../core/schemas.js";
 
 export type GetHookStatusParams = {
   /**

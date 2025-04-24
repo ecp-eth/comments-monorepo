@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { HexSchema } from "./core.js";
+import { HexSchema } from "../core/schemas.js";
 
 export const IndexerAPIAuthorEnsDataSchema = z.object({
   name: z.string(),

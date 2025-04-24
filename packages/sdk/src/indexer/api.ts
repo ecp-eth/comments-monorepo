@@ -1,15 +1,14 @@
 import { Effect } from "effect";
+import { HexSchema, type Hex } from "../core/schemas.js";
 import {
-  HexSchema,
-  type Hex,
   IndexerAPIListCommentRepliesSchema,
   type IndexerAPIListCommentRepliesSchemaType,
   IndexerAPIListCommentsSchema,
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
   IndexerAPIAuthorDataSchema,
-} from "./schemas/index.js";
-import { INDEXER_API_URL } from "./constants.js";
+} from "./schemas.js";
+import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
 
 /**

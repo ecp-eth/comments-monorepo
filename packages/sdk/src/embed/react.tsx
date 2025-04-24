@@ -1,147 +1,15 @@
-/**
- * Ethereum Comments Protocol SDK for React
- *
- * @module
- */
-"use client";
-
-import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Hex, SignTypedDataParameters } from "viem";
-import { useSignTypedData } from "wagmi";
+import { createCommentsEmbedURL } from "./utils.js";
 import {
   COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL,
   COMMENTS_EMBED_DEFAULT_URL,
-} from "./constants.js";
+} from "../constants.js";
 import {
-  EmbedConfigSchema,
-  EmbedConfigSupportedChainIdsSchemaType,
-  EmbedConfigThemeSchemaType,
+  type EmbedConfigSupportedChainIdsSchemaType,
+  type EmbedConfigThemeSchemaType,
   EmbedResizedEventSchema,
-  type EmbedConfigSchemaInputType,
 } from "./schemas/index.js";
-import * as lz from "lz-ts";
-
-// also export the type for generating docs correctly
-export type {
-  EmbedConfigSchemaInputType,
-  EmbedConfigSchemaOutputType,
-} from "./schemas/index.js";
-
-const { compressToURI } = lz;
-
-/**
- * A hook for repeat gasless transaction pattern
- *
- * Gasless transaction typically requires 3 steps:
- * 1. prepare typed data to be passed to `signTypedData`, typically this is also created from server side with an app signature.
- * 2. sign typed data on client side
- * 3. send the dual signed data to server
- *
- * This hook abstracts these steps and help with the repetition of the pattern.
- *
- * @category Hooks
- * @param props
- * @returns
- */
-export function useGaslessTransaction<
-  TVariables extends object | undefined,
-  TReturnValue,
-  TInputVariables = void,
-  TSignTypedDataParams extends
-    SignTypedDataParameters = SignTypedDataParameters,
->(props: {
-  prepareSignTypedDataParams: (variables: TInputVariables) => Promise<
-    | TSignTypedDataParams
-    | {
-        signTypedDataParams: TSignTypedDataParams;
-        /** Miscellaneous data passed to be passed to sendSignedData */
-        variables: TVariables;
-      }
-  >;
-  signTypedData?: (signTypedDataParams: TSignTypedDataParams) => Promise<Hex>;
-  sendSignedData: (args: {
-    signTypedDataParams: TSignTypedDataParams;
-    signature: Hex;
-    /** Miscellaneous data passed from prepareSignTypedDataParams */
-    variables: TVariables;
-  }) => Promise<TReturnValue>;
-}) {
-  const { signTypedDataAsync } = useSignTypedData();
-
-  return useMutation<TReturnValue, Error, TInputVariables>({
-    mutationFn: async (inputVariables) => {
-      const signTypedDataFn = props.signTypedData ?? signTypedDataAsync;
-
-      const prepareResult =
-        await props.prepareSignTypedDataParams(inputVariables);
-      const signTypedDataParams =
-        "signTypedDataParams" in prepareResult
-          ? prepareResult.signTypedDataParams
-          : prepareResult;
-      const signature = await signTypedDataFn(
-        "signTypedDataParams" in prepareResult
-          ? prepareResult.signTypedDataParams
-          : prepareResult
-      );
-
-      const signedData = await props.sendSignedData({
-        signTypedDataParams,
-        signature,
-        variables:
-          "variables" in prepareResult
-            ? prepareResult.variables
-            : (undefined as TVariables),
-      });
-      return signedData;
-    },
-  });
-}
-
-/**
- * Parameters for `createCommentsEmbedURL`
- */
-export type CreateCommentsEmbedURLParams = {
-  /**
-   * The URI of the comments embed iframe page.
-   */
-  embedUri: string;
-  /**
-   * The target URI or author address to embed comments for.
-   */
-  source: { targetUri: string } | { author: Hex };
-  /**
-   * The configuration for the comments embed.
-   */
-  config?: EmbedConfigSchemaInputType;
-};
-
-/**
- * Creates a URL for the comments embed iframe.
- *
- * @param options
- *
- * @returns The URL for the comments embed iframe.
- */
-export function createCommentsEmbedURL({
-  embedUri,
-  source,
-  config,
-}: CreateCommentsEmbedURLParams): string {
-  const url = new URL(embedUri);
-
-  if ("targetUri" in source) {
-    url.searchParams.set("targetUri", source.targetUri);
-  } else {
-    url.searchParams.set("author", source.author);
-  }
-
-  if (config && EmbedConfigSchema.parse(config)) {
-    url.searchParams.set("config", compressToURI(JSON.stringify(config)));
-  }
-
-  return url.toString();
-}
+import type { Hex } from "../core/schemas.js";
 
 /**
  * The props for `<CommentsEmbed />` component.

@@ -5,8 +5,7 @@ import {
   DEFAULT_COMMENT_TYPE,
   EMPTY_PARENT_ID,
 } from "../constants.js";
-import { HexSchema, type CommentData } from "../schemas/core.js";
-import type { Hex } from "../types.js";
+import { HexSchema, type Hex } from "../core/schemas.js";
 import { CommentsV1Abi } from "../abis.js";
 import {
   stringToHex,
@@ -17,6 +16,7 @@ import type {
   ContractWriteFunctions,
   ContractReadFunctions,
   CreateCommentDataParams,
+  CommentData,
 } from "./types.js";
 import {
   AddCommentTypedDataSchema,

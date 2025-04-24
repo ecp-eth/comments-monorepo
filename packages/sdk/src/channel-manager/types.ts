@@ -3,7 +3,7 @@ import type {
   ReadContractParameters,
   ReadContractReturnType,
 } from "viem";
-import type { Hex } from "../types.js";
+import type { Hex } from "../core/schemas.js";
 import type { ChannelManagerAbi } from "../abis.js";
 
 export type ChannelManagerAbiType = typeof ChannelManagerAbi;
