@@ -4,9 +4,11 @@ export const comments = onchainTable(
   "comments",
   (t) => ({
     id: t.hex().primaryKey(),
+    channelId: t.bigint().notNull(),
     content: t.text().notNull(),
     metadata: t.text().notNull(),
     targetUri: t.text().notNull(),
+    commentType: t.text().notNull(),
     parentId: t.hex(),
     rootCommentId: t.hex(),
     author: t.hex().notNull(),
@@ -33,6 +35,8 @@ export const comments = onchainTable(
     authorIdx: index().on(table.author),
     moderationStatusIdx: index().on(table.moderationStatus),
     rootCommentIdIdx: index().on(table.rootCommentId),
+    channelIdIdx: index().on(table.channelId),
+    commentTypeIdx: index().on(table.commentType),
   })
 );
 

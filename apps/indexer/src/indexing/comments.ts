@@ -90,6 +90,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       chainId: context.network.chainId,
       appSigner: event.args.commentData.appSigner,
       logIndex: event.log.logIndex,
+      channelId: event.args.commentData.channelId,
+      commentType: event.args.commentData.commentType,
       ...(moderationStatus
         ? {
             moderationStatus: moderationStatus.status,

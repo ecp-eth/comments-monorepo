@@ -43,12 +43,22 @@ const getCommentsRoute = createRoute({
 });
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { appSigner, sort, limit, cursor, mode, viewer } =
-      c.req.valid("query");
+    const {
+      appSigner,
+      sort,
+      limit,
+      cursor,
+      mode,
+      viewer,
+      channelId,
+      commentType,
+    } = c.req.valid("query");
     const { commentId } = c.req.valid("param");
 
     const sharedConditions = [
       appSigner ? eq(schema.comments.appSigner, appSigner) : undefined,
+      channelId != null ? eq(schema.comments.channelId, channelId) : undefined,
+      commentType ? eq(schema.comments.commentType, commentType) : undefined,
     ];
 
     if (mode === "flat") {
