@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EmbedConfigSupportedFont } from "./embed.fonts.js";
+import { EmbedConfigSupportedFont } from "./fonts.js";
 
 export { EmbedConfigSupportedFont };
 

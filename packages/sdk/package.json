@@ -18,25 +18,25 @@
       "import": "./dist/esm/abis.js",
       "default": "./dist/cjs/abis.cjs"
     },
-    "./react": {
-      "types": "./dist/esm/react.d.ts",
-      "import": "./dist/esm/react.js",
-      "default": "./dist/cjs/react.cjs"
+    "./api": {
+      "types": "./dist/esm/api.d.ts",
+      "import": "./dist/esm/api.js",
+      "default": "./dist/cjs/api.cjs"
     },
     "./schemas": {
       "types": "./dist/esm/schemas/index.d.ts",
       "import": "./dist/esm/schemas/index.js",
       "default": "./dist/cjs/schemas/index.cjs"
     },
-    "./types": {
-      "types": "./dist/esm/types.d.ts",
-      "import": "./dist/esm/types.js",
-      "default": "./dist/cjs/types.cjs"
-    },
     "./channel-manager": {
       "types": "./dist/esm/channel-manager/index.d.ts",
       "import": "./dist/esm/channel-manager/index.js",
       "default": "./dist/cjs/channel-manager/index.cjs"
+    },
+    "./channel-manager/react": {
+      "types": "./dist/esm/channel-manager/react/index.d.ts",
+      "import": "./dist/esm/channel-manager/react/index.js",
+      "default": "./dist/cjs/channel-manager/react/index.cjs"
     },
     "./channel-manager/*": {
       "types": "./dist/esm/channel-manager/*.d.ts",
@@ -48,10 +48,50 @@
       "import": "./dist/esm/comments/index.js",
       "default": "./dist/cjs/comments/index.cjs"
     },
+    "./comments/react": {
+      "types": "./dist/esm/comments/react/index.d.ts",
+      "import": "./dist/esm/comments/react/index.js",
+      "default": "./dist/cjs/comments/react/index.cjs"
+    },
     "./comments/*": {
       "types": "./dist/esm/comments/*.d.ts",
       "import": "./dist/esm/comments/*.js",
       "default": "./dist/cjs/comments/*.cjs"
+    },
+    "./core": {
+      "types": "./dist/esm/core/index.d.ts",
+      "import": "./dist/esm/core/index.js",
+      "default": "./dist/cjs/core/index.cjs"
+    },
+    "./core/*": {
+      "types": "./dist/esm/core/*.d.ts",
+      "import": "./dist/esm/core/*.js",
+      "default": "./dist/cjs/core/*.cjs"
+    },
+    "./embed": {
+      "types": "./dist/esm/embed/index.d.ts",
+      "import": "./dist/esm/embed/index.js",
+      "default": "./dist/cjs/embed/index.cjs"
+    },
+    "./embed/schemas": {
+      "types": "./dist/esm/embed/schemas/index.d.ts",
+      "import": "./dist/esm/embed/schemas/index.js",
+      "default": "./dist/cjs/embed/schemas/index.cjs"
+    },
+    "./embed/*": {
+      "types": "./dist/esm/embed/*.d.ts",
+      "import": "./dist/esm/embed/*.js",
+      "default": "./dist/cjs/embed/*.cjs"
+    },
+    "./indexer": {
+      "types": "./dist/esm/indexer/index.d.ts",
+      "import": "./dist/esm/indexer/index.js",
+      "default": "./dist/cjs/indexer/index.cjs"
+    },
+    "./indexer/*": {
+      "types": "./dist/esm/indexer/*.d.ts",
+      "import": "./dist/esm/indexer/*.js",
+      "default": "./dist/cjs/indexer/*.cjs"
     }
   },
   "scripts": {

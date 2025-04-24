@@ -1,7 +1,29 @@
 import { z } from "zod";
-import { HexSchema } from "../schemas/core.js";
+import { HexSchema } from "../core/schemas.js";
 import { DOMAIN_NAME, DOMAIN_VERSION } from "./eip712.js";
 import { DEFAULT_COMMENT_TYPE, EMPTY_PARENT_ID } from "../constants.js";
+import { CommentData } from "./types.js";
+
+/**
+ * Comment schema. This is used as output of the functions.
+ */
+export const CommentDataSchema = z.object({
+  author: HexSchema,
+  appSigner: HexSchema,
+
+  channelId: z.bigint(),
+  nonce: z.bigint(),
+  deadline: z.bigint(),
+  parentId: HexSchema,
+
+  content: z.string(),
+  metadata: z.string(),
+  targetUri: z.string(),
+  commentType: z.string(),
+});
+
+// this just tests if the shape is correct
+({}) as z.infer<typeof CommentDataSchema> satisfies CommentData;
 
 const BaseCommentInputDataSchema = z.object({
   author: HexSchema,

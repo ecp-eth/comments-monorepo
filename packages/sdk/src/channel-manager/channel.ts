@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { CHANNEL_MANAGER_ADDRESS, ZERO_ADDRESS } from "../constants.js";
-import { HexSchema } from "../schemas/core.js";
-import type { Hex } from "../types.js";
+import { HexSchema } from "../core/schemas.js";
+import type { Hex } from "../core/schemas.js";
 import { ChannelManagerAbi } from "../abis.js";
-import { isZeroHex } from "../utils.js";
+import { isZeroHex } from "../core/utils.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 
 export type CreateChannelParams = {

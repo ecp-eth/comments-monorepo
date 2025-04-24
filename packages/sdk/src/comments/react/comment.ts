@@ -7,7 +7,7 @@ import {
   type UseQueryResult,
 } from "@tanstack/react-query";
 import { usePublicClient, useWriteContract } from "wagmi";
-import type { Hex } from "../../types.js";
+import type { Hex } from "../../core/schemas.js";
 import {
   type PostCommentAsAuthorParams,
   type PostCommentAsAuthorResult,
