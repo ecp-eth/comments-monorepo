@@ -69,20 +69,20 @@ export const AddCommentTypedDataSchema = z.object({
     chainId: z.number(),
     verifyingContract: HexSchema,
   }),
-  message: CommentInputDataSchema,
+  message: CommentDataSchema,
   types: z.object({
     AddComment: z.array(
       z.union([
         z.object({ name: z.literal("content"), type: z.literal("string") }),
         z.object({ name: z.literal("metadata"), type: z.literal("string") }),
         z.object({ name: z.literal("targetUri"), type: z.literal("string") }),
-        // z.object({ name: z.literal("parentId"), type: z.literal("bytes32") }),
         z.object({ name: z.literal("commentType"), type: z.literal("string") }),
         z.object({ name: z.literal("author"), type: z.literal("address") }),
         z.object({ name: z.literal("appSigner"), type: z.literal("address") }),
         z.object({ name: z.literal("channelId"), type: z.literal("uint256") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
+        z.object({ name: z.literal("parentId"), type: z.literal("bytes32") }),
       ])
     ),
   }),

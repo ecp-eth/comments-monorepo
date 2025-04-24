@@ -285,9 +285,9 @@ describe("getHookTransactionFee()", () => {
 
 describe("setHookTransactionFee()", () => {
   it("sets new transaction fee", async () => {
-    const newFeePercentage = 500; // 5%
+    const newFeeBasisPoints = 500; // 5%
     const result = await setHookTransactionFee({
-      feePercentage: newFeePercentage,
+      feeBasisPoints: newFeeBasisPoints,
       writeContract: client.writeContract,
       channelManagerAddress,
     });
@@ -304,14 +304,14 @@ describe("setHookTransactionFee()", () => {
       channelManagerAddress,
     });
 
-    assert.equal(fee.fee, newFeePercentage);
+    assert.equal(fee.fee, newFeeBasisPoints);
   });
 
   it("fails if fee percentage is too high", async () => {
     await assert.rejects(
       () =>
         setHookTransactionFee({
-          feePercentage: 10001, // More than 100%
+          feeBasisPoints: 10001, // More than 100%
           writeContract: client.writeContract,
           channelManagerAddress,
         }),
@@ -326,7 +326,7 @@ describe("setHookTransactionFee()", () => {
     await assert.rejects(
       () =>
         setHookTransactionFee({
-          feePercentage: 500,
+          feeBasisPoints: 500,
           writeContract: client2.writeContract,
           channelManagerAddress,
         }),
