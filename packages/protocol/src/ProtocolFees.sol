@@ -24,7 +24,6 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
     uint96 internal channelCreationFee;
     uint96 internal hookRegistrationFee;
     uint16 internal hookTransactionFeePercentage; // In basis points (1% = 100)
-    uint256 internal accumulatedFees;
 
     /// @notice Constructor sets the contract owner and initializes fees
     /// @param initialOwner The address that will own the contract
@@ -36,7 +35,6 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
         hookRegistrationFee = 0.02 ether;
         // 2% fee on hook revenue
         hookTransactionFeePercentage = 200;
-        accumulatedFees = 0;
     }
 
     /// @notice Sets the fee for creating a new channel (only owner)
@@ -84,8 +82,7 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
     ) external onlyOwner nonReentrant returns (uint256 amount) {
         if (recipient == address(0)) revert IChannelManager.ZeroAddress();
 
-        amount = accumulatedFees;
-        accumulatedFees = 0;
+        amount = address(this).balance;
 
         (bool success, ) = recipient.call{value: amount}("");
         require(success, "Fee withdrawal failed");
@@ -116,7 +113,6 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
             uint256 protocolFee = (value * hookTransactionFeePercentage) /
                 10000;
             hookValue = value - protocolFee;
-            accumulatedFees += protocolFee;
         } else {
             hookValue = value;
         }
@@ -129,8 +125,6 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
     function _collectFee(uint96 requiredFee) internal virtual returns (uint96) {
         if (msg.value < requiredFee) revert IChannelManager.InsufficientFee();
 
-        accumulatedFees += requiredFee;
-
         if (msg.value > requiredFee) {
             // Refund excess payment
             (bool success, ) = msg.sender.call{value: msg.value - requiredFee}(
@@ -140,10 +134,5 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
         }
 
         return requiredFee;
-    }
-
-    /// @notice Fallback function to receive ETH
-    receive() external payable {
-        accumulatedFees += msg.value;
     }
 }
