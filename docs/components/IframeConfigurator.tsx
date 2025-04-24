@@ -3,13 +3,11 @@ import {
   CommentsEmbed,
   CommentsByAuthorEmbed,
   createCommentsEmbedURL,
-} from "@ecp.eth/sdk/react";
-import { useDebounce } from "use-debounce";
-import {
   type EmbedConfigSchemaInputType,
   EmbedConfigSupportedFont,
-  type Hex,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/embed";
+import { useDebounce } from "use-debounce";
+import { type Hex } from "@ecp.eth/sdk/core";
 import { publicEnv } from "../publicEnv";
 import { Info } from "lucide-react";
 
