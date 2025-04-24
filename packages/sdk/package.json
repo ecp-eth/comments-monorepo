@@ -55,10 +55,8 @@
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
     "build": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
-    "test": "pnpm run test:types && pnpm run test:unit",
-    "test:types": "tsd",
-    "test:unit": "node --experimental-strip-types --no-warnings ./scripts/run-tests.ts",
-    "test:unit:watch": "pnpm run test:unit --watch",
+    "test": "node --experimental-strip-types --no-warnings ./scripts/run-tests.ts",
+    "test:watch": "pnpm run test --watch",
     "lint": "eslint \"./src/**/*.ts\""
   },
   "devDependencies": {
@@ -71,7 +69,6 @@
     "eslint": "^9.19.0",
     "node-resolve-ts": "^1.0.2",
     "react": "^19.0.0",
-    "tsd": "^0.32.0",
     "viem": "^2.26.0",
     "wagmi": "^2.14.16",
     "zod": "^3.24.1"
