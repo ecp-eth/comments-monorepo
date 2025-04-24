@@ -590,7 +590,8 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
                 commentData.appSigner,
                 commentData.channelId,
                 commentData.nonce,
-                commentData.deadline
+                commentData.deadline,
+                commentData.parentId
             )
         );
 
