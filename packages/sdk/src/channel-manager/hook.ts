@@ -337,9 +337,9 @@ export async function getHookTransactionFee(
 
 export type SetHookTransactionFeeParams = {
   /**
-   * The fee for the hook transaction in basis points (1% = 100)
+   * The fee for the hook transaction in basis points (0.01% = 1 point)
    */
-  feePercentage: number;
+  feeBasisPoints: number;
   /**
    * The address of the channel manager
    *
@@ -355,7 +355,7 @@ export type SetHookTransactionFeeResult = {
 
 const SetHookTransactionFeeParamsSchema = z.object({
   channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
-  feePercentage: z.number().int().min(0).max(10000),
+  feeBasisPoints: z.number().int().min(0).max(10000),
 });
 
 /**
@@ -367,14 +367,14 @@ const SetHookTransactionFeeParamsSchema = z.object({
 export async function setHookTransactionFee(
   params: SetHookTransactionFeeParams
 ): Promise<SetHookTransactionFeeResult> {
-  const { channelManagerAddress, feePercentage } =
+  const { channelManagerAddress, feeBasisPoints } =
     SetHookTransactionFeeParamsSchema.parse(params);
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
     abi: ChannelManagerAbi,
     functionName: "setHookTransactionFee",
-    args: [feePercentage],
+    args: [feeBasisPoints],
   });
 
   return {

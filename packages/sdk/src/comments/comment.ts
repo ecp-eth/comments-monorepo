@@ -21,6 +21,7 @@ import type {
 import {
   AddCommentTypedDataSchema,
   type AddCommentTypedDataSchemaType,
+  CommentDataSchema,
   type CommentInputData,
   CommentInputDataSchema,
   DeleteCommentTypedDataSchema,
@@ -39,7 +40,7 @@ export type PostCommentAsAuthorParams = {
    *
    * You can obtain this by using the `createCommentData()` function
    */
-  comment: CommentInputData;
+  comment: CommentData;
   /**
    * The app signature
    */
@@ -65,7 +66,7 @@ export type PostCommentAsAuthorResult = {
 
 const PostCommentAsAuthorParamsSchema = z.object({
   // we don't care here because comment is validated internally by createCommentData
-  comment: z.custom<CommentInputData>(() => true),
+  comment: CommentDataSchema,
   appSignature: HexSchema,
   fee: z.bigint().optional(),
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
@@ -103,7 +104,7 @@ export type PostCommentParams = {
    *
    * You can obtain this by using the `createCommentData()` function
    */
-  comment: CommentInputData;
+  comment: CommentData;
   /**
    * The app signature
    */
@@ -128,7 +129,7 @@ export type PostCommentResult = {
 };
 
 const PostCommentParamsSchema = z.object({
-  comment: z.custom<CommentInputData>(() => true),
+  comment: CommentDataSchema,
   appSignature: HexSchema,
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
   fee: z.bigint().optional(),

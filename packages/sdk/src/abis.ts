@@ -1818,7 +1818,7 @@ export const ChannelManagerAbi = [
     name: "setHookTransactionFee",
     inputs: [
       {
-        name: "feePercentage",
+        name: "feeBasisPoints",
         type: "uint16",
         internalType: "uint16",
       },
@@ -2299,7 +2299,7 @@ export const ChannelManagerAbi = [
     name: "HookTransactionFeeUpdated",
     inputs: [
       {
-        name: "newFeePercentage",
+        name: "newBasisPoints",
         type: "uint16",
         indexed: false,
         internalType: "uint16",
