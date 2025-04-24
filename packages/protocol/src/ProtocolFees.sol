@@ -23,7 +23,7 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
     // Fee configuration
     uint96 internal channelCreationFee;
     uint96 internal hookRegistrationFee;
-    uint16 internal hookTransactionFeePercentage; // In basis points (1% = 100)
+    uint16 internal hookTransactionFeeBasisPoints; // (1 basis point = 0.01%)
     uint256 internal accumulatedFees;
 
     /// @notice Constructor sets the contract owner and initializes fees
@@ -35,7 +35,7 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
         channelCreationFee = 0.02 ether;
         hookRegistrationFee = 0.02 ether;
         // 2% fee on hook revenue
-        hookTransactionFeePercentage = 200;
+        hookTransactionFeeBasisPoints = 200;
         accumulatedFees = 0;
     }
 
@@ -54,11 +54,11 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
     }
 
     /// @notice Sets the fee percentage taken from hook transactions (only owner)
-    /// @param feePercentage The fee percentage in basis points (1% = 100)
-    function setHookTransactionFee(uint16 feePercentage) external onlyOwner {
-        if (feePercentage > 10000) revert InvalidFeePercentage(); // Max 100%
-        hookTransactionFeePercentage = feePercentage;
-        emit IFeeManager.HookTransactionFeeUpdated(feePercentage);
+    /// @param feeBasisPoints The fee percentage in basis points (1 basis point = 0.01%)
+    function setHookTransactionFee(uint16 feeBasisPoints) external onlyOwner {
+        if (feeBasisPoints > 10000) revert InvalidFeePercentage(); // Max 100%
+        hookTransactionFeeBasisPoints = feeBasisPoints;
+        emit IFeeManager.HookTransactionFeeUpdated(feeBasisPoints);
     }
 
     /// @notice Gets the current channel creation fee
@@ -71,9 +71,9 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
         return hookRegistrationFee;
     }
 
-    /// @notice Gets the current hook transaction fee percentage
+    /// @notice Gets the current hook transaction fee percentage in basis points
     function getHookTransactionFee() external view returns (uint16) {
-        return hookTransactionFeePercentage;
+        return hookTransactionFeeBasisPoints;
     }
 
     /// @notice Withdraws accumulated fees to a specified address (only owner)
@@ -112,8 +112,8 @@ abstract contract ProtocolFees is IFeeManager, Ownable, ReentrancyGuard {
     function calculateHookTransactionFee(
         uint256 value
     ) public payable returns (uint256 hookValue) {
-        if (value > 0 && hookTransactionFeePercentage > 0) {
-            uint256 protocolFee = (value * hookTransactionFeePercentage) /
+        if (value > 0 && hookTransactionFeeBasisPoints > 0) {
+            uint256 protocolFee = (value * hookTransactionFeeBasisPoints) /
                 10000;
             hookValue = value - protocolFee;
             accumulatedFees += protocolFee;
