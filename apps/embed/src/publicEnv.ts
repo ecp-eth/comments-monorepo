@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { HexSchema } from "@ecp.eth/sdk/schemas";
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 
 export const publicEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "production"]),

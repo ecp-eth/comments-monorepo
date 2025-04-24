@@ -1,9 +1,9 @@
 import {
-  HexSchema,
   IndexerAPICommentWithRepliesSchema,
   IndexerAPIListCommentRepliesSchema,
   IndexerAPIListCommentsSchema,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 

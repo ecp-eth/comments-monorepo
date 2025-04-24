@@ -1,4 +1,4 @@
-import type { Hex } from "@ecp.eth/sdk/schemas";
+import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { eq } from "ponder";
 import { getIndexerDb } from "../db";
 import { db } from "../../db";

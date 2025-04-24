@@ -14,7 +14,7 @@ import {
   TooltipContent,
   Tooltip,
 } from "@/components/ui/tooltip";
-import type { IndexerAPICommentModerationStatusSchemaType } from "@ecp.eth/sdk/schemas";
+import type { IndexerAPICommentModerationStatusSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 type CommentAuthorProps = {
   author: AuthorType;

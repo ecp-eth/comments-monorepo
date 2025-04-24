@@ -9,12 +9,13 @@ import {
   createCommentData,
   createCommentTypedData,
   getNonce,
-  isMuted,
-} from "@ecp.eth/sdk";
+} from "@ecp.eth/sdk/comments";
+import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
-import { chain } from "@/lib/wagmi";
+import { chain, transport } from "@/lib/wagmi";
+import { createPublicClient } from "viem";
 
 const chainId = chain.id;
 
@@ -84,10 +85,14 @@ export async function POST(
   }
 
   const appSigner = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+  const publicClient = createPublicClient({
+    chain,
+    transport,
+  });
   const nonce = await getNonce({
     author,
     appSigner: appSigner.address,
-    chain,
+    readContract: publicClient.readContract,
   });
 
   const commentData = createCommentData({

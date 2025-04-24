@@ -1,4 +1,4 @@
-import { useGaslessTransaction } from "@ecp.eth/sdk/react";
+import { useGaslessTransaction } from "@ecp.eth/sdk/comments/react";
 import type { Hex, SignTypedDataParameters } from "viem";
 import {
   DeleteCommentResponseSchema,

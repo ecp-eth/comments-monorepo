@@ -1,5 +1,5 @@
 import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
-import { CommentData } from "@ecp.eth/sdk/schemas";
+import { CommentData } from "@ecp.eth/sdk/comments/types";
 import { Hex } from "viem";
 import { writeContract } from "@wagmi/core";
 import { config } from "../wagmi.config";

@@ -1,17 +1,16 @@
-import { type Hex } from "viem";
 import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
-  HexSchema,
-  IndexerAPIModerationChangeModerationStatusOnCommentSchemaType,
-} from "@ecp.eth/sdk/schemas";
+  type IndexerAPIModerationChangeModerationStatusOnCommentSchemaType,
+} from "@ecp.eth/sdk/indexer/schemas";
+import { type Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { ensDataResolver, type ResolvedEnsData } from "./ens-data-resolver";
 import type { CommentSelectType } from "ponder:schema";
 import {
   farcasterDataResolver,
   ResolvedFarcasterData,
 } from "./farcaster-data-resolver";
-import { getCommentCursor } from "@ecp.eth/sdk";
+import { getCommentCursor } from "@ecp.eth/sdk/indexer";
 import { env } from "../env";
 
 type CommentFromDB = CommentSelectType & {

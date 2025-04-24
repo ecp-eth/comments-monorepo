@@ -6,7 +6,7 @@ import {
 import schema from "ponder:schema";
 import { eq } from "ponder";
 import { authMiddleware } from "../../../middleware/auth";
-import { IndexerAPIModerationChangeModerationStatusOnCommentSchema } from "@ecp.eth/sdk/schemas";
+import { IndexerAPIModerationChangeModerationStatusOnCommentSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { resolveAuthorDataAndFormatCommentChangeModerationStatusResponse } from "../../../lib/response-formatters";
 import { db } from "../../../db";
 

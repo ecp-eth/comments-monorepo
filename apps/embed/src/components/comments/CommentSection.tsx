@@ -18,7 +18,7 @@ import {
   COMMENTS_PER_PAGE,
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
-import { fetchComments } from "@ecp.eth/sdk";
+import { fetchComments } from "@ecp.eth/sdk/indexer";
 import {
   type ListCommentsQueryPageParamsSchemaType,
   type CommentPageSchemaType,

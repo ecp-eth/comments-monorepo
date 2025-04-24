@@ -8,7 +8,7 @@ import {
 } from "@ecp.eth/shared/schemas";
 import { cn } from "@/lib/utils";
 import { publicEnv } from "@/publicEnv";
-import { fetchCommentReplies } from "@ecp.eth/sdk";
+import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";

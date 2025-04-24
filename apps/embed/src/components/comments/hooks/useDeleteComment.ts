@@ -1,15 +1,11 @@
-import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import { useCallback } from "react";
 import type { Hex } from "viem";
-import {
-  getChainId,
-  waitForTransactionReceipt,
-  writeContract,
-} from "viem/actions";
+import { getChainId, waitForTransactionReceipt } from "viem/actions";
 import { useConnectorClient } from "wagmi";
 import { useCommentDeletion } from "@ecp.eth/shared/hooks";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
+import { useDeleteCommentAsAuthor } from "@ecp.eth/sdk/comments/react";
 
 type OnCommentDeleteParams = {
   commentId: Hex;
@@ -21,6 +17,7 @@ type OnCommentDelete = (params: OnCommentDeleteParams) => Promise<void>;
 export function useDeleteComment(): OnCommentDelete {
   const commentDeletion = useCommentDeletion();
   const { data: client } = useConnectorClient();
+  const { mutateAsync: deleteCommentAsAuthor } = useDeleteCommentAsAuthor();
 
   return useCallback(
     async (params: OnCommentDeleteParams) => {
@@ -29,11 +26,8 @@ export function useDeleteComment(): OnCommentDelete {
           throw new Error("No client");
         }
 
-        const txHash = await writeContract(client, {
-          address: COMMENTS_V1_ADDRESS,
-          abi: CommentsV1Abi,
-          functionName: "deleteCommentAsAuthor",
-          args: [params.commentId],
+        const { txHash } = await deleteCommentAsAuthor({
+          commentId: params.commentId,
         });
 
         const chainId = await getChainId(client);

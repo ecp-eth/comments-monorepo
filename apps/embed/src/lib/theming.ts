@@ -1,4 +1,4 @@
-import type { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/schemas";
+import type { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
 import { CSSProperties } from "react";
 
 export function createThemeCSSVariables(

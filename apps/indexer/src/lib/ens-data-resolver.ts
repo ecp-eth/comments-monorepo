@@ -8,7 +8,7 @@ import {
 import {
   IndexerAPIAuthorEnsDataSchema,
   type IndexerAPIAuthorEnsDataSchemaType,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
 import { normalize } from "viem/ens";
 import { mainnet } from "viem/chains";
 import DataLoader from "dataloader";

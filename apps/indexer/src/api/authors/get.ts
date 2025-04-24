@@ -1,4 +1,4 @@
-import { IndexerAPIAuthorDataSchema } from "@ecp.eth/sdk/schemas";
+import { IndexerAPIAuthorDataSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { GetAuthorParamsSchema } from "../../lib/schemas";
 import { ensDataResolver } from "../../lib/ens-data-resolver";

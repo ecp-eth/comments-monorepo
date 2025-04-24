@@ -5,7 +5,7 @@ import {
 import {
   IndexerAPIFarcasterDataSchema,
   type IndexerAPIFarcasterDataSchemaType,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
 import { Address, getAddress, type Hex } from "viem";
 import DataLoader from "dataloader";
 import { LRUCache } from "lru-cache";

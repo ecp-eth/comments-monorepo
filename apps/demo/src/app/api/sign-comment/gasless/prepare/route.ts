@@ -10,14 +10,19 @@ import { resolveSubmitterAccount } from "@/lib/submitter";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import { chain, transport } from "@/lib/wagmi";
 import {
-  COMMENTS_V1_ADDRESS,
-  CommentsV1Abi,
   createCommentData,
   createCommentTypedData,
   getNonce,
-  isMuted,
-} from "@ecp.eth/sdk";
-import { createWalletClient, hashTypedData, publicActions } from "viem";
+  isApproved,
+  postComment,
+} from "@ecp.eth/sdk/comments";
+import { isMuted } from "@ecp.eth/sdk/indexer";
+import {
+  createPublicClient,
+  createWalletClient,
+  hashTypedData,
+  publicActions,
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
 
@@ -76,11 +81,15 @@ export async function POST(
   }
 
   const appSigner = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+  const publicClient = createPublicClient({
+    chain,
+    transport,
+  });
 
   const nonce = await getNonce({
     author,
     appSigner: appSigner.address,
-    chain: chain,
+    readContract: publicClient.readContract,
   });
 
   const commentData = createCommentData({
@@ -116,14 +125,13 @@ export async function POST(
     }).extend(publicActions);
 
     // Check approval on chain
-    const isApproved = await walletClient.readContract({
-      address: COMMENTS_V1_ADDRESS,
-      abi: CommentsV1Abi,
-      functionName: "isApproved",
-      args: [author, appSigner.address],
+    const hasApproval = await isApproved({
+      appSigner: appSigner.address,
+      author,
+      readContract: walletClient.readContract,
     });
 
-    if (isApproved) {
+    if (hasApproval) {
       // Verify app signature
       const isAppSignatureValid = await walletClient.verifyTypedData({
         ...typedCommentData,
@@ -142,11 +150,10 @@ export async function POST(
       }
 
       try {
-        const txHash = await walletClient.writeContract({
-          abi: CommentsV1Abi,
-          address: COMMENTS_V1_ADDRESS,
-          functionName: "postComment",
-          args: [commentData, "0x", signature],
+        const { txHash } = await postComment({
+          comment: typedCommentData.message,
+          appSignature: signature,
+          writeContract: walletClient.writeContract,
         });
 
         return new JSONResponse(
