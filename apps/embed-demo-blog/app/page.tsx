@@ -1,7 +1,7 @@
-import { CommentsByAuthorEmbed } from "@ecp.eth/sdk/react";
+import { CommentsByAuthorEmbed } from "@ecp.eth/sdk/embed/react";
 import { BlogPosts } from "app/components/posts";
 import { commentsEmbedTheme } from "./comments-embed-theme";
-import type { Hex } from "@ecp.eth/sdk/schemas";
+import type { Hex } from "@ecp.eth/sdk/core/schemas";
 
 export default function Page() {
   return (
