@@ -7,7 +7,7 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { chain, transport } from "@/lib/wagmi";
-import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
+import { postComment } from "@ecp.eth/sdk/comments";
 import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -69,24 +69,10 @@ export async function POST(
   }
 
   try {
-    const txHash = await walletClient.writeContract({
-      abi: CommentsV1Abi,
-      address: COMMENTS_V1_ADDRESS,
-      functionName: "postComment",
-      args: [
-        {
-          appSigner: signTypedDataParams.message.appSigner,
-          author: signTypedDataParams.message.author,
-          content: signTypedDataParams.message.content,
-          metadata: signTypedDataParams.message.metadata,
-          parentId: signTypedDataParams.message.parentId,
-          targetUri: signTypedDataParams.message.targetUri,
-          deadline: signTypedDataParams.message.deadline,
-          nonce: signTypedDataParams.message.nonce,
-        },
-        authorSignature,
-        appSignature,
-      ],
+    const { txHash } = await postComment({
+      appSignature,
+      comment: signTypedDataParams.message,
+      writeContract: walletClient.writeContract,
     });
 
     return new JSONResponse(GaslessPostCommentResponseSchema, { txHash });

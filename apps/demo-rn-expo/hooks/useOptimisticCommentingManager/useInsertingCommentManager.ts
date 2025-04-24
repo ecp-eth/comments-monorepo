@@ -1,12 +1,11 @@
 import { useCallback, useState } from "react";
 import { QueryClient, type QueryKey } from "@tanstack/react-query";
-import { isZeroHex } from "@ecp.eth/sdk/";
+import { Hex, isZeroHex } from "@ecp.eth/sdk/core";
 import {
-  Hex,
   IndexerAPIListCommentsSchemaType,
   IndexerAPICommentWithRepliesSchemaType,
   IndexerAPIListCommentRepliesSchemaType,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
 import {
   FetchCommentInfinityQuerySchema,
   PendingCommentOperationSchemaType,

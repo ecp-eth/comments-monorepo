@@ -5,7 +5,7 @@ import {
   ChangeModerationStatusOnCommentBodySchema,
 } from "../../../lib/schemas";
 import { authMiddleware } from "../../../middleware/auth";
-import { IndexerAPIModerationChangeModerationStatusOnCommentSchema } from "@ecp.eth/sdk/schemas";
+import { IndexerAPIModerationChangeModerationStatusOnCommentSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { resolveAuthorDataAndFormatCommentChangeModerationStatusResponse } from "../../../lib/response-formatters";
 import { updateCommentModerationStatus } from "../../../management/services/moderation";
 

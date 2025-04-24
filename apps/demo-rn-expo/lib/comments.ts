@@ -1,7 +1,7 @@
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { fetchAPI } from "./fetch";
 import { Hex, TransactionReceipt } from "viem";
-import { CommentData } from "@ecp.eth/sdk/schemas";
+import { CommentData } from "@ecp.eth/sdk/comments/types";
 import { SignCommentPayloadRequestSchemaType } from "./generated/schemas";
 import {
   deleteCommentAsAuthorViaCommentsV1,

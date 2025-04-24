@@ -7,7 +7,7 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { chain, transport } from "@/lib/wagmi";
-import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
+import { deleteComment } from "@ecp.eth/sdk/comments";
 import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -71,19 +71,10 @@ export async function POST(
   }
 
   try {
-    const txHash = await walletClient.writeContract({
-      abi: CommentsV1Abi,
-      address: COMMENTS_V1_ADDRESS,
-      functionName: "deleteComment",
-      args: [
-        signTypedDataParams.message.commentId,
-        signTypedDataParams.message.author,
-        signTypedDataParams.message.appSigner,
-        signTypedDataParams.message.nonce,
-        signTypedDataParams.message.deadline,
-        authorSignature,
-        appSignature,
-      ],
+    const { txHash } = await deleteComment({
+      ...signTypedDataParams.message,
+      appSignature,
+      writeContract: walletClient.writeContract,
     });
 
     return new JSONResponse(DeleteCommentResponseSchema, { txHash });

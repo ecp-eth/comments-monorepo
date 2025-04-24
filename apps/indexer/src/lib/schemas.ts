@@ -1,8 +1,8 @@
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import {
-  HexSchema,
   IndexerAPICommentModerationStatusSchema,
   IndexerAPIPaginationSchema,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
 import { z } from "@hono/zod-openapi";
 import { normalizeUrl } from "./utils";
 import { hexToString } from "viem";

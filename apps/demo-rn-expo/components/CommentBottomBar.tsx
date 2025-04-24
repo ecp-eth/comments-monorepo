@@ -1,7 +1,7 @@
 import {
   IndexerAPICommentSchemaType,
   IndexerAPICommentWithRepliesSchemaType,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { View, TouchableOpacity } from "react-native";
 import LinkButton from "../ui/LinkButton";

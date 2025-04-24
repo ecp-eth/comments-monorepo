@@ -7,7 +7,7 @@ import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, asc, desc, eq, gt, lt, or } from "ponder";
 import { authMiddleware } from "../../middleware/auth";
-import { IndexerAPIModerationGetPendingCommentsSchema } from "@ecp.eth/sdk/schemas";
+import { IndexerAPIModerationGetPendingCommentsSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response-formatters";
 
 const getPendingCommentsRoute = createRoute({

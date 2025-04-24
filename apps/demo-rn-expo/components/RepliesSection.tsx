@@ -12,12 +12,12 @@ import Animated, { AnimatedStyle } from "react-native-reanimated";
 import theme from "../theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Comment } from "./Comment";
-import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/schemas";
+import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Hex } from "viem";
 import { COMMENT_BOX_AVERAGE_HEIGHT } from "../lib/constants";
 import { publicEnv } from "../env";
-import { fetchCommentReplies } from "@ecp.eth/sdk";
+import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
 
 type RepliesSectionProps = {

@@ -1,5 +1,4 @@
 import { JSONResponse } from "@ecp.eth/shared/helpers";
-import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
 import {
   createPublicClient,
   createWalletClient,
@@ -18,6 +17,7 @@ import { chain, transport } from "@/lib/wagmi";
 import { privateKeyToAccount } from "viem/accounts";
 import { env } from "@/env";
 import { getApprovalStatusAndNonce } from "@/lib/contract";
+import { addApproval } from "@ecp.eth/sdk/comments";
 
 export async function POST(
   req: Request
@@ -92,17 +92,10 @@ export async function POST(
   }).extend(publicActions);
 
   try {
-    const txHash = await walletClient.writeContract({
-      abi: CommentsV1Abi,
-      address: COMMENTS_V1_ADDRESS,
-      functionName: "addApproval",
-      args: [
-        signTypedDataParams.message.author,
-        signTypedDataParams.message.appSigner,
-        signTypedDataParams.message.nonce,
-        signTypedDataParams.message.deadline,
-        authorSignature,
-      ],
+    const { txHash } = await addApproval({
+      signature: authorSignature,
+      typedData: signTypedDataParams,
+      writeContract: walletClient.writeContract,
     });
 
     return new JSONResponse(ApproveResponseSchema, { txHash });

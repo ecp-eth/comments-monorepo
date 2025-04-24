@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useSwitchChain } from "wagmi";
-import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/schemas";
+import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import TextArea from "../ui/TextArea";
 import Button from "../ui/Button";

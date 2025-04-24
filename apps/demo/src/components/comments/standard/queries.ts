@@ -7,7 +7,7 @@ import {
   type SignCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
-import { fetchAuthorData } from "@ecp.eth/sdk";
+import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
 import {
   RateLimitedError,

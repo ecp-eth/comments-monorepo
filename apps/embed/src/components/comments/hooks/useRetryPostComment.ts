@@ -2,13 +2,12 @@ import { useCommentRetrySubmission } from "@ecp.eth/shared/hooks";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { useConnectorClient, useSwitchChain, useWriteContract } from "wagmi";
+import { useConnectorClient, useSwitchChain } from "wagmi";
 import { submitCommentMutationFunction } from "../queries";
 import type { Hex } from "viem";
 import { switchChain, waitForTransactionReceipt } from "viem/actions";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
-import { postCommentAsAuthorViaCommentsV1 } from "@ecp.eth/shared/helpers";
-
+import { usePostCommentAsAuthor } from "@ecp.eth/sdk/comments/react";
 export type OnRetryPostCommentParams = {
   comment: Comment;
   /**
@@ -35,7 +34,7 @@ export function useRetryPostComment({
   const { data: client } = useConnectorClient();
   const commentRetrySubmission = useCommentRetrySubmission();
   const { switchChainAsync } = useSwitchChain();
-  const { writeContractAsync } = useWriteContract();
+  const { mutateAsync: postCommentAsAuthor } = usePostCommentAsAuthor();
 
   return useCallback<OnRetryPostComment>(
     async (params) => {
@@ -77,10 +76,12 @@ export function useRetryPostComment({
         async writeContractAsync({
           signCommentResponse: { signature: appSignature, data: commentData },
         }) {
-          return await postCommentAsAuthorViaCommentsV1(
-            { appSignature, commentData },
-            writeContractAsync
-          );
+          const { txHash } = await postCommentAsAuthor({
+            appSignature,
+            comment: commentData,
+          });
+
+          return txHash;
         },
       });
 
@@ -115,12 +116,6 @@ export function useRetryPostComment({
         throw e;
       }
     },
-    [
-      client,
-      connectedAddress,
-      writeContractAsync,
-      switchChainAsync,
-      commentRetrySubmission,
-    ]
+    [client, connectedAddress, switchChainAsync, commentRetrySubmission]
   );
 }

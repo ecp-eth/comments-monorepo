@@ -1,4 +1,4 @@
-import { HexSchema } from "@ecp.eth/sdk/schemas";
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod";
 import { publicEnvSchema } from "./publicEnv";
 

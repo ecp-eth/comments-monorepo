@@ -1,7 +1,7 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, asc, desc, eq, gt, isNull, lt, or } from "ponder";
-import { IndexerAPIListCommentsSchema } from "@ecp.eth/sdk/schemas";
+import { IndexerAPIListCommentsSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response-formatters";
 import { GetCommentsQuerySchema } from "../../lib/schemas";

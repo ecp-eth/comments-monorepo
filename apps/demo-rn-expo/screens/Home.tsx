@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/schemas";
+import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { CommentSection } from "../components/CommentSection";
 import { StatusBar } from "../components/StatusBar";
 import { CommentForm } from "../components/CommentForm";

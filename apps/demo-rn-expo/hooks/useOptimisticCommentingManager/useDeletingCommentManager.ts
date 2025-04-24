@@ -1,6 +1,6 @@
 import { QueryClient, type QueryKey } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import { Hex, IndexerAPIListCommentsSchemaType } from "@ecp.eth/sdk/schemas";
+import { IndexerAPIListCommentsSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { useMonitorListCommentsCache } from "./useMonitorListCommentsCache";
 import { everyIndexerAPIListComments } from "./helpers";
 import {
@@ -8,6 +8,7 @@ import {
   IndexerAPICommentWithPendingOperationSchemaType,
   PendingOperationSchema,
 } from "./schemas";
+import { Hex } from "@ecp.eth/sdk/core/schemas";
 
 const DELETED_COMMENT_CONTENT = "[deleted]";
 
