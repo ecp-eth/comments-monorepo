@@ -5,7 +5,7 @@ import {
   ChangeModerationStatusOnCommentBodySchema,
 } from "../../../lib/schemas";
 import { authMiddleware } from "../../../middleware/auth";
-import { IndexerAPIModerationChangeModerationStatusOnCommentSchema } from "@ecp.eth/sdk/indexer/schemas";
+import { IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { resolveAuthorDataAndFormatCommentChangeModerationStatusResponse } from "../../../lib/response-formatters";
 import { updateCommentModerationStatus } from "../../../management/services/moderation";
 
@@ -30,7 +30,8 @@ const changeCommentModerationStatusRoute = createRoute({
       description: "Comment with moderation status changed",
       content: {
         "application/json": {
-          schema: IndexerAPIModerationChangeModerationStatusOnCommentSchema,
+          schema:
+            IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema,
         },
       },
     },
@@ -81,8 +82,10 @@ export function setupChangeCommentModerationStatus(app: OpenAPIHono) {
     }
 
     return c.json(
-      await resolveAuthorDataAndFormatCommentChangeModerationStatusResponse(
-        updatedComment
+      IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema.parse(
+        await resolveAuthorDataAndFormatCommentChangeModerationStatusResponse(
+          updatedComment
+        )
       ),
       200
     );

@@ -7,7 +7,7 @@ import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, asc, desc, eq, gt, lt, or } from "ponder";
 import { authMiddleware } from "../../middleware/auth";
-import { IndexerAPIModerationGetPendingCommentsSchema } from "@ecp.eth/sdk/indexer/schemas";
+import { IndexerAPIModerationGetPendingCommentsOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response-formatters";
 
 const getPendingCommentsRoute = createRoute({
@@ -24,7 +24,7 @@ const getPendingCommentsRoute = createRoute({
       description: "List of pending comments",
       content: {
         "application/json": {
-          schema: IndexerAPIModerationGetPendingCommentsSchema,
+          schema: IndexerAPIModerationGetPendingCommentsOutputSchema,
         },
       },
     },
@@ -134,7 +134,12 @@ export function setupGetPendingModerationComments(app: OpenAPIHono) {
         previousComment,
       });
 
-    return c.json(formattedComments, 200);
+    return c.json(
+      IndexerAPIModerationGetPendingCommentsOutputSchema.parse(
+        formattedComments
+      ),
+      200
+    );
   });
 
   return app;

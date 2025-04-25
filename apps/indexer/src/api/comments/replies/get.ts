@@ -1,7 +1,7 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, asc, desc, eq, gt, lt, or, isNull } from "ponder";
-import { IndexerAPIListCommentRepliesSchema } from "@ecp.eth/sdk/indexer/schemas";
+import { IndexerAPIListCommentRepliesOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../../lib/response-formatters";
 import {
@@ -26,7 +26,7 @@ const getCommentsRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: IndexerAPIListCommentRepliesSchema,
+          schema: IndexerAPIListCommentRepliesOutputSchema,
         },
       },
       description: "Retrieve specific comment with its replies",
@@ -179,7 +179,7 @@ export default (app: OpenAPIHono) => {
       });
 
     return c.json(
-      IndexerAPIListCommentRepliesSchema.parse(formattedComments),
+      IndexerAPIListCommentRepliesOutputSchema.parse(formattedComments),
       200
     );
   });

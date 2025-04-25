@@ -6,7 +6,7 @@ import {
 import schema from "ponder:schema";
 import { eq } from "ponder";
 import { authMiddleware } from "../../../middleware/auth";
-import { IndexerAPIModerationChangeModerationStatusOnCommentSchema } from "@ecp.eth/sdk/indexer/schemas";
+import { IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { resolveAuthorDataAndFormatCommentChangeModerationStatusResponse } from "../../../lib/response-formatters";
 import { db } from "../../../db";
 
@@ -24,7 +24,8 @@ const getCommentRoute = createRoute({
       description: "Comment found",
       content: {
         "application/json": {
-          schema: IndexerAPIModerationChangeModerationStatusOnCommentSchema,
+          schema:
+            IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema,
         },
       },
     },
@@ -65,8 +66,10 @@ export function setupGetComment(app: OpenAPIHono) {
     }
 
     return c.json(
-      await resolveAuthorDataAndFormatCommentChangeModerationStatusResponse(
-        comment
+      IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema.parse(
+        await resolveAuthorDataAndFormatCommentChangeModerationStatusResponse(
+          comment
+        )
       ),
       200
     );

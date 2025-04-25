@@ -38,6 +38,14 @@ export type FetchCommentsOptions = {
    */
   appSigner?: Hex;
   /**
+   * Filter comments by channel ID
+   */
+  channelId?: bigint;
+  /**
+   * Filter comments by comment type
+   */
+  commentType?: string;
+  /**
    * Number of times to retry the signing operation in case of failure.
    *
    * @default 3
@@ -74,6 +82,8 @@ const FetchCommentsOptionsSchema = z.object({
   author: HexSchema.optional(),
   apiUrl: z.string().url().default(INDEXER_API_URL),
   appSigner: HexSchema.optional(),
+  channelId: z.coerce.bigint().optional(),
+  commentType: z.string().optional(),
   retries: z.number().int().positive().default(3),
   sort: z.enum(["asc", "desc"]).default("desc"),
   cursor: HexSchema.optional(),
@@ -103,6 +113,8 @@ export async function fetchComments(
     signal,
     viewer,
     mode,
+    channelId,
+    commentType,
   } = FetchCommentsOptionsSchema.parse(options);
 
   const fetchCommentsTask = Effect.tryPromise(async (signal) => {
@@ -133,6 +145,14 @@ export async function fetchComments(
 
     if (mode) {
       url.searchParams.set("mode", mode);
+    }
+
+    if (channelId) {
+      url.searchParams.set("channelId", channelId.toString());
+    }
+
+    if (commentType) {
+      url.searchParams.set("commentType", commentType);
     }
 
     const response = await fetch(url.toString(), {
@@ -204,6 +224,14 @@ export type FetchCommentRepliesOptions = {
    */
   mode?: "nested" | "flat";
   /**
+   * Filter replies by comment type
+   */
+  commentType?: string;
+  /**
+   * Filter replies by channel ID
+   */
+  channelId?: bigint;
+  /**
    * @default 50
    */
   limit?: number;
@@ -221,6 +249,8 @@ const FetchCommentRepliesOptionSchema = z.object({
   signal: z.instanceof(AbortSignal).optional(),
   sort: z.enum(["asc", "desc"]).default("desc"),
   mode: z.enum(["nested", "flat"]).optional(),
+  commentType: z.string().optional(),
+  channelId: z.coerce.bigint().optional(),
 });
 
 /**
@@ -242,6 +272,8 @@ export async function fetchCommentReplies(
     sort,
     viewer,
     mode,
+    commentType,
+    channelId,
   } = FetchCommentRepliesOptionSchema.parse(options);
 
   const fetchRepliesTask = Effect.tryPromise(async (signal) => {
@@ -264,6 +296,14 @@ export async function fetchCommentReplies(
 
     if (mode) {
       url.searchParams.set("mode", mode);
+    }
+
+    if (channelId) {
+      url.searchParams.set("channelId", channelId.toString());
+    }
+
+    if (commentType) {
+      url.searchParams.set("commentType", commentType);
     }
 
     const response = await fetch(url.toString(), {
