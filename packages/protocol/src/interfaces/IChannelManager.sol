@@ -22,6 +22,11 @@ interface IChannelManager {
         bool hookEnabled;
     }
 
+    struct HookConfig {
+        bool registered;
+        bool enabled;
+    }
+
     /// @notice Error thrown when channel does not exist
     error ChannelDoesNotExist();
     /// @notice Error thrown when hook address is invalid
@@ -166,11 +171,10 @@ interface IChannelManager {
 
     /// @notice Checks if a hook is registered and globally enabled
     /// @param hook The address of the hook
-    /// @return registered Whether the hook is registered
-    /// @return enabled Whether the hook is globally enabled
+    /// @return hookConfig The hook configuration
     function getHookStatus(
         address hook
-    ) external view returns (bool registered, bool enabled);
+    ) external view returns (HookConfig memory);
 
     /// @notice Updates the comments contract address (only owner)
     /// @param _commentsContract The new comments contract address

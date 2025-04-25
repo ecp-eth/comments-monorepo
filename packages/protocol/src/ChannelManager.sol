@@ -19,8 +19,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     mapping(uint256 => ChannelConfig) private channels;
 
     // Global hook registry
-    mapping(address => bool) private registeredHooks;
-    mapping(address => bool) private globallyEnabledHooks;
+    mapping(address => HookConfig) private hooks;
 
     // Base URI for NFT metadata
     string private baseURIValue;
@@ -81,8 +80,10 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
         if (hook == address(0)) revert IChannelManager.InvalidHookAddress();
 
+        HookConfig storage hookConfig = hooks[hook];
+
         // Check if hook is already registered
-        if (registeredHooks[hook])
+        if (hookConfig.registered)
             revert IChannelManager.HookAlreadyRegistered();
 
         // Validate that the hook implements IHook interface
@@ -94,9 +95,9 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
             revert IChannelManager.InvalidHookInterface();
         }
 
-        registeredHooks[hook] = true;
+        hookConfig.registered = true;
         // Hooks are disabled by default
-        globallyEnabledHooks[hook] = false;
+        hookConfig.enabled = false;
 
         emit IChannelManager.HookRegistered(hook);
         emit IChannelManager.HookGlobalStatusUpdated(hook, false);
@@ -109,20 +110,21 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         address hook,
         bool enabled
     ) external onlyOwner {
-        if (!registeredHooks[hook]) revert IChannelManager.HookNotRegistered();
+        HookConfig storage hookConfig = hooks[hook];
+        if (!hookConfig.registered) revert IChannelManager.HookNotRegistered();
 
-        globallyEnabledHooks[hook] = enabled;
+        hookConfig.enabled = enabled;
         emit IChannelManager.HookGlobalStatusUpdated(hook, enabled);
     }
 
     /// @notice Checks if a hook is registered and globally enabled
     /// @param hook The address of the hook
-    /// @return registered Whether the hook is registered
-    /// @return enabled Whether the hook is globally enabled
+    /// @return hookConfig The hook configuration
     function getHookStatus(
         address hook
-    ) external view returns (bool registered, bool enabled) {
-        return (registeredHooks[hook], globallyEnabledHooks[hook]);
+    ) external view returns (HookConfig memory) {
+        HookConfig memory hookConfig = hooks[hook];
+        return hookConfig;
     }
 
     /// @notice Internal function to check if a channel exists
@@ -206,7 +208,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     /// @param hook The address of the hook contract
     function _setHook(uint256 channelId, address hook) internal {
         if (hook != address(0)) {
-            if (!registeredHooks[hook]) revert HookNotRegistered();
+            if (!hooks[hook].registered) revert HookNotRegistered();
             channels[channelId].hook = IHook(hook);
         } else {
             delete channels[channelId].hook; // Properly reset to default value
@@ -268,9 +270,11 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
             return true;
         }
 
+        HookConfig storage hookConfig = hooks[hookAddress];
+
         // Check both global and channel-specific enablement
-        if (!registeredHooks[hookAddress]) revert HookNotRegistered();
-        if (!globallyEnabledHooks[hookAddress]) revert HookDisabledGlobally();
+        if (!hookConfig.registered) revert HookNotRegistered();
+        if (!hookConfig.enabled) revert HookDisabledGlobally();
 
         // Calculate hook value after protocol fee
         uint256 hookValue = calculateHookTransactionFee(msg.value);

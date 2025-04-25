@@ -8,38 +8,7 @@ import {IHook} from "../src/interfaces/IHook.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import {TestUtils} from "./utils.sol";
-
-// Mock hook contract for testing
-contract MockHook is IHook {
-    bool public shouldReturnTrue = true;
-
-    function setShouldReturnTrue(bool _shouldReturn) external {
-        shouldReturnTrue = _shouldReturn;
-    }
-
-    function supportsInterface(
-        bytes4 interfaceId
-    ) external pure returns (bool) {
-        return interfaceId == type(IHook).interfaceId;
-    }
-
-    function beforeComment(
-        ICommentTypes.CommentData calldata,
-        address,
-        bytes32
-    ) external payable returns (bool) {
-        return shouldReturnTrue;
-    }
-
-    function afterComment(
-        ICommentTypes.CommentData calldata,
-        address,
-        bytes32
-    ) external view returns (bool) {
-        return shouldReturnTrue;
-    }
-}
+import {TestUtils, MockHook} from "./utils.sol";
 
 // Invalid hook that doesn't support the interface
 contract InvalidHook {
