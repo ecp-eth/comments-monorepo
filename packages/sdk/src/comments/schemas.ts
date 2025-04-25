@@ -1,8 +1,16 @@
 import { z } from "zod";
 import { HexSchema } from "../core/schemas.js";
 import { DOMAIN_NAME, DOMAIN_VERSION } from "./eip712.js";
-import { DEFAULT_COMMENT_TYPE, EMPTY_PARENT_ID } from "../constants.js";
-import type { CommentData } from "./types.js";
+import {
+  DEFAULT_CHANNEL_ID,
+  DEFAULT_COMMENT_TYPE,
+  EMPTY_PARENT_ID,
+} from "../constants.js";
+import type {
+  CommentData,
+  CreateReplyCommentDataParams,
+  CreateRootCommentDataParams,
+} from "./types.js";
 
 /**
  * Comment schema. This is used as output of the functions.
@@ -29,7 +37,7 @@ const BaseCommentInputDataSchema = z.object({
   author: HexSchema,
   appSigner: HexSchema,
 
-  channelId: z.bigint(),
+  channelId: z.bigint().default(DEFAULT_CHANNEL_ID),
   nonce: z.bigint(),
   deadline: z.bigint(),
   parentId: HexSchema,
@@ -48,11 +56,23 @@ export const RootCommentInputDataSchema = BaseCommentInputDataSchema.omit({
   parentId: z.literal(EMPTY_PARENT_ID),
 });
 
+// this just tests if the shape is correct
+({}) as z.infer<typeof RootCommentInputDataSchema> satisfies Omit<
+  CreateRootCommentDataParams,
+  "metadata"
+>;
+
 export const ReplyCommentInputDataSchema = BaseCommentInputDataSchema.omit({
   targetUri: true,
 }).extend({
   targetUri: z.literal(""),
 });
+
+// this just tests if the shape is correct
+({}) as z.infer<typeof ReplyCommentInputDataSchema> satisfies Omit<
+  CreateReplyCommentDataParams,
+  "metadata"
+>;
 
 export const CommentInputDataSchema = z.union([
   RootCommentInputDataSchema,
