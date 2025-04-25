@@ -1203,10 +1203,6 @@ export const ChannelManagerAbi = [
     stateMutability: "nonpayable",
   },
   {
-    type: "receive",
-    stateMutability: "payable",
-  },
-  {
     type: "function",
     name: "approve",
     inputs: [

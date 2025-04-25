@@ -18,16 +18,6 @@
       "import": "./dist/esm/abis.js",
       "default": "./dist/cjs/abis.cjs"
     },
-    "./api": {
-      "types": "./dist/esm/api.d.ts",
-      "import": "./dist/esm/api.js",
-      "default": "./dist/cjs/api.cjs"
-    },
-    "./schemas": {
-      "types": "./dist/esm/schemas/index.d.ts",
-      "import": "./dist/esm/schemas/index.js",
-      "default": "./dist/cjs/schemas/index.cjs"
-    },
     "./channel-manager": {
       "types": "./dist/esm/channel-manager/index.d.ts",
       "import": "./dist/esm/channel-manager/index.js",
