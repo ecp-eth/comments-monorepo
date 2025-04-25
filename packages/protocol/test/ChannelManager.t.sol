@@ -284,23 +284,22 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         channelManager.registerHook{value: 0.02 ether}(address(newHook));
 
         // Test initial hook registration status
-        (bool registered, bool enabled) = channelManager.getHookStatus(
-            address(newHook)
-        );
-        assertTrue(registered);
-        assertFalse(enabled); // Should be disabled by default after registration
+        IChannelManager.HookConfig memory hookConfig = channelManager
+            .getHookStatus(address(newHook));
+        assertTrue(hookConfig.registered);
+        assertFalse(hookConfig.enabled); // Should be disabled by default after registration
 
         // Enable hook globally
         channelManager.setHookGloballyEnabled(address(newHook), true);
-        (registered, enabled) = channelManager.getHookStatus(address(newHook));
-        assertTrue(registered);
-        assertTrue(enabled);
+        hookConfig = channelManager.getHookStatus(address(newHook));
+        assertTrue(hookConfig.registered);
+        assertTrue(hookConfig.enabled);
 
         // Disable hook globally
         channelManager.setHookGloballyEnabled(address(newHook), false);
-        (registered, enabled) = channelManager.getHookStatus(address(newHook));
-        assertTrue(registered);
-        assertFalse(enabled);
+        hookConfig = channelManager.getHookStatus(address(newHook));
+        assertTrue(hookConfig.registered);
+        assertFalse(hookConfig.enabled);
 
         assertEq(address(channelManager).balance - initialBalance, 0.02 ether);
     }
