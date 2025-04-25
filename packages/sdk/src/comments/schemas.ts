@@ -19,9 +19,9 @@ export const CommentDataSchema = z.object({
   author: HexSchema,
   appSigner: HexSchema,
 
-  channelId: z.bigint(),
-  nonce: z.bigint(),
-  deadline: z.bigint(),
+  channelId: z.coerce.bigint(),
+  nonce: z.coerce.bigint(),
+  deadline: z.coerce.bigint(),
   parentId: HexSchema,
 
   content: z.string(),
