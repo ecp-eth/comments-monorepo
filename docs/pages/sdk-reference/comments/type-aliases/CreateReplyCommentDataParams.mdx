@@ -1,0 +1,27 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / CreateReplyCommentDataParams
+
+# Type Alias: CreateReplyCommentDataParams
+
+```ts
+type CreateReplyCommentDataParams = CreateCommentDataParamsShared & {
+  parentId: Hex;
+};
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:56](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L56)
+
+The parameters for creating a reply comment
+
+## Type declaration
+
+### parentId
+
+```ts
+parentId: Hex;
+```
+
+The ID of the parent comment

@@ -1,0 +1,39 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments/react](/sdk-reference/comments/react/index.mdx) / useGetNonce
+
+# Function: useGetNonce()
+
+```ts
+function useGetNonce(): (params) => Promise<bigint>;
+```
+
+Defined in: [packages/sdk/src/comments/react/comment.ts:263](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/react/comment.ts#L263)
+
+React hook to get the nonce for the author and app signer
+
+## Returns
+
+The result of the query
+
+```ts
+(params): Promise<bigint>;
+```
+
+Get the nonce for the author and app signer
+
+### Parameters
+
+#### params
+
+[`GetNonceParams`](/sdk-reference/comments/type-aliases/GetNonceParams.mdx)
+
+The parameters for getting a nonce
+
+### Returns
+
+`Promise`\<`bigint`\>
+
+The nonce

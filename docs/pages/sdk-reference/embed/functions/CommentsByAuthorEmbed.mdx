@@ -1,0 +1,38 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [embed](/sdk-reference/embed/index.mdx) / CommentsByAuthorEmbed
+
+# Function: CommentsByAuthorEmbed()
+
+```ts
+function CommentsByAuthorEmbed(props): Element;
+```
+
+Defined in: [packages/sdk/src/embed/react.tsx:156](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/react.tsx#L156)
+
+Renders comments embed iframe for the given author.
+
+This is client component only.
+
+## Parameters
+
+### props
+
+[`CommentsByAuthorEmbedProps`](/sdk-reference/embed/type-aliases/CommentsByAuthorEmbedProps.mdx)
+
+## Returns
+
+`Element`
+
+## Examples
+
+```tsx
+<CommentsByAuthorEmbed author="0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d" />
+```
+
+```tsx
+// force dark theme
+<CommentsByAuthorEmbed author="0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d" config={{ theme: { mode: 'dark' }}} />
+```

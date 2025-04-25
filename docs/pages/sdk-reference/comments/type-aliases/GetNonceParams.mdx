@@ -1,0 +1,80 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetNonceParams
+
+# Type Alias: GetNonceParams
+
+```ts
+type GetNonceParams = {
+  appSigner: Hex;
+  author: Hex;
+  commentsAddress?: Hex;
+  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "nonces">>;
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:457](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L457)
+
+## Properties
+
+### appSigner
+
+```ts
+appSigner: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:465](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L465)
+
+The app signer
+
+***
+
+### author
+
+```ts
+author: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:461](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L461)
+
+The author of the comment
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:470](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L470)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### readContract()
+
+```ts
+readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "nonces">>;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:471](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L471)
+
+#### Parameters
+
+##### parameters
+
+`ReadContractParameters`\<*typeof* [`CommentsV1Abi`](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx), `"nonces"`\>
+
+#### Returns
+
+`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentsV1Abi`](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx), `"nonces"`\>\>

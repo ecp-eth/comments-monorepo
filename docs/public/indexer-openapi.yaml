@@ -47,6 +47,19 @@ paths:
           name: cursor
           in: query
         - schema:
+            type: string
+            pattern: ^d+$
+            description: The channel ID
+          required: false
+          name: channelId
+          in: query
+        - schema:
+            type: string
+            description: The comment type
+          required: false
+          name: commentType
+          in: query
+        - schema:
             type: integer
             minimum: 1
             maximum: 100
@@ -131,6 +144,11 @@ paths:
                           required:
                             - address
                         id: {}
+                        channelId:
+                          type: string
+                          pattern: ^d+$
+                        commentType:
+                          type: string
                         content:
                           type: string
                         chainId:
@@ -212,6 +230,11 @@ paths:
                                     required:
                                       - address
                                   id: {}
+                                  channelId:
+                                    type: string
+                                    pattern: ^d+$
+                                  commentType:
+                                    type: string
                                   content:
                                     type: string
                                   chainId:
@@ -246,6 +269,8 @@ paths:
                                   - appSigner
                                   - author
                                   - id
+                                  - channelId
+                                  - commentType
                                   - content
                                   - chainId
                                   - deletedAt
@@ -281,6 +306,8 @@ paths:
                         - appSigner
                         - author
                         - id
+                        - channelId
+                        - commentType
                         - content
                         - chainId
                         - deletedAt
@@ -363,6 +390,19 @@ paths:
           name: cursor
           in: query
         - schema:
+            type: string
+            pattern: ^d+$
+            description: The channel ID
+          required: false
+          name: channelId
+          in: query
+        - schema:
+            type: string
+            description: The comment type
+          required: false
+          name: commentType
+          in: query
+        - schema:
             type: integer
             minimum: 1
             maximum: 100
@@ -436,6 +476,11 @@ paths:
                           required:
                             - address
                         id: {}
+                        channelId:
+                          type: string
+                          pattern: ^d+$
+                        commentType:
+                          type: string
                         content:
                           type: string
                         chainId:
@@ -466,10 +511,132 @@ paths:
                           type:
                             - string
                             - 'null'
+                        replies:
+                          type: object
+                          properties:
+                            extra:
+                              type: object
+                              properties:
+                                moderationEnabled:
+                                  type: boolean
+                              required:
+                                - moderationEnabled
+                            results:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  appSigner: {}
+                                  author:
+                                    type: object
+                                    properties:
+                                      address: {}
+                                      ens:
+                                        type: object
+                                        properties:
+                                          name:
+                                            type: string
+                                          avatarUrl:
+                                            type:
+                                              - string
+                                              - 'null'
+                                        required:
+                                          - name
+                                          - avatarUrl
+                                      farcaster:
+                                        type: object
+                                        properties:
+                                          fid:
+                                            type: integer
+                                          pfpUrl:
+                                            type: string
+                                          displayName:
+                                            type: string
+                                          username:
+                                            type: string
+                                        required:
+                                          - fid
+                                    required:
+                                      - address
+                                  id: {}
+                                  channelId:
+                                    type: string
+                                    pattern: ^d+$
+                                  commentType:
+                                    type: string
+                                  content:
+                                    type: string
+                                  chainId:
+                                    type: integer
+                                  deletedAt:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  logIndex:
+                                    type:
+                                      - integer
+                                      - 'null'
+                                  metadata:
+                                    type: string
+                                  parentId: {}
+                                  targetUri:
+                                    type: string
+                                  timestamp:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  txHash: {}
+                                  cursor: {}
+                                  moderationStatus:
+                                    type: string
+                                    enum: *ref_0
+                                  moderationStatusChangedAt:
+                                    type:
+                                      - string
+                                      - 'null'
+                                required:
+                                  - appSigner
+                                  - author
+                                  - id
+                                  - channelId
+                                  - commentType
+                                  - content
+                                  - chainId
+                                  - deletedAt
+                                  - logIndex
+                                  - metadata
+                                  - parentId
+                                  - targetUri
+                                  - timestamp
+                                  - txHash
+                                  - cursor
+                                  - moderationStatus
+                                  - moderationStatusChangedAt
+                            pagination:
+                              type: object
+                              properties:
+                                limit:
+                                  type: integer
+                                hasNext:
+                                  type: boolean
+                                hasPrevious:
+                                  type: boolean
+                                startCursor: {}
+                                endCursor: {}
+                              required:
+                                - limit
+                                - hasNext
+                                - hasPrevious
+                          required:
+                            - extra
+                            - results
+                            - pagination
                       required:
                         - appSigner
                         - author
                         - id
+                        - channelId
+                        - commentType
                         - content
                         - chainId
                         - deletedAt
@@ -482,6 +649,7 @@ paths:
                         - cursor
                         - moderationStatus
                         - moderationStatusChangedAt
+                        - replies
                   pagination:
                     type: object
                     properties:
@@ -907,6 +1075,11 @@ paths:
                           required:
                             - address
                         id: {}
+                        channelId:
+                          type: string
+                          pattern: ^d+$
+                        commentType:
+                          type: string
                         content:
                           type: string
                         chainId:
@@ -941,6 +1114,8 @@ paths:
                         - appSigner
                         - author
                         - id
+                        - channelId
+                        - commentType
                         - content
                         - chainId
                         - deletedAt
@@ -1059,6 +1234,11 @@ paths:
                     required:
                       - address
                   id: {}
+                  channelId:
+                    type: string
+                    pattern: ^d+$
+                  commentType:
+                    type: string
                   content:
                     type: string
                   chainId:
@@ -1093,6 +1273,8 @@ paths:
                   - appSigner
                   - author
                   - id
+                  - channelId
+                  - commentType
                   - content
                   - chainId
                   - deletedAt
@@ -1192,6 +1374,11 @@ paths:
                     required:
                       - address
                   id: {}
+                  channelId:
+                    type: string
+                    pattern: ^d+$
+                  commentType:
+                    type: string
                   content:
                     type: string
                   chainId:
@@ -1226,6 +1413,8 @@ paths:
                   - appSigner
                   - author
                   - id
+                  - channelId
+                  - commentType
                   - content
                   - chainId
                   - deletedAt

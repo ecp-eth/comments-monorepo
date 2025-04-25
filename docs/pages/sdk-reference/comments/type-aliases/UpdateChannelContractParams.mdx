@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / UpdateChannelContractParams
+
+# Type Alias: UpdateChannelContractParams
+
+```ts
+type UpdateChannelContractParams = {
+  channelContract: Hex;
+  commentsContractAddress?: Hex;
+  writeContract: ContractWriteFunctions["updateChannelContract"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:7](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L7)
+
+## Properties
+
+### channelContract
+
+```ts
+channelContract: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:11](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L11)
+
+The new channel manager contract address
+
+***
+
+### commentsContractAddress?
+
+```ts
+optional commentsContractAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:16](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L16)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["updateChannelContract"];
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:17](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L17)

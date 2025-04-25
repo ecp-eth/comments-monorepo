@@ -1,0 +1,44 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetDomainSeparatorParams
+
+# Type Alias: GetDomainSeparatorParams
+
+```ts
+type GetDomainSeparatorParams = {
+  commentsContractAddress?: Hex;
+  readContract: ContractReadFunctions["DOMAIN_SEPARATOR"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:120](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L120)
+
+## Properties
+
+### commentsContractAddress?
+
+```ts
+optional commentsContractAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:125](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L125)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["DOMAIN_SEPARATOR"];
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:126](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L126)

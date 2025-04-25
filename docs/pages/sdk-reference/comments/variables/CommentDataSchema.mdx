@@ -1,0 +1,48 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / CommentDataSchema
+
+# Variable: CommentDataSchema
+
+```ts
+const CommentDataSchema: ZodObject<{
+  appSigner: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  author: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  channelId: ZodBigInt;
+  commentType: ZodString;
+  content: ZodString;
+  deadline: ZodBigInt;
+  metadata: ZodString;
+  nonce: ZodBigInt;
+  parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  targetUri: ZodString;
+}, "strip", ZodTypeAny, {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: string;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: string;
+}, {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: string;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: string;
+}>;
+```
+
+Defined in: [packages/sdk/src/comments/schemas.ts:18](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L18)
+
+Comment schema. This is used as output of the functions.

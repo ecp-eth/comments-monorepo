@@ -1,0 +1,197 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / FetchCommentRepliesOptions
+
+# Type Alias: FetchCommentRepliesOptions
+
+```ts
+type FetchCommentRepliesOptions = {
+  apiUrl?: string;
+  appSigner?: Hex;
+  channelId?: bigint;
+  commentId: Hex;
+  commentType?: string;
+  cursor?: Hex;
+  limit?: number;
+  mode?: "nested" | "flat";
+  retries?: number;
+  signal?: AbortSignal;
+  sort?: "asc" | "desc";
+  viewer?: Hex;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:186](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L186)
+
+The options for `fetchCommentReplies()`
+
+## Properties
+
+### apiUrl?
+
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:200](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L200)
+
+URL on which /api/comments/$commentId/replies endpoint will be called
+
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+***
+
+### appSigner?
+
+```ts
+optional appSigner: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:204](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L204)
+
+Filters to only comments sent using this app signer key.
+
+***
+
+### channelId?
+
+```ts
+optional channelId: bigint;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:233](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L233)
+
+Filter replies by channel ID
+
+***
+
+### commentId
+
+```ts
+commentId: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:190](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L190)
+
+The ID of the comment to fetch replies for
+
+***
+
+### commentType?
+
+```ts
+optional commentType: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:229](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L229)
+
+Filter replies by comment type
+
+***
+
+### cursor?
+
+```ts
+optional cursor: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:214](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L214)
+
+The cursor to fetch comments from
+
+***
+
+### limit?
+
+```ts
+optional limit: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:237](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L237)
+
+#### Default
+
+```ts
+50
+```
+
+***
+
+### mode?
+
+```ts
+optional mode: "nested" | "flat";
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:225](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L225)
+
+The mode to fetch replies in by default it returns only the first level of replies.
+If flat is used it will return all replies sorted by timestamp in descending order.
+
+#### Default
+
+```ts
+"nested"
+```
+
+***
+
+### retries?
+
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:210](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L210)
+
+Number of times to retry the signing operation in case of failure.
+
+#### Default
+
+```ts
+3
+```
+
+***
+
+### signal?
+
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:238](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L238)
+
+***
+
+### sort?
+
+```ts
+optional sort: "asc" | "desc";
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:218](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L218)
+
+#### Default
+
+```ts
+"desc"
+```
+
+***
+
+### viewer?
+
+```ts
+optional viewer: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:194](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L194)
+
+The viewer's address. This is useful when the content moderation is enabled on the indexer.
