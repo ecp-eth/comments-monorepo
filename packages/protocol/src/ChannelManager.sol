@@ -63,9 +63,11 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         // Create default channel with ID 0
         _safeMint(initialOwner, 0);
 
-        channels[0].name = "Home";
-        channels[0].description = "Any kind of content";
-        channels[0].metadata = "{}";
+        ChannelConfig storage channelZero = channels[0];
+
+        channelZero.name = "Home";
+        channelZero.description = "Any kind of content";
+        channelZero.metadata = "{}";
     }
 
     modifier onlyCommentsContract() {
@@ -159,9 +161,11 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
         _safeMint(msg.sender, channelId);
 
-        channels[channelId].name = name;
-        channels[channelId].description = description;
-        channels[channelId].metadata = metadata;
+        ChannelConfig storage channel = channels[channelId];
+
+        channel.name = name;
+        channel.description = description;
+        channel.metadata = metadata;
 
         // Add hook if provided
         if (hook != address(0)) {
@@ -186,9 +190,11 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         if (!_channelExists(channelId)) revert ChannelDoesNotExist();
         if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
 
-        channels[channelId].name = name;
-        channels[channelId].description = description;
-        channels[channelId].metadata = metadata;
+        ChannelConfig storage channel = channels[channelId];
+
+        channel.name = name;
+        channel.description = description;
+        channel.metadata = metadata;
 
         emit ChannelUpdated(channelId, name, description, metadata);
     }

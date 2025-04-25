@@ -38,6 +38,9 @@ contract DebugGasUsage is Test, IERC721Receiver {
         debugSetHookGloballyEnabledTrue();
         debugSetHookGloballyEnabledFalse();
         debugExecuteHooks();
+        debugConstructChannelManager();
+        debugCreateChannel();
+        debugUpdateChannel();
     }
 
     function debugRegisterHook() public {
@@ -118,6 +121,40 @@ contract DebugGasUsage is Test, IERC721Receiver {
             user1,
             bytes32(0),
             IChannelManager.HookPhase.Before
+        );
+    }
+
+    function debugConstructChannelManager() public {
+        measureGas("constructChannelManager", runConstructChannelManager);
+    }
+
+    function runConstructChannelManager() internal {
+        new ChannelManager(address(this));
+    }
+
+    function debugCreateChannel() public {
+        measureGas("createChannel", runCreateChannel);
+    }
+
+    function runCreateChannel() internal {
+        channelManager.createChannel{value: 0.02 ether}(
+            "Test Channel 2",
+            "Description",
+            "{}",
+            address(0)
+        );
+    }
+
+    function debugUpdateChannel() public {
+        measureGas("updateChannel", runUpdateChannel);
+    }
+
+    function runUpdateChannel() internal {
+        channelManager.updateChannel(
+            channelId,
+            "Test Channel 3",
+            "Description",
+            "{}"
         );
     }
 
