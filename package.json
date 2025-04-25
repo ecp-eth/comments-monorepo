@@ -11,7 +11,8 @@
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "pkg:publish": "scripts/publish.sh",
-    "postinstall": "node scripts/fix-sentry-opentelemetry.js"
+    "postinstall": "node scripts/fix-sentry-opentelemetry.js",
+    "test": "turbo test --filter=!./packages/protocol"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
