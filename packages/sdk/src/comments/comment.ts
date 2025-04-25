@@ -110,6 +110,10 @@ export type PostCommentParams = {
    */
   appSignature: Hex;
   /**
+   * The author signature. Necessary if the author hasn't approved the signer to post comments on their behalf.
+   */
+  authorSignature?: Hex;
+  /**
    * The fee for the comment
    */
   fee?: bigint;
@@ -131,6 +135,7 @@ export type PostCommentResult = {
 const PostCommentParamsSchema = z.object({
   comment: CommentDataSchema,
   appSignature: HexSchema,
+  authorSignature: HexSchema.optional(),
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
   fee: z.bigint().optional(),
 });
@@ -144,13 +149,14 @@ const PostCommentParamsSchema = z.object({
 export async function postComment(params: PostCommentParams) {
   const validatedParams = PostCommentParamsSchema.parse(params);
 
-  const { comment, appSignature, commentsAddress, fee } = validatedParams;
+  const { comment, appSignature, authorSignature, commentsAddress, fee } =
+    validatedParams;
 
   const txHash = await params.writeContract({
     address: commentsAddress,
     abi: CommentsV1Abi,
     functionName: "postComment",
-    args: [comment, stringToHex(""), appSignature],
+    args: [comment, authorSignature ?? stringToHex(""), appSignature],
     value: fee,
   });
 
@@ -321,6 +327,10 @@ export type DeleteCommentParams = {
    */
   appSignature: Hex;
   /**
+   * The author signature. Necessary if the author hasn't approved the signer to delete comments on their behalf.
+   */
+  authorSignature?: Hex;
+  /**
    * The write contract function
    */
   writeContract: ContractWriteFunctions["deleteComment"];
@@ -334,6 +344,7 @@ const DeleteCommentParamsSchema = z.object({
   deadline: z.bigint(),
   commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
   appSignature: HexSchema,
+  authorSignature: HexSchema.optional(),
 });
 
 /**
@@ -353,6 +364,7 @@ export async function deleteComment(params: DeleteCommentParams) {
     deadline,
     commentsAddress,
     appSignature,
+    authorSignature,
   } = validatedParams;
 
   const txHash = await params.writeContract({
@@ -365,7 +377,7 @@ export async function deleteComment(params: DeleteCommentParams) {
       appSigner,
       nonce,
       deadline,
-      stringToHex(""),
+      authorSignature ?? stringToHex(""),
       appSignature,
     ],
   });

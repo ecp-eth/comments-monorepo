@@ -71,6 +71,7 @@ export async function POST(
   try {
     const { txHash } = await postComment({
       appSignature,
+      authorSignature,
       comment: signTypedDataParams.message,
       writeContract: walletClient.writeContract,
     });

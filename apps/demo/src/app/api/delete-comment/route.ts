@@ -74,6 +74,7 @@ export async function POST(
     const { txHash } = await deleteComment({
       ...signTypedDataParams.message,
       appSignature,
+      authorSignature,
       writeContract: walletClient.writeContract,
     });
 
