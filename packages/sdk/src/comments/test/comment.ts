@@ -22,7 +22,7 @@ import {
   createDeleteCommentTypedData,
   createCommentData,
 } from "../comment.js";
-import { addApprovalAsAuthor } from "../approval.js";
+import { addApprovalAsAuthor, revokeApprovalAsAuthor } from "../approval.js";
 import { CommentsV1Abi } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
@@ -135,6 +135,63 @@ describe("postComment()", () => {
     const result = await postComment({
       comment: commentData,
       appSignature,
+      writeContract: appSignerClient.writeContract,
+      commentsAddress,
+    });
+
+    const receipt = await appSignerClient.waitForTransactionReceipt({
+      hash: result.txHash,
+    });
+
+    assert.equal(receipt.status, "success");
+  });
+
+  it("posts a comment with author signature when no approval exists", async () => {
+    const revokeApprovalResult = await revokeApprovalAsAuthor({
+      appSigner: appSignerAccount.address,
+      writeContract: client.writeContract,
+      commentsAddress,
+    });
+
+    await client.waitForTransactionReceipt({
+      hash: revokeApprovalResult.txHash,
+    });
+
+    await revokeApprovalAsAuthor({
+      appSigner: appSignerAccount.address,
+      writeContract: client.writeContract,
+      commentsAddress,
+    });
+
+    // Get a fresh nonce since we're not using the beforeEach setup
+    const nonce = await getNonce({
+      author: account.address,
+      appSigner: appSignerAccount.address,
+      readContract: client.readContract,
+      commentsAddress,
+    });
+
+    const commentData = createCommentData({
+      author: account.address,
+      appSigner: appSignerAccount.address,
+      content: "Test comment content",
+      targetUri: "https://example.com",
+      nonce,
+    });
+
+    const typedData = createCommentTypedData({
+      chainId: anvil.id,
+      commentData,
+      commentsAddress,
+    });
+
+    const appSignature = await appSignerClient.signTypedData(typedData);
+    const authorSignature = await client.signTypedData(typedData);
+
+    const result = await postComment({
+      comment: commentData,
+      appSignature,
+      authorSignature,
       writeContract: appSignerClient.writeContract,
       commentsAddress,
     });
