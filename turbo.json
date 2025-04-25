@@ -17,6 +17,8 @@
   "globalPassThroughEnv": [
     "APP_URL",
     "APP_SIGNER_PRIVATE_KEY",
+    "CONTRACT_OWNER_ADDRESS",
+    "FUND_ADDRESS",
     "CI",
     "COMMENTS_INDEXER_URL",
     "SUBMITTER_PRIVATE_KEY",

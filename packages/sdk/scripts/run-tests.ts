@@ -2,20 +2,31 @@ import { run } from "node:test";
 import { spec } from "node:test/reporters";
 import process from "node:process";
 import path from "node:path";
-import { exec } from "node:child_process";
+import { type ChildProcess, spawn } from "node:child_process";
 
 const wantsWatchMode = process.argv.includes("--watch");
 
 const cwd = path.resolve(import.meta.dirname, "../../protocol");
 
-const nodeProcess = exec("anvil --host 0.0.0.0 --block-time 1", { cwd });
+const nodeProcess = spawn("anvil", ["--host", "0.0.0.0", "--block-time", "1"], {
+  cwd,
+  env: process.env,
+});
 const nodeProcessTimeout = AbortSignal.timeout(20_000);
 
 // wait for nodeProcess to output Listening on 0.0.0.0:8545 in stdout
 await Promise.race([
   new Promise((resolve, reject) => {
+    nodeProcess.on("exit", (code) => {
+      if (code !== 0) {
+        reject(new Error("Anvil node failed to start"));
+      }
+    });
+
     nodeProcess.stdout?.on("data", (data) => {
-      if (data.toString().includes("Listening on 0.0.0.0:8545")) {
+      const output = data.toString();
+
+      if (output.includes("Listening on 0.0.0.0:8545")) {
         console.log("Anvil node started");
         resolve(true);
       }
@@ -36,11 +47,20 @@ await Promise.race([
 nodeProcess.stdout?.removeAllListeners();
 nodeProcess.stderr?.removeAllListeners();
 
-process.on("beforeExit", () => {
-  if (!nodeProcess.killed) {
-    console.log("Killing anvil node");
-    nodeProcess.kill();
+// Add robust process termination handler
+function killProcess(childProcess: ChildProcess) {
+  childProcess.unref();
+
+  if (childProcess.killed) {
+    return;
   }
+
+  console.log("Killing anvil node");
+  childProcess.kill();
+}
+
+process.on("beforeExit", () => {
+  killProcess(nodeProcess);
 });
 
 run({
@@ -54,11 +74,8 @@ run({
   .on("test:fail", () => {
     process.exitCode = 1;
   })
-  .on("end", () => {
-    if (!nodeProcess.killed) {
-      console.log("Killing anvil node");
-      nodeProcess.kill();
-    }
+  .on("end", async () => {
+    killProcess(nodeProcess);
   })
   .compose(spec)
   .pipe(process.stdout);

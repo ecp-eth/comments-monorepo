@@ -21,11 +21,11 @@ import {
   getChannelManager,
 } from "../contract.js";
 
-type UseUpdateChannelContractParams = Omit<
+export type UseUpdateChannelContractParams = Omit<
   UpdateChannelContractParams,
   "writeContract"
 >;
-type UseUpdateChannelContractOptions = Omit<
+export type UseUpdateChannelContractOptions = Omit<
   UseMutationOptions<
     UpdateChannelContractResult,
     Error,
@@ -33,7 +33,7 @@ type UseUpdateChannelContractOptions = Omit<
   >,
   "mutationFn"
 >;
-type UseUpdateChannelContractResult = UseMutationResult<
+export type UseUpdateChannelContractResult = UseMutationResult<
   UpdateChannelContractResult,
   Error,
   UseUpdateChannelContractParams
@@ -61,12 +61,15 @@ export function useUpdateChannelContract(
   });
 }
 
-type UseGetContractNameParams = Omit<GetContractNameParams, "readContract">;
-type UseGetContractNameOptions = Omit<
+export type UseGetContractNameParams = Omit<
+  GetContractNameParams,
+  "readContract"
+>;
+export type UseGetContractNameOptions = Omit<
   UseQueryOptions<string, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetContractNameResult = UseQueryResult<string, Error>;
+export type UseGetContractNameResult = UseQueryResult<string, Error>;
 
 /**
  * React hook to get the contract name
@@ -101,15 +104,15 @@ export function useGetContractName(
   });
 }
 
-type UseGetContractVersionParams = Omit<
+export type UseGetContractVersionParams = Omit<
   GetContractVersionParams,
   "readContract"
 >;
-type UseGetContractVersionOptions = Omit<
+export type UseGetContractVersionOptions = Omit<
   UseQueryOptions<string, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetContractVersionResult = UseQueryResult<string, Error>;
+export type UseGetContractVersionResult = UseQueryResult<string, Error>;
 
 /**
  * React hook to get the contract version
@@ -144,15 +147,15 @@ export function useGetContractVersion(
   });
 }
 
-type UseGetDomainSeparatorParams = Omit<
+export type UseGetDomainSeparatorParams = Omit<
   GetDomainSeparatorParams,
   "readContract"
 >;
-type UseGetDomainSeparatorOptions = Omit<
+export type UseGetDomainSeparatorOptions = Omit<
   UseQueryOptions<string, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetDomainSeparatorResult = UseQueryResult<string, Error>;
+export type UseGetDomainSeparatorResult = UseQueryResult<string, Error>;
 
 /**
  * React hook to get the EIP-712 domain separator
@@ -187,12 +190,15 @@ export function useGetDomainSeparator(
   });
 }
 
-type UseGetChannelManagerParams = Omit<GetChannelManagerParams, "readContract">;
-type UseGetChannelManagerOptions = Omit<
+export type UseGetChannelManagerParams = Omit<
+  GetChannelManagerParams,
+  "readContract"
+>;
+export type UseGetChannelManagerOptions = Omit<
   UseQueryOptions<string, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetChannelManagerResult = UseQueryResult<string, Error>;
+export type UseGetChannelManagerResult = UseQueryResult<string, Error>;
 
 /**
  * React hook to get the channel manager contract address
