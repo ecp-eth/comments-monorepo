@@ -39,12 +39,12 @@ import {
   channelExists,
 } from "../channel.js";
 
-type UseCreateChannelParams = Omit<CreateChannelParams, "writeContract">;
-type UseCreateChannelOptions = Omit<
+export type UseCreateChannelParams = Omit<CreateChannelParams, "writeContract">;
+export type UseCreateChannelOptions = Omit<
   UseMutationOptions<CreateChannelResult, Error, UseCreateChannelParams>,
   "mutationFn"
 >;
-type UseCreateChannelResult = UseMutationResult<
+export type UseCreateChannelResult = UseMutationResult<
   CreateChannelResult,
   Error,
   UseCreateChannelParams
@@ -72,12 +72,12 @@ export function useCreateChannel(
   });
 }
 
-type UseUpdateChannelParams = Omit<UpdateChannelParams, "writeContract">;
-type UseUpdateChannelOptions = Omit<
+export type UseUpdateChannelParams = Omit<UpdateChannelParams, "writeContract">;
+export type UseUpdateChannelOptions = Omit<
   UseMutationOptions<UpdateChannelResult, Error, UseUpdateChannelParams>,
   "mutationFn"
 >;
-type UseUpdateChannelResult = UseMutationResult<
+export type UseUpdateChannelResult = UseMutationResult<
   UpdateChannelResult,
   Error,
   UseUpdateChannelParams
@@ -105,12 +105,12 @@ export function useUpdateChannel(
   });
 }
 
-type UseGetChannelParams = Omit<GetChannelParams, "readContract">;
-type UseGetChannelOptions = Omit<
+export type UseGetChannelParams = Omit<GetChannelParams, "readContract">;
+export type UseGetChannelOptions = Omit<
   UseQueryOptions<GetChannelResult, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetChannelResult = UseQueryResult<GetChannelResult, Error>;
+export type UseGetChannelResult = UseQueryResult<GetChannelResult, Error>;
 
 /**
  * Get a channel
@@ -145,12 +145,12 @@ export function useGetChannel(
   });
 }
 
-type UseChannelExistsParams = Omit<ChannelExistsParams, "readContract">;
-type UseChannelExistsOptions = Omit<
+export type UseChannelExistsParams = Omit<ChannelExistsParams, "readContract">;
+export type UseChannelExistsOptions = Omit<
   UseQueryOptions<boolean, Error>,
   "queryKey" | "queryFn"
 >;
-type UseChannelExistsResult = UseQueryResult<boolean, Error>;
+export type UseChannelExistsResult = UseQueryResult<boolean, Error>;
 
 /**
  * Check if a channel exists
@@ -185,12 +185,18 @@ export function useChannelExists(
   });
 }
 
-type UseGetChannelOwnerParams = Omit<GetChannelOwnerParams, "readContract">;
-type UseGetChannelOwnerOptions = Omit<
+export type UseGetChannelOwnerParams = Omit<
+  GetChannelOwnerParams,
+  "readContract"
+>;
+export type UseGetChannelOwnerOptions = Omit<
   UseQueryOptions<GetChannelOwnerResult, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetChannelOwnerResult = UseQueryResult<GetChannelOwnerResult, Error>;
+export type UseGetChannelOwnerResult = UseQueryResult<
+  GetChannelOwnerResult,
+  Error
+>;
 
 /**
  * Get the owner of a channel
@@ -225,15 +231,15 @@ export function useGetChannelOwner(
   });
 }
 
-type UseGetChannelCreationFeeParams = Omit<
+export type UseGetChannelCreationFeeParams = Omit<
   GetChannelCreationFeeParams,
   "readContract"
 >;
-type UseGetChannelCreationFeeOptions = Omit<
+export type UseGetChannelCreationFeeOptions = Omit<
   UseQueryOptions<GetChannelCreationFeeResult, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetChannelCreationFeeResult = UseQueryResult<
+export type UseGetChannelCreationFeeResult = UseQueryResult<
   GetChannelCreationFeeResult,
   Error
 >;
@@ -271,11 +277,11 @@ export function useGetChannelCreationFee(
   });
 }
 
-type UseSetChannelCreationFeeParams = Omit<
+export type UseSetChannelCreationFeeParams = Omit<
   SetChannelCreationFeeParams,
   "writeContract"
 >;
-type UseSetChannelCreationFeeOptions = Omit<
+export type UseSetChannelCreationFeeOptions = Omit<
   UseMutationOptions<
     SetChannelCreationFeeResult,
     Error,
@@ -283,7 +289,7 @@ type UseSetChannelCreationFeeOptions = Omit<
   >,
   "mutationFn"
 >;
-type UseSetChannelCreationFeeResult = UseMutationResult<
+export type UseSetChannelCreationFeeResult = UseMutationResult<
   SetChannelCreationFeeResult,
   Error,
   UseSetChannelCreationFeeParams
@@ -311,12 +317,12 @@ export function useSetChannelCreationFee(
   });
 }
 
-type UseWithdrawFeesParams = Omit<WithdrawFeesParams, "writeContract">;
-type UseWithdrawFeesOptions = Omit<
+export type UseWithdrawFeesParams = Omit<WithdrawFeesParams, "writeContract">;
+export type UseWithdrawFeesOptions = Omit<
   UseMutationOptions<WithdrawFeesResult, Error, UseWithdrawFeesParams>,
   "mutationFn"
 >;
-type UseWithdrawFeesResult = UseMutationResult<
+export type UseWithdrawFeesResult = UseMutationResult<
   WithdrawFeesResult,
   Error,
   UseWithdrawFeesParams
@@ -344,11 +350,11 @@ export function useWithdrawFees(
   });
 }
 
-type UseUpdateCommentsContractParams = Omit<
+export type UseUpdateCommentsContractParams = Omit<
   UpdateCommentsContractParams,
   "writeContract"
 >;
-type UseUpdateCommentsContractOptions = Omit<
+export type UseUpdateCommentsContractOptions = Omit<
   UseMutationOptions<
     UpdateCommentsContractResult,
     Error,
@@ -356,7 +362,7 @@ type UseUpdateCommentsContractOptions = Omit<
   >,
   "mutationFn"
 >;
-type UseUpdateCommentsContractResult = UseMutationResult<
+export type UseUpdateCommentsContractResult = UseMutationResult<
   UpdateCommentsContractResult,
   Error,
   UseUpdateCommentsContractParams
@@ -384,12 +390,12 @@ export function useUpdateCommentsContract(
   });
 }
 
-type UseSetBaseURIParams = Omit<SetBaseURIParams, "writeContract">;
-type UseSetBaseURIOptions = Omit<
+export type UseSetBaseURIParams = Omit<SetBaseURIParams, "writeContract">;
+export type UseSetBaseURIOptions = Omit<
   UseMutationOptions<SetBaseURIResult, Error, UseSetBaseURIParams>,
   "mutationFn"
 >;
-type UseSetBaseURIResult = UseMutationResult<
+export type UseSetBaseURIResult = UseMutationResult<
   SetBaseURIResult,
   Error,
   UseSetBaseURIParams

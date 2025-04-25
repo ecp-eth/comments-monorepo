@@ -29,11 +29,11 @@ import {
 } from "../comment.js";
 import { useCallback } from "react";
 
-type UsePostCommentAsAuthorParams = Omit<
+export type UsePostCommentAsAuthorParams = Omit<
   PostCommentAsAuthorParams,
   "writeContract"
 >;
-type UsePostCommentAsAuthorOptions = Omit<
+export type UsePostCommentAsAuthorOptions = Omit<
   UseMutationOptions<
     PostCommentAsAuthorResult,
     Error,
@@ -41,7 +41,7 @@ type UsePostCommentAsAuthorOptions = Omit<
   >,
   "mutationFn"
 >;
-type UsePostCommentAsAuthorResult = UseMutationResult<
+export type UsePostCommentAsAuthorResult = UseMutationResult<
   PostCommentAsAuthorResult,
   Error,
   UsePostCommentAsAuthorParams
@@ -69,12 +69,12 @@ export function usePostCommentAsAuthor(
   });
 }
 
-type UsePostCommentParams = Omit<PostCommentParams, "writeContract">;
-type UsePostCommentOptions = Omit<
+export type UsePostCommentParams = Omit<PostCommentParams, "writeContract">;
+export type UsePostCommentOptions = Omit<
   UseMutationOptions<PostCommentResult, Error, UsePostCommentParams>,
   "mutationFn"
 >;
-type UsePostCommentResult = UseMutationResult<
+export type UsePostCommentResult = UseMutationResult<
   PostCommentResult,
   Error,
   UsePostCommentParams
@@ -102,12 +102,12 @@ export function usePostComment(
   });
 }
 
-type UseGetCommentParams = Omit<GetCommentParams, "readContract">;
-type UseGetCommentOptions = Omit<
+export type UseGetCommentParams = Omit<GetCommentParams, "readContract">;
+export type UseGetCommentOptions = Omit<
   UseQueryOptions<GetCommentResult, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetCommentResult = UseQueryResult<GetCommentResult, Error>;
+export type UseGetCommentResult = UseQueryResult<GetCommentResult, Error>;
 
 /**
  * React hook to get a comment by ID
@@ -142,12 +142,12 @@ export function useGetComment(
   });
 }
 
-type UseGetCommentIdParams = Omit<GetCommentIdParams, "readContract">;
-type UseGetCommentIdOptions = Omit<
+export type UseGetCommentIdParams = Omit<GetCommentIdParams, "readContract">;
+export type UseGetCommentIdOptions = Omit<
   UseQueryOptions<Hex, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetCommentIdResult = UseQueryResult<Hex, Error>;
+export type UseGetCommentIdResult = UseQueryResult<Hex, Error>;
 
 /**
  * React hook to get the ID for a comment before it is posted
@@ -182,11 +182,11 @@ export function useGetCommentId(
   });
 }
 
-type UseDeleteCommentAsAuthorParams = Omit<
+export type UseDeleteCommentAsAuthorParams = Omit<
   DeleteCommentAsAuthorParams,
   "writeContract"
 >;
-type UseDeleteCommentAsAuthorOptions = Omit<
+export type UseDeleteCommentAsAuthorOptions = Omit<
   UseMutationOptions<
     DeleteCommentAsAuthorResult,
     Error,
@@ -194,7 +194,7 @@ type UseDeleteCommentAsAuthorOptions = Omit<
   >,
   "mutationFn"
 >;
-type UseDeleteCommentAsAuthorResult = UseMutationResult<
+export type UseDeleteCommentAsAuthorResult = UseMutationResult<
   DeleteCommentAsAuthorResult,
   Error,
   UseDeleteCommentAsAuthorParams
@@ -222,12 +222,12 @@ export function useDeleteCommentAsAuthor(
   });
 }
 
-type UseDeleteCommentParams = Omit<DeleteCommentParams, "writeContract">;
-type UseDeleteCommentOptions = Omit<
+export type UseDeleteCommentParams = Omit<DeleteCommentParams, "writeContract">;
+export type UseDeleteCommentOptions = Omit<
   UseMutationOptions<{ txHash: Hex }, Error, UseDeleteCommentParams>,
   "mutationFn"
 >;
-type UseDeleteCommentResult = UseMutationResult<
+export type UseDeleteCommentResult = UseMutationResult<
   { txHash: Hex },
   Error,
   UseDeleteCommentParams
@@ -258,8 +258,6 @@ export function useDeleteComment(
 /**
  * React hook to get the nonce for the author and app signer
  *
- * @param params - The parameters for getting a nonce
- * @param options - The options for the query
  * @returns The result of the query
  */
 export function useGetNonce(): typeof getNonce {

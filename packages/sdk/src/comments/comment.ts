@@ -541,7 +541,7 @@ export function createCommentTypedData(
 
 /**
  * Create the data structure of a comment
- * @return {@link schemas!CommentData | CommentData} The data structure of a comment
+ * @return {@link comments!CommentData | CommentData} The data structure of a comment
  *
  */
 export function createCommentData({

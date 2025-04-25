@@ -34,12 +34,12 @@ import {
   setHookTransactionFee,
 } from "../hook.js";
 
-type UseGetHookStatusParams = Omit<GetHookStatusParams, "readContract">;
-type UseGetHookStatusOptions = Omit<
+export type UseGetHookStatusParams = Omit<GetHookStatusParams, "readContract">;
+export type UseGetHookStatusOptions = Omit<
   UseQueryOptions<GetHookStatusResult, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetHookStatusResult = UseQueryResult<GetHookStatusResult, Error>;
+export type UseGetHookStatusResult = UseQueryResult<GetHookStatusResult, Error>;
 
 /**
  * Get the status of a hook
@@ -74,12 +74,12 @@ export function useGetHookStatus(
   });
 }
 
-type UseSetHookParams = Omit<SetHookParams, "writeContract">;
-type UseSetHookOptions = Omit<
+export type UseSetHookParams = Omit<SetHookParams, "writeContract">;
+export type UseSetHookOptions = Omit<
   UseMutationOptions<SetHookResult, Error, UseSetHookParams>,
   "mutationFn"
 >;
-type UseSetHookResult = UseMutationResult<
+export type UseSetHookResult = UseMutationResult<
   SetHookResult,
   Error,
   UseSetHookParams
@@ -105,12 +105,12 @@ export function useSetHook(options: UseSetHookOptions = {}): UseSetHookResult {
   });
 }
 
-type UseRegisterHookParams = Omit<RegisterHookParams, "writeContract">;
-type UseRegisterHookOptions = Omit<
+export type UseRegisterHookParams = Omit<RegisterHookParams, "writeContract">;
+export type UseRegisterHookOptions = Omit<
   UseMutationOptions<RegisterHookResult, Error, UseRegisterHookParams>,
   "mutationFn"
 >;
-type UseRegisterHookResult = UseMutationResult<
+export type UseRegisterHookResult = UseMutationResult<
   RegisterHookResult,
   Error,
   UseRegisterHookParams
@@ -138,16 +138,16 @@ export function useRegisterHook(
   });
 }
 
-type UseSetHookGloballyEnabledParams = Omit<
+export type UseSetHookGloballyEnabledParams = Omit<
   SetHookGloballyEnabledParams,
   "writeContract"
 >;
-type UseSetHookGloballyEnabledOptions = UseMutationOptions<
+export type UseSetHookGloballyEnabledOptions = UseMutationOptions<
   SetHookGloballyEnabledResult,
   Error,
   UseSetHookGloballyEnabledParams
 >;
-type UseSetHookGloballyEnabledResult = UseMutationResult<
+export type UseSetHookGloballyEnabledResult = UseMutationResult<
   SetHookGloballyEnabledResult,
   Error,
   UseSetHookGloballyEnabledParams
@@ -175,15 +175,15 @@ export function useSetHookGloballyEnabled(
   });
 }
 
-type UseGetHookRegistrationFeeParams = Omit<
+export type UseGetHookRegistrationFeeParams = Omit<
   GetHookRegistrationFeeParams,
   "readContract"
 >;
-type UseGetHookRegistrationFeeOptions = Omit<
+export type UseGetHookRegistrationFeeOptions = Omit<
   UseQueryOptions<GetHookRegistrationFeeResult, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetHookRegistrationFeeResult = UseQueryResult<
+export type UseGetHookRegistrationFeeResult = UseQueryResult<
   GetHookRegistrationFeeResult,
   Error
 >;
@@ -221,16 +221,16 @@ export function useGetHookRegistrationFee(
   });
 }
 
-type UseSetHookRegistrationFeeParams = Omit<
+export type UseSetHookRegistrationFeeParams = Omit<
   SetHookRegistrationFeeParams,
   "writeContract"
 >;
-type UseSetHookRegistrationFeeOptions = UseMutationOptions<
+export type UseSetHookRegistrationFeeOptions = UseMutationOptions<
   SetHookRegistrationFeeResult,
   Error,
   UseSetHookRegistrationFeeParams
 >;
-type UseSetHookRegistrationFeeResult = UseMutationResult<
+export type UseSetHookRegistrationFeeResult = UseMutationResult<
   SetHookRegistrationFeeResult,
   Error,
   UseSetHookRegistrationFeeParams
@@ -258,15 +258,15 @@ export function useSetHookRegistrationFee(
   });
 }
 
-type UseGetHookTransactionFeeParams = Omit<
+export type UseGetHookTransactionFeeParams = Omit<
   GetHookTransactionFeeParams,
   "readContract"
 >;
-type UseGetHookTransactionFeeOptions = Omit<
+export type UseGetHookTransactionFeeOptions = Omit<
   UseQueryOptions<GetHookTransactionFeeResult, Error>,
   "queryKey" | "queryFn"
 >;
-type UseGetHookTransactionFeeResult = UseQueryResult<
+export type UseGetHookTransactionFeeResult = UseQueryResult<
   GetHookTransactionFeeResult,
   Error
 >;
@@ -304,11 +304,11 @@ export function useGetHookTransactionFee(
   });
 }
 
-type UseSetHookTransactionFeeParams = Omit<
+export type UseSetHookTransactionFeeParams = Omit<
   SetHookTransactionFeeParams,
   "writeContract"
 >;
-type UseSetHookTransactionFeeOptions = Omit<
+export type UseSetHookTransactionFeeOptions = Omit<
   UseMutationOptions<
     SetHookTransactionFeeResult,
     Error,
@@ -316,7 +316,7 @@ type UseSetHookTransactionFeeOptions = Omit<
   >,
   "mutationFn"
 >;
-type UseSetHookTransactionFeeResult = UseMutationResult<
+export type UseSetHookTransactionFeeResult = UseMutationResult<
   SetHookTransactionFeeResult,
   Error,
   UseSetHookTransactionFeeParams

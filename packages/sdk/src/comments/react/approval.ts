@@ -24,12 +24,12 @@ import {
   revokeApproval,
 } from "../approval.js";
 
-type UseIsApprovedParams = Omit<IsApprovedParams, "readContract">;
-type UseIsApprovedOptions = Omit<
+export type UseIsApprovedParams = Omit<IsApprovedParams, "readContract">;
+export type UseIsApprovedOptions = Omit<
   UseQueryOptions<boolean, Error>,
   "queryKey" | "queryFn"
 >;
-type UseIsApprovedResult = UseQueryResult<boolean, Error>;
+export type UseIsApprovedResult = UseQueryResult<boolean, Error>;
 
 /**
  * React hook to check if an app signer is approved for an author
@@ -69,11 +69,11 @@ export function useIsApproved(
   });
 }
 
-type UseAddApprovalAsAuthorParams = Omit<
+export type UseAddApprovalAsAuthorParams = Omit<
   AddApprovalAsAuthorParams,
   "writeContract"
 >;
-type UseAddApprovalAsAuthorOptions = Omit<
+export type UseAddApprovalAsAuthorOptions = Omit<
   UseMutationOptions<
     AddApprovalAsAuthorResult,
     Error,
@@ -81,7 +81,7 @@ type UseAddApprovalAsAuthorOptions = Omit<
   >,
   "mutationFn"
 >;
-type UseAddApprovalAsAuthorResult = UseMutationResult<
+export type UseAddApprovalAsAuthorResult = UseMutationResult<
   AddApprovalAsAuthorResult,
   Error,
   UseAddApprovalAsAuthorParams
@@ -109,12 +109,12 @@ export function useAddApprovalAsAuthor(
   });
 }
 
-type UseAddApprovalParams = Omit<AddApprovalParams, "writeContract">;
-type UseAddApprovalOptions = Omit<
+export type UseAddApprovalParams = Omit<AddApprovalParams, "writeContract">;
+export type UseAddApprovalOptions = Omit<
   UseMutationOptions<AddApprovalResult, Error, UseAddApprovalParams>,
   "mutationFn"
 >;
-type UseAddApprovalResult = UseMutationResult<
+export type UseAddApprovalResult = UseMutationResult<
   AddApprovalResult,
   Error,
   UseAddApprovalParams
@@ -142,11 +142,11 @@ export function useAddApproval(
   });
 }
 
-type UseRevokeApprovalAsAuthorParams = Omit<
+export type UseRevokeApprovalAsAuthorParams = Omit<
   RevokeApprovalAsAuthorParams,
   "writeContract"
 >;
-type UseRevokeApprovalAsAuthorOptions = Omit<
+export type UseRevokeApprovalAsAuthorOptions = Omit<
   UseMutationOptions<
     RevokeApprovalAsAuthorResult,
     Error,
@@ -154,7 +154,7 @@ type UseRevokeApprovalAsAuthorOptions = Omit<
   >,
   "mutationFn"
 >;
-type UseRevokeApprovalAsAuthorResult = UseMutationResult<
+export type UseRevokeApprovalAsAuthorResult = UseMutationResult<
   RevokeApprovalAsAuthorResult,
   Error,
   UseRevokeApprovalAsAuthorParams
@@ -182,12 +182,15 @@ export function useRevokeApprovalAsAuthor(
   });
 }
 
-type UseRevokeApprovalParams = Omit<RevokeApprovalParams, "writeContract">;
-type UseRevokeApprovalOptions = Omit<
+export type UseRevokeApprovalParams = Omit<
+  RevokeApprovalParams,
+  "writeContract"
+>;
+export type UseRevokeApprovalOptions = Omit<
   UseMutationOptions<RevokeApprovalResult, Error, UseRevokeApprovalParams>,
   "mutationFn"
 >;
-type UseRevokeApprovalResult = UseMutationResult<
+export type UseRevokeApprovalResult = UseMutationResult<
   RevokeApprovalResult,
   Error,
   UseRevokeApprovalParams
