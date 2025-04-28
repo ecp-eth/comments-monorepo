@@ -21,7 +21,9 @@ await Promise.race([
     });
 
     nodeProcess.stdout?.on("data", (data) => {
-      if (data.toString().includes("Listening on 0.0.0.0:8545")) {
+      const output = data.toString();
+
+      if (output.includes("Listening on 0.0.0.0:8545")) {
         console.log("Anvil node started");
         resolve(true);
       }
