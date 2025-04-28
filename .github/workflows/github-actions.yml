@@ -116,13 +116,6 @@ jobs:
           node-version: 22
           cache: "pnpm"
 
-      - name: Check anvil existence
-        run: |
-          if ! command -v anvil &> /dev/null; then
-            echo "anvil could not be found"
-            exit 1
-          fi
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -136,4 +129,5 @@ jobs:
       #   run: pnpm check-types
 
       - name: Test
+        working-directory: packages/sdk
         run: pnpm test
