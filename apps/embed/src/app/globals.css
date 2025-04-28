@@ -13,8 +13,7 @@ body {
 }
 
 @layer base {
-  :root,
-  .theme-root {
+  .light-theme-values {
     --background: var(--light-theme-background, white);
     --foreground: var(--light-theme-foreground, hsl(0 0% 3.9%));
     --account-edit-link: var(--light-theme-account-edit-link, rgb(59 130 246));
@@ -45,41 +44,10 @@ body {
     --root-padding-horizontal: var(--theme-root-padding-horizontal, 0);
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root:not(.light),
-    .theme-root:not(.light) {
-      --background: var(--dark-theme-background, hsl(0 0% 3.9%));
-      --foreground: var(--dark-theme-foreground, hsl(0 0% 98%));
-      --account-edit-link: var(--dark-theme-account-edit-link, rgb(59 130 246));
-      --popover: var(--dark-theme-background, hsl(0 0% 3.9%));
-      --popover-foreground: var(--dark-theme-foreground, hsl(0 0% 98%));
-      --primary: var(--dark-theme-primary, hsl(0 0% 98%));
-      --primary-foreground: var(--dark-theme-primary-foreground, hsl(0 0% 9%));
-      --secondary: var(--dark-theme-secondary, hsl(0 0% 14.9%));
-      --secondary-foreground: var(
-        --dark-theme-secondary-foreground,
-        hsl(0 0% 98%)
-      );
-      --muted: var(--dark-theme-secondary, hsl(0 0% 14.9%));
-      --muted-foreground: var(--dark-theme-muted-foreground, hsl(0 0% 63.9%));
-      --accent: var(--dark-theme-secondary, hsl(0 0% 14.9%));
-      --accent-foreground: var(--dark-theme-foreground, hsl(0 0% 98%));
-      --destructive: var(--dark-theme-destructive, hsl(0 84.2% 60.2%));
-      --destructive-foreground: var(
-        --dark-theme-destructive-foreground,
-        hsl(0 0% 98%)
-      );
-      --border: var(--dark-theme-border, hsl(0 0% 14.9%));
-      --border-focus: var(--dark-theme-border-focus, hsl(0 0% 83.1%));
-      --input: var(--dark-theme-border, hsl(0 0% 14.9%));
-      --ring: var(--dark-theme-ring, hsl(0 0% 83.1%));
-    }
-  }
-
-  :root.dark,
-  .theme-root.dark {
+  .dark-theme-values {
     --background: var(--dark-theme-background, hsl(0 0% 3.9%));
     --foreground: var(--dark-theme-foreground, hsl(0 0% 98%));
+    --account-edit-link: var(--dark-theme-account-edit-link, rgb(59 130 246));
     --popover: var(--dark-theme-background, hsl(0 0% 3.9%));
     --popover-foreground: var(--dark-theme-foreground, hsl(0 0% 98%));
     --primary: var(--dark-theme-primary, hsl(0 0% 98%));
@@ -99,8 +67,24 @@ body {
       hsl(0 0% 98%)
     );
     --border: var(--dark-theme-border, hsl(0 0% 14.9%));
+    --border-focus: var(--dark-theme-border-focus, hsl(0 0% 83.1%));
     --input: var(--dark-theme-border, hsl(0 0% 14.9%));
     --ring: var(--dark-theme-ring, hsl(0 0% 83.1%));
+  }
+
+  .theme-root,
+  .theme-root.light {
+    @apply light-theme-values;
+  }
+
+  .theme-root.dark {
+    @apply dark-theme-values;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .theme-root:not(.light) {
+      @apply dark-theme-values;
+    }
   }
 }
 
