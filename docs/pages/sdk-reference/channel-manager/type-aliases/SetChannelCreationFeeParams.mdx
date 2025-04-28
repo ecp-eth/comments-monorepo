@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / SetChannelCreationFeeParams
+
+# Type Alias: SetChannelCreationFeeParams
+
+```ts
+type SetChannelCreationFeeParams = {
+  channelManagerAddress?: Hex;
+  fee: bigint;
+  writeContract: ContractWriteFunctions["setChannelCreationFee"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:321](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L321)
+
+## Properties
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:331](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L331)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### fee
+
+```ts
+fee: bigint;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:325](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L325)
+
+The fee for creating a channel in wei
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["setChannelCreationFee"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:332](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L332)

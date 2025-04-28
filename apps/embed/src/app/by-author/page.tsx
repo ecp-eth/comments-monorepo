@@ -1,5 +1,5 @@
-import { HexSchema } from "@ecp.eth/sdk/schemas";
-import { fetchComments } from "@ecp.eth/sdk";
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
+import { fetchComments } from "@ecp.eth/sdk/indexer";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";

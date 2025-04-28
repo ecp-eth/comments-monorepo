@@ -3,7 +3,7 @@ import {
   IndexerAPICommentWithRepliesSchema,
   IndexerAPICommentWithRepliesSchemaType,
   IndexerAPIListCommentRepliesSchemaType,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
 
 /**
  * tree traverse over comments returned from indexer api, include the ones in replies

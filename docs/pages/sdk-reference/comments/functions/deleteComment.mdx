@@ -1,0 +1,33 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / deleteComment
+
+# Function: deleteComment()
+
+```ts
+function deleteComment(params): Promise<{
+  txHash: `0x${string}`;
+}>;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:356](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L356)
+
+Delete a comment with app signature verification
+
+## Parameters
+
+### params
+
+[`DeleteCommentParams`](/sdk-reference/comments/type-aliases/DeleteCommentParams.mdx)
+
+The parameters for deleting a comment
+
+## Returns
+
+`Promise`\<\{
+  `txHash`: `` `0x${string}` ``;
+\}\>
+
+The transaction hash

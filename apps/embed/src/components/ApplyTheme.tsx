@@ -1,6 +1,6 @@
 import { createThemeCSSVariables } from "@/lib/theming";
 import { cn } from "@/lib/utils";
-import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/schemas";
+import type { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
 import { useEmbedConfig } from "./EmbedConfigProvider";
 
 function LinkGoogleFont({ config }: { config: EmbedConfigSchemaOutputType }) {

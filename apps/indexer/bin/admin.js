@@ -400,7 +400,7 @@ moderateComments
        */
       const rawResponse = await response.json();
       /**
-       * @type {import('@ecp.eth/sdk/schemas').IndexerAPIListCommentsSchemaType}
+       * @type {import('@ecp.eth/sdk/indexer/schemas').IndexerAPIListCommentsSchemaType}
        */
       const result = rawResponse;
 

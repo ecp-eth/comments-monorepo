@@ -1,0 +1,44 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / GetHookRegistrationFeeParams
+
+# Type Alias: GetHookRegistrationFeeParams
+
+```ts
+type GetHookRegistrationFeeParams = {
+  channelManagerAddress?: Hex;
+  readContract: ContractReadFunctions["getHookRegistrationFee"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:210](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L210)
+
+## Properties
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:216](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L216)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["getHookRegistrationFee"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:217](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L217)

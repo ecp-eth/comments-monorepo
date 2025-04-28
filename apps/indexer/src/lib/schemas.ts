@@ -1,8 +1,8 @@
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import {
-  HexSchema,
   IndexerAPICommentModerationStatusSchema,
   IndexerAPIPaginationSchema,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
 import { z } from "@hono/zod-openapi";
 import { normalizeUrl } from "./utils";
 import { hexToString } from "viem";
@@ -132,6 +132,12 @@ export const GetCommentsQuerySchema = z.object({
   cursor: InputCommentCursorSchema.optional().openapi({
     description:
       "Non inclusive cursor from which to fetch the comments based on sort",
+  }),
+  channelId: z.coerce.bigint().optional().openapi({
+    description: "The channel ID",
+  }),
+  commentType: z.string().optional().openapi({
+    description: "The comment type (e.g. comment, question, answer, etc)",
   }),
   // zod-openapi plugin doesn't automatically infer the minimum value from `int().positive()`
   // so use min(1) for better compatibility

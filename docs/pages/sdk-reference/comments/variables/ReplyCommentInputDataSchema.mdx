@@ -1,0 +1,48 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / ReplyCommentInputDataSchema
+
+# Variable: ReplyCommentInputDataSchema
+
+```ts
+const ReplyCommentInputDataSchema: ZodObject<extendShape<Omit<{
+  appSigner: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  author: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  channelId: ZodDefault<ZodBigInt>;
+  commentType: ZodDefault<ZodString>;
+  content: ZodString;
+  deadline: ZodBigInt;
+  metadata: ZodString;
+  nonce: ZodBigInt;
+  parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  targetUri: ZodString;
+}, "targetUri">, {
+  targetUri: ZodLiteral<"">;
+}>, "strip", ZodTypeAny, {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: string;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: "";
+}, {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  channelId?: bigint;
+  commentType?: string;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: "";
+}>;
+```
+
+Defined in: [packages/sdk/src/comments/schemas.ts:65](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L65)

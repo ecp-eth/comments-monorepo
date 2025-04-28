@@ -1,0 +1,122 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / ExecuteHooksParams
+
+# Type Alias: ExecuteHooksParams
+
+```ts
+type ExecuteHooksParams = {
+  caller: Hex;
+  channelId: bigint;
+  channelManagerAddress?: Hex;
+  commentData: CommentInputData;
+  commentId: Hex;
+  phase: "Before" | "After";
+  value?: bigint;
+  writeContract: ContractWriteFunctions["executeHooks"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:382](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L382)
+
+## Properties
+
+### caller
+
+```ts
+caller: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:394](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L394)
+
+The address that initiated the transaction
+
+***
+
+### channelId
+
+```ts
+channelId: bigint;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:386](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L386)
+
+The ID of the channel to execute hooks for
+
+***
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:412](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L412)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### commentData
+
+```ts
+commentData: CommentInputData;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:390](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L390)
+
+The comment data to process
+
+***
+
+### commentId
+
+```ts
+commentId: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:398](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L398)
+
+The unique identifier of the comment
+
+***
+
+### phase
+
+```ts
+phase: "Before" | "After";
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:402](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L402)
+
+The phase of hook execution (Before or After)
+
+***
+
+### value?
+
+```ts
+optional value: bigint;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:406](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L406)
+
+The value to send with the transaction
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["executeHooks"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:413](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L413)

@@ -1,0 +1,249 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / ContractWriteFunctions
+
+# Type Alias: ContractWriteFunctions
+
+```ts
+type ContractWriteFunctions = {
+  addApproval: (args) => Promise<Hex>;
+  addApprovalAsAuthor: (args) => Promise<Hex>;
+  deleteComment: (args) => Promise<Hex>;
+  deleteCommentAsAuthor: (args) => Promise<Hex>;
+  postComment: (args) => Promise<Hex>;
+  postCommentAsAuthor: (args) => Promise<Hex>;
+  removeApproval: (args) => Promise<Hex>;
+  renounceOwnership: (args) => Promise<Hex>;
+  revokeApprovalAsAuthor: (args) => Promise<Hex>;
+  transferOwnership: (args) => Promise<Hex>;
+  updateChannelContract: (args) => Promise<Hex>;
+};
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:113](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L113)
+
+## Properties
+
+### addApproval()
+
+```ts
+addApproval: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:134](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L134)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"nonpayable"`, `"addApproval"`\>
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### addApprovalAsAuthor()
+
+```ts
+addApprovalAsAuthor: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:142](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L142)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"nonpayable"`, `"addApprovalAsAuthor"`\>
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### deleteComment()
+
+```ts
+deleteComment: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:150](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L150)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"nonpayable"`, `"deleteComment"`\>
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### deleteCommentAsAuthor()
+
+```ts
+deleteCommentAsAuthor: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:158](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L158)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"nonpayable"`, `"deleteCommentAsAuthor"`\>
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### postComment()
+
+```ts
+postComment: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:114](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L114)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"payable"`, `"postComment"`\> & \{
+  `value?`: `bigint`;
+\}
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### postCommentAsAuthor()
+
+```ts
+postCommentAsAuthor: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:124](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L124)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"payable"`, `"postCommentAsAuthor"`\> & \{
+  `value?`: `bigint`;
+\}
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### removeApproval()
+
+```ts
+removeApproval: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:166](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L166)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"nonpayable"`, `"removeApproval"`\>
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### renounceOwnership()
+
+```ts
+renounceOwnership: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:174](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L174)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"nonpayable"`, `"renounceOwnership"`\>
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### revokeApprovalAsAuthor()
+
+```ts
+revokeApprovalAsAuthor: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:182](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L182)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"nonpayable"`, `"revokeApprovalAsAuthor"`\>
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### transferOwnership()
+
+```ts
+transferOwnership: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:190](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L190)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"nonpayable"`, `"transferOwnership"`\>
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### updateChannelContract()
+
+```ts
+updateChannelContract: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:198](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L198)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentsV1AbiType`](/sdk-reference/comments/type-aliases/CommentsV1AbiType.mdx), `"nonpayable"`, `"updateChannelContract"`\>
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>

@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / GetHookStatusParams
+
+# Type Alias: GetHookStatusParams
+
+```ts
+type GetHookStatusParams = {
+  channelManagerAddress?: Hex;
+  hookAddress: Hex;
+  readContract: ContractReadFunctions["getHookStatus"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:11](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L11)
+
+## Properties
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:21](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L21)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### hookAddress
+
+```ts
+hookAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:15](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L15)
+
+The address of the hook
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["getHookStatus"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:22](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L22)

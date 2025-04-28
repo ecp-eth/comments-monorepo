@@ -1,0 +1,88 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / CreateApprovalTypedDataParams
+
+# Type Alias: CreateApprovalTypedDataParams
+
+```ts
+type CreateApprovalTypedDataParams = {
+  appSigner: Hex;
+  author: Hex;
+  chainId: number;
+  commentsAddress?: Hex;
+  deadline?: bigint;
+  nonce: bigint;
+};
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:449](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L449)
+
+## Properties
+
+### appSigner
+
+```ts
+appSigner: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:451](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L451)
+
+***
+
+### author
+
+```ts
+author: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:450](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L450)
+
+***
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:455](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L455)
+
+The chain ID
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:467](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L467)
+
+The address of the comments contract
+
+***
+
+### deadline?
+
+```ts
+optional deadline: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:463](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L463)
+
+Timestamp after which the signature becomes invalid
+
+***
+
+### nonce
+
+```ts
+nonce: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:459](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L459)
+
+The current nonce for the author and app signer

@@ -1,0 +1,149 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPIListCommentRepliesSchemaType
+
+# Type Alias: IndexerAPIListCommentRepliesSchemaType
+
+```ts
+type IndexerAPIListCommentRepliesSchemaType = {
+  extra: {
+     moderationEnabled: boolean;
+  };
+  pagination: {
+     endCursor?: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor?: `0x${string}`;
+  };
+  results: {
+     appSigner: `0x${string}`;
+     author: {
+        address: `0x${string}`;
+        ens?: {
+           avatarUrl: null | string;
+           name: string;
+        };
+        farcaster?: {
+           displayName?: string;
+           fid: number;
+           pfpUrl?: string;
+           username?: string;
+        };
+     };
+     chainId: number;
+     channelId: bigint;
+     commentType: string;
+     content: string;
+     cursor: `0x${string}`;
+     deletedAt: null | Date;
+     id: `0x${string}`;
+     logIndex: null | number;
+     metadata: string;
+     moderationStatus: "approved" | "pending" | "rejected";
+     moderationStatusChangedAt: Date;
+     parentId: null | `0x${string}`;
+     targetUri: string;
+     timestamp: Date;
+     txHash: `0x${string}`;
+  }[];
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:166](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L166)
+
+## Type declaration
+
+### extra
+
+```ts
+extra: {
+  moderationEnabled: boolean;
+} = IndexerAPIExtraSchema;
+```
+
+#### extra.moderationEnabled
+
+```ts
+moderationEnabled: boolean;
+```
+
+### pagination
+
+```ts
+pagination: {
+  endCursor?: `0x${string}`;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  limit: number;
+  startCursor?: `0x${string}`;
+} = IndexerAPICursorPaginationSchema;
+```
+
+#### pagination.endCursor?
+
+```ts
+optional endCursor: `0x${string}`;
+```
+
+#### pagination.hasNext
+
+```ts
+hasNext: boolean;
+```
+
+#### pagination.hasPrevious
+
+```ts
+hasPrevious: boolean;
+```
+
+#### pagination.limit
+
+```ts
+limit: number;
+```
+
+#### pagination.startCursor?
+
+```ts
+optional startCursor: `0x${string}`;
+```
+
+### results
+
+```ts
+results: {
+  appSigner: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens?: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster?: {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username?: string;
+     };
+  };
+  chainId: number;
+  channelId: bigint;
+  commentType: string;
+  content: string;
+  cursor: `0x${string}`;
+  deletedAt: null | Date;
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: string;
+  moderationStatus: "approved" | "pending" | "rejected";
+  moderationStatusChangedAt: Date;
+  parentId: null | `0x${string}`;
+  targetUri: string;
+  timestamp: Date;
+  txHash: `0x${string}`;
+}[];
+```

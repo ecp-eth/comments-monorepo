@@ -10,12 +10,12 @@ import { resolveSubmitterAccount } from "@/lib/submitter";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import { chain, transport } from "@/lib/wagmi";
 import {
-  COMMENTS_V1_ADDRESS,
-  CommentsV1Abi,
   createDeleteCommentTypedData,
+  deleteComment,
   getNonce,
-} from "@ecp.eth/sdk";
-import { createWalletClient, publicActions } from "viem";
+  isApproved,
+} from "@ecp.eth/sdk/comments";
+import { createPublicClient, createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export async function POST(
@@ -48,12 +48,15 @@ export async function POST(
   const account = privateKeyToAccount(
     env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
   );
+  const publicClient = createPublicClient({
+    chain,
+    transport,
+  });
 
   const nonce = await getNonce({
     author: authorAddress,
     appSigner: account.address,
-    chain,
-    transport,
+    readContract: publicClient.readContract,
   });
 
   // Construct deletion signature data
@@ -76,14 +79,13 @@ export async function POST(
     }).extend(publicActions);
 
     // Check approval on chain
-    const isApproved = await walletClient.readContract({
-      address: COMMENTS_V1_ADDRESS,
-      abi: CommentsV1Abi,
-      functionName: "isApproved",
-      args: [authorAddress, account.address],
+    const hasApproval = await isApproved({
+      appSigner: account.address,
+      author: authorAddress,
+      readContract: walletClient.readContract,
     });
 
-    if (isApproved) {
+    if (hasApproval) {
       // Verify app signature
       const isAppSignatureValid = await walletClient.verifyTypedData({
         ...typedDeleteCommentData,
@@ -100,19 +102,10 @@ export async function POST(
       }
 
       try {
-        const txHash = await walletClient.writeContract({
-          abi: CommentsV1Abi,
-          address: COMMENTS_V1_ADDRESS,
-          functionName: "deleteComment",
-          args: [
-            commentId,
-            authorAddress,
-            account.address,
-            nonce,
-            typedDeleteCommentData.message.deadline,
-            "0x",
-            signature,
-          ],
+        const { txHash } = await deleteComment({
+          ...typedDeleteCommentData.message,
+          appSignature: signature,
+          writeContract: walletClient.writeContract,
         });
 
         return new JSONResponse(

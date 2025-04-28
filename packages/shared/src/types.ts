@@ -6,7 +6,7 @@ import type {
 import type {
   IndexerAPICommentSchemaType,
   IndexerAPICommentWithRepliesSchemaType,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
 
 export type OnDeleteComment = (id: Hex) => void;
 export type OnRetryPostComment = (

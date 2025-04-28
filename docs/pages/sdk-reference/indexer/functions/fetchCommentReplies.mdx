@@ -1,0 +1,111 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / fetchCommentReplies
+
+# Function: fetchCommentReplies()
+
+```ts
+function fetchCommentReplies(options): Promise<{
+  extra: {
+     moderationEnabled: boolean;
+  };
+  pagination: {
+     endCursor?: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor?: `0x${string}`;
+  };
+  results: {
+     appSigner: `0x${string}`;
+     author: {
+        address: `0x${string}`;
+        ens?: {
+           avatarUrl: null | string;
+           name: string;
+        };
+        farcaster?: {
+           displayName?: string;
+           fid: number;
+           pfpUrl?: string;
+           username?: string;
+        };
+     };
+     chainId: number;
+     channelId: bigint;
+     commentType: string;
+     content: string;
+     cursor: `0x${string}`;
+     deletedAt: null | Date;
+     id: `0x${string}`;
+     logIndex: null | number;
+     metadata: string;
+     moderationStatus: "approved" | "pending" | "rejected";
+     moderationStatusChangedAt: Date;
+     parentId: null | `0x${string}`;
+     targetUri: string;
+     timestamp: Date;
+     txHash: `0x${string}`;
+  }[];
+}>;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:261](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L261)
+
+Fetch replies for a comment from the Indexer API
+
+## Parameters
+
+### options
+
+[`FetchCommentRepliesOptions`](/sdk-reference/indexer/type-aliases/FetchCommentRepliesOptions.mdx)
+
+## Returns
+
+`Promise`\<\{
+  `extra`: \{
+     `moderationEnabled`: `boolean`;
+  \};
+  `pagination`: \{
+     `endCursor?`: `` `0x${string}` ``;
+     `hasNext`: `boolean`;
+     `hasPrevious`: `boolean`;
+     `limit`: `number`;
+     `startCursor?`: `` `0x${string}` ``;
+  \};
+  `results`: \{
+     `appSigner`: `` `0x${string}` ``;
+     `author`: \{
+        `address`: `` `0x${string}` ``;
+        `ens?`: \{
+           `avatarUrl`: `null` \| `string`;
+           `name`: `string`;
+        \};
+        `farcaster?`: \{
+           `displayName?`: `string`;
+           `fid`: `number`;
+           `pfpUrl?`: `string`;
+           `username?`: `string`;
+        \};
+     \};
+     `chainId`: `number`;
+     `channelId`: `bigint`;
+     `commentType`: `string`;
+     `content`: `string`;
+     `cursor`: `` `0x${string}` ``;
+     `deletedAt`: `null` \| `Date`;
+     `id`: `` `0x${string}` ``;
+     `logIndex`: `null` \| `number`;
+     `metadata`: `string`;
+     `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
+     `moderationStatusChangedAt`: `Date`;
+     `parentId`: `null` \| `` `0x${string}` ``;
+     `targetUri`: `string`;
+     `timestamp`: `Date`;
+     `txHash`: `` `0x${string}` ``;
+  \}[];
+\}\>
+
+A promise that resolves replies fetched from the Indexer API

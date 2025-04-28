@@ -5,7 +5,7 @@ import type {
   WebhookRequestBodyApproveCommentSchemaType,
   WebhookRequestBodyRejectCommentSchemaType,
 } from "./schemas";
-import type { Hex } from "@ecp.eth/sdk/schemas";
+import type { Hex } from "@ecp.eth/sdk/core/schemas";
 
 interface CommentPendingModeration {
   id: Hex;

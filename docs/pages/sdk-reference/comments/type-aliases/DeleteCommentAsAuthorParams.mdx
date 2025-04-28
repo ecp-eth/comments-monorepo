@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / DeleteCommentAsAuthorParams
+
+# Type Alias: DeleteCommentAsAuthorParams
+
+```ts
+type DeleteCommentAsAuthorParams = {
+  commentId: Hex;
+  commentsAddress?: Hex;
+  writeContract: ContractWriteFunctions["deleteCommentAsAuthor"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:253](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L253)
+
+## Properties
+
+### commentId
+
+```ts
+commentId: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:257](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L257)
+
+The ID of the comment to delete
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:262](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L262)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["deleteCommentAsAuthor"];
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:263](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L263)

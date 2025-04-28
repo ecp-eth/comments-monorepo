@@ -8,48 +8,18 @@
 
 Ethereum Comments Protocol SDK default exports
 
-## Type Aliases
-
-| Type Alias | Description |
-| ------ | ------ |
-| [CreateCommentDataParams](/sdk-reference/defaultExports/type-aliases/CreateCommentDataParams.mdx) | The parameters for creating a comment |
-| [CreateCommentDataParamsReply](/sdk-reference/defaultExports/type-aliases/CreateCommentDataParamsReply.mdx) | The parameters for creating a reply comment |
-| [CreateCommentDataParamsRoot](/sdk-reference/defaultExports/type-aliases/CreateCommentDataParamsRoot.mdx) | The parameters for creating a root comment |
-| [CreateCommentDataParamsShared](/sdk-reference/defaultExports/type-aliases/CreateCommentDataParamsShared.mdx) | The shared parameters for creating a comment |
-| [FetchAuthorDataOptions](/sdk-reference/defaultExports/type-aliases/FetchAuthorDataOptions.mdx) | The options for `fetchAuthorData()` |
-| [FetchCommentRepliesOptions](/sdk-reference/defaultExports/type-aliases/FetchCommentRepliesOptions.mdx) | The options for `fetchCommentReplies()` |
-| [FetchCommentsOptions](/sdk-reference/defaultExports/type-aliases/FetchCommentsOptions.mdx) | The options for `fetchComments()` |
-| [IsMutedOptions](/sdk-reference/defaultExports/type-aliases/IsMutedOptions.mdx) | The options for `isMuted()` |
-
 ## Variables
 
 | Variable | Description |
 | ------ | ------ |
-| [ADD\_APPROVAL\_TYPE](/sdk-reference/defaultExports/variables/ADD_APPROVAL_TYPE.mdx) | - |
-| [COMMENT\_TYPE](/sdk-reference/defaultExports/variables/COMMENT_TYPE.mdx) | - |
+| [CHANNEL\_MANAGER\_ADDRESS](/sdk-reference/defaultExports/variables/CHANNEL_MANAGER_ADDRESS.mdx) | The address of the ChannelManager contract. |
+| [ChannelManagerAbi](/sdk-reference/defaultExports/variables/ChannelManagerAbi.mdx) | ABI of the ChannelManager contract. |
 | [COMMENTS\_EMBED\_DEFAULT\_BY\_AUTHOR\_URL](/sdk-reference/defaultExports/variables/COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL.mdx) | The default `embedUri` for the CommentsByAuthorEmbed component. It runs a service that creates app signatures for requests and submits the transaction to the CommentsV1 contract. |
 | [COMMENTS\_EMBED\_DEFAULT\_URL](/sdk-reference/defaultExports/variables/COMMENTS_EMBED_DEFAULT_URL.mdx) | The default `embedUri` for the CommentsEmbed component. It runs a service that creates app signatures for requests and submits the transaction to the CommentsV1 contract. |
 | [COMMENTS\_V1\_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS.mdx) | The address of the CommentsV1 contract. It is created using the CREATE2 opcode so should be identical across chains if no collisions occur. |
 | [CommentsV1Abi](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx) | ABI of the CommentsV1 contract. |
-| [DELETE\_COMMENT\_TYPE](/sdk-reference/defaultExports/variables/DELETE_COMMENT_TYPE.mdx) | - |
-| [DOMAIN\_NAME](/sdk-reference/defaultExports/variables/DOMAIN_NAME.mdx) | - |
-| [DOMAIN\_VERSION](/sdk-reference/defaultExports/variables/DOMAIN_VERSION.mdx) | - |
+| [DEFAULT\_CHANNEL\_ID](/sdk-reference/defaultExports/variables/DEFAULT_CHANNEL_ID.mdx) | The default channel ID for the CommentsV1 contract. |
+| [DEFAULT\_COMMENT\_TYPE](/sdk-reference/defaultExports/variables/DEFAULT_COMMENT_TYPE.mdx) | The default comment type for the CommentsV1 contract. |
 | [EMPTY\_PARENT\_ID](/sdk-reference/defaultExports/variables/EMPTY_PARENT_ID.mdx) | The parent ID for comments that are not replies. |
 | [INDEXER\_API\_URL](/sdk-reference/defaultExports/variables/INDEXER_API_URL.mdx) | The default URL for the Indexer API. |
-| [REMOVE\_APPROVAL\_TYPE](/sdk-reference/defaultExports/variables/REMOVE_APPROVAL_TYPE.mdx) | - |
-
-## Functions
-
-| Function | Description |
-| ------ | ------ |
-| [createApprovalTypedData](/sdk-reference/defaultExports/functions/createApprovalTypedData.mdx) | Create the EIP-712 typed data structure for approving comment |
-| [createCommentData](/sdk-reference/defaultExports/functions/createCommentData.mdx) | Create the data structure of a comment |
-| [createCommentTypedData](/sdk-reference/defaultExports/functions/createCommentTypedData.mdx) | Create the EIP-712 typed data structure for adding comment |
-| [createDeleteCommentTypedData](/sdk-reference/defaultExports/functions/createDeleteCommentTypedData.mdx) | Create the EIP-712 typed data structure for deleting comment |
-| [fetchAuthorData](/sdk-reference/defaultExports/functions/fetchAuthorData.mdx) | Fetch author data from the Indexer API |
-| [fetchCommentReplies](/sdk-reference/defaultExports/functions/fetchCommentReplies.mdx) | Fetch replies for a comment from the Indexer API |
-| [fetchComments](/sdk-reference/defaultExports/functions/fetchComments.mdx) | Fetch comments from the Indexer API |
-| [getCommentCursor](/sdk-reference/defaultExports/functions/getCommentCursor.mdx) | Get the cursor for a comment |
-| [getNonce](/sdk-reference/defaultExports/functions/getNonce.mdx) | Read the nonce from CommentsV1 contract for a given author and app signer |
-| [isMuted](/sdk-reference/defaultExports/functions/isMuted.mdx) | Checks if an address is marked as a muted on the indexer of your choice. |
-| [isZeroHex](/sdk-reference/defaultExports/functions/isZeroHex.mdx) | Check if a hex string is zero |
+| [ZERO\_ADDRESS](/sdk-reference/defaultExports/variables/ZERO_ADDRESS.mdx) | The zero address. |

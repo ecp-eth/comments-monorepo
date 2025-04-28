@@ -1,0 +1,78 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / FetchAuthorDataOptions
+
+# Type Alias: FetchAuthorDataOptions
+
+```ts
+type FetchAuthorDataOptions = {
+  address: Hex;
+  apiUrl?: string;
+  retries?: number;
+  signal?: AbortSignal;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:337](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L337)
+
+The options for `fetchAuthorData()`
+
+## Properties
+
+### address
+
+```ts
+address: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:341](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L341)
+
+Author's address
+
+***
+
+### apiUrl?
+
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:353](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L353)
+
+URL on which /api/authors/$address endpoint will be called
+
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+***
+
+### retries?
+
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:347](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L347)
+
+Number of times to retry the signing operation in case of failure.
+
+#### Default
+
+```ts
+3
+```
+
+***
+
+### signal?
+
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:354](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L354)

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { fetchComments } from "@ecp.eth/sdk";
+import { fetchComments } from "@ecp.eth/sdk/indexer";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   View,
@@ -14,7 +14,7 @@ import {
   withTiming,
 } from "react-native-reanimated";
 import { Hex } from "viem";
-import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/schemas";
+import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { publicEnv } from "../env";
 import { Comment } from "./Comment";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

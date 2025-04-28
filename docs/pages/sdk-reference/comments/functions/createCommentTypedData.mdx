@@ -1,0 +1,367 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / createCommentTypedData
+
+# Function: createCommentTypedData()
+
+```ts
+function createCommentTypedData(params): {
+  domain: {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: `0x${string}`;
+     version: "1";
+  };
+  message: {
+     appSigner: `0x${string}`;
+     author: `0x${string}`;
+     channelId: bigint;
+     commentType: string;
+     content: string;
+     deadline: bigint;
+     metadata: string;
+     nonce: bigint;
+     parentId: `0x${string}`;
+     targetUri: string;
+  };
+  primaryType: "AddComment";
+  types: {
+     AddComment: (
+        | {
+        name: "content";
+        type: "string";
+      }
+        | {
+        name: "metadata";
+        type: "string";
+      }
+        | {
+        name: "targetUri";
+        type: "string";
+      }
+        | {
+        name: "commentType";
+        type: "string";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "appSigner";
+        type: "address";
+      }
+        | {
+        name: "channelId";
+        type: "uint256";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+      }
+        | {
+        name: "parentId";
+        type: "bytes32";
+     })[];
+  };
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:522](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L522)
+
+Create the EIP-712 typed data structure for adding comment
+
+## Parameters
+
+### params
+
+[`CreateCommentTypedDataParams`](/sdk-reference/comments/type-aliases/CreateCommentTypedDataParams.mdx)
+
+## Returns
+
+```ts
+{
+  domain: {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: `0x${string}`;
+     version: "1";
+  };
+  message: {
+     appSigner: `0x${string}`;
+     author: `0x${string}`;
+     channelId: bigint;
+     commentType: string;
+     content: string;
+     deadline: bigint;
+     metadata: string;
+     nonce: bigint;
+     parentId: `0x${string}`;
+     targetUri: string;
+  };
+  primaryType: "AddComment";
+  types: {
+     AddComment: (
+        | {
+        name: "content";
+        type: "string";
+      }
+        | {
+        name: "metadata";
+        type: "string";
+      }
+        | {
+        name: "targetUri";
+        type: "string";
+      }
+        | {
+        name: "commentType";
+        type: "string";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "appSigner";
+        type: "address";
+      }
+        | {
+        name: "channelId";
+        type: "uint256";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+      }
+        | {
+        name: "parentId";
+        type: "bytes32";
+     })[];
+  };
+}
+```
+
+The typed data
+
+### domain
+
+```ts
+domain: {
+  chainId: number;
+  name: "Comments";
+  verifyingContract: `0x${string}`;
+  version: "1";
+};
+```
+
+#### domain.chainId
+
+```ts
+chainId: number;
+```
+
+#### domain.name
+
+```ts
+name: "Comments";
+```
+
+#### domain.verifyingContract
+
+```ts
+verifyingContract: `0x${string}` = HexSchema;
+```
+
+#### domain.version
+
+```ts
+version: "1";
+```
+
+### message
+
+```ts
+message: {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: string;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: string;
+} = CommentDataSchema;
+```
+
+#### message.appSigner
+
+```ts
+appSigner: `0x${string}` = HexSchema;
+```
+
+#### message.author
+
+```ts
+author: `0x${string}` = HexSchema;
+```
+
+#### message.channelId
+
+```ts
+channelId: bigint;
+```
+
+#### message.commentType
+
+```ts
+commentType: string;
+```
+
+#### message.content
+
+```ts
+content: string;
+```
+
+#### message.deadline
+
+```ts
+deadline: bigint;
+```
+
+#### message.metadata
+
+```ts
+metadata: string;
+```
+
+#### message.nonce
+
+```ts
+nonce: bigint;
+```
+
+#### message.parentId
+
+```ts
+parentId: `0x${string}` = HexSchema;
+```
+
+#### message.targetUri
+
+```ts
+targetUri: string;
+```
+
+### primaryType
+
+```ts
+primaryType: "AddComment";
+```
+
+### types
+
+```ts
+types: {
+  AddComment: (
+     | {
+     name: "content";
+     type: "string";
+   }
+     | {
+     name: "metadata";
+     type: "string";
+   }
+     | {
+     name: "targetUri";
+     type: "string";
+   }
+     | {
+     name: "commentType";
+     type: "string";
+   }
+     | {
+     name: "author";
+     type: "address";
+   }
+     | {
+     name: "appSigner";
+     type: "address";
+   }
+     | {
+     name: "channelId";
+     type: "uint256";
+   }
+     | {
+     name: "nonce";
+     type: "uint256";
+   }
+     | {
+     name: "deadline";
+     type: "uint256";
+   }
+     | {
+     name: "parentId";
+     type: "bytes32";
+  })[];
+};
+```
+
+#### types.AddComment
+
+```ts
+AddComment: (
+  | {
+  name: "content";
+  type: "string";
+}
+  | {
+  name: "metadata";
+  type: "string";
+}
+  | {
+  name: "targetUri";
+  type: "string";
+}
+  | {
+  name: "commentType";
+  type: "string";
+}
+  | {
+  name: "author";
+  type: "address";
+}
+  | {
+  name: "appSigner";
+  type: "address";
+}
+  | {
+  name: "channelId";
+  type: "uint256";
+}
+  | {
+  name: "nonce";
+  type: "uint256";
+}
+  | {
+  name: "deadline";
+  type: "uint256";
+}
+  | {
+  name: "parentId";
+  type: "bytes32";
+})[];
+```

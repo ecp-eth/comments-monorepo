@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "module": "ESNext",
     "strictNullChecks": true,
     "jsx": "react-native"

@@ -64,3 +64,17 @@ packages/shared/hooks
 packages/shared/schemas
 packages/shared/types
 packages/shared/components
+packages/sdk/channel-manager
+packages/sdk/channel-manager/*
+packages/sdk/comments
+packages/sdk/comments/*
+packages/sdk/core
+packages/sdk/core/*
+packages/sdk/embed
+packages/sdk/embed/*
+packages/sdk/api
+packages/sdk/embed/schemas
+packages/sdk/indexer
+packages/sdk/indexer/*
+packages/sdk/channel-manager/react
+packages/sdk/comments/react

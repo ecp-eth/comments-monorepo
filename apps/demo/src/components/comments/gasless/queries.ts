@@ -13,9 +13,9 @@ import {
   PreparedSignedGaslessPostCommentNotApprovedResponseSchema,
 } from "@/lib/schemas";
 import type { Hex } from "viem";
-import { fetchAuthorData } from "@ecp.eth/sdk";
+import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { publicEnv } from "@/publicEnv";
-import type { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/schemas";
+import type { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 export type PreparedGaslessPostCommentOperationApprovedResult =
   PreparedGaslessPostCommentOperationApprovedSchemaType & {

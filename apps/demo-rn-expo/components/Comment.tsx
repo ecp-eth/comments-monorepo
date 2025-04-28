@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   IndexerAPICommentSchemaType,
   IndexerAPICommentWithRepliesSchemaType,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/indexer/schemas";
 import { View, Text, TextLayoutLine } from "react-native";
 import { useEnrichedAuthor } from "../hooks/useEnrichedAuthor";
 import { AuthorBox } from "./AuthorBox";

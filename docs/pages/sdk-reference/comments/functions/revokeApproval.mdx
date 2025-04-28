@@ -1,0 +1,29 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / revokeApproval
+
+# Function: revokeApproval()
+
+```ts
+function revokeApproval(params): Promise<RevokeApprovalResult>;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:267](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L267)
+
+Removes an app signer approval with signature verification
+
+## Parameters
+
+### params
+
+[`RevokeApprovalParams`](/sdk-reference/comments/type-aliases/RevokeApprovalParams.mdx)
+
+The parameters for removing an app signer approval
+
+## Returns
+
+`Promise`\<[`RevokeApprovalResult`](/sdk-reference/comments/type-aliases/RevokeApprovalResult.mdx)\>
+
+The transaction hash of the removal

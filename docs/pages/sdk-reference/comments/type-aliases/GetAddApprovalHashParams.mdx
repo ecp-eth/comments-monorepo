@@ -1,0 +1,102 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetAddApprovalHashParams
+
+# Type Alias: GetAddApprovalHashParams
+
+```ts
+type GetAddApprovalHashParams = {
+  appSigner: Hex;
+  author: Hex;
+  commentsAddress?: Hex;
+  deadline?: bigint;
+  nonce: bigint;
+  readContract: ReadAddApprovalHashFromContractFunction;
+};
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:297](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L297)
+
+## Properties
+
+### appSigner
+
+```ts
+appSigner: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:305](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L305)
+
+The address of the app signer
+
+***
+
+### author
+
+```ts
+author: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:301](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L301)
+
+The address of the author
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:321](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L321)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### deadline?
+
+```ts
+optional deadline: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:315](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L315)
+
+Timestamp after which the signature becomes invalid
+
+#### Default
+
+```ts
+1 day from now
+```
+
+***
+
+### nonce
+
+```ts
+nonce: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:309](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L309)
+
+The current nonce for the author
+
+***
+
+### readContract
+
+```ts
+readContract: ReadAddApprovalHashFromContractFunction;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:322](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L322)

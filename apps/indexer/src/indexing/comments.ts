@@ -13,7 +13,7 @@ import {
   insertCommentModerationStatus,
 } from "../management/services/moderation";
 import { notifyCommentPendingModeration } from "../lib/telegram-notifications";
-import { Hex } from "@ecp.eth/sdk/types";
+import type { Hex } from "@ecp.eth/sdk/core/schemas";
 // import { isProfane } from "../lib/profanity-detection";
 
 const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
@@ -90,6 +90,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       chainId: context.network.chainId,
       appSigner: event.args.commentData.appSigner,
       logIndex: event.log.logIndex,
+      channelId: event.args.commentData.channelId,
+      commentType: event.args.commentData.commentType,
       ...(moderationStatus
         ? {
             moderationStatus: moderationStatus.status,

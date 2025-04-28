@@ -1,0 +1,87 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / PostCommentAsAuthorParams
+
+# Type Alias: PostCommentAsAuthorParams
+
+```ts
+type PostCommentAsAuthorParams = {
+  appSignature: Hex;
+  comment: CommentData;
+  commentsAddress?: Hex;
+  fee?: bigint;
+  writeContract: ContractWriteFunctions["postCommentAsAuthor"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:37](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L37)
+
+## Properties
+
+### appSignature
+
+```ts
+appSignature: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:47](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L47)
+
+The app signature
+
+***
+
+### comment
+
+```ts
+comment: CommentData;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:43](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L43)
+
+The comment data
+
+You can obtain this by using the `createCommentData()` function
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:56](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L56)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### fee?
+
+```ts
+optional fee: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:51](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L51)
+
+The fee for the comment
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["postCommentAsAuthor"];
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:60](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L60)
+
+The write contract function

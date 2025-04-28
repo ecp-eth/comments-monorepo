@@ -1,12 +1,12 @@
 // !!! DO NOT MODIFY !!!
 // THIS FILE IS COPIED DIRECTLY FROM DEMO APP
 // Run script instead: `pnpm run api:schema:sync`
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import {
   AddApprovalTypedDataSchema,
   AddCommentTypedDataSchema,
   DeleteCommentTypedDataSchema,
-  HexSchema,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/comments/schemas";
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 // import { isProfane } from "./profanity-detection";

@@ -8,7 +8,7 @@ import {
 } from "@ecp.eth/shared/schemas";
 import { cn } from "@/lib/utils";
 import { publicEnv } from "@/publicEnv";
-import { fetchCommentReplies } from "@ecp.eth/sdk";
+import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
@@ -46,11 +46,11 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
 
   const onDeleteClick = useCallback(() => {
     deleteComment({ comment, queryKey: rootQueryKey });
-  }, [comment, deleteComment, queryKey]);
+  }, [comment, deleteComment, rootQueryKey]);
 
   const onRetryPostClick = useCallback(() => {
     retryPostComment({ comment, queryKey: rootQueryKey });
-  }, [comment, retryPostComment, queryKey]);
+  }, [comment, retryPostComment, rootQueryKey]);
 
   const repliesQuery = useInfiniteQuery({
     enabled: comment.pendingOperation?.action !== "post",

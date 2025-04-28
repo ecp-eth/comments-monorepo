@@ -4,20 +4,24 @@ pragma solidity ^0.8.13;
 import {Script, console} from "forge-std/Script.sol";
 import {CommentsV1} from "../src/CommentsV1.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
+import {NoopHook} from "../src/hooks/NoopHook.sol";
 
 contract DeployScript is Script {
     enum Env {
         Dev,
-        Prod
+        Prod,
+        Test
     }
 
     CommentsV1 public comments;
     ChannelManager public channelManager;
+    NoopHook public noopHook;
 
     function setUp() public {}
 
     function run(string calldata envInput) public {
         Env env = getEnv(envInput);
+        uint256 salt = uint256(0);
 
         address ownerAddress = vm.envAddress("CONTRACT_OWNER_ADDRESS");
         uint256 deployerPrivateKey = env == Env.Prod
@@ -33,17 +37,27 @@ contract DeployScript is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        if (env == Env.Dev) {
+        if (env == Env.Dev || env == Env.Test) {
             // Fund wallet with real identity for testing
             address fundAddress = vm.envAddress("FUND_ADDRESS");
             payable(fundAddress).transfer(1 ether);
         }
 
+        if (env == Env.Test) {
+            // We deploy the contract in different tests in sdk, so we want to have different addresses
+            salt = uint256(bytes32(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, block.coinbase, block.number, block.gaslimit, block.timestamp))));
+
+            // Deploy NoopHook
+            noopHook = new NoopHook();
+
+            console.log("NoopHook deployed at", address(noopHook));
+        }
+
         // Deploy CommentsV1 first
-        comments = new CommentsV1{salt: bytes32(uint256(0))}(deployerAddress);
+        comments = new CommentsV1{salt: bytes32(salt)}(deployerAddress);
 
         // Deploy ChannelManager with CommentsV1 address
-        channelManager = new ChannelManager{salt: bytes32(uint256(0))}(
+        channelManager = new ChannelManager{salt: bytes32(salt)}(
             deployerAddress
         );
 
@@ -75,8 +89,13 @@ contract DeployScript is Script {
             keccak256(abi.encodePacked("prod"))
         ) {
             env = Env.Prod;
+        } else if (
+            keccak256(abi.encodePacked(envInput)) ==
+            keccak256(abi.encodePacked("test"))
+        ) {
+            env = Env.Test;
         } else {
-            revert("Invalid env. Use 'dev' or 'prod'");
+            revert("Invalid env. Use 'dev' or 'prod' or 'test'");
         }
 
         return env;

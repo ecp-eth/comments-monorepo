@@ -1,16 +1,17 @@
 import { waitForTransactionReceipt } from "@wagmi/core";
-import { fetchAPI } from "./fetch";
 import { Hex, TransactionReceipt } from "viem";
-import { CommentData, IndexerAPICommentSchemaType } from "@ecp.eth/sdk/schemas";
+import { CommentData } from "@ecp.eth/sdk/comments/types";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
+import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
+import { QueryClient } from "@tanstack/react-query";
+import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
+import { fetchAPI } from "./fetch";
 import { SignCommentPayloadRequestSchemaType } from "./generated/schemas";
 import {
   deleteCommentAsAuthorViaCommentsV1,
   postCommentAsAuthorViaCommentsV1,
 } from "./contracts";
 import { chain, config } from "../wagmi.config";
-import { bigintReplacer } from "@ecp.eth/shared/helpers";
-import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
-import { QueryClient } from "@tanstack/react-query";
 import { FetchCommentInfinityQuerySchema } from "../hooks/useOptimisticCommentingManager/schemas";
 
 const chainId = chain.id;

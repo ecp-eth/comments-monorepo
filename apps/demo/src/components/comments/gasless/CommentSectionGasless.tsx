@@ -1,6 +1,5 @@
 "use client";
 
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
 import { Button } from "@/components/ui/button";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
@@ -10,12 +9,12 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
+import { createApprovalTypedData } from "@ecp.eth/sdk/comments";
 import {
-  COMMENTS_V1_ADDRESS,
-  createApprovalTypedData,
-  fetchComments,
-} from "@ecp.eth/sdk";
-import { useGaslessTransaction } from "@ecp.eth/sdk/react";
+  useGaslessTransaction,
+  useRevokeApprovalAsAuthor,
+} from "@ecp.eth/sdk/comments/react";
+import { fetchComments } from "@ecp.eth/sdk/indexer";
 import {
   ChangeApprovalStatusRequestBodySchemaType,
   ChangeApprovalStatusResponseSchema,
@@ -30,7 +29,7 @@ import {
   useNewCommentsChecker,
   useIsAccountStatusResolved,
 } from "@ecp.eth/shared/hooks";
-import type { Hex } from "@ecp.eth/sdk/schemas";
+import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import {
   CommentGaslessProvider,
   CommentGaslessProviderContextType,
@@ -53,6 +52,8 @@ export function CommentSectionGasless() {
     [currentUrl, viewer]
   );
 
+  const { mutateAsync: revokeApproval } = useRevokeApprovalAsAuthor();
+
   const removeApprovalContract = useWriteContract();
 
   const approvalStatus = useApprovalStatus();
@@ -69,7 +70,7 @@ export function CommentSectionGasless() {
         throw new Error("Already approved");
       }
 
-      const signTypedDataParams = await createApprovalTypedData({
+      const signTypedDataParams = createApprovalTypedData({
         author: viewer,
         appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         chainId: chain.id,
@@ -178,28 +179,29 @@ export function CommentSectionGasless() {
   const { reset: resetApproveGaslessTransactionsMutation } =
     approveGaslessTransactionsMutation;
   const { reset: resetRemoveApprovalContract } = removeApprovalContract;
+  const { refetch: refetchApprovalStatus } = approvalStatus;
 
   useEffect(() => {
     if (approveContractReceipt.data?.status === "success") {
-      approvalStatus.refetch();
+      refetchApprovalStatus();
       resetApproveGaslessTransactionsMutation();
       removeApprovalContract.reset();
     }
   }, [
     approveContractReceipt.data?.status,
-    approvalStatus.refetch,
+    refetchApprovalStatus,
     removeApprovalContract,
     resetApproveGaslessTransactionsMutation,
   ]);
 
   useEffect(() => {
     if (removeApprovalContractReceipt.data?.status === "success") {
-      approvalStatus.refetch();
+      refetchApprovalStatus();
       resetApproveGaslessTransactionsMutation();
       resetRemoveApprovalContract();
     }
   }, [
-    approvalStatus.refetch,
+    refetchApprovalStatus,
     removeApprovalContractReceipt.data?.status,
     resetApproveGaslessTransactionsMutation,
     resetRemoveApprovalContract,
@@ -267,11 +269,8 @@ export function CommentSectionGasless() {
                     throw new Error("No data found");
                   }
 
-                  removeApprovalContract.writeContract({
-                    abi: CommentsV1Abi,
-                    address: COMMENTS_V1_ADDRESS,
-                    functionName: "revokeApprovalAsAuthor",
-                    args: [publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS],
+                  revokeApproval({
+                    appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
                   });
                 }}
               >

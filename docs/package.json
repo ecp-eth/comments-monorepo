@@ -12,7 +12,7 @@
     "ref:gen:demo:demo": "cp ../apps/demo/README.md pages/demos/custom-integration/index.mdx",
     "ref:gen:demo:react-native": "cp ../apps/demo-rn-expo/README.md pages/demos/react-native-integration/index.mdx",
     "ref:gen:demo": "pnpm run ref:gen:demo:blog && pnpm run ref:gen:demo:demo && pnpm run ref:gen:demo:react-native",
-    "ref:gen:sdk": "typedoc --tsconfig ../packages/sdk/tsconfig.json --out pages/sdk-reference/ --entryPoints ../packages/sdk/src/index.ts ../packages/sdk/src/types.ts ../packages/sdk/src/react.tsx ../packages/sdk/src/schemas/index.ts --publicPath /sdk-reference/",
+    "ref:gen:sdk": "typedoc --publicPath /sdk-reference/",
     "ref:gen:protocol": "solidity-docgen -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen",
     "ref:gen:indexer:index": "cp ../apps/indexer/README.md pages/indexer-reference/index.mdx",
     "ref:gen:indexer": "npm run ref:gen:indexer:index && NEYNAR_API_KEY=123 SKIP_DRIZZLE_SCHEMA_DETECTION=1 WEBHOOK_SECRET=secret DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres tsx --import ./scripts/ponder-module-register.mjs scripts/generate-indexer-openapi-spec.ts",

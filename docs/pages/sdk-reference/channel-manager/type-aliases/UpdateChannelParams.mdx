@@ -1,0 +1,96 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / UpdateChannelParams
+
+# Type Alias: UpdateChannelParams
+
+```ts
+type UpdateChannelParams = {
+  channelId: bigint;
+  channelManagerAddress?: Hex;
+  description?: string;
+  metadata?: string;
+  name: string;
+  writeContract: ContractWriteFunctions["updateChannel"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:131](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L131)
+
+## Properties
+
+### channelId
+
+```ts
+channelId: bigint;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:135](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L135)
+
+The ID of the channel to update
+
+***
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:153](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L153)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### description?
+
+```ts
+optional description: string;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:143](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L143)
+
+The description of the channel
+
+***
+
+### metadata?
+
+```ts
+optional metadata: string;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:147](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L147)
+
+The metadata of the channel
+
+***
+
+### name
+
+```ts
+name: string;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:139](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L139)
+
+The name of the channel
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["updateChannel"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:154](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L154)
