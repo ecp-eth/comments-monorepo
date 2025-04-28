@@ -8,7 +8,7 @@ Here are a few examples:
 ### Fetch comments
 
 ```ts
-import { fetchComments } from "@ecp.eth/sdk";
+import { fetchComments } from "@ecp.eth/sdk/indexer";
 
 console.log("fetching comments...");
 
@@ -25,18 +25,18 @@ console.log(
 );
 ```
 
-The response is a list of comments and pagination information, see [`IndexerAPIListCommentsSchemaType`](/sdk-reference/schemas/type-aliases/IndexerAPIListCommentsSchemaType).
+The response is a list of comments and pagination information, see [`IndexerAPIListCommentsSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPIListCommentsSchemaType).
 
 #### API reference
 
-- [`fetchComments`](/sdk-reference/defaultExports/functions/fetchComments)
-- [`FetchCommentsOptions`](/sdk-reference/defaultExports/type-aliases/FetchCommentsOptions)
-- [`IndexerAPIListCommentsSchemaType`](/sdk-reference/schemas/type-aliases/IndexerAPIListCommentsSchemaType)
+- [`fetchComments`](/sdk-reference/indexer/functions/fetchComments)
+- [`FetchCommentsOptions`](/sdk-reference/indexer/type-aliases/FetchCommentsOptions)
+- [`IndexerAPIListCommentsSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPIListCommentsSchemaType)
 
 ### Fetch replies
 
 ```ts
-import { fetchCommentReplies } from "@ecp.eth/sdk";
+import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 
 console.log("fetching replies...");
 
@@ -53,5 +53,5 @@ console.log("here is a list of replies", replies);
 
 #### API reference
 
-- [`fetchCommentReplies`](/sdk-reference/defaultExports/functions/fetchCommentReplies)
-- [`FetchCommentRepliesOptions`](/sdk-reference/defaultExports/type-aliases/FetchCommentRepliesOptions)
+- [`fetchCommentReplies`](/sdk-reference/indexer/functions/fetchCommentReplies)
+- [`FetchCommentRepliesOptions`](/sdk-reference/indexer/type-aliases/FetchCommentRepliesOptions)
