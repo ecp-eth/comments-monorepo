@@ -131,4 +131,5 @@ jobs:
         run: pnpm check-types
 
       - name: Test
+        working-directory: packages/sdk
         run: pnpm test
