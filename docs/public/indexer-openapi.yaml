@@ -55,7 +55,7 @@ paths:
           in: query
         - schema:
             type: string
-            description: The comment type
+            description: The comment type (e.g. comment, question, answer, etc)
           required: false
           name: commentType
           in: query
@@ -398,7 +398,7 @@ paths:
           in: query
         - schema:
             type: string
-            description: The comment type
+            description: The comment type (e.g. comment, question, answer, etc)
           required: false
           name: commentType
           in: query
