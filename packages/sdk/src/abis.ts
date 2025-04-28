@@ -1551,14 +1551,21 @@ export const ChannelManagerAbi = [
     ],
     outputs: [
       {
-        name: "registered",
-        type: "bool",
-        internalType: "bool",
-      },
-      {
-        name: "enabled",
-        type: "bool",
-        internalType: "bool",
+        name: "",
+        type: "tuple",
+        internalType: "struct IChannelManager.HookConfig",
+        components: [
+          {
+            name: "registered",
+            type: "bool",
+            internalType: "bool",
+          },
+          {
+            name: "enabled",
+            type: "bool",
+            internalType: "bool",
+          },
+        ],
       },
     ],
     stateMutability: "view",

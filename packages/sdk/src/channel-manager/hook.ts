@@ -44,17 +44,14 @@ export async function getHookStatus(
   const { hookAddress, channelManagerAddress } =
     GetHookStatusParamsSchema.parse(params);
 
-  const [registered, enabled] = await params.readContract({
+  const result = await params.readContract({
     address: channelManagerAddress,
     abi: ChannelManagerAbi,
     functionName: "getHookStatus",
     args: [hookAddress],
   });
 
-  return {
-    registered,
-    enabled,
-  };
+  return result;
 }
 
 export type SetHookParams = {
