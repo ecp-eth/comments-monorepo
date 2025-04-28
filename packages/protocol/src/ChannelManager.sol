@@ -163,15 +163,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
         // Add hook if provided
         if (hook != address(0)) {
-            if (!registeredHooks[hook]) revert HookNotRegistered();
-            if (!IERC165(hook).supportsInterface(type(IHook).interfaceId)) {
-                revert InvalidHookInterface();
-            }
-
-            channels[channelId].hook = IHook(hook);
-
-            emit HookSet(channelId, hook);
-            emit HookStatusUpdated(channelId, hook, true);
+            _setHook(channelId, hook);
         }
 
         emit ChannelCreated(channelId, name, metadata);
@@ -206,6 +198,13 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         if (!_channelExists(channelId)) revert ChannelDoesNotExist();
         if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
 
+        return _setHook(channelId, hook);
+    }
+
+    /// @notice Internal function to set the hook for a channel
+    /// @param channelId The unique identifier of the channel
+    /// @param hook The address of the hook contract
+    function _setHook(uint256 channelId, address hook) internal {
         if (hook != address(0)) {
             if (!registeredHooks[hook]) revert HookNotRegistered();
             channels[channelId].hook = IHook(hook);
