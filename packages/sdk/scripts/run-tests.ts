@@ -51,15 +51,19 @@ const killProcess = async (process: ChildProcess) => {
   }
 
   console.log("Killing anvil node");
-  process.kill();
 
-  // Wait for process to exit
+  // First try SIGTERM
+  process.kill("SIGTERM");
+
+  // Wait for process to exit with a timeout
   await new Promise((resolve) => {
     const timeout = setTimeout(() => {
-      console.log("Process did not exit, forcing kill with SIGKILL");
+      console.log(
+        "Process did not exit with SIGTERM, forcing kill with SIGKILL"
+      );
       process.kill("SIGKILL");
       resolve(true);
-    }, 5000);
+    }, 2000); // Reduced timeout to 2 seconds
 
     process.once("exit", () => {
       clearTimeout(timeout);
