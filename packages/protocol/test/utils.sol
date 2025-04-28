@@ -2,12 +2,13 @@
 pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
-import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
-import {ChannelManager} from "../src/ChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {LibString} from "solady/utils/LibString.sol";
+import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
+import {CommentsV1} from "../src/CommentsV1.sol";
+import {ChannelManager} from "../src/ChannelManager.sol";
+import {IHook} from "../src/interfaces/IHook.sol";
 
 /**
  * @title TestUtils
@@ -221,5 +222,36 @@ library TestUtils {
         comments.updateChannelContract(address(channelManager));
 
         return (comments, channelManager);
+    }
+}
+
+// Mock hook contract for testing
+contract MockHook is IHook {
+    bool public shouldReturnTrue = true;
+
+    function setShouldReturnTrue(bool _shouldReturn) external {
+        shouldReturnTrue = _shouldReturn;
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) external pure returns (bool) {
+        return interfaceId == type(IHook).interfaceId;
+    }
+
+    function beforeComment(
+        ICommentTypes.CommentData calldata,
+        address,
+        bytes32
+    ) external payable returns (bool) {
+        return shouldReturnTrue;
+    }
+
+    function afterComment(
+        ICommentTypes.CommentData calldata,
+        address,
+        bytes32
+    ) external view returns (bool) {
+        return shouldReturnTrue;
     }
 }

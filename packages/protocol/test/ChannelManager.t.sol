@@ -8,38 +8,7 @@ import {IHook} from "../src/interfaces/IHook.sol";
 import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import {TestUtils} from "./utils.sol";
-
-// Mock hook contract for testing
-contract MockHook is IHook {
-    bool public shouldReturnTrue = true;
-
-    function setShouldReturnTrue(bool _shouldReturn) external {
-        shouldReturnTrue = _shouldReturn;
-    }
-
-    function supportsInterface(
-        bytes4 interfaceId
-    ) external pure returns (bool) {
-        return interfaceId == type(IHook).interfaceId;
-    }
-
-    function beforeComment(
-        ICommentTypes.CommentData calldata,
-        address,
-        bytes32
-    ) external payable returns (bool) {
-        return shouldReturnTrue;
-    }
-
-    function afterComment(
-        ICommentTypes.CommentData calldata,
-        address,
-        bytes32
-    ) external view returns (bool) {
-        return shouldReturnTrue;
-    }
-}
+import {TestUtils, MockHook} from "./utils.sol";
 
 // Invalid hook that doesn't support the interface
 contract InvalidHook {
@@ -315,23 +284,22 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         channelManager.registerHook{value: 0.02 ether}(address(newHook));
 
         // Test initial hook registration status
-        (bool registered, bool enabled) = channelManager.getHookStatus(
-            address(newHook)
-        );
-        assertTrue(registered);
-        assertFalse(enabled); // Should be disabled by default after registration
+        IChannelManager.HookConfig memory hookConfig = channelManager
+            .getHookStatus(address(newHook));
+        assertTrue(hookConfig.registered);
+        assertFalse(hookConfig.enabled); // Should be disabled by default after registration
 
         // Enable hook globally
         channelManager.setHookGloballyEnabled(address(newHook), true);
-        (registered, enabled) = channelManager.getHookStatus(address(newHook));
-        assertTrue(registered);
-        assertTrue(enabled);
+        hookConfig = channelManager.getHookStatus(address(newHook));
+        assertTrue(hookConfig.registered);
+        assertTrue(hookConfig.enabled);
 
         // Disable hook globally
         channelManager.setHookGloballyEnabled(address(newHook), false);
-        (registered, enabled) = channelManager.getHookStatus(address(newHook));
-        assertTrue(registered);
-        assertFalse(enabled);
+        hookConfig = channelManager.getHookStatus(address(newHook));
+        assertTrue(hookConfig.registered);
+        assertFalse(hookConfig.enabled);
 
         assertEq(address(channelManager).balance - initialBalance, 0.02 ether);
     }
