@@ -100,6 +100,7 @@ jobs:
       WEBHOOK_SECRET: "secret"
       TURBO_UI: "false"
       CONTRACT_OWNER_ADDRESS: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+      FUND_ADDRESS: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
     name: Build and Test on Node.js 22
     steps:
       - name: Check out code
