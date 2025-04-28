@@ -1,0 +1,190 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / DeleteCommentTypedDataSchemaType
+
+# Type Alias: DeleteCommentTypedDataSchemaType
+
+```ts
+type DeleteCommentTypedDataSchemaType = {
+  domain: {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: `0x${string}`;
+     version: "1";
+  };
+  message: {
+     appSigner: `0x${string}`;
+     author: `0x${string}`;
+     commentId: `0x${string}`;
+     deadline: bigint;
+     nonce: bigint;
+  };
+  primaryType: "DeleteComment";
+  types: {
+     DeleteComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "appSigner";
+        type: "address";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+     })[];
+  };
+};
+```
+
+Defined in: [packages/sdk/src/comments/schemas.ts:143](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L143)
+
+## Type declaration
+
+### domain
+
+```ts
+domain: {
+  chainId: number;
+  name: "Comments";
+  verifyingContract: `0x${string}`;
+  version: "1";
+};
+```
+
+#### domain.chainId
+
+```ts
+chainId: number;
+```
+
+#### domain.name
+
+```ts
+name: "Comments";
+```
+
+#### domain.verifyingContract
+
+```ts
+verifyingContract: `0x${string}` = HexSchema;
+```
+
+#### domain.version
+
+```ts
+version: "1";
+```
+
+### message
+
+```ts
+message: {
+  appSigner: `0x${string}`;
+  author: `0x${string}`;
+  commentId: `0x${string}`;
+  deadline: bigint;
+  nonce: bigint;
+};
+```
+
+#### message.appSigner
+
+```ts
+appSigner: `0x${string}` = HexSchema;
+```
+
+#### message.author
+
+```ts
+author: `0x${string}` = HexSchema;
+```
+
+#### message.commentId
+
+```ts
+commentId: `0x${string}` = HexSchema;
+```
+
+#### message.deadline
+
+```ts
+deadline: bigint;
+```
+
+#### message.nonce
+
+```ts
+nonce: bigint;
+```
+
+### primaryType
+
+```ts
+primaryType: "DeleteComment";
+```
+
+### types
+
+```ts
+types: {
+  DeleteComment: (
+     | {
+     name: "commentId";
+     type: "bytes32";
+   }
+     | {
+     name: "author";
+     type: "address";
+   }
+     | {
+     name: "appSigner";
+     type: "address";
+   }
+     | {
+     name: "nonce";
+     type: "uint256";
+   }
+     | {
+     name: "deadline";
+     type: "uint256";
+  })[];
+};
+```
+
+#### types.DeleteComment
+
+```ts
+DeleteComment: (
+  | {
+  name: "commentId";
+  type: "bytes32";
+}
+  | {
+  name: "author";
+  type: "address";
+}
+  | {
+  name: "appSigner";
+  type: "address";
+}
+  | {
+  name: "nonce";
+  type: "uint256";
+}
+  | {
+  name: "deadline";
+  type: "uint256";
+})[];
+```

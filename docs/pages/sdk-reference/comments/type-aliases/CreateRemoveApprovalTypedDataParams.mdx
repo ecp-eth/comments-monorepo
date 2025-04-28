@@ -1,0 +1,92 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / CreateRemoveApprovalTypedDataParams
+
+# Type Alias: CreateRemoveApprovalTypedDataParams
+
+```ts
+type CreateRemoveApprovalTypedDataParams = {
+  appSigner: Hex;
+  author: Hex;
+  chainId: number;
+  commentsAddress?: Hex;
+  deadline?: bigint;
+  nonce: bigint;
+};
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:512](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L512)
+
+## Properties
+
+### appSigner
+
+```ts
+appSigner: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:520](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L520)
+
+The address of the app signer
+
+***
+
+### author
+
+```ts
+author: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:516](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L516)
+
+The address of the author
+
+***
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:524](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L524)
+
+The chain ID
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:536](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L536)
+
+The address of the comments contract
+
+***
+
+### deadline?
+
+```ts
+optional deadline: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:532](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L532)
+
+Timestamp after which the signature becomes invalid
+
+***
+
+### nonce
+
+```ts
+nonce: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:528](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L528)
+
+The current nonce for the author and app signer

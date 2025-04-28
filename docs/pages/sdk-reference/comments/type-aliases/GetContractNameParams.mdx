@@ -1,0 +1,44 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetContractNameParams
+
+# Type Alias: GetContractNameParams
+
+```ts
+type GetContractNameParams = {
+  commentsContractAddress?: Hex;
+  readContract: ContractReadFunctions["name"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:53](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L53)
+
+## Properties
+
+### commentsContractAddress?
+
+```ts
+optional commentsContractAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:58](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L58)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["name"];
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:59](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L59)

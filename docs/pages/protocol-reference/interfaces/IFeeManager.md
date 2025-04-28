@@ -1,0 +1,98 @@
+##### @ecp.eth/protocol
+
+----
+
+# `IFeeManager`
+
+This interface defines functions for managing various protocol fees
+
+
+
+
+
+
+
+## Events
+
+### `ChannelCreationFeeUpdated(uint96 newFee)`
+
+Emitted when channel creation fee is updated
+
+
+
+
+### `HookRegistrationFeeUpdated(uint96 newFee)`
+
+Emitted when hook registration fee is updated
+
+
+
+
+### `HookTransactionFeeUpdated(uint16 newBasisPoints)`
+
+Emitted when hook transaction fee percentage is updated
+
+
+
+
+### `FeesWithdrawn(address recipient, uint256 amount)`
+
+Emitted when fees are withdrawn
+
+
+
+
+
+## Functions
+
+### `setChannelCreationFee(uint96 fee)` (external)
+
+Sets the fee for creating a new channel
+
+
+
+
+### `setHookRegistrationFee(uint96 fee)` (external)
+
+Sets the fee for registering a new hook
+
+
+
+
+### `setHookTransactionFee(uint16 feeBasisPoints)` (external)
+
+Sets the fee percentage taken from hook transactions
+
+
+
+
+### `getChannelCreationFee() → uint96 fee` (external)
+
+Gets the current channel creation fee
+
+
+
+
+### `getHookRegistrationFee() → uint96 fee` (external)
+
+Gets the current hook registration fee
+
+
+
+
+### `getHookTransactionFee() → uint16 feeBasisPoints` (external)
+
+Gets the current hook transaction fee percentage
+
+
+
+
+### `withdrawFees(address recipient) → uint256 amount` (external)
+
+Withdraws accumulated fees to a specified address
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / withdrawFees
+
+# Function: withdrawFees()
+
+```ts
+function withdrawFees(params): Promise<WithdrawFeesResult>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:395](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L395)
+
+Withdraws accumulated fees to a specified address
+
+## Parameters
+
+### params
+
+[`WithdrawFeesParams`](/sdk-reference/channel-manager/type-aliases/WithdrawFeesParams.mdx)
+
+The parameters for withdrawing accumulated fees
+
+## Returns
+
+`Promise`\<[`WithdrawFeesResult`](/sdk-reference/channel-manager/type-aliases/WithdrawFeesResult.mdx)\>
+
+The transaction hash of the withdrawal

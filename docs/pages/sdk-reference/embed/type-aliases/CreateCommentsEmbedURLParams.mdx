@@ -1,0 +1,66 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [embed](/sdk-reference/embed/index.mdx) / CreateCommentsEmbedURLParams
+
+# Type Alias: CreateCommentsEmbedURLParams
+
+```ts
+type CreateCommentsEmbedURLParams = {
+  config?: EmbedConfigSchemaInputType;
+  embedUri: string;
+  source:   | {
+     targetUri: string;
+   }
+     | {
+     author: Hex;
+   };
+};
+```
+
+Defined in: [packages/sdk/src/embed/utils.ts:13](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L13)
+
+Parameters for `createCommentsEmbedURL`
+
+## Properties
+
+### config?
+
+```ts
+optional config: EmbedConfigSchemaInputType;
+```
+
+Defined in: [packages/sdk/src/embed/utils.ts:25](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L25)
+
+The configuration for the comments embed.
+
+***
+
+### embedUri
+
+```ts
+embedUri: string;
+```
+
+Defined in: [packages/sdk/src/embed/utils.ts:17](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L17)
+
+The URI of the comments embed iframe page.
+
+***
+
+### source
+
+```ts
+source: 
+  | {
+  targetUri: string;
+}
+  | {
+  author: Hex;
+};
+```
+
+Defined in: [packages/sdk/src/embed/utils.ts:21](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L21)
+
+The target URI or author address to embed comments for.

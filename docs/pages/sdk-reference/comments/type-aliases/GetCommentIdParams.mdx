@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetCommentIdParams
+
+# Type Alias: GetCommentIdParams
+
+```ts
+type GetCommentIdParams = {
+  commentData: CreateCommentDataParams;
+  commentsAddress?: Hex;
+  readContract: ContractReadFunctions["getCommentId"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:215](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L215)
+
+## Properties
+
+### commentData
+
+```ts
+commentData: CreateCommentDataParams;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:219](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L219)
+
+The comment data to get ID for
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:224](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L224)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["getCommentId"];
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:225](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L225)

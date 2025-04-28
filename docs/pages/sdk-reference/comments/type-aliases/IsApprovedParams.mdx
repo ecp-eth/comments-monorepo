@@ -1,0 +1,70 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / IsApprovedParams
+
+# Type Alias: IsApprovedParams
+
+```ts
+type IsApprovedParams = {
+  appSigner: Hex;
+  author: Hex;
+  commentsAddress?: Hex;
+  readContract: ContractReadFunctions["isApproved"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:24](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L24)
+
+## Properties
+
+### appSigner
+
+```ts
+appSigner: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:32](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L32)
+
+The app signer address
+
+***
+
+### author
+
+```ts
+author: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:28](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L28)
+
+The author address
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:37](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L37)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["isApproved"];
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:38](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L38)

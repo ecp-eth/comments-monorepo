@@ -1,0 +1,404 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentWithRepliesOutputSchemaType
+
+# Type Alias: IndexerAPICommentWithRepliesOutputSchemaType
+
+```ts
+type IndexerAPICommentWithRepliesOutputSchemaType = {
+  appSigner: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens?: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster?: {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username?: string;
+     };
+  };
+  chainId: number;
+  channelId: string;
+  commentType: string;
+  content: string;
+  cursor: `0x${string}`;
+  deletedAt: null | string;
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: string;
+  moderationStatus: "approved" | "pending" | "rejected";
+  moderationStatusChangedAt: string;
+  parentId: null | `0x${string}`;
+  replies: {
+     extra: {
+        moderationEnabled: boolean;
+     };
+     pagination: {
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     };
+     results: {
+        appSigner: `0x${string}`;
+        author: {
+           address: `0x${string}`;
+           ens?: {
+              avatarUrl: null | string;
+              name: string;
+           };
+           farcaster?: {
+              displayName?: string;
+              fid: number;
+              pfpUrl?: string;
+              username?: string;
+           };
+        };
+        chainId: number;
+        channelId: string;
+        commentType: string;
+        content: string;
+        cursor: `0x${string}`;
+        deletedAt: null | string;
+        id: `0x${string}`;
+        logIndex: null | number;
+        metadata: string;
+        moderationStatus: "approved" | "pending" | "rejected";
+        moderationStatusChangedAt: string;
+        parentId: null | `0x${string}`;
+        targetUri: string;
+        timestamp: string;
+        txHash: `0x${string}`;
+     }[];
+  };
+  targetUri: string;
+  timestamp: string;
+  txHash: `0x${string}`;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:135](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L135)
+
+## Type declaration
+
+### appSigner
+
+```ts
+appSigner: `0x${string}` = HexSchema;
+```
+
+### author
+
+```ts
+author: {
+  address: `0x${string}`;
+  ens?: {
+     avatarUrl: null | string;
+     name: string;
+  };
+  farcaster?: {
+     displayName?: string;
+     fid: number;
+     pfpUrl?: string;
+     username?: string;
+  };
+} = IndexerAPIAuthorDataSchema;
+```
+
+#### author.address
+
+```ts
+address: `0x${string}` = HexSchema;
+```
+
+#### author.ens?
+
+```ts
+optional ens: {
+  avatarUrl: null | string;
+  name: string;
+};
+```
+
+#### author.ens.avatarUrl
+
+```ts
+avatarUrl: null | string;
+```
+
+#### author.ens.name
+
+```ts
+name: string;
+```
+
+#### author.farcaster?
+
+```ts
+optional farcaster: {
+  displayName?: string;
+  fid: number;
+  pfpUrl?: string;
+  username?: string;
+};
+```
+
+#### author.farcaster.displayName?
+
+```ts
+optional displayName: string;
+```
+
+#### author.farcaster.fid
+
+```ts
+fid: number;
+```
+
+#### author.farcaster.pfpUrl?
+
+```ts
+optional pfpUrl: string;
+```
+
+#### author.farcaster.username?
+
+```ts
+optional username: string;
+```
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+### channelId
+
+```ts
+channelId: string = bigintToString;
+```
+
+### commentType
+
+```ts
+commentType: string;
+```
+
+### content
+
+```ts
+content: string;
+```
+
+### cursor
+
+```ts
+cursor: `0x${string}` = HexSchema;
+```
+
+### deletedAt
+
+```ts
+deletedAt: null | string;
+```
+
+### id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+### logIndex
+
+```ts
+logIndex: null | number;
+```
+
+### metadata
+
+```ts
+metadata: string;
+```
+
+### moderationStatus
+
+```ts
+moderationStatus: "approved" | "pending" | "rejected" = IndexerAPICommentModerationStatusSchema;
+```
+
+### moderationStatusChangedAt
+
+```ts
+moderationStatusChangedAt: string = dateToString;
+```
+
+### parentId
+
+```ts
+parentId: null | `0x${string}`;
+```
+
+### replies
+
+```ts
+replies: {
+  extra: {
+     moderationEnabled: boolean;
+  };
+  pagination: {
+     endCursor?: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor?: `0x${string}`;
+  };
+  results: {
+     appSigner: `0x${string}`;
+     author: {
+        address: `0x${string}`;
+        ens?: {
+           avatarUrl: null | string;
+           name: string;
+        };
+        farcaster?: {
+           displayName?: string;
+           fid: number;
+           pfpUrl?: string;
+           username?: string;
+        };
+     };
+     chainId: number;
+     channelId: string;
+     commentType: string;
+     content: string;
+     cursor: `0x${string}`;
+     deletedAt: null | string;
+     id: `0x${string}`;
+     logIndex: null | number;
+     metadata: string;
+     moderationStatus: "approved" | "pending" | "rejected";
+     moderationStatusChangedAt: string;
+     parentId: null | `0x${string}`;
+     targetUri: string;
+     timestamp: string;
+     txHash: `0x${string}`;
+  }[];
+};
+```
+
+#### replies.extra
+
+```ts
+extra: {
+  moderationEnabled: boolean;
+} = IndexerAPIExtraSchema;
+```
+
+#### replies.extra.moderationEnabled
+
+```ts
+moderationEnabled: boolean;
+```
+
+#### replies.pagination
+
+```ts
+pagination: {
+  endCursor?: `0x${string}`;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  limit: number;
+  startCursor?: `0x${string}`;
+} = IndexerAPICursorPaginationSchema;
+```
+
+#### replies.pagination.endCursor?
+
+```ts
+optional endCursor: `0x${string}`;
+```
+
+#### replies.pagination.hasNext
+
+```ts
+hasNext: boolean;
+```
+
+#### replies.pagination.hasPrevious
+
+```ts
+hasPrevious: boolean;
+```
+
+#### replies.pagination.limit
+
+```ts
+limit: number;
+```
+
+#### replies.pagination.startCursor?
+
+```ts
+optional startCursor: `0x${string}`;
+```
+
+#### replies.results
+
+```ts
+results: {
+  appSigner: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens?: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster?: {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username?: string;
+     };
+  };
+  chainId: number;
+  channelId: string;
+  commentType: string;
+  content: string;
+  cursor: `0x${string}`;
+  deletedAt: null | string;
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: string;
+  moderationStatus: "approved" | "pending" | "rejected";
+  moderationStatusChangedAt: string;
+  parentId: null | `0x${string}`;
+  targetUri: string;
+  timestamp: string;
+  txHash: `0x${string}`;
+}[];
+```
+
+### targetUri
+
+```ts
+targetUri: string;
+```
+
+### timestamp
+
+```ts
+timestamp: string = dateToString;
+```
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```

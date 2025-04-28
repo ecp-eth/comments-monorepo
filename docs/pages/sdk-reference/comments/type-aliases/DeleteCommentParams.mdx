@@ -1,0 +1,137 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / DeleteCommentParams
+
+# Type Alias: DeleteCommentParams
+
+```ts
+type DeleteCommentParams = {
+  appSignature: Hex;
+  appSigner: Hex;
+  author: Hex;
+  authorSignature?: Hex;
+  commentId: Hex;
+  commentsAddress?: Hex;
+  deadline: bigint;
+  nonce: bigint;
+  writeContract: ContractWriteFunctions["deleteComment"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:299](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L299)
+
+## Properties
+
+### appSignature
+
+```ts
+appSignature: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:328](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L328)
+
+The app signature
+
+***
+
+### appSigner
+
+```ts
+appSigner: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:311](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L311)
+
+The app signer
+
+***
+
+### author
+
+```ts
+author: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:307](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L307)
+
+The author of the comment
+
+***
+
+### authorSignature?
+
+```ts
+optional authorSignature: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:332](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L332)
+
+The author signature. Necessary if the author hasn't approved the signer to delete comments on their behalf.
+
+***
+
+### commentId
+
+```ts
+commentId: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:303](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L303)
+
+The ID of the comment to delete
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:324](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L324)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### deadline
+
+```ts
+deadline: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:319](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L319)
+
+The deadline for the signature
+
+***
+
+### nonce
+
+```ts
+nonce: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:315](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L315)
+
+The nonce for the signature
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["deleteComment"];
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:336](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L336)
+
+The write contract function

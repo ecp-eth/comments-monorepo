@@ -1,0 +1,70 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / SetHookParams
+
+# Type Alias: SetHookParams
+
+```ts
+type SetHookParams = {
+  channelId: bigint;
+  channelManagerAddress?: Hex;
+  hook: Hex;
+  writeContract: ContractWriteFunctions["setHook"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:57](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L57)
+
+## Properties
+
+### channelId
+
+```ts
+channelId: bigint;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:61](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L61)
+
+The ID of the channel to set the hook for
+
+***
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:71](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L71)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### hook
+
+```ts
+hook: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:65](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L65)
+
+The address of the hook to set
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["setHook"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:72](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L72)
