@@ -2,7 +2,7 @@ import { run } from "node:test";
 import { spec } from "node:test/reporters";
 import process from "node:process";
 import path from "node:path";
-import { exec } from "node:child_process";
+import { type ChildProcess, exec } from "node:child_process";
 
 const wantsWatchMode = process.argv.includes("--watch");
 
@@ -44,11 +44,32 @@ await Promise.race([
 nodeProcess.stdout?.removeAllListeners();
 nodeProcess.stderr?.removeAllListeners();
 
-process.on("beforeExit", () => {
-  if (!nodeProcess.killed) {
-    console.log("Killing anvil node");
-    nodeProcess.kill();
+// Add robust process termination handler
+const killProcess = async (process: ChildProcess) => {
+  if (process.killed) {
+    return;
   }
+
+  console.log("Killing anvil node");
+  process.kill();
+
+  // Wait for process to exit
+  await new Promise((resolve) => {
+    const timeout = setTimeout(() => {
+      console.log("Process did not exit, forcing kill with SIGKILL");
+      process.kill("SIGKILL");
+      resolve(true);
+    }, 5000);
+
+    process.once("exit", () => {
+      clearTimeout(timeout);
+      resolve(true);
+    });
+  });
+};
+
+process.on("beforeExit", () => {
+  killProcess(nodeProcess);
 });
 
 run({
@@ -62,11 +83,8 @@ run({
   .on("test:fail", () => {
     process.exitCode = 1;
   })
-  .on("end", () => {
-    if (!nodeProcess.killed) {
-      console.log("Killing anvil node");
-      nodeProcess.kill();
-    }
+  .on("end", async () => {
+    await killProcess(nodeProcess);
   })
   .compose(spec)
   .pipe(process.stdout);
