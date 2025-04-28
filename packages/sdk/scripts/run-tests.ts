@@ -14,6 +14,12 @@ const nodeProcessTimeout = AbortSignal.timeout(20_000);
 // wait for nodeProcess to output Listening on 0.0.0.0:8545 in stdout
 await Promise.race([
   new Promise((resolve, reject) => {
+    nodeProcess.on("exit", (code) => {
+      if (code !== 0) {
+        reject(new Error("Anvil node failed to start"));
+      }
+    });
+
     nodeProcess.stdout?.on("data", (data) => {
       if (data.toString().includes("Listening on 0.0.0.0:8545")) {
         console.log("Anvil node started");
