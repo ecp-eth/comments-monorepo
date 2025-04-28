@@ -81,7 +81,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentDeletion]
+    [wagmiConfig, commentDeletion, deleteCommentAsAuthor]
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(
@@ -158,7 +158,13 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, connectedAddress, commentRetrySubmission]
+    [
+      wagmiConfig,
+      connectedAddress,
+      commentRetrySubmission,
+      switchChainAsync,
+      postCommentAsAuthor,
+    ]
   );
 
   const postComment = useCallback<OnPostComment>(
@@ -224,7 +230,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentSubmission]
+    [wagmiConfig, commentSubmission, postCommentAsAuthor, switchChainAsync]
   );
 
   return useMemo(

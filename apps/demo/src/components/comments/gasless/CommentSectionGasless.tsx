@@ -179,28 +179,29 @@ export function CommentSectionGasless() {
   const { reset: resetApproveGaslessTransactionsMutation } =
     approveGaslessTransactionsMutation;
   const { reset: resetRemoveApprovalContract } = removeApprovalContract;
+  const { refetch: refetchApprovalStatus } = approvalStatus;
 
   useEffect(() => {
     if (approveContractReceipt.data?.status === "success") {
-      approvalStatus.refetch();
+      refetchApprovalStatus();
       resetApproveGaslessTransactionsMutation();
       removeApprovalContract.reset();
     }
   }, [
     approveContractReceipt.data?.status,
-    approvalStatus.refetch,
+    refetchApprovalStatus,
     removeApprovalContract,
     resetApproveGaslessTransactionsMutation,
   ]);
 
   useEffect(() => {
     if (removeApprovalContractReceipt.data?.status === "success") {
-      approvalStatus.refetch();
+      refetchApprovalStatus();
       resetApproveGaslessTransactionsMutation();
       resetRemoveApprovalContract();
     }
   }, [
-    approvalStatus.refetch,
+    refetchApprovalStatus,
     removeApprovalContractReceipt.data?.status,
     resetApproveGaslessTransactionsMutation,
     resetRemoveApprovalContract,

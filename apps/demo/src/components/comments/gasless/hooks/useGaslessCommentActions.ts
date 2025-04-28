@@ -35,6 +35,7 @@ export function useGaslessCommentActions({
     connectedAddress,
   });
   const submitCommentMutation = useGaslessSubmitComment();
+  const { mutateAsync: submitComment } = submitCommentMutation;
   const commentDeletion = useCommentDeletion();
   const commentRetrySubmission = useCommentRetrySubmission();
   const commentSubmission = useCommentSubmission();
@@ -106,7 +107,7 @@ export function useGaslessCommentActions({
         throw new Error("Only post comments can be retried");
       }
 
-      const pendingOperation = await submitCommentMutation.mutateAsync({
+      const pendingOperation = await submitComment({
         content: comment.content,
         isApproved: comment.pendingOperation.type === "gasless-preapproved",
         targetUri: comment.targetUri,
@@ -144,12 +145,12 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, submitCommentMutation]
+    [wagmiConfig, submitComment, commentRetrySubmission]
   );
 
   const postComment = useCallback<OnPostComment>(
     async (params) => {
-      const pendingOperation = await submitCommentMutation.mutateAsync({
+      const pendingOperation = await submitComment({
         content: params.comment.content,
         isApproved: hasApproval,
         ...("targetUri" in params.comment
@@ -192,7 +193,7 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, hasApproval, commentSubmission]
+    [wagmiConfig, hasApproval, commentSubmission, submitComment]
   );
 
   return useMemo(

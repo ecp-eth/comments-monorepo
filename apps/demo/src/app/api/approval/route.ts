@@ -14,8 +14,6 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { chain, transport } from "@/lib/wagmi";
-import { privateKeyToAccount } from "viem/accounts";
-import { env } from "@/env";
 import { getApprovalStatusAndNonce } from "@/lib/contract";
 import { addApproval } from "@ecp.eth/sdk/comments";
 
@@ -47,7 +45,6 @@ export async function POST(
     hash,
     signature: authorSignature,
   });
-  const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
   const publicClient = createPublicClient({
     chain,
     transport,

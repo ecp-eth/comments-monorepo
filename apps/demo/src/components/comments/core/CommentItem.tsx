@@ -46,11 +46,11 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
 
   const onDeleteClick = useCallback(() => {
     deleteComment({ comment, queryKey: rootQueryKey });
-  }, [comment, deleteComment, queryKey]);
+  }, [comment, deleteComment, rootQueryKey]);
 
   const onRetryPostClick = useCallback(() => {
     retryPostComment({ comment, queryKey: rootQueryKey });
-  }, [comment, retryPostComment, queryKey]);
+  }, [comment, retryPostComment, rootQueryKey]);
 
   const repliesQuery = useInfiniteQuery({
     enabled: comment.pendingOperation?.action !== "post",

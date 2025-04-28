@@ -12,7 +12,7 @@ import {
   useSignTypedData,
   useConfig,
 } from "wagmi";
-import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
+import { waitForTransactionReceipt } from "@wagmi/core";
 import {
   useCommentDeletion,
   useCommentSubmission,
@@ -81,7 +81,7 @@ export function useCommentActions(): CommentActionsContextType<SwapWithCommentEx
         throw e;
       }
     },
-    [wagmiConfig, commentDeletion]
+    [wagmiConfig, commentDeletion, deleteCommentAsAuthor]
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(async () => {
@@ -183,7 +183,13 @@ export function useCommentActions(): CommentActionsContextType<SwapWithCommentEx
         throw e;
       }
     },
-    [wagmiConfig, commentSubmission]
+    [
+      wagmiConfig,
+      commentSubmission,
+      switchChainAsync,
+      signTypedDataAsync,
+      sendTransactionAsync,
+    ]
   );
 
   return useMemo(

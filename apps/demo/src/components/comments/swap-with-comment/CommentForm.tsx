@@ -2,7 +2,7 @@ import {
   CommentForm as BaseCommentForm,
   CommentFormProps,
 } from "../core/CommentForm";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useAccount, useChainId } from "wagmi";
 import { PriceView } from "./0x/PriceView";
 import QuoteView from "./0x/QuoteView";
