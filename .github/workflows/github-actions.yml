@@ -98,6 +98,7 @@ jobs:
       SUBMITTER_PRIVATE_KEY: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
       APP_URL: "http://localhost:3000"
       WEBHOOK_SECRET: "secret"
+      TURBO_UI: "false"
     name: Build and Test on Node.js 22
     steps:
       - name: Check out code
