@@ -137,7 +137,7 @@ export const GetCommentsQuerySchema = z.object({
     description: "The channel ID",
   }),
   commentType: z.string().optional().openapi({
-    description: "The comment type",
+    description: "The comment type (e.g. comment, question, answer, etc)",
   }),
   // zod-openapi plugin doesn't automatically infer the minimum value from `int().positive()`
   // so use min(1) for better compatibility
