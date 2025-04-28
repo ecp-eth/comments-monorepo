@@ -19,73 +19,73 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # build-protocol:
-  #   runs-on: "ubuntu-latest"
-  #   defaults:
-  #     run:
-  #       working-directory: packages/protocol
-  #   steps:
-  #     - name: "Check out the repo"
-  #       uses: "actions/checkout@v4"
+  build-protocol:
+    runs-on: "ubuntu-latest"
+    defaults:
+      run:
+        working-directory: packages/protocol
+    steps:
+      - name: "Check out the repo"
+        uses: "actions/checkout@v4"
 
-  #     - name: "Install Foundry"
-  #       uses: "foundry-rs/foundry-toolchain@v1"
+      - name: "Install Foundry"
+        uses: "foundry-rs/foundry-toolchain@v1"
 
-  #     - name: "Setup pnpm"
-  #       uses: "pnpm/action-setup@v2"
+      - name: "Setup pnpm"
+        uses: "pnpm/action-setup@v2"
 
-  #     - name: "Setup Node.js"
-  #       uses: "actions/setup-node@v4"
-  #       with:
-  #         node-version: "22"
-  #         cache: "pnpm"
+      - name: "Setup Node.js"
+        uses: "actions/setup-node@v4"
+        with:
+          node-version: "22"
+          cache: "pnpm"
 
-  #     - name: "Install the Node.js dependencies"
-  #       run: "pnpm install --frozen-lockfile"
+      - name: "Install the Node.js dependencies"
+        run: "pnpm install --frozen-lockfile"
 
-  #     - name: "Build the contracts and print their size"
-  #       run: "forge build --sizes"
+      - name: "Build the contracts and print their size"
+        run: "forge build --sizes"
 
-  #     - name: "Add build summary"
-  #       run: |
-  #         echo "## Build result" >> $GITHUB_STEP_SUMMARY
-  #         echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
+      - name: "Add build summary"
+        run: |
+          echo "## Build result" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
 
-  # test-protocol:
-  #   needs: ["build-protocol"]
-  #   runs-on: "ubuntu-latest"
-  #   defaults:
-  #     run:
-  #       working-directory: packages/protocol
-  #   steps:
-  #     - name: "Check out the repo"
-  #       uses: "actions/checkout@v4"
+  test-protocol:
+    needs: ["build-protocol"]
+    runs-on: "ubuntu-latest"
+    defaults:
+      run:
+        working-directory: packages/protocol
+    steps:
+      - name: "Check out the repo"
+        uses: "actions/checkout@v4"
 
-  #     - name: "Install Foundry"
-  #       uses: "foundry-rs/foundry-toolchain@v1"
+      - name: "Install Foundry"
+        uses: "foundry-rs/foundry-toolchain@v1"
 
-  #     - name: "Setup pnpm"
-  #       uses: "pnpm/action-setup@v2"
+      - name: "Setup pnpm"
+        uses: "pnpm/action-setup@v2"
 
-  #     - name: "Setup Node.js"
-  #       uses: "actions/setup-node@v4"
-  #       with:
-  #         node-version: "22"
-  #         cache: "pnpm"
+      - name: "Setup Node.js"
+        uses: "actions/setup-node@v4"
+        with:
+          node-version: "22"
+          cache: "pnpm"
 
-  #     - name: "Install the Node.js dependencies"
-  #       run: "pnpm install"
+      - name: "Install the Node.js dependencies"
+        run: "pnpm install"
 
-  #     - name: "Show the Foundry config"
-  #       run: "forge config"
+      - name: "Show the Foundry config"
+        run: "forge config"
 
-  #     - name: "Run the tests"
-  #       run: "forge test -vvv"
+      - name: "Run the tests"
+        run: "forge test -vvv"
 
-  #     - name: "Add test summary"
-  #       run: |
-  #         echo "## Tests result" >> $GITHUB_STEP_SUMMARY
-  #         echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
+      - name: "Add test summary"
+        run: |
+          echo "## Tests result" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
 
   build-js:
     timeout-minutes: 15
@@ -124,11 +124,11 @@ jobs:
       - name: Build the project
         run: pnpm build
 
-      # - name: Lint
-      #   run: pnpm lint
+      - name: Lint
+        run: pnpm lint
 
-      # - name: Typecheck
-      #   run: pnpm check-types
+      - name: Typecheck
+        run: pnpm check-types
 
       - name: Test
         working-directory: packages/sdk
