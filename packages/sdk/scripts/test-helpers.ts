@@ -9,7 +9,10 @@ export function deployContracts(): {
   channelManagerAddress: Hex;
   noopHookAddress: Hex;
 } {
-  const deployProcessRawOutput = execSync("pnpm run deploy:test", { cwd });
+  const deployProcessRawOutput = execSync("pnpm run deploy:test", {
+    cwd,
+    env: process.env,
+  });
   const deployProcessOutput = deployProcessRawOutput.toString();
 
   const commentsAddress = deployProcessOutput.match(

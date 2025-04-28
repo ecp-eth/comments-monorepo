@@ -10,6 +10,7 @@ const cwd = path.resolve(import.meta.dirname, "../../protocol");
 
 const nodeProcess = spawn("anvil", ["--host", "0.0.0.0", "--block-time", "1"], {
   cwd,
+  env: process.env,
 });
 const nodeProcessTimeout = AbortSignal.timeout(20_000);
 
