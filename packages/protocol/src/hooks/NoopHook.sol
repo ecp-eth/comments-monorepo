@@ -17,7 +17,7 @@ contract NoopHook is IHook {
     }
 
     function beforeComment(
-        ICommentTypes.CommentData calldata commentData,
+        ICommentTypes.CommentData calldata,
         address,
         bytes32
     ) external payable returns (bool) {
@@ -25,11 +25,10 @@ contract NoopHook is IHook {
     }
 
     function afterComment(
-        ICommentTypes.CommentData calldata commentData,
+        ICommentTypes.CommentData calldata,
         address,
         bytes32
-    ) external returns (bool) {
+    ) external pure returns (bool) {
         return true;
     }
 }
-
