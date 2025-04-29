@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / GetChannelOwnerParams
+
+# Type Alias: GetChannelOwnerParams
+
+```ts
+type GetChannelOwnerParams = {
+  channelId: bigint;
+  channelManagerAddress?: Hex;
+  readContract: ContractReadFunctions["getChannelOwner"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:234](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L234)
+
+## Properties
+
+### channelId
+
+```ts
+channelId: bigint;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:238](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L238)
+
+The ID of the channel to get the owner of
+
+***
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:244](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L244)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["getChannelOwner"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:245](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L245)

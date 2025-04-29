@@ -13,12 +13,12 @@ import {
   COMMENTS_PER_PAGE,
   NEW_COMMENTS_BY_AUTHOR_CHECK_INTERVAL,
 } from "@/lib/constants";
-import { fetchComments } from "@ecp.eth/sdk";
+import { fetchComments } from "@ecp.eth/sdk/indexer";
 import {
   type CommentPageSchemaType,
   CommentPageSchema,
 } from "@ecp.eth/shared/schemas";
-import type { Hex } from "@ecp.eth/sdk/schemas";
+import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { CommentByAuthor } from "./CommentByAuthor";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { publicEnv } from "@/publicEnv";

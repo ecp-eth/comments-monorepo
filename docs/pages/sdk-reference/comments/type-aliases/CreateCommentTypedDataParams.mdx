@@ -1,0 +1,55 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / CreateCommentTypedDataParams
+
+# Type Alias: CreateCommentTypedDataParams
+
+```ts
+type CreateCommentTypedDataParams = {
+  chainId: number;
+  commentData: CommentInputData;
+  commentsAddress?: Hex;
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:502](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L502)
+
+## Properties
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:504](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L504)
+
+***
+
+### commentData
+
+```ts
+commentData: CommentInputData;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:503](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L503)
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:509](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L509)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```

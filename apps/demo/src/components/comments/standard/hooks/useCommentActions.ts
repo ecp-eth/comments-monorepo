@@ -7,15 +7,17 @@ import type {
 } from "../../core/CommentActionsContext";
 import type { Hex } from "viem";
 import { waitForTransactionReceipt } from "@wagmi/core";
-import { useWriteContract, useSwitchChain, useConfig } from "wagmi";
+import { useSwitchChain, useConfig } from "wagmi";
 import {
   useCommentDeletion,
   useCommentRetrySubmission,
   useCommentSubmission,
 } from "@ecp.eth/shared/hooks";
-import { COMMENTS_V1_ADDRESS, CommentsV1Abi, isZeroHex } from "@ecp.eth/sdk";
 import { submitCommentMutationFunction } from "../queries";
-import { postCommentAsAuthorViaCommentsV1 } from "@ecp.eth/shared/helpers";
+import {
+  useDeleteCommentAsAuthor,
+  usePostCommentAsAuthor,
+} from "@ecp.eth/sdk/comments/react";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 
@@ -27,19 +29,17 @@ export function useCommentActions({
   connectedAddress,
 }: UseCommentActionsProps): CommentActionsContextType {
   const wagmiConfig = useConfig();
-  const { writeContractAsync } = useWriteContract();
   const { switchChainAsync } = useSwitchChain();
   const commentDeletion = useCommentDeletion();
   const commentRetrySubmission = useCommentRetrySubmission();
   const commentSubmission = useCommentSubmission();
+  const { mutateAsync: deleteCommentAsAuthor } = useDeleteCommentAsAuthor();
+  const { mutateAsync: postCommentAsAuthor } = usePostCommentAsAuthor();
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {
-        const txHash = await writeContractAsync({
-          address: COMMENTS_V1_ADDRESS,
-          abi: CommentsV1Abi,
-          functionName: "deleteCommentAsAuthor",
-          args: [params.comment.id],
+        const { txHash } = await deleteCommentAsAuthor({
+          commentId: params.comment.id,
         });
 
         const pendingOperation: PendingDeleteCommentOperationSchemaType = {
@@ -81,7 +81,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentDeletion]
+    [wagmiConfig, commentDeletion, deleteCommentAsAuthor]
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(
@@ -118,10 +118,12 @@ export function useCommentActions({
         async writeContractAsync({
           signCommentResponse: { signature: appSignature, data: commentData },
         }) {
-          return await postCommentAsAuthorViaCommentsV1(
-            { appSignature, commentData },
-            writeContractAsync
-          );
+          const { txHash } = await postCommentAsAuthor({
+            appSignature,
+            comment: commentData,
+          });
+
+          return txHash;
         },
       });
 
@@ -156,7 +158,13 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, connectedAddress, commentRetrySubmission]
+    [
+      wagmiConfig,
+      connectedAddress,
+      commentRetrySubmission,
+      switchChainAsync,
+      postCommentAsAuthor,
+    ]
   );
 
   const postComment = useCallback<OnPostComment>(
@@ -182,10 +190,12 @@ export function useCommentActions({
         async writeContractAsync({
           signCommentResponse: { signature: appSignature, data: commentData },
         }) {
-          return await postCommentAsAuthorViaCommentsV1(
-            { appSignature, commentData },
-            writeContractAsync
-          );
+          const { txHash } = await postCommentAsAuthor({
+            appSignature,
+            comment: commentData,
+          });
+
+          return txHash;
         },
       });
 
@@ -220,7 +230,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentSubmission]
+    [wagmiConfig, commentSubmission, postCommentAsAuthor, switchChainAsync]
   );
 
   return useMemo(

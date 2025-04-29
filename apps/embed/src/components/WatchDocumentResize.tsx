@@ -3,7 +3,7 @@
 import {
   EmbedGetDimensionsEventSchema,
   EmbedResizedEventSchema,
-} from "@ecp.eth/sdk/schemas";
+} from "@ecp.eth/sdk/embed/schemas";
 import { useEffect } from "react";
 
 export function WatchDocumentResize() {

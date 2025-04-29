@@ -1,0 +1,64 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / SetHookGloballyEnabledParams
+
+# Type Alias: SetHookGloballyEnabledParams
+
+```ts
+type SetHookGloballyEnabledParams = {
+  channelManagerAddress?: Hex;
+  enabled: boolean;
+  hookAddress: Hex;
+  writeContract: ContractWriteFunctions["setHookGloballyEnabled"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:160](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L160)
+
+## Properties
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:172](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L172)
+
+The address of the channel manager
+
+***
+
+### enabled
+
+```ts
+enabled: boolean;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:168](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L168)
+
+Whether the hook should be enabled
+
+***
+
+### hookAddress
+
+```ts
+hookAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:164](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L164)
+
+The address of the hook to set the globally enabled status of
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["setHookGloballyEnabled"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:173](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L173)

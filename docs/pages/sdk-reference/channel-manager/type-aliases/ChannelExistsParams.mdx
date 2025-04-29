@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / ChannelExistsParams
+
+# Type Alias: ChannelExistsParams
+
+```ts
+type ChannelExistsParams = {
+  channelId: bigint;
+  channelManagerAddress?: Hex;
+  readContract: ContractReadFunctions["channelExists"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:193](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L193)
+
+## Properties
+
+### channelId
+
+```ts
+channelId: bigint;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:197](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L197)
+
+The ID of the channel to check
+
+***
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:203](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L203)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["channelExists"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:204](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L204)

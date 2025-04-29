@@ -1,7 +1,7 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { fetchComments } from "@ecp.eth/sdk";
+import { fetchComments } from "@ecp.eth/sdk/indexer";
 import { useEffect, useMemo, useState } from "react";
 import { publicEnv } from "@/publicEnv";
 import {

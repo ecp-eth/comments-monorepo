@@ -4,8 +4,8 @@ import {
   type GaslessPostCommentResponseSchemaType,
   type PreparedSignedGaslessPostCommentNotApprovedSchemaType,
 } from "@/lib/schemas";
-import { useGaslessTransaction } from "@ecp.eth/sdk/react";
-import { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/schemas";
+import { useGaslessTransaction } from "@ecp.eth/sdk/comments/react";
+import type { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { useConnectAccount } from "@ecp.eth/shared/hooks";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
@@ -13,7 +13,7 @@ import type { Hex, SignTypedDataParameters } from "viem";
 import { prepareSignedGaslessComment } from "../queries";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { InvalidCommentError, RateLimitedError } from "../../core/errors";
-import { fetchAuthorData } from "@ecp.eth/sdk";
+import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { publicEnv } from "@/publicEnv";
 
 type SubmitGaslessCommentVariables =

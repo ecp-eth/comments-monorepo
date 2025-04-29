@@ -1,5 +1,5 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-import { HexSchema } from "@ecp.eth/sdk/schemas";
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod";
 
 export const publicEnvSchema = z.object({

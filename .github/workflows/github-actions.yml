@@ -88,7 +88,7 @@ jobs:
           echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
 
   build-js:
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     env:
       APP_SIGNER_PRIVATE_KEY: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
@@ -98,10 +98,10 @@ jobs:
       SUBMITTER_PRIVATE_KEY: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
       APP_URL: "http://localhost:3000"
       WEBHOOK_SECRET: "secret"
-    strategy:
-      matrix:
-        node: [22]
-    name: Build and Test on Node.js ${{ matrix.node }}
+      TURBO_UI: "false"
+      CONTRACT_OWNER_ADDRESS: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+      FUND_ADDRESS: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+    name: Build and Test on Node.js 22
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -115,7 +115,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 22
           cache: "pnpm"
 
       - name: Install dependencies
@@ -129,3 +129,6 @@ jobs:
 
       - name: Typecheck
         run: pnpm check-types
+
+      - name: Test
+        run: pnpm test

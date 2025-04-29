@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/schemas";
+import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { CommentSection } from "../components/CommentSection";
 import { StatusBar } from "../components/StatusBar";
 import { CommentForm } from "../components/CommentForm";
-import { isZeroHex } from "@ecp.eth/sdk";
+import { isZeroHex } from "@ecp.eth/sdk/core";
 
 export default function Home() {
   const [justViewingReplies, setJustViewingReplies] = useState(false);

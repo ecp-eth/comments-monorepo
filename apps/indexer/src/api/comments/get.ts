@@ -1,7 +1,7 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, asc, desc, eq, gt, isNull, lt, or } from "ponder";
-import { IndexerAPIListCommentsSchema } from "@ecp.eth/sdk/schemas";
+import { IndexerAPIListCommentsOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response-formatters";
 import { GetCommentsQuerySchema } from "../../lib/schemas";
@@ -21,7 +21,7 @@ const getCommentsRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: IndexerAPIListCommentsSchema,
+          schema: IndexerAPIListCommentsOutputSchema,
         },
       },
       description: "Retrieve a list of comments",
@@ -37,14 +37,26 @@ const getCommentsRoute = createRoute({
  */
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { author, targetUri, appSigner, sort, limit, cursor, viewer, mode } =
-      c.req.valid("query");
+    const {
+      author,
+      targetUri,
+      appSigner,
+      sort,
+      limit,
+      cursor,
+      viewer,
+      mode,
+      channelId,
+      commentType,
+    } = c.req.valid("query");
 
     const sharedConditions = [
       author ? eq(schema.comments.author, author) : undefined,
       isNull(schema.comments.parentId),
       targetUri ? eq(schema.comments.targetUri, targetUri) : undefined,
       appSigner ? eq(schema.comments.appSigner, appSigner) : undefined,
+      channelId != null ? eq(schema.comments.channelId, channelId) : undefined,
+      commentType ? eq(schema.comments.commentType, commentType) : undefined,
     ];
 
     const repliesConditions: (SQL<unknown> | undefined)[] = [];
@@ -156,7 +168,10 @@ export default (app: OpenAPIHono) => {
         replyLimit: REPLIES_PER_COMMENT,
       });
 
-    return c.json(IndexerAPIListCommentsSchema.parse(formattedComments), 200);
+    return c.json(
+      IndexerAPIListCommentsOutputSchema.parse(formattedComments),
+      200
+    );
   });
 
   return app;

@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "check-types": "turbo run check-types",
-    "build": "turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./apps/embed-demo-blog",
+    "build": "turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./apps/embed-demo-blog --filter=!./docs",
     "build:indexer": "turbo build --filter=./apps/indexer... --filter=./packages/protocol",
     "dev": "turbo dev --filter=./apps/demo... --filter=./apps/indexer --filter=./packages/protocol --filter=./packages/test-protocol",
     "dev:indexer": "turbo dev --filter=./apps/indexer... --filter=./packages/protocol",
@@ -11,7 +11,8 @@
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "pkg:publish": "scripts/publish.sh",
-    "postinstall": "node scripts/fix-sentry-opentelemetry.js"
+    "postinstall": "node scripts/fix-sentry-opentelemetry.js",
+    "test": "turbo test --filter=!./packages/protocol"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
@@ -20,7 +21,7 @@
     "turbo": "^2.5.0",
     "typescript": "^5.8.2"
   },
-  "packageManager": "pnpm@10.6.5",
+  "packageManager": "pnpm@10.8.1",
   "engines": {
     "node": ">=22"
   },

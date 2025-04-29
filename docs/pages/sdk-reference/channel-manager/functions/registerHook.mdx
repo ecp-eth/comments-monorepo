@@ -1,0 +1,29 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / registerHook
+
+# Function: registerHook()
+
+```ts
+function registerHook(params): Promise<RegisterHookResult>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:141](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L141)
+
+Register a hook into a global registry
+
+## Parameters
+
+### params
+
+[`RegisterHookParams`](/sdk-reference/channel-manager/type-aliases/RegisterHookParams.mdx)
+
+The parameters for registering a hook
+
+## Returns
+
+`Promise`\<[`RegisterHookResult`](/sdk-reference/channel-manager/type-aliases/RegisterHookResult.mdx)\>
+
+The transaction hash of the registered hook

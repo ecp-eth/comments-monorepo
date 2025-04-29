@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / RevokeApprovalAsAuthorParams
+
+# Type Alias: RevokeApprovalAsAuthorParams
+
+```ts
+type RevokeApprovalAsAuthorParams = {
+  appSigner: Hex;
+  commentsAddress?: Hex;
+  writeContract: ContractWriteFunctions["revokeApprovalAsAuthor"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:179](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L179)
+
+## Properties
+
+### appSigner
+
+```ts
+appSigner: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:183](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L183)
+
+The address of the app signer being unapproved
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:189](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L189)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["revokeApprovalAsAuthor"];
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:190](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L190)

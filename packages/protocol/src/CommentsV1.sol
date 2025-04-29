@@ -1,12 +1,36 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
+import "./interfaces/IHook.sol";
+import "./interfaces/ICommentTypes.sol";
+import "./interfaces/IChannelManager.sol";
+import "./ChannelManager.sol";
 
 /// @title CommentsV1 - A decentralized comments system
-/// @notice This contract allows users to post and manage comments with optional app-signer approval
+/// @notice This contract allows users to post and manage comments with optional app-signer approval and channel-specific hooks
 /// @dev Implements EIP-712 for typed structured data hashing and signing
-contract CommentsV1 {
+/// @dev Security Model:
+/// 1. Authentication:
+///    - Comments can be posted directly by authors or via signatures
+///    - App signers must be approved by authors
+///    - All signatures follow EIP-712 for better security
+/// 2. Authorization:
+///    - Only comment authors can delete their comments
+///    - App signer approvals can be revoked at any time
+///    - Nonce system prevents signature replay attacks
+/// 3. Hook System:
+///    - Protected against reentrancy
+///    - Channel-specific hooks are executed before and after comment operations
+///    - Channel owners control their hooks
+/// 4. Data Integrity:
+///    - Thread IDs are immutable once set
+///    - Parent-child relationships are verified
+///    - Comment IDs are cryptographically secure
+contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
     /// @notice Emitted when a new comment is added
     /// @param commentId Unique identifier of the comment
     /// @param author Address of the comment author
@@ -34,39 +58,44 @@ contract CommentsV1 {
     /// @param appSigner Address being unapproved
     event ApprovalRemoved(address indexed author, address indexed appSigner);
 
-    error InvalidAuthor();
+    /// @notice Error thrown when author address is invalid
+    error InvalidAuthorAddress();
+    /// @notice Error thrown when app signature verification fails
     error InvalidAppSignature();
+    /// @notice Error thrown when author signature verification fails
     error InvalidAuthorSignature();
-    error InvalidNonce();
-    error DeadlineReached();
-    error NotAuthorized();
-
-    /// @notice Struct containing all data for a comment
-    /// @param content The actual text content of the comment
-    /// @param metadata Additional JSON metadata for the comment
-    /// @param targetUri the URI about which the comment is being made
-    /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
-    /// @param author The address of the comment author
-    /// @param appSigner The address of the application signer that authorized this comment
-    /// @param deadline Timestamp after which the signatures for this comment become invalid
-    /// @param nonce The nonce for the comment
-    struct CommentData {
-        string content;
-        string metadata;
-        string targetUri;
-        bytes32 parentId;
-        address author;
-        address appSigner;
-        uint256 nonce;
-        uint256 deadline;
-    }
+    /// @notice Error thrown when nonce is invalid
+    error InvalidNonce(
+        address author,
+        address appSigner,
+        uint256 expected,
+        uint256 provided
+    );
+    /// @notice Error thrown when deadline has passed
+    error SignatureDeadlineReached(uint256 deadline, uint256 currentTime);
+    /// @notice Error thrown when caller is not authorized
+    error NotAuthorized(address caller, address requiredCaller);
+    /// @notice Error thrown when channel does not exist
+    error ChannelDoesNotExist();
+    /// @notice Error thrown when channel hook execution fails
+    error ChannelHookExecutionFailed();
+    /// @notice Error thrown when signature length is invalid
+    error InvalidSignatureLength();
+    /// @notice Error thrown when signature s value is invalid
+    error InvalidSignatureS();
+    /// @notice Error thrown when parent comment does not exist
+    error ParentCommentDoesNotExist();
+    /// @notice Error thrown when both parentId and targetUri are set
+    error InvalidCommentReference(string message);
+    /// @notice Error thrown when address is zero
+    error ZeroAddress();
 
     string public constant name = "Comments";
     string public constant version = "1";
     bytes32 public immutable DOMAIN_SEPARATOR;
-    bytes32 public constant COMMENT_TYPEHASH =
+    bytes32 public constant ADD_COMMENT_TYPEHASH =
         keccak256(
-            "AddComment(string content,string metadata,string targetUri,bytes32 parentId,address author,address appSigner,uint256 nonce,uint256 deadline)"
+            "AddComment(string content,string metadata,string targetUri,string commentType,address author,address appSigner,uint256 channelId,uint256 nonce,uint256 deadline,bytes32 parentId)"
         );
     bytes32 public constant DELETE_COMMENT_TYPEHASH =
         keccak256(
@@ -81,10 +110,21 @@ contract CommentsV1 {
             "RemoveApproval(address author,address appSigner,uint256 nonce,uint256 deadline)"
         );
 
+    // On-chain storage mappings
+    mapping(bytes32 => CommentData) public comments;
     mapping(address => mapping(address => bool)) public isApproved;
     mapping(address => mapping(address => uint256)) public nonces;
+    mapping(bytes32 => bool) public deleted;
 
-    constructor() {
+    // Channel manager reference
+    IChannelManager public channelManager;
+
+    /// @notice Constructor initializes the contract with the deployer as owner and channel manager
+    /// @dev Sets up EIP-712 domain separator
+    /// @param initialOwner The address that will own the contract
+    constructor(address initialOwner) Ownable(initialOwner) {
+        if (initialOwner == address(0)) revert ZeroAddress();
+
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256(
@@ -104,7 +144,7 @@ contract CommentsV1 {
     function postCommentAsAuthor(
         CommentData calldata commentData,
         bytes calldata appSignature
-    ) external {
+    ) external payable {
         _postComment(commentData, bytes(""), appSignature);
     }
 
@@ -116,7 +156,7 @@ contract CommentsV1 {
         CommentData calldata commentData,
         bytes calldata authorSignature,
         bytes calldata appSignature
-    ) external {
+    ) external payable {
         _postComment(commentData, authorSignature, appSignature);
     }
 
@@ -128,41 +168,103 @@ contract CommentsV1 {
         CommentData calldata commentData,
         bytes memory authorSignature,
         bytes memory appSignature
-    ) internal {
+    ) internal nonReentrant {
+        // Validate submitted within deadline
         if (block.timestamp > commentData.deadline) {
-            revert DeadlineReached();
+            revert SignatureDeadlineReached(
+                commentData.deadline,
+                block.timestamp
+            );
         }
 
+        // Validate parentId and targetUri
+        if (commentData.parentId != bytes32(0)) {
+            if (
+                comments[commentData.parentId].author == address(0) &&
+                !deleted[commentData.parentId]
+            ) {
+                revert ParentCommentDoesNotExist();
+            }
+            if (bytes(commentData.targetUri).length > 0) {
+                revert InvalidCommentReference(
+                    "Parent comment and targetUri cannot both be set"
+                );
+            }
+        }
+
+        // Validate nonce
         if (
             nonces[commentData.author][commentData.appSigner] !=
             commentData.nonce
         ) {
-            revert InvalidNonce();
+            revert InvalidNonce(
+                commentData.author,
+                commentData.appSigner,
+                nonces[commentData.author][commentData.appSigner],
+                commentData.nonce
+            );
+        }
+
+        // Validate channel exists
+        if (!channelManager.channelExists(commentData.channelId)) {
+            revert ChannelDoesNotExist();
         }
 
         nonces[commentData.author][commentData.appSigner]++;
 
         bytes32 commentId = getCommentId(commentData);
 
-        if (
-            !SignatureChecker.isValidSignatureNow(
-                commentData.appSigner,
-                commentId,
-                appSignature
-            )
-        ) {
-            revert InvalidAppSignature();
+        // Validate signatures if present
+        if (appSignature.length > 0) {
+            _validateSignature(appSignature);
+            if (
+                !SignatureChecker.isValidSignatureNow(
+                    commentData.appSigner,
+                    commentId,
+                    appSignature
+                )
+            ) {
+                revert InvalidAppSignature();
+            }
+        }
+
+        if (authorSignature.length > 0) {
+            _validateSignature(authorSignature);
         }
 
         if (
             msg.sender == commentData.author ||
             isApproved[commentData.author][commentData.appSigner] ||
-            SignatureChecker.isValidSignatureNow(
-                commentData.author,
-                commentId,
-                authorSignature
-            )
+            (authorSignature.length > 0 &&
+                SignatureChecker.isValidSignatureNow(
+                    commentData.author,
+                    commentId,
+                    authorSignature
+                ))
         ) {
+            // Execute channel-specific hooks before comment
+            bool hookSuccess = channelManager.executeHooks{value: msg.value}(
+                commentData.channelId,
+                commentData,
+                msg.sender,
+                commentId,
+                IChannelManager.HookPhase.Before
+            );
+            if (!hookSuccess) revert ChannelHookExecutionFailed();
+
+            // Store comment data on-chain
+            comments[commentId] = commentData;
+
+            // Execute channel-specific hooks after comment
+            hookSuccess = channelManager.executeHooks(
+                commentData.channelId,
+                commentData,
+                msg.sender,
+                commentId,
+                IChannelManager.HookPhase.After
+            );
+            if (!hookSuccess) revert ChannelHookExecutionFailed();
+
             emit CommentAdded(
                 commentId,
                 commentData.author,
@@ -172,19 +274,26 @@ contract CommentsV1 {
             return;
         }
 
-        revert NotAuthorized();
+        revert NotAuthorized(msg.sender, commentData.author);
     }
 
     /// @notice Deletes a comment when called by the author directly
     /// @param commentId The unique identifier of the comment to delete
     function deleteCommentAsAuthor(bytes32 commentId) external {
+        CommentData storage comment = comments[commentId];
+        require(comment.author != address(0), "Comment does not exist");
+        require(comment.author == msg.sender, "Not comment author");
         _deleteComment(commentId, msg.sender);
     }
 
     /// @notice Deletes a comment with author signature verification
     /// @param commentId The unique identifier of the comment to delete
     /// @param author The address of the comment author
+    /// @param appSigner The address of the app signer
+    /// @param nonce The current nonce for the author
+    /// @param deadline Timestamp after which the signature becomes invalid
     /// @param authorSignature The signature from the author authorizing deletion (empty if app)
+    /// @param appSignature The signature from the app signer authorizing deletion (empty if author)
     function deleteComment(
         bytes32 commentId,
         address author,
@@ -195,12 +304,20 @@ contract CommentsV1 {
         bytes calldata appSignature
     ) external {
         if (block.timestamp > deadline) {
-            revert DeadlineReached();
+            revert SignatureDeadlineReached(deadline, block.timestamp);
         }
 
         if (nonces[author][appSigner] != nonce) {
-            revert InvalidNonce();
+            revert InvalidNonce(
+                author,
+                appSigner,
+                nonces[author][appSigner],
+                nonce
+            );
         }
+
+        CommentData storage comment = comments[commentId];
+        require(comment.author != address(0), "Comment does not exist");
 
         nonces[author][appSigner]++;
 
@@ -233,13 +350,15 @@ contract CommentsV1 {
             return;
         }
 
-        revert NotAuthorized();
+        revert NotAuthorized(msg.sender, author);
     }
 
     /// @notice Internal function to handle comment deletion logic
     /// @param commentId The unique identifier of the comment to delete
     /// @param author The address of the comment author
     function _deleteComment(bytes32 commentId, address author) internal {
+        delete comments[commentId];
+        deleted[commentId] = true;
         emit CommentDeleted(commentId, author);
     }
 
@@ -254,7 +373,7 @@ contract CommentsV1 {
     /// @notice Internal function to remove an app signer approval
     /// @param author The address removing approval
     /// @param appSigner The address being unapproved
-    function _removeApproval(address author, address appSigner) internal {
+    function _revokeApproval(address author, address appSigner) internal {
         isApproved[author][appSigner] = false;
         emit ApprovalRemoved(author, appSigner);
     }
@@ -267,8 +386,8 @@ contract CommentsV1 {
 
     /// @notice Removes an app signer approval when called directly by the author
     /// @param appSigner The address to remove approval from
-    function removeApprovalAsAuthor(address appSigner) external {
-        _removeApproval(msg.sender, appSigner);
+    function revokeApprovalAsAuthor(address appSigner) external {
+        _revokeApproval(msg.sender, appSigner);
     }
 
     /// @notice Approves an app signer with signature verification
@@ -285,11 +404,16 @@ contract CommentsV1 {
         bytes calldata signature
     ) external {
         if (block.timestamp > deadline) {
-            revert DeadlineReached();
+            revert SignatureDeadlineReached(deadline, block.timestamp);
         }
 
         if (nonces[author][appSigner] != nonce) {
-            revert InvalidNonce();
+            revert InvalidNonce(
+                author,
+                appSigner,
+                nonces[author][appSigner],
+                nonce
+            );
         }
 
         nonces[author][appSigner]++;
@@ -328,11 +452,16 @@ contract CommentsV1 {
         bytes calldata signature
     ) external {
         if (block.timestamp > deadline) {
-            revert DeadlineReached();
+            revert SignatureDeadlineReached(deadline, block.timestamp);
         }
 
         if (nonces[author][appSigner] != nonce) {
-            revert InvalidNonce();
+            revert InvalidNonce(
+                author,
+                appSigner,
+                nonces[author][appSigner],
+                nonce
+            );
         }
 
         nonces[author][appSigner]++;
@@ -354,7 +483,7 @@ contract CommentsV1 {
             revert InvalidAuthorSignature();
         }
 
-        _removeApproval(author, appSigner);
+        _revokeApproval(author, appSigner);
     }
 
     /// @notice Calculates the EIP-712 hash for a permit
@@ -452,15 +581,17 @@ contract CommentsV1 {
     ) public view returns (bytes32) {
         bytes32 structHash = keccak256(
             abi.encode(
-                COMMENT_TYPEHASH,
+                ADD_COMMENT_TYPEHASH,
                 keccak256(bytes(commentData.content)),
                 keccak256(bytes(commentData.metadata)),
                 keccak256(bytes(commentData.targetUri)),
-                commentData.parentId,
+                keccak256(bytes(commentData.commentType)),
                 commentData.author,
                 commentData.appSigner,
+                commentData.channelId,
                 commentData.nonce,
-                commentData.deadline
+                commentData.deadline,
+                commentData.parentId
             )
         );
 
@@ -468,5 +599,46 @@ contract CommentsV1 {
             keccak256(
                 abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash)
             );
+    }
+
+    /// @notice Get comment data by ID
+    /// @param commentId The comment ID to query
+    /// @return The comment data struct
+    function getComment(
+        bytes32 commentId
+    ) external view returns (CommentData memory) {
+        CommentData storage comment = comments[commentId];
+        require(comment.author != address(0), "Comment does not exist");
+        return comment;
+    }
+
+    /// @notice Updates the channel manager contract address (only owner)
+    /// @param _channelContract The new channel manager contract address
+    function updateChannelContract(
+        address _channelContract
+    ) external onlyOwner {
+        if (_channelContract == address(0)) revert ZeroAddress();
+        channelManager = ChannelManager(payable(_channelContract));
+    }
+
+    /// @notice Validates a signature against malleability
+    /// @dev Ensures signature follows EIP-2098 and has valid s value
+    /// @param signature The signature to validate
+    function _validateSignature(bytes memory signature) internal pure {
+        if (signature.length != 65) revert InvalidSignatureLength();
+
+        // Extract s value from signature
+        uint256 s;
+        assembly {
+            s := mload(add(signature, 0x40))
+        }
+
+        // Ensure s is in lower half of curve's order
+        if (
+            s >
+            0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0
+        ) {
+            revert InvalidSignatureS();
+        }
     }
 }

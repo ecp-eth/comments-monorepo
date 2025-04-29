@@ -1,0 +1,119 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetDeleteCommentHashParams
+
+# Type Alias: GetDeleteCommentHashParams
+
+```ts
+type GetDeleteCommentHashParams = {
+  appSigner: Hex;
+  author: Hex;
+  commentId: Hex;
+  commentsAddress?: Hex;
+  deadline: bigint;
+  nonce: bigint;
+  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "getDeleteCommentHash">>;
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:390](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L390)
+
+## Properties
+
+### appSigner
+
+```ts
+appSigner: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:402](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L402)
+
+The app signer
+
+***
+
+### author
+
+```ts
+author: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:398](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L398)
+
+The author of the comment
+
+***
+
+### commentId
+
+```ts
+commentId: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:394](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L394)
+
+The ID of the comment to delete
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:415](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L415)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### deadline
+
+```ts
+deadline: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:410](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L410)
+
+The deadline for the signature
+
+***
+
+### nonce
+
+```ts
+nonce: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:406](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L406)
+
+The nonce for the signature
+
+***
+
+### readContract()
+
+```ts
+readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "getDeleteCommentHash">>;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:416](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L416)
+
+#### Parameters
+
+##### parameters
+
+`ReadContractParameters`\<*typeof* [`CommentsV1Abi`](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx), `"getDeleteCommentHash"`\>
+
+#### Returns
+
+`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentsV1Abi`](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx), `"getDeleteCommentHash"`\>\>

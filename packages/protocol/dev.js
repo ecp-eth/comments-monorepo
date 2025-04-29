@@ -8,7 +8,7 @@ nodeProcess.stdout.on("data", (data) => {
 
   if (data.includes("Listening on 0.0.0.0:8545")) {
     const devProcess = exec(
-      "forge script script/Dev.s.sol:DevScript --rpc-url http://localhost:8545 --broadcast",
+      "pnpm run deploy:dev",
       { cwd },
       (error, stdout, stderr) => {
         if (error) {
@@ -19,6 +19,14 @@ nodeProcess.stdout.on("data", (data) => {
         console.error(stderr);
       }
     );
+
+    devProcess.stdout.on("data", (data) => {
+      console.log(data.toString());
+    });
+
+    devProcess.stderr.on("data", (data) => {
+      console.error(data.toString());
+    });
 
     devProcess.on("exit", (code) => {
       if (code !== 0) {

@@ -1,9 +1,32 @@
+import { toHex } from "viem/utils";
+
 /**
  * The address of the CommentsV1 contract.
  * It is created using the CREATE2 opcode so should be identical across chains if no collisions occur.
  */
 export const COMMENTS_V1_ADDRESS =
-  "0xabD9cE1952992211dEe051Df6ed337fa6efC995d" as const;
+  "0x58ac49Af6E9Dd94d91884A586F11156E0550b382" as const;
+
+/**
+ * The address of the ChannelManager contract.
+ */
+export const CHANNEL_MANAGER_ADDRESS =
+  "0xcd4eb79B2eC867E737836c356eB0F446d02a004c" as const;
+
+/**
+ * The zero address.
+ */
+export const ZERO_ADDRESS = toHex(0, { size: 20 });
+
+/**
+ * The default channel ID for the CommentsV1 contract.
+ */
+export const DEFAULT_CHANNEL_ID = 0n;
+
+/**
+ * The default comment type for the CommentsV1 contract.
+ */
+export const DEFAULT_COMMENT_TYPE = "comment" as const;
 
 /**
  * The default `embedUri` for the CommentsEmbed component.
@@ -32,5 +55,4 @@ export const INDEXER_API_URL = "https://api.ethcomments.xyz";
  *
  * This is bytes32(0)
  */
-export const EMPTY_PARENT_ID =
-  "0x0000000000000000000000000000000000000000000000000000000000000000" as const;
+export const EMPTY_PARENT_ID = toHex(0, { size: 32 });

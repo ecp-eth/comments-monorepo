@@ -11,5 +11,18 @@
   "typeDeclarationVisibility": "verbose",
   "outputFileStrategy": "members",
   "entryFileName": "index.mdx",
-  "mergeReadme": true
+  "mergeReadme": true,
+  "entryPoints": [
+    "../packages/sdk/src/index.ts",
+    "../packages/sdk/src/core/index.ts",
+    "../packages/sdk/src/comments/index.ts",
+    "../packages/sdk/src/comments/react/index.ts",
+    "../packages/sdk/src/channel-manager/index.ts",
+    "../packages/sdk/src/channel-manager/react/index.ts",
+    "../packages/sdk/src/channel-manager/types.ts",
+    "../packages/sdk/src/embed/index.ts",
+    "../packages/sdk/src/indexer/index.ts"
+  ],
+  "out": "pages/sdk-reference",
+  "tsconfig": "../packages/sdk/tsconfig.json"
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { EmbedConfigSchema, HexSchema } from "@ecp.eth/sdk/schemas";
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
+import { EmbedConfigSchema } from "@ecp.eth/sdk/embed/schemas";
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { MAX_COMMENT_LENGTH } from "./constants";
 import { decompressFromURI } from "lz-ts";

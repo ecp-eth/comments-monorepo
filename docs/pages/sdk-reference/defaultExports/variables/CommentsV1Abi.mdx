@@ -8,7 +8,11 @@
 
 ```ts
 const CommentsV1Abi: readonly [{
-  inputs: readonly [];
+  inputs: readonly [{
+     internalType: "address";
+     name: "initialOwner";
+     type: "address";
+  }];
   stateMutability: "nonpayable";
   type: "constructor";
 }, {
@@ -23,7 +27,7 @@ const CommentsV1Abi: readonly [{
   type: "function";
 }, {
   inputs: readonly [];
-  name: "COMMENT_TYPEHASH";
+  name: "ADD_COMMENT_TYPEHASH";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
@@ -98,6 +102,66 @@ const CommentsV1Abi: readonly [{
   stateMutability: "nonpayable";
   type: "function";
 }, {
+  inputs: readonly [];
+  name: "channelManager";
+  outputs: readonly [{
+     internalType: "contract IChannelManager";
+     name: "";
+     type: "address";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  name: "comments";
+  outputs: readonly [{
+     internalType: "address";
+     name: "author";
+     type: "address";
+   }, {
+     internalType: "address";
+     name: "appSigner";
+     type: "address";
+   }, {
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+   }, {
+     internalType: "uint256";
+     name: "nonce";
+     type: "uint256";
+   }, {
+     internalType: "uint256";
+     name: "deadline";
+     type: "uint256";
+   }, {
+     internalType: "bytes32";
+     name: "parentId";
+     type: "bytes32";
+   }, {
+     internalType: "string";
+     name: "content";
+     type: "string";
+   }, {
+     internalType: "string";
+     name: "metadata";
+     type: "string";
+   }, {
+     internalType: "string";
+     name: "targetUri";
+     type: "string";
+   }, {
+     internalType: "string";
+     name: "commentType";
+     type: "string";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
   inputs: readonly [{
      internalType: "bytes32";
      name: "commentId";
@@ -143,6 +207,20 @@ const CommentsV1Abi: readonly [{
   type: "function";
 }, {
   inputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  name: "deleted";
+  outputs: readonly [{
+     internalType: "bool";
+     name: "";
+     type: "bool";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
      internalType: "address";
      name: "author";
      type: "address";
@@ -169,7 +247,37 @@ const CommentsV1Abi: readonly [{
   type: "function";
 }, {
   inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "getComment";
+  outputs: readonly [{
      components: readonly [{
+        internalType: "address";
+        name: "author";
+        type: "address";
+      }, {
+        internalType: "address";
+        name: "appSigner";
+        type: "address";
+      }, {
+        internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "uint256";
+        name: "nonce";
+        type: "uint256";
+      }, {
+        internalType: "uint256";
+        name: "deadline";
+        type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
         internalType: "string";
         name: "content";
         type: "string";
@@ -182,10 +290,19 @@ const CommentsV1Abi: readonly [{
         name: "targetUri";
         type: "string";
       }, {
-        internalType: "bytes32";
-        name: "parentId";
-        type: "bytes32";
-      }, {
+        internalType: "string";
+        name: "commentType";
+        type: "string";
+     }];
+     internalType: "struct ICommentTypes.CommentData";
+     name: "";
+     type: "tuple";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     components: readonly [{
         internalType: "address";
         name: "author";
         type: "address";
@@ -195,14 +312,38 @@ const CommentsV1Abi: readonly [{
         type: "address";
       }, {
         internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "uint256";
         name: "nonce";
         type: "uint256";
       }, {
         internalType: "uint256";
         name: "deadline";
         type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
+        internalType: "string";
+        name: "content";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "metadata";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "targetUri";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "commentType";
+        type: "string";
      }];
-     internalType: "struct CommentsV1.CommentData";
+     internalType: "struct ICommentTypes.CommentData";
      name: "commentData";
      type: "tuple";
   }];
@@ -317,8 +458,52 @@ const CommentsV1Abi: readonly [{
   stateMutability: "view";
   type: "function";
 }, {
+  inputs: readonly [];
+  name: "owner";
+  outputs: readonly [{
+     internalType: "address";
+     name: "";
+     type: "address";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [];
+  name: "paused";
+  outputs: readonly [{
+     internalType: "bool";
+     name: "";
+     type: "bool";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
   inputs: readonly [{
      components: readonly [{
+        internalType: "address";
+        name: "author";
+        type: "address";
+      }, {
+        internalType: "address";
+        name: "appSigner";
+        type: "address";
+      }, {
+        internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "uint256";
+        name: "nonce";
+        type: "uint256";
+      }, {
+        internalType: "uint256";
+        name: "deadline";
+        type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
         internalType: "string";
         name: "content";
         type: "string";
@@ -331,27 +516,11 @@ const CommentsV1Abi: readonly [{
         name: "targetUri";
         type: "string";
       }, {
-        internalType: "bytes32";
-        name: "parentId";
-        type: "bytes32";
-      }, {
-        internalType: "address";
-        name: "author";
-        type: "address";
-      }, {
-        internalType: "address";
-        name: "appSigner";
-        type: "address";
-      }, {
-        internalType: "uint256";
-        name: "nonce";
-        type: "uint256";
-      }, {
-        internalType: "uint256";
-        name: "deadline";
-        type: "uint256";
+        internalType: "string";
+        name: "commentType";
+        type: "string";
      }];
-     internalType: "struct CommentsV1.CommentData";
+     internalType: "struct ICommentTypes.CommentData";
      name: "commentData";
      type: "tuple";
    }, {
@@ -365,11 +534,35 @@ const CommentsV1Abi: readonly [{
   }];
   name: "postComment";
   outputs: readonly [];
-  stateMutability: "nonpayable";
+  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [{
      components: readonly [{
+        internalType: "address";
+        name: "author";
+        type: "address";
+      }, {
+        internalType: "address";
+        name: "appSigner";
+        type: "address";
+      }, {
+        internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "uint256";
+        name: "nonce";
+        type: "uint256";
+      }, {
+        internalType: "uint256";
+        name: "deadline";
+        type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
         internalType: "string";
         name: "content";
         type: "string";
@@ -382,27 +575,11 @@ const CommentsV1Abi: readonly [{
         name: "targetUri";
         type: "string";
       }, {
-        internalType: "bytes32";
-        name: "parentId";
-        type: "bytes32";
-      }, {
-        internalType: "address";
-        name: "author";
-        type: "address";
-      }, {
-        internalType: "address";
-        name: "appSigner";
-        type: "address";
-      }, {
-        internalType: "uint256";
-        name: "nonce";
-        type: "uint256";
-      }, {
-        internalType: "uint256";
-        name: "deadline";
-        type: "uint256";
+        internalType: "string";
+        name: "commentType";
+        type: "string";
      }];
-     internalType: "struct CommentsV1.CommentData";
+     internalType: "struct ICommentTypes.CommentData";
      name: "commentData";
      type: "tuple";
    }, {
@@ -412,7 +589,7 @@ const CommentsV1Abi: readonly [{
   }];
   name: "postCommentAsAuthor";
   outputs: readonly [];
-  stateMutability: "nonpayable";
+  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -441,12 +618,38 @@ const CommentsV1Abi: readonly [{
   stateMutability: "nonpayable";
   type: "function";
 }, {
+  inputs: readonly [];
+  name: "renounceOwnership";
+  outputs: readonly [];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
   inputs: readonly [{
      internalType: "address";
      name: "appSigner";
      type: "address";
   }];
-  name: "removeApprovalAsAuthor";
+  name: "revokeApprovalAsAuthor";
+  outputs: readonly [];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "newOwner";
+     type: "address";
+  }];
+  name: "transferOwnership";
+  outputs: readonly [];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "_channelContract";
+     type: "address";
+  }];
+  name: "updateChannelContract";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -509,6 +712,30 @@ const CommentsV1Abi: readonly [{
      type: "address";
    }, {
      components: readonly [{
+        internalType: "address";
+        name: "author";
+        type: "address";
+      }, {
+        internalType: "address";
+        name: "appSigner";
+        type: "address";
+      }, {
+        internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "uint256";
+        name: "nonce";
+        type: "uint256";
+      }, {
+        internalType: "uint256";
+        name: "deadline";
+        type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
         internalType: "string";
         name: "content";
         type: "string";
@@ -521,28 +748,12 @@ const CommentsV1Abi: readonly [{
         name: "targetUri";
         type: "string";
       }, {
-        internalType: "bytes32";
-        name: "parentId";
-        type: "bytes32";
-      }, {
-        internalType: "address";
-        name: "author";
-        type: "address";
-      }, {
-        internalType: "address";
-        name: "appSigner";
-        type: "address";
-      }, {
-        internalType: "uint256";
-        name: "nonce";
-        type: "uint256";
-      }, {
-        internalType: "uint256";
-        name: "deadline";
-        type: "uint256";
+        internalType: "string";
+        name: "commentType";
+        type: "string";
      }];
      indexed: false;
-     internalType: "struct CommentsV1.CommentData";
+     internalType: "struct ICommentTypes.CommentData";
      name: "commentData";
      type: "tuple";
   }];
@@ -564,8 +775,55 @@ const CommentsV1Abi: readonly [{
   name: "CommentDeleted";
   type: "event";
 }, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "address";
+     name: "previousOwner";
+     type: "address";
+   }, {
+     indexed: true;
+     internalType: "address";
+     name: "newOwner";
+     type: "address";
+  }];
+  name: "OwnershipTransferred";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: false;
+     internalType: "address";
+     name: "account";
+     type: "address";
+  }];
+  name: "Paused";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: false;
+     internalType: "address";
+     name: "account";
+     type: "address";
+  }];
+  name: "Unpaused";
+  type: "event";
+}, {
   inputs: readonly [];
-  name: "DeadlineReached";
+  name: "ChannelDoesNotExist";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "ChannelHookExecutionFailed";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "EnforcedPause";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "ExpectedPause";
   type: "error";
 }, {
   inputs: readonly [];
@@ -573,19 +831,99 @@ const CommentsV1Abi: readonly [{
   type: "error";
 }, {
   inputs: readonly [];
-  name: "InvalidAuthor";
+  name: "InvalidAuthorAddress";
   type: "error";
 }, {
   inputs: readonly [];
   name: "InvalidAuthorSignature";
   type: "error";
 }, {
-  inputs: readonly [];
+  inputs: readonly [{
+     internalType: "string";
+     name: "message";
+     type: "string";
+  }];
+  name: "InvalidCommentReference";
+  type: "error";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "author";
+     type: "address";
+   }, {
+     internalType: "address";
+     name: "appSigner";
+     type: "address";
+   }, {
+     internalType: "uint256";
+     name: "expected";
+     type: "uint256";
+   }, {
+     internalType: "uint256";
+     name: "provided";
+     type: "uint256";
+  }];
   name: "InvalidNonce";
   type: "error";
 }, {
   inputs: readonly [];
+  name: "InvalidSignatureLength";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "InvalidSignatureS";
+  type: "error";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "caller";
+     type: "address";
+   }, {
+     internalType: "address";
+     name: "requiredCaller";
+     type: "address";
+  }];
   name: "NotAuthorized";
+  type: "error";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "owner";
+     type: "address";
+  }];
+  name: "OwnableInvalidOwner";
+  type: "error";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "account";
+     type: "address";
+  }];
+  name: "OwnableUnauthorizedAccount";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "ParentCommentDoesNotExist";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "ReentrancyGuardReentrantCall";
+  type: "error";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
+     name: "deadline";
+     type: "uint256";
+   }, {
+     internalType: "uint256";
+     name: "currentTime";
+     type: "uint256";
+  }];
+  name: "SignatureDeadlineReached";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "ZeroAddress";
   type: "error";
 }];
 ```

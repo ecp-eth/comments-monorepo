@@ -1,0 +1,44 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetChannelManagerParams
+
+# Type Alias: GetChannelManagerParams
+
+```ts
+type GetChannelManagerParams = {
+  commentsContractAddress?: Hex;
+  readContract: ContractReadFunctions["channelManager"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:154](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L154)
+
+## Properties
+
+### commentsContractAddress?
+
+```ts
+optional commentsContractAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:159](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L159)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENTS_V1_ADDRESS
+```
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["channelManager"];
+```
+
+Defined in: [packages/sdk/src/comments/contract.ts:160](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/contract.ts#L160)

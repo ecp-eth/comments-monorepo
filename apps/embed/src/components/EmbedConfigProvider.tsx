@@ -1,10 +1,10 @@
 "use client";
 
+import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import {
   EmbedConfigSchema,
-  EmbedConfigSchemaOutputType,
-  Hex,
-} from "@ecp.eth/sdk/schemas";
+  type EmbedConfigSchemaOutputType,
+} from "@ecp.eth/sdk/embed/schemas";
 import { createContext, useContext } from "react";
 import { zeroAddress } from "viem";
 

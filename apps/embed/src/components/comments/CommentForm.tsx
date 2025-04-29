@@ -3,9 +3,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect, useRef, useState } from "react";
 import { waitForTransactionReceipt } from "@wagmi/core";
-import { useAccount, useConfig, useSwitchChain, useWriteContract } from "wagmi";
-import { CommentsV1Abi } from "@ecp.eth/sdk/abis";
-import { COMMENTS_V1_ADDRESS, fetchAuthorData } from "@ecp.eth/sdk";
+import { useAccount, useConfig, useSwitchChain } from "wagmi";
+import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import {
   useCommentSubmission,
   useConnectAccount,
@@ -15,7 +14,7 @@ import {
   EmbedConfigProviderByTargetURIConfig,
   useEmbedConfig,
 } from "../EmbedConfigProvider";
-import type { Hex } from "@ecp.eth/sdk/schemas";
+import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { cn } from "@/lib/utils";
 import {
   createCommentRepliesQueryKey,
@@ -32,6 +31,7 @@ import { publicEnv } from "@/publicEnv";
 import { CommentFormErrors } from "./CommentFormErrors";
 import { InvalidCommentError } from "./errors";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
+import { usePostCommentAsAuthor } from "@ecp.eth/sdk/comments/react";
 
 interface CommentFormProps {
   autoFocus?: boolean;
@@ -79,7 +79,7 @@ export function CommentForm({
   // auto focusing on top level comment box will cause unwanted scroll
   useTextAreaAutoFocus(textAreaRef, !!autoFocus);
 
-  const postCommentContract = useWriteContract();
+  const { mutateAsync: postCommentAsAuthor } = usePostCommentAsAuthor();
 
   const submitCommentMutation = useMutation({
     mutationFn: async (_formData: FormData): Promise<void> => {
@@ -105,13 +105,13 @@ export function CommentForm({
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        writeContractAsync({ signCommentResponse }) {
-          return postCommentContract.writeContractAsync({
-            abi: CommentsV1Abi,
-            address: COMMENTS_V1_ADDRESS,
-            functionName: "postCommentAsAuthor",
-            args: [signCommentResponse.data, signCommentResponse.signature],
+        async writeContractAsync({ signCommentResponse }) {
+          const { txHash } = await postCommentAsAuthor({
+            comment: signCommentResponse.data,
+            appSignature: signCommentResponse.signature,
           });
+
+          return txHash;
         },
       });
 

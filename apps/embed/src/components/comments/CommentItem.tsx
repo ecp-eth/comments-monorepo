@@ -3,7 +3,7 @@ import {
   type Comment as CommentType,
 } from "@ecp.eth/shared/schemas";
 import { CommentActionButton } from "./CommentActionButton";
-import { fetchCommentReplies } from "@ecp.eth/sdk";
+import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import { publicEnv } from "@/publicEnv";
 import { useInfiniteQuery } from "@tanstack/react-query";
