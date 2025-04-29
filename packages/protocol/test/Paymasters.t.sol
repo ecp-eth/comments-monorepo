@@ -240,6 +240,11 @@ contract PaymastersTest is Test, IERC721Receiver {
             entryPointContract.balanceOf(address(paymaster)),
             initialPaymasterBalance
         );
+
+        assertEq(
+            channelManager.getChannelOwner(channelId),
+            address(user1Account)
+        );
     }
 
     function onERC721Received(
