@@ -57,7 +57,8 @@ program
           );
 
           console.log(`created ${key} at (${proxyDir})`);
-        }
+        },
+        false
       );
 
       console.log(`Done processing ${pkg.name}`);
@@ -65,6 +66,40 @@ program
 
     console.log(
       `${chalk.green.bold("Done!")} Total generated proxy packages: ${results.length}.`
+    );
+  });
+
+program
+  .command("clean")
+  .description("Clean existing proxy packages")
+  .argument("<glob-pattern>", "The pattern to search for the package")
+  .action(async (pattern) => {
+    console.log("Cleaning proxy packages...");
+
+    const results = await everyPackage(pattern, async ({ pkg, path }) => {
+      const dir = nodePath.dirname(path);
+
+      console.log(`Cleaning ${pkg.name} at (${dir})`);
+
+      await everyExportWithCJSModule(
+        pkg,
+        async ({ key, cjsPath, typePath }) => {
+          const proxyDir = nodePath.resolve(dir, key);
+
+          if (nodeFs.existsSync(proxyDir)) {
+            nodeFs.rmdirSync(proxyDir, { recursive: true });
+          }
+
+          console.log(`cleaned ${key} at (${proxyDir})`);
+        },
+        false
+      );
+
+      console.log(`Done processing ${pkg.name}`);
+    });
+
+    console.log(
+      `${chalk.green.bold("Done!")} Total cleaned proxy packages: ${results.length}.`
     );
   });
 
@@ -87,51 +122,55 @@ program
 
       console.log(`Start processing ${pkg.name} at (${dir})`);
 
-      await everyExportWithCJSModule(pkg, async ({ key }) => {
-        const proxyDir = nodePath.resolve(dir, key);
-        const relativePath = nodePath.relative(projectRoot, proxyDir);
+      await everyExportWithCJSModule(
+        pkg,
+        async ({ key }) => {
+          const proxyDir = nodePath.resolve(dir, key);
+          const relativePath = nodePath.relative(projectRoot, proxyDir);
 
-        // Check and update .gitignore
-        const gitignorePath = nodePath.join(projectRoot, ".gitignore");
-        if (!nodeFs.existsSync(gitignorePath)) {
-          nodeFs.writeFileSync(gitignorePath, "");
-        }
+          // Check and update .gitignore
+          const gitignorePath = nodePath.join(projectRoot, ".gitignore");
+          if (!nodeFs.existsSync(gitignorePath)) {
+            nodeFs.writeFileSync(gitignorePath, "");
+          }
 
-        const gitignoreContent = nodeFs.readFileSync(gitignorePath, "utf-8");
+          const gitignoreContent = nodeFs.readFileSync(gitignorePath, "utf-8");
 
-        if (!gitignoreContent.includes(relativePath)) {
-          nodeFs.appendFileSync(gitignorePath, `\n${relativePath}`);
-          console.log(`Added ${relativePath} to .gitignore`);
-        }
+          if (!gitignoreContent.includes(relativePath)) {
+            nodeFs.appendFileSync(gitignorePath, `\n${relativePath}`);
+            console.log(`Added ${relativePath} to .gitignore`);
+          }
 
-        // Check and update VS Code settings
-        const vscodeSettingsPath = nodePath.join(
-          projectRoot,
-          ".vscode/settings.json"
-        );
-        let settings: { "files.exclude"?: Record<string, unknown> } = {};
-
-        if (nodeFs.existsSync(vscodeSettingsPath)) {
-          settings = JSON.parse(
-            nodeFs.readFileSync(vscodeSettingsPath, "utf-8")
+          // Check and update VS Code settings
+          const vscodeSettingsPath = nodePath.join(
+            projectRoot,
+            ".vscode/settings.json"
           );
-        } else {
-          nodeFs.mkdirSync(nodePath.dirname(vscodeSettingsPath), {
-            recursive: true,
-          });
-        }
+          let settings: { "files.exclude"?: Record<string, unknown> } = {};
 
-        settings["files.exclude"] ??= {};
+          if (nodeFs.existsSync(vscodeSettingsPath)) {
+            settings = JSON.parse(
+              nodeFs.readFileSync(vscodeSettingsPath, "utf-8")
+            );
+          } else {
+            nodeFs.mkdirSync(nodePath.dirname(vscodeSettingsPath), {
+              recursive: true,
+            });
+          }
 
-        if (!settings["files.exclude"][relativePath]) {
-          settings["files.exclude"][relativePath] = true;
-          nodeFs.writeFileSync(
-            vscodeSettingsPath,
-            JSON.stringify(settings, null, 2)
-          );
-          console.log(`Added ${relativePath} to VS Code files.exclude`);
-        }
-      });
+          settings["files.exclude"] ??= {};
+
+          if (!settings["files.exclude"][relativePath]) {
+            settings["files.exclude"][relativePath] = true;
+            nodeFs.writeFileSync(
+              vscodeSettingsPath,
+              JSON.stringify(settings, null, 2)
+            );
+            console.log(`Added ${relativePath} to VS Code files.exclude`);
+          }
+        },
+        true
+      );
 
       console.log(`Done processing ${pkg.name}`);
     });
