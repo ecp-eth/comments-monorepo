@@ -170,7 +170,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             );
             if (!hookSuccess)
                 revert ChannelHookExecutionFailed(
-                    IChannelManager.HookPhase.Before
+                    Hooks.HookPhase.BeforeComment
                 );
 
             // Store comment data on-chain
@@ -185,9 +185,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                 Hooks.HookPhase.AfterComment
             );
             if (!hookSuccess)
-                revert ChannelHookExecutionFailed(
-                    IChannelManager.HookPhase.After
-                );
+                revert ChannelHookExecutionFailed(Hooks.HookPhase.AfterComment);
 
             emit CommentAdded(
                 commentId,
@@ -283,7 +281,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             commentId,
             Hooks.HookPhase.BeforeDeleteComment
         );
-        if (!hookSuccess) revert ChannelHookExecutionFailed();
+        if (!hookSuccess)
+            revert ChannelHookExecutionFailed(
+                Hooks.HookPhase.BeforeDeleteComment
+            );
 
         // Store comment data for after hook
         Comments.CommentData memory commentToDelete = comment;
@@ -300,7 +301,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             commentId,
             Hooks.HookPhase.AfterDeleteComment
         );
-        if (!hookSuccess) revert ChannelHookExecutionFailed();
+        if (!hookSuccess)
+            revert ChannelHookExecutionFailed(
+                Hooks.HookPhase.AfterDeleteComment
+            );
 
         emit CommentDeleted(commentId, author);
     }

@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "../libraries/Comments.sol";
+import "../libraries/Hooks.sol";
 
 /// @title ICommentManager - Interface for the Comments contract
 /// @notice This interface defines the functions and events for the Comments contract
@@ -53,7 +54,7 @@ interface ICommentManager {
     /// @notice Error thrown when channel does not exist
     error ChannelDoesNotExist();
     /// @notice Error thrown when channel hook execution fails
-    error ChannelHookExecutionFailed();
+    error ChannelHookExecutionFailed(Hooks.HookPhase hookPhase);
     /// @notice Error thrown when signature length is invalid
     error InvalidSignatureLength();
     /// @notice Error thrown when signature s value is invalid
@@ -198,7 +199,5 @@ interface ICommentManager {
 
     /// @notice Updates the channel manager contract address (only owner)
     /// @param _channelContract The new channel manager contract address
-    function updateChannelContract(
-        address _channelContract
-    ) external;
+    function updateChannelContract(address _channelContract) external;
 }
