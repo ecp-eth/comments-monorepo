@@ -45,12 +45,15 @@ If you want the iframe to automatically adjust its height based on content, add 
 ```html
 <script>
   window.addEventListener("message", function (event) {
-    if (event.origin === "https://embed.ethcomments.xyz") {
-      if (event.data.type === "@ecp.eth/sdk/embed/resize") {
-        document.getElementById("comments-iframe").style.height =
-          event.data.height + "px";
-      }
+    if (
+      event.origin !== "https://embed.ethcomments.xyz" ||
+      event.data.type !== "@ecp.eth/sdk/embed/resize"
+    ) {
+      return;
     }
+
+    document.getElementById("comments-iframe").style.height =
+      event.data.height + "px";
   });
 </script>
 ```

@@ -1,207 +1,25 @@
 import * as React from "react";
 import {
-  CommentsEmbed,
-  CommentsByAuthorEmbed,
-  createCommentsEmbedURL,
   type EmbedConfigSchemaInputType,
   EmbedConfigSupportedFont,
 } from "@ecp.eth/sdk/embed";
 import { useDebounce } from "use-debounce";
 import { type Hex } from "@ecp.eth/sdk/core";
-import { publicEnv } from "../publicEnv";
-import { Info } from "lucide-react";
-
-const DEFAULT_CONFIG: EmbedConfigSchemaInputType = {
-  theme: {
-    colors: {
-      light: {
-        background: "#ffffff",
-        foreground: "#0a0a0a",
-        "account-edit-link": "#3b82f6",
-        primary: "#171717",
-        "primary-foreground": "#fafafa",
-        secondary: "#f5f5f5",
-        "secondary-foreground": "#171717",
-        destructive: "#ef4444",
-        "destructive-foreground": "#fafafa",
-        "muted-foreground": "#737373",
-        ring: "#0a0a0a",
-        border: "#e5e5e5",
-        "border-focus": "#0a0a0a",
-      },
-      dark: {
-        background: "#0a0a0a",
-        foreground: "#fafafa",
-        "account-edit-link": "#3b82f6",
-        primary: "#fafafa",
-        "primary-foreground": "#171717",
-        secondary: "#262626",
-        "secondary-foreground": "#fafafa",
-        destructive: "#ef4444",
-        "destructive-foreground": "#fafafa",
-        "muted-foreground": "#a3a3a3",
-        ring: "#d4d4d4",
-        border: "#262626",
-        "border-focus": "#d4d4d4",
-      },
-    },
-    font: {
-      fontFamily: {
-        system: "Geist, Arial, Helvetica, sans-serif",
-      },
-      sizes: {
-        base: {
-          size: "1rem",
-          lineHeight: "1.5",
-        },
-        "error-screen-title": {
-          size: "1.5rem",
-          lineHeight: "1.2",
-        },
-        "empty-screen-title": {
-          size: "1.5rem",
-          lineHeight: "1.2",
-        },
-        headline: {
-          size: "1.25rem",
-          lineHeight: "1.2",
-        },
-        xs: {
-          size: "0.75rem",
-          lineHeight: "1",
-        },
-        sm: {
-          size: "0.875rem",
-          lineHeight: "1.25",
-        },
-      },
-    },
-    other: {
-      radius: "0.5rem",
-      "root-padding-vertical": "0",
-      "root-padding-horizontal": "0",
-    },
-  },
-};
-
-const COLOR_FIELDS = [
-  {
-    key: "background",
-    label: "Background",
-    help: "The main background color of the comments section",
-  },
-  {
-    key: "foreground",
-    label: "Foreground",
-    help: "The main text color used throughout the comments section",
-  },
-  {
-    key: "account-edit-link",
-    label: "Account Edit Link",
-    help: "Color of the link to edit account settings",
-  },
-  {
-    key: "primary",
-    label: "Primary",
-    help: "The primary color used for main actions and important elements",
-  },
-  {
-    key: "primary-foreground",
-    label: "Primary Foreground",
-    help: "Text color used on primary colored elements",
-  },
-  {
-    key: "secondary",
-    label: "Secondary",
-    help: "The secondary color used for less prominent elements",
-  },
-  {
-    key: "secondary-foreground",
-    label: "Secondary Foreground",
-    help: "Text color used on secondary colored elements",
-  },
-  {
-    key: "destructive",
-    label: "Destructive",
-    help: "Color used for destructive actions like delete",
-  },
-  {
-    key: "destructive-foreground",
-    label: "Destructive Foreground",
-    help: "Text color used on destructive elements",
-  },
-  {
-    key: "muted-foreground",
-    label: "Muted Foreground",
-    help: "Color used for less prominent text",
-  },
-  {
-    key: "ring",
-    label: "Ring",
-    help: "Color of the focus ring around interactive elements",
-  },
-  { key: "border", label: "Border", help: "Color of borders between elements" },
-  {
-    key: "border-focus",
-    label: "Border Focus",
-    help: "Color of borders when elements are focused",
-  },
-] as const;
-
-const FONT_SIZE_FIELDS = [
-  {
-    key: "base",
-    label: "Base",
-    help: "The default font size used throughout the comments section. Value can be a number, percentage, px, rem, etc.",
-  },
-  {
-    key: "error-screen-title",
-    label: "Error Screen Title",
-    help: "Font size for error screen headings. Value can be a number, percentage, px, rem, etc.",
-  },
-  {
-    key: "empty-screen-title",
-    label: "Empty Screen Title",
-    help: "Font size for empty state headings. Value can be a number, percentage, px, rem, etc.",
-  },
-  {
-    key: "headline",
-    label: "Headline",
-    help: "Font size for section headlines. Value can be a number, percentage, px, rem, etc.",
-  },
-  {
-    key: "xs",
-    label: "Extra Small",
-    help: "Smallest font size used for very small text. Value can be a number, percentage, px, rem, etc.",
-  },
-  {
-    key: "sm",
-    label: "Small",
-    help: "Small font size used for secondary text. Value can be a number, percentage, px, rem, etc.",
-  },
-] as const;
-
-const OTHER_FIELDS = [
-  {
-    key: "radius",
-    label: "Border Radius",
-    help: "Border radius used for rounded corners. Value can be a number, percentage, px, rem, etc.",
-  },
-  {
-    key: "root-padding-vertical",
-    label: "Root Padding Vertical",
-    help: "Vertical padding around the entire comments section. Value can be a number, percentage, px, rem, etc.",
-  },
-  {
-    key: "root-padding-horizontal",
-    label: "Root Padding Horizontal",
-    help: "Horizontal padding around the entire comments section. Value can be a number, percentage, px, rem, etc.",
-  },
-] as const;
+import {
+  DEFAULT_CONFIG,
+  COLOR_FIELDS,
+  FONT_SIZE_FIELDS,
+  OTHER_FIELDS,
+} from "./constants";
+import LabelWithHelp from "./LabelWithHelp";
+import { publicEnv } from "../../publicEnv";
+import CommentsEmbedPreview from "./CommentsEmbedPreview";
+import GeneratedURL from "./GeneratedURL";
 
 export default function IframeConfigurator() {
   const [mode, setMode] = React.useState<"post" | "author">("post");
   const [showAdvanced, setShowAdvanced] = React.useState(false);
+  const [autoHeightAdjustment, setAutoHeightAdjustment] = React.useState(true);
   const [uri, setUri] = React.useState(
     "https://docs.ethcomments.xyz/integration-options/embed-comments"
   );
@@ -394,6 +212,26 @@ export default function IframeConfigurator() {
                 <option>Auto</option>
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                htmlFor="auto-height-adjust-select"
+              >
+                Auto Height Adjustment
+              </label>
+              <select
+                id="auto-height-adjust-select"
+                value={autoHeightAdjustment ? "enabled" : "disabled"}
+                onChange={(e) =>
+                  setAutoHeightAdjustment(e.target.value === "enabled")
+                }
+                className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
+              >
+                <option value="enabled">Enabled</option>
+                <option value="disabled">Disabled</option>
               </select>
             </div>
 
@@ -665,6 +503,7 @@ export default function IframeConfigurator() {
             config={debouncedConfig}
             embedUri={embedUri}
             source={mode === "post" ? { targetUri: uri } : { author }}
+            autoHeightAdjustment={autoHeightAdjustment}
           />
         </div>
 
@@ -677,162 +516,6 @@ export default function IframeConfigurator() {
           />
         </div>
       </>
-    </div>
-  );
-}
-
-function GeneratedURL({
-  embedUri,
-  config,
-  source,
-}: {
-  embedUri: string | undefined;
-  config: EmbedConfigSchemaInputType;
-  source: { targetUri: string } | { author: Hex } | undefined;
-}) {
-  const [copied, setCopied] = React.useState(false);
-  const timeoutRef = React.useRef<any>(null);
-
-  if (typeof window === "undefined" || !embedUri || !source) {
-    return null;
-  }
-
-  try {
-    const url = createCommentsEmbedURL({
-      embedUri,
-      source,
-      config:
-        JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
-          ? config
-          : undefined,
-    });
-    const frameSrc = new URL(url).origin;
-    const snippet = `<iframe
-  src="${url}"
-  style="width: 100%; height: 600px; border: none;"
-  title="Comments"
-></iframe>`;
-
-    const copyToClipboard = () => {
-      navigator.clipboard.writeText(snippet);
-      setCopied(true);
-
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
-    };
-
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex gap-2 text-sm text-[var(--vocs-color_noteText)] p-2 border border-[var(--vocs-color_noteBorder)] bg-[var(--vocs-color_noteBackground)] rounded-[var(--vocs-borderRadius_4)]">
-          <Info className="mt-0.5 h-[1em] w-[1em]" />
-          <span>
-            Make sure to set the{" "}
-            <code className="vocs_Code">Content-Security-Policy</code> header
-            with <code className="vocs_Code">frame-src</code> allowing{" "}
-            <code className="vocs_Code">{frameSrc}</code>. See{" "}
-            <a
-              className="vocs_Anchor vocs_Link vocs_Link_accent"
-              href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/frame-src"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              CSP frame-src
-            </a>
-            .
-          </span>
-        </div>
-        <textarea
-          readOnly
-          value={snippet}
-          className="flex-1 p-2 border rounded cursor-pointer text-input-text bg-input border-input-border font-mono text-sm"
-          onClick={copyToClipboard}
-          rows={6}
-        />
-        <button
-          onClick={copyToClipboard}
-          className="px-4 py-2 border rounded block m-auto"
-          type="button"
-        >
-          <span className="block w-[7ch] truncate">
-            {copied ? "Copied!" : "Copy"}
-          </span>
-        </button>
-      </div>
-    );
-  } catch (e) {
-    return (
-      <div className="flex flex-col gap-2">
-        <span className="text-red-500">Could not create an embed URL.</span>
-        <pre className="font-mono w-full">{String(e)}</pre>
-      </div>
-    );
-  }
-}
-
-function CommentsEmbedPreview({
-  embedUri,
-  source,
-  config,
-}: {
-  embedUri: string | undefined;
-  config: EmbedConfigSchemaInputType;
-  source: { targetUri: string } | { author: Hex };
-}) {
-  if (typeof window === "undefined" || !embedUri) {
-    return null;
-  }
-
-  try {
-    // this just validates the config
-    createCommentsEmbedURL({
-      embedUri,
-      source,
-      config:
-        JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
-          ? config
-          : undefined,
-    });
-
-    return "targetUri" in source ? (
-      <CommentsEmbed
-        uri={source.targetUri}
-        embedUri={embedUri}
-        theme={config.theme}
-        disablePromotion={config.disablePromotion}
-      />
-    ) : (
-      <CommentsByAuthorEmbed
-        author={source.author}
-        embedUri={embedUri}
-        theme={config.theme}
-        disablePromotion={config.disablePromotion}
-      />
-    );
-  } catch (e) {
-    return (
-      <div className="flex flex-col gap-2">
-        <span className="text-red-500">Could not create show a preview</span>
-        <pre className="font-mono w-full">{String(e)}</pre>
-      </div>
-    );
-  }
-}
-
-function LabelWithHelp({
-  label,
-  help,
-  htmlFor,
-}: {
-  htmlFor: string;
-  label: string;
-  help: string;
-}) {
-  return (
-    <div className="flex items-center gap-1" title={help}>
-      <label className="text-sm font-medium" htmlFor={htmlFor}>
-        {label}
-      </label>
-      <Info className="w-3 h-3 text-muted-foreground" />
     </div>
   );
 }
