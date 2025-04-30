@@ -31,7 +31,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className="antialiased bg-background">
+      <body className="antialiased">
         {children}
         <WatchDocumentResize />
         <ApplyCSSSelectorTags />
