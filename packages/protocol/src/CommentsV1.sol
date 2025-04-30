@@ -78,7 +78,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
     /// @notice Error thrown when channel does not exist
     error ChannelDoesNotExist();
     /// @notice Error thrown when channel hook execution fails
-    error ChannelHookExecutionFailed();
+    error ChannelHookExecutionFailed(IChannelManager.HookPhase hookPhase);
     /// @notice Error thrown when signature length is invalid
     error InvalidSignatureLength();
     /// @notice Error thrown when signature s value is invalid
@@ -250,7 +250,10 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
                 commentId,
                 IChannelManager.HookPhase.Before
             );
-            if (!hookSuccess) revert ChannelHookExecutionFailed();
+            if (!hookSuccess)
+                revert ChannelHookExecutionFailed(
+                    IChannelManager.HookPhase.Before
+                );
 
             // Store comment data on-chain
             comments[commentId] = commentData;
@@ -263,7 +266,10 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
                 commentId,
                 IChannelManager.HookPhase.After
             );
-            if (!hookSuccess) revert ChannelHookExecutionFailed();
+            if (!hookSuccess)
+                revert ChannelHookExecutionFailed(
+                    IChannelManager.HookPhase.After
+                );
 
             emit CommentAdded(
                 commentId,
