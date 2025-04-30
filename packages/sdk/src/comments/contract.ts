@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { COMMENTS_V1_ADDRESS } from "../constants.js";
+import { COMMENT_MANAGER_ADDRESS } from "../constants.js";
 import { type Hex, HexSchema } from "../core/schemas.js";
-import { CommentsV1Abi } from "../abis.js";
+import { CommentManagerAbi } from "../abis.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 
 export type UpdateChannelContractParams = {
@@ -11,7 +11,7 @@ export type UpdateChannelContractParams = {
   channelContract: Hex;
   /**
    * The address of the comments contract
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsContractAddress?: Hex;
   writeContract: ContractWriteFunctions["updateChannelContract"];
@@ -23,7 +23,7 @@ export type UpdateChannelContractResult = {
 
 const UpdateChannelContractParamsSchema = z.object({
   channelContract: HexSchema,
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsContractAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
 /**
@@ -40,7 +40,7 @@ export async function updateChannelContract(
 
   const txHash = await params.writeContract({
     address: commentsContractAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "updateChannelContract",
     args: [channelContract],
   });
@@ -53,14 +53,14 @@ export async function updateChannelContract(
 export type GetContractNameParams = {
   /**
    * The address of the comments contract
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsContractAddress?: Hex;
   readContract: ContractReadFunctions["name"];
 };
 
 const GetContractNameParamsSchema = z.object({
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsContractAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
 /**
@@ -76,7 +76,7 @@ export async function getContractName(
 
   const name = await params.readContract({
     address: commentsContractAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "name",
   });
 
@@ -86,14 +86,14 @@ export async function getContractName(
 export type GetContractVersionParams = {
   /**
    * The address of the comments contract
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsContractAddress?: Hex;
   readContract: ContractReadFunctions["version"];
 };
 
 const GetContractVersionParamsSchema = z.object({
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsContractAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
 /**
@@ -110,7 +110,7 @@ export async function getContractVersion(
 
   const version = await params.readContract({
     address: commentsContractAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "version",
   });
 
@@ -120,14 +120,14 @@ export async function getContractVersion(
 export type GetDomainSeparatorParams = {
   /**
    * The address of the comments contract
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsContractAddress?: Hex;
   readContract: ContractReadFunctions["DOMAIN_SEPARATOR"];
 };
 
 const GetDomainSeparatorParamsSchema = z.object({
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsContractAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
 /**
@@ -144,7 +144,7 @@ export async function getDomainSeparator(
 
   const domainSeparator = await params.readContract({
     address: commentsContractAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "DOMAIN_SEPARATOR",
   });
 
@@ -154,14 +154,14 @@ export async function getDomainSeparator(
 export type GetChannelManagerParams = {
   /**
    * The address of the comments contract
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsContractAddress?: Hex;
   readContract: ContractReadFunctions["channelManager"];
 };
 
 const GetChannelManagerParamsSchema = z.object({
-  commentsContractAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsContractAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
 /**
@@ -178,7 +178,7 @@ export async function getChannelManager(
 
   const channelManager = await params.readContract({
     address: commentsContractAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "channelManager",
   });
 

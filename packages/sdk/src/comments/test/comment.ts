@@ -23,7 +23,7 @@ import {
   createCommentData,
 } from "../comment.js";
 import { addApprovalAsAuthor, revokeApprovalAsAuthor } from "../approval.js";
-import { CommentsV1Abi } from "../../abis.js";
+import { CommentManagerAbi } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
 import type { CommentData } from "../types.js";
@@ -273,7 +273,7 @@ describe("getComment()", () => {
     });
 
     const logs = parseEventLogs({
-      abi: CommentsV1Abi,
+      abi: CommentManagerAbi,
       logs: receipt.logs,
       eventName: "CommentAdded",
     });
@@ -361,7 +361,7 @@ describe("deleteCommentAsAuthor()", () => {
     });
 
     const logs = parseEventLogs({
-      abi: CommentsV1Abi,
+      abi: CommentManagerAbi,
       logs: receipt.logs,
       eventName: "CommentAdded",
     });
@@ -434,7 +434,7 @@ describe("deleteComment()", () => {
     });
 
     const logs = parseEventLogs({
-      abi: CommentsV1Abi,
+      abi: CommentManagerAbi,
       logs: receipt.logs,
       eventName: "CommentAdded",
     });

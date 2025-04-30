@@ -1,10 +1,10 @@
 import { toHex } from "viem/utils";
 
 /**
- * The address of the CommentsV1 contract.
+ * The address of the CommentManager contract.
  * It is created using the CREATE2 opcode so should be identical across chains if no collisions occur.
  */
-export const COMMENTS_V1_ADDRESS =
+export const COMMENT_MANAGER_ADDRESS =
   "0x58ac49Af6E9Dd94d91884A586F11156E0550b382" as const;
 
 /**

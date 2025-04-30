@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { COMMENTS_V1_ADDRESS } from "../constants.js";
+import { COMMENT_MANAGER_ADDRESS } from "../constants.js";
 import { type Hex, HexSchema } from "../core/schemas.js";
-import { CommentsV1Abi } from "../abis.js";
+import { CommentManagerAbi } from "../abis.js";
 import type { ReadContractParameters, ReadContractReturnType } from "viem";
 import type {
-  CommentsV1AbiType,
+  CommentManagerAbiType,
   ContractReadFunctions,
   ContractWriteFunctions,
 } from "./types.js";
@@ -32,7 +32,7 @@ export type IsApprovedParams = {
   appSigner: Hex;
   /**
    * The address of the comments contract
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
   readContract: ContractReadFunctions["isApproved"];
@@ -41,7 +41,7 @@ export type IsApprovedParams = {
 const IsApprovedParamsSchema = z.object({
   author: HexSchema,
   appSigner: HexSchema,
-  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
 /**
@@ -56,7 +56,7 @@ export async function isApproved(params: IsApprovedParams): Promise<boolean> {
 
   const approved = await params.readContract({
     address: commentsAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "isApproved",
     args: [author, appSigner],
   });
@@ -72,7 +72,7 @@ export type AddApprovalAsAuthorParams = {
   /**
    * The address of the comments contract
    *
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
   writeContract: ContractWriteFunctions["addApprovalAsAuthor"];
@@ -84,7 +84,7 @@ export type AddApprovalAsAuthorResult = {
 
 const AddApprovalAsAuthorParamsSchema = z.object({
   appSigner: HexSchema,
-  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["addApprovalAsAuthor"]>(
     () => true
   ),
@@ -105,7 +105,7 @@ export async function addApprovalAsAuthor(
 
   const txHash = await writeContract({
     address: commentsAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "addApprovalAsAuthor",
     args: [appSigner],
   });
@@ -129,7 +129,7 @@ export type AddApprovalParams = {
   /**
    * The address of the comments contract
    *
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
   writeContract: ContractWriteFunctions["addApproval"];
@@ -142,7 +142,7 @@ export type AddApprovalResult = {
 const AddApprovalParamsSchema = z.object({
   typedData: AddApprovalTypedDataSchema,
   signature: HexSchema,
-  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["addApproval"]>(() => true),
 });
 
@@ -160,7 +160,7 @@ export async function addApproval(
 
   const txHash = await writeContract({
     address: commentsAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "addApproval",
     args: [
       typedData.message.author,
@@ -184,7 +184,7 @@ export type RevokeApprovalAsAuthorParams = {
   /**
    * The address of the comments contract
    *
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
   writeContract: ContractWriteFunctions["revokeApprovalAsAuthor"];
@@ -196,7 +196,7 @@ export type RevokeApprovalAsAuthorResult = {
 
 const RevokeApprovalAsAuthorParamsSchema = z.object({
   appSigner: HexSchema,
-  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["revokeApprovalAsAuthor"]>(
     () => true
   ),
@@ -217,7 +217,7 @@ export async function revokeApprovalAsAuthor(
 
   const txHash = await writeContract({
     address: commentsAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "revokeApprovalAsAuthor",
     args: [appSigner],
   });
@@ -241,7 +241,7 @@ export type RevokeApprovalParams = {
   /**
    * The address of the comments contract
    *
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
   writeContract: ContractWriteFunctions["removeApproval"];
@@ -254,7 +254,7 @@ export type RevokeApprovalResult = {
 const RevokeApprovalParamsSchema = z.object({
   typedData: RemoveApprovalTypedDataSchema,
   signature: HexSchema,
-  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["removeApproval"]>(() => true),
 });
 
@@ -274,7 +274,7 @@ export async function revokeApproval(
 
   const txHash = await writeContract({
     address: commentsAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "removeApproval",
     args: [
       typedData.message.author,
@@ -291,8 +291,13 @@ export async function revokeApproval(
 }
 
 export type ReadAddApprovalHashFromContractFunction = (
-  parameters: ReadContractParameters<CommentsV1AbiType, "getAddApprovalHash">
-) => Promise<ReadContractReturnType<CommentsV1AbiType, "getAddApprovalHash">>;
+  parameters: ReadContractParameters<
+    CommentManagerAbiType,
+    "getAddApprovalHash"
+  >
+) => Promise<
+  ReadContractReturnType<CommentManagerAbiType, "getAddApprovalHash">
+>;
 
 export type GetAddApprovalHashParams = {
   /**
@@ -316,7 +321,7 @@ export type GetAddApprovalHashParams = {
   /**
    * The address of the comments contract
    *
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
   readContract: ReadAddApprovalHashFromContractFunction;
@@ -339,7 +344,7 @@ const GetAddApprovalHashParamsSchema = z.object({
   appSigner: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint().optional(),
-  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
 /**
@@ -362,7 +367,7 @@ export async function getAddApprovalHash(
 
   const hash = await params.readContract({
     address: commentsAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "getAddApprovalHash",
     args: [author, appSigner, nonce, computedDeadline],
   });
@@ -379,9 +384,12 @@ export async function getAddApprovalHash(
 }
 
 export type ReadRemoveApprovalHashFromContractFunction = (
-  parameters: ReadContractParameters<CommentsV1AbiType, "getRemoveApprovalHash">
+  parameters: ReadContractParameters<
+    CommentManagerAbiType,
+    "getRemoveApprovalHash"
+  >
 ) => Promise<
-  ReadContractReturnType<CommentsV1AbiType, "getRemoveApprovalHash">
+  ReadContractReturnType<CommentManagerAbiType, "getRemoveApprovalHash">
 >;
 
 export type GetRemoveApprovalHashParams = {
@@ -404,7 +412,7 @@ export type GetRemoveApprovalHashParams = {
   /**
    * The address of the comments contract
    *
-   * @default COMMENTS_V1_ADDRESS
+   * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
   readContract: ReadRemoveApprovalHashFromContractFunction;
@@ -419,7 +427,7 @@ const GetRemoveApprovalHashParamsSchema = z.object({
   appSigner: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint(),
-  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
 /**
@@ -436,7 +444,7 @@ export async function getRemoveApprovalHash(
 
   const hash = await params.readContract({
     address: commentsAddress,
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "getRemoveApprovalHash",
     args: [author, appSigner, nonce, deadline],
   });
@@ -475,7 +483,7 @@ const CreateApprovalTypedDataParamsSchema = z.object({
   chainId: z.number(),
   nonce: z.bigint(),
   deadline: z.bigint().optional(),
-  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
 /**
@@ -545,7 +553,7 @@ const CreateRemoveApprovalTypedDataParamsSchema = z.object({
   chainId: z.number(),
   nonce: z.bigint(),
   deadline: z.bigint().optional(),
-  commentsAddress: HexSchema.default(COMMENTS_V1_ADDRESS),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
 /**

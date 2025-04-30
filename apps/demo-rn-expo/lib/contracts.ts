@@ -1,4 +1,4 @@
-import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
+import { COMMENT_MANAGER_ADDRESS, CommentManagerAbi } from "@ecp.eth/sdk";
 import { CommentData } from "@ecp.eth/sdk/comments/types";
 import { Hex } from "viem";
 import { writeContract } from "@wagmi/core";
@@ -14,9 +14,9 @@ export const postCommentAsAuthorViaCommentsV1 = async ({
   commentData,
 }: PostCommentViaCommentsV1Params) => {
   return await writeContract(config, {
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "postCommentAsAuthor",
-    address: COMMENTS_V1_ADDRESS,
+    address: COMMENT_MANAGER_ADDRESS,
     args: [commentData, appSignature],
   });
 };
@@ -29,9 +29,9 @@ export const deleteCommentAsAuthorViaCommentsV1 = async ({
   commentId,
 }: DeleteCommentViaCommentsV1Params) => {
   return await writeContract(config, {
-    abi: CommentsV1Abi,
+    abi: CommentManagerAbi,
     functionName: "deleteCommentAsAuthor",
-    address: COMMENTS_V1_ADDRESS,
+    address: COMMENT_MANAGER_ADDRESS,
     args: [commentId],
   });
 };
