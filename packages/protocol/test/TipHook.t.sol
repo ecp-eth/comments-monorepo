@@ -3,9 +3,8 @@ pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
-import {IHook} from "../src/interfaces/IHook.sol";
-import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
+import {CommentManager} from "../src/CommentManager.sol";
+import {BaseHook} from "../src/hooks/BaseHook.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
@@ -13,6 +12,8 @@ import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {TestUtils} from "./utils.sol";
 import {LibString} from "solady/utils/LibString.sol";
+import {Hooks} from "../src/libraries/Hooks.sol";
+import {Comments} from "../src/libraries/Comments.sol";
 
 struct TipInfo {
     bool found;
@@ -21,7 +22,7 @@ struct TipInfo {
 
 /// @title TipHook - A hook for processing ETH tips in reply comments
 /// @notice This hook allows users to send ETH tips to comment authors by mentioning a tip amount in their reply
-contract TipHook is IHook, ERC165 {
+contract TipHook is BaseHook {
     using Strings for uint256;
     using TestUtils for string;
 
@@ -31,32 +32,32 @@ contract TipHook is IHook, ERC165 {
     error InvalidTipSyntax(string);
     error TipAmountMismatch();
 
-    // Reference to the CommentsV1 contract
-    CommentsV1 public immutable comments;
+    // Reference to the CommentManager contract
+    CommentManager public immutable comments;
 
     constructor(address _comments) {
-        comments = CommentsV1(_comments);
+        comments = CommentManager(_comments);
     }
 
-    /// @notice Checks if the contract implements the specified interface
-    /// @param interfaceId The interface identifier to check
-    /// @return True if the contract implements the interface
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(ERC165, IERC165) returns (bool) {
-        return
-            interfaceId == type(IHook).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
+        return Hooks.Permissions({
+            beforeInitialize: false,
+            afterInitialize: false,
+            beforeComment: true,
+            afterComment: true,
+            beforeDeleteComment: false,
+            afterDeleteComment: false
+        });
     }
 
     /// @notice Execute before a comment is processed to handle ETH tips
     /// @param commentData The comment data to process
     /// @return success Whether the hook execution was successful
-    function beforeComment(
-        ICommentTypes.CommentData calldata commentData,
+    function _beforeComment(
+        Comments.CommentData calldata commentData,
         address,
         bytes32
-    ) external payable returns (bool) {
+    ) internal override returns (bool) {
         // Check if this is a reply comment
         if (commentData.parentId == bytes32(0)) {
             // For non-reply comments, return false if ETH was sent
@@ -99,16 +100,6 @@ contract TipHook is IHook, ERC165 {
             console.log("No tip amount found");
         }
 
-        return true;
-    }
-
-    /// @notice Execute after a comment is processed
-    /// @return success Whether the hook execution was successful
-    function afterComment(
-        ICommentTypes.CommentData calldata,
-        address,
-        bytes32
-    ) external pure returns (bool) {
         return true;
     }
 
@@ -274,7 +265,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
 
     ChannelManager public channelManager;
     TipHook public tipHook;
-    CommentsV1 public comments;
+    CommentManager public comments;
 
     address public owner;
     address public user1;
@@ -291,15 +282,11 @@ abstract contract TipHookTest is Test, IERC721Receiver {
 
         (comments, channelManager) = TestUtils.createContracts(owner);
 
-        // Deploy TipHook with the CommentsV1 address
+        // Deploy TipHook with the CommentManager address
         tipHook = new TipHook(address(comments));
 
         // Fund the ChannelManager with enough ETH for tests
         vm.deal(address(channelManager), 100 ether);
-
-        // Register and enable the tip hook
-        channelManager.registerHook{value: 0.02 ether}(address(tipHook));
-        channelManager.setHookGloballyEnabled(address(tipHook), true);
 
         // Create a test channel with the tip hook
         channelId = channelManager.createChannel{value: 0.02 ether}(
@@ -319,7 +306,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
     /// @notice Test successful tip processing in a reply comment
     function testTipInReplyComment() public {
         // --- Parent Comment Setup ---
-        ICommentTypes.CommentData memory parentCommentData = ICommentTypes
+        Comments.CommentData memory parentCommentData = Comments
             .CommentData({
                 content: "Parent comment",
                 metadata: "{}",
@@ -343,7 +330,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         // --- Reply Comment Setup (With Tip Mention) ---
         uint256 tipAmount = 0.1 ether;
 
-        ICommentTypes.CommentData memory replyCommentData = ICommentTypes
+        Comments.CommentData memory replyCommentData = Comments
             .CommentData({
                 content: string(
                     abi.encodePacked(
@@ -378,7 +365,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
 
     /// @notice Test that hook reverts when sent ETH amount doesn't match mentioned amount
     function testRevertWhenTipAmountMismatch() public {
-        ICommentTypes.CommentData memory parentCommentData = ICommentTypes
+        Comments.CommentData memory parentCommentData = Comments
             .CommentData({
                 content: "Parent comment",
                 metadata: "{}",
@@ -398,7 +385,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         bytes32 parentCommentId = comments.getCommentId(parentCommentData);
 
         // --- Reply Comment Setup (With Tip Mention) ---
-        ICommentTypes.CommentData memory replyCommentData = ICommentTypes
+        Comments.CommentData memory replyCommentData = Comments
             .CommentData({
                 content: string(
                     abi.encodePacked(
@@ -427,7 +414,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
     /// @notice Test that hook reverts when tip syntax is invalid
     function testRevertWhenTipSyntaxInvalid() public {
         // --- Parent Comment Setup ---
-        ICommentTypes.CommentData memory parentCommentData = ICommentTypes
+        Comments.CommentData memory parentCommentData = Comments
             .CommentData({
                 content: "Parent comment",
                 metadata: "{}",
@@ -447,7 +434,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         bytes32 parentCommentId = comments.getCommentId(parentCommentData);
 
         // --- Reply Comment Setup (With Invalid Tip Syntax) ---
-        ICommentTypes.CommentData memory replyCommentData = ICommentTypes
+        Comments.CommentData memory replyCommentData = Comments
             .CommentData({
                 content: string(
                     abi.encodePacked(
@@ -476,7 +463,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
     /// @notice Test that no tip is processed when no tip is mentioned
     function testNoTipWithoutMention() public {
         // --- Parent Comment Setup ---
-        ICommentTypes.CommentData memory parentCommentData = ICommentTypes
+        Comments.CommentData memory parentCommentData = Comments
             .CommentData({
                 content: "Parent comment",
                 metadata: "{}",
@@ -498,7 +485,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         uint256 initialBalance = user1.balance;
 
         // --- Reply Comment Setup (No Tip Mention) ---
-        ICommentTypes.CommentData memory replyCommentData = ICommentTypes
+        Comments.CommentData memory replyCommentData = Comments
             .CommentData({
                 content: "Regular reply without tip", // No tip mention
                 metadata: "{}",

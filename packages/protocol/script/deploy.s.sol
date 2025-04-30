@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
+import {CommentManager} from "../src/CommentManager.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
 
 contract DeployScript is Script {
@@ -11,7 +11,7 @@ contract DeployScript is Script {
         Prod
     }
 
-    CommentsV1 public comments;
+    CommentManager public comments;
     ChannelManager public channelManager;
 
     function setUp() public {}
@@ -39,10 +39,10 @@ contract DeployScript is Script {
             payable(fundAddress).transfer(1 ether);
         }
 
-        // Deploy CommentsV1 first
-        comments = new CommentsV1{salt: bytes32(uint256(0))}(deployerAddress);
+        // Deploy CommentManager first
+        comments = new CommentManager{salt: bytes32(uint256(0))}(deployerAddress);
 
-        // Deploy ChannelManager with CommentsV1 address
+        // Deploy ChannelManager with CommentManager address
         channelManager = new ChannelManager{salt: bytes32(uint256(0))}(
             deployerAddress
         );
@@ -56,7 +56,7 @@ contract DeployScript is Script {
         comments.transferOwnership(ownerAddress);
 
         console.log("ChannelManager deployed at", address(channelManager));
-        console.log("CommentsV1 deployed at", address(comments));
+        console.log("CommentManager deployed at", address(comments));
 
         vm.stopBroadcast();
     }

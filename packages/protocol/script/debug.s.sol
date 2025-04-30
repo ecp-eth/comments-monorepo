@@ -4,15 +4,15 @@ pragma solidity ^0.8.20;
 import {Test, console} from "forge-std/Test.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
-import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
-import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
+import {CommentManager} from "../src/CommentManager.sol";
 import {TestUtils, MockHook} from "../test/utils.sol";
+import {Comments} from "../src/libraries/Comments.sol";
+import {Hooks} from "../src/libraries/Hooks.sol";
 
-/// @notice This script is used to debug the gas usage of the ChannelManager and CommentsV1 contracts.
+/// @notice This script is used to debug the gas usage of the ChannelManager and CommentManager contracts.
 /// @dev This script is not used in the protocol and should not be used in production.
 contract DebugGasUsage is Test, IERC721Receiver {
-    CommentsV1 public comments;
+    CommentManager public comments;
     ChannelManager public channelManager;
     MockHook public mockHook;
 
@@ -21,7 +21,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     address public user2;
 
     uint256 channelId;
-    ICommentTypes.CommentData commentData;
+    Comments.CommentData commentData;
 
     function setUp() public {
         owner = address(this);
@@ -34,57 +34,14 @@ contract DebugGasUsage is Test, IERC721Receiver {
     }
 
     function run() public {
-        debugRegisterHook();
-        debugSetHookGloballyEnabledTrue();
-        debugSetHookGloballyEnabledFalse();
-        debugExecuteHooks();
+        debugExecuteHook();
         debugConstructChannelManager();
         debugCreateChannel();
         debugUpdateChannel();
     }
 
-    function debugRegisterHook() public {
+    function debugExecuteHook() public {
         mockHook = new MockHook();
-
-        measureGas("registerHook", runRegisterHook);
-    }
-
-    function runRegisterHook() internal {
-        channelManager.registerHook{value: 0.02 ether}(address(mockHook));
-    }
-
-    function debugSetHookGloballyEnabledTrue() public {
-        mockHook = new MockHook();
-        channelManager.registerHook{value: 0.02 ether}(address(mockHook));
-
-        measureGas("setHookGloballyEnabledTrue", runSetHookGloballyEnabledTrue);
-    }
-
-    function runSetHookGloballyEnabledTrue() internal {
-        channelManager.setHookGloballyEnabled(address(mockHook), true);
-    }
-
-    function debugSetHookGloballyEnabledFalse() public {
-        mockHook = new MockHook();
-        channelManager.registerHook{value: 0.02 ether}(address(mockHook));
-
-        measureGas(
-            "setHookGloballyEnabledFalse",
-            runSetHookGloballyEnabledFalse
-        );
-    }
-
-    function runSetHookGloballyEnabledFalse() internal {
-        channelManager.setHookGloballyEnabled(address(mockHook), false);
-    }
-
-    function debugExecuteHooks() public {
-        mockHook = new MockHook();
-
-        // Register the mock hook
-        channelManager.registerHook{value: 0.02 ether}(address(mockHook));
-        // Enable the hook globally
-        channelManager.setHookGloballyEnabled(address(mockHook), true);
 
         // Create channel with hook
         channelId = channelManager.createChannel{value: 0.02 ether}(
@@ -95,7 +52,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
         );
 
         // Create comment data using direct construction
-        commentData = ICommentTypes.CommentData({
+        commentData = Comments.CommentData({
             content: "Test comment",
             metadata: "{}",
             targetUri: "",
@@ -111,16 +68,16 @@ contract DebugGasUsage is Test, IERC721Receiver {
         vm.deal(address(comments), 10 ether);
         vm.prank(address(comments));
 
-        measureGas("executeHooks", runExecuteHooks);
+        measureGas("executeHook", runExecuteHook);
     }
 
-    function runExecuteHooks() internal {
-        channelManager.executeHooks{value: 0.02 ether}(
+    function runExecuteHook() internal {
+        channelManager.executeHook{value: 0.02 ether}(
             channelId,
             commentData,
             user1,
             bytes32(0),
-            IChannelManager.HookPhase.Before
+            Hooks.HookPhase.BeforeComment
         );
     }
 

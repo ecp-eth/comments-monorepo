@@ -3,15 +3,17 @@ pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
+import {CommentManager} from "../src/CommentManager.sol";
 import {IHook} from "../src/interfaces/IHook.sol";
-import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {TestUtils} from "./utils.sol";
+import {BaseHook} from "../src/hooks/BaseHook.sol";
+import {Hooks} from "../src/libraries/Hooks.sol";
+import {Comments} from "../src/libraries/Comments.sol";
 
 // Fee charging hook contract
-contract FlatFeeHook is IHook {
+contract FlatFeeHook is BaseHook {
     uint256 public constant COMMENT_FEE = 0.001 ether;
     uint256 public constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
     uint256 public constant HOOK_FEE = 900000000000000; // 0.0009 ether (after 10% protocol fee)
@@ -28,17 +30,22 @@ contract FlatFeeHook is IHook {
         feeCollector = _feeCollector;
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) external pure returns (bool) {
-        return interfaceId == type(IHook).interfaceId;
+    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
+        return Hooks.Permissions({
+            beforeInitialize: false,
+            afterInitialize: false,
+            beforeComment: true,
+            afterComment: true,
+            beforeDeleteComment: false,
+            afterDeleteComment: false
+        });
     }
 
-    function beforeComment(
-        ICommentTypes.CommentData calldata commentData,
+    function _beforeComment(
+        Comments.CommentData calldata commentData,
         address,
         bytes32
-    ) external payable returns (bool) {
+    ) internal override returns (bool) {
         require(msg.value >= HOOK_FEE, "Insufficient fee");
 
         totalFeesCollected += HOOK_FEE;
@@ -52,17 +59,17 @@ contract FlatFeeHook is IHook {
         return true;
     }
 
-    function afterComment(
-        ICommentTypes.CommentData calldata commentData,
+    function _afterComment(
+        Comments.CommentData calldata commentData,
         address,
         bytes32
-    ) external returns (bool) {
-        // Process any pending refund
+    ) internal override returns (bool) {
+        // Process any pending refunds
         uint256 refundAmount = pendingRefunds[commentData.author];
         if (refundAmount > 0) {
-            pendingRefunds[commentData.author] = 0;
+            delete pendingRefunds[commentData.author];
             (bool success, ) = commentData.author.call{value: refundAmount}("");
-            require(success, "Fee refund failed");
+            require(success, "Refund failed");
             emit RefundIssued(commentData.author, refundAmount);
         }
         return true;
@@ -77,11 +84,8 @@ contract FlatFeeHook is IHook {
 
         (bool success, ) = feeCollector.call{value: amount}("");
         require(success, "Fee withdrawal failed");
-
         emit FeeWithdrawn(feeCollector, amount);
     }
-
-    receive() external payable {}
 }
 
 contract FlatFeeHookTest is Test, IERC721Receiver {
@@ -89,7 +93,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     ChannelManager public channelManager;
     FlatFeeHook public feeHook;
-    CommentsV1 public comments;
+    CommentManager public comments;
     address public commentsContract;
 
     address public owner;
@@ -123,23 +127,15 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         (comments, channelManager) = TestUtils.createContracts(owner);
 
         // Set protocol fees
-        channelManager.setHookRegistrationFee(HOOK_REGISTRATION_FEE);
         channelManager.setChannelCreationFee(CHANNEL_CREATION_FEE);
         channelManager.setHookTransactionFee(PROTOCOL_FEE_PERCENTAGE);
-
-        // Register the fee hook
-        channelManager.registerHook{value: HOOK_REGISTRATION_FEE}(
-            address(feeHook)
-        );
-        // Enable the hook globally
-        channelManager.setHookGloballyEnabled(address(feeHook), true);
 
         vm.deal(user1, 100 ether);
         vm.deal(user2, 100 ether);
     }
 
     function _signAppSignature(
-        ICommentTypes.CommentData memory commentData
+        Comments.CommentData memory commentData
     ) internal view returns (bytes memory) {
         bytes32 digest = comments.getCommentId(commentData);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
@@ -152,8 +148,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             value: CHANNEL_CREATION_FEE
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
-        // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes
+        Comments.CommentData memory commentData = Comments
             .CommentData({
                 content: "Test comment",
                 metadata: "{}",
@@ -194,7 +189,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes
+        Comments.CommentData memory commentData = Comments
             .CommentData({
                 content: "Test comment",
                 metadata: "{}",
@@ -241,7 +236,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes
+        Comments.CommentData memory commentData = Comments
             .CommentData({
                 content: "Test comment",
                 metadata: "{}",
@@ -273,7 +268,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes
+        Comments.CommentData memory commentData = Comments
             .CommentData({
                 content: "Test comment",
                 metadata: "{}",

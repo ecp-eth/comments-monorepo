@@ -5,91 +5,14 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
-import "./interfaces/IHook.sol";
-import "./interfaces/ICommentTypes.sol";
-import "./interfaces/IChannelManager.sol";
+import "./libraries/Comments.sol";
+import "./interfaces/ICommentManager.sol";
 import "./ChannelManager.sol";
 
-/// @title CommentsV1 - A decentralized comments system
+/// @title CommentManager - A decentralized comments system
 /// @notice This contract allows users to post and manage comments with optional app-signer approval and channel-specific hooks
 /// @dev Implements EIP-712 for typed structured data hashing and signing
-/// @dev Security Model:
-/// 1. Authentication:
-///    - Comments can be posted directly by authors or via signatures
-///    - App signers must be approved by authors
-///    - All signatures follow EIP-712 for better security
-/// 2. Authorization:
-///    - Only comment authors can delete their comments
-///    - App signer approvals can be revoked at any time
-///    - Nonce system prevents signature replay attacks
-/// 3. Hook System:
-///    - Protected against reentrancy
-///    - Channel-specific hooks are executed before and after comment operations
-///    - Channel owners control their hooks
-/// 4. Data Integrity:
-///    - Thread IDs are immutable once set
-///    - Parent-child relationships are verified
-///    - Comment IDs are cryptographically secure
-contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
-    /// @notice Emitted when a new comment is added
-    /// @param commentId Unique identifier of the comment
-    /// @param author Address of the comment author
-    /// @param appSigner Address of the application signer
-    /// @param commentData Struct containing all comment data
-    event CommentAdded(
-        bytes32 indexed commentId,
-        address indexed author,
-        address indexed appSigner,
-        CommentData commentData
-    );
-
-    /// @notice Emitted when a comment is deleted
-    /// @param commentId Unique identifier of the deleted comment
-    /// @param author Address of the comment author
-    event CommentDeleted(bytes32 indexed commentId, address indexed author);
-
-    /// @notice Emitted when an author approves an app signer
-    /// @param author Address of the author giving approval
-    /// @param appSigner Address being approved
-    event ApprovalAdded(address indexed author, address indexed appSigner);
-
-    /// @notice Emitted when an author removes an app signer's approval
-    /// @param author Address of the author removing approval
-    /// @param appSigner Address being unapproved
-    event ApprovalRemoved(address indexed author, address indexed appSigner);
-
-    /// @notice Error thrown when author address is invalid
-    error InvalidAuthorAddress();
-    /// @notice Error thrown when app signature verification fails
-    error InvalidAppSignature();
-    /// @notice Error thrown when author signature verification fails
-    error InvalidAuthorSignature();
-    /// @notice Error thrown when nonce is invalid
-    error InvalidNonce(
-        address author,
-        address appSigner,
-        uint256 expected,
-        uint256 provided
-    );
-    /// @notice Error thrown when deadline has passed
-    error SignatureDeadlineReached(uint256 deadline, uint256 currentTime);
-    /// @notice Error thrown when caller is not authorized
-    error NotAuthorized(address caller, address requiredCaller);
-    /// @notice Error thrown when channel does not exist
-    error ChannelDoesNotExist();
-    /// @notice Error thrown when channel hook execution fails
-    error ChannelHookExecutionFailed();
-    /// @notice Error thrown when signature length is invalid
-    error InvalidSignatureLength();
-    /// @notice Error thrown when signature s value is invalid
-    error InvalidSignatureS();
-    /// @notice Error thrown when parent comment does not exist
-    error ParentCommentDoesNotExist();
-    /// @notice Error thrown when both parentId and targetUri are set
-    error InvalidCommentReference(string message);
-    /// @notice Error thrown when address is zero
-    error ZeroAddress();
-
+contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     string public constant name = "Comments";
     string public constant version = "1";
     bytes32 public immutable DOMAIN_SEPARATOR;
@@ -111,7 +34,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
         );
 
     // On-chain storage mappings
-    mapping(bytes32 => CommentData) public comments;
+    mapping(bytes32 => Comments.CommentData) public comments;
     mapping(address => mapping(address => bool)) public isApproved;
     mapping(address => mapping(address => uint256)) public nonces;
     mapping(bytes32 => bool) public deleted;
@@ -138,22 +61,17 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
         );
     }
 
-    /// @notice Posts a comment directly from the author's address
-    /// @param commentData The comment data struct containing content and metadata
-    /// @param appSignature Signature from the app signer authorizing the comment
+    /// @inheritdoc ICommentManager
     function postCommentAsAuthor(
-        CommentData calldata commentData,
+        Comments.CommentData calldata commentData,
         bytes calldata appSignature
     ) external payable {
         _postComment(commentData, bytes(""), appSignature);
     }
 
-    /// @notice Posts a comment with both author and app signer signatures
-    /// @param commentData The comment data struct containing content and metadata
-    /// @param authorSignature Signature from the author authorizing the comment
-    /// @param appSignature Signature from the app signer authorizing the comment
+    /// @inheritdoc ICommentManager
     function postComment(
-        CommentData calldata commentData,
+        Comments.CommentData calldata commentData,
         bytes calldata authorSignature,
         bytes calldata appSignature
     ) external payable {
@@ -165,7 +83,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
     /// @param authorSignature Signature from the author (empty if called via postCommentAsAuthor)
     /// @param appSignature Signature from the app signer
     function _postComment(
-        CommentData calldata commentData,
+        Comments.CommentData calldata commentData,
         bytes memory authorSignature,
         bytes memory appSignature
     ) internal nonReentrant {
@@ -243,12 +161,12 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
                 ))
         ) {
             // Execute channel-specific hooks before comment
-            bool hookSuccess = channelManager.executeHooks{value: msg.value}(
+            bool hookSuccess = channelManager.executeHook{value: msg.value}(
                 commentData.channelId,
                 commentData,
                 msg.sender,
                 commentId,
-                IChannelManager.HookPhase.Before
+                Hooks.HookPhase.BeforeComment
             );
             if (!hookSuccess) revert ChannelHookExecutionFailed();
 
@@ -256,12 +174,12 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
             comments[commentId] = commentData;
 
             // Execute channel-specific hooks after comment
-            hookSuccess = channelManager.executeHooks(
+            hookSuccess = channelManager.executeHook(
                 commentData.channelId,
                 commentData,
                 msg.sender,
                 commentId,
-                IChannelManager.HookPhase.After
+                Hooks.HookPhase.AfterComment
             );
             if (!hookSuccess) revert ChannelHookExecutionFailed();
 
@@ -277,23 +195,15 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
         revert NotAuthorized(msg.sender, commentData.author);
     }
 
-    /// @notice Deletes a comment when called by the author directly
-    /// @param commentId The unique identifier of the comment to delete
+    /// @inheritdoc ICommentManager
     function deleteCommentAsAuthor(bytes32 commentId) external {
-        CommentData storage comment = comments[commentId];
+        Comments.CommentData storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
         require(comment.author == msg.sender, "Not comment author");
         _deleteComment(commentId, msg.sender);
     }
 
-    /// @notice Deletes a comment with author signature verification
-    /// @param commentId The unique identifier of the comment to delete
-    /// @param author The address of the comment author
-    /// @param appSigner The address of the app signer
-    /// @param nonce The current nonce for the author
-    /// @param deadline Timestamp after which the signature becomes invalid
-    /// @param authorSignature The signature from the author authorizing deletion (empty if app)
-    /// @param appSignature The signature from the app signer authorizing deletion (empty if author)
+    /// @inheritdoc ICommentManager
     function deleteComment(
         bytes32 commentId,
         address author,
@@ -316,7 +226,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
             );
         }
 
-        CommentData storage comment = comments[commentId];
+        Comments.CommentData storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
 
         nonces[author][appSigner]++;
@@ -357,8 +267,35 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
     /// @param commentId The unique identifier of the comment to delete
     /// @param author The address of the comment author
     function _deleteComment(bytes32 commentId, address author) internal {
+        Comments.CommentData storage comment = comments[commentId];
+        
+        // Execute channel-specific hooks before comment deletion
+        bool hookSuccess = channelManager.executeHook{value: msg.value}(
+            comment.channelId,
+            comment,
+            msg.sender,
+            commentId,
+            Hooks.HookPhase.BeforeDeleteComment
+        );
+        if (!hookSuccess) revert ChannelHookExecutionFailed();
+        
+        // Store comment data for after hook
+        Comments.CommentData memory commentToDelete = comment;
+        
+        // Delete the comment
         delete comments[commentId];
         deleted[commentId] = true;
+        
+        // Execute channel-specific hooks after comment deletion
+        hookSuccess = channelManager.executeHook(
+            commentToDelete.channelId,
+            commentToDelete,
+            msg.sender,
+            commentId,
+            Hooks.HookPhase.AfterDeleteComment
+        );
+        if (!hookSuccess) revert ChannelHookExecutionFailed();
+        
         emit CommentDeleted(commentId, author);
     }
 
@@ -378,24 +315,17 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
         emit ApprovalRemoved(author, appSigner);
     }
 
-    /// @notice Approves an app signer when called directly by the author
-    /// @param appSigner The address to approve
+    /// @inheritdoc ICommentManager
     function addApprovalAsAuthor(address appSigner) external {
         _addApproval(msg.sender, appSigner);
     }
 
-    /// @notice Removes an app signer approval when called directly by the author
-    /// @param appSigner The address to remove approval from
+    /// @inheritdoc ICommentManager
     function revokeApprovalAsAuthor(address appSigner) external {
         _revokeApproval(msg.sender, appSigner);
     }
 
-    /// @notice Approves an app signer with signature verification
-    /// @param author The address granting approval
-    /// @param appSigner The address being approved
-    /// @param nonce The current nonce for the author
-    /// @param deadline Timestamp after which the signature becomes invalid
-    /// @param signature The author's signature authorizing the approval
+    /// @inheritdoc ICommentManager
     function addApproval(
         address author,
         address appSigner,
@@ -438,12 +368,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
         _addApproval(author, appSigner);
     }
 
-    /// @notice Removes an app signer approval with signature verification
-    /// @param author The address removing approval
-    /// @param appSigner The address being unapproved
-    /// @param nonce The current nonce for the author
-    /// @param deadline Timestamp after which the signature becomes invalid
-    /// @param signature The author's signature authorizing the removal
+    /// @inheritdoc ICommentManager
     function removeApproval(
         address author,
         address appSigner,
@@ -542,13 +467,7 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
             );
     }
 
-    /// @notice Calculates the EIP-712 hash for deleting a comment
-    /// @param commentId The unique identifier of the comment to delete
-    /// @param author The address of the comment author
-    /// @param appSigner The address of the app signer
-    /// @param nonce The current nonce for the author
-    /// @param deadline Timestamp after which the signature becomes invalid
-    /// @return The computed hash
+    /// @inheritdoc ICommentManager
     function getDeleteCommentHash(
         bytes32 commentId,
         address author,
@@ -573,11 +492,9 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
             );
     }
 
-    /// @notice Calculates the EIP-712 hash for a comment
-    /// @param commentData The comment data struct to hash
-    /// @return bytes32 The computed hash
+    /// @inheritdoc ICommentManager
     function getCommentId(
-        CommentData memory commentData
+        Comments.CommentData memory commentData
     ) public view returns (bytes32) {
         bytes32 structHash = keccak256(
             abi.encode(
@@ -601,19 +518,16 @@ contract CommentsV1 is ICommentTypes, ReentrancyGuard, Pausable, Ownable {
             );
     }
 
-    /// @notice Get comment data by ID
-    /// @param commentId The comment ID to query
-    /// @return The comment data struct
+    /// @inheritdoc ICommentManager
     function getComment(
         bytes32 commentId
-    ) external view returns (CommentData memory) {
-        CommentData storage comment = comments[commentId];
+    ) external view returns (Comments.CommentData memory) {
+        Comments.CommentData storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
         return comment;
     }
 
-    /// @notice Updates the channel manager contract address (only owner)
-    /// @param _channelContract The new channel manager contract address
+    /// @inheritdoc ICommentManager
     function updateChannelContract(
         address _channelContract
     ) external onlyOwner {
