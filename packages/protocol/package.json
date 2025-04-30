@@ -14,6 +14,7 @@
     "deploy": " forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"prod\" --rpc-url http://localhost:8545 --broadcast"
   },
   "dependencies": {
+    "@account-abstraction/contracts": "^0.8.0",
     "@openzeppelin/contracts": "^5.3.0",
     "forge-std": "github:foundry-rs/forge-std#v1.9.6",
     "solady": "^0.1.14"
