@@ -86,6 +86,26 @@ export type ContractWriteFunctions = {
       value?: bigint;
     }
   ) => Promise<Hex>;
+
+  collectChannelCreationFee: (
+    args: ContractFunctionParameters<
+      ChannelManagerAbiType,
+      "payable",
+      "collectChannelCreationFee"
+    > & {
+      value?: bigint;
+    }
+  ) => Promise<Hex>;
+
+  calculateHookTransactionFee: (
+    args: ContractFunctionParameters<
+      ChannelManagerAbiType,
+      "payable",
+      "calculateHookTransactionFee"
+    > & {
+      value?: bigint;
+    }
+  ) => Promise<Hex>;
 };
 
 export type ContractReadFunctions = {

@@ -229,3 +229,54 @@ export async function executeHook(
     txHash,
   };
 }
+
+export type CalculateHookTransactionFeeParams = {
+  /**
+   * The total value to calculate fee for
+   */
+  value: bigint;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  writeContract: ContractWriteFunctions["calculateHookTransactionFee"];
+};
+
+export type CalculateHookTransactionFeeResult = {
+  txHash: Hex;
+  hookValue: bigint;
+};
+
+const CalculateHookTransactionFeeParamsSchema = z.object({
+  value: z.bigint().min(0n),
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Calculates the hook transaction fee and returns the hook value after deducting the protocol fee.
+ * If the value is 0 or if the hook transaction fee percentage is 0, returns the original value.
+ *
+ * @param params - The parameters for calculating the hook transaction fee
+ * @returns The transaction hash and the hook value after fee deduction
+ */
+export async function calculateHookTransactionFee(
+  params: CalculateHookTransactionFeeParams
+): Promise<CalculateHookTransactionFeeResult> {
+  const { value, channelManagerAddress } =
+    CalculateHookTransactionFeeParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerAbi,
+    functionName: "calculateHookTransactionFee",
+    args: [value],
+    value,
+  });
+
+  return {
+    txHash,
+    hookValue: value,
+  };
+}

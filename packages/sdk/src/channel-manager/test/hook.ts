@@ -14,6 +14,7 @@ import {
   setHook,
   getHookTransactionFee,
   setHookTransactionFee,
+  calculateHookTransactionFee,
 } from "../hook.js";
 import { createChannel } from "../channel.js";
 import { ChannelManagerAbi } from "../../abis.js";
@@ -170,6 +171,76 @@ describe("setHookTransactionFee()", () => {
         assert.ok(err.message.includes("Error: OwnableUnauthorizedAccount("));
         return true;
       }
+    );
+  });
+});
+
+describe("calculateHookTransactionFee()", () => {
+  it("calculates fee for non-zero value", async () => {
+    const value = parseEther("1.0");
+
+    const result = await calculateHookTransactionFee({
+      value,
+      writeContract: client.writeContract,
+      channelManagerAddress,
+    });
+
+    const receipt = await client.waitForTransactionReceipt({
+      hash: result.txHash,
+    });
+
+    assert.equal(receipt.status, "success");
+    assert.ok(
+      result.hookValue <= value,
+      "Hook value should be less than or equal to input value"
+    );
+  });
+
+  it("returns same value when input is zero", async () => {
+    const value = 0n;
+
+    const result = await calculateHookTransactionFee({
+      value,
+      writeContract: client.writeContract,
+      channelManagerAddress,
+    });
+
+    const receipt = await client.waitForTransactionReceipt({
+      hash: result.txHash,
+    });
+
+    assert.equal(receipt.status, "success");
+    assert.equal(
+      result.hookValue,
+      value,
+      "Hook value should equal input value when input is zero"
+    );
+  });
+
+  it("returns same value when fee percentage is zero", async () => {
+    // First set fee to zero
+    await setHookTransactionFee({
+      feeBasisPoints: 0,
+      writeContract: client.writeContract,
+      channelManagerAddress,
+    });
+
+    const value = parseEther("1.0");
+    const result = await calculateHookTransactionFee({
+      value,
+      writeContract: client.writeContract,
+      channelManagerAddress,
+    });
+
+    const receipt = await client.waitForTransactionReceipt({
+      hash: result.txHash,
+    });
+
+    assert.equal(receipt.status, "success");
+    assert.equal(
+      result.hookValue,
+      value,
+      "Hook value should equal input value when fee is zero"
     );
   });
 });
