@@ -3,13 +3,10 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./interfaces/IChannelManager.sol";
-import "./interfaces/IHook.sol";
 import "./interfaces/IProtocolFees.sol";
-import "./libraries/Hooks.sol";
 import "./ProtocolFees.sol";
 import "./libraries/Comments.sol";
 

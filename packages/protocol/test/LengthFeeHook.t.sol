@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
 import {CommentManager} from "../src/CommentManager.sol";
-import {IHook} from "../src/interfaces/IHook.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
