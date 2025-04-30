@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
-import {IHook} from "../src/interfaces/IHook.sol";
-import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
+import {CommentManager} from "../src/CommentManager.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {TestUtils} from "./utils.sol";
-
+import {BaseHook} from "../src/hooks/BaseHook.sol";
+import {Hooks} from "../src/libraries/Hooks.sol";
+import {Comments} from "../src/libraries/Comments.sol";
 /// @title SharedFeeHook - A hook that splits comment fees between channel owners and parent comment authors
 /// @notice This hook charges 0.001 ETH per comment and splits it between channel owners and parent comment authors
-contract SharedFeeHook is IHook {
+contract SharedFeeHook is BaseHook {
     using SafeERC20 for IERC20;
 
     // Token used for fee payment
@@ -56,17 +56,22 @@ contract SharedFeeHook is IHook {
         channelManager = IChannelManager(_channelManager);
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) external pure returns (bool) {
-        return interfaceId == type(IHook).interfaceId;
+    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
+        return Hooks.Permissions({
+            beforeComment: true,
+            afterComment: false,
+            beforeDeleteComment: false,
+            afterDeleteComment: false,
+            beforeInitialize: false,
+            afterInitialize: false
+        });
     }
 
-    function beforeComment(
-        ICommentTypes.CommentData calldata commentData,
+    function _beforeComment(
+        Comments.CommentData calldata commentData,
         address,
         bytes32
-    ) external payable returns (bool) {
+    ) internal override returns (bool) {
         // Calculate protocol fee
         uint256 protocolFee = (feeAmount * PROTOCOL_FEE_PERCENTAGE) / 10000;
         uint256 hookFee = feeAmount - protocolFee;
@@ -89,14 +94,6 @@ contract SharedFeeHook is IHook {
         // Distribute fees to recipients
         _distributeFees(hookFee);
 
-        return true;
-    }
-
-    function afterComment(
-        ICommentTypes.CommentData calldata,
-        address,
-        bytes32
-    ) external pure returns (bool) {
         return true;
     }
 
@@ -301,7 +298,7 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
 
     ChannelManager public channelManager;
     SharedFeeHook public feeHook;
-    CommentsV1 public comments;
+    CommentManager public comments;
     MockERC20 public paymentToken;
     address public commentsContract;
 
@@ -343,11 +340,6 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
             address(channelManager)
         );
 
-        // Register the fee hook
-        channelManager.registerHook{value: 0.02 ether}(address(feeHook));
-        // Enable the hook globally
-        channelManager.setHookGloballyEnabled(address(feeHook), true);
-
         // Setup token balances and approvals
         paymentToken.mint(user1, INITIAL_TOKEN_BALANCE);
         paymentToken.mint(user2, INITIAL_TOKEN_BALANCE);
@@ -363,7 +355,7 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
     }
 
     function _signAppSignature(
-        ICommentTypes.CommentData memory commentData
+        Comments.CommentData memory commentData
     ) internal view returns (bytes memory) {
         bytes32 digest = comments.getCommentId(commentData);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
@@ -380,19 +372,18 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
         );
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes
-            .CommentData({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                appSigner: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CommentData memory commentData = Comments.CommentData({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            appSigner: user2,
+            channelId: channelId,
+            nonce: comments.nonces(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         bytes memory appSignature = _signAppSignature(commentData);
 

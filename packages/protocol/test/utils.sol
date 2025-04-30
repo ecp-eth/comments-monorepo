@@ -5,10 +5,13 @@ import {Test} from "forge-std/Test.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {LibString} from "solady/utils/LibString.sol";
-import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
+import {CommentManager} from "../src/CommentManager.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
 import {IHook} from "../src/interfaces/IHook.sol";
+import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
+import {BaseHook} from "../src/hooks/BaseHook.sol";
+import {Hooks} from "../src/libraries/Hooks.sol";
+import {Comments} from "../src/libraries/Comments.sol";
 
 /**
  * @title TestUtils
@@ -213,8 +216,8 @@ library TestUtils {
      */
     function createContracts(
         address owner
-    ) internal returns (CommentsV1 comments, ChannelManager channelManager) {
-        comments = new CommentsV1(owner);
+    ) internal returns (CommentManager comments, ChannelManager channelManager) {
+        comments = new CommentManager(owner);
         channelManager = new ChannelManager(owner);
 
         // update contract addresses
@@ -226,32 +229,37 @@ library TestUtils {
 }
 
 // Mock hook contract for testing
-contract MockHook is IHook {
+contract MockHook is BaseHook {
     bool public shouldReturnTrue = true;
 
     function setShouldReturnTrue(bool _shouldReturn) external {
         shouldReturnTrue = _shouldReturn;
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) external pure returns (bool) {
-        return interfaceId == type(IHook).interfaceId;
+    function getHookPermissions() external pure override returns (Hooks.Permissions memory) {
+        return Hooks.Permissions({
+            beforeInitialize: false,
+            afterInitialize: false,
+            beforeComment: true,
+            afterComment: true,
+            beforeDeleteComment: false,
+            afterDeleteComment: false
+        });
     }
 
-    function beforeComment(
-        ICommentTypes.CommentData calldata,
+    function _beforeComment(
+        Comments.CommentData calldata,
         address,
         bytes32
-    ) external payable returns (bool) {
+    ) internal virtual override returns (bool) {
         return shouldReturnTrue;
     }
 
-    function afterComment(
-        ICommentTypes.CommentData calldata,
+    function _afterComment(
+        Comments.CommentData calldata,
         address,
         bytes32
-    ) external view returns (bool) {
+    ) internal virtual override returns (bool) {
         return shouldReturnTrue;
     }
 }

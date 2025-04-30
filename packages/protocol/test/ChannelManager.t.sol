@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
-import {IHook} from "../src/interfaces/IHook.sol";
-import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
+import {CommentManager} from "../src/CommentManager.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {TestUtils, MockHook} from "./utils.sol";
-
+import {Comments} from "../src/libraries/Comments.sol";
+import {Hooks} from "../src/libraries/Hooks.sol";
 // Invalid hook that doesn't support the interface
 contract InvalidHook {
     function supportsInterface(bytes4) external pure returns (bool) {
@@ -20,7 +19,7 @@ contract InvalidHook {
 contract ChannelManagerTest is Test, IERC721Receiver {
     using TestUtils for string;
 
-    CommentsV1 public comments;
+    CommentManager public comments;
     ChannelManager public channelManager;
     MockHook public mockHook;
     InvalidHook public invalidHook;
@@ -58,14 +57,6 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         invalidHook = new InvalidHook();
 
         (comments, channelManager) = TestUtils.createContracts(owner);
-
-        // Set hook registration fee to 0.02 ether
-        channelManager.setHookRegistrationFee(0.02 ether);
-
-        // Register the mock hook
-        channelManager.registerHook{value: 0.02 ether}(address(mockHook));
-        // Enable the hook globally
-        channelManager.setHookGloballyEnabled(address(mockHook), true);
 
         vm.deal(user1, 100 ether);
         vm.deal(user2, 100 ether);
@@ -165,7 +156,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         assertEq(hook, address(mockHook));
     }
 
-    function test_ExecuteHooks() public {
+    function test_ExecuteHook() public {
         // Create channel with hook
         uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
             "Test Channel",
@@ -175,19 +166,18 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         );
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes
-            .CommentData({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                appSigner: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CommentData memory commentData = Comments.CommentData({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            appSigner: user2,
+            channelId: channelId,
+            nonce: comments.nonces(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // add some ether to the comments v1 contract to allow it to call hook with fee
         vm.deal(address(comments), 10 ether);
@@ -196,12 +186,12 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         vm.prank(address(comments));
         uint256 initialBalance = address(channelManager).balance;
         assertTrue(
-            channelManager.executeHooks{value: 0.02 ether}(
+            channelManager.executeHook{value: 0.02 ether}(
                 channelId,
                 commentData,
                 user1,
                 bytes32(0),
-                IChannelManager.HookPhase.Before
+                Hooks.HookPhase.BeforeComment
             )
         );
         assertEq(
@@ -213,12 +203,12 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         // Test afterComment hook
         vm.prank(address(comments));
         assertTrue(
-            channelManager.executeHooks(
+            channelManager.executeHook(
                 channelId,
                 commentData,
                 user1,
                 bytes32(0),
-                IChannelManager.HookPhase.After
+                Hooks.HookPhase.AfterComment
             )
         );
 
@@ -226,82 +216,13 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         mockHook.setShouldReturnTrue(false);
         vm.prank(address(comments));
         vm.expectRevert(IChannelManager.ChannelHookExecutionFailed.selector);
-        channelManager.executeHooks(
+        channelManager.executeHook(
             channelId,
             commentData,
             user1,
             bytes32(0),
-            IChannelManager.HookPhase.Before
+            Hooks.HookPhase.BeforeComment
         );
-    }
-
-    function test_RevertWhen_RegisterInvalidHook() public {
-        // Register the invalid hook first
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IChannelManager.InvalidHookInterface.selector
-            )
-        );
-        channelManager.registerHook{value: 0.02 ether}(address(invalidHook));
-    }
-
-    function test_RevertWhen_CreatingChannelWithUnregisteredHook() public {
-        vm.expectRevert(
-            abi.encodeWithSelector(IChannelManager.HookNotRegistered.selector)
-        );
-        channelManager.createChannel{value: 0.02 ether}(
-            "Test Channel",
-            "Description",
-            "{}",
-            address(invalidHook)
-        );
-    }
-
-    function test_RevertWhen_AddingUnregisteredHook() public {
-        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
-            "Test Channel",
-            "Description",
-            "{}",
-            address(0)
-        );
-
-        // Create a new valid hook but don't register it
-        MockHook unregisteredHook = new MockHook();
-
-        // Try to add an unregistered hook
-        vm.expectRevert(
-            abi.encodeWithSelector(IChannelManager.HookNotRegistered.selector)
-        );
-        channelManager.setHook(channelId, address(unregisteredHook));
-    }
-
-    function test_GlobalHookManagement() public {
-        // Create a new hook for testing global management
-        MockHook newHook = new MockHook();
-
-        // Register the new hook
-        uint256 initialBalance = address(channelManager).balance;
-        channelManager.registerHook{value: 0.02 ether}(address(newHook));
-
-        // Test initial hook registration status
-        IChannelManager.HookConfig memory hookConfig = channelManager
-            .getHookStatus(address(newHook));
-        assertTrue(hookConfig.registered);
-        assertFalse(hookConfig.enabled); // Should be disabled by default after registration
-
-        // Enable hook globally
-        channelManager.setHookGloballyEnabled(address(newHook), true);
-        hookConfig = channelManager.getHookStatus(address(newHook));
-        assertTrue(hookConfig.registered);
-        assertTrue(hookConfig.enabled);
-
-        // Disable hook globally
-        channelManager.setHookGloballyEnabled(address(newHook), false);
-        hookConfig = channelManager.getHookStatus(address(newHook));
-        assertTrue(hookConfig.registered);
-        assertFalse(hookConfig.enabled);
-
-        assertEq(address(channelManager).balance - initialBalance, 0.02 ether);
     }
 
     function onERC721Received(

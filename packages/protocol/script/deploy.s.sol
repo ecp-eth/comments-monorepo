@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
+import {CommentManager} from "../src/CommentManager.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
 import {NoopHook} from "../src/hooks/NoopHook.sol";
 
@@ -13,7 +13,7 @@ contract DeployScript is Script {
         Test
     }
 
-    CommentsV1 public comments;
+    CommentManager public comments;
     ChannelManager public channelManager;
     NoopHook public noopHook;
 
@@ -45,7 +45,20 @@ contract DeployScript is Script {
 
         if (env == Env.Test) {
             // We deploy the contract in different tests in sdk, so we want to have different addresses
-            salt = uint256(bytes32(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, block.coinbase, block.number, block.gaslimit, block.timestamp))));
+            salt = uint256(
+                bytes32(
+                    keccak256(
+                        abi.encodePacked(
+                            block.timestamp,
+                            block.prevrandao,
+                            block.coinbase,
+                            block.number,
+                            block.gaslimit,
+                            block.timestamp
+                        )
+                    )
+                )
+            );
 
             // Deploy NoopHook
             noopHook = new NoopHook();
@@ -53,11 +66,13 @@ contract DeployScript is Script {
             console.log("NoopHook deployed at", address(noopHook));
         }
 
-        // Deploy CommentsV1 first
-        comments = new CommentsV1{salt: bytes32(salt)}(deployerAddress);
+        // Deploy CommentManager first
+        comments = new CommentManager{salt: bytes32(uint256(0))}(
+            deployerAddress
+        );
 
-        // Deploy ChannelManager with CommentsV1 address
-        channelManager = new ChannelManager{salt: bytes32(salt)}(
+        // Deploy ChannelManager with CommentManager address
+        channelManager = new ChannelManager{salt: bytes32(uint256(0))}(
             deployerAddress
         );
 
@@ -70,7 +85,7 @@ contract DeployScript is Script {
         comments.transferOwnership(ownerAddress);
 
         console.log("ChannelManager deployed at", address(channelManager));
-        console.log("CommentsV1 deployed at", address(comments));
+        console.log("CommentManager deployed at", address(comments));
 
         vm.stopBroadcast();
     }

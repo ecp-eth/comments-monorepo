@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-/// @title ICommentTypes - Interface defining comment-related types
-interface ICommentTypes {
+/// @title Comments - Library defining comment-related types
+library Comments {
     /// @notice Struct containing all comment data
     /// @param content The actual text content of the comment
     /// @param metadata Additional JSON data that shouldn't be shown to the user as it is
@@ -29,4 +29,4 @@ interface ICommentTypes {
         string targetUri;
         string commentType;
     }
-}
+} 

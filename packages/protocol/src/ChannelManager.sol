@@ -3,13 +3,12 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "./interfaces/IHook.sol";
 import "./interfaces/IChannelManager.sol";
-import "./interfaces/IFeeManager.sol";
+import "./interfaces/IProtocolFees.sol";
 import "./ProtocolFees.sol";
+import "./libraries/Comments.sol";
 
 /// @title ChannelManager - A contract for managing comment channels and their hooks as NFTs
 /// @notice This contract allows creation and management of channels with configurable hooks, where each channel is an NFT
@@ -17,9 +16,6 @@ import "./ProtocolFees.sol";
 contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     // Mapping from channel ID to channel configuration
     mapping(uint256 => ChannelConfig) private channels;
-
-    // Global hook registry
-    mapping(address => HookConfig) private hooks;
 
     // Base URI for NFT metadata
     string private baseURIValue;
@@ -75,60 +71,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         _;
     }
 
-    /// @notice Registers a new hook in the global registry
-    /// @param hook The address of the hook to register
-    function registerHook(address hook) external payable nonReentrant {
-        collectHookRegistrationFee();
-
-        if (hook == address(0)) revert IChannelManager.InvalidHookAddress();
-
-        HookConfig storage hookConfig = hooks[hook];
-
-        // Check if hook is already registered
-        if (hookConfig.registered)
-            revert IChannelManager.HookAlreadyRegistered();
-
-        // Validate that the hook implements IHook interface
-        try IERC165(hook).supportsInterface(type(IHook).interfaceId) returns (
-            bool result
-        ) {
-            if (!result) revert IChannelManager.InvalidHookInterface();
-        } catch {
-            revert IChannelManager.InvalidHookInterface();
-        }
-
-        hookConfig.registered = true;
-        // Hooks are disabled by default
-        hookConfig.enabled = false;
-
-        emit IChannelManager.HookRegistered(hook);
-        emit IChannelManager.HookGlobalStatusUpdated(hook, false);
-    }
-
-    /// @notice Enables or disables a hook globally (only owner)
-    /// @param hook The address of the hook
-    /// @param enabled Whether to enable or disable the hook
-    function setHookGloballyEnabled(
-        address hook,
-        bool enabled
-    ) external onlyOwner {
-        HookConfig storage hookConfig = hooks[hook];
-        if (!hookConfig.registered) revert IChannelManager.HookNotRegistered();
-
-        hookConfig.enabled = enabled;
-        emit IChannelManager.HookGlobalStatusUpdated(hook, enabled);
-    }
-
-    /// @notice Checks if a hook is registered and globally enabled
-    /// @param hook The address of the hook
-    /// @return hookConfig The hook configuration
-    function getHookStatus(
-        address hook
-    ) external view returns (HookConfig memory) {
-        HookConfig memory hookConfig = hooks[hook];
-        return hookConfig;
-    }
-
     /// @notice Internal function to check if a channel exists
     /// @param channelId The channel ID to check
     /// @return bool Whether the channel exists
@@ -138,12 +80,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         return _ownerOf(channelId) != address(0);
     }
 
-    /// @notice Creates a new channel as an NFT with a hash-based ID
-    /// @param name The name of the channel
-    /// @param description The description of the channel
-    /// @param metadata The channel metadata (arbitrary JSON)
-    /// @param hook The address of the hook to add to the channel
-    /// @return channelId The unique identifier of the created channel
+    /// @inheritdoc IChannelManager
     function createChannel(
         string calldata name,
         string calldata description,
@@ -176,11 +113,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         return channelId;
     }
 
-    /// @notice Updates an existing channel's configuration
-    /// @param channelId The unique identifier of the channel
-    /// @param name The new name of the channel
-    /// @param description The new description of the channel
-    /// @param metadata The new metadata
+    /// @inheritdoc IChannelManager
     function updateChannel(
         uint256 channelId,
         string calldata name,
@@ -199,9 +132,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         emit ChannelUpdated(channelId, name, description, metadata);
     }
 
-    /// @notice Sets the hook for a channel
-    /// @param channelId The unique identifier of the channel
-    /// @param hook The address of the hook contract
+    /// @inheritdoc IChannelManager
     function setHook(uint256 channelId, address hook) external {
         if (!_channelExists(channelId)) revert ChannelDoesNotExist();
         if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
@@ -214,8 +145,46 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     /// @param hook The address of the hook contract
     function _setHook(uint256 channelId, address hook) internal {
         if (hook != address(0)) {
-            if (!hooks[hook].registered) revert HookNotRegistered();
+            // Validate that the hook implements IHook interface
+            try IERC165(hook).supportsInterface(type(IHook).interfaceId) returns (
+                bool result
+            ) {
+                if (!result) revert InvalidHookInterface();
+            } catch {
+                revert InvalidHookInterface();
+            }
+
+            // Get hook permissions and store them on the channel
+            Hooks.Permissions memory permissions = IHook(hook).getHookPermissions();
+
+            // Call beforeInitialize hook if permitted
+            if (permissions.beforeInitialize) {
+                try IHook(hook).beforeInitialize(address(this)) returns (bool success) {
+                    if (!success) revert HookInitializationFailed();
+                } catch Error(string memory reason) {
+                    revert(reason);
+                } catch (bytes memory returnData) {
+                    assembly {
+                        revert(add(returnData, 0x20), mload(returnData))
+                    }
+                }
+            }
+
             channels[channelId].hook = IHook(hook);
+            channels[channelId].permissions = permissions;
+
+            // Call afterInitialize hook if permitted
+            if (permissions.afterInitialize) {
+                try IHook(hook).afterInitialize(address(this)) returns (bool success) {
+                    if (!success) revert HookInitializationFailed();
+                } catch Error(string memory reason) {
+                    revert(reason);
+                } catch (bytes memory returnData) {
+                    assembly {
+                        revert(add(returnData, 0x20), mload(returnData))
+                    }
+                }
+            }
         } else {
             delete channels[channelId].hook; // Properly reset to default value
         }
@@ -224,12 +193,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         emit HookStatusUpdated(channelId, hook, hook != address(0));
     }
 
-    /// @notice Gets a channel's configuration
-    /// @param channelId The unique identifier of the channel
-    /// @return name The name of the channel
-    /// @return description The description of the channel
-    /// @return metadata The channel metadata
-    /// @return hook The address of the channel's hook
+    /// @inheritdoc IChannelManager
     function getChannel(
         uint256 channelId
     )
@@ -253,20 +217,14 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         );
     }
 
-    /// @notice Public function to execute hook for a channel
-    /// @param channelId The unique identifier of the channel
-    /// @param commentData The comment data to process
-    /// @param caller The address that initiated the transaction
-    /// @param commentId The unique identifier of the comment
-    /// @param phase The phase of hook execution (Before or After)
-    /// @return success Whether the hook execution was successful
-    function executeHooks(
+    /// @inheritdoc IChannelManager
+    function executeHook(
         uint256 channelId,
-        ICommentTypes.CommentData memory commentData,
+        Comments.CommentData calldata commentData,
         address caller,
         bytes32 commentId,
-        HookPhase phase
-    ) external payable onlyCommentsContract returns (bool) {
+        Hooks.HookPhase phase
+    ) external payable returns (bool) {
         if (!_channelExists(channelId)) revert ChannelDoesNotExist();
 
         ChannelConfig storage channel = channels[channelId];
@@ -276,17 +234,12 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
             return true;
         }
 
-        HookConfig storage hookConfig = hooks[hookAddress];
-
-        // Check both global and channel-specific enablement
-        if (!hookConfig.registered) revert HookNotRegistered();
-        if (!hookConfig.enabled) revert HookDisabledGlobally();
-
         // Calculate hook value after protocol fee
         uint256 hookValue = calculateHookTransactionFee(msg.value);
 
         // Execute the appropriate hook function based on phase
-        if (phase == HookPhase.Before) {
+        if (phase == Hooks.HookPhase.BeforeComment) {
+            if (!channel.permissions.beforeComment) return true;
             bool success;
             try
                 channel.hook.beforeComment{value: hookValue}(
@@ -307,7 +260,8 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
             }
             if (!success) revert ChannelHookExecutionFailed();
             return true;
-        } else {
+        } else if (phase == Hooks.HookPhase.AfterComment) {
+            if (!channel.permissions.afterComment) return true;
             // After phase - don't revert on failure
             bool success = true;
             try
@@ -322,12 +276,50 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
                 emit HookExecutionFailed(channelId, hookAddress, phase);
             }
             return success;
+        } else if (phase == Hooks.HookPhase.BeforeDeleteComment) {
+            if (!channel.permissions.beforeDeleteComment) return true;
+            bool success = true;
+            try
+                channel.hook.beforeDeleteComment{value: msg.value}(
+                    commentData,
+                    caller,
+                    commentId
+                )
+            returns (bool result) {
+                success = result;
+            } catch Error(string memory reason) {
+                // Propagate the error message
+                revert(reason);
+            } catch (bytes memory returnData) {
+                // Propagate custom errors
+                assembly {
+                    revert(add(returnData, 0x20), mload(returnData))
+                }
+            }
+            if (!success) revert ChannelHookExecutionFailed();
+            return true;
+        } else if (phase == Hooks.HookPhase.AfterDeleteComment) {
+            if (!channel.permissions.afterDeleteComment) return true;
+            // After phase - don't revert on failure
+            bool success = true;
+            try
+                channel.hook.afterDeleteComment(commentData, caller, commentId)
+            returns (bool result) {
+                success = result;
+            } catch {
+                emit HookExecutionFailed(channelId, hookAddress, phase);
+                return true;
+            }
+            if (!success) {
+                emit HookExecutionFailed(channelId, hookAddress, phase);
+            }
+            return success;
         }
+        
+        return true;
     }
 
-    /// @notice Check if a channel exists
-    /// @param channelId The channel ID to check
-    /// @return bool Whether the channel exists
+    /// @inheritdoc IChannelManager
     function channelExists(uint256 channelId) public view returns (bool) {
         try this.ownerOf(channelId) returns (address) {
             return true;
@@ -336,17 +328,14 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         }
     }
 
-    /// @notice Gets the owner of a channel
-    /// @param channelId The unique identifier of the channel
-    /// @return owner The address of the channel owner
+    /// @inheritdoc IChannelManager
     function getChannelOwner(
         uint256 channelId
     ) external view returns (address) {
         return ownerOf(channelId);
     }
 
-    /// @notice Updates the comments contract address (only owner)
-    /// @param _commentsContract The new comments contract address
+    /// @inheritdoc IChannelManager
     function updateCommentsContract(
         address _commentsContract
     ) external onlyOwner {
@@ -354,8 +343,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         commentsContract = _commentsContract;
     }
 
-    /// @notice Sets the base URI for NFT metadata
-    /// @param baseURI_ The new base URI
+    /// @inheritdoc IChannelManager
     function setBaseURI(string calldata baseURI_) external onlyOwner {
         if (bytes(baseURI_).length == 0)
             revert IChannelManager.InvalidBaseURI();
