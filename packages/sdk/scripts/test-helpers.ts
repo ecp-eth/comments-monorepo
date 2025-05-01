@@ -16,7 +16,7 @@ export function deployContracts(): {
   const deployProcessOutput = deployProcessRawOutput.toString();
 
   const commentsAddress = deployProcessOutput.match(
-    /CommentsV1 deployed at (0x[a-fA-F0-9]{40})/
+    /CommentManager deployed at (0x[a-fA-F0-9]{40})/
   )?.[1];
   const channelManagerAddress = deployProcessOutput.match(
     /ChannelManager deployed at (0x[a-fA-F0-9]{40})/

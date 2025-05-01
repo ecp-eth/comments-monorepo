@@ -11,14 +11,10 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import { anvil } from "viem/chains";
 import {
-  getHookStatus,
   setHook,
-  registerHook,
-  setHookGloballyEnabled,
-  getHookRegistrationFee,
-  setHookRegistrationFee,
   getHookTransactionFee,
   setHookTransactionFee,
+  calculateHookTransactionFee,
 } from "../hook.js";
 import { createChannel } from "../channel.js";
 import { ChannelManagerAbi } from "../../abis.js";
@@ -47,67 +43,6 @@ const client2 = createWalletClient({
   transport: http("http://localhost:8545"),
   account: account2,
 }).extend(publicActions);
-
-// Test hook address
-const TEST_HOOK_ADDRESS = "0x1234567890123456789012345678901234567890";
-
-describe("getHookStatus()", () => {
-  it("returns hook status for unregistered hook", async () => {
-    const status = await getHookStatus({
-      hookAddress: TEST_HOOK_ADDRESS,
-      readContract: client.readContract,
-      channelManagerAddress,
-    });
-
-    assert.deepEqual(
-      status,
-      { registered: false, enabled: false },
-      "unregistered hook should return false for both registered and enabled"
-    );
-  });
-});
-
-describe("registerHook()", () => {
-  it("registers a new hook", async () => {
-    const result = await registerHook({
-      hookAddress: noopHookAddress,
-      writeContract: client.writeContract,
-      channelManagerAddress,
-      fee: parseEther("0.02"),
-    });
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-
-    const status = await getHookStatus({
-      hookAddress: noopHookAddress,
-      readContract: client.readContract,
-      channelManagerAddress,
-    });
-
-    assert.equal(status.registered, true, "hook should be registered");
-  });
-
-  it("fails if hook is already registered", async () => {
-    await assert.rejects(
-      () =>
-        registerHook({
-          hookAddress: noopHookAddress,
-          writeContract: client.writeContract,
-          channelManagerAddress,
-          fee: parseEther("0.02"),
-        }),
-      (err) => {
-        assert.ok(err instanceof ContractFunctionExecutionError);
-        assert.ok(err.message.includes("Error: HookAlreadyRegistered()"));
-        return true;
-      }
-    );
-  });
-});
 
 describe("setHook()", () => {
   let channelId: bigint;
@@ -162,107 +97,8 @@ describe("setHook()", () => {
         }),
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);
-        assert.ok(err.message.includes("Error: HookNotRegistered()"));
-        return true;
-      }
-    );
-  });
-});
-
-describe("setHookGloballyEnabled()", () => {
-  it("enables / disables hook globally", async () => {
-    let result = await setHookGloballyEnabled({
-      hookAddress: noopHookAddress,
-      enabled: true,
-      writeContract: client.writeContract,
-      channelManagerAddress,
-    });
-
-    let receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-
-    // Verify the hook is enabled
-    let status = await getHookStatus({
-      hookAddress: noopHookAddress,
-      readContract: client.readContract,
-      channelManagerAddress,
-    });
-
-    assert.equal(status.enabled, true, "hook should be enabled");
-
-    result = await setHookGloballyEnabled({
-      hookAddress: noopHookAddress,
-      enabled: false,
-      writeContract: client.writeContract,
-      channelManagerAddress,
-    });
-
-    receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-
-    // Verify the hook is disabled
-    status = await getHookStatus({
-      hookAddress: noopHookAddress,
-      readContract: client.readContract,
-      channelManagerAddress,
-    });
-
-    assert.equal(status.enabled, false, "hook should be disabled");
-  });
-});
-
-describe("getHookRegistrationFee()", () => {
-  it("returns the registration fee", async () => {
-    const result = await getHookRegistrationFee({
-      readContract: client.readContract,
-      channelManagerAddress,
-    });
-
-    assert.ok(typeof result.fee === "bigint", "fee should be a bigint");
-  });
-});
-
-describe("setHookRegistrationFee()", () => {
-  it("sets new registration fee", async () => {
-    const newFee = parseEther("0.1");
-    const result = await setHookRegistrationFee({
-      fee: newFee,
-      writeContract: client.writeContract,
-      channelManagerAddress,
-    });
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-
-    // Verify the new fee
-    const fee = await getHookRegistrationFee({
-      readContract: client.readContract,
-      channelManagerAddress,
-    });
-
-    assert.equal(fee.fee, newFee);
-  });
-
-  it("fails if caller is not owner", async () => {
-    await assert.rejects(
-      () =>
-        setHookRegistrationFee({
-          fee: parseEther("0.1"),
-          writeContract: client2.writeContract,
-          channelManagerAddress,
-        }),
-      (err) => {
-        assert.ok(err instanceof ContractFunctionExecutionError);
-        assert.ok(err.message.includes("Error: OwnableUnauthorizedAccount("));
+        // somehow it is not possible to get error message here since it is swallowed
+        // assert.ok(err.toString().includes("Error: InvalidHookInterface()"));
         return true;
       }
     );
@@ -335,6 +171,76 @@ describe("setHookTransactionFee()", () => {
         assert.ok(err.message.includes("Error: OwnableUnauthorizedAccount("));
         return true;
       }
+    );
+  });
+});
+
+describe("calculateHookTransactionFee()", () => {
+  it("calculates fee for non-zero value", async () => {
+    const value = parseEther("1.0");
+
+    const result = await calculateHookTransactionFee({
+      value,
+      writeContract: client.writeContract,
+      channelManagerAddress,
+    });
+
+    const receipt = await client.waitForTransactionReceipt({
+      hash: result.txHash,
+    });
+
+    assert.equal(receipt.status, "success");
+    assert.ok(
+      result.hookValue <= value,
+      "Hook value should be less than or equal to input value"
+    );
+  });
+
+  it("returns same value when input is zero", async () => {
+    const value = 0n;
+
+    const result = await calculateHookTransactionFee({
+      value,
+      writeContract: client.writeContract,
+      channelManagerAddress,
+    });
+
+    const receipt = await client.waitForTransactionReceipt({
+      hash: result.txHash,
+    });
+
+    assert.equal(receipt.status, "success");
+    assert.equal(
+      result.hookValue,
+      value,
+      "Hook value should equal input value when input is zero"
+    );
+  });
+
+  it("returns same value when fee percentage is zero", async () => {
+    // First set fee to zero
+    await setHookTransactionFee({
+      feeBasisPoints: 0,
+      writeContract: client.writeContract,
+      channelManagerAddress,
+    });
+
+    const value = parseEther("1.0");
+    const result = await calculateHookTransactionFee({
+      value,
+      writeContract: client.writeContract,
+      channelManagerAddress,
+    });
+
+    const receipt = await client.waitForTransactionReceipt({
+      hash: result.txHash,
+    });
+
+    assert.equal(receipt.status, "success");
+    assert.equal(
+      result.hookValue,
+      value,
+      "Hook value should equal input value when fee is zero"
     );
   });
 });

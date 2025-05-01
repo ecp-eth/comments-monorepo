@@ -67,12 +67,10 @@ contract DeployScript is Script {
         }
 
         // Deploy CommentManager first
-        comments = new CommentManager{salt: bytes32(uint256(0))}(
-            deployerAddress
-        );
+        comments = new CommentManager{salt: bytes32(salt)}(deployerAddress);
 
         // Deploy ChannelManager with CommentManager address
-        channelManager = new ChannelManager{salt: bytes32(uint256(0))}(
+        channelManager = new ChannelManager{salt: bytes32(salt)}(
             deployerAddress
         );
 

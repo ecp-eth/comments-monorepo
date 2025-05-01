@@ -1,7 +1,7 @@
 import React from "react";
 import { defineConfig } from "vocs";
 import { remarkMermaid } from "@theguild/remark-mermaid";
-import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import { COMMENT_MANAGER_ADDRESS } from "@ecp.eth/sdk";
 import remarkFindAndReplace from "./plugins/remark-find-replace";
 
 export default defineConfig({
@@ -249,7 +249,7 @@ export default defineConfig({
         remarkFindAndReplace,
         {
           replacements: {
-            COMMENTS_V1_ADDRESS: COMMENTS_V1_ADDRESS,
+            COMMENT_MANAGER_ADDRESS: COMMENT_MANAGER_ADDRESS,
           },
         },
       ],
@@ -258,8 +258,9 @@ export default defineConfig({
   vite: {
     envPrefix: "VITE_",
     define: {
-      "import.meta.env.COMMENTS_V1_ADDRESS":
-        JSON.stringify(COMMENTS_V1_ADDRESS),
+      "import.meta.env.COMMENT_MANAGER_ADDRESS": JSON.stringify(
+        COMMENT_MANAGER_ADDRESS
+      ),
     },
   },
 });
