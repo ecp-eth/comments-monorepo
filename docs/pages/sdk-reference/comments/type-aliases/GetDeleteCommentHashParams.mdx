@@ -14,7 +14,7 @@ type GetDeleteCommentHashParams = {
   commentsAddress?: Hex;
   deadline: bigint;
   nonce: bigint;
-  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "getDeleteCommentHash">>;
+  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">>;
 };
 ```
 
@@ -71,7 +71,7 @@ The address of the comments contract
 #### Default
 
 ```ts
-COMMENTS_V1_ADDRESS
+COMMENT_MANAGER_ADDRESS
 ```
 
 ***
@@ -103,7 +103,7 @@ The nonce for the signature
 ### readContract()
 
 ```ts
-readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "getDeleteCommentHash">>;
+readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">>;
 ```
 
 Defined in: [packages/sdk/src/comments/comment.ts:416](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L416)
@@ -112,8 +112,8 @@ Defined in: [packages/sdk/src/comments/comment.ts:416](https://github.com/ecp-et
 
 ##### parameters
 
-`ReadContractParameters`\<*typeof* [`CommentsV1Abi`](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx), `"getDeleteCommentHash"`\>
+`ReadContractParameters`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getDeleteCommentHash"`\>
 
 #### Returns
 
-`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentsV1Abi`](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx), `"getDeleteCommentHash"`\>\>
+`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getDeleteCommentHash"`\>\>

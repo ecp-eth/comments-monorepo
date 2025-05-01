@@ -27,7 +27,7 @@ sequenceDiagram
     Author->>App server: Post the comment request
     App server->>App server: Signs the comment request
     App server-->>Author: Responds comment data and app signature
-    Author->>Contract: CommentV1.postCommentAsAuthor(commentData, appSignature)
+    Author->>Contract: CommentManager.postCommentAsAuthor(commentData, appSignature)
     Contract->>Indexer: Emit comment event
     Indexer->>Indexer: Store the comment
     Indexer-->>Author: Responds with updated comments feed
@@ -62,7 +62,7 @@ sequenceDiagram
     App server-->>Author: Responds comment data and appSignature
     Author->>Author: Author signs the comment data and appSignature
     Author->>App server: Post comment data and authorSignature
-    App server->>Contract: CommentV1.postComment(commentData, authorSignature, appSignature)
+    App server->>Contract: CommentManager.postComment(commentData, authorSignature, appSignature)
     Contract->>Indexer: Emit comment event
     Indexer->>Indexer: Store the comment
     Indexer-->>Author: Responds with updated comments feed
@@ -101,13 +101,13 @@ sequenceDiagram
         Author->>Author: Sign the approval request with author signer
         Author->>App server: Post approval request, author signature, app signature
         App server->>App server: Verify app signature
-        App server->>Contract: CommentV1.addApproval(authorAddress, appSignerAddress, authorSignature)
+        App server->>Contract: CommentManager.addApproval(authorAddress, appSignerAddress, authorSignature)
     end
 
     Note over Author,Indexer: Gasless transaction with prior approval
     Author->>App server: Post the comment request
     App server->>App server: Signs the comment request
-    App server->>Contract: CommentV1.postComment(commentData, authorSignature, appSignature)
+    App server->>Contract: CommentManager.postComment(commentData, authorSignature, appSignature)
     Contract->>Indexer: Emit comment event
     Indexer->>Indexer: Store the comment
     Indexer-->>Author: Responds with updated comments feed

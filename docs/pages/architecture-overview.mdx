@@ -7,13 +7,13 @@ The Ethereum Comments Protocol enables decentralized commenting through a combin
 ```mermaid
 graph TD
     A[fa:fa-window-maximize App server] --> B["fa:fa-file-code SDK"]
-    B --> C["fa:fa-file-contract CommentV1\n(Smart Contract)"]
+    B --> C["fa:fa-file-contract CommentManager\n(Smart Contract)"]
     B --> D[fa:fa-server Indexer]
     D --> E[fa:fa-database Database]
     C --> D
 ```
 
-### 1. CommentV1 (Smart Contract)
+### 1. CommentManager (Smart Contract)
 
 - Manages comment storage and threading relationships
 - Emits events for comment additions, deletions and approvals

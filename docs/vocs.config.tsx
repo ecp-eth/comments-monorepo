@@ -226,7 +226,23 @@ export default defineConfig({
         },
         {
           text: "Protocol Reference",
-          link: "/protocol-reference/CommentsV1",
+          link: "/protocol-reference/",
+          collapsed: true,
+          items: [
+            {
+              text: "CommentManager",
+              link: "/protocol-reference/CommentManager",
+            },
+            {
+              text: "ChannelManager",
+              link: "/protocol-reference/ChannelManager",
+            },
+            {
+              text: "ProtocolFees",
+              link: "/protocol-reference/ProtocolFees",
+            },
+            { text: "Everything else", link: "/protocol-reference" },
+          ],
         },
       ],
     },

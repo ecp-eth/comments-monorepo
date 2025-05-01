@@ -2,12 +2,12 @@
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [defaultExports](/sdk-reference/defaultExports/index.mdx) / CommentsV1Abi
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [defaultExports](/sdk-reference/defaultExports/index.mdx) / CommentManagerABI
 
-# Variable: CommentsV1Abi
+# Variable: CommentManagerABI
 
 ```ts
-const CommentsV1Abi: readonly [{
+const CommentManagerABI: readonly [{
   inputs: readonly [{
      internalType: "address";
      name: "initialOwner";
@@ -294,7 +294,7 @@ const CommentsV1Abi: readonly [{
         name: "commentType";
         type: "string";
      }];
-     internalType: "struct ICommentTypes.CommentData";
+     internalType: "struct Comments.CommentData";
      name: "";
      type: "tuple";
   }];
@@ -343,7 +343,7 @@ const CommentsV1Abi: readonly [{
         name: "commentType";
         type: "string";
      }];
-     internalType: "struct ICommentTypes.CommentData";
+     internalType: "struct Comments.CommentData";
      name: "commentData";
      type: "tuple";
   }];
@@ -520,7 +520,7 @@ const CommentsV1Abi: readonly [{
         name: "commentType";
         type: "string";
      }];
-     internalType: "struct ICommentTypes.CommentData";
+     internalType: "struct Comments.CommentData";
      name: "commentData";
      type: "tuple";
    }, {
@@ -579,7 +579,7 @@ const CommentsV1Abi: readonly [{
         name: "commentType";
         type: "string";
      }];
-     internalType: "struct ICommentTypes.CommentData";
+     internalType: "struct Comments.CommentData";
      name: "commentData";
      type: "tuple";
    }, {
@@ -753,7 +753,7 @@ const CommentsV1Abi: readonly [{
         type: "string";
      }];
      indexed: false;
-     internalType: "struct ICommentTypes.CommentData";
+     internalType: "struct Comments.CommentData";
      name: "commentData";
      type: "tuple";
   }];
@@ -814,7 +814,11 @@ const CommentsV1Abi: readonly [{
   name: "ChannelDoesNotExist";
   type: "error";
 }, {
-  inputs: readonly [];
+  inputs: readonly [{
+     internalType: "enum Hooks.HookPhase";
+     name: "hookPhase";
+     type: "uint8";
+  }];
   name: "ChannelHookExecutionFailed";
   type: "error";
 }, {
@@ -930,4 +934,4 @@ const CommentsV1Abi: readonly [{
 
 Defined in: [packages/sdk/src/abis.ts:4](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L4)
 
-ABI of the CommentsV1 contract.
+ABI of the CommentManager contract.

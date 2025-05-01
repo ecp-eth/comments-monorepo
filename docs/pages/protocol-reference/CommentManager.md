@@ -2,60 +2,14 @@
 
 ----
 
-# `CommentsV1`
+# `CommentManager`
 
 This contract allows users to post and manage comments with optional app-signer approval and channel-specific hooks
 
 
 Implements EIP-712 for typed structured data hashing and signing
-Security Model:
-1. Authentication:
-   - Comments can be posted directly by authors or via signatures
-   - App signers must be approved by authors
-   - All signatures follow EIP-712 for better security
-2. Authorization:
-   - Only comment authors can delete their comments
-   - App signer approvals can be revoked at any time
-   - Nonce system prevents signature replay attacks
-3. Hook System:
-   - Protected against reentrancy
-   - Channel-specific hooks are executed before and after comment operations
-   - Channel owners control their hooks
-4. Data Integrity:
-   - Thread IDs are immutable once set
-   - Parent-child relationships are verified
-   - Comment IDs are cryptographically secure
 
 
-
-
-
-## Events
-
-### `CommentAdded(bytes32 commentId, address author, address appSigner, struct ICommentTypes.CommentData commentData)`
-
-Emitted when a new comment is added
-
-
-
-
-### `CommentDeleted(bytes32 commentId, address author)`
-
-Emitted when a comment is deleted
-
-
-
-
-### `ApprovalAdded(address author, address appSigner)`
-
-Emitted when an author approves an app signer
-
-
-
-
-### `ApprovalRemoved(address author, address appSigner)`
-
-Emitted when an author removes an app signer's approval
 
 
 
@@ -71,21 +25,21 @@ Constructor initializes the contract with the deployer as owner and channel mana
 Sets up EIP-712 domain separator
 
 
-### `postCommentAsAuthor(struct ICommentTypes.CommentData commentData, bytes appSignature)` (external)
+### `postCommentAsAuthor(struct Comments.CommentData commentData, bytes appSignature)` (external)
 
 Posts a comment directly from the author's address
 
 
 
 
-### `postComment(struct ICommentTypes.CommentData commentData, bytes authorSignature, bytes appSignature)` (external)
+### `postComment(struct Comments.CommentData commentData, bytes authorSignature, bytes appSignature)` (external)
 
 Posts a comment with both author and app signer signatures
 
 
 
 
-### `_postComment(struct ICommentTypes.CommentData commentData, bytes authorSignature, bytes appSignature)` (internal)
+### `_postComment(struct Comments.CommentData commentData, bytes authorSignature, bytes appSignature)` (internal)
 
 Internal function to handle comment posting logic
 
@@ -176,14 +130,14 @@ Calculates the EIP-712 hash for deleting a comment
 
 
 
-### `getCommentId(struct ICommentTypes.CommentData commentData) → bytes32` (public)
+### `getCommentId(struct Comments.CommentData commentData) → bytes32` (public)
 
 Calculates the EIP-712 hash for a comment
 
 
 
 
-### `getComment(bytes32 commentId) → struct ICommentTypes.CommentData` (external)
+### `getComment(bytes32 commentId) → struct Comments.CommentData` (external)
 
 Get comment data by ID
 

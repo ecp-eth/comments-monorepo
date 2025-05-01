@@ -25,16 +25,7 @@ This interface defines the core functionality for managing channels and their as
 - **hook:** (contract IHook) 
 
 
-- **hookEnabled:** (bool) 
-
-
-### `HookConfig`
-
-
-- **registered:** (bool) 
-
-
-- **enabled:** (bool) 
+- **permissions:** (struct Hooks.Permissions) 
 
 
 
@@ -42,23 +33,9 @@ This interface defines the core functionality for managing channels and their as
 
 ## Events
 
-### `HookExecutionFailed(uint256 channelId, address hook, enum IChannelManager.HookPhase phase)`
+### `HookExecutionFailed(uint256 channelId, address hook, enum Hooks.HookPhase phase)`
 
 Emitted when a hook execution fails
-
-
-
-
-### `HookRegistered(address hook)`
-
-Emitted when a hook is registered in the global registry
-
-
-
-
-### `HookGlobalStatusUpdated(address hook, bool enabled)`
-
-Emitted when a hook's global enabled status is updated
 
 
 
@@ -129,20 +106,6 @@ Gets a channel's configuration
 
 
 
-### `setHookGloballyEnabled(address hook, bool enabled)` (external)
-
-Enables or disables a hook globally (only owner)
-
-
-
-
-### `getHookStatus(address hook) → struct IChannelManager.HookConfig` (external)
-
-Checks if a hook is registered and globally enabled
-
-
-
-
 ### `updateCommentsContract(address _commentsContract)` (external)
 
 Updates the comments contract address (only owner)
@@ -157,7 +120,7 @@ Sets the base URI for NFT metadata
 
 
 
-### `executeHooks(uint256 channelId, struct ICommentTypes.CommentData commentData, address caller, bytes32 commentId, enum IChannelManager.HookPhase phase) → bool` (external)
+### `executeHook(uint256 channelId, struct Comments.CommentData commentData, address caller, bytes32 commentId, enum Hooks.HookPhase phase) → bool` (external)
 
 Executes hook for a channel
 
@@ -171,26 +134,9 @@ Checks if a channel exists
 
 
 
-### `registerHook(address hook)` (external)
-
-Registers a new hook in the global registry
-
-
-
-
 ### `getChannelOwner(uint256 channelId) → address` (external)
 
 Gets the owner of a channel
-
-
-
-
-
-## Enums
-
-### `HookPhase`
-
-
 
 
 

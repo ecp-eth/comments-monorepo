@@ -17,8 +17,8 @@ You may want to read more about the [post comment flows](/post-comment-flows) fo
 
 #### The Contract
 
-- For latest contract address, see [COMMENTS_V1_ADDRESS](/sdk-reference/defaultExports/variables/COMMENTS_V1_ADDRESS).
-- We will call [`postCommentAsAuthor()`](/protocol-reference/CommentsV1#postcommentasauthorstruct-commentsv1commentdata-commentdata-bytes-appsignature-external) method to post the comment.
+- For latest contract address, see [COMMENT_MANAGER_ADDRESS](/sdk-reference/defaultExports/variables/COMMENT_MANAGER_ADDRESS).
+- We will call [`postCommentAsAuthor()`](/protocol-reference/CommentManager#postcommentasauthorstruct-commentscommentdata-commentdata-bytes-appsignature-external) method to post the comment.
 
 #### Demo Dependencies
 
@@ -135,8 +135,8 @@ Now with the wagmi ready to go, and the comment data and app signature returned 
 
 ```typescript
 await writeContractAsync({
-  abi: CommentsV1Abi,
-  address: COMMENTS_V1_ADDRESS,
+  abi: CommentManagerABI,
+  address: COMMENT_MANAGER_ADDRESS,
   functionName: "postCommentAsAuthor",
   args: [commentData, appSignature],
 });
@@ -160,7 +160,7 @@ await writeContractAsync({
 ### Additional Resources
 
 - Check out **gasless** [post comment flows](/post-comment-flows)
-- See [Protocol API Reference](/protocol-reference/CommentsV1) for more functions and details.
+- See [Protocol API Reference](/protocol-reference/CommentManager) for more functions and details.
 - See [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) for implementations of:
   1. The other post comment flows.
   2. Request permission from the user for gasless posting.

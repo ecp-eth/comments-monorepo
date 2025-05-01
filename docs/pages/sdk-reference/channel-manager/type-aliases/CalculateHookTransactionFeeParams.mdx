@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / CalculateHookTransactionFeeParams
+
+# Type Alias: CalculateHookTransactionFeeParams
+
+```ts
+type CalculateHookTransactionFeeParams = {
+  channelManagerAddress?: Hex;
+  value: bigint;
+  writeContract: ContractWriteFunctions["calculateHookTransactionFee"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:233](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L233)
+
+## Properties
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:243](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L243)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### value
+
+```ts
+value: bigint;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:237](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L237)
+
+The total value to calculate fee for
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["calculateHookTransactionFee"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:244](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L244)

@@ -2,12 +2,12 @@
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [defaultExports](/sdk-reference/defaultExports/index.mdx) / ChannelManagerAbi
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [defaultExports](/sdk-reference/defaultExports/index.mdx) / ChannelManagerABI
 
-# Variable: ChannelManagerAbi
+# Variable: ChannelManagerABI
 
 ```ts
-const ChannelManagerAbi: readonly [{
+const ChannelManagerABI: readonly [{
   inputs: readonly [{
      internalType: "address";
      name: "initialOwner";
@@ -74,16 +74,6 @@ const ChannelManagerAbi: readonly [{
 }, {
   inputs: readonly [];
   name: "collectChannelCreationFee";
-  outputs: readonly [{
-     internalType: "uint96";
-     name: "";
-     type: "uint96";
-  }];
-  stateMutability: "payable";
-  type: "function";
-}, {
-  inputs: readonly [];
-  name: "collectHookRegistrationFee";
   outputs: readonly [{
      internalType: "uint96";
      name: "";
@@ -174,7 +164,7 @@ const ChannelManagerAbi: readonly [{
         name: "commentType";
         type: "string";
      }];
-     internalType: "struct ICommentTypes.CommentData";
+     internalType: "struct Comments.CommentData";
      name: "commentData";
      type: "tuple";
    }, {
@@ -186,11 +176,11 @@ const ChannelManagerAbi: readonly [{
      name: "commentId";
      type: "bytes32";
    }, {
-     internalType: "enum IChannelManager.HookPhase";
+     internalType: "enum Hooks.HookPhase";
      name: "phase";
      type: "uint8";
   }];
-  name: "executeHooks";
+  name: "executeHook";
   outputs: readonly [{
      internalType: "bool";
      name: "";
@@ -264,39 +254,6 @@ const ChannelManagerAbi: readonly [{
   type: "function";
 }, {
   inputs: readonly [];
-  name: "getHookRegistrationFee";
-  outputs: readonly [{
-     internalType: "uint96";
-     name: "";
-     type: "uint96";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [{
-     internalType: "address";
-     name: "hook";
-     type: "address";
-  }];
-  name: "getHookStatus";
-  outputs: readonly [{
-     components: readonly [{
-        internalType: "bool";
-        name: "registered";
-        type: "bool";
-      }, {
-        internalType: "bool";
-        name: "enabled";
-        type: "bool";
-     }];
-     internalType: "struct IChannelManager.HookConfig";
-     name: "";
-     type: "tuple";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [];
   name: "getHookTransactionFee";
   outputs: readonly [{
      internalType: "uint16";
@@ -356,16 +313,6 @@ const ChannelManagerAbi: readonly [{
      type: "address";
   }];
   stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [{
-     internalType: "address";
-     name: "hook";
-     type: "address";
-  }];
-  name: "registerHook";
-  outputs: readonly [];
-  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [];
@@ -458,30 +405,6 @@ const ChannelManagerAbi: readonly [{
      type: "address";
   }];
   name: "setHook";
-  outputs: readonly [];
-  stateMutability: "nonpayable";
-  type: "function";
-}, {
-  inputs: readonly [{
-     internalType: "address";
-     name: "hook";
-     type: "address";
-   }, {
-     internalType: "bool";
-     name: "enabled";
-     type: "bool";
-  }];
-  name: "setHookGloballyEnabled";
-  outputs: readonly [];
-  stateMutability: "nonpayable";
-  type: "function";
-}, {
-  inputs: readonly [{
-     internalType: "uint96";
-     name: "fee";
-     type: "uint96";
-  }];
-  name: "setHookRegistrationFee";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -783,46 +706,11 @@ const ChannelManagerAbi: readonly [{
      type: "address";
    }, {
      indexed: false;
-     internalType: "enum IChannelManager.HookPhase";
+     internalType: "enum Hooks.HookPhase";
      name: "phase";
      type: "uint8";
   }];
   name: "HookExecutionFailed";
-  type: "event";
-}, {
-  anonymous: false;
-  inputs: readonly [{
-     indexed: true;
-     internalType: "address";
-     name: "hook";
-     type: "address";
-   }, {
-     indexed: false;
-     internalType: "bool";
-     name: "enabled";
-     type: "bool";
-  }];
-  name: "HookGlobalStatusUpdated";
-  type: "event";
-}, {
-  anonymous: false;
-  inputs: readonly [{
-     indexed: true;
-     internalType: "address";
-     name: "hook";
-     type: "address";
-  }];
-  name: "HookRegistered";
-  type: "event";
-}, {
-  anonymous: false;
-  inputs: readonly [{
-     indexed: false;
-     internalType: "uint96";
-     name: "newFee";
-     type: "uint96";
-  }];
-  name: "HookRegistrationFeeUpdated";
   type: "event";
 }, {
   anonymous: false;
@@ -1014,11 +902,7 @@ const ChannelManagerAbi: readonly [{
   type: "error";
 }, {
   inputs: readonly [];
-  name: "HookAlreadyRegistered";
-  type: "error";
-}, {
-  inputs: readonly [];
-  name: "HookDisabledGlobally";
+  name: "HookInitializationFailed";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1038,7 +922,7 @@ const ChannelManagerAbi: readonly [{
   type: "error";
 }, {
   inputs: readonly [];
-  name: "InvalidFeePercentage";
+  name: "InvalidFee";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1079,6 +963,6 @@ const ChannelManagerAbi: readonly [{
 }];
 ```
 
-Defined in: [packages/sdk/src/abis.ts:1193](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L1193)
+Defined in: [packages/sdk/src/abis.ts:1199](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L1199)
 
 ABI of the ChannelManager contract.
