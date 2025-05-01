@@ -421,12 +421,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         _revokeApproval(author, appSigner);
     }
 
-    /// @notice Calculates the EIP-712 hash for a permit
-    /// @param author Address of the author
-    /// @param appSigner Address of the app signer
-    /// @param nonce Current nonce for the author
-    /// @param deadline Timestamp after which the signature is invalid
-    /// @return bytes32 The computed hash
+    /// @inheritdoc ICommentManager
     function getAddApprovalHash(
         address author,
         address appSigner,
@@ -449,12 +444,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             );
     }
 
-    /// @notice Calculates the EIP-712 hash for removing an approval
-    /// @param author The address removing approval
-    /// @param appSigner The address being unapproved
-    /// @param nonce The current nonce for the author
-    /// @param deadline Timestamp after which the signature becomes invalid
-    /// @return The computed hash
+    /// @inheritdoc ICommentManager
     function getRemoveApprovalHash(
         address author,
         address appSigner,
