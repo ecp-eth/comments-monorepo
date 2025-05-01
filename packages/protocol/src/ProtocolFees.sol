@@ -84,15 +84,13 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
     /// @return hookValue The amount that should be passed to the hook
     function calculateHookTransactionFee(
         uint256 value
-    ) public payable returns (uint256 hookValue) {
-        if (value > 0 && hookTransactionFeeBasisPoints > 0) {
-            uint256 protocolFee = (value * hookTransactionFeeBasisPoints) /
-                10000;
-            hookValue = value - protocolFee;
-        } else {
-            hookValue = value;
+    ) public view returns (uint256 hookValue) {
+        if (value <= 0 || hookTransactionFeeBasisPoints <= 0) {
+            return value;
         }
-        return hookValue;
+
+        uint256 protocolFee = (value * hookTransactionFeeBasisPoints) / 10000;
+        return value - protocolFee;
     }
 
     /// @notice Internal function to handle fee collection and refunds
