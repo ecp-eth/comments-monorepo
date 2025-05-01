@@ -17,7 +17,7 @@ import {
   calculateHookTransactionFee,
 } from "../hook.js";
 import { createChannel } from "../channel.js";
-import { ChannelManagerAbi } from "../../abis.js";
+import { ChannelManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 
 const { channelManagerAddress, noopHookAddress } = deployContracts();
@@ -60,7 +60,7 @@ describe("setHook()", () => {
     });
 
     const logs = parseEventLogs({
-      abi: ChannelManagerAbi,
+      abi: ChannelManagerABI,
       logs: receipt.logs,
       eventName: "ChannelCreated",
     });

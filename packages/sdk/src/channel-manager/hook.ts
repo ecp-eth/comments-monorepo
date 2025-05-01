@@ -4,7 +4,7 @@ import {
   CommentInputDataSchema,
   type CommentInputData,
 } from "../comments/schemas.js";
-import { ChannelManagerAbi } from "../abis.js";
+import { ChannelManagerABI } from "../abis.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 import { type Hex, HexSchema } from "../core/schemas.js";
 
@@ -48,7 +48,7 @@ export async function setHook(params: SetHookParams): Promise<SetHookResult> {
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "setHook",
     args: [channelId, hook],
   });
@@ -90,7 +90,7 @@ export async function getHookTransactionFee(
 
   const fee = await params.readContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "getHookTransactionFee",
   });
 
@@ -134,7 +134,7 @@ export async function setHookTransactionFee(
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "setHookTransactionFee",
     args: [feeBasisPoints],
   });
@@ -213,7 +213,7 @@ export async function executeHook(
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "executeHook",
     args: [
       channelId,
@@ -269,7 +269,7 @@ export async function calculateHookTransactionFee(
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "calculateHookTransactionFee",
     args: [value],
     value,

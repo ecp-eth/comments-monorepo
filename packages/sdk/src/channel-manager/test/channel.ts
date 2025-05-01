@@ -23,7 +23,7 @@ import {
   setBaseURI,
   collectChannelCreationFee,
 } from "../channel.js";
-import { ChannelManagerAbi } from "../../abis.js";
+import { ChannelManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 
 const { channelManagerAddress } = deployContracts();
@@ -126,7 +126,7 @@ describe("getChannel()", () => {
     assert.equal(receipt.status, "success");
 
     const logs = parseEventLogs({
-      abi: ChannelManagerAbi,
+      abi: ChannelManagerABI,
       logs: receipt.logs,
       eventName: "ChannelCreated",
     });
@@ -209,7 +209,7 @@ describe("getChannelOwner()", () => {
     assert.equal(receipt.status, "success");
 
     const logs = parseEventLogs({
-      abi: ChannelManagerAbi,
+      abi: ChannelManagerABI,
       logs: receipt.logs,
       eventName: "ChannelCreated",
     });
@@ -248,7 +248,7 @@ describe("updateChannel()", () => {
     assert.equal(receipt.status, "success");
 
     const logs = parseEventLogs({
-      abi: ChannelManagerAbi,
+      abi: ChannelManagerABI,
       logs: receipt.logs,
       eventName: "ChannelCreated",
     });
@@ -356,7 +356,7 @@ describe("withdrawFees()", () => {
     assert.equal(receipt.status, "success");
 
     const logs = parseEventLogs({
-      abi: ChannelManagerAbi,
+      abi: ChannelManagerABI,
       logs: receipt.logs,
       eventName: "FeesWithdrawn",
     });

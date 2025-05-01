@@ -1,4 +1,4 @@
-import { COMMENT_MANAGER_ADDRESS, CommentManagerAbi } from "@ecp.eth/sdk";
+import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
 import { Address, Chain, PublicClient, Transport } from "viem";
 import { chain } from "@/lib/wagmi";
 import { publicEnv } from "@/publicEnv";
@@ -20,7 +20,7 @@ export async function getApprovalStatusAndNonce<
           contracts: [
             {
               address: COMMENT_MANAGER_ADDRESS,
-              abi: CommentManagerAbi,
+              abi: CommentManagerABI,
               functionName: "isApproved",
               args: [
                 connectedAddress,
@@ -29,7 +29,7 @@ export async function getApprovalStatusAndNonce<
             },
             {
               address: COMMENT_MANAGER_ADDRESS,
-              abi: CommentManagerAbi,
+              abi: CommentManagerABI,
               functionName: "nonces",
               args: [
                 connectedAddress,
@@ -42,7 +42,7 @@ export async function getApprovalStatusAndNonce<
           await Promise.all([
             publicClient.readContract({
               address: COMMENT_MANAGER_ADDRESS,
-              abi: CommentManagerAbi,
+              abi: CommentManagerABI,
               functionName: "isApproved",
               args: [
                 connectedAddress,
@@ -51,7 +51,7 @@ export async function getApprovalStatusAndNonce<
             }),
             publicClient.readContract({
               address: COMMENT_MANAGER_ADDRESS,
-              abi: CommentManagerAbi,
+              abi: CommentManagerABI,
               functionName: "nonces",
               args: [
                 connectedAddress,

@@ -44,12 +44,12 @@ const formattedAbi = await format(
   /**
    * ABI of the CommentManager contract.
    */
-  export const CommentManagerAbi = ${commentsAbi.trim()} as const;
+  export const CommentManagerABI = ${commentsAbi.trim()} as const;
 
   /**
    * ABI of the ChannelManager contract.
    */
-  export const ChannelManagerAbi = ${channelManagerAbi.trim()} as const;
+  export const ChannelManagerABI = ${channelManagerAbi.trim()} as const;
 `,
   { parser: "typescript" }
 );

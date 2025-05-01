@@ -3,10 +3,10 @@ import type {
   ReadContractParameters,
   ReadContractReturnType,
 } from "viem";
-import type { CommentManagerAbi } from "../abis.js";
+import type { CommentManagerABI } from "../abis.js";
 import type { Hex } from "../core/schemas.js";
 
-export type CommentManagerAbiType = typeof CommentManagerAbi;
+export type CommentManagerABIType = typeof CommentManagerABI;
 
 /**
  * The shared parameters for creating a comment
@@ -113,7 +113,7 @@ export type CommentData = {
 export type ContractWriteFunctions = {
   postComment: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "payable",
       "postComment"
     > & {
@@ -123,7 +123,7 @@ export type ContractWriteFunctions = {
 
   postCommentAsAuthor: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "payable",
       "postCommentAsAuthor"
     > & {
@@ -133,7 +133,7 @@ export type ContractWriteFunctions = {
 
   addApproval: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "nonpayable",
       "addApproval"
     >
@@ -141,7 +141,7 @@ export type ContractWriteFunctions = {
 
   addApprovalAsAuthor: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "nonpayable",
       "addApprovalAsAuthor"
     >
@@ -149,7 +149,7 @@ export type ContractWriteFunctions = {
 
   deleteComment: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "nonpayable",
       "deleteComment"
     >
@@ -157,7 +157,7 @@ export type ContractWriteFunctions = {
 
   deleteCommentAsAuthor: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "nonpayable",
       "deleteCommentAsAuthor"
     >
@@ -165,7 +165,7 @@ export type ContractWriteFunctions = {
 
   removeApproval: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "nonpayable",
       "removeApproval"
     >
@@ -173,7 +173,7 @@ export type ContractWriteFunctions = {
 
   renounceOwnership: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "nonpayable",
       "renounceOwnership"
     >
@@ -181,7 +181,7 @@ export type ContractWriteFunctions = {
 
   revokeApprovalAsAuthor: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "nonpayable",
       "revokeApprovalAsAuthor"
     >
@@ -189,7 +189,7 @@ export type ContractWriteFunctions = {
 
   transferOwnership: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "nonpayable",
       "transferOwnership"
     >
@@ -197,7 +197,7 @@ export type ContractWriteFunctions = {
 
   updateChannelContract: (
     args: ContractFunctionParameters<
-      CommentManagerAbiType,
+      CommentManagerABIType,
       "nonpayable",
       "updateChannelContract"
     >
@@ -206,50 +206,50 @@ export type ContractWriteFunctions = {
 
 export type ContractReadFunctions = {
   getAddApprovalHash: (
-    args: ReadContractParameters<CommentManagerAbiType, "getAddApprovalHash">
+    args: ReadContractParameters<CommentManagerABIType, "getAddApprovalHash">
   ) => Promise<
-    ReadContractReturnType<CommentManagerAbiType, "getAddApprovalHash">
+    ReadContractReturnType<CommentManagerABIType, "getAddApprovalHash">
   >;
 
   getRemoveApprovalHash: (
-    args: ReadContractParameters<CommentManagerAbiType, "getRemoveApprovalHash">
+    args: ReadContractParameters<CommentManagerABIType, "getRemoveApprovalHash">
   ) => Promise<
-    ReadContractReturnType<CommentManagerAbiType, "getRemoveApprovalHash">
+    ReadContractReturnType<CommentManagerABIType, "getRemoveApprovalHash">
   >;
 
   getDeleteCommentHash: (
-    args: ReadContractParameters<CommentManagerAbiType, "getDeleteCommentHash">
+    args: ReadContractParameters<CommentManagerABIType, "getDeleteCommentHash">
   ) => Promise<
-    ReadContractReturnType<CommentManagerAbiType, "getDeleteCommentHash">
+    ReadContractReturnType<CommentManagerABIType, "getDeleteCommentHash">
   >;
 
   getCommentId: (
-    args: ReadContractParameters<CommentManagerAbiType, "getCommentId">
-  ) => Promise<ReadContractReturnType<CommentManagerAbiType, "getCommentId">>;
+    args: ReadContractParameters<CommentManagerABIType, "getCommentId">
+  ) => Promise<ReadContractReturnType<CommentManagerABIType, "getCommentId">>;
 
   getComment: (
-    args: ReadContractParameters<CommentManagerAbiType, "getComment">
-  ) => Promise<ReadContractReturnType<CommentManagerAbiType, "getComment">>;
+    args: ReadContractParameters<CommentManagerABIType, "getComment">
+  ) => Promise<ReadContractReturnType<CommentManagerABIType, "getComment">>;
 
   isApproved: (
-    args: ReadContractParameters<CommentManagerAbiType, "isApproved">
-  ) => Promise<ReadContractReturnType<CommentManagerAbiType, "isApproved">>;
+    args: ReadContractParameters<CommentManagerABIType, "isApproved">
+  ) => Promise<ReadContractReturnType<CommentManagerABIType, "isApproved">>;
 
   name: (
-    args: ReadContractParameters<CommentManagerAbiType, "name">
-  ) => Promise<ReadContractReturnType<CommentManagerAbiType, "name">>;
+    args: ReadContractParameters<CommentManagerABIType, "name">
+  ) => Promise<ReadContractReturnType<CommentManagerABIType, "name">>;
 
   version: (
-    args: ReadContractParameters<CommentManagerAbiType, "version">
-  ) => Promise<ReadContractReturnType<CommentManagerAbiType, "version">>;
+    args: ReadContractParameters<CommentManagerABIType, "version">
+  ) => Promise<ReadContractReturnType<CommentManagerABIType, "version">>;
 
   DOMAIN_SEPARATOR: (
-    args: ReadContractParameters<CommentManagerAbiType, "DOMAIN_SEPARATOR">
+    args: ReadContractParameters<CommentManagerABIType, "DOMAIN_SEPARATOR">
   ) => Promise<
-    ReadContractReturnType<CommentManagerAbiType, "DOMAIN_SEPARATOR">
+    ReadContractReturnType<CommentManagerABIType, "DOMAIN_SEPARATOR">
   >;
 
   channelManager: (
-    args: ReadContractParameters<CommentManagerAbiType, "channelManager">
-  ) => Promise<ReadContractReturnType<CommentManagerAbiType, "channelManager">>;
+    args: ReadContractParameters<CommentManagerABIType, "channelManager">
+  ) => Promise<ReadContractReturnType<CommentManagerABIType, "channelManager">>;
 };

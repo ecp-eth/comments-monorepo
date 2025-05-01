@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { COMMENT_MANAGER_ADDRESS } from "../constants.js";
 import { type Hex, HexSchema } from "../core/schemas.js";
-import { CommentManagerAbi } from "../abis.js";
+import { CommentManagerABI } from "../abis.js";
 import type { ReadContractParameters, ReadContractReturnType } from "viem";
 import type {
-  CommentManagerAbiType,
+  CommentManagerABIType,
   ContractReadFunctions,
   ContractWriteFunctions,
 } from "./types.js";
@@ -56,7 +56,7 @@ export async function isApproved(params: IsApprovedParams): Promise<boolean> {
 
   const approved = await params.readContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "isApproved",
     args: [author, appSigner],
   });
@@ -105,7 +105,7 @@ export async function addApprovalAsAuthor(
 
   const txHash = await writeContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "addApprovalAsAuthor",
     args: [appSigner],
   });
@@ -160,7 +160,7 @@ export async function addApproval(
 
   const txHash = await writeContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "addApproval",
     args: [
       typedData.message.author,
@@ -217,7 +217,7 @@ export async function revokeApprovalAsAuthor(
 
   const txHash = await writeContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "revokeApprovalAsAuthor",
     args: [appSigner],
   });
@@ -274,7 +274,7 @@ export async function revokeApproval(
 
   const txHash = await writeContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "removeApproval",
     args: [
       typedData.message.author,
@@ -292,11 +292,11 @@ export async function revokeApproval(
 
 export type ReadAddApprovalHashFromContractFunction = (
   parameters: ReadContractParameters<
-    CommentManagerAbiType,
+    CommentManagerABIType,
     "getAddApprovalHash"
   >
 ) => Promise<
-  ReadContractReturnType<CommentManagerAbiType, "getAddApprovalHash">
+  ReadContractReturnType<CommentManagerABIType, "getAddApprovalHash">
 >;
 
 export type GetAddApprovalHashParams = {
@@ -367,7 +367,7 @@ export async function getAddApprovalHash(
 
   const hash = await params.readContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "getAddApprovalHash",
     args: [author, appSigner, nonce, computedDeadline],
   });
@@ -385,11 +385,11 @@ export async function getAddApprovalHash(
 
 export type ReadRemoveApprovalHashFromContractFunction = (
   parameters: ReadContractParameters<
-    CommentManagerAbiType,
+    CommentManagerABIType,
     "getRemoveApprovalHash"
   >
 ) => Promise<
-  ReadContractReturnType<CommentManagerAbiType, "getRemoveApprovalHash">
+  ReadContractReturnType<CommentManagerABIType, "getRemoveApprovalHash">
 >;
 
 export type GetRemoveApprovalHashParams = {
@@ -444,7 +444,7 @@ export async function getRemoveApprovalHash(
 
   const hash = await params.readContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "getRemoveApprovalHash",
     args: [author, appSigner, nonce, deadline],
   });

@@ -6,7 +6,7 @@ import {
   EMPTY_PARENT_ID,
 } from "../constants.js";
 import { HexSchema, type Hex } from "../core/schemas.js";
-import { CommentManagerAbi } from "../abis.js";
+import { CommentManagerABI } from "../abis.js";
 import {
   stringToHex,
   type ReadContractParameters,
@@ -87,7 +87,7 @@ export async function postCommentAsAuthor(
 
   const txHash = await params.writeContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "postCommentAsAuthor",
     args: [comment, appSignature],
     value: fee,
@@ -154,7 +154,7 @@ export async function postComment(params: PostCommentParams) {
 
   const txHash = await params.writeContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "postComment",
     args: [comment, authorSignature ?? stringToHex(""), appSignature],
     value: fee,
@@ -176,8 +176,8 @@ export type GetCommentParams = {
    */
   commentsAddress?: Hex;
   readContract: (
-    parameters: ReadContractParameters<typeof CommentManagerAbi, "getComment">
-  ) => Promise<ReadContractReturnType<typeof CommentManagerAbi, "getComment">>;
+    parameters: ReadContractParameters<typeof CommentManagerABI, "getComment">
+  ) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getComment">>;
 };
 
 export type GetCommentResult = {
@@ -202,7 +202,7 @@ export async function getComment(
 
   const comment = await params.readContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "getComment",
     args: [commentId],
   });
@@ -242,7 +242,7 @@ export async function getCommentId(params: GetCommentIdParams): Promise<Hex> {
 
   const commentId = await params.readContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "getCommentId",
     args: [createCommentData(commentData)],
   });
@@ -286,7 +286,7 @@ export async function deleteCommentAsAuthor(
 
   const txHash = await params.writeContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "deleteCommentAsAuthor",
     args: [commentId],
   });
@@ -369,7 +369,7 @@ export async function deleteComment(params: DeleteCommentParams) {
 
   const txHash = await params.writeContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "deleteComment",
     args: [
       commentId,
@@ -415,11 +415,11 @@ export type GetDeleteCommentHashParams = {
   commentsAddress?: Hex;
   readContract: (
     parameters: ReadContractParameters<
-      typeof CommentManagerAbi,
+      typeof CommentManagerABI,
       "getDeleteCommentHash"
     >
   ) => Promise<
-    ReadContractReturnType<typeof CommentManagerAbi, "getDeleteCommentHash">
+    ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">
   >;
 };
 
@@ -446,7 +446,7 @@ export async function getDeleteCommentHash(
 
   const hash = await params.readContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "getDeleteCommentHash",
     args: [commentId, author, appSigner, nonce, deadline],
   });
@@ -469,8 +469,8 @@ export type GetNonceParams = {
    */
   commentsAddress?: Hex;
   readContract: (
-    parameters: ReadContractParameters<typeof CommentManagerAbi, "nonces">
-  ) => Promise<ReadContractReturnType<typeof CommentManagerAbi, "nonces">>;
+    parameters: ReadContractParameters<typeof CommentManagerABI, "nonces">
+  ) => Promise<ReadContractReturnType<typeof CommentManagerABI, "nonces">>;
 };
 
 const GetNonceParamsSchema = z.object({
@@ -491,7 +491,7 @@ export async function getNonce(params: GetNonceParams): Promise<bigint> {
 
   const nonce = await params.readContract({
     address: commentsAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "nonces",
     args: [author, appSigner],
   });

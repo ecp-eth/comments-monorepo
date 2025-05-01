@@ -1,7 +1,7 @@
 /**
  * ABI of the CommentManager contract.
  */
-export const CommentManagerAbi = [
+export const CommentManagerABI = [
   {
     type: "constructor",
     inputs: [
@@ -1196,7 +1196,7 @@ export const CommentManagerAbi = [
 /**
  * ABI of the ChannelManager contract.
  */
-export const ChannelManagerAbi = [
+export const ChannelManagerABI = [
   {
     type: "constructor",
     inputs: [

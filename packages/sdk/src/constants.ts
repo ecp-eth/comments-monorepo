@@ -1,7 +1,7 @@
 import { toHex } from "viem/utils";
 
 /**
- * The address of the CommentManager contract.
+ * The address of the `CommentManager` contract.
  * It is created using the CREATE2 opcode so should be identical across chains if no collisions occur.
  */
 export const COMMENT_MANAGER_ADDRESS =
@@ -19,26 +19,26 @@ export const CHANNEL_MANAGER_ADDRESS =
 export const ZERO_ADDRESS = toHex(0, { size: 20 });
 
 /**
- * The default channel ID for the CommentsV1 contract.
+ * The default channel ID for the CommentManager contract.
  */
 export const DEFAULT_CHANNEL_ID = 0n;
 
 /**
- * The default comment type for the CommentsV1 contract.
+ * The default comment type for the `CommentManager` contract.
  */
 export const DEFAULT_COMMENT_TYPE = "comment" as const;
 
 /**
  * The default `embedUri` for the CommentsEmbed component.
  * It runs a service that creates app signatures for requests and
- * submits the transaction to the CommentsV1 contract.
+ * submits the transaction to the `CommentManager` contract.
  */
 export const COMMENTS_EMBED_DEFAULT_URL = "https://embed.ethcomments.xyz";
 
 /**
  * The default `embedUri` for the CommentsByAuthorEmbed component.
  * It runs a service that creates app signatures for requests and
- * submits the transaction to the CommentsV1 contract.
+ * submits the transaction to the `CommentManager` contract.
  */
 export const COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL =
   "https://embed.ethcomments.xyz/by-author";

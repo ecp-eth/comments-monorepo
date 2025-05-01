@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { COMMENT_MANAGER_ADDRESS } from "../constants.js";
 import { type Hex, HexSchema } from "../core/schemas.js";
-import { CommentManagerAbi } from "../abis.js";
+import { CommentManagerABI } from "../abis.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 
 export type UpdateChannelContractParams = {
@@ -40,7 +40,7 @@ export async function updateChannelContract(
 
   const txHash = await params.writeContract({
     address: commentsContractAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "updateChannelContract",
     args: [channelContract],
   });
@@ -76,7 +76,7 @@ export async function getContractName(
 
   const name = await params.readContract({
     address: commentsContractAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "name",
   });
 
@@ -110,7 +110,7 @@ export async function getContractVersion(
 
   const version = await params.readContract({
     address: commentsContractAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "version",
   });
 
@@ -144,7 +144,7 @@ export async function getDomainSeparator(
 
   const domainSeparator = await params.readContract({
     address: commentsContractAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "DOMAIN_SEPARATOR",
   });
 
@@ -178,7 +178,7 @@ export async function getChannelManager(
 
   const channelManager = await params.readContract({
     address: commentsContractAddress,
-    abi: CommentManagerAbi,
+    abi: CommentManagerABI,
     functionName: "channelManager",
   });
 
