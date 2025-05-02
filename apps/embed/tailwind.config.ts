@@ -83,7 +83,10 @@ export default {
           DEFAULT: "var(--border)",
           focus: "var(--border-focus)",
         },
-        input: "var(--input)",
+        input: {
+          DEFAULT: "var(--input)",
+          foreground: "var(--input-foreground)",
+        },
         ring: "var(--ring)",
       },
       borderRadius: {

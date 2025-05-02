@@ -32,7 +32,7 @@ export function ApplyTheme({ children }: ApplyThemeProps) {
     <>
       <LinkGoogleFont config={config} />
       <div
-        className={cn("theme-root", config?.theme?.mode)}
+        className={cn("theme-root", config?.theme?.mode, "bg-background")}
         style={createThemeCSSVariables(config)}
       >
         {children}

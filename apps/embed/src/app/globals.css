@@ -37,7 +37,8 @@ body {
     );
     --border: var(--light-theme-border, hsl(0 0% 89.8%));
     --border-focus: var(--light-theme-border-focus, hsl(0 0% 3.9%));
-    --input: var(--light-theme-border, hsl(0 0% 89.8%));
+    --input: var(--light-theme-input, hsla(0, 0%, 100%, 0));
+    --input-foreground: var(--light-theme-input-foreground, hsl(0 0% 3.9%));
     --ring: var(--light-theme-ring, hsl(0 0% 3.9%));
     --radius: var(--theme-radius, 0.5rem);
     --root-padding-vertical: var(--theme-root-padding-vertical, 0);
@@ -68,8 +69,13 @@ body {
     );
     --border: var(--dark-theme-border, hsl(0 0% 14.9%));
     --border-focus: var(--dark-theme-border-focus, hsl(0 0% 83.1%));
-    --input: var(--dark-theme-border, hsl(0 0% 14.9%));
+    --input: var(--dark-theme-input, hsla(0, 0%, 0%, 0));
+    --input-foreground: var(--dark-theme-input-foreground, hsl(0 0% 98%));
     --ring: var(--dark-theme-ring, hsl(0 0% 83.1%));
+  }
+
+  .theme-root {
+    min-height: 100vh;
   }
 
   .theme-root,
@@ -106,7 +112,7 @@ body {
     overflow: hidden;
   }
 
-  .has-not-parent-window {
+  html.has-not-parent-window {
     overflow: auto;
   }
 }
