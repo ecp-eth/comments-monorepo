@@ -44,10 +44,14 @@ const CSSRGBColorSchema = z
   .regex(/^rgba?\([0-9]{1,3},\s*[0-9]{1,3},\s*[0-9]{1,3}(,\s*[0-9]{1,3})?\)$/)
   .describe("Valid CSS RGB color value");
 
+const CSSPercentageRegexStr = "[0-9]{1,3}(\\.[0-9]{1,2})?%";
+
 const CSSHSLColorSchema = z
   .string()
   .regex(
-    /^hsla?\([0-9]{1,3}(deg)?,\s*[0-9]{1,3}%,\s*[0-9]{1,3}%(,\s*([0-9]?\.?[0-9]+|[0-9]{1,3}%))?\)$/
+    new RegExp(
+      `^hsla?\\([0-9]{1,3}(deg)?,\\s*${CSSPercentageRegexStr},\\s*${CSSPercentageRegexStr}(,\\s*([0-1]?\\.?[0-9]+|[0-9]{1,3}%))?\\)$`
+    )
   )
   .describe("Valid CSS HSL color value");
 
