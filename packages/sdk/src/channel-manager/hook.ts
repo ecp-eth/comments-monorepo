@@ -272,7 +272,6 @@ export async function calculateHookTransactionFee(
     abi: ChannelManagerABI,
     functionName: "calculateHookTransactionFee",
     args: [value],
-    value,
   });
 
   return {
