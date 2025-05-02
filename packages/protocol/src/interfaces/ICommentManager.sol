@@ -34,8 +34,6 @@ interface ICommentManager {
     /// @param appSigner Address being unapproved
     event ApprovalRemoved(address indexed author, address indexed appSigner);
 
-    /// @notice Error thrown when author address is invalid
-    error InvalidAuthorAddress();
     /// @notice Error thrown when app signature verification fails
     error InvalidAppSignature();
     /// @notice Error thrown when author signature verification fails

@@ -24,10 +24,6 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
     error InvalidHookAddress();
     /// @notice Error thrown when hook does not implement required interface
     error InvalidHookInterface();
-    /// @notice Error thrown when channel already has a hook
-    error ChannelAlreadyHasHook();
-    /// @notice Error thrown when hook is not found
-    error HookNotFound();
     /// @notice Error thrown when insufficient fee is provided
     error InsufficientFee();
     /// @notice Error thrown when channel already exists
@@ -40,8 +36,6 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
     error UnauthorizedCaller();
     /// @notice Error thrown when hook execution fails
     error ChannelHookExecutionFailed();
-    /// @notice Error thrown when hook is not registered
-    error HookNotRegistered();
     /// @notice Error thrown when hook initialization fails
     error HookInitializationFailed();
 
