@@ -76,6 +76,7 @@ export const DEFAULT_CONFIG: EmbedConfigSchemaInputType = {
       "root-padding-horizontal": "0",
     },
   },
+  restrictMaximumContainerWidth: true,
 };
 
 export const COLOR_FIELDS = [

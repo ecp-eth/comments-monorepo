@@ -32,18 +32,12 @@ export default function CommentsEmbedPreview({
     });
 
     return "targetUri" in source ? (
-      <CommentsEmbed
-        uri={source.targetUri}
-        embedUri={embedUri}
-        theme={config.theme}
-        disablePromotion={config.disablePromotion}
-      />
+      <CommentsEmbed uri={source.targetUri} embedUri={embedUri} {...config} />
     ) : (
       <CommentsByAuthorEmbed
         author={source.author}
         embedUri={embedUri}
-        theme={config.theme}
-        disablePromotion={config.disablePromotion}
+        {...config}
       />
     );
   } catch (e) {

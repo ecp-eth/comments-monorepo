@@ -4,6 +4,7 @@ import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
 import { Providers } from "./providers";
 import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
+import { cn } from "@ecp.eth/shared/helpers";
 
 const SearchParamsSchema = z.object({
   targetUri: z.string().url(),
@@ -58,7 +59,12 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
         }}
       >
         <main className="p-0 text-foreground font-default px-root-padding-horizontal py-root-padding-vertical">
-          <div className="max-w-4xl mx-auto">
+          <div
+            className={cn(
+              "mx-auto",
+              config.restrictMaximumContainerWidth && "max-w-4xl"
+            )}
+          >
             <CommentSection
             /* initialData={{
                     pages: [comments],

@@ -226,8 +226,16 @@ export const EmbedConfigSchema = z.object({
   chainId: EmbedConfigSupportedChainIdsSchema,
   /**
    * Hide powered by ECP link
+   *
+   * @default false
    */
   disablePromotion: z.boolean().default(false),
+  /**
+   * Restrict the maximum container width
+   *
+   * @default true
+   */
+  restrictMaximumContainerWidth: z.boolean().default(true),
 });
 
 /**

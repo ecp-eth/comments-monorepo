@@ -31,6 +31,7 @@ import { PoweredBy } from "@ecp.eth/shared/components";
 import { CommentItem } from "./CommentItem";
 import { createRootCommentsQueryKey } from "./queries";
 import { NoCommentsScreen } from "../NoCommentsScreen";
+import { cn } from "@ecp.eth/shared/helpers";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -43,7 +44,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   useAutoBodyMinHeight();
 
   const { address } = useAccount();
-  const { targetUri, disablePromotion } =
+  const { targetUri, disablePromotion, restrictMaximumContainerWidth } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
     () => createRootCommentsQueryKey(address, targetUri),
@@ -123,7 +124,9 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   }, [data]);
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div
+      className={cn("mx-auto", restrictMaximumContainerWidth && "max-w-2xl")}
+    >
       <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
       <div className="mb-4">
         <CommentForm />
