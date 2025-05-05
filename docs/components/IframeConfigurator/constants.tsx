@@ -17,9 +17,12 @@ export const DEFAULT_CONFIG: EmbedConfigSchemaInputType = {
         ring: "#0a0a0a",
         border: "#e5e5e5",
         "border-focus": "#0a0a0a",
+        input: "#ffffff",
+        "input-foreground": "#0A0A0A",
       },
       dark: {
-        background: "#0a0a0a",
+        // match background colour with default vocs dark theme
+        background: "#121113",
         foreground: "#fafafa",
         "account-edit-link": "#3b82f6",
         primary: "#fafafa",
@@ -32,6 +35,8 @@ export const DEFAULT_CONFIG: EmbedConfigSchemaInputType = {
         ring: "#d4d4d4",
         border: "#262626",
         "border-focus": "#d4d4d4",
+        input: "#121113",
+        "input-foreground": "#FAFAFA",
       },
     },
     font: {
@@ -134,6 +139,16 @@ export const COLOR_FIELDS = [
     key: "border-focus",
     label: "Border Focus",
     help: "Color of borders when elements are focused",
+  },
+  {
+    key: "input",
+    label: "Input",
+    help: "Color of the input field",
+  },
+  {
+    key: "input-foreground",
+    label: "Input Foreground",
+    help: "Color of the text in the input field",
   },
 ] as const;
 

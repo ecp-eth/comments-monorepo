@@ -57,7 +57,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
           ...config,
         }}
       >
-        <main className="p-0 text-foreground font-default px-root-padding-horizontal py-root-padding-vertical bg-background">
+        <main className="p-0 text-foreground font-default px-root-padding-horizontal py-root-padding-vertical">
           <div className="max-w-4xl mx-auto">
             <CommentSection
             /* initialData={{

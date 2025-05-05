@@ -104,6 +104,8 @@ export const EmbedConfigThemePaletteSchema = z.object({
   "border-focus": CSSColorSchema.optional().describe(
     "Border color when focused"
   ),
+  input: CSSColorSchema.optional().describe("Input background color"),
+  "input-foreground": CSSColorSchema.optional().describe("Input text color"),
 });
 
 export type EmbedConfigThemePaletteSchemaType = z.infer<
