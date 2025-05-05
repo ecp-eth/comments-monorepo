@@ -6,8 +6,7 @@ import {
   COMMENTS_EMBED_DEFAULT_URL,
 } from "../constants.js";
 import {
-  type EmbedConfigSupportedChainIdsSchemaType,
-  type EmbedConfigThemeSchemaType,
+  type EmbedConfigSchemaInputType,
   EmbedResizedEventSchema,
 } from "./schemas/index.js";
 import type { Hex } from "../core/schemas.js";
@@ -32,23 +31,7 @@ export type CommentsEmbedProps = {
    * Allows to pass custom props to iframe
    */
   iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
-  /**
-   * Allows to customise the theme of the embed iframe.
-   */
-  theme?: EmbedConfigThemeSchemaType;
-  /**
-   * Hide powered by ECP link
-   *
-   * @default false
-   */
-  disablePromotion?: boolean;
-  /**
-   * The chain id to use for posting comments.
-   *
-   * @default 8453
-   */
-  chainId?: EmbedConfigSupportedChainIdsSchemaType;
-};
+} & EmbedConfigSchemaInputType;
 
 /**
  * Renders comments embed iframe for the given uri.
@@ -74,21 +57,15 @@ export function CommentsEmbed({
   uri,
   containerProps,
   iframeProps,
-  theme,
-  disablePromotion,
-  chainId,
+  ...rest
 }: CommentsEmbedProps) {
   const iframeUri = useMemo(() => {
     return createCommentsEmbedURL({
       embedUri,
       source: { targetUri: uri.toString() },
-      config: {
-        theme,
-        disablePromotion,
-        chainId,
-      },
+      config: rest,
     });
-  }, [embedUri, uri, theme, disablePromotion, chainId]);
+  }, [embedUri, uri, rest]);
 
   return (
     <CommentsEmbedInternal
@@ -116,23 +93,7 @@ export type CommentsByAuthorEmbedProps = {
    * Allows to pass custom props to iframe
    */
   iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
-  /**
-   * Allows to customise the theme of the embed iframe.
-   */
-  theme?: EmbedConfigThemeSchemaType;
-  /**
-   * Hide powered by ECP link
-   *
-   * @default false
-   */
-  disablePromotion?: boolean;
-  /**
-   * The chain id to use for posting comments.
-   *
-   * @default 8453
-   */
-  chainId?: EmbedConfigSupportedChainIdsSchemaType;
-};
+} & EmbedConfigSchemaInputType;
 
 /**
  * Renders comments embed iframe for the given author.
@@ -156,23 +117,17 @@ export type CommentsByAuthorEmbedProps = {
 export function CommentsByAuthorEmbed({
   embedUri = COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL,
   author,
-  theme,
   containerProps,
   iframeProps,
-  disablePromotion,
-  chainId,
+  ...rest
 }: CommentsByAuthorEmbedProps) {
   const iframeUri = useMemo(() => {
     return createCommentsEmbedURL({
       embedUri,
       source: { author },
-      config: {
-        theme,
-        disablePromotion,
-        chainId,
-      },
+      config: rest,
     });
-  }, [embedUri, author, theme, disablePromotion, chainId]);
+  }, [embedUri, author, rest]);
 
   return (
     <CommentsEmbedInternal

@@ -258,6 +258,36 @@ export default function IframeConfigurator() {
               </select>
             </div>
 
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                htmlFor="maximum-container-width-select"
+              >
+                Maximum container width
+              </label>
+              <select
+                id="maximum-container-width-select"
+                value={
+                  config.restrictMaximumContainerWidth
+                    ? "restricted"
+                    : "unrestricted"
+                }
+                onChange={(e) => {
+                  setConfig((prev) => ({
+                    ...prev,
+                    restrictMaximumContainerWidth:
+                      e.target.value === "restricted",
+                  }));
+                }}
+                className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
+              >
+                <option value="restricted">Restricted (672px)</option>
+                <option value="unrestricted">
+                  Unrestricted (taking up all available horizontal space)
+                </option>
+              </select>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="flex flex-col gap-4">
                 <h3 className="text-md font-medium">Light Theme Colors</h3>
