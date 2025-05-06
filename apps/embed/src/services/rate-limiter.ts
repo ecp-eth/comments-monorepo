@@ -24,10 +24,10 @@ export class RateLimiter {
       token: redisToken,
     });
 
-    // Create a new ratelimiter that allows 1 request per minute
+    // Create a new ratelimiter that allows 1 request per 15 seconds
     this.limiter = new Ratelimit({
       redis: this.redis,
-      limiter: Ratelimit.slidingWindow(1, "1 m"),
+      limiter: Ratelimit.slidingWindow(1, "15 s"),
       prefix: namespace,
     });
   }
