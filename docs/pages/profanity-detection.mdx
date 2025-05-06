@@ -1,0 +1,45 @@
+# Profanity Detection
+
+By default, the protocol does not include profanity detection to remain neutral and accommodate multi-language communities.
+This design choice helps avoid potential false positives that can occur with language-specific profanity filters.
+
+## Implementing Your Own Filter
+
+You can guard against profane comments in two places:
+
+1. When the app signer signs the comment — this prevents the comment from being broadcast to the network.
+2. When the comment is returned to the app — this prevents it from being displayed to users.
+
+Taking the comment signing API as an example (see our [demo app](<(https://github.com/ecp-eth/comments-monorepo/blob/main/apps/demo/src/app/api/sign-comment/route.ts)>)),
+you can add profanity detection by filtering the comment content using a zod schema:
+
+```typescript
+const CommentSchema = z.object({
+  author: HexSchema,
+  content: z
+    .string()
+    .trim()
+    .nonempty()
+    .refine((val) => !isProfane(val), "Comment contains profanity"),
+});
+```
+
+Use it in your comment signing API to parse the request body:
+
+```typescript
+const parseResult = CommentSchema.safeParse(await req.json());
+```
+
+## Popular Profanity Detection Libraries
+
+1. [obscenity](https://www.npmjs.com/package/obscenity)
+1. [bad-words](https://www.npmjs.com/package/bad-words)
+1. [leo-profanity](https://www.npmjs.com/package/leo-profanity)
+1. [profanity-check](https://www.npmjs.com/package/profanity-check)
+
+Choose a solution that best fits your community's language and moderation needs. Remember to:
+
+- Test thoroughly to minimize false positives
+- Consider maintaining custom word lists
+- Allow for cultural and linguistic context
+- Consider implementing an appeals process for false positives

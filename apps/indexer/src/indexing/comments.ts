@@ -14,7 +14,6 @@ import {
 } from "../management/services/moderation";
 import { notifyCommentPendingModeration } from "../lib/telegram-notifications";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
-// import { isProfane } from "../lib/profanity-detection";
 
 const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
 
@@ -23,12 +22,6 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     const targetUri = transformCommentTargetUri(
       event.args.commentData.targetUri
     );
-
-    // uncomment to enable basic profanity detection
-    /* 
-    if (isProfane(event.args.commentData.content)) {
-      return;
-    }*/
 
     if (await getMutedAccount(event.args.commentData.author)) {
       return;

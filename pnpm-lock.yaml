@@ -106,9 +106,6 @@ importers:
       next-themes:
         specifier: ^0.4.4
         version: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      obscenity:
-        specifier: ^0.4.3
-        version: 0.4.3
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -363,9 +360,6 @@ importers:
       next-themes:
         specifier: ^0.4.4
         version: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      obscenity:
-        specifier: ^0.4.3
-        version: 0.4.3
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -506,9 +500,6 @@ importers:
       normalize-url:
         specifier: ^8.0.1
         version: 8.0.1
-      obscenity:
-        specifier: ^0.4.3
-        version: 0.4.3
       pg:
         specifier: ^8.11.3
         version: 8.13.1
@@ -8647,10 +8638,6 @@ packages:
   object.values@1.2.1:
     resolution: {integrity: sha512-gXah6aZrcUxjWg2zR2MwouP2eHlCBzdV4pygudehaKXSGW4v2AsRQUK+lwwXhii6KFZcunEnmSUoYp5CXibxtA==}
     engines: {node: '>= 0.4'}
-
-  obscenity@0.4.3:
-    resolution: {integrity: sha512-DZKM0xUEksY5dVGaZoyC5VmIRMSbI6O0Gyb/07L+77d4zWJKKf5tQZrhlT0aiVYD6prTmnxiS3RhN0sfh5Q95Q==}
-    engines: {node: '>=14.0.0'}
 
   obuf@1.1.2:
     resolution: {integrity: sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==}
@@ -21653,8 +21640,6 @@ snapshots:
       call-bound: 1.0.4
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
-
-  obscenity@0.4.3: {}
 
   obuf@1.1.2: {}
 

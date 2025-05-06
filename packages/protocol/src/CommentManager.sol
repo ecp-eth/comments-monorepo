@@ -253,7 +253,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         ) {
             _deleteComment(commentId, author);
             return;
-        } else if (
+        }
+
+        if (
             SignatureChecker.isValidSignatureNow(
                 author,
                 deleteHash,
