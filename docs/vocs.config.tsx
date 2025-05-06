@@ -241,7 +241,7 @@ export default defineConfig({
               text: "ProtocolFees",
               link: "/protocol-reference/ProtocolFees",
             },
-            { text: "Everything else", link: "/protocol-reference" },
+            { text: "All", link: "/protocol-reference" },
           ],
         },
       ],

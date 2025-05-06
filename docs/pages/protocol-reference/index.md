@@ -2,8 +2,8 @@
 
 ## Core Contracts
 
-- [ChannelManager](./ChannelManager.md) - NFT-based channel creation and management
 - [CommentManager](./CommentManager.md) - Comment posting and management with signature verification
+- [ChannelManager](./ChannelManager.md) - NFT-based channel creation and management
 - [ProtocolFees](./ProtocolFees.md) - Fee management for protocol operations
 
 ## Hooks
