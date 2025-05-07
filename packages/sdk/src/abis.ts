@@ -1,7 +1,7 @@
 /**
- * ABI of the CommentsV1 contract.
+ * ABI of the CommentManager contract.
  */
-export const CommentsV1Abi = [
+export const CommentManagerABI = [
   {
     type: "constructor",
     inputs: [
@@ -324,7 +324,7 @@ export const CommentsV1Abi = [
       {
         name: "",
         type: "tuple",
-        internalType: "struct ICommentTypes.CommentData",
+        internalType: "struct Comments.CommentData",
         components: [
           {
             name: "author",
@@ -388,7 +388,7 @@ export const CommentsV1Abi = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct ICommentTypes.CommentData",
+        internalType: "struct Comments.CommentData",
         components: [
           {
             name: "author",
@@ -619,7 +619,7 @@ export const CommentsV1Abi = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct ICommentTypes.CommentData",
+        internalType: "struct Comments.CommentData",
         components: [
           {
             name: "author",
@@ -694,7 +694,7 @@ export const CommentsV1Abi = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct ICommentTypes.CommentData",
+        internalType: "struct Comments.CommentData",
         components: [
           {
             name: "author",
@@ -913,7 +913,7 @@ export const CommentsV1Abi = [
         name: "commentData",
         type: "tuple",
         indexed: false,
-        internalType: "struct ICommentTypes.CommentData",
+        internalType: "struct Comments.CommentData",
         components: [
           {
             name: "author",
@@ -1042,7 +1042,13 @@ export const CommentsV1Abi = [
   {
     type: "error",
     name: "ChannelHookExecutionFailed",
-    inputs: [],
+    inputs: [
+      {
+        name: "hookPhase",
+        type: "uint8",
+        internalType: "enum Hooks.HookPhase",
+      },
+    ],
   },
   {
     type: "error",
@@ -1190,7 +1196,7 @@ export const CommentsV1Abi = [
 /**
  * ABI of the ChannelManager contract.
  */
-export const ChannelManagerAbi = [
+export const ChannelManagerABI = [
   {
     type: "constructor",
     inputs: [
@@ -1292,19 +1298,6 @@ export const ChannelManagerAbi = [
   },
   {
     type: "function",
-    name: "collectHookRegistrationFee",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint96",
-        internalType: "uint96",
-      },
-    ],
-    stateMutability: "payable",
-  },
-  {
-    type: "function",
     name: "commentsContract",
     inputs: [],
     outputs: [
@@ -1352,7 +1345,7 @@ export const ChannelManagerAbi = [
   },
   {
     type: "function",
-    name: "executeHooks",
+    name: "executeHook",
     inputs: [
       {
         name: "channelId",
@@ -1362,7 +1355,7 @@ export const ChannelManagerAbi = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct ICommentTypes.CommentData",
+        internalType: "struct Comments.CommentData",
         components: [
           {
             name: "author",
@@ -1429,7 +1422,7 @@ export const ChannelManagerAbi = [
       {
         name: "phase",
         type: "uint8",
-        internalType: "enum IChannelManager.HookPhase",
+        internalType: "enum Hooks.HookPhase",
       },
     ],
     outputs: [
@@ -1528,50 +1521,6 @@ export const ChannelManagerAbi = [
   },
   {
     type: "function",
-    name: "getHookRegistrationFee",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint96",
-        internalType: "uint96",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "getHookStatus",
-    inputs: [
-      {
-        name: "hook",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "tuple",
-        internalType: "struct IChannelManager.HookConfig",
-        components: [
-          {
-            name: "registered",
-            type: "bool",
-            internalType: "bool",
-          },
-          {
-            name: "enabled",
-            type: "bool",
-            internalType: "bool",
-          },
-        ],
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
     name: "getHookTransactionFee",
     inputs: [],
     outputs: [
@@ -1651,19 +1600,6 @@ export const ChannelManagerAbi = [
       },
     ],
     stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "registerHook",
-    inputs: [
-      {
-        name: "hook",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    outputs: [],
-    stateMutability: "payable",
   },
   {
     type: "function",
@@ -1780,37 +1716,6 @@ export const ChannelManagerAbi = [
         name: "hook",
         type: "address",
         internalType: "address",
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "setHookGloballyEnabled",
-    inputs: [
-      {
-        name: "hook",
-        type: "address",
-        internalType: "address",
-      },
-      {
-        name: "enabled",
-        type: "bool",
-        internalType: "bool",
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "setHookRegistrationFee",
-    inputs: [
-      {
-        name: "fee",
-        type: "uint96",
-        internalType: "uint96",
       },
     ],
     outputs: [],
@@ -2203,52 +2108,7 @@ export const ChannelManagerAbi = [
         name: "phase",
         type: "uint8",
         indexed: false,
-        internalType: "enum IChannelManager.HookPhase",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "HookGlobalStatusUpdated",
-    inputs: [
-      {
-        name: "hook",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "enabled",
-        type: "bool",
-        indexed: false,
-        internalType: "bool",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "HookRegistered",
-    inputs: [
-      {
-        name: "hook",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "HookRegistrationFeeUpdated",
-    inputs: [
-      {
-        name: "newFee",
-        type: "uint96",
-        indexed: false,
-        internalType: "uint96",
+        internalType: "enum Hooks.HookPhase",
       },
     ],
     anonymous: false,
@@ -2500,12 +2360,7 @@ export const ChannelManagerAbi = [
   },
   {
     type: "error",
-    name: "HookAlreadyRegistered",
-    inputs: [],
-  },
-  {
-    type: "error",
-    name: "HookDisabledGlobally",
+    name: "HookInitializationFailed",
     inputs: [],
   },
   {
@@ -2530,7 +2385,7 @@ export const ChannelManagerAbi = [
   },
   {
     type: "error",
-    name: "InvalidFeePercentage",
+    name: "InvalidFee",
     inputs: [],
   },
   {

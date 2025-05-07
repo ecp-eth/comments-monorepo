@@ -1,0 +1,30 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / collectChannelCreationFee
+
+# Function: collectChannelCreationFee()
+
+```ts
+function collectChannelCreationFee(params): Promise<CollectChannelCreationFeeResult>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:533](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L533)
+
+Collects the channel creation fee. If the sent value is greater than the required fee,
+the excess amount will be refunded to the sender.
+
+## Parameters
+
+### params
+
+[`CollectChannelCreationFeeParams`](/sdk-reference/channel-manager/type-aliases/CollectChannelCreationFeeParams.mdx)
+
+The parameters for collecting the channel creation fee
+
+## Returns
+
+`Promise`\<[`CollectChannelCreationFeeResult`](/sdk-reference/channel-manager/type-aliases/CollectChannelCreationFeeResult.mdx)\>
+
+The transaction hash of the fee collection

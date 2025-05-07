@@ -2,37 +2,77 @@
 
 The Comments Protocol is a smart contract that enables users to post and manage comments with optional app-signer approval. It implements EIP-712 for typed structured data hashing and signing.
 
-## Contract Details
+## Comment Manager Contract Details
 
-- **Contract Address:** `%COMMENTS_V1_ADDRESS`
+- **Contract Address:** `%COMMENT_MANAGER_ADDRESS`
 - **Networks:**
-  - [Ethereum](https://etherscan.io/address/%COMMENTS_V1_ADDRESS)
-  - [Ethereum Sepolia](https://sepolia.etherscan.io/address/%COMMENTS_V1_ADDRESS)
-  - [Base](https://basescan.org/address/%COMMENTS_V1_ADDRESS)
-  - [Base Sepolia](https://sepolia.basescan.org/address/%COMMENTS_V1_ADDRESS)
-  - [World chain](https://worldscan.worldchain.xyz/address/%COMMENTS_V1_ADDRESS)
-- **Contract Explorer:** [View on Basescan](https://basescan.org/address/%COMMENTS_V1_ADDRESS#code)
-- **Contract ABI:** [View ABI Documentation](/protocol-reference/CommentsV1)
+  - [Ethereum](https://etherscan.io/address/%COMMENT_MANAGER_ADDRESS)
+  - [Ethereum Sepolia](https://sepolia.etherscan.io/address/%COMMENT_MANAGER_ADDRESS)
+  - [Base](https://basescan.org/address/%COMMENT_MANAGER_ADDRESS)
+  - [Base Sepolia](https://sepolia.basescan.org/address/%COMMENT_MANAGER_ADDRESS)
+  - [World chain](https://worldscan.worldchain.xyz/address/%COMMENT_MANAGER_ADDRESS)
+- **Contract Explorer:** [View on Basescan](https://basescan.org/address/%COMMENT_MANAGER_ADDRESS#code)
+- **Contract ABI:** [View ABI Documentation](/protocol-reference/CommentManager)
 
-## Features
+### Features
 
+- Comments stored on-chain
 - Post comments with or without app-signer approval
 - Delete comments with signature verification
 - Manage app-signer approvals
 - EIP-712 compliant for secure signing
 - Support for comment metadata and parent-child relationships
 
-## Contract Functions
+### Contract Functions
 
 The contract provides several key functions:
 
-| Function                 | Description                                               | Note                                                          |
-| ------------------------ | --------------------------------------------------------- | ------------------------------------------------------------- |
-| `postCommentAsAuthor`    | Post a comment directly from the author's address         |                                                               |
-| `postComment`            | Post a comment with both author and app signer signatures |                                                               |
-| `deleteCommentAsAuthor`  | Delete a comment when called by the author                | ⚠️ Comment data remains on blockchain, only marked as deleted |
-| `deleteComment`          | Delete a comment with signature verification              | ⚠️ Comment data remains on blockchain, only marked as deleted |
-| `addApprovalAsAuthor`    | Approve an app signer directly                            |                                                               |
-| `revokeApprovalAsAuthor` | Remove an app signer approval directly                    |                                                               |
+| Function                 | Description                                               | Note                                                           |
+| ------------------------ | --------------------------------------------------------- | -------------------------------------------------------------- |
+| `postCommentAsAuthor`    | Post a comment directly from the author's address         |                                                                |
+| `postComment`            | Post a comment with both author and app signer signatures |                                                                |
+| `deleteCommentAsAuthor`  | Delete a comment when called by the author                | ⚠️ Deleted data may still be traceable or recoverable on-chain |
+| `deleteComment`          | Delete a comment with signature verification              | ⚠️ Deleted data may still be traceable or recoverable on-chain |
+| `addApprovalAsAuthor`    | Approve an app signer directly                            |                                                                |
+| `revokeApprovalAsAuthor` | Remove an app signer approval directly                    |                                                                |
 
-For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/CommentsV1).
+For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/CommentManager).
+
+## Channel Manager Contract Details
+
+- **Contract Address:** `%CHANNEL_MANAGER_ADDRESS`
+- **Networks:**
+  - [Ethereum](https://etherscan.io/address/%CHANNEL_MANAGER_ADDRESS)
+  - [Ethereum Sepolia](https://sepolia.etherscan.io/address/%CHANNEL_MANAGER_ADDRESS)
+  - [Base](https://basescan.org/address/%CHANNEL_MANAGER_ADDRESS)
+  - [Base Sepolia](https://sepolia.basescan.org/address/%CHANNEL_MANAGER_ADDRESS)
+  - [World chain](https://worldscan.worldchain.xyz/address/%CHANNEL_MANAGER_ADDRESS)
+- **Contract Explorer:** [View on Basescan](https://basescan.org/address/%CHANNEL_MANAGER_ADDRESS#code)
+- **Contract ABI:** [View ABI Documentation](/protocol-reference/CommentManager)
+
+### Features
+
+- Comments stored on-chain
+- Post comments with or without app-signer approval
+- Delete comments with signature verification
+- Manage app-signer approvals
+- EIP-712 compliant for secure signing
+- Support for comment metadata and parent-child relationships
+
+### Contract Functions
+
+The contract provides several key functions:
+
+| Function                 | Description                                                                           | Note                                     |
+| ------------------------ | ------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `createChannel`          | Creates a new channel with specified name, description, metadata, and optional hook   | Requires channel creation fee            |
+| `updateChannel`          | Updates an existing channel's name, description, and metadata                         | Only callable by channel owner           |
+| `setHook`                | Sets or updates a hook contract for a channel                                         | Only callable by channel owner           |
+| `getChannel`             | Retrieves channel information including name, description, metadata, and hook address |                                          |
+| `executeHook`            | Executes channel hooks for comment operations                                         | Normally called by the Comments contract |
+| `channelExists`          | Checks if a channel ID exists                                                         |                                          |
+| `getChannelOwner`        | Gets the owner address of a channel                                                   |                                          |
+| `updateCommentsContract` | Updates the address of the Comments contract                                          | Only callable by contract owner          |
+| `setBaseURI`             | Sets the base URI for token metadata                                                  | Only callable by contract owner          |
+
+For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/CommentManager).

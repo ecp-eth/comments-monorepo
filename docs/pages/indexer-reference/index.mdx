@@ -4,7 +4,7 @@ The ECP (Ethereum Comments Protocol) Indexer is a [Ponder](https://ponder.sh/) b
 
 ## Overview
 
-The ECP Indexer utilise [Ponder](https://ponder.sh/) to monitor CommentV1 contract events for comment-related activities and processes them into a queryable database. It supports the following features:
+The ECP Indexer utilise [Ponder](https://ponder.sh/) to monitor `CommentManager` contract events for comment-related activities and processes them into a queryable database. It supports the following features:
 
 - Indexes comments from ECP-compatible smart contracts
 - Processes comment metadata and content

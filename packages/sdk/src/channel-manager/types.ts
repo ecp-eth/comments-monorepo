@@ -4,27 +4,18 @@ import type {
   ReadContractReturnType,
 } from "viem";
 import type { Hex } from "../core/schemas.js";
-import type { ChannelManagerAbi } from "../abis.js";
+import type { ChannelManagerABI } from "../abis.js";
 
-export type ChannelManagerAbiType = typeof ChannelManagerAbi;
+export type ChannelManagerABIType = typeof ChannelManagerABI;
 
 // we can't use generics and mapped type because the API would be lazy resolved
 // causing type errors in userland.
 export type ContractWriteFunctions = {
   createChannel: (
     args: ContractFunctionParameters<
-      ChannelManagerAbiType,
+      ChannelManagerABIType,
       "payable",
       "createChannel"
-    > & {
-      value?: bigint;
-    }
-  ) => Promise<Hex>;
-  registerHook: (
-    args: ContractFunctionParameters<
-      ChannelManagerAbiType,
-      "payable",
-      "registerHook"
     > & {
       value?: bigint;
     }
@@ -32,7 +23,7 @@ export type ContractWriteFunctions = {
 
   setBaseURI: (
     args: ContractFunctionParameters<
-      ChannelManagerAbiType,
+      ChannelManagerABIType,
       "nonpayable",
       "setBaseURI"
     >
@@ -40,7 +31,7 @@ export type ContractWriteFunctions = {
 
   setChannelCreationFee: (
     args: ContractFunctionParameters<
-      ChannelManagerAbiType,
+      ChannelManagerABIType,
       "nonpayable",
       "setChannelCreationFee"
     >
@@ -48,31 +39,15 @@ export type ContractWriteFunctions = {
 
   setHook: (
     args: ContractFunctionParameters<
-      ChannelManagerAbiType,
+      ChannelManagerABIType,
       "nonpayable",
       "setHook"
     >
   ) => Promise<Hex>;
 
-  setHookGloballyEnabled: (
-    args: ContractFunctionParameters<
-      ChannelManagerAbiType,
-      "nonpayable",
-      "setHookGloballyEnabled"
-    >
-  ) => Promise<Hex>;
-
-  setHookRegistrationFee: (
-    args: ContractFunctionParameters<
-      ChannelManagerAbiType,
-      "nonpayable",
-      "setHookRegistrationFee"
-    >
-  ) => Promise<Hex>;
-
   setHookTransactionFee: (
     args: ContractFunctionParameters<
-      ChannelManagerAbiType,
+      ChannelManagerABIType,
       "nonpayable",
       "setHookTransactionFee"
     >
@@ -80,7 +55,7 @@ export type ContractWriteFunctions = {
 
   updateChannel: (
     args: ContractFunctionParameters<
-      ChannelManagerAbiType,
+      ChannelManagerABIType,
       "nonpayable",
       "updateChannel"
     >
@@ -88,7 +63,7 @@ export type ContractWriteFunctions = {
 
   updateCommentsContract: (
     args: ContractFunctionParameters<
-      ChannelManagerAbiType,
+      ChannelManagerABIType,
       "nonpayable",
       "updateCommentsContract"
     >
@@ -96,17 +71,37 @@ export type ContractWriteFunctions = {
 
   withdrawFees: (
     args: ContractFunctionParameters<
-      ChannelManagerAbiType,
+      ChannelManagerABIType,
       "nonpayable",
       "withdrawFees"
     >
   ) => Promise<Hex>;
 
-  executeHooks: (
+  executeHook: (
     args: ContractFunctionParameters<
-      ChannelManagerAbiType,
+      ChannelManagerABIType,
       "payable",
-      "executeHooks"
+      "executeHook"
+    > & {
+      value?: bigint;
+    }
+  ) => Promise<Hex>;
+
+  collectChannelCreationFee: (
+    args: ContractFunctionParameters<
+      ChannelManagerABIType,
+      "payable",
+      "collectChannelCreationFee"
+    > & {
+      value?: bigint;
+    }
+  ) => Promise<Hex>;
+
+  calculateHookTransactionFee: (
+    args: ContractFunctionParameters<
+      ChannelManagerABIType,
+      "payable",
+      "calculateHookTransactionFee"
     > & {
       value?: bigint;
     }
@@ -115,41 +110,28 @@ export type ContractWriteFunctions = {
 
 export type ContractReadFunctions = {
   getChannel: (
-    args: ReadContractParameters<ChannelManagerAbiType, "getChannel">
-  ) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getChannel">>;
+    args: ReadContractParameters<ChannelManagerABIType, "getChannel">
+  ) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
 
   channelExists: (
-    args: ReadContractParameters<ChannelManagerAbiType, "channelExists">
-  ) => Promise<ReadContractReturnType<ChannelManagerAbiType, "channelExists">>;
+    args: ReadContractParameters<ChannelManagerABIType, "channelExists">
+  ) => Promise<ReadContractReturnType<ChannelManagerABIType, "channelExists">>;
 
   getChannelOwner: (
-    args: ReadContractParameters<ChannelManagerAbiType, "getChannelOwner">
+    args: ReadContractParameters<ChannelManagerABIType, "getChannelOwner">
   ) => Promise<
-    ReadContractReturnType<ChannelManagerAbiType, "getChannelOwner">
+    ReadContractReturnType<ChannelManagerABIType, "getChannelOwner">
   >;
 
   getChannelCreationFee: (
-    args: ReadContractParameters<ChannelManagerAbiType, "getChannelCreationFee">
+    args: ReadContractParameters<ChannelManagerABIType, "getChannelCreationFee">
   ) => Promise<
-    ReadContractReturnType<ChannelManagerAbiType, "getChannelCreationFee">
-  >;
-
-  getHookStatus: (
-    args: ReadContractParameters<ChannelManagerAbiType, "getHookStatus">
-  ) => Promise<ReadContractReturnType<ChannelManagerAbiType, "getHookStatus">>;
-
-  getHookRegistrationFee: (
-    args: ReadContractParameters<
-      ChannelManagerAbiType,
-      "getHookRegistrationFee"
-    >
-  ) => Promise<
-    ReadContractReturnType<ChannelManagerAbiType, "getHookRegistrationFee">
+    ReadContractReturnType<ChannelManagerABIType, "getChannelCreationFee">
   >;
 
   getHookTransactionFee: (
-    args: ReadContractParameters<ChannelManagerAbiType, "getHookTransactionFee">
+    args: ReadContractParameters<ChannelManagerABIType, "getHookTransactionFee">
   ) => Promise<
-    ReadContractReturnType<ChannelManagerAbiType, "getHookTransactionFee">
+    ReadContractReturnType<ChannelManagerABIType, "getHookTransactionFee">
   >;
 };

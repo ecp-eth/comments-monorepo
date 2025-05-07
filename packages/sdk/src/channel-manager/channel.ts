@@ -2,7 +2,7 @@ import { z } from "zod";
 import { CHANNEL_MANAGER_ADDRESS, ZERO_ADDRESS } from "../constants.js";
 import { HexSchema } from "../core/schemas.js";
 import type { Hex } from "../core/schemas.js";
-import { ChannelManagerAbi } from "../abis.js";
+import { ChannelManagerABI } from "../abis.js";
 import { isZeroHex } from "../core/utils.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 
@@ -63,7 +63,7 @@ export async function createChannel(
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "createChannel",
     args: [name, description, metadata, hook],
     value: fee,
@@ -115,7 +115,7 @@ export async function getChannel(
 
   const [name, description, metadata, hook] = await params.readContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "getChannel",
     args: [channelId],
   });
@@ -180,7 +180,7 @@ export async function updateChannel(
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "updateChannel",
     args: [channelId, name, description, metadata],
   });
@@ -223,7 +223,7 @@ export async function channelExists(
 
   const exists = await params.readContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "channelExists",
     args: [channelId],
   });
@@ -268,7 +268,7 @@ export async function getChannelOwner(
 
   const owner = await params.readContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "getChannelOwner",
     args: [channelId],
   });
@@ -310,7 +310,7 @@ export async function getChannelCreationFee(
 
   const fee = await params.readContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "getChannelCreationFee",
     args: [],
   });
@@ -355,7 +355,7 @@ export async function setChannelCreationFee(
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "setChannelCreationFee",
     args: [fee],
   });
@@ -400,7 +400,7 @@ export async function withdrawFees(
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "withdrawFees",
     args: [recipient],
   });
@@ -445,7 +445,7 @@ export async function updateCommentsContract(
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "updateCommentsContract",
     args: [commentsContract],
   });
@@ -490,9 +490,57 @@ export async function setBaseURI(
 
   const txHash = await params.writeContract({
     address: channelManagerAddress,
-    abi: ChannelManagerAbi,
+    abi: ChannelManagerABI,
     functionName: "setBaseURI",
     args: [baseURI],
+  });
+
+  return {
+    txHash,
+  };
+}
+
+export type CollectChannelCreationFeeParams = {
+  /**
+   * The value to send with the transaction (must be >= required fee)
+   */
+  value: bigint;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  writeContract: ContractWriteFunctions["collectChannelCreationFee"];
+};
+
+export type CollectChannelCreationFeeResult = {
+  txHash: Hex;
+};
+
+const CollectChannelCreationFeeParamsSchema = z.object({
+  value: z.bigint().min(0n),
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Collects the channel creation fee. If the sent value is greater than the required fee,
+ * the excess amount will be refunded to the sender.
+ *
+ * @param params - The parameters for collecting the channel creation fee
+ * @returns The transaction hash of the fee collection
+ */
+export async function collectChannelCreationFee(
+  params: CollectChannelCreationFeeParams
+): Promise<CollectChannelCreationFeeResult> {
+  const { value, channelManagerAddress } =
+    CollectChannelCreationFeeParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerABI,
+    functionName: "collectChannelCreationFee",
+    value,
   });
 
   return {

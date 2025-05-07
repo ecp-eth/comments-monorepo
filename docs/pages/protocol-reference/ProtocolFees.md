@@ -36,21 +36,14 @@ Constructor sets the contract owner and initializes fees
 
 ### `setChannelCreationFee(uint96 fee)` (external)
 
-Sets the fee for creating a new channel (only owner)
-
-
-
-
-### `setHookRegistrationFee(uint96 fee)` (external)
-
-Sets the fee for registering a new hook (only owner)
+Sets the fee for creating a new channel
 
 
 
 
 ### `setHookTransactionFee(uint16 feeBasisPoints)` (external)
 
-Sets the fee percentage taken from hook transactions (only owner)
+Sets the fee percentage taken from hook transactions
 
 
 
@@ -61,21 +54,17 @@ Gets the current channel creation fee
 
 
 
-### `getHookRegistrationFee() → uint96` (external)
-
-Gets the current hook registration fee
-
-
 
 ### `getHookTransactionFee() → uint16` (external)
 
-Gets the current hook transaction fee percentage in basis points
+Gets the current hook transaction fee percentage
+
 
 
 
 ### `withdrawFees(address recipient) → uint256 amount` (external)
 
-Withdraws accumulated fees to a specified address (only owner)
+Withdraws accumulated fees to a specified address
 
 
 
@@ -83,13 +72,6 @@ Withdraws accumulated fees to a specified address (only owner)
 ### `collectChannelCreationFee() → uint96` (public)
 
 Collects channel creation fee
-
-
-
-
-### `collectHookRegistrationFee() → uint96` (public)
-
-Collects hook registration fee
 
 
 

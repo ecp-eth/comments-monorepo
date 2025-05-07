@@ -11,7 +11,7 @@ type GetNonceParams = {
   appSigner: Hex;
   author: Hex;
   commentsAddress?: Hex;
-  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "nonces">>;
+  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "nonces">>;
 };
 ```
 
@@ -56,7 +56,7 @@ The address of the comments contract
 #### Default
 
 ```ts
-COMMENTS_V1_ADDRESS
+COMMENT_MANAGER_ADDRESS
 ```
 
 ***
@@ -64,7 +64,7 @@ COMMENTS_V1_ADDRESS
 ### readContract()
 
 ```ts
-readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "nonces">>;
+readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "nonces">>;
 ```
 
 Defined in: [packages/sdk/src/comments/comment.ts:471](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L471)
@@ -73,8 +73,8 @@ Defined in: [packages/sdk/src/comments/comment.ts:471](https://github.com/ecp-et
 
 ##### parameters
 
-`ReadContractParameters`\<*typeof* [`CommentsV1Abi`](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx), `"nonces"`\>
+`ReadContractParameters`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"nonces"`\>
 
 #### Returns
 
-`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentsV1Abi`](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx), `"nonces"`\>\>
+`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"nonces"`\>\>

@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / CollectChannelCreationFeeParams
+
+# Type Alias: CollectChannelCreationFeeParams
+
+```ts
+type CollectChannelCreationFeeParams = {
+  channelManagerAddress?: Hex;
+  value: bigint;
+  writeContract: ContractWriteFunctions["collectChannelCreationFee"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:503](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L503)
+
+## Properties
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:513](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L513)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### value
+
+```ts
+value: bigint;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:507](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L507)
+
+The value to send with the transaction (must be >= required fee)
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["collectChannelCreationFee"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:514](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L514)

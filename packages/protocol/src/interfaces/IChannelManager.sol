@@ -2,29 +2,20 @@
 pragma solidity ^0.8.20;
 
 import "./IHook.sol";
-import "./ICommentTypes.sol";
+import "./IProtocolFees.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
+import "../libraries/Comments.sol";
 
 /// @title IChannelManager - Interface for managing comment channels and their hooks
 /// @notice This interface defines the core functionality for managing channels and their associated hooks
-interface IChannelManager {
-    /// @notice Enum defining the phase of hook execution
-    enum HookPhase {
-        Before,
-        After
-    }
-
+interface IChannelManager is IProtocolFees, IERC721Enumerable {
     /// @notice Struct containing channel configuration
     struct ChannelConfig {
         string name;
         string description;
         string metadata; // Arbitrary JSON metadata
         IHook hook; // Single hook for the channel
-        bool hookEnabled;
-    }
-
-    struct HookConfig {
-        bool registered;
-        bool enabled;
+        Hooks.Permissions permissions; // Hook permissions
     }
 
     /// @notice Error thrown when channel does not exist
@@ -33,16 +24,6 @@ interface IChannelManager {
     error InvalidHookAddress();
     /// @notice Error thrown when hook does not implement required interface
     error InvalidHookInterface();
-    /// @notice Error thrown when channel already has a hook
-    error ChannelAlreadyHasHook();
-    /// @notice Error thrown when hook is not found
-    error HookNotFound();
-    /// @notice Error thrown when hook is not registered
-    error HookNotRegistered();
-    /// @notice Error thrown when hook is already registered
-    error HookAlreadyRegistered();
-    /// @notice Error thrown when hook is disabled globally
-    error HookDisabledGlobally();
     /// @notice Error thrown when insufficient fee is provided
     error InsufficientFee();
     /// @notice Error thrown when channel already exists
@@ -55,6 +36,8 @@ interface IChannelManager {
     error UnauthorizedCaller();
     /// @notice Error thrown when hook execution fails
     error ChannelHookExecutionFailed();
+    /// @notice Error thrown when hook initialization fails
+    error HookInitializationFailed();
 
     /// @notice Emitted when a hook execution fails
     /// @param channelId The unique identifier of the channel
@@ -63,17 +46,8 @@ interface IChannelManager {
     event HookExecutionFailed(
         uint256 indexed channelId,
         address indexed hook,
-        HookPhase phase
+        Hooks.HookPhase phase
     );
-
-    /// @notice Emitted when a hook is registered in the global registry
-    /// @param hook The address of the registered hook
-    event HookRegistered(address indexed hook);
-
-    /// @notice Emitted when a hook's global enabled status is updated
-    /// @param hook The address of the hook
-    /// @param enabled Whether the hook is enabled globally
-    event HookGlobalStatusUpdated(address indexed hook, bool enabled);
 
     /// @notice Emitted when the base URI for NFT metadata is updated
     /// @param baseURI The new base URI
@@ -164,18 +138,6 @@ interface IChannelManager {
             address hook
         );
 
-    /// @notice Enables or disables a hook globally (only owner)
-    /// @param hook The address of the hook
-    /// @param enabled Whether to enable or disable the hook
-    function setHookGloballyEnabled(address hook, bool enabled) external;
-
-    /// @notice Checks if a hook is registered and globally enabled
-    /// @param hook The address of the hook
-    /// @return hookConfig The hook configuration
-    function getHookStatus(
-        address hook
-    ) external view returns (HookConfig memory);
-
     /// @notice Updates the comments contract address (only owner)
     /// @param _commentsContract The new comments contract address
     function updateCommentsContract(address _commentsContract) external;
@@ -191,22 +153,18 @@ interface IChannelManager {
     /// @param commentId Unique identifier of the comment
     /// @param phase The phase of hook execution (Before or After)
     /// @return success Whether the hook execution was successful
-    function executeHooks(
+    function executeHook(
         uint256 channelId,
-        ICommentTypes.CommentData memory commentData,
+        Comments.CommentData calldata commentData,
         address caller,
         bytes32 commentId,
-        HookPhase phase
+        Hooks.HookPhase phase
     ) external payable returns (bool);
 
     /// @notice Checks if a channel exists
     /// @param channelId Unique identifier of the channel
     /// @return exists Whether the channel exists
     function channelExists(uint256 channelId) external view returns (bool);
-
-    /// @notice Registers a new hook in the global registry
-    /// @param hook The address of the hook to register
-    function registerHook(address hook) external payable;
 
     /// @notice Gets the owner of a channel
     /// @param channelId The unique identifier of the channel

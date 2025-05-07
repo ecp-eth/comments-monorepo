@@ -13,9 +13,8 @@ import "@account-abstraction/contracts/core/UserOperationLib.sol";
 import "@account-abstraction/contracts/core/Helpers.sol";
 import {BasePaymaster} from "@account-abstraction/contracts/core/BasePaymaster.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
+import {CommentManager} from "../src/CommentManager.sol";
 import {IHook} from "../src/interfaces/IHook.sol";
-import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {TestUtils, MockHook} from "./utils.sol";
@@ -98,7 +97,7 @@ contract PaymastersTest is Test, IERC721Receiver {
 
     EntryPoint public entryPointContract;
     TestPaymasterAcceptAll public paymaster;
-    CommentsV1 public comments;
+    CommentManager public comments;
     ChannelManager public channelManager;
     MockHook public mockHook;
 
@@ -135,10 +134,6 @@ contract PaymastersTest is Test, IERC721Receiver {
 
         // Fund the paymaster first
         paymaster.deposit{value: 1 ether}();
-
-        // Register and enable the mock hook
-        channelManager.registerHook{value: 0.02 ether}(address(mockHook));
-        channelManager.setHookGloballyEnabled(address(mockHook), true);
     }
 
     function test_CreateChannelThroughPaymaster() public {

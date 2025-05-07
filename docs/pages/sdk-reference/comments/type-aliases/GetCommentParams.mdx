@@ -10,7 +10,7 @@
 type GetCommentParams = {
   commentId: Hex;
   commentsAddress?: Hex;
-  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "getComment">>;
+  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getComment">>;
 };
 ```
 
@@ -43,7 +43,7 @@ The address of the comments contract
 #### Default
 
 ```ts
-COMMENTS_V1_ADDRESS
+COMMENT_MANAGER_ADDRESS
 ```
 
 ***
@@ -51,7 +51,7 @@ COMMENTS_V1_ADDRESS
 ### readContract()
 
 ```ts
-readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentsV1Abi, "getComment">>;
+readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getComment">>;
 ```
 
 Defined in: [packages/sdk/src/comments/comment.ts:178](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L178)
@@ -60,8 +60,8 @@ Defined in: [packages/sdk/src/comments/comment.ts:178](https://github.com/ecp-et
 
 ##### parameters
 
-`ReadContractParameters`\<*typeof* [`CommentsV1Abi`](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx), `"getComment"`\>
+`ReadContractParameters`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getComment"`\>
 
 #### Returns
 
-`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentsV1Abi`](/sdk-reference/defaultExports/variables/CommentsV1Abi.mdx), `"getComment"`\>\>
+`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getComment"`\>\>

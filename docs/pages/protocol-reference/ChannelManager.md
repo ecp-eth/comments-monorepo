@@ -38,27 +38,6 @@ Constructor sets the contract owner and initializes ERC721
 
 
 
-### `registerHook(address hook)` (external)
-
-Registers a new hook in the global registry
-
-
-
-
-### `setHookGloballyEnabled(address hook, bool enabled)` (external)
-
-Enables or disables a hook globally (only owner)
-
-
-
-
-### `getHookStatus(address hook) → struct IChannelManager.HookConfig` (external)
-
-Checks if a hook is registered and globally enabled
-
-
-
-
 ### `_channelExists(uint256 channelId) → bool` (internal)
 
 Internal function to check if a channel exists
@@ -68,7 +47,7 @@ Internal function to check if a channel exists
 
 ### `createChannel(string name, string description, string metadata, address hook) → uint256 channelId` (external)
 
-Creates a new channel as an NFT with a hash-based ID
+Creates a new channel
 
 
 
@@ -101,16 +80,16 @@ Gets a channel's configuration
 
 
 
-### `executeHooks(uint256 channelId, struct ICommentTypes.CommentData commentData, address caller, bytes32 commentId, enum IChannelManager.HookPhase phase) → bool` (external)
+### `executeHook(uint256 channelId, struct Comments.CommentData commentData, address caller, bytes32 commentId, enum Hooks.HookPhase phase) → bool` (external)
 
-Public function to execute hook for a channel
+Executes hook for a channel
 
 
 
 
 ### `channelExists(uint256 channelId) → bool` (public)
 
-Check if a channel exists
+Checks if a channel exists
 
 
 

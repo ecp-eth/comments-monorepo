@@ -8,14 +8,13 @@
 
 ```ts
 type ContractWriteFunctions = {
+  calculateHookTransactionFee: (args) => Promise<Hex>;
+  collectChannelCreationFee: (args) => Promise<Hex>;
   createChannel: (args) => Promise<Hex>;
-  executeHooks: (args) => Promise<Hex>;
-  registerHook: (args) => Promise<Hex>;
+  executeHook: (args) => Promise<Hex>;
   setBaseURI: (args) => Promise<Hex>;
   setChannelCreationFee: (args) => Promise<Hex>;
   setHook: (args) => Promise<Hex>;
-  setHookGloballyEnabled: (args) => Promise<Hex>;
-  setHookRegistrationFee: (args) => Promise<Hex>;
   setHookTransactionFee: (args) => Promise<Hex>;
   updateChannel: (args) => Promise<Hex>;
   updateCommentsContract: (args) => Promise<Hex>;
@@ -26,6 +25,50 @@ type ContractWriteFunctions = {
 Defined in: [packages/sdk/src/channel-manager/types.ts:13](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L13)
 
 ## Properties
+
+### calculateHookTransactionFee()
+
+```ts
+calculateHookTransactionFee: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:100](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L100)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"payable"`, `"calculateHookTransactionFee"`\> & \{
+  `value?`: `bigint`;
+\}
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### collectChannelCreationFee()
+
+```ts
+collectChannelCreationFee: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:90](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L90)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"payable"`, `"collectChannelCreationFee"`\> & \{
+  `value?`: `bigint`;
+\}
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
 
 ### createChannel()
 
@@ -39,7 +82,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:14](https://github.com/ec
 
 ##### args
 
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"payable"`, `"createChannel"`\> & \{
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"payable"`, `"createChannel"`\> & \{
   `value?`: `bigint`;
 \}
 
@@ -49,41 +92,19 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:14](https://github.com/ec
 
 ***
 
-### executeHooks()
+### executeHook()
 
 ```ts
-executeHooks: (args) => Promise<Hex>;
+executeHook: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:105](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L105)
+Defined in: [packages/sdk/src/channel-manager/types.ts:80](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L80)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"payable"`, `"executeHooks"`\> & \{
-  `value?`: `bigint`;
-\}
-
-#### Returns
-
-`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
-
-***
-
-### registerHook()
-
-```ts
-registerHook: (args) => Promise<Hex>;
-```
-
-Defined in: [packages/sdk/src/channel-manager/types.ts:23](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L23)
-
-#### Parameters
-
-##### args
-
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"payable"`, `"registerHook"`\> & \{
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"payable"`, `"executeHook"`\> & \{
   `value?`: `bigint`;
 \}
 
@@ -99,13 +120,13 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:23](https://github.com/ec
 setBaseURI: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:33](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L33)
+Defined in: [packages/sdk/src/channel-manager/types.ts:24](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L24)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"nonpayable"`, `"setBaseURI"`\>
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"nonpayable"`, `"setBaseURI"`\>
 
 #### Returns
 
@@ -119,13 +140,13 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:33](https://github.com/ec
 setChannelCreationFee: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:41](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L41)
+Defined in: [packages/sdk/src/channel-manager/types.ts:32](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L32)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"nonpayable"`, `"setChannelCreationFee"`\>
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"nonpayable"`, `"setChannelCreationFee"`\>
 
 #### Returns
 
@@ -139,53 +160,13 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:41](https://github.com/ec
 setHook: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:49](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L49)
+Defined in: [packages/sdk/src/channel-manager/types.ts:40](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L40)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"nonpayable"`, `"setHook"`\>
-
-#### Returns
-
-`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
-
-***
-
-### setHookGloballyEnabled()
-
-```ts
-setHookGloballyEnabled: (args) => Promise<Hex>;
-```
-
-Defined in: [packages/sdk/src/channel-manager/types.ts:57](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L57)
-
-#### Parameters
-
-##### args
-
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"nonpayable"`, `"setHookGloballyEnabled"`\>
-
-#### Returns
-
-`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
-
-***
-
-### setHookRegistrationFee()
-
-```ts
-setHookRegistrationFee: (args) => Promise<Hex>;
-```
-
-Defined in: [packages/sdk/src/channel-manager/types.ts:65](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L65)
-
-#### Parameters
-
-##### args
-
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"nonpayable"`, `"setHookRegistrationFee"`\>
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"nonpayable"`, `"setHook"`\>
 
 #### Returns
 
@@ -199,13 +180,13 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:65](https://github.com/ec
 setHookTransactionFee: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:73](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L73)
+Defined in: [packages/sdk/src/channel-manager/types.ts:48](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L48)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"nonpayable"`, `"setHookTransactionFee"`\>
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"nonpayable"`, `"setHookTransactionFee"`\>
 
 #### Returns
 
@@ -219,13 +200,13 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:73](https://github.com/ec
 updateChannel: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:81](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L81)
+Defined in: [packages/sdk/src/channel-manager/types.ts:56](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L56)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"nonpayable"`, `"updateChannel"`\>
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"nonpayable"`, `"updateChannel"`\>
 
 #### Returns
 
@@ -239,13 +220,13 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:81](https://github.com/ec
 updateCommentsContract: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:89](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L89)
+Defined in: [packages/sdk/src/channel-manager/types.ts:64](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L64)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"nonpayable"`, `"updateCommentsContract"`\>
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"nonpayable"`, `"updateCommentsContract"`\>
 
 #### Returns
 
@@ -259,13 +240,13 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:89](https://github.com/ec
 withdrawFees: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:97](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L97)
+Defined in: [packages/sdk/src/channel-manager/types.ts:72](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L72)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`ChannelManagerAbiType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerAbiType.mdx), `"nonpayable"`, `"withdrawFees"`\>
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"nonpayable"`, `"withdrawFees"`\>
 
 #### Returns
 

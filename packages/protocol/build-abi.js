@@ -11,7 +11,13 @@ const outputAbiPaths = [
 
 const commentsAbi = execFileSync(
   "pnpm",
-  ["forge", "inspect", "./src/CommentsV1.sol:CommentsV1", "abi", "--json"],
+  [
+    "forge",
+    "inspect",
+    "./src/CommentManager.sol:CommentManager",
+    "abi",
+    "--json",
+  ],
   {
     cwd: currentDir,
     encoding: "utf-8",
@@ -36,14 +42,14 @@ const channelManagerAbi = execFileSync(
 const formattedAbi = await format(
   `
   /**
-   * ABI of the CommentsV1 contract.
+   * ABI of the CommentManager contract.
    */
-  export const CommentsV1Abi = ${commentsAbi.trim()} as const;
+  export const CommentManagerABI = ${commentsAbi.trim()} as const;
 
   /**
    * ABI of the ChannelManager contract.
    */
-  export const ChannelManagerAbi = ${channelManagerAbi.trim()} as const;
+  export const ChannelManagerABI = ${channelManagerAbi.trim()} as const;
 `,
   { parser: "typescript" }
 );

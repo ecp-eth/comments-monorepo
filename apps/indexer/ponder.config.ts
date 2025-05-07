@@ -1,6 +1,6 @@
 import { createConfig } from "ponder";
 import { http, Transport } from "viem";
-import { COMMENTS_V1_ADDRESS, CommentsV1Abi } from "@ecp.eth/sdk";
+import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
 
 const networks = Object.entries(process.env).reduce(
   (acc, [key, value]) => {
@@ -36,11 +36,11 @@ export default createConfig({
   networks,
   contracts: {
     CommentsV1: {
-      abi: CommentsV1Abi,
+      abi: CommentManagerABI,
       network: Object.entries(networks).reduce(
         (acc, [chainId, network]) => {
           acc[chainId] = {
-            address: COMMENTS_V1_ADDRESS,
+            address: COMMENT_MANAGER_ADDRESS,
             startBlock: network.startBlock,
           };
           return acc;

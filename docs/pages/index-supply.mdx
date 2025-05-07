@@ -5,7 +5,7 @@ This guide will walk you through the steps to setup Index Supply to query commen
 
 ## Event Signatures
 
-All events emitted by the CommentsV1 contract [can be found here](/protocol-reference/CommentsV1#events).
+All events emitted by the `CommentManager` contract [can be found here](/protocol-reference/CommentManager#events).
 
 ### Struct to Tuple Conversion
 
@@ -86,7 +86,7 @@ Here's how to fetch comments for a specific URI using Index Supply:
 
 ```typescript
 import { z } from "zod";
-import { COMMENTS_V1_ADDRESS } from "@ecp.eth/sdk";
+import { COMMENT_MANAGER_ADDRESS } from "@ecp.eth/sdk";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { indexSupplyClient, ISPrimitive } from "./isClient";
 
@@ -137,7 +137,7 @@ async function fetchComments(
     FROM
       CommentAdded
     WHERE
-      address = ${COMMENTS_V1_ADDRESS}
+      address = ${COMMENT_MANAGER_ADDRESS}
     AND
       appSigner = ${appSigner}
     AND
@@ -216,4 +216,4 @@ console.log(
 ## Additional Resources
 
 - [Index Supply Documentation](https://www.indexsupply.net/docs)
-- [ECP Protocol Reference](/protocol-reference/CommentsV1)
+- [ECP Protocol Reference](/protocol-reference/CommentManager)

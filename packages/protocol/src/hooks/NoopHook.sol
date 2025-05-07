@@ -2,9 +2,9 @@
 pragma solidity ^0.8.20;
 
 import {ChannelManager} from "../ChannelManager.sol";
-import {CommentsV1} from "../CommentsV1.sol";
 import {IHook} from "../interfaces/IHook.sol";
-import {ICommentTypes} from "../interfaces/ICommentTypes.sol";
+import {Hooks} from "../libraries/Hooks.sol";
+import {Comments} from "../libraries/Comments.sol";
 import {IChannelManager} from "../interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
@@ -17,7 +17,7 @@ contract NoopHook is IHook {
     }
 
     function beforeComment(
-        ICommentTypes.CommentData calldata,
+        Comments.CommentData calldata,
         address,
         bytes32
     ) external payable returns (bool) {
@@ -25,10 +25,37 @@ contract NoopHook is IHook {
     }
 
     function afterComment(
-        ICommentTypes.CommentData calldata,
+        Comments.CommentData calldata,
         address,
         bytes32
-    ) external pure returns (bool) {
+    ) external payable returns (bool) {
         return true;
     }
+
+    function getHookPermissions()
+        external
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {}
+
+    function beforeInitialize(
+        address channel
+    ) external override returns (bool success) {}
+
+    function afterInitialize(
+        address channel
+    ) external override returns (bool success) {}
+
+    function beforeDeleteComment(
+        Comments.CommentData calldata commentData,
+        address caller,
+        bytes32 commentId
+    ) external payable override returns (bool success) {}
+
+    function afterDeleteComment(
+        Comments.CommentData calldata commentData,
+        address caller,
+        bytes32 commentId
+    ) external override returns (bool success) {}
 }

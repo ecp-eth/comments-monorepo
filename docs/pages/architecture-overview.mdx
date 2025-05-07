@@ -6,27 +6,49 @@ The Ethereum Comments Protocol enables decentralized commenting through a combin
 
 ```mermaid
 graph TD
-    A[fa:fa-window-maximize App server] --> B["fa:fa-file-code SDK"]
-    B --> C["fa:fa-file-contract CommentV1\n(Smart Contract)"]
-    B --> D[fa:fa-server Indexer]
-    D --> E[fa:fa-database Database]
-    C --> D
+    AppServer[fa:fa-window-maximize App server]
+    SDK["fa:fa-file-code SDK"]
+    Contracts["fa:fa-file-contract Contracts\n"]
+    Indexer[fa:fa-server Indexer]
+    Indexer[fa:fa-server Indexer]
+    Database@{ shape: cyl, label: "fa:fa-database Database" }
+
+    AppServer <--> SDK
+    SDK -->|Invokes| Contracts
+    SDK -->|Fetches comments| Indexer
+    Indexer -->|Stores comments| Database
+    Contracts -->|emit events| Indexer
+    Indexer -->|subscribes to events| Contracts
+
+    subgraph "Contracts"
+        CommentManager[fa:fa-file-contract CommentManager] --> ChannelManager[fa:fa-file-contract ChannelManager]
+    end
 ```
 
-### 1. CommentV1 (Smart Contract)
+### 1. Comment Manager (Smart Contract)
 
 - Manages comment storage and threading relationships
-- Emits events for comment additions, deletions and approvals
-- [Dual-signature system](/dual-signature-system) where both authors and app signers can authorize actions
+- Emits events for comment additions, deletions, and approvals
+- Implements a [dual-signature system](/dual-signature-system), allowing both authors and app signers to authorize actions
 
-### 2. Indexer
+See [CommentManager](/contract#comment-manager-contract-details) for more details.
+
+### 2. Channel Manager (Smart Contract)
+
+- Manages channel storage
+- Handles fees for channel creation and comment posting
+- Pluggable via hooks
+
+See [ChannelManager](/contract#channel-manager-contract-details) for more details.
+
+### 3. Indexer
 
 - Listens for comment events on-chain
 - Processes and indexes comments for efficient querying
 - Maintains a synchronized database of all comments
 
-### 3. SDK
+### 4. SDK
 
 - Provides easy-to-use interfaces for developers
 - Handles interaction with smart contracts
-- Manages connection to indexer services
+- Manages connections to indexer services

@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
-import {CommentsV1} from "../src/CommentsV1.sol";
-import {IHook} from "../src/interfaces/IHook.sol";
-import {ICommentTypes} from "../src/interfaces/ICommentTypes.sol";
+import {CommentManager} from "../src/CommentManager.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {TestUtils} from "./utils.sol";
+import {BaseHook} from "../src/hooks/BaseHook.sol";
+import {Hooks} from "../src/libraries/Hooks.sol";
+import {Comments} from "../src/libraries/Comments.sol";
 
 // Token contract for testing
 contract TestToken is ERC20 {
@@ -19,7 +20,7 @@ contract TestToken is ERC20 {
 }
 
 // Token gating hook contract
-contract TokenGatedHook is IHook {
+contract TokenGatedHook is BaseHook {
     ERC20 public token;
     uint256 public requiredBalance;
 
@@ -28,35 +29,40 @@ contract TokenGatedHook is IHook {
         requiredBalance = _requiredBalance;
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) external pure returns (bool) {
-        return interfaceId == type(IHook).interfaceId;
-    }
-
-    function beforeComment(
-        ICommentTypes.CommentData calldata commentData,
+    function _beforeComment(
+        Comments.CommentData calldata commentData,
         address,
         bytes32
-    ) external payable returns (bool) {
+    ) internal view override returns (bool) {
         // Check if the comment author has enough tokens
         uint256 balance = token.balanceOf(commentData.author);
         return balance >= requiredBalance;
     }
 
-    function afterComment(
-        ICommentTypes.CommentData calldata,
+    function _afterComment(
+        Comments.CommentData calldata,
         address,
         bytes32
-    ) external pure returns (bool) {
+    ) internal pure override returns (bool) {
         return true;
+    }
+
+    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
+        return Hooks.Permissions({
+            beforeInitialize: false,
+            afterInitialize: false,
+            beforeComment: true,
+            afterComment: true,
+            beforeDeleteComment: false,
+            afterDeleteComment: false
+        });
     }
 }
 
 contract TokenGatedHookTest is Test, IERC721Receiver {
     using TestUtils for string;
 
-    CommentsV1 public comments;
+    CommentManager public comments;
     ChannelManager public channelManager;
     TokenGatedHook public tokenGatedHook;
     TestToken public testToken;
@@ -81,11 +87,6 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
 
         (comments, channelManager) = TestUtils.createContracts(owner);
 
-        // Register the token gated hook
-        channelManager.registerHook{value: 0.02 ether}(address(tokenGatedHook));
-        // Enable the hook globally
-        channelManager.setHookGloballyEnabled(address(tokenGatedHook), true);
-
         vm.deal(user1, 100 ether);
         vm.deal(user2, 100 ether);
     }
@@ -103,29 +104,28 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         testToken.transfer(user1, 1000 * 10 ** 18);
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes
-            .CommentData({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                appSigner: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CommentData memory commentData = Comments.CommentData({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            appSigner: user2,
+            channelId: channelId,
+            nonce: comments.nonces(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // Test beforeComment hook - should succeed
         vm.prank(address(comments));
         assertTrue(
-            channelManager.executeHooks(
+            channelManager.executeHook(
                 channelId,
                 commentData,
                 user1,
                 bytes32(0),
-                IChannelManager.HookPhase.Before
+                Hooks.HookPhase.BeforeComment
             )
         );
     }
@@ -143,29 +143,28 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         testToken.transfer(user1, 999 * 10 ** 18);
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes
-            .CommentData({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                appSigner: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CommentData memory commentData = Comments.CommentData({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            appSigner: user2,
+            channelId: channelId,
+            nonce: comments.nonces(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // Test beforeComment hook - should fail
         vm.prank(address(comments));
         vm.expectRevert(IChannelManager.ChannelHookExecutionFailed.selector);
-        channelManager.executeHooks(
+        channelManager.executeHook(
             channelId,
             commentData,
             user1,
             bytes32(0),
-            IChannelManager.HookPhase.Before
+            Hooks.HookPhase.BeforeComment
         );
     }
 
@@ -179,29 +178,28 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         );
 
         // Create comment data using direct construction
-        ICommentTypes.CommentData memory commentData = ICommentTypes
-            .CommentData({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                appSigner: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CommentData memory commentData = Comments.CommentData({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            appSigner: user2,
+            channelId: channelId,
+            nonce: comments.nonces(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // First try without tokens - should fail
         vm.prank(address(comments));
         vm.expectRevert(IChannelManager.ChannelHookExecutionFailed.selector);
-        channelManager.executeHooks(
+        channelManager.executeHook(
             channelId,
             commentData,
             user1,
             bytes32(0),
-            IChannelManager.HookPhase.Before
+            Hooks.HookPhase.BeforeComment
         );
 
         // Transfer 1000 tokens to user1
@@ -210,12 +208,12 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         // Try again with tokens - should succeed
         vm.prank(address(comments));
         assertTrue(
-            channelManager.executeHooks(
+            channelManager.executeHook(
                 channelId,
                 commentData,
                 user1,
                 bytes32(0),
-                IChannelManager.HookPhase.Before
+                Hooks.HookPhase.BeforeComment
             )
         );
     }
