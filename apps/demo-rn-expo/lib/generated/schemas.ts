@@ -9,18 +9,10 @@ import {
 } from "@ecp.eth/sdk/comments/schemas";
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
-// import { isProfane } from "./profanity-detection";
 
 const sharedCommentSchema = z.object({
   author: HexSchema,
-  // replace with following line to enable basic profanity detection
   content: z.string().trim().nonempty(),
-  /* content: z
-    .string()
-    .trim()
-    .nonempty()
-    .max(MAX_COMMENT_LENGTH)
-    .refine((val) => !isProfane(val), "Comment contains profanity"), */
 });
 
 export const PrepareSignedGaslessCommentRequestBodySchema = z.union([

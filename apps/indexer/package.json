@@ -32,7 +32,6 @@
     "kysely": "^0.26.3",
     "lru-cache": "^11.0.2",
     "normalize-url": "^8.0.1",
-    "obscenity": "^0.4.3",
     "pg": "^8.11.3",
     "ponder": "^0.10.6",
     "viem": "^2.26.0",
