@@ -47,6 +47,7 @@ You may want to test the app on your phone because it requires wallet app to pos
 
 5. Scan the QR code from the terminal with the [Expo Go](https://expo.dev/go) app on your phone.
 
-# Known PNPM issues:
+# Known issues:
 
-- although PNPM team consider that is correct behavior, we experienced a couple times when upgrading libs (totally unrelated to wagmi, such as react-native-async-storage) in this repo, causing a duplicated `wagmi` package gets referenced by `sdk` and `shared` packages, this cause build issues for the other apps in the monorepo. We've tried solution from [this issue](https://github.com/pnpm/pnpm/issues/5585) but none of them permanently fixed the issue, we should consider writing a custom script to force linking the packages into the same folder.
+- PNPM: Although PNPM team consider that is correct behavior, we experienced a couple times when upgrading libs (totally unrelated to wagmi, such as react-native-async-storage) in this repo, causing a duplicated `wagmi` package gets referenced by `sdk` and `shared` packages, this cause build issues for the other apps in the monorepo. We've tried solution from [this issue](https://github.com/pnpm/pnpm/issues/5585) but none of them permanently fixed the issue, we should consider writing a custom script to force linking the packages into the same folder.
+- AppKit: For error message about "\_reactNative.BackHandler.removeEventListener is not a function (it is undefined)", please see: https://github.com/reown-com/appkit-react-native/issues/339
