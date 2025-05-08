@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 
-export function useAppForegrounded() {
+export function useAppStateEffect({
+  foregrounded,
+  backgrounded,
+}: {
+  foregrounded?: () => void;
+  backgrounded?: () => void;
+}) {
   const appState = useRef(AppState.currentState);
   const [appIsInForeground, setAppIsInForeground] = useState(true);
   useEffect(() => {
@@ -13,21 +19,23 @@ export function useAppForegrounded() {
           nextAppState === "active"
         ) {
           setAppIsInForeground(true);
+          foregrounded?.();
         }
         if (
           appState.current === "active" &&
           nextAppState.match(/inactive|background/)
         ) {
           setAppIsInForeground(false);
+          backgrounded?.();
         }
         appState.current = nextAppState;
       }
     );
 
     return () => handler.remove();
-  }, []);
+  }, [backgrounded, foregrounded]);
 
   return appIsInForeground;
 }
 
-export default useAppForegrounded;
+export default useAppStateEffect;

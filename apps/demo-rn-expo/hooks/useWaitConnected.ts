@@ -3,7 +3,7 @@ import { useAccount, useAccountEffect } from "wagmi";
 import Deferred from "promise-deferred";
 import { Hex } from "viem";
 import { useAppKit } from "@reown/appkit-wagmi-react-native";
-import { useAppForegroundedEffect } from "./useAppForegroundedEffect";
+import { useAppStateEffect } from "./useAppStateEffect";
 
 export default function useWaitConnected() {
   const { address } = useAccount();
@@ -12,8 +12,10 @@ export default function useWaitConnected() {
   const waitConnectedPromise = useRef<Deferred<Hex> | null>(null);
   const waitAppForegroundPromise = useRef<Deferred<void> | null>(null);
 
-  useAppForegroundedEffect(() => {
-    waitAppForegroundPromise.current?.resolve();
+  useAppStateEffect({
+    foregrounded: () => {
+      waitAppForegroundPromise.current?.resolve();
+    },
   });
 
   useAccountEffect({
