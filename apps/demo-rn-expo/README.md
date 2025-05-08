@@ -21,25 +21,29 @@ You may want to test the app on your phone because it requires wallet app to pos
 
 1. Install dependencies:
 
-```bash
-pnpm install
-```
+   ```bash
+   pnpm install
+   ```
 
 2. Create a `.env` file based on the `.env.sample` file:
 
-```bash
-cp .env.example .env
-```
+   ```bash
+   cp .env.example .env
+   ```
 
 3. Update the `.env` file with your own values.
 
 4. Run the app:
 
-```bash
-# until expo 0.53 is fully release we need to run development built instead
-# https://docs.expo.dev/develop/development-builds/create-a-build/
-pnpm run dev:ios
-```
+   ```bash
+   pnpm run ios
+   ```
+
+   alternatively, run the app as development build:
+
+   ```
+   pnpm run dev:ios
+   ```
 
 5. Scan the QR code from the terminal with the [Expo Go](https://expo.dev/go) app on your phone.
 
