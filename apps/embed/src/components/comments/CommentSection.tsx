@@ -71,7 +71,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     } as ListCommentsQueryPageParamsSchemaType,
     queryFn: async ({ pageParam, signal }) => {
       const response = await fetchComments({
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         targetUri,
         limit: pageParam.limit,
@@ -105,7 +105,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     queryKey,
     fetchComments(options) {
       return fetchComments({
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         targetUri,
         limit: COMMENTS_PER_PAGE,

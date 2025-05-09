@@ -9,7 +9,7 @@ library Comments {
     /// @param targetUri the URI about which the comment is being made
     /// @param commentType The type of the comment (e.g. "question", "answer", "feedback", etc.)
     /// @param author The address of the comment author
-    /// @param appSigner The address of the application signer that authorized this comment
+    /// @param app The address of the application signer that authorized this comment
     /// @param channelId The channel ID associated with the comment
     /// @param nonce The nonce for the comment
     /// @param deadline Timestamp after which the signatures for this comment become invalid
@@ -17,7 +17,7 @@ library Comments {
     struct CommentData {
         // Pack these two addresses together (saves 1 storage slot)
         address author; // 20 bytes
-        address appSigner; // 20 bytes
+        address app; // 20 bytes
         // 32-byte types
         uint256 channelId;
         uint256 nonce;

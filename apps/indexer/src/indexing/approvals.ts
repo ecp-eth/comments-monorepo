@@ -3,14 +3,14 @@ import schema from "ponder:schema";
 
 export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:ApprovalAdded", async ({ event, context }) => {
-    const id = `${event.args.author}-${event.args.appSigner}-${context.network.chainId}`;
+    const id = `${event.args.author}-${event.args.app}-${context.network.chainId}`;
 
     await context.db
       .insert(schema.approvals)
       .values({
         id,
         author: event.args.author,
-        appSigner: event.args.appSigner,
+        app: event.args.app,
         chainId: context.network.chainId,
         txHash: event.transaction.hash,
         logIndex: event.log.logIndex,
@@ -23,7 +23,7 @@ export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
   });
 
   ponder.on("CommentsV1:ApprovalRemoved", async ({ event, context }) => {
-    const id = `${event.args.author}-${event.args.appSigner}-${context.network.chainId}`;
+    const id = `${event.args.author}-${event.args.app}-${context.network.chainId}`;
 
     await context.db
       .update(schema.approvals, {

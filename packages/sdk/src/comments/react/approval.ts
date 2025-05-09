@@ -47,12 +47,7 @@ export function useIsApproved(
   return useQuery({
     ...options,
     enabled: options.enabled && !!client,
-    queryKey: [
-      "isApproved",
-      params.author,
-      params.appSigner,
-      params.commentsAddress,
-    ],
+    queryKey: ["isApproved", params.author, params.app, params.commentsAddress],
     queryFn: async () => {
       const result = await isApproved({
         ...params,

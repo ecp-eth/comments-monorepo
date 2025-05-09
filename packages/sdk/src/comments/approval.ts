@@ -29,7 +29,7 @@ export type IsApprovedParams = {
   /**
    * The app signer address
    */
-  appSigner: Hex;
+  app: Hex;
   /**
    * The address of the comments contract
    * @default COMMENT_MANAGER_ADDRESS
@@ -40,7 +40,7 @@ export type IsApprovedParams = {
 
 const IsApprovedParamsSchema = z.object({
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
@@ -51,14 +51,13 @@ const IsApprovedParamsSchema = z.object({
  * @returns Whether the app signer is approved
  */
 export async function isApproved(params: IsApprovedParams): Promise<boolean> {
-  const { author, appSigner, commentsAddress } =
-    IsApprovedParamsSchema.parse(params);
+  const { author, app, commentsAddress } = IsApprovedParamsSchema.parse(params);
 
   const approved = await params.readContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "isApproved",
-    args: [author, appSigner],
+    args: [author, app],
   });
 
   return approved;
@@ -68,7 +67,7 @@ export type AddApprovalAsAuthorParams = {
   /**
    * The address of the app signer being approved
    */
-  appSigner: Hex;
+  app: Hex;
   /**
    * The address of the comments contract
    *
@@ -83,7 +82,7 @@ export type AddApprovalAsAuthorResult = {
 };
 
 const AddApprovalAsAuthorParamsSchema = z.object({
-  appSigner: HexSchema,
+  app: HexSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["addApprovalAsAuthor"]>(
     () => true
@@ -101,13 +100,13 @@ export async function addApprovalAsAuthor(
 ): Promise<AddApprovalAsAuthorResult> {
   const validatedParams = AddApprovalAsAuthorParamsSchema.parse(params);
 
-  const { appSigner, commentsAddress, writeContract } = validatedParams;
+  const { app, commentsAddress, writeContract } = validatedParams;
 
   const txHash = await writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "addApprovalAsAuthor",
-    args: [appSigner],
+    args: [app],
   });
 
   return {
@@ -164,7 +163,7 @@ export async function addApproval(
     functionName: "addApproval",
     args: [
       typedData.message.author,
-      typedData.message.appSigner,
+      typedData.message.app,
       typedData.message.nonce,
       typedData.message.deadline,
       signature,
@@ -180,7 +179,7 @@ export type RevokeApprovalAsAuthorParams = {
   /**
    * The address of the app signer being unapproved
    */
-  appSigner: Hex;
+  app: Hex;
   /**
    * The address of the comments contract
    *
@@ -195,7 +194,7 @@ export type RevokeApprovalAsAuthorResult = {
 };
 
 const RevokeApprovalAsAuthorParamsSchema = z.object({
-  appSigner: HexSchema,
+  app: HexSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["revokeApprovalAsAuthor"]>(
     () => true
@@ -213,13 +212,13 @@ export async function revokeApprovalAsAuthor(
 ): Promise<RevokeApprovalAsAuthorResult> {
   const validatedParams = RevokeApprovalAsAuthorParamsSchema.parse(params);
 
-  const { appSigner, commentsAddress, writeContract } = validatedParams;
+  const { app, commentsAddress, writeContract } = validatedParams;
 
   const txHash = await writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "revokeApprovalAsAuthor",
-    args: [appSigner],
+    args: [app],
   });
 
   return {
@@ -278,7 +277,7 @@ export async function revokeApproval(
     functionName: "removeApproval",
     args: [
       typedData.message.author,
-      typedData.message.appSigner,
+      typedData.message.app,
       typedData.message.nonce,
       typedData.message.deadline,
       signature,
@@ -307,7 +306,7 @@ export type GetAddApprovalHashParams = {
   /**
    * The address of the app signer
    */
-  appSigner: Hex;
+  app: Hex;
   /**
    * The current nonce for the author
    */
@@ -329,7 +328,7 @@ export type GetAddApprovalHashParams = {
 
 export type GetAddApprovalHashData = {
   author: Hex;
-  appSigner: Hex;
+  app: Hex;
   nonce: bigint;
   deadline: bigint;
 };
@@ -341,7 +340,7 @@ export type GetAddApprovalHashResult = {
 
 const GetAddApprovalHashParamsSchema = z.object({
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint().optional(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
@@ -356,7 +355,7 @@ const GetAddApprovalHashParamsSchema = z.object({
 export async function getAddApprovalHash(
   params: GetAddApprovalHashParams
 ): Promise<GetAddApprovalHashResult> {
-  const { author, appSigner, nonce, deadline, commentsAddress } =
+  const { author, app, nonce, deadline, commentsAddress } =
     GetAddApprovalHashParamsSchema.parse(params);
 
   let computedDeadline = deadline;
@@ -369,14 +368,14 @@ export async function getAddApprovalHash(
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "getAddApprovalHash",
-    args: [author, appSigner, nonce, computedDeadline],
+    args: [author, app, nonce, computedDeadline],
   });
 
   return {
     hash,
     data: {
       author,
-      appSigner,
+      app,
       nonce,
       deadline: computedDeadline,
     },
@@ -400,7 +399,7 @@ export type GetRemoveApprovalHashParams = {
   /**
    * The address of the app signer
    */
-  appSigner: Hex;
+  app: Hex;
   /**
    * The current nonce for the author
    */
@@ -424,7 +423,7 @@ export type GetRemoveApprovalHashResult = {
 
 const GetRemoveApprovalHashParamsSchema = z.object({
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
@@ -439,14 +438,14 @@ const GetRemoveApprovalHashParamsSchema = z.object({
 export async function getRemoveApprovalHash(
   params: GetRemoveApprovalHashParams
 ): Promise<GetRemoveApprovalHashResult> {
-  const { author, appSigner, nonce, deadline, commentsAddress } =
+  const { author, app, nonce, deadline, commentsAddress } =
     GetRemoveApprovalHashParamsSchema.parse(params);
 
   const hash = await params.readContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "getRemoveApprovalHash",
-    args: [author, appSigner, nonce, deadline],
+    args: [author, app, nonce, deadline],
   });
 
   return {
@@ -456,7 +455,7 @@ export async function getRemoveApprovalHash(
 
 export type CreateApprovalTypedDataParams = {
   author: Hex;
-  appSigner: Hex;
+  app: Hex;
   /**
    * The chain ID
    */
@@ -479,7 +478,7 @@ export type CreateApprovalTypedDataResult = AddApprovalTypedDataSchemaType;
 
 const CreateApprovalTypedDataParamsSchema = z.object({
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
   chainId: z.number(),
   nonce: z.bigint(),
   deadline: z.bigint().optional(),
@@ -495,7 +494,7 @@ export function createApprovalTypedData(
 ): CreateApprovalTypedDataResult {
   const validatedParams = CreateApprovalTypedDataParamsSchema.parse(params);
 
-  const { author, appSigner, chainId, nonce, deadline, commentsAddress } =
+  const { author, app, chainId, nonce, deadline, commentsAddress } =
     validatedParams;
 
   return AddApprovalTypedDataSchema.parse({
@@ -509,7 +508,7 @@ export function createApprovalTypedData(
     primaryType: "AddApproval",
     message: {
       author,
-      appSigner,
+      app,
       nonce,
       deadline:
         deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
@@ -525,7 +524,7 @@ export type CreateRemoveApprovalTypedDataParams = {
   /**
    * The address of the app signer
    */
-  appSigner: Hex;
+  app: Hex;
   /**
    * The chain ID
    */
@@ -549,7 +548,7 @@ export type CreateRemoveApprovalTypedDataResult =
 
 const CreateRemoveApprovalTypedDataParamsSchema = z.object({
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
   chainId: z.number(),
   nonce: z.bigint(),
   deadline: z.bigint().optional(),
@@ -566,7 +565,7 @@ export function createRemoveApprovalTypedData(
   const validatedParams =
     CreateRemoveApprovalTypedDataParamsSchema.parse(params);
 
-  const { author, appSigner, chainId, nonce, deadline, commentsAddress } =
+  const { author, app, chainId, nonce, deadline, commentsAddress } =
     validatedParams;
 
   let computedDeadline = deadline;
@@ -586,7 +585,7 @@ export function createRemoveApprovalTypedData(
     primaryType: "RemoveApproval",
     message: {
       author,
-      appSigner,
+      app,
       nonce,
       deadline: computedDeadline,
     },

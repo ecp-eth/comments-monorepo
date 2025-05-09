@@ -18,19 +18,19 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     bytes32 public immutable DOMAIN_SEPARATOR;
     bytes32 public constant ADD_COMMENT_TYPEHASH =
         keccak256(
-            "AddComment(string content,string metadata,string targetUri,string commentType,address author,address appSigner,uint256 channelId,uint256 nonce,uint256 deadline,bytes32 parentId)"
+            "AddComment(string content,string metadata,string targetUri,string commentType,address author,address app,uint256 channelId,uint256 nonce,uint256 deadline,bytes32 parentId)"
         );
     bytes32 public constant DELETE_COMMENT_TYPEHASH =
         keccak256(
-            "DeleteComment(bytes32 commentId,address author,address appSigner,uint256 nonce,uint256 deadline)"
+            "DeleteComment(bytes32 commentId,address author,address app,uint256 nonce,uint256 deadline)"
         );
     bytes32 public constant ADD_APPROVAL_TYPEHASH =
         keccak256(
-            "AddApproval(address author,address appSigner,uint256 nonce,uint256 deadline)"
+            "AddApproval(address author,address app,uint256 nonce,uint256 deadline)"
         );
     bytes32 public constant REMOVE_APPROVAL_TYPEHASH =
         keccak256(
-            "RemoveApproval(address author,address appSigner,uint256 nonce,uint256 deadline)"
+            "RemoveApproval(address author,address app,uint256 nonce,uint256 deadline)"
         );
 
     // On-chain storage mappings
@@ -112,13 +112,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         // Validate nonce
         if (
-            nonces[commentData.author][commentData.appSigner] !=
+            nonces[commentData.author][commentData.app] !=
             commentData.nonce
         ) {
             revert InvalidNonce(
                 commentData.author,
-                commentData.appSigner,
-                nonces[commentData.author][commentData.appSigner],
+                commentData.app,
+                nonces[commentData.author][commentData.app],
                 commentData.nonce
             );
         }
@@ -128,7 +128,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             revert ChannelDoesNotExist();
         }
 
-        nonces[commentData.author][commentData.appSigner]++;
+        nonces[commentData.author][commentData.app]++;
 
         bytes32 commentId = getCommentId(commentData);
 
@@ -137,7 +137,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             _validateSignature(appSignature);
             if (
                 !SignatureChecker.isValidSignatureNow(
-                    commentData.appSigner,
+                    commentData.app,
                     commentId,
                     appSignature
                 )
@@ -152,7 +152,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         if (
             msg.sender == commentData.author ||
-            isApproved[commentData.author][commentData.appSigner] ||
+            isApproved[commentData.author][commentData.app] ||
             (authorSignature.length > 0 &&
                 SignatureChecker.isValidSignatureNow(
                     commentData.author,
@@ -190,7 +190,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             emit CommentAdded(
                 commentId,
                 commentData.author,
-                commentData.appSigner,
+                commentData.app,
                 commentData
             );
             return;
@@ -211,7 +211,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     function deleteComment(
         bytes32 commentId,
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline,
         bytes calldata authorSignature,
@@ -221,11 +221,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             revert SignatureDeadlineReached(deadline, block.timestamp);
         }
 
-        if (nonces[author][appSigner] != nonce) {
+        if (nonces[author][app] != nonce) {
             revert InvalidNonce(
                 author,
-                appSigner,
-                nonces[author][appSigner],
+                app,
+                nonces[author][app],
                 nonce
             );
         }
@@ -233,20 +233,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         Comments.CommentData storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
 
-        nonces[author][appSigner]++;
+        nonces[author][app]++;
 
         bytes32 deleteHash = getDeleteCommentHash(
             commentId,
             author,
-            appSigner,
+            app,
             nonce,
             deadline
         );
 
         if (
-            isApproved[author][appSigner] &&
+            isApproved[author][app] &&
             SignatureChecker.isValidSignatureNow(
-                appSigner,
+                app,
                 deleteHash,
                 appSignature
             )
@@ -313,34 +313,34 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     /// @notice Internal function to add an app signer approval
     /// @param author The address granting approval
-    /// @param appSigner The address being approved
-    function _addApproval(address author, address appSigner) internal {
-        isApproved[author][appSigner] = true;
-        emit ApprovalAdded(author, appSigner);
+    /// @param app The address being approved
+    function _addApproval(address author, address app) internal {
+        isApproved[author][app] = true;
+        emit ApprovalAdded(author, app);
     }
 
     /// @notice Internal function to remove an app signer approval
     /// @param author The address removing approval
-    /// @param appSigner The address being unapproved
-    function _revokeApproval(address author, address appSigner) internal {
-        isApproved[author][appSigner] = false;
-        emit ApprovalRemoved(author, appSigner);
+    /// @param app The address being unapproved
+    function _revokeApproval(address author, address app) internal {
+        isApproved[author][app] = false;
+        emit ApprovalRemoved(author, app);
     }
 
     /// @inheritdoc ICommentManager
-    function addApprovalAsAuthor(address appSigner) external {
-        _addApproval(msg.sender, appSigner);
+    function addApprovalAsAuthor(address app) external {
+        _addApproval(msg.sender, app);
     }
 
     /// @inheritdoc ICommentManager
-    function revokeApprovalAsAuthor(address appSigner) external {
-        _revokeApproval(msg.sender, appSigner);
+    function revokeApprovalAsAuthor(address app) external {
+        _revokeApproval(msg.sender, app);
     }
 
     /// @inheritdoc ICommentManager
     function addApproval(
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline,
         bytes calldata signature
@@ -349,20 +349,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             revert SignatureDeadlineReached(deadline, block.timestamp);
         }
 
-        if (nonces[author][appSigner] != nonce) {
+        if (nonces[author][app] != nonce) {
             revert InvalidNonce(
                 author,
-                appSigner,
-                nonces[author][appSigner],
+                app,
+                nonces[author][app],
                 nonce
             );
         }
 
-        nonces[author][appSigner]++;
+        nonces[author][app]++;
 
         bytes32 addApprovalHash = getAddApprovalHash(
             author,
-            appSigner,
+            app,
             nonce,
             deadline
         );
@@ -377,13 +377,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             revert InvalidAuthorSignature();
         }
 
-        _addApproval(author, appSigner);
+        _addApproval(author, app);
     }
 
     /// @inheritdoc ICommentManager
     function removeApproval(
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline,
         bytes calldata signature
@@ -392,20 +392,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             revert SignatureDeadlineReached(deadline, block.timestamp);
         }
 
-        if (nonces[author][appSigner] != nonce) {
+        if (nonces[author][app] != nonce) {
             revert InvalidNonce(
                 author,
-                appSigner,
-                nonces[author][appSigner],
+                app,
+                nonces[author][app],
                 nonce
             );
         }
 
-        nonces[author][appSigner]++;
+        nonces[author][app]++;
 
         bytes32 removeApprovalHash = getRemoveApprovalHash(
             author,
-            appSigner,
+            app,
             nonce,
             deadline
         );
@@ -420,13 +420,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             revert InvalidAuthorSignature();
         }
 
-        _revokeApproval(author, appSigner);
+        _revokeApproval(author, app);
     }
 
     /// @inheritdoc ICommentManager
     function getAddApprovalHash(
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline
     ) public view returns (bytes32) {
@@ -434,7 +434,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             abi.encode(
                 ADD_APPROVAL_TYPEHASH,
                 author,
-                appSigner,
+                app,
                 nonce,
                 deadline
             )
@@ -449,7 +449,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     /// @inheritdoc ICommentManager
     function getRemoveApprovalHash(
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline
     ) public view returns (bytes32) {
@@ -457,7 +457,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             abi.encode(
                 REMOVE_APPROVAL_TYPEHASH,
                 author,
-                appSigner,
+                app,
                 nonce,
                 deadline
             )
@@ -473,7 +473,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     function getDeleteCommentHash(
         bytes32 commentId,
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline
     ) public view returns (bytes32) {
@@ -482,7 +482,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                 DELETE_COMMENT_TYPEHASH,
                 commentId,
                 author,
-                appSigner,
+                app,
                 nonce,
                 deadline
             )
@@ -506,7 +506,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                 keccak256(bytes(commentData.targetUri)),
                 keccak256(bytes(commentData.commentType)),
                 commentData.author,
-                commentData.appSigner,
+                commentData.app,
                 commentData.channelId,
                 commentData.nonce,
                 commentData.deadline,

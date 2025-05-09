@@ -59,7 +59,7 @@ export function CommentSection({
         return fetchComments({
           apiUrl: publicEnv.EXPO_PUBLIC_INDEXER_URL,
           targetUri: publicEnv.EXPO_PUBLIC_TARGET_URI,
-          appSigner: publicEnv.EXPO_PUBLIC_APP_SIGNER_ADDRESS,
+          app: publicEnv.EXPO_PUBLIC_APP_SIGNER_ADDRESS,
 
           limit: pageParam.limit,
           cursor: pageParam.cursor,

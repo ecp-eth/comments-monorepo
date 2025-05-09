@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / DeleteCommentTypedDataSchemaType
 
@@ -9,41 +9,42 @@
 ```ts
 type DeleteCommentTypedDataSchemaType = {
   domain: {
-     chainId: number;
-     name: "Comments";
-     verifyingContract: `0x${string}`;
-     version: "1";
+    chainId: number;
+    name: "Comments";
+    verifyingContract: `0x${string}`;
+    version: "1";
   };
   message: {
-     appSigner: `0x${string}`;
-     author: `0x${string}`;
-     commentId: `0x${string}`;
-     deadline: bigint;
-     nonce: bigint;
+    app: `0x${string}`;
+    author: `0x${string}`;
+    commentId: `0x${string}`;
+    deadline: bigint;
+    nonce: bigint;
   };
   primaryType: "DeleteComment";
   types: {
-     DeleteComment: (
-        | {
-        name: "commentId";
-        type: "bytes32";
-      }
-        | {
-        name: "author";
-        type: "address";
-      }
-        | {
-        name: "appSigner";
-        type: "address";
-      }
-        | {
-        name: "nonce";
-        type: "uint256";
-      }
-        | {
-        name: "deadline";
-        type: "uint256";
-     })[];
+    DeleteComment: (
+      | {
+          name: "commentId";
+          type: "bytes32";
+        }
+      | {
+          name: "author";
+          type: "address";
+        }
+      | {
+          name: "app";
+          type: "address";
+        }
+      | {
+          name: "nonce";
+          type: "uint256";
+        }
+      | {
+          name: "deadline";
+          type: "uint256";
+        }
+    )[];
   };
 };
 ```
@@ -60,7 +61,7 @@ domain: {
   name: "Comments";
   verifyingContract: `0x${string}`;
   version: "1";
-};
+}
 ```
 
 #### domain.chainId
@@ -91,18 +92,18 @@ version: "1";
 
 ```ts
 message: {
-  appSigner: `0x${string}`;
+  app: `0x${string}`;
   author: `0x${string}`;
   commentId: `0x${string}`;
   deadline: bigint;
   nonce: bigint;
-};
+}
 ```
 
-#### message.appSigner
+#### message.app
 
 ```ts
-appSigner: `0x${string}` = HexSchema;
+app: `0x${string}` = HexSchema;
 ```
 
 #### message.author
@@ -149,7 +150,7 @@ types: {
      type: "address";
    }
      | {
-     name: "appSigner";
+     name: "app";
      type: "address";
    }
      | {
@@ -176,7 +177,7 @@ DeleteComment: (
   type: "address";
 }
   | {
-  name: "appSigner";
+  name: "app";
   type: "address";
 }
   | {

@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / CommentData
 
@@ -8,7 +8,7 @@
 
 ```ts
 type CommentData = {
-  appSigner: Hex;
+  app: Hex;
   author: Hex;
   channelId: bigint;
   commentType: string;
@@ -27,17 +27,17 @@ The data structure of a comment to be signed and then passed to the Embed API
 
 ## Properties
 
-### appSigner
+### app
 
 ```ts
-appSigner: Hex;
+app: Hex;
 ```
 
 Defined in: [packages/sdk/src/comments/types.ts:102](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L102)
 
 The address of the app signer
 
-***
+---
 
 ### author
 
@@ -49,7 +49,7 @@ Defined in: [packages/sdk/src/comments/types.ts:98](https://github.com/ecp-eth/c
 
 The address of the author of the comment
 
-***
+---
 
 ### channelId
 
@@ -61,7 +61,7 @@ Defined in: [packages/sdk/src/comments/types.ts:88](https://github.com/ecp-eth/c
 
 The ID of the channel
 
-***
+---
 
 ### commentType
 
@@ -73,7 +73,7 @@ Defined in: [packages/sdk/src/comments/types.ts:84](https://github.com/ecp-eth/c
 
 The type of the comment
 
-***
+---
 
 ### content
 
@@ -85,7 +85,7 @@ Defined in: [packages/sdk/src/comments/types.ts:72](https://github.com/ecp-eth/c
 
 The content of the comment
 
-***
+---
 
 ### deadline
 
@@ -97,7 +97,7 @@ Defined in: [packages/sdk/src/comments/types.ts:110](https://github.com/ecp-eth/
 
 The deadline of the comment submission in seconds since epoch
 
-***
+---
 
 ### metadata
 
@@ -109,7 +109,7 @@ Defined in: [packages/sdk/src/comments/types.ts:76](https://github.com/ecp-eth/c
 
 Metadata about the comment
 
-***
+---
 
 ### nonce
 
@@ -121,7 +121,7 @@ Defined in: [packages/sdk/src/comments/types.ts:106](https://github.com/ecp-eth/
 
 The nonce for the user per app
 
-***
+---
 
 ### parentId
 
@@ -137,7 +137,7 @@ id of parent comments if it has one, 0x for no parent comment
 
 This zero address (32 bytes of zeros) indicates the comment has no parent and is a top-level comment
 
-***
+---
 
 ### targetUri
 

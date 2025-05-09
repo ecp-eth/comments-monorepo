@@ -73,7 +73,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
     queryFn: async ({ pageParam, signal }) => {
       const response = await fetchCommentReplies({
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         cursor: pageParam.cursor,
         limit: pageParam.limit,
         commentId: comment.id,
@@ -103,7 +103,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
     fetchComments({ cursor, signal }) {
       return fetchCommentReplies({
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         commentId: comment.id,
         cursor,
         limit: 10,

@@ -8,7 +8,7 @@ export const ADD_COMMENT_TYPE = {
     { name: "targetUri", type: "string" },
     { name: "commentType", type: "string" },
     { name: "author", type: "address" },
-    { name: "appSigner", type: "address" },
+    { name: "app", type: "address" },
     { name: "channelId", type: "uint256" },
     { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
@@ -20,7 +20,7 @@ export const DELETE_COMMENT_TYPE = {
   DeleteComment: [
     { name: "commentId", type: "bytes32" },
     { name: "author", type: "address" },
-    { name: "appSigner", type: "address" },
+    { name: "app", type: "address" },
     { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
   ],
@@ -29,7 +29,7 @@ export const DELETE_COMMENT_TYPE = {
 export const ADD_APPROVAL_TYPE = {
   AddApproval: [
     { name: "author", type: "address" },
-    { name: "appSigner", type: "address" },
+    { name: "app", type: "address" },
     { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
   ],
@@ -38,7 +38,7 @@ export const ADD_APPROVAL_TYPE = {
 export const REMOVE_APPROVAL_TYPE = {
   RemoveApproval: [
     { name: "author", type: "address" },
-    { name: "appSigner", type: "address" },
+    { name: "app", type: "address" },
     { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
   ],

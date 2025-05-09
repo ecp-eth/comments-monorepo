@@ -70,7 +70,7 @@ Once the data reaches the app server, it creates a `CommentData` with `nonce` ge
 ```typescript
 const nonce = await getNonce({
   author,
-  appSigner: appSigner.address,
+  app: app.address,
   chain,
 });
 
@@ -79,7 +79,7 @@ const commentData = createCommentData({
   targetUri,
   parentId,
   author,
-  appSigner: appSigner.address,
+  app: app.address,
   nonce,
 });
 ```
@@ -98,7 +98,7 @@ const typedCommentData = createCommentTypedData({
 Finally, sign the typed data using the app signer's private key and return both `signature` and `commentData`:
 
 ```typescript
-const signature = await appSigner.signTypedData(typedCommentData);
+const signature = await app.signTypedData(typedCommentData);
 
 return {
   signature,

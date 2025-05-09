@@ -86,14 +86,14 @@ export async function POST(req: Request) {
 
   const nonce = await getNonce({
     author,
-    appSigner: account.address,
+    app: account.address,
     readContract: publicClient.readContract,
   });
 
   const commentData = createCommentData({
     content,
     author,
-    appSigner: account.address,
+    app: account.address,
     nonce,
     ...("parentId" in passedCommentData
       ? {

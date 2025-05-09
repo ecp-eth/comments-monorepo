@@ -19,7 +19,7 @@ For example, the `CommentAdded` event was defined as:
 event CommentAdded(
   bytes32 indexed commentId,
   address indexed author,
-  address indexed appSigner,
+  address indexed app,
   CommentData commentData
 );
 ```
@@ -27,7 +27,7 @@ event CommentAdded(
 It must be converted to the following tuple form in order to work with Index Supply:
 
 ```solidity
-CommentAdded(bytes32 indexed commentId, address indexed author, address indexed appSigner, (string content, string metadata, string targetUri, bytes32 parentId, address author, address appSigner, bytes32 salt, uint256 deadline) commentData)
+CommentAdded(bytes32 indexed commentId, address indexed author, address indexed app, (string content, string metadata, string targetUri, bytes32 parentId, address author, address app, bytes32 salt, uint256 deadline) commentData)
 ```
 
 _please note: at the time of writing, Index Supply's query interface doesn't support multi-line event signatures._
@@ -93,14 +93,14 @@ import { indexSupplyClient, ISPrimitive } from "./isClient";
 const COMMENT_ADDED_EVENT = `CommentAdded(
     bytes32 indexed commentId,
     address indexed author,
-    address indexed appSigner, 
+    address indexed app, 
     (
       string content,
       string metadata,
       string targetUri,
       bytes32 parentId,
       address author,
-      address appSigner,
+      address app,
       bytes32 salt,
       uint256 deadline
     ) commentData
@@ -111,7 +111,7 @@ const commentSchema = z.object({
   content: z.string(),
   targetUri: z.string(),
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
   parentId: z.string().nullable(),
   blockNumber: z.number(),
   transactionHash: HexSchema,
@@ -121,7 +121,7 @@ type Comment = z.infer<typeof commentSchema>;
 
 async function fetchComments(
   targetUri: string,
-  appSigner: string,
+  app: string,
   chain = "8453"
 ): Promise<Comment[]> {
   const query = `
@@ -130,7 +130,7 @@ async function fetchComments(
       (commentData->>'content') as "content",
       (commentData->>'targetUri') as "targetUri",
       "author", 
-      "appSigner",
+      "app",
       (commentData->>'parentId') as "parentId",
       block_num as "blockNumber",
       tx_hash as "transactionHash"
@@ -139,7 +139,7 @@ async function fetchComments(
     WHERE
       address = ${COMMENT_MANAGER_ADDRESS}
     AND
-      appSigner = ${appSigner}
+      app = ${app}
     AND
       commentData->>'targetUri' = '${targetUri}'
     ORDER BY block_num DESC

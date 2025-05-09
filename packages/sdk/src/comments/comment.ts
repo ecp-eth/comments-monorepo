@@ -308,7 +308,7 @@ export type DeleteCommentParams = {
   /**
    * The app signer
    */
-  appSigner: Hex;
+  app: Hex;
   /**
    * The nonce for the signature
    */
@@ -339,7 +339,7 @@ export type DeleteCommentParams = {
 const DeleteCommentParamsSchema = z.object({
   commentId: HexSchema,
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
@@ -359,7 +359,7 @@ export async function deleteComment(params: DeleteCommentParams) {
   const {
     commentId,
     author,
-    appSigner,
+    app,
     nonce,
     deadline,
     commentsAddress,
@@ -374,7 +374,7 @@ export async function deleteComment(params: DeleteCommentParams) {
     args: [
       commentId,
       author,
-      appSigner,
+      app,
       nonce,
       deadline,
       authorSignature ?? stringToHex(""),
@@ -399,7 +399,7 @@ export type GetDeleteCommentHashParams = {
   /**
    * The app signer
    */
-  appSigner: Hex;
+  app: Hex;
   /**
    * The nonce for the signature
    */
@@ -426,7 +426,7 @@ export type GetDeleteCommentHashParams = {
 const GetDeleteCommentHashParamsSchema = z.object({
   commentId: HexSchema,
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
@@ -441,14 +441,14 @@ const GetDeleteCommentHashParamsSchema = z.object({
 export async function getDeleteCommentHash(
   params: GetDeleteCommentHashParams
 ): Promise<Hex> {
-  const { commentId, author, appSigner, nonce, deadline, commentsAddress } =
+  const { commentId, author, app, nonce, deadline, commentsAddress } =
     GetDeleteCommentHashParamsSchema.parse(params);
 
   const hash = await params.readContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "getDeleteCommentHash",
-    args: [commentId, author, appSigner, nonce, deadline],
+    args: [commentId, author, app, nonce, deadline],
   });
 
   return hash;
@@ -462,7 +462,7 @@ export type GetNonceParams = {
   /**
    * The app signer
    */
-  appSigner: Hex;
+  app: Hex;
   /**
    * The address of the comments contract
    * @default COMMENT_MANAGER_ADDRESS
@@ -475,7 +475,7 @@ export type GetNonceParams = {
 
 const GetNonceParamsSchema = z.object({
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
@@ -486,14 +486,13 @@ const GetNonceParamsSchema = z.object({
  * @returns The nonce
  */
 export async function getNonce(params: GetNonceParams): Promise<bigint> {
-  const { author, appSigner, commentsAddress } =
-    GetNonceParamsSchema.parse(params);
+  const { author, app, commentsAddress } = GetNonceParamsSchema.parse(params);
 
   const nonce = await params.readContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "nonces",
-    args: [author, appSigner],
+    args: [author, app],
   });
 
   return nonce;
@@ -548,7 +547,7 @@ export function createCommentData({
   content,
   metadata,
   author,
-  appSigner,
+  app,
   nonce,
   deadline,
   channelId = DEFAULT_CHANNEL_ID,
@@ -561,7 +560,7 @@ export function createCommentData({
     targetUri: "parentId" in params ? "" : params.targetUri,
     parentId: "parentId" in params ? params.parentId : EMPTY_PARENT_ID,
     author,
-    appSigner,
+    app,
     channelId,
     commentType,
     nonce,
@@ -573,7 +572,7 @@ export type CreateDeleteCommentTypedDataParams = {
   commentId: Hex;
   chainId: number;
   author: Hex;
-  appSigner: Hex;
+  app: Hex;
   nonce: bigint;
   deadline?: bigint;
   /**
@@ -587,7 +586,7 @@ const CreateDeleteCommentTypedDataParamsSchema = z.object({
   commentId: HexSchema,
   chainId: z.number(),
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint().optional(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
@@ -607,15 +606,8 @@ export function createDeleteCommentTypedData(
   const validatedParams =
     CreateDeleteCommentTypedDataParamsSchema.parse(params);
 
-  const {
-    commentId,
-    chainId,
-    author,
-    appSigner,
-    nonce,
-    deadline,
-    commentsAddress,
-  } = validatedParams;
+  const { commentId, chainId, author, app, nonce, deadline, commentsAddress } =
+    validatedParams;
 
   return DeleteCommentTypedDataSchema.parse({
     domain: {
@@ -629,7 +621,7 @@ export function createDeleteCommentTypedData(
     message: {
       commentId,
       author,
-      appSigner,
+      app,
       nonce,
       deadline:
         deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now

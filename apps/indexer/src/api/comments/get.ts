@@ -40,7 +40,7 @@ export default (app: OpenAPIHono) => {
     const {
       author,
       targetUri,
-      appSigner,
+      app,
       sort,
       limit,
       cursor,
@@ -54,7 +54,7 @@ export default (app: OpenAPIHono) => {
       author ? eq(schema.comments.author, author) : undefined,
       isNull(schema.comments.parentId),
       targetUri ? eq(schema.comments.targetUri, targetUri) : undefined,
-      appSigner ? eq(schema.comments.appSigner, appSigner) : undefined,
+      app ? eq(schema.comments.app, app) : undefined,
       channelId != null ? eq(schema.comments.channelId, channelId) : undefined,
       commentType ? eq(schema.comments.commentType, commentType) : undefined,
     ];

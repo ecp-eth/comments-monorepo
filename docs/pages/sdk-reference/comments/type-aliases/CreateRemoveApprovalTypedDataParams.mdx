@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / CreateRemoveApprovalTypedDataParams
 
@@ -8,7 +8,7 @@
 
 ```ts
 type CreateRemoveApprovalTypedDataParams = {
-  appSigner: Hex;
+  app: Hex;
   author: Hex;
   chainId: number;
   commentsAddress?: Hex;
@@ -21,17 +21,17 @@ Defined in: [packages/sdk/src/comments/approval.ts:520](https://github.com/ecp-e
 
 ## Properties
 
-### appSigner
+### app
 
 ```ts
-appSigner: Hex;
+app: Hex;
 ```
 
 Defined in: [packages/sdk/src/comments/approval.ts:528](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L528)
 
 The address of the app signer
 
-***
+---
 
 ### author
 
@@ -43,7 +43,7 @@ Defined in: [packages/sdk/src/comments/approval.ts:524](https://github.com/ecp-e
 
 The address of the author
 
-***
+---
 
 ### chainId
 
@@ -55,7 +55,7 @@ Defined in: [packages/sdk/src/comments/approval.ts:532](https://github.com/ecp-e
 
 The chain ID
 
-***
+---
 
 ### commentsAddress?
 
@@ -67,7 +67,7 @@ Defined in: [packages/sdk/src/comments/approval.ts:544](https://github.com/ecp-e
 
 The address of the comments contract
 
-***
+---
 
 ### deadline?
 
@@ -79,7 +79,7 @@ Defined in: [packages/sdk/src/comments/approval.ts:540](https://github.com/ecp-e
 
 Timestamp after which the signature becomes invalid
 
-***
+---
 
 ### nonce
 

@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / RevokeApprovalAsAuthorParams
 
@@ -8,7 +8,7 @@
 
 ```ts
 type RevokeApprovalAsAuthorParams = {
-  appSigner: Hex;
+  app: Hex;
   commentsAddress?: Hex;
   writeContract: ContractWriteFunctions["revokeApprovalAsAuthor"];
 };
@@ -18,17 +18,17 @@ Defined in: [packages/sdk/src/comments/approval.ts:179](https://github.com/ecp-e
 
 ## Properties
 
-### appSigner
+### app
 
 ```ts
-appSigner: Hex;
+app: Hex;
 ```
 
 Defined in: [packages/sdk/src/comments/approval.ts:183](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L183)
 
 The address of the app signer being unapproved
 
-***
+---
 
 ### commentsAddress?
 
@@ -43,10 +43,10 @@ The address of the comments contract
 #### Default
 
 ```ts
-COMMENT_MANAGER_ADDRESS
+COMMENT_MANAGER_ADDRESS;
 ```
 
-***
+---
 
 ### writeContract
 

@@ -33,9 +33,9 @@ const testPrivateKey =
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // Anvil's first private key
 const account = privateKeyToAccount(testPrivateKey);
 
-const appSignerPrivateKey =
+const appPrivateKey =
   "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"; // Anvil's second private key
-const appSigner = privateKeyToAccount(appSignerPrivateKey);
+const app = privateKeyToAccount(appPrivateKey);
 
 // Create wallet client
 const client = createWalletClient({
@@ -44,17 +44,17 @@ const client = createWalletClient({
   account,
 }).extend(publicActions);
 
-const appSignerClient = createWalletClient({
+const appClient = createWalletClient({
   chain: anvil,
   transport: http("http://localhost:8545"),
-  account: appSigner,
+  account: app,
 }).extend(publicActions);
 
 describe("isApproved()", () => {
   it("checks if app signer is not approved", async () => {
     const approved = await isApproved({
       author: account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       readContract: client.readContract,
       commentsAddress,
     });
@@ -70,7 +70,7 @@ describe("isApproved()", () => {
 describe("addApprovalAsAuthor()", () => {
   it("approves app signer", async () => {
     const result = await addApprovalAsAuthor({
-      appSigner: appSigner.address,
+      app: app.address,
       writeContract: client.writeContract,
       commentsAddress,
     });
@@ -84,7 +84,7 @@ describe("addApprovalAsAuthor()", () => {
     // Verify approval
     const approved = await isApproved({
       author: account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       readContract: client.readContract,
       commentsAddress,
     });
@@ -100,14 +100,14 @@ describe("addApproval()", () => {
   beforeEach(async () => {
     const nonce = await getNonce({
       author: client.account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       readContract: client.readContract,
       commentsAddress,
     });
 
     typedData = createApprovalTypedData({
       author: client.account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       nonce,
       commentsAddress,
       chainId: anvil.id,
@@ -120,11 +120,11 @@ describe("addApproval()", () => {
     const result = await addApproval({
       typedData,
       signature: authorSignature,
-      writeContract: appSignerClient.writeContract,
+      writeContract: appClient.writeContract,
       commentsAddress,
     });
 
-    const receipt = await appSignerClient.waitForTransactionReceipt({
+    const receipt = await appClient.waitForTransactionReceipt({
       hash: result.txHash,
     });
 
@@ -132,7 +132,7 @@ describe("addApproval()", () => {
 
     const approved = await isApproved({
       author: account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       readContract: client.readContract,
       commentsAddress,
     });
@@ -161,7 +161,7 @@ describe("revokeApprovalAsAuthor()", () => {
   beforeEach(async () => {
     // First approve the app signer
     const result = await addApprovalAsAuthor({
-      appSigner: appSigner.address,
+      app: app.address,
       writeContract: client.writeContract,
       commentsAddress,
     });
@@ -173,7 +173,7 @@ describe("revokeApprovalAsAuthor()", () => {
 
   it("revokes approval", async () => {
     const result = await revokeApprovalAsAuthor({
-      appSigner: appSigner.address,
+      app: app.address,
       writeContract: client.writeContract,
       commentsAddress,
     });
@@ -187,7 +187,7 @@ describe("revokeApprovalAsAuthor()", () => {
     // Verify approval is revoked
     const approved = await isApproved({
       author: account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       readContract: client.readContract,
       commentsAddress,
     });
@@ -202,7 +202,7 @@ describe("revokeApproval()", () => {
 
   beforeEach(async () => {
     const result = await addApprovalAsAuthor({
-      appSigner: appSigner.address,
+      app: app.address,
       writeContract: client.writeContract,
       commentsAddress,
     });
@@ -213,14 +213,14 @@ describe("revokeApproval()", () => {
 
     const nonce = await getNonce({
       author: client.account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       readContract: client.readContract,
       commentsAddress,
     });
 
     typedData = createRemoveApprovalTypedData({
       author: client.account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       nonce,
       commentsAddress,
       chainId: anvil.id,
@@ -246,7 +246,7 @@ describe("revokeApproval()", () => {
     // Verify approval is revoked
     const approved = await isApproved({
       author: account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       readContract: client.readContract,
       commentsAddress,
     });
@@ -275,7 +275,7 @@ describe("getAddApprovalHash()", () => {
   it("returns hash for approval", async () => {
     const result = await getAddApprovalHash({
       author: account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       nonce: 0n,
       deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
       readContract: client.readContract,
@@ -291,7 +291,7 @@ describe("getRemoveApprovalHash()", () => {
   it("returns hash for removal", async () => {
     const result = await getRemoveApprovalHash({
       author: account.address,
-      appSigner: appSigner.address,
+      app: app.address,
       nonce: 0n,
       deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
       readContract: client.readContract,

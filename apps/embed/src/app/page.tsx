@@ -44,7 +44,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
     // which causes issues with the feed
 
     /* const comments = await fetchComments({
-      appSigner: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+      app: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       targetUri,
       limit: COMMENTS_PER_PAGE,

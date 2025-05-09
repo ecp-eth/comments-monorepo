@@ -72,7 +72,7 @@ export function CommentSectionGasless() {
 
       const signTypedDataParams = createApprovalTypedData({
         author: viewer,
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         chainId: chain.id,
         nonce: approvalData.nonce,
       });
@@ -128,7 +128,7 @@ export function CommentSectionGasless() {
       queryFn: ({ pageParam, signal }) => {
         return fetchComments({
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-          appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+          app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
           targetUri: currentUrl,
           cursor: pageParam.cursor,
           limit: pageParam.limit,
@@ -158,7 +158,7 @@ export function CommentSectionGasless() {
     fetchComments({ cursor, signal }) {
       return fetchComments({
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         targetUri: currentUrl,
         limit: COMMENTS_PER_PAGE,
         cursor,
@@ -270,7 +270,7 @@ export function CommentSectionGasless() {
                   }
 
                   revokeApproval({
-                    appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+                    app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
                   });
                 }}
               >

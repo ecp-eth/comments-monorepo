@@ -88,7 +88,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         internalType: "address",
       },
@@ -116,7 +116,7 @@ export const CommentManagerABI = [
     name: "addApprovalAsAuthor",
     inputs: [
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         internalType: "address",
       },
@@ -154,7 +154,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         internalType: "address",
       },
@@ -216,7 +216,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         internalType: "address",
       },
@@ -286,7 +286,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         internalType: "address",
       },
@@ -332,7 +332,7 @@ export const CommentManagerABI = [
             internalType: "address",
           },
           {
-            name: "appSigner",
+            name: "app",
             type: "address",
             internalType: "address",
           },
@@ -396,7 +396,7 @@ export const CommentManagerABI = [
             internalType: "address",
           },
           {
-            name: "appSigner",
+            name: "app",
             type: "address",
             internalType: "address",
           },
@@ -467,7 +467,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         internalType: "address",
       },
@@ -501,7 +501,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         internalType: "address",
       },
@@ -627,7 +627,7 @@ export const CommentManagerABI = [
             internalType: "address",
           },
           {
-            name: "appSigner",
+            name: "app",
             type: "address",
             internalType: "address",
           },
@@ -702,7 +702,7 @@ export const CommentManagerABI = [
             internalType: "address",
           },
           {
-            name: "appSigner",
+            name: "app",
             type: "address",
             internalType: "address",
           },
@@ -767,7 +767,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         internalType: "address",
       },
@@ -802,7 +802,7 @@ export const CommentManagerABI = [
     name: "revokeApprovalAsAuthor",
     inputs: [
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         internalType: "address",
       },
@@ -860,7 +860,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         indexed: true,
         internalType: "address",
@@ -879,7 +879,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         indexed: true,
         internalType: "address",
@@ -904,7 +904,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         indexed: true,
         internalType: "address",
@@ -921,7 +921,7 @@ export const CommentManagerABI = [
             internalType: "address",
           },
           {
-            name: "appSigner",
+            name: "app",
             type: "address",
             internalType: "address",
           },
@@ -1096,7 +1096,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "appSigner",
+        name: "app",
         type: "address",
         internalType: "address",
       },
@@ -1363,7 +1363,7 @@ export const ChannelManagerABI = [
             internalType: "address",
           },
           {
-            name: "appSigner",
+            name: "app",
             type: "address",
             internalType: "address",
           },

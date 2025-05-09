@@ -55,7 +55,7 @@ export async function POST(
 
   const nonce = await getNonce({
     author: authorAddress,
-    appSigner: account.address,
+    app: account.address,
     readContract: publicClient.readContract,
   });
 
@@ -64,7 +64,7 @@ export async function POST(
     commentId: commentId as `0x${string}`,
     chainId: chain.id,
     author: authorAddress,
-    appSigner: account.address,
+    app: account.address,
     nonce: nonce,
   });
 
@@ -80,7 +80,7 @@ export async function POST(
 
     // Check approval on chain
     const hasApproval = await isApproved({
-      appSigner: account.address,
+      app: account.address,
       author: authorAddress,
       readContract: walletClient.readContract,
     });
