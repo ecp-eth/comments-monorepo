@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / FetchCommentRepliesOptions
 
@@ -9,7 +9,7 @@
 ```ts
 type FetchCommentRepliesOptions = {
   apiUrl?: string;
-  appSigner?: Hex;
+  app?: Hex;
   channelId?: bigint;
   commentId: Hex;
   commentType?: string;
@@ -42,22 +42,22 @@ URL on which /api/comments/$commentId/replies endpoint will be called
 #### Default
 
 ```ts
-"https://api.ethcomments.xyz"
+"https://api.ethcomments.xyz";
 ```
 
-***
+---
 
-### appSigner?
+### app?
 
 ```ts
-optional appSigner: Hex;
+optional app: Hex;
 ```
 
 Defined in: [packages/sdk/src/indexer/api.ts:204](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L204)
 
 Filters to only comments sent using this app signer key.
 
-***
+---
 
 ### channelId?
 
@@ -69,7 +69,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:233](https://github.com/ecp-eth/com
 
 Filter replies by channel ID
 
-***
+---
 
 ### commentId
 
@@ -81,7 +81,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:190](https://github.com/ecp-eth/com
 
 The ID of the comment to fetch replies for
 
-***
+---
 
 ### commentType?
 
@@ -93,7 +93,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:229](https://github.com/ecp-eth/com
 
 Filter replies by comment type
 
-***
+---
 
 ### cursor?
 
@@ -105,7 +105,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:214](https://github.com/ecp-eth/com
 
 The cursor to fetch comments from
 
-***
+---
 
 ### limit?
 
@@ -118,10 +118,10 @@ Defined in: [packages/sdk/src/indexer/api.ts:237](https://github.com/ecp-eth/com
 #### Default
 
 ```ts
-50
+50;
 ```
 
-***
+---
 
 ### mode?
 
@@ -137,10 +137,10 @@ If flat is used it will return all replies sorted by timestamp in descending ord
 #### Default
 
 ```ts
-"nested"
+"nested";
 ```
 
-***
+---
 
 ### retries?
 
@@ -155,10 +155,10 @@ Number of times to retry the signing operation in case of failure.
 #### Default
 
 ```ts
-3
+3;
 ```
 
-***
+---
 
 ### signal?
 
@@ -168,7 +168,7 @@ optional signal: AbortSignal;
 
 Defined in: [packages/sdk/src/indexer/api.ts:238](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L238)
 
-***
+---
 
 ### sort?
 
@@ -181,10 +181,10 @@ Defined in: [packages/sdk/src/indexer/api.ts:218](https://github.com/ecp-eth/com
 #### Default
 
 ```ts
-"desc"
+"desc";
 ```
 
-***
+---
 
 ### viewer?
 

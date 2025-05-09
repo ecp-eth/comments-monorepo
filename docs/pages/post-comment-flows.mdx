@@ -10,7 +10,7 @@ It is recommended to finish the [architecture overview](/architecture-overview) 
 The simplest approach is having the author pay the gas fee directly. The process works as follows:
 
 1. The author creates a post comment request containing the comment details
-2. The app server signs this request using its `appSigner` to authorize the post action
+2. The app server signs this request using its `app` to authorize the post action
 3. The app server returns the signature to the author
 
 This provides a direct path for posting comments, though it requires the author to have funds for gas fees.
@@ -101,7 +101,7 @@ sequenceDiagram
         Author->>Author: Sign the approval request with author signer
         Author->>App server: Post approval request, author signature, app signature
         App server->>App server: Verify app signature
-        App server->>Contract: CommentManager.addApproval(authorAddress, appSignerAddress, authorSignature)
+        App server->>Contract: CommentManager.addApproval(authorAddress, appAddress, authorSignature)
     end
 
     Note over Author,Indexer: Gasless transaction with prior approval

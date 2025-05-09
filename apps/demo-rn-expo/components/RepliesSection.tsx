@@ -83,7 +83,7 @@ function RepliesSection({
         return fetchCommentReplies({
           mode: "flat",
           apiUrl: publicEnv.EXPO_PUBLIC_INDEXER_URL,
-          appSigner: publicEnv.EXPO_PUBLIC_APP_SIGNER_ADDRESS,
+          app: publicEnv.EXPO_PUBLIC_APP_SIGNER_ADDRESS,
           commentId: rootComment.id,
 
           limit: pageParam.limit,

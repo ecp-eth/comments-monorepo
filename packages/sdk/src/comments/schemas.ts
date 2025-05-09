@@ -17,7 +17,7 @@ import type {
  */
 export const CommentDataSchema = z.object({
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
 
   channelId: z.coerce.bigint(),
   nonce: z.coerce.bigint(),
@@ -35,7 +35,7 @@ export const CommentDataSchema = z.object({
 
 const BaseCommentInputDataSchema = z.object({
   author: HexSchema,
-  appSigner: HexSchema,
+  app: HexSchema,
 
   channelId: z.bigint().default(DEFAULT_CHANNEL_ID),
   nonce: z.bigint(),
@@ -98,7 +98,7 @@ export const AddCommentTypedDataSchema = z.object({
         z.object({ name: z.literal("targetUri"), type: z.literal("string") }),
         z.object({ name: z.literal("commentType"), type: z.literal("string") }),
         z.object({ name: z.literal("author"), type: z.literal("address") }),
-        z.object({ name: z.literal("appSigner"), type: z.literal("address") }),
+        z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("channelId"), type: z.literal("uint256") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
@@ -122,7 +122,7 @@ export const DeleteCommentTypedDataSchema = z.object({
   }),
   message: z.object({
     commentId: HexSchema,
-    appSigner: HexSchema,
+    app: HexSchema,
     author: HexSchema,
     deadline: z.coerce.bigint(),
     nonce: z.coerce.bigint(),
@@ -132,7 +132,7 @@ export const DeleteCommentTypedDataSchema = z.object({
       z.union([
         z.object({ name: z.literal("commentId"), type: z.literal("bytes32") }),
         z.object({ name: z.literal("author"), type: z.literal("address") }),
-        z.object({ name: z.literal("appSigner"), type: z.literal("address") }),
+        z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
       ])
@@ -154,7 +154,7 @@ export const AddApprovalTypedDataSchema = z.object({
   }),
   message: z.object({
     author: HexSchema,
-    appSigner: HexSchema,
+    app: HexSchema,
     nonce: z.coerce.bigint(),
     deadline: z.coerce.bigint(),
   }),
@@ -162,7 +162,7 @@ export const AddApprovalTypedDataSchema = z.object({
     AddApproval: z.array(
       z.union([
         z.object({ name: z.literal("author"), type: z.literal("address") }),
-        z.object({ name: z.literal("appSigner"), type: z.literal("address") }),
+        z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
       ])
@@ -184,7 +184,7 @@ export const RemoveApprovalTypedDataSchema = z.object({
   }),
   message: z.object({
     author: HexSchema,
-    appSigner: HexSchema,
+    app: HexSchema,
     nonce: z.coerce.bigint(),
     deadline: z.coerce.bigint(),
   }),
@@ -192,7 +192,7 @@ export const RemoveApprovalTypedDataSchema = z.object({
     RemoveApproval: z.array(
       z.union([
         z.object({ name: z.literal("author"), type: z.literal("address") }),
-        z.object({ name: z.literal("appSigner"), type: z.literal("address") }),
+        z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
       ])

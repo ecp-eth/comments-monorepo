@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / CreateDeleteCommentTypedDataParams
 
@@ -8,7 +8,7 @@
 
 ```ts
 type CreateDeleteCommentTypedDataParams = {
-  appSigner: Hex;
+  app: Hex;
   author: Hex;
   chainId: number;
   commentId: Hex;
@@ -22,15 +22,15 @@ Defined in: [packages/sdk/src/comments/comment.ts:572](https://github.com/ecp-et
 
 ## Properties
 
-### appSigner
+### app
 
 ```ts
-appSigner: Hex;
+app: Hex;
 ```
 
 Defined in: [packages/sdk/src/comments/comment.ts:576](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L576)
 
-***
+---
 
 ### author
 
@@ -40,7 +40,7 @@ author: Hex;
 
 Defined in: [packages/sdk/src/comments/comment.ts:575](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L575)
 
-***
+---
 
 ### chainId
 
@@ -50,7 +50,7 @@ chainId: number;
 
 Defined in: [packages/sdk/src/comments/comment.ts:574](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L574)
 
-***
+---
 
 ### commentId
 
@@ -60,7 +60,7 @@ commentId: Hex;
 
 Defined in: [packages/sdk/src/comments/comment.ts:573](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L573)
 
-***
+---
 
 ### commentsAddress?
 
@@ -75,10 +75,10 @@ The address of the comments contract
 #### Default
 
 ```ts
-COMMENT_MANAGER_ADDRESS
+COMMENT_MANAGER_ADDRESS;
 ```
 
-***
+---
 
 ### deadline?
 
@@ -88,7 +88,7 @@ optional deadline: bigint;
 
 Defined in: [packages/sdk/src/comments/comment.ts:578](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L578)
 
-***
+---
 
 ### nonce
 

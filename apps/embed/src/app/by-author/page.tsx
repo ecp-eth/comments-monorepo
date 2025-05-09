@@ -47,7 +47,7 @@ export default async function EmbedCommentsByAuthorPage({
 
   try {
     const comments = await fetchComments({
-      appSigner: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+      app: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       author,
       limit: COMMENTS_PER_PAGE,

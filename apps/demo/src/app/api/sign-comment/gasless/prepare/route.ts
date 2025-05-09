@@ -80,7 +80,7 @@ export async function POST(
     );
   }
 
-  const appSigner = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+  const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
   const publicClient = createPublicClient({
     chain,
     transport,
@@ -88,14 +88,14 @@ export async function POST(
 
   const nonce = await getNonce({
     author,
-    appSigner: appSigner.address,
+    app: app.address,
     readContract: publicClient.readContract,
   });
 
   const commentData = createCommentData({
     content,
     author,
-    appSigner: appSigner.address,
+    app: app.address,
     nonce,
     ...("parentId" in passedCommentData
       ? {
@@ -113,7 +113,7 @@ export async function POST(
     chainId,
   });
 
-  const signature = await appSigner.signTypedData(typedCommentData);
+  const signature = await app.signTypedData(typedCommentData);
   const commentId = hashTypedData(typedCommentData);
 
   if (submitIfApproved) {
@@ -126,7 +126,7 @@ export async function POST(
 
     // Check approval on chain
     const hasApproval = await isApproved({
-      appSigner: appSigner.address,
+      app: app.address,
       author,
       readContract: walletClient.readContract,
     });
@@ -136,7 +136,7 @@ export async function POST(
       const isAppSignatureValid = await walletClient.verifyTypedData({
         ...typedCommentData,
         signature,
-        address: appSigner.address,
+        address: app.address,
       });
 
       if (!isAppSignatureValid) {

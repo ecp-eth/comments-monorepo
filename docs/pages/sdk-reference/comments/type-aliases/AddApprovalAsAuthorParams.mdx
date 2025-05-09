@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / AddApprovalAsAuthorParams
 
@@ -8,7 +8,7 @@
 
 ```ts
 type AddApprovalAsAuthorParams = {
-  appSigner: Hex;
+  app: Hex;
   commentsAddress?: Hex;
   writeContract: ContractWriteFunctions["addApprovalAsAuthor"];
 };
@@ -18,17 +18,17 @@ Defined in: [packages/sdk/src/comments/approval.ts:67](https://github.com/ecp-et
 
 ## Properties
 
-### appSigner
+### app
 
 ```ts
-appSigner: Hex;
+app: Hex;
 ```
 
 Defined in: [packages/sdk/src/comments/approval.ts:71](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L71)
 
 The address of the app signer being approved
 
-***
+---
 
 ### commentsAddress?
 
@@ -43,10 +43,10 @@ The address of the comments contract
 #### Default
 
 ```ts
-COMMENT_MANAGER_ADDRESS
+COMMENT_MANAGER_ADDRESS;
 ```
 
-***
+---
 
 ### writeContract
 

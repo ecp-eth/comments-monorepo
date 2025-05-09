@@ -56,7 +56,7 @@ export function CommentSectionReadonly({
       },
       queryFn: async ({ pageParam, signal }) => {
         const response = await fetchComments({
-          appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+          app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           author,
           limit: pageParam.limit,
@@ -86,7 +86,7 @@ export function CommentSectionReadonly({
     queryKey: ["comments-by-author-new-comments-check", author],
     queryFn: async ({ client, signal }) => {
       const newComments = await fetchComments({
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         author,
         limit: 20,

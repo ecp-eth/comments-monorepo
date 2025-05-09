@@ -84,21 +84,21 @@ export async function POST(
     );
   }
 
-  const appSigner = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+  const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
   const publicClient = createPublicClient({
     chain,
     transport,
   });
   const nonce = await getNonce({
     author,
-    appSigner: appSigner.address,
+    app: app.address,
     readContract: publicClient.readContract,
   });
 
   const commentData = createCommentData({
     content,
     author,
-    appSigner: appSigner.address,
+    app: app.address,
     nonce,
     ...("parentId" in passedCommentData
       ? {
@@ -114,7 +114,7 @@ export async function POST(
     chainId,
   });
 
-  const signature = await appSigner.signTypedData(typedCommentData);
+  const signature = await app.signTypedData(typedCommentData);
 
   const hash = hashTypedData(typedCommentData);
 

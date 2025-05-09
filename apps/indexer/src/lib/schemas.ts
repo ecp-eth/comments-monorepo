@@ -126,7 +126,7 @@ export const GetCommentsQuerySchema = z.object({
   viewer: HexSchema.optional().openapi({
     description: "The viewer's address",
   }),
-  appSigner: HexSchema.optional().openapi({
+  app: HexSchema.optional().openapi({
     description: "The address of the app signer",
   }),
   cursor: InputCommentCursorSchema.optional().openapi({
@@ -184,7 +184,7 @@ export const GetApprovalsQuerySchema = z.object({
   author: HexSchema.openapi({
     description: "The author's address",
   }),
-  appSigner: HexSchema.openapi({
+  app: HexSchema.openapi({
     description: "The address of the app signer",
   }),
   limit: z.coerce.number().int().positive().max(100).default(50).openapi({
@@ -200,7 +200,7 @@ export const GetApprovalsQuerySchema = z.object({
  */
 export const GetApprovalSchema = z.object({
   id: z.string(),
-  appSigner: HexSchema,
+  app: HexSchema,
   deletedAt: z.coerce.date().nullable(),
   chainId: z.number().int(),
   txHash: HexSchema,

@@ -15,7 +15,7 @@ export const comments = onchainTable(
     timestamp: t.timestamp({ withTimezone: true }).notNull(),
     deletedAt: t.timestamp({ withTimezone: true }),
     chainId: t.integer().notNull(),
-    appSigner: t.hex().notNull(),
+    app: t.hex().notNull(),
     txHash: t.hex().notNull(),
     logIndex: t.integer(),
     moderationStatus: t
@@ -29,7 +29,7 @@ export const comments = onchainTable(
   (table) => ({
     targetUriIdx: index().on(table.targetUri),
     parentIdIdx: index().on(table.parentId),
-    appSignerIdx: index().on(table.appSigner),
+    appIdx: index().on(table.app),
     timestampIdx: index().on(table.timestamp),
     deletedAtIdx: index().on(table.deletedAt),
     authorIdx: index().on(table.author),
@@ -48,7 +48,7 @@ export const approvals = onchainTable(
   (t) => ({
     id: t.text().primaryKey(),
     author: t.hex().notNull(),
-    appSigner: t.hex().notNull(),
+    app: t.hex().notNull(),
     chainId: t.integer().notNull(),
     txHash: t.hex().notNull(),
     logIndex: t.integer().notNull(),
@@ -56,7 +56,7 @@ export const approvals = onchainTable(
   }),
   (table) => ({
     authorIdx: index().on(table.author),
-    appSignerIdx: index().on(table.appSigner),
+    appIdx: index().on(table.app),
     chainIdIdx: index().on(table.chainId),
     deletedAtIdx: index().on(table.deletedAt),
   })

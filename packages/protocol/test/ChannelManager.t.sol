@@ -172,7 +172,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             targetUri: "",
             commentType: "comment",
             author: user1,
-            appSigner: user2,
+            app: user2,
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days,

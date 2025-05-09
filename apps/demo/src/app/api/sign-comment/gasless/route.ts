@@ -37,7 +37,7 @@ export async function POST(
     parsedBodyResult.data;
 
   // Check that signature is from the app signer
-  const appSigner = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+  const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
 
   // Can be any account with funds for gas on desired chain
   const submitterAccount = await resolveSubmitterAccount();
@@ -51,14 +51,14 @@ export async function POST(
   const isAppSignatureValid = await walletClient.verifyTypedData({
     ...signTypedDataParams,
     signature: appSignature,
-    address: appSigner.address,
+    address: app.address,
   });
 
   if (!isAppSignatureValid) {
     console.log("verifying app signature failed", {
       ...signTypedDataParams,
       signature: appSignature,
-      address: appSigner.address,
+      address: app.address,
     });
 
     return new JSONResponse(

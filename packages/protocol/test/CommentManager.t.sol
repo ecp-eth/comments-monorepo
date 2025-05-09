@@ -28,7 +28,7 @@ contract CommentsTest is Test, IERC721Receiver {
     event CommentAdded(
         bytes32 indexed commentId,
         address indexed author,
-        address indexed appSigner,
+        address indexed app,
         Comments.CommentData commentData
     );
     event CommentDeleted(bytes32 indexed commentId, address indexed author);
@@ -42,15 +42,15 @@ contract CommentsTest is Test, IERC721Receiver {
     // Test accounts
     address public owner;
     address public author;
-    address public appSigner;
+    address public app;
     uint256 public authorPrivateKey = 0x1;
-    uint256 public appSignerPrivateKey = 0x2;
+    uint256 public appPrivateKey = 0x2;
     uint256 public wrongPrivateKey = 0x3;
 
     function setUp() public {
         owner = address(this);
         author = vm.addr(authorPrivateKey);
-        appSigner = vm.addr(appSignerPrivateKey);
+        app = vm.addr(appPrivateKey);
 
         noHook = new NoHook();
 
@@ -58,7 +58,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
         // Setup private keys for signing
         vm.deal(author, 100 ether);
-        vm.deal(appSigner, 100 ether);
+        vm.deal(app, 100 ether);
     }
 
     function _createBasicCommentData()
@@ -66,7 +66,7 @@ contract CommentsTest is Test, IERC721Receiver {
         view
         returns (Comments.CommentData memory)
     {
-        uint256 nonce = comments.nonces(author, appSigner);
+        uint256 nonce = comments.nonces(author, app);
 
         return
             Comments.CommentData({
@@ -75,7 +75,7 @@ contract CommentsTest is Test, IERC721Receiver {
                 targetUri: "",
                 commentType: "comment",
                 author: author,
-                appSigner: appSigner,
+                app: app,
                 channelId: 0,
                 nonce: nonce,
                 deadline: block.timestamp + 1 days,
@@ -86,11 +86,11 @@ contract CommentsTest is Test, IERC721Receiver {
     function test_PostCommentAsAuthor() public {
         Comments.CommentData
             memory commentData = _createBasicCommentData();
-        commentData.appSigner = appSigner;
+        commentData.app = app;
 
         // Generate app signature
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         // Send transaction as author
         vm.prank(author);
@@ -100,10 +100,10 @@ contract CommentsTest is Test, IERC721Receiver {
     function test_PostCommentAsAuthor_InvalidAuthor() public {
         Comments.CommentData
             memory commentData = _createBasicCommentData();
-        commentData.appSigner = appSigner;
+        commentData.app = app;
 
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         // Send transaction from wrong address
         address wrongAuthor = address(0x3);
@@ -121,11 +121,11 @@ contract CommentsTest is Test, IERC721Receiver {
     function test_PostComment() public {
         Comments.CommentData
             memory commentData = _createBasicCommentData();
-        commentData.appSigner = appSigner;
+        commentData.app = app;
 
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         comments.postComment(commentData, authorSignature, appSignature);
     }
@@ -133,7 +133,7 @@ contract CommentsTest is Test, IERC721Receiver {
     function test_PostComment_InvalidAppSignature() public {
         Comments.CommentData
             memory commentData = _createBasicCommentData();
-        commentData.appSigner = appSigner;
+        commentData.app = app;
 
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
@@ -148,7 +148,7 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.CommentData
             memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
@@ -170,7 +170,7 @@ contract CommentsTest is Test, IERC721Receiver {
             memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         comments.postComment(commentData, authorSignature, appSignature);
 
@@ -178,8 +178,8 @@ contract CommentsTest is Test, IERC721Receiver {
         bytes32 deleteHash = comments.getDeleteCommentHash(
             commentId,
             author,
-            appSigner,
-            comments.nonces(author, appSigner),
+            app,
+            comments.nonces(author, app),
             block.timestamp + 1 days
         );
         bytes memory authorDeleteSignature = _signEIP712(
@@ -192,8 +192,8 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.deleteComment(
             commentId,
             author,
-            appSigner,
-            comments.nonces(author, appSigner),
+            app,
+            comments.nonces(author, app),
             block.timestamp + 1 days,
             authorDeleteSignature,
             ""
@@ -205,18 +205,18 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.CommentData
             memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
 
         // Try to delete with wrong signature
-        uint256 nonce = comments.nonces(author, appSigner);
+        uint256 nonce = comments.nonces(author, app);
         uint256 deadline = block.timestamp + 1 days;
         bytes32 deleteHash = comments.getDeleteCommentHash(
             commentId,
             author,
-            appSigner,
+            app,
             nonce,
             deadline
         );
@@ -233,7 +233,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.deleteComment(
             commentId,
             author,
-            appSigner,
+            app,
             nonce,
             deadline,
             wrongSignature,
@@ -250,14 +250,14 @@ contract CommentsTest is Test, IERC721Receiver {
         commentData.nonce = commentData.nonce + 1;
 
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         vm.prank(author);
         vm.expectRevert(
             abi.encodeWithSelector(
                 ICommentManager.InvalidNonce.selector,
                 author,
-                appSigner,
+                app,
                 0,
                 1
             )
@@ -272,13 +272,13 @@ contract CommentsTest is Test, IERC721Receiver {
 
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         vm.expectRevert(
             abi.encodeWithSelector(
                 ICommentManager.InvalidNonce.selector,
                 author,
-                appSigner,
+                app,
                 0,
                 1
             )
@@ -289,36 +289,36 @@ contract CommentsTest is Test, IERC721Receiver {
     function test_AddApprovalAsAuthor() public {
         vm.prank(author);
         vm.expectEmit(true, true, true, true);
-        emit ApprovalAdded(author, appSigner);
-        comments.addApprovalAsAuthor(appSigner);
+        emit ApprovalAdded(author, app);
+        comments.addApprovalAsAuthor(app);
 
-        assertTrue(comments.isApproved(author, appSigner));
+        assertTrue(comments.isApproved(author, app));
     }
 
     function test_revokeApprovalAsAuthor() public {
         // First add approval
         vm.prank(author);
-        comments.addApprovalAsAuthor(appSigner);
+        comments.addApprovalAsAuthor(app);
 
         // Then remove it
         vm.prank(author);
         vm.expectEmit(true, true, true, true);
-        emit ApprovalRemoved(author, appSigner);
-        comments.revokeApprovalAsAuthor(appSigner);
+        emit ApprovalRemoved(author, app);
+        comments.revokeApprovalAsAuthor(app);
 
-        assertFalse(comments.isApproved(author, appSigner));
+        assertFalse(comments.isApproved(author, app));
     }
 
     function test_PostComment_WithApproval() public {
         // First add approval
         vm.prank(author);
-        comments.addApprovalAsAuthor(appSigner);
+        comments.addApprovalAsAuthor(app);
 
         // Create and post comment
         Comments.CommentData
             memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         // Post comment from any address since we have approval
         comments.postComment(commentData, bytes(""), appSignature);
@@ -328,7 +328,7 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.CommentData
             memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         // Should fail without approval or valid signature
         vm.expectRevert(
@@ -347,7 +347,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
         bytes32 addApprovalHash = comments.getAddApprovalHash(
             author,
-            appSigner,
+            app,
             nonce,
             deadline
         );
@@ -355,23 +355,23 @@ contract CommentsTest is Test, IERC721Receiver {
 
         vm.prank(author);
         vm.expectEmit(true, true, true, true);
-        emit ApprovalAdded(author, appSigner);
-        comments.addApproval(author, appSigner, nonce, deadline, signature);
+        emit ApprovalAdded(author, app);
+        comments.addApproval(author, app, nonce, deadline, signature);
 
-        assertTrue(comments.isApproved(author, appSigner));
+        assertTrue(comments.isApproved(author, app));
     }
 
     function test_revokeApproval_WithSignature() public {
         // First add approval
         vm.prank(author);
-        comments.addApprovalAsAuthor(appSigner);
+        comments.addApprovalAsAuthor(app);
 
         uint256 nonce = 0;
         uint256 deadline = block.timestamp + 1 days;
 
         bytes32 removeHash = comments.getRemoveApprovalHash(
             author,
-            appSigner,
+            app,
             nonce,
             deadline
         );
@@ -379,10 +379,10 @@ contract CommentsTest is Test, IERC721Receiver {
 
         vm.prank(author);
         vm.expectEmit(true, true, true, true);
-        emit ApprovalRemoved(author, appSigner);
-        comments.removeApproval(author, appSigner, nonce, deadline, signature);
+        emit ApprovalRemoved(author, app);
+        comments.removeApproval(author, app, nonce, deadline, signature);
 
-        assertFalse(comments.isApproved(author, appSigner));
+        assertFalse(comments.isApproved(author, app));
     }
 
     function test_AddApproval_InvalidNonce() public {
@@ -391,7 +391,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
         bytes32 addApprovalHash = comments.getAddApprovalHash(
             author,
-            appSigner,
+            app,
             wrongNonce,
             deadline
         );
@@ -401,14 +401,14 @@ contract CommentsTest is Test, IERC721Receiver {
             abi.encodeWithSelector(
                 ICommentManager.InvalidNonce.selector,
                 author,
-                appSigner,
+                app,
                 0,
                 1
             )
         );
         comments.addApproval(
             author,
-            appSigner,
+            app,
             wrongNonce,
             deadline,
             signature
@@ -417,14 +417,14 @@ contract CommentsTest is Test, IERC721Receiver {
 
     function test_revokeApproval_InvalidNonce() public {
         vm.prank(author);
-        comments.addApprovalAsAuthor(appSigner);
+        comments.addApprovalAsAuthor(app);
 
         uint256 wrongNonce = 1;
         uint256 deadline = block.timestamp + 1 days;
 
         bytes32 removeApprovalHash = comments.getRemoveApprovalHash(
             author,
-            appSigner,
+            app,
             wrongNonce,
             deadline
         );
@@ -437,14 +437,14 @@ contract CommentsTest is Test, IERC721Receiver {
             abi.encodeWithSelector(
                 ICommentManager.InvalidNonce.selector,
                 author,
-                appSigner,
+                app,
                 0,
                 1
             )
         );
         comments.removeApproval(
             author,
-            appSigner,
+            app,
             wrongNonce,
             deadline,
             signature
@@ -455,7 +455,7 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.CommentData
             memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
@@ -465,7 +465,7 @@ contract CommentsTest is Test, IERC721Receiver {
         bytes32 deleteHash = comments.getDeleteCommentHash(
             commentId,
             author,
-            appSigner,
+            app,
             wrongNonce,
             deadline
         );
@@ -478,7 +478,7 @@ contract CommentsTest is Test, IERC721Receiver {
             abi.encodeWithSelector(
                 ICommentManager.InvalidNonce.selector,
                 author,
-                appSigner,
+                app,
                 1,
                 100
             )
@@ -486,7 +486,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.deleteComment(
             commentId,
             author,
-            appSigner,
+            app,
             wrongNonce,
             deadline,
             authorDeleteSignature,
@@ -497,13 +497,13 @@ contract CommentsTest is Test, IERC721Receiver {
     function test_DeleteComment_WithApprovedSigner() public {
         // First add approval
         vm.prank(author);
-        comments.addApprovalAsAuthor(appSigner);
+        comments.addApprovalAsAuthor(app);
 
         // Create and post a comment
         Comments.CommentData
             memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
@@ -512,12 +512,12 @@ contract CommentsTest is Test, IERC721Receiver {
         bytes32 deleteHash = comments.getDeleteCommentHash(
             commentId,
             author,
-            appSigner,
-            comments.nonces(author, appSigner),
+            app,
+            comments.nonces(author, app),
             block.timestamp + 1 days
         );
         bytes memory appDeleteSignature = _signEIP712(
-            appSignerPrivateKey,
+            appPrivateKey,
             deleteHash
         );
 
@@ -526,8 +526,8 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.deleteComment(
             commentId,
             author,
-            appSigner,
-            comments.nonces(author, appSigner),
+            app,
+            comments.nonces(author, app),
             block.timestamp + 1 days,
             bytes(""), // Empty author signature
             appDeleteSignature
@@ -547,7 +547,7 @@ contract CommentsTest is Test, IERC721Receiver {
         commentData.channelId = channelId1;
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         // Post comment with fee
         vm.prank(author);
@@ -575,7 +575,7 @@ contract CommentsTest is Test, IERC721Receiver {
         commentData.channelId = channelId2;
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         // Try to post comment with insufficient fee
         vm.prank(author);
@@ -593,19 +593,19 @@ contract CommentsTest is Test, IERC721Receiver {
             memory parentComment = _createBasicCommentData();
         bytes32 parentId = comments.getCommentId(parentComment);
         bytes memory parentAuthorSig = _signEIP712(authorPrivateKey, parentId);
-        bytes memory parentAppSig = _signEIP712(appSignerPrivateKey, parentId);
+        bytes memory parentAppSig = _signEIP712(appPrivateKey, parentId);
 
         comments.postComment(parentComment, parentAuthorSig, parentAppSig);
 
         // Post reply comment
         Comments.CommentData
             memory replyComment = _createBasicCommentData();
-        replyComment.nonce = comments.nonces(author, appSigner); // Update nonce
+        replyComment.nonce = comments.nonces(author, app); // Update nonce
         replyComment.parentId = parentId; // Set parent ID for reply
 
         bytes32 replyId = comments.getCommentId(replyComment);
         bytes memory replyAuthorSig = _signEIP712(authorPrivateKey, replyId);
-        bytes memory replyAppSig = _signEIP712(appSignerPrivateKey, replyId);
+        bytes memory replyAppSig = _signEIP712(appPrivateKey, replyId);
 
         comments.postComment(replyComment, replyAuthorSig, replyAppSig);
 
@@ -627,7 +627,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         vm.expectRevert(
             abi.encodeWithSelector(
@@ -653,7 +653,7 @@ contract CommentsTest is Test, IERC721Receiver {
             memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         comments.postComment(commentData, authorSignature, appSignature);
 
@@ -667,26 +667,26 @@ contract CommentsTest is Test, IERC721Receiver {
     function test_ApprovalLifecycle() public {
         // Add approval
         vm.prank(author);
-        comments.addApprovalAsAuthor(appSigner);
-        assertTrue(comments.isApproved(author, appSigner));
+        comments.addApprovalAsAuthor(app);
+        assertTrue(comments.isApproved(author, app));
 
         // Post comment without author signature (using approval)
         Comments.CommentData
             memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         comments.postComment(commentData, bytes(""), appSignature);
 
         // Remove approval
         vm.prank(author);
-        comments.revokeApprovalAsAuthor(appSigner);
-        assertFalse(comments.isApproved(author, appSigner));
+        comments.revokeApprovalAsAuthor(app);
+        assertFalse(comments.isApproved(author, app));
 
         // Try to post again without approval (should fail)
-        commentData.nonce = comments.nonces(author, appSigner);
+        commentData.nonce = comments.nonces(author, app);
         commentId = comments.getCommentId(commentData);
-        appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        appSignature = _signEIP712(appPrivateKey, commentId);
 
         vm.expectRevert(
             abi.encodeWithSelector(
@@ -699,25 +699,25 @@ contract CommentsTest is Test, IERC721Receiver {
     }
 
     function test_NonceIncrement() public {
-        uint256 initialNonce = comments.nonces(author, appSigner);
+        uint256 initialNonce = comments.nonces(author, app);
 
         // Post comment
         Comments.CommentData
             memory commentData = _createBasicCommentData();
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         comments.postComment(commentData, authorSignature, appSignature);
 
-        assertEq(comments.nonces(author, appSigner), initialNonce + 1);
+        assertEq(comments.nonces(author, app), initialNonce + 1);
 
         // Try to reuse the same nonce
         vm.expectRevert(
             abi.encodeWithSelector(
                 ICommentManager.InvalidNonce.selector,
                 author,
-                appSigner,
+                app,
                 initialNonce + 1,
                 initialNonce
             )
@@ -731,7 +731,7 @@ contract CommentsTest is Test, IERC721Receiver {
             memory parentComment = _createBasicCommentData();
         bytes32 parentId = comments.getCommentId(parentComment);
         bytes memory parentAuthorSig = _signEIP712(authorPrivateKey, parentId);
-        bytes memory parentAppSig = _signEIP712(appSignerPrivateKey, parentId);
+        bytes memory parentAppSig = _signEIP712(appPrivateKey, parentId);
 
         comments.postComment(parentComment, parentAuthorSig, parentAppSig);
 
@@ -742,12 +742,12 @@ contract CommentsTest is Test, IERC721Receiver {
         // Post reply to deleted comment
         Comments.CommentData
             memory replyComment = _createBasicCommentData();
-        replyComment.nonce = comments.nonces(author, appSigner); // Update nonce
+        replyComment.nonce = comments.nonces(author, app); // Update nonce
         replyComment.parentId = parentId; // Set parent ID for reply
 
         bytes32 replyId = comments.getCommentId(replyComment);
         bytes memory replyAuthorSig = _signEIP712(authorPrivateKey, replyId);
-        bytes memory replyAppSig = _signEIP712(appSignerPrivateKey, replyId);
+        bytes memory replyAppSig = _signEIP712(appPrivateKey, replyId);
 
         // This should succeed even though parent is deleted
         comments.postComment(replyComment, replyAuthorSig, replyAppSig);
@@ -769,7 +769,7 @@ contract CommentsTest is Test, IERC721Receiver {
             memory parentComment = _createBasicCommentData();
         bytes32 parentId = comments.getCommentId(parentComment);
         bytes memory parentAuthorSig = _signEIP712(authorPrivateKey, parentId);
-        bytes memory parentAppSig = _signEIP712(appSignerPrivateKey, parentId);
+        bytes memory parentAppSig = _signEIP712(appPrivateKey, parentId);
         comments.postComment(parentComment, parentAuthorSig, parentAppSig);
 
         // Create a comment with both parentId and targetUri set
@@ -780,7 +780,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
         bytes32 commentId = comments.getCommentId(commentData);
         bytes memory authorSignature = _signEIP712(authorPrivateKey, commentId);
-        bytes memory appSignature = _signEIP712(appSignerPrivateKey, commentId);
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
 
         // Expect revert when trying to post comment with both parentId and targetUri
         vm.expectRevert(

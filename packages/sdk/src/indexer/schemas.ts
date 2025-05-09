@@ -42,7 +42,7 @@ export type IndexerAPICommentModerationStatusSchemaType = z.infer<
 >;
 
 export const IndexerAPICommentSchema = z.object({
-  appSigner: HexSchema,
+  app: HexSchema,
   author: IndexerAPIAuthorDataSchema,
   id: HexSchema,
   channelId: z.coerce.bigint(),

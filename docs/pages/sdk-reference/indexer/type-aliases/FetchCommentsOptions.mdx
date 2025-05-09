@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / FetchCommentsOptions
 
@@ -9,7 +9,7 @@
 ```ts
 type FetchCommentsOptions = {
   apiUrl?: string;
-  appSigner?: Hex;
+  app?: Hex;
   author?: Hex;
   channelId?: bigint;
   commentType?: string;
@@ -43,22 +43,22 @@ URL on which /api/comments endpoint will be called
 #### Default
 
 ```ts
-"https://api.ethcomments.xyz"
+"https://api.ethcomments.xyz";
 ```
 
-***
+---
 
-### appSigner?
+### app?
 
 ```ts
-optional appSigner: Hex;
+optional app: Hex;
 ```
 
 Defined in: [packages/sdk/src/indexer/api.ts:39](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L39)
 
 Filter comments sent using this app signer key.
 
-***
+---
 
 ### author?
 
@@ -70,7 +70,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:25](https://github.com/ecp-eth/comm
 
 Filter comments by author
 
-***
+---
 
 ### channelId?
 
@@ -82,7 +82,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:43](https://github.com/ecp-eth/comm
 
 Filter comments by channel ID
 
-***
+---
 
 ### commentType?
 
@@ -94,7 +94,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:47](https://github.com/ecp-eth/comm
 
 Filter comments by comment type
 
-***
+---
 
 ### cursor?
 
@@ -106,7 +106,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:57](https://github.com/ecp-eth/comm
 
 The cursor to fetch comments from
 
-***
+---
 
 ### limit?
 
@@ -121,10 +121,10 @@ The number of comments to fetch
 #### Default
 
 ```ts
-50
+50;
 ```
 
-***
+---
 
 ### mode?
 
@@ -140,10 +140,10 @@ If flat is used it will return all comments sorted by timestamp in descending or
 #### Default
 
 ```ts
-"nested"
+"nested";
 ```
 
-***
+---
 
 ### retries?
 
@@ -158,10 +158,10 @@ Number of times to retry the signing operation in case of failure.
 #### Default
 
 ```ts
-3
+3;
 ```
 
-***
+---
 
 ### signal?
 
@@ -171,7 +171,7 @@ optional signal: AbortSignal;
 
 Defined in: [packages/sdk/src/indexer/api.ts:77](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L77)
 
-***
+---
 
 ### sort?
 
@@ -186,10 +186,10 @@ The sort order, either `asc` or `desc`
 #### Default
 
 ```ts
-"desc"
+"desc";
 ```
 
-***
+---
 
 ### targetUri?
 
@@ -201,7 +201,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:21](https://github.com/ecp-eth/comm
 
 The target URI to fetch comments for
 
-***
+---
 
 ### viewer?
 

@@ -36,7 +36,7 @@ export type FetchCommentsOptions = {
   /**
    * Filter comments sent using this app signer key.
    */
-  appSigner?: Hex;
+  app?: Hex;
   /**
    * Filter comments by channel ID
    */
@@ -81,7 +81,7 @@ const FetchCommentsOptionsSchema = z.object({
   targetUri: z.string().url().optional(),
   author: HexSchema.optional(),
   apiUrl: z.string().url().default(INDEXER_API_URL),
-  appSigner: HexSchema.optional(),
+  app: HexSchema.optional(),
   channelId: z.coerce.bigint().optional(),
   commentType: z.string().optional(),
   retries: z.number().int().positive().default(3),
@@ -109,7 +109,7 @@ export async function fetchComments(
     retries,
     sort,
     targetUri,
-    appSigner,
+    app,
     signal,
     viewer,
     mode,
@@ -131,8 +131,8 @@ export async function fetchComments(
     url.searchParams.set("sort", sort);
     url.searchParams.set("limit", limit.toString());
 
-    if (appSigner) {
-      url.searchParams.set("appSigner", appSigner);
+    if (app) {
+      url.searchParams.set("app", app);
     }
 
     if (cursor) {
@@ -201,7 +201,7 @@ export type FetchCommentRepliesOptions = {
   /**
    * Filters to only comments sent using this app signer key.
    */
-  appSigner?: Hex;
+  app?: Hex;
   /**
    * Number of times to retry the signing operation in case of failure.
    *
@@ -241,7 +241,7 @@ export type FetchCommentRepliesOptions = {
 const FetchCommentRepliesOptionSchema = z.object({
   commentId: HexSchema,
   apiUrl: z.string().url().default(INDEXER_API_URL),
-  appSigner: HexSchema.optional(),
+  app: HexSchema.optional(),
   retries: z.number().int().positive().default(3),
   cursor: HexSchema.optional(),
   viewer: HexSchema.optional(),
@@ -267,7 +267,7 @@ export async function fetchCommentReplies(
     limit,
     cursor,
     retries,
-    appSigner,
+    app,
     signal,
     sort,
     viewer,
@@ -282,8 +282,8 @@ export async function fetchCommentReplies(
     url.searchParams.set("limit", limit.toString());
     url.searchParams.set("sort", sort);
 
-    if (appSigner) {
-      url.searchParams.set("appSigner", appSigner);
+    if (app) {
+      url.searchParams.set("app", app);
     }
 
     if (cursor) {

@@ -35,9 +35,9 @@ const testPrivateKey =
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // Anvil's first private key
 const account = privateKeyToAccount(testPrivateKey);
 
-const appSignerPrivateKey =
+const appPrivateKey =
   "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"; // Anvil's second private key
-const appSignerAccount = privateKeyToAccount(appSignerPrivateKey);
+const appAccount = privateKeyToAccount(appPrivateKey);
 
 // Create wallet client
 const client = createWalletClient({
@@ -46,24 +46,24 @@ const client = createWalletClient({
   account,
 }).extend(publicActions);
 
-const appSignerClient = createWalletClient({
+const appClient = createWalletClient({
   chain: anvil,
   transport: http("http://localhost:8545"),
-  account: appSignerAccount,
+  account: appAccount,
 }).extend(publicActions);
 
 describe("postCommentAsAuthor()", () => {
   it("posts a comment as author", async () => {
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });
 
     const commentData = createCommentData({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       content: "Test comment content",
       targetUri: "https://example.com",
       nonce,
@@ -75,7 +75,7 @@ describe("postCommentAsAuthor()", () => {
       commentsAddress,
     });
 
-    const appSignature = await appSignerClient.signTypedData(typedData);
+    const appSignature = await appClient.signTypedData(typedData);
 
     const result = await postCommentAsAuthor({
       comment: commentData,
@@ -98,7 +98,7 @@ describe("postComment()", () => {
 
   beforeEach(async () => {
     const approvalResult = await addApprovalAsAuthor({
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       writeContract: client.writeContract,
       commentsAddress,
     });
@@ -109,14 +109,14 @@ describe("postComment()", () => {
 
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });
 
     commentData = createCommentData({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       content: "Test comment content",
       targetUri: "https://example.com",
       nonce,
@@ -128,18 +128,18 @@ describe("postComment()", () => {
       commentsAddress,
     });
 
-    appSignature = await appSignerClient.signTypedData(typedData);
+    appSignature = await appClient.signTypedData(typedData);
   });
 
   it("posts a comment with signatures", async () => {
     const result = await postComment({
       comment: commentData,
       appSignature,
-      writeContract: appSignerClient.writeContract,
+      writeContract: appClient.writeContract,
       commentsAddress,
     });
 
-    const receipt = await appSignerClient.waitForTransactionReceipt({
+    const receipt = await appClient.waitForTransactionReceipt({
       hash: result.txHash,
     });
 
@@ -148,7 +148,7 @@ describe("postComment()", () => {
 
   it("posts a comment with author signature when no approval exists", async () => {
     const revokeApprovalResult = await revokeApprovalAsAuthor({
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       writeContract: client.writeContract,
       commentsAddress,
     });
@@ -158,7 +158,7 @@ describe("postComment()", () => {
     });
 
     await revokeApprovalAsAuthor({
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       writeContract: client.writeContract,
       commentsAddress,
     });
@@ -166,14 +166,14 @@ describe("postComment()", () => {
     // Get a fresh nonce since we're not using the beforeEach setup
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });
 
     const commentData = createCommentData({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       content: "Test comment content",
       targetUri: "https://example.com",
       nonce,
@@ -185,18 +185,18 @@ describe("postComment()", () => {
       commentsAddress,
     });
 
-    const appSignature = await appSignerClient.signTypedData(typedData);
+    const appSignature = await appClient.signTypedData(typedData);
     const authorSignature = await client.signTypedData(typedData);
 
     const result = await postComment({
       comment: commentData,
       appSignature,
       authorSignature,
-      writeContract: appSignerClient.writeContract,
+      writeContract: appClient.writeContract,
       commentsAddress,
     });
 
-    const receipt = await appSignerClient.waitForTransactionReceipt({
+    const receipt = await appClient.waitForTransactionReceipt({
       hash: result.txHash,
     });
 
@@ -206,7 +206,7 @@ describe("postComment()", () => {
   it("fails with invalid author signature", async () => {
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });
@@ -215,7 +215,7 @@ describe("postComment()", () => {
       () =>
         postComment({
           comment: createCommentData({
-            appSigner: appSignerAccount.address,
+            app: appAccount.address,
             author: account.address,
             content: "Test comment content",
             metadata: { test: true },
@@ -223,7 +223,7 @@ describe("postComment()", () => {
             targetUri: "https://example.com",
           }),
           appSignature,
-          writeContract: appSignerClient.writeContract,
+          writeContract: appClient.writeContract,
           commentsAddress,
         }),
       (err) => {
@@ -240,14 +240,14 @@ describe("getComment()", () => {
   beforeEach(async () => {
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });
 
     const commentData = createCommentData({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       content: "Test comment content",
       targetUri: "https://example.com",
       nonce,
@@ -259,7 +259,7 @@ describe("getComment()", () => {
       commentsAddress,
     });
 
-    const appSignature = await appSignerClient.signTypedData(typedData);
+    const appSignature = await appClient.signTypedData(typedData);
 
     const result = await postCommentAsAuthor({
       comment: commentData,
@@ -298,14 +298,14 @@ describe("getCommentId()", () => {
   it("returns comment ID", async () => {
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });
 
     const commentId = await getCommentId({
       commentData: {
-        appSigner: appSignerAccount.address,
+        app: appAccount.address,
         author: account.address,
         content: "Test comment content",
         metadata: { test: true },
@@ -327,14 +327,14 @@ describe("deleteCommentAsAuthor()", () => {
   beforeEach(async () => {
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });
 
     const commentData = createCommentData({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       content: "Test comment content",
       metadata: { test: true },
       nonce,
@@ -347,7 +347,7 @@ describe("deleteCommentAsAuthor()", () => {
       commentsAddress,
     });
 
-    const appSignature = await appSignerClient.signTypedData(typedData);
+    const appSignature = await appClient.signTypedData(typedData);
 
     const result = await postCommentAsAuthor({
       comment: commentData,
@@ -390,7 +390,7 @@ describe("deleteComment()", () => {
 
   beforeEach(async () => {
     const approvalResult = await addApprovalAsAuthor({
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       writeContract: client.writeContract,
       commentsAddress,
     });
@@ -401,20 +401,20 @@ describe("deleteComment()", () => {
 
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });
 
     const commentData = createCommentData({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       content: "Test comment content",
       targetUri: "https://example.com",
       nonce,
     });
 
-    const appSignature = await appSignerClient.signTypedData(
+    const appSignature = await appClient.signTypedData(
       createCommentTypedData({
         chainId: anvil.id,
         commentData,
@@ -446,7 +446,7 @@ describe("deleteComment()", () => {
   it("deletes a comment with signatures", async () => {
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });
@@ -455,25 +455,25 @@ describe("deleteComment()", () => {
       commentId,
       chainId: anvil.id,
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       nonce,
       commentsAddress,
     });
 
-    const appSignature = await appSignerClient.signTypedData(typedData);
+    const appSignature = await appClient.signTypedData(typedData);
 
     const result = await deleteComment({
       commentId,
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       nonce,
       deadline: typedData.message.deadline,
       appSignature,
-      writeContract: appSignerClient.writeContract,
+      writeContract: appClient.writeContract,
       commentsAddress,
     });
 
-    const receipt = await appSignerClient.waitForTransactionReceipt({
+    const receipt = await appClient.waitForTransactionReceipt({
       hash: result.txHash,
     });
 
@@ -483,7 +483,7 @@ describe("deleteComment()", () => {
   it("fails with invalid signatures", async () => {
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });
@@ -492,7 +492,7 @@ describe("deleteComment()", () => {
       commentId,
       chainId: anvil.id,
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       nonce,
       commentsAddress,
     });
@@ -502,11 +502,11 @@ describe("deleteComment()", () => {
         deleteComment({
           commentId,
           author: account.address,
-          appSigner: appSignerAccount.address,
+          app: appAccount.address,
           nonce,
           deadline: typedData.message.deadline,
           appSignature: "0x1234", // Invalid signature
-          writeContract: appSignerClient.writeContract,
+          writeContract: appClient.writeContract,
           commentsAddress,
         }),
       (err) => {
@@ -523,7 +523,7 @@ describe("getDeleteCommentHash()", () => {
       commentId:
         "0x1234567890123456789012345678901234567890123456789012345678901234",
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       nonce: 0n,
       deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
       readContract: client.readContract,
@@ -539,7 +539,7 @@ describe("getNonce()", () => {
   it("returns current nonce", async () => {
     const nonce = await getNonce({
       author: account.address,
-      appSigner: appSignerAccount.address,
+      app: appAccount.address,
       readContract: client.readContract,
       commentsAddress,
     });

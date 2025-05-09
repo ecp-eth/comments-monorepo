@@ -44,7 +44,7 @@ export function CommentSection() {
       queryFn: ({ pageParam, signal }) => {
         return fetchComments({
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-          appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+          app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
           targetUri: currentUrl,
           cursor: pageParam.cursor,
           limit: pageParam.limit,
@@ -74,7 +74,7 @@ export function CommentSection() {
     fetchComments({ cursor, signal }) {
       return fetchComments({
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        appSigner: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         targetUri: currentUrl,
         limit: COMMENTS_PER_PAGE,
         cursor,

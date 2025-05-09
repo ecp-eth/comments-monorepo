@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetRemoveApprovalHashParams
 
@@ -8,7 +8,7 @@
 
 ```ts
 type GetRemoveApprovalHashParams = {
-  appSigner: Hex;
+  app: Hex;
   author: Hex;
   commentsAddress?: Hex;
   deadline: bigint;
@@ -21,17 +21,17 @@ Defined in: [packages/sdk/src/comments/approval.ts:395](https://github.com/ecp-e
 
 ## Properties
 
-### appSigner
+### app
 
 ```ts
-appSigner: Hex;
+app: Hex;
 ```
 
 Defined in: [packages/sdk/src/comments/approval.ts:403](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L403)
 
 The address of the app signer
 
-***
+---
 
 ### author
 
@@ -43,7 +43,7 @@ Defined in: [packages/sdk/src/comments/approval.ts:399](https://github.com/ecp-e
 
 The address of the author
 
-***
+---
 
 ### commentsAddress?
 
@@ -58,10 +58,10 @@ The address of the comments contract
 #### Default
 
 ```ts
-COMMENT_MANAGER_ADDRESS
+COMMENT_MANAGER_ADDRESS;
 ```
 
-***
+---
 
 ### deadline
 
@@ -73,7 +73,7 @@ Defined in: [packages/sdk/src/comments/approval.ts:411](https://github.com/ecp-e
 
 Timestamp after which the signature becomes invalid
 
-***
+---
 
 ### nonce
 
@@ -85,7 +85,7 @@ Defined in: [packages/sdk/src/comments/approval.ts:407](https://github.com/ecp-e
 
 The current nonce for the author
 
-***
+---
 
 ### readContract
 

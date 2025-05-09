@@ -10,12 +10,12 @@ interface ICommentManager {
     /// @notice Emitted when a new comment is added
     /// @param commentId Unique identifier of the comment
     /// @param author Address of the comment author
-    /// @param appSigner Address of the application signer
+    /// @param app Address of the application signer
     /// @param commentData Struct containing all comment data
     event CommentAdded(
         bytes32 indexed commentId,
         address indexed author,
-        address indexed appSigner,
+        address indexed app,
         Comments.CommentData commentData
     );
 
@@ -26,13 +26,13 @@ interface ICommentManager {
 
     /// @notice Emitted when an author approves an app signer
     /// @param author Address of the author giving approval
-    /// @param appSigner Address being approved
-    event ApprovalAdded(address indexed author, address indexed appSigner);
+    /// @param app Address being approved
+    event ApprovalAdded(address indexed author, address indexed app);
 
     /// @notice Emitted when an author removes an app signer's approval
     /// @param author Address of the author removing approval
-    /// @param appSigner Address being unapproved
-    event ApprovalRemoved(address indexed author, address indexed appSigner);
+    /// @param app Address being unapproved
+    event ApprovalRemoved(address indexed author, address indexed app);
 
     /// @notice Error thrown when app signature verification fails
     error InvalidAppSignature();
@@ -41,7 +41,7 @@ interface ICommentManager {
     /// @notice Error thrown when nonce is invalid
     error InvalidNonce(
         address author,
-        address appSigner,
+        address app,
         uint256 expected,
         uint256 provided
     );
@@ -89,7 +89,7 @@ interface ICommentManager {
     /// @notice Deletes a comment with author signature verification
     /// @param commentId The unique identifier of the comment to delete
     /// @param author The address of the comment author
-    /// @param appSigner The address of the app signer
+    /// @param app The address of the app signer
     /// @param nonce The current nonce for the author
     /// @param deadline Timestamp after which the signature becomes invalid
     /// @param authorSignature The signature from the author authorizing deletion (empty if app)
@@ -97,7 +97,7 @@ interface ICommentManager {
     function deleteComment(
         bytes32 commentId,
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline,
         bytes calldata authorSignature,
@@ -105,22 +105,22 @@ interface ICommentManager {
     ) external;
 
     /// @notice Approves an app signer when called directly by the author
-    /// @param appSigner The address to approve
-    function addApprovalAsAuthor(address appSigner) external;
+    /// @param app The address to approve
+    function addApprovalAsAuthor(address app) external;
 
     /// @notice Removes an app signer approval when called directly by the author
-    /// @param appSigner The address to remove approval from
-    function revokeApprovalAsAuthor(address appSigner) external;
+    /// @param app The address to remove approval from
+    function revokeApprovalAsAuthor(address app) external;
 
     /// @notice Approves an app signer with signature verification
     /// @param author The address granting approval
-    /// @param appSigner The address being approved
+    /// @param app The address being approved
     /// @param nonce The current nonce for the author
     /// @param deadline Timestamp after which the signature becomes invalid
     /// @param signature The author's signature authorizing the approval
     function addApproval(
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline,
         bytes calldata signature
@@ -128,13 +128,13 @@ interface ICommentManager {
 
     /// @notice Removes an app signer approval with signature verification
     /// @param author The address removing approval
-    /// @param appSigner The address being unapproved
+    /// @param app The address being unapproved
     /// @param nonce The current nonce for the author
     /// @param deadline Timestamp after which the signature becomes invalid
     /// @param signature The author's signature authorizing the removal
     function removeApproval(
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline,
         bytes calldata signature
@@ -142,26 +142,26 @@ interface ICommentManager {
 
     /// @notice Calculates the EIP-712 hash for a permit
     /// @param author Address of the author
-    /// @param appSigner Address of the app signer
+    /// @param app Address of the app signer
     /// @param nonce Current nonce for the author
     /// @param deadline Timestamp after which the signature is invalid
     /// @return bytes32 The computed hash
     function getAddApprovalHash(
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline
     ) external view returns (bytes32);
 
     /// @notice Calculates the EIP-712 hash for removing an approval
     /// @param author The address removing approval
-    /// @param appSigner The address being unapproved
+    /// @param app The address being unapproved
     /// @param nonce The current nonce for the author
     /// @param deadline Timestamp after which the signature becomes invalid
     /// @return The computed hash
     function getRemoveApprovalHash(
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline
     ) external view returns (bytes32);
@@ -169,14 +169,14 @@ interface ICommentManager {
     /// @notice Calculates the EIP-712 hash for deleting a comment
     /// @param commentId The unique identifier of the comment to delete
     /// @param author The address of the comment author
-    /// @param appSigner The address of the app signer
+    /// @param app The address of the app signer
     /// @param nonce The current nonce for the author
     /// @param deadline Timestamp after which the signature becomes invalid
     /// @return The computed hash
     function getDeleteCommentHash(
         bytes32 commentId,
         address author,
-        address appSigner,
+        address app,
         uint256 nonce,
         uint256 deadline
     ) external view returns (bytes32);
