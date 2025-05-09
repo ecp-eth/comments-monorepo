@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentSchemaType
 
@@ -10,17 +10,17 @@
 type IndexerAPICommentSchemaType = {
   app: `0x${string}`;
   author: {
-    address: `0x${string}`;
-    ens?: {
-      avatarUrl: null | string;
-      name: string;
-    };
-    farcaster?: {
-      displayName?: string;
-      fid: number;
-      pfpUrl?: string;
-      username?: string;
-    };
+     address: `0x${string}`;
+     ens?: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster?: {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username?: string;
+     };
   };
   chainId: number;
   channelId: bigint;

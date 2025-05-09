@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / createRemoveApprovalTypedData
 
@@ -9,42 +9,41 @@
 ```ts
 function createRemoveApprovalTypedData(params): {
   domain: {
-    chainId: number;
-    name: "Comments";
-    verifyingContract: `0x${string}`;
-    version: "1";
+     chainId: number;
+     name: "Comments";
+     verifyingContract: `0x${string}`;
+     version: "1";
   };
   message: {
-    app: `0x${string}`;
-    author: `0x${string}`;
-    deadline: bigint;
-    nonce: bigint;
+     app: `0x${string}`;
+     author: `0x${string}`;
+     deadline: bigint;
+     nonce: bigint;
   };
   primaryType: "RemoveApproval";
   types: {
-    RemoveApproval: (
-      | {
-          name: "author";
-          type: "address";
-        }
-      | {
-          name: "app";
-          type: "address";
-        }
-      | {
-          name: "nonce";
-          type: "uint256";
-        }
-      | {
-          name: "deadline";
-          type: "uint256";
-        }
-    )[];
+     RemoveApproval: (
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "app";
+        type: "address";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+     })[];
   };
 };
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:563](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L563)
+Defined in: [packages/sdk/src/comments/approval.ts:562](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L562)
 
 Create the EIP-712 typed data structure for removing approval
 
@@ -103,7 +102,7 @@ domain: {
   name: "Comments";
   verifyingContract: `0x${string}`;
   version: "1";
-}
+};
 ```
 
 #### domain.chainId
@@ -138,7 +137,7 @@ message: {
   author: `0x${string}`;
   deadline: bigint;
   nonce: bigint;
-}
+};
 ```
 
 #### message.app

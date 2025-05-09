@@ -16,6 +16,8 @@ type EmbedConfigThemeColorsSchemaType = {
      destructive?: string;
      destructive-foreground?: string;
      foreground?: string;
+     input?: string;
+     input-foreground?: string;
      muted-foreground?: string;
      primary?: string;
      primary-foreground?: string;
@@ -31,6 +33,8 @@ type EmbedConfigThemeColorsSchemaType = {
      destructive?: string;
      destructive-foreground?: string;
      foreground?: string;
+     input?: string;
+     input-foreground?: string;
      muted-foreground?: string;
      primary?: string;
      primary-foreground?: string;
@@ -41,7 +45,7 @@ type EmbedConfigThemeColorsSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/embed/schemas/index.ts:114](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L114)
+Defined in: [packages/sdk/src/embed/schemas/index.ts:120](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L120)
 
 ## Type declaration
 
@@ -56,6 +60,8 @@ optional dark: {
   destructive?: string;
   destructive-foreground?: string;
   foreground?: string;
+  input?: string;
+  input-foreground?: string;
   muted-foreground?: string;
   primary?: string;
   primary-foreground?: string;
@@ -107,6 +113,18 @@ optional destructive-foreground: string;
 optional foreground: string;
 ```
 
+#### dark.input?
+
+```ts
+optional input: string;
+```
+
+#### dark.input-foreground?
+
+```ts
+optional input-foreground: string;
+```
+
 #### dark.muted-foreground?
 
 ```ts
@@ -154,6 +172,8 @@ optional light: {
   destructive?: string;
   destructive-foreground?: string;
   foreground?: string;
+  input?: string;
+  input-foreground?: string;
   muted-foreground?: string;
   primary?: string;
   primary-foreground?: string;
@@ -203,6 +223,18 @@ optional destructive-foreground: string;
 
 ```ts
 optional foreground: string;
+```
+
+#### light.input?
+
+```ts
+optional input: string;
+```
+
+#### light.input-foreground?
+
+```ts
+optional input-foreground: string;
 ```
 
 #### light.muted-foreground?

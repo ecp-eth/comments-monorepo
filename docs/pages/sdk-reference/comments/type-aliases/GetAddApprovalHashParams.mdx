@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetAddApprovalHashParams
 
@@ -17,7 +17,7 @@ type GetAddApprovalHashParams = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:302](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L302)
+Defined in: [packages/sdk/src/comments/approval.ts:301](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L301)
 
 ## Properties
 
@@ -27,11 +27,11 @@ Defined in: [packages/sdk/src/comments/approval.ts:302](https://github.com/ecp-e
 app: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:310](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L310)
+Defined in: [packages/sdk/src/comments/approval.ts:309](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L309)
 
 The address of the app signer
 
----
+***
 
 ### author
 
@@ -39,11 +39,11 @@ The address of the app signer
 author: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:306](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L306)
+Defined in: [packages/sdk/src/comments/approval.ts:305](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L305)
 
 The address of the author
 
----
+***
 
 ### commentsAddress?
 
@@ -51,17 +51,17 @@ The address of the author
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:326](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L326)
+Defined in: [packages/sdk/src/comments/approval.ts:325](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L325)
 
 The address of the comments contract
 
 #### Default
 
 ```ts
-COMMENT_MANAGER_ADDRESS;
+COMMENT_MANAGER_ADDRESS
 ```
 
----
+***
 
 ### deadline?
 
@@ -69,7 +69,7 @@ COMMENT_MANAGER_ADDRESS;
 optional deadline: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:320](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L320)
+Defined in: [packages/sdk/src/comments/approval.ts:319](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L319)
 
 Timestamp after which the signature becomes invalid
 
@@ -79,7 +79,7 @@ Timestamp after which the signature becomes invalid
 1 day from now
 ```
 
----
+***
 
 ### nonce
 
@@ -87,11 +87,11 @@ Timestamp after which the signature becomes invalid
 nonce: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:314](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L314)
+Defined in: [packages/sdk/src/comments/approval.ts:313](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L313)
 
 The current nonce for the author
 
----
+***
 
 ### readContract
 
@@ -99,4 +99,4 @@ The current nonce for the author
 readContract: ReadAddApprovalHashFromContractFunction;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:327](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L327)
+Defined in: [packages/sdk/src/comments/approval.ts:326](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L326)

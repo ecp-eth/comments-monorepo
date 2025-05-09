@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetDeleteCommentHashParams
 
@@ -14,11 +14,7 @@ type GetDeleteCommentHashParams = {
   commentsAddress?: Hex;
   deadline: bigint;
   nonce: bigint;
-  readContract: (
-    parameters
-  ) => Promise<
-    ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">
-  >;
+  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">>;
 };
 ```
 
@@ -36,7 +32,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:402](https://github.com/ecp-et
 
 The app signer
 
----
+***
 
 ### author
 
@@ -48,7 +44,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:398](https://github.com/ecp-et
 
 The author of the comment
 
----
+***
 
 ### commentId
 
@@ -60,7 +56,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:394](https://github.com/ecp-et
 
 The ID of the comment to delete
 
----
+***
 
 ### commentsAddress?
 
@@ -75,10 +71,10 @@ The address of the comments contract
 #### Default
 
 ```ts
-COMMENT_MANAGER_ADDRESS;
+COMMENT_MANAGER_ADDRESS
 ```
 
----
+***
 
 ### deadline
 
@@ -90,7 +86,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:410](https://github.com/ecp-et
 
 The deadline for the signature
 
----
+***
 
 ### nonce
 
@@ -102,15 +98,12 @@ Defined in: [packages/sdk/src/comments/comment.ts:406](https://github.com/ecp-et
 
 The nonce for the signature
 
----
+***
 
 ### readContract()
 
 ```ts
-readContract: (parameters) =>
-  Promise<
-    ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">
-  >;
+readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">>;
 ```
 
 Defined in: [packages/sdk/src/comments/comment.ts:416](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L416)
@@ -119,8 +112,8 @@ Defined in: [packages/sdk/src/comments/comment.ts:416](https://github.com/ecp-et
 
 ##### parameters
 
-`ReadContractParameters`\<_typeof_ [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getDeleteCommentHash"`\>
+`ReadContractParameters`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getDeleteCommentHash"`\>
 
 #### Returns
 
-`Promise`\<`ReadContractReturnType`\<_typeof_ [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getDeleteCommentHash"`\>\>
+`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getDeleteCommentHash"`\>\>

@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / DeleteCommentParams
 
@@ -8,8 +8,8 @@
 
 ```ts
 type DeleteCommentParams = {
-  appSignature: Hex;
   app: Hex;
+  appSignature: Hex;
   author: Hex;
   authorSignature?: Hex;
   commentId: Hex;
@@ -24,18 +24,6 @@ Defined in: [packages/sdk/src/comments/comment.ts:299](https://github.com/ecp-et
 
 ## Properties
 
-### appSignature
-
-```ts
-appSignature: Hex;
-```
-
-Defined in: [packages/sdk/src/comments/comment.ts:328](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L328)
-
-The app signature
-
----
-
 ### app
 
 ```ts
@@ -46,7 +34,19 @@ Defined in: [packages/sdk/src/comments/comment.ts:311](https://github.com/ecp-et
 
 The app signer
 
----
+***
+
+### appSignature
+
+```ts
+appSignature: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:328](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L328)
+
+The app signature
+
+***
 
 ### author
 
@@ -58,7 +58,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:307](https://github.com/ecp-et
 
 The author of the comment
 
----
+***
 
 ### authorSignature?
 
@@ -70,7 +70,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:332](https://github.com/ecp-et
 
 The author signature. Necessary if the author hasn't approved the signer to delete comments on their behalf.
 
----
+***
 
 ### commentId
 
@@ -82,7 +82,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:303](https://github.com/ecp-et
 
 The ID of the comment to delete
 
----
+***
 
 ### commentsAddress?
 
@@ -97,10 +97,10 @@ The address of the comments contract
 #### Default
 
 ```ts
-COMMENT_MANAGER_ADDRESS;
+COMMENT_MANAGER_ADDRESS
 ```
 
----
+***
 
 ### deadline
 
@@ -112,7 +112,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:319](https://github.com/ecp-et
 
 The deadline for the signature
 
----
+***
 
 ### nonce
 
@@ -124,7 +124,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:315](https://github.com/ecp-et
 
 The nonce for the signature
 
----
+***
 
 ### writeContract
 

@@ -17,6 +17,8 @@ type EmbedConfigThemeSchemaType = {
         destructive?: string;
         destructive-foreground?: string;
         foreground?: string;
+        input?: string;
+        input-foreground?: string;
         muted-foreground?: string;
         primary?: string;
         primary-foreground?: string;
@@ -32,6 +34,8 @@ type EmbedConfigThemeSchemaType = {
         destructive?: string;
         destructive-foreground?: string;
         foreground?: string;
+        input?: string;
+        input-foreground?: string;
         muted-foreground?: string;
         primary?: string;
         primary-foreground?: string;
@@ -1817,7 +1821,7 @@ type EmbedConfigThemeSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/embed/schemas/index.ts:180](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L180)
+Defined in: [packages/sdk/src/embed/schemas/index.ts:186](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L186)
 
 The type for embed theme configuration
 
@@ -1835,6 +1839,8 @@ optional colors: {
      destructive?: string;
      destructive-foreground?: string;
      foreground?: string;
+     input?: string;
+     input-foreground?: string;
      muted-foreground?: string;
      primary?: string;
      primary-foreground?: string;
@@ -1850,6 +1856,8 @@ optional colors: {
      destructive?: string;
      destructive-foreground?: string;
      foreground?: string;
+     input?: string;
+     input-foreground?: string;
      muted-foreground?: string;
      primary?: string;
      primary-foreground?: string;
@@ -1871,6 +1879,8 @@ optional dark: {
   destructive?: string;
   destructive-foreground?: string;
   foreground?: string;
+  input?: string;
+  input-foreground?: string;
   muted-foreground?: string;
   primary?: string;
   primary-foreground?: string;
@@ -1922,6 +1932,18 @@ optional destructive-foreground: string;
 optional foreground: string;
 ```
 
+#### colors.dark.input?
+
+```ts
+optional input: string;
+```
+
+#### colors.dark.input-foreground?
+
+```ts
+optional input-foreground: string;
+```
+
 #### colors.dark.muted-foreground?
 
 ```ts
@@ -1969,6 +1991,8 @@ optional light: {
   destructive?: string;
   destructive-foreground?: string;
   foreground?: string;
+  input?: string;
+  input-foreground?: string;
   muted-foreground?: string;
   primary?: string;
   primary-foreground?: string;
@@ -2018,6 +2042,18 @@ optional destructive-foreground: string;
 
 ```ts
 optional foreground: string;
+```
+
+#### colors.light.input?
+
+```ts
+optional input: string;
+```
+
+#### colors.light.input-foreground?
+
+```ts
+optional input-foreground: string;
 ```
 
 #### colors.light.muted-foreground?
