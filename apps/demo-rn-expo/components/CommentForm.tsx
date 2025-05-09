@@ -18,7 +18,7 @@ import { usePostComment } from "../hooks/usePostComment";
 import { chain } from "../wagmi.config";
 import { useOptimisticCommentingManager } from "../hooks/useOptimisticCommentingManager";
 import { useShowErrorInToast } from "../hooks/useShowErrorInToast";
-import { useAppForegroundedEffect } from "../hooks/useAppForegroundedEffect";
+import { useAppStateEffect } from "../hooks/useAppStateEffect";
 import { useKeyboardRemainingheight } from "../hooks/useKeyboardRemainingHeight";
 import theme from "../theme";
 import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
@@ -69,16 +69,16 @@ export function CommentForm({
 
   useShowErrorInToast(error);
 
-  useAppForegroundedEffect(
-    useCallback(() => {
+  useAppStateEffect({
+    foregrounded: useCallback(() => {
       if (isPostingComment || !error) {
         // user returned without error and is still posting (could bew still signing)
         // probably the wallet hangs we reset state to allow they to try again
         reset();
         setIsProcessing(false);
       }
-    }, [error, isPostingComment, reset])
-  );
+    }, [error, isPostingComment, reset]),
+  });
 
   useEffect(() => {
     if (justViewingReplies) {
