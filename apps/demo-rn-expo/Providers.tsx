@@ -14,8 +14,11 @@ const queryClient = new QueryClient();
 createAppKit({
   projectId,
   featuredWalletIds: [
+    // rainbow
     "1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369",
+    // Zerion
     "ecc4036f814562b41a5268adc86270fba1365471402006302e70169465b7ac18",
+    // metamask
     "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
   ],
   wagmiConfig,
