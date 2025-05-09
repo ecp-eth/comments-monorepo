@@ -27,7 +27,11 @@
   },
   "pnpm": {
     "overrides": {
-      "@hono/zod-openapi>@asteasolutions/zod-to-openapi": "^7.3.0"
+      "@hono/zod-openapi>@asteasolutions/zod-to-openapi": "^7.3.0",
+      "@react-native-async-storage/async-storage": "^2.1.2",
+      "@reown/appkit": "^1.7.4",
+      "valtio": "2.1.4",
+      "use-sync-external-store": "^1.5.0"
     },
     "patchedDependencies": {
       "typedoc-plugin-markdown": "patches/typedoc-plugin-markdown.patch"
