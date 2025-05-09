@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetNonceParams
 
@@ -11,9 +11,7 @@ type GetNonceParams = {
   app: Hex;
   author: Hex;
   commentsAddress?: Hex;
-  readContract: (
-    parameters
-  ) => Promise<ReadContractReturnType<typeof CommentManagerABI, "nonces">>;
+  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "nonces">>;
 };
 ```
 
@@ -31,7 +29,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:465](https://github.com/ecp-et
 
 The app signer
 
----
+***
 
 ### author
 
@@ -43,7 +41,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:461](https://github.com/ecp-et
 
 The author of the comment
 
----
+***
 
 ### commentsAddress?
 
@@ -58,16 +56,15 @@ The address of the comments contract
 #### Default
 
 ```ts
-COMMENT_MANAGER_ADDRESS;
+COMMENT_MANAGER_ADDRESS
 ```
 
----
+***
 
 ### readContract()
 
 ```ts
-readContract: (parameters) =>
-  Promise<ReadContractReturnType<typeof CommentManagerABI, "nonces">>;
+readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "nonces">>;
 ```
 
 Defined in: [packages/sdk/src/comments/comment.ts:471](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L471)
@@ -76,8 +73,8 @@ Defined in: [packages/sdk/src/comments/comment.ts:471](https://github.com/ecp-et
 
 ##### parameters
 
-`ReadContractParameters`\<_typeof_ [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"nonces"`\>
+`ReadContractParameters`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"nonces"`\>
 
 #### Returns
 
-`Promise`\<`ReadContractReturnType`\<_typeof_ [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"nonces"`\>\>
+`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"nonces"`\>\>

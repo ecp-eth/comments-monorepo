@@ -15,6 +15,8 @@ type EmbedConfigThemePaletteSchemaType = {
   destructive?: string;
   destructive-foreground?: string;
   foreground?: string;
+  input?: string;
+  input-foreground?: string;
   muted-foreground?: string;
   primary?: string;
   primary-foreground?: string;
@@ -24,7 +26,7 @@ type EmbedConfigThemePaletteSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/embed/schemas/index.ts:105](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L105)
+Defined in: [packages/sdk/src/embed/schemas/index.ts:111](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L111)
 
 ## Type declaration
 
@@ -68,6 +70,18 @@ optional destructive-foreground: string;
 
 ```ts
 optional foreground: string;
+```
+
+### input?
+
+```ts
+optional input: string;
+```
+
+### input-foreground?
+
+```ts
+optional input-foreground: string;
 ```
 
 ### muted-foreground?

@@ -10,6 +10,7 @@
 type EmbedConfigSchemaInputType = {
   chainId?: 1 | 31337 | 8453 | 11155111;
   disablePromotion?: boolean;
+  restrictMaximumContainerWidth?: boolean;
   theme?: {
      colors?: {
         dark?: {
@@ -20,6 +21,8 @@ type EmbedConfigSchemaInputType = {
            destructive?: string;
            destructive-foreground?: string;
            foreground?: string;
+           input?: string;
+           input-foreground?: string;
            muted-foreground?: string;
            primary?: string;
            primary-foreground?: string;
@@ -35,6 +38,8 @@ type EmbedConfigSchemaInputType = {
            destructive?: string;
            destructive-foreground?: string;
            foreground?: string;
+           input?: string;
+           input-foreground?: string;
            muted-foreground?: string;
            primary?: string;
            primary-foreground?: string;
@@ -1821,7 +1826,7 @@ type EmbedConfigSchemaInputType = {
 };
 ```
 
-Defined in: [packages/sdk/src/embed/schemas/index.ts:230](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L230)
+Defined in: [packages/sdk/src/embed/schemas/index.ts:244](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L244)
 
 Custom configuration for `<CommentEmbed />` component.
 
@@ -1850,6 +1855,26 @@ optional disablePromotion: boolean;
 
 Hide powered by ECP link
 
+#### Default
+
+```ts
+false
+```
+
+### restrictMaximumContainerWidth?
+
+```ts
+optional restrictMaximumContainerWidth: boolean;
+```
+
+Restrict the maximum container width
+
+#### Default
+
+```ts
+true
+```
+
 ### theme?
 
 ```ts
@@ -1863,6 +1888,8 @@ optional theme: {
         destructive?: string;
         destructive-foreground?: string;
         foreground?: string;
+        input?: string;
+        input-foreground?: string;
         muted-foreground?: string;
         primary?: string;
         primary-foreground?: string;
@@ -1878,6 +1905,8 @@ optional theme: {
         destructive?: string;
         destructive-foreground?: string;
         foreground?: string;
+        input?: string;
+        input-foreground?: string;
         muted-foreground?: string;
         primary?: string;
         primary-foreground?: string;
@@ -3677,6 +3706,8 @@ optional colors: {
      destructive?: string;
      destructive-foreground?: string;
      foreground?: string;
+     input?: string;
+     input-foreground?: string;
      muted-foreground?: string;
      primary?: string;
      primary-foreground?: string;
@@ -3692,6 +3723,8 @@ optional colors: {
      destructive?: string;
      destructive-foreground?: string;
      foreground?: string;
+     input?: string;
+     input-foreground?: string;
      muted-foreground?: string;
      primary?: string;
      primary-foreground?: string;
@@ -3713,6 +3746,8 @@ optional dark: {
   destructive?: string;
   destructive-foreground?: string;
   foreground?: string;
+  input?: string;
+  input-foreground?: string;
   muted-foreground?: string;
   primary?: string;
   primary-foreground?: string;
@@ -3764,6 +3799,18 @@ optional destructive-foreground: string;
 optional foreground: string;
 ```
 
+#### theme.colors.dark.input?
+
+```ts
+optional input: string;
+```
+
+#### theme.colors.dark.input-foreground?
+
+```ts
+optional input-foreground: string;
+```
+
 #### theme.colors.dark.muted-foreground?
 
 ```ts
@@ -3811,6 +3858,8 @@ optional light: {
   destructive?: string;
   destructive-foreground?: string;
   foreground?: string;
+  input?: string;
+  input-foreground?: string;
   muted-foreground?: string;
   primary?: string;
   primary-foreground?: string;
@@ -3860,6 +3909,18 @@ optional destructive-foreground: string;
 
 ```ts
 optional foreground: string;
+```
+
+#### theme.colors.light.input?
+
+```ts
+optional input: string;
+```
+
+#### theme.colors.light.input-foreground?
+
+```ts
+optional input-foreground: string;
 ```
 
 #### theme.colors.light.muted-foreground?

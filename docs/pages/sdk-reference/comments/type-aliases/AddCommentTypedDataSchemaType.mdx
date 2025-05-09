@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / AddCommentTypedDataSchemaType
 
@@ -9,67 +9,66 @@
 ```ts
 type AddCommentTypedDataSchemaType = {
   domain: {
-    chainId: number;
-    name: "Comments";
-    verifyingContract: `0x${string}`;
-    version: "1";
+     chainId: number;
+     name: "Comments";
+     verifyingContract: `0x${string}`;
+     version: "1";
   };
   message: {
-    app: `0x${string}`;
-    author: `0x${string}`;
-    channelId: bigint;
-    commentType: string;
-    content: string;
-    deadline: bigint;
-    metadata: string;
-    nonce: bigint;
-    parentId: `0x${string}`;
-    targetUri: string;
+     app: `0x${string}`;
+     author: `0x${string}`;
+     channelId: bigint;
+     commentType: string;
+     content: string;
+     deadline: bigint;
+     metadata: string;
+     nonce: bigint;
+     parentId: `0x${string}`;
+     targetUri: string;
   };
   primaryType: "AddComment";
   types: {
-    AddComment: (
-      | {
-          name: "content";
-          type: "string";
-        }
-      | {
-          name: "metadata";
-          type: "string";
-        }
-      | {
-          name: "targetUri";
-          type: "string";
-        }
-      | {
-          name: "commentType";
-          type: "string";
-        }
-      | {
-          name: "author";
-          type: "address";
-        }
-      | {
-          name: "app";
-          type: "address";
-        }
-      | {
-          name: "channelId";
-          type: "uint256";
-        }
-      | {
-          name: "nonce";
-          type: "uint256";
-        }
-      | {
-          name: "deadline";
-          type: "uint256";
-        }
-      | {
-          name: "parentId";
-          type: "bytes32";
-        }
-    )[];
+     AddComment: (
+        | {
+        name: "content";
+        type: "string";
+      }
+        | {
+        name: "metadata";
+        type: "string";
+      }
+        | {
+        name: "targetUri";
+        type: "string";
+      }
+        | {
+        name: "commentType";
+        type: "string";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "app";
+        type: "address";
+      }
+        | {
+        name: "channelId";
+        type: "uint256";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+      }
+        | {
+        name: "parentId";
+        type: "bytes32";
+     })[];
   };
 };
 ```
@@ -86,7 +85,7 @@ domain: {
   name: "Comments";
   verifyingContract: `0x${string}`;
   version: "1";
-}
+};
 ```
 
 #### domain.chainId
