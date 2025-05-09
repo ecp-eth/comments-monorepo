@@ -104,8 +104,8 @@
     "eslint": "^9.19.0",
     "node-resolve-ts": "^1.0.2",
     "react": "^19.0.0",
-    "viem": "^2.26.0",
-    "wagmi": "^2.14.16",
+    "viem": "^2.29.1",
+    "wagmi": "^2.15.2",
     "zod": "^3.24.1"
   },
   "dependencies": {
@@ -115,8 +115,8 @@
   "peerDependencies": {
     "@tanstack/react-query": ">=5.0.0",
     "react": "18 || 19",
-    "viem": "^2.26.0",
-    "wagmi": "^2.14.16",
+    "viem": "^2.29.1",
+    "wagmi": "^2.15.2",
     "zod": "^3.24.1"
   },
   "tsd": {

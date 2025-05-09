@@ -56,14 +56,15 @@
     "@rainbow-me/rainbowkit": "^2.2.4",
     "@tanstack/react-query": "^5.69.0",
     "@types/react": "^19.0.8",
+    "@wagmi/core": "^2.17.1",
     "clsx": "^2.1.1",
     "eslint": "^9.19.0",
     "next": "^15.3.0",
     "react": "^19.0.0",
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.0.1",
-    "viem": "^2.26.0",
-    "wagmi": "^2.14.16",
+    "viem": "^2.29.1",
+    "wagmi": "^2.15.2",
     "zod": "^3.24.1"
   },
   "peerDependencies": {
@@ -75,8 +76,8 @@
     "react": "18 || 19",
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.0.1",
-    "viem": "^2.26.0",
-    "wagmi": "^2.14.16",
+    "viem": "^2.29.1",
+    "wagmi": "^2.15.2",
     "zod": "^3.24.1"
   }
 }

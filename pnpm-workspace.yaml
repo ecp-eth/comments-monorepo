@@ -1,15 +1,16 @@
+dedupePeerDependents: true
 packages:
   - apps/*
   - packages/*
   - docs
-  - '!docs/templates/*'
+  - "!docs/templates/*"
 onlyBuiltDependencies:
-  - '@nestjs/core'
-  - '@openapitools/openapi-generator-cli'
-  - '@scarf/scarf'
-  - '@sentry-internal/node-cpu-profiler'
-  - '@sentry/cli'
-  - '@tree-sitter-grammars/tree-sitter-yaml'
+  - "@nestjs/core"
+  - "@openapitools/openapi-generator-cli"
+  - "@scarf/scarf"
+  - "@sentry-internal/node-cpu-profiler"
+  - "@sentry/cli"
+  - "@tree-sitter-grammars/tree-sitter-yaml"
   - bigint-buffer
   - bufferutil
   - core-js-pure
