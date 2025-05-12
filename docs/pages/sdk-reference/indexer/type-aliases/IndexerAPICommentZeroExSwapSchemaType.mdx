@@ -1,0 +1,82 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentZeroExSwapSchemaType
+
+# Type Alias: IndexerAPICommentZeroExSwapSchemaType
+
+```ts
+type IndexerAPICommentZeroExSwapSchemaType = {
+  from: {
+     address: `0x${string}`;
+     amount: string;
+     symbol: string;
+  };
+  to: {
+     address: `0x${string}`;
+     amount: string;
+     symbol: string;
+  };
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L63)
+
+## Type declaration
+
+### from
+
+```ts
+from: {
+  address: `0x${string}`;
+  amount: string;
+  symbol: string;
+};
+```
+
+#### from.address
+
+```ts
+address: `0x${string}` = HexSchema;
+```
+
+#### from.amount
+
+```ts
+amount: string = IndexerAPIZeroExTokenAmountSchema;
+```
+
+#### from.symbol
+
+```ts
+symbol: string;
+```
+
+### to
+
+```ts
+to: {
+  address: `0x${string}`;
+  amount: string;
+  symbol: string;
+};
+```
+
+#### to.address
+
+```ts
+address: `0x${string}` = HexSchema;
+```
+
+#### to.amount
+
+```ts
+amount: string = IndexerAPIZeroExTokenAmountSchema;
+```
+
+#### to.symbol
+
+```ts
+symbol: string;
+```

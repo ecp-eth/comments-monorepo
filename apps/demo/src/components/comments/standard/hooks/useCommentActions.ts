@@ -113,8 +113,10 @@ export function useCommentActions({
 
       const pendingOperation = await submitCommentMutationFunction({
         address: connectedAddress,
+        zeroExSwap: null,
         commentRequest: {
           content: comment.content,
+          metadata: comment.metadata,
           ...(comment.parentId
             ? {
                 parentId: comment.parentId,
@@ -184,8 +186,10 @@ export function useCommentActions({
 
       const pendingOperation = await submitCommentMutationFunction({
         address: params.address,
+        zeroExSwap: null,
         commentRequest: {
           content: comment.content,
+          metadata: comment.metadata ?? "",
           ...("parentId" in comment
             ? {
                 parentId: comment.parentId,

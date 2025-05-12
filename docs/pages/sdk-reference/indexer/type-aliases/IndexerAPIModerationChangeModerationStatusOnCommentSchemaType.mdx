@@ -39,10 +39,23 @@ type IndexerAPIModerationChangeModerationStatusOnCommentSchemaType = {
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: Date;
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:206](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L206)
+Defined in: [packages/sdk/src/indexer/schemas.ts:230](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L230)
 
 ## Type declaration
 
@@ -232,4 +245,23 @@ txHash: `0x${string}` = HexSchema;
 
 ```ts
 updatedAt: Date;
+```
+
+### zeroExSwap
+
+```ts
+zeroExSwap: 
+  | null
+  | {
+  from: {
+     address: `0x${string}`;
+     amount: string;
+     symbol: string;
+  };
+  to: {
+     address: `0x${string}`;
+     amount: string;
+     symbol: string;
+  };
+};
 ```

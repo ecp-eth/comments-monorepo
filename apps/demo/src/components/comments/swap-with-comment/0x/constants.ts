@@ -1,21 +1,11 @@
-import type { Abi, Address } from "abitype";
 import { erc20Abi } from "viem";
 import { base } from "viem/chains";
+import type { Token } from "./types";
 
 export const PERMIT2_ADDRESS = "0x000000000022D473030F116dDEE9F6B43aC78BA3";
 
 export const AFFILIATE_FEE = 100; // 1% affiliate fee. Denoted in Bps.
 export const FEE_RECIPIENT = "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d"; // The ETH address that should receive affiliate fees
-
-export interface Token {
-  name: string;
-  address: Address;
-  symbol: string;
-  decimals: number;
-  chainId: number;
-  logoURI: string;
-  abi: Abi;
-}
 
 const TOKENS = {
   weth: {

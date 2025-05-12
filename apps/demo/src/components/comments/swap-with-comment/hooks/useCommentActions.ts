@@ -5,27 +5,30 @@ import type {
   OnPostComment,
   OnRetryPostComment,
 } from "../../core/CommentActionsContext";
-import { concat, type Hex, numberToHex, size } from "viem";
+import { concat, type Hex, encodeFunctionData, numberToHex, size } from "viem";
 import {
-  useSendTransaction,
   useSwitchChain,
   useSignTypedData,
   useConfig,
+  useSendCalls,
 } from "wagmi";
-import { waitForTransactionReceipt } from "@wagmi/core";
+import { waitForCallsStatus, waitForTransactionReceipt } from "@wagmi/core";
 import {
   useCommentDeletion,
   useCommentSubmission,
 } from "@ecp.eth/shared/hooks";
 import { submitCommentMutationFunction } from "../../standard/queries";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-import type { QuoteResponseLiquidityAvailableSchemaType } from "../0x/schemas";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { useDeleteComment } from "@ecp.eth/sdk/comments/react";
 import { useCommentActions as useStandardCommentActions } from "../../standard/hooks/useCommentActions";
+import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
+import type { QuoteViewState } from "../0x/QuoteView";
+import type { IndexerAPICommentZeroExSwapSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 export type SwapWithCommentExtra = {
-  quote: QuoteResponseLiquidityAvailableSchemaType;
+  quoteViewState: QuoteViewState;
 };
 
 type UseCommentActionsProps = {
@@ -39,7 +42,7 @@ export function useCommentActions({
     connectedAddress,
   });
   const wagmiConfig = useConfig();
-  const { sendTransactionAsync } = useSendTransaction();
+  const { sendCallsAsync } = useSendCalls();
   const { switchChainAsync } = useSwitchChain();
   const { signTypedDataAsync } = useSignTypedData();
   const commentDeletion = useCommentDeletion();
@@ -109,7 +112,9 @@ export function useCommentActions({
         throw new Error("Missing extra data");
       }
 
-      const { quote } = params.extra;
+      const { quoteViewState } = params.extra;
+
+      const { quote, price } = quoteViewState;
 
       // (1) Sign the Permit2 EIP-712 message returned from quote
       const signature = await signTypedDataAsync(quote.permit2.eip712);
@@ -124,10 +129,32 @@ export function useCommentActions({
       const sigLengthHex = signatureLengthInHex;
       const sig = signature;
 
+      const zeroExSwap: IndexerAPICommentZeroExSwapSchemaType = {
+        from: {
+          amount: price.from.amount,
+          address: quote.sellToken,
+          symbol: price.from.token.symbol,
+        },
+        to: {
+          amount: price.to.amount,
+          address: quote.buyToken,
+          symbol: price.to.token.symbol,
+        },
+      };
+
       const pendingOperation = await submitCommentMutationFunction({
         address: params.address,
+        zeroExSwap,
         commentRequest: {
           content: comment.content,
+          metadata: JSON.stringify(
+            {
+              swap: true,
+              provider: "0x",
+              data: zeroExSwap,
+            },
+            bigintReplacer,
+          ),
           ...("parentId" in comment
             ? {
                 parentId: comment.parentId,
@@ -139,27 +166,30 @@ export function useCommentActions({
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        async writeContractAsync({ chainId }) {
-          // TODO: to be replaced with EIP 7702
-          // const commentDataSuffix = createCommentSuffixData({
-          //   commentData: _params.data,
-          //   appSignature: _params.signature,
-          // });
-
-          quote.transaction.data = concat([
-            transactionData,
-            sigLengthHex,
-            sig,
-            // commentDataSuffix,
-          ]);
-
-          return sendTransactionAsync({
-            account: params.address,
-            to: quote.transaction.to,
-            data: quote.transaction.data,
-            value: quote.transaction.value,
-            chainId,
+        async writeContractAsync({ signCommentResponse }) {
+          const { id } = await sendCallsAsync({
+            calls: [
+              {
+                to: COMMENT_MANAGER_ADDRESS,
+                data: encodeFunctionData({
+                  abi: CommentManagerABI,
+                  functionName: "postComment",
+                  args: [
+                    signCommentResponse.data,
+                    signCommentResponse.signature,
+                  ],
+                }),
+              },
+              {
+                to: quote.transaction.to,
+                data: concat([transactionData, sigLengthHex, sig]),
+                value: quote.transaction.value,
+              },
+            ],
+            forceAtomic: true,
           });
+
+          return id as Hex;
         },
       });
 
@@ -171,8 +201,8 @@ export function useCommentActions({
 
         params.onStart?.();
 
-        const receipt = await waitForTransactionReceipt(wagmiConfig, {
-          hash: pendingOperation.txHash,
+        const receipt = await waitForCallsStatus(wagmiConfig, {
+          id: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
 
@@ -195,11 +225,11 @@ export function useCommentActions({
       }
     },
     [
-      wagmiConfig,
-      commentSubmission,
-      switchChainAsync,
       signTypedDataAsync,
-      sendTransactionAsync,
+      switchChainAsync,
+      sendCallsAsync,
+      commentSubmission,
+      wagmiConfig,
     ],
   );
 

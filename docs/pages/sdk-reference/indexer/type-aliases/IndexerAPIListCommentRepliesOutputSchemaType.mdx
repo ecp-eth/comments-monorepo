@@ -89,17 +89,43 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: string;
+           zeroExSwap:   | null
+              | {
+              from: {
+                 address: `0x${string}`;
+                 amount: string;
+                 symbol: string;
+              };
+              to: {
+                 address: `0x${string}`;
+                 amount: string;
+                 symbol: string;
+              };
+            };
         }[];
      };
      revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: string;
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
   }[];
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:180](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L180)
+Defined in: [packages/sdk/src/indexer/schemas.ts:204](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L204)
 
 ## Type declaration
 
@@ -233,11 +259,37 @@ results: {
         targetUri: string;
         txHash: `0x${string}`;
         updatedAt: string;
+        zeroExSwap:   | null
+           | {
+           from: {
+              address: `0x${string}`;
+              amount: string;
+              symbol: string;
+           };
+           to: {
+              address: `0x${string}`;
+              amount: string;
+              symbol: string;
+           };
+         };
      }[];
   };
   revision: number;
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: string;
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
 }[];
 ```

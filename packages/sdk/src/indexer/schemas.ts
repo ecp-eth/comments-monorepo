@@ -41,6 +41,29 @@ export type IndexerAPICommentModerationStatusSchemaType = z.infer<
   typeof IndexerAPICommentModerationStatusSchema
 >;
 
+export const IndexerAPIZeroExTokenAmountSchema = z.coerce
+  .string()
+  .regex(/^\d+(\.\d+)?$/, {
+    message: "Amount must be a number with optional decimal part",
+  });
+
+export const IndexerAPICommentZeroExSwapSchema = z.object({
+  from: z.object({
+    address: HexSchema,
+    amount: IndexerAPIZeroExTokenAmountSchema,
+    symbol: z.string(),
+  }),
+  to: z.object({
+    address: HexSchema,
+    amount: IndexerAPIZeroExTokenAmountSchema,
+    symbol: z.string(),
+  }),
+});
+
+export type IndexerAPICommentZeroExSwapSchemaType = z.infer<
+  typeof IndexerAPICommentZeroExSwapSchema
+>;
+
 export const IndexerAPICommentSchema = z.object({
   app: HexSchema,
   author: IndexerAPIAuthorDataSchema,
@@ -61,6 +84,7 @@ export const IndexerAPICommentSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   revision: z.number().int(),
+  zeroExSwap: IndexerAPICommentZeroExSwapSchema.nullable(),
 });
 
 export type IndexerAPICommentSchemaType = z.infer<

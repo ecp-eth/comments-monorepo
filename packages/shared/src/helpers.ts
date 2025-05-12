@@ -209,7 +209,7 @@ export function insertPendingCommentToPage(
     return queryData;
   }
 
-  const { response, txHash, chainId } = pendingOperation;
+  const { response, txHash, chainId, zeroExSwap } = pendingOperation;
 
   const moderationEnabled = queryData.pages[0].extra.moderationEnabled;
 
@@ -228,6 +228,7 @@ export function insertPendingCommentToPage(
     revision: 0,
     moderationStatus: moderationEnabled ? "pending" : "approved",
     moderationStatusChangedAt: new Date(),
+    zeroExSwap: zeroExSwap ?? null,
     replies: {
       extra: queryData.pages[0].extra,
       results: [],

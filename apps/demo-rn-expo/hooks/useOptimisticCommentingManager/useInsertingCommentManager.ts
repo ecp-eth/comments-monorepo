@@ -235,6 +235,7 @@ function createIndexerAPICommentDataFromPendingCommentOperation(
       address: pendingCommentOperation.response.data.author,
     },
     deletedAt: null,
+    zeroExSwap: null,
     cursor: pendingCommentOperation.response.hash,
     replies: {
       results: [],

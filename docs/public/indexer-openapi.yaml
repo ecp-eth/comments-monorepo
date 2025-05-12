@@ -188,6 +188,40 @@ paths:
                             - 'null'
                         revision:
                           type: integer
+                        zeroExSwap:
+                          type:
+                            - object
+                            - 'null'
+                          properties:
+                            from:
+                              type: object
+                              properties:
+                                address: {}
+                                amount:
+                                  type: string
+                                  pattern: ^\d+(\.\d+)?$
+                                symbol:
+                                  type: string
+                              required:
+                                - address
+                                - amount
+                                - symbol
+                            to:
+                              type: object
+                              properties:
+                                address: {}
+                                amount:
+                                  type: string
+                                  pattern: ^\d+(\.\d+)?$
+                                symbol:
+                                  type: string
+                              required:
+                                - address
+                                - amount
+                                - symbol
+                          required:
+                            - from
+                            - to
                         replies:
                           type: object
                           properties:
@@ -277,6 +311,40 @@ paths:
                                       - 'null'
                                   revision:
                                     type: integer
+                                  zeroExSwap:
+                                    type:
+                                      - object
+                                      - 'null'
+                                    properties:
+                                      from:
+                                        type: object
+                                        properties:
+                                          address: {}
+                                          amount:
+                                            type: string
+                                            pattern: ^\d+(\.\d+)?$
+                                          symbol:
+                                            type: string
+                                        required:
+                                          - address
+                                          - amount
+                                          - symbol
+                                      to:
+                                        type: object
+                                        properties:
+                                          address: {}
+                                          amount:
+                                            type: string
+                                            pattern: ^\d+(\.\d+)?$
+                                          symbol:
+                                            type: string
+                                        required:
+                                          - address
+                                          - amount
+                                          - symbol
+                                    required:
+                                      - from
+                                      - to
                                 required:
                                   - app
                                   - author
@@ -297,6 +365,7 @@ paths:
                                   - createdAt
                                   - updatedAt
                                   - revision
+                                  - zeroExSwap
                             pagination:
                               type: object
                               properties:
@@ -336,6 +405,7 @@ paths:
                         - createdAt
                         - updatedAt
                         - revision
+                        - zeroExSwap
                         - replies
                   pagination:
                     type: object
@@ -533,6 +603,40 @@ paths:
                             - 'null'
                         revision:
                           type: integer
+                        zeroExSwap:
+                          type:
+                            - object
+                            - 'null'
+                          properties:
+                            from:
+                              type: object
+                              properties:
+                                address: {}
+                                amount:
+                                  type: string
+                                  pattern: ^\d+(\.\d+)?$
+                                symbol:
+                                  type: string
+                              required:
+                                - address
+                                - amount
+                                - symbol
+                            to:
+                              type: object
+                              properties:
+                                address: {}
+                                amount:
+                                  type: string
+                                  pattern: ^\d+(\.\d+)?$
+                                symbol:
+                                  type: string
+                              required:
+                                - address
+                                - amount
+                                - symbol
+                          required:
+                            - from
+                            - to
                         replies:
                           type: object
                           properties:
@@ -622,6 +726,40 @@ paths:
                                       - 'null'
                                   revision:
                                     type: integer
+                                  zeroExSwap:
+                                    type:
+                                      - object
+                                      - 'null'
+                                    properties:
+                                      from:
+                                        type: object
+                                        properties:
+                                          address: {}
+                                          amount:
+                                            type: string
+                                            pattern: ^\d+(\.\d+)?$
+                                          symbol:
+                                            type: string
+                                        required:
+                                          - address
+                                          - amount
+                                          - symbol
+                                      to:
+                                        type: object
+                                        properties:
+                                          address: {}
+                                          amount:
+                                            type: string
+                                            pattern: ^\d+(\.\d+)?$
+                                          symbol:
+                                            type: string
+                                        required:
+                                          - address
+                                          - amount
+                                          - symbol
+                                    required:
+                                      - from
+                                      - to
                                 required:
                                   - app
                                   - author
@@ -642,6 +780,7 @@ paths:
                                   - createdAt
                                   - updatedAt
                                   - revision
+                                  - zeroExSwap
                             pagination:
                               type: object
                               properties:
@@ -681,6 +820,7 @@ paths:
                         - createdAt
                         - updatedAt
                         - revision
+                        - zeroExSwap
                         - replies
                   pagination:
                     type: object
@@ -1148,6 +1288,40 @@ paths:
                             - 'null'
                         revision:
                           type: integer
+                        zeroExSwap:
+                          type:
+                            - object
+                            - 'null'
+                          properties:
+                            from:
+                              type: object
+                              properties:
+                                address: {}
+                                amount:
+                                  type: string
+                                  pattern: ^\d+(\.\d+)?$
+                                symbol:
+                                  type: string
+                              required:
+                                - address
+                                - amount
+                                - symbol
+                            to:
+                              type: object
+                              properties:
+                                address: {}
+                                amount:
+                                  type: string
+                                  pattern: ^\d+(\.\d+)?$
+                                symbol:
+                                  type: string
+                              required:
+                                - address
+                                - amount
+                                - symbol
+                          required:
+                            - from
+                            - to
                       required:
                         - app
                         - author
@@ -1168,6 +1342,7 @@ paths:
                         - createdAt
                         - updatedAt
                         - revision
+                        - zeroExSwap
                   pagination:
                     type: object
                     properties:
@@ -1315,6 +1490,40 @@ paths:
                       - 'null'
                   revision:
                     type: integer
+                  zeroExSwap:
+                    type:
+                      - object
+                      - 'null'
+                    properties:
+                      from:
+                        type: object
+                        properties:
+                          address: {}
+                          amount:
+                            type: string
+                            pattern: ^\d+(\.\d+)?$
+                          symbol:
+                            type: string
+                        required:
+                          - address
+                          - amount
+                          - symbol
+                      to:
+                        type: object
+                        properties:
+                          address: {}
+                          amount:
+                            type: string
+                            pattern: ^\d+(\.\d+)?$
+                          symbol:
+                            type: string
+                        required:
+                          - address
+                          - amount
+                          - symbol
+                    required:
+                      - from
+                      - to
                 required:
                   - app
                   - author
@@ -1335,6 +1544,7 @@ paths:
                   - createdAt
                   - updatedAt
                   - revision
+                  - zeroExSwap
         '400':
           description: When request is not valid
           content:
@@ -1463,6 +1673,40 @@ paths:
                       - 'null'
                   revision:
                     type: integer
+                  zeroExSwap:
+                    type:
+                      - object
+                      - 'null'
+                    properties:
+                      from:
+                        type: object
+                        properties:
+                          address: {}
+                          amount:
+                            type: string
+                            pattern: ^\d+(\.\d+)?$
+                          symbol:
+                            type: string
+                        required:
+                          - address
+                          - amount
+                          - symbol
+                      to:
+                        type: object
+                        properties:
+                          address: {}
+                          amount:
+                            type: string
+                            pattern: ^\d+(\.\d+)?$
+                          symbol:
+                            type: string
+                        required:
+                          - address
+                          - amount
+                          - symbol
+                    required:
+                      - from
+                      - to
                 required:
                   - app
                   - author
@@ -1483,6 +1727,7 @@ paths:
                   - createdAt
                   - updatedAt
                   - revision
+                  - zeroExSwap
         '401':
           description: When user is not authenticated
           content:

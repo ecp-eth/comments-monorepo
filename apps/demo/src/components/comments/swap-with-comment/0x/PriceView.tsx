@@ -13,7 +13,6 @@ import {
   BASE_TOKENS_BY_SYMBOL,
   AFFILIATE_FEE,
   FEE_RECIPIENT,
-  Token,
 } from "./constants";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
@@ -40,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Token } from "./types";
 
 export const DEFAULT_BUY_TOKEN = (chainId: number) => {
   if (chainId === 1) {
@@ -47,13 +47,27 @@ export const DEFAULT_BUY_TOKEN = (chainId: number) => {
   }
 };
 
+export type PriceViewState = {
+  price: PriceResponseLiquidityAvailableSchemaType;
+  from: {
+    token: Token;
+    amount: string;
+  };
+  to: {
+    token: Token;
+    amount: string;
+  };
+};
+
+export type OnFinalizeFunction = (state: PriceViewState) => void;
+
 export function PriceView({
   taker,
-  setFinalize,
+  onFinalize,
   chainId,
 }: {
   taker: Address | undefined;
-  setFinalize: (price: PriceResponseLiquidityAvailableSchemaType) => void;
+  onFinalize: OnFinalizeFunction;
   chainId: number;
 }) {
   const [sellToken, setSellToken] = useState("weth");
@@ -151,9 +165,26 @@ export function PriceView({
 
   const handleFinalizeClick = useCallback(() => {
     if (price) {
-      setFinalize(price);
+      onFinalize({
+        price,
+        from: {
+          token: sellTokenObject,
+          amount: sellAmount,
+        },
+        to: {
+          token: buyTokenObject,
+          amount: buyAmount,
+        },
+      });
     }
-  }, [price, setFinalize]);
+  }, [
+    buyAmount,
+    buyTokenObject,
+    price,
+    sellAmount,
+    sellTokenObject,
+    onFinalize,
+  ]);
 
   const inSufficientBalance =
     data && sellAmount

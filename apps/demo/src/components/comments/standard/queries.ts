@@ -10,7 +10,10 @@ import {
   type SignCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
-import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
+import {
+  fetchAuthorData,
+  type IndexerAPICommentZeroExSwapSchemaType,
+} from "@ecp.eth/sdk/indexer";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
 import {
   RateLimitedError,
@@ -31,6 +34,7 @@ export class SubmitEditCommentMutationError extends Error {}
 type SubmitCommentParams = {
   address: Hex | undefined;
   commentRequest: Omit<SignCommentPayloadRequestSchemaType, "author">;
+  zeroExSwap: IndexerAPICommentZeroExSwapSchemaType | null;
   switchChainAsync: (chainId: number) => Promise<Chain>;
   writeContractAsync: (params: {
     signCommentResponse: SignCommentResponseClientSchemaType;
@@ -43,6 +47,7 @@ export async function submitCommentMutationFunction({
   commentRequest,
   switchChainAsync,
   writeContractAsync,
+  zeroExSwap,
 }: SubmitCommentParams): Promise<PendingPostCommentOperationSchemaType> {
   if (!address) {
     throw new SubmitCommentMutationError("Wallet not connected.");
@@ -120,6 +125,7 @@ export async function submitCommentMutationFunction({
       action: "post",
       state: { status: "pending" },
       chainId: chain.id,
+      zeroExSwap: zeroExSwap ?? undefined,
     };
   } catch (e) {
     if (

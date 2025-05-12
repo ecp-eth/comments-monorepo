@@ -50,11 +50,24 @@ type IndexerAPIListCommentRepliesSchemaType = {
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
   }[];
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:169](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L169)
+Defined in: [packages/sdk/src/indexer/schemas.ts:193](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L193)
 
 ## Type declaration
 
@@ -149,5 +162,18 @@ results: {
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: Date;
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
 }[];
 ```

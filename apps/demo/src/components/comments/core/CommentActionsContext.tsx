@@ -35,11 +35,13 @@ export type OnPostCommentParams<TExtra = unknown> = {
         author: Hex;
         parentId: Hex;
         content: string;
+        metadata?: string;
       }
     | {
         author: Hex;
         content: string;
         targetUri: string;
+        metadata?: string;
       };
   /**
    * Query key to a query where comment is stored
@@ -118,14 +120,14 @@ export type CommentActionsContextType<TExtraPostComment = unknown> = {
 };
 
 export const CommentActionsContext =
-  createContext<CommentActionsContextType | null>(null);
+  createContext<CommentActionsContextType<any> | null>(null);
 
-export function CommentActionsProvider({
+export function CommentActionsProvider<TExtraPostComment = unknown>({
   children,
   value,
 }: {
   children: React.ReactNode;
-  value: CommentActionsContextType;
+  value: CommentActionsContextType<TExtraPostComment>;
 }) {
   return (
     <CommentActionsContext.Provider value={value}>
