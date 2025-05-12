@@ -1067,11 +1067,6 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
-    name: "InvalidAuthorAddress",
-    inputs: [],
-  },
-  {
-    type: "error",
     name: "InvalidAuthorSignature",
     inputs: [],
   },
@@ -1262,7 +1257,7 @@ export const ChannelManagerABI = [
         internalType: "uint256",
       },
     ],
-    stateMutability: "payable",
+    stateMutability: "view",
   },
   {
     type: "function",
@@ -2221,11 +2216,6 @@ export const ChannelManagerABI = [
   },
   {
     type: "error",
-    name: "ChannelAlreadyHasHook",
-    inputs: [],
-  },
-  {
-    type: "error",
     name: "ChannelDoesNotExist",
     inputs: [],
   },
@@ -2361,16 +2351,6 @@ export const ChannelManagerABI = [
   {
     type: "error",
     name: "HookInitializationFailed",
-    inputs: [],
-  },
-  {
-    type: "error",
-    name: "HookNotFound",
-    inputs: [],
-  },
-  {
-    type: "error",
-    name: "HookNotRegistered",
     inputs: [],
   },
   {

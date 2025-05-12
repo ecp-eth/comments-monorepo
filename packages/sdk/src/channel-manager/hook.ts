@@ -241,11 +241,10 @@ export type CalculateHookTransactionFeeParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  writeContract: ContractWriteFunctions["calculateHookTransactionFee"];
+  readContract: ContractReadFunctions["calculateHookTransactionFee"];
 };
 
 export type CalculateHookTransactionFeeResult = {
-  txHash: Hex;
   hookValue: bigint;
 };
 
@@ -267,7 +266,7 @@ export async function calculateHookTransactionFee(
   const { value, channelManagerAddress } =
     CalculateHookTransactionFeeParamsSchema.parse(params);
 
-  const txHash = await params.writeContract({
+  const result = await params.readContract({
     address: channelManagerAddress,
     abi: ChannelManagerABI,
     functionName: "calculateHookTransactionFee",
@@ -275,7 +274,6 @@ export async function calculateHookTransactionFee(
   });
 
   return {
-    txHash,
-    hookValue: value,
+    hookValue: result,
   };
 }

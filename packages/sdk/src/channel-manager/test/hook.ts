@@ -181,15 +181,10 @@ describe("calculateHookTransactionFee()", () => {
 
     const result = await calculateHookTransactionFee({
       value,
-      writeContract: client.writeContract,
+      readContract: client.readContract,
       channelManagerAddress,
     });
 
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
     assert.ok(
       result.hookValue <= value,
       "Hook value should be less than or equal to input value"
@@ -201,15 +196,10 @@ describe("calculateHookTransactionFee()", () => {
 
     const result = await calculateHookTransactionFee({
       value,
-      writeContract: client.writeContract,
+      readContract: client.readContract,
       channelManagerAddress,
     });
 
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
     assert.equal(
       result.hookValue,
       value,
@@ -219,15 +209,8 @@ describe("calculateHookTransactionFee()", () => {
 
   it("returns same value when fee percentage is zero", async () => {
     // First set fee to zero
-    await setHookTransactionFee({
+    const result = await setHookTransactionFee({
       feeBasisPoints: 0,
-      writeContract: client.writeContract,
-      channelManagerAddress,
-    });
-
-    const value = parseEther("1.0");
-    const result = await calculateHookTransactionFee({
-      value,
       writeContract: client.writeContract,
       channelManagerAddress,
     });
@@ -237,8 +220,16 @@ describe("calculateHookTransactionFee()", () => {
     });
 
     assert.equal(receipt.status, "success");
+
+    const value = parseEther("1.0");
+    const calculationResult = await calculateHookTransactionFee({
+      value,
+      readContract: client.readContract,
+      channelManagerAddress,
+    });
+
     assert.equal(
-      result.hookValue,
+      calculationResult.hookValue,
       value,
       "Hook value should equal input value when fee is zero"
     );
