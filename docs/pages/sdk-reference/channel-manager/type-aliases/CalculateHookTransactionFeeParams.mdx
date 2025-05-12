@@ -9,8 +9,8 @@
 ```ts
 type CalculateHookTransactionFeeParams = {
   channelManagerAddress?: Hex;
+  readContract: ContractReadFunctions["calculateHookTransactionFee"];
   value: bigint;
-  writeContract: ContractWriteFunctions["calculateHookTransactionFee"];
 };
 ```
 
@@ -36,6 +36,16 @@ CHANNEL_MANAGER_ADDRESS
 
 ***
 
+### readContract
+
+```ts
+readContract: ContractReadFunctions["calculateHookTransactionFee"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:244](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L244)
+
+***
+
 ### value
 
 ```ts
@@ -45,13 +55,3 @@ value: bigint;
 Defined in: [packages/sdk/src/channel-manager/hook.ts:237](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L237)
 
 The total value to calculate fee for
-
-***
-
-### writeContract
-
-```ts
-writeContract: ContractWriteFunctions["calculateHookTransactionFee"];
-```
-
-Defined in: [packages/sdk/src/channel-manager/hook.ts:244](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L244)

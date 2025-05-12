@@ -55,7 +55,7 @@ const ChannelManagerABI: readonly [{
      name: "hookValue";
      type: "uint256";
   }];
-  stateMutability: "payable";
+  stateMutability: "view";
   type: "function";
 }, {
   inputs: readonly [{
@@ -798,10 +798,6 @@ const ChannelManagerABI: readonly [{
   type: "error";
 }, {
   inputs: readonly [];
-  name: "ChannelAlreadyHasHook";
-  type: "error";
-}, {
-  inputs: readonly [];
   name: "ChannelDoesNotExist";
   type: "error";
 }, {
@@ -906,14 +902,6 @@ const ChannelManagerABI: readonly [{
   type: "error";
 }, {
   inputs: readonly [];
-  name: "HookNotFound";
-  type: "error";
-}, {
-  inputs: readonly [];
-  name: "HookNotRegistered";
-  type: "error";
-}, {
-  inputs: readonly [];
   name: "InsufficientFee";
   type: "error";
 }, {
@@ -963,6 +951,6 @@ const ChannelManagerABI: readonly [{
 }];
 ```
 
-Defined in: [packages/sdk/src/abis.ts:1199](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L1199)
+Defined in: [packages/sdk/src/abis.ts:1194](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L1194)
 
 ABI of the ChannelManager contract.

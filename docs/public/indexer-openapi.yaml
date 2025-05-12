@@ -111,7 +111,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        appSigner: {}
+                        app: {}
                         author:
                           type: object
                           properties:
@@ -197,7 +197,7 @@ paths:
                               items:
                                 type: object
                                 properties:
-                                  appSigner: {}
+                                  app: {}
                                   author:
                                     type: object
                                     properties:
@@ -266,7 +266,7 @@ paths:
                                       - string
                                       - 'null'
                                 required:
-                                  - appSigner
+                                  - app
                                   - author
                                   - id
                                   - channelId
@@ -303,7 +303,7 @@ paths:
                             - results
                             - pagination
                       required:
-                        - appSigner
+                        - app
                         - author
                         - id
                         - channelId
@@ -443,7 +443,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        appSigner: {}
+                        app: {}
                         author:
                           type: object
                           properties:
@@ -526,7 +526,7 @@ paths:
                               items:
                                 type: object
                                 properties:
-                                  appSigner: {}
+                                  app: {}
                                   author:
                                     type: object
                                     properties:
@@ -595,7 +595,7 @@ paths:
                                       - string
                                       - 'null'
                                 required:
-                                  - appSigner
+                                  - app
                                   - author
                                   - id
                                   - channelId
@@ -632,7 +632,7 @@ paths:
                             - results
                             - pagination
                       required:
-                        - appSigner
+                        - app
                         - author
                         - id
                         - channelId
@@ -1042,7 +1042,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        appSigner: {}
+                        app: {}
                         author:
                           type: object
                           properties:
@@ -1111,7 +1111,7 @@ paths:
                             - string
                             - 'null'
                       required:
-                        - appSigner
+                        - app
                         - author
                         - id
                         - channelId
@@ -1201,7 +1201,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  appSigner: {}
+                  app: {}
                   author:
                     type: object
                     properties:
@@ -1270,7 +1270,7 @@ paths:
                       - string
                       - 'null'
                 required:
-                  - appSigner
+                  - app
                   - author
                   - id
                   - channelId
@@ -1341,7 +1341,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  appSigner: {}
+                  app: {}
                   author:
                     type: object
                     properties:
@@ -1410,7 +1410,7 @@ paths:
                       - string
                       - 'null'
                 required:
-                  - appSigner
+                  - app
                   - author
                   - id
                   - channelId
