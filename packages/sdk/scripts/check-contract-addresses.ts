@@ -2,7 +2,7 @@ import process from "node:process";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { COMMENT_MANAGER_ADDRESS, CHANNEL_MANAGER_ADDRESS } from "@ecp.eth/sdk";
-import { deployContracts } from "./test-helpers.ts";
+import { deployContractsAsync } from "./test-helpers.ts";
 
 async function startAnvil() {
   const cwd = path.resolve(import.meta.dirname, "../../protocol");
@@ -63,13 +63,20 @@ async function startAnvil() {
 }
 
 async function checkContractAddresses() {
-  const killProcess = await startAnvil();
-  const deployResult = deployContracts();
-
   function exit(code: number) {
     killProcess();
     process.exit(code);
   }
+
+  const killProcess = await startAnvil();
+
+  process.on("uncaughtException", (e) => {
+    console.error(e);
+    killProcess();
+    process.exit(1);
+  });
+
+  const deployResult = await deployContractsAsync("dev");
 
   if (
     deployResult.channelManagerAddress !== CHANNEL_MANAGER_ADDRESS ||
@@ -83,6 +90,8 @@ async function checkContractAddresses() {
     exit(1);
     return;
   }
+
+  console.log("Contract addresses are good");
 
   exit(0);
 }
