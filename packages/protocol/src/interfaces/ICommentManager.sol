@@ -68,7 +68,7 @@ interface ICommentManager {
     /// @param commentData The comment data struct containing content and metadata
     /// @param appSignature Signature from the app signer authorizing the comment
     function postCommentAsAuthor(
-        Comments.CommentData calldata commentData,
+        Comments.CreateCommentData calldata commentData,
         bytes calldata appSignature
     ) external payable;
 
@@ -77,7 +77,7 @@ interface ICommentManager {
     /// @param authorSignature Signature from the author authorizing the comment
     /// @param appSignature Signature from the app signer authorizing the comment
     function postComment(
-        Comments.CommentData calldata commentData,
+        Comments.CreateCommentData calldata commentData,
         bytes calldata authorSignature,
         bytes calldata appSignature
     ) external payable;
@@ -185,7 +185,7 @@ interface ICommentManager {
     /// @param commentData The comment data struct to hash
     /// @return bytes32 The computed hash
     function getCommentId(
-        Comments.CommentData memory commentData
+        Comments.CreateCommentData memory commentData
     ) external view returns (bytes32);
 
     /// @notice Get comment data by ID

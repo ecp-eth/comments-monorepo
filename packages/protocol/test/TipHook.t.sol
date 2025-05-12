@@ -36,15 +36,21 @@ contract TipHook is BaseHook {
         comments = CommentManager(_comments);
     }
 
-    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            beforeInitialize: false,
-            afterInitialize: false,
-            beforeComment: true,
-            afterComment: true,
-            beforeDeleteComment: false,
-            afterDeleteComment: false
-        });
+    function _getHookPermissions()
+        internal
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                beforeInitialize: false,
+                afterInitialize: false,
+                beforeComment: true,
+                afterComment: true,
+                beforeDeleteComment: false,
+                afterDeleteComment: false
+            });
     }
 
     /// @notice Execute before a comment is processed to handle ETH tips
@@ -63,7 +69,7 @@ contract TipHook is BaseHook {
         }
 
         // Get the parent comment's author
-        (address parentAuthor, , , , , , , , , ) = comments.comments(
+        (address parentAuthor, , , , , , , , , , , ) = comments.comments(
             commentData.parentId
         );
 
@@ -300,8 +306,8 @@ abstract contract TipHookTest is Test, IERC721Receiver {
     /// @notice Test successful tip processing in a reply comment
     function testTipInReplyComment() public {
         // --- Parent Comment Setup ---
-        Comments.CommentData memory parentCommentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory parentCommentData = Comments
+            .CreateCommentData({
                 content: "Parent comment",
                 metadata: "{}",
                 targetUri: "",
@@ -324,8 +330,8 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         // --- Reply Comment Setup (With Tip Mention) ---
         uint256 tipAmount = 0.1 ether;
 
-        Comments.CommentData memory replyCommentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory replyCommentData = Comments
+            .CreateCommentData({
                 content: string(
                     abi.encodePacked(
                         "Reply with tip !",
@@ -359,8 +365,8 @@ abstract contract TipHookTest is Test, IERC721Receiver {
 
     /// @notice Test that hook reverts when sent ETH amount doesn't match mentioned amount
     function testRevertWhenTipAmountMismatch() public {
-        Comments.CommentData memory parentCommentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory parentCommentData = Comments
+            .CreateCommentData({
                 content: "Parent comment",
                 metadata: "{}",
                 targetUri: "",
@@ -379,8 +385,8 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         bytes32 parentCommentId = comments.getCommentId(parentCommentData);
 
         // --- Reply Comment Setup (With Tip Mention) ---
-        Comments.CommentData memory replyCommentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory replyCommentData = Comments
+            .CreateCommentData({
                 content: string(
                     abi.encodePacked(
                         "Reply with tip !",
@@ -408,8 +414,8 @@ abstract contract TipHookTest is Test, IERC721Receiver {
     /// @notice Test that hook reverts when tip syntax is invalid
     function testRevertWhenTipSyntaxInvalid() public {
         // --- Parent Comment Setup ---
-        Comments.CommentData memory parentCommentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory parentCommentData = Comments
+            .CreateCommentData({
                 content: "Parent comment",
                 metadata: "{}",
                 targetUri: "",
@@ -428,8 +434,8 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         bytes32 parentCommentId = comments.getCommentId(parentCommentData);
 
         // --- Reply Comment Setup (With Invalid Tip Syntax) ---
-        Comments.CommentData memory replyCommentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory replyCommentData = Comments
+            .CreateCommentData({
                 content: string(
                     abi.encodePacked(
                         "Reply with invalid tip syntax !",
@@ -457,8 +463,8 @@ abstract contract TipHookTest is Test, IERC721Receiver {
     /// @notice Test that no tip is processed when no tip is mentioned
     function testNoTipWithoutMention() public {
         // --- Parent Comment Setup ---
-        Comments.CommentData memory parentCommentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory parentCommentData = Comments
+            .CreateCommentData({
                 content: "Parent comment",
                 metadata: "{}",
                 targetUri: "",
@@ -479,8 +485,8 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         uint256 initialBalance = user1.balance;
 
         // --- Reply Comment Setup (No Tip Mention) ---
-        Comments.CommentData memory replyCommentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory replyCommentData = Comments
+            .CreateCommentData({
                 content: "Regular reply without tip", // No tip mention
                 metadata: "{}",
                 targetUri: "",

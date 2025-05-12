@@ -63,7 +63,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     /// @inheritdoc ICommentManager
     function postCommentAsAuthor(
-        Comments.CommentData calldata commentData,
+        Comments.CreateCommentData calldata commentData,
         bytes calldata appSignature
     ) external payable {
         _postComment(commentData, bytes(""), appSignature);
@@ -71,7 +71,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     /// @inheritdoc ICommentManager
     function postComment(
-        Comments.CommentData calldata commentData,
+        Comments.CreateCommentData calldata commentData,
         bytes calldata authorSignature,
         bytes calldata appSignature
     ) external payable {
@@ -83,7 +83,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     /// @param authorSignature Signature from the author (empty if called via postCommentAsAuthor)
     /// @param appSignature Signature from the app signer
     function _postComment(
-        Comments.CommentData calldata commentData,
+        Comments.CreateCommentData calldata commentData,
         bytes memory authorSignature,
         bytes memory appSignature
     ) internal nonReentrant {
@@ -111,10 +111,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         }
 
         // Validate nonce
-        if (
-            nonces[commentData.author][commentData.app] !=
-            commentData.nonce
-        ) {
+        if (nonces[commentData.author][commentData.app] != commentData.nonce) {
             revert InvalidNonce(
                 commentData.author,
                 commentData.app,
@@ -150,6 +147,21 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             _validateSignature(authorSignature);
         }
 
+        Comments.CommentData memory comment = Comments.CommentData({
+            author: commentData.author,
+            app: commentData.app,
+            channelId: commentData.channelId,
+            parentId: commentData.parentId,
+            content: commentData.content,
+            metadata: commentData.metadata,
+            targetUri: commentData.targetUri,
+            commentType: commentData.commentType,
+            createdAt: uint80(block.timestamp),
+            updatedAt: uint80(block.timestamp),
+            nonce: commentData.nonce,
+            deadline: commentData.deadline
+        });
+
         if (
             msg.sender == commentData.author ||
             isApproved[commentData.author][commentData.app] ||
@@ -162,8 +174,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         ) {
             // Execute channel-specific hooks before comment
             bool hookSuccess = channelManager.executeHook{value: msg.value}(
-                commentData.channelId,
-                commentData,
+                comment.channelId,
+                comment,
                 msg.sender,
                 commentId,
                 Hooks.HookPhase.BeforeComment
@@ -174,12 +186,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                 );
 
             // Store comment data on-chain
-            comments[commentId] = commentData;
+            comments[commentId] = comment;
 
             // Execute channel-specific hooks after comment
             hookSuccess = channelManager.executeHook(
-                commentData.channelId,
-                commentData,
+                comment.channelId,
+                comment,
                 msg.sender,
                 commentId,
                 Hooks.HookPhase.AfterComment
@@ -187,12 +199,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             if (!hookSuccess)
                 revert ChannelHookExecutionFailed(Hooks.HookPhase.AfterComment);
 
-            emit CommentAdded(
-                commentId,
-                commentData.author,
-                commentData.app,
-                commentData
-            );
+            emit CommentAdded(commentId, comment.author, comment.app, comment);
             return;
         }
 
@@ -222,12 +229,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         }
 
         if (nonces[author][app] != nonce) {
-            revert InvalidNonce(
-                author,
-                app,
-                nonces[author][app],
-                nonce
-            );
+            revert InvalidNonce(author, app, nonces[author][app], nonce);
         }
 
         Comments.CommentData storage comment = comments[commentId];
@@ -245,11 +247,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         if (
             isApproved[author][app] &&
-            SignatureChecker.isValidSignatureNow(
-                app,
-                deleteHash,
-                appSignature
-            )
+            SignatureChecker.isValidSignatureNow(app, deleteHash, appSignature)
         ) {
             _deleteComment(commentId, author);
             return;
@@ -350,12 +348,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         }
 
         if (nonces[author][app] != nonce) {
-            revert InvalidNonce(
-                author,
-                app,
-                nonces[author][app],
-                nonce
-            );
+            revert InvalidNonce(author, app, nonces[author][app], nonce);
         }
 
         nonces[author][app]++;
@@ -393,12 +386,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         }
 
         if (nonces[author][app] != nonce) {
-            revert InvalidNonce(
-                author,
-                app,
-                nonces[author][app],
-                nonce
-            );
+            revert InvalidNonce(author, app, nonces[author][app], nonce);
         }
 
         nonces[author][app]++;
@@ -431,13 +419,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         uint256 deadline
     ) public view returns (bytes32) {
         bytes32 structHash = keccak256(
-            abi.encode(
-                ADD_APPROVAL_TYPEHASH,
-                author,
-                app,
-                nonce,
-                deadline
-            )
+            abi.encode(ADD_APPROVAL_TYPEHASH, author, app, nonce, deadline)
         );
 
         return
@@ -454,13 +436,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         uint256 deadline
     ) public view returns (bytes32) {
         bytes32 structHash = keccak256(
-            abi.encode(
-                REMOVE_APPROVAL_TYPEHASH,
-                author,
-                app,
-                nonce,
-                deadline
-            )
+            abi.encode(REMOVE_APPROVAL_TYPEHASH, author, app, nonce, deadline)
         );
 
         return
@@ -496,7 +472,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     /// @inheritdoc ICommentManager
     function getCommentId(
-        Comments.CommentData memory commentData
+        Comments.CreateCommentData memory commentData
     ) public view returns (bytes32) {
         bytes32 structHash = keccak256(
             abi.encode(

@@ -18,6 +18,8 @@ library Comments {
         // Pack these two addresses together (saves 1 storage slot)
         address author; // 20 bytes
         address app; // 20 bytes
+        uint80 createdAt;
+        uint80 updatedAt;
         // 32-byte types
         uint256 channelId;
         uint256 nonce;
@@ -29,4 +31,18 @@ library Comments {
         string targetUri;
         string commentType;
     }
-} 
+
+    struct CreateCommentData {
+        address author;
+        address app;
+        uint256 channelId;
+        uint256 nonce;
+        uint256 deadline;
+        bytes32 parentId;
+        // Dynamic types last (conventional pattern)
+        string content;
+        string metadata;
+        string targetUri;
+        string commentType;
+    }
+}
