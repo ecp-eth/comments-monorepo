@@ -100,7 +100,7 @@ export type ContractWriteFunctions = {
   calculateHookTransactionFee: (
     args: ContractFunctionParameters<
       ChannelManagerABIType,
-      "payable",
+      "view",
       "calculateHookTransactionFee"
     > & {
       value?: bigint;
