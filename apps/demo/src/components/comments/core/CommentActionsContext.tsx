@@ -125,7 +125,7 @@ export function CommentActionsProvider({
   value,
 }: {
   children: React.ReactNode;
-  value: CommentActionsContextType;
+  value: CommentActionsContextType<any>;
 }) {
   return (
     <CommentActionsContext.Provider value={value}>

@@ -5,14 +5,15 @@ import type {
   OnPostComment,
   OnRetryPostComment,
 } from "../../core/CommentActionsContext";
-import { concat, type Hex, numberToHex, size } from "viem";
+import { concat, type Hex, encodeFunctionData, numberToHex, size } from "viem";
 import {
   useSendTransaction,
   useSwitchChain,
   useSignTypedData,
   useConfig,
+  useSendCalls,
 } from "wagmi";
-import { waitForTransactionReceipt } from "@wagmi/core";
+import { waitForCallsStatus, waitForTransactionReceipt } from "@wagmi/core";
 import {
   useCommentDeletion,
   useCommentSubmission,
@@ -23,6 +24,7 @@ import type { QuoteResponseLiquidityAvailableSchemaType } from "../0x/schemas";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { useDeleteComment } from "@ecp.eth/sdk/comments/react";
 import { useCommentActions as useStandardCommentActions } from "../../standard/hooks/useCommentActions";
+import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
 
 export type SwapWithCommentExtra = {
   quote: QuoteResponseLiquidityAvailableSchemaType;
@@ -39,6 +41,7 @@ export function useCommentActions({
     connectedAddress,
   });
   const wagmiConfig = useConfig();
+  const { sendCallsAsync } = useSendCalls();
   const { sendTransactionAsync } = useSendTransaction();
   const { switchChainAsync } = useSwitchChain();
   const { signTypedDataAsync } = useSignTypedData();
@@ -139,27 +142,30 @@ export function useCommentActions({
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        async writeContractAsync({ chainId }) {
-          // TODO: to be replaced with EIP 7702
-          // const commentDataSuffix = createCommentSuffixData({
-          //   commentData: _params.data,
-          //   appSignature: _params.signature,
-          // });
-
-          quote.transaction.data = concat([
-            transactionData,
-            sigLengthHex,
-            sig,
-            // commentDataSuffix,
-          ]);
-
-          return sendTransactionAsync({
-            account: params.address,
-            to: quote.transaction.to,
-            data: quote.transaction.data,
-            value: quote.transaction.value,
-            chainId,
+        async writeContractAsync({ signCommentResponse }) {
+          const { id } = await sendCallsAsync({
+            calls: [
+              {
+                to: COMMENT_MANAGER_ADDRESS,
+                data: encodeFunctionData({
+                  abi: CommentManagerABI,
+                  functionName: "postComment",
+                  args: [
+                    signCommentResponse.data,
+                    signCommentResponse.signature,
+                  ],
+                }),
+              },
+              {
+                to: quote.transaction.to,
+                data: concat([transactionData, sigLengthHex, sig]),
+                value: quote.transaction.value,
+              },
+            ],
+            forceAtomic: true,
           });
+
+          return id as Hex;
         },
       });
 
@@ -171,8 +177,8 @@ export function useCommentActions({
 
         params.onStart?.();
 
-        const receipt = await waitForTransactionReceipt(wagmiConfig, {
-          hash: pendingOperation.txHash,
+        const receipt = await waitForCallsStatus(wagmiConfig, {
+          id: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
 

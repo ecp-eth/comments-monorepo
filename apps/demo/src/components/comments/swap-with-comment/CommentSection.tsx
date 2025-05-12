@@ -16,12 +16,16 @@ import {
 import type { Hex } from "viem";
 import { CommentForm } from "./CommentForm";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
-import { useAccount } from "wagmi";
+import { useAccount, useCapabilities, useChainId } from "wagmi";
 import { CommentItem } from "../core/CommentItem";
 import { createRootCommentsQueryKey } from "../core/queries";
+import { CommentActionsProvider } from "../core/CommentActionsContext";
+import { useCommentActions } from "./hooks/useCommentActions";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
+  const chainId = useChainId();
+  const { data: capabilities } = useCapabilities();
   const isAccountStatusResolved = useIsAccountStatusResolved();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
@@ -87,45 +91,59 @@ export function CommentSection() {
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
 
+  const commentActions = useCommentActions({
+    connectedAddress: viewer,
+  });
+
   const results = useMemo(() => {
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
+  const isEIP7702Supported =
+    !!capabilities && capabilities[chainId]?.atomic?.status === "supported";
+
   return (
-    <CommentSectionWrapper>
-      <h2 className="text-lg font-semibold mb-4">Comments</h2>
-      <CommentForm />
-      {error && <div>Error loading comments: {(error as Error).message}</div>}
-      {isSuccess && (
-        <>
-          {hasNewComments && (
-            <Button
-              className="mb-4"
-              onClick={() => fetchNewComments()}
-              variant="secondary"
-              size="sm"
-            >
-              Load new comments
-            </Button>
-          )}
-          {results.map((comment) => (
-            <CommentItem
-              key={`${comment.id}-${comment.deletedAt}`}
-              comment={comment}
-              connectedAddress={viewer}
-            />
-          ))}
-          {hasNextPage && (
-            <Button
-              onClick={() => fetchNextPage()}
-              variant="secondary"
-              size="sm"
-            >
-              Load More
-            </Button>
-          )}
-        </>
-      )}
-    </CommentSectionWrapper>
+    <CommentActionsProvider value={commentActions}>
+      <CommentSectionWrapper>
+        <h2 className="text-lg font-semibold mb-4">Comments</h2>
+        {!isEIP7702Supported && (
+          <div className="text-red-500">
+            Your wallet doesn't support atomic transactions
+          </div>
+        )}
+        <CommentForm disabled={!isEIP7702Supported} />
+        {error && <div>Error loading comments: {(error as Error).message}</div>}
+        {isSuccess && (
+          <>
+            {hasNewComments && (
+              <Button
+                className="mb-4"
+                onClick={() => fetchNewComments()}
+                variant="secondary"
+                size="sm"
+              >
+                Load new comments
+              </Button>
+            )}
+            {results.map((comment) => (
+              <CommentItem
+                key={`${comment.id}-${comment.deletedAt}`}
+                comment={comment}
+                connectedAddress={viewer}
+              />
+            ))}
+            {hasNextPage && (
+              <Button
+                onClick={() => fetchNextPage()}
+                variant="secondary"
+                size="sm"
+              >
+                Load More
+              </Button>
+            )}
+          </>
+        )}
+      </CommentSectionWrapper>
+    </CommentActionsProvider>
   );
 }
