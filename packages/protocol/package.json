@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build:abi": "node ./build-abi.js",
-    "test": "forge test -vvv",
+    "test": "forge test -vvv --via-ir --optimizer-runs 1",
     "debug:gas": "forge script script/debug.s.sol:DebugGasUsage",
     "node": "anvil --block-time 2",
     "dev": "node dev.js",
