@@ -159,6 +159,16 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
+        name: "createdAt",
+        type: "uint80",
+        internalType: "uint80",
+      },
+      {
+        name: "updatedAt",
+        type: "uint80",
+        internalType: "uint80",
+      },
+      {
         name: "channelId",
         type: "uint256",
         internalType: "uint256",
@@ -337,6 +347,16 @@ export const CommentManagerABI = [
             internalType: "address",
           },
           {
+            name: "createdAt",
+            type: "uint80",
+            internalType: "uint80",
+          },
+          {
+            name: "updatedAt",
+            type: "uint80",
+            internalType: "uint80",
+          },
+          {
             name: "channelId",
             type: "uint256",
             internalType: "uint256",
@@ -388,7 +408,7 @@ export const CommentManagerABI = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct Comments.CommentData",
+        internalType: "struct Comments.CreateCommentData",
         components: [
           {
             name: "author",
@@ -619,7 +639,7 @@ export const CommentManagerABI = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct Comments.CommentData",
+        internalType: "struct Comments.CreateCommentData",
         components: [
           {
             name: "author",
@@ -694,7 +714,7 @@ export const CommentManagerABI = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct Comments.CommentData",
+        internalType: "struct Comments.CreateCommentData",
         components: [
           {
             name: "author",
@@ -924,6 +944,16 @@ export const CommentManagerABI = [
             name: "app",
             type: "address",
             internalType: "address",
+          },
+          {
+            name: "createdAt",
+            type: "uint80",
+            internalType: "uint80",
+          },
+          {
+            name: "updatedAt",
+            type: "uint80",
+            internalType: "uint80",
           },
           {
             name: "channelId",
@@ -1361,6 +1391,16 @@ export const ChannelManagerABI = [
             name: "app",
             type: "address",
             internalType: "address",
+          },
+          {
+            name: "createdAt",
+            type: "uint80",
+            internalType: "uint80",
+          },
+          {
+            name: "updatedAt",
+            type: "uint80",
+            internalType: "uint80",
           },
           {
             name: "channelId",
