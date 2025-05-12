@@ -181,15 +181,10 @@ describe("calculateHookTransactionFee()", () => {
 
     const result = await calculateHookTransactionFee({
       value,
-      writeContract: client.writeContract,
+      readContract: client.readContract,
       channelManagerAddress,
     });
 
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
     assert.ok(
       result.hookValue <= value,
       "Hook value should be less than or equal to input value"
@@ -201,15 +196,10 @@ describe("calculateHookTransactionFee()", () => {
 
     const result = await calculateHookTransactionFee({
       value,
-      writeContract: client.writeContract,
+      readContract: client.readContract,
       channelManagerAddress,
     });
 
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
     assert.equal(
       result.hookValue,
       value,
@@ -228,15 +218,10 @@ describe("calculateHookTransactionFee()", () => {
     const value = parseEther("1.0");
     const result = await calculateHookTransactionFee({
       value,
-      writeContract: client.writeContract,
+      readContract: client.readContract,
       channelManagerAddress,
     });
 
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
     assert.equal(
       result.hookValue,
       value,

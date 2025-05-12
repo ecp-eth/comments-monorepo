@@ -96,16 +96,6 @@ export type ContractWriteFunctions = {
       value?: bigint;
     }
   ) => Promise<Hex>;
-
-  calculateHookTransactionFee: (
-    args: ContractFunctionParameters<
-      ChannelManagerABIType,
-      "view",
-      "calculateHookTransactionFee"
-    > & {
-      value?: bigint;
-    }
-  ) => Promise<Hex>;
 };
 
 export type ContractReadFunctions = {
@@ -133,5 +123,14 @@ export type ContractReadFunctions = {
     args: ReadContractParameters<ChannelManagerABIType, "getHookTransactionFee">
   ) => Promise<
     ReadContractReturnType<ChannelManagerABIType, "getHookTransactionFee">
+  >;
+
+  calculateHookTransactionFee: (
+    args: ReadContractParameters<
+      ChannelManagerABIType,
+      "calculateHookTransactionFee"
+    >
+  ) => Promise<
+    ReadContractReturnType<ChannelManagerABIType, "calculateHookTransactionFee">
   >;
 };
