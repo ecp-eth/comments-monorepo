@@ -100,11 +100,8 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
         if (msg.value < requiredFee) revert IChannelManager.InsufficientFee();
 
         if (msg.value > requiredFee) {
-            // Refund excess payment
-            (bool success, ) = msg.sender.call{value: msg.value - requiredFee}(
-                ""
-            );
-            require(success, "Refund failed");
+            // Refund excess payment using transfer for safety
+            payable(msg.sender).transfer(msg.value - requiredFee);
         }
 
         return requiredFee;

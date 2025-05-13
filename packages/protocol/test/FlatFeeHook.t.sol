@@ -6,6 +6,7 @@ import {ChannelManager} from "../src/ChannelManager.sol";
 import {CommentManager} from "../src/CommentManager.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {TestUtils} from "./utils.sol";
 import {BaseHook} from "../src/hooks/BaseHook.sol";
 import {Hooks} from "../src/libraries/Hooks.sol";
@@ -67,8 +68,7 @@ contract FlatFeeHook is BaseHook {
         uint256 refundAmount = pendingRefunds[commentData.author];
         if (refundAmount > 0) {
             delete pendingRefunds[commentData.author];
-            (bool success, ) = commentData.author.call{value: refundAmount}("");
-            require(success, "Refund failed");
+            payable(commentData.author).transfer(refundAmount);
             emit RefundIssued(commentData.author, refundAmount);
         }
         return true;
@@ -81,8 +81,7 @@ contract FlatFeeHook is BaseHook {
         uint256 amount = totalFeesCollected;
         totalFeesCollected = 0;
 
-        (bool success, ) = feeCollector.call{value: amount}("");
-        require(success, "Fee withdrawal failed");
+        payable(feeCollector).transfer(amount);
         emit FeeWithdrawn(feeCollector, amount);
     }
 }

@@ -85,10 +85,7 @@ contract TipHook is BaseHook {
                 parentAuthor,
                 msg.value
             );
-            (bool success, ) = parentAuthor.call{value: msg.value}("");
-            if (!success) {
-                revert TipTransferFailed();
-            }
+            payable(parentAuthor).transfer(msg.value);
         } else if (msg.value > 0) {
             revert InvalidTipSyntax(
                 "ETH was sent but no valid tip mention was found"
