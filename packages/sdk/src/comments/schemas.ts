@@ -107,7 +107,7 @@ export const AddCommentTypedDataSchema = z.object({
     chainId: z.number(),
     verifyingContract: HexSchema,
   }),
-  message: CommentDataSchema,
+  message: CreateCommentDataSchema,
   types: z.object({
     AddComment: z.array(
       z.union([
