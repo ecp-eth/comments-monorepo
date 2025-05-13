@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { SignTypedDataParameters } from "viem";
 import { useSignTypedData } from "wagmi";
 import type { Hex } from "../../core/schemas.js";
+import { SignTypedDataVariables } from "wagmi/query";
 
 /**
  * A hook for repeat gasless transaction pattern
@@ -21,8 +21,7 @@ export function useGaslessTransaction<
   TVariables extends object | undefined,
   TReturnValue,
   TInputVariables = void,
-  TSignTypedDataParams extends
-    SignTypedDataParameters = SignTypedDataParameters,
+  TSignTypedDataParams extends SignTypedDataVariables = SignTypedDataVariables,
 >(props: {
   prepareSignTypedDataParams: (variables: TInputVariables) => Promise<
     | TSignTypedDataParams
