@@ -28,6 +28,9 @@ export const CommentDataSchema = z.object({
   metadata: z.string(),
   targetUri: z.string(),
   commentType: z.string(),
+
+  createdAt: z.coerce.bigint(),
+  updatedAt: z.coerce.bigint(),
 });
 
 // this just tests if the shape is correct
