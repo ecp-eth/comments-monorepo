@@ -24,6 +24,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         keccak256(
             "DeleteComment(bytes32 commentId,address author,address app,uint256 nonce,uint256 deadline)"
         );
+    bytes32 public constant EDIT_COMMENT_TYPEHASH =
+        keccak256(
+            "EditComment(bytes32 commentId,string content,string metadata,address app,uint256 nonce,uint256 deadline)"
+        );
     bytes32 public constant ADD_APPROVAL_TYPEHASH =
         keccak256(
             "AddApproval(address author,address app,uint256 nonce,uint256 deadline)"
@@ -207,6 +211,98 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     }
 
     /// @inheritdoc ICommentManager
+    function editCommentAsAuthor(
+        bytes32 commentId,
+        Comments.EditCommentData calldata editData,
+        bytes calldata appSignature
+    ) external {
+        _editComment(commentId, editData, bytes(""), appSignature);
+    }
+
+    /// @inheritdoc ICommentManager
+    function editComment(
+        bytes32 commentId,
+        Comments.EditCommentData calldata editData,
+        bytes calldata authorSignature,
+        bytes calldata appSignature
+    ) external {
+        _editComment(commentId, editData, authorSignature, appSignature);
+    }
+
+    /// @notice Internal function to handle comment editing logic
+    /// @param commentId The unique identifier of the comment to edit
+    /// @param editData The comment data struct containing content and metadata
+    /// @param authorSignature Signature from the author (empty if called via editCommentAsAuthor)
+    /// @param appSignature Signature from the app signer
+    function _editComment(
+        bytes32 commentId,
+        Comments.EditCommentData calldata editData,
+        bytes memory authorSignature,
+        bytes memory appSignature
+    ) internal {
+        if (block.timestamp > editData.deadline) {
+            revert SignatureDeadlineReached(editData.deadline, block.timestamp);
+        }
+
+        Comments.CommentData storage comment = comments[commentId];
+
+        require(comment.author != address(0), "Comment does not exist");
+
+        // Validate nonce
+        if (nonces[comment.author][editData.app] != editData.nonce) {
+            revert InvalidNonce(
+                comment.author,
+                editData.app,
+                nonces[comment.author][editData.app],
+                editData.nonce
+            );
+        }
+
+        nonces[comment.author][editData.app]++;
+
+        bytes32 editHash = getEditCommentHash(commentId, editData);
+
+        // Validate signatures if present
+        if (appSignature.length > 0) {
+            _validateSignature(appSignature);
+            if (
+                !SignatureChecker.isValidSignatureNow(
+                    // @QUESTION do we want to allow any app to edit a comment?
+                    editData.app,
+                    editHash,
+                    appSignature
+                )
+            ) {
+                revert InvalidAppSignature();
+            }
+        }
+
+        if (authorSignature.length > 0) {
+            _validateSignature(authorSignature);
+        }
+
+        if (
+            msg.sender != comment.author &&
+            !isApproved[comment.author][editData.app] &&
+            !(authorSignature.length > 0 &&
+                SignatureChecker.isValidSignatureNow(
+                    comment.author,
+                    editHash,
+                    authorSignature
+                ))
+        ) {
+            revert NotAuthorized(msg.sender, comment.author);
+        }
+
+        // @QUESTION do we want to update also app?
+        comment.content = editData.content;
+        comment.metadata = editData.metadata;
+        comment.updatedAt = uint80(block.timestamp);
+
+        emit CommentEdited(commentId, comment.author, editData.app, comment);
+    }
+
+    /// @inheritdoc ICommentManager
     function deleteCommentAsAuthor(bytes32 commentId) external {
         Comments.CommentData storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
@@ -234,7 +330,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         Comments.CommentData storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
-        require(comment.author == author, "Author does not match comment author");
+        require(
+            comment.author == author,
+            "Author does not match comment author"
+        );
         nonces[author][app]++;
 
         bytes32 deleteHash = getDeleteCommentHash(
@@ -462,6 +561,21 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                 nonce,
                 deadline
             )
+        );
+
+        return
+            keccak256(
+                abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash)
+            );
+    }
+
+    /// @inheritdoc ICommentManager
+    function getEditCommentHash(
+        bytes32 commentId,
+        Comments.EditCommentData calldata editData
+    ) public view returns (bytes32) {
+        bytes32 structHash = keccak256(
+            abi.encode(EDIT_COMMENT_TYPEHASH, commentId, editData)
         );
 
         return
