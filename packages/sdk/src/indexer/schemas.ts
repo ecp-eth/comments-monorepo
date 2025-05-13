@@ -74,7 +74,8 @@ const dateToString = z.coerce.date().transform((val) => val.toISOString());
 
 export const IndexerAPICommentOutputSchema = IndexerAPICommentSchema.extend({
   channelId: bigintToString,
-  timestamp: dateToString,
+  createdAt: dateToString,
+  updatedAt: dateToString,
   moderationStatusChangedAt: dateToString,
   deletedAt: dateToString.nullable(),
 });

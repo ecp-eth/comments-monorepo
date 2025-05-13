@@ -100,7 +100,7 @@ export const InputCommentCursorSchema = z.preprocess((value, ctx) => {
     const parsed = HexSchema.parse(value);
     const hex = hexToString(parsed);
     const [createdAt, id] = z
-      .tuple([z.coerce.date(), HexSchema])
+      .tuple([z.coerce.number().positive(), HexSchema])
       .parse(hex.split(":"));
 
     return {
