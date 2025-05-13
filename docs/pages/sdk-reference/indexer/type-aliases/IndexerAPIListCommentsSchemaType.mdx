@@ -37,6 +37,7 @@ type IndexerAPIListCommentsSchemaType = {
      channelId: bigint;
      commentType: string;
      content: string;
+     createdAt: Date;
      cursor: `0x${string}`;
      deletedAt: null | Date;
      id: `0x${string}`;
@@ -75,6 +76,7 @@ type IndexerAPIListCommentsSchemaType = {
            channelId: bigint;
            commentType: string;
            content: string;
+           createdAt: Date;
            cursor: `0x${string}`;
            deletedAt: null | Date;
            id: `0x${string}`;
@@ -84,18 +86,18 @@ type IndexerAPIListCommentsSchemaType = {
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
            targetUri: string;
-           timestamp: Date;
            txHash: `0x${string}`;
+           updatedAt: Date;
         }[];
      };
      targetUri: string;
-     timestamp: Date;
      txHash: `0x${string}`;
+     updatedAt: Date;
   }[];
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:145](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L145)
+Defined in: [packages/sdk/src/indexer/schemas.ts:147](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L147)
 
 ## Type declaration
 
@@ -177,6 +179,7 @@ results: {
   channelId: bigint;
   commentType: string;
   content: string;
+  createdAt: Date;
   cursor: `0x${string}`;
   deletedAt: null | Date;
   id: `0x${string}`;
@@ -215,6 +218,7 @@ results: {
         channelId: bigint;
         commentType: string;
         content: string;
+        createdAt: Date;
         cursor: `0x${string}`;
         deletedAt: null | Date;
         id: `0x${string}`;
@@ -224,12 +228,12 @@ results: {
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
         targetUri: string;
-        timestamp: Date;
         txHash: `0x${string}`;
+        updatedAt: Date;
      }[];
   };
   targetUri: string;
-  timestamp: Date;
   txHash: `0x${string}`;
+  updatedAt: Date;
 }[];
 ```

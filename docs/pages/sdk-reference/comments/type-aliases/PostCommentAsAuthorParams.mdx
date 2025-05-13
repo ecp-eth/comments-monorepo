@@ -9,14 +9,14 @@
 ```ts
 type PostCommentAsAuthorParams = {
   appSignature: Hex;
-  comment: CommentData;
+  comment: CommentInputData;
   commentsAddress?: Hex;
   fee?: bigint;
   writeContract: ContractWriteFunctions["postCommentAsAuthor"];
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:37](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L37)
+Defined in: [packages/sdk/src/comments/comment.ts:36](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L36)
 
 ## Properties
 
@@ -26,7 +26,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:37](https://github.com/ecp-eth
 appSignature: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:47](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L47)
+Defined in: [packages/sdk/src/comments/comment.ts:46](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L46)
 
 The app signature
 
@@ -35,10 +35,10 @@ The app signature
 ### comment
 
 ```ts
-comment: CommentData;
+comment: CommentInputData;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:43](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L43)
+Defined in: [packages/sdk/src/comments/comment.ts:42](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L42)
 
 The comment data
 
@@ -52,7 +52,7 @@ You can obtain this by using the `createCommentData()` function
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:56](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L56)
+Defined in: [packages/sdk/src/comments/comment.ts:55](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L55)
 
 The address of the comments contract
 
@@ -70,7 +70,7 @@ COMMENT_MANAGER_ADDRESS
 optional fee: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:51](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L51)
+Defined in: [packages/sdk/src/comments/comment.ts:50](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L50)
 
 The fee for the comment
 
@@ -82,6 +82,6 @@ The fee for the comment
 writeContract: ContractWriteFunctions["postCommentAsAuthor"];
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:60](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L60)
+Defined in: [packages/sdk/src/comments/comment.ts:59](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L59)
 
 The write contract function

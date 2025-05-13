@@ -26,6 +26,7 @@ type IndexerAPICommentWithRepliesSchemaType = {
   channelId: bigint;
   commentType: string;
   content: string;
+  createdAt: Date;
   cursor: `0x${string}`;
   deletedAt: null | Date;
   id: `0x${string}`;
@@ -64,6 +65,7 @@ type IndexerAPICommentWithRepliesSchemaType = {
         channelId: bigint;
         commentType: string;
         content: string;
+        createdAt: Date;
         cursor: `0x${string}`;
         deletedAt: null | Date;
         id: `0x${string}`;
@@ -73,17 +75,17 @@ type IndexerAPICommentWithRepliesSchemaType = {
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
         targetUri: string;
-        timestamp: Date;
         txHash: `0x${string}`;
+        updatedAt: Date;
      }[];
   };
   targetUri: string;
-  timestamp: Date;
   txHash: `0x${string}`;
+  updatedAt: Date;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:122](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L122)
+Defined in: [packages/sdk/src/indexer/schemas.ts:124](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L124)
 
 ## Type declaration
 
@@ -197,6 +199,12 @@ commentType: string;
 content: string;
 ```
 
+### createdAt
+
+```ts
+createdAt: Date;
+```
+
 ### cursor
 
 ```ts
@@ -278,6 +286,7 @@ replies: {
      channelId: bigint;
      commentType: string;
      content: string;
+     createdAt: Date;
      cursor: `0x${string}`;
      deletedAt: null | Date;
      id: `0x${string}`;
@@ -287,8 +296,8 @@ replies: {
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
      targetUri: string;
-     timestamp: Date;
      txHash: `0x${string}`;
+     updatedAt: Date;
   }[];
 };
 ```
@@ -371,6 +380,7 @@ results: {
   channelId: bigint;
   commentType: string;
   content: string;
+  createdAt: Date;
   cursor: `0x${string}`;
   deletedAt: null | Date;
   id: `0x${string}`;
@@ -380,8 +390,8 @@ results: {
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
   targetUri: string;
-  timestamp: Date;
   txHash: `0x${string}`;
+  updatedAt: Date;
 }[];
 ```
 
@@ -391,14 +401,14 @@ results: {
 targetUri: string;
 ```
 
-### timestamp
-
-```ts
-timestamp: Date;
-```
-
 ### txHash
 
 ```ts
 txHash: `0x${string}` = HexSchema;
+```
+
+### updatedAt
+
+```ts
+updatedAt: Date;
 ```

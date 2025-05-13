@@ -37,6 +37,7 @@ function fetchCommentReplies(options): Promise<{
      channelId: bigint;
      commentType: string;
      content: string;
+     createdAt: Date;
      cursor: `0x${string}`;
      deletedAt: null | Date;
      id: `0x${string}`;
@@ -46,8 +47,8 @@ function fetchCommentReplies(options): Promise<{
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
      targetUri: string;
-     timestamp: Date;
      txHash: `0x${string}`;
+     updatedAt: Date;
   }[];
 }>;
 ```
@@ -94,6 +95,7 @@ Fetch replies for a comment from the Indexer API
      `channelId`: `bigint`;
      `commentType`: `string`;
      `content`: `string`;
+     `createdAt`: `Date`;
      `cursor`: `` `0x${string}` ``;
      `deletedAt`: `null` \| `Date`;
      `id`: `` `0x${string}` ``;
@@ -103,8 +105,8 @@ Fetch replies for a comment from the Indexer API
      `moderationStatusChangedAt`: `Date`;
      `parentId`: `null` \| `` `0x${string}` ``;
      `targetUri`: `string`;
-     `timestamp`: `Date`;
      `txHash`: `` `0x${string}` ``;
+     `updatedAt`: `Date`;
   \}[];
 \}\>
 

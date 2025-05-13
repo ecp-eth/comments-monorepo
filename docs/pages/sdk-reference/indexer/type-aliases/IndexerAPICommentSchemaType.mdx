@@ -26,6 +26,7 @@ type IndexerAPICommentSchemaType = {
   channelId: bigint;
   commentType: string;
   content: string;
+  createdAt: Date;
   cursor: `0x${string}`;
   deletedAt: null | Date;
   id: `0x${string}`;
@@ -35,12 +36,12 @@ type IndexerAPICommentSchemaType = {
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
   targetUri: string;
-  timestamp: Date;
   txHash: `0x${string}`;
+  updatedAt: Date;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:64](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L64)
+Defined in: [packages/sdk/src/indexer/schemas.ts:65](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L65)
 
 ## Type declaration
 
@@ -154,6 +155,12 @@ commentType: string;
 content: string;
 ```
 
+### createdAt
+
+```ts
+createdAt: Date;
+```
+
 ### cursor
 
 ```ts
@@ -208,14 +215,14 @@ parentId: null | `0x${string}`;
 targetUri: string;
 ```
 
-### timestamp
-
-```ts
-timestamp: Date;
-```
-
 ### txHash
 
 ```ts
 txHash: `0x${string}` = HexSchema;
+```
+
+### updatedAt
+
+```ts
+updatedAt: Date;
 ```

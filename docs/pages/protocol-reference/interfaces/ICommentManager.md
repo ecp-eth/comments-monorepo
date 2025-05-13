@@ -45,14 +45,14 @@ Emitted when an author removes an app signer's approval
 
 ## Functions
 
-### `postCommentAsAuthor(struct Comments.CommentData commentData, bytes appSignature)` (external)
+### `postCommentAsAuthor(struct Comments.CreateCommentData commentData, bytes appSignature)` (external)
 
 Posts a comment directly from the author's address
 
 
 
 
-### `postComment(struct Comments.CommentData commentData, bytes authorSignature, bytes appSignature)` (external)
+### `postComment(struct Comments.CreateCommentData commentData, bytes authorSignature, bytes appSignature)` (external)
 
 Posts a comment with both author and app signer signatures
 
@@ -122,7 +122,7 @@ Calculates the EIP-712 hash for deleting a comment
 
 
 
-### `getCommentId(struct Comments.CommentData commentData) → bytes32` (external)
+### `getCommentId(struct Comments.CreateCommentData commentData) → bytes32` (external)
 
 Calculates the EIP-712 hash for a comment
 

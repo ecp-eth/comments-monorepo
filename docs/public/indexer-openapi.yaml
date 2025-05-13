@@ -32,13 +32,13 @@ paths:
         - schema:
             type: object
             properties:
-              timestamp:
+              createdAt:
                 type:
                   - string
                   - 'null'
               id: {}
             required:
-              - timestamp
+              - createdAt
               - id
             description: >-
               Non inclusive cursor from which to fetch the comments based on
@@ -166,10 +166,6 @@ paths:
                         parentId: {}
                         targetUri:
                           type: string
-                        timestamp:
-                          type:
-                            - string
-                            - 'null'
                         txHash: {}
                         cursor: {}
                         moderationStatus:
@@ -179,6 +175,14 @@ paths:
                             - rejected
                             - pending
                         moderationStatusChangedAt:
+                          type:
+                            - string
+                            - 'null'
+                        createdAt:
+                          type:
+                            - string
+                            - 'null'
+                        updatedAt:
                           type:
                             - string
                             - 'null'
@@ -252,16 +256,20 @@ paths:
                                   parentId: {}
                                   targetUri:
                                     type: string
-                                  timestamp:
-                                    type:
-                                      - string
-                                      - 'null'
                                   txHash: {}
                                   cursor: {}
                                   moderationStatus:
                                     type: string
                                     enum: *ref_0
                                   moderationStatusChangedAt:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  createdAt:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  updatedAt:
                                     type:
                                       - string
                                       - 'null'
@@ -278,11 +286,12 @@ paths:
                                   - metadata
                                   - parentId
                                   - targetUri
-                                  - timestamp
                                   - txHash
                                   - cursor
                                   - moderationStatus
                                   - moderationStatusChangedAt
+                                  - createdAt
+                                  - updatedAt
                             pagination:
                               type: object
                               properties:
@@ -315,11 +324,12 @@ paths:
                         - metadata
                         - parentId
                         - targetUri
-                        - timestamp
                         - txHash
                         - cursor
                         - moderationStatus
                         - moderationStatusChangedAt
+                        - createdAt
+                        - updatedAt
                         - replies
                   pagination:
                     type: object
@@ -375,13 +385,13 @@ paths:
         - schema:
             type: object
             properties:
-              timestamp:
+              createdAt:
                 type:
                   - string
                   - 'null'
               id: {}
             required:
-              - timestamp
+              - createdAt
               - id
             description: >-
               Non inclusive cursor from which to fetch the comments based on
@@ -498,16 +508,20 @@ paths:
                         parentId: {}
                         targetUri:
                           type: string
-                        timestamp:
-                          type:
-                            - string
-                            - 'null'
                         txHash: {}
                         cursor: {}
                         moderationStatus:
                           type: string
                           enum: *ref_0
                         moderationStatusChangedAt:
+                          type:
+                            - string
+                            - 'null'
+                        createdAt:
+                          type:
+                            - string
+                            - 'null'
+                        updatedAt:
                           type:
                             - string
                             - 'null'
@@ -581,16 +595,20 @@ paths:
                                   parentId: {}
                                   targetUri:
                                     type: string
-                                  timestamp:
-                                    type:
-                                      - string
-                                      - 'null'
                                   txHash: {}
                                   cursor: {}
                                   moderationStatus:
                                     type: string
                                     enum: *ref_0
                                   moderationStatusChangedAt:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  createdAt:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  updatedAt:
                                     type:
                                       - string
                                       - 'null'
@@ -607,11 +625,12 @@ paths:
                                   - metadata
                                   - parentId
                                   - targetUri
-                                  - timestamp
                                   - txHash
                                   - cursor
                                   - moderationStatus
                                   - moderationStatusChangedAt
+                                  - createdAt
+                                  - updatedAt
                             pagination:
                               type: object
                               properties:
@@ -644,11 +663,12 @@ paths:
                         - metadata
                         - parentId
                         - targetUri
-                        - timestamp
                         - txHash
                         - cursor
                         - moderationStatus
                         - moderationStatusChangedAt
+                        - createdAt
+                        - updatedAt
                         - replies
                   pagination:
                     type: object
@@ -996,13 +1016,13 @@ paths:
         - schema:
             type: object
             properties:
-              timestamp:
+              createdAt:
                 type:
                   - string
                   - 'null'
               id: {}
             required:
-              - timestamp
+              - createdAt
               - id
             description: >-
               Non inclusive cursor from which to fetch the comments based on
@@ -1097,16 +1117,20 @@ paths:
                         parentId: {}
                         targetUri:
                           type: string
-                        timestamp:
-                          type:
-                            - string
-                            - 'null'
                         txHash: {}
                         cursor: {}
                         moderationStatus:
                           type: string
                           enum: *ref_0
                         moderationStatusChangedAt:
+                          type:
+                            - string
+                            - 'null'
+                        createdAt:
+                          type:
+                            - string
+                            - 'null'
+                        updatedAt:
                           type:
                             - string
                             - 'null'
@@ -1123,11 +1147,12 @@ paths:
                         - metadata
                         - parentId
                         - targetUri
-                        - timestamp
                         - txHash
                         - cursor
                         - moderationStatus
                         - moderationStatusChangedAt
+                        - createdAt
+                        - updatedAt
                   pagination:
                     type: object
                     properties:
@@ -1256,16 +1281,20 @@ paths:
                   parentId: {}
                   targetUri:
                     type: string
-                  timestamp:
-                    type:
-                      - string
-                      - 'null'
                   txHash: {}
                   cursor: {}
                   moderationStatus:
                     type: string
                     enum: *ref_0
                   moderationStatusChangedAt:
+                    type:
+                      - string
+                      - 'null'
+                  createdAt:
+                    type:
+                      - string
+                      - 'null'
+                  updatedAt:
                     type:
                       - string
                       - 'null'
@@ -1282,11 +1311,12 @@ paths:
                   - metadata
                   - parentId
                   - targetUri
-                  - timestamp
                   - txHash
                   - cursor
                   - moderationStatus
                   - moderationStatusChangedAt
+                  - createdAt
+                  - updatedAt
         '400':
           description: When request is not valid
           content:
@@ -1396,16 +1426,20 @@ paths:
                   parentId: {}
                   targetUri:
                     type: string
-                  timestamp:
-                    type:
-                      - string
-                      - 'null'
                   txHash: {}
                   cursor: {}
                   moderationStatus:
                     type: string
                     enum: *ref_0
                   moderationStatusChangedAt:
+                    type:
+                      - string
+                      - 'null'
+                  createdAt:
+                    type:
+                      - string
+                      - 'null'
+                  updatedAt:
                     type:
                       - string
                       - 'null'
@@ -1422,11 +1456,12 @@ paths:
                   - metadata
                   - parentId
                   - targetUri
-                  - timestamp
                   - txHash
                   - cursor
                   - moderationStatus
                   - moderationStatusChangedAt
+                  - createdAt
+                  - updatedAt
         '401':
           description: When user is not authenticated
           content:

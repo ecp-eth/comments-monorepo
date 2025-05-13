@@ -13,33 +13,39 @@ const CommentDataSchema: ZodObject<{
   channelId: ZodBigInt;
   commentType: ZodString;
   content: ZodString;
+  createdAt: ZodBigInt;
   deadline: ZodBigInt;
   metadata: ZodString;
   nonce: ZodBigInt;
   parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
   targetUri: ZodString;
+  updatedAt: ZodBigInt;
 }, "strip", ZodTypeAny, {
   app: `0x${string}`;
   author: `0x${string}`;
   channelId: bigint;
   commentType: string;
   content: string;
+  createdAt: bigint;
   deadline: bigint;
   metadata: string;
   nonce: bigint;
   parentId: `0x${string}`;
   targetUri: string;
+  updatedAt: bigint;
 }, {
   app: `0x${string}`;
   author: `0x${string}`;
   channelId: bigint;
   commentType: string;
   content: string;
+  createdAt: bigint;
   deadline: bigint;
   metadata: string;
   nonce: bigint;
   parentId: `0x${string}`;
   targetUri: string;
+  updatedAt: bigint;
 }>;
 ```
 

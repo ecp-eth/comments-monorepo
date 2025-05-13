@@ -34,6 +34,7 @@ type IndexerAPIModerationGetPendingCommentsSchemaType = {
      channelId: bigint;
      commentType: string;
      content: string;
+     createdAt: Date;
      cursor: `0x${string}`;
      deletedAt: null | Date;
      id: `0x${string}`;
@@ -43,13 +44,13 @@ type IndexerAPIModerationGetPendingCommentsSchemaType = {
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
      targetUri: string;
-     timestamp: Date;
      txHash: `0x${string}`;
+     updatedAt: Date;
   }[];
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:186](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L186)
+Defined in: [packages/sdk/src/indexer/schemas.ts:188](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L188)
 
 ## Type declaration
 
@@ -117,6 +118,7 @@ results: {
   channelId: bigint;
   commentType: string;
   content: string;
+  createdAt: Date;
   cursor: `0x${string}`;
   deletedAt: null | Date;
   id: `0x${string}`;
@@ -126,7 +128,7 @@ results: {
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
   targetUri: string;
-  timestamp: Date;
   txHash: `0x${string}`;
+  updatedAt: Date;
 }[];
 ```
