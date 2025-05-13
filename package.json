@@ -9,15 +9,19 @@
     "dev:indexer": "turbo dev --filter=./apps/indexer... --filter=./packages/protocol",
     "dev:embed": "turbo dev --filter=./apps/embed... --filter=./apps/embed-demo-blog --filter=./apps/indexer --filter=./packages/protocol",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --write \"**/*.{js,ts,tsx,sol}\"",
     "pkg:publish": "scripts/publish.sh",
     "postinstall": "node scripts/fix-sentry-opentelemetry.js",
-    "test": "turbo test --filter=!./packages/protocol"
+    "test": "turbo test --filter=!./packages/protocol",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
     "eslint": "^9.19.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.0.0",
     "prettier": "^3.4.2",
+    "prettier-plugin-solidity": "^2.0.0",
     "tsup": "^8.3.6",
     "turbo": "^2.5.0",
     "typescript": "^5.8.3"
@@ -40,5 +44,8 @@
       "valtio": "2.1.4",
       "use-sync-external-store": "^1.5.0"
     }
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,sol}": "pnpm run format"
   }
 }
