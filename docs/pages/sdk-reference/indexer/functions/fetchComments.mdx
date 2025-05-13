@@ -37,6 +37,7 @@ function fetchComments(options): Promise<{
      channelId: bigint;
      commentType: string;
      content: string;
+     createdAt: Date;
      cursor: `0x${string}`;
      deletedAt: null | Date;
      id: `0x${string}`;
@@ -75,6 +76,7 @@ function fetchComments(options): Promise<{
            channelId: bigint;
            commentType: string;
            content: string;
+           createdAt: Date;
            cursor: `0x${string}`;
            deletedAt: null | Date;
            id: `0x${string}`;
@@ -84,13 +86,13 @@ function fetchComments(options): Promise<{
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
            targetUri: string;
-           timestamp: Date;
            txHash: `0x${string}`;
+           updatedAt: Date;
         }[];
      };
      targetUri: string;
-     timestamp: Date;
      txHash: `0x${string}`;
+     updatedAt: Date;
   }[];
 }>;
 ```
@@ -137,6 +139,7 @@ Fetch comments from the Indexer API
      `channelId`: `bigint`;
      `commentType`: `string`;
      `content`: `string`;
+     `createdAt`: `Date`;
      `cursor`: `` `0x${string}` ``;
      `deletedAt`: `null` \| `Date`;
      `id`: `` `0x${string}` ``;
@@ -175,6 +178,7 @@ Fetch comments from the Indexer API
            `channelId`: `bigint`;
            `commentType`: `string`;
            `content`: `string`;
+           `createdAt`: `Date`;
            `cursor`: `` `0x${string}` ``;
            `deletedAt`: `null` \| `Date`;
            `id`: `` `0x${string}` ``;
@@ -184,13 +188,13 @@ Fetch comments from the Indexer API
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
            `targetUri`: `string`;
-           `timestamp`: `Date`;
            `txHash`: `` `0x${string}` ``;
+           `updatedAt`: `Date`;
         \}[];
      \};
      `targetUri`: `string`;
-     `timestamp`: `Date`;
      `txHash`: `` `0x${string}` ``;
+     `updatedAt`: `Date`;
   \}[];
 \}\>
 

@@ -26,6 +26,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
   channelId: string;
   commentType: string;
   content: string;
+  createdAt: string;
   cursor: `0x${string}`;
   deletedAt: null | string;
   id: `0x${string}`;
@@ -64,6 +65,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
         channelId: string;
         commentType: string;
         content: string;
+        createdAt: string;
         cursor: `0x${string}`;
         deletedAt: null | string;
         id: `0x${string}`;
@@ -73,17 +75,17 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
         moderationStatusChangedAt: string;
         parentId: null | `0x${string}`;
         targetUri: string;
-        timestamp: string;
         txHash: `0x${string}`;
+        updatedAt: string;
      }[];
   };
   targetUri: string;
-  timestamp: string;
   txHash: `0x${string}`;
+  updatedAt: string;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:135](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L135)
+Defined in: [packages/sdk/src/indexer/schemas.ts:137](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L137)
 
 ## Type declaration
 
@@ -197,6 +199,12 @@ commentType: string;
 content: string;
 ```
 
+### createdAt
+
+```ts
+createdAt: string = dateToString;
+```
+
 ### cursor
 
 ```ts
@@ -278,6 +286,7 @@ replies: {
      channelId: string;
      commentType: string;
      content: string;
+     createdAt: string;
      cursor: `0x${string}`;
      deletedAt: null | string;
      id: `0x${string}`;
@@ -287,8 +296,8 @@ replies: {
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
      targetUri: string;
-     timestamp: string;
      txHash: `0x${string}`;
+     updatedAt: string;
   }[];
 };
 ```
@@ -371,6 +380,7 @@ results: {
   channelId: string;
   commentType: string;
   content: string;
+  createdAt: string;
   cursor: `0x${string}`;
   deletedAt: null | string;
   id: `0x${string}`;
@@ -380,8 +390,8 @@ results: {
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
   targetUri: string;
-  timestamp: string;
   txHash: `0x${string}`;
+  updatedAt: string;
 }[];
 ```
 
@@ -391,14 +401,14 @@ results: {
 targetUri: string;
 ```
 
-### timestamp
-
-```ts
-timestamp: string = dateToString;
-```
-
 ### txHash
 
 ```ts
 txHash: `0x${string}` = HexSchema;
+```
+
+### updatedAt
+
+```ts
+updatedAt: string = dateToString;
 ```

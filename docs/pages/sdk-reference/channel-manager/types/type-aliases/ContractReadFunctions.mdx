@@ -8,6 +8,7 @@
 
 ```ts
 type ContractReadFunctions = {
+  calculateHookTransactionFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "calculateHookTransactionFee">>;
   channelExists: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "channelExists">>;
   getChannel: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
   getChannelCreationFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelCreationFee">>;
@@ -16,9 +17,29 @@ type ContractReadFunctions = {
 };
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:111](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L111)
+Defined in: [packages/sdk/src/channel-manager/types.ts:101](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L101)
 
 ## Properties
+
+### calculateHookTransactionFee()
+
+```ts
+calculateHookTransactionFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "calculateHookTransactionFee">>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:128](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L128)
+
+#### Parameters
+
+##### args
+
+`ReadContractParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"calculateHookTransactionFee"`\>
+
+#### Returns
+
+`Promise`\<`ReadContractReturnType`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"calculateHookTransactionFee"`\>\>
+
+***
 
 ### channelExists()
 
@@ -26,7 +47,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:111](https://github.com/e
 channelExists: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "channelExists">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:116](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L116)
+Defined in: [packages/sdk/src/channel-manager/types.ts:106](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L106)
 
 #### Parameters
 
@@ -46,7 +67,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:116](https://github.com/e
 getChannel: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:112](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L112)
+Defined in: [packages/sdk/src/channel-manager/types.ts:102](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L102)
 
 #### Parameters
 
@@ -66,7 +87,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:112](https://github.com/e
 getChannelCreationFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelCreationFee">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:126](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L126)
+Defined in: [packages/sdk/src/channel-manager/types.ts:116](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L116)
 
 #### Parameters
 
@@ -86,7 +107,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:126](https://github.com/e
 getChannelOwner: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelOwner">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:120](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L120)
+Defined in: [packages/sdk/src/channel-manager/types.ts:110](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L110)
 
 #### Parameters
 
@@ -106,7 +127,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:120](https://github.com/e
 getHookTransactionFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getHookTransactionFee">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:132](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L132)
+Defined in: [packages/sdk/src/channel-manager/types.ts:122](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L122)
 
 #### Parameters
 

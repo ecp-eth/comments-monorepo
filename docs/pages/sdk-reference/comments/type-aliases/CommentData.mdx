@@ -13,11 +13,13 @@ type CommentData = {
   channelId: bigint;
   commentType: string;
   content: string;
+  createdAt: bigint;
   deadline: bigint;
   metadata: string;
   nonce: bigint;
   parentId: Hex;
   targetUri: string;
+  updatedAt: bigint;
 };
 ```
 
@@ -87,6 +89,18 @@ The content of the comment
 
 ***
 
+### createdAt
+
+```ts
+createdAt: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:114](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L114)
+
+The timestamp of the comment creation in seconds since epoch
+
+***
+
 ### deadline
 
 ```ts
@@ -148,3 +162,15 @@ targetUri: string;
 Defined in: [packages/sdk/src/comments/types.ts:80](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L80)
 
 Empty string for replies
+
+***
+
+### updatedAt
+
+```ts
+updatedAt: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:118](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L118)
+
+The timestamp of the comment update in seconds since epoch

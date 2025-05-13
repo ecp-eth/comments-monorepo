@@ -1,8 +1,10 @@
 {
   "extends": "@ecp.eth/typescript-config/react-library.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "module": "ESNext",
+    "moduleResolution": "bundler"
   },
-  "include": ["src", "scripts"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

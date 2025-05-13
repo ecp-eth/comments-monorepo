@@ -7,10 +7,34 @@
 # Function: createCommentData()
 
 ```ts
-function createCommentData(__namedParameters): CommentData;
+function createCommentData(__namedParameters): 
+  | {
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: string;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: string;
+}
+  | {
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: string;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+  parentId: `0x${string}`;
+  targetUri: "";
+};
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:546](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L546)
+Defined in: [packages/sdk/src/comments/comment.ts:545](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L545)
 
 Create the data structure of a comment
 
@@ -22,6 +46,29 @@ Create the data structure of a comment
 
 ## Returns
 
-[`CommentData`](/sdk-reference/comments/type-aliases/CommentData.mdx)
+  \| \{
+  `app`: `` `0x${string}` ``;
+  `author`: `` `0x${string}` ``;
+  `channelId`: `bigint`;
+  `commentType`: `string`;
+  `content`: `string`;
+  `deadline`: `bigint`;
+  `metadata`: `string`;
+  `nonce`: `bigint`;
+  `parentId`: `` `0x${string}` ``;
+  `targetUri`: `string`;
+\}
+  \| \{
+  `app`: `` `0x${string}` ``;
+  `author`: `` `0x${string}` ``;
+  `channelId`: `bigint`;
+  `commentType`: `string`;
+  `content`: `string`;
+  `deadline`: `bigint`;
+  `metadata`: `string`;
+  `nonce`: `bigint`;
+  `parentId`: `` `0x${string}` ``;
+  `targetUri`: `""`;
+\}
 
-[CommentData](/sdk-reference/comments/type-aliases/CommentData.mdx) The data structure of a comment
+[CommentInputData](/sdk-reference/comments/type-aliases/CommentInputData.mdx) The data structure of a comment

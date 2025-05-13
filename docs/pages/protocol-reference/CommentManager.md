@@ -25,21 +25,21 @@ Constructor initializes the contract with the deployer as owner and channel mana
 Sets up EIP-712 domain separator
 
 
-### `postCommentAsAuthor(struct Comments.CommentData commentData, bytes appSignature)` (external)
+### `postCommentAsAuthor(struct Comments.CreateCommentData commentData, bytes appSignature)` (external)
 
 Posts a comment directly from the author's address
 
 
 
 
-### `postComment(struct Comments.CommentData commentData, bytes authorSignature, bytes appSignature)` (external)
+### `postComment(struct Comments.CreateCommentData commentData, bytes authorSignature, bytes appSignature)` (external)
 
 Posts a comment with both author and app signer signatures
 
 
 
 
-### `_postComment(struct Comments.CommentData commentData, bytes authorSignature, bytes appSignature)` (internal)
+### `_postComment(struct Comments.CreateCommentData commentData, bytes authorSignature, bytes appSignature)` (internal)
 
 Internal function to handle comment posting logic
 
@@ -130,7 +130,7 @@ Calculates the EIP-712 hash for deleting a comment
 
 
 
-### `getCommentId(struct Comments.CommentData commentData) → bytes32` (public)
+### `getCommentId(struct Comments.CreateCommentData commentData) → bytes32` (public)
 
 Calculates the EIP-712 hash for a comment
 

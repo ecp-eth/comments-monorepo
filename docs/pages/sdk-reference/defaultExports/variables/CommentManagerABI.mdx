@@ -127,6 +127,14 @@ const CommentManagerABI: readonly [{
      name: "app";
      type: "address";
    }, {
+     internalType: "uint80";
+     name: "createdAt";
+     type: "uint80";
+   }, {
+     internalType: "uint80";
+     name: "updatedAt";
+     type: "uint80";
+   }, {
      internalType: "uint256";
      name: "channelId";
      type: "uint256";
@@ -262,6 +270,14 @@ const CommentManagerABI: readonly [{
         name: "app";
         type: "address";
       }, {
+        internalType: "uint80";
+        name: "createdAt";
+        type: "uint80";
+      }, {
+        internalType: "uint80";
+        name: "updatedAt";
+        type: "uint80";
+      }, {
         internalType: "uint256";
         name: "channelId";
         type: "uint256";
@@ -343,7 +359,7 @@ const CommentManagerABI: readonly [{
         name: "commentType";
         type: "string";
      }];
-     internalType: "struct Comments.CommentData";
+     internalType: "struct Comments.CreateCommentData";
      name: "commentData";
      type: "tuple";
   }];
@@ -520,7 +536,7 @@ const CommentManagerABI: readonly [{
         name: "commentType";
         type: "string";
      }];
-     internalType: "struct Comments.CommentData";
+     internalType: "struct Comments.CreateCommentData";
      name: "commentData";
      type: "tuple";
    }, {
@@ -579,7 +595,7 @@ const CommentManagerABI: readonly [{
         name: "commentType";
         type: "string";
      }];
-     internalType: "struct Comments.CommentData";
+     internalType: "struct Comments.CreateCommentData";
      name: "commentData";
      type: "tuple";
    }, {
@@ -720,6 +736,14 @@ const CommentManagerABI: readonly [{
         name: "app";
         type: "address";
       }, {
+        internalType: "uint80";
+        name: "createdAt";
+        type: "uint80";
+      }, {
+        internalType: "uint80";
+        name: "updatedAt";
+        type: "uint80";
+      }, {
         internalType: "uint256";
         name: "channelId";
         type: "uint256";
@@ -832,10 +856,6 @@ const CommentManagerABI: readonly [{
 }, {
   inputs: readonly [];
   name: "InvalidAppSignature";
-  type: "error";
-}, {
-  inputs: readonly [];
-  name: "InvalidAuthorAddress";
   type: "error";
 }, {
   inputs: readonly [];

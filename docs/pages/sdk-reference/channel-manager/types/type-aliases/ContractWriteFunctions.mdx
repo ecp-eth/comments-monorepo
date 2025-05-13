@@ -8,7 +8,6 @@
 
 ```ts
 type ContractWriteFunctions = {
-  calculateHookTransactionFee: (args) => Promise<Hex>;
   collectChannelCreationFee: (args) => Promise<Hex>;
   createChannel: (args) => Promise<Hex>;
   executeHook: (args) => Promise<Hex>;
@@ -25,28 +24,6 @@ type ContractWriteFunctions = {
 Defined in: [packages/sdk/src/channel-manager/types.ts:13](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L13)
 
 ## Properties
-
-### calculateHookTransactionFee()
-
-```ts
-calculateHookTransactionFee: (args) => Promise<Hex>;
-```
-
-Defined in: [packages/sdk/src/channel-manager/types.ts:100](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L100)
-
-#### Parameters
-
-##### args
-
-`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"payable"`, `"calculateHookTransactionFee"`\> & \{
-  `value?`: `bigint`;
-\}
-
-#### Returns
-
-`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
-
-***
 
 ### collectChannelCreationFee()
 

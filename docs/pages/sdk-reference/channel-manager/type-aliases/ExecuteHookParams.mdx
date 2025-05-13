@@ -11,7 +11,7 @@ type ExecuteHookParams = {
   caller: Hex;
   channelId: bigint;
   channelManagerAddress?: Hex;
-  commentData: CommentInputData;
+  commentData: CommentData;
   commentId: Hex;
   phase: "Before" | "After";
   value?: bigint;
@@ -19,7 +19,7 @@ type ExecuteHookParams = {
 };
 ```
 
-Defined in: [packages/sdk/src/channel-manager/hook.ts:147](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L147)
+Defined in: [packages/sdk/src/channel-manager/hook.ts:145](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L145)
 
 ## Properties
 
@@ -29,7 +29,7 @@ Defined in: [packages/sdk/src/channel-manager/hook.ts:147](https://github.com/ec
 caller: Hex;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/hook.ts:159](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L159)
+Defined in: [packages/sdk/src/channel-manager/hook.ts:157](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L157)
 
 The address that initiated the transaction
 
@@ -41,7 +41,7 @@ The address that initiated the transaction
 channelId: bigint;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/hook.ts:151](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L151)
+Defined in: [packages/sdk/src/channel-manager/hook.ts:149](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L149)
 
 The ID of the channel to execute hooks for
 
@@ -53,7 +53,7 @@ The ID of the channel to execute hooks for
 optional channelManagerAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/hook.ts:177](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L177)
+Defined in: [packages/sdk/src/channel-manager/hook.ts:175](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L175)
 
 The address of the channel manager
 
@@ -68,10 +68,10 @@ CHANNEL_MANAGER_ADDRESS
 ### commentData
 
 ```ts
-commentData: CommentInputData;
+commentData: CommentData;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/hook.ts:155](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L155)
+Defined in: [packages/sdk/src/channel-manager/hook.ts:153](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L153)
 
 The comment data to process
 
@@ -83,7 +83,7 @@ The comment data to process
 commentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/hook.ts:163](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L163)
+Defined in: [packages/sdk/src/channel-manager/hook.ts:161](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L161)
 
 The unique identifier of the comment
 
@@ -95,7 +95,7 @@ The unique identifier of the comment
 phase: "Before" | "After";
 ```
 
-Defined in: [packages/sdk/src/channel-manager/hook.ts:167](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L167)
+Defined in: [packages/sdk/src/channel-manager/hook.ts:165](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L165)
 
 The phase of hook execution (Before or After)
 
@@ -107,7 +107,7 @@ The phase of hook execution (Before or After)
 optional value: bigint;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/hook.ts:171](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L171)
+Defined in: [packages/sdk/src/channel-manager/hook.ts:169](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L169)
 
 The value to send with the transaction
 
@@ -119,4 +119,4 @@ The value to send with the transaction
 writeContract: ContractWriteFunctions["executeHook"];
 ```
 
-Defined in: [packages/sdk/src/channel-manager/hook.ts:178](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L178)
+Defined in: [packages/sdk/src/channel-manager/hook.ts:176](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L176)
