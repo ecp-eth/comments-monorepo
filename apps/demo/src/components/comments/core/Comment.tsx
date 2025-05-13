@@ -45,7 +45,7 @@ export function Comment({
         <CommentAuthor
           author={comment.author}
           moderationStatus={comment.moderationStatus}
-          timestamp={comment.timestamp}
+          timestamp={comment.createdAt}
         />
         {isAuthor &&
           !comment.deletedAt &&

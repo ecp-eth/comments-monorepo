@@ -50,7 +50,7 @@ export function Comment({
           <AuthorBox author={author} />
         </AuthorLinker>
 
-        <TimeBox timestamp={comment.timestamp} />
+        <TimeBox timestamp={comment.createdAt} />
       </View>
       <CommentContent comment={comment} />
       <CommentBottomBar

@@ -224,7 +224,8 @@ function createIndexerAPICommentDataFromPendingCommentOperation(
     ...pendingCommentOperation.response.data,
     id: pendingCommentOperation.response.hash,
     chainId: pendingCommentOperation.chainId,
-    timestamp: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
     txHash: pendingCommentOperation.txHash,
     logIndex: 0,
     author: {

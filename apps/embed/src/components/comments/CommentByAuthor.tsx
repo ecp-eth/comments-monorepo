@@ -27,7 +27,7 @@ export function CommentByAuthor({
   const authorNameOrAddress = getCommentAuthorNameOrAddress(comment.author);
   const authorUrl = formatAuthorLink(comment.author);
   const commentRelativeTime = useCommentRelativeTime(
-    comment.timestamp,
+    comment.createdAt,
     currentTimestamp
   );
 
@@ -50,7 +50,7 @@ export function CommentByAuthor({
                 <span>{authorNameOrAddress}</span>
               )}{" "}
               •{" "}
-              <span title={formatDate(comment.timestamp)}>
+              <span title={formatDate(comment.createdAt)}>
                 {commentRelativeTime}
               </span>
             </div>

@@ -36,6 +36,13 @@ export const CommentDataSchema = z.object({
 // this just tests if the shape is correct
 ({}) as z.infer<typeof CommentDataSchema> satisfies CommentData;
 
+export const CreateCommentDataSchema = CommentDataSchema.omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CreateCommentData = z.infer<typeof CreateCommentDataSchema>;
+
 const BaseCommentInputDataSchema = z.object({
   author: HexSchema,
   app: HexSchema,
@@ -77,12 +84,20 @@ export const ReplyCommentInputDataSchema = BaseCommentInputDataSchema.omit({
   "metadata"
 >;
 
+/**
+ * Comment input data schema. This is used as input of the functions.
+ *
+ * It validates precisely what shapes we expect in case of a comment or a reply.
+ */
 export const CommentInputDataSchema = z.union([
   RootCommentInputDataSchema,
   ReplyCommentInputDataSchema,
 ]);
 
 export type CommentInputData = z.infer<typeof CommentInputDataSchema>;
+
+// this is just for type checking
+({}) as CommentInputData satisfies CreateCommentData;
 
 export const AddCommentTypedDataSchema = z.object({
   primaryType: z.literal("AddComment"),

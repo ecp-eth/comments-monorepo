@@ -8,12 +8,18 @@ import {
   type IndexerAPIExtraSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
-import { CommentDataSchema } from "@ecp.eth/sdk/comments/schemas";
+import {
+  CommentInputData,
+  CreateCommentDataSchema,
+} from "@ecp.eth/sdk/comments/schemas";
 import { z } from "zod";
 
-export const CommentDataWithIdSchema = CommentDataSchema.extend({
+export const CommentDataWithIdSchema = CreateCommentDataSchema.extend({
   id: HexSchema,
 });
+
+// this is just for type checking
+({}) as z.infer<typeof CommentDataWithIdSchema> satisfies CommentInputData;
 
 /**
  * Parses response from API endpoint for usage in client
