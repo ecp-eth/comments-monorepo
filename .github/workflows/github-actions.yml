@@ -150,13 +150,41 @@ jobs:
         run: node --experimental-strip-types --no-warnings ./scripts/check-contract-addresses.ts
         working-directory: packages/sdk
 
+  build-docs:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      TURBO_UI: "false"
+    name: Build docs to check for out of sync files
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: "Install Foundry"
+        uses: "foundry-rs/foundry-toolchain@v1"
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the project
+        run: pnpm build
+
       - name: "Docs: Build docs"
         run: pnpm run build
         working-directory: docs
 
       - name: "Docs: Warn if docs are not synced"
         id: docs-warn-out-of-sync
-        continue-on-error: true
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
             git status --porcelain | while read -r line; do
@@ -168,14 +196,3 @@ jobs:
             exit 1
           fi
         shell: bash
-      - name: "Docs: Write out of sync docs files as a comment"
-        uses: actions/github-script@v7
-        if: failure()
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '👋 Please note that the following docs files are out of sync: \n${{steps.docs-warn-out-of-sync.outputs.files}}'
-            })
