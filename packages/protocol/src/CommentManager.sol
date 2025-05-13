@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 import "./libraries/Comments.sol";
 import "./interfaces/ICommentManager.sol";
 import "./ChannelManager.sol";
+import "./libraries/Channels.sol";
 
 /// @title CommentManager - A decentralized comments system
 /// @notice This contract allows users to post and manage comments with optional app-signer approval and channel-specific hooks
@@ -33,11 +34,15 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             "RemoveApproval(address author,address app,uint256 nonce,uint256 deadline)"
         );
 
+
     // On-chain storage mappings
-    mapping(bytes32 => Comments.CommentData) public comments;
-    mapping(address => mapping(address => bool)) public isApproved;
-    mapping(address => mapping(address => uint256)) public nonces;
-    mapping(bytes32 => bool) public deleted;
+    mapping(bytes32 => Comments.Comment) internal comments;
+    /// @notice Mapping of author to app to approval status
+    mapping(address => mapping(address => bool)) internal isApproved;
+    /// @notice Mapping of author to app to nonce
+    mapping(address => mapping(address => uint256)) internal nonces;
+    /// @notice Mapping of comment ID to deleted status, if missing in mapping, the comment is not deleted
+    mapping(bytes32 => bool) internal deleted;
 
     // Channel manager reference
     IChannelManager public channelManager;
@@ -63,7 +68,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     /// @inheritdoc ICommentManager
     function postCommentAsAuthor(
-        Comments.CreateCommentData calldata commentData,
+        Comments.CreateComment calldata commentData,
         bytes calldata appSignature
     ) external payable {
         _postComment(commentData, bytes(""), appSignature);
@@ -71,7 +76,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     /// @inheritdoc ICommentManager
     function postComment(
-        Comments.CreateCommentData calldata commentData,
+        Comments.CreateComment calldata commentData,
         bytes calldata authorSignature,
         bytes calldata appSignature
     ) external payable {
@@ -83,7 +88,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     /// @param authorSignature Signature from the author (empty if called via postCommentAsAuthor)
     /// @param appSignature Signature from the app signer
     function _postComment(
-        Comments.CreateCommentData calldata commentData,
+        Comments.CreateComment calldata commentData,
         bytes memory authorSignature,
         bytes memory appSignature
     ) internal nonReentrant {
@@ -122,7 +127,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         // Validate channel exists
         if (!channelManager.channelExists(commentData.channelId)) {
-            revert ChannelDoesNotExist();
+            revert IChannelManager.ChannelDoesNotExist();
         }
 
         nonces[commentData.author][commentData.app]++;
@@ -147,21 +152,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             _validateSignature(authorSignature);
         }
 
-        Comments.CommentData memory comment = Comments.CommentData({
-            author: commentData.author,
-            app: commentData.app,
-            channelId: commentData.channelId,
-            parentId: commentData.parentId,
-            content: commentData.content,
-            metadata: commentData.metadata,
-            targetUri: commentData.targetUri,
-            commentType: commentData.commentType,
-            createdAt: uint80(block.timestamp),
-            updatedAt: uint80(block.timestamp),
-            nonce: commentData.nonce,
-            deadline: commentData.deadline
-        });
-
         if (
             msg.sender == commentData.author ||
             isApproved[commentData.author][commentData.app] ||
@@ -172,34 +162,42 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                     authorSignature
                 ))
         ) {
-            // Execute channel-specific hooks before comment
-            bool hookSuccess = channelManager.executeHook{value: msg.value}(
-                comment.channelId,
-                comment,
-                msg.sender,
-                commentId,
-                Hooks.HookPhase.BeforeComment
-            );
-            if (!hookSuccess)
-                revert ChannelHookExecutionFailed(
-                    Hooks.HookPhase.BeforeComment
-                );
-
+            Comments.Comment memory comment = Comments.Comment({
+                author: commentData.author,
+                app: commentData.app,
+                channelId: commentData.channelId,
+                parentId: commentData.parentId,
+                content: commentData.content,
+                metadata: commentData.metadata,
+                targetUri: commentData.targetUri,
+                commentType: commentData.commentType,
+                createdAt: uint80(block.timestamp),
+                updatedAt: uint80(block.timestamp),
+                nonce: commentData.nonce,
+                deadline: commentData.deadline,
+                commentHookData: ""
+            });
             // Store comment data on-chain
             comments[commentId] = comment;
 
-            // Execute channel-specific hooks after comment
-            hookSuccess = channelManager.executeHook(
-                comment.channelId,
-                comment,
-                msg.sender,
-                commentId,
-                Hooks.HookPhase.AfterComment
-            );
-            if (!hookSuccess)
-                revert ChannelHookExecutionFailed(Hooks.HookPhase.AfterComment);
+            Channels.Channel memory channel = channelManager.getChannel(commentData.channelId);
+            address hookAddress = address(channel.hook);
 
-            emit CommentAdded(commentId, comment.author, comment.app, comment);
+            if (hookAddress != address(0) && channel.permissions.afterComment) {
+                // Calculate hook value after protocol fee
+                uint256 msgValueAfterFee = channelManager.deductProtocolHookTransactionFee(msg.value);
+
+                string memory commentHookData = channel.hook.afterComment{value: msgValueAfterFee}(
+                    comment,
+                    msg.sender,
+                    commentId
+                );
+
+                Comments.Comment storage storedComment = comments[commentId];
+                storedComment.commentHookData = commentHookData;
+            }
+
+            emit CommentAdded(commentId, comment.author, comment.app, comment, comments[commentId].commentHookData);
             return;
         }
 
@@ -208,7 +206,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     /// @inheritdoc ICommentManager
     function deleteCommentAsAuthor(bytes32 commentId) external {
-        Comments.CommentData storage comment = comments[commentId];
+        Comments.Comment storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
         require(comment.author == msg.sender, "Not comment author");
         _deleteComment(commentId, msg.sender);
@@ -232,7 +230,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             revert InvalidNonce(author, app, nonces[author][app], nonce);
         }
 
-        Comments.CommentData storage comment = comments[commentId];
+        Comments.Comment storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
         require(comment.author == author, "Author does not match comment author");
         nonces[author][app]++;
@@ -271,40 +269,28 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     /// @param commentId The unique identifier of the comment to delete
     /// @param author The address of the comment author
     function _deleteComment(bytes32 commentId, address author) internal {
-        Comments.CommentData storage comment = comments[commentId];
-
-        // Execute channel-specific hooks before comment deletion
-        bool hookSuccess = channelManager.executeHook{value: msg.value}(
-            comment.channelId,
-            comment,
-            msg.sender,
-            commentId,
-            Hooks.HookPhase.BeforeDeleteComment
-        );
-        if (!hookSuccess)
-            revert ChannelHookExecutionFailed(
-                Hooks.HookPhase.BeforeDeleteComment
-            );
+        Comments.Comment storage comment = comments[commentId];
 
         // Store comment data for after hook
-        Comments.CommentData memory commentToDelete = comment;
+        Comments.Comment memory commentToDelete = comment;
 
         // Delete the comment
         delete comments[commentId];
         deleted[commentId] = true;
 
-        // Execute channel-specific hooks after comment deletion
-        hookSuccess = channelManager.executeHook(
-            commentToDelete.channelId,
-            commentToDelete,
-            msg.sender,
-            commentId,
-            Hooks.HookPhase.AfterDeleteComment
-        );
-        if (!hookSuccess)
-            revert ChannelHookExecutionFailed(
-                Hooks.HookPhase.AfterDeleteComment
+        Channels.Channel memory channel = channelManager.getChannel(commentToDelete.channelId);
+        address hookAddress = address(channel.hook);
+
+        if (hookAddress != address(0) && channel.permissions.afterDeleteComment) {   
+            // Calculate hook value after protocol fee
+            uint256 msgValueAfterFee = channelManager.deductProtocolHookTransactionFee(msg.value);
+
+            channel.hook.afterDeleteComment{value: msgValueAfterFee}(
+                commentToDelete,
+                msg.sender,
+                commentId
             );
+        }
 
         emit CommentDeleted(commentId, author);
     }
@@ -471,8 +457,19 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     }
 
     /// @inheritdoc ICommentManager
+    function getComment(
+        bytes32 commentId
+    ) external view returns (Comments.Comment memory) {
+        Comments.Comment memory comment = comments[commentId];
+        if (comment.author == address(0)) {
+            revert CommentDoesNotExist();
+        }
+        return comment;
+    }
+
+    /// @inheritdoc ICommentManager
     function getCommentId(
-        Comments.CreateCommentData memory commentData
+        Comments.CreateComment memory commentData
     ) public view returns (bytes32) {
         bytes32 structHash = keccak256(
             abi.encode(
@@ -494,15 +491,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             keccak256(
                 abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash)
             );
-    }
-
-    /// @inheritdoc ICommentManager
-    function getComment(
-        bytes32 commentId
-    ) external view returns (Comments.CommentData memory) {
-        Comments.CommentData storage comment = comments[commentId];
-        require(comment.author != address(0), "Comment does not exist");
-        return comment;
     }
 
     /// @inheritdoc ICommentManager
@@ -532,5 +520,28 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         ) {
             revert InvalidSignatureS();
         }
+    }
+
+    /// @inheritdoc ICommentManager
+    function getIsApproved(
+        address author,
+        address app
+    ) external view returns (bool) {
+        return isApproved[author][app];
+    }
+
+    /// @inheritdoc ICommentManager
+    function getNonce(
+        address author,
+        address app
+    ) external view returns (uint256) {
+        return nonces[author][app];
+    }
+
+    /// @inheritdoc ICommentManager
+    function getIsDeleted(
+        bytes32 commentId
+    ) external view returns (bool) {
+        return deleted[commentId];
     }
 }

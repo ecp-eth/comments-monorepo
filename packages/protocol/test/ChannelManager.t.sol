@@ -9,6 +9,7 @@ import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Recei
 import {TestUtils, MockHook} from "./utils.sol";
 import {Comments} from "../src/libraries/Comments.sol";
 import {Hooks} from "../src/libraries/Hooks.sol";
+import {Channels} from "../src/libraries/Channels.sol";
 // Invalid hook that doesn't support the interface
 contract InvalidHook {
     function supportsInterface(bytes4) external pure returns (bool) {
@@ -75,17 +76,12 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             address(0)
         );
 
-        (
-            string memory channelName,
-            string memory channelDesc,
-            string memory channelMeta,
-            address hook
-        ) = channelManager.getChannel(channelId);
+        Channels.Channel memory channel = channelManager.getChannel(channelId);
 
-        assertEq(channelName, name);
-        assertEq(channelDesc, description);
-        assertEq(channelMeta, metadata);
-        assertEq(hook, address(0));
+        assertEq(channel.name, name);
+        assertEq(channel.description, description);
+        assertEq(channel.metadata, metadata);
+        assertEq(address(channel.hook), address(0));
         assertEq(address(channelManager).balance - initialBalance, 0.02 ether);
     }
 
@@ -102,8 +98,8 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             address(mockHook)
         );
 
-        (, , , address channelHook) = channelManager.getChannel(channelId);
-        assertEq(channelHook, address(mockHook));
+        Channels.Channel memory channel = channelManager.getChannel(channelId);
+        assertEq(address(channel.hook), address(mockHook));
         assertEq(address(channelManager).balance - initialBalance, 0.02 ether);
     }
 
@@ -128,16 +124,11 @@ contract ChannelManagerTest is Test, IERC721Receiver {
             newMetadata
         );
 
-        (
-            string memory channelName,
-            string memory channelDesc,
-            string memory channelMeta,
+        Channels.Channel memory channel = channelManager.getChannel(channelId);
 
-        ) = channelManager.getChannel(channelId);
-
-        assertEq(channelName, newName);
-        assertEq(channelDesc, newDescription);
-        assertEq(channelMeta, newMetadata);
+        assertEq(channel.name, newName);
+        assertEq(channel.description, newDescription);
+        assertEq(channel.metadata, newMetadata);
     }
 
     function test_SetHook() public {
@@ -152,79 +143,8 @@ contract ChannelManagerTest is Test, IERC721Receiver {
         // Set hook
         channelManager.setHook(channelId, address(mockHook));
 
-        (, , , address hook) = channelManager.getChannel(channelId);
-        assertEq(hook, address(mockHook));
-    }
-
-    function test_ExecuteHook() public {
-        // Create channel with hook
-        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
-            "Test Channel",
-            "Description",
-            "{}",
-            address(mockHook)
-        );
-
-        // Create comment data using direct construction
-        Comments.CommentData memory commentData = Comments.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            app: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0),
-            createdAt: uint80(block.timestamp),
-            updatedAt: uint80(block.timestamp)
-        });
-
-        // add some ether to the comments v1 contract to allow it to call hook with fee
-        vm.deal(address(comments), 10 ether);
-
-        // Test beforeComment hook
-        vm.prank(address(comments));
-        uint256 initialBalance = address(channelManager).balance;
-        assertTrue(
-            channelManager.executeHook{value: 0.02 ether}(
-                channelId,
-                commentData,
-                user1,
-                bytes32(0),
-                Hooks.HookPhase.BeforeComment
-            )
-        );
-        assertEq(
-            address(channelManager).balance - initialBalance,
-            // 0.02 * 2% = 0.0004
-            0.0004 ether
-        );
-
-        // Test afterComment hook
-        vm.prank(address(comments));
-        assertTrue(
-            channelManager.executeHook(
-                channelId,
-                commentData,
-                user1,
-                bytes32(0),
-                Hooks.HookPhase.AfterComment
-            )
-        );
-
-        // Test with hook returning false
-        mockHook.setShouldReturnTrue(false);
-        vm.prank(address(comments));
-        vm.expectRevert(IChannelManager.ChannelHookExecutionFailed.selector);
-        channelManager.executeHook(
-            channelId,
-            commentData,
-            user1,
-            bytes32(0),
-            Hooks.HookPhase.BeforeComment
-        );
+        Channels.Channel memory channel = channelManager.getChannel(channelId);
+        assertEq(address(channel.hook), address(mockHook));
     }
 
     function onERC721Received(

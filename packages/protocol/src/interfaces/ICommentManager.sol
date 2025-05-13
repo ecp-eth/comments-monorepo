@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "../libraries/Comments.sol";
 import "../libraries/Hooks.sol";
+import "./IChannelManager.sol";
 
 /// @title ICommentManager - Interface for the Comments contract
 /// @notice This interface defines the functions and events for the Comments contract
@@ -16,7 +17,8 @@ interface ICommentManager {
         bytes32 indexed commentId,
         address indexed author,
         address indexed app,
-        Comments.CommentData commentData
+        Comments.Comment commentData,
+        string commentHookData
     );
 
     /// @notice Emitted when a comment is deleted
@@ -49,10 +51,6 @@ interface ICommentManager {
     error SignatureDeadlineReached(uint256 deadline, uint256 currentTime);
     /// @notice Error thrown when caller is not authorized
     error NotAuthorized(address caller, address requiredCaller);
-    /// @notice Error thrown when channel does not exist
-    error ChannelDoesNotExist();
-    /// @notice Error thrown when channel hook execution fails
-    error ChannelHookExecutionFailed(Hooks.HookPhase hookPhase);
     /// @notice Error thrown when signature length is invalid
     error InvalidSignatureLength();
     /// @notice Error thrown when signature s value is invalid
@@ -63,12 +61,14 @@ interface ICommentManager {
     error InvalidCommentReference(string message);
     /// @notice Error thrown when address is zero
     error ZeroAddress();
+    /// @notice Error thrown when comment does not exist
+    error CommentDoesNotExist();
 
     /// @notice Posts a comment directly from the author's address
     /// @param commentData The comment data struct containing content and metadata
     /// @param appSignature Signature from the app signer authorizing the comment
     function postCommentAsAuthor(
-        Comments.CreateCommentData calldata commentData,
+        Comments.CreateComment calldata commentData,
         bytes calldata appSignature
     ) external payable;
 
@@ -77,7 +77,7 @@ interface ICommentManager {
     /// @param authorSignature Signature from the author authorizing the comment
     /// @param appSignature Signature from the app signer authorizing the comment
     function postComment(
-        Comments.CreateCommentData calldata commentData,
+        Comments.CreateComment calldata commentData,
         bytes calldata authorSignature,
         bytes calldata appSignature
     ) external payable;
@@ -185,17 +185,42 @@ interface ICommentManager {
     /// @param commentData The comment data struct to hash
     /// @return bytes32 The computed hash
     function getCommentId(
-        Comments.CreateCommentData memory commentData
+        Comments.CreateComment memory commentData
     ) external view returns (bytes32);
-
-    /// @notice Get comment data by ID
-    /// @param commentId The comment ID to query
-    /// @return The comment data struct
-    function getComment(
-        bytes32 commentId
-    ) external view returns (Comments.CommentData memory);
 
     /// @notice Updates the channel manager contract address (only owner)
     /// @param _channelContract The new channel manager contract address
     function updateChannelContract(address _channelContract) external;
+
+    /// @notice Get a comment by its ID
+    /// @param commentId The ID of the comment to get
+    /// @return The comment data
+    function getComment(
+        bytes32 commentId
+    ) external view returns (Comments.Comment memory);
+
+    /// @notice Get the approval status for an author and app
+    /// @param author The address of the author
+    /// @param app The address of the app
+    /// @return The approval status
+    function getIsApproved(
+        address author,
+        address app
+    ) external view returns (bool);
+
+    /// @notice Get the nonce for an author and app
+    /// @param author The address of the author
+    /// @param app The address of the app
+    /// @return The nonce
+    function getNonce(
+        address author,
+        address app
+    ) external view returns (uint256);
+
+    /// @notice Get the deleted status for a comment
+    /// @param commentId The ID of the comment
+    /// @return The deleted status
+    function getIsDeleted(
+        bytes32 commentId
+    ) external view returns (bool);
 }

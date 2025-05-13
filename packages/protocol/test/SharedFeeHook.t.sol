@@ -56,28 +56,19 @@ contract SharedFeeHook is BaseHook {
         channelManager = IChannelManager(_channelManager);
     }
 
-    function _getHookPermissions()
-        internal
-        pure
-        override
-        returns (Hooks.Permissions memory)
-    {
-        return
-            Hooks.Permissions({
-                beforeComment: true,
-                afterComment: false,
-                beforeDeleteComment: false,
-                afterDeleteComment: false,
-                beforeInitialize: false,
-                afterInitialize: false
-            });
+    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
+        return Hooks.Permissions({
+            afterComment: true,
+            afterDeleteComment: false,
+            afterInitialize: false
+        });
     }
 
-    function _beforeComment(
-        Comments.CommentData calldata commentData,
+    function _afterComment(
+        Comments.Comment calldata commentData,
         address,
         bytes32
-    ) internal override returns (bool) {
+    ) internal override returns (string memory commentHookData) {
         // Calculate protocol fee
         uint256 protocolFee = (feeAmount * PROTOCOL_FEE_PERCENTAGE) / 10000;
         uint256 hookFee = feeAmount - protocolFee;
@@ -100,7 +91,7 @@ contract SharedFeeHook is BaseHook {
         // Distribute fees to recipients
         _distributeFees(hookFee);
 
-        return true;
+        return "";
     }
 
     function addRecipient(address _recipient, uint256 _share) external {
@@ -361,7 +352,7 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
     }
 
     function _signAppSignature(
-        Comments.CreateCommentData memory commentData
+        Comments.CreateComment memory commentData
     ) internal view returns (bytes memory) {
         bytes32 digest = comments.getCommentId(commentData);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
@@ -378,8 +369,8 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
         );
 
         // Create comment data using direct construction
-        Comments.CreateCommentData memory commentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory commentData = Comments
+            .CreateComment({
                 content: "Test comment",
                 metadata: "{}",
                 targetUri: "",
@@ -387,7 +378,7 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
                 author: user1,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user1, user2),
+                nonce: comments.getNonce(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });

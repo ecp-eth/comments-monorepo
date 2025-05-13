@@ -334,7 +334,7 @@ export const CommentManagerABI = [
       {
         name: "",
         type: "tuple",
-        internalType: "struct Comments.CommentData",
+        internalType: "struct Comments.Comment",
         components: [
           {
             name: "author",
@@ -408,7 +408,7 @@ export const CommentManagerABI = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct Comments.CreateCommentData",
+        internalType: "struct Comments.CreateComment",
         components: [
           {
             name: "author",
@@ -639,7 +639,7 @@ export const CommentManagerABI = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct Comments.CreateCommentData",
+        internalType: "struct Comments.CreateComment",
         components: [
           {
             name: "author",
@@ -714,7 +714,7 @@ export const CommentManagerABI = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct Comments.CreateCommentData",
+        internalType: "struct Comments.CreateComment",
         components: [
           {
             name: "author",
@@ -933,7 +933,7 @@ export const CommentManagerABI = [
         name: "commentData",
         type: "tuple",
         indexed: false,
-        internalType: "struct Comments.CommentData",
+        internalType: "struct Comments.Comment",
         components: [
           {
             name: "author",
@@ -1272,7 +1272,7 @@ export const ChannelManagerABI = [
   },
   {
     type: "function",
-    name: "calculateHookTransactionFee",
+    name: "deductProtocolHookTransactionFee",
     inputs: [
       {
         name: "value",
@@ -1380,7 +1380,7 @@ export const ChannelManagerABI = [
       {
         name: "commentData",
         type: "tuple",
-        internalType: "struct Comments.CommentData",
+        internalType: "struct Comments.Comment",
         components: [
           {
             name: "author",

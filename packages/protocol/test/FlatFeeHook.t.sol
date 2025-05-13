@@ -20,7 +20,6 @@ contract FlatFeeHook is BaseHook {
 
     address public feeCollector;
     uint256 public totalFeesCollected;
-    mapping(address => uint256) public pendingRefunds;
 
     event FeeCollected(address indexed author, uint256 amount);
     event FeeWithdrawn(address indexed collector, uint256 amount);
@@ -30,28 +29,19 @@ contract FlatFeeHook is BaseHook {
         feeCollector = _feeCollector;
     }
 
-    function _getHookPermissions()
-        internal
-        pure
-        override
-        returns (Hooks.Permissions memory)
-    {
-        return
-            Hooks.Permissions({
-                beforeInitialize: false,
-                afterInitialize: false,
-                beforeComment: true,
-                afterComment: true,
-                beforeDeleteComment: false,
-                afterDeleteComment: false
-            });
+    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
+        return Hooks.Permissions({
+            afterInitialize: false,
+            afterComment: true,
+            afterDeleteComment: false
+        });
     }
 
-    function _beforeComment(
-        Comments.CommentData calldata commentData,
+    function _afterComment(
+        Comments.Comment calldata commentData,
         address,
         bytes32
-    ) internal override returns (bool) {
+    ) internal override returns (string memory commentHookData) {
         require(msg.value >= HOOK_FEE, "Insufficient fee");
 
         totalFeesCollected += HOOK_FEE;
@@ -59,25 +49,15 @@ contract FlatFeeHook is BaseHook {
 
         // Store any excess payment for refund in afterComment
         if (msg.value > HOOK_FEE) {
-            pendingRefunds[commentData.author] = msg.value - HOOK_FEE;
+            // Process any pending refunds
+            uint256 refundAmount = msg.value - HOOK_FEE;
+            if (refundAmount > 0) {
+                payable(commentData.author).transfer(refundAmount);
+                emit RefundIssued(commentData.author, refundAmount);
+            }
         }
+        return "";
 
-        return true;
-    }
-
-    function _afterComment(
-        Comments.CommentData calldata commentData,
-        address,
-        bytes32
-    ) internal override returns (bool) {
-        // Process any pending refunds
-        uint256 refundAmount = pendingRefunds[commentData.author];
-        if (refundAmount > 0) {
-            delete pendingRefunds[commentData.author];
-            payable(commentData.author).transfer(refundAmount);
-            emit RefundIssued(commentData.author, refundAmount);
-        }
-        return true;
     }
 
     function withdrawFees() external {
@@ -139,7 +119,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     }
 
     function _signAppSignature(
-        Comments.CreateCommentData memory commentData
+        Comments.CreateComment memory commentData
     ) internal view returns (bytes memory) {
         bytes32 digest = comments.getCommentId(commentData);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
@@ -152,8 +132,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             value: CHANNEL_CREATION_FEE
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
-        Comments.CreateCommentData memory commentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory commentData = Comments
+            .CreateComment({
                 content: "Test comment",
                 metadata: "{}",
                 targetUri: "",
@@ -161,7 +141,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
                 author: user1,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user1, user2),
+                nonce: comments.getNonce(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });
@@ -193,8 +173,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        Comments.CreateCommentData memory commentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory commentData = Comments
+            .CreateComment({
                 content: "Test comment",
                 metadata: "{}",
                 targetUri: "",
@@ -202,7 +182,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
                 author: user1,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user1, user2),
+                nonce: comments.getNonce(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });
@@ -240,8 +220,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        Comments.CreateCommentData memory commentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory commentData = Comments
+            .CreateComment({
                 content: "Test comment",
                 metadata: "{}",
                 targetUri: "",
@@ -249,7 +229,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
                 author: user1,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user1, user2),
+                nonce: comments.getNonce(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });
@@ -272,8 +252,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        Comments.CreateCommentData memory commentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory commentData = Comments
+            .CreateComment({
                 content: "Test comment",
                 metadata: "{}",
                 targetUri: "",
@@ -281,7 +261,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
                 author: user1,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user1, user2),
+                nonce: comments.getNonce(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });

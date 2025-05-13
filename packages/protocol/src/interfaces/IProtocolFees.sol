@@ -43,4 +43,15 @@ interface IProtocolFees {
     /// @param recipient The address to receive the fees
     /// @return amount The amount withdrawn
     function withdrawFees(address recipient) external returns (uint256 amount);
+
+     /// @notice Collects channel creation fee
+    /// @return The amount of fees collected
+    function collectChannelCreationFee() external payable returns (uint96);
+
+    /// @notice Collects hook transaction fee
+    /// @param value The total value sent with the transaction
+    /// @return hookValue The amount that should be passed to the hook
+    function deductProtocolHookTransactionFee(
+        uint256 value
+    ) external view returns (uint256 hookValue);
 }

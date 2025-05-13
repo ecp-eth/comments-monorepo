@@ -230,36 +230,19 @@ library TestUtils {
 
 // Mock hook contract for testing
 contract MockHook is BaseHook {
-    bool public shouldReturnTrue = true;
-
-    function setShouldReturnTrue(bool _shouldReturn) external {
-        shouldReturnTrue = _shouldReturn;
-    }
-
     function getHookPermissions() external pure override returns (Hooks.Permissions memory) {
         return Hooks.Permissions({
-            beforeInitialize: false,
             afterInitialize: false,
-            beforeComment: true,
             afterComment: true,
-            beforeDeleteComment: false,
             afterDeleteComment: false
         });
     }
 
-    function _beforeComment(
-        Comments.CommentData calldata,
-        address,
-        bytes32
-    ) internal virtual override returns (bool) {
-        return shouldReturnTrue;
-    }
-
     function _afterComment(
-        Comments.CommentData calldata,
+        Comments.Comment calldata,
         address,
         bytes32
-    ) internal virtual override returns (bool) {
-        return shouldReturnTrue;
+    ) internal virtual override returns (string memory commentHookData) {
+        return "";
     }
 }

@@ -11,6 +11,8 @@ import {TestUtils} from "./utils.sol";
 import {LibString} from "solady/utils/LibString.sol";
 import {Hooks} from "../src/libraries/Hooks.sol";
 import {Comments} from "../src/libraries/Comments.sol";
+import {ICommentManager} from "../src/interfaces/ICommentManager.sol";
+import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
 
 struct TipInfo {
     bool found;
@@ -23,55 +25,43 @@ contract TipHook is BaseHook {
     using Strings for uint256;
     using TestUtils for string;
 
-    error NotAReplyComment();
-    error NoTipAmount();
-    error TipTransferFailed();
     error InvalidTipSyntax(string);
     error TipAmountMismatch();
 
     // Reference to the CommentManager contract
-    CommentManager public immutable comments;
+    ICommentManager public immutable commentManager;
 
-    constructor(address _comments) {
-        comments = CommentManager(_comments);
+    constructor(address _commentManager) {
+        commentManager = CommentManager(_commentManager);
     }
 
-    function _getHookPermissions()
-        internal
-        pure
-        override
-        returns (Hooks.Permissions memory)
-    {
-        return
-            Hooks.Permissions({
-                beforeInitialize: false,
-                afterInitialize: false,
-                beforeComment: true,
-                afterComment: true,
-                beforeDeleteComment: false,
-                afterDeleteComment: false
-            });
+    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
+        return Hooks.Permissions({
+            afterInitialize: false,
+            afterComment: true,
+            afterDeleteComment: false
+        });
     }
 
-    /// @notice Execute before a comment is processed to handle ETH tips
+    /// @notice Execute after a comment is processed to handle ETH tips
     /// @param commentData The comment data to process
-    /// @return success Whether the hook execution was successful
-    function _beforeComment(
-        Comments.CommentData calldata commentData,
+    /// @return commentHookData The comment hook data that was generated
+    function _afterComment(
+        Comments.Comment calldata commentData,
         address,
         bytes32
-    ) internal override returns (bool) {
+    ) internal override returns (string memory commentHookData) {
         // Check if this is a reply comment
-        if (commentData.parentId == bytes32(0)) {
-            // For non-reply comments, return false if ETH was sent
-            // This allows the ChannelManager to handle the revert
-            return msg.value == 0;
+        if (commentData.parentId == bytes32(0) && msg.value == 0) {
+            // No tip was sent, so ignore it.
+            return "";
         }
 
         // Get the parent comment's author
-        (address parentAuthor, , , , , , , , , , , ) = comments.comments(
+        Comments.Comment memory parentComment = commentManager.getComment(
             commentData.parentId
         );
+        address parentAuthor = parentComment.author;
 
         // Parse the tip mention and amount
         TipInfo memory tipInfo = parseTipMention(commentData.content);
@@ -100,7 +90,7 @@ contract TipHook is BaseHook {
             console.log("No tip amount found");
         }
 
-        return true;
+        return "";
     }
 
     /// @notice Parse a tip mention from a comment's content
@@ -263,9 +253,9 @@ abstract contract TipHookTest is Test, IERC721Receiver {
     using TestUtils for string;
     using LibString for string;
 
-    ChannelManager public channelManager;
+    IChannelManager public channelManager;
     TipHook public tipHook;
-    CommentManager public comments;
+    ICommentManager public commentManager;
 
     address public owner;
     address public user1;
@@ -280,10 +270,10 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         user2 = makeAddr("user2");
         user3 = makeAddr("user3");
 
-        (comments, channelManager) = TestUtils.createContracts(owner);
+        (commentManager, channelManager) = TestUtils.createContracts(owner);
 
         // Deploy TipHook with the CommentManager address
-        tipHook = new TipHook(address(comments));
+        tipHook = new TipHook(address(commentManager));
 
         // Fund the ChannelManager with enough ETH for tests
         vm.deal(address(channelManager), 100 ether);
@@ -306,8 +296,8 @@ abstract contract TipHookTest is Test, IERC721Receiver {
     /// @notice Test successful tip processing in a reply comment
     function testTipInReplyComment() public {
         // --- Parent Comment Setup ---
-        Comments.CreateCommentData memory parentCommentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory parentComment = Comments
+            .CreateComment({
                 content: "Parent comment",
                 metadata: "{}",
                 targetUri: "",
@@ -315,23 +305,23 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 author: user1,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user1, user2),
+                nonce: commentManager.getNonce(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });
 
         // Post parent comment
         vm.prank(user1);
-        comments.postCommentAsAuthor(parentCommentData, "");
-        bytes32 parentId = comments.getCommentId(parentCommentData);
+        commentManager.postCommentAsAuthor(parentComment, "");
+        bytes32 parentId = commentManager.getCommentId(parentComment);
 
         uint256 initialBalance = user1.balance;
 
         // --- Reply Comment Setup (With Tip Mention) ---
         uint256 tipAmount = 0.1 ether;
 
-        Comments.CreateCommentData memory replyCommentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory replyComment = Comments
+            .CreateComment({
                 content: string(
                     abi.encodePacked(
                         "Reply with tip !",
@@ -345,14 +335,14 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 author: user2,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user2, user2),
+                nonce: commentManager.getNonce(user2, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: parentId
             });
 
         // --- Post Reply Comment (With Correct Tip Amount) ---
         vm.prank(user2);
-        comments.postCommentAsAuthor{value: tipAmount}(replyCommentData, "");
+        commentManager.postCommentAsAuthor{value: tipAmount}(replyComment, "");
         console.log("user1 address:", user1);
         console.log("tipAmount", tipAmount, initialBalance, user1.balance);
         // The parent author should receive the tip amount
@@ -365,8 +355,8 @@ abstract contract TipHookTest is Test, IERC721Receiver {
 
     /// @notice Test that hook reverts when sent ETH amount doesn't match mentioned amount
     function testRevertWhenTipAmountMismatch() public {
-        Comments.CreateCommentData memory parentCommentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory parentComment = Comments
+            .CreateComment({
                 content: "Parent comment",
                 metadata: "{}",
                 targetUri: "",
@@ -374,19 +364,19 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 author: user1,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user1, user2),
+                nonce: commentManager.getNonce(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });
 
         // Post parent comment
         vm.prank(user1);
-        comments.postCommentAsAuthor(parentCommentData, "");
-        bytes32 parentCommentId = comments.getCommentId(parentCommentData);
+        commentManager.postCommentAsAuthor(parentComment, "");
+        bytes32 parentCommentId = commentManager.getCommentId(parentComment);
 
         // --- Reply Comment Setup (With Tip Mention) ---
-        Comments.CreateCommentData memory replyCommentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory replyComment = Comments
+            .CreateComment({
                 content: string(
                     abi.encodePacked(
                         "Reply with tip !",
@@ -400,7 +390,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 author: user2,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user2, user2),
+                nonce: commentManager.getNonce(user2, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: parentCommentId
             });
@@ -408,14 +398,14 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         // --- Post Reply Comment (With Incorrect Tip Amount) ---
         vm.prank(user2);
         vm.expectRevert(TipHook.TipAmountMismatch.selector);
-        comments.postCommentAsAuthor{value: 0.05 ether}(replyCommentData, "");
+        commentManager.postCommentAsAuthor{value: 0.05 ether}(replyComment, "");
     }
 
     /// @notice Test that hook reverts when tip syntax is invalid
     function testRevertWhenTipSyntaxInvalid() public {
         // --- Parent Comment Setup ---
-        Comments.CreateCommentData memory parentCommentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory parentComment = Comments
+            .CreateComment({
                 content: "Parent comment",
                 metadata: "{}",
                 targetUri: "",
@@ -423,19 +413,19 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 author: user1,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user1, user2),
+                nonce: commentManager.getNonce(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });
 
         // Post parent comment
         vm.prank(user1);
-        comments.postCommentAsAuthor(parentCommentData, "");
-        bytes32 parentCommentId = comments.getCommentId(parentCommentData);
+        commentManager.postCommentAsAuthor(parentComment, "");
+        bytes32 parentCommentId = commentManager.getCommentId(parentComment);
 
         // --- Reply Comment Setup (With Invalid Tip Syntax) ---
-        Comments.CreateCommentData memory replyCommentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory replyComment = Comments
+            .CreateComment({
                 content: string(
                     abi.encodePacked(
                         "Reply with invalid tip syntax !",
@@ -449,7 +439,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 author: user2,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user2, user2),
+                nonce: commentManager.getNonce(user2, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: parentCommentId
             });
@@ -457,14 +447,14 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         // --- Post Reply Comment (With Invalid Tip Syntax) ---
         vm.prank(user2);
         vm.expectRevert(TipHook.InvalidTipSyntax.selector);
-        comments.postCommentAsAuthor{value: 0.1 ether}(replyCommentData, "");
+        commentManager.postCommentAsAuthor{value: 0.1 ether}(replyComment, "");
     }
 
     /// @notice Test that no tip is processed when no tip is mentioned
     function testNoTipWithoutMention() public {
         // --- Parent Comment Setup ---
-        Comments.CreateCommentData memory parentCommentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory parentComment = Comments
+            .CreateComment({
                 content: "Parent comment",
                 metadata: "{}",
                 targetUri: "",
@@ -472,21 +462,21 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 author: user1,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user1, user2),
+                nonce: commentManager.getNonce(user1, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: bytes32(0)
             });
 
         // Post parent comment
         vm.prank(user1);
-        comments.postCommentAsAuthor(parentCommentData, "");
-        bytes32 parentCommentId = comments.getCommentId(parentCommentData);
+        commentManager.postCommentAsAuthor(parentComment, "");
+        bytes32 parentCommentId = commentManager.getCommentId(parentComment);
 
         uint256 initialBalance = user1.balance;
 
         // --- Reply Comment Setup (No Tip Mention) ---
-        Comments.CreateCommentData memory replyCommentData = Comments
-            .CreateCommentData({
+        Comments.CreateComment memory replyComment = Comments
+            .CreateComment({
                 content: "Regular reply without tip", // No tip mention
                 metadata: "{}",
                 targetUri: "",
@@ -494,14 +484,14 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 author: user2,
                 app: user2,
                 channelId: channelId,
-                nonce: comments.nonces(user2, user2),
+                nonce: commentManager.getNonce(user2, user2),
                 deadline: block.timestamp + 1 days,
                 parentId: parentCommentId
             });
 
         // --- Post Reply Comment (No Value) ---
         vm.prank(user2);
-        comments.postCommentAsAuthor(replyCommentData, "");
+        commentManager.postCommentAsAuthor(replyComment, "");
 
         assertEq(
             user1.balance,

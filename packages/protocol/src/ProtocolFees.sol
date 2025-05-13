@@ -73,16 +73,13 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
         return amount;
     }
 
-    /// @notice Collects channel creation fee
-    /// @return The amount of fees collected
+    /// @inheritdoc IProtocolFees
     function collectChannelCreationFee() public payable returns (uint96) {
         return _collectFee(channelCreationFee);
     }
 
-    /// @notice Collects hook transaction fee
-    /// @param value The total value sent with the transaction
-    /// @return hookValue The amount that should be passed to the hook
-    function calculateHookTransactionFee(
+    /// @inheritdoc IProtocolFees
+    function deductProtocolHookTransactionFee(
         uint256 value
     ) public view returns (uint256 hookValue) {
         if (value <= 0 || hookTransactionFeeBasisPoints <= 0) {

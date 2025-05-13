@@ -36,23 +36,12 @@ abstract contract BaseHook is IHook, ERC165 {
 
     function _getHookPermissions() internal pure virtual returns (Hooks.Permissions memory) {
         return Hooks.Permissions({
-            beforeInitialize: false,
             afterInitialize: false,
-            beforeComment: false,
             afterComment: false,
-            beforeDeleteComment: false,
             afterDeleteComment: false
         });
     }
 
-    /// @inheritdoc IHook
-    function beforeInitialize(address channel) external virtual returns (bool) {
-        return _beforeInitialize(channel);
-    }
-
-    function _beforeInitialize(address) internal virtual returns (bool) {
-        revert HookNotImplemented();
-    }
 
     /// @inheritdoc IHook
     function afterInitialize(address channel) external virtual returns (bool) {
@@ -64,67 +53,33 @@ abstract contract BaseHook is IHook, ERC165 {
     }
 
     /// @inheritdoc IHook
-    function beforeComment(
-        Comments.CommentData calldata commentData,
-        address caller,
-        bytes32 commentId
-    ) external payable virtual returns (bool) {
-        return _beforeComment(commentData, caller, commentId);
-    }
-
-    function _beforeComment(
-        Comments.CommentData calldata,
-        address,
-        bytes32
-    ) internal virtual returns (bool) {
-        revert HookNotImplemented();
-    }
-
-    /// @inheritdoc IHook
     function afterComment(
-        Comments.CommentData calldata commentData,
+        Comments.Comment calldata commentData,
         address caller,
         bytes32 commentId
-    ) external payable virtual returns (bool) {
+    ) external payable virtual returns (string memory) {
         return _afterComment(commentData, caller, commentId);
     }
 
     function _afterComment(
-        Comments.CommentData calldata,
+        Comments.Comment calldata,
         address,
         bytes32
-    ) internal virtual returns (bool) {
-        revert HookNotImplemented();
-    }
-
-    /// @inheritdoc IHook
-    function beforeDeleteComment(
-        Comments.CommentData calldata commentData,
-        address caller,
-        bytes32 commentId
-    ) external payable virtual returns (bool) {
-        return _beforeDeleteComment(commentData, caller, commentId);
-    }
-
-    function _beforeDeleteComment(
-        Comments.CommentData calldata,
-        address,
-        bytes32
-    ) internal virtual returns (bool) {
+    ) internal virtual returns (string memory) {
         revert HookNotImplemented();
     }
 
     /// @inheritdoc IHook
     function afterDeleteComment(
-        Comments.CommentData calldata commentData,
+        Comments.Comment calldata commentData,
         address caller,
         bytes32 commentId
-    ) external virtual returns (bool) {
+    ) external payable virtual returns (bool) {
         return _afterDeleteComment(commentData, caller, commentId);
     }
 
     function _afterDeleteComment(
-        Comments.CommentData calldata,
+        Comments.Comment calldata,
         address,
         bytes32
     ) internal virtual returns (bool) {
