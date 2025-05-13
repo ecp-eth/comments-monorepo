@@ -232,7 +232,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         Comments.CommentData storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
-
+        require(comment.author == author, "Author does not match comment author");
         nonces[author][app]++;
 
         bytes32 deleteHash = getDeleteCommentHash(
