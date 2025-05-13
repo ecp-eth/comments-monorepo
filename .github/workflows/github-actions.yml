@@ -155,15 +155,27 @@ jobs:
         working-directory: docs
 
       - name: "Docs: Warn if docs are not synced"
+        id: docs-warn-out-of-sync
         continue-on-error: true
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
             git status --porcelain | while read -r line; do
               # Extract the filename (3rd character onward)
-              file=$(echo "$line" | cut -c4-)
+              file=$(echo "$line" | cut -c3-)
               # Print a warning for each file
               echo "::warning file=$file::$file out of sync"
             done
             exit 1
           fi
         shell: bash
+      - name: "Docs: Write out of sync docs files as a comment"
+        uses: actions/github-script@v7
+        if: failure()
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Please note that the following docs files are out of sync: \n${{steps.docs-warn-out-of-sync.outputs.files}}'
+            })
