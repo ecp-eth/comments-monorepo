@@ -84,8 +84,8 @@ async function checkContractAddresses() {
   ) {
     console.error(
       `Contract addresses are not up to date:
-      - CHANNEL_MANAGER_ADDRESS: Latest address ${deployResult.channelManagerAddress}, current SDK address ${CHANNEL_MANAGER_ADDRESS}
-      - COMMENT_MANAGER_ADDRESS: Latest address ${deployResult.commentsAddress}, current SDK address ${COMMENT_MANAGER_ADDRESS}`
+      - COMMENT_MANAGER_ADDRESS: Latest address ${deployResult.commentsAddress}, current SDK address ${COMMENT_MANAGER_ADDRESS}
+      - CHANNEL_MANAGER_ADDRESS: Latest address ${deployResult.channelManagerAddress}, current SDK address ${CHANNEL_MANAGER_ADDRESS}`
     );
     exit(1);
     return;

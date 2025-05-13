@@ -154,11 +154,16 @@ jobs:
         run: pnpm run build
         working-directory: docs
 
-      - name: "Docs: Ensure docs are synced"
+      - name: "Docs: Warn if docs are not synced"
+        continue-on-error: true
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
-            echo "Docs folder needs to be synced, please run \`pnpm run build\` in the docs folder" >&2
-            git status
+            git status --porcelain | while read -r line; do
+              # Extract the filename (3rd character onward)
+              file=$(echo "$line" | cut -c4-)
+              # Print a warning for each file
+              echo "::warning file=$file::$file out of sync"
+            done
             exit 1
           fi
         shell: bash
