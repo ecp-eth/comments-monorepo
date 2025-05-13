@@ -26,7 +26,7 @@ import { addApprovalAsAuthor, revokeApprovalAsAuthor } from "../approval.js";
 import { CommentManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
-import { CreateCommentData } from "../schemas.js";
+import type { CreateCommentData } from "../schemas.js";
 
 const { commentsAddress } = deployContracts();
 
