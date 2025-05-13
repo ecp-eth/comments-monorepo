@@ -80,7 +80,7 @@ jobs:
         run: "forge config"
 
       - name: "Run the tests"
-        run: "forge test -vvv"
+        run: "forge test -vvv --via-ir --optimizer-runs 1"
 
       - name: "Add test summary"
         run: |

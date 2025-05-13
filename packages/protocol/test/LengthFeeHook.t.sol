@@ -109,15 +109,21 @@ contract LengthFeeHook is BaseHook {
     // Allow receiving ETH in case it's sent by mistake
     receive() external payable {}
 
-    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            beforeInitialize: false,
-            afterInitialize: false,
-            beforeComment: true,
-            afterComment: true,
-            beforeDeleteComment: false,
-            afterDeleteComment: false
-        });
+    function _getHookPermissions()
+        internal
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                beforeInitialize: false,
+                afterInitialize: false,
+                beforeComment: true,
+                afterComment: true,
+                beforeDeleteComment: false,
+                afterDeleteComment: false
+            });
     }
 }
 
@@ -297,7 +303,7 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
     }
 
     function _signAppSignature(
-        Comments.CommentData memory commentData
+        Comments.CreateCommentData memory commentData
     ) internal view returns (bytes memory) {
         bytes32 digest = comments.getCommentId(commentData);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
@@ -320,18 +326,19 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
             ((expectedTotalFee * PROTOCOL_FEE_PERCENTAGE) / 10000);
 
         // Create comment data using direct construction
-        Comments.CommentData memory commentData = Comments.CommentData({
-            content: content,
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            app: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        Comments.CreateCommentData memory commentData = Comments
+            .CreateCommentData({
+                content: content,
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                app: user2,
+                channelId: channelId,
+                nonce: comments.nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
@@ -368,18 +375,19 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
         string memory content = "Test comment";
 
         // Create comment data using direct construction
-        Comments.CommentData memory commentData = Comments.CommentData({
-            content: content,
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            app: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
+        Comments.CreateCommentData memory commentData = Comments
+            .CreateCommentData({
+                content: content,
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                app: user2,
+                channelId: channelId,
+                nonce: comments.nonces(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
 
         // Make a few comments to collect fees
         for (uint i = 0; i < 3; i++) {

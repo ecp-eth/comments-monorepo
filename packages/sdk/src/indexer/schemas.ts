@@ -54,11 +54,12 @@ export const IndexerAPICommentSchema = z.object({
   metadata: z.string(),
   parentId: HexSchema.nullable(),
   targetUri: z.string(),
-  timestamp: z.coerce.date(),
   txHash: HexSchema,
   cursor: HexSchema,
   moderationStatus: IndexerAPICommentModerationStatusSchema,
   moderationStatusChangedAt: z.coerce.date(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });
 
 export type IndexerAPICommentSchemaType = z.infer<
@@ -73,7 +74,8 @@ const dateToString = z.coerce.date().transform((val) => val.toISOString());
 
 export const IndexerAPICommentOutputSchema = IndexerAPICommentSchema.extend({
   channelId: bigintToString,
-  timestamp: dateToString,
+  createdAt: dateToString,
+  updatedAt: dateToString,
   moderationStatusChangedAt: dateToString,
   deletedAt: dateToString.nullable(),
 });

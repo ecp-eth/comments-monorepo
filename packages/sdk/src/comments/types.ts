@@ -108,6 +108,14 @@ export type CommentData = {
    * The deadline of the comment submission in seconds since epoch
    */
   deadline: bigint;
+  /**
+   * The timestamp of the comment creation in seconds since epoch
+   */
+  createdAt: bigint;
+  /**
+   * The timestamp of the comment update in seconds since epoch
+   */
+  updatedAt: bigint;
 };
 
 export type ContractWriteFunctions = {

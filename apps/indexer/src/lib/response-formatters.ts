@@ -132,10 +132,10 @@ export async function resolveUserDataAndFormatListCommentsResponse({
               hasNext: replies.length > replyLimit,
               hasPrevious: false,
               startCursor: startReply
-                ? getCommentCursor(startReply.id as Hex, startReply.timestamp)
+                ? getCommentCursor(startReply.id as Hex, startReply.createdAt)
                 : undefined,
               endCursor: endReply
-                ? getCommentCursor(endReply.id as Hex, endReply.timestamp)
+                ? getCommentCursor(endReply.id as Hex, endReply.createdAt)
                 : undefined,
             },
           },
@@ -147,10 +147,10 @@ export async function resolveUserDataAndFormatListCommentsResponse({
       hasNext: nextComment !== endComment,
       hasPrevious: !!previousComment,
       startCursor: startComment
-        ? getCommentCursor(startComment.id as Hex, startComment.timestamp)
+        ? getCommentCursor(startComment.id as Hex, startComment.createdAt)
         : undefined,
       endCursor: endComment
-        ? getCommentCursor(endComment.id as Hex, endComment.timestamp)
+        ? getCommentCursor(endComment.id as Hex, endComment.createdAt)
         : undefined,
     },
     extra: {
@@ -179,7 +179,7 @@ function formatComment(comment: CommentSelectType) {
     ...comment,
     id: HexSchema.parse(comment.id),
     content: comment.deletedAt ? "[deleted]" : comment.content,
-    cursor: getCommentCursor(comment.id as Hex, comment.timestamp),
+    cursor: getCommentCursor(comment.id as Hex, comment.createdAt),
   };
 }
 

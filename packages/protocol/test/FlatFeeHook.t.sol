@@ -30,15 +30,21 @@ contract FlatFeeHook is BaseHook {
         feeCollector = _feeCollector;
     }
 
-    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            beforeInitialize: false,
-            afterInitialize: false,
-            beforeComment: true,
-            afterComment: true,
-            beforeDeleteComment: false,
-            afterDeleteComment: false
-        });
+    function _getHookPermissions()
+        internal
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                beforeInitialize: false,
+                afterInitialize: false,
+                beforeComment: true,
+                afterComment: true,
+                beforeDeleteComment: false,
+                afterDeleteComment: false
+            });
     }
 
     function _beforeComment(
@@ -133,7 +139,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     }
 
     function _signAppSignature(
-        Comments.CommentData memory commentData
+        Comments.CreateCommentData memory commentData
     ) internal view returns (bytes memory) {
         bytes32 digest = comments.getCommentId(commentData);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
@@ -146,8 +152,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             value: CHANNEL_CREATION_FEE
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
-        Comments.CommentData memory commentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory commentData = Comments
+            .CreateCommentData({
                 content: "Test comment",
                 metadata: "{}",
                 targetUri: "",
@@ -187,8 +193,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        Comments.CommentData memory commentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory commentData = Comments
+            .CreateCommentData({
                 content: "Test comment",
                 metadata: "{}",
                 targetUri: "",
@@ -234,8 +240,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        Comments.CommentData memory commentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory commentData = Comments
+            .CreateCommentData({
                 content: "Test comment",
                 metadata: "{}",
                 targetUri: "",
@@ -266,8 +272,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        Comments.CommentData memory commentData = Comments
-            .CommentData({
+        Comments.CreateCommentData memory commentData = Comments
+            .CreateCommentData({
                 content: "Test comment",
                 metadata: "{}",
                 targetUri: "",

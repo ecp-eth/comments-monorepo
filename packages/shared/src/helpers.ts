@@ -222,7 +222,8 @@ export function insertPendingCommentToPage(
     logIndex: 0,
     txHash,
     chainId,
-    timestamp: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
     moderationStatus: moderationEnabled ? "pending" : "approved",
     moderationStatusChangedAt: new Date(),
     replies: {

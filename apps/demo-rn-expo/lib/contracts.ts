@@ -1,11 +1,11 @@
 import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
-import { CommentData } from "@ecp.eth/sdk/comments/types";
 import { Hex } from "viem";
 import { writeContract } from "@wagmi/core";
 import { config } from "../wagmi.config";
+import type { CreateCommentData } from "@ecp.eth/sdk/comments/schemas";
 
 type PostCommentViaCommentsV1Params = {
-  commentData: CommentData;
+  commentData: CreateCommentData;
   appSignature: Hex;
 };
 

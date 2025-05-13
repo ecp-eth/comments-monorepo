@@ -21,7 +21,6 @@ import type {
 import {
   AddCommentTypedDataSchema,
   type AddCommentTypedDataSchemaType,
-  CommentDataSchema,
   type CommentInputData,
   CommentInputDataSchema,
   DeleteCommentTypedDataSchema,
@@ -40,7 +39,7 @@ export type PostCommentAsAuthorParams = {
    *
    * You can obtain this by using the `createCommentData()` function
    */
-  comment: CommentData;
+  comment: CommentInputData;
   /**
    * The app signature
    */
@@ -65,8 +64,8 @@ export type PostCommentAsAuthorResult = {
 };
 
 const PostCommentAsAuthorParamsSchema = z.object({
-  // we don't care here because comment is validated internally by createCommentData
-  comment: CommentDataSchema,
+  // we don't care here because comment is validated internally by createCommentData()
+  comment: CommentInputDataSchema,
   appSignature: HexSchema,
   fee: z.bigint().optional(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
@@ -104,7 +103,7 @@ export type PostCommentParams = {
    *
    * You can obtain this by using the `createCommentData()` function
    */
-  comment: CommentData;
+  comment: CommentInputData;
   /**
    * The app signature
    */
@@ -133,7 +132,7 @@ export type PostCommentResult = {
 };
 
 const PostCommentParamsSchema = z.object({
-  comment: CommentDataSchema,
+  comment: CommentInputDataSchema,
   appSignature: HexSchema,
   authorSignature: HexSchema.optional(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
@@ -540,7 +539,7 @@ export function createCommentTypedData(
 
 /**
  * Create the data structure of a comment
- * @return {@link comments!CommentData | CommentData} The data structure of a comment
+ * @return {@link comments!CommentInputData | CommentInputData} The data structure of a comment
  *
  */
 export function createCommentData({
@@ -553,7 +552,7 @@ export function createCommentData({
   channelId = DEFAULT_CHANNEL_ID,
   commentType = DEFAULT_COMMENT_TYPE,
   ...params
-}: CreateCommentDataParams): CommentData {
+}: CreateCommentDataParams): CommentInputData {
   return CommentInputDataSchema.parse({
     content,
     metadata: metadata ? JSON.stringify(metadata) : "",

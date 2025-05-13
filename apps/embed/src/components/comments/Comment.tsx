@@ -61,7 +61,7 @@ export function Comment({
       <div className="flex justify-between items-center mb-2">
         <CommentAuthor
           author={comment.author}
-          timestamp={comment.timestamp}
+          timestamp={comment.createdAt}
           currentTimestamp={currentTimestamp}
           moderationStatus={comment.moderationStatus}
         />

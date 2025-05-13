@@ -88,10 +88,10 @@ export default (app: OpenAPIHono) => {
                 ? [
                     or(
                       and(
-                        eq(schema.comments.timestamp, cursor.timestamp),
+                        eq(schema.comments.createdAt, cursor.createdAt),
                         lt(schema.comments.id, cursor.id)
                       ),
-                      lt(schema.comments.timestamp, cursor.timestamp)
+                      lt(schema.comments.createdAt, cursor.createdAt)
                     ),
                   ]
                 : []),
@@ -99,18 +99,18 @@ export default (app: OpenAPIHono) => {
                 ? [
                     or(
                       and(
-                        eq(schema.comments.timestamp, cursor.timestamp),
+                        eq(schema.comments.createdAt, cursor.createdAt),
                         gt(schema.comments.id, cursor.id)
                       ),
-                      gt(schema.comments.timestamp, cursor.timestamp)
+                      gt(schema.comments.createdAt, cursor.createdAt)
                     ),
                   ]
                 : [])
             ),
             orderBy:
               sort === "desc"
-                ? [asc(schema.comments.timestamp), asc(schema.comments.id)]
-                : [desc(schema.comments.timestamp), desc(schema.comments.id)],
+                ? [asc(schema.comments.createdAt), asc(schema.comments.id)]
+                : [desc(schema.comments.createdAt), desc(schema.comments.id)],
           })
           .execute()
       : undefined;
@@ -119,7 +119,7 @@ export default (app: OpenAPIHono) => {
       with: {
         [mode === "flat" ? "flatReplies" : "replies"]: {
           where: and(...repliesConditions),
-          orderBy: [desc(schema.comments.timestamp), desc(schema.comments.id)],
+          orderBy: [desc(schema.comments.createdAt), desc(schema.comments.id)],
           limit: REPLIES_PER_COMMENT + 1,
         },
       },
@@ -129,10 +129,10 @@ export default (app: OpenAPIHono) => {
           ? [
               or(
                 and(
-                  eq(schema.comments.timestamp, cursor.timestamp),
+                  eq(schema.comments.createdAt, cursor.createdAt),
                   lt(schema.comments.id, cursor.id)
                 ),
-                lt(schema.comments.timestamp, cursor.timestamp)
+                lt(schema.comments.createdAt, cursor.createdAt)
               ),
             ]
           : []),
@@ -140,18 +140,18 @@ export default (app: OpenAPIHono) => {
           ? [
               or(
                 and(
-                  eq(schema.comments.timestamp, cursor.timestamp),
+                  eq(schema.comments.createdAt, cursor.createdAt),
                   gt(schema.comments.id, cursor.id)
                 ),
-                gt(schema.comments.timestamp, cursor.timestamp)
+                gt(schema.comments.createdAt, cursor.createdAt)
               ),
             ]
           : [])
       ),
       orderBy:
         sort === "desc"
-          ? [desc(schema.comments.timestamp), desc(schema.comments.id)]
-          : [asc(schema.comments.timestamp), asc(schema.comments.id)],
+          ? [desc(schema.comments.createdAt), desc(schema.comments.id)]
+          : [asc(schema.comments.createdAt), asc(schema.comments.id)],
       limit: limit + 1,
     });
 

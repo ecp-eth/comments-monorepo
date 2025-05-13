@@ -62,7 +62,9 @@ contract DebugGasUsage is Test, IERC721Receiver {
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
+            parentId: bytes32(0),
+            createdAt: uint80(block.timestamp),
+            updatedAt: uint80(block.timestamp)
         });
 
         vm.deal(address(comments), 10 ether);

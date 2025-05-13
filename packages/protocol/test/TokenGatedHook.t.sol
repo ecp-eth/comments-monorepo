@@ -47,15 +47,21 @@ contract TokenGatedHook is BaseHook {
         return true;
     }
 
-    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            beforeInitialize: false,
-            afterInitialize: false,
-            beforeComment: true,
-            afterComment: true,
-            beforeDeleteComment: false,
-            afterDeleteComment: false
-        });
+    function _getHookPermissions()
+        internal
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                beforeInitialize: false,
+                afterInitialize: false,
+                beforeComment: true,
+                afterComment: true,
+                beforeDeleteComment: false,
+                afterDeleteComment: false
+            });
     }
 }
 
@@ -114,7 +120,9 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
+            parentId: bytes32(0),
+            createdAt: uint80(block.timestamp),
+            updatedAt: uint80(block.timestamp)
         });
 
         // Test beforeComment hook - should succeed
@@ -153,7 +161,9 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
+            parentId: bytes32(0),
+            createdAt: uint80(block.timestamp),
+            updatedAt: uint80(block.timestamp)
         });
 
         // Test beforeComment hook - should fail
@@ -188,7 +198,9 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
             channelId: channelId,
             nonce: comments.nonces(user1, user2),
             deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
+            parentId: bytes32(0),
+            createdAt: uint80(block.timestamp),
+            updatedAt: uint80(block.timestamp)
         });
 
         // First try without tokens - should fail

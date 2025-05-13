@@ -1,6 +1,5 @@
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { Hex, TransactionReceipt } from "viem";
-import { CommentData } from "@ecp.eth/sdk/comments/types";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 import { QueryClient } from "@tanstack/react-query";
@@ -13,13 +12,14 @@ import {
 } from "./contracts";
 import { chain, config } from "../wagmi.config";
 import { FetchCommentInfinityQuerySchema } from "../hooks/useOptimisticCommentingManager/schemas";
+import type { CreateCommentData } from "@ecp.eth/sdk/comments/schemas";
 
 const chainId = chain.id;
 
 type PostCommentResponse = {
   receipt: TransactionReceipt;
   txHash: Hex;
-  commentData: CommentData;
+  commentData: CreateCommentData;
   appSignature: Hex;
   commentId: Hex;
 };
