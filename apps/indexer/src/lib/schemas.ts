@@ -86,7 +86,7 @@ export const APIErrorResponseSchema = z.object({
 });
 
 const CommentCursorSchema = z.object({
-  timestamp: z.coerce.date(),
+  createdAt: z.coerce.date(),
   id: HexSchema,
 });
 
@@ -99,12 +99,12 @@ export const InputCommentCursorSchema = z.preprocess((value, ctx) => {
   try {
     const parsed = HexSchema.parse(value);
     const hex = hexToString(parsed);
-    const [timestamp, id] = z
-      .tuple([z.coerce.number().positive(), HexSchema])
+    const [createdAt, id] = z
+      .tuple([z.coerce.date(), HexSchema])
       .parse(hex.split(":"));
 
     return {
-      timestamp,
+      createdAt,
       id,
     };
   } catch {

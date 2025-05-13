@@ -414,7 +414,8 @@ moderateComments
         console.table([
           {
             "Comment ID": comment.id,
-            Timestamp: comment.timestamp,
+            "Created At": comment.createdAt,
+            "Updated At": comment.updatedAt,
             "Author (address)": comment.author.address,
             "Author (ENS)": comment.author.ens?.name,
             "Author (FC)": comment.author.farcaster?.username,

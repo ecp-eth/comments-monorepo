@@ -27,7 +27,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       return;
     }
 
-    const timestamp = new Date(Number(event.block.timestamp) * 1000);
+    const createdAt = new Date(Number(event.args.commentData.createdAt) * 1000);
+    const updatedAt = new Date(Number(event.args.commentData.updatedAt) * 1000);
 
     const parentId = transformCommentParentId(event.args.commentData.parentId);
     let rootCommentId: Hex | null = null;
@@ -51,7 +52,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
               author: event.args.commentData.author,
               txHash: event.transaction.hash,
               logIndex: event.log.logIndex,
-              timestamp,
+              createdAt,
+              updatedAt,
               parentCommentId: event.args.commentData.parentId,
             },
           }
@@ -79,7 +81,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       rootCommentId,
       author: event.args.commentData.author,
       txHash: event.transaction.hash,
-      timestamp,
+      createdAt,
+      updatedAt,
       chainId: context.network.chainId,
       app: event.args.commentData.app,
       logIndex: event.log.logIndex,
@@ -92,7 +95,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
           }
         : {
             moderationStatus: defaultModerationStatus,
-            moderationStatusChangedAt: timestamp,
+            moderationStatusChangedAt: createdAt,
           }),
     });
 

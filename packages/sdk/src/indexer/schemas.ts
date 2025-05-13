@@ -54,11 +54,12 @@ export const IndexerAPICommentSchema = z.object({
   metadata: z.string(),
   parentId: HexSchema.nullable(),
   targetUri: z.string(),
-  timestamp: z.coerce.date(),
   txHash: HexSchema,
   cursor: HexSchema,
   moderationStatus: IndexerAPICommentModerationStatusSchema,
   moderationStatusChangedAt: z.coerce.date(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });
 
 export type IndexerAPICommentSchemaType = z.infer<
