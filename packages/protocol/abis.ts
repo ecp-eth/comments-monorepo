@@ -67,6 +67,19 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
+    name: "EDIT_COMMENT_TYPEHASH",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "REMOVE_APPROVAL_TYPEHASH",
     inputs: [],
     outputs: [
@@ -188,6 +201,111 @@ export const CommentManagerABI = [
         name: "commentId",
         type: "bytes32",
         internalType: "bytes32",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "editComment",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "editData",
+        type: "tuple",
+        internalType: "struct Comments.EditCommentData",
+        components: [
+          {
+            name: "app",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "nonce",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "deadline",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "content",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "metadata",
+            type: "string",
+            internalType: "string",
+          },
+        ],
+      },
+      {
+        name: "authorSignature",
+        type: "bytes",
+        internalType: "bytes",
+      },
+      {
+        name: "appSignature",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "editCommentAsAuthor",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "editData",
+        type: "tuple",
+        internalType: "struct Comments.EditCommentData",
+        components: [
+          {
+            name: "app",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "nonce",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "deadline",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "content",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "metadata",
+            type: "string",
+            internalType: "string",
+          },
+        ],
+      },
+      {
+        name: "appSignature",
+        type: "bytes",
+        internalType: "bytes",
       },
     ],
     outputs: [],
@@ -412,6 +530,57 @@ export const CommentManagerABI = [
         name: "deadline",
         type: "uint256",
         internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getEditCommentHash",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "editData",
+        type: "tuple",
+        internalType: "struct Comments.EditCommentData",
+        components: [
+          {
+            name: "app",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "nonce",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "deadline",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "content",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "metadata",
+            type: "string",
+            internalType: "string",
+          },
+        ],
       },
     ],
     outputs: [
@@ -951,6 +1120,104 @@ export const CommentManagerABI = [
         type: "address",
         indexed: true,
         internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "CommentEdited",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+      {
+        name: "author",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "app",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "commentData",
+        type: "tuple",
+        indexed: false,
+        internalType: "struct Comments.Comment",
+        components: [
+          {
+            name: "author",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "app",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "createdAt",
+            type: "uint80",
+            internalType: "uint80",
+          },
+          {
+            name: "updatedAt",
+            type: "uint80",
+            internalType: "uint80",
+          },
+          {
+            name: "channelId",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "nonce",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "deadline",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "parentId",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "content",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "metadata",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "targetUri",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "commentType",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "hookData",
+            type: "string",
+            internalType: "string",
+          },
+        ],
       },
     ],
     anonymous: false,

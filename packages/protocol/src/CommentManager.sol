@@ -237,7 +237,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             revert SignatureDeadlineReached(editData.deadline, block.timestamp);
         }
 
-        Comments.CommentData storage comment = comments[commentId];
+        Comments.Comment storage comment = comments[commentId];
 
         require(comment.author != address(0), "Comment does not exist");
 
@@ -257,7 +257,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         // Validate signatures if present
         if (appSignature.length > 0) {
-            _validateSignature(appSignature);
             if (
                 !SignatureChecker.isValidSignatureNow(
                     // @QUESTION do we want to allow any app to edit a comment?
@@ -270,13 +269,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             }
         }
 
-        if (authorSignature.length > 0) {
-            _validateSignature(authorSignature);
-        }
-
         if (
             msg.sender != comment.author &&
-            !isApproved[comment.author][editData.app] &&
+            !approvals[comment.author][editData.app] &&
             !(authorSignature.length > 0 &&
                 SignatureChecker.isValidSignatureNow(
                     comment.author,

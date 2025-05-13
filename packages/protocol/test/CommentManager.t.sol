@@ -35,7 +35,7 @@ contract CommentsTest is Test, IERC721Receiver {
         bytes32 indexed commentId,
         address indexed author,
         address indexed app,
-        Comments.CommentData commentData
+        Comments.Comment commentData
     );
 
     CommentManager public comments;
@@ -806,17 +806,17 @@ contract CommentsTest is Test, IERC721Receiver {
                 content: "Edited content",
                 metadata: '{"edited":true}',
                 app: app,
-                nonce: comments.nonces(author, app),
+                nonce: comments.getNonce(author, app),
                 deadline: block.timestamp + 1 days
             });
     }
 
     function test_EditCommentAsAuthor() public {
         // First create a comment
-        Comments.CreateCommentData
-            memory commentData = _createBasicCreateCommentData();
+        Comments.CreateComment
+            memory commentData = _createBasicCreateComment();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
+        bytes memory appSignature = TestUtils.signEIP712(vm, appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
@@ -825,9 +825,9 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(commentId, editData);
-        bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
+        bytes memory editAppSignature = TestUtils.signEIP712(vm, appPrivateKey, editHash);
 
-        Comments.CommentData memory expectedCommentData = comments.getComment(
+        Comments.Comment memory expectedCommentData = comments.getComment(
             commentId
         );
 
@@ -841,7 +841,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.editCommentAsAuthor(commentId, editData, editAppSignature);
 
         // Verify the comment was edited
-        Comments.CommentData memory editedComment = comments.getComment(
+        Comments.Comment memory editedComment = comments.getComment(
             commentId
         );
         assertEq(editedComment.content, editData.content);
@@ -851,15 +851,15 @@ contract CommentsTest is Test, IERC721Receiver {
 
     function test_EditCommentAsAuthor_InvalidAuthor() public {
         // First create a comment
-        Comments.CreateCommentData
-            memory commentData = _createBasicCreateCommentData();
+        Comments.CreateComment
+            memory commentData = _createBasicCreateComment();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
+        bytes memory appSignature = TestUtils.signEIP712(vm, appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
 
-        Comments.CommentData memory originalComment = comments.getComment(
+        Comments.Comment memory originalComment = comments.getComment(
             commentId
         );
 
@@ -867,7 +867,7 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(commentId, editData);
-        bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
+        bytes memory editAppSignature = TestUtils.signEIP712(vm, appPrivateKey, editHash);
 
         address wrongAuthor = address(0x3);
         vm.prank(wrongAuthor);
@@ -881,7 +881,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.editCommentAsAuthor(commentId, editData, editAppSignature);
 
         // Verify comment did not change
-        Comments.CommentData memory editedComment = comments.getComment(
+        Comments.Comment memory editedComment = comments.getComment(
             commentId
         );
         assertEq(editedComment.content, originalComment.content);
@@ -891,10 +891,10 @@ contract CommentsTest is Test, IERC721Receiver {
 
     function test_EditComment() public {
         // First create a comment
-        Comments.CreateCommentData
-            memory commentData = _createBasicCreateCommentData();
+        Comments.CreateComment
+            memory commentData = _createBasicCreateComment();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
+        bytes memory appSignature = TestUtils.signEIP712(vm, appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
@@ -903,13 +903,14 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(commentId, editData);
-        bytes memory editAuthorSignature = _signEIP712(
+        bytes memory editAuthorSignature = TestUtils.signEIP712(
+            vm,
             authorPrivateKey,
             editHash
         );
-        bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
+        bytes memory editAppSignature = TestUtils.signEIP712(vm, appPrivateKey, editHash);
 
-        Comments.CommentData memory expectedCommentData = comments.getComment(
+        Comments.Comment memory expectedCommentData = comments.getComment(
             commentId
         );
 
@@ -927,7 +928,7 @@ contract CommentsTest is Test, IERC721Receiver {
         );
 
         // Verify the comment was edited
-        Comments.CommentData memory editedComment = comments.getComment(
+        Comments.Comment memory editedComment = comments.getComment(
             commentId
         );
         assertEq(editedComment.content, editData.content);
@@ -937,10 +938,10 @@ contract CommentsTest is Test, IERC721Receiver {
 
     function test_EditComment_InvalidAppSignature() public {
         // First create a comment
-        Comments.CreateCommentData
-            memory commentData = _createBasicCreateCommentData();
+        Comments.CreateComment
+            memory commentData = _createBasicCreateComment();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
+        bytes memory appSignature = TestUtils.signEIP712(vm, appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
@@ -949,11 +950,12 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(commentId, editData);
-        bytes memory editAuthorSignature = _signEIP712(
+        bytes memory editAuthorSignature = TestUtils.signEIP712(
+            vm,
             authorPrivateKey,
             editHash
         );
-        bytes memory wrongAppSignature = _signEIP712(wrongPrivateKey, editHash);
+        bytes memory wrongAppSignature = TestUtils.signEIP712(vm, wrongPrivateKey, editHash);
 
         vm.expectRevert(ICommentManager.InvalidAppSignature.selector);
         comments.editComment(
@@ -966,10 +968,10 @@ contract CommentsTest is Test, IERC721Receiver {
 
     function test_EditComment_InvalidNonce() public {
         // First create a comment
-        Comments.CreateCommentData
-            memory commentData = _createBasicCreateCommentData();
+        Comments.CreateComment
+            memory commentData = _createBasicCreateComment();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
+        bytes memory appSignature = TestUtils.signEIP712(vm, appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
@@ -981,11 +983,12 @@ contract CommentsTest is Test, IERC721Receiver {
         editData.nonce = editData.nonce + 1; // Use wrong nonce
 
         bytes32 editHash = comments.getEditCommentHash(commentId, editData);
-        bytes memory editAuthorSignature = _signEIP712(
+        bytes memory editAuthorSignature = TestUtils.signEIP712(
+            vm,
             authorPrivateKey,
             editHash
         );
-        bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
+        bytes memory editAppSignature = TestUtils.signEIP712(vm, appPrivateKey, editHash);
 
         vm.expectRevert(
             abi.encodeWithSelector(
@@ -1010,10 +1013,10 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.addApprovalAsAuthor(app);
 
         // Create and post a comment
-        Comments.CreateCommentData
-            memory commentData = _createBasicCreateCommentData();
+        Comments.CreateComment
+            memory commentData = _createBasicCreateComment();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
+        bytes memory appSignature = TestUtils.signEIP712(vm, appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
@@ -1022,9 +1025,9 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(commentId, editData);
-        bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
+        bytes memory editAppSignature = TestUtils.signEIP712(vm, appPrivateKey, editHash);
 
-        Comments.CommentData memory expectedCommentData = comments.getComment(
+        Comments.Comment memory expectedCommentData = comments.getComment(
             commentId
         );
 
@@ -1037,7 +1040,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.editComment(commentId, editData, bytes(""), editAppSignature);
 
         // Verify the comment was edited
-        Comments.CommentData memory editedComment = comments.getComment(
+        Comments.Comment memory editedComment = comments.getComment(
             commentId
         );
         assertEq(editedComment.content, editData.content);
@@ -1047,10 +1050,10 @@ contract CommentsTest is Test, IERC721Receiver {
 
     function test_EditComment_ExpiredDeadline() public {
         // First create a comment
-        Comments.CreateCommentData
-            memory commentData = _createBasicCreateCommentData();
+        Comments.CreateComment
+            memory commentData = _createBasicCreateComment();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
+        bytes memory appSignature = TestUtils.signEIP712(vm, appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
@@ -1061,11 +1064,12 @@ contract CommentsTest is Test, IERC721Receiver {
         editData.deadline = block.timestamp - 1; // Set expired deadline
 
         bytes32 editHash = comments.getEditCommentHash(commentId, editData);
-        bytes memory editAuthorSignature = _signEIP712(
+        bytes memory editAuthorSignature = TestUtils.signEIP712(
+            vm,
             authorPrivateKey,
             editHash
         );
-        bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
+        bytes memory editAppSignature = TestUtils.signEIP712(vm, appPrivateKey, editHash);
 
         vm.expectRevert(
             abi.encodeWithSelector(
@@ -1087,11 +1091,12 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(nonExistentId, editData);
-        bytes memory editAuthorSignature = _signEIP712(
+        bytes memory editAuthorSignature = TestUtils.signEIP712(
+            vm,
             authorPrivateKey,
             editHash
         );
-        bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
+        bytes memory editAppSignature = TestUtils.signEIP712(vm, appPrivateKey, editHash);
 
         vm.expectRevert("Comment does not exist");
         comments.editComment(
@@ -1104,10 +1109,10 @@ contract CommentsTest is Test, IERC721Receiver {
 
     function test_EditComment_InvalidAuthor() public {
         // First create a comment
-        Comments.CreateCommentData
-            memory commentData = _createBasicCreateCommentData();
+        Comments.CreateComment
+            memory commentData = _createBasicCreateComment();
         bytes32 commentId = comments.getCommentId(commentData);
-        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
+        bytes memory appSignature = TestUtils.signEIP712(vm, appPrivateKey, commentId);
 
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
@@ -1119,11 +1124,12 @@ contract CommentsTest is Test, IERC721Receiver {
         bytes32 editHash = comments.getEditCommentHash(commentId, editData);
         address wrongAuthor = address(0x3);
         // use signature of wrong author
-        bytes memory editAuthorSignature = _signEIP712(
+        bytes memory editAuthorSignature = TestUtils.signEIP712(
+            vm,
             wrongPrivateKey,
             editHash
         );
-        bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
+        bytes memory editAppSignature = TestUtils.signEIP712(vm, appPrivateKey, editHash);
 
         vm.prank(wrongAuthor);
         vm.expectRevert(

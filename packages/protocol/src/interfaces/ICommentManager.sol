@@ -34,7 +34,7 @@ interface ICommentManager {
         bytes32 indexed commentId,
         address indexed author,
         address indexed app,
-        Comments.CommentData commentData
+        Comments.Comment commentData
     );
 
     /// @notice Emitted when an author approves an app signer
