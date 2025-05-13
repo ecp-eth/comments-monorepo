@@ -187,11 +187,12 @@ jobs:
         id: docs-warn-out-of-sync
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
+            echo "::warning ::Below files are out of sync"
             git status --porcelain | while read -r line; do
               # Extract the filename (3rd character onward)
               file=$(echo "$line" | cut -c3-)
               # Print a warning for each file
-              echo "::warning file=$file::$file out of sync"
+              echo "::warning file=$file::$file"
             done
             exit 1
           fi
