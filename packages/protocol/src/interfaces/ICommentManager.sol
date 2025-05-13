@@ -25,6 +25,18 @@ interface ICommentManager {
     /// @param author Address of the comment author
     event CommentDeleted(bytes32 indexed commentId, address indexed author);
 
+    /// @notice Emitted when a comment is edited
+    /// @param commentId Unique identifier of the edited comment
+    /// @param author Address of the comment author
+    /// @param app Address of the app signer
+    /// @param commentData Struct containing all comment data
+    event CommentEdited(
+        bytes32 indexed commentId,
+        address indexed author,
+        address indexed app,
+        Comments.CommentData commentData
+    );
+
     /// @notice Emitted when an author approves an app signer
     /// @param author Address of the author giving approval
     /// @param app Address being approved
@@ -99,6 +111,28 @@ interface ICommentManager {
         address app,
         uint256 nonce,
         uint256 deadline,
+        bytes calldata authorSignature,
+        bytes calldata appSignature
+    ) external;
+
+    /// @notice Edits a comment when called by the author directly
+    /// @param commentId The unique identifier of the comment to edit
+    /// @param editData The comment data struct containing content and metadata
+    /// @param appSignature The signature from the app signer authorizing the edit
+    function editCommentAsAuthor(
+        bytes32 commentId,
+        Comments.EditCommentData calldata editData,
+        bytes calldata appSignature
+    ) external;
+
+    /// @notice Edits a comment with both author and app signer signatures
+    /// @param commentId The unique identifier of the comment to edit
+    /// @param editData The comment data struct containing content and metadata
+    /// @param authorSignature The signature from the author authorizing the edit (empty if app)
+    /// @param appSignature The signature from the app signer authorizing the edit (empty if author)
+    function editComment(
+        bytes32 commentId,
+        Comments.EditCommentData calldata editData,
         bytes calldata authorSignature,
         bytes calldata appSignature
     ) external;
@@ -178,6 +212,15 @@ interface ICommentManager {
         address app,
         uint256 nonce,
         uint256 deadline
+    ) external view returns (bytes32);
+
+    /// @notice Calculates the EIP-712 hash for editing a comment
+    /// @param commentId The unique identifier of the comment to edit
+    /// @param editData The comment data struct containing content and metadata
+    /// @return The computed hash
+    function getEditCommentHash(
+        bytes32 commentId,
+        Comments.EditCommentData calldata editData
     ) external view returns (bytes32);
 
     /// @notice Calculates the EIP-712 hash for a comment

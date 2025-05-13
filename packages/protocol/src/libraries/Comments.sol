@@ -61,4 +61,12 @@ library Comments {
         string targetUri;
         string commentType;
     }
-} 
+
+    struct EditCommentData {
+        address app;
+        uint256 nonce;
+        uint256 deadline;
+        string content;
+        string metadata;
+    }
+}
