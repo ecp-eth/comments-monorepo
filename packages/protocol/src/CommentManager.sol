@@ -91,7 +91,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         Comments.CreateComment calldata commentData,
         bytes memory authorSignature,
         bytes memory appSignature
-    ) internal nonReentrant {
+    ) internal {
         // Validate submitted within deadline
         if (block.timestamp > commentData.deadline) {
             revert SignatureDeadlineReached(

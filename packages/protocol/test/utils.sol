@@ -143,7 +143,7 @@ library TestUtils {
      * @notice Parse and convert an amount to wei
      * @param contentBytes The bytes of the content to parse
      * @param startNum The position where the number starts
-     * @param endPos The position where the number ends
+     * @param endPos The position where the number ends - exclusive of endPos
      * @return found Whether a valid amount was found
      * @return amount The amount in wei
      */
@@ -157,8 +157,8 @@ library TestUtils {
         }
 
         if (endPos == startNum) {
-            // Handle case where there's no number after the "ETH"
-            return (true, 0);
+            // Handle case where there's no number
+            return (false, 0);
         }
 
         // Convert the parsed number to wei
@@ -170,10 +170,11 @@ library TestUtils {
         // Parse whole number part
         while (currentPos < endPos && contentBytes[currentPos] != 0x2e) {
             // 0x2e is '.'
-            wholeNumber =
-                wholeNumber *
-                10 +
-                (uint8(contentBytes[currentPos]) - 0x30); // 0x30 is '0'
+            uint8 currentByte = uint8(contentBytes[currentPos]);
+            if (currentByte < 0x30 || currentByte > 0x39) {
+                return (false, 0); // Invalid digit found
+            }
+            wholeNumber = wholeNumber * 10 + (currentByte - 0x30); // 0x30 is '0'
             currentPos++;
         }
 
@@ -183,29 +184,32 @@ library TestUtils {
             currentPos++; // Skip decimal point
             while (currentPos < endPos) {
                 uint8 currentByte = uint8(contentBytes[currentPos]);
-                if (currentByte >= 0x30 && currentByte <= 0x39) {
-                    // ASCII '0' to '9'
-                    fractionalPart = fractionalPart * 10 + (currentByte - 0x30); // 0x30 is '0'
-                    decimalsCount++;
-                    currentPos++;
-                } else {
-                    break;
+                if (currentByte < 0x30 || currentByte > 0x39) {
+                    return (false, 0); // Invalid digit found
                 }
+                fractionalPart = fractionalPart * 10 + (currentByte - 0x30); // 0x30 is '0'
+                decimalsCount++;
+                currentPos++;
             }
         }
 
         // Convert to wei
         if (fractionalPart == 0 && decimalsCount == 0) {
-            // For whole numbers, simply multiply by 1 ether
+            // For whole numbers, multiply by 1 ether safely
+            if (wholeNumber == 0) {
+                return (true, 0);
+            }
+            // Check for overflow before multiplication
+            if (wholeNumber > type(uint256).max / 1 ether) {
+                return (false, 0);
+            }
             return (true, wholeNumber * 1 ether);
-        } else {
-            // For decimal numbers, calculate the fractional part separately
-            // to avoid precision issues
-            uint256 wholePart = wholeNumber * 1 ether;
-            uint256 fractionalPartInWei = (fractionalPart * 1 ether) /
-                (10 ** decimalsCount);
-            return (true, wholePart + fractionalPartInWei);
         }
+
+        // For decimal numbers, calculate the amount in wei
+        uint256 baseAmount = wholeNumber * 1 ether;
+        uint256 fractionalAmount = fractionalPart * (1 ether / (10 ** decimalsCount));
+        return (true, baseAmount + fractionalAmount);
     }
 
     /**
