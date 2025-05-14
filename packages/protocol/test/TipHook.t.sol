@@ -13,6 +13,7 @@ import {Hooks} from "../src/libraries/Hooks.sol";
 import {Comments} from "../src/libraries/Comments.sol";
 import {ICommentManager} from "../src/interfaces/ICommentManager.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
+import {TestUtils} from "./utils.sol";
 
 struct TipInfo {
     bool found;
@@ -45,12 +46,12 @@ contract TipHook is BaseHook {
 
     /// @notice Execute after a comment is processed to handle ETH tips
     /// @param commentData The comment data to process
-    /// @return commentHookData The comment hook data that was generated
+    /// @return hookData The comment hook data that was generated
     function _afterComment(
         Comments.Comment calldata commentData,
         address,
         bytes32 commentId
-    ) internal override returns (string memory commentHookData) {
+    ) internal override returns (string memory hookData) {
         // Check if this is a reply comment
         if (commentData.parentId == bytes32(0) && msg.value == 0) {
             // No tip was sent, so ignore it.
@@ -101,6 +102,7 @@ contract TipHook is BaseHook {
                 parentId: commentId
             });
 
+            
             commentManager.postCommentAsAuthor(tipAckData, "");
         } else if (msg.value > 0) {
             revert InvalidTipAmount();
@@ -356,8 +358,9 @@ contract TipHookTest is Test, IERC721Receiver {
             });
 
         // Post parent comment
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, parentComment, commentManager);
         vm.prank(user1);
-        commentManager.postCommentAsAuthor(parentComment, "");
+        commentManager.postCommentAsAuthor(parentComment, appSignature);
         bytes32 parentId = commentManager.getCommentId(parentComment);
 
         uint256 initialBalance = user1.balance;
@@ -386,8 +389,9 @@ contract TipHookTest is Test, IERC721Receiver {
             });
 
         // --- Post Reply Comment (With Correct Tip Amount) ---
+        appSignature = TestUtils.generateAppSignature(vm, replyComment, commentManager);
         vm.prank(user2);
-        commentManager.postCommentAsAuthor{value: tipAmount}(replyComment, "");
+        commentManager.postCommentAsAuthor{value: tipAmount}(replyComment, appSignature);
         console.log("user1 address:", user1);
         console.log("tipAmount", tipAmount, initialBalance, user1.balance);
         uint256 expectedAmountAfterFee = CommentManager(address(commentManager)).channelManager().deductProtocolHookTransactionFee(tipAmount);
@@ -417,8 +421,9 @@ contract TipHookTest is Test, IERC721Receiver {
             });
 
         // Post parent comment
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, parentComment, commentManager);
         vm.prank(user1);
-        commentManager.postCommentAsAuthor(parentComment, "");
+        commentManager.postCommentAsAuthor(parentComment, appSignature);
         bytes32 parentCommentId = commentManager.getCommentId(parentComment);
 
         // --- Reply Comment Setup (With Tip Mention) ---
@@ -443,9 +448,10 @@ contract TipHookTest is Test, IERC721Receiver {
             });
 
         // --- Post Reply Comment (With Incorrect Tip Amount) ---
+        appSignature = TestUtils.generateAppSignature(vm, replyComment, commentManager);
         vm.prank(user2);
         vm.expectRevert(TipHook.TipAmountMismatch.selector);
-        commentManager.postCommentAsAuthor{value: 0.05 ether}(replyComment, "");
+        commentManager.postCommentAsAuthor{value: 0.05 ether}(replyComment, appSignature);
     }
 
     /// @notice Test that hook reverts when tip syntax is invalid
@@ -466,8 +472,9 @@ contract TipHookTest is Test, IERC721Receiver {
             });
 
         // Post parent comment
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, parentComment, commentManager);
         vm.prank(user1);
-        commentManager.postCommentAsAuthor(parentComment, "");
+        commentManager.postCommentAsAuthor(parentComment, appSignature);
         bytes32 parentCommentId = commentManager.getCommentId(parentComment);
 
         // --- Reply Comment Setup (With Invalid Tip Syntax) ---
@@ -492,9 +499,10 @@ contract TipHookTest is Test, IERC721Receiver {
             });
 
         // --- Post Reply Comment (With Invalid Tip Syntax) ---
+        appSignature = TestUtils.generateAppSignature(vm, replyComment, commentManager);
         vm.prank(user2);
         vm.expectRevert(TipHook.InvalidTipAmount.selector);
-        commentManager.postCommentAsAuthor{value: 0.1 ether}(replyComment, "");
+        commentManager.postCommentAsAuthor{value: 0.1 ether}(replyComment, appSignature);
     }
 
     /// @notice Test that no tip is processed when no tip is mentioned
@@ -515,8 +523,9 @@ contract TipHookTest is Test, IERC721Receiver {
             });
 
         // Post parent comment
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, parentComment, commentManager);
         vm.prank(user1);
-        commentManager.postCommentAsAuthor(parentComment, "");
+        commentManager.postCommentAsAuthor(parentComment, appSignature);
         bytes32 parentCommentId = commentManager.getCommentId(parentComment);
 
         uint256 initialBalance = user1.balance;
@@ -537,8 +546,9 @@ contract TipHookTest is Test, IERC721Receiver {
             });
 
         // --- Post Reply Comment (No Value) ---
+        appSignature = TestUtils.generateAppSignature(vm, replyComment, commentManager);
         vm.prank(user2);
-        commentManager.postCommentAsAuthor(replyComment, "");
+        commentManager.postCommentAsAuthor(replyComment, appSignature);
 
         assertEq(
             user1.balance,
@@ -565,8 +575,9 @@ contract TipHookTest is Test, IERC721Receiver {
             });
 
         // Post parent comment
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, parentComment, commentManager);
         vm.prank(user1);
-        commentManager.postCommentAsAuthor(parentComment, "");
+        commentManager.postCommentAsAuthor(parentComment, appSignature);
         bytes32 parentId = commentManager.getCommentId(parentComment);
 
         // --- Reply Comment Setup (With Tip Mention) ---
@@ -593,11 +604,12 @@ contract TipHookTest is Test, IERC721Receiver {
             });
 
         // --- Post Reply Comment (With Correct Tip Amount) ---
+        appSignature = TestUtils.generateAppSignature(vm, replyComment, commentManager);
         vm.prank(user2);
 
         // FIXME: assert no revert. 
         
-        commentManager.postCommentAsAuthor{value: tipAmount}(replyComment, "");
+        commentManager.postCommentAsAuthor{value: tipAmount}(replyComment, appSignature);
 
         // Verify the nonce for the tip acknowledgment comment
         assertEq(

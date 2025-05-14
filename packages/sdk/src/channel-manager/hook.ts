@@ -1,10 +1,8 @@
 import { z } from "zod";
 import { CHANNEL_MANAGER_ADDRESS } from "../constants.js";
-import { CommentDataSchema } from "../comments/schemas.js";
 import { ChannelManagerABI } from "../abis.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 import { type Hex, HexSchema } from "../core/schemas.js";
-import type { CommentData } from "../comments/types.js";
 
 export type SetHookParams = {
   /**
@@ -142,136 +140,51 @@ export async function setHookTransactionFee(
   };
 }
 
-export type ExecuteHookParams = {
-  /**
-   * The ID of the channel to execute hooks for
-   */
-  channelId: bigint;
-  /**
-   * The comment data to process
-   */
-  commentData: CommentData;
-  /**
-   * The address that initiated the transaction
-   */
-  caller: Hex;
-  /**
-   * The unique identifier of the comment
-   */
-  commentId: Hex;
-  /**
-   * The phase of hook execution (Before or After)
-   */
-  phase: "Before" | "After";
-  /**
-   * The value to send with the transaction
-   */
-  value?: bigint;
+export type DeductProtocolHookTransactionFeeParams = {
   /**
    * The address of the channel manager
    *
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  writeContract: ContractWriteFunctions["executeHook"];
+  readContract: ContractReadFunctions["deductProtocolHookTransactionFee"];
 };
 
-export type ExecuteHookResult = {
-  txHash: Hex;
+export type DeductProtocolHookTransactionFeeResult = {
+  deductedFee: bigint;
 };
 
-const ExecuteHookParamsSchema = z.object({
-  channelId: z.bigint(),
-  commentData: CommentDataSchema,
-  caller: HexSchema,
-  commentId: HexSchema,
-  phase: z.enum(["Before", "After"]),
-  value: z.bigint().min(0n).optional(),
-  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
-});
-
-/**
- * Execute hooks for a channel
- *
- * @param params - The parameters for executing hooks
- * @returns The transaction hash of the hook execution
- */
-export async function executeHook(
-  params: ExecuteHookParams
-): Promise<ExecuteHookResult> {
-  const {
-    channelId,
-    commentData,
-    caller,
-    commentId,
-    phase,
-    value,
-    channelManagerAddress,
-  } = ExecuteHookParamsSchema.parse(params);
-
-  const txHash = await params.writeContract({
-    address: channelManagerAddress,
-    abi: ChannelManagerABI,
-    functionName: "executeHook",
-    args: [
-      channelId,
-      commentData,
-      caller,
-      commentId,
-      phase === "Before" ? 0 : 1,
-    ],
-    value,
-  });
-
-  return {
-    txHash,
-  };
-}
-
-export type CalculateHookTransactionFeeParams = {
-  /**
-   * The total value to calculate fee for
-   */
-  value: bigint;
+const DeductProtocolHookTransactionFeeParamsSchema = z.object({
   /**
    * The address of the channel manager
    *
    * @default CHANNEL_MANAGER_ADDRESS
    */
-  channelManagerAddress?: Hex;
-  readContract: ContractReadFunctions["calculateHookTransactionFee"];
-};
-
-export type CalculateHookTransactionFeeResult = {
-  hookValue: bigint;
-};
-
-const CalculateHookTransactionFeeParamsSchema = z.object({
-  value: z.bigint().min(0n),
   channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+  /**
+   * The total value sent with the transaction
+   */
+  value: z.bigint(),
 });
 
 /**
- * Calculates the hook transaction fee and returns the hook value after deducting the protocol fee.
- * If the value is 0 or if the hook transaction fee percentage is 0, returns the original value.
+ * Calculates the hook transaction fee by deducting the protocol fee
  *
- * @param params - The parameters for calculating the hook transaction fee
- * @returns The transaction hash and the hook value after fee deduction
+ * @param params - The total value sent with the transaction
+ * @returns The amount that should be passed to the hook
  */
-export async function calculateHookTransactionFee(
-  params: CalculateHookTransactionFeeParams
-): Promise<CalculateHookTransactionFeeResult> {
-  const { value, channelManagerAddress } =
-    CalculateHookTransactionFeeParamsSchema.parse(params);
+export async function deductProtocolHookTransactionFee(
+  params: DeductProtocolHookTransactionFeeParams
+): Promise<DeductProtocolHookTransactionFeeResult> {
+  const { channelManagerAddress, value } =
+    DeductProtocolHookTransactionFeeParamsSchema.parse(params);
 
-  const result = await params.readContract({
+  const deductedFee = await params.readContract({
     address: channelManagerAddress,
     abi: ChannelManagerABI,
-    functionName: "calculateHookTransactionFee",
+    functionName: "deductProtocolHookTransactionFee",
     args: [value],
   });
 
-  return {
-    hookValue: result,
-  };
+  return { deductedFee };
 }

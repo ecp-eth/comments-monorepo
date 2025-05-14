@@ -156,16 +156,17 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     function _setHook(uint256 channelId, address hook) internal {
         if (hook != address(0)) {
             // Validate that the hook implements IHook interface
-            try IERC165(hook).supportsInterface(type(IHook).interfaceId) returns (
-                bool result
-            ) {
+            try
+                IERC165(hook).supportsInterface(type(IHook).interfaceId)
+            returns (bool result) {
                 if (!result) revert InvalidHookInterface();
             } catch {
                 revert InvalidHookInterface();
             }
 
             // Get hook permissions and store them on the channel
-            Hooks.Permissions memory permissions = IHook(hook).getHookPermissions();
+            Hooks.Permissions memory permissions = IHook(hook)
+                .getHookPermissions();
 
             channels[channelId].hook = IHook(hook);
             channels[channelId].permissions = permissions;

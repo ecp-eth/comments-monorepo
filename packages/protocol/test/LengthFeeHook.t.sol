@@ -53,7 +53,7 @@ contract LengthFeeHook is BaseHook {
         Comments.Comment calldata commentData,
         address,
         bytes32
-    ) internal override returns (string memory commentHookData) {
+    ) internal override returns (string memory hookData) {
         // Calculate fee based on content length
         uint256 contentLength = bytes(commentData.content).length;
         uint256 totalFee = contentLength * tokensPerCharacter;

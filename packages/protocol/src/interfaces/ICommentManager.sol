@@ -17,8 +17,7 @@ interface ICommentManager {
         bytes32 indexed commentId,
         address indexed author,
         address indexed app,
-        Comments.Comment commentData,
-        string commentHookData
+        Comments.Comment commentData
     );
 
     /// @notice Emitted when a comment is deleted
@@ -203,7 +202,7 @@ interface ICommentManager {
     /// @param author The address of the author
     /// @param app The address of the app
     /// @return The approval status
-    function getIsApproved(
+    function isApproved(
         address author,
         address app
     ) external view returns (bool);
@@ -220,7 +219,7 @@ interface ICommentManager {
     /// @notice Get the deleted status for a comment
     /// @param commentId The ID of the comment
     /// @return The deleted status
-    function getIsDeleted(
+    function isDeleted(
         bytes32 commentId
     ) external view returns (bool);
 }

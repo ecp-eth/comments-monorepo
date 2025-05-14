@@ -17,12 +17,12 @@ interface IHook is IERC165 {
     /// @param commentData The comment data that was processed
     /// @param caller The original msg.sender that initiated the transaction
     /// @param commentId The unique identifier of the processed comment
-    /// @return commentHookData The comment hook data that was generated
+    /// @return hookData The comment hook data that was generated
     function afterComment(
         Comments.Comment calldata commentData,
         address caller,
         bytes32 commentId
-    ) external payable returns (string memory commentHookData);
+    ) external payable returns (string memory hookData);
 
     /// @notice Execute after a comment is deleted
     /// @param commentData The comment data that was deleted

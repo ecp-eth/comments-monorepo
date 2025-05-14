@@ -31,6 +31,8 @@ export const CommentDataSchema = z.object({
 
   createdAt: z.coerce.bigint(),
   updatedAt: z.coerce.bigint(),
+
+  hookData: z.string(),
 });
 
 // this just tests if the shape is correct
@@ -56,6 +58,8 @@ const BaseCommentInputDataSchema = z.object({
   metadata: z.string(),
   targetUri: z.string(),
   commentType: z.string().default(DEFAULT_COMMENT_TYPE),
+
+  hookData: z.string().default(""),
 });
 
 export const RootCommentInputDataSchema = BaseCommentInputDataSchema.omit({

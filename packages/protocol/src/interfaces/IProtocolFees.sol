@@ -44,11 +44,7 @@ interface IProtocolFees {
     /// @return amount The amount withdrawn
     function withdrawFees(address recipient) external returns (uint256 amount);
 
-     /// @notice Collects channel creation fee
-    /// @return The amount of fees collected
-    function collectChannelCreationFee() external payable returns (uint96);
-
-    /// @notice Collects hook transaction fee
+    /// @notice Calculates the hook transaction fee by deducting the protocol fee
     /// @param value The total value sent with the transaction
     /// @return hookValue The amount that should be passed to the hook
     function deductProtocolHookTransactionFee(

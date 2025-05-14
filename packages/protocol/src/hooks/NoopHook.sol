@@ -20,7 +20,7 @@ contract NoopHook is IHook {
         Comments.Comment calldata,
         address,
         bytes32
-    ) external payable returns (string memory commentHookData) {
+    ) external payable returns (string memory hookData) {
         return "";
     }
 

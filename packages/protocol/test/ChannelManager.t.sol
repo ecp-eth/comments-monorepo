@@ -10,6 +10,7 @@ import {TestUtils, MockHook} from "./utils.sol";
 import {Comments} from "../src/libraries/Comments.sol";
 import {Hooks} from "../src/libraries/Hooks.sol";
 import {Channels} from "../src/libraries/Channels.sol";
+
 // Invalid hook that doesn't support the interface
 contract InvalidHook {
     function supportsInterface(bytes4) external pure returns (bool) {

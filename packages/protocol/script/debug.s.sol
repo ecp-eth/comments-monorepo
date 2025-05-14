@@ -22,6 +22,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
 
     uint256 channelId;
     Comments.Comment commentData;
+    Comments.CreateComment createCommentData;
 
     function setUp() public {
         owner = address(this);
@@ -88,26 +89,27 @@ contract DebugGasUsage is Test, IERC721Receiver {
     }
 
     function debugPostComment() public {
+        // Create comment data using direct construction
+        createCommentData = Comments
+            .CreateComment({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                app: user2,
+                channelId: channelId,
+                nonce: comments.getNonce(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
+
+        // Post comment directly as author
+        vm.prank(user1);
         measureGas("postComment", runPostComment);
     }
 
     function runPostComment() internal {
-        // Create comment data using direct construction
-        Comments.CreateComment memory createCommentData = Comments.CreateComment({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            app: user2,
-            channelId: channelId,
-            nonce: comments.getNonce(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0)
-        });
-
-        // Post comment directly as author
-        vm.prank(user1);
         comments.postCommentAsAuthor{value: 0}(createCommentData, "");
     }
 
