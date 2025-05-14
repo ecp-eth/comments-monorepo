@@ -26,6 +26,16 @@ import {
   type DeleteCommentParams,
   deleteComment,
   getNonce,
+  editComment,
+  type EditCommentParams,
+  type EditCommentResult,
+  editCommentAsAuthor,
+  type EditCommentAsAuthorParams,
+  type EditCommentAsAuthorResult,
+  getDeleteCommentHash,
+  type GetEditCommentHashParams,
+  getEditCommentHash,
+  type GetDeleteCommentHashParams,
 } from "../comment.js";
 import { useCallback } from "react";
 
@@ -278,4 +288,163 @@ export function useGetNonce(): typeof getNonce {
     },
     [client]
   );
+}
+
+export type UseEditCommentParams = Omit<EditCommentParams, "writeContract">;
+export type UseEditCommentOptions = Omit<
+  UseMutationOptions<EditCommentResult, Error, UseEditCommentParams>,
+  "mutationFn"
+>;
+export type UseEditCommentResult = UseMutationResult<
+  EditCommentResult,
+  Error,
+  UseEditCommentParams
+>;
+
+/**
+ * React hook to edit a comment with app signature verification
+ *
+ * @param options - The options for the mutation
+ * @returns The result of the mutation
+ */
+export function useEditComment(
+  options: UseEditCommentOptions = {}
+): UseEditCommentResult {
+  const { writeContractAsync } = useWriteContract();
+
+  return useMutation({
+    ...options,
+    mutationFn: (params) => {
+      return editComment({
+        ...params,
+        writeContract: writeContractAsync,
+      });
+    },
+  });
+}
+
+export type UseEditCommentAsAuthorParams = Omit<
+  EditCommentAsAuthorParams,
+  "writeContract"
+>;
+export type UseEditCommentAsAuthorOptions = Omit<
+  UseMutationOptions<
+    EditCommentAsAuthorResult,
+    Error,
+    UseEditCommentAsAuthorParams
+  >,
+  "mutationFn"
+>;
+export type UseEditCommentAsAuthorResult = UseMutationResult<
+  EditCommentAsAuthorResult,
+  Error,
+  UseEditCommentAsAuthorParams
+>;
+
+/**
+ * React hook to edit a comment as an author
+ *
+ * @param options - The options for the mutation
+ * @returns The result of the mutation
+ */
+export function useEditCommentAsAuthor(
+  options: UseEditCommentAsAuthorOptions = {}
+): UseEditCommentAsAuthorResult {
+  const { writeContractAsync } = useWriteContract();
+
+  return useMutation({
+    ...options,
+    mutationFn: (params) => {
+      return editCommentAsAuthor({
+        ...params,
+        writeContract: writeContractAsync,
+      });
+    },
+  });
+}
+
+export type UseGetEditCommentHashParams = Omit<
+  GetEditCommentHashParams,
+  "readContract"
+>;
+export type UseGetEditCommentHashOptions = Omit<
+  UseQueryOptions<Hex, Error>,
+  "queryKey" | "queryFn"
+>;
+export type UseGetEditCommentHashResult = UseQueryResult<Hex, Error>;
+
+/**
+ * React hook to get the hash for editing a comment
+ *
+ * @param params - The parameters for getting the edit comment hash
+ * @param options - The options for the query
+ * @returns The result of the query
+ */
+export function useGetEditCommentHash(
+  params: UseGetEditCommentHashParams,
+  options: UseGetEditCommentHashOptions = {}
+): UseGetEditCommentHashResult {
+  const client = usePublicClient();
+
+  return useQuery({
+    ...options,
+    enabled: options.enabled && !!client,
+    queryKey: ["editCommentHash", params.edit, params.commentsAddress],
+    queryFn: async () => {
+      const result = await getEditCommentHash({
+        ...params,
+        readContract: async (params) => {
+          if (!client) {
+            throw new Error("Client not found");
+          }
+
+          return client.readContract(params);
+        },
+      });
+      return result;
+    },
+  });
+}
+
+export type UseGetDeleteCommentHashParams = Omit<
+  GetDeleteCommentHashParams,
+  "readContract"
+>;
+export type UseGetDeleteCommentHashOptions = Omit<
+  UseQueryOptions<Hex, Error>,
+  "queryKey" | "queryFn"
+>;
+export type UseGetDeleteCommentHashResult = UseQueryResult<Hex, Error>;
+
+/**
+ * React hook to get the hash for deleting a comment
+ *
+ * @param params - The parameters for getting the delete comment hash
+ * @param options - The options for the query
+ * @returns The result of the query
+ */
+export function useGetDeleteCommentHash(
+  params: UseGetDeleteCommentHashParams,
+  options: UseGetDeleteCommentHashOptions = {}
+): UseGetDeleteCommentHashResult {
+  const client = usePublicClient();
+
+  return useQuery({
+    ...options,
+    enabled: options.enabled && !!client,
+    queryKey: ["deleteCommentHash", params.commentId, params.commentsAddress],
+    queryFn: async () => {
+      const result = await getDeleteCommentHash({
+        ...params,
+        readContract: async (params) => {
+          if (!client) {
+            throw new Error("Client not found");
+          }
+
+          return client.readContract(params);
+        },
+      });
+      return result;
+    },
+  });
 }
