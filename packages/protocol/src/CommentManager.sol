@@ -575,7 +575,15 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         Comments.EditCommentData calldata editData
     ) public view returns (bytes32) {
         bytes32 structHash = keccak256(
-            abi.encode(EDIT_COMMENT_TYPEHASH, commentId, editData)
+            abi.encode(
+                EDIT_COMMENT_TYPEHASH,
+                commentId,
+                keccak256(bytes(editData.content)),
+                keccak256(bytes(editData.metadata)),
+                editData.app,
+                editData.nonce,
+                editData.deadline
+            )
         );
 
         return
