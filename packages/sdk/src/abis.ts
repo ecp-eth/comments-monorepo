@@ -218,7 +218,7 @@ export const CommentManagerABI = [
       {
         name: "editData",
         type: "tuple",
-        internalType: "struct Comments.EditCommentData",
+        internalType: "struct Comments.EditComment",
         components: [
           {
             name: "app",
@@ -273,7 +273,7 @@ export const CommentManagerABI = [
       {
         name: "editData",
         type: "tuple",
-        internalType: "struct Comments.EditCommentData",
+        internalType: "struct Comments.EditComment",
         components: [
           {
             name: "app",
@@ -558,7 +558,7 @@ export const CommentManagerABI = [
       {
         name: "editData",
         type: "tuple",
-        internalType: "struct Comments.EditCommentData",
+        internalType: "struct Comments.EditComment",
         components: [
           {
             name: "app",
@@ -1152,7 +1152,7 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "commentData",
+        name: "comment",
         type: "tuple",
         indexed: false,
         internalType: "struct Comments.Comment",

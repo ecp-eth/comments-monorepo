@@ -206,7 +206,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     /// @inheritdoc ICommentManager
     function editCommentAsAuthor(
         bytes32 commentId,
-        Comments.EditCommentData calldata editData,
+        Comments.EditComment calldata editData,
         bytes calldata appSignature
     ) external {
         _editComment(commentId, editData, bytes(""), appSignature);
@@ -215,7 +215,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     /// @inheritdoc ICommentManager
     function editComment(
         bytes32 commentId,
-        Comments.EditCommentData calldata editData,
+        Comments.EditComment calldata editData,
         bytes calldata authorSignature,
         bytes calldata appSignature
     ) external {
@@ -229,7 +229,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     /// @param appSignature Signature from the app signer
     function _editComment(
         bytes32 commentId,
-        Comments.EditCommentData calldata editData,
+        Comments.EditComment calldata editData,
         bytes memory authorSignature,
         bytes memory appSignature
     ) internal {
@@ -558,7 +558,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     function getEditCommentHash(
         bytes32 commentId,
         address author,
-        Comments.EditCommentData calldata editData
+        Comments.EditComment calldata editData
     ) public view returns (bytes32) {
         bytes32 structHash = keccak256(
             abi.encode(

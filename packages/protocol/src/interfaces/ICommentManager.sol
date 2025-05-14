@@ -29,12 +29,12 @@ interface ICommentManager {
     /// @param commentId Unique identifier of the edited comment
     /// @param author Address of the comment author
     /// @param app Address of the app signer
-    /// @param commentData Struct containing all comment data
+    /// @param comment Struct containing all comment data
     event CommentEdited(
         bytes32 indexed commentId,
         address indexed author,
         address indexed app,
-        Comments.Comment commentData
+        Comments.Comment comment
     );
 
     /// @notice Emitted when an author approves an app signer
@@ -121,7 +121,7 @@ interface ICommentManager {
     /// @param appSignature The signature from the app signer authorizing the edit
     function editCommentAsAuthor(
         bytes32 commentId,
-        Comments.EditCommentData calldata editData,
+        Comments.EditComment calldata editData,
         bytes calldata appSignature
     ) external;
 
@@ -132,7 +132,7 @@ interface ICommentManager {
     /// @param appSignature The signature from the app signer authorizing the edit (empty if author)
     function editComment(
         bytes32 commentId,
-        Comments.EditCommentData calldata editData,
+        Comments.EditComment calldata editData,
         bytes calldata authorSignature,
         bytes calldata appSignature
     ) external;
@@ -222,7 +222,7 @@ interface ICommentManager {
     function getEditCommentHash(
         bytes32 commentId,
         address author,
-        Comments.EditCommentData calldata editData
+        Comments.EditComment calldata editData
     ) external view returns (bytes32);
 
     /// @notice Calculates the EIP-712 hash for a comment
@@ -264,7 +264,5 @@ interface ICommentManager {
     /// @notice Get the deleted status for a comment
     /// @param commentId The ID of the comment
     /// @return The deleted status
-    function isDeleted(
-        bytes32 commentId
-    ) external view returns (bool);
+    function isDeleted(bytes32 commentId) external view returns (bool);
 }

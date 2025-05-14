@@ -68,7 +68,7 @@ library Comments {
     /// @param deadline Timestamp after which the signatures for this comment become invalid
     /// @param content The actual text content of the comment
     /// @param metadata Additional JSON data that shouldn't be shown to the user as it is
-    struct EditCommentData {
+    struct EditComment {
         address app;
         uint256 nonce;
         uint256 deadline;

@@ -956,10 +956,10 @@ contract CommentsTest is Test, IERC721Receiver {
     function _createBasicEditCommentData()
         internal
         view
-        returns (Comments.EditCommentData memory)
+        returns (Comments.EditComment memory)
     {
         return
-            Comments.EditCommentData({
+            Comments.EditComment({
                 content: "Edited content",
                 metadata: '{"edited":true}',
                 app: app,
@@ -982,8 +982,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.postCommentAsAuthor(commentData, appSignature);
 
         // Now edit the comment
-        Comments.EditCommentData
-            memory editData = _createBasicEditCommentData();
+        Comments.EditComment memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(
             commentId,
             commentData.author,
@@ -1033,8 +1032,7 @@ contract CommentsTest is Test, IERC721Receiver {
         );
 
         // Try to edit from wrong address
-        Comments.EditCommentData
-            memory editData = _createBasicEditCommentData();
+        Comments.EditComment memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(
             commentId,
             commentData.author,
@@ -1078,8 +1076,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.postCommentAsAuthor(commentData, appSignature);
 
         // Now edit the comment
-        Comments.EditCommentData
-            memory editData = _createBasicEditCommentData();
+        Comments.EditComment memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(
             commentId,
             commentData.author,
@@ -1134,8 +1131,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.postCommentAsAuthor(commentData, appSignature);
 
         // Try to edit with wrong app signature
-        Comments.EditCommentData
-            memory editData = _createBasicEditCommentData();
+        Comments.EditComment memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(
             commentId,
             commentData.author,
@@ -1175,8 +1171,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.postCommentAsAuthor(commentData, appSignature);
 
         // Try to edit with wrong nonce
-        Comments.EditCommentData
-            memory editData = _createBasicEditCommentData();
+        Comments.EditComment memory editData = _createBasicEditCommentData();
         uint256 goodNonce = editData.nonce;
         editData.nonce = editData.nonce + 1; // Use wrong nonce
 
@@ -1231,8 +1226,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.postCommentAsAuthor(commentData, appSignature);
 
         // Edit comment with app signature only (using approval)
-        Comments.EditCommentData
-            memory editData = _createBasicEditCommentData();
+        Comments.EditComment memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(
             commentId,
             commentData.author,
@@ -1277,8 +1271,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.postCommentAsAuthor(commentData, appSignature);
 
         // Try to edit with expired deadline
-        Comments.EditCommentData
-            memory editData = _createBasicEditCommentData();
+        Comments.EditComment memory editData = _createBasicEditCommentData();
         editData.deadline = block.timestamp - 1; // Set expired deadline
 
         bytes32 editHash = comments.getEditCommentHash(
@@ -1314,8 +1307,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     function test_EditComment_NonExistentComment() public {
         bytes32 nonExistentId = bytes32(uint256(1));
-        Comments.EditCommentData
-            memory editData = _createBasicEditCommentData();
+        Comments.EditComment memory editData = _createBasicEditCommentData();
         bytes32 editHash = comments.getEditCommentHash(
             nonExistentId,
             author,
@@ -1355,8 +1347,7 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.postCommentAsAuthor(commentData, appSignature);
 
         // Try to edit with invalid author signature
-        Comments.EditCommentData
-            memory editData = _createBasicEditCommentData();
+        Comments.EditComment memory editData = _createBasicEditCommentData();
 
         bytes32 editHash = comments.getEditCommentHash(
             commentId,
