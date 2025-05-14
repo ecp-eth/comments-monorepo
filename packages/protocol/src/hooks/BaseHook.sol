@@ -30,18 +30,29 @@ abstract contract BaseHook is IHook, ERC165 {
     }
 
     /// @inheritdoc IHook
-    function getHookPermissions() external pure virtual returns (Hooks.Permissions memory) {
+    function getHookPermissions()
+        external
+        pure
+        virtual
+        returns (Hooks.Permissions memory)
+    {
         return _getHookPermissions();
     }
 
-    function _getHookPermissions() internal pure virtual returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            afterInitialize: false,
-            afterComment: false,
-            afterDeleteComment: false
-        });
+    function _getHookPermissions()
+        internal
+        pure
+        virtual
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                afterInitialize: false,
+                afterComment: false,
+                afterDeleteComment: false,
+                afterEditComment: false
+            });
     }
-
 
     /// @inheritdoc IHook
     function afterInitialize(address channel) external virtual returns (bool) {
@@ -85,4 +96,21 @@ abstract contract BaseHook is IHook, ERC165 {
     ) internal virtual returns (bool) {
         revert HookNotImplemented();
     }
-} 
+
+    /// @inheritdoc IHook
+    function afterEditComment(
+        Comments.Comment calldata commentData,
+        address caller,
+        bytes32 commentId
+    ) external payable virtual returns (string memory) {
+        return _afterEditComment(commentData, caller, commentId);
+    }
+
+    function _afterEditComment(
+        Comments.Comment calldata,
+        address,
+        bytes32
+    ) internal virtual returns (string memory) {
+        revert HookNotImplemented();
+    }
+}

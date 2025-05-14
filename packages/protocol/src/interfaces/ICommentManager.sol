@@ -123,7 +123,7 @@ interface ICommentManager {
         bytes32 commentId,
         Comments.EditComment calldata editData,
         bytes calldata appSignature
-    ) external;
+    ) external payable;
 
     /// @notice Edits a comment with both author and app signer signatures
     /// @param commentId The unique identifier of the comment to edit
@@ -135,7 +135,7 @@ interface ICommentManager {
         Comments.EditComment calldata editData,
         bytes calldata authorSignature,
         bytes calldata appSignature
-    ) external;
+    ) external payable;
 
     /// @notice Approves an app signer when called directly by the author
     /// @param app The address to approve

@@ -259,7 +259,7 @@ export const CommentManagerABI = [
       },
     ],
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -309,7 +309,7 @@ export const CommentManagerABI = [
       },
     ],
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -1616,6 +1616,11 @@ export const ChannelManagerABI = [
               },
               {
                 name: "afterDeleteComment",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "afterEditComment",
                 type: "bool",
                 internalType: "bool",
               },

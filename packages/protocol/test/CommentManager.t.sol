@@ -11,6 +11,8 @@ import {TestUtils} from "./utils.sol";
 import {BaseHook} from "../src/hooks/BaseHook.sol";
 import {Hooks} from "../src/libraries/Hooks.sol";
 
+error TestHookRejected();
+
 contract NoHook is BaseHook {
     function getHookPermissions()
         external
@@ -22,8 +24,34 @@ contract NoHook is BaseHook {
             Hooks.Permissions({
                 afterInitialize: false,
                 afterComment: false,
-                afterDeleteComment: false
+                afterDeleteComment: false,
+                afterEditComment: false
             });
+    }
+}
+
+contract RejectEditHook is BaseHook {
+    function getHookPermissions()
+        external
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                afterInitialize: false,
+                afterComment: false,
+                afterDeleteComment: false,
+                afterEditComment: true
+            });
+    }
+
+    function afterEditComment(
+        Comments.Comment calldata,
+        address,
+        bytes32
+    ) external payable override returns (string memory) {
+        revert TestHookRejected();
     }
 }
 
@@ -46,6 +74,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     CommentManager public comments;
     NoHook public noHook;
+    RejectEditHook public rejectEditHook;
     ChannelManager public channelManager;
 
     // Test accounts
@@ -61,7 +90,7 @@ contract CommentsTest is Test, IERC721Receiver {
         author = vm.addr(authorPrivateKey);
         app = vm.addr(appPrivateKey);
         noHook = new NoHook();
-
+        rejectEditHook = new RejectEditHook();
         (comments, channelManager) = TestUtils.createContracts(owner);
 
         // Setup private keys for signing
@@ -1014,6 +1043,47 @@ contract CommentsTest is Test, IERC721Receiver {
         assertEq(editedComment.updatedAt, uint80(block.timestamp));
     }
 
+    function test_EditCommentAsAuthor_RejectedByHook() public {
+        // Create a channel with the reject hook
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
+            "Test Channel",
+            "Test Description",
+            "{}",
+            address(rejectEditHook)
+        );
+
+        // Create a comment
+        Comments.CreateComment memory commentData = _createBasicCreateComment();
+        commentData.channelId = channelId;
+        bytes32 commentId = comments.getCommentId(commentData);
+        bytes memory appSignature = TestUtils.signEIP712(
+            vm,
+            appPrivateKey,
+            commentId
+        );
+
+        vm.prank(author);
+        comments.postCommentAsAuthor(commentData, appSignature);
+
+        // Try to edit the comment
+        Comments.EditComment memory editData = _createBasicEditCommentData();
+        bytes32 editHash = comments.getEditCommentHash(
+            commentId,
+            commentData.author,
+            editData
+        );
+
+        bytes memory editAppSignature = TestUtils.signEIP712(
+            vm,
+            appPrivateKey,
+            editHash
+        );
+
+        vm.prank(author);
+        vm.expectRevert(TestHookRejected.selector);
+        comments.editCommentAsAuthor(commentId, editData, editAppSignature);
+    }
+
     function test_EditCommentAsAuthor_InvalidAuthor() public {
         // First create a comment
         Comments.CreateComment memory commentData = _createBasicCreateComment();
@@ -1413,7 +1483,8 @@ contract MaliciousFeeCollector is BaseHook {
             Hooks.Permissions({
                 afterComment: true,
                 afterDeleteComment: false,
-                afterInitialize: false
+                afterInitialize: false,
+                afterEditComment: false
             });
     }
 }

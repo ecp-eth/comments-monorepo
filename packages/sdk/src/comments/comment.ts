@@ -786,6 +786,10 @@ export type EditCommentAsAuthorParams = {
    */
   edit: EditCommentData;
   /**
+   * The fee for the edit operation
+   */
+  fee?: bigint;
+  /**
    * The address of the comments contract
    * @default COMMENT_MANAGER_ADDRESS
    */
@@ -804,6 +808,7 @@ const EditCommentAsAuthorParamsSchema = z.object({
   edit: EditCommentDataSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   appSignature: HexSchema,
+  fee: z.bigint().optional(),
 });
 
 export type EditCommentAsAuthorResult = {
@@ -821,13 +826,14 @@ export async function editCommentAsAuthor(
 ): Promise<EditCommentAsAuthorResult> {
   const validatedParams = EditCommentAsAuthorParamsSchema.parse(params);
 
-  const { edit, commentsAddress, appSignature } = validatedParams;
+  const { edit, commentsAddress, appSignature, fee } = validatedParams;
 
   const txHash = await params.writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "editCommentAsAuthor",
     args: [edit.commentId, edit, appSignature],
+    value: fee,
   });
 
   return {
@@ -842,6 +848,10 @@ export type EditCommentParams = {
    * You can obtain this by using the `createEditCommentData()` function
    */
   edit: EditCommentData;
+  /**
+   * The fee for the edit operation
+   */
+  fee?: bigint;
   /**
    * The address of the comments contract
    * @default COMMENT_MANAGER_ADDRESS
@@ -866,6 +876,7 @@ const EditCommentParamsSchema = z.object({
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   appSignature: HexSchema,
   authorSignature: HexSchema.optional(),
+  fee: z.bigint().optional(),
 });
 
 export type EditCommentResult = {
@@ -883,7 +894,7 @@ export async function editComment(
 ): Promise<EditCommentResult> {
   const validatedParams = EditCommentParamsSchema.parse(params);
 
-  const { edit, commentsAddress, appSignature, authorSignature } =
+  const { edit, commentsAddress, appSignature, authorSignature, fee } =
     validatedParams;
 
   const txHash = await params.writeContract({
@@ -896,6 +907,7 @@ export async function editComment(
       appSignature,
       authorSignature ?? stringToHex(""),
     ],
+    value: fee,
   });
 
   return {

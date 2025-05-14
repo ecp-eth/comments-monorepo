@@ -208,7 +208,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         bytes32 commentId,
         Comments.EditComment calldata editData,
         bytes calldata appSignature
-    ) external {
+    ) external payable {
         _editComment(commentId, editData, bytes(""), appSignature);
     }
 
@@ -218,7 +218,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         Comments.EditComment calldata editData,
         bytes calldata authorSignature,
         bytes calldata appSignature
-    ) external {
+    ) external payable {
         _editComment(commentId, editData, authorSignature, appSignature);
     }
 
@@ -290,6 +290,23 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         comment.content = editData.content;
         comment.metadata = editData.metadata;
         comment.updatedAt = uint80(block.timestamp);
+
+        Channels.Channel memory channel = channelManager.getChannel(
+            comment.channelId
+        );
+        address hookAddress = address(channel.hook);
+
+        if (hookAddress != address(0) && channel.permissions.afterEditComment) {
+            // Calculate hook value after protocol fee
+            uint256 msgValueAfterFee = channelManager
+                .deductProtocolHookTransactionFee(msg.value);
+
+            channel.hook.afterEditComment{value: msgValueAfterFee}(
+                comment,
+                msg.sender,
+                commentId
+            );
+        }
 
         emit CommentEdited(commentId, comment.author, editData.app, comment);
     }

@@ -4,13 +4,11 @@ import { HexSchema } from "../core/schemas.js";
 import type { Hex } from "../core/schemas.js";
 import { ChannelManagerABI } from "../abis.js";
 import { isZeroHex } from "../core/utils.js";
-import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
-
-export type ChannelPermissions = {
-  afterInitialize: boolean;
-  afterComment: boolean;
-  afterDeleteComment: boolean;
-};
+import type {
+  ContractWriteFunctions,
+  ContractReadFunctions,
+  ChannelPermissions,
+} from "./types.js";
 
 export type CreateChannelParams = {
   /**

@@ -174,17 +174,21 @@ export type ContractWriteFunctions = {
   editComment: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
-      "nonpayable",
+      "payable",
       "editComment"
-    >
+    > & {
+      value?: bigint;
+    }
   ) => Promise<Hex>;
 
   editCommentAsAuthor: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
-      "nonpayable",
+      "payable",
       "editCommentAsAuthor"
-    >
+    > & {
+      value?: bigint;
+    }
   ) => Promise<Hex>;
 
   removeApproval: (

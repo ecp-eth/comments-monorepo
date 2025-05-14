@@ -39,5 +39,13 @@ contract NoopHook is IHook {
         Comments.Comment calldata commentData,
         address caller,
         bytes32 commentId
-    ) external override payable returns (bool success) {}
+    ) external payable override returns (bool success) {}
+
+    function afterEditComment(
+        Comments.Comment calldata,
+        address,
+        bytes32
+    ) external payable override returns (string memory commentHookData) {
+        return "";
+    }
 }

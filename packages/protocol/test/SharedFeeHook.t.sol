@@ -56,12 +56,19 @@ contract SharedFeeHook is BaseHook {
         channelManager = IChannelManager(_channelManager);
     }
 
-    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            afterComment: true,
-            afterDeleteComment: false,
-            afterInitialize: false
-        });
+    function _getHookPermissions()
+        internal
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                afterComment: true,
+                afterDeleteComment: false,
+                afterEditComment: false,
+                afterInitialize: false
+            });
     }
 
     function _afterComment(
@@ -369,19 +376,18 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
         );
 
         // Create comment data using direct construction
-        Comments.CreateComment memory commentData = Comments
-            .CreateComment({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.getNonce(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory commentData = Comments.CreateComment({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: comments.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
