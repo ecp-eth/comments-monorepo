@@ -650,6 +650,13 @@ export function createDeleteCommentTypedData(
 }
 
 export type GetEditCommentHashParams = {
+  /**
+   * The author of the comment
+   */
+  author: Hex;
+  /**
+   * The edit data
+   */
   edit: EditCommentData;
   /**
    * The address of the comments contract
@@ -660,6 +667,7 @@ export type GetEditCommentHashParams = {
 };
 
 const GetEditCommentHashParamsSchema = z.object({
+  author: HexSchema,
   edit: EditCommentDataSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
@@ -671,14 +679,14 @@ const GetEditCommentHashParamsSchema = z.object({
 export async function getEditCommentHash(
   params: GetEditCommentHashParams
 ): Promise<Hex> {
-  const { edit, commentsAddress } =
+  const { author, edit, commentsAddress } =
     GetEditCommentHashParamsSchema.parse(params);
 
   const hash = await params.readContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "getEditCommentHash",
-    args: [edit.commentId, edit],
+    args: [edit.commentId, author, edit],
   });
 
   return hash;
@@ -730,6 +738,10 @@ export function createEditCommentData(
 
 export type CreateEditCommentTypedDataParams = {
   /**
+   * The author of the comment
+   */
+  author: Hex;
+  /**
    * The edit data
    *
    * You can obtain this by using the `createEditCommentData()` function
@@ -747,6 +759,7 @@ export type CreateEditCommentTypedDataParams = {
 };
 
 const CreateEditCommentTypedDataParamsSchema = z.object({
+  author: HexSchema,
   edit: EditCommentDataSchema,
   chainId: z.number(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
@@ -762,7 +775,7 @@ export function createEditCommentTypedData(
 ): EditCommentTypedDataSchemaType {
   const validatedParams = CreateEditCommentTypedDataParamsSchema.parse(params);
 
-  const { edit, chainId, commentsAddress } = validatedParams;
+  const { author, edit, chainId, commentsAddress } = validatedParams;
 
   return EditCommentTypedDataSchema.parse({
     domain: {
@@ -773,7 +786,10 @@ export function createEditCommentTypedData(
     },
     types: EDIT_COMMENT_TYPE,
     primaryType: "EditComment",
-    message: edit,
+    message: {
+      ...edit,
+      author,
+    },
   });
 }
 

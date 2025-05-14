@@ -618,6 +618,7 @@ describe("editCommentAsAuthor()", () => {
     });
 
     const typedData = createEditCommentTypedData({
+      author: account.address,
       edit,
       chainId: anvil.id,
       commentsAddress,
@@ -724,6 +725,7 @@ describe("editComment()", () => {
     });
 
     const typedData = createEditCommentTypedData({
+      author: account.address,
       chainId: anvil.id,
       edit,
       commentsAddress,
@@ -798,6 +800,7 @@ describe("getEditCommentHash()", () => {
     });
 
     const result = await getEditCommentHash({
+      author: account.address,
       edit,
       readContract: client.readContract,
       commentsAddress,

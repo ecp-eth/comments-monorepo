@@ -639,6 +639,11 @@ export const CommentManagerABI = [
         internalType: "bytes32",
       },
       {
+        name: "author",
+        type: "address",
+        internalType: "address",
+      },
+      {
         name: "editData",
         type: "tuple",
         internalType: "struct Comments.EditCommentData",

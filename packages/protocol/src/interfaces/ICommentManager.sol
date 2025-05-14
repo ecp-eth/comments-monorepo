@@ -217,10 +217,12 @@ interface ICommentManager {
 
     /// @notice Calculates the EIP-712 hash for editing a comment
     /// @param commentId The unique identifier of the comment to edit
+    /// @param author The address of the comment author
     /// @param editData The comment data struct containing content and metadata
     /// @return The computed hash
     function getEditCommentHash(
         bytes32 commentId,
+        address author,
         Comments.EditCommentData calldata editData
     ) external view returns (bytes32);
 

@@ -815,7 +815,11 @@ contract CommentsTest is Test, IERC721Receiver {
         // Now edit the comment
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
-        bytes32 editHash = comments.getEditCommentHash(commentId, editData);
+        bytes32 editHash = comments.getEditCommentHash(
+            commentId,
+            commentData.author,
+            editData
+        );
         bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
 
         Comments.CommentData memory expectedCommentData = comments.getComment(
@@ -857,7 +861,11 @@ contract CommentsTest is Test, IERC721Receiver {
         // Try to edit from wrong address
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
-        bytes32 editHash = comments.getEditCommentHash(commentId, editData);
+        bytes32 editHash = comments.getEditCommentHash(
+            commentId,
+            commentData.author,
+            editData
+        );
         bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
 
         address wrongAuthor = address(0x3);
@@ -893,7 +901,11 @@ contract CommentsTest is Test, IERC721Receiver {
         // Now edit the comment
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
-        bytes32 editHash = comments.getEditCommentHash(commentId, editData);
+        bytes32 editHash = comments.getEditCommentHash(
+            commentId,
+            commentData.author,
+            editData
+        );
         bytes memory editAuthorSignature = _signEIP712(
             authorPrivateKey,
             editHash
@@ -939,7 +951,11 @@ contract CommentsTest is Test, IERC721Receiver {
         // Try to edit with wrong app signature
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
-        bytes32 editHash = comments.getEditCommentHash(commentId, editData);
+        bytes32 editHash = comments.getEditCommentHash(
+            commentId,
+            commentData.author,
+            editData
+        );
         bytes memory editAuthorSignature = _signEIP712(
             authorPrivateKey,
             editHash
@@ -971,7 +987,11 @@ contract CommentsTest is Test, IERC721Receiver {
         uint256 goodNonce = editData.nonce;
         editData.nonce = editData.nonce + 1; // Use wrong nonce
 
-        bytes32 editHash = comments.getEditCommentHash(commentId, editData);
+        bytes32 editHash = comments.getEditCommentHash(
+            commentId,
+            commentData.author,
+            editData
+        );
         bytes memory editAuthorSignature = _signEIP712(
             authorPrivateKey,
             editHash
@@ -1012,7 +1032,11 @@ contract CommentsTest is Test, IERC721Receiver {
         // Edit comment with app signature only (using approval)
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
-        bytes32 editHash = comments.getEditCommentHash(commentId, editData);
+        bytes32 editHash = comments.getEditCommentHash(
+            commentId,
+            commentData.author,
+            editData
+        );
         bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
 
         Comments.CommentData memory expectedCommentData = comments.getComment(
@@ -1051,7 +1075,11 @@ contract CommentsTest is Test, IERC721Receiver {
             memory editData = _createBasicEditCommentData();
         editData.deadline = block.timestamp - 1; // Set expired deadline
 
-        bytes32 editHash = comments.getEditCommentHash(commentId, editData);
+        bytes32 editHash = comments.getEditCommentHash(
+            commentId,
+            commentData.author,
+            editData
+        );
         bytes memory editAuthorSignature = _signEIP712(
             authorPrivateKey,
             editHash
@@ -1077,7 +1105,11 @@ contract CommentsTest is Test, IERC721Receiver {
         bytes32 nonExistentId = bytes32(uint256(1));
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
-        bytes32 editHash = comments.getEditCommentHash(nonExistentId, editData);
+        bytes32 editHash = comments.getEditCommentHash(
+            nonExistentId,
+            author,
+            editData
+        );
         bytes memory editAuthorSignature = _signEIP712(
             authorPrivateKey,
             editHash
@@ -1107,7 +1139,11 @@ contract CommentsTest is Test, IERC721Receiver {
         Comments.EditCommentData
             memory editData = _createBasicEditCommentData();
 
-        bytes32 editHash = comments.getEditCommentHash(commentId, editData);
+        bytes32 editHash = comments.getEditCommentHash(
+            commentId,
+            commentData.author,
+            editData
+        );
         address wrongAuthor = address(0x3);
         // use signature of wrong author
         bytes memory editAuthorSignature = _signEIP712(
