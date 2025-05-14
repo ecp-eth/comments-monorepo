@@ -6,6 +6,12 @@ import { ChannelManagerABI } from "../abis.js";
 import { isZeroHex } from "../core/utils.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";
 
+export type ChannelPermissions = {
+  afterInitialize: boolean;
+  afterComment: boolean;
+  afterDeleteComment: boolean;
+};
+
 export type CreateChannelParams = {
   /**
    * The name of the channel
@@ -93,6 +99,7 @@ export type GetChannelResult = {
   description: string | undefined;
   metadata: string | undefined;
   hook: Hex | undefined;
+  permissions: ChannelPermissions;
 };
 
 const GetChannelParamsSchema = z.object({
@@ -113,18 +120,20 @@ export async function getChannel(
   const { channelId, channelManagerAddress } =
     GetChannelParamsSchema.parse(params);
 
-  const { name, description, metadata, hook } = await params.readContract({
-    address: channelManagerAddress,
-    abi: ChannelManagerABI,
-    functionName: "getChannel",
-    args: [channelId],
-  });
+  const { name, description, metadata, hook, permissions } =
+    await params.readContract({
+      address: channelManagerAddress,
+      abi: ChannelManagerABI,
+      functionName: "getChannel",
+      args: [channelId],
+    });
 
   return {
     name,
     description: !description ? undefined : description,
     metadata: !metadata ? undefined : metadata,
     hook: isZeroHex(hook) ? undefined : hook,
+    permissions,
   };
 }
 

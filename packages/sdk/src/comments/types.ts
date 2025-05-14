@@ -261,9 +261,13 @@ export type ContractReadFunctions = {
     args: ReadContractParameters<CommentManagerABIType, "getComment">
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "getComment">>;
 
-  isApproved: (
+  getIsApproved: (
     args: ReadContractParameters<CommentManagerABIType, "isApproved">
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "isApproved">>;
+
+  getNonce: (
+    args: ReadContractParameters<CommentManagerABIType, "getNonce">
+  ) => Promise<ReadContractReturnType<CommentManagerABIType, "getNonce">>;
 
   name: (
     args: ReadContractParameters<CommentManagerABIType, "name">

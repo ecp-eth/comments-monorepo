@@ -2,12 +2,7 @@ import { z } from "zod";
 import { COMMENT_MANAGER_ADDRESS } from "../constants.js";
 import { type Hex, HexSchema } from "../core/schemas.js";
 import { CommentManagerABI } from "../abis.js";
-import type { ReadContractParameters, ReadContractReturnType } from "viem";
-import type {
-  CommentManagerABIType,
-  ContractReadFunctions,
-  ContractWriteFunctions,
-} from "./types.js";
+import type { ContractReadFunctions, ContractWriteFunctions } from "./types.js";
 import {
   ADD_APPROVAL_TYPE,
   REMOVE_APPROVAL_TYPE,
@@ -35,7 +30,7 @@ export type IsApprovedParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  readContract: ContractReadFunctions["isApproved"];
+  readContract: ContractReadFunctions["getIsApproved"];
 };
 
 const IsApprovedParamsSchema = z.object({
@@ -289,15 +284,6 @@ export async function revokeApproval(
   };
 }
 
-export type ReadAddApprovalHashFromContractFunction = (
-  parameters: ReadContractParameters<
-    CommentManagerABIType,
-    "getAddApprovalHash"
-  >
-) => Promise<
-  ReadContractReturnType<CommentManagerABIType, "getAddApprovalHash">
->;
-
 export type GetAddApprovalHashParams = {
   /**
    * The address of the author
@@ -323,7 +309,7 @@ export type GetAddApprovalHashParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  readContract: ReadAddApprovalHashFromContractFunction;
+  readContract: ContractReadFunctions["getAddApprovalHash"];
 };
 
 export type GetAddApprovalHashData = {
@@ -382,15 +368,6 @@ export async function getAddApprovalHash(
   };
 }
 
-export type ReadRemoveApprovalHashFromContractFunction = (
-  parameters: ReadContractParameters<
-    CommentManagerABIType,
-    "getRemoveApprovalHash"
-  >
-) => Promise<
-  ReadContractReturnType<CommentManagerABIType, "getRemoveApprovalHash">
->;
-
 export type GetRemoveApprovalHashParams = {
   /**
    * The address of the author
@@ -414,7 +391,7 @@ export type GetRemoveApprovalHashParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  readContract: ReadRemoveApprovalHashFromContractFunction;
+  readContract: ContractReadFunctions["getRemoveApprovalHash"];
 };
 
 export type GetRemoveApprovalHashResult = {

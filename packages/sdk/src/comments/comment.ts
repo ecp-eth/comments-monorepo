@@ -7,11 +7,7 @@ import {
 } from "../constants.js";
 import { HexSchema, type Hex } from "../core/schemas.js";
 import { CommentManagerABI } from "../abis.js";
-import {
-  stringToHex,
-  type ReadContractParameters,
-  type ReadContractReturnType,
-} from "viem";
+import { stringToHex } from "viem";
 import type {
   ContractWriteFunctions,
   ContractReadFunctions,
@@ -179,9 +175,7 @@ export type GetCommentParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  readContract: (
-    parameters: ReadContractParameters<typeof CommentManagerABI, "getComment">
-  ) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getComment">>;
+  readContract: ContractReadFunctions["getComment"];
 };
 
 export type GetCommentResult = {
@@ -419,14 +413,7 @@ export type GetDeleteCommentHashParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  readContract: (
-    parameters: ReadContractParameters<
-      typeof CommentManagerABI,
-      "getDeleteCommentHash"
-    >
-  ) => Promise<
-    ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">
-  >;
+  readContract: ContractReadFunctions["getDeleteCommentHash"];
 };
 
 const GetDeleteCommentHashParamsSchema = z.object({
@@ -474,9 +461,7 @@ export type GetNonceParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  readContract: (
-    parameters: ReadContractParameters<typeof CommentManagerABI, "getNonce">
-  ) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getNonce">>;
+  readContract: ContractReadFunctions["getNonce"];
 };
 
 const GetNonceParamsSchema = z.object({
