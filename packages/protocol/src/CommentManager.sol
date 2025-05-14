@@ -27,7 +27,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         );
     bytes32 public constant EDIT_COMMENT_TYPEHASH =
         keccak256(
-            "EditComment(bytes32 commentId,string content,string metadata,address app,uint256 nonce,uint256 deadline)"
+            "EditComment(bytes32 commentId,string content,string metadata,address author,address app,uint256 nonce,uint256 deadline)"
         );
     bytes32 public constant ADD_APPROVAL_TYPEHASH =
         keccak256(
@@ -253,7 +253,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         nonces[comment.author][editData.app]++;
 
-        bytes32 editHash = getEditCommentHash(commentId, editData);
+        bytes32 editHash = getEditCommentHash(
+            commentId,
+            comment.author,
+            editData
+        );
 
         // Validate signatures if present
         if (appSignature.length > 0) {
@@ -553,6 +557,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     /// @inheritdoc ICommentManager
     function getEditCommentHash(
         bytes32 commentId,
+        address author,
         Comments.EditCommentData calldata editData
     ) public view returns (bytes32) {
         bytes32 structHash = keccak256(
@@ -561,6 +566,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                 commentId,
                 keccak256(bytes(editData.content)),
                 keccak256(bytes(editData.metadata)),
+                author,
                 editData.app,
                 editData.nonce,
                 editData.deadline

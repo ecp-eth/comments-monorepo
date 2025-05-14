@@ -31,6 +31,7 @@ export const EDIT_COMMENT_TYPE = {
     { name: "commentId", type: "bytes32" },
     { name: "content", type: "string" },
     { name: "metadata", type: "string" },
+    { name: "author", type: "address" },
     { name: "app", type: "address" },
     { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
