@@ -171,6 +171,22 @@ export type ContractWriteFunctions = {
     >
   ) => Promise<Hex>;
 
+  editComment: (
+    args: ContractFunctionParameters<
+      CommentManagerABIType,
+      "nonpayable",
+      "editComment"
+    >
+  ) => Promise<Hex>;
+
+  editCommentAsAuthor: (
+    args: ContractFunctionParameters<
+      CommentManagerABIType,
+      "nonpayable",
+      "editCommentAsAuthor"
+    >
+  ) => Promise<Hex>;
+
   removeApproval: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
@@ -229,6 +245,12 @@ export type ContractReadFunctions = {
     args: ReadContractParameters<CommentManagerABIType, "getDeleteCommentHash">
   ) => Promise<
     ReadContractReturnType<CommentManagerABIType, "getDeleteCommentHash">
+  >;
+
+  getEditCommentHash: (
+    args: ReadContractParameters<CommentManagerABIType, "getEditCommentHash">
+  ) => Promise<
+    ReadContractReturnType<CommentManagerABIType, "getEditCommentHash">
   >;
 
   getCommentId: (

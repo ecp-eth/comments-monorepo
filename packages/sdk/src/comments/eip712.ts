@@ -26,6 +26,17 @@ export const DELETE_COMMENT_TYPE = {
   ],
 } as const;
 
+export const EDIT_COMMENT_TYPE = {
+  EditComment: [
+    { name: "commentId", type: "bytes32" },
+    { name: "content", type: "string" },
+    { name: "metadata", type: "string" },
+    { name: "app", type: "address" },
+    { name: "nonce", type: "uint256" },
+    { name: "deadline", type: "uint256" },
+  ],
+} as const;
+
 export const ADD_APPROVAL_TYPE = {
   AddApproval: [
     { name: "author", type: "address" },

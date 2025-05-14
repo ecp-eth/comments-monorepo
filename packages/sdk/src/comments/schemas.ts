@@ -103,6 +103,17 @@ export type CommentInputData = z.infer<typeof CommentInputDataSchema>;
 // this is just for type checking
 ({}) as CommentInputData satisfies CreateCommentData;
 
+export const EditCommentDataSchema = z.object({
+  commentId: HexSchema,
+  content: z.string(),
+  metadata: z.string(),
+  app: HexSchema,
+  nonce: z.bigint(),
+  deadline: z.bigint(),
+});
+
+export type EditCommentData = z.infer<typeof EditCommentDataSchema>;
+
 export const AddCommentTypedDataSchema = z.object({
   primaryType: z.literal("AddComment"),
   domain: z.object({
@@ -164,6 +175,38 @@ export const DeleteCommentTypedDataSchema = z.object({
 
 export type DeleteCommentTypedDataSchemaType = z.infer<
   typeof DeleteCommentTypedDataSchema
+>;
+
+export const EditCommentTypedDataSchema = z.object({
+  primaryType: z.literal("EditComment"),
+  domain: z.object({
+    name: z.literal(DOMAIN_NAME),
+    version: z.literal(DOMAIN_VERSION),
+  }),
+  message: z.object({
+    commentId: HexSchema,
+    content: z.string(),
+    metadata: z.string(),
+    app: HexSchema,
+    nonce: z.coerce.bigint(),
+    deadline: z.coerce.bigint(),
+  }),
+  types: z.object({
+    EditComment: z.array(
+      z.union([
+        z.object({ name: z.literal("commentId"), type: z.literal("bytes32") }),
+        z.object({ name: z.literal("content"), type: z.literal("string") }),
+        z.object({ name: z.literal("metadata"), type: z.literal("string") }),
+        z.object({ name: z.literal("app"), type: z.literal("address") }),
+        z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
+        z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
+      ])
+    ),
+  }),
+});
+
+export type EditCommentTypedDataSchemaType = z.infer<
+  typeof EditCommentTypedDataSchema
 >;
 
 export const AddApprovalTypedDataSchema = z.object({
