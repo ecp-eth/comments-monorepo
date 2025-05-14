@@ -178,6 +178,8 @@ export const EditCommentTypedDataSchema = z.object({
   domain: z.object({
     name: z.literal(DOMAIN_NAME),
     version: z.literal(DOMAIN_VERSION),
+    chainId: z.number(),
+    verifyingContract: HexSchema,
   }),
   message: z.object({
     commentId: HexSchema,
