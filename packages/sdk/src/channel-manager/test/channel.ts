@@ -147,6 +147,12 @@ describe("getChannel()", () => {
       description: undefined,
       metadata: undefined,
       hook: undefined,
+      permissions: {
+        afterComment: false,
+        afterDeleteComment: false,
+        afterEditComment: false,
+        afterInitialize: false,
+      },
     });
   });
 });
