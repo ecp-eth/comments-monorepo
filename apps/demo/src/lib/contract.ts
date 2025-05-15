@@ -21,7 +21,7 @@ export async function getApprovalStatusAndNonce<
             {
               address: COMMENT_MANAGER_ADDRESS,
               abi: CommentManagerABI,
-              functionName: "isApproved",
+              functionName: "getIsApproved",
               args: [
                 connectedAddress,
                 publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
@@ -43,7 +43,7 @@ export async function getApprovalStatusAndNonce<
             publicClient.readContract({
               address: COMMENT_MANAGER_ADDRESS,
               abi: CommentManagerABI,
-              functionName: "isApproved",
+              functionName: "getIsApproved",
               args: [
                 connectedAddress,
                 publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
