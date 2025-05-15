@@ -285,6 +285,12 @@ describe("updateChannel()", () => {
       description: "New description",
       metadata: "New metadata",
       hook: undefined,
+      permissions: {
+        afterComment: false,
+        afterDeleteComment: false,
+        afterEditComment: false,
+        afterInitialize: false,
+      },
     });
   });
 });
