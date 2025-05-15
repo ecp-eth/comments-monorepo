@@ -124,6 +124,17 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.postCommentAsAuthor(commentData, appSignature);
     }
 
+    function test_PostCommentAsAuthor_InvalidAppSignature() public {
+        Comments.CreateCommentData
+            memory commentData = _createBasicCreateCommentData();
+        commentData.app = app;
+
+        // Send transaction as author
+        vm.prank(author);
+        vm.expectRevert(ICommentManager.InvalidAppSignature.selector);
+        comments.postCommentAsAuthor(commentData, "");
+    }
+
     function test_PostComment() public {
         Comments.CreateCommentData
             memory commentData = _createBasicCreateCommentData();
