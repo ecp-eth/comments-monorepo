@@ -170,8 +170,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                 commentType: commentData.commentType,
                 createdAt: uint80(block.timestamp),
                 updatedAt: uint80(block.timestamp),
-                nonce: commentData.nonce,
-                deadline: commentData.deadline,
                 hookData: ""
             });
             // Store comment data on-chain

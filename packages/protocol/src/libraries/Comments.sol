@@ -26,8 +26,6 @@ library Comments {
         uint80 updatedAt;
         // 32-byte types
         uint256 channelId;
-        uint256 nonce;
-        uint256 deadline;
         bytes32 parentId;
         // Dynamic types last (conventional pattern)
         string content;

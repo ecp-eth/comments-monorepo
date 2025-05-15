@@ -12,9 +12,6 @@ import type {
   CreateRootCommentDataParams,
 } from "./types.js";
 
-/**
- * Comment schema. This is used as output of the functions.
- */
 export const CommentDataSchema = z.object({
   author: HexSchema,
   app: HexSchema,
@@ -103,6 +100,9 @@ export type CommentInputData = z.infer<typeof CommentInputDataSchema>;
 // this is just for type checking
 ({}) as CommentInputData satisfies CreateCommentData;
 
+/**
+ * Edit comment data schema. This is used as input of the functions.
+ */
 export const EditCommentDataSchema = z.object({
   commentId: HexSchema,
   content: z.string(),
