@@ -221,7 +221,7 @@ export function CommentForm<TExtraSubmitData = unknown>({
 
       return result;
     },
-    [postComment, parentId]
+    [postComment, parentId, extra, onSubmitStartRef]
   );
 
   return <BaseCommentForm {...props} onSubmit={handleSubmit} />;
@@ -273,7 +273,7 @@ export function CommentEditForm<TExtraEditData = unknown>({
 
       return result;
     },
-    [editComment, comment, queryKey]
+    [editComment, comment, queryKey, extra, onSubmitStartRef]
   );
 
   return (

@@ -7,7 +7,7 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { chain, transport } from "@/lib/wagmi";
-import { editComment, getEditCommentHash } from "@ecp.eth/sdk/comments";
+import { editComment } from "@ecp.eth/sdk/comments";
 import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -47,12 +47,6 @@ export async function POST(
     chain,
     transport,
   }).extend(publicActions);
-
-  const editCommentHash = await getEditCommentHash({
-    author: signTypedDataParams.message.author,
-    edit,
-    readContract: walletClient.readContract,
-  });
 
   const isAppSignatureValid = await walletClient.verifyTypedData({
     ...signTypedDataParams,

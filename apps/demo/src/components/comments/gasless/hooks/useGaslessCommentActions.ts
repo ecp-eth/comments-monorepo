@@ -302,7 +302,7 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, submitComment, commentRetryEdition]
+    [submitEditComment, commentRetryEdition, wagmiConfig]
   );
 
   return useMemo(
