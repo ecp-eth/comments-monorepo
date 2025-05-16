@@ -182,6 +182,7 @@ export async function submitEditCommentMutationFunction({
     commentId: comment.id,
     content: editRequest.content,
     metadata: comment.metadata,
+    chainId: editRequest.chainId,
   });
 
   if (!parseResult.success) {
