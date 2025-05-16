@@ -1,15 +1,15 @@
-import { useCommentRetrySubmission } from "@ecp.eth/shared/hooks";
+import { useCommentRetryEdition } from "@ecp.eth/shared/hooks";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useConfig, useSwitchChain } from "wagmi";
-import { submitCommentMutationFunction } from "../queries";
+import { submitEditCommentMutationFunction } from "../queries";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
-import { usePostCommentAsAuthor } from "@ecp.eth/sdk/comments/react";
+import { useEditCommentAsAuthor } from "@ecp.eth/sdk/comments/react";
 import { waitForTransactionReceipt } from "@wagmi/core";
 
-export type OnRetryPostCommentParams = {
+export type OnRetryEditCommentParams = {
   comment: Comment;
   /**
    * Query key to a query where comment is stored
@@ -21,23 +21,23 @@ export type OnRetryPostCommentParams = {
   onStart?: () => void;
 };
 
-export type OnRetryPostComment = (
-  params: OnRetryPostCommentParams
+export type OnRetryEditComment = (
+  params: OnRetryEditCommentParams
 ) => Promise<void>;
 
-type UseRetryPostCommentParams = {
+type UseRetryEditCommentParams = {
   connectedAddress: Hex | undefined;
 };
 
-export function useRetryPostComment({
+export function useRetryEditComment({
   connectedAddress,
-}: UseRetryPostCommentParams): OnRetryPostComment {
+}: UseRetryEditCommentParams): OnRetryEditComment {
   const wagmiConfig = useConfig();
-  const commentRetrySubmission = useCommentRetrySubmission();
+  const commentRetryEdition = useCommentRetryEdition();
   const { switchChainAsync } = useSwitchChain();
-  const { mutateAsync: postCommentAsAuthor } = usePostCommentAsAuthor();
+  const { mutateAsync: editCommentAsAuthor } = useEditCommentAsAuthor();
 
-  return useCallback<OnRetryPostComment>(
+  return useCallback<OnRetryEditComment>(
     async (params) => {
       const { comment } = params;
 
@@ -49,32 +49,24 @@ export function useRetryPostComment({
         throw new Error("Only non-gasless comments can be retried");
       }
 
-      if (comment.pendingOperation.action !== "post") {
-        throw new Error("Only post comments can be retried");
+      if (comment.pendingOperation.action !== "edit") {
+        throw new Error("Only edit comments can be retried");
       }
 
-      const pendingOperation = await submitCommentMutationFunction({
+      const pendingOperation = await submitEditCommentMutationFunction({
         address: connectedAddress,
-        commentRequest: {
+        comment,
+        editRequest: {
+          ...comment.pendingOperation.response.data,
           chainId: comment.pendingOperation.chainId,
-          content: comment.content,
-          ...(comment.parentId
-            ? {
-                parentId: comment.parentId,
-              }
-            : {
-                targetUri: comment.targetUri,
-              }),
         },
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        async writeContractAsync({
-          signCommentResponse: { signature: appSignature, data: commentData },
-        }) {
-          const { txHash } = await postCommentAsAuthor({
-            appSignature,
-            comment: commentData,
+        async writeContractAsync({ signEditCommentResponse }) {
+          const { txHash } = await editCommentAsAuthor({
+            edit: signEditCommentResponse.data,
+            appSignature: signEditCommentResponse.signature,
           });
 
           return txHash;
@@ -82,7 +74,7 @@ export function useRetryPostComment({
       });
 
       try {
-        commentRetrySubmission.start({
+        commentRetryEdition.start({
           ...params,
           pendingOperation,
         });
@@ -98,12 +90,12 @@ export function useRetryPostComment({
           throw new Error("Transaction reverted");
         }
 
-        commentRetrySubmission.success({
+        commentRetryEdition.success({
           ...params,
           pendingOperation,
         });
       } catch (e) {
-        commentRetrySubmission.error({
+        commentRetryEdition.error({
           pendingOperation,
           queryKey: params.queryKey,
           error: e instanceof Error ? e : new Error(String(e)),
@@ -115,8 +107,8 @@ export function useRetryPostComment({
     [
       connectedAddress,
       switchChainAsync,
-      postCommentAsAuthor,
-      commentRetrySubmission,
+      editCommentAsAuthor,
+      commentRetryEdition,
       wagmiConfig,
     ]
   );
