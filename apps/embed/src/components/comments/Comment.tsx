@@ -110,7 +110,7 @@ export function Comment({
       >
         <CommentText
           // make sure comment is updated if was deleted
-          key={comment.deletedAt?.toISOString()}
+          key={`${comment.deletedAt?.toISOString()}-${comment.updatedAt}-${comment.revision}`}
           text={comment.content}
         />
       </div>

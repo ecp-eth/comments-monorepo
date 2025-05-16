@@ -153,7 +153,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
       {isEditing ? (
         <CommentEditForm
           comment={comment}
-          queryKey={queryKey}
+          queryKey={rootQueryKey}
           onCancel={() => setIsEditing(false)}
           onSubmitStart={() => {
             setIsEditing(false);
