@@ -677,7 +677,7 @@ export async function getEditCommentHash(
   return hash;
 }
 
-export type EditCommentDataParams = {
+type BaseEditCommentDataParams = {
   /**
    * The ID of the comment to edit
    */
@@ -691,10 +691,6 @@ export type EditCommentDataParams = {
    */
   content: string;
   /**
-   * The metadata of the comment (either updated or original)
-   */
-  metadata: object;
-  /**
    * The nonce for the signature
    */
   nonce: bigint;
@@ -706,6 +702,24 @@ export type EditCommentDataParams = {
   deadline?: bigint;
 };
 
+type EditCommentDataParamsWithMetadataRaw = BaseEditCommentDataParams & {
+  /**
+   * The metadata of the comment as a raw string (already json serialized)
+   */
+  metadataRaw: string;
+};
+
+type EditCommentDataParamsWithMetadataObject = BaseEditCommentDataParams & {
+  /**
+   * The metadata of the comment as an object
+   */
+  metadataObject: object;
+};
+
+type EditCommentDataParams =
+  | EditCommentDataParamsWithMetadataRaw
+  | EditCommentDataParamsWithMetadataObject;
+
 /**
  * Create the data structure of a comment for editing
  * @return {@link comments!EditCommentData | EditCommentData} The data structure of a comment for editing
@@ -715,7 +729,10 @@ export function createEditCommentData(
 ): EditCommentData {
   return EditCommentDataSchema.parse({
     ...params,
-    metadata: params.metadata ? JSON.stringify(params.metadata) : "",
+    metadata:
+      "metadataRaw" in params
+        ? params.metadataRaw
+        : JSON.stringify(params.metadataObject),
     deadline:
       params.deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
   });
@@ -904,8 +921,8 @@ export async function editComment(
     args: [
       edit.commentId,
       edit,
-      appSignature,
       authorSignature ?? stringToHex(""),
+      appSignature,
     ],
     value: fee,
   });

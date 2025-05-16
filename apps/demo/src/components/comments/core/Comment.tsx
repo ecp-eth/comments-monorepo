@@ -19,6 +19,8 @@ type CommentProps = {
   onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
+  onEditClick: () => void;
+  onRetryEditClick: () => void;
 };
 
 export function Comment({
@@ -27,6 +29,8 @@ export function Comment({
   onRetryDeleteClick,
   onRetryPostClick,
   onReplyClick,
+  onEditClick,
+  onRetryEditClick,
 }: CommentProps) {
   const { address: connectedAddress } = useAccount();
 
@@ -37,6 +41,10 @@ export function Comment({
 
   const isDeleting =
     comment.pendingOperation?.action === "delete" &&
+    comment.pendingOperation.state.status === "pending";
+
+  const isEditing =
+    comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "pending";
 
   return (
@@ -56,6 +64,13 @@ export function Comment({
                 <MoreVerticalIcon className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={onEditClick}
+                  disabled={isEditing}
+                >
+                  Edit
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-red-600 cursor-pointer"
                   onClick={onDeleteClick}
@@ -82,6 +97,7 @@ export function Comment({
           onRetryDeleteClick={onRetryDeleteClick}
           onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
+          onRetryEditClick={onRetryEditClick}
         />
       </div>
     </>

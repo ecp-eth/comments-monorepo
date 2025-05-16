@@ -2,7 +2,9 @@ import { useCallback, useMemo } from "react";
 import type {
   CommentActionsContextType,
   OnDeleteComment,
+  OnEditComment,
   OnPostComment,
+  OnRetryEditComment,
   OnRetryPostComment,
 } from "../../core/CommentActionsContext";
 import type { Hex } from "viem";
@@ -10,11 +12,16 @@ import { waitForTransactionReceipt, getChainId } from "@wagmi/core";
 import { useConfig } from "wagmi";
 import {
   useCommentDeletion,
+  useCommentEdition,
+  useCommentRetryEdition,
   useCommentRetrySubmission,
   useCommentSubmission,
 } from "@ecp.eth/shared/hooks";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-import { useGaslessSubmitComment } from "./useGaslessSubmitComment";
+import {
+  useGaslessEditComment,
+  useGaslessSubmitComment,
+} from "./useGaslessSubmitComment";
 import { useGaslessDeleteComment } from "./useGaslessDeleteComment";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 
@@ -39,6 +46,10 @@ export function useGaslessCommentActions({
   const commentDeletion = useCommentDeletion();
   const commentRetrySubmission = useCommentRetrySubmission();
   const commentSubmission = useCommentSubmission();
+  const editCommentMutation = useGaslessEditComment();
+  const { mutateAsync: submitEditComment } = editCommentMutation;
+  const commentEdition = useCommentEdition();
+  const commentRetryEdition = useCommentRetryEdition();
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {
@@ -196,12 +207,118 @@ export function useGaslessCommentActions({
     [wagmiConfig, hasApproval, commentSubmission, submitComment]
   );
 
+  const editComment = useCallback<OnEditComment>(
+    async (params) => {
+      const pendingOperation = await submitEditComment({
+        isApproved: hasApproval,
+        commentId: params.comment.id,
+        content: params.edit.content,
+        metadata: params.edit.metadata,
+      });
+
+      try {
+        commentEdition.start({
+          ...params,
+          pendingOperation,
+        });
+
+        params.onStart?.();
+
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
+          hash: pendingOperation.txHash,
+          timeout: TX_RECEIPT_TIMEOUT,
+        });
+
+        if (receipt.status !== "success") {
+          throw new Error("Transaction reverted");
+        }
+
+        commentEdition.success({
+          pendingOperation,
+          queryKey: params.queryKey,
+        });
+      } catch (e) {
+        commentEdition.error({
+          queryKey: params.queryKey,
+          commentId: pendingOperation.response.data.commentId,
+          error: e instanceof Error ? e : new Error(String(e)),
+        });
+      }
+    },
+    [hasApproval, submitEditComment, commentEdition, wagmiConfig]
+  );
+
+  const retryEditComment = useCallback<OnRetryEditComment>(
+    async (params) => {
+      const { comment } = params;
+
+      if (!comment.pendingOperation) {
+        throw new Error("No pending operation to retry");
+      }
+
+      if (comment.pendingOperation.type === "non-gasless") {
+        throw new Error("Only gasless comments can be retried");
+      }
+
+      if (comment.pendingOperation.action !== "edit") {
+        throw new Error("Only edit comments can be retried");
+      }
+
+      const pendingOperation = await submitEditComment({
+        isApproved: comment.pendingOperation.type === "gasless-preapproved",
+        commentId: comment.id,
+        content: comment.content,
+        metadata: comment.metadata,
+      });
+
+      try {
+        commentRetryEdition.start({
+          ...params,
+          pendingOperation,
+        });
+
+        params.onStart?.();
+
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
+          hash: pendingOperation.txHash,
+          timeout: TX_RECEIPT_TIMEOUT,
+        });
+
+        if (receipt.status !== "success") {
+          throw new Error("Transaction reverted");
+        }
+
+        commentRetryEdition.success({
+          ...params,
+          pendingOperation,
+        });
+      } catch (e) {
+        commentRetryEdition.error({
+          pendingOperation,
+          queryKey: params.queryKey,
+          error: e instanceof Error ? e : new Error(String(e)),
+        });
+
+        throw e;
+      }
+    },
+    [wagmiConfig, submitComment, commentRetryEdition]
+  );
+
   return useMemo(
     () => ({
       deleteComment,
       retryPostComment,
       postComment,
+      editComment,
+      retryEditComment,
     }),
-    [deleteComment, retryPostComment, postComment]
+    [
+      deleteComment,
+      retryPostComment,
+      postComment,
+      editComment,
+      retryEditComment,
+    ]
   );
 }

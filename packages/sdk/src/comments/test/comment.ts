@@ -614,7 +614,7 @@ describe("editCommentAsAuthor()", () => {
       commentId,
       nonce,
       content: "Updated comment content",
-      metadata: { test: true, updated: true },
+      metadataObject: { test: true, updated: true },
     });
 
     const typedData = createEditCommentTypedData({
@@ -721,7 +721,7 @@ describe("editComment()", () => {
       commentId,
       nonce,
       content: "Updated comment content",
-      metadata: { test: true, updated: true },
+      metadataObject: { test: true, updated: true },
     });
 
     const typedData = createEditCommentTypedData({
@@ -769,7 +769,7 @@ describe("editComment()", () => {
       commentId,
       nonce,
       content: "Updated comment content",
-      metadata: { test: true, updated: true },
+      metadataObject: { test: true, updated: true },
     });
 
     await assert.rejects(
@@ -796,7 +796,7 @@ describe("getEditCommentHash()", () => {
         "0x1234567890123456789012345678901234567890123456789012345678901234",
       nonce: 1n,
       content: "Updated comment content",
-      metadata: { test: true, updated: true },
+      metadataObject: { test: true, updated: true },
     });
 
     const result = await getEditCommentHash({

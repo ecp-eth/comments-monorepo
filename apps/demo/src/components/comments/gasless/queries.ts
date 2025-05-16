@@ -11,6 +11,11 @@ import {
   type PreparedSignedGaslessDeleteCommentNotApprovedSchemaType,
   PreparedGaslessPostCommentOperationApprovedResponseSchema,
   PreparedSignedGaslessPostCommentNotApprovedResponseSchema,
+  type PrepareSignedGaslessEditCommentRequestBodySchemaType,
+  type PrepareSignedGaslessEditCommentApprovedResponseSchemaType,
+  type PrepareSignedGaslessEditCommentNotApprovedResponseSchemaType,
+  PrepareSignedGaslessEditCommentNotApprovedResponseSchema,
+  PrepareSignedGaslessEditCommentApprovedResponseSchema,
 } from "@/lib/schemas";
 import type { Hex } from "viem";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
@@ -112,6 +117,54 @@ export async function prepareSignedGaslessComment(
     ...parsed,
     resolvedAuthor,
   };
+}
+
+export async function prepareSignedGaslessEditComment(
+  submitIfApproved: true,
+  body: Omit<
+    PrepareSignedGaslessEditCommentRequestBodySchemaType,
+    "submitIfApproved"
+  >
+): Promise<PrepareSignedGaslessEditCommentApprovedResponseSchemaType>;
+export async function prepareSignedGaslessEditComment(
+  submitIfApproved: false,
+  body: Omit<
+    PrepareSignedGaslessEditCommentRequestBodySchemaType,
+    "submitIfApproved"
+  >
+): Promise<PrepareSignedGaslessEditCommentNotApprovedResponseSchemaType>;
+export async function prepareSignedGaslessEditComment(
+  submitIfApproved: boolean,
+  body: Omit<
+    PrepareSignedGaslessEditCommentRequestBodySchemaType,
+    "submitIfApproved"
+  >
+): Promise<
+  | PrepareSignedGaslessEditCommentApprovedResponseSchemaType
+  | PrepareSignedGaslessEditCommentNotApprovedResponseSchemaType
+> {
+  const response = await fetch("/api/sign-edit-comment/gasless/prepare", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ...body,
+      submitIfApproved,
+    } satisfies PrepareSignedGaslessEditCommentRequestBodySchemaType),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to sign edit comment");
+  }
+
+  const data = await response.json();
+
+  if (submitIfApproved) {
+    return PrepareSignedGaslessEditCommentApprovedResponseSchema.parse(data);
+  }
+
+  return PrepareSignedGaslessEditCommentNotApprovedResponseSchema.parse(data);
 }
 
 async function gaslessDeleteComment(

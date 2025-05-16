@@ -108,8 +108,8 @@ export const EditCommentDataSchema = z.object({
   content: z.string(),
   metadata: z.string(),
   app: HexSchema,
-  nonce: z.bigint(),
-  deadline: z.bigint(),
+  nonce: z.coerce.bigint(),
+  deadline: z.coerce.bigint(),
 });
 
 export type EditCommentData = z.infer<typeof EditCommentDataSchema>;

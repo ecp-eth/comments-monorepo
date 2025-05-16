@@ -2,7 +2,7 @@ import type { Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { Comment } from "./Comment";
 import { useCallback, useState } from "react";
 import type { QueryKey } from "@tanstack/react-query";
-import { CommentForm } from "./CommentForm";
+import { CommentEditForm, CommentForm } from "./CommentForm";
 import { useCommentActions } from "./CommentActionsContext";
 
 type ReplyItemProps = {
@@ -11,11 +11,17 @@ type ReplyItemProps = {
 };
 
 export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
-  const { deleteComment, retryPostComment } = useCommentActions();
+  const { deleteComment, retryPostComment, retryEditComment } =
+    useCommentActions();
   const [isReplying, setIsReplying] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const onReplyClick = useCallback(() => {
     setIsReplying(true);
+  }, []);
+
+  const onEditClick = useCallback(() => {
+    setIsEditing(true);
   }, []);
 
   const onDeleteClick = useCallback(() => {
@@ -26,25 +32,43 @@ export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
     retryPostComment({ comment, queryKey });
   }, [comment, retryPostComment, queryKey]);
 
+  const onRetryEditClick = useCallback(() => {
+    retryEditComment({ comment, queryKey });
+  }, [comment, retryEditComment, queryKey]);
+
   return (
     <div className={"mb-4 border-gray-200 border-l-2 pl-4"}>
-      <Comment
-        comment={comment}
-        onReplyClick={onReplyClick}
-        onRetryPostClick={onRetryPostClick}
-        onDeleteClick={onDeleteClick}
-        onRetryDeleteClick={onDeleteClick}
-      />
+      {isEditing ? (
+        <CommentEditForm
+          queryKey={queryKey}
+          comment={comment}
+          onCancel={() => {
+            setIsEditing(false);
+          }}
+          onSubmitStart={() => {
+            setIsEditing(false);
+          }}
+        />
+      ) : (
+        <Comment
+          comment={comment}
+          onReplyClick={onReplyClick}
+          onRetryPostClick={onRetryPostClick}
+          onDeleteClick={onDeleteClick}
+          onRetryDeleteClick={onDeleteClick}
+          onEditClick={onEditClick}
+          onRetryEditClick={onRetryEditClick}
+        />
+      )}
       {isReplying && (
         <CommentForm
           autoFocus
-          onLeftEmpty={() => {
+          onCancel={() => {
             setIsReplying(false);
           }}
           onSubmitStart={() => {
             setIsReplying(false);
           }}
-          placeholder="What are your thoughts?"
           parentId={comment.id}
         />
       )}

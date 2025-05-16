@@ -3,14 +3,23 @@ import {
   GaslessPostCommentResponseSchema,
   type GaslessPostCommentResponseSchemaType,
   type PreparedSignedGaslessPostCommentNotApprovedSchemaType,
+  GaslessEditResponseSchema,
+  type GaslessEditResponseSchemaType,
+  type PrepareSignedGaslessEditCommentNotApprovedResponseSchemaType,
 } from "@/lib/schemas";
 import { useGaslessTransaction } from "@ecp.eth/sdk/comments/react";
 import type { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { useConnectAccount } from "@ecp.eth/shared/hooks";
-import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
+import type {
+  PendingEditCommentOperationSchemaType,
+  PendingPostCommentOperationSchemaType,
+} from "@ecp.eth/shared/schemas";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import type { Hex, SignTypedDataParameters } from "viem";
-import { prepareSignedGaslessComment } from "../queries";
+import {
+  prepareSignedGaslessComment,
+  prepareSignedGaslessEditComment,
+} from "../queries";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { InvalidCommentError, RateLimitedError } from "../../core/errors";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
@@ -182,6 +191,154 @@ export function useGaslessSubmitComment(
         resolvedAuthor,
         type: "gasless-not-approved",
         action: "post",
+        chainId: result.chainId,
+        state: { status: "pending" },
+      };
+    },
+  });
+}
+
+type SubmitGaslessEditCommentVariables = {
+  content: string;
+  isApproved: boolean;
+  commentId: Hex;
+  metadata: string;
+};
+
+type SubmitGaslessEditCommentVariablesInternal = {
+  author: Hex;
+  content: string;
+  commentId: Hex;
+  metadata: string;
+};
+
+type EditPriorNotApprovedResult = GaslessEditResponseSchemaType &
+  PrepareSignedGaslessEditCommentNotApprovedResponseSchemaType;
+
+export function useGaslessEditComment(
+  options?: UseMutationOptions<
+    PendingEditCommentOperationSchemaType,
+    Error,
+    SubmitGaslessEditCommentVariables
+  >
+) {
+  const connectAccount = useConnectAccount();
+
+  // post a comment that was previously approved, so not need for
+  // user approval for signature for each interaction
+  const editPriorApprovedCommentMutation = useMutation({
+    mutationFn: async (
+      variables: SubmitGaslessEditCommentVariablesInternal
+    ) => {
+      return prepareSignedGaslessEditComment(
+        // tell the server to submit right away after preparation of the comment data,
+        // if the app is previously approved
+        true,
+        variables
+      );
+    },
+  });
+
+  // post a comment that was previously NOT approved,
+  // will require user interaction for signature
+  const editPriorNotApprovedSubmitMutation = useGaslessTransaction<
+    PrepareSignedGaslessEditCommentNotApprovedResponseSchemaType,
+    EditPriorNotApprovedResult,
+    SubmitGaslessEditCommentVariablesInternal
+  >({
+    async prepareSignTypedDataParams(variables) {
+      const data = await prepareSignedGaslessEditComment(false, variables);
+
+      return {
+        signTypedDataParams:
+          data.signTypedDataParams as unknown as SignTypedDataParameters,
+        variables: data,
+      };
+    },
+    async sendSignedData({ signature, variables }) {
+      const response = await fetch("/api/sign-edit-comment/gasless", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          {
+            ...variables,
+            authorSignature: signature,
+          },
+          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+        ),
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new RateLimitedError();
+        }
+
+        if (response.status === 400) {
+          throw new InvalidCommentError(
+            BadRequestResponseSchema.parse(await response.json())
+          );
+        }
+
+        throw new Error("Failed to edit comment");
+      }
+
+      const { txHash } = GaslessEditResponseSchema.parse(await response.json());
+
+      return {
+        txHash,
+        ...variables,
+      };
+    },
+  });
+
+  return useMutation<
+    PendingEditCommentOperationSchemaType,
+    Error,
+    SubmitGaslessEditCommentVariables
+  >({
+    ...options,
+    mutationFn: async ({
+      isApproved,
+      ...variables
+    }: SubmitGaslessEditCommentVariables) => {
+      const address = await connectAccount();
+
+      if (isApproved) {
+        const result = await editPriorApprovedCommentMutation.mutateAsync({
+          ...variables,
+          author: address,
+        });
+
+        return {
+          response: {
+            data: result.edit,
+            hash: result.txHash,
+            signature: result.appSignature,
+          },
+          txHash: result.txHash,
+          type: "gasless-preapproved",
+          action: "edit",
+          chainId: result.chainId,
+          state: { status: "pending" },
+        };
+      }
+
+      const result = await editPriorNotApprovedSubmitMutation.mutateAsync({
+        ...variables,
+        author: address,
+      });
+
+      return {
+        response: {
+          data: result.edit,
+          hash: result.txHash,
+          signature: result.appSignature,
+        },
+        txHash: result.txHash,
+        type: "gasless-not-approved",
+        action: "edit",
         chainId: result.chainId,
         state: { status: "pending" },
       };
