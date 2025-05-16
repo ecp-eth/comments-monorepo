@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { ponder as Ponder } from "ponder:registry";
+import { ponder, ponder as Ponder } from "ponder:registry";
 import {
   transformCommentParentId,
   transformCommentTargetUri,
@@ -134,3 +134,26 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     }
   });
 }
+
+ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
+  const existingComment = await context.db.find(schema.comments, {
+    id: event.args.commentId,
+  });
+
+  if (!existingComment) {
+    return;
+  }
+
+  const updatedAt = new Date(Number(event.args.comment.updatedAt) * 1000);
+
+  await context.db
+    .update(schema.comments, {
+      id: event.args.commentId,
+    })
+    .set({
+      content: event.args.comment.content,
+      metadata: event.args.comment.metadata,
+      revision: existingComment.revision + 1,
+      updatedAt,
+    });
+});

@@ -225,6 +225,7 @@ export function insertPendingCommentToPage(
     chainId,
     createdAt: new Date(),
     updatedAt: new Date(),
+    revision: 0,
     moderationStatus: moderationEnabled ? "pending" : "approved",
     moderationStatusChangedAt: new Date(),
     replies: {
@@ -388,6 +389,7 @@ export function markPendingEditCommentAsPending(
     for (const comment of page.results) {
       if (isSameHex(comment.id, pendingOperation.response.data.commentId)) {
         comment.content = pendingOperation.response.data.content;
+        comment.revision++;
         comment.pendingOperation = pendingOperation;
 
         return queryData;
