@@ -55,7 +55,7 @@ contract RejectEditHook is BaseHook {
     }
 }
 
-contract AcceptEditHook is BaseHook {
+contract AlwaysReturningDataHook is BaseHook {
     function getHookPermissions()
         external
         pure
@@ -65,13 +65,21 @@ contract AcceptEditHook is BaseHook {
         return
             Hooks.Permissions({
                 afterInitialize: false,
-                afterComment: false,
+                afterComment: true,
                 afterDeleteComment: false,
                 afterEditComment: true
             });
     }
 
     function afterEditComment(
+        Comments.Comment calldata,
+        address,
+        bytes32
+    ) external payable override returns (string memory) {
+        return "hook data";
+    }
+
+    function afterComment(
         Comments.Comment calldata,
         address,
         bytes32
@@ -96,11 +104,11 @@ contract CommentsTest is Test, IERC721Receiver {
         address indexed app,
         Comments.Comment commentData
     );
-
+    event CommentHookDataUpdated(bytes32 indexed commentId, string hookData);
     CommentManager public comments;
     NoHook public noHook;
     RejectEditHook public rejectEditHook;
-    AcceptEditHook public acceptEditHook;
+    AlwaysReturningDataHook public alwaysReturningDataHook;
     ChannelManager public channelManager;
 
     // Test accounts
@@ -117,7 +125,7 @@ contract CommentsTest is Test, IERC721Receiver {
         app = vm.addr(appPrivateKey);
         noHook = new NoHook();
         rejectEditHook = new RejectEditHook();
-        acceptEditHook = new AcceptEditHook();
+        alwaysReturningDataHook = new AlwaysReturningDataHook();
         (comments, channelManager) = TestUtils.createContracts(owner);
 
         // Setup private keys for signing
@@ -1009,6 +1017,58 @@ contract CommentsTest is Test, IERC721Receiver {
         comments.postComment(commentData, authorSignature, appSignature);
     }
 
+    function test_PostComment_WithHookData() public {
+        // Create a channel with the hook
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
+            "Test Channel",
+            "Test Description",
+            "{}",
+            address(alwaysReturningDataHook)
+        );
+
+        // Create a comment
+        Comments.CreateComment memory commentData = _createBasicCreateComment();
+        commentData.channelId = channelId;
+        bytes32 commentId = comments.getCommentId(commentData);
+        bytes memory authorSignature = TestUtils.signEIP712(
+            vm,
+            authorPrivateKey,
+            commentId
+        );
+        bytes memory appSignature = TestUtils.signEIP712(
+            vm,
+            appPrivateKey,
+            commentId
+        );
+
+        vm.expectEmit(true, true, true, true);
+        emit CommentAdded(
+            commentId,
+            author,
+            app,
+            Comments.Comment({
+                author: commentData.author,
+                app: commentData.app,
+                content: commentData.content,
+                commentType: commentData.commentType,
+                createdAt: uint80(block.timestamp),
+                updatedAt: uint80(block.timestamp),
+                metadata: commentData.metadata,
+                channelId: commentData.channelId,
+                parentId: commentData.parentId,
+                targetUri: commentData.targetUri,
+                hookData: ""
+            })
+        );
+        vm.expectEmit(true, true, true, true);
+        emit CommentHookDataUpdated(commentId, "hook data");
+        comments.postComment(commentData, authorSignature, appSignature);
+
+        // Verify the comment was created with hook data
+        Comments.Comment memory createdComment = comments.getComment(commentId);
+        assertEq(createdComment.hookData, "hook data");
+    }
+
     function _createBasicEditCommentData()
         internal
         view
@@ -1076,7 +1136,7 @@ contract CommentsTest is Test, IERC721Receiver {
             "Test Channel",
             "Test Description",
             "{}",
-            address(acceptEditHook)
+            address(alwaysReturningDataHook)
         );
 
         // Create a comment
@@ -1113,11 +1173,12 @@ contract CommentsTest is Test, IERC721Receiver {
         expectedCommentData.content = editData.content;
         expectedCommentData.metadata = editData.metadata;
         expectedCommentData.updatedAt = uint80(block.timestamp);
-        expectedCommentData.hookData = "hook data";
 
         vm.prank(author);
         vm.expectEmit(true, true, true, true);
         emit CommentEdited(commentId, author, app, expectedCommentData);
+        vm.expectEmit(true, true, true, true);
+        emit CommentHookDataUpdated(commentId, "hook data");
         comments.editCommentAsAuthor(commentId, editData, editAppSignature);
 
         // Verify the comment was edited

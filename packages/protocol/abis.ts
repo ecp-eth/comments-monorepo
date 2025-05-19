@@ -1199,6 +1199,25 @@ export const CommentManagerABI = [
   },
   {
     type: "event",
+    name: "CommentHookDataUpdated",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+      {
+        name: "hookData",
+        type: "string",
+        indexed: false,
+        internalType: "string",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "OwnershipTransferred",
     inputs: [
       {
