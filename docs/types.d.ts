@@ -1,4 +1,4 @@
-declare module '*.css?raw' {
+declare module "*.css?raw" {
   const content: string;
   export default content;
 }

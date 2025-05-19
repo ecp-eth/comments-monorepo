@@ -52,7 +52,7 @@ export class RateLimiter {
     }
 
     const { success, reset, remaining } = await this.limiter.limit(
-      ethereumAddress.toLowerCase()
+      ethereumAddress.toLowerCase(),
     );
 
     return {

@@ -73,5 +73,12 @@ Withdraws accumulated fees to a specified address
 
 
 
+### `deductProtocolHookTransactionFee(uint256 value) → uint256 hookValue` (external)
+
+Calculates the hook transaction fee by deducting the protocol fee
+
+
+
+
 
 

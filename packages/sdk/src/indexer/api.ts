@@ -99,7 +99,7 @@ const FetchCommentsOptionsSchema = z.object({
  * @returns A promise that resolves comments fetched from the Indexer API
  */
 export async function fetchComments(
-  options: FetchCommentsOptions
+  options: FetchCommentsOptions,
 ): Promise<IndexerAPIListCommentsSchemaType> {
   const {
     apiUrl,
@@ -259,7 +259,7 @@ const FetchCommentRepliesOptionSchema = z.object({
  * @returns A promise that resolves replies fetched from the Indexer API
  */
 export async function fetchCommentReplies(
-  options: FetchCommentRepliesOptions
+  options: FetchCommentRepliesOptions,
 ): Promise<IndexerAPIListCommentRepliesSchemaType> {
   const {
     apiUrl,
@@ -367,7 +367,7 @@ const FetchAuthorDataOptionsSchema = z.object({
  * @returns A promise that resolves author data fetched from the Indexer API
  */
 export async function fetchAuthorData(
-  options: FetchAuthorDataOptions
+  options: FetchAuthorDataOptions,
 ): Promise<IndexerAPIAuthorDataSchemaType> {
   const { address, retries, apiUrl, signal } =
     FetchAuthorDataOptionsSchema.parse(options);
@@ -460,12 +460,12 @@ export async function isMuted(options: IsMutedOptions): Promise<boolean> {
       }
 
       throw new Error(
-        `Failed to check if address is muted: ${response.statusText} (${response.status})`
+        `Failed to check if address is muted: ${response.statusText} (${response.status})`,
       );
     }),
     {
       times: retries,
-    }
+    },
   );
 
   return Effect.runPromise(isMutedTask, { signal });

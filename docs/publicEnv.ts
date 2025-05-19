@@ -12,14 +12,14 @@ export const publicEnvSchema = z.object({
     // VITE_ECP_ETH_EMBED_URL=
     // ```
     .transform((val) =>
-      z.string().url().safeParse(val).success ? val : undefined
+      z.string().url().safeParse(val).success ? val : undefined,
     )
     .optional(),
   VITE_ECP_ETH_EMBED_BY_AUTHOR_URL: z.coerce
     .string()
     .url()
     .transform((val) =>
-      z.string().url().safeParse(val).success ? val : undefined
+      z.string().url().safeParse(val).success ? val : undefined,
     )
     .optional(),
 });

@@ -57,7 +57,7 @@ export default (app: OpenAPIHono) => {
       const rootComment = await db.query.comments.findFirst({
         where: and(
           eq(schema.comments.id, commentId),
-          isNull(schema.comments.rootCommentId)
+          isNull(schema.comments.rootCommentId),
         ),
       });
 
@@ -66,7 +66,7 @@ export default (app: OpenAPIHono) => {
           {
             message: "Flat mode is not supported for non-root comments",
           },
-          400
+          400,
         );
       }
 
@@ -80,7 +80,7 @@ export default (app: OpenAPIHono) => {
 
       if (viewer) {
         sharedConditions.push(
-          or(onlyApproved, eq(schema.comments.author, viewer))
+          or(onlyApproved, eq(schema.comments.author, viewer)),
         );
       } else {
         sharedConditions.push(onlyApproved);
@@ -98,9 +98,9 @@ export default (app: OpenAPIHono) => {
                     or(
                       and(
                         eq(schema.comments.createdAt, cursor.createdAt),
-                        lt(schema.comments.id, cursor.id)
+                        lt(schema.comments.id, cursor.id),
                       ),
-                      lt(schema.comments.createdAt, cursor.createdAt)
+                      lt(schema.comments.createdAt, cursor.createdAt),
                     ),
                   ]
                 : []),
@@ -109,12 +109,12 @@ export default (app: OpenAPIHono) => {
                     or(
                       and(
                         eq(schema.comments.createdAt, cursor.createdAt),
-                        gt(schema.comments.id, cursor.id)
+                        gt(schema.comments.id, cursor.id),
                       ),
-                      gt(schema.comments.createdAt, cursor.createdAt)
+                      gt(schema.comments.createdAt, cursor.createdAt),
                     ),
                   ]
-                : [])
+                : []),
             ),
             orderBy:
               sort === "desc"
@@ -132,9 +132,9 @@ export default (app: OpenAPIHono) => {
               or(
                 and(
                   eq(schema.comments.createdAt, cursor.createdAt),
-                  lt(schema.comments.id, cursor.id)
+                  lt(schema.comments.id, cursor.id),
                 ),
-                lt(schema.comments.createdAt, cursor.createdAt)
+                lt(schema.comments.createdAt, cursor.createdAt),
               ),
             ]
           : []),
@@ -143,12 +143,12 @@ export default (app: OpenAPIHono) => {
               or(
                 and(
                   eq(schema.comments.createdAt, cursor.createdAt),
-                  gt(schema.comments.id, cursor.id)
+                  gt(schema.comments.id, cursor.id),
                 ),
-                gt(schema.comments.createdAt, cursor.createdAt)
+                gt(schema.comments.createdAt, cursor.createdAt),
               ),
             ]
-          : [])
+          : []),
       ),
       orderBy:
         sort === "desc"
@@ -172,7 +172,7 @@ export default (app: OpenAPIHono) => {
 
     return c.json(
       IndexerAPIListCommentRepliesOutputSchema.parse(formattedComments),
-      200
+      200,
     );
   });
 

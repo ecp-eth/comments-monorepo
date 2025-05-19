@@ -11,7 +11,7 @@ import { CJSESMExport, NonPrivatePackageWithExports, Package } from "./types";
  * @returns The parsed package.json object
  */
 export async function readPackageJson(
-  packageJsonPath: string
+  packageJsonPath: string,
 ): Promise<Package> {
   const packageJsonString = nodeFs.readFileSync(packageJsonPath, "utf-8");
   return JSON.parse(packageJsonString);
@@ -33,7 +33,7 @@ export async function everyPackage<RetType>(
   }: {
     pkg: NonPrivatePackageWithExports;
     path: string;
-  }) => Promise<RetType>
+  }) => Promise<RetType>,
 ): Promise<RetType[]> {
   const packagePaths = await glob(globPattern);
   const packages = (
@@ -49,7 +49,7 @@ export async function everyPackage<RetType>(
           pkg: await readPackageJson(resolvedPath),
           path: resolvedPath,
         };
-      })
+      }),
     )
   ).filter<{ pkg: NonPrivatePackageWithExports; path: string }>(
     (ctx): ctx is { pkg: NonPrivatePackageWithExports; path: string } => {
@@ -57,7 +57,7 @@ export async function everyPackage<RetType>(
       if (pkg.private === true) return false;
       if (!pkg.exports) return false;
       return true;
-    }
+    },
   );
   return await Promise.all(packages.map(onEachPackage));
 }
@@ -81,10 +81,10 @@ export async function everyExportWithCJSModule<RetType>(
     cjsPath: string;
     typePath: string;
   }) => Promise<RetType>,
-  avoidSpread: boolean
+  avoidSpread: boolean,
 ): Promise<RetType[]> {
   const allPromisedExports: Promise<CJSESMExportEntry[]>[] = Object.entries(
-    pkg.exports
+    pkg.exports,
   )
     .filter((entries): entries is CJSESMExportEntry => {
       const [key, exports] = entries;
@@ -130,11 +130,11 @@ export async function everyExportWithCJSModule<RetType>(
                   const resolvedKey = key.replace("*", wildcardMatches);
                   const resolvedDefault = exports.default.replace(
                     "*",
-                    wildcardMatches
+                    wildcardMatches,
                   );
                   const resolvedTypes = exports.types.replace(
                     "*",
-                    wildcardMatches
+                    wildcardMatches,
                   );
 
                   return [
@@ -147,12 +147,12 @@ export async function everyExportWithCJSModule<RetType>(
                 }) as [string, { default: string; types: string }][];
 
               return expandedEntries;
-            })()
+            })(),
           );
         }
         return acc;
       },
-      [] as Promise<CJSESMExportEntry[]>[]
+      [] as Promise<CJSESMExportEntry[]>[],
     );
 
   const allExportsArray = await Promise.all(allPromisedExports);
@@ -164,7 +164,7 @@ export async function everyExportWithCJSModule<RetType>(
         cjsPath: exports.default,
         typePath: exports.types,
       });
-    })
+    }),
   );
 }
 

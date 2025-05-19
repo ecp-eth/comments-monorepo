@@ -35,11 +35,11 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const rootQueryKey = useMemo(
     () => createRootCommentsQueryKey(connectedAddress, window.location.href),
-    [connectedAddress]
+    [connectedAddress],
   );
   const queryKey = useMemo(
     () => createCommentRepliesQueryKey(connectedAddress, comment.id),
-    [comment.id, connectedAddress]
+    [comment.id, connectedAddress],
   );
 
   const onReplyClick = useCallback(() => {

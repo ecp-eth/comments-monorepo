@@ -107,7 +107,7 @@ function BaseCommentForm({
       } catch (e) {
         if (e instanceof z.ZodError) {
           throw new InvalidCommentError(
-            e.flatten().fieldErrors as Record<string, string[]>
+            e.flatten().fieldErrors as Record<string, string[]>,
           );
         }
 
@@ -158,7 +158,7 @@ function BaseCommentForm({
           "w-full p-2 min-h-[70px] max-h-[400px] resize-vertical",
           submitMutation.error &&
             submitMutation.error instanceof InvalidCommentError &&
-            "border-destructive focus-visible:border-destructive"
+            "border-destructive focus-visible:border-destructive",
         )}
         disabled={isSubmitting}
         maxLength={MAX_COMMENT_LENGTH}
@@ -276,7 +276,7 @@ export function CommentForm({
       switchChainAsync,
       targetUri,
       wagmiConfig,
-    ]
+    ],
   );
 
   return <BaseCommentForm {...props} onSubmit={submitCommentMutation} />;
@@ -412,7 +412,7 @@ export function CommentEditForm({
       queryKey,
       switchChainAsync,
       wagmiConfig,
-    ]
+    ],
   );
 
   return (

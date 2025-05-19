@@ -69,23 +69,23 @@ Withdraws accumulated fees to a specified address
 
 
 
-### `collectChannelCreationFee() → uint96` (public)
+### `collectChannelCreationFee() → uint96` (internal)
 
-Collects channel creation fee
-
-
+Guard against insufficient channel creation fee
 
 
-### `calculateHookTransactionFee(uint256 value) → uint256 hookValue` (public)
 
-Collects hook transaction fee
+
+### `deductProtocolHookTransactionFee(uint256 value) → uint256 hookValue` (external)
+
+Calculates the hook transaction fee by deducting the protocol fee
 
 
 
 
 ### `_collectFee(uint96 requiredFee) → uint96` (internal)
 
-Internal function to handle fee collection and refunds
+Internal function to guard against insufficient fee
 
 
 

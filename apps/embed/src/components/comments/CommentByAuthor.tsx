@@ -28,7 +28,7 @@ export function CommentByAuthor({
   const authorUrl = formatAuthorLink(comment.author);
   const commentRelativeTime = useCommentRelativeTime(
     comment.createdAt,
-    currentTimestamp
+    currentTimestamp,
   );
 
   return (
@@ -70,7 +70,7 @@ export function CommentByAuthor({
       <div
         className={cn(
           "mb-2 text-foreground",
-          comment.deletedAt && "text-muted-foreground"
+          comment.deletedAt && "text-muted-foreground",
         )}
       >
         <CommentText

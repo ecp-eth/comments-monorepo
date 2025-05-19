@@ -18,7 +18,7 @@ export class CommentNotFoundError extends HTTPException {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       ),
     });
   }
@@ -37,7 +37,7 @@ export class CommentModerationStatusNotFoundError extends HTTPException {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       ),
     });
   }
@@ -56,7 +56,7 @@ export class CommentAlreadyInStatusError extends HTTPException {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       ),
     });
   }
@@ -66,7 +66,7 @@ type ModerationStatus = "pending" | "approved" | "rejected";
 
 export async function insertCommentModerationStatus(
   commentId: string,
-  status: ModerationStatus = "pending"
+  status: ModerationStatus = "pending",
 ) {
   const db = getIndexerDb();
 
@@ -81,7 +81,7 @@ export async function insertCommentModerationStatus(
 
 export async function updateCommentModerationStatus(
   commentId: Hex,
-  status: ModerationStatus
+  status: ModerationStatus,
 ) {
   const indexerDb = getIndexerDb();
 

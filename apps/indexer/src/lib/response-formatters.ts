@@ -77,11 +77,11 @@ export async function resolveUserDataAndFormatListCommentsResponse({
         const replies = nestedReplies ?? flatReplies ?? [];
         const resolvedAuthorEnsData = resolveUserData(
           resolvedAuthorsEnsData,
-          comment.author
+          comment.author,
         );
         const resolvedAuthorFarcasterData = resolveUserData(
           resolvedAuthorsFarcasterData,
-          comment.author
+          comment.author,
         );
 
         const slicedReplies = replies.slice(0, replyLimit);
@@ -93,7 +93,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
           author: formatAuthor(
             comment.author,
             resolvedAuthorEnsData,
-            resolvedAuthorFarcasterData
+            resolvedAuthorFarcasterData,
           ),
           replies: {
             extra: {
@@ -102,11 +102,11 @@ export async function resolveUserDataAndFormatListCommentsResponse({
             results: slicedReplies.map((reply) => {
               const resolvedAuthorEnsData = resolveUserData(
                 resolvedAuthorsEnsData,
-                reply.author
+                reply.author,
               );
               const resolvedAuthorFarcasterData = resolveUserData(
                 resolvedAuthorsFarcasterData,
-                reply.author
+                reply.author,
               );
 
               return {
@@ -114,7 +114,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
                 author: formatAuthor(
                   reply.author,
                   resolvedAuthorEnsData,
-                  resolvedAuthorFarcasterData
+                  resolvedAuthorFarcasterData,
                 ),
                 // do not go deeper than first level of replies
                 replies: {
@@ -140,7 +140,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
             },
           },
         };
-      }
+      },
     ),
     pagination: {
       limit,
@@ -165,7 +165,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
 export function formatAuthor(
   author: Hex,
   resolvedEnsData: ResolvedEnsData | null | undefined,
-  resolvedFarcasterData: ResolvedFarcasterData | null | undefined
+  resolvedFarcasterData: ResolvedFarcasterData | null | undefined,
 ): IndexerAPIAuthorDataSchemaType {
   return {
     address: author,
@@ -192,13 +192,13 @@ function resolveUserData<
     list.find(
       (item): item is TListItem =>
         !(item instanceof Error) &&
-        item.address.toLowerCase() === lowercasedAddress
+        item.address.toLowerCase() === lowercasedAddress,
     ) ?? null
   );
 }
 
 export async function resolveAuthorDataAndFormatCommentChangeModerationStatusResponse(
-  comment: CommentSelectType
+  comment: CommentSelectType,
 ): Promise<IndexerAPIModerationChangeModerationStatusOnCommentSchemaType> {
   const [resolvedEnsData, resolvedFarcasterData] = await Promise.all([
     ensDataResolver.load(comment.author),
@@ -210,7 +210,7 @@ export async function resolveAuthorDataAndFormatCommentChangeModerationStatusRes
     author: formatAuthor(
       comment.author,
       resolvedEnsData,
-      resolvedFarcasterData
+      resolvedFarcasterData,
     ),
   };
 }

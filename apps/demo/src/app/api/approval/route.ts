@@ -18,7 +18,7 @@ import { getApprovalStatusAndNonce } from "@/lib/contract";
 import { addApproval } from "@ecp.eth/sdk/comments";
 
 export async function POST(
-  req: Request
+  req: Request,
 ): Promise<
   JSONResponse<
     | typeof BadRequestResponseSchema
@@ -27,14 +27,14 @@ export async function POST(
   >
 > {
   const parsedBodyResult = ChangeApprovalStatusRequestBodySchema.safeParse(
-    await req.json()
+    await req.json(),
   );
 
   if (!parsedBodyResult.success) {
     return new JSONResponse(
       BadRequestResponseSchema,
       parsedBodyResult.error.flatten().fieldErrors,
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -56,7 +56,7 @@ export async function POST(
   const [{ result: isApproved }, { result: nonce }] =
     await getApprovalStatusAndNonce<typeof transport, typeof chain>(
       publicClient,
-      authorAddress
+      authorAddress,
     );
 
   if (isApproved) {
@@ -65,7 +65,7 @@ export async function POST(
       { signTypedDataParams: ["Already approved"] },
       {
         status: 400,
-      }
+      },
     );
   }
 
@@ -75,7 +75,7 @@ export async function POST(
       { signTypedDataParams: ["Incorrect nonce"] },
       {
         status: 400,
-      }
+      },
     );
   }
 
@@ -102,7 +102,7 @@ export async function POST(
     return new JSONResponse(
       InternalServerErrorResponseSchema,
       { error: "Failed to add approval" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

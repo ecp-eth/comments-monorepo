@@ -279,7 +279,7 @@ export default defineConfig({
     envPrefix: "VITE_",
     define: {
       "import.meta.env.COMMENT_MANAGER_ADDRESS": JSON.stringify(
-        COMMENT_MANAGER_ADDRESS
+        COMMENT_MANAGER_ADDRESS,
       ),
     },
   },

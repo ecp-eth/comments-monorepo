@@ -26,7 +26,7 @@ export function CommentBottomBar({
   const replyCount = hasRepliesProp
     ? comment.replies.results.reduce(
         (acc, item) => (item.deletedAt ? acc : acc + 1),
-        0
+        0,
       )
     : 0;
   const hasReplies = replyCount > 0;
@@ -64,7 +64,7 @@ export function CommentBottomBar({
 }
 
 function isIndexerAPICommentWithRepliesSchemaType(
-  comment: IndexerAPICommentSchemaType | IndexerAPICommentWithRepliesSchemaType
+  comment: IndexerAPICommentSchemaType | IndexerAPICommentWithRepliesSchemaType,
 ): comment is IndexerAPICommentWithRepliesSchemaType {
   return (
     "replies" in comment &&

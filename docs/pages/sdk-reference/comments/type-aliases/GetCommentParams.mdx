@@ -10,11 +10,11 @@
 type GetCommentParams = {
   commentId: Hex;
   commentsAddress?: Hex;
-  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getComment">>;
+  readContract: ContractReadFunctions["getComment"];
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:167](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L167)
+Defined in: [packages/sdk/src/comments/comment.ts:168](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L168)
 
 ## Properties
 
@@ -24,7 +24,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:167](https://github.com/ecp-et
 commentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:171](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L171)
+Defined in: [packages/sdk/src/comments/comment.ts:172](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L172)
 
 The ID of the comment to get
 
@@ -36,7 +36,7 @@ The ID of the comment to get
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:176](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L176)
+Defined in: [packages/sdk/src/comments/comment.ts:177](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L177)
 
 The address of the comments contract
 
@@ -48,20 +48,10 @@ COMMENT_MANAGER_ADDRESS
 
 ***
 
-### readContract()
+### readContract
 
 ```ts
-readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getComment">>;
+readContract: ContractReadFunctions["getComment"];
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:177](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L177)
-
-#### Parameters
-
-##### parameters
-
-`ReadContractParameters`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getComment"`\>
-
-#### Returns
-
-`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getComment"`\>\>
+Defined in: [packages/sdk/src/comments/comment.ts:178](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L178)

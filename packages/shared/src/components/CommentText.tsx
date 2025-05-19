@@ -28,7 +28,7 @@ export function CommentText({
   maxLines = 5,
 }: CommentTextProps) {
   const [shownText, setShownText] = useState(() =>
-    truncateText(text, maxLength, maxLines)
+    truncateText(text, maxLength, maxLines),
   );
   const isTruncated = text.length > shownText.length;
 

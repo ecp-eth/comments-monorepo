@@ -58,7 +58,7 @@ export function authMiddleware(): MiddlewareHandler {
       throw new HTTPException(401, {
         res: Response.json(
           { message: "Invalid timestamp format" },
-          { status: 401 }
+          { status: 401 },
         ),
       });
     }
@@ -89,7 +89,7 @@ export function authMiddleware(): MiddlewareHandler {
 
 async function createSignatureMessage(
   req: HonoRequest,
-  timestamp: string
+  timestamp: string,
 ): Promise<Uint8Array> {
   const method = req.method;
   const url = new URL(req.url);
@@ -104,6 +104,6 @@ async function createSignatureMessage(
   const queryString = url.searchParams.toString();
 
   return new TextEncoder().encode(
-    `${method}${path}${queryString}${timestamp}${body}`
+    `${method}${path}${queryString}${timestamp}${body}`,
   );
 }

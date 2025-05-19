@@ -20,7 +20,7 @@ export const transports = Object.entries(networks).reduce(
     acc[Number(chainId)] = network.transport;
     return acc;
   },
-  {} as Record<number, Transport>
+  {} as Record<number, Transport>,
 );
 
 export const getWagmiConfig = (selectedChainId: number) => {
@@ -28,7 +28,7 @@ export const getWagmiConfig = (selectedChainId: number) => {
 
   if (!selectedChain) {
     throw new Error(
-      `Chain ${selectedChainId} not supported, here is a list of supported chains: ${supportedChains.reduce((acc, chain) => `${acc}, ${chain.name}`, "")}`
+      `Chain ${selectedChainId} not supported, here is a list of supported chains: ${supportedChains.reduce((acc, chain) => `${acc}, ${chain.name}`, "")}`,
     );
   }
 

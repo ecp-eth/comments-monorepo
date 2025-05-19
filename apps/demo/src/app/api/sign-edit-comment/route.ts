@@ -20,21 +20,21 @@ import { SignEditCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 const chainId = chain.id;
 
 export async function POST(
-  req: Request
+  req: Request,
 ): Promise<
   JSONResponse<
     typeof SignEditCommentResponseClientSchema | typeof BadRequestResponseSchema
   >
 > {
   const parsedBodyResult = SignEditCommentPayloadRequestSchema.safeParse(
-    await req.json()
+    await req.json(),
   );
 
   if (!parsedBodyResult.success) {
     return new JSONResponse(
       BadRequestResponseSchema,
       parsedBodyResult.error.flatten().fieldErrors,
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -52,10 +52,10 @@ export async function POST(
         status: 429,
         headers: {
           "Retry-After": String(
-            Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+            Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
           ),
         },
-      }
+      },
     );
   }
 
@@ -68,7 +68,7 @@ export async function POST(
     return new JSONResponse(
       BadRequestResponseSchema,
       { author: ["Muted"] },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -110,6 +110,6 @@ export async function POST(
     },
     {
       jsonReplacer: bigintReplacer,
-    }
+    },
   );
 }

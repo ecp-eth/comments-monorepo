@@ -11,11 +11,11 @@ type GetNonceParams = {
   app: Hex;
   author: Hex;
   commentsAddress?: Hex;
-  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "nonces">>;
+  readContract: ContractReadFunctions["getNonce"];
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:456](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L456)
+Defined in: [packages/sdk/src/comments/comment.ts:450](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L450)
 
 ## Properties
 
@@ -25,7 +25,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:456](https://github.com/ecp-et
 app: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:464](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L464)
+Defined in: [packages/sdk/src/comments/comment.ts:458](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L458)
 
 The app signer
 
@@ -37,7 +37,7 @@ The app signer
 author: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:460](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L460)
+Defined in: [packages/sdk/src/comments/comment.ts:454](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L454)
 
 The author of the comment
 
@@ -49,7 +49,7 @@ The author of the comment
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:469](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L469)
+Defined in: [packages/sdk/src/comments/comment.ts:463](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L463)
 
 The address of the comments contract
 
@@ -61,20 +61,10 @@ COMMENT_MANAGER_ADDRESS
 
 ***
 
-### readContract()
+### readContract
 
 ```ts
-readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "nonces">>;
+readContract: ContractReadFunctions["getNonce"];
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:470](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L470)
-
-#### Parameters
-
-##### parameters
-
-`ReadContractParameters`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"nonces"`\>
-
-#### Returns
-
-`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"nonces"`\>\>
+Defined in: [packages/sdk/src/comments/comment.ts:464](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L464)

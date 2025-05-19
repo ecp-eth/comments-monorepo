@@ -70,7 +70,7 @@ export function setupMarkAuthorAsMuted(app: OpenAPIHono) {
         {
           message: "Account is already marked as muted",
         },
-        409
+        409,
       );
     }
 
@@ -78,7 +78,7 @@ export function setupMarkAuthorAsMuted(app: OpenAPIHono) {
       {
         address,
       },
-      200
+      200,
     );
   });
 

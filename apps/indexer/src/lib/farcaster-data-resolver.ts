@@ -81,5 +81,5 @@ export const farcasterDataResolver = new DataLoader<Hex, ResolvedFarcasterData>(
   {
     cacheMap,
     maxBatchSize: 350, // this is limit coming from neynar api
-  }
+  },
 );

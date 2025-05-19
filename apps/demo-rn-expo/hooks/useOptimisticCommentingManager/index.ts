@@ -26,11 +26,11 @@ export function useOptimisticCommentingManager(queryKey: QueryKey) {
   const client = useQueryClient();
   const { insertPendingCommentOperation } = useInsertingCommentManager(
     client,
-    queryKey
+    queryKey,
   );
   const { deletePendingCommentOperation } = useDeletingCommentManager(
     client,
-    queryKey
+    queryKey,
   );
 
   return {

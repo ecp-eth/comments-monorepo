@@ -3,10 +3,10 @@ import { formatDateRelative } from "../helpers.js";
 
 export function useCommentRelativeTime(
   timestamp: Date | number,
-  initialNow: number
+  initialNow: number,
 ) {
   const [relativeTime, setRelativeTime] = useState<string>(
-    formatDateRelative(timestamp, initialNow)
+    formatDateRelative(timestamp, initialNow),
   );
   const timestampMs = new Date(timestamp).getTime();
   const now = initialNow;

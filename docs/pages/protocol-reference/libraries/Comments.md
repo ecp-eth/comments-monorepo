@@ -10,7 +10,7 @@
 
 ## Structs
 
-### `CommentData`
+### `Comment`
 
 
 - **author:** (address) The address of the comment author
@@ -28,15 +28,8 @@
 - **updatedAt:** (uint80) The timestamp when the comment was last updated
 
 
+
 - **channelId:** (uint256) The channel ID associated with the comment
-
-
-
-- **nonce:** (uint256) The nonce for the comment
-
-
-
-- **deadline:** (uint256) Timestamp after which the signatures for this comment become invalid
 
 
 
@@ -44,11 +37,11 @@
 
 
 
-- **content:** (string) The actual text content of the comment
+- **content:** (string) The text content of the comment - may contain urls, images and mentions
 
 
 
-- **metadata:** (string) Additional JSON data that shouldn't be shown to the user as it is
+- **metadata:** (string) Additional JSON data that shouldn't be displayed to the user
 
 
 
@@ -56,11 +49,14 @@
 
 
 
-- **commentType:** (string) The type of the comment (e.g. "question", "answer", "feedback", etc.)
+- **commentType:** (string) The type of the comment (e.g. "comment", "like", etc.)
 
 
 
-### `CreateCommentData`
+- **hookData:** (string) Additional data for the comment, added by a hook.
+
+
+### `CreateComment`
 
 
 - **author:** (address) The address of the comment author
@@ -100,6 +96,28 @@
 
 
 - **commentType:** (string) The type of the comment (e.g. "question", "answer", "feedback", etc.)
+
+
+### `EditComment`
+
+
+- **app:** (address) The address of the application signer that authorized this comment
+
+
+
+- **nonce:** (uint256) The nonce for the comment
+
+
+
+- **deadline:** (uint256) Timestamp after which the signatures for this comment become invalid
+
+
+
+- **content:** (string) The actual text content of the comment
+
+
+
+- **metadata:** (string) Additional JSON data that shouldn't be shown to the user as it is
 
 
 

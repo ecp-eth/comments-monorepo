@@ -20,7 +20,7 @@ export async function resolveSubmitterAccount() {
       walletApi: {
         authorizationPrivateKey: submitterSettings.PRIVY_AUTHORIZATION_KEY,
       },
-    }
+    },
   );
 
   return createViemAccount({

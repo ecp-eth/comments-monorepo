@@ -46,20 +46,6 @@ const ChannelManagerABI: readonly [{
 }, {
   inputs: readonly [{
      internalType: "uint256";
-     name: "value";
-     type: "uint256";
-  }];
-  name: "calculateHookTransactionFee";
-  outputs: readonly [{
-     internalType: "uint256";
-     name: "hookValue";
-     type: "uint256";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [{
-     internalType: "uint256";
      name: "channelId";
      type: "uint256";
   }];
@@ -68,26 +54,6 @@ const ChannelManagerABI: readonly [{
      internalType: "bool";
      name: "";
      type: "bool";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [];
-  name: "collectChannelCreationFee";
-  outputs: readonly [{
-     internalType: "uint96";
-     name: "";
-     type: "uint96";
-  }];
-  stateMutability: "payable";
-  type: "function";
-}, {
-  inputs: readonly [];
-  name: "commentsContract";
-  outputs: readonly [{
-     internalType: "address";
-     name: "";
-     type: "address";
   }];
   stateMutability: "view";
   type: "function";
@@ -120,81 +86,16 @@ const ChannelManagerABI: readonly [{
 }, {
   inputs: readonly [{
      internalType: "uint256";
-     name: "channelId";
+     name: "value";
      type: "uint256";
-   }, {
-     components: readonly [{
-        internalType: "address";
-        name: "author";
-        type: "address";
-      }, {
-        internalType: "address";
-        name: "app";
-        type: "address";
-      }, {
-        internalType: "uint80";
-        name: "createdAt";
-        type: "uint80";
-      }, {
-        internalType: "uint80";
-        name: "updatedAt";
-        type: "uint80";
-      }, {
-        internalType: "uint256";
-        name: "channelId";
-        type: "uint256";
-      }, {
-        internalType: "uint256";
-        name: "nonce";
-        type: "uint256";
-      }, {
-        internalType: "uint256";
-        name: "deadline";
-        type: "uint256";
-      }, {
-        internalType: "bytes32";
-        name: "parentId";
-        type: "bytes32";
-      }, {
-        internalType: "string";
-        name: "content";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "metadata";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
-        type: "string";
-     }];
-     internalType: "struct Comments.CommentData";
-     name: "commentData";
-     type: "tuple";
-   }, {
-     internalType: "address";
-     name: "caller";
-     type: "address";
-   }, {
-     internalType: "bytes32";
-     name: "commentId";
-     type: "bytes32";
-   }, {
-     internalType: "enum Hooks.HookPhase";
-     name: "phase";
-     type: "uint8";
   }];
-  name: "executeHook";
+  name: "deductProtocolHookTransactionFee";
   outputs: readonly [{
-     internalType: "bool";
-     name: "";
-     type: "bool";
+     internalType: "uint256";
+     name: "hookValue";
+     type: "uint256";
   }];
-  stateMutability: "payable";
+  stateMutability: "view";
   type: "function";
 }, {
   inputs: readonly [{
@@ -218,21 +119,47 @@ const ChannelManagerABI: readonly [{
   }];
   name: "getChannel";
   outputs: readonly [{
-     internalType: "string";
-     name: "name";
-     type: "string";
-   }, {
-     internalType: "string";
-     name: "description";
-     type: "string";
-   }, {
-     internalType: "string";
-     name: "metadata";
-     type: "string";
-   }, {
-     internalType: "address";
-     name: "hook";
-     type: "address";
+     components: readonly [{
+        internalType: "string";
+        name: "name";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "description";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "metadata";
+        type: "string";
+      }, {
+        internalType: "contract IHook";
+        name: "hook";
+        type: "address";
+      }, {
+        components: readonly [{
+           internalType: "bool";
+           name: "afterInitialize";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "afterComment";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "afterDeleteComment";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "afterEditComment";
+           type: "bool";
+        }];
+        internalType: "struct Hooks.Permissions";
+        name: "permissions";
+        type: "tuple";
+     }];
+     internalType: "struct Channels.Channel";
+     name: "";
+     type: "tuple";
   }];
   stateMutability: "view";
   type: "function";
@@ -712,26 +639,6 @@ const ChannelManagerABI: readonly [{
      internalType: "address";
      name: "hook";
      type: "address";
-   }, {
-     indexed: false;
-     internalType: "enum Hooks.HookPhase";
-     name: "phase";
-     type: "uint8";
-  }];
-  name: "HookExecutionFailed";
-  type: "event";
-}, {
-  anonymous: false;
-  inputs: readonly [{
-     indexed: true;
-     internalType: "uint256";
-     name: "channelId";
-     type: "uint256";
-   }, {
-     indexed: true;
-     internalType: "address";
-     name: "hook";
-     type: "address";
   }];
   name: "HookSet";
   type: "event";
@@ -807,10 +714,6 @@ const ChannelManagerABI: readonly [{
 }, {
   inputs: readonly [];
   name: "ChannelDoesNotExist";
-  type: "error";
-}, {
-  inputs: readonly [];
-  name: "ChannelHookExecutionFailed";
   type: "error";
 }, {
   inputs: readonly [];
@@ -906,10 +809,6 @@ const ChannelManagerABI: readonly [{
   type: "error";
 }, {
   inputs: readonly [];
-  name: "HookInitializationFailed";
-  type: "error";
-}, {
-  inputs: readonly [];
   name: "InsufficientFee";
   type: "error";
 }, {
@@ -919,10 +818,6 @@ const ChannelManagerABI: readonly [{
 }, {
   inputs: readonly [];
   name: "InvalidFee";
-  type: "error";
-}, {
-  inputs: readonly [];
-  name: "InvalidHookAddress";
   type: "error";
 }, {
   inputs: readonly [];
@@ -959,6 +854,6 @@ const ChannelManagerABI: readonly [{
 }];
 ```
 
-Defined in: [packages/sdk/src/abis.ts:1224](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L1224)
+Defined in: [packages/sdk/src/abis.ts:1415](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L1415)
 
 ABI of the ChannelManager contract.

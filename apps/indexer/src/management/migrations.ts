@@ -45,7 +45,7 @@ class StaticMigrationsProvider implements MigrationProvider {
             .createTable("muted_accounts")
             .addColumn("account", "text", (col) => col.primaryKey())
             .addColumn("created_at", "timestamp", (col) =>
-              col.notNull().defaultTo(sql`now()`)
+              col.notNull().defaultTo(sql`now()`),
             )
             .addColumn("reason", "text")
             .execute();
@@ -75,18 +75,18 @@ class StaticMigrationsProvider implements MigrationProvider {
             .createTable("comment_moderation_statuses")
             .addColumn("comment_id", "text", (col) => col.primaryKey())
             .addColumn("created_at", "timestamptz", (col) =>
-              col.notNull().defaultTo(sql`now()`)
+              col.notNull().defaultTo(sql`now()`),
             )
             .addColumn("updated_at", "timestamptz", (col) =>
-              col.notNull().defaultTo(sql`now()`)
+              col.notNull().defaultTo(sql`now()`),
             )
             .addColumn("moderation_status", "text", (col) =>
               col
                 .notNull()
                 .defaultTo("pending")
                 .check(
-                  sql`moderation_status IN ('pending', 'approved', 'rejected')`
-                )
+                  sql`moderation_status IN ('pending', 'approved', 'rejected')`,
+                ),
             )
             .execute();
         },

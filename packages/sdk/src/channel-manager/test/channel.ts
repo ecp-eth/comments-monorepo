@@ -79,15 +79,15 @@ describe("createChannel()", () => {
       (err) => {
         assert.ok(
           err instanceof ContractFunctionExecutionError,
-          "should be a ContractFunctionExecutionError"
+          "should be a ContractFunctionExecutionError",
         );
         assert.ok(
           err.message.includes("Error: InsufficientFee()"),
-          "should include InsufficientFee"
+          "should include InsufficientFee",
         );
 
         return true;
-      }
+      },
     );
   });
 
@@ -166,7 +166,7 @@ describe("channelExists()", () => {
         channelManagerAddress,
       }),
       true,
-      "should return true for default channel id"
+      "should return true for default channel id",
     );
 
     assert.equal(
@@ -176,7 +176,7 @@ describe("channelExists()", () => {
         channelManagerAddress,
       }),
       false,
-      "should return false for non-existent channel id"
+      "should return false for non-existent channel id",
     );
   });
 });
@@ -191,7 +191,7 @@ describe("getChannelCreationFee()", () => {
     assert.deepEqual(
       fee,
       { fee: parseEther("0.02") },
-      "should return default channel creation fee"
+      "should return default channel creation fee",
     );
   });
 });
@@ -314,7 +314,7 @@ describe("setChannelCreationFee()", () => {
         assert.ok(err instanceof ContractFunctionExecutionError);
         assert.ok(err.message.includes("Error: OwnableUnauthorizedAccount("));
         return true;
-      }
+      },
     );
   });
 

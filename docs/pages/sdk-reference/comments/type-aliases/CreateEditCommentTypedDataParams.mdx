@@ -1,0 +1,74 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / CreateEditCommentTypedDataParams
+
+# Type Alias: CreateEditCommentTypedDataParams
+
+```ts
+type CreateEditCommentTypedDataParams = {
+  author: Hex;
+  chainId: number;
+  commentsAddress?: Hex;
+  edit: EditCommentData;
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:741](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L741)
+
+## Properties
+
+### author
+
+```ts
+author: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:745](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L745)
+
+The author of the comment
+
+***
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:755](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L755)
+
+The chain ID
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:760](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L760)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENT_MANAGER_ADDRESS
+```
+
+***
+
+### edit
+
+```ts
+edit: EditCommentData;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:751](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L751)
+
+The edit data
+
+You can obtain this by using the `createEditCommentData()` function

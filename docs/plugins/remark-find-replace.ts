@@ -25,7 +25,7 @@ export default function remarkFindAndReplace({
         .map((key) => escapeStringRegexp(attachPrefix(key)))
         .join("|") +
       ")",
-    "g"
+    "g",
   );
 
   const replacer = (_match: any, name: string) =>

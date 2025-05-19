@@ -33,13 +33,13 @@ type OnCommentRetryEditionErrorParams = Pick<
 };
 
 type OnCommentRetryEditionStart = (
-  params: OnCommentRetryEditionStartParams
+  params: OnCommentRetryEditionStartParams,
 ) => void;
 type OnCommentRetryEditionSuccess = (
-  params: OnCommentRetryEditionSuccessParams
+  params: OnCommentRetryEditionSuccessParams,
 ) => void;
 type OnCommentRetryEditionError = (
-  params: OnCommentRetryEditionErrorParams
+  params: OnCommentRetryEditionErrorParams,
 ) => void;
 
 type CommentRetryEditionAPI = {
@@ -63,10 +63,10 @@ export function useCommentRetryEdition(): CommentRetryEditionAPI {
           const queryData = ListCommentsQueryDataSchema.parse(data);
 
           return markCommentAsReediting(queryData, params.pendingOperation);
-        }
+        },
       );
     },
-    [client]
+    [client],
   );
 
   const success = useCallback<OnCommentRetryEditionSuccess>(
@@ -82,14 +82,14 @@ export function useCommentRetryEdition(): CommentRetryEditionAPI {
 
           return markPendingEditCommentAsEdited(
             queryData,
-            params.pendingOperation.response.data.commentId
+            params.pendingOperation.response.data.commentId,
           );
-        }
+        },
       );
 
       toast.success("Comment edited");
     },
-    [client]
+    [client],
   );
 
   const error = useCallback<OnCommentRetryEditionError>(
@@ -106,14 +106,14 @@ export function useCommentRetryEdition(): CommentRetryEditionAPI {
           return markPendingEditCommentAsFailed(
             queryData,
             params.pendingOperation.response.data.commentId,
-            params.error
+            params.error,
           );
-        }
+        },
       );
 
       toast.error("Failed to edit comment");
     },
-    [client]
+    [client],
   );
 
   return useMemo(
@@ -122,6 +122,6 @@ export function useCommentRetryEdition(): CommentRetryEditionAPI {
       success,
       error,
     }),
-    [start, success, error]
+    [start, success, error],
   );
 }

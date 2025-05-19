@@ -46,6 +46,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
@@ -53,7 +54,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:168](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L168)
+Defined in: [packages/sdk/src/indexer/schemas.ts:169](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L169)
 
 ## Type declaration
 
@@ -144,6 +145,7 @@ results: {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  revision: number;
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: Date;

@@ -40,7 +40,7 @@ export function getCommentAuthorNameOrAddress(author: AuthorType): string {
 
 export function hasNewComments(
   oldQueryData: InfiniteData<CommentPageSchemaType>,
-  newCommentsPage: CommentPageSchemaType
+  newCommentsPage: CommentPageSchemaType,
 ) {
   if (newCommentsPage.results.length === 0) {
     return false;
@@ -51,10 +51,10 @@ export function hasNewComments(
       page.results
         .filter(
           (comment): comment is PendingComment =>
-            comment.pendingOperation?.action === "post"
+            comment.pendingOperation?.action === "post",
         )
-        .map((comment) => comment.id)
-    )
+        .map((comment) => comment.id),
+    ),
   );
 
   for (const newComment of newCommentsPage.results) {
@@ -71,7 +71,7 @@ export function mergeNewComments(
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  newCommentsPage: CommentPageSchemaType
+  newCommentsPage: CommentPageSchemaType,
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   if (newCommentsPage.results.length === 0) {
     return oldQueryData;
@@ -83,10 +83,10 @@ export function mergeNewComments(
         page.results
           .filter(
             (comment): comment is PendingComment =>
-              comment.pendingOperation?.action === "post"
+              comment.pendingOperation?.action === "post",
           )
-          .map((comment) => [comment.id, { pageIndex }])
-      )
+          .map((comment) => [comment.id, { pageIndex }]),
+      ),
     );
 
   for (const newComment of newCommentsPage.results) {
@@ -133,7 +133,7 @@ export function markCommentAsDeleting(
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  pendingOperation: PendingDeleteCommentOperationSchemaType
+  pendingOperation: PendingDeleteCommentOperationSchemaType,
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   for (const page of queryData.pages) {
     for (const comment of page.results) {
@@ -168,7 +168,7 @@ export function markCommentDeletionAsFailed(
     ListCommentsQueryPageParamsSchemaType
   >,
   commentId: Hex,
-  error: Error
+  error: Error,
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   for (const page of queryData.pages) {
     for (const comment of page.results) {
@@ -203,7 +203,7 @@ export function insertPendingCommentToPage(
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  pendingOperation: PendingPostCommentOperationSchemaType
+  pendingOperation: PendingPostCommentOperationSchemaType,
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   if (!queryData.pages[0]) {
     return queryData;
@@ -253,7 +253,7 @@ export function markCommentAsReposting(
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  pendingOperation: PendingPostCommentOperationSchemaType
+  pendingOperation: PendingPostCommentOperationSchemaType,
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   for (const page of queryData.pages) {
     for (const comment of page.results) {
@@ -285,7 +285,7 @@ export function markPendingPostCommentAsFailed(
     ListCommentsQueryPageParamsSchemaType
   >,
   commentId: Hex,
-  error: Error
+  error: Error,
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   for (const page of queryData.pages) {
     for (const comment of page.results) {
@@ -319,7 +319,7 @@ export function markPendingPostCommentAsPosted(
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  commentId: Hex
+  commentId: Hex,
 ) {
   for (const page of queryData.pages) {
     for (const comment of page.results) {
@@ -352,7 +352,7 @@ export function markCommentAsReediting(
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  pendingOperation: PendingEditCommentOperationSchemaType
+  pendingOperation: PendingEditCommentOperationSchemaType,
 ) {
   for (const page of queryData.pages) {
     for (const comment of page.results) {
@@ -383,7 +383,7 @@ export function markPendingEditCommentAsPending(
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  pendingOperation: PendingEditCommentOperationSchemaType
+  pendingOperation: PendingEditCommentOperationSchemaType,
 ) {
   for (const page of queryData.pages) {
     for (const comment of page.results) {
@@ -411,7 +411,7 @@ export function markPendingEditCommentAsFailed(
     ListCommentsQueryPageParamsSchemaType
   >,
   commentId: Hex,
-  error: Error
+  error: Error,
 ) {
   for (const page of queryData.pages) {
     for (const comment of page.results) {
@@ -445,7 +445,7 @@ export function markPendingEditCommentAsEdited(
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  commentId: Hex
+  commentId: Hex,
 ) {
   for (const page of queryData.pages) {
     for (const comment of page.results) {
@@ -483,7 +483,7 @@ export function markCommentAsDeleted(
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >,
-  commentId: Hex
+  commentId: Hex,
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   function markComment(page: CommentPageSchemaType): boolean {
     for (const comment of page.results) {
@@ -556,7 +556,7 @@ export function formatDate(timestamp: number | Date): string {
 
 export function formatDateRelative(
   timestamp: number | Date,
-  now: number
+  now: number,
 ): string {
   const date = new Date(timestamp);
   const diffInMs = date.getTime() - now;
@@ -622,7 +622,7 @@ export function bigintReplacer(key: string, value: unknown) {
  */
 export function formatAuthorLinkWithTemplate(
   author: AuthorType,
-  urlTemplate?: string
+  urlTemplate?: string,
 ): string | null {
   if (!urlTemplate) {
     return null;
@@ -643,7 +643,7 @@ export function formatAuthorLinkWithTemplate(
 export function truncateText(
   text: string,
   maxLength: number,
-  maxLines: number
+  maxLines: number,
 ): string {
   const splitByNewline = text.split("\n");
   let truncated = text;
@@ -668,7 +668,7 @@ export function truncateText(
  */
 export function getChainById<TChain extends Chain>(
   id: number,
-  chains: Readonly<TChain[]>
+  chains: Readonly<TChain[]>,
 ): TChain | undefined {
   for (const [, chain] of Object.entries(chains)) {
     if (chain.id === id) {
@@ -690,7 +690,7 @@ export class JSONResponse<TSchema extends z.ZodType> extends Response {
     data: z.input<TSchema>,
     init?: ResponseInit & {
       jsonReplacer?: (key: string, value: unknown) => unknown;
-    }
+    },
   ) {
     const { jsonReplacer, ...responseInit } = init || {};
 
@@ -706,7 +706,7 @@ export class JSONResponse<TSchema extends z.ZodType> extends Response {
 
 export function getNetworkFromProcessEnv(
   prefix: string,
-  processEnv: object
+  processEnv: object,
 ): Record<number, ProcessEnvNetwork> {
   const urlEnvName = prefix + "RPC_URL_";
   const networks = Object.entries(processEnv).reduce(
@@ -725,7 +725,7 @@ export function getNetworkFromProcessEnv(
 
       return acc;
     },
-    {} as Record<number, ProcessEnvNetwork>
+    {} as Record<number, ProcessEnvNetwork>,
   );
 
   return networks;

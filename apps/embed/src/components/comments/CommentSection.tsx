@@ -48,7 +48,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
     () => createRootCommentsQueryKey(address, targetUri),
-    [targetUri, address]
+    [targetUri, address],
   );
 
   const isAccountStatusResolved = useIsAccountStatusResolved();
@@ -86,7 +86,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     getNextPageParam(
-      lastPage
+      lastPage,
     ): ListCommentsQueryPageParamsSchemaType | undefined {
       if (!lastPage.pagination.hasNext) {
         return;

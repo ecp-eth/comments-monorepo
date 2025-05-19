@@ -1,0 +1,60 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / EditCommentData
+
+# Type Alias: EditCommentData
+
+```ts
+type EditCommentData = {
+  app: `0x${string}`;
+  commentId: `0x${string}`;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+};
+```
+
+Defined in: [packages/sdk/src/comments/schemas.ts:115](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L115)
+
+Edit comment data schema. This is used as input of the functions.
+
+## Type declaration
+
+### app
+
+```ts
+app: `0x${string}` = HexSchema;
+```
+
+### commentId
+
+```ts
+commentId: `0x${string}` = HexSchema;
+```
+
+### content
+
+```ts
+content: string;
+```
+
+### deadline
+
+```ts
+deadline: bigint;
+```
+
+### metadata
+
+```ts
+metadata: string;
+```
+
+### nonce
+
+```ts
+nonce: bigint;
+```

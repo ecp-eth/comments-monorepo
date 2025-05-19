@@ -13,15 +13,11 @@ Core functionality for managing comment channels
 
 | Type Alias | Description |
 | ------ | ------ |
-| [CalculateHookTransactionFeeParams](/sdk-reference/channel-manager/type-aliases/CalculateHookTransactionFeeParams.mdx) | - |
-| [CalculateHookTransactionFeeResult](/sdk-reference/channel-manager/type-aliases/CalculateHookTransactionFeeResult.mdx) | - |
 | [ChannelExistsParams](/sdk-reference/channel-manager/type-aliases/ChannelExistsParams.mdx) | - |
-| [CollectChannelCreationFeeParams](/sdk-reference/channel-manager/type-aliases/CollectChannelCreationFeeParams.mdx) | - |
-| [CollectChannelCreationFeeResult](/sdk-reference/channel-manager/type-aliases/CollectChannelCreationFeeResult.mdx) | - |
 | [CreateChannelParams](/sdk-reference/channel-manager/type-aliases/CreateChannelParams.mdx) | - |
 | [CreateChannelResult](/sdk-reference/channel-manager/type-aliases/CreateChannelResult.mdx) | - |
-| [ExecuteHookParams](/sdk-reference/channel-manager/type-aliases/ExecuteHookParams.mdx) | - |
-| [ExecuteHookResult](/sdk-reference/channel-manager/type-aliases/ExecuteHookResult.mdx) | - |
+| [DeductProtocolHookTransactionFeeParams](/sdk-reference/channel-manager/type-aliases/DeductProtocolHookTransactionFeeParams.mdx) | - |
+| [DeductProtocolHookTransactionFeeResult](/sdk-reference/channel-manager/type-aliases/DeductProtocolHookTransactionFeeResult.mdx) | - |
 | [GetChannelCreationFeeParams](/sdk-reference/channel-manager/type-aliases/GetChannelCreationFeeParams.mdx) | - |
 | [GetChannelCreationFeeResult](/sdk-reference/channel-manager/type-aliases/GetChannelCreationFeeResult.mdx) | - |
 | [GetChannelOwnerParams](/sdk-reference/channel-manager/type-aliases/GetChannelOwnerParams.mdx) | - |
@@ -49,11 +45,9 @@ Core functionality for managing comment channels
 
 | Function | Description |
 | ------ | ------ |
-| [calculateHookTransactionFee](/sdk-reference/channel-manager/functions/calculateHookTransactionFee.mdx) | Calculates the hook transaction fee and returns the hook value after deducting the protocol fee. If the value is 0 or if the hook transaction fee percentage is 0, returns the original value. |
 | [channelExists](/sdk-reference/channel-manager/functions/channelExists.mdx) | Check if a channel exists |
-| [collectChannelCreationFee](/sdk-reference/channel-manager/functions/collectChannelCreationFee.mdx) | Collects the channel creation fee. If the sent value is greater than the required fee, the excess amount will be refunded to the sender. |
 | [createChannel](/sdk-reference/channel-manager/functions/createChannel.mdx) | Create a new channel |
-| [executeHook](/sdk-reference/channel-manager/functions/executeHook.mdx) | Execute hooks for a channel |
+| [deductProtocolHookTransactionFee](/sdk-reference/channel-manager/functions/deductProtocolHookTransactionFee.mdx) | Calculates the hook transaction fee by deducting the protocol fee |
 | [getChannel](/sdk-reference/channel-manager/functions/getChannel.mdx) | Get a channel |
 | [getChannelCreationFee](/sdk-reference/channel-manager/functions/getChannelCreationFee.mdx) | Get the creation fee from channel manager |
 | [getChannelOwner](/sdk-reference/channel-manager/functions/getChannelOwner.mdx) | Get the owner of a channel |
@@ -71,6 +65,12 @@ Core functionality for managing comment channels
 ### ChannelManagerABIType
 
 Re-exports [ChannelManagerABIType](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx)
+
+***
+
+### ChannelPermissions
+
+Re-exports [ChannelPermissions](/sdk-reference/channel-manager/types/type-aliases/ChannelPermissions.mdx)
 
 ***
 

@@ -53,7 +53,7 @@ export function CommentForm({
   const keyboardRemainingHeight = useKeyboardRemainingheight(
     isReplying
       ? HAS_REPLY_TEXT_TEXTAREA_PERCENTAGE
-      : TOTAL_COMMENT_AREA_PERCENTAGE
+      : TOTAL_COMMENT_AREA_PERCENTAGE,
   );
 
   const {
@@ -177,7 +177,7 @@ export function CommentForm({
 }
 
 const useInsertPendingOperations = (
-  rootComment?: IndexerAPICommentSchemaType
+  rootComment?: IndexerAPICommentSchemaType,
 ) => {
   const isReplying = !!rootComment;
   const { insertPendingCommentOperation } = useOptimisticCommentingManager([
@@ -192,7 +192,7 @@ const useInsertPendingOperations = (
         insertPendingReplyOperation(pendingCommentOperation);
       }
     },
-    [insertPendingCommentOperation, insertPendingReplyOperation, isReplying]
+    [insertPendingCommentOperation, insertPendingReplyOperation, isReplying],
   );
 };
 
@@ -203,7 +203,7 @@ type ReplyToCommentProps = {
 
 function ReplyToComment({ comment, onClose }: ReplyToCommentProps) {
   const replyingCommentContentHeight = useKeyboardRemainingheight(
-    HAS_REPLY_TEXT_COMMENT_CONTENT_PERCENTAGE
+    HAS_REPLY_TEXT_COMMENT_CONTENT_PERCENTAGE,
   );
   return (
     <View
@@ -215,8 +215,8 @@ function ReplyToComment({ comment, onClose }: ReplyToCommentProps) {
           Math.ceil(
             Math.min(
               replyingCommentContentHeight,
-              Dimensions.get("window").height * 0.3
-            ) / lineHeight
+              Dimensions.get("window").height * 0.3,
+            ) / lineHeight,
           ) * lineHeight,
         flexDirection: "row",
         justifyContent: "space-between",

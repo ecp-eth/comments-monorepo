@@ -49,7 +49,7 @@ export function generateHMACParams({
  */
 export function generateHMACUrl(
   baseUrl: string | URL,
-  options: GenerateHMACParamsOptions
+  options: GenerateHMACParamsOptions,
 ): URL {
   const url = new URL(baseUrl);
 

@@ -64,7 +64,7 @@ export type UsePostCommentAsAuthorResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function usePostCommentAsAuthor(
-  options: UsePostCommentAsAuthorOptions = {}
+  options: UsePostCommentAsAuthorOptions = {},
 ): UsePostCommentAsAuthorResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -97,7 +97,7 @@ export type UsePostCommentResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function usePostComment(
-  options: UsePostCommentOptions = {}
+  options: UsePostCommentOptions = {},
 ): UsePostCommentResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -128,7 +128,7 @@ export type UseGetCommentResult = UseQueryResult<GetCommentResult, Error>;
  */
 export function useGetComment(
   params: UseGetCommentParams,
-  options: UseGetCommentOptions = {}
+  options: UseGetCommentOptions = {},
 ): UseGetCommentResult {
   const client = usePublicClient();
 
@@ -168,7 +168,7 @@ export type UseGetCommentIdResult = UseQueryResult<Hex, Error>;
  */
 export function useGetCommentId(
   params: UseGetCommentIdParams,
-  options: UseGetCommentIdOptions = {}
+  options: UseGetCommentIdOptions = {},
 ): UseGetCommentIdResult {
   const client = usePublicClient();
 
@@ -217,7 +217,7 @@ export type UseDeleteCommentAsAuthorResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useDeleteCommentAsAuthor(
-  options: UseDeleteCommentAsAuthorOptions = {}
+  options: UseDeleteCommentAsAuthorOptions = {},
 ): UseDeleteCommentAsAuthorResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -250,7 +250,7 @@ export type UseDeleteCommentResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useDeleteComment(
-  options: UseDeleteCommentOptions = {}
+  options: UseDeleteCommentOptions = {},
 ): UseDeleteCommentResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -286,7 +286,7 @@ export function useGetNonce(): typeof getNonce {
         },
       });
     },
-    [client]
+    [client],
   );
 }
 
@@ -308,7 +308,7 @@ export type UseEditCommentResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useEditComment(
-  options: UseEditCommentOptions = {}
+  options: UseEditCommentOptions = {},
 ): UseEditCommentResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -348,7 +348,7 @@ export type UseEditCommentAsAuthorResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useEditCommentAsAuthor(
-  options: UseEditCommentAsAuthorOptions = {}
+  options: UseEditCommentAsAuthorOptions = {},
 ): UseEditCommentAsAuthorResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -382,7 +382,7 @@ export type UseGetEditCommentHashResult = UseQueryResult<Hex, Error>;
  */
 export function useGetEditCommentHash(
   params: UseGetEditCommentHashParams,
-  options: UseGetEditCommentHashOptions = {}
+  options: UseGetEditCommentHashOptions = {},
 ): UseGetEditCommentHashResult {
   const client = usePublicClient();
 
@@ -425,7 +425,7 @@ export type UseGetDeleteCommentHashResult = UseQueryResult<Hex, Error>;
  */
 export function useGetDeleteCommentHash(
   params: UseGetDeleteCommentHashParams,
-  options: UseGetDeleteCommentHashOptions = {}
+  options: UseGetDeleteCommentHashOptions = {},
 ): UseGetDeleteCommentHashResult {
   const client = usePublicClient();
 

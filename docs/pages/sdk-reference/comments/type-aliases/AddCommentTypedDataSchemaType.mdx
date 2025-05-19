@@ -21,6 +21,7 @@ type AddCommentTypedDataSchemaType = {
      commentType: string;
      content: string;
      deadline: bigint;
+     hookData: string;
      metadata: string;
      nonce: bigint;
      parentId: `0x${string}`;
@@ -73,7 +74,7 @@ type AddCommentTypedDataSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:129](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L129)
+Defined in: [packages/sdk/src/comments/schemas.ts:144](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L144)
 
 ## Type declaration
 
@@ -122,6 +123,7 @@ message: {
   commentType: string;
   content: string;
   deadline: bigint;
+  hookData: string;
   metadata: string;
   nonce: bigint;
   parentId: `0x${string}`;
@@ -163,6 +165,12 @@ content: string;
 
 ```ts
 deadline: bigint;
+```
+
+#### message.hookData
+
+```ts
+hookData: string;
 ```
 
 #### message.metadata

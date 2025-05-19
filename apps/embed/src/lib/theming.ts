@@ -2,7 +2,7 @@ import type { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
 import { CSSProperties } from "react";
 
 export function createThemeCSSVariables(
-  config: EmbedConfigSchemaOutputType | undefined
+  config: EmbedConfigSchemaOutputType | undefined,
 ): CSSProperties {
   const variables: Record<string, string> = {};
 
@@ -28,7 +28,7 @@ export function createThemeCSSVariables(
     if ("google" in fontFamily && fontFamily.google) {
       variables["--theme-font-family-default"] = fontFamily.google.replace(
         "_",
-        " "
+        " ",
       );
     } else if ("system" in fontFamily && fontFamily.system) {
       variables["--theme-font-family-default"] = fontFamily.system;

@@ -34,7 +34,7 @@ const script = spawn(
     "http://localhost:8545",
     "--broadcast",
   ],
-  { cwd, stdio: "inherit" }
+  { cwd, stdio: "inherit" },
 );
 
 script.on("exit", (code) => {

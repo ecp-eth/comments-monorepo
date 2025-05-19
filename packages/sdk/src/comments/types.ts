@@ -122,7 +122,7 @@ export type ContractWriteFunctions = {
       "postComment"
     > & {
       value?: bigint;
-    }
+    },
   ) => Promise<Hex>;
 
   postCommentAsAuthor: (
@@ -132,7 +132,7 @@ export type ContractWriteFunctions = {
       "postCommentAsAuthor"
     > & {
       value?: bigint;
-    }
+    },
   ) => Promise<Hex>;
 
   addApproval: (
@@ -140,7 +140,7 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "addApproval"
-    >
+    >,
   ) => Promise<Hex>;
 
   addApprovalAsAuthor: (
@@ -148,7 +148,7 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "addApprovalAsAuthor"
-    >
+    >,
   ) => Promise<Hex>;
 
   deleteComment: (
@@ -156,7 +156,7 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "deleteComment"
-    >
+    >,
   ) => Promise<Hex>;
 
   deleteCommentAsAuthor: (
@@ -164,7 +164,7 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "deleteCommentAsAuthor"
-    >
+    >,
   ) => Promise<Hex>;
 
   editComment: (
@@ -174,7 +174,7 @@ export type ContractWriteFunctions = {
       "editComment"
     > & {
       value?: bigint;
-    }
+    },
   ) => Promise<Hex>;
 
   editCommentAsAuthor: (
@@ -184,7 +184,7 @@ export type ContractWriteFunctions = {
       "editCommentAsAuthor"
     > & {
       value?: bigint;
-    }
+    },
   ) => Promise<Hex>;
 
   removeApproval: (
@@ -192,7 +192,7 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "removeApproval"
-    >
+    >,
   ) => Promise<Hex>;
 
   renounceOwnership: (
@@ -200,7 +200,7 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "renounceOwnership"
-    >
+    >,
   ) => Promise<Hex>;
 
   revokeApprovalAsAuthor: (
@@ -208,7 +208,7 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "revokeApprovalAsAuthor"
-    >
+    >,
   ) => Promise<Hex>;
 
   transferOwnership: (
@@ -216,7 +216,7 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "transferOwnership"
-    >
+    >,
   ) => Promise<Hex>;
 
   updateChannelContract: (
@@ -224,66 +224,69 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "updateChannelContract"
-    >
+    >,
   ) => Promise<Hex>;
 };
 
 export type ContractReadFunctions = {
   getAddApprovalHash: (
-    args: ReadContractParameters<CommentManagerABIType, "getAddApprovalHash">
+    args: ReadContractParameters<CommentManagerABIType, "getAddApprovalHash">,
   ) => Promise<
     ReadContractReturnType<CommentManagerABIType, "getAddApprovalHash">
   >;
 
   getRemoveApprovalHash: (
-    args: ReadContractParameters<CommentManagerABIType, "getRemoveApprovalHash">
+    args: ReadContractParameters<
+      CommentManagerABIType,
+      "getRemoveApprovalHash"
+    >,
   ) => Promise<
     ReadContractReturnType<CommentManagerABIType, "getRemoveApprovalHash">
   >;
 
   getDeleteCommentHash: (
-    args: ReadContractParameters<CommentManagerABIType, "getDeleteCommentHash">
+    args: ReadContractParameters<CommentManagerABIType, "getDeleteCommentHash">,
   ) => Promise<
     ReadContractReturnType<CommentManagerABIType, "getDeleteCommentHash">
   >;
 
   getEditCommentHash: (
-    args: ReadContractParameters<CommentManagerABIType, "getEditCommentHash">
+    args: ReadContractParameters<CommentManagerABIType, "getEditCommentHash">,
   ) => Promise<
     ReadContractReturnType<CommentManagerABIType, "getEditCommentHash">
   >;
 
   getCommentId: (
-    args: ReadContractParameters<CommentManagerABIType, "getCommentId">
+    args: ReadContractParameters<CommentManagerABIType, "getCommentId">,
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "getCommentId">>;
 
   getComment: (
-    args: ReadContractParameters<CommentManagerABIType, "getComment">
+    args: ReadContractParameters<CommentManagerABIType, "getComment">,
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "getComment">>;
 
   getIsApproved: (
-    args: ReadContractParameters<CommentManagerABIType, "isApproved">
+    args: ReadContractParameters<CommentManagerABIType, "isApproved">,
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "isApproved">>;
 
   getNonce: (
-    args: ReadContractParameters<CommentManagerABIType, "getNonce">
+    args: ReadContractParameters<CommentManagerABIType, "getNonce">,
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "getNonce">>;
 
   name: (
-    args: ReadContractParameters<CommentManagerABIType, "name">
+    args: ReadContractParameters<CommentManagerABIType, "name">,
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "name">>;
 
   version: (
-    args: ReadContractParameters<CommentManagerABIType, "version">
+    args: ReadContractParameters<CommentManagerABIType, "version">,
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "version">>;
 
   DOMAIN_SEPARATOR: (
-    args: ReadContractParameters<CommentManagerABIType, "DOMAIN_SEPARATOR">
+    args: ReadContractParameters<CommentManagerABIType, "DOMAIN_SEPARATOR">,
   ) => Promise<
     ReadContractReturnType<CommentManagerABIType, "DOMAIN_SEPARATOR">
   >;
 
   channelManager: (
-    args: ReadContractParameters<CommentManagerABIType, "channelManager">
+    args: ReadContractParameters<CommentManagerABIType, "channelManager">,
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "channelManager">>;
 };

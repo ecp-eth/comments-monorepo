@@ -21,6 +21,7 @@ function createCommentTypedData(params): {
      commentType: string;
      content: string;
      deadline: bigint;
+     hookData: string;
      metadata: string;
      nonce: bigint;
      parentId: `0x${string}`;
@@ -73,7 +74,7 @@ function createCommentTypedData(params): {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:520](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L520)
+Defined in: [packages/sdk/src/comments/comment.ts:512](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L512)
 
 Create the EIP-712 typed data structure for adding comment
 
@@ -100,6 +101,7 @@ Create the EIP-712 typed data structure for adding comment
      commentType: string;
      content: string;
      deadline: bigint;
+     hookData: string;
      metadata: string;
      nonce: bigint;
      parentId: `0x${string}`;
@@ -199,6 +201,7 @@ message: {
   commentType: string;
   content: string;
   deadline: bigint;
+  hookData: string;
   metadata: string;
   nonce: bigint;
   parentId: `0x${string}`;
@@ -240,6 +243,12 @@ content: string;
 
 ```ts
 deadline: bigint;
+```
+
+#### message.hookData
+
+```ts
+hookData: string;
 ```
 
 #### message.metadata

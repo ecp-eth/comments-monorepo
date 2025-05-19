@@ -234,7 +234,7 @@ describe("postComment()", () => {
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);
         return true;
-      }
+      },
     );
   });
 });
@@ -424,7 +424,7 @@ describe("deleteComment()", () => {
         chainId: anvil.id,
         commentData,
         commentsAddress,
-      })
+      }),
     );
 
     const postResult = await postCommentAsAuthor({
@@ -517,7 +517,7 @@ describe("deleteComment()", () => {
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);
         return true;
-      }
+      },
     );
   });
 });
@@ -684,7 +684,7 @@ describe("editComment()", () => {
         chainId: anvil.id,
         commentData,
         commentsAddress,
-      })
+      }),
     );
 
     const postResult = await postCommentAsAuthor({
@@ -783,7 +783,7 @@ describe("editComment()", () => {
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);
         return true;
-      }
+      },
     );
   });
 });

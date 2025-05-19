@@ -92,12 +92,12 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentDeletion, deleteCommentAsAuthor]
+    [wagmiConfig, commentDeletion, deleteCommentAsAuthor],
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(async () => {
     throw new Error(
-      "Retrying post with swapping is not possible at the moment."
+      "Retrying post with swapping is not possible at the moment.",
     );
   }, []);
 
@@ -200,7 +200,7 @@ export function useCommentActions({
       switchChainAsync,
       signTypedDataAsync,
       sendTransactionAsync,
-    ]
+    ],
   );
 
   return useMemo(
@@ -217,6 +217,6 @@ export function useCommentActions({
       postComment,
       editComment,
       retryEditComment,
-    ]
+    ],
   );
 }

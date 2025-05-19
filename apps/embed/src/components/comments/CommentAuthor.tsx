@@ -32,7 +32,7 @@ export function CommentAuthor({
   const authorUrl = formatAuthorLink(author);
   const commentRelativeTime = useCommentRelativeTime(
     timestamp,
-    currentTimestamp
+    currentTimestamp,
   );
 
   return (

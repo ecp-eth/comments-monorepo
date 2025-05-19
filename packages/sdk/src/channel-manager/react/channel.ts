@@ -57,7 +57,7 @@ export type UseCreateChannelResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useCreateChannel(
-  options: UseCreateChannelOptions = {}
+  options: UseCreateChannelOptions = {},
 ): UseCreateChannelResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -90,7 +90,7 @@ export type UseUpdateChannelResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useUpdateChannel(
-  options: UseUpdateChannelOptions = {}
+  options: UseUpdateChannelOptions = {},
 ): UseUpdateChannelResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -121,7 +121,7 @@ export type UseGetChannelResult = UseQueryResult<GetChannelResult, Error>;
  */
 export function useGetChannel(
   params: UseGetChannelParams,
-  options: UseGetChannelOptions = {}
+  options: UseGetChannelOptions = {},
 ): UseGetChannelResult {
   const client = usePublicClient();
 
@@ -161,7 +161,7 @@ export type UseChannelExistsResult = UseQueryResult<boolean, Error>;
  */
 export function useChannelExists(
   params: UseChannelExistsParams,
-  options: UseChannelExistsOptions = {}
+  options: UseChannelExistsOptions = {},
 ): UseChannelExistsResult {
   const client = usePublicClient();
 
@@ -207,7 +207,7 @@ export type UseGetChannelOwnerResult = UseQueryResult<
  */
 export function useGetChannelOwner(
   params: UseGetChannelOwnerParams,
-  options: UseGetChannelOwnerOptions = {}
+  options: UseGetChannelOwnerOptions = {},
 ): UseGetChannelOwnerResult {
   const client = usePublicClient();
 
@@ -253,7 +253,7 @@ export type UseGetChannelCreationFeeResult = UseQueryResult<
  */
 export function useGetChannelCreationFee(
   params: UseGetChannelCreationFeeParams = {},
-  options: UseGetChannelCreationFeeOptions = {}
+  options: UseGetChannelCreationFeeOptions = {},
 ): UseGetChannelCreationFeeResult {
   const client = usePublicClient();
 
@@ -302,7 +302,7 @@ export type UseSetChannelCreationFeeResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useSetChannelCreationFee(
-  options: UseSetChannelCreationFeeOptions = {}
+  options: UseSetChannelCreationFeeOptions = {},
 ): UseSetChannelCreationFeeResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -335,7 +335,7 @@ export type UseWithdrawFeesResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useWithdrawFees(
-  options: UseWithdrawFeesOptions = {}
+  options: UseWithdrawFeesOptions = {},
 ): UseWithdrawFeesResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -375,7 +375,7 @@ export type UseUpdateCommentsContractResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useUpdateCommentsContract(
-  options: UseUpdateCommentsContractOptions = {}
+  options: UseUpdateCommentsContractOptions = {},
 ): UseUpdateCommentsContractResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -408,7 +408,7 @@ export type UseSetBaseURIResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useSetBaseURI(
-  options: UseSetBaseURIOptions = {}
+  options: UseSetBaseURIOptions = {},
 ): UseSetBaseURIResult {
   const { writeContractAsync } = useWriteContract();
 

@@ -18,7 +18,7 @@ export function WatchDocumentResize() {
           type: "@ecp.eth/sdk/embed/resize",
           height,
         }),
-        "*"
+        "*",
       );
     };
 

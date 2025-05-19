@@ -85,11 +85,13 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: string;
            parentId: null | `0x${string}`;
+           revision: number;
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: string;
         }[];
      };
+     revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: string;
@@ -97,7 +99,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:179](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L179)
+Defined in: [packages/sdk/src/indexer/schemas.ts:180](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L180)
 
 ## Type declaration
 
@@ -227,11 +229,13 @@ results: {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: string;
         parentId: null | `0x${string}`;
+        revision: number;
         targetUri: string;
         txHash: `0x${string}`;
         updatedAt: string;
      }[];
   };
+  revision: number;
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: string;

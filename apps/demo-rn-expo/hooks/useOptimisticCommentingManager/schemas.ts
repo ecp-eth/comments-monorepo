@@ -14,7 +14,7 @@ export const PendingCommentOperationSchema = z
     response: SignCommentResponseClientSchema,
   })
   .describe(
-    "Contains information about pending operation so we can show that in comment list"
+    "Contains information about pending operation so we can show that in comment list",
   );
 
 export type PendingCommentOperationSchemaType = z.infer<
@@ -29,7 +29,7 @@ export const PendingOperationSchema = z
     pendingType: z.enum(["insert", "delete"]).optional(),
   })
   .describe(
-    "A object with an attached property to indicate the parent object is a pending operation"
+    "A object with an attached property to indicate the parent object is a pending operation",
   );
 
 export type PendingOperationSchemaType = z.infer<typeof PendingOperationSchema>;
@@ -44,7 +44,7 @@ export type IndexerAPICommentWithPendingOperationSchemaType = z.infer<
 export const IndexerAPIListCommentsWithPendingOperationsSchema = z.object({
   ...IndexerAPIListCommentsSchema.shape,
   results: z.array(
-    IndexerAPICommentWithRepliesSchema.extend(PendingOperationSchema.shape)
+    IndexerAPICommentWithRepliesSchema.extend(PendingOperationSchema.shape),
   ),
 });
 
@@ -64,7 +64,7 @@ export type FetchCommentInfinityPageParamSchemaType = z.infer<
 export const FetchCommentInfinityQuerySchema = z.object({
   pageParams: z.array(FetchCommentInfinityPageParamSchema),
   pages: z.array(
-    z.union([IndexerAPIListCommentsSchema, IndexerAPIListCommentRepliesSchema])
+    z.union([IndexerAPIListCommentsSchema, IndexerAPIListCommentRepliesSchema]),
   ),
 });
 

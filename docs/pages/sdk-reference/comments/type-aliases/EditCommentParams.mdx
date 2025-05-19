@@ -1,0 +1,100 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / EditCommentParams
+
+# Type Alias: EditCommentParams
+
+```ts
+type EditCommentParams = {
+  appSignature: Hex;
+  authorSignature?: Hex;
+  commentsAddress?: Hex;
+  edit: EditCommentData;
+  fee?: bigint;
+  writeContract: ContractWriteFunctions["editComment"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:861](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L861)
+
+## Properties
+
+### appSignature
+
+```ts
+appSignature: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:880](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L880)
+
+The app signature
+
+***
+
+### authorSignature?
+
+```ts
+optional authorSignature: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:884](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L884)
+
+The author signature. Necessary if the author hasn't approved the signer to edit comments on their behalf.
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:876](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L876)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENT_MANAGER_ADDRESS
+```
+
+***
+
+### edit
+
+```ts
+edit: EditCommentData;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:867](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L867)
+
+The edit data
+
+You can obtain this by using the `createEditCommentData()` function
+
+***
+
+### fee?
+
+```ts
+optional fee: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:871](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L871)
+
+The fee for the edit operation
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["editComment"];
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:888](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L888)
+
+The write contract function

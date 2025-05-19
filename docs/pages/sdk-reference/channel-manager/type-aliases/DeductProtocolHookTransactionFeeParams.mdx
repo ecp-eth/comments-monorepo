@@ -1,0 +1,44 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / DeductProtocolHookTransactionFeeParams
+
+# Type Alias: DeductProtocolHookTransactionFeeParams
+
+```ts
+type DeductProtocolHookTransactionFeeParams = {
+  channelManagerAddress?: Hex;
+  readContract: ContractReadFunctions["deductProtocolHookTransactionFee"];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:143](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L143)
+
+## Properties
+
+### channelManagerAddress?
+
+```ts
+optional channelManagerAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:149](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L149)
+
+The address of the channel manager
+
+#### Default
+
+```ts
+CHANNEL_MANAGER_ADDRESS
+```
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["deductProtocolHookTransactionFee"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:150](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L150)

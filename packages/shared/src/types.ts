@@ -11,7 +11,7 @@ import type {
 export type OnDeleteComment = (id: Hex) => void;
 export type OnRetryPostComment = (
   comment: Comment,
-  newPendingOperation: PendingPostCommentOperationSchemaType
+  newPendingOperation: PendingPostCommentOperationSchemaType,
 ) => void;
 
 export type OnSubmitSuccessFunction = () => void;

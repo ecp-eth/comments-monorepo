@@ -240,7 +240,7 @@ export type ChangeApprovalStatusResponseSchemaType = z.infer<
 
 export const BadRequestResponseSchema = z.record(
   z.string(),
-  z.string().array()
+  z.string().array(),
 );
 
 export const InternalServerErrorResponseSchema = z.object({

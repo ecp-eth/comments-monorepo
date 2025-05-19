@@ -20,7 +20,7 @@ import {
 
 export function useInsertingCommentManager(
   client: QueryClient,
-  queryKey: QueryKey
+  queryKey: QueryKey,
 ) {
   const [pendingCommentOperations, setPendingCommentOperations] = useState<
     PendingCommentOperationSchemaType[]
@@ -32,7 +32,7 @@ export function useInsertingCommentManager(
       // find out uninserted pending comment and insert them to the cache
       const uninserted = filterUninsertedPendingCommentOperations(
         pendingCommentOperations,
-        cachedIndexerAPIListComments
+        cachedIndexerAPIListComments,
       );
 
       insertPendingCommentOperationToCache(client, queryKey, uninserted);
@@ -43,7 +43,7 @@ export function useInsertingCommentManager(
         const unindexedPendingCommentOperations =
           filterUnindexedPendingCommentOperations(
             pendingCommentOperations,
-            cachedIndexerAPIListComments
+            cachedIndexerAPIListComments,
           );
 
         return unindexedPendingCommentOperations;
@@ -58,7 +58,7 @@ export function useInsertingCommentManager(
       ]);
       setPendingCommentOperations((prev) => [...prev, pendingCommentOperation]);
     },
-    [client, queryKey]
+    [client, queryKey],
   );
 
   return {
@@ -74,7 +74,7 @@ export function useInsertingCommentManager(
  */
 function filterUninsertedPendingCommentOperations(
   pendingCommentOperations: PendingCommentOperationSchemaType[],
-  cachedIndexerAPIListComments: IndexerAPIListCommentsSchemaType
+  cachedIndexerAPIListComments: IndexerAPIListCommentsSchemaType,
 ) {
   return pendingCommentOperations.filter((pendingCommentOperation) => {
     const notFoundInCache = everyIndexerAPIListComments(
@@ -84,7 +84,7 @@ function filterUninsertedPendingCommentOperations(
           // found a match, break the loop
           return false;
         }
-      }
+      },
     );
 
     return notFoundInCache;
@@ -100,7 +100,7 @@ function filterUninsertedPendingCommentOperations(
  */
 function filterUnindexedPendingCommentOperations(
   pendingCommentOperations: PendingCommentOperationSchemaType[],
-  cachedIndexerAPIListComments: IndexerAPIListCommentsSchemaType
+  cachedIndexerAPIListComments: IndexerAPIListCommentsSchemaType,
 ) {
   return pendingCommentOperations.filter((pendingCommentOperation) => {
     let foundButUnindexed = false;
@@ -119,7 +119,7 @@ function filterUnindexedPendingCommentOperations(
 
         // break the loop
         return false;
-      }
+      },
     );
 
     return foundButUnindexed || notFoundInCache;
@@ -135,7 +135,7 @@ function filterUnindexedPendingCommentOperations(
 function insertPendingCommentOperationToCache(
   client: QueryClient,
   queryKey: QueryKey,
-  pendingCommentOperations: PendingCommentOperationSchemaType[]
+  pendingCommentOperations: PendingCommentOperationSchemaType[],
 ) {
   if (pendingCommentOperations.length <= 0) {
     return;
@@ -151,7 +151,7 @@ function insertPendingCommentOperationToCache(
     if (!parsed.success) {
       console.error(
         "Failed to parse existing cache data, this is likely a bug. detailed error follows:",
-        parsed.error
+        parsed.error,
       );
       console.error(existingCache);
       return;
@@ -165,14 +165,14 @@ function insertPendingCommentOperationToCache(
         ? cachedArrayOfIndexerAPIListComments[0]
         : getParentStructureForInserting(
             cachedArrayOfIndexerAPIListComments,
-            pendingCommentOperation.response.data.parentId
+            pendingCommentOperation.response.data.parentId,
           );
 
       parentStructure.results.unshift(
         createIndexerAPICommentDataFromPendingCommentOperation(
           pendingCommentOperation,
-          "insert"
-        )
+          "insert",
+        ),
       );
 
       popOutOfLimitItemsFromList(parentStructure);
@@ -184,7 +184,7 @@ function insertPendingCommentOperationToCache(
 
 function getParentStructureForInserting(
   arrayOfIndexerAPICommentReplies: IndexerAPIListCommentRepliesSchemaType[],
-  parentId: Hex
+  parentId: Hex,
 ): IndexerAPIListCommentRepliesSchemaType {
   let parentStructure: IndexerAPIListCommentRepliesSchemaType | undefined;
 
@@ -203,7 +203,7 @@ function getParentStructureForInserting(
           parentStructure = indexerAPIComment.replies;
           return false;
         }
-      }
+      },
     );
   });
 
@@ -217,7 +217,7 @@ function getParentStructureForInserting(
  */
 function createIndexerAPICommentDataFromPendingCommentOperation(
   pendingCommentOperation: PendingCommentOperationSchemaType,
-  pendingType: PendingOperationSchemaType["pendingType"]
+  pendingType: PendingOperationSchemaType["pendingType"],
 ): IndexerAPICommentWithRepliesSchemaType & PendingOperationSchemaType {
   // insert pending comment to the top of the list
   return {
@@ -256,7 +256,7 @@ function createIndexerAPICommentDataFromPendingCommentOperation(
  * @param cachedIndexAPIListComments
  */
 function popOutOfLimitItemsFromList(
-  cachedIndexAPIListComments: IndexerAPIListCommentRepliesSchemaType
+  cachedIndexAPIListComments: IndexerAPIListCommentRepliesSchemaType,
 ) {
   const itemsToPop =
     cachedIndexAPIListComments.results.length -

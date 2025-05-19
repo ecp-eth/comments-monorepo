@@ -69,7 +69,7 @@ export function setupChangeCommentModerationStatus(app: OpenAPIHono) {
 
     const updatedComment = await updateCommentModerationStatus(
       commentId,
-      moderationStatus
+      moderationStatus,
     );
 
     if (!updatedComment) {
@@ -77,17 +77,17 @@ export function setupChangeCommentModerationStatus(app: OpenAPIHono) {
         {
           message: "Comment not found",
         },
-        404
+        404,
       );
     }
 
     return c.json(
       IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema.parse(
         await resolveAuthorDataAndFormatCommentChangeModerationStatusResponse(
-          updatedComment
-        )
+          updatedComment,
+        ),
       ),
-      200
+      200,
     );
   });
 

@@ -56,20 +56,20 @@ export async function prepareSignedGaslessComment(
   submitIfApproved: true,
   body:
     | PrepareSignedGaslessCommentRequestBodySchemaTypeReply
-    | PrepareSignedGaslessCommentRequestBodySchemaTypeComment
+    | PrepareSignedGaslessCommentRequestBodySchemaTypeComment,
 ): Promise<PreparedGaslessPostCommentOperationApprovedResult>;
 export async function prepareSignedGaslessComment(
   submitIfApproved: false,
   body:
     | PrepareSignedGaslessCommentRequestBodySchemaTypeReply
-    | PrepareSignedGaslessCommentRequestBodySchemaTypeComment
+    | PrepareSignedGaslessCommentRequestBodySchemaTypeComment,
 ): Promise<PreparedGaslessPostCommentOperationNotApprovedResult>;
 
 export async function prepareSignedGaslessComment(
   submitIfApproved: boolean,
   body:
     | PrepareSignedGaslessCommentRequestBodySchemaTypeReply
-    | PrepareSignedGaslessCommentRequestBodySchemaTypeComment
+    | PrepareSignedGaslessCommentRequestBodySchemaTypeComment,
 ): Promise<
   | PreparedGaslessPostCommentOperationApprovedResult
   | PreparedGaslessPostCommentOperationNotApprovedResult
@@ -124,21 +124,21 @@ export async function prepareSignedGaslessEditComment(
   body: Omit<
     PrepareSignedGaslessEditCommentRequestBodySchemaType,
     "submitIfApproved"
-  >
+  >,
 ): Promise<PrepareSignedGaslessEditCommentApprovedResponseSchemaType>;
 export async function prepareSignedGaslessEditComment(
   submitIfApproved: false,
   body: Omit<
     PrepareSignedGaslessEditCommentRequestBodySchemaType,
     "submitIfApproved"
-  >
+  >,
 ): Promise<PrepareSignedGaslessEditCommentNotApprovedResponseSchemaType>;
 export async function prepareSignedGaslessEditComment(
   submitIfApproved: boolean,
   body: Omit<
     PrepareSignedGaslessEditCommentRequestBodySchemaType,
     "submitIfApproved"
-  >
+  >,
 ): Promise<
   | PrepareSignedGaslessEditCommentApprovedResponseSchemaType
   | PrepareSignedGaslessEditCommentNotApprovedResponseSchemaType
@@ -168,7 +168,7 @@ export async function prepareSignedGaslessEditComment(
 }
 
 async function gaslessDeleteComment(
-  params: PrepareGaslessCommentDeletionRequestBodySchemaType
+  params: PrepareGaslessCommentDeletionRequestBodySchemaType,
 ): Promise<PrepareGaslessDeleteCommentOperationResponseSchemaType> {
   const response = await fetch(`/api/delete-comment/prepare`, {
     method: "POST",
@@ -183,7 +183,7 @@ async function gaslessDeleteComment(
   }
 
   return PrepareGaslessDeleteCommentOperationResponseSchema.parse(
-    await response.json()
+    await response.json(),
   );
 }
 
@@ -225,6 +225,6 @@ export async function deletePriorNotApprovedCommentMutationFunction({
   });
 
   return PreparedSignedGaslessDeleteCommentNotApprovedResponseSchema.parse(
-    result
+    result,
   );
 }

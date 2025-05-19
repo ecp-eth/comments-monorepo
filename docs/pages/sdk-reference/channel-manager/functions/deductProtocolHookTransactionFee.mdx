@@ -1,0 +1,29 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / deductProtocolHookTransactionFee
+
+# Function: deductProtocolHookTransactionFee()
+
+```ts
+function deductProtocolHookTransactionFee(params): Promise<DeductProtocolHookTransactionFeeResult>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/hook.ts:176](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/hook.ts#L176)
+
+Calculates the hook transaction fee by deducting the protocol fee
+
+## Parameters
+
+### params
+
+[`DeductProtocolHookTransactionFeeParams`](/sdk-reference/channel-manager/type-aliases/DeductProtocolHookTransactionFeeParams.mdx)
+
+The total value sent with the transaction
+
+## Returns
+
+`Promise`\<[`DeductProtocolHookTransactionFeeResult`](/sdk-reference/channel-manager/type-aliases/DeductProtocolHookTransactionFeeResult.mdx)\>
+
+The amount that should be passed to the hook

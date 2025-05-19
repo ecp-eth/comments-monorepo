@@ -39,7 +39,7 @@ export const comments = onchainTable(
     rootCommentIdIdx: index().on(table.rootCommentId),
     channelIdIdx: index().on(table.channelId),
     commentTypeIdx: index().on(table.commentType),
-  })
+  }),
 );
 
 export type CommentSelectType = typeof comments.$inferSelect;
@@ -61,7 +61,7 @@ export const approvals = onchainTable(
     appIdx: index().on(table.app),
     chainIdIdx: index().on(table.chainId),
     deletedAtIdx: index().on(table.deletedAt),
-  })
+  }),
 );
 
 export const commentRelations = relations(comments, ({ one, many }) => ({

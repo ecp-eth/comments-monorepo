@@ -34,7 +34,7 @@ type OnCommentDeletionErrorParams = Pick<
 
 type OnCommentDeletionStart = (params: OnCommentDeletionStartParams) => void;
 type OnCommentDeletionSuccess = (
-  params: OnCommentDeletionSuccessParams
+  params: OnCommentDeletionSuccessParams,
 ) => void;
 type OnCommentDeletionError = (params: OnCommentDeletionErrorParams) => void;
 
@@ -55,10 +55,10 @@ export function useCommentDeletion(): CommentDeletionAPI {
           const queryData = ListCommentsQueryDataSchema.parse(data);
 
           return markCommentAsDeleting(queryData, params.pendingOperation);
-        }
+        },
       );
     },
-    [client]
+    [client],
   );
 
   const success = useCallback<OnCommentDeletionSuccess>(
@@ -70,14 +70,14 @@ export function useCommentDeletion(): CommentDeletionAPI {
 
           return markCommentAsDeleted(
             queryData,
-            params.pendingOperation.commentId
+            params.pendingOperation.commentId,
           );
-        }
+        },
       );
 
       toast.success("Comment deleted");
     },
-    [client]
+    [client],
   );
 
   const error = useCallback<OnCommentDeletionError>(
@@ -90,14 +90,14 @@ export function useCommentDeletion(): CommentDeletionAPI {
           return markCommentDeletionAsFailed(
             queryData,
             params.commentId,
-            params.error
+            params.error,
           );
-        }
+        },
       );
 
       toast.error("Failed to delete comment");
     },
-    [client]
+    [client],
   );
 
   return useMemo(
@@ -106,6 +106,6 @@ export function useCommentDeletion(): CommentDeletionAPI {
       success,
       error,
     }),
-    [start, success, error]
+    [start, success, error],
   );
 }

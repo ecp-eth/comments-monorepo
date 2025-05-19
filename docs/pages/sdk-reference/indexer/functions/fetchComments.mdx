@@ -85,11 +85,13 @@ function fetchComments(options): Promise<{
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           revision: number;
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
         }[];
      };
+     revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
@@ -187,11 +189,13 @@ Fetch comments from the Indexer API
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
+           `revision`: `number`;
            `targetUri`: `string`;
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
         \}[];
      \};
+     `revision`: `number`;
      `targetUri`: `string`;
      `txHash`: `` `0x${string}` ``;
      `updatedAt`: `Date`;

@@ -80,7 +80,7 @@ const AddApprovalAsAuthorParamsSchema = z.object({
   app: HexSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["addApprovalAsAuthor"]>(
-    () => true
+    () => true,
   ),
 });
 
@@ -91,7 +91,7 @@ const AddApprovalAsAuthorParamsSchema = z.object({
  * @returns The transaction hash of the approval
  */
 export async function addApprovalAsAuthor(
-  params: AddApprovalAsAuthorParams
+  params: AddApprovalAsAuthorParams,
 ): Promise<AddApprovalAsAuthorResult> {
   const validatedParams = AddApprovalAsAuthorParamsSchema.parse(params);
 
@@ -147,7 +147,7 @@ const AddApprovalParamsSchema = z.object({
  * @returns The transaction hash of the approval
  */
 export async function addApproval(
-  params: AddApprovalParams
+  params: AddApprovalParams,
 ): Promise<AddApprovalResult> {
   const { typedData, signature, commentsAddress, writeContract } =
     AddApprovalParamsSchema.parse(params);
@@ -192,7 +192,7 @@ const RevokeApprovalAsAuthorParamsSchema = z.object({
   app: HexSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["revokeApprovalAsAuthor"]>(
-    () => true
+    () => true,
   ),
 });
 
@@ -203,7 +203,7 @@ const RevokeApprovalAsAuthorParamsSchema = z.object({
  * @returns The transaction hash of the revocation
  */
 export async function revokeApprovalAsAuthor(
-  params: RevokeApprovalAsAuthorParams
+  params: RevokeApprovalAsAuthorParams,
 ): Promise<RevokeApprovalAsAuthorResult> {
   const validatedParams = RevokeApprovalAsAuthorParamsSchema.parse(params);
 
@@ -259,7 +259,7 @@ const RevokeApprovalParamsSchema = z.object({
  * @returns The transaction hash of the removal
  */
 export async function revokeApproval(
-  params: RevokeApprovalParams
+  params: RevokeApprovalParams,
 ): Promise<RevokeApprovalResult> {
   const validatedParams = RevokeApprovalParamsSchema.parse(params);
 
@@ -339,7 +339,7 @@ const GetAddApprovalHashParamsSchema = z.object({
  * @returns The computed hash
  */
 export async function getAddApprovalHash(
-  params: GetAddApprovalHashParams
+  params: GetAddApprovalHashParams,
 ): Promise<GetAddApprovalHashResult> {
   const { author, app, nonce, deadline, commentsAddress } =
     GetAddApprovalHashParamsSchema.parse(params);
@@ -413,7 +413,7 @@ const GetRemoveApprovalHashParamsSchema = z.object({
  * @returns The computed hash
  */
 export async function getRemoveApprovalHash(
-  params: GetRemoveApprovalHashParams
+  params: GetRemoveApprovalHashParams,
 ): Promise<GetRemoveApprovalHashResult> {
   const { author, app, nonce, deadline, commentsAddress } =
     GetRemoveApprovalHashParamsSchema.parse(params);
@@ -467,7 +467,7 @@ const CreateApprovalTypedDataParamsSchema = z.object({
  * @returns The typed data
  */
 export function createApprovalTypedData(
-  params: CreateApprovalTypedDataParams
+  params: CreateApprovalTypedDataParams,
 ): CreateApprovalTypedDataResult {
   const validatedParams = CreateApprovalTypedDataParamsSchema.parse(params);
 
@@ -537,7 +537,7 @@ const CreateRemoveApprovalTypedDataParamsSchema = z.object({
  * @returns The typed data
  */
 export function createRemoveApprovalTypedData(
-  params: CreateRemoveApprovalTypedDataParams
+  params: CreateRemoveApprovalTypedDataParams,
 ): CreateRemoveApprovalTypedDataResult {
   const validatedParams =
     CreateRemoveApprovalTypedDataParamsSchema.parse(params);

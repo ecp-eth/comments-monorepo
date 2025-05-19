@@ -35,13 +35,13 @@ type OnCommentSubmissionErrorParams = Pick<
 };
 
 type OnCommentSubmissionStart = (
-  params: OnCommentSubmissionStartParams
+  params: OnCommentSubmissionStartParams,
 ) => void;
 type OnCommentSubmissionSuccess = (
-  params: OnCommentSubmissionSuccessParams
+  params: OnCommentSubmissionSuccessParams,
 ) => void;
 type OnCommentSubmissionError = (
-  params: OnCommentSubmissionErrorParams
+  params: OnCommentSubmissionErrorParams,
 ) => void;
 
 type CommentSubmissionAPI = {
@@ -65,10 +65,10 @@ export function useCommentSubmission(): CommentSubmissionAPI {
           const queryData = ListCommentsQueryDataSchema.parse(data);
 
           return insertPendingCommentToPage(queryData, params.pendingOperation);
-        }
+        },
       );
     },
-    [client]
+    [client],
   );
 
   const success = useCallback<OnCommentSubmissionSuccess>(
@@ -84,14 +84,14 @@ export function useCommentSubmission(): CommentSubmissionAPI {
 
           return markPendingPostCommentAsPosted(
             queryData,
-            params.pendingOperation.response.data.id
+            params.pendingOperation.response.data.id,
           );
-        }
+        },
       );
 
       toast.success("Comment posted");
     },
-    [client]
+    [client],
   );
 
   const error = useCallback<OnCommentSubmissionError>(
@@ -108,14 +108,14 @@ export function useCommentSubmission(): CommentSubmissionAPI {
           return markPendingPostCommentAsFailed(
             queryData,
             params.commentId,
-            params.error
+            params.error,
           );
-        }
+        },
       );
 
       toast.error("Failed to post comment");
     },
-    [client]
+    [client],
   );
 
   return useMemo(
@@ -124,6 +124,6 @@ export function useCommentSubmission(): CommentSubmissionAPI {
       success,
       error,
     }),
-    [start, success, error]
+    [start, success, error],
   );
 }

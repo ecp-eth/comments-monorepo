@@ -85,7 +85,7 @@ function BaseCommentForm({
       } catch (e) {
         if (e instanceof z.ZodError) {
           throw new InvalidCommentError(
-            e.flatten().fieldErrors as Record<string, string[]>
+            e.flatten().fieldErrors as Record<string, string[]>,
           );
         }
 
@@ -221,7 +221,7 @@ export function CommentForm<TExtraSubmitData = unknown>({
 
       return result;
     },
-    [postComment, parentId, extra, onSubmitStartRef]
+    [postComment, parentId, extra, onSubmitStartRef],
   );
 
   return <BaseCommentForm {...props} onSubmit={handleSubmit} />;
@@ -273,7 +273,7 @@ export function CommentEditForm<TExtraEditData = unknown>({
 
       return result;
     },
-    [editComment, comment, queryKey, extra, onSubmitStartRef]
+    [editComment, comment, queryKey, extra, onSubmitStartRef],
   );
 
   return (

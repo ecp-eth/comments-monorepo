@@ -22,7 +22,7 @@ export type OnRetryPostCommentParams = {
 };
 
 export type OnRetryPostComment = (
-  params: OnRetryPostCommentParams
+  params: OnRetryPostCommentParams,
 ) => Promise<void>;
 
 type UseRetryPostCommentParams = {
@@ -118,6 +118,6 @@ export function useRetryPostComment({
       postCommentAsAuthor,
       commentRetrySubmission,
       wagmiConfig,
-    ]
+    ],
   );
 }

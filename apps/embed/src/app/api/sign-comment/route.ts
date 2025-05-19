@@ -21,7 +21,7 @@ import { supportedChains } from "@/lib/wagmi";
 
 export async function POST(req: Request) {
   const parseResult = SignCommentPayloadRequestSchema.safeParse(
-    await req.json()
+    await req.json(),
   );
 
   if (!parseResult.success) {
@@ -44,10 +44,10 @@ export async function POST(req: Request) {
         status: 429,
         headers: {
           "Retry-After": String(
-            Math.ceil((rateLimiterResult.reset - Date.now()) / 1000)
+            Math.ceil((rateLimiterResult.reset - Date.now()) / 1000),
           ),
         },
-      }
+      },
     );
   }
 
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       },
       {
         status: 403,
-      }
+      },
     );
   }
 
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
       {
         error: "Chain not supported",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -122,6 +122,6 @@ export async function POST(req: Request) {
     },
     {
       jsonReplacer: bigintReplacer,
-    }
+    },
   );
 }

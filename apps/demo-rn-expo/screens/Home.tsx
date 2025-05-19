@@ -12,7 +12,7 @@ export default function Home() {
     useState<IndexerAPICommentSchemaType>();
   const [rootComment, setRootComment] = useState<IndexerAPICommentSchemaType>();
   const handleSetCommentState = (
-    replyingComment: IndexerAPICommentSchemaType
+    replyingComment: IndexerAPICommentSchemaType,
   ) => {
     setReplyingComment(replyingComment);
     if (!replyingComment.parentId || isZeroHex(replyingComment.parentId)) {

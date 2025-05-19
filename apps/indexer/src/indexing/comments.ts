@@ -20,7 +20,7 @@ const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
     const targetUri = transformCommentTargetUri(
-      event.args.commentData.targetUri
+      event.args.commentData.targetUri,
     );
 
     if (await getMutedAccount(event.args.commentData.author)) {
@@ -56,7 +56,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
               updatedAt,
               parentCommentId: event.args.commentData.parentId,
             },
-          }
+          },
         );
 
         return;
@@ -69,7 +69,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     // We need to check if the comment already has a moderation status
     // this is useful during the reindex process
     const moderationStatus = await getCommentModerationStatus(
-      event.args.commentId
+      event.args.commentId,
     );
 
     await context.db.insert(schema.comments).values({
@@ -103,7 +103,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     if (!moderationStatus) {
       await insertCommentModerationStatus(
         event.args.commentId,
-        defaultModerationStatus
+        defaultModerationStatus,
       );
 
       await notifyCommentPendingModeration({

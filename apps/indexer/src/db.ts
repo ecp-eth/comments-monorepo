@@ -6,7 +6,7 @@ import { env } from "./env";
 const table = drizzleTable;
 
 function assertDrizzleSchemaSymbolSupported(
-  tableExport: unknown
+  tableExport: unknown,
 ): asserts tableExport is typeof drizzleTable & {
   readonly Schema: unique symbol;
 } {
@@ -26,7 +26,7 @@ if (!env.SKIP_DRIZZLE_SCHEMA_DETECTION) {
 
   if (!(table.Schema in schema.approvals) || !schema.approvals[table.Schema]) {
     throw new Error(
-      "Schema is not set on the table this will cause the drizzle to load from public schema"
+      "Schema is not set on the table this will cause the drizzle to load from public schema",
     );
   }
 }

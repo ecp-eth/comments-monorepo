@@ -58,7 +58,7 @@ export function ApplyFadeToScrollable({
       // Calculate scroll positions
       const scrollTop = Math.floor(contentOffset.y);
       const scrollBottom = Math.floor(
-        contentSize.height - layoutMeasurement.height - contentOffset.y
+        contentSize.height - layoutMeasurement.height - contentOffset.y,
       );
 
       // Update fade opacities with smooth animation
@@ -70,7 +70,7 @@ export function ApplyFadeToScrollable({
         duration: 150,
       });
     },
-    [bottomFadeOpacity, topFadeOpacity]
+    [bottomFadeOpacity, topFadeOpacity],
   );
 
   const childElement = React.isValidElement(children)

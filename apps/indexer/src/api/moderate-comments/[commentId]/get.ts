@@ -61,17 +61,17 @@ export function setupGetComment(app: OpenAPIHono) {
         {
           message: "Comment not found",
         },
-        404
+        404,
       );
     }
 
     return c.json(
       IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema.parse(
         await resolveAuthorDataAndFormatCommentChangeModerationStatusResponse(
-          comment
-        )
+          comment,
+        ),
       ),
-      200
+      200,
     );
   });
 

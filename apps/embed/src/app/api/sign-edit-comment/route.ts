@@ -20,7 +20,7 @@ import { SignEditCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 
 export async function POST(req: Request) {
   const parsedBodyResult = SignEditCommentPayloadRequestSchema.safeParse(
-    await req.json()
+    await req.json(),
   );
 
   if (!parsedBodyResult.success) {
@@ -44,10 +44,10 @@ export async function POST(req: Request) {
         status: 429,
         headers: {
           "Retry-After": String(
-            Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+            Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
           ),
         },
-      }
+      },
     );
   }
 
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
       {
         error: "Muted",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
       {
         error: "Chain not supported",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -114,6 +114,6 @@ export async function POST(req: Request) {
     },
     {
       jsonReplacer: bigintReplacer,
-    }
+    },
   );
 }

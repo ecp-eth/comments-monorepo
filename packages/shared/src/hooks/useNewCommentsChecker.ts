@@ -92,7 +92,7 @@ export function useNewCommentsChecker({
             limit: 1,
           },
         };
-      }
+      },
     );
   }, [client, newCommentsQueryKey]);
 
@@ -118,7 +118,7 @@ export function useNewCommentsChecker({
         }
 
         return mergeNewComments(oldData, newComments);
-      }
+      },
     );
 
     resetQuery();
@@ -139,7 +139,7 @@ export function useNewCommentsChecker({
         }
 
         return mergeNewComments(oldData, newComments);
-      }
+      },
     );
 
     resetQuery();

@@ -24,16 +24,23 @@ Implements channel management with the following security features:
 
 ## Functions
 
-### `_generateChannelId(address creator, string name, string description, string metadata) → uint256` (internal)
-
-Generates a unique channel ID based on input parameters
-
-
-
-
 ### `constructor(address initialOwner)` (public)
 
 Constructor sets the contract owner and initializes ERC721
+
+
+
+
+### `getChannel(uint256 channelId) → struct Channels.Channel` (external)
+
+Get a channel by its ID
+
+
+
+
+### `_generateChannelId(address creator, string name, string description, string metadata) → uint256` (internal)
+
+Generates a unique channel ID based on input parameters
 
 
 
@@ -69,20 +76,6 @@ Sets the hook for a channel
 ### `_setHook(uint256 channelId, address hook)` (internal)
 
 Internal function to set the hook for a channel
-
-
-
-
-### `getChannel(uint256 channelId) → string name, string description, string metadata, address hook` (external)
-
-Gets a channel's configuration
-
-
-
-
-### `executeHook(uint256 channelId, struct Comments.CommentData commentData, address caller, bytes32 commentId, enum Hooks.HookPhase phase) → bool` (external)
-
-Executes hook for a channel
 
 
 

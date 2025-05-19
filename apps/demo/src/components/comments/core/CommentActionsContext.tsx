@@ -98,15 +98,15 @@ export type OnRetryEditCommentParams = {
 };
 
 export type OnRetryEditComment = (
-  params: OnRetryEditCommentParams
+  params: OnRetryEditCommentParams,
 ) => Promise<void>;
 
 export type OnDeleteComment = (params: OnDeleteCommentParams) => Promise<void>;
 export type OnRetryPostComment = (
-  params: OnRetryPostCommentParams
+  params: OnRetryPostCommentParams,
 ) => Promise<void>;
 export type OnPostComment<TExtra = unknown> = (
-  params: OnPostCommentParams<TExtra>
+  params: OnPostCommentParams<TExtra>,
 ) => Promise<void>;
 export type OnEditComment = (params: OnEditCommentParams) => Promise<void>;
 export type CommentActionsContextType<TExtraPostComment = unknown> = {
@@ -141,7 +141,7 @@ export function useCommentActions<
 
   if (!context) {
     throw new Error(
-      "useCommentActions must be used within a CommentActionsProvider"
+      "useCommentActions must be used within a CommentActionsProvider",
     );
   }
 

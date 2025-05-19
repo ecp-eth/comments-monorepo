@@ -19,7 +19,7 @@ Core functionality for managing comments and approvals
 | [AddApprovalResult](/sdk-reference/comments/type-aliases/AddApprovalResult.mdx) | - |
 | [AddApprovalTypedDataSchemaType](/sdk-reference/comments/type-aliases/AddApprovalTypedDataSchemaType.mdx) | - |
 | [AddCommentTypedDataSchemaType](/sdk-reference/comments/type-aliases/AddCommentTypedDataSchemaType.mdx) | - |
-| [CommentData](/sdk-reference/comments/type-aliases/CommentData.mdx) | The data structure of a comment to be signed and then passed to the Embed API |
+| [CommentData](/sdk-reference/comments/type-aliases/CommentData.mdx) | The data structure of a comment returned by the contract |
 | [CommentInputData](/sdk-reference/comments/type-aliases/CommentInputData.mdx) | Comment input data schema. This is used as input of the functions. |
 | [CommentManagerABIType](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx) | - |
 | [ContractReadFunctions](/sdk-reference/comments/type-aliases/ContractReadFunctions.mdx) | - |
@@ -31,6 +31,7 @@ Core functionality for managing comments and approvals
 | [CreateCommentDataParamsShared](/sdk-reference/comments/type-aliases/CreateCommentDataParamsShared.mdx) | The shared parameters for creating a comment |
 | [CreateCommentTypedDataParams](/sdk-reference/comments/type-aliases/CreateCommentTypedDataParams.mdx) | - |
 | [CreateDeleteCommentTypedDataParams](/sdk-reference/comments/type-aliases/CreateDeleteCommentTypedDataParams.mdx) | - |
+| [CreateEditCommentTypedDataParams](/sdk-reference/comments/type-aliases/CreateEditCommentTypedDataParams.mdx) | - |
 | [CreateRemoveApprovalTypedDataParams](/sdk-reference/comments/type-aliases/CreateRemoveApprovalTypedDataParams.mdx) | - |
 | [CreateRemoveApprovalTypedDataResult](/sdk-reference/comments/type-aliases/CreateRemoveApprovalTypedDataResult.mdx) | - |
 | [CreateReplyCommentDataParams](/sdk-reference/comments/type-aliases/CreateReplyCommentDataParams.mdx) | The parameters for creating a reply comment |
@@ -39,6 +40,12 @@ Core functionality for managing comments and approvals
 | [DeleteCommentAsAuthorResult](/sdk-reference/comments/type-aliases/DeleteCommentAsAuthorResult.mdx) | - |
 | [DeleteCommentParams](/sdk-reference/comments/type-aliases/DeleteCommentParams.mdx) | - |
 | [DeleteCommentTypedDataSchemaType](/sdk-reference/comments/type-aliases/DeleteCommentTypedDataSchemaType.mdx) | - |
+| [EditCommentAsAuthorParams](/sdk-reference/comments/type-aliases/EditCommentAsAuthorParams.mdx) | - |
+| [EditCommentAsAuthorResult](/sdk-reference/comments/type-aliases/EditCommentAsAuthorResult.mdx) | - |
+| [EditCommentData](/sdk-reference/comments/type-aliases/EditCommentData.mdx) | Edit comment data schema. This is used as input of the functions. |
+| [EditCommentParams](/sdk-reference/comments/type-aliases/EditCommentParams.mdx) | - |
+| [EditCommentResult](/sdk-reference/comments/type-aliases/EditCommentResult.mdx) | - |
+| [EditCommentTypedDataSchemaType](/sdk-reference/comments/type-aliases/EditCommentTypedDataSchemaType.mdx) | - |
 | [GetAddApprovalHashData](/sdk-reference/comments/type-aliases/GetAddApprovalHashData.mdx) | - |
 | [GetAddApprovalHashParams](/sdk-reference/comments/type-aliases/GetAddApprovalHashParams.mdx) | - |
 | [GetAddApprovalHashResult](/sdk-reference/comments/type-aliases/GetAddApprovalHashResult.mdx) | - |
@@ -50,6 +57,7 @@ Core functionality for managing comments and approvals
 | [GetContractVersionParams](/sdk-reference/comments/type-aliases/GetContractVersionParams.mdx) | - |
 | [GetDeleteCommentHashParams](/sdk-reference/comments/type-aliases/GetDeleteCommentHashParams.mdx) | - |
 | [GetDomainSeparatorParams](/sdk-reference/comments/type-aliases/GetDomainSeparatorParams.mdx) | - |
+| [GetEditCommentHashParams](/sdk-reference/comments/type-aliases/GetEditCommentHashParams.mdx) | - |
 | [GetNonceParams](/sdk-reference/comments/type-aliases/GetNonceParams.mdx) | - |
 | [GetRemoveApprovalHashParams](/sdk-reference/comments/type-aliases/GetRemoveApprovalHashParams.mdx) | - |
 | [GetRemoveApprovalHashResult](/sdk-reference/comments/type-aliases/GetRemoveApprovalHashResult.mdx) | - |
@@ -58,8 +66,6 @@ Core functionality for managing comments and approvals
 | [PostCommentAsAuthorResult](/sdk-reference/comments/type-aliases/PostCommentAsAuthorResult.mdx) | - |
 | [PostCommentParams](/sdk-reference/comments/type-aliases/PostCommentParams.mdx) | - |
 | [PostCommentResult](/sdk-reference/comments/type-aliases/PostCommentResult.mdx) | - |
-| [ReadAddApprovalHashFromContractFunction](/sdk-reference/comments/type-aliases/ReadAddApprovalHashFromContractFunction.mdx) | - |
-| [ReadRemoveApprovalHashFromContractFunction](/sdk-reference/comments/type-aliases/ReadRemoveApprovalHashFromContractFunction.mdx) | - |
 | [RemoveApprovalTypedDataSchemaType](/sdk-reference/comments/type-aliases/RemoveApprovalTypedDataSchemaType.mdx) | - |
 | [RevokeApprovalAsAuthorParams](/sdk-reference/comments/type-aliases/RevokeApprovalAsAuthorParams.mdx) | - |
 | [RevokeApprovalAsAuthorResult](/sdk-reference/comments/type-aliases/RevokeApprovalAsAuthorResult.mdx) | - |
@@ -74,10 +80,12 @@ Core functionality for managing comments and approvals
 | ------ | ------ |
 | [AddApprovalTypedDataSchema](/sdk-reference/comments/variables/AddApprovalTypedDataSchema.mdx) | - |
 | [AddCommentTypedDataSchema](/sdk-reference/comments/variables/AddCommentTypedDataSchema.mdx) | - |
-| [CommentDataSchema](/sdk-reference/comments/variables/CommentDataSchema.mdx) | Comment schema. This is used as output of the functions. |
+| [CommentDataSchema](/sdk-reference/comments/variables/CommentDataSchema.mdx) | - |
 | [CommentInputDataSchema](/sdk-reference/comments/variables/CommentInputDataSchema.mdx) | Comment input data schema. This is used as input of the functions. |
 | [CreateCommentDataSchema](/sdk-reference/comments/variables/CreateCommentDataSchema.mdx) | - |
 | [DeleteCommentTypedDataSchema](/sdk-reference/comments/variables/DeleteCommentTypedDataSchema.mdx) | - |
+| [EditCommentDataSchema](/sdk-reference/comments/variables/EditCommentDataSchema.mdx) | Edit comment data schema. This is used as input of the functions. |
+| [EditCommentTypedDataSchema](/sdk-reference/comments/variables/EditCommentTypedDataSchema.mdx) | - |
 | [RemoveApprovalTypedDataSchema](/sdk-reference/comments/variables/RemoveApprovalTypedDataSchema.mdx) | - |
 | [ReplyCommentInputDataSchema](/sdk-reference/comments/variables/ReplyCommentInputDataSchema.mdx) | - |
 | [RootCommentInputDataSchema](/sdk-reference/comments/variables/RootCommentInputDataSchema.mdx) | - |
@@ -92,9 +100,13 @@ Core functionality for managing comments and approvals
 | [createCommentData](/sdk-reference/comments/functions/createCommentData.mdx) | Create the data structure of a comment |
 | [createCommentTypedData](/sdk-reference/comments/functions/createCommentTypedData.mdx) | Create the EIP-712 typed data structure for adding comment |
 | [createDeleteCommentTypedData](/sdk-reference/comments/functions/createDeleteCommentTypedData.mdx) | Create the EIP-712 typed data structure for deleting comment |
+| [createEditCommentData](/sdk-reference/comments/functions/createEditCommentData.mdx) | Create the data structure of a comment for editing |
+| [createEditCommentTypedData](/sdk-reference/comments/functions/createEditCommentTypedData.mdx) | Create the EIP-712 typed data structure for editing comment |
 | [createRemoveApprovalTypedData](/sdk-reference/comments/functions/createRemoveApprovalTypedData.mdx) | Create the EIP-712 typed data structure for removing approval |
 | [deleteComment](/sdk-reference/comments/functions/deleteComment.mdx) | Delete a comment with app signature verification |
 | [deleteCommentAsAuthor](/sdk-reference/comments/functions/deleteCommentAsAuthor.mdx) | Delete a comment as an author |
+| [editComment](/sdk-reference/comments/functions/editComment.mdx) | Edit a comment |
+| [editCommentAsAuthor](/sdk-reference/comments/functions/editCommentAsAuthor.mdx) | Edit a comment as an author |
 | [getAddApprovalHash](/sdk-reference/comments/functions/getAddApprovalHash.mdx) | Gets the EIP-712 hash for adding approval |
 | [getChannelManager](/sdk-reference/comments/functions/getChannelManager.mdx) | Gets the channel manager contract address |
 | [getComment](/sdk-reference/comments/functions/getComment.mdx) | Get a comment by ID |
@@ -103,6 +115,7 @@ Core functionality for managing comments and approvals
 | [getContractVersion](/sdk-reference/comments/functions/getContractVersion.mdx) | Gets the contract version |
 | [getDeleteCommentHash](/sdk-reference/comments/functions/getDeleteCommentHash.mdx) | Get the hash for deleting a comment |
 | [getDomainSeparator](/sdk-reference/comments/functions/getDomainSeparator.mdx) | Gets the EIP-712 domain separator |
+| [getEditCommentHash](/sdk-reference/comments/functions/getEditCommentHash.mdx) | Get the hash for editing a comment |
 | [getNonce](/sdk-reference/comments/functions/getNonce.mdx) | Get the nonce for the author and app signer |
 | [getRemoveApprovalHash](/sdk-reference/comments/functions/getRemoveApprovalHash.mdx) | Gets the EIP-712 hash for removing approval |
 | [isApproved](/sdk-reference/comments/functions/isApproved.mdx) | Checks if an app signer is approved for an author |

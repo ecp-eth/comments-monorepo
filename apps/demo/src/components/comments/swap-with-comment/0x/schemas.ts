@@ -63,13 +63,13 @@ const RouteSchema = z.object({
       to: AddressSchema,
       source: z.string(),
       proportionBps: z.coerce.bigint(),
-    })
+    }),
   ),
   tokens: z.array(
     z.object({
       address: AddressSchema,
       symbol: z.string(),
-    })
+    }),
   ),
 });
 
@@ -146,7 +146,7 @@ export const SwapAPIInvalidInputResponseSchema = z.object({
       z.object({
         field: z.string(),
         reason: z.string(),
-      })
+      }),
     ),
   }),
 });

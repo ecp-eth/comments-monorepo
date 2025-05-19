@@ -14,11 +14,11 @@ type GetDeleteCommentHashParams = {
   commentsAddress?: Hex;
   deadline: bigint;
   nonce: bigint;
-  readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">>;
+  readContract: ContractReadFunctions["getDeleteCommentHash"];
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:389](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L389)
+Defined in: [packages/sdk/src/comments/comment.ts:388](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L388)
 
 ## Properties
 
@@ -28,7 +28,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:389](https://github.com/ecp-et
 app: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:401](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L401)
+Defined in: [packages/sdk/src/comments/comment.ts:400](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L400)
 
 The app signer
 
@@ -40,7 +40,7 @@ The app signer
 author: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:397](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L397)
+Defined in: [packages/sdk/src/comments/comment.ts:396](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L396)
 
 The author of the comment
 
@@ -52,7 +52,7 @@ The author of the comment
 commentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:393](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L393)
+Defined in: [packages/sdk/src/comments/comment.ts:392](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L392)
 
 The ID of the comment to delete
 
@@ -64,7 +64,7 @@ The ID of the comment to delete
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:414](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L414)
+Defined in: [packages/sdk/src/comments/comment.ts:415](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L415)
 
 The address of the comments contract
 
@@ -82,9 +82,15 @@ COMMENT_MANAGER_ADDRESS
 deadline: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:409](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L409)
+Defined in: [packages/sdk/src/comments/comment.ts:410](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L410)
 
 The deadline for the signature
+
+#### Default
+
+```ts
+1 day from now
+```
 
 ***
 
@@ -94,26 +100,16 @@ The deadline for the signature
 nonce: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:405](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L405)
+Defined in: [packages/sdk/src/comments/comment.ts:404](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L404)
 
 The nonce for the signature
 
 ***
 
-### readContract()
+### readContract
 
 ```ts
-readContract: (parameters) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">>;
+readContract: ContractReadFunctions["getDeleteCommentHash"];
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:415](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L415)
-
-#### Parameters
-
-##### parameters
-
-`ReadContractParameters`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getDeleteCommentHash"`\>
-
-#### Returns
-
-`Promise`\<`ReadContractReturnType`\<*typeof* [`CommentManagerABI`](/sdk-reference/defaultExports/variables/CommentManagerABI.mdx), `"getDeleteCommentHash"`\>\>
+Defined in: [packages/sdk/src/comments/comment.ts:416](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L416)

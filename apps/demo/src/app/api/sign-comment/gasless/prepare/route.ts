@@ -27,7 +27,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
 
 export async function POST(
-  req: Request
+  req: Request,
 ): Promise<
   JSONResponse<
     | typeof PreparedGaslessPostCommentOperationApprovedResponseSchema
@@ -43,7 +43,7 @@ export async function POST(
     return new JSONResponse(
       BadRequestResponseSchema,
       parsedBodyResult.error.flatten().fieldErrors,
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -60,10 +60,10 @@ export async function POST(
         status: 429,
         headers: {
           "Retry-After": String(
-            Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+            Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
           ),
         },
-      }
+      },
     );
   }
 
@@ -76,7 +76,7 @@ export async function POST(
     return new JSONResponse(
       BadRequestResponseSchema,
       { author: ["Muted"] },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -145,7 +145,7 @@ export async function POST(
         return new JSONResponse(
           BadRequestResponseSchema,
           { appSignature: ["Invalid app signature"] },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -167,7 +167,7 @@ export async function POST(
           },
           {
             jsonReplacer: bigintReplacer,
-          }
+          },
         );
       } catch (error) {
         console.error(error);
@@ -175,7 +175,7 @@ export async function POST(
         return new JSONResponse(
           InternalServerErrorResponseSchema,
           { error: "Failed to post comment" },
-          { status: 500 }
+          { status: 500 },
         );
       }
     }
@@ -192,6 +192,6 @@ export async function POST(
     },
     {
       jsonReplacer: bigintReplacer,
-    }
+    },
   );
 }

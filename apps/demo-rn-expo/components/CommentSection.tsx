@@ -52,7 +52,7 @@ export function CommentSection({
         // to fill the screen
         // cursor: pageParam,
         limit: Math.ceil(
-          Dimensions.get("window").height / COMMENT_BOX_AVERAGE_HEIGHT
+          Dimensions.get("window").height / COMMENT_BOX_AVERAGE_HEIGHT,
         ),
       },
       queryFn: ({ pageParam, signal }) => {
@@ -159,7 +159,7 @@ export function CommentSection({
 }
 
 const useDeletePendingOperations = (
-  rootComment?: IndexerAPICommentSchemaType
+  rootComment?: IndexerAPICommentSchemaType,
 ) => {
   const isReplying = !!rootComment;
   const { deletePendingCommentOperation } = useOptimisticCommentingManager([
@@ -174,14 +174,14 @@ const useDeletePendingOperations = (
         deletePendingReplyOperation(commentId);
       }
     },
-    [deletePendingCommentOperation, deletePendingReplyOperation, isReplying]
+    [deletePendingCommentOperation, deletePendingReplyOperation, isReplying],
   );
 };
 
 const useRepliesAnimation = (
   onViewReplies: (comment: IndexerAPICommentSchemaType) => void,
   onCloseViewReplies: () => void,
-  replyingComment: IndexerAPICommentSchemaType | undefined
+  replyingComment: IndexerAPICommentSchemaType | undefined,
 ) => {
   const repliesLeft = useSharedValue<`${number}%`>("100%");
   const repliesSectionAnimatedStyle = useAnimatedStyle(() => {

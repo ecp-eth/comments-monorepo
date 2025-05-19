@@ -22,13 +22,7 @@
 
 
 
-### `beforeComment(struct Comments.CommentData, address, bytes32) → bool` (external)
-
-
-
-
-
-### `afterComment(struct Comments.CommentData, address, bytes32) → bool` (external)
+### `afterComment(struct Comments.Comment, address, bytes32) → string hookData` (external)
 
 
 
@@ -40,25 +34,19 @@
 
 
 
-### `beforeInitialize(address channel) → bool success` (external)
-
-
-
-
-
 ### `afterInitialize(address channel) → bool success` (external)
 
 
 
 
 
-### `beforeDeleteComment(struct Comments.CommentData commentData, address caller, bytes32 commentId) → bool success` (external)
+### `afterDeleteComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → bool success` (external)
 
 
 
 
 
-### `afterDeleteComment(struct Comments.CommentData commentData, address caller, bytes32 commentId) → bool success` (external)
+### `afterEditComment(struct Comments.Comment, address, bytes32) → string commentHookData` (external)
 
 
 

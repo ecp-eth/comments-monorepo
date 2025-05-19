@@ -65,7 +65,7 @@ export default function QuoteView({
 
       const response = await fetch(
         `/api/0x/quote?${new URLSearchParams(params).toString()}`,
-        { signal }
+        { signal },
       );
       const data = await response.json();
 
@@ -167,7 +167,7 @@ export default function QuoteView({
               ? "Affiliate Fee: " +
                 formatUnits(
                   quote.fees.integratorFee.amount,
-                  buyTokenInfo.decimals
+                  buyTokenInfo.decimals,
                 ) +
                 " " +
                 buyTokenInfo.symbol
@@ -190,7 +190,7 @@ export default function QuoteView({
                   <p>
                     {sellTokenInfo.symbol +
                       ` Sell Tax: ${formatTax(
-                        quote.tokenMetadata.sellToken.sellTaxBps
+                        quote.tokenMetadata.sellToken.sellTaxBps,
                       )}%`}
                   </p>
                 )}

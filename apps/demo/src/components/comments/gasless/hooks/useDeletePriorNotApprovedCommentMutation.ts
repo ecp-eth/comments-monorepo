@@ -47,7 +47,7 @@ export function useDeletePriorNotApprovedCommentMutation({
             ...variables,
             authorSignature: signature,
           },
-          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+          bigintReplacer, // because typed data contains a bigint when parsed using our zod schemas
         ),
       });
 
