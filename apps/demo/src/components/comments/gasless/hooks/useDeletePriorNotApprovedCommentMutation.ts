@@ -28,12 +28,8 @@ export function useDeletePriorNotApprovedCommentMutation({
       });
 
       return {
-        signTypedDataParams:
-          data.signTypedDataParams as unknown as SignTypedDataParameters,
+        signTypedDataParams: data.signTypedDataParams,
         variables: data,
-      } satisfies {
-        signTypedDataParams: SignTypedDataParameters;
-        variables: PreparedSignedGaslessDeleteCommentNotApprovedSchemaType;
       };
     },
     async sendSignedData({ signature, variables }) {

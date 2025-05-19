@@ -87,12 +87,8 @@ export function useGaslessSubmitComment(
       const data = await prepareSignedGaslessComment(false, variables);
 
       return {
-        signTypedDataParams:
-          data.signTypedDataParams as unknown as SignTypedDataParameters,
+        signTypedDataParams: data.signTypedDataParams,
         variables: data,
-      } satisfies {
-        signTypedDataParams: SignTypedDataParameters;
-        variables: PreparedSignedGaslessPostCommentNotApprovedSchemaType;
       };
     },
     async sendSignedData({ signature, variables }) {

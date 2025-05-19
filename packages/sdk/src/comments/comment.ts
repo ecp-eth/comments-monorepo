@@ -76,7 +76,7 @@ const PostCommentAsAuthorParamsSchema = z.object({
  * Posts a comment as an author
  *
  * @param params - The parameters for posting a comment as an author
- * @returns The transaction hash and comment ID
+ * @returns The transaction hash
  */
 export async function postCommentAsAuthor(
   params: PostCommentAsAuthorParams,
