@@ -159,41 +159,40 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                     authorSignature
                 ))
         ) {
-            Comments.Comment memory comment = Comments.Comment({
-                author: commentData.author,
-                app: commentData.app,
-                channelId: commentData.channelId,
-                parentId: commentData.parentId,
-                content: commentData.content,
-                metadata: commentData.metadata,
-                targetUri: commentData.targetUri,
-                commentType: commentData.commentType,
-                createdAt: uint80(block.timestamp),
-                updatedAt: uint80(block.timestamp),
-                hookData: ""
-            });
-            // Store comment data on-chain
-            comments[commentId] = comment;
+            Comments.Comment storage comment = comments[commentId];
+
+            comment.author = commentData.author;
+            comment.app = commentData.app;
+            comment.channelId = commentData.channelId;
+            comment.parentId = commentData.parentId;
+            comment.content = commentData.content;
+            comment.metadata = commentData.metadata;
+            comment.targetUri = commentData.targetUri;
+            comment.commentType = commentData.commentType;
+            comment.createdAt = uint80(block.timestamp);
+            comment.updatedAt = uint80(block.timestamp);
+            comment.hookData = "";
 
             Channels.Channel memory channel = channelManager.getChannel(
                 commentData.channelId
             );
             address hookAddress = address(channel.hook);
 
+            emit CommentAdded(commentId, comment.author, comment.app, comment);
+
             if (hookAddress != address(0) && channel.permissions.afterComment) {
                 // Calculate hook value after protocol fee
                 uint256 msgValueAfterFee = channelManager
                     .deductProtocolHookTransactionFee(msg.value);
 
-                string memory commentHookData = channel.hook.afterComment{
+                string memory hookData = channel.hook.afterComment{
                     value: msgValueAfterFee
                 }(comment, msg.sender, commentId);
 
-                Comments.Comment storage storedComment = comments[commentId];
-                storedComment.hookData = commentHookData;
-            }
+                comment.hookData = hookData;
 
-            emit CommentAdded(commentId, comment.author, comment.app, comment);
+                emit CommentHookDataUpdated(commentId, hookData);
+            }
 
             return;
         }
@@ -290,6 +289,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         );
         address hookAddress = address(channel.hook);
 
+        emit CommentEdited(commentId, comment.author, editData.app, comment);
+
         if (hookAddress != address(0) && channel.permissions.afterEditComment) {
             // Calculate hook value after protocol fee
             uint256 msgValueAfterFee = channelManager
@@ -300,9 +301,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             }(comment, msg.sender, commentId);
 
             comment.hookData = hookData;
-        }
 
-        emit CommentEdited(commentId, comment.author, editData.app, comment);
+            emit CommentHookDataUpdated(commentId, hookData);
+        }
     }
 
     /// @inheritdoc ICommentManager
@@ -387,6 +388,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         );
         address hookAddress = address(channel.hook);
 
+        emit CommentDeleted(commentId, author);
+
         if (
             hookAddress != address(0) && channel.permissions.afterDeleteComment
         ) {
@@ -400,8 +403,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                 commentId
             );
         }
-
-        emit CommentDeleted(commentId, author);
     }
 
     /// @notice Internal function to add an app signer approval

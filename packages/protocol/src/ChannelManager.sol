@@ -154,6 +154,9 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     /// @param channelId The unique identifier of the channel
     /// @param hook The address of the hook contract
     function _setHook(uint256 channelId, address hook) internal {
+        emit HookSet(channelId, hook);
+        emit HookStatusUpdated(channelId, hook, hook != address(0));
+
         if (hook != address(0)) {
             // Validate that the hook implements IHook interface
             try
@@ -178,9 +181,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         } else {
             delete channels[channelId].hook; // Properly reset to default value
         }
-
-        emit HookSet(channelId, hook);
-        emit HookStatusUpdated(channelId, hook, hook != address(0));
     }
 
     /// @inheritdoc IChannelManager

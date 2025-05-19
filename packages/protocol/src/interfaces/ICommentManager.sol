@@ -37,6 +37,11 @@ interface ICommentManager {
         Comments.Comment comment
     );
 
+    /// @notice Emitted when a comment's hook data is updated
+    /// @param commentId Unique identifier of the comment
+    /// @param hookData The new hook data
+    event CommentHookDataUpdated(bytes32 indexed commentId, string hookData);
+
     /// @notice Emitted when an author approves an app signer
     /// @param author Address of the author giving approval
     /// @param app Address being approved
