@@ -55,6 +55,31 @@ contract RejectEditHook is BaseHook {
     }
 }
 
+contract AcceptEditHook is BaseHook {
+    function getHookPermissions()
+        external
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                afterInitialize: false,
+                afterComment: false,
+                afterDeleteComment: false,
+                afterEditComment: true
+            });
+    }
+
+    function afterEditComment(
+        Comments.Comment calldata,
+        address,
+        bytes32
+    ) external payable override returns (string memory) {
+        return "hook data";
+    }
+}
+
 contract CommentsTest is Test, IERC721Receiver {
     event CommentAdded(
         bytes32 indexed commentId,
@@ -75,6 +100,7 @@ contract CommentsTest is Test, IERC721Receiver {
     CommentManager public comments;
     NoHook public noHook;
     RejectEditHook public rejectEditHook;
+    AcceptEditHook public acceptEditHook;
     ChannelManager public channelManager;
 
     // Test accounts
@@ -91,6 +117,7 @@ contract CommentsTest is Test, IERC721Receiver {
         app = vm.addr(appPrivateKey);
         noHook = new NoHook();
         rejectEditHook = new RejectEditHook();
+        acceptEditHook = new AcceptEditHook();
         (comments, channelManager) = TestUtils.createContracts(owner);
 
         // Setup private keys for signing
@@ -1041,6 +1068,56 @@ contract CommentsTest is Test, IERC721Receiver {
         assertEq(editedComment.content, editData.content);
         assertEq(editedComment.metadata, editData.metadata);
         assertEq(editedComment.updatedAt, uint80(block.timestamp));
+    }
+
+    function test_EditCommentAsAuthor_UpdatedWithHookData() public {
+        // Create a channel with the reject hook
+        uint256 channelId = channelManager.createChannel{value: 0.02 ether}(
+            "Test Channel",
+            "Test Description",
+            "{}",
+            address(acceptEditHook)
+        );
+
+        // Create a comment
+        Comments.CreateComment memory commentData = _createBasicCreateComment();
+        commentData.channelId = channelId;
+        bytes32 commentId = comments.getCommentId(commentData);
+
+        // Post the comment
+        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
+        vm.prank(author);
+        comments.postCommentAsAuthor(commentData, appSignature);
+
+        // Edit the comment
+        Comments.EditComment memory editData = _createBasicEditCommentData();
+        bytes32 editHash = comments.getEditCommentHash(
+            commentId,
+            commentData.author,
+            editData
+        );
+        bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
+
+        Comments.Comment memory expectedCommentData = comments.getComment(
+            commentId
+        );
+
+        expectedCommentData.content = editData.content;
+        expectedCommentData.metadata = editData.metadata;
+        expectedCommentData.updatedAt = uint80(block.timestamp);
+        expectedCommentData.commentHookData = "hook data";
+
+        vm.prank(author);
+        vm.expectEmit(true, true, true, true);
+        emit CommentEdited(commentId, author, app, expectedCommentData);
+        comments.editCommentAsAuthor(commentId, editData, editAppSignature);
+
+        // Verify the comment was edited
+        Comments.Comment memory editedComment = comments.getComment(commentId);
+        assertEq(editedComment.content, editData.content);
+        assertEq(editedComment.metadata, editData.metadata);
+        assertEq(editedComment.updatedAt, uint80(block.timestamp));
+        assertEq(editedComment.commentHookData, "hook data");
     }
 
     function test_EditCommentAsAuthor_RejectedByHook() public {

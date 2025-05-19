@@ -299,11 +299,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             uint256 msgValueAfterFee = channelManager
                 .deductProtocolHookTransactionFee(msg.value);
 
-            channel.hook.afterEditComment{value: msgValueAfterFee}(
-                comment,
-                msg.sender,
-                commentId
-            );
+            string memory commentHookData = channel.hook.afterEditComment{
+                value: msgValueAfterFee
+            }(comment, msg.sender, commentId);
+
+            comment.commentHookData = commentHookData;
         }
 
         emit CommentEdited(commentId, comment.author, editData.app, comment);
