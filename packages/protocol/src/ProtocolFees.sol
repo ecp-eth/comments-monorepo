@@ -97,7 +97,7 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
     /// @param requiredFee The fee amount required for the operation
     /// @return The amount of fees collected
     function _collectFee(uint96 requiredFee) internal virtual returns (uint96) {
-        if (msg.value < requiredFee) revert IChannelManager.InsufficientFee();
+        if (msg.value < requiredFee) revert InsufficientFee();
 
         if (msg.value > requiredFee) {
             // Refund excess payment using transfer for safety

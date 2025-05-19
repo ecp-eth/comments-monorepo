@@ -6,6 +6,8 @@ pragma solidity ^0.8.20;
 interface IProtocolFees {
     /// @notice Error thrown when fee percentage is invalid (>100%)
     error InvalidFee();
+    /// @notice Error thrown when insufficient fee is provided
+    error InsufficientFee();
 
     /// @notice Emitted when channel creation fee is updated
     /// @param newFee The new fee amount in wei
