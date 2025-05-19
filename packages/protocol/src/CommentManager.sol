@@ -261,7 +261,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         if (appSignature.length > 0) {
             if (
                 !SignatureChecker.isValidSignatureNow(
-                    // @QUESTION do we want to allow any app to edit a comment?
                     editData.app,
                     editHash,
                     appSignature
@@ -284,7 +283,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             revert NotAuthorized(msg.sender, comment.author);
         }
 
-        // @QUESTION do we want to update also app?
         comment.content = editData.content;
         comment.metadata = editData.metadata;
         comment.updatedAt = uint80(block.timestamp);
