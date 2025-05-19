@@ -26,8 +26,6 @@ library Comments {
         uint80 updatedAt;
         // 32-byte types
         uint256 channelId;
-        uint256 nonce;
-        uint256 deadline;
         bytes32 parentId;
         // Dynamic types last (conventional pattern)
         string content;
@@ -61,4 +59,18 @@ library Comments {
         string targetUri;
         string commentType;
     }
-} 
+
+    /// @notice Struct containing all comment data for editing a comment
+    /// @param app The address of the application signer that authorized this comment
+    /// @param nonce The nonce for the comment
+    /// @param deadline Timestamp after which the signatures for this comment become invalid
+    /// @param content The actual text content of the comment
+    /// @param metadata Additional JSON data that shouldn't be shown to the user as it is
+    struct EditComment {
+        address app;
+        uint256 nonce;
+        uint256 deadline;
+        string content;
+        string metadata;
+    }
+}

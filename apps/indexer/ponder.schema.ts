@@ -26,6 +26,7 @@ export const comments = onchainTable(
       .default("pending")
       .notNull(),
     moderationStatusChangedAt: t.timestamp({ withTimezone: true }).notNull(),
+    revision: t.integer().notNull().default(0),
   }),
   (table) => ({
     targetUriIdx: index().on(table.targetUri),

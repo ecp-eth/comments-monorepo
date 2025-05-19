@@ -8,6 +8,13 @@ import type { ChannelManagerABI } from "../abis.js";
 
 export type ChannelManagerABIType = typeof ChannelManagerABI;
 
+export type ChannelPermissions = {
+  afterInitialize: boolean;
+  afterComment: boolean;
+  afterDeleteComment: boolean;
+  afterEditComment: boolean;
+};
+
 // we can't use generics and mapped type because the API would be lazy resolved
 // causing type errors in userland.
 export type ContractWriteFunctions = {

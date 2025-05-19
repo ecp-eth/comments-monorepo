@@ -7,11 +7,7 @@ import {
 } from "../constants.js";
 import { HexSchema, type Hex } from "../core/schemas.js";
 import { CommentManagerABI } from "../abis.js";
-import {
-  stringToHex,
-  type ReadContractParameters,
-  type ReadContractReturnType,
-} from "viem";
+import { stringToHex } from "viem";
 import type {
   ContractWriteFunctions,
   ContractReadFunctions,
@@ -25,10 +21,15 @@ import {
   CommentInputDataSchema,
   DeleteCommentTypedDataSchema,
   type DeleteCommentTypedDataSchemaType,
+  type EditCommentData,
+  EditCommentDataSchema,
+  EditCommentTypedDataSchema,
+  type EditCommentTypedDataSchemaType,
 } from "./schemas.js";
 import {
   ADD_COMMENT_TYPE,
   DELETE_COMMENT_TYPE,
+  EDIT_COMMENT_TYPE,
   DOMAIN_NAME,
   DOMAIN_VERSION,
 } from "./eip712.js";
@@ -174,9 +175,7 @@ export type GetCommentParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  readContract: (
-    parameters: ReadContractParameters<typeof CommentManagerABI, "getComment">
-  ) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getComment">>;
+  readContract: ContractReadFunctions["getComment"];
 };
 
 export type GetCommentResult = {
@@ -405,6 +404,8 @@ export type GetDeleteCommentHashParams = {
   nonce: bigint;
   /**
    * The deadline for the signature
+   *
+   * @default 1 day from now
    */
   deadline: bigint;
   /**
@@ -412,14 +413,7 @@ export type GetDeleteCommentHashParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  readContract: (
-    parameters: ReadContractParameters<
-      typeof CommentManagerABI,
-      "getDeleteCommentHash"
-    >
-  ) => Promise<
-    ReadContractReturnType<typeof CommentManagerABI, "getDeleteCommentHash">
-  >;
+  readContract: ContractReadFunctions["getDeleteCommentHash"];
 };
 
 const GetDeleteCommentHashParamsSchema = z.object({
@@ -467,9 +461,7 @@ export type GetNonceParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  readContract: (
-    parameters: ReadContractParameters<typeof CommentManagerABI, "getNonce">
-  ) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getNonce">>;
+  readContract: ContractReadFunctions["getNonce"];
 };
 
 const GetNonceParamsSchema = z.object({
@@ -570,9 +562,23 @@ export function createCommentData({
 export type CreateDeleteCommentTypedDataParams = {
   commentId: Hex;
   chainId: number;
+  /**
+   * The author of the comment
+   */
   author: Hex;
+  /**
+   * The app signer
+   */
   app: Hex;
+  /**
+   * The nonce of author and app
+   */
   nonce: bigint;
+  /**
+   * The deadline of the comment
+   *
+   * @default 1 day from now
+   */
   deadline?: bigint;
   /**
    * The address of the comments contract
@@ -626,4 +632,302 @@ export function createDeleteCommentTypedData(
         deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
     },
   });
+}
+
+export type GetEditCommentHashParams = {
+  /**
+   * The author of the comment
+   */
+  author: Hex;
+  /**
+   * The edit data
+   */
+  edit: EditCommentData;
+  /**
+   * The address of the comments contract
+   * @default COMMENT_MANAGER_ADDRESS
+   */
+  commentsAddress?: Hex;
+  readContract: ContractReadFunctions["getEditCommentHash"];
+};
+
+const GetEditCommentHashParamsSchema = z.object({
+  author: HexSchema,
+  edit: EditCommentDataSchema,
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
+});
+
+/**
+ * Get the hash for editing a comment
+ * @returns The edit comment hash
+ */
+export async function getEditCommentHash(
+  params: GetEditCommentHashParams
+): Promise<Hex> {
+  const { author, edit, commentsAddress } =
+    GetEditCommentHashParamsSchema.parse(params);
+
+  const hash = await params.readContract({
+    address: commentsAddress,
+    abi: CommentManagerABI,
+    functionName: "getEditCommentHash",
+    args: [edit.commentId, author, edit],
+  });
+
+  return hash;
+}
+
+type BaseEditCommentDataParams = {
+  /**
+   * The ID of the comment to edit
+   */
+  commentId: Hex;
+  /**
+   * The app
+   */
+  app: Hex;
+  /**
+   * The content of the comment (either updated or original)
+   */
+  content: string;
+  /**
+   * The nonce for the signature
+   */
+  nonce: bigint;
+  /**
+   * The deadline of the comment
+   *
+   * @default 1 day from now
+   */
+  deadline?: bigint;
+};
+
+type EditCommentDataParamsWithMetadataRaw = BaseEditCommentDataParams & {
+  /**
+   * The metadata of the comment as a raw string (already json serialized)
+   */
+  metadataRaw: string;
+};
+
+type EditCommentDataParamsWithMetadataObject = BaseEditCommentDataParams & {
+  /**
+   * The metadata of the comment as an object
+   */
+  metadataObject: object;
+};
+
+type EditCommentDataParams =
+  | EditCommentDataParamsWithMetadataRaw
+  | EditCommentDataParamsWithMetadataObject;
+
+/**
+ * Create the data structure of a comment for editing
+ * @return {@link comments!EditCommentData | EditCommentData} The data structure of a comment for editing
+ */
+export function createEditCommentData(
+  params: EditCommentDataParams
+): EditCommentData {
+  return EditCommentDataSchema.parse({
+    ...params,
+    metadata:
+      "metadataRaw" in params
+        ? params.metadataRaw
+        : JSON.stringify(params.metadataObject),
+    deadline:
+      params.deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
+  });
+}
+
+export type CreateEditCommentTypedDataParams = {
+  /**
+   * The author of the comment
+   */
+  author: Hex;
+  /**
+   * The edit data
+   *
+   * You can obtain this by using the `createEditCommentData()` function
+   */
+  edit: EditCommentData;
+  /**
+   * The chain ID
+   */
+  chainId: number;
+  /**
+   * The address of the comments contract
+   * @default COMMENT_MANAGER_ADDRESS
+   */
+  commentsAddress?: Hex;
+};
+
+const CreateEditCommentTypedDataParamsSchema = z.object({
+  author: HexSchema,
+  edit: EditCommentDataSchema,
+  chainId: z.number(),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
+});
+
+/**
+ * Create the EIP-712 typed data structure for editing comment
+ *
+ * @returns The typed data
+ */
+export function createEditCommentTypedData(
+  params: CreateEditCommentTypedDataParams
+): EditCommentTypedDataSchemaType {
+  const validatedParams = CreateEditCommentTypedDataParamsSchema.parse(params);
+
+  const { author, edit, chainId, commentsAddress } = validatedParams;
+
+  return EditCommentTypedDataSchema.parse({
+    domain: {
+      name: DOMAIN_NAME,
+      version: DOMAIN_VERSION,
+      chainId,
+      verifyingContract: commentsAddress,
+    },
+    types: EDIT_COMMENT_TYPE,
+    primaryType: "EditComment",
+    message: {
+      ...edit,
+      author,
+    },
+  });
+}
+
+export type EditCommentAsAuthorParams = {
+  /**
+   * The edit data
+   *
+   * You can obtain this by using the `createEditCommentData()` function
+   */
+  edit: EditCommentData;
+  /**
+   * The fee for the edit operation
+   */
+  fee?: bigint;
+  /**
+   * The address of the comments contract
+   * @default COMMENT_MANAGER_ADDRESS
+   */
+  commentsAddress?: Hex;
+  /**
+   * The author signature.
+   */
+  appSignature: Hex;
+  /**
+   * The write contract function
+   */
+  writeContract: ContractWriteFunctions["editCommentAsAuthor"];
+};
+
+const EditCommentAsAuthorParamsSchema = z.object({
+  edit: EditCommentDataSchema,
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
+  appSignature: HexSchema,
+  fee: z.bigint().optional(),
+});
+
+export type EditCommentAsAuthorResult = {
+  txHash: Hex;
+};
+
+/**
+ * Edit a comment as an author
+ *
+ * @param params - The parameters for editing a comment as an author
+ * @returns The transaction hash
+ */
+export async function editCommentAsAuthor(
+  params: EditCommentAsAuthorParams
+): Promise<EditCommentAsAuthorResult> {
+  const validatedParams = EditCommentAsAuthorParamsSchema.parse(params);
+
+  const { edit, commentsAddress, appSignature, fee } = validatedParams;
+
+  const txHash = await params.writeContract({
+    address: commentsAddress,
+    abi: CommentManagerABI,
+    functionName: "editCommentAsAuthor",
+    args: [edit.commentId, edit, appSignature],
+    value: fee,
+  });
+
+  return {
+    txHash,
+  };
+}
+
+export type EditCommentParams = {
+  /**
+   * The edit data
+   *
+   * You can obtain this by using the `createEditCommentData()` function
+   */
+  edit: EditCommentData;
+  /**
+   * The fee for the edit operation
+   */
+  fee?: bigint;
+  /**
+   * The address of the comments contract
+   * @default COMMENT_MANAGER_ADDRESS
+   */
+  commentsAddress?: Hex;
+  /**
+   * The app signature
+   */
+  appSignature: Hex;
+  /**
+   * The author signature. Necessary if the author hasn't approved the signer to edit comments on their behalf.
+   */
+  authorSignature?: Hex;
+  /**
+   * The write contract function
+   */
+  writeContract: ContractWriteFunctions["editComment"];
+};
+
+const EditCommentParamsSchema = z.object({
+  edit: EditCommentDataSchema,
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
+  appSignature: HexSchema,
+  authorSignature: HexSchema.optional(),
+  fee: z.bigint().optional(),
+});
+
+export type EditCommentResult = {
+  txHash: Hex;
+};
+
+/**
+ * Edit a comment
+ *
+ * @param params - The parameters for editing a comment
+ * @returns The transaction hash
+ */
+export async function editComment(
+  params: EditCommentParams
+): Promise<EditCommentResult> {
+  const validatedParams = EditCommentParamsSchema.parse(params);
+
+  const { edit, commentsAddress, appSignature, authorSignature, fee } =
+    validatedParams;
+
+  const txHash = await params.writeContract({
+    address: commentsAddress,
+    abi: CommentManagerABI,
+    functionName: "editComment",
+    args: [
+      edit.commentId,
+      edit,
+      authorSignature ?? stringToHex(""),
+      appSignature,
+    ],
+    value: fee,
+  });
+
+  return {
+    txHash,
+  };
 }

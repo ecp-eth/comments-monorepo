@@ -45,12 +45,61 @@ export type OnPostCommentParams<TExtra = unknown> = {
    * Query key to a query where comment is stored
    */
   queryKey: QueryKey;
+  /**
+   * Extra data to be passed to post comment
+   */
   extra?: TExtra;
   /**
    * Called when transaction was created.
    */
   onStart?: () => void;
 };
+
+export type OnEditCommentParams<TExtra = unknown> = {
+  address: Hex;
+  /**
+   * Original comment
+   */
+  comment: Comment;
+  edit: {
+    /**
+     * Updated Comment content
+     */
+    content: string;
+    /**
+     * Updated Comment metadata
+     */
+    metadata: string;
+  };
+  /**
+   * Query key to a query where comment is stored
+   */
+  queryKey: QueryKey;
+  /**
+   * Extra data to be passed to edit comment
+   */
+  extra?: TExtra;
+  /**
+   * Called when transaction was created.
+   */
+  onStart?: () => void;
+};
+
+export type OnRetryEditCommentParams = {
+  comment: Comment;
+  /**
+   * Query key to a query where comment is stored
+   */
+  queryKey: QueryKey;
+  /**
+   * Called when transaction was created.
+   */
+  onStart?: () => void;
+};
+
+export type OnRetryEditComment = (
+  params: OnRetryEditCommentParams
+) => Promise<void>;
 
 export type OnDeleteComment = (params: OnDeleteCommentParams) => Promise<void>;
 export type OnRetryPostComment = (
@@ -59,11 +108,13 @@ export type OnRetryPostComment = (
 export type OnPostComment<TExtra = unknown> = (
   params: OnPostCommentParams<TExtra>
 ) => Promise<void>;
-
+export type OnEditComment = (params: OnEditCommentParams) => Promise<void>;
 export type CommentActionsContextType<TExtraPostComment = unknown> = {
   deleteComment: OnDeleteComment;
   postComment: OnPostComment<TExtraPostComment>;
   retryPostComment: OnRetryPostComment;
+  editComment: OnEditComment;
+  retryEditComment: OnRetryEditComment;
 };
 
 export const CommentActionsContext =

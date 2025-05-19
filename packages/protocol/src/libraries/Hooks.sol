@@ -14,5 +14,6 @@ library Hooks {
         bool afterInitialize;
         bool afterComment;
         bool afterDeleteComment;
+        bool afterEditComment;
     }
-} 
+}

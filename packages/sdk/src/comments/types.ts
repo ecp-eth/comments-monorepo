@@ -63,7 +63,7 @@ export type CreateCommentDataParams =
   | CreateReplyCommentDataParams;
 
 /**
- * The data structure of a comment to be signed and then passed to the Embed API
+ * The data structure of a comment returned by the contract
  */
 export type CommentData = {
   /**
@@ -101,14 +101,6 @@ export type CommentData = {
    */
   app: Hex;
   /**
-   * The nonce for the user per app
-   */
-  nonce: bigint;
-  /**
-   * The deadline of the comment submission in seconds since epoch
-   */
-  deadline: bigint;
-  /**
    * The timestamp of the comment creation in seconds since epoch
    */
   createdAt: bigint;
@@ -116,6 +108,10 @@ export type CommentData = {
    * The timestamp of the comment update in seconds since epoch
    */
   updatedAt: bigint;
+  /**
+   * Additional data for the comment, added by a hook.
+   */
+  hookData: string;
 };
 
 export type ContractWriteFunctions = {
@@ -169,6 +165,26 @@ export type ContractWriteFunctions = {
       "nonpayable",
       "deleteCommentAsAuthor"
     >
+  ) => Promise<Hex>;
+
+  editComment: (
+    args: ContractFunctionParameters<
+      CommentManagerABIType,
+      "payable",
+      "editComment"
+    > & {
+      value?: bigint;
+    }
+  ) => Promise<Hex>;
+
+  editCommentAsAuthor: (
+    args: ContractFunctionParameters<
+      CommentManagerABIType,
+      "payable",
+      "editCommentAsAuthor"
+    > & {
+      value?: bigint;
+    }
   ) => Promise<Hex>;
 
   removeApproval: (
@@ -231,6 +247,12 @@ export type ContractReadFunctions = {
     ReadContractReturnType<CommentManagerABIType, "getDeleteCommentHash">
   >;
 
+  getEditCommentHash: (
+    args: ReadContractParameters<CommentManagerABIType, "getEditCommentHash">
+  ) => Promise<
+    ReadContractReturnType<CommentManagerABIType, "getEditCommentHash">
+  >;
+
   getCommentId: (
     args: ReadContractParameters<CommentManagerABIType, "getCommentId">
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "getCommentId">>;
@@ -239,9 +261,13 @@ export type ContractReadFunctions = {
     args: ReadContractParameters<CommentManagerABIType, "getComment">
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "getComment">>;
 
-  isApproved: (
+  getIsApproved: (
     args: ReadContractParameters<CommentManagerABIType, "isApproved">
   ) => Promise<ReadContractReturnType<CommentManagerABIType, "isApproved">>;
+
+  getNonce: (
+    args: ReadContractParameters<CommentManagerABIType, "getNonce">
+  ) => Promise<ReadContractReturnType<CommentManagerABIType, "getNonce">>;
 
   name: (
     args: ReadContractParameters<CommentManagerABIType, "name">

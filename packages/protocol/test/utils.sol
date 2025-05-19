@@ -279,7 +279,8 @@ contract MockHook is BaseHook {
             Hooks.Permissions({
                 afterInitialize: false,
                 afterComment: true,
-                afterDeleteComment: false
+                afterDeleteComment: false,
+                afterEditComment: false
             });
     }
 

@@ -25,6 +25,18 @@ interface ICommentManager {
     /// @param author Address of the comment author
     event CommentDeleted(bytes32 indexed commentId, address indexed author);
 
+    /// @notice Emitted when a comment is edited
+    /// @param commentId Unique identifier of the edited comment
+    /// @param author Address of the comment author
+    /// @param app Address of the app signer
+    /// @param comment Struct containing all comment data
+    event CommentEdited(
+        bytes32 indexed commentId,
+        address indexed author,
+        address indexed app,
+        Comments.Comment comment
+    );
+
     /// @notice Emitted when an author approves an app signer
     /// @param author Address of the author giving approval
     /// @param app Address being approved
@@ -103,6 +115,28 @@ interface ICommentManager {
         bytes calldata appSignature
     ) external;
 
+    /// @notice Edits a comment when called by the author directly
+    /// @param commentId The unique identifier of the comment to edit
+    /// @param editData The comment data struct containing content and metadata
+    /// @param appSignature The signature from the app signer authorizing the edit
+    function editCommentAsAuthor(
+        bytes32 commentId,
+        Comments.EditComment calldata editData,
+        bytes calldata appSignature
+    ) external payable;
+
+    /// @notice Edits a comment with both author and app signer signatures
+    /// @param commentId The unique identifier of the comment to edit
+    /// @param editData The comment data struct containing content and metadata
+    /// @param authorSignature The signature from the author authorizing the edit (empty if app)
+    /// @param appSignature The signature from the app signer authorizing the edit (empty if author)
+    function editComment(
+        bytes32 commentId,
+        Comments.EditComment calldata editData,
+        bytes calldata authorSignature,
+        bytes calldata appSignature
+    ) external payable;
+
     /// @notice Approves an app signer when called directly by the author
     /// @param app The address to approve
     function addApprovalAsAuthor(address app) external;
@@ -180,6 +214,17 @@ interface ICommentManager {
         uint256 deadline
     ) external view returns (bytes32);
 
+    /// @notice Calculates the EIP-712 hash for editing a comment
+    /// @param commentId The unique identifier of the comment to edit
+    /// @param author The address of the comment author
+    /// @param editData The comment data struct containing content and metadata
+    /// @return The computed hash
+    function getEditCommentHash(
+        bytes32 commentId,
+        address author,
+        Comments.EditComment calldata editData
+    ) external view returns (bytes32);
+
     /// @notice Calculates the EIP-712 hash for a comment
     /// @param commentData The comment data struct to hash
     /// @return bytes32 The computed hash
@@ -219,7 +264,5 @@ interface ICommentManager {
     /// @notice Get the deleted status for a comment
     /// @param commentId The ID of the comment
     /// @return The deleted status
-    function isDeleted(
-        bytes32 commentId
-    ) external view returns (bool);
+    function isDeleted(bytes32 commentId) external view returns (bool);
 }

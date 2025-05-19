@@ -37,16 +37,23 @@ contract TokenGatedHook is BaseHook {
     ) internal view override returns (string memory hookData) {
         // Check if the comment author has enough tokens
         uint256 balance = token.balanceOf(commentData.author);
-        if(balance < requiredBalance) revert NotEnoughTokens();
+        if (balance < requiredBalance) revert NotEnoughTokens();
         return "";
     }
 
-    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            afterInitialize: false,
-            afterComment: true,
-            afterDeleteComment: false
-        });
+    function _getHookPermissions()
+        internal
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                afterInitialize: false,
+                afterComment: true,
+                afterDeleteComment: false,
+                afterEditComment: false
+            });
     }
 }
 

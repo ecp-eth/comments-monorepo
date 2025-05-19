@@ -6,7 +6,10 @@ import "../libraries/Hooks.sol";
 import "../libraries/Comments.sol";
 
 interface IHook is IERC165 {
-    function getHookPermissions() external pure returns (Hooks.Permissions memory);
+    function getHookPermissions()
+        external
+        pure
+        returns (Hooks.Permissions memory);
 
     /// @notice Execute after a hook is initialized on a channel
     /// @param channel The address of the channel the hook was added to
@@ -34,4 +37,15 @@ interface IHook is IERC165 {
         address caller,
         bytes32 commentId
     ) external payable returns (bool success);
+
+    /// @notice Execute after a comment is edited
+    /// @param commentData The comment data that was edited
+    /// @param caller The original msg.sender that initiated the transaction
+    /// @param commentId The unique identifier of the edited comment
+    /// @return commentHookData The comment hook data that was generated
+    function afterEditComment(
+        Comments.Comment calldata commentData,
+        address caller,
+        bytes32 commentId
+    ) external payable returns (string memory commentHookData);
 }

@@ -6,3 +6,5 @@ export { useCommentDeletion } from "./useCommentDeletion.js";
 export { useCommentSubmission } from "./useCommentSubmission.js";
 export { useCommentRetrySubmission } from "./useCommentRetrySubmission.js";
 export { useIsAccountStatusResolved } from "./useIsAccountStatusResolved.js";
+export { useCommentEdition } from "./useCommentEdition.js";
+export { useCommentRetryEdition } from "./useCommentRetryEdition.js";

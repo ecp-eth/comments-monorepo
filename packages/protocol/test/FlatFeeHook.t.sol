@@ -29,12 +29,19 @@ contract FlatFeeHook is BaseHook {
         feeCollector = _feeCollector;
     }
 
-    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            afterInitialize: false,
-            afterComment: true,
-            afterDeleteComment: false
-        });
+    function _getHookPermissions()
+        internal
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                afterInitialize: false,
+                afterComment: true,
+                afterDeleteComment: false,
+                afterEditComment: false
+            });
     }
 
     function _afterComment(
@@ -57,7 +64,6 @@ contract FlatFeeHook is BaseHook {
             }
         }
         return "";
-
     }
 
     function withdrawFees() external {
@@ -132,19 +138,18 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
             value: CHANNEL_CREATION_FEE
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
-        Comments.CreateComment memory commentData = Comments
-            .CreateComment({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.getNonce(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory commentData = Comments.CreateComment({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: comments.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
@@ -173,19 +178,18 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        Comments.CreateComment memory commentData = Comments
-            .CreateComment({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.getNonce(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory commentData = Comments.CreateComment({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: comments.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
@@ -220,19 +224,18 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        Comments.CreateComment memory commentData = Comments
-            .CreateComment({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.getNonce(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory commentData = Comments.CreateComment({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: comments.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
@@ -252,19 +255,18 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
         }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
 
         // Create comment data using direct construction
-        Comments.CreateComment memory commentData = Comments
-            .CreateComment({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.getNonce(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory commentData = Comments.CreateComment({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: comments.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // Make a few comments to collect fees
         for (uint i = 0; i < 3; i++) {

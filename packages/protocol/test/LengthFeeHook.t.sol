@@ -101,12 +101,19 @@ contract LengthFeeHook is BaseHook {
     // Allow receiving ETH in case it's sent by mistake
     receive() external payable {}
 
-    function _getHookPermissions() internal pure override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            afterInitialize: false,
-            afterComment: true,
-            afterDeleteComment: false
-        });
+    function _getHookPermissions()
+        internal
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                afterInitialize: false,
+                afterComment: true,
+                afterDeleteComment: false,
+                afterEditComment: false
+            });
     }
 }
 
@@ -309,19 +316,18 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
             ((expectedTotalFee * PROTOCOL_FEE_PERCENTAGE) / 10000);
 
         // Create comment data using direct construction
-        Comments.CreateComment memory commentData = Comments
-            .CreateComment({
-                content: content,
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.getNonce(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory commentData = Comments.CreateComment({
+            content: content,
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: comments.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
@@ -358,19 +364,18 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
         string memory content = "Test comment";
 
         // Create comment data using direct construction
-        Comments.CreateComment memory commentData = Comments
-            .CreateComment({
-                content: content,
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.getNonce(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory commentData = Comments.CreateComment({
+            content: content,
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: comments.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // Make a few comments to collect fees
         for (uint i = 0; i < 3; i++) {

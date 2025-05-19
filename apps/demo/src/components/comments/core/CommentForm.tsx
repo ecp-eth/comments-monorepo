@@ -1,6 +1,6 @@
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { z } from "zod";
@@ -16,31 +16,33 @@ import {
   createCommentRepliesQueryKey,
   createRootCommentsQueryKey,
 } from "./queries";
+import type { Comment } from "@ecp.eth/shared/schemas";
 
-export interface CommentFormProps<TExtraSubmitData = unknown> {
+type OnSubmitFunction = (params: {
+  author: Hex;
+  content: string;
+}) => Promise<void>;
+
+type BaseCommentFormProps = {
   /**
    * @default false
    */
   autoFocus?: boolean;
   disabled?: boolean;
+  defaultContent?: string;
   /**
-   * Called when user blurred text area with empty content
+   * Called when user pressed escape or left the form empty or unchanged (blurred with empty or unchanged content)
    */
-  onLeftEmpty?: () => void;
-  /**
-   * Called when transaction was created but not yet processed.
-   */
-  onSubmitStart?: () => void;
+  onCancel?: () => void;
   /**
    * Called when transaction was created and also successfully processed.
    */
   onSubmitSuccess?: OnSubmitSuccessFunction;
+  onSubmit: OnSubmitFunction;
   /**
-   * Extra data to be passed to post comment
+   * @default "What are your thoughts?"
    */
-  extra?: TExtraSubmitData;
   placeholder?: string;
-  parentId?: Hex;
   /**
    * @default "Post"
    */
@@ -49,65 +51,35 @@ export interface CommentFormProps<TExtraSubmitData = unknown> {
    * @default "Posting..."
    */
   submitPendingLabel?: string;
-}
+};
 
-export function CommentForm<TExtraSubmitData = unknown>({
-  autoFocus,
+function BaseCommentForm({
+  autoFocus = false,
+  defaultContent,
   disabled = false,
+  onCancel,
+  onSubmit,
   placeholder = "What are your thoughts?",
-  onLeftEmpty,
-  parentId,
   submitIdleLabel = "Post",
   submitPendingLabel = "Posting...",
-  onSubmitStart,
   onSubmitSuccess,
-  extra,
-}: CommentFormProps<TExtraSubmitData>) {
-  const { postComment } = useCommentActions<TExtraSubmitData>();
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const connectAccount = useConnectAccount();
-  const { address } = useAccount();
-  const [content, setContent] = useState("");
+}: BaseCommentFormProps) {
   const [formState, setFormState] = useState<"idle" | "post">("idle");
+  const { address } = useAccount();
+  const connectAccount = useConnectAccount();
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [content, setContent] = useState(defaultContent || "");
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
-  const onSubmitStartRef = useFreshRef(onSubmitStart);
 
-  const submitCommentMutation = useMutation({
+  const submitMutation = useMutation({
     mutationFn: async (formData: FormData): Promise<void> => {
       try {
         const author = await connectAccount();
-
         const submitAction = formData.get("action") as "post";
 
         setFormState(submitAction);
 
-        let queryKey: QueryKey;
-
-        if (parentId) {
-          queryKey = createCommentRepliesQueryKey(author, parentId);
-        } else {
-          queryKey = createRootCommentsQueryKey(author, window.location.href);
-        }
-
-        const result = await postComment({
-          address: author,
-          comment: parentId
-            ? {
-                author,
-                content,
-                parentId,
-              }
-            : {
-                author,
-                content,
-                targetUri: window.location.href,
-              },
-          queryKey,
-          extra,
-          onStart: () => {
-            onSubmitStartRef.current?.();
-          },
-        });
+        const result = await onSubmit({ author, content });
 
         return result;
       } catch (e) {
@@ -124,36 +96,48 @@ export function CommentForm<TExtraSubmitData = unknown>({
     },
     onSuccess() {
       setContent("");
-      submitCommentMutation.reset();
+      submitMutation.reset();
       onSubmitSuccessRef.current?.();
     },
   });
 
   useEffect(() => {
-    if (submitCommentMutation.error instanceof InvalidCommentError) {
+    if (submitMutation.error instanceof InvalidCommentError) {
       textAreaRef.current?.focus();
     }
-  }, [submitCommentMutation.error]);
+  }, [submitMutation.error]);
 
-  const isSubmitting = submitCommentMutation.isPending;
+  const isSubmitting = submitMutation.isPending;
   const trimmedContent = content.trim();
   const isContentValid = trimmedContent.length > 0;
 
   return (
     <form
-      action={submitCommentMutation.mutate}
+      action={submitMutation.mutateAsync}
       className="mb-4 flex flex-col gap-2"
     >
       <Textarea
         autoFocus={autoFocus}
         onBlur={() => {
-          if (!content && !isSubmitting) {
-            onLeftEmpty?.();
+          if (isSubmitting) {
+            return;
+          }
+
+          if (
+            !content ||
+            (defaultContent != null && content === defaultContent)
+          ) {
+            onCancel?.();
           }
         }}
         name="comment"
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        onKeyUp={(e) => {
+          if (!isSubmitting && e.key === "Escape") {
+            onCancel?.();
+          }
+        }}
         placeholder={placeholder}
         className="w-full p-2 border border-gray-300 rounded"
         disabled={isSubmitting || disabled}
@@ -174,9 +158,131 @@ export function CommentForm<TExtraSubmitData = unknown>({
           </Button>
         </div>
       </div>
-      {submitCommentMutation.error && (
-        <CommentFormErrors error={submitCommentMutation.error} />
+      {submitMutation.error && (
+        <CommentFormErrors error={submitMutation.error} />
       )}
     </form>
+  );
+}
+
+export type CommentFormProps<TExtraSubmitData = unknown> = Omit<
+  BaseCommentFormProps,
+  "onSubmit"
+> & {
+  /**
+   * Called when transaction was created but not yet processed.
+   */
+  onSubmitStart?: () => void;
+  /**
+   * Extra data to be passed to post comment
+   */
+  extra?: TExtraSubmitData;
+  parentId?: Hex;
+};
+
+export function CommentForm<TExtraSubmitData = unknown>({
+  parentId,
+  onSubmitStart,
+  extra,
+  ...props
+}: CommentFormProps<TExtraSubmitData>) {
+  const { postComment } = useCommentActions<TExtraSubmitData>();
+  const onSubmitStartRef = useFreshRef(onSubmitStart);
+
+  const handleSubmit = useCallback<OnSubmitFunction>(
+    async ({ author, content }) => {
+      let queryKey: QueryKey;
+
+      if (parentId) {
+        queryKey = createCommentRepliesQueryKey(author, parentId);
+      } else {
+        queryKey = createRootCommentsQueryKey(author, window.location.href);
+      }
+
+      const result = await postComment({
+        address: author,
+        comment: parentId
+          ? {
+              author,
+              content,
+              parentId,
+            }
+          : {
+              author,
+              content,
+              targetUri: window.location.href,
+            },
+        queryKey,
+        extra,
+        onStart: () => {
+          onSubmitStartRef.current?.();
+        },
+      });
+
+      return result;
+    },
+    [postComment, parentId, extra, onSubmitStartRef]
+  );
+
+  return <BaseCommentForm {...props} onSubmit={handleSubmit} />;
+}
+
+type CommentEditFormProps<TExtraEditData = unknown> = Omit<
+  BaseCommentFormProps,
+  "defaultContent" | "onSubmit"
+> & {
+  comment: Comment;
+  /**
+   * Query key to a query where comment is stored
+   */
+  queryKey: QueryKey;
+  /**
+   * Extra data to be passed to edit comment
+   */
+  extra?: TExtraEditData;
+  /**
+   * Called when transaction was created.
+   */
+  onSubmitStart?: () => void;
+};
+
+export function CommentEditForm<TExtraEditData = unknown>({
+  comment,
+  queryKey,
+  extra,
+  onSubmitStart,
+  submitIdleLabel = "Update",
+  submitPendingLabel = "Updating...",
+  ...props
+}: CommentEditFormProps<TExtraEditData>) {
+  const { editComment } = useCommentActions<TExtraEditData>();
+  const onSubmitStartRef = useFreshRef(onSubmitStart);
+
+  const handleSubmit = useCallback<OnSubmitFunction>(
+    async ({ author, content }) => {
+      const result = await editComment({
+        address: author,
+        comment,
+        edit: { content, metadata: comment.metadata },
+        queryKey,
+        extra,
+        onStart: () => {
+          onSubmitStartRef.current?.();
+        },
+      });
+
+      return result;
+    },
+    [editComment, comment, queryKey, extra, onSubmitStartRef]
+  );
+
+  return (
+    <BaseCommentForm
+      {...props}
+      defaultContent={comment.content}
+      onSubmit={handleSubmit}
+      submitIdleLabel={submitIdleLabel}
+      submitPendingLabel={submitPendingLabel}
+    />
   );
 }

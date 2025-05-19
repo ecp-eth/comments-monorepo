@@ -21,8 +21,8 @@ export class InvalidCommentError extends CommentFormSubmitError {
       return (
         <span className="inline-flex gap-1" key={field}>
           <strong>{field}: </strong>
-          {messages.map((message) => (
-            <span key={message}>{message}</span>
+          {messages.map((message, index) => (
+            <span key={`${field}-${index}`}>{message}</span>
           ))}
         </span>
       );

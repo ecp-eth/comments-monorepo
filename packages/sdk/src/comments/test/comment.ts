@@ -21,6 +21,11 @@ import {
   createCommentTypedData,
   createDeleteCommentTypedData,
   createCommentData,
+  editComment,
+  editCommentAsAuthor,
+  createEditCommentTypedData,
+  createEditCommentData,
+  getEditCommentHash,
 } from "../comment.js";
 import { addApprovalAsAuthor, revokeApprovalAsAuthor } from "../approval.js";
 import { CommentManagerABI } from "../../abis.js";
@@ -545,5 +550,263 @@ describe("getNonce()", () => {
     });
 
     assert.ok(typeof nonce === "bigint", "should return a bigint");
+  });
+});
+
+describe("editCommentAsAuthor()", () => {
+  let commentId: Hex;
+
+  beforeEach(async () => {
+    const nonce = await getNonce({
+      author: account.address,
+      app: appAccount.address,
+      readContract: client.readContract,
+      commentsAddress,
+    });
+
+    const commentData = createCommentData({
+      author: account.address,
+      app: appAccount.address,
+      content: "Test comment content",
+      metadata: { test: true },
+      nonce,
+      targetUri: "https://example.com",
+    });
+
+    const typedData = createCommentTypedData({
+      chainId: anvil.id,
+      commentData,
+      commentsAddress,
+    });
+
+    const appSignature = await appClient.signTypedData(typedData);
+
+    const result = await postCommentAsAuthor({
+      comment: commentData,
+      appSignature,
+      writeContract: client.writeContract,
+      commentsAddress,
+    });
+
+    const receipt = await client.waitForTransactionReceipt({
+      hash: result.txHash,
+    });
+
+    const logs = parseEventLogs({
+      abi: CommentManagerABI,
+      logs: receipt.logs,
+      eventName: "CommentAdded",
+    });
+
+    assert.ok(logs.length > 0, "CommentAdded event should be found");
+    commentId = logs[0]!.args.commentId;
+  });
+
+  it("edits a comment as author", async () => {
+    const nonce = await getNonce({
+      author: account.address,
+      app: appAccount.address,
+      readContract: client.readContract,
+      commentsAddress,
+    });
+    const edit = createEditCommentData({
+      app: appAccount.address,
+      commentId,
+      nonce,
+      content: "Updated comment content",
+      metadataObject: { test: true, updated: true },
+    });
+
+    const typedData = createEditCommentTypedData({
+      author: account.address,
+      edit,
+      chainId: anvil.id,
+      commentsAddress,
+    });
+
+    const appSignature = await appClient.signTypedData(typedData);
+
+    const result = await editCommentAsAuthor({
+      edit,
+      writeContract: client.writeContract,
+      commentsAddress,
+      appSignature,
+    });
+
+    const receipt = await client.waitForTransactionReceipt({
+      hash: result.txHash,
+    });
+
+    assert.equal(receipt.status, "success");
+
+    // Verify the comment was updated
+    const updatedComment = await getComment({
+      commentId,
+      readContract: client.readContract,
+      commentsAddress,
+    });
+
+    assert.equal(updatedComment.comment.content, "Updated comment content");
+  });
+});
+
+describe("editComment()", () => {
+  let commentId: Hex;
+
+  beforeEach(async () => {
+    const approvalResult = await addApprovalAsAuthor({
+      app: appAccount.address,
+      writeContract: client.writeContract,
+      commentsAddress,
+    });
+
+    await client.waitForTransactionReceipt({
+      hash: approvalResult.txHash,
+    });
+
+    const nonce = await getNonce({
+      author: account.address,
+      app: appAccount.address,
+      readContract: client.readContract,
+      commentsAddress,
+    });
+
+    const commentData = createCommentData({
+      author: account.address,
+      app: appAccount.address,
+      content: "Test comment content",
+      targetUri: "https://example.com",
+      nonce,
+    });
+
+    const appSignature = await appClient.signTypedData(
+      createCommentTypedData({
+        chainId: anvil.id,
+        commentData,
+        commentsAddress,
+      })
+    );
+
+    const postResult = await postCommentAsAuthor({
+      comment: commentData,
+      appSignature,
+      writeContract: client.writeContract,
+      commentsAddress,
+    });
+
+    const receipt = await client.waitForTransactionReceipt({
+      hash: postResult.txHash,
+    });
+
+    const logs = parseEventLogs({
+      abi: CommentManagerABI,
+      logs: receipt.logs,
+      eventName: "CommentAdded",
+    });
+
+    assert.ok(logs.length > 0, "CommentAdded event should be found");
+    commentId = logs[0]!.args.commentId;
+  });
+
+  it("edits a comment with signatures", async () => {
+    const nonce = await getNonce({
+      author: account.address,
+      app: appAccount.address,
+      readContract: client.readContract,
+      commentsAddress,
+    });
+
+    const edit = createEditCommentData({
+      app: appAccount.address,
+      commentId,
+      nonce,
+      content: "Updated comment content",
+      metadataObject: { test: true, updated: true },
+    });
+
+    const typedData = createEditCommentTypedData({
+      author: account.address,
+      chainId: anvil.id,
+      edit,
+      commentsAddress,
+    });
+
+    const appSignature = await appClient.signTypedData(typedData);
+
+    const result = await editComment({
+      edit,
+      appSignature,
+      writeContract: appClient.writeContract,
+      commentsAddress,
+    });
+
+    const receipt = await appClient.waitForTransactionReceipt({
+      hash: result.txHash,
+    });
+
+    assert.equal(receipt.status, "success");
+
+    // Verify the comment was updated
+    const updatedComment = await getComment({
+      commentId,
+      readContract: client.readContract,
+      commentsAddress,
+    });
+
+    assert.equal(updatedComment.comment.content, "Updated comment content");
+  });
+
+  it("fails with invalid signatures", async () => {
+    const nonce = await getNonce({
+      author: account.address,
+      app: appAccount.address,
+      readContract: client.readContract,
+      commentsAddress,
+    });
+
+    const edit = createEditCommentData({
+      app: appAccount.address,
+      commentId,
+      nonce,
+      content: "Updated comment content",
+      metadataObject: { test: true, updated: true },
+    });
+
+    await assert.rejects(
+      () =>
+        editComment({
+          edit,
+          appSignature: "0x1234", // Invalid signature
+          writeContract: appClient.writeContract,
+          commentsAddress,
+        }),
+      (err) => {
+        assert.ok(err instanceof ContractFunctionExecutionError);
+        return true;
+      }
+    );
+  });
+});
+
+describe("getEditCommentHash()", () => {
+  it("returns hash for comment edit", async () => {
+    const edit = createEditCommentData({
+      app: appAccount.address,
+      commentId:
+        "0x1234567890123456789012345678901234567890123456789012345678901234",
+      nonce: 1n,
+      content: "Updated comment content",
+      metadataObject: { test: true, updated: true },
+    });
+
+    const result = await getEditCommentHash({
+      author: account.address,
+      edit,
+      readContract: client.readContract,
+      commentsAddress,
+    });
+
+    assert.ok(result.startsWith("0x"), "should return a hex string");
+    assert.equal(result.length, 66, "should be 32 bytes + 0x prefix");
   });
 });
