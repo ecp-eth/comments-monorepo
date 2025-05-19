@@ -1085,7 +1085,11 @@ contract CommentsTest is Test, IERC721Receiver {
         bytes32 commentId = comments.getCommentId(commentData);
 
         // Post the comment
-        bytes memory appSignature = _signEIP712(appPrivateKey, commentId);
+        bytes memory appSignature = TestUtils.signEIP712(
+            vm,
+            appPrivateKey,
+            commentId
+        );
         vm.prank(author);
         comments.postCommentAsAuthor(commentData, appSignature);
 
@@ -1096,7 +1100,11 @@ contract CommentsTest is Test, IERC721Receiver {
             commentData.author,
             editData
         );
-        bytes memory editAppSignature = _signEIP712(appPrivateKey, editHash);
+        bytes memory editAppSignature = TestUtils.signEIP712(
+            vm,
+            appPrivateKey,
+            editHash
+        );
 
         Comments.Comment memory expectedCommentData = comments.getComment(
             commentId
@@ -1105,7 +1113,7 @@ contract CommentsTest is Test, IERC721Receiver {
         expectedCommentData.content = editData.content;
         expectedCommentData.metadata = editData.metadata;
         expectedCommentData.updatedAt = uint80(block.timestamp);
-        expectedCommentData.commentHookData = "hook data";
+        expectedCommentData.hookData = "hook data";
 
         vm.prank(author);
         vm.expectEmit(true, true, true, true);
@@ -1117,7 +1125,7 @@ contract CommentsTest is Test, IERC721Receiver {
         assertEq(editedComment.content, editData.content);
         assertEq(editedComment.metadata, editData.metadata);
         assertEq(editedComment.updatedAt, uint80(block.timestamp));
-        assertEq(editedComment.commentHookData, "hook data");
+        assertEq(editedComment.hookData, "hook data");
     }
 
     function test_EditCommentAsAuthor_RejectedByHook() public {

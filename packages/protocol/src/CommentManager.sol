@@ -257,17 +257,15 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             editData
         );
 
-        // Validate signatures if present
-        if (appSignature.length > 0) {
-            if (
-                !SignatureChecker.isValidSignatureNow(
-                    editData.app,
-                    editHash,
-                    appSignature
-                )
-            ) {
-                revert InvalidAppSignature();
-            }
+        // Validate app signature
+        if (
+            !SignatureChecker.isValidSignatureNow(
+                editData.app,
+                editHash,
+                appSignature
+            )
+        ) {
+            revert InvalidAppSignature();
         }
 
         if (
@@ -297,11 +295,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             uint256 msgValueAfterFee = channelManager
                 .deductProtocolHookTransactionFee(msg.value);
 
-            string memory commentHookData = channel.hook.afterEditComment{
+            string memory hookData = channel.hook.afterEditComment{
                 value: msgValueAfterFee
             }(comment, msg.sender, commentId);
 
-            comment.commentHookData = commentHookData;
+            comment.hookData = hookData;
         }
 
         emit CommentEdited(commentId, comment.author, editData.app, comment);
