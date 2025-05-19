@@ -11,6 +11,6 @@ export function cn(...inputs: ClassValue[]) {
 export function formatAuthorLink(author: AuthorType): string | null {
   return formatAuthorLinkWithTemplate(
     author,
-    publicEnv.NEXT_PUBLIC_COMMENT_AUTHOR_URL
+    publicEnv.NEXT_PUBLIC_COMMENT_AUTHOR_URL,
   );
 }

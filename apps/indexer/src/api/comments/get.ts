@@ -67,7 +67,7 @@ export default (app: OpenAPIHono) => {
       if (viewer) {
         const approvedOrViewersComments = or(
           approvedComments,
-          eq(schema.comments.author, viewer)
+          eq(schema.comments.author, viewer),
         );
 
         sharedConditions.push(approvedOrViewersComments);
@@ -89,9 +89,9 @@ export default (app: OpenAPIHono) => {
                     or(
                       and(
                         eq(schema.comments.createdAt, cursor.createdAt),
-                        lt(schema.comments.id, cursor.id)
+                        lt(schema.comments.id, cursor.id),
                       ),
-                      lt(schema.comments.createdAt, cursor.createdAt)
+                      lt(schema.comments.createdAt, cursor.createdAt),
                     ),
                   ]
                 : []),
@@ -100,12 +100,12 @@ export default (app: OpenAPIHono) => {
                     or(
                       and(
                         eq(schema.comments.createdAt, cursor.createdAt),
-                        gt(schema.comments.id, cursor.id)
+                        gt(schema.comments.id, cursor.id),
                       ),
-                      gt(schema.comments.createdAt, cursor.createdAt)
+                      gt(schema.comments.createdAt, cursor.createdAt),
                     ),
                   ]
-                : [])
+                : []),
             ),
             orderBy:
               sort === "desc"
@@ -130,9 +130,9 @@ export default (app: OpenAPIHono) => {
               or(
                 and(
                   eq(schema.comments.createdAt, cursor.createdAt),
-                  lt(schema.comments.id, cursor.id)
+                  lt(schema.comments.id, cursor.id),
                 ),
-                lt(schema.comments.createdAt, cursor.createdAt)
+                lt(schema.comments.createdAt, cursor.createdAt),
               ),
             ]
           : []),
@@ -141,12 +141,12 @@ export default (app: OpenAPIHono) => {
               or(
                 and(
                   eq(schema.comments.createdAt, cursor.createdAt),
-                  gt(schema.comments.id, cursor.id)
+                  gt(schema.comments.id, cursor.id),
                 ),
-                gt(schema.comments.createdAt, cursor.createdAt)
+                gt(schema.comments.createdAt, cursor.createdAt),
               ),
             ]
-          : [])
+          : []),
       ),
       orderBy:
         sort === "desc"
@@ -170,7 +170,7 @@ export default (app: OpenAPIHono) => {
 
     return c.json(
       IndexerAPIListCommentsOutputSchema.parse(formattedComments),
-      200
+      200,
     );
   });
 

@@ -62,12 +62,12 @@ export function useCommentEdition(): CommentEditionAPI {
 
           return markPendingEditCommentAsPending(
             queryData,
-            params.pendingOperation
+            params.pendingOperation,
           );
-        }
+        },
       );
     },
-    [client]
+    [client],
   );
 
   const success = useCallback<OnCommentEditionSuccess>(
@@ -83,14 +83,14 @@ export function useCommentEdition(): CommentEditionAPI {
 
           return markPendingEditCommentAsEdited(
             queryData,
-            params.pendingOperation.response.data.commentId
+            params.pendingOperation.response.data.commentId,
           );
-        }
+        },
       );
 
       toast.success("Comment updated");
     },
-    [client]
+    [client],
   );
 
   const error = useCallback<OnCommentEditionError>(
@@ -107,14 +107,14 @@ export function useCommentEdition(): CommentEditionAPI {
           return markPendingPostCommentAsFailed(
             queryData,
             params.commentId,
-            params.error
+            params.error,
           );
-        }
+        },
       );
 
       toast.error("Failed to post comment");
     },
-    [client]
+    [client],
   );
 
   return useMemo(
@@ -123,6 +123,6 @@ export function useCommentEdition(): CommentEditionAPI {
       success,
       error,
     }),
-    [start, success, error]
+    [start, success, error],
   );
 }

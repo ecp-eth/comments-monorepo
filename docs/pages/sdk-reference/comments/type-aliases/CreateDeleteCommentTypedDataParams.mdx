@@ -18,7 +18,7 @@ type CreateDeleteCommentTypedDataParams = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:570](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L570)
+Defined in: [packages/sdk/src/comments/comment.ts:562](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L562)
 
 ## Properties
 
@@ -28,7 +28,9 @@ Defined in: [packages/sdk/src/comments/comment.ts:570](https://github.com/ecp-et
 app: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:574](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L574)
+Defined in: [packages/sdk/src/comments/comment.ts:572](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L572)
+
+The app signer
 
 ***
 
@@ -38,7 +40,9 @@ Defined in: [packages/sdk/src/comments/comment.ts:574](https://github.com/ecp-et
 author: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:573](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L573)
+Defined in: [packages/sdk/src/comments/comment.ts:568](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L568)
+
+The author of the comment
 
 ***
 
@@ -48,7 +52,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:573](https://github.com/ecp-et
 chainId: number;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:572](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L572)
+Defined in: [packages/sdk/src/comments/comment.ts:564](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L564)
 
 ***
 
@@ -58,7 +62,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:572](https://github.com/ecp-et
 commentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:571](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L571)
+Defined in: [packages/sdk/src/comments/comment.ts:563](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L563)
 
 ***
 
@@ -68,7 +72,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:571](https://github.com/ecp-et
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:581](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L581)
+Defined in: [packages/sdk/src/comments/comment.ts:587](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L587)
 
 The address of the comments contract
 
@@ -86,7 +90,15 @@ COMMENT_MANAGER_ADDRESS
 optional deadline: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:576](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L576)
+Defined in: [packages/sdk/src/comments/comment.ts:582](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L582)
+
+The deadline of the comment
+
+#### Default
+
+```ts
+1 day from now
+```
 
 ***
 
@@ -96,4 +108,6 @@ Defined in: [packages/sdk/src/comments/comment.ts:576](https://github.com/ecp-et
 nonce: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:575](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L575)
+Defined in: [packages/sdk/src/comments/comment.ts:576](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L576)
+
+The nonce of author and app

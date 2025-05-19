@@ -68,6 +68,6 @@ export function useDeleteComment(): OnCommentDelete {
         throw e;
       }
     },
-    [client]
+    [client],
   );
 }

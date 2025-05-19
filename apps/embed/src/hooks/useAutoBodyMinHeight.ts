@@ -1,6 +1,10 @@
 "use client";
 
-import { useChainModal, useConnectModal, useAccountModal } from "@rainbow-me/rainbowkit";
+import {
+  useChainModal,
+  useConnectModal,
+  useAccountModal,
+} from "@rainbow-me/rainbowkit";
 import { useEffect, useState } from "react";
 
 export function useAutoBodyMinHeight() {
@@ -10,7 +14,7 @@ export function useAutoBodyMinHeight() {
   const [hasMinHeight, setHasMinHeight] = useState(false);
 
   useEffect(() => {
-    setHasMinHeight(connectModalOpen || accountModalOpen || chainModalOpen)
+    setHasMinHeight(connectModalOpen || accountModalOpen || chainModalOpen);
   }, [connectModalOpen, accountModalOpen, chainModalOpen]);
 
   useEffect(() => {
@@ -18,19 +22,21 @@ export function useAutoBodyMinHeight() {
       return;
     }
 
-    const body = document.body
-    const currentMinHeight = parseFloat(getComputedStyle(document.body).minHeight)
+    const body = document.body;
+    const currentMinHeight = parseFloat(
+      getComputedStyle(document.body).minHeight,
+    );
 
     if (currentMinHeight >= 570) {
-      return
+      return;
     }
 
-    const originalMinHeight = body.style.minHeight
+    const originalMinHeight = body.style.minHeight;
 
-    body.style.minHeight = '570px'
+    body.style.minHeight = "570px";
 
     return () => {
-      body.style.minHeight = originalMinHeight
-    }
-  }, [hasMinHeight])
+      body.style.minHeight = originalMinHeight;
+    };
+  }, [hasMinHeight]);
 }

@@ -76,7 +76,7 @@ function RepliesSection({
         // to fill the screen
         // cursor: pageParam,
         limit: Math.ceil(
-          Dimensions.get("window").height / COMMENT_BOX_AVERAGE_HEIGHT
+          Dimensions.get("window").height / COMMENT_BOX_AVERAGE_HEIGHT,
         ),
       },
       queryFn: ({ pageParam, signal }) => {

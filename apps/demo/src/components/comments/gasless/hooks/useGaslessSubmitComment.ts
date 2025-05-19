@@ -59,7 +59,7 @@ export function useGaslessSubmitComment(
     PendingPostCommentOperationSchemaType,
     Error,
     SubmitGaslessCommentVariables
-  >
+  >,
 ) {
   const connectAccount = useConnectAccount();
 
@@ -71,7 +71,7 @@ export function useGaslessSubmitComment(
         // tell the server to submit right away after preparation of the comment data,
         // if the app is previously approved
         true,
-        variables
+        variables,
       );
     },
   });
@@ -106,7 +106,7 @@ export function useGaslessSubmitComment(
             ...variables,
             authorSignature: signature,
           },
-          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+          bigintReplacer, // because typed data contains a bigint when parsed using our zod schemas
         ),
       });
 
@@ -117,7 +117,7 @@ export function useGaslessSubmitComment(
 
         if (response.status === 400) {
           throw new InvalidCommentError(
-            BadRequestResponseSchema.parse(await response.json())
+            BadRequestResponseSchema.parse(await response.json()),
           );
         }
 
@@ -125,7 +125,7 @@ export function useGaslessSubmitComment(
       }
 
       const { txHash } = GaslessPostCommentResponseSchema.parse(
-        await response.json()
+        await response.json(),
       );
 
       return {
@@ -220,7 +220,7 @@ export function useGaslessEditComment(
     PendingEditCommentOperationSchemaType,
     Error,
     SubmitGaslessEditCommentVariables
-  >
+  >,
 ) {
   const connectAccount = useConnectAccount();
 
@@ -228,13 +228,13 @@ export function useGaslessEditComment(
   // user approval for signature for each interaction
   const editPriorApprovedCommentMutation = useMutation({
     mutationFn: async (
-      variables: SubmitGaslessEditCommentVariablesInternal
+      variables: SubmitGaslessEditCommentVariablesInternal,
     ) => {
       return prepareSignedGaslessEditComment(
         // tell the server to submit right away after preparation of the comment data,
         // if the app is previously approved
         true,
-        variables
+        variables,
       );
     },
   });
@@ -266,7 +266,7 @@ export function useGaslessEditComment(
             ...variables,
             authorSignature: signature,
           },
-          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+          bigintReplacer, // because typed data contains a bigint when parsed using our zod schemas
         ),
       });
 
@@ -277,7 +277,7 @@ export function useGaslessEditComment(
 
         if (response.status === 400) {
           throw new InvalidCommentError(
-            BadRequestResponseSchema.parse(await response.json())
+            BadRequestResponseSchema.parse(await response.json()),
           );
         }
 

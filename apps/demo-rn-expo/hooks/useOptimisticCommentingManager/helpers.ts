@@ -15,8 +15,8 @@ export function everyIndexerAPIListComments(
   indexerAPIListCommentResult: IndexerAPIListCommentRepliesSchemaType,
   callback: (
     indexerAPIComment: IndexerAPICommentSchemaType,
-    parentStructure: IndexerAPIListCommentRepliesSchemaType
-  ) => boolean | undefined
+    parentStructure: IndexerAPIListCommentRepliesSchemaType,
+  ) => boolean | undefined,
 ) {
   const comments = indexerAPIListCommentResult.results;
 
@@ -42,7 +42,7 @@ export function everyIndexerAPIListComments(
  * @returns
  */
 export function isIndexerAPICommentWithRepliesSchema(
-  indexerAPIComment: IndexerAPICommentSchemaType
+  indexerAPIComment: IndexerAPICommentSchemaType,
 ): indexerAPIComment is IndexerAPICommentWithRepliesSchemaType {
   try {
     IndexerAPICommentWithRepliesSchema.parse(indexerAPIComment);

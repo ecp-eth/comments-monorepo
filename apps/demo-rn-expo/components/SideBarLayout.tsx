@@ -112,7 +112,7 @@ function useSideBarAnimatedStyle(sideBarWidth: number) {
   const translateX = useSharedValue(-1 * sideBarWidth);
   // for manual activation detection
   const initialTouchLocation = useSharedValue<{ x: number; y: number } | null>(
-    null
+    null,
   );
   // for dragging
   const initialX = useSharedValue(0);
@@ -131,7 +131,7 @@ function useSideBarAnimatedStyle(sideBarWidth: number) {
       }
 
       const deltaX = Math.abs(
-        event.changedTouches[0].x - initialTouchLocation.value.x
+        event.changedTouches[0].x - initialTouchLocation.value.x,
       );
 
       if (deltaX > 20) {
@@ -178,7 +178,7 @@ function useSideBarAnimatedStyle(sideBarWidth: number) {
   const toggleSideBar = () => {
     translateX.value = withTiming(
       translateX.value === 0 ? -1 * sideBarWidth : 0,
-      { duration: SIDE_BAR_ANIMATION_DURATION }
+      { duration: SIDE_BAR_ANIMATION_DURATION },
     );
   };
 

@@ -60,7 +60,7 @@ const CreateChannelParamsSchema = z.object({
  * @returns The transaction hash of the created channel
  */
 export async function createChannel(
-  params: CreateChannelParams
+  params: CreateChannelParams,
 ): Promise<CreateChannelResult> {
   const { name, description, metadata, hook, channelManagerAddress, fee } =
     CreateChannelParamsSchema.parse(params);
@@ -113,7 +113,7 @@ const GetChannelParamsSchema = z.object({
  * @returns The channel
  */
 export async function getChannel(
-  params: GetChannelParams
+  params: GetChannelParams,
 ): Promise<GetChannelResult> {
   const { channelId, channelManagerAddress } =
     GetChannelParamsSchema.parse(params);
@@ -180,7 +180,7 @@ const UpdateChannelParamsSchema = z.object({
  * @returns The transaction hash of the updated channel
  */
 export async function updateChannel(
-  params: UpdateChannelParams
+  params: UpdateChannelParams,
 ): Promise<UpdateChannelResult> {
   const { channelId, name, description, metadata, channelManagerAddress } =
     UpdateChannelParamsSchema.parse(params);
@@ -223,7 +223,7 @@ const ChannelExistsParamsSchema = z.object({
  * @returns Whether the channel exists
  */
 export async function channelExists(
-  params: ChannelExistsParams
+  params: ChannelExistsParams,
 ): Promise<boolean> {
   const { channelId, channelManagerAddress } =
     ChannelExistsParamsSchema.parse(params);
@@ -268,7 +268,7 @@ const GetChannelOwnerParamsSchema = z.object({
  * @returns The owner of the channel
  */
 export async function getChannelOwner(
-  params: GetChannelOwnerParams
+  params: GetChannelOwnerParams,
 ): Promise<GetChannelOwnerResult> {
   const { channelId, channelManagerAddress } =
     GetChannelOwnerParamsSchema.parse(params);
@@ -310,7 +310,7 @@ const GetChannelCreationFeeParamsSchema = z.object({
  * @returns The creation fee from channel manager
  */
 export async function getChannelCreationFee(
-  params: GetChannelCreationFeeParams
+  params: GetChannelCreationFeeParams,
 ): Promise<GetChannelCreationFeeResult> {
   const { channelManagerAddress } =
     GetChannelCreationFeeParamsSchema.parse(params);
@@ -355,7 +355,7 @@ const SetChannelCreationFeeParamsSchema = z.object({
  * @returns The transaction hash of the set creation fee
  */
 export async function setChannelCreationFee(
-  params: SetChannelCreationFeeParams
+  params: SetChannelCreationFeeParams,
 ): Promise<SetChannelCreationFeeResult> {
   const { channelManagerAddress, fee } =
     SetChannelCreationFeeParamsSchema.parse(params);
@@ -400,7 +400,7 @@ const WithdrawFeesParamsSchema = z.object({
  * @returns The transaction hash of the withdrawal
  */
 export async function withdrawFees(
-  params: WithdrawFeesParams
+  params: WithdrawFeesParams,
 ): Promise<WithdrawFeesResult> {
   const { recipient, channelManagerAddress } =
     WithdrawFeesParamsSchema.parse(params);
@@ -445,7 +445,7 @@ const UpdateCommentsContractParamsSchema = z.object({
  * @returns The transaction hash of the updated comments contract address
  */
 export async function updateCommentsContract(
-  params: UpdateCommentsContractParams
+  params: UpdateCommentsContractParams,
 ): Promise<UpdateCommentsContractResult> {
   const { commentsContract, channelManagerAddress } =
     UpdateCommentsContractParamsSchema.parse(params);
@@ -490,7 +490,7 @@ const SetBaseURIParamsSchema = z.object({
  * @returns The transaction hash of the set base URI
  */
 export async function setBaseURI(
-  params: SetBaseURIParams
+  params: SetBaseURIParams,
 ): Promise<SetBaseURIResult> {
   const { baseURI, channelManagerAddress } =
     SetBaseURIParamsSchema.parse(params);

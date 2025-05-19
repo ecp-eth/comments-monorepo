@@ -53,19 +53,19 @@ program
 
           nodeFs.writeFileSync(
             `${proxyDir}/package.json`,
-            `${JSON.stringify({ type: "module", types, main }, undefined, 2)}\n`
+            `${JSON.stringify({ type: "module", types, main }, undefined, 2)}\n`,
           );
 
           console.log(`created ${key} at (${proxyDir})`);
         },
-        false
+        false,
       );
 
       console.log(`Done processing ${pkg.name}`);
     });
 
     console.log(
-      `${chalk.green.bold("Done!")} Total generated proxy packages: ${results.length}.`
+      `${chalk.green.bold("Done!")} Total generated proxy packages: ${results.length}.`,
     );
   });
 
@@ -92,14 +92,14 @@ program
 
           console.log(`cleaned ${key} at (${proxyDir})`);
         },
-        false
+        false,
       );
 
       console.log(`Done processing ${pkg.name}`);
     });
 
     console.log(
-      `${chalk.green.bold("Done!")} Total cleaned proxy packages: ${results.length}.`
+      `${chalk.green.bold("Done!")} Total cleaned proxy packages: ${results.length}.`,
     );
   });
 
@@ -144,13 +144,13 @@ program
           // Check and update VS Code settings
           const vscodeSettingsPath = nodePath.join(
             projectRoot,
-            ".vscode/settings.json"
+            ".vscode/settings.json",
           );
           let settings: { "files.exclude"?: Record<string, unknown> } = {};
 
           if (nodeFs.existsSync(vscodeSettingsPath)) {
             settings = JSON.parse(
-              nodeFs.readFileSync(vscodeSettingsPath, "utf-8")
+              nodeFs.readFileSync(vscodeSettingsPath, "utf-8"),
             );
           } else {
             nodeFs.mkdirSync(nodePath.dirname(vscodeSettingsPath), {
@@ -164,19 +164,19 @@ program
             settings["files.exclude"][relativePath] = true;
             nodeFs.writeFileSync(
               vscodeSettingsPath,
-              JSON.stringify(settings, null, 2)
+              JSON.stringify(settings, null, 2),
             );
             console.log(`Added ${relativePath} to VS Code files.exclude`);
           }
         },
-        true
+        true,
       );
 
       console.log(`Done processing ${pkg.name}`);
     });
 
     console.log(
-      `${chalk.green.bold("Done!")} Total hidden proxy packages: ${results.length}.`
+      `${chalk.green.bold("Done!")} Total hidden proxy packages: ${results.length}.`,
     );
   });
 

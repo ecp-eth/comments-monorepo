@@ -101,7 +101,7 @@ export function PriceView({
 
       const response = await fetch(
         `/api/0x/price?${new URLSearchParams(params).toString()}`,
-        { signal }
+        { signal },
       );
 
       const responseData = await response.json();
@@ -260,7 +260,7 @@ export function PriceView({
             Affiliate Fee:{" "}
             {formatUnits(
               BigInt(price.fees.integratorFee.amount),
-              BASE_TOKENS_BY_SYMBOL[buyToken].decimals
+              BASE_TOKENS_BY_SYMBOL[buyToken].decimals,
             )}{" "}
             {BASE_TOKENS_BY_SYMBOL[buyToken].symbol}
           </div>

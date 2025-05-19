@@ -34,7 +34,7 @@ export default (app: OpenAPIHono) => {
     const query = db.query.approvals.findMany({
       where: and(
         eq(schema.approvals.author, author),
-        eq(schema.approvals.app, app)
+        eq(schema.approvals.app, app),
       ),
       orderBy: desc(schema.approvals.deletedAt),
       limit: limit + 1,

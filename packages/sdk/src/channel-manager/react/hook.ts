@@ -72,7 +72,7 @@ export type UseGetHookTransactionFeeResult = UseQueryResult<
  */
 export function useGetHookTransactionFee(
   params: UseGetHookTransactionFeeParams = {},
-  options: UseGetHookTransactionFeeOptions = {}
+  options: UseGetHookTransactionFeeOptions = {},
 ): UseGetHookTransactionFeeResult {
   const client = usePublicClient();
 
@@ -121,7 +121,7 @@ export type UseSetHookTransactionFeeResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useSetHookTransactionFee(
-  options: UseSetHookTransactionFeeOptions = {}
+  options: UseSetHookTransactionFeeOptions = {},
 ): UseSetHookTransactionFeeResult {
   const { writeContractAsync } = useWriteContract();
 

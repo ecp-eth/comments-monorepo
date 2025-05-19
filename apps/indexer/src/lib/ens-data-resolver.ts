@@ -21,7 +21,7 @@ export type ResolvedEnsData = {
 
 async function resolveEnsData(
   client: PublicClient,
-  address: Hex
+  address: Hex,
 ): Promise<ResolvedEnsData> {
   const name = await client.getEnsName({ address });
 
@@ -68,12 +68,12 @@ function createEnsResolverLoader() {
   return new DataLoader<Hex, ResolvedEnsData>(
     async (addresses) => {
       return Promise.all(
-        addresses.map((address) => resolveEnsData(publicClient, address))
+        addresses.map((address) => resolveEnsData(publicClient, address)),
       );
     },
     {
       cacheMap,
-    }
+    },
   );
 }
 

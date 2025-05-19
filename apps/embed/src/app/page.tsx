@@ -17,7 +17,7 @@ type EmbedPageProps = {
 
 export default async function EmbedPage({ searchParams }: EmbedPageProps) {
   const parseSearchParamsResult = SearchParamsSchema.safeParse(
-    await searchParams
+    await searchParams,
   );
 
   if (!parseSearchParamsResult.success) {
@@ -29,7 +29,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
             {JSON.stringify(
               parseSearchParamsResult.error.flatten().fieldErrors,
               null,
-              "  "
+              "  ",
             )}
           </pre>
         }
@@ -62,7 +62,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
           <div
             className={cn(
               "mx-auto",
-              config.restrictMaximumContainerWidth && "max-w-4xl"
+              config.restrictMaximumContainerWidth && "max-w-4xl",
             )}
           >
             <CommentSection

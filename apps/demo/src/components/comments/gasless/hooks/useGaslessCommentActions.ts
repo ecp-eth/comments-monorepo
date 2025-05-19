@@ -99,7 +99,7 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, deleteCommentMutation, hasApproval, commentDeletion]
+    [wagmiConfig, deleteCommentMutation, hasApproval, commentDeletion],
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(
@@ -156,7 +156,7 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, submitComment, commentRetrySubmission]
+    [wagmiConfig, submitComment, commentRetrySubmission],
   );
 
   const postComment = useCallback<OnPostComment>(
@@ -204,7 +204,7 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, hasApproval, commentSubmission, submitComment]
+    [wagmiConfig, hasApproval, commentSubmission, submitComment],
   );
 
   const editComment = useCallback<OnEditComment>(
@@ -245,7 +245,7 @@ export function useGaslessCommentActions({
         });
       }
     },
-    [hasApproval, submitEditComment, commentEdition, wagmiConfig]
+    [hasApproval, submitEditComment, commentEdition, wagmiConfig],
   );
 
   const retryEditComment = useCallback<OnRetryEditComment>(
@@ -302,7 +302,7 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [submitEditComment, commentRetryEdition, wagmiConfig]
+    [submitEditComment, commentRetryEdition, wagmiConfig],
   );
 
   return useMemo(
@@ -319,6 +319,6 @@ export function useGaslessCommentActions({
       postComment,
       editComment,
       retryEditComment,
-    ]
+    ],
   );
 }

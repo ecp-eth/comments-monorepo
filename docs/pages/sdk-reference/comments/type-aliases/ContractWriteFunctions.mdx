@@ -12,6 +12,8 @@ type ContractWriteFunctions = {
   addApprovalAsAuthor: (args) => Promise<Hex>;
   deleteComment: (args) => Promise<Hex>;
   deleteCommentAsAuthor: (args) => Promise<Hex>;
+  editComment: (args) => Promise<Hex>;
+  editCommentAsAuthor: (args) => Promise<Hex>;
   postComment: (args) => Promise<Hex>;
   postCommentAsAuthor: (args) => Promise<Hex>;
   removeApproval: (args) => Promise<Hex>;
@@ -22,7 +24,7 @@ type ContractWriteFunctions = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:121](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L121)
+Defined in: [packages/sdk/src/comments/types.ts:117](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L117)
 
 ## Properties
 
@@ -32,7 +34,7 @@ Defined in: [packages/sdk/src/comments/types.ts:121](https://github.com/ecp-eth/
 addApproval: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:142](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L142)
+Defined in: [packages/sdk/src/comments/types.ts:138](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L138)
 
 #### Parameters
 
@@ -52,7 +54,7 @@ Defined in: [packages/sdk/src/comments/types.ts:142](https://github.com/ecp-eth/
 addApprovalAsAuthor: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:150](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L150)
+Defined in: [packages/sdk/src/comments/types.ts:146](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L146)
 
 #### Parameters
 
@@ -72,7 +74,7 @@ Defined in: [packages/sdk/src/comments/types.ts:150](https://github.com/ecp-eth/
 deleteComment: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:158](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L158)
+Defined in: [packages/sdk/src/comments/types.ts:154](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L154)
 
 #### Parameters
 
@@ -92,7 +94,7 @@ Defined in: [packages/sdk/src/comments/types.ts:158](https://github.com/ecp-eth/
 deleteCommentAsAuthor: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:166](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L166)
+Defined in: [packages/sdk/src/comments/types.ts:162](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L162)
 
 #### Parameters
 
@@ -106,13 +108,57 @@ Defined in: [packages/sdk/src/comments/types.ts:166](https://github.com/ecp-eth/
 
 ***
 
+### editComment()
+
+```ts
+editComment: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:170](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L170)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"payable"`, `"editComment"`\> & \{
+  `value?`: `bigint`;
+\}
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
+### editCommentAsAuthor()
+
+```ts
+editCommentAsAuthor: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:180](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L180)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"payable"`, `"editCommentAsAuthor"`\> & \{
+  `value?`: `bigint`;
+\}
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
 ### postComment()
 
 ```ts
 postComment: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:122](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L122)
+Defined in: [packages/sdk/src/comments/types.ts:118](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L118)
 
 #### Parameters
 
@@ -134,7 +180,7 @@ Defined in: [packages/sdk/src/comments/types.ts:122](https://github.com/ecp-eth/
 postCommentAsAuthor: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:132](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L132)
+Defined in: [packages/sdk/src/comments/types.ts:128](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L128)
 
 #### Parameters
 
@@ -156,7 +202,7 @@ Defined in: [packages/sdk/src/comments/types.ts:132](https://github.com/ecp-eth/
 removeApproval: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:174](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L174)
+Defined in: [packages/sdk/src/comments/types.ts:190](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L190)
 
 #### Parameters
 
@@ -176,7 +222,7 @@ Defined in: [packages/sdk/src/comments/types.ts:174](https://github.com/ecp-eth/
 renounceOwnership: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:182](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L182)
+Defined in: [packages/sdk/src/comments/types.ts:198](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L198)
 
 #### Parameters
 
@@ -196,7 +242,7 @@ Defined in: [packages/sdk/src/comments/types.ts:182](https://github.com/ecp-eth/
 revokeApprovalAsAuthor: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:190](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L190)
+Defined in: [packages/sdk/src/comments/types.ts:206](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L206)
 
 #### Parameters
 
@@ -216,7 +262,7 @@ Defined in: [packages/sdk/src/comments/types.ts:190](https://github.com/ecp-eth/
 transferOwnership: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:198](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L198)
+Defined in: [packages/sdk/src/comments/types.ts:214](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L214)
 
 #### Parameters
 
@@ -236,7 +282,7 @@ Defined in: [packages/sdk/src/comments/types.ts:198](https://github.com/ecp-eth/
 updateChannelContract: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:206](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L206)
+Defined in: [packages/sdk/src/comments/types.ts:222](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L222)
 
 #### Parameters
 

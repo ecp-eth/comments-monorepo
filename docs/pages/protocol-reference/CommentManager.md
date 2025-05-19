@@ -25,23 +25,44 @@ Constructor initializes the contract with the deployer as owner and channel mana
 Sets up EIP-712 domain separator
 
 
-### `postCommentAsAuthor(struct Comments.CreateCommentData commentData, bytes appSignature)` (external)
+### `postCommentAsAuthor(struct Comments.CreateComment commentData, bytes appSignature)` (external)
 
 Posts a comment directly from the author's address
 
 
 
 
-### `postComment(struct Comments.CreateCommentData commentData, bytes authorSignature, bytes appSignature)` (external)
+### `postComment(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature)` (external)
 
 Posts a comment with both author and app signer signatures
 
 
 
 
-### `_postComment(struct Comments.CreateCommentData commentData, bytes authorSignature, bytes appSignature)` (internal)
+### `_postComment(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature)` (internal)
 
 Internal function to handle comment posting logic
+
+
+
+
+### `editCommentAsAuthor(bytes32 commentId, struct Comments.EditComment editData, bytes appSignature)` (external)
+
+Edits a comment when called by the author directly
+
+
+
+
+### `editComment(bytes32 commentId, struct Comments.EditComment editData, bytes authorSignature, bytes appSignature)` (external)
+
+Edits a comment with both author and app signer signatures
+
+
+
+
+### `_editComment(bytes32 commentId, struct Comments.EditComment editData, bytes authorSignature, bytes appSignature)` (internal)
+
+Internal function to handle comment editing logic
 
 
 
@@ -130,16 +151,16 @@ Calculates the EIP-712 hash for deleting a comment
 
 
 
-### `getCommentId(struct Comments.CreateCommentData commentData) → bytes32` (public)
+### `getEditCommentHash(bytes32 commentId, address author, struct Comments.EditComment editData) → bytes32` (public)
+
+Calculates the EIP-712 hash for editing a comment
+
+
+
+
+### `getCommentId(struct Comments.CreateComment commentData) → bytes32` (public)
 
 Calculates the EIP-712 hash for a comment
-
-
-
-
-### `getComment(bytes32 commentId) → struct Comments.CommentData` (external)
-
-Get comment data by ID
 
 
 
@@ -151,12 +172,32 @@ Updates the channel manager contract address (only owner)
 
 
 
-### `_validateSignature(bytes signature)` (internal)
+### `getComment(bytes32 commentId) → struct Comments.Comment` (external)
 
-Validates a signature against malleability
+Get a comment by its ID
 
 
-Ensures signature follows EIP-2098 and has valid s value
+
+
+### `isApproved(address author, address app) → bool` (external)
+
+Get the approval status for an author and app
+
+
+
+
+### `getNonce(address author, address app) → uint256` (external)
+
+Get the nonce for an author and app
+
+
+
+
+### `isDeleted(bytes32 commentId) → bool` (external)
+
+Get the deleted status for a comment
+
+
 
 
 

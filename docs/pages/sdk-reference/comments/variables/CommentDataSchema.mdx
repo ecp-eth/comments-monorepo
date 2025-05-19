@@ -15,6 +15,7 @@ const CommentDataSchema: ZodObject<{
   content: ZodString;
   createdAt: ZodBigInt;
   deadline: ZodBigInt;
+  hookData: ZodString;
   metadata: ZodString;
   nonce: ZodBigInt;
   parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
@@ -28,6 +29,7 @@ const CommentDataSchema: ZodObject<{
   content: string;
   createdAt: bigint;
   deadline: bigint;
+  hookData: string;
   metadata: string;
   nonce: bigint;
   parentId: `0x${string}`;
@@ -41,6 +43,7 @@ const CommentDataSchema: ZodObject<{
   content: string;
   createdAt: bigint;
   deadline: bigint;
+  hookData: string;
   metadata: string;
   nonce: bigint;
   parentId: `0x${string}`;
@@ -49,6 +52,4 @@ const CommentDataSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:18](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L18)
-
-Comment schema. This is used as output of the functions.
+Defined in: [packages/sdk/src/comments/schemas.ts:15](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L15)

@@ -136,7 +136,7 @@ export const AddCommentTypedDataSchema = z.object({
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
         z.object({ name: z.literal("parentId"), type: z.literal("bytes32") }),
-      ])
+      ]),
     ),
   }),
 });
@@ -168,7 +168,7 @@ export const DeleteCommentTypedDataSchema = z.object({
         z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
-      ])
+      ]),
     ),
   }),
 });
@@ -204,7 +204,7 @@ export const EditCommentTypedDataSchema = z.object({
         z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
-      ])
+      ]),
     ),
   }),
 });
@@ -234,7 +234,7 @@ export const AddApprovalTypedDataSchema = z.object({
         z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
-      ])
+      ]),
     ),
   }),
 });
@@ -264,7 +264,7 @@ export const RemoveApprovalTypedDataSchema = z.object({
         z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
-      ])
+      ]),
     ),
   }),
 });

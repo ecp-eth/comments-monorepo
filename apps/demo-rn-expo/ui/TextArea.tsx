@@ -9,7 +9,7 @@ export default forwardRef(function TextArea(
     editable,
     ...props
   }: TextInputProps & { error?: string | boolean },
-  ref: Ref<TextInput>
+  ref: Ref<TextInput>,
 ) {
   return (
     <TextInput

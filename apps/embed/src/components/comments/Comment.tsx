@@ -25,7 +25,7 @@ import {
 
 export type OnRetryPostComment = (
   comment: CommentType,
-  newPendingOperation: PendingCommentOperationSchemaType
+  newPendingOperation: PendingCommentOperationSchemaType,
 ) => void;
 
 interface CommentProps {
@@ -105,7 +105,7 @@ export function Comment({
       <div
         className={cn(
           "mb-2 text-foreground break-words hyphens-auto",
-          comment.deletedAt && "text-muted-foreground"
+          comment.deletedAt && "text-muted-foreground",
         )}
       >
         <CommentText

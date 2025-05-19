@@ -29,7 +29,7 @@ export function useAppStateEffect({
           backgrounded?.();
         }
         appState.current = nextAppState;
-      }
+      },
     );
 
     return () => handler.remove();

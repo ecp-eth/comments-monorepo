@@ -35,13 +35,14 @@ type IndexerAPICommentSchemaType = {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  revision: number;
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: Date;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:65](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L65)
+Defined in: [packages/sdk/src/indexer/schemas.ts:66](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L66)
 
 ## Type declaration
 
@@ -207,6 +208,12 @@ moderationStatusChangedAt: Date;
 
 ```ts
 parentId: null | `0x${string}`;
+```
+
+### revision
+
+```ts
+revision: number;
 ```
 
 ### targetUri

@@ -21,15 +21,15 @@ export default function IframeConfigurator() {
   const [showAdvanced, setShowAdvanced] = React.useState(false);
   const [autoHeightAdjustment, setAutoHeightAdjustment] = React.useState(true);
   const [uri, setUri] = React.useState(
-    "https://docs.ethcomments.xyz/integration-options/embed-comments"
+    "https://docs.ethcomments.xyz/integration-options/embed-comments",
   );
   const [author, setAuthor] = React.useState<Hex>(
-    "0x0000000000000000000000000000000000000000"
+    "0x0000000000000000000000000000000000000000",
   );
   const [embedUri, setEmbedUri] = React.useState(
     mode === "post"
       ? publicEnv.VITE_ECP_ETH_EMBED_URL
-      : publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL
+      : publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL,
   );
   const [config, setConfig] =
     React.useState<EmbedConfigSchemaInputType>(DEFAULT_CONFIG);
@@ -40,14 +40,14 @@ export default function IframeConfigurator() {
     setEmbedUri(
       mode === "post"
         ? publicEnv.VITE_ECP_ETH_EMBED_URL
-        : publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL
+        : publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL,
     );
   }, [mode]);
 
   const updateThemeColor = (
     mode: "light" | "dark",
     key: (typeof COLOR_FIELDS)[number]["key"],
-    value: string
+    value: string,
   ) => {
     setConfig((prev) => ({
       ...prev,
@@ -82,7 +82,7 @@ export default function IframeConfigurator() {
   const updateFontSize = (
     key: (typeof FONT_SIZE_FIELDS)[number]["key"],
     property: "size" | "lineHeight",
-    value: string
+    value: string,
   ) => {
     setConfig((prev) => ({
       ...prev,
@@ -104,7 +104,7 @@ export default function IframeConfigurator() {
 
   const updateOther = (
     key: (typeof OTHER_FIELDS)[number]["key"],
-    value: string
+    value: string,
   ) => {
     setConfig((prev) => ({
       ...prev,
@@ -359,7 +359,7 @@ export default function IframeConfigurator() {
                       type,
                       type === "system"
                         ? "Geist, Arial, Helvetica, sans-serif"
-                        : ""
+                        : "",
                     );
                   }}
                   className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
@@ -392,7 +392,7 @@ export default function IframeConfigurator() {
                           <option key={font} value={font}>
                             {font}
                           </option>
-                        )
+                        ),
                       )}
                     </select>
                   </div>

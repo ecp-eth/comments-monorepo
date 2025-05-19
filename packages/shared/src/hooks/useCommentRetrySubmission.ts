@@ -33,13 +33,13 @@ type OnCommentRetrySubmissionErrorParams = Pick<
 };
 
 type OnCommentRetrySubmissionStart = (
-  params: OnCommentRetrySubmissionStartParams
+  params: OnCommentRetrySubmissionStartParams,
 ) => void;
 type OnCommentRetrySubmissionSuccess = (
-  params: OnCommentRetrySubmissionSuccessParams
+  params: OnCommentRetrySubmissionSuccessParams,
 ) => void;
 type OnCommentRetrySubmissionError = (
-  params: OnCommentRetrySubmissionErrorParams
+  params: OnCommentRetrySubmissionErrorParams,
 ) => void;
 
 type CommentRetrySubmissionAPI = {
@@ -63,10 +63,10 @@ export function useCommentRetrySubmission(): CommentRetrySubmissionAPI {
           const queryData = ListCommentsQueryDataSchema.parse(data);
 
           return markCommentAsReposting(queryData, params.pendingOperation);
-        }
+        },
       );
     },
-    [client]
+    [client],
   );
 
   const success = useCallback<OnCommentRetrySubmissionSuccess>(
@@ -82,14 +82,14 @@ export function useCommentRetrySubmission(): CommentRetrySubmissionAPI {
 
           return markPendingPostCommentAsPosted(
             queryData,
-            params.pendingOperation.response.data.id
+            params.pendingOperation.response.data.id,
           );
-        }
+        },
       );
 
       toast.success("Comment posted");
     },
-    [client]
+    [client],
   );
 
   const error = useCallback<OnCommentRetrySubmissionError>(
@@ -106,14 +106,14 @@ export function useCommentRetrySubmission(): CommentRetrySubmissionAPI {
           return markPendingPostCommentAsFailed(
             queryData,
             params.pendingOperation.response.data.id,
-            params.error
+            params.error,
           );
-        }
+        },
       );
 
       toast.error("Failed to post comment");
     },
-    [client]
+    [client],
   );
 
   return useMemo(
@@ -122,6 +122,6 @@ export function useCommentRetrySubmission(): CommentRetrySubmissionAPI {
       success,
       error,
     }),
-    [start, success, error]
+    [start, success, error],
   );
 }

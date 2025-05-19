@@ -11,7 +11,7 @@ export function PoweredBy({ className }: PoweredByProps) {
     <Link
       className={cn(
         "flex items-center gap-2 opacity-50 hover:opacity-100 text-sm",
-        className
+        className,
       )}
       href="https://docs.ethcomments.xyz"
       target="_blank"

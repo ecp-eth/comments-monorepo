@@ -92,7 +92,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentDeletion, deleteCommentAsAuthor]
+    [wagmiConfig, commentDeletion, deleteCommentAsAuthor],
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(
@@ -175,7 +175,7 @@ export function useCommentActions({
       commentRetrySubmission,
       switchChainAsync,
       postCommentAsAuthor,
-    ]
+    ],
   );
 
   const postComment = useCallback<OnPostComment>(
@@ -241,7 +241,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentSubmission, postCommentAsAuthor, switchChainAsync]
+    [wagmiConfig, commentSubmission, postCommentAsAuthor, switchChainAsync],
   );
 
   const editComment = useCallback<OnEditComment>(
@@ -298,7 +298,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [commentEdition, editCommentAsAuthor, switchChainAsync, wagmiConfig]
+    [commentEdition, editCommentAsAuthor, switchChainAsync, wagmiConfig],
   );
 
   const retryEditComment = useCallback<OnRetryEditComment>(
@@ -372,7 +372,7 @@ export function useCommentActions({
       switchChainAsync,
       wagmiConfig,
       commentRetryEdition,
-    ]
+    ],
   );
 
   return useMemo(
@@ -389,6 +389,6 @@ export function useCommentActions({
       postComment,
       editComment,
       retryEditComment,
-    ]
+    ],
   );
 }

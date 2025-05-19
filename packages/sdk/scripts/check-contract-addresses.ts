@@ -13,7 +13,7 @@ async function startAnvil() {
     {
       cwd,
       env: process.env,
-    }
+    },
   );
   const nodeProcessTimeout = AbortSignal.timeout(20_000);
 
@@ -85,7 +85,7 @@ async function checkContractAddresses() {
     console.error(
       `Contract addresses are not up to date:
       - COMMENT_MANAGER_ADDRESS: Latest address ${deployResult.commentsAddress}, current SDK address ${COMMENT_MANAGER_ADDRESS}
-      - CHANNEL_MANAGER_ADDRESS: Latest address ${deployResult.channelManagerAddress}, current SDK address ${CHANNEL_MANAGER_ADDRESS}`
+      - CHANNEL_MANAGER_ADDRESS: Latest address ${deployResult.channelManagerAddress}, current SDK address ${CHANNEL_MANAGER_ADDRESS}`,
     );
     exit(1);
     return;

@@ -186,6 +186,8 @@ paths:
                           type:
                             - string
                             - 'null'
+                        revision:
+                          type: integer
                         replies:
                           type: object
                           properties:
@@ -273,6 +275,8 @@ paths:
                                     type:
                                       - string
                                       - 'null'
+                                  revision:
+                                    type: integer
                                 required:
                                   - app
                                   - author
@@ -292,6 +296,7 @@ paths:
                                   - moderationStatusChangedAt
                                   - createdAt
                                   - updatedAt
+                                  - revision
                             pagination:
                               type: object
                               properties:
@@ -330,6 +335,7 @@ paths:
                         - moderationStatusChangedAt
                         - createdAt
                         - updatedAt
+                        - revision
                         - replies
                   pagination:
                     type: object
@@ -525,6 +531,8 @@ paths:
                           type:
                             - string
                             - 'null'
+                        revision:
+                          type: integer
                         replies:
                           type: object
                           properties:
@@ -612,6 +620,8 @@ paths:
                                     type:
                                       - string
                                       - 'null'
+                                  revision:
+                                    type: integer
                                 required:
                                   - app
                                   - author
@@ -631,6 +641,7 @@ paths:
                                   - moderationStatusChangedAt
                                   - createdAt
                                   - updatedAt
+                                  - revision
                             pagination:
                               type: object
                               properties:
@@ -669,6 +680,7 @@ paths:
                         - moderationStatusChangedAt
                         - createdAt
                         - updatedAt
+                        - revision
                         - replies
                   pagination:
                     type: object
@@ -1134,6 +1146,8 @@ paths:
                           type:
                             - string
                             - 'null'
+                        revision:
+                          type: integer
                       required:
                         - app
                         - author
@@ -1153,6 +1167,7 @@ paths:
                         - moderationStatusChangedAt
                         - createdAt
                         - updatedAt
+                        - revision
                   pagination:
                     type: object
                     properties:
@@ -1298,6 +1313,8 @@ paths:
                     type:
                       - string
                       - 'null'
+                  revision:
+                    type: integer
                 required:
                   - app
                   - author
@@ -1317,6 +1334,7 @@ paths:
                   - moderationStatusChangedAt
                   - createdAt
                   - updatedAt
+                  - revision
         '400':
           description: When request is not valid
           content:
@@ -1443,6 +1461,8 @@ paths:
                     type:
                       - string
                       - 'null'
+                  revision:
+                    type: integer
                 required:
                   - app
                   - author
@@ -1462,6 +1482,7 @@ paths:
                   - moderationStatusChangedAt
                   - createdAt
                   - updatedAt
+                  - revision
         '401':
           description: When user is not authenticated
           content:

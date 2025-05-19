@@ -8,7 +8,7 @@ function normalizeAddress(address: Hex): Hex {
 
 export async function muteAccount(
   address: Hex,
-  reason?: string
+  reason?: string,
 ): Promise<boolean> {
   const db = getIndexerDb();
 
@@ -35,7 +35,7 @@ export async function unmuteAccount(address: Hex): Promise<boolean> {
 }
 
 export async function getMutedAccount(
-  address: Hex
+  address: Hex,
 ): Promise<MutedAccountSelect | undefined> {
   const db = getIndexerDb();
 

@@ -49,7 +49,7 @@ export function CommentSectionGasless() {
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
     () => createRootCommentsQueryKey(viewer, currentUrl),
-    [currentUrl, viewer]
+    [currentUrl, viewer],
   );
 
   const { mutateAsync: revokeApproval } = useRevokeApprovalAsAuthor();
@@ -96,7 +96,7 @@ export function CommentSectionGasless() {
             signTypedDataParams,
             authorSignature: signature,
           } satisfies ChangeApprovalStatusRequestBodySchemaType,
-          bigintReplacer // because typed data contains a bigint when parsed using our zod schemas
+          bigintReplacer, // because typed data contains a bigint when parsed using our zod schemas
         ),
       });
 
@@ -216,7 +216,7 @@ export function CommentSectionGasless() {
       () => ({
         isApproved: approvalStatus.data?.approved ?? false,
       }),
-      [approvalStatus.data?.approved]
+      [approvalStatus.data?.approved],
     );
 
   const isApprovalPending =

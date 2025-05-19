@@ -33,7 +33,7 @@ const UpdateChannelContractParamsSchema = z.object({
  * @returns The transaction hash
  */
 export async function updateChannelContract(
-  params: UpdateChannelContractParams
+  params: UpdateChannelContractParams,
 ): Promise<UpdateChannelContractResult> {
   const { channelContract, commentsContractAddress } =
     UpdateChannelContractParamsSchema.parse(params);
@@ -70,7 +70,7 @@ const GetContractNameParamsSchema = z.object({
  * @returns The contract name
  */
 export async function getContractName(
-  params: GetContractNameParams
+  params: GetContractNameParams,
 ): Promise<string> {
   const { commentsContractAddress } = GetContractNameParamsSchema.parse(params);
 
@@ -103,7 +103,7 @@ const GetContractVersionParamsSchema = z.object({
  * @returns The contract version
  */
 export async function getContractVersion(
-  params: GetContractVersionParams
+  params: GetContractVersionParams,
 ): Promise<string> {
   const { commentsContractAddress } =
     GetContractVersionParamsSchema.parse(params);
@@ -137,7 +137,7 @@ const GetDomainSeparatorParamsSchema = z.object({
  * @returns The domain separator
  */
 export async function getDomainSeparator(
-  params: GetDomainSeparatorParams
+  params: GetDomainSeparatorParams,
 ): Promise<Hex> {
   const { commentsContractAddress } =
     GetDomainSeparatorParamsSchema.parse(params);
@@ -171,7 +171,7 @@ const GetChannelManagerParamsSchema = z.object({
  * @returns The channel manager contract address
  */
 export async function getChannelManager(
-  params: GetChannelManagerParams
+  params: GetChannelManagerParams,
 ): Promise<Hex> {
   const { commentsContractAddress } =
     GetChannelManagerParamsSchema.parse(params);

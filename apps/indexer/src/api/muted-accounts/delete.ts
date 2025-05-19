@@ -58,7 +58,7 @@ export function setupUnmuteAccount(app: OpenAPIHono) {
         {
           message: "Muted account not found",
         },
-        404
+        404,
       );
     }
 

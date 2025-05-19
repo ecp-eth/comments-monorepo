@@ -20,21 +20,21 @@ import { createPublicClient } from "viem";
 const chainId = chain.id;
 
 export async function POST(
-  req: Request
+  req: Request,
 ): Promise<
   JSONResponse<
     typeof SignCommentResponseServerSchema | typeof BadRequestResponseSchema
   >
 > {
   const parsedBodyResult = SignCommentPayloadRequestSchema.safeParse(
-    await req.json()
+    await req.json(),
   );
 
   if (!parsedBodyResult.success) {
     return new JSONResponse(
       BadRequestResponseSchema,
       parsedBodyResult.error.flatten().fieldErrors,
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -64,10 +64,10 @@ export async function POST(
         status: 429,
         headers: {
           "Retry-After": String(
-            Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+            Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
           ),
         },
-      }
+      },
     );
   }
 
@@ -80,7 +80,7 @@ export async function POST(
     return new JSONResponse(
       BadRequestResponseSchema,
       { author: ["Muted"] },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -127,6 +127,6 @@ export async function POST(
     },
     {
       jsonReplacer: bigintReplacer,
-    }
+    },
   );
 }

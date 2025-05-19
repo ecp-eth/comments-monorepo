@@ -6,7 +6,7 @@ import { useEffect } from "react";
  */
 export function useTextAreaAutoFocus<T extends HTMLTextAreaElement | null>(
   textareaRef: React.RefObject<T>,
-  enabled: boolean
+  enabled: boolean,
 ) {
   useEffect(() => {
     if (!textareaRef.current || !enabled) {

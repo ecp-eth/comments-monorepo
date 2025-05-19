@@ -18,9 +18,9 @@ export function useMonitorListCommentsCache(
   }: {
     enabled: boolean;
     onUpdate: (
-      data: IndexerAPIListCommentsWithPendingOperationsSchemaType
+      data: IndexerAPIListCommentsWithPendingOperationsSchemaType,
     ) => void;
-  }
+  },
 ) {
   useEffect(() => {
     if (!enabled) {
@@ -41,7 +41,7 @@ export function useMonitorListCommentsCache(
 
       const parsed =
         IndexerAPIListCommentsWithPendingOperationsSchema.safeParse(
-          query.state.data
+          query.state.data,
         );
       if (!parsed.success) {
         return;

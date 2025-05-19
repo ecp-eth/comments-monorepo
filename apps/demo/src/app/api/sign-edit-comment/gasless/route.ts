@@ -13,7 +13,7 @@ import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export async function POST(
-  req: Request
+  req: Request,
 ): Promise<
   JSONResponse<
     | typeof GaslessEditResponseSchema
@@ -22,14 +22,14 @@ export async function POST(
   >
 > {
   const parsedBodyResult = GaslessEditRequestBodySchema.safeParse(
-    await req.json()
+    await req.json(),
   );
 
   if (!parsedBodyResult.success) {
     return new JSONResponse(
       BadRequestResponseSchema,
       parsedBodyResult.error.flatten().fieldErrors,
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -64,7 +64,7 @@ export async function POST(
     return new JSONResponse(
       BadRequestResponseSchema,
       { signature: ["Invalid app signature"] },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -83,7 +83,7 @@ export async function POST(
     return new JSONResponse(
       InternalServerErrorResponseSchema,
       { error: "Failed to edit comment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

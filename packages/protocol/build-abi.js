@@ -21,7 +21,7 @@ const commentsAbi = execFileSync(
   {
     cwd: currentDir,
     encoding: "utf-8",
-  }
+  },
 );
 
 const channelManagerAbi = execFileSync(
@@ -36,7 +36,7 @@ const channelManagerAbi = execFileSync(
   {
     cwd: currentDir,
     encoding: "utf-8",
-  }
+  },
 );
 
 const formattedAbi = await format(
@@ -51,7 +51,7 @@ const formattedAbi = await format(
    */
   export const ChannelManagerABI = ${channelManagerAbi.trim()} as const;
 `,
-  { parser: "typescript" }
+  { parser: "typescript" },
 );
 
 for (const outputAbiPath of outputAbiPaths) {

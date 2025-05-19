@@ -14,7 +14,7 @@ const DELETED_COMMENT_CONTENT = "[deleted]";
 
 export function useDeletingCommentManager(
   client: QueryClient,
-  queryKey: QueryKey
+  queryKey: QueryKey,
 ) {
   const [deletingCommentIds, setDeletingCommentIds] = useState<Hex[]>([]);
 
@@ -23,14 +23,14 @@ export function useDeletingCommentManager(
     onUpdate: (cachedIndexerAPIListComments) => {
       const undeleted = filterUnmarkedDeletedPendingCommentOperations(
         deletingCommentIds,
-        cachedIndexerAPIListComments
+        cachedIndexerAPIListComments,
       );
       deletePendingCommentOperationFromCache(client, queryKey, undeleted);
 
       setDeletingCommentIds((prev) => {
         const unindexed = filterUnindexedDeletedPendingCommentOperations(
           prev,
-          cachedIndexerAPIListComments
+          cachedIndexerAPIListComments,
         );
 
         return unindexed;
@@ -43,7 +43,7 @@ export function useDeletingCommentManager(
       deletePendingCommentOperationFromCache(client, queryKey, [deletingId]);
       setDeletingCommentIds((prev) => [...prev, deletingId]);
     },
-    [client, queryKey]
+    [client, queryKey],
   );
 
   return {
@@ -59,7 +59,7 @@ export function useDeletingCommentManager(
  */
 function filterUnmarkedDeletedPendingCommentOperations(
   deletingIds: Hex[],
-  cachedIndexerAPIListComments: IndexerAPIListCommentsSchemaType
+  cachedIndexerAPIListComments: IndexerAPIListCommentsSchemaType,
 ) {
   return deletingIds.filter((deletingId) => {
     const notFoundInCache = everyIndexerAPIListComments(
@@ -72,7 +72,7 @@ function filterUnmarkedDeletedPendingCommentOperations(
           // found a match, break the loop
           return false;
         }
-      }
+      },
     );
 
     return notFoundInCache;
@@ -87,7 +87,7 @@ function filterUnmarkedDeletedPendingCommentOperations(
  */
 function filterUnindexedDeletedPendingCommentOperations(
   deletingIds: Hex[],
-  cachedIndexerAPIListComments: IndexerAPIListCommentsSchemaType
+  cachedIndexerAPIListComments: IndexerAPIListCommentsSchemaType,
 ) {
   return deletingIds.filter((deletingId) => {
     let foundButUnindexed = false;
@@ -107,7 +107,7 @@ function filterUnindexedDeletedPendingCommentOperations(
           // this is pending comment inserted optimistically
           foundButUnindexed = true;
         }
-      }
+      },
     );
 
     return notFoundInCache || foundButUnindexed;
@@ -123,7 +123,7 @@ function filterUnindexedDeletedPendingCommentOperations(
 function deletePendingCommentOperationFromCache(
   client: QueryClient,
   queryKey: QueryKey,
-  deletingIds: Hex[]
+  deletingIds: Hex[],
 ) {
   if (deletingIds.length <= 0) {
     return;
@@ -138,7 +138,7 @@ function deletePendingCommentOperationFromCache(
     if (!parsed.success) {
       console.error(
         "Failed to parse old data, this is likely a bug:",
-        parsed.error
+        parsed.error,
       );
       return;
     }
@@ -161,9 +161,9 @@ function deletePendingCommentOperationFromCache(
               }
 
               return true;
-            }
+            },
           );
-        }
+        },
       );
     });
 

@@ -50,8 +50,8 @@ const CSSHSLColorSchema = z
   .string()
   .regex(
     new RegExp(
-      `^hsla?\\([0-9]{1,3}(deg)?,\\s*${CSSPercentageRegexStr},\\s*${CSSPercentageRegexStr}(,\\s*([0-1]?\\.?[0-9]+|[0-9]{1,3}%))?\\)$`
-    )
+      `^hsla?\\([0-9]{1,3}(deg)?,\\s*${CSSPercentageRegexStr},\\s*${CSSPercentageRegexStr}(,\\s*([0-1]?\\.?[0-9]+|[0-9]{1,3}%))?\\)$`,
+    ),
   )
   .describe("Valid CSS HSL color value");
 
@@ -80,29 +80,29 @@ export const EmbedConfigThemePaletteSchema = z.object({
   background: CSSColorSchema.optional(),
   foreground: CSSColorSchema.optional().describe('Text on "background" color'),
   "account-edit-link": CSSColorSchema.optional().describe(
-    'Color used by "edit" button in comment form when a wallet is connected'
+    'Color used by "edit" button in comment form when a wallet is connected',
   ),
   primary: CSSColorSchema.optional().describe('"primary" background color'),
   "primary-foreground": CSSColorSchema.optional().describe(
-    'Text on "primary" background'
+    'Text on "primary" background',
   ),
   secondary: CSSColorSchema.optional().describe('"secondary" background color'),
   "secondary-foreground": CSSColorSchema.optional().describe(
-    'Text on "secondary" background'
+    'Text on "secondary" background',
   ),
   destructive: CSSColorSchema.optional().describe(
-    '"destructive" background color, or text color for error messages'
+    '"destructive" background color, or text color for error messages',
   ),
   "destructive-foreground": CSSColorSchema.optional().describe(
-    'Text on "destructive" background'
+    'Text on "destructive" background',
   ),
   "muted-foreground": CSSColorSchema.optional().describe('"muted" text'),
   ring: CSSColorSchema.optional().describe(
-    "Color used by interactive elements like button when they are focused"
+    "Color used by interactive elements like button when they are focused",
   ),
   border: CSSColorSchema.optional().describe("Border color"),
   "border-focus": CSSColorSchema.optional().describe(
-    "Border color when focused"
+    "Border color when focused",
   ),
   input: CSSColorSchema.optional().describe("Input background color"),
   "input-foreground": CSSColorSchema.optional().describe("Input text color"),
@@ -146,7 +146,7 @@ export const EmbedConfigFontSchema = z
       }),
       z.object({
         google: EmbedConfigSupportedFont.optional().describe(
-          "Font family available on Google fonts"
+          "Font family available on Google fonts",
         ),
       }),
     ]),
@@ -173,7 +173,7 @@ export const EmbedConfigThemeSchema = z.object({
     .enum(["light", "dark"])
     .optional()
     .describe(
-      'Theme mode, "light" or "dark". Defaults to prefers-color-scheme if omitted.'
+      'Theme mode, "light" or "dark". Defaults to prefers-color-scheme if omitted.',
     ),
   colors: EmbedConfigThemeColorsSchema.optional(),
   font: EmbedConfigFontSchema.optional(),

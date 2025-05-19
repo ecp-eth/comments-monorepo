@@ -25,7 +25,7 @@ type PostCommentResponse = {
 };
 
 export const postComment = async (
-  comment: SignCommentPayloadRequestSchemaType
+  comment: SignCommentPayloadRequestSchemaType,
 ): Promise<PostCommentResponse> => {
   const signed = await fetchAPI(
     "/api/sign-comment",
@@ -36,7 +36,7 @@ export const postComment = async (
       },
       body: JSON.stringify(comment, bigintReplacer),
     },
-    SignCommentResponseClientSchema
+    SignCommentResponseClientSchema,
   );
 
   const {
@@ -73,7 +73,7 @@ export const deleteComment = async ({ commentId }: { commentId: Hex }) => {
 export const getParentCommentFromCache = (
   queryClient: QueryClient,
   parentCommentId: Hex,
-  rootCommentId: Hex
+  rootCommentId: Hex,
 ): IndexerAPICommentSchemaType | undefined => {
   const existingCache = queryClient.getQueryData(["replies", rootCommentId]);
 
@@ -82,7 +82,7 @@ export const getParentCommentFromCache = (
   if (!parsed.success) {
     console.error(
       "Failed to parse existing cache data, this is likely a bug. detailed error follows:",
-      parsed.error
+      parsed.error,
     );
     console.error(existingCache);
     return;

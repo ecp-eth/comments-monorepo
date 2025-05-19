@@ -17,7 +17,7 @@ nodeProcess.stdout.on("data", (data) => {
         }
         console.log(stdout);
         console.error(stderr);
-      }
+      },
     );
 
     devProcess.stdout.on("data", (data) => {

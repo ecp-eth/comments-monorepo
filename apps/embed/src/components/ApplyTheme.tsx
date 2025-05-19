@@ -14,7 +14,7 @@ function LinkGoogleFont({ config }: { config: EmbedConfigSchemaOutputType }) {
 
   googleFontsUrl.searchParams.set(
     "family",
-    fontFamily.google.replace("_", " ")
+    fontFamily.google.replace("_", " "),
   );
   googleFontsUrl.searchParams.set("display", "swap");
 

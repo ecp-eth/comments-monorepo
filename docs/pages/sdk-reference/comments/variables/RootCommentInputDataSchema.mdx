@@ -14,6 +14,7 @@ const RootCommentInputDataSchema: ZodObject<extendShape<Omit<{
   commentType: ZodDefault<ZodString>;
   content: ZodString;
   deadline: ZodBigInt;
+  hookData: ZodDefault<ZodString>;
   metadata: ZodString;
   nonce: ZodBigInt;
   parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
@@ -28,6 +29,7 @@ const RootCommentInputDataSchema: ZodObject<extendShape<Omit<{
   commentType: string;
   content: string;
   deadline: bigint;
+  hookData: string;
   metadata: string;
   nonce: bigint;
   parentId: `0x${string}`;
@@ -39,6 +41,7 @@ const RootCommentInputDataSchema: ZodObject<extendShape<Omit<{
   commentType?: string;
   content: string;
   deadline: bigint;
+  hookData?: string;
   metadata: string;
   nonce: bigint;
   parentId: `0x${string}`;
@@ -46,4 +49,4 @@ const RootCommentInputDataSchema: ZodObject<extendShape<Omit<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:61](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L61)
+Defined in: [packages/sdk/src/comments/schemas.ts:62](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L62)

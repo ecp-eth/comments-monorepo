@@ -5,7 +5,7 @@ export const HexSchema = z.custom<`0x${string}`>(
     z
       .string()
       .regex(/^0x[0-9a-fA-F]+$/)
-      .safeParse(value).success
+      .safeParse(value).success,
 );
 
 /**

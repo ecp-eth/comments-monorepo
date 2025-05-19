@@ -19,7 +19,7 @@ import { createPublicClient, createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export async function POST(
-  req: Request
+  req: Request,
 ): Promise<
   JSONResponse<
     | typeof BadRequestResponseSchema
@@ -35,7 +35,7 @@ export async function POST(
     return new JSONResponse(
       BadRequestResponseSchema,
       parsedBodyResult.error.flatten().fieldErrors,
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -46,7 +46,7 @@ export async function POST(
   } = parsedBodyResult.data;
 
   const account = privateKeyToAccount(
-    env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`
+    env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`,
   );
   const publicClient = createPublicClient({
     chain,
@@ -97,7 +97,7 @@ export async function POST(
         return new JSONResponse(
           BadRequestResponseSchema,
           { appSignature: ["Invalid app signature"] },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -112,7 +112,7 @@ export async function POST(
           PreparedSignedGaslessDeleteCommentApprovedResponseSchema,
           {
             txHash,
-          }
+          },
         );
       } catch (error) {
         console.error(error);
@@ -120,7 +120,7 @@ export async function POST(
         return new JSONResponse(
           InternalServerErrorResponseSchema,
           { error: "Failed to delete comment" },
-          { status: 500 }
+          { status: 500 },
         );
       }
     }
@@ -134,6 +134,6 @@ export async function POST(
     },
     {
       jsonReplacer: bigintReplacer,
-    }
+    },
   );
 }

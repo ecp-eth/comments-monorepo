@@ -36,19 +36,6 @@ Checks if the contract implements the specified interface
 
 
 
-### `beforeInitialize(address channel) → bool` (external)
-
-Execute before a hook is initialized on a channel
-
-
-
-
-### `_beforeInitialize(address) → bool` (internal)
-
-
-
-
-
 ### `afterInitialize(address channel) → bool` (external)
 
 Execute after a hook is initialized on a channel
@@ -62,53 +49,40 @@ Execute after a hook is initialized on a channel
 
 
 
-### `beforeComment(struct Comments.CommentData commentData, address caller, bytes32 commentId) → bool` (external)
-
-Execute before a comment is processed
-
-
-
-
-### `_beforeComment(struct Comments.CommentData, address, bytes32) → bool` (internal)
-
-
-
-
-
-### `afterComment(struct Comments.CommentData commentData, address caller, bytes32 commentId) → bool` (external)
+### `afterComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → string` (external)
 
 Execute after a comment is processed
 
 
 
 
-### `_afterComment(struct Comments.CommentData, address, bytes32) → bool` (internal)
+### `_afterComment(struct Comments.Comment, address, bytes32) → string` (internal)
 
 
 
 
 
-### `beforeDeleteComment(struct Comments.CommentData commentData, address caller, bytes32 commentId) → bool` (external)
-
-Execute before a comment is deleted
-
-
-
-
-### `_beforeDeleteComment(struct Comments.CommentData, address, bytes32) → bool` (internal)
-
-
-
-
-
-### `afterDeleteComment(struct Comments.CommentData commentData, address caller, bytes32 commentId) → bool` (external)
+### `afterDeleteComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → bool` (external)
 
 Execute after a comment is deleted
 
 
 
 
-### `_afterDeleteComment(struct Comments.CommentData, address, bytes32) → bool` (internal)
+### `_afterDeleteComment(struct Comments.Comment, address, bytes32) → bool` (internal)
+
+
+
+
+
+### `afterEditComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → string` (external)
+
+Execute after a comment is edited
+
+
+
+
+### `_afterEditComment(struct Comments.Comment, address, bytes32) → string` (internal)
 
 
 

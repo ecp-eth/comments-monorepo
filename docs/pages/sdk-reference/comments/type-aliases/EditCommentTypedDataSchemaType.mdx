@@ -1,0 +1,230 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / EditCommentTypedDataSchemaType
+
+# Type Alias: EditCommentTypedDataSchemaType
+
+```ts
+type EditCommentTypedDataSchemaType = {
+  domain: {
+     chainId: number;
+     name: "Comments";
+     verifyingContract: `0x${string}`;
+     version: "1";
+  };
+  message: {
+     app: `0x${string}`;
+     author: `0x${string}`;
+     commentId: `0x${string}`;
+     content: string;
+     deadline: bigint;
+     metadata: string;
+     nonce: bigint;
+  };
+  primaryType: "EditComment";
+  types: {
+     EditComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "content";
+        type: "string";
+      }
+        | {
+        name: "metadata";
+        type: "string";
+      }
+        | {
+        name: "author";
+        type: "address";
+      }
+        | {
+        name: "app";
+        type: "address";
+      }
+        | {
+        name: "nonce";
+        type: "uint256";
+      }
+        | {
+        name: "deadline";
+        type: "uint256";
+     })[];
+  };
+};
+```
+
+Defined in: [packages/sdk/src/comments/schemas.ts:212](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L212)
+
+## Type declaration
+
+### domain
+
+```ts
+domain: {
+  chainId: number;
+  name: "Comments";
+  verifyingContract: `0x${string}`;
+  version: "1";
+};
+```
+
+#### domain.chainId
+
+```ts
+chainId: number;
+```
+
+#### domain.name
+
+```ts
+name: "Comments";
+```
+
+#### domain.verifyingContract
+
+```ts
+verifyingContract: `0x${string}` = HexSchema;
+```
+
+#### domain.version
+
+```ts
+version: "1";
+```
+
+### message
+
+```ts
+message: {
+  app: `0x${string}`;
+  author: `0x${string}`;
+  commentId: `0x${string}`;
+  content: string;
+  deadline: bigint;
+  metadata: string;
+  nonce: bigint;
+};
+```
+
+#### message.app
+
+```ts
+app: `0x${string}` = HexSchema;
+```
+
+#### message.author
+
+```ts
+author: `0x${string}` = HexSchema;
+```
+
+#### message.commentId
+
+```ts
+commentId: `0x${string}` = HexSchema;
+```
+
+#### message.content
+
+```ts
+content: string;
+```
+
+#### message.deadline
+
+```ts
+deadline: bigint;
+```
+
+#### message.metadata
+
+```ts
+metadata: string;
+```
+
+#### message.nonce
+
+```ts
+nonce: bigint;
+```
+
+### primaryType
+
+```ts
+primaryType: "EditComment";
+```
+
+### types
+
+```ts
+types: {
+  EditComment: (
+     | {
+     name: "commentId";
+     type: "bytes32";
+   }
+     | {
+     name: "content";
+     type: "string";
+   }
+     | {
+     name: "metadata";
+     type: "string";
+   }
+     | {
+     name: "author";
+     type: "address";
+   }
+     | {
+     name: "app";
+     type: "address";
+   }
+     | {
+     name: "nonce";
+     type: "uint256";
+   }
+     | {
+     name: "deadline";
+     type: "uint256";
+  })[];
+};
+```
+
+#### types.EditComment
+
+```ts
+EditComment: (
+  | {
+  name: "commentId";
+  type: "bytes32";
+}
+  | {
+  name: "content";
+  type: "string";
+}
+  | {
+  name: "metadata";
+  type: "string";
+}
+  | {
+  name: "author";
+  type: "address";
+}
+  | {
+  name: "app";
+  type: "address";
+}
+  | {
+  name: "nonce";
+  type: "uint256";
+}
+  | {
+  name: "deadline";
+  type: "uint256";
+})[];
+```

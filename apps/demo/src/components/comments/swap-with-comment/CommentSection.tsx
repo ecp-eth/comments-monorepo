@@ -26,7 +26,7 @@ export function CommentSection() {
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
     () => createRootCommentsQueryKey(viewer, currentUrl),
-    [currentUrl, viewer]
+    [currentUrl, viewer],
   );
 
   useEffect(() => {

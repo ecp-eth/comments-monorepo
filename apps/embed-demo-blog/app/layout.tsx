@@ -57,7 +57,7 @@ export default function RootLayout({
       className={cx(
         "text-black antialiased bg-white dark:text-white dark:bg-black",
         geistSans.variable,
-        geistMono.variable
+        geistMono.variable,
       )}
     >
       <body className="antialiased max-w-xl mx-4 mt-8 lg:mx-auto">

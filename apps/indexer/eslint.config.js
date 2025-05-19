@@ -6,9 +6,9 @@ const config = [
   {
     languageOptions: {
       globals: {
-        ...globals.node
-      }
-    }
+        ...globals.node,
+      },
+    },
   },
 ];
 

@@ -26,14 +26,14 @@ import type {
 
 export function createRootCommentsQueryKey(
   address: Hex | undefined,
-  targetUri: string
+  targetUri: string,
 ) {
   return ["comments", address, targetUri];
 }
 
 export function createCommentRepliesQueryKey(
   address: Hex | undefined,
-  commentId: Hex
+  commentId: Hex,
 ) {
   return ["comments", address, commentId];
 }
@@ -105,17 +105,17 @@ export async function submitCommentMutationFunction({
     }
 
     throw new SubmitCommentMutationError(
-      "Failed to obtain signed comment data, please try again."
+      "Failed to obtain signed comment data, please try again.",
     );
   }
 
   const signedCommentResult = SignCommentResponseClientSchema.safeParse(
-    await response.json()
+    await response.json(),
   );
 
   if (!signedCommentResult.success) {
     throw new SubmitCommentMutationError(
-      "Server returned malformed signed comment data, please try again."
+      "Server returned malformed signed comment data, please try again.",
     );
   }
 
@@ -140,14 +140,14 @@ export async function submitCommentMutationFunction({
       e.shortMessage.includes("User rejected the request.")
     ) {
       throw new SubmitCommentMutationError(
-        "Could not post the comment because the transaction was rejected."
+        "Could not post the comment because the transaction was rejected.",
       );
     }
 
     console.error(e);
 
     throw new SubmitCommentMutationError(
-      "Failed to post comment, please try again."
+      "Failed to post comment, please try again.",
     );
   }
 }
@@ -215,17 +215,17 @@ export async function submitEditCommentMutationFunction({
     }
 
     throw new SubmitEditCommentMutationError(
-      "Failed to obtain signed comment data, please try again."
+      "Failed to obtain signed comment data, please try again.",
     );
   }
 
   const signedCommentResult = SignEditCommentResponseClientSchema.safeParse(
-    await response.json()
+    await response.json(),
   );
 
   if (!signedCommentResult.success) {
     throw new SubmitEditCommentMutationError(
-      "Server returned malformed signed comment data, please try again."
+      "Server returned malformed signed comment data, please try again.",
     );
   }
 
@@ -249,14 +249,14 @@ export async function submitEditCommentMutationFunction({
       e.shortMessage.includes("User rejected the request.")
     ) {
       throw new SubmitEditCommentMutationError(
-        "Could not edit the comment because the transaction was rejected."
+        "Could not edit the comment because the transaction was rejected.",
       );
     }
 
     console.error(e);
 
     throw new SubmitEditCommentMutationError(
-      "Failed to edit comment, please try again."
+      "Failed to edit comment, please try again.",
     );
   }
 }

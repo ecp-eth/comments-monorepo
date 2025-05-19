@@ -46,7 +46,7 @@ export type UseUpdateChannelContractResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useUpdateChannelContract(
-  options: UseUpdateChannelContractOptions = {}
+  options: UseUpdateChannelContractOptions = {},
 ): UseUpdateChannelContractResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -80,7 +80,7 @@ export type UseGetContractNameResult = UseQueryResult<string, Error>;
  */
 export function useGetContractName(
   params: UseGetContractNameParams = {},
-  options: UseGetContractNameOptions = {}
+  options: UseGetContractNameOptions = {},
 ): UseGetContractNameResult {
   const client = usePublicClient();
 
@@ -123,7 +123,7 @@ export type UseGetContractVersionResult = UseQueryResult<string, Error>;
  */
 export function useGetContractVersion(
   params: UseGetContractVersionParams = {},
-  options: UseGetContractVersionOptions = {}
+  options: UseGetContractVersionOptions = {},
 ): UseGetContractVersionResult {
   const client = usePublicClient();
 
@@ -166,7 +166,7 @@ export type UseGetDomainSeparatorResult = UseQueryResult<string, Error>;
  */
 export function useGetDomainSeparator(
   params: UseGetDomainSeparatorParams = {},
-  options: UseGetDomainSeparatorOptions = {}
+  options: UseGetDomainSeparatorOptions = {},
 ): UseGetDomainSeparatorResult {
   const client = usePublicClient();
 
@@ -209,7 +209,7 @@ export type UseGetChannelManagerResult = UseQueryResult<string, Error>;
  */
 export function useGetChannelManager(
   params: UseGetChannelManagerParams = {},
-  options: UseGetChannelManagerOptions = {}
+  options: UseGetChannelManagerOptions = {},
 ): UseGetChannelManagerResult {
   const client = usePublicClient();
 

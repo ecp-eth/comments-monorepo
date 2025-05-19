@@ -53,7 +53,7 @@ export function setupGetMutedAccount(app: OpenAPIHono) {
           address: mutedAccount.account,
           createdAt: mutedAccount.created_at,
         },
-        200
+        200,
       );
     }
 
@@ -61,7 +61,7 @@ export function setupGetMutedAccount(app: OpenAPIHono) {
       {
         message: "Address is not marked as muted",
       },
-      404
+      404,
     );
   });
 

@@ -14,14 +14,16 @@ type ContractReadFunctions = {
   getComment: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getComment">>;
   getCommentId: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getCommentId">>;
   getDeleteCommentHash: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getDeleteCommentHash">>;
+  getEditCommentHash: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getEditCommentHash">>;
+  getIsApproved: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "isApproved">>;
+  getNonce: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getNonce">>;
   getRemoveApprovalHash: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getRemoveApprovalHash">>;
-  isApproved: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "isApproved">>;
   name: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "name">>;
   version: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "version">>;
 };
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:215](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L215)
+Defined in: [packages/sdk/src/comments/types.ts:231](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L231)
 
 ## Properties
 
@@ -31,7 +33,7 @@ Defined in: [packages/sdk/src/comments/types.ts:215](https://github.com/ecp-eth/
 channelManager: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "channelManager">>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:260](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L260)
+Defined in: [packages/sdk/src/comments/types.ts:289](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L289)
 
 #### Parameters
 
@@ -51,7 +53,7 @@ Defined in: [packages/sdk/src/comments/types.ts:260](https://github.com/ecp-eth/
 DOMAIN_SEPARATOR: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "DOMAIN_SEPARATOR">>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:254](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L254)
+Defined in: [packages/sdk/src/comments/types.ts:283](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L283)
 
 #### Parameters
 
@@ -71,7 +73,7 @@ Defined in: [packages/sdk/src/comments/types.ts:254](https://github.com/ecp-eth/
 getAddApprovalHash: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getAddApprovalHash">>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:216](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L216)
+Defined in: [packages/sdk/src/comments/types.ts:232](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L232)
 
 #### Parameters
 
@@ -91,7 +93,7 @@ Defined in: [packages/sdk/src/comments/types.ts:216](https://github.com/ecp-eth/
 getComment: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getComment">>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:238](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L238)
+Defined in: [packages/sdk/src/comments/types.ts:263](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L263)
 
 #### Parameters
 
@@ -111,7 +113,7 @@ Defined in: [packages/sdk/src/comments/types.ts:238](https://github.com/ecp-eth/
 getCommentId: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getCommentId">>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:234](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L234)
+Defined in: [packages/sdk/src/comments/types.ts:259](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L259)
 
 #### Parameters
 
@@ -131,7 +133,7 @@ Defined in: [packages/sdk/src/comments/types.ts:234](https://github.com/ecp-eth/
 getDeleteCommentHash: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getDeleteCommentHash">>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:228](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L228)
+Defined in: [packages/sdk/src/comments/types.ts:247](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L247)
 
 #### Parameters
 
@@ -145,33 +147,33 @@ Defined in: [packages/sdk/src/comments/types.ts:228](https://github.com/ecp-eth/
 
 ***
 
-### getRemoveApprovalHash()
+### getEditCommentHash()
 
 ```ts
-getRemoveApprovalHash: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getRemoveApprovalHash">>;
+getEditCommentHash: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getEditCommentHash">>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:222](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L222)
+Defined in: [packages/sdk/src/comments/types.ts:253](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L253)
 
 #### Parameters
 
 ##### args
 
-`ReadContractParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"getRemoveApprovalHash"`\>
+`ReadContractParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"getEditCommentHash"`\>
 
 #### Returns
 
-`Promise`\<`ReadContractReturnType`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"getRemoveApprovalHash"`\>\>
+`Promise`\<`ReadContractReturnType`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"getEditCommentHash"`\>\>
 
 ***
 
-### isApproved()
+### getIsApproved()
 
 ```ts
-isApproved: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "isApproved">>;
+getIsApproved: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "isApproved">>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:242](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L242)
+Defined in: [packages/sdk/src/comments/types.ts:267](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L267)
 
 #### Parameters
 
@@ -185,13 +187,53 @@ Defined in: [packages/sdk/src/comments/types.ts:242](https://github.com/ecp-eth/
 
 ***
 
+### getNonce()
+
+```ts
+getNonce: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getNonce">>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:271](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L271)
+
+#### Parameters
+
+##### args
+
+`ReadContractParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"getNonce"`\>
+
+#### Returns
+
+`Promise`\<`ReadContractReturnType`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"getNonce"`\>\>
+
+***
+
+### getRemoveApprovalHash()
+
+```ts
+getRemoveApprovalHash: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "getRemoveApprovalHash">>;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:238](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L238)
+
+#### Parameters
+
+##### args
+
+`ReadContractParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"getRemoveApprovalHash"`\>
+
+#### Returns
+
+`Promise`\<`ReadContractReturnType`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"getRemoveApprovalHash"`\>\>
+
+***
+
 ### name()
 
 ```ts
 name: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "name">>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:246](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L246)
+Defined in: [packages/sdk/src/comments/types.ts:275](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L275)
 
 #### Parameters
 
@@ -211,7 +253,7 @@ Defined in: [packages/sdk/src/comments/types.ts:246](https://github.com/ecp-eth/
 version: (args) => Promise<ReadContractReturnType<CommentManagerABIType, "version">>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:250](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L250)
+Defined in: [packages/sdk/src/comments/types.ts:279](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L279)
 
 #### Parameters
 

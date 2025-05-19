@@ -12,7 +12,7 @@ export async function getApprovalStatusAndNonce<
   >,
 >(
   publicClient: TPublicClient,
-  connectedAddress: Address
+  connectedAddress: Address,
 ): Promise<[{ result: boolean }, { result: bigint }]> {
   return (
     chain.contracts?.multicall3

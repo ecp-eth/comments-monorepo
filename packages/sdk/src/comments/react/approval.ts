@@ -40,7 +40,7 @@ export type UseIsApprovedResult = UseQueryResult<boolean, Error>;
  */
 export function useIsApproved(
   params: UseIsApprovedParams,
-  options: UseIsApprovedOptions = {}
+  options: UseIsApprovedOptions = {},
 ): UseIsApprovedResult {
   const client = usePublicClient();
 
@@ -89,7 +89,7 @@ export type UseAddApprovalAsAuthorResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useAddApprovalAsAuthor(
-  options: UseAddApprovalAsAuthorOptions = {}
+  options: UseAddApprovalAsAuthorOptions = {},
 ): UseAddApprovalAsAuthorResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -122,7 +122,7 @@ export type UseAddApprovalResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useAddApproval(
-  options: UseAddApprovalOptions = {}
+  options: UseAddApprovalOptions = {},
 ): UseAddApprovalResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -162,7 +162,7 @@ export type UseRevokeApprovalAsAuthorResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useRevokeApprovalAsAuthor(
-  options: UseRevokeApprovalAsAuthorOptions = {}
+  options: UseRevokeApprovalAsAuthorOptions = {},
 ): UseRevokeApprovalAsAuthorResult {
   const { writeContractAsync } = useWriteContract();
 
@@ -198,7 +198,7 @@ export type UseRevokeApprovalResult = UseMutationResult<
  * @returns The result of the mutation
  */
 export function useRevokeApproval(
-  options: UseRevokeApprovalOptions = {}
+  options: UseRevokeApprovalOptions = {},
 ): UseRevokeApprovalResult {
   const { writeContractAsync } = useWriteContract();
 

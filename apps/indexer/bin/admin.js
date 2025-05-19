@@ -26,10 +26,10 @@ async function createRequestSignature(
   method,
   url,
   body,
-  timestamp
+  timestamp,
 ) {
   const message = new TextEncoder().encode(
-    `${method}${url.pathname}${url.searchParams.toString()}${timestamp}${body}`
+    `${method}${url.pathname}${url.searchParams.toString()}${timestamp}${body}`,
   );
   const signature = await signAsync(message, privateKey);
 
@@ -78,7 +78,7 @@ const authAccount = new Command("accounts")
     "-d, --db-url <url>",
     "Database URL (defaults to DATABASE_URL)",
     urlOptionValidator,
-    process.env.DATABASE_URL
+    process.env.DATABASE_URL,
   );
 
 auth.addCommand(authAccount);
@@ -169,7 +169,7 @@ const mutedAccounts = new Command("muted-accounts")
     "-u, --url <url>",
     "The URL of indexer",
     urlOptionValidator,
-    "https://api.ethcomments.xyz"
+    "https://api.ethcomments.xyz",
   );
 
 program.addCommand(mutedAccounts);
@@ -206,7 +206,7 @@ mutedAccounts
             "POST",
             endpointUrl,
             body,
-            timestamp
+            timestamp,
           ),
         },
         body,
@@ -246,7 +246,7 @@ mutedAccounts
             "DELETE",
             endpointUrl,
             "",
-            timestamp
+            timestamp,
           ),
         },
       });
@@ -272,7 +272,7 @@ const moderateComments = new Command("moderate-comments")
     "-u, --url <url>",
     "The URL of indexer",
     urlOptionValidator,
-    "https://api.ethcomments.xyz"
+    "https://api.ethcomments.xyz",
   );
 
 program.addCommand(moderateComments);
@@ -302,7 +302,7 @@ moderateComments
             "PATCH",
             endpointUrl,
             body,
-            timestamp
+            timestamp,
           ),
         },
         body,
@@ -346,7 +346,7 @@ moderateComments
             "PATCH",
             endpointUrl,
             body,
-            timestamp
+            timestamp,
           ),
         },
         body,
@@ -384,7 +384,7 @@ moderateComments
             "GET",
             endpointUrl,
             "",
-            timestamp
+            timestamp,
           ),
         },
       });

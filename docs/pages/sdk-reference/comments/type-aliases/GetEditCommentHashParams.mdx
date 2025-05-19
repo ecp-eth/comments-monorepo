@@ -1,0 +1,70 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / GetEditCommentHashParams
+
+# Type Alias: GetEditCommentHashParams
+
+```ts
+type GetEditCommentHashParams = {
+  author: Hex;
+  commentsAddress?: Hex;
+  edit: EditCommentData;
+  readContract: ContractReadFunctions["getEditCommentHash"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:637](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L637)
+
+## Properties
+
+### author
+
+```ts
+author: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:641](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L641)
+
+The author of the comment
+
+***
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:650](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L650)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENT_MANAGER_ADDRESS
+```
+
+***
+
+### edit
+
+```ts
+edit: EditCommentData;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:645](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L645)
+
+The edit data
+
+***
+
+### readContract
+
+```ts
+readContract: ContractReadFunctions["getEditCommentHash"];
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:651](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L651)

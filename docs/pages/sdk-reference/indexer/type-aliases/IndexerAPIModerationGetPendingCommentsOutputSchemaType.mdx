@@ -43,6 +43,7 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
+     revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: string;
@@ -50,7 +51,7 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:198](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L198)
+Defined in: [packages/sdk/src/indexer/schemas.ts:199](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L199)
 
 ## Type declaration
 
@@ -127,6 +128,7 @@ results: {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
+  revision: number;
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: string;

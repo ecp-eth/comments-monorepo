@@ -9,7 +9,7 @@ export async function tryAsync<T>(
      * @default 10
      */
     retries?: number;
-  }
+  },
 ) {
   for (let i = 0; i < retries; i++) {
     try {

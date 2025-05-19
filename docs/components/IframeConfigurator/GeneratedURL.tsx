@@ -26,7 +26,7 @@ function CodeSnippet({
         return;
       }
       const embedIframe = document.querySelector(
-        "iframe[title=Comments]"
+        "iframe[title=Comments]",
       ) as HTMLElement;
 
       if (!embedIframe) {
@@ -88,7 +88,7 @@ export default function GeneratedURL({
     });
     const frameSrc = new URL(url).origin;
     const snippet = renderToString(
-      <CodeSnippet url={url} autoHeightAdjustment={autoHeightAdjustment} />
+      <CodeSnippet url={url} autoHeightAdjustment={autoHeightAdjustment} />,
     );
 
     const copyToClipboard = () => {

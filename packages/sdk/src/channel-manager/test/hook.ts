@@ -99,7 +99,7 @@ describe("setHook()", () => {
         // somehow it is not possible to get error message here since it is swallowed
         // assert.ok(err.toString().includes("Error: InvalidHookInterface()"));
         return true;
-      }
+      },
     );
   });
 });
@@ -113,7 +113,7 @@ describe("getHookTransactionFee()", () => {
 
     assert.ok(
       typeof result.fee === "number",
-      "fee should be a number (basis points)"
+      "fee should be a number (basis points)",
     );
   });
 });
@@ -153,7 +153,7 @@ describe("setHookTransactionFee()", () => {
       (err) => {
         assert.ok(err instanceof Error);
         return true;
-      }
+      },
     );
   });
 
@@ -169,7 +169,7 @@ describe("setHookTransactionFee()", () => {
         assert.ok(err instanceof ContractFunctionExecutionError);
         assert.ok(err.message.includes("Error: OwnableUnauthorizedAccount("));
         return true;
-      }
+      },
     );
   });
 });

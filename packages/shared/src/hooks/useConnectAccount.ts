@@ -38,7 +38,7 @@ export function useConnectAccount() {
       !addressRef.current
     ) {
       deferredRef.current?.reject(
-        new Error("Please connect a wallet to continue")
+        new Error("Please connect a wallet to continue"),
       );
     }
 

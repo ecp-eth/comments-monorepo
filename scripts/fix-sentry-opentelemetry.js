@@ -40,7 +40,7 @@ do {
         }
 
         markOpentelemetryPackageAsCJS(
-          path.join(package.parentPath, package.name)
+          path.join(package.parentPath, package.name),
         );
       }
     } else {

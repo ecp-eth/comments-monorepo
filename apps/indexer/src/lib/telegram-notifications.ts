@@ -15,13 +15,13 @@ interface CommentPendingModeration {
 }
 
 export function notifyCommentPendingModeration(
-  comment: CommentPendingModeration
+  comment: CommentPendingModeration,
 ) {
   return tryAsync(
     async () => {
       if (!env.MODERATION_ENABLED || !env.MODERATION_ENABLE_NOTIFICATIONS) {
         console.warn(
-          "Moderation notifications are disabled, skipping notification"
+          "Moderation notifications are disabled, skipping notification",
         );
         return;
       }
@@ -104,13 +104,13 @@ Reject URI: ${rejectUri}
               ],
             },
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         console.error(await response.text());
         throw new Error(
-          `Failed to send Telegram notification: ${response.statusText}`
+          `Failed to send Telegram notification: ${response.statusText}`,
         );
       }
     },
@@ -118,6 +118,6 @@ Reject URI: ${rejectUri}
       onError(error) {
         console.error(error);
       },
-    }
+    },
   );
 }

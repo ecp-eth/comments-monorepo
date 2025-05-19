@@ -61,7 +61,7 @@ export function hmacMiddleware({
     if (
       !crypto.timingSafeEqual(
         Buffer.from(signature),
-        Buffer.from(calculatedSignature)
+        Buffer.from(calculatedSignature),
       )
     ) {
       throw new HTTPException(401, { message: "Invalid signature" });

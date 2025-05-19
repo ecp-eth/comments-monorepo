@@ -13,38 +13,16 @@ Library containing hook-related types and utilities
 ### `Permissions`
 
 
-- **beforeInitialize:** (bool) 
-
-
 - **afterInitialize:** (bool) 
-
-
-- **beforeComment:** (bool) 
 
 
 - **afterComment:** (bool) 
 
 
-- **beforeDeleteComment:** (bool) 
-
-
 - **afterDeleteComment:** (bool) 
 
 
-
-
-
-
-
-
-
-## Enums
-
-### `HookPhase`
-
-
-
-
+- **afterEditComment:** (bool) 
 
 
 

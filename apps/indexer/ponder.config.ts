@@ -7,7 +7,7 @@ const networks = Object.entries(process.env).reduce(
     if (key.startsWith("PONDER_RPC_URL_")) {
       const chainId = parseInt(key.replace("PONDER_RPC_URL_", ""));
       const startBlock = parseInt(
-        process.env[`PONDER_START_BLOCK_${chainId}`] || "0"
+        process.env[`PONDER_START_BLOCK_${chainId}`] || "0",
       );
 
       acc[chainId] = {
@@ -27,7 +27,7 @@ const networks = Object.entries(process.env).reduce(
       disableCache?: boolean;
       startBlock?: number;
     }
-  >
+  >,
 );
 
 console.log(`Detected networks:`, networks);
@@ -45,7 +45,7 @@ export default createConfig({
           };
           return acc;
         },
-        {} as Record<string, { address: `0x${string}`; startBlock?: number }>
+        {} as Record<string, { address: `0x${string}`; startBlock?: number }>,
       ),
     },
   },
@@ -58,7 +58,7 @@ export default createConfig({
           };
           return acc;
         },
-        {} as Record<string, { startBlock?: number }>
+        {} as Record<string, { startBlock?: number }>,
       ),
       interval: 1,
     },

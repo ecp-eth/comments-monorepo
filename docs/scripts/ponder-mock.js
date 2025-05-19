@@ -1,11 +1,8 @@
 /**
  * Mock module for the `ponder:*` modules
  */
-export default {
-}
+export default {};
 
-export const schema = {
-}
+export const schema = {};
 
-export const db = {
-}
+export const db = {};

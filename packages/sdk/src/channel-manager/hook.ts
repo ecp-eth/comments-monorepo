@@ -79,7 +79,7 @@ const GetHookTransactionFeeParamsSchema = z.object({
  * @returns The hook transaction fee from channel manager
  */
 export async function getHookTransactionFee(
-  params: GetHookTransactionFeeParams
+  params: GetHookTransactionFeeParams,
 ): Promise<GetHookTransactionFeeResult> {
   const { channelManagerAddress } =
     GetHookTransactionFeeParamsSchema.parse(params);
@@ -123,7 +123,7 @@ const SetHookTransactionFeeParamsSchema = z.object({
  * @returns The transaction hash of the set hook transaction fee
  */
 export async function setHookTransactionFee(
-  params: SetHookTransactionFeeParams
+  params: SetHookTransactionFeeParams,
 ): Promise<SetHookTransactionFeeResult> {
   const { channelManagerAddress, feeBasisPoints } =
     SetHookTransactionFeeParamsSchema.parse(params);
@@ -174,7 +174,7 @@ const DeductProtocolHookTransactionFeeParamsSchema = z.object({
  * @returns The amount that should be passed to the hook
  */
 export async function deductProtocolHookTransactionFee(
-  params: DeductProtocolHookTransactionFeeParams
+  params: DeductProtocolHookTransactionFeeParams,
 ): Promise<DeductProtocolHookTransactionFeeResult> {
   const { channelManagerAddress, value } =
     DeductProtocolHookTransactionFeeParamsSchema.parse(params);

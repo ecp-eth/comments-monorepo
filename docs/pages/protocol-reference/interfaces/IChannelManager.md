@@ -8,37 +8,11 @@ This interface defines the core functionality for managing channels and their as
 
 
 
-## Structs
-
-### `ChannelConfig`
-
-
-- **name:** (string) 
-
-
-- **description:** (string) 
-
-
-- **metadata:** (string) 
-
-
-- **hook:** (contract IHook) 
-
-
-- **permissions:** (struct Hooks.Permissions) 
-
 
 
 
 
 ## Events
-
-### `HookExecutionFailed(uint256 channelId, address hook, enum Hooks.HookPhase phase)`
-
-Emitted when a hook execution fails
-
-
-
 
 ### `BaseURIUpdated(string baseURI)`
 
@@ -85,6 +59,13 @@ Creates a new channel
 
 
 
+### `getChannel(uint256 channelId) → struct Channels.Channel` (external)
+
+Get a channel by its ID
+
+
+
+
 ### `updateChannel(uint256 channelId, string name, string description, string metadata)` (external)
 
 Updates an existing channel's configuration
@@ -99,13 +80,6 @@ Sets the hook for a channel
 
 
 
-### `getChannel(uint256 channelId) → string name, string description, string metadata, address hook` (external)
-
-Gets a channel's configuration
-
-
-
-
 ### `updateCommentsContract(address _commentsContract)` (external)
 
 Updates the comments contract address (only owner)
@@ -116,13 +90,6 @@ Updates the comments contract address (only owner)
 ### `setBaseURI(string baseURI_)` (external)
 
 Sets the base URI for NFT metadata
-
-
-
-
-### `executeHook(uint256 channelId, struct Comments.CommentData commentData, address caller, bytes32 commentId, enum Hooks.HookPhase phase) → bool` (external)
-
-Executes hook for a channel
 
 
 

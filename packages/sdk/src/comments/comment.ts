@@ -79,7 +79,7 @@ const PostCommentAsAuthorParamsSchema = z.object({
  * @returns The transaction hash and comment ID
  */
 export async function postCommentAsAuthor(
-  params: PostCommentAsAuthorParams
+  params: PostCommentAsAuthorParams,
 ): Promise<PostCommentAsAuthorResult> {
   const validatedParams = PostCommentAsAuthorParamsSchema.parse(params);
 
@@ -194,7 +194,7 @@ const GetCommentParamsSchema = z.object({
  * @returns The comment data
  */
 export async function getComment(
-  params: GetCommentParams
+  params: GetCommentParams,
 ): Promise<GetCommentResult> {
   const { commentId, commentsAddress } = GetCommentParamsSchema.parse(params);
 
@@ -277,7 +277,7 @@ const DeleteCommentAsAuthorParamsSchema = z.object({
  * @returns The transaction hash
  */
 export async function deleteCommentAsAuthor(
-  params: DeleteCommentAsAuthorParams
+  params: DeleteCommentAsAuthorParams,
 ): Promise<DeleteCommentAsAuthorResult> {
   const { commentId, commentsAddress } =
     DeleteCommentAsAuthorParamsSchema.parse(params);
@@ -432,7 +432,7 @@ const GetDeleteCommentHashParamsSchema = z.object({
  * @returns The delete comment hash
  */
 export async function getDeleteCommentHash(
-  params: GetDeleteCommentHashParams
+  params: GetDeleteCommentHashParams,
 ): Promise<Hex> {
   const { commentId, author, app, nonce, deadline, commentsAddress } =
     GetDeleteCommentHashParamsSchema.parse(params);
@@ -510,7 +510,7 @@ const CreateCommentTypedDataParamsSchema = z.object({
  * @returns The typed data
  */
 export function createCommentTypedData(
-  params: CreateCommentTypedDataParams
+  params: CreateCommentTypedDataParams,
 ): AddCommentTypedDataSchemaType {
   const validatedParams = CreateCommentTypedDataParamsSchema.parse(params);
 
@@ -606,7 +606,7 @@ const CreateDeleteCommentTypedDataParamsSchema = z.object({
  * @returns The typed data
  */
 export function createDeleteCommentTypedData(
-  params: CreateDeleteCommentTypedDataParams
+  params: CreateDeleteCommentTypedDataParams,
 ): DeleteCommentTypedDataSchemaType {
   const validatedParams =
     CreateDeleteCommentTypedDataParamsSchema.parse(params);
@@ -662,7 +662,7 @@ const GetEditCommentHashParamsSchema = z.object({
  * @returns The edit comment hash
  */
 export async function getEditCommentHash(
-  params: GetEditCommentHashParams
+  params: GetEditCommentHashParams,
 ): Promise<Hex> {
   const { author, edit, commentsAddress } =
     GetEditCommentHashParamsSchema.parse(params);
@@ -725,7 +725,7 @@ type EditCommentDataParams =
  * @return {@link comments!EditCommentData | EditCommentData} The data structure of a comment for editing
  */
 export function createEditCommentData(
-  params: EditCommentDataParams
+  params: EditCommentDataParams,
 ): EditCommentData {
   return EditCommentDataSchema.parse({
     ...params,
@@ -773,7 +773,7 @@ const CreateEditCommentTypedDataParamsSchema = z.object({
  * @returns The typed data
  */
 export function createEditCommentTypedData(
-  params: CreateEditCommentTypedDataParams
+  params: CreateEditCommentTypedDataParams,
 ): EditCommentTypedDataSchemaType {
   const validatedParams = CreateEditCommentTypedDataParamsSchema.parse(params);
 
@@ -839,7 +839,7 @@ export type EditCommentAsAuthorResult = {
  * @returns The transaction hash
  */
 export async function editCommentAsAuthor(
-  params: EditCommentAsAuthorParams
+  params: EditCommentAsAuthorParams,
 ): Promise<EditCommentAsAuthorResult> {
   const validatedParams = EditCommentAsAuthorParamsSchema.parse(params);
 
@@ -907,7 +907,7 @@ export type EditCommentResult = {
  * @returns The transaction hash
  */
 export async function editComment(
-  params: EditCommentParams
+  params: EditCommentParams,
 ): Promise<EditCommentResult> {
   const validatedParams = EditCommentParamsSchema.parse(params);
 

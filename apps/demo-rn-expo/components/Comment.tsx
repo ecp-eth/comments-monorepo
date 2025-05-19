@@ -123,8 +123,8 @@ function CommentContent({ comment }: { comment: IndexerAPICommentSchemaType }) {
       truncatedText.slice(
         0,
         // 3 is for "..." and 2 is buffer
-        truncatedText.length - READ_MORE_TEXT.length - 3 - 2
-      ) + "..."
+        truncatedText.length - READ_MORE_TEXT.length - 3 - 2,
+      ) + "...",
     );
   }, [readMoreWidth, commentContentLines, boxWidth, comment.content]);
 

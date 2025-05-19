@@ -62,7 +62,7 @@ describe("isApproved()", () => {
     assert.equal(
       approved,
       false,
-      "app signer should not be approved initially"
+      "app signer should not be approved initially",
     );
   });
 });
@@ -152,7 +152,7 @@ describe("addApproval()", () => {
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);
         return true;
-      }
+      },
     );
   });
 });
@@ -266,7 +266,7 @@ describe("revokeApproval()", () => {
       (err) => {
         assert.ok(err instanceof ContractFunctionExecutionError);
         return true;
-      }
+      },
     );
   });
 });
