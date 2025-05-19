@@ -5,13 +5,13 @@ import { toHex } from "viem/utils";
  * It is created using the CREATE2 opcode so should be identical across chains if no collisions occur.
  */
 export const COMMENT_MANAGER_ADDRESS =
-  "0x482D0a4fc560041B856c4CA8E5c1f927779db6E2" as const;
+  "0x9506d86635550dC1c449C406A4A3c74A9d83603D" as const;
 
 /**
  * The address of the ChannelManager contract.
  */
 export const CHANNEL_MANAGER_ADDRESS =
-  "0xC801A9FA1cc09B4816AAeeE5D46a95569B40Af94" as const;
+  "0x255B710ecd83045637DAa8315f5430C7f587c1a0" as const;
 
 /**
  * The zero address.
