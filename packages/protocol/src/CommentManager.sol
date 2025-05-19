@@ -34,11 +34,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
             "RemoveApproval(address author,address app,uint256 nonce,uint256 deadline)"
         );
 
-
     // On-chain storage mappings
     mapping(bytes32 => Comments.Comment) internal comments;
     /// @notice Mapping of author to app to approval status
-    mapping(address => mapping(address => bool)) internal isApproved;
+    mapping(address => mapping(address => bool)) internal approvals;
     /// @notice Mapping of author to app to nonce
     mapping(address => mapping(address => uint256)) internal nonces;
     /// @notice Mapping of comment ID to deleted status, if missing in mapping, the comment is not deleted
@@ -134,27 +133,21 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         bytes32 commentId = getCommentId(commentData);
 
-        // Validate signatures if present
-        if (appSignature.length > 0) {
-            _validateSignature(appSignature);
-            if (
-                !SignatureChecker.isValidSignatureNow(
-                    commentData.app,
-                    commentId,
-                    appSignature
-                )
-            ) {
-                revert InvalidAppSignature();
-            }
-        }
-
-        if (authorSignature.length > 0) {
-            _validateSignature(authorSignature);
+        // always validate app signature
+        if (
+            commentData.app != msg.sender &&
+            !SignatureChecker.isValidSignatureNow(
+                commentData.app,
+                commentId,
+                appSignature
+            )
+        ) {
+            revert InvalidAppSignature();
         }
 
         if (
             msg.sender == commentData.author ||
-            isApproved[commentData.author][commentData.app] ||
+            approvals[commentData.author][commentData.app] ||
             (authorSignature.length > 0 &&
                 SignatureChecker.isValidSignatureNow(
                     commentData.author,
@@ -175,29 +168,31 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
                 updatedAt: uint80(block.timestamp),
                 nonce: commentData.nonce,
                 deadline: commentData.deadline,
-                commentHookData: ""
+                hookData: ""
             });
             // Store comment data on-chain
             comments[commentId] = comment;
 
-            Channels.Channel memory channel = channelManager.getChannel(commentData.channelId);
+            Channels.Channel memory channel = channelManager.getChannel(
+                commentData.channelId
+            );
             address hookAddress = address(channel.hook);
 
             if (hookAddress != address(0) && channel.permissions.afterComment) {
                 // Calculate hook value after protocol fee
-                uint256 msgValueAfterFee = channelManager.deductProtocolHookTransactionFee(msg.value);
+                uint256 msgValueAfterFee = channelManager
+                    .deductProtocolHookTransactionFee(msg.value);
 
-                string memory commentHookData = channel.hook.afterComment{value: msgValueAfterFee}(
-                    comment,
-                    msg.sender,
-                    commentId
-                );
+                string memory commentHookData = channel.hook.afterComment{
+                    value: msgValueAfterFee
+                }(comment, msg.sender, commentId);
 
                 Comments.Comment storage storedComment = comments[commentId];
-                storedComment.commentHookData = commentHookData;
+                storedComment.hookData = commentHookData;
             }
 
-            emit CommentAdded(commentId, comment.author, comment.app, comment, comments[commentId].commentHookData);
+            emit CommentAdded(commentId, comment.author, comment.app, comment);
+
             return;
         }
 
@@ -232,7 +227,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         Comments.Comment storage comment = comments[commentId];
         require(comment.author != address(0), "Comment does not exist");
-        require(comment.author == author, "Author does not match comment author");
+        require(
+            comment.author == author,
+            "Author does not match comment author"
+        );
         nonces[author][app]++;
 
         bytes32 deleteHash = getDeleteCommentHash(
@@ -244,7 +242,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         );
 
         if (
-            isApproved[author][app] &&
+            approvals[author][app] &&
             SignatureChecker.isValidSignatureNow(app, deleteHash, appSignature)
         ) {
             _deleteComment(commentId, author);
@@ -278,12 +276,17 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         delete comments[commentId];
         deleted[commentId] = true;
 
-        Channels.Channel memory channel = channelManager.getChannel(commentToDelete.channelId);
+        Channels.Channel memory channel = channelManager.getChannel(
+            commentToDelete.channelId
+        );
         address hookAddress = address(channel.hook);
 
-        if (hookAddress != address(0) && channel.permissions.afterDeleteComment) {   
+        if (
+            hookAddress != address(0) && channel.permissions.afterDeleteComment
+        ) {
             // Calculate hook value after protocol fee
-            uint256 msgValueAfterFee = channelManager.deductProtocolHookTransactionFee(msg.value);
+            uint256 msgValueAfterFee = channelManager
+                .deductProtocolHookTransactionFee(msg.value);
 
             channel.hook.afterDeleteComment{value: msgValueAfterFee}(
                 commentToDelete,
@@ -299,7 +302,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     /// @param author The address granting approval
     /// @param app The address being approved
     function _addApproval(address author, address app) internal {
-        isApproved[author][app] = true;
+        approvals[author][app] = true;
         emit ApprovalAdded(author, app);
     }
 
@@ -307,7 +310,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     /// @param author The address removing approval
     /// @param app The address being unapproved
     function _revokeApproval(address author, address app) internal {
-        isApproved[author][app] = false;
+        approvals[author][app] = false;
         emit ApprovalRemoved(author, app);
     }
 
@@ -457,17 +460,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     }
 
     /// @inheritdoc ICommentManager
-    function getComment(
-        bytes32 commentId
-    ) external view returns (Comments.Comment memory) {
-        Comments.Comment memory comment = comments[commentId];
-        if (comment.author == address(0)) {
-            revert CommentDoesNotExist();
-        }
-        return comment;
-    }
-
-    /// @inheritdoc ICommentManager
     function getCommentId(
         Comments.CreateComment memory commentData
     ) public view returns (bytes32) {
@@ -501,33 +493,23 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         channelManager = ChannelManager(payable(_channelContract));
     }
 
-    /// @notice Validates a signature against malleability
-    /// @dev Ensures signature follows EIP-2098 and has valid s value
-    /// @param signature The signature to validate
-    function _validateSignature(bytes memory signature) internal pure {
-        if (signature.length != 65) revert InvalidSignatureLength();
-
-        // Extract s value from signature
-        uint256 s;
-        assembly {
-            s := mload(add(signature, 0x40))
+    /// @inheritdoc ICommentManager
+    function getComment(
+        bytes32 commentId
+    ) external view returns (Comments.Comment memory) {
+        Comments.Comment memory comment = comments[commentId];
+        if (comment.author == address(0)) {
+            revert CommentDoesNotExist();
         }
-
-        // Ensure s is in lower half of curve's order
-        if (
-            s >
-            0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0
-        ) {
-            revert InvalidSignatureS();
-        }
+        return comment;
     }
 
     /// @inheritdoc ICommentManager
-    function getIsApproved(
+    function isApproved(
         address author,
         address app
     ) external view returns (bool) {
-        return isApproved[author][app];
+        return approvals[author][app];
     }
 
     /// @inheritdoc ICommentManager
@@ -539,9 +521,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     }
 
     /// @inheritdoc ICommentManager
-    function getIsDeleted(
-        bytes32 commentId
-    ) external view returns (bool) {
+    function isDeleted(bytes32 commentId) external view returns (bool) {
         return deleted[commentId];
     }
 }

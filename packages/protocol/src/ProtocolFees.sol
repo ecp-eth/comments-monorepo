@@ -73,15 +73,18 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
         return amount;
     }
 
-    /// @inheritdoc IProtocolFees
-    function collectChannelCreationFee() public payable returns (uint96) {
+    /// @notice Guard against insufficient channel creation fee
+    /// @return The amount of fees collected
+    function collectChannelCreationFee() internal returns (uint96) {
         return _collectFee(channelCreationFee);
     }
 
-    /// @inheritdoc IProtocolFees
+    /// @notice Calculates the hook transaction fee by deducting the protocol fee
+    /// @param value The total value sent with the transaction
+    /// @return hookValue The amount that should be passed to the hook
     function deductProtocolHookTransactionFee(
         uint256 value
-    ) public view returns (uint256 hookValue) {
+    ) external view returns (uint256 hookValue) {
         if (value <= 0 || hookTransactionFeeBasisPoints <= 0) {
             return value;
         }
@@ -90,11 +93,11 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
         return value - protocolFee;
     }
 
-    /// @notice Internal function to handle fee collection and refunds
+    /// @notice Internal function to guard against insufficient fee
     /// @param requiredFee The fee amount required for the operation
     /// @return The amount of fees collected
     function _collectFee(uint96 requiredFee) internal virtual returns (uint96) {
-        if (msg.value < requiredFee) revert IChannelManager.InsufficientFee();
+        if (msg.value < requiredFee) revert InsufficientFee();
 
         if (msg.value > requiredFee) {
             // Refund excess payment using transfer for safety

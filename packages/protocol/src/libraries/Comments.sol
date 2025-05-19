@@ -17,7 +17,7 @@ library Comments {
     /// @param metadata Additional JSON data that shouldn't be displayed to the user
     /// @param targetUri the URI about which the comment is being made
     /// @param commentType The type of the comment (e.g. "comment", "like", etc.)
-    /// @param commentHookData Additional data for the comment, added by a hook.
+    /// @param hookData Additional data for the comment, added by a hook.
     struct Comment {
         // Pack these two addresses together (saves 1 storage slot)
         address author; // 20 bytes
@@ -34,7 +34,7 @@ library Comments {
         string metadata;
         string targetUri;
         string commentType;
-        string commentHookData;
+        string hookData;
     }
 
     /// @notice Struct containing all comment data for creating a comment

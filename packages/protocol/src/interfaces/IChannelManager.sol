@@ -14,8 +14,6 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
     error ChannelDoesNotExist();
     /// @notice Error thrown when hook does not implement required interface
     error InvalidHookInterface();
-    /// @notice Error thrown when insufficient fee is provided
-    error InsufficientFee();
     /// @notice Error thrown when channel already exists
     error ChannelAlreadyExists();
     /// @notice Error thrown when base URI is invalid

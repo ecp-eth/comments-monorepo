@@ -41,7 +41,7 @@ contract FlatFeeHook is BaseHook {
         Comments.Comment calldata commentData,
         address,
         bytes32
-    ) internal override returns (string memory commentHookData) {
+    ) internal override returns (string memory hookData) {
         require(msg.value >= HOOK_FEE, "Insufficient fee");
 
         totalFeesCollected += HOOK_FEE;

@@ -468,8 +468,8 @@ export type GetNonceParams = {
    */
   commentsAddress?: Hex;
   readContract: (
-    parameters: ReadContractParameters<typeof CommentManagerABI, "nonces">
-  ) => Promise<ReadContractReturnType<typeof CommentManagerABI, "nonces">>;
+    parameters: ReadContractParameters<typeof CommentManagerABI, "getNonce">
+  ) => Promise<ReadContractReturnType<typeof CommentManagerABI, "getNonce">>;
 };
 
 const GetNonceParamsSchema = z.object({
@@ -490,7 +490,7 @@ export async function getNonce(params: GetNonceParams): Promise<bigint> {
   const nonce = await params.readContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "nonces",
+    functionName: "getNonce",
     args: [author, app],
   });
 

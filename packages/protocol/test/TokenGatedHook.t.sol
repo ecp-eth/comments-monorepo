@@ -34,7 +34,7 @@ contract TokenGatedHook is BaseHook {
         Comments.Comment calldata commentData,
         address,
         bytes32
-    ) internal view override returns (string memory commentHookData) {
+    ) internal view override returns (string memory hookData) {
         // Check if the comment author has enough tokens
         uint256 balance = token.balanceOf(commentData.author);
         if(balance < requiredBalance) revert NotEnoughTokens();
@@ -109,8 +109,9 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         });
 
         // Post comment as author - should succeed
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, commentData, comments);
         vm.prank(user1);
-        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, "");
+        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, appSignature);
     }
 
     function test_TokenGatedHookBlocksCommentWithoutEnoughTokens() public {
@@ -140,9 +141,10 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         });
 
         // Post comment as author - should fail
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, commentData, comments);
         vm.prank(user1);
         vm.expectRevert(TokenGatedHook.NotEnoughTokens.selector);
-        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, "");
+        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, appSignature);
     }
 
     function test_TokenGatedHookAllowsCommentAfterReceivingTokens() public {
@@ -169,16 +171,18 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         });
 
         // First try without tokens - should fail
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, commentData, comments);
         vm.prank(user1);
         vm.expectRevert(TokenGatedHook.NotEnoughTokens.selector);
-        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, "");
+        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, appSignature);
 
         // Transfer 1000 tokens to user1
         testToken.transfer(user1, 1000 * 10 ** 18);
 
         // Try again with tokens - should succeed
+        appSignature = TestUtils.generateAppSignature(vm, commentData, comments);
         vm.prank(user1);
-        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, "");
+        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, appSignature);
     }
 
     function onERC721Received(

@@ -203,7 +203,7 @@ describe("postComment()", () => {
     assert.equal(receipt.status, "success");
   });
 
-  it("fails with invalid author signature", async () => {
+  it("fails with invalid app signature", async () => {
     const nonce = await getNonce({
       author: account.address,
       app: appAccount.address,
@@ -223,7 +223,7 @@ describe("postComment()", () => {
             targetUri: "https://example.com",
           }),
           appSignature,
-          writeContract: appClient.writeContract,
+          writeContract: client.writeContract,
           commentsAddress,
         }),
       (err) => {

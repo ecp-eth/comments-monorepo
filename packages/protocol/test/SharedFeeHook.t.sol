@@ -68,7 +68,7 @@ contract SharedFeeHook is BaseHook {
         Comments.Comment calldata commentData,
         address,
         bytes32
-    ) internal override returns (string memory commentHookData) {
+    ) internal override returns (string memory hookData) {
         // Calculate protocol fee
         uint256 protocolFee = (feeAmount * PROTOCOL_FEE_PERCENTAGE) / 10000;
         uint256 hookFee = feeAmount - protocolFee;

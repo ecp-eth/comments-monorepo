@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
+import {Vm} from "forge-std/Vm.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {LibString} from "solady/utils/LibString.sol";
@@ -9,6 +10,7 @@ import {CommentManager} from "../src/CommentManager.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
 import {IHook} from "../src/interfaces/IHook.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
+import {ICommentManager} from "../src/interfaces/ICommentManager.sol";
 import {BaseHook} from "../src/hooks/BaseHook.sol";
 import {Hooks} from "../src/libraries/Hooks.sol";
 import {Comments} from "../src/libraries/Comments.sol";
@@ -208,19 +210,21 @@ library TestUtils {
 
         // For decimal numbers, calculate the amount in wei
         uint256 baseAmount = wholeNumber * 1 ether;
-        uint256 fractionalAmount = fractionalPart * (1 ether / (10 ** decimalsCount));
+        uint256 fractionalAmount = fractionalPart *
+            (1 ether / (10 ** decimalsCount));
         return (true, baseAmount + fractionalAmount);
     }
 
-    /**
-     * @notice create the Comments and ChannelManager contracts and update the reference addresses accordingly
-     * @param owner The owner of the contracts
-     * @return comments The Comments contract
-     * @return channelManager The ChannelManager contract
-     */
+    /// @notice create the Comments and ChannelManager contracts and update the reference addresses accordingly
+    /// @param owner The owner of the contracts
+    /// @return comments The Comments contract
+    /// @return channelManager The ChannelManager contract
     function createContracts(
         address owner
-    ) internal returns (CommentManager comments, ChannelManager channelManager) {
+    )
+        internal
+        returns (CommentManager comments, ChannelManager channelManager)
+    {
         comments = new CommentManager(owner);
         channelManager = new ChannelManager(owner);
 
@@ -230,23 +234,60 @@ library TestUtils {
 
         return (comments, channelManager);
     }
+
+    /// @notice Helper function to sign EIP-712 messages
+    function signEIP712(
+        Vm vm,
+        uint256 privateKey,
+        bytes32 digest
+    ) internal pure returns (bytes memory) {
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, digest);
+        return abi.encodePacked(r, s, v);
+    }
+
+    function generateAppSignature(
+        Vm vm,
+        Comments.CreateComment memory commentData,
+        ICommentManager comments
+    ) internal view returns (bytes memory) {
+        uint256 appPrivateKey = 0x2;
+        address app = vm.addr(appPrivateKey);
+
+        commentData.app = app;
+        bytes32 commentId = comments.getCommentId(commentData);
+        bytes memory appSignature = signEIP712(vm, appPrivateKey, commentId);
+
+        return appSignature;
+    }
 }
 
 // Mock hook contract for testing
 contract MockHook is BaseHook {
-    function getHookPermissions() external pure override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            afterInitialize: false,
-            afterComment: true,
-            afterDeleteComment: false
-        });
+    string public returningHookData;
+
+    function setReturningHookData(string memory _returningHookData) external {
+        returningHookData = _returningHookData;
+    }
+
+    function getHookPermissions()
+        external
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                afterInitialize: false,
+                afterComment: true,
+                afterDeleteComment: false
+            });
     }
 
     function _afterComment(
         Comments.Comment calldata,
         address,
         bytes32
-    ) internal virtual override returns (string memory commentHookData) {
-        return "";
+    ) internal virtual override returns (string memory) {
+        return returningHookData;
     }
 }
