@@ -173,18 +173,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       Channels.Channel memory channel = channelManager.getChannel(
         commentData.channelId
       );
-      address hookAddress = address(channel.hook);
 
       emit CommentAdded(commentId, comment.author, comment.app, comment);
 
-      if (hookAddress != address(0) && channel.permissions.afterComment) {
+      if (channel.hook != address(0) && channel.permissions.afterComment) {
+        IHook hook = IHook(channel.hook);
         // Calculate hook value after protocol fee
         uint256 msgValueAfterFee = channelManager
           .deductProtocolHookTransactionFee(msg.value);
 
-        string memory hookData = channel.hook.afterComment{
-          value: msgValueAfterFee
-        }(comment, msg.sender, commentId);
+        string memory hookData = hook.afterComment{ value: msgValueAfterFee }(
+          comment,
+          msg.sender,
+          commentId
+        );
 
         comment.hookData = hookData;
 
@@ -280,18 +282,21 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Channels.Channel memory channel = channelManager.getChannel(
       comment.channelId
     );
-    address hookAddress = address(channel.hook);
 
     emit CommentEdited(commentId, comment.author, editData.app, comment);
 
-    if (hookAddress != address(0) && channel.permissions.afterEditComment) {
+    if (channel.hook != address(0) && channel.permissions.afterEditComment) {
+      IHook hook = IHook(channel.hook);
+
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      string memory hookData = channel.hook.afterEditComment{
-        value: msgValueAfterFee
-      }(comment, msg.sender, commentId);
+      string memory hookData = hook.afterEditComment{ value: msgValueAfterFee }(
+        comment,
+        msg.sender,
+        commentId
+      );
 
       comment.hookData = hookData;
 
@@ -372,16 +377,16 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Channels.Channel memory channel = channelManager.getChannel(
       commentToDelete.channelId
     );
-    address hookAddress = address(channel.hook);
 
     emit CommentDeleted(commentId, author);
 
-    if (hookAddress != address(0) && channel.permissions.afterDeleteComment) {
+    if (channel.hook != address(0) && channel.permissions.afterDeleteComment) {
+      IHook hook = IHook(channel.hook);
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      channel.hook.afterDeleteComment{ value: msgValueAfterFee }(
+      hook.afterDeleteComment{ value: msgValueAfterFee }(
         commentToDelete,
         msg.sender,
         commentId

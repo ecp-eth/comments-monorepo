@@ -12,11 +12,38 @@ import { TestUtils, MockHook } from "./utils.sol";
 import { Comments } from "../src/libraries/Comments.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
 import { Channels } from "../src/libraries/Channels.sol";
+import { BaseHook } from "../src/hooks/BaseHook.sol";
 
 // Invalid hook that doesn't support the interface
 contract InvalidHook {
   function supportsInterface(bytes4) external pure returns (bool) {
     return false;
+  }
+}
+
+contract RejectChannelUpdateHook is BaseHook {
+  function getHookPermissions()
+    external
+    pure
+    override
+    returns (Hooks.Permissions memory)
+  {
+    return
+      Hooks.Permissions({
+        afterInitialize: false,
+        afterComment: false,
+        afterDeleteComment: false,
+        afterEditComment: false,
+        onChannelUpdated: true
+      });
+  }
+
+  function onChannelUpdated(
+    address,
+    uint256,
+    Channels.Channel calldata
+  ) external pure override returns (bool) {
+    revert("Rejected by hook");
   }
 }
 
