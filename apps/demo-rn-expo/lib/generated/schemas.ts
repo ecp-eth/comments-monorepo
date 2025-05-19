@@ -6,6 +6,8 @@ import {
   AddApprovalTypedDataSchema,
   AddCommentTypedDataSchema,
   DeleteCommentTypedDataSchema,
+  EditCommentDataSchema,
+  EditCommentTypedDataSchema,
 } from "@ecp.eth/sdk/comments/schemas";
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
@@ -141,6 +143,73 @@ export const SignCommentPayloadRequestSchema = z.union([
 
 export type SignCommentPayloadRequestSchemaType = z.infer<
   typeof SignCommentPayloadRequestSchema
+>;
+
+export const GaslessEditRequestBodySchema = z.object({
+  signTypedDataParams: EditCommentTypedDataSchema,
+  appSignature: HexSchema,
+  authorSignature: HexSchema,
+  edit: EditCommentDataSchema,
+});
+
+export type GaslessEditRequestBodySchemaType = z.infer<
+  typeof GaslessEditRequestBodySchema
+>;
+
+export const GaslessEditResponseSchema = z.object({
+  txHash: HexSchema,
+});
+
+export type GaslessEditResponseSchemaType = z.infer<
+  typeof GaslessEditResponseSchema
+>;
+
+export const PrepareSignedGaslessEditCommentRequestBodySchema = z.object({
+  commentId: HexSchema,
+  content: z.string().trim().nonempty(),
+  author: HexSchema,
+  metadata: z.string(),
+  submitIfApproved: z.boolean(),
+});
+
+export type PrepareSignedGaslessEditCommentRequestBodySchemaType = z.infer<
+  typeof PrepareSignedGaslessEditCommentRequestBodySchema
+>;
+
+export const PrepareSignedGaslessEditCommentNotApprovedResponseSchema =
+  z.object({
+    signTypedDataParams: EditCommentTypedDataSchema,
+    appSignature: HexSchema,
+    chainId: z.number(),
+    edit: EditCommentDataSchema,
+  });
+
+export type PrepareSignedGaslessEditCommentNotApprovedResponseSchemaType =
+  z.infer<typeof PrepareSignedGaslessEditCommentNotApprovedResponseSchema>;
+
+export const PrepareSignedGaslessEditCommentApprovedResponseSchema = z.object({
+  txHash: HexSchema,
+  edit: EditCommentDataSchema,
+  appSignature: HexSchema,
+  chainId: z.number(),
+});
+
+export type PrepareSignedGaslessEditCommentApprovedResponseSchemaType = z.infer<
+  typeof PrepareSignedGaslessEditCommentApprovedResponseSchema
+>;
+
+/**
+ * Used for editing comments (gas is paid by the user)
+ */
+export const SignEditCommentPayloadRequestSchema = z.object({
+  commentId: HexSchema,
+  content: z.string().trim().nonempty(),
+  author: HexSchema,
+  metadata: z.string(),
+});
+
+export type SignEditCommentPayloadRequestSchemaType = z.infer<
+  typeof SignEditCommentPayloadRequestSchema
 >;
 
 /**

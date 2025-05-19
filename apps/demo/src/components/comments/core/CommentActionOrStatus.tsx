@@ -8,15 +8,20 @@ export function CommentActionOrStatus({
   onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
+  onRetryEditClick,
 }: {
   comment: Comment;
   hasAccountConnected: boolean;
   onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
+  onRetryEditClick: () => void;
 }) {
   const isDeleting =
     comment.pendingOperation?.action === "delete" &&
+    comment.pendingOperation.state.status === "pending";
+  const isEditing =
+    comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "pending";
   const isPosting =
     comment.pendingOperation?.action === "post" &&
@@ -26,6 +31,9 @@ export function CommentActionOrStatus({
     comment.pendingOperation.state.status === "error";
   const didPostingFailed =
     comment.pendingOperation?.action === "post" &&
+    comment.pendingOperation.state.status === "error";
+  const didEditingFailed =
+    comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "error";
 
   if (didPostingFailed) {
@@ -52,11 +60,31 @@ export function CommentActionOrStatus({
     );
   }
 
+  if (didEditingFailed) {
+    return (
+      <div className="flex items-center gap-1 text-xs text-destructive">
+        <MessageCircleWarningIcon className="w-3 h-3" />
+        <span>
+          Could not edit the comment.{" "}
+          <RetryButton onClick={onRetryEditClick}>Retry</RetryButton>
+        </span>
+      </div>
+    );
+  }
   if (isDeleting) {
     return (
       <div className="flex items-center gap-1 text-xs text-muted-foreground">
         <Loader2Icon className="w-3 h-3 animate-spin" />
         <span>Deleting...</span>
+      </div>
+    );
+  }
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        <Loader2Icon className="w-3 h-3 animate-spin" />
+        <span>Editing...</span>
       </div>
     );
   }

@@ -11,6 +11,9 @@ import {TestUtils} from "./utils.sol";
 import {LibString} from "solady/utils/LibString.sol";
 import {Hooks} from "../src/libraries/Hooks.sol";
 import {Comments} from "../src/libraries/Comments.sol";
+import {ICommentManager} from "../src/interfaces/ICommentManager.sol";
+import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
+import {TestUtils} from "./utils.sol";
 
 struct TipInfo {
     bool found;
@@ -23,17 +26,14 @@ contract TipHook is BaseHook {
     using Strings for uint256;
     using TestUtils for string;
 
-    error NotAReplyComment();
-    error NoTipAmount();
-    error TipTransferFailed();
-    error InvalidTipSyntax(string);
+    error InvalidTipAmount();
     error TipAmountMismatch();
 
     // Reference to the CommentManager contract
-    CommentManager public immutable comments;
+    ICommentManager public immutable commentManager;
 
-    constructor(address _comments) {
-        comments = CommentManager(_comments);
+    constructor(address _commentManager) {
+        commentManager = CommentManager(_commentManager);
     }
 
     function _getHookPermissions()
@@ -44,44 +44,51 @@ contract TipHook is BaseHook {
     {
         return
             Hooks.Permissions({
-                beforeInitialize: false,
                 afterInitialize: false,
-                beforeComment: true,
                 afterComment: true,
-                beforeDeleteComment: false,
-                afterDeleteComment: false
+                afterDeleteComment: false,
+                afterEditComment: false
             });
     }
 
-    /// @notice Execute before a comment is processed to handle ETH tips
+    /// @notice Execute after a comment is processed to handle ETH tips
     /// @param commentData The comment data to process
-    /// @return success Whether the hook execution was successful
-    function _beforeComment(
-        Comments.CommentData calldata commentData,
+    /// @return hookData The comment hook data that was generated
+    function _afterComment(
+        Comments.Comment calldata commentData,
         address,
-        bytes32
-    ) internal override returns (bool) {
+        bytes32 commentId
+    ) internal override returns (string memory hookData) {
         // Check if this is a reply comment
-        if (commentData.parentId == bytes32(0)) {
-            // For non-reply comments, return false if ETH was sent
-            // This allows the ChannelManager to handle the revert
-            return msg.value == 0;
+        if (commentData.parentId == bytes32(0) && msg.value == 0) {
+            // No tip was sent, so ignore it.
+            return "";
         }
 
         // Get the parent comment's author
-        (address parentAuthor, , , , , , , , , , , ) = comments.comments(
+        Comments.Comment memory parentComment = commentManager.getComment(
             commentData.parentId
         );
+        address parentAuthor = parentComment.author;
 
         // Parse the tip mention and amount
         TipInfo memory tipInfo = parseTipMention(commentData.content);
 
         if (tipInfo.found) {
-            // Verify the sent amount matches the mentioned amount
-            if (msg.value != tipInfo.amount) {
+            // Calculate the expected amount after protocol fee (2%)
+            uint256 expectedAmountAfterFee = CommentManager(
+                address(commentManager)
+            ).channelManager().deductProtocolHookTransactionFee(tipInfo.amount);
+
+            // Verify the sent amount matches the mentioned amount after fee
+            if (msg.value != expectedAmountAfterFee) {
                 console.log("Tip amount mismatch");
+                console.log("Comment content:", tipInfo.amount);
                 console.log("Sent amount:", msg.value);
-                console.log("Expected amount:", tipInfo.amount);
+                console.log(
+                    "Expected amount after fee:",
+                    expectedAmountAfterFee
+                );
                 revert TipAmountMismatch();
             }
 
@@ -92,15 +99,36 @@ contract TipHook is BaseHook {
                 msg.value
             );
             payable(parentAuthor).transfer(msg.value);
+
+            // Create a new comment acknowledging the tip
+            Comments.CreateComment memory tipAckData = Comments.CreateComment({
+                content: string(
+                    abi.encodePacked(
+                        "tipped ",
+                        Strings.toString(tipInfo.amount / 1e18),
+                        " ETH to ",
+                        LibString.toHexString(uint160(parentAuthor))
+                    )
+                ),
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: address(this),
+                app: address(this),
+                channelId: commentData.channelId,
+                nonce: commentManager.getNonce(address(this), address(this)),
+                deadline: block.timestamp + 1 days,
+                parentId: commentId
+            });
+
+            commentManager.postCommentAsAuthor(tipAckData, "");
         } else if (msg.value > 0) {
-            revert InvalidTipSyntax(
-                "ETH was sent but no valid tip mention was found"
-            );
+            revert InvalidTipAmount();
         } else {
             console.log("No tip amount found");
         }
 
-        return true;
+        return "";
     }
 
     /// @notice Parse a tip mention from a comment's content
@@ -127,6 +155,7 @@ contract TipHook is BaseHook {
 
             if (contentBytes[i] == "!") {
                 // Check if address matches
+
                 (bool matchFound, uint256 addrStart) = checkAddressMatch(
                     contentBytes,
                     i,
@@ -181,17 +210,40 @@ contract TipHook is BaseHook {
 
         return (matchFound, addrStart);
     }
+    function trimWhitespace(
+        bytes memory contentBytes,
+        uint256 currentPos,
+        uint256 endPos2
+    ) internal pure returns (uint256, uint256) {
+        // Skip leading whitespace
+        while (currentPos < endPos2 && contentBytes[currentPos] == " ") {
+            currentPos++;
+        }
 
-    // Helper function to skip whitespace
+        // Skip trailing whitespace
+        uint256 endPos = endPos2;
+        while (endPos > currentPos) {
+            if (contentBytes[endPos - 1] != " ") {
+                break;
+            }
+            endPos--;
+        }
+
+        return (currentPos, endPos);
+    }
+
+    // Helper function to trim whitespace from start and end of content
     function skipWhitespace(
         bytes memory contentBytes,
         uint256 currentPos
     ) internal pure returns (uint256) {
+        // Skip leading whitespace
         while (
             currentPos < contentBytes.length && contentBytes[currentPos] == " "
         ) {
             currentPos++;
         }
+
         return currentPos;
     }
 
@@ -206,10 +258,15 @@ contract TipHook is BaseHook {
             // Check for "ETH" suffix
             if (isEthSuffix(contentBytes, endPos)) {
                 // Found "ETH" suffix, parse the amount
-                (bool found, uint256 amount) = TestUtils.parseAndConvertAmount(
+                (uint256 currentPos2, uint256 endPos2) = trimWhitespace(
                     contentBytes,
                     currentPos,
                     endPos
+                );
+                (bool found, uint256 amount) = TestUtils.parseAndConvertAmount(
+                    contentBytes,
+                    currentPos2,
+                    endPos2
                 );
                 if (found) {
                     return TipInfo(true, amount);
@@ -259,13 +316,13 @@ contract TipHook is BaseHook {
     }
 }
 
-abstract contract TipHookTest is Test, IERC721Receiver {
+contract TipHookTest is Test, IERC721Receiver {
     using TestUtils for string;
     using LibString for string;
 
-    ChannelManager public channelManager;
+    IChannelManager public channelManager;
     TipHook public tipHook;
-    CommentManager public comments;
+    ICommentManager public commentManager;
 
     address public owner;
     address public user1;
@@ -280,10 +337,10 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         user2 = makeAddr("user2");
         user3 = makeAddr("user3");
 
-        (comments, channelManager) = TestUtils.createContracts(owner);
+        (commentManager, channelManager) = TestUtils.createContracts(owner);
 
         // Deploy TipHook with the CommentManager address
-        tipHook = new TipHook(address(comments));
+        tipHook = new TipHook(address(commentManager));
 
         // Fund the ChannelManager with enough ETH for tests
         vm.deal(address(channelManager), 100 ether);
@@ -306,202 +363,247 @@ abstract contract TipHookTest is Test, IERC721Receiver {
     /// @notice Test successful tip processing in a reply comment
     function testTipInReplyComment() public {
         // --- Parent Comment Setup ---
-        Comments.CreateCommentData memory parentCommentData = Comments
-            .CreateCommentData({
-                content: "Parent comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory parentComment = Comments.CreateComment({
+            content: "Parent comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: commentManager.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // Post parent comment
+        bytes memory appSignature = TestUtils.generateAppSignature(
+            vm,
+            parentComment,
+            commentManager
+        );
         vm.prank(user1);
-        comments.postCommentAsAuthor(parentCommentData, "");
-        bytes32 parentId = comments.getCommentId(parentCommentData);
+        commentManager.postCommentAsAuthor(parentComment, appSignature);
+        bytes32 parentId = commentManager.getCommentId(parentComment);
 
         uint256 initialBalance = user1.balance;
 
         // --- Reply Comment Setup (With Tip Mention) ---
         uint256 tipAmount = 0.1 ether;
 
-        Comments.CreateCommentData memory replyCommentData = Comments
-            .CreateCommentData({
-                content: string(
-                    abi.encodePacked(
-                        "Reply with tip !",
-                        LibString.toHexString(uint160(address(tipHook))),
-                        " 0.1 ETH"
-                    )
-                ),
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user2,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user2, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: parentId
-            });
+        Comments.CreateComment memory replyComment = Comments.CreateComment({
+            content: string(
+                abi.encodePacked(
+                    "Reply with tip !",
+                    LibString.toHexString(uint160(address(tipHook))),
+                    " 0.1 ETH"
+                )
+            ),
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user2,
+            app: user2,
+            channelId: channelId,
+            nonce: commentManager.getNonce(user2, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: parentId
+        });
 
         // --- Post Reply Comment (With Correct Tip Amount) ---
+        appSignature = TestUtils.generateAppSignature(
+            vm,
+            replyComment,
+            commentManager
+        );
         vm.prank(user2);
-        comments.postCommentAsAuthor{value: tipAmount}(replyCommentData, "");
+        commentManager.postCommentAsAuthor{value: tipAmount}(
+            replyComment,
+            appSignature
+        );
         console.log("user1 address:", user1);
         console.log("tipAmount", tipAmount, initialBalance, user1.balance);
+        uint256 expectedAmountAfterFee = CommentManager(address(commentManager))
+            .channelManager()
+            .deductProtocolHookTransactionFee(tipAmount);
+
         // The parent author should receive the tip amount
         assertEq(
             user1.balance,
-            initialBalance + tipAmount,
+            initialBalance + expectedAmountAfterFee,
             "Tip should be transferred to parent author"
         );
     }
 
     /// @notice Test that hook reverts when sent ETH amount doesn't match mentioned amount
     function testRevertWhenTipAmountMismatch() public {
-        Comments.CreateCommentData memory parentCommentData = Comments
-            .CreateCommentData({
-                content: "Parent comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory parentComment = Comments.CreateComment({
+            content: "Parent comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: commentManager.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // Post parent comment
+        bytes memory appSignature = TestUtils.generateAppSignature(
+            vm,
+            parentComment,
+            commentManager
+        );
         vm.prank(user1);
-        comments.postCommentAsAuthor(parentCommentData, "");
-        bytes32 parentCommentId = comments.getCommentId(parentCommentData);
+        commentManager.postCommentAsAuthor(parentComment, appSignature);
+        bytes32 parentCommentId = commentManager.getCommentId(parentComment);
 
         // --- Reply Comment Setup (With Tip Mention) ---
-        Comments.CreateCommentData memory replyCommentData = Comments
-            .CreateCommentData({
-                content: string(
-                    abi.encodePacked(
-                        "Reply with tip !",
-                        LibString.toHexString(uint160(address(tipHook))),
-                        " 0.1ETH"
-                    )
-                ),
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user2,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user2, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: parentCommentId
-            });
+        Comments.CreateComment memory replyComment = Comments.CreateComment({
+            content: string(
+                abi.encodePacked(
+                    "Reply with tip !",
+                    LibString.toHexString(uint160(address(tipHook))),
+                    " 0.1ETH"
+                )
+            ),
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user2,
+            app: user2,
+            channelId: channelId,
+            nonce: commentManager.getNonce(user2, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: parentCommentId
+        });
 
         // --- Post Reply Comment (With Incorrect Tip Amount) ---
+        appSignature = TestUtils.generateAppSignature(
+            vm,
+            replyComment,
+            commentManager
+        );
         vm.prank(user2);
         vm.expectRevert(TipHook.TipAmountMismatch.selector);
-        comments.postCommentAsAuthor{value: 0.05 ether}(replyCommentData, "");
+        commentManager.postCommentAsAuthor{value: 0.05 ether}(
+            replyComment,
+            appSignature
+        );
     }
 
     /// @notice Test that hook reverts when tip syntax is invalid
     function testRevertWhenTipSyntaxInvalid() public {
         // --- Parent Comment Setup ---
-        Comments.CreateCommentData memory parentCommentData = Comments
-            .CreateCommentData({
-                content: "Parent comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory parentComment = Comments.CreateComment({
+            content: "Parent comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: commentManager.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // Post parent comment
+        bytes memory appSignature = TestUtils.generateAppSignature(
+            vm,
+            parentComment,
+            commentManager
+        );
         vm.prank(user1);
-        comments.postCommentAsAuthor(parentCommentData, "");
-        bytes32 parentCommentId = comments.getCommentId(parentCommentData);
+        commentManager.postCommentAsAuthor(parentComment, appSignature);
+        bytes32 parentCommentId = commentManager.getCommentId(parentComment);
 
         // --- Reply Comment Setup (With Invalid Tip Syntax) ---
-        Comments.CreateCommentData memory replyCommentData = Comments
-            .CreateCommentData({
-                content: string(
-                    abi.encodePacked(
-                        "Reply with invalid tip syntax !",
-                        LibString.toHexString(uint160(address(tipHook))),
-                        " invalid_amount"
-                    )
-                ),
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user2,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user2, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: parentCommentId
-            });
+        Comments.CreateComment memory replyComment = Comments.CreateComment({
+            content: string(
+                abi.encodePacked(
+                    "Reply with invalid tip syntax !",
+                    LibString.toHexString(uint160(address(tipHook))),
+                    " invalid_amount"
+                )
+            ),
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user2,
+            app: user2,
+            channelId: channelId,
+            nonce: commentManager.getNonce(user2, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: parentCommentId
+        });
 
         // --- Post Reply Comment (With Invalid Tip Syntax) ---
+        appSignature = TestUtils.generateAppSignature(
+            vm,
+            replyComment,
+            commentManager
+        );
         vm.prank(user2);
-        vm.expectRevert(TipHook.InvalidTipSyntax.selector);
-        comments.postCommentAsAuthor{value: 0.1 ether}(replyCommentData, "");
+        vm.expectRevert(TipHook.InvalidTipAmount.selector);
+        commentManager.postCommentAsAuthor{value: 0.1 ether}(
+            replyComment,
+            appSignature
+        );
     }
 
     /// @notice Test that no tip is processed when no tip is mentioned
     function testNoTipWithoutMention() public {
         // --- Parent Comment Setup ---
-        Comments.CreateCommentData memory parentCommentData = Comments
-            .CreateCommentData({
-                content: "Parent comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory parentComment = Comments.CreateComment({
+            content: "Parent comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: commentManager.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // Post parent comment
+        bytes memory appSignature = TestUtils.generateAppSignature(
+            vm,
+            parentComment,
+            commentManager
+        );
         vm.prank(user1);
-        comments.postCommentAsAuthor(parentCommentData, "");
-        bytes32 parentCommentId = comments.getCommentId(parentCommentData);
+        commentManager.postCommentAsAuthor(parentComment, appSignature);
+        bytes32 parentCommentId = commentManager.getCommentId(parentComment);
 
         uint256 initialBalance = user1.balance;
 
         // --- Reply Comment Setup (No Tip Mention) ---
-        Comments.CreateCommentData memory replyCommentData = Comments
-            .CreateCommentData({
-                content: "Regular reply without tip", // No tip mention
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user2,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user2, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: parentCommentId
-            });
+        Comments.CreateComment memory replyComment = Comments.CreateComment({
+            content: "Regular reply without tip", // No tip mention
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user2,
+            app: user2,
+            channelId: channelId,
+            nonce: commentManager.getNonce(user2, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: parentCommentId
+        });
 
         // --- Post Reply Comment (No Value) ---
+        appSignature = TestUtils.generateAppSignature(
+            vm,
+            replyComment,
+            commentManager
+        );
         vm.prank(user2);
-        comments.postCommentAsAuthor(replyCommentData, "");
+        commentManager.postCommentAsAuthor(replyComment, appSignature);
 
         assertEq(
             user1.balance,
@@ -510,8 +612,79 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         );
     }
 
-    /// @notice Test suite for the parseTipMention function
-    function test_parseTipContent() public view {
+    /// @notice Test that the tip acknowledgment comment is posted correctly
+    function testTipAcknowledgmentComment() public {
+        // --- Parent Comment Setup ---
+        Comments.CreateComment memory parentComment = Comments.CreateComment({
+            content: "Parent comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: commentManager.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
+
+        // Post parent comment
+        bytes memory appSignature = TestUtils.generateAppSignature(
+            vm,
+            parentComment,
+            commentManager
+        );
+        vm.prank(user1);
+        commentManager.postCommentAsAuthor(parentComment, appSignature);
+        bytes32 parentId = commentManager.getCommentId(parentComment);
+
+        // --- Reply Comment Setup (With Tip Mention) ---
+        uint256 tipAmount = 0.1 ether;
+
+        Comments.CreateComment memory replyComment = Comments.CreateComment({
+            content: string(
+                abi.encodePacked(
+                    "Reply with tip !",
+                    LibString.toHexString(uint160(address(tipHook))),
+                    " 0.1 ETH"
+                )
+            ),
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user2,
+            app: user2,
+            channelId: channelId,
+            nonce: commentManager.getNonce(user2, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: parentId
+        });
+
+        // --- Post Reply Comment (With Correct Tip Amount) ---
+        appSignature = TestUtils.generateAppSignature(
+            vm,
+            replyComment,
+            commentManager
+        );
+        vm.prank(user2);
+
+        // FIXME: assert no revert.
+
+        commentManager.postCommentAsAuthor{value: tipAmount}(
+            replyComment,
+            appSignature
+        );
+
+        // Verify the nonce for the tip acknowledgment comment
+        assertEq(
+            commentManager.getNonce(address(tipHook), address(tipHook)),
+            1,
+            "Tip hook nonce should be 1 after posting acknowledgment"
+        );
+    }
+
+    /// @notice Test suite for the parseTipMention function - Basic valid cases
+    function test_parseTipContent_basicValidCases() public view {
         // Test case 1: Valid tip with space between number and ETH
         string memory validTipWithSpace = string(
             abi.encodePacked(
@@ -535,8 +708,11 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         result = tipHook.parseTipMention(validTipNoSpace);
         assertTrue(result.found, "Should find valid tip without space");
         assertEq(result.amount, 0.1 ether, "Should parse 0.1ETH correctly");
+    }
 
-        // Test case 3: Valid tip with whole number
+    /// @notice Test suite for the parseTipMention function - Number format cases
+    function test_parseTipContent_numberFormats() public view {
+        // Test case 1: Valid tip with whole number
         string memory wholeNumberTip = string(
             abi.encodePacked(
                 "!",
@@ -544,11 +720,11 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 " 1 ETH"
             )
         );
-        result = tipHook.parseTipMention(wholeNumberTip);
+        TipInfo memory result = tipHook.parseTipMention(wholeNumberTip);
         assertTrue(result.found, "Should find valid whole number tip");
         assertEq(result.amount, 1 ether, "Should parse 1 ETH correctly");
 
-        // Test case 4: Valid tip with decimal number
+        // Test case 2: Valid tip with decimal number
         string memory decimalTip = string(
             abi.encodePacked(
                 "!",
@@ -559,8 +735,11 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         result = tipHook.parseTipMention(decimalTip);
         assertTrue(result.found, "Should find valid decimal tip");
         assertEq(result.amount, 0.01 ether, "Should parse 0.01 ETH correctly");
+    }
 
-        // Test case 5: Invalid tip - wrong address
+    /// @notice Test suite for the parseTipMention function - Invalid cases
+    function test_parseTipContent_invalidCases() public view {
+        // Test case 1: Invalid tip - wrong address
         string memory wrongAddressTip = string(
             abi.encodePacked(
                 "!",
@@ -568,10 +747,10 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 " 0.1 ETH"
             )
         );
-        result = tipHook.parseTipMention(wrongAddressTip);
+        TipInfo memory result = tipHook.parseTipMention(wrongAddressTip);
         assertFalse(result.found, "Should not find tip with wrong address");
 
-        // Test case 6: Invalid tip - missing number
+        // Test case 2: Invalid tip - missing number
         string memory missingNumberTip = string(
             abi.encodePacked(
                 "!",
@@ -582,7 +761,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
         result = tipHook.parseTipMention(missingNumberTip);
         assertFalse(result.found, "Should not find tip with missing number");
 
-        // Test case 7: Invalid tip - invalid number format
+        // Test case 3: Invalid tip - invalid number format
         string memory invalidNumberTip = string(
             abi.encodePacked(
                 "!",
@@ -596,7 +775,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
             "Should not find tip with invalid number format"
         );
 
-        // Test case 8: Invalid tip - missing ETH suffix
+        // Test case 4: Invalid tip - missing ETH suffix
         string memory missingEthSuffixTip = string(
             abi.encodePacked(
                 "!",
@@ -609,8 +788,11 @@ abstract contract TipHookTest is Test, IERC721Receiver {
             result.found,
             "Should not find tip with missing ETH suffix"
         );
+    }
 
-        // Test case 9: Tip mention in the middle of text
+    /// @notice Test suite for the parseTipMention function - Complex cases
+    function test_parseTipContent_complexCases() public view {
+        // Test case 1: Tip mention in the middle of text
         string memory tipInMiddle = string(
             abi.encodePacked(
                 "Here's a tip ",
@@ -620,7 +802,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
                 " for you"
             )
         );
-        result = tipHook.parseTipMention(tipInMiddle);
+        TipInfo memory result = tipHook.parseTipMention(tipInMiddle);
         assertTrue(
             result.found,
             "Should find tip mention in the middle of text"
@@ -631,7 +813,7 @@ abstract contract TipHookTest is Test, IERC721Receiver {
             "Should parse 0.1 ETH correctly from middle of text"
         );
 
-        // Test case 10: Multiple tip mentions (should find the first one)
+        // Test case 2: Multiple tip mentions (should find the first one)
         string memory multipleTips = string(
             abi.encodePacked(
                 "!",
@@ -651,5 +833,14 @@ abstract contract TipHookTest is Test, IERC721Receiver {
             0.1 ether,
             "Should parse first tip amount correctly"
         );
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external pure returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 }

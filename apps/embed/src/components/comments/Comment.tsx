@@ -34,6 +34,8 @@ interface CommentProps {
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
   onReplyClick: () => void;
+  onEditClick: () => void;
+  onRetryEditClick: () => void;
 }
 
 export function Comment({
@@ -42,6 +44,8 @@ export function Comment({
   onRetryDeleteClick,
   onRetryPostClick,
   onReplyClick,
+  onEditClick,
+  onRetryEditClick,
 }: CommentProps) {
   const { currentTimestamp } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
@@ -56,6 +60,10 @@ export function Comment({
     comment.pendingOperation?.action === "delete" &&
     comment.pendingOperation.state.status === "pending";
 
+  const isEditing =
+    comment.pendingOperation?.action === "edit" &&
+    comment.pendingOperation.state.status === "pending";
+
   return (
     <>
       <div className="flex justify-between items-center mb-2">
@@ -65,24 +73,34 @@ export function Comment({
           currentTimestamp={currentTimestamp}
           moderationStatus={comment.moderationStatus}
         />
-        {isAuthor && !comment.pendingOperation && !comment.deletedAt && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="p-1 text-muted-foreground">
-                <MoreVertical className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="text-destructive cursor-pointer"
-                onClick={onDeleteClick}
-                disabled={isDeleting}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        {isAuthor &&
+          !comment.deletedAt &&
+          (!comment.pendingOperation ||
+            comment.pendingOperation.state.status === "success") && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="p-1 text-muted-foreground">
+                  <MoreVertical className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={onEditClick}
+                  disabled={isEditing}
+                >
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive cursor-pointer"
+                  onClick={onDeleteClick}
+                  disabled={isDeleting}
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
       </div>
       <div
         className={cn(
@@ -92,7 +110,7 @@ export function Comment({
       >
         <CommentText
           // make sure comment is updated if was deleted
-          key={comment.deletedAt?.toISOString()}
+          key={`${comment.deletedAt?.toISOString()}-${comment.updatedAt}-${comment.revision}`}
           text={comment.content}
         />
       </div>
@@ -103,6 +121,7 @@ export function Comment({
           onRetryDeleteClick={onRetryDeleteClick}
           onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
+          onRetryEditClick={onRetryEditClick}
         />
       </div>
     </>

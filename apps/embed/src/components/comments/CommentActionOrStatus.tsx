@@ -9,6 +9,7 @@ interface CommentActionOrStatusProps {
   onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
+  onRetryEditClick: () => void;
 }
 
 export function CommentActionOrStatus({
@@ -17,6 +18,7 @@ export function CommentActionOrStatus({
   onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
+  onRetryEditClick,
 }: CommentActionOrStatusProps) {
   const isDeleting =
     comment.pendingOperation?.action === "delete" &&
@@ -30,6 +32,12 @@ export function CommentActionOrStatus({
   const didPostingFailed =
     comment.pendingOperation?.action === "post" &&
     comment.pendingOperation.state.status === "error";
+  const didEditingFailed =
+    comment.pendingOperation?.action === "edit" &&
+    comment.pendingOperation.state.status === "error";
+  const isEditing =
+    comment.pendingOperation?.action === "edit" &&
+    comment.pendingOperation.state.status === "pending";
 
   if (didPostingFailed) {
     return (
@@ -55,11 +63,28 @@ export function CommentActionOrStatus({
     );
   }
 
+  if (didEditingFailed) {
+    return (
+      <div className="flex items-center gap-1 text-xs text-destructive">
+        <MessageCircleWarningIcon className="w-3 h-3" />
+      </div>
+    );
+  }
+
   if (isDeleting) {
     return (
       <div className="flex items-center gap-1 text-xs text-muted-foreground">
         <Loader2Icon className="w-3 h-3 animate-spin" />
         <span>Deleting...</span>
+      </div>
+    );
+  }
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        <Loader2Icon className="w-3 h-3 animate-spin" />
+        <span>Editing...</span>
       </div>
     );
   }

@@ -64,20 +64,18 @@ contract SharedFeeHook is BaseHook {
     {
         return
             Hooks.Permissions({
-                beforeComment: true,
-                afterComment: false,
-                beforeDeleteComment: false,
+                afterComment: true,
                 afterDeleteComment: false,
-                beforeInitialize: false,
+                afterEditComment: false,
                 afterInitialize: false
             });
     }
 
-    function _beforeComment(
-        Comments.CommentData calldata commentData,
+    function _afterComment(
+        Comments.Comment calldata commentData,
         address,
         bytes32
-    ) internal override returns (bool) {
+    ) internal override returns (string memory hookData) {
         // Calculate protocol fee
         uint256 protocolFee = (feeAmount * PROTOCOL_FEE_PERCENTAGE) / 10000;
         uint256 hookFee = feeAmount - protocolFee;
@@ -100,7 +98,7 @@ contract SharedFeeHook is BaseHook {
         // Distribute fees to recipients
         _distributeFees(hookFee);
 
-        return true;
+        return "";
     }
 
     function addRecipient(address _recipient, uint256 _share) external {
@@ -361,7 +359,7 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
     }
 
     function _signAppSignature(
-        Comments.CreateCommentData memory commentData
+        Comments.CreateComment memory commentData
     ) internal view returns (bytes memory) {
         bytes32 digest = comments.getCommentId(commentData);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
@@ -378,19 +376,18 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
         );
 
         // Create comment data using direct construction
-        Comments.CreateCommentData memory commentData = Comments
-            .CreateCommentData({
-                content: "Test comment",
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory commentData = Comments.CreateComment({
+            content: "Test comment",
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: comments.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         bytes memory appSignature = _signAppSignature(commentData);
 

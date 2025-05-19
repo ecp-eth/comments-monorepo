@@ -12,9 +12,6 @@ import type {
   CreateRootCommentDataParams,
 } from "./types.js";
 
-/**
- * Comment schema. This is used as output of the functions.
- */
 export const CommentDataSchema = z.object({
   author: HexSchema,
   app: HexSchema,
@@ -31,6 +28,8 @@ export const CommentDataSchema = z.object({
 
   createdAt: z.coerce.bigint(),
   updatedAt: z.coerce.bigint(),
+
+  hookData: z.string(),
 });
 
 // this just tests if the shape is correct
@@ -56,6 +55,8 @@ const BaseCommentInputDataSchema = z.object({
   metadata: z.string(),
   targetUri: z.string(),
   commentType: z.string().default(DEFAULT_COMMENT_TYPE),
+
+  hookData: z.string().default(""),
 });
 
 export const RootCommentInputDataSchema = BaseCommentInputDataSchema.omit({
@@ -98,6 +99,20 @@ export type CommentInputData = z.infer<typeof CommentInputDataSchema>;
 
 // this is just for type checking
 ({}) as CommentInputData satisfies CreateCommentData;
+
+/**
+ * Edit comment data schema. This is used as input of the functions.
+ */
+export const EditCommentDataSchema = z.object({
+  commentId: HexSchema,
+  content: z.string(),
+  metadata: z.string(),
+  app: HexSchema,
+  nonce: z.coerce.bigint(),
+  deadline: z.coerce.bigint(),
+});
+
+export type EditCommentData = z.infer<typeof EditCommentDataSchema>;
 
 export const AddCommentTypedDataSchema = z.object({
   primaryType: z.literal("AddComment"),
@@ -160,6 +175,42 @@ export const DeleteCommentTypedDataSchema = z.object({
 
 export type DeleteCommentTypedDataSchemaType = z.infer<
   typeof DeleteCommentTypedDataSchema
+>;
+
+export const EditCommentTypedDataSchema = z.object({
+  primaryType: z.literal("EditComment"),
+  domain: z.object({
+    name: z.literal(DOMAIN_NAME),
+    version: z.literal(DOMAIN_VERSION),
+    chainId: z.number(),
+    verifyingContract: HexSchema,
+  }),
+  message: z.object({
+    commentId: HexSchema,
+    content: z.string(),
+    metadata: z.string(),
+    author: HexSchema,
+    app: HexSchema,
+    nonce: z.coerce.bigint(),
+    deadline: z.coerce.bigint(),
+  }),
+  types: z.object({
+    EditComment: z.array(
+      z.union([
+        z.object({ name: z.literal("commentId"), type: z.literal("bytes32") }),
+        z.object({ name: z.literal("content"), type: z.literal("string") }),
+        z.object({ name: z.literal("metadata"), type: z.literal("string") }),
+        z.object({ name: z.literal("author"), type: z.literal("address") }),
+        z.object({ name: z.literal("app"), type: z.literal("address") }),
+        z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
+        z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
+      ])
+    ),
+  }),
+});
+
+export type EditCommentTypedDataSchemaType = z.infer<
+  typeof EditCommentTypedDataSchema
 >;
 
 export const AddApprovalTypedDataSchema = z.object({

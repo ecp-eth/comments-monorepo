@@ -9,18 +9,50 @@ import "./interfaces/IChannelManager.sol";
 import "./interfaces/IProtocolFees.sol";
 import "./ProtocolFees.sol";
 import "./libraries/Comments.sol";
+import "./libraries/Channels.sol";
 
 /// @title ChannelManager - A contract for managing comment channels and their hooks as NFTs
 /// @notice This contract allows creation and management of channels with configurable hooks, where each channel is an NFT
 /// @dev Implements channel management with the following security features:
 contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
+    /// @notice Base URI for NFT metadata
+    string internal baseURIValue;
+
+    /// @notice Address of the comments contract
+    address internal commentsContract;
+
     // Mapping from channel ID to channel configuration
-    mapping(uint256 => ChannelConfig) private channels;
+    mapping(uint256 => Channels.Channel) internal channels;
 
-    // Base URI for NFT metadata
-    string private baseURIValue;
+    /// @notice Constructor sets the contract owner and initializes ERC721
+    /// @param initialOwner The address that will own the contract
+    constructor(
+        address initialOwner
+    ) ProtocolFees(initialOwner) ERC721("ECP Channel", "ECPC") {
+        if (initialOwner == address(0)) revert ZeroAddress();
 
-    address public commentsContract;
+        // Create default channel with ID 0
+        _safeMint(initialOwner, 0);
+
+        Channels.Channel storage channelZero = channels[0];
+
+        channelZero.name = "Home";
+        channelZero.description = "Any kind of content";
+        channelZero.metadata = "{}";
+    }
+
+    modifier onlyCommentsContract() {
+        if (msg.sender != commentsContract) revert UnauthorizedCaller();
+        _;
+    }
+
+    /// @inheritdoc IChannelManager
+    function getChannel(
+        uint256 channelId
+    ) external view returns (Channels.Channel memory) {
+        if (!_channelExists(channelId)) revert ChannelDoesNotExist();
+        return channels[channelId];
+    }
 
     /// @notice Generates a unique channel ID based on input parameters
     /// @param creator The address creating the channel
@@ -47,28 +79,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
                     )
                 )
             );
-    }
-
-    /// @notice Constructor sets the contract owner and initializes ERC721
-    /// @param initialOwner The address that will own the contract
-    constructor(
-        address initialOwner
-    ) ProtocolFees(initialOwner) ERC721("ECP Channel", "ECPC") {
-        if (initialOwner == address(0)) revert ZeroAddress();
-
-        // Create default channel with ID 0
-        _safeMint(initialOwner, 0);
-
-        ChannelConfig storage channelZero = channels[0];
-
-        channelZero.name = "Home";
-        channelZero.description = "Any kind of content";
-        channelZero.metadata = "{}";
-    }
-
-    modifier onlyCommentsContract() {
-        if (msg.sender != commentsContract) revert UnauthorizedCaller();
-        _;
     }
 
     /// @notice Internal function to check if a channel exists
@@ -98,7 +108,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
         _safeMint(msg.sender, channelId);
 
-        ChannelConfig storage channel = channels[channelId];
+        Channels.Channel storage channel = channels[channelId];
 
         channel.name = name;
         channel.description = description;
@@ -123,7 +133,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         if (!_channelExists(channelId)) revert ChannelDoesNotExist();
         if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
 
-        ChannelConfig storage channel = channels[channelId];
+        Channels.Channel storage channel = channels[channelId];
 
         channel.name = name;
         channel.description = description;
@@ -146,44 +156,24 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     function _setHook(uint256 channelId, address hook) internal {
         if (hook != address(0)) {
             // Validate that the hook implements IHook interface
-            try IERC165(hook).supportsInterface(type(IHook).interfaceId) returns (
-                bool result
-            ) {
+            try
+                IERC165(hook).supportsInterface(type(IHook).interfaceId)
+            returns (bool result) {
                 if (!result) revert InvalidHookInterface();
             } catch {
                 revert InvalidHookInterface();
             }
 
             // Get hook permissions and store them on the channel
-            Hooks.Permissions memory permissions = IHook(hook).getHookPermissions();
-
-            // Call beforeInitialize hook if permitted
-            if (permissions.beforeInitialize) {
-                try IHook(hook).beforeInitialize(address(this)) returns (bool success) {
-                    if (!success) revert HookInitializationFailed();
-                } catch Error(string memory reason) {
-                    revert(reason);
-                } catch (bytes memory returnData) {
-                    assembly {
-                        revert(add(returnData, 0x20), mload(returnData))
-                    }
-                }
-            }
+            Hooks.Permissions memory permissions = IHook(hook)
+                .getHookPermissions();
 
             channels[channelId].hook = IHook(hook);
             channels[channelId].permissions = permissions;
 
             // Call afterInitialize hook if permitted
             if (permissions.afterInitialize) {
-                try IHook(hook).afterInitialize(address(this)) returns (bool success) {
-                    if (!success) revert HookInitializationFailed();
-                } catch Error(string memory reason) {
-                    revert(reason);
-                } catch (bytes memory returnData) {
-                    assembly {
-                        revert(add(returnData, 0x20), mload(returnData))
-                    }
-                }
+                IHook(hook).afterInitialize(address(this));
             }
         } else {
             delete channels[channelId].hook; // Properly reset to default value
@@ -191,132 +181,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
         emit HookSet(channelId, hook);
         emit HookStatusUpdated(channelId, hook, hook != address(0));
-    }
-
-    /// @inheritdoc IChannelManager
-    function getChannel(
-        uint256 channelId
-    )
-        external
-        view
-        returns (
-            string memory name,
-            string memory description,
-            string memory metadata,
-            address hook
-        )
-    {
-        if (!_channelExists(channelId)) revert ChannelDoesNotExist();
-
-        ChannelConfig storage channel = channels[channelId];
-        return (
-            channel.name,
-            channel.description,
-            channel.metadata,
-            address(channel.hook)
-        );
-    }
-
-    /// @inheritdoc IChannelManager
-    function executeHook(
-        uint256 channelId,
-        Comments.CommentData calldata commentData,
-        address caller,
-        bytes32 commentId,
-        Hooks.HookPhase phase
-    ) external payable returns (bool) {
-        if (!_channelExists(channelId)) revert ChannelDoesNotExist();
-
-        ChannelConfig storage channel = channels[channelId];
-        address hookAddress = address(channel.hook);
-
-        if (hookAddress == address(0)) {
-            return true;
-        }
-
-        // Calculate hook value after protocol fee
-        uint256 hookValue = calculateHookTransactionFee(msg.value);
-
-        // Execute the appropriate hook function based on phase
-        if (phase == Hooks.HookPhase.BeforeComment) {
-            if (!channel.permissions.beforeComment) return true;
-            bool success;
-            try
-                channel.hook.beforeComment{value: hookValue}(
-                    commentData,
-                    caller,
-                    commentId
-                )
-            returns (bool result) {
-                success = result;
-            } catch Error(string memory reason) {
-                // Propagate the error message
-                revert(reason);
-            } catch (bytes memory returnData) {
-                // Propagate custom errors
-                assembly {
-                    revert(add(returnData, 0x20), mload(returnData))
-                }
-            }
-            if (!success) revert ChannelHookExecutionFailed();
-            return true;
-        } else if (phase == Hooks.HookPhase.AfterComment) {
-            if (!channel.permissions.afterComment) return true;
-            // After phase - don't revert on failure
-            bool success = true;
-            try
-                channel.hook.afterComment(commentData, caller, commentId)
-            returns (bool result) {
-                success = result;
-            } catch {
-                emit HookExecutionFailed(channelId, hookAddress, phase);
-                return true;
-            }
-            if (!success) {
-                emit HookExecutionFailed(channelId, hookAddress, phase);
-            }
-            return success;
-        } else if (phase == Hooks.HookPhase.BeforeDeleteComment) {
-            if (!channel.permissions.beforeDeleteComment) return true;
-            bool success = true;
-            try
-                channel.hook.beforeDeleteComment{value: msg.value}(
-                    commentData,
-                    caller,
-                    commentId
-                )
-            returns (bool result) {
-                success = result;
-            } catch Error(string memory reason) {
-                // Propagate the error message
-                revert(reason);
-            } catch (bytes memory returnData) {
-                // Propagate custom errors
-                assembly {
-                    revert(add(returnData, 0x20), mload(returnData))
-                }
-            }
-            if (!success) revert ChannelHookExecutionFailed();
-            return true;
-        } else if (phase == Hooks.HookPhase.AfterDeleteComment) {
-            if (!channel.permissions.afterDeleteComment) return true;
-            // After phase - don't revert on failure
-            bool success = true;
-            try
-                channel.hook.afterDeleteComment(commentData, caller, commentId)
-            returns (bool result) {
-                success = result;
-            } catch {
-                emit HookExecutionFailed(channelId, hookAddress, phase);
-                return true;
-            }
-            if (!success) {
-                emit HookExecutionFailed(channelId, hookAddress, phase);
-            }
-            return success;
-        }
-        
-        return true;
     }
 
     /// @inheritdoc IChannelManager

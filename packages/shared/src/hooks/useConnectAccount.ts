@@ -69,7 +69,11 @@ export function useConnectAccount() {
 
     deferredRef.current = deferred;
 
-    openConnectModal?.();
+    if (openConnectModal) {
+      openConnectModal();
+    } else {
+      console.warn("openConnectModal from rainbowkit is not available");
+    }
 
     return deferred.promise.finally(() => {
       clearTimeout(deferred.timeout);

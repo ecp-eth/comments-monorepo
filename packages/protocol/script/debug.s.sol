@@ -21,7 +21,8 @@ contract DebugGasUsage is Test, IERC721Receiver {
     address public user2;
 
     uint256 channelId;
-    Comments.CommentData commentData;
+    Comments.Comment commentData;
+    Comments.CreateComment createCommentData;
 
     function setUp() public {
         owner = address(this);
@@ -34,13 +35,14 @@ contract DebugGasUsage is Test, IERC721Receiver {
     }
 
     function run() public {
-        debugExecuteHook();
+        debugSetupChannel();
         debugConstructChannelManager();
         debugCreateChannel();
         debugUpdateChannel();
+        debugPostComment();
     }
 
-    function debugExecuteHook() public {
+    function debugSetupChannel() public {
         mockHook = new MockHook();
 
         // Create channel with hook
@@ -49,37 +51,6 @@ contract DebugGasUsage is Test, IERC721Receiver {
             "Description",
             "{}",
             address(mockHook)
-        );
-
-        // Create comment data using direct construction
-        commentData = Comments.CommentData({
-            content: "Test comment",
-            metadata: "{}",
-            targetUri: "",
-            commentType: "comment",
-            author: user1,
-            app: user2,
-            channelId: channelId,
-            nonce: comments.nonces(user1, user2),
-            deadline: block.timestamp + 1 days,
-            parentId: bytes32(0),
-            createdAt: uint80(block.timestamp),
-            updatedAt: uint80(block.timestamp)
-        });
-
-        vm.deal(address(comments), 10 ether);
-        vm.prank(address(comments));
-
-        measureGas("executeHook", runExecuteHook);
-    }
-
-    function runExecuteHook() internal {
-        channelManager.executeHook{value: 0.02 ether}(
-            channelId,
-            commentData,
-            user1,
-            bytes32(0),
-            Hooks.HookPhase.BeforeComment
         );
     }
 
@@ -115,6 +86,31 @@ contract DebugGasUsage is Test, IERC721Receiver {
             "Description",
             "{}"
         );
+    }
+
+    function debugPostComment() public {
+        // Create comment data using direct construction
+        createCommentData = Comments
+            .CreateComment({
+                content: "Test comment",
+                metadata: "{}",
+                targetUri: "",
+                commentType: "comment",
+                author: user1,
+                app: user2,
+                channelId: channelId,
+                nonce: comments.getNonce(user1, user2),
+                deadline: block.timestamp + 1 days,
+                parentId: bytes32(0)
+            });
+
+        // Post comment directly as author
+        vm.prank(user1);
+        measureGas("postComment", runPostComment);
+    }
+
+    function runPostComment() internal {
+        comments.postCommentAsAuthor{value: 0}(createCommentData, "");
     }
 
     // Internal function to measure gas usage

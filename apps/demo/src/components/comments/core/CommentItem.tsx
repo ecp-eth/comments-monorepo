@@ -16,7 +16,7 @@ import type { Hex } from "viem";
 import { CommentActionButton } from "./CommentActionButton";
 import { Comment } from "./Comment";
 import { useCommentActions } from "./CommentActionsContext";
-import { CommentForm } from "./CommentForm";
+import { CommentEditForm, CommentForm } from "./CommentForm";
 import { ReplyItem } from "./ReplyItem";
 import {
   createCommentRepliesQueryKey,
@@ -29,8 +29,10 @@ type CommentItemProps = {
 };
 
 export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
-  const { deleteComment, retryPostComment } = useCommentActions();
+  const { deleteComment, retryPostComment, retryEditComment } =
+    useCommentActions();
   const [isReplying, setIsReplying] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const rootQueryKey = useMemo(
     () => createRootCommentsQueryKey(connectedAddress, window.location.href),
     [connectedAddress]
@@ -44,6 +46,10 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
     setIsReplying(true);
   }, []);
 
+  const onEditClick = useCallback(() => {
+    setIsEditing(true);
+  }, []);
+
   const onDeleteClick = useCallback(() => {
     deleteComment({ comment, queryKey: rootQueryKey });
   }, [comment, deleteComment, rootQueryKey]);
@@ -51,6 +57,10 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   const onRetryPostClick = useCallback(() => {
     retryPostComment({ comment, queryKey: rootQueryKey });
   }, [comment, retryPostComment, rootQueryKey]);
+
+  const onRetryEditClick = useCallback(() => {
+    retryEditComment({ comment, queryKey });
+  }, [comment, retryEditComment, queryKey]);
 
   const repliesQuery = useInfiniteQuery({
     enabled: comment.pendingOperation?.action !== "post",
@@ -126,24 +136,39 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
 
   return (
     <div className={cn("mb-4 border-gray-200")}>
-      <Comment
-        key={`${comment.id}-${comment.deletedAt}`}
-        comment={comment}
-        onReplyClick={onReplyClick}
-        onRetryPostClick={onRetryPostClick}
-        onDeleteClick={onDeleteClick}
-        onRetryDeleteClick={onDeleteClick}
-      />
+      {isEditing ? (
+        <CommentEditForm
+          comment={comment}
+          queryKey={rootQueryKey}
+          key={`${comment.id}-${comment.deletedAt}-edit`}
+          onCancel={() => {
+            setIsEditing(false);
+          }}
+          onSubmitStart={() => {
+            setIsEditing(false);
+          }}
+        />
+      ) : (
+        <Comment
+          key={`${comment.id}-${comment.deletedAt}`}
+          comment={comment}
+          onReplyClick={onReplyClick}
+          onRetryPostClick={onRetryPostClick}
+          onDeleteClick={onDeleteClick}
+          onRetryDeleteClick={onDeleteClick}
+          onEditClick={onEditClick}
+          onRetryEditClick={onRetryEditClick}
+        />
+      )}
       {isReplying && (
         <CommentForm
           autoFocus
-          onLeftEmpty={() => {
+          onCancel={() => {
             setIsReplying(false);
           }}
           onSubmitStart={() => {
             setIsReplying(false);
           }}
-          placeholder="What are your thoughts?"
           parentId={comment.id}
         />
       )}

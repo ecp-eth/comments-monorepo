@@ -23,28 +23,22 @@ contract TestToken is ERC20 {
 contract TokenGatedHook is BaseHook {
     ERC20 public token;
     uint256 public requiredBalance;
+    error NotEnoughTokens();
 
     constructor(address _token, uint256 _requiredBalance) {
         token = ERC20(_token);
         requiredBalance = _requiredBalance;
     }
 
-    function _beforeComment(
-        Comments.CommentData calldata commentData,
+    function _afterComment(
+        Comments.Comment calldata commentData,
         address,
         bytes32
-    ) internal view override returns (bool) {
+    ) internal view override returns (string memory hookData) {
         // Check if the comment author has enough tokens
         uint256 balance = token.balanceOf(commentData.author);
-        return balance >= requiredBalance;
-    }
-
-    function _afterComment(
-        Comments.CommentData calldata,
-        address,
-        bytes32
-    ) internal pure override returns (bool) {
-        return true;
+        if (balance < requiredBalance) revert NotEnoughTokens();
+        return "";
     }
 
     function _getHookPermissions()
@@ -55,12 +49,10 @@ contract TokenGatedHook is BaseHook {
     {
         return
             Hooks.Permissions({
-                beforeInitialize: false,
                 afterInitialize: false,
-                beforeComment: true,
                 afterComment: true,
-                beforeDeleteComment: false,
-                afterDeleteComment: false
+                afterDeleteComment: false,
+                afterEditComment: false
             });
     }
 }
@@ -109,8 +101,8 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         // Transfer 1000 tokens to user1
         testToken.transfer(user1, 1000 * 10 ** 18);
 
-        // Create comment data using direct construction
-        Comments.CommentData memory commentData = Comments.CommentData({
+        // Create comment data
+        Comments.CreateComment memory commentData = Comments.CreateComment({
             content: "Test comment",
             metadata: "{}",
             targetUri: "",
@@ -118,24 +110,15 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
             author: user1,
             app: user2,
             channelId: channelId,
-            nonce: comments.nonces(user1, user2),
+            nonce: comments.getNonce(user1, user2),
             deadline: block.timestamp + 1 days,
-            parentId: bytes32(0),
-            createdAt: uint80(block.timestamp),
-            updatedAt: uint80(block.timestamp)
+            parentId: bytes32(0)
         });
 
-        // Test beforeComment hook - should succeed
-        vm.prank(address(comments));
-        assertTrue(
-            channelManager.executeHook(
-                channelId,
-                commentData,
-                user1,
-                bytes32(0),
-                Hooks.HookPhase.BeforeComment
-            )
-        );
+        // Post comment as author - should succeed
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, commentData, comments);
+        vm.prank(user1);
+        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, appSignature);
     }
 
     function test_TokenGatedHookBlocksCommentWithoutEnoughTokens() public {
@@ -150,8 +133,8 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
         // Transfer only 999 tokens to user1 (not enough)
         testToken.transfer(user1, 999 * 10 ** 18);
 
-        // Create comment data using direct construction
-        Comments.CommentData memory commentData = Comments.CommentData({
+        // Create comment data
+        Comments.CreateComment memory commentData = Comments.CreateComment({
             content: "Test comment",
             metadata: "{}",
             targetUri: "",
@@ -159,23 +142,16 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
             author: user1,
             app: user2,
             channelId: channelId,
-            nonce: comments.nonces(user1, user2),
+            nonce: comments.getNonce(user1, user2),
             deadline: block.timestamp + 1 days,
-            parentId: bytes32(0),
-            createdAt: uint80(block.timestamp),
-            updatedAt: uint80(block.timestamp)
+            parentId: bytes32(0)
         });
 
-        // Test beforeComment hook - should fail
-        vm.prank(address(comments));
-        vm.expectRevert(IChannelManager.ChannelHookExecutionFailed.selector);
-        channelManager.executeHook(
-            channelId,
-            commentData,
-            user1,
-            bytes32(0),
-            Hooks.HookPhase.BeforeComment
-        );
+        // Post comment as author - should fail
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, commentData, comments);
+        vm.prank(user1);
+        vm.expectRevert(TokenGatedHook.NotEnoughTokens.selector);
+        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, appSignature);
     }
 
     function test_TokenGatedHookAllowsCommentAfterReceivingTokens() public {
@@ -187,8 +163,8 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
             address(tokenGatedHook)
         );
 
-        // Create comment data using direct construction
-        Comments.CommentData memory commentData = Comments.CommentData({
+        // Create comment data
+        Comments.CreateComment memory commentData = Comments.CreateComment({
             content: "Test comment",
             metadata: "{}",
             targetUri: "",
@@ -196,38 +172,24 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
             author: user1,
             app: user2,
             channelId: channelId,
-            nonce: comments.nonces(user1, user2),
+            nonce: comments.getNonce(user1, user2),
             deadline: block.timestamp + 1 days,
-            parentId: bytes32(0),
-            createdAt: uint80(block.timestamp),
-            updatedAt: uint80(block.timestamp)
+            parentId: bytes32(0)
         });
 
         // First try without tokens - should fail
-        vm.prank(address(comments));
-        vm.expectRevert(IChannelManager.ChannelHookExecutionFailed.selector);
-        channelManager.executeHook(
-            channelId,
-            commentData,
-            user1,
-            bytes32(0),
-            Hooks.HookPhase.BeforeComment
-        );
+        bytes memory appSignature = TestUtils.generateAppSignature(vm, commentData, comments);
+        vm.prank(user1);
+        vm.expectRevert(TokenGatedHook.NotEnoughTokens.selector);
+        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, appSignature);
 
         // Transfer 1000 tokens to user1
         testToken.transfer(user1, 1000 * 10 ** 18);
 
         // Try again with tokens - should succeed
-        vm.prank(address(comments));
-        assertTrue(
-            channelManager.executeHook(
-                channelId,
-                commentData,
-                user1,
-                bytes32(0),
-                Hooks.HookPhase.BeforeComment
-            )
-        );
+        appSignature = TestUtils.generateAppSignature(vm, commentData, comments);
+        vm.prank(user1);
+        comments.postCommentAsAuthor{value: 0.01 ether}(commentData, appSignature);
     }
 
     function onERC721Received(

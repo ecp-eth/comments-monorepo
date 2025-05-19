@@ -4,6 +4,7 @@ import type {
   ListCommentsQueryPageParamsSchemaType,
   PendingComment,
   PendingDeleteCommentOperationSchemaType,
+  PendingEditCommentOperationSchemaType,
   PendingPostCommentOperationSchemaType,
 } from "./schemas.js";
 import type { InfiniteData } from "@tanstack/react-query";
@@ -224,6 +225,7 @@ export function insertPendingCommentToPage(
     chainId,
     createdAt: new Date(),
     updatedAt: new Date(),
+    revision: 0,
     moderationStatus: moderationEnabled ? "pending" : "approved",
     moderationStatusChangedAt: new Date(),
     replies: {
@@ -324,6 +326,132 @@ export function markPendingPostCommentAsPosted(
       if (
         isSameHex(comment.id, commentId) &&
         comment.pendingOperation?.action === "post"
+      ) {
+        comment.pendingOperation = {
+          ...comment.pendingOperation,
+          state: {
+            status: "success",
+          },
+        };
+
+        return queryData;
+      }
+    }
+  }
+
+  return queryData;
+}
+
+/**
+ * Mark a comment as re-editing by setting the `pendingOperation` field to a pending edit operation
+ *
+ * This function mutates the queryData argument
+ */
+export function markCommentAsReediting(
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
+  pendingOperation: PendingEditCommentOperationSchemaType
+) {
+  for (const page of queryData.pages) {
+    for (const comment of page.results) {
+      if (isSameHex(comment.id, pendingOperation.response.data.commentId)) {
+        comment.pendingOperation = {
+          ...pendingOperation,
+          action: "edit",
+          state: {
+            status: "pending",
+          },
+        };
+
+        return queryData;
+      }
+    }
+  }
+
+  return queryData;
+}
+
+/**
+ * Mark a pending edit comment as pending
+ *
+ * This function mutates the queryData argument
+ */
+export function markPendingEditCommentAsPending(
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
+  pendingOperation: PendingEditCommentOperationSchemaType
+) {
+  for (const page of queryData.pages) {
+    for (const comment of page.results) {
+      if (isSameHex(comment.id, pendingOperation.response.data.commentId)) {
+        comment.content = pendingOperation.response.data.content;
+        comment.revision++;
+        comment.pendingOperation = pendingOperation;
+
+        return queryData;
+      }
+    }
+  }
+
+  return queryData;
+}
+
+/**
+ * Mark a pending edit comment as failed
+ *
+ * This function mutates the queryData argument
+ */
+export function markPendingEditCommentAsFailed(
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
+  commentId: Hex,
+  error: Error
+) {
+  for (const page of queryData.pages) {
+    for (const comment of page.results) {
+      if (
+        isSameHex(comment.id, commentId) &&
+        comment.pendingOperation?.action === "edit"
+      ) {
+        comment.pendingOperation = {
+          ...comment.pendingOperation,
+          state: {
+            status: "error",
+            error,
+          },
+        };
+
+        return queryData;
+      }
+    }
+  }
+
+  return queryData;
+}
+
+/**
+ * Mark a pending edit comment as edited
+ *
+ * This function mutates the queryData argument
+ */
+export function markPendingEditCommentAsEdited(
+  queryData: InfiniteData<
+    CommentPageSchemaType,
+    ListCommentsQueryPageParamsSchemaType
+  >,
+  commentId: Hex
+) {
+  for (const page of queryData.pages) {
+    for (const comment of page.results) {
+      if (
+        isSameHex(comment.id, commentId) &&
+        comment.pendingOperation?.action === "edit"
       ) {
         comment.pendingOperation = {
           ...comment.pendingOperation,

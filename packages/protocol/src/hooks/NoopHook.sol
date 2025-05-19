@@ -16,20 +16,12 @@ contract NoopHook is IHook {
         return interfaceId == type(IHook).interfaceId;
     }
 
-    function beforeComment(
-        Comments.CommentData calldata,
-        address,
-        bytes32
-    ) external payable returns (bool) {
-        return true;
-    }
-
     function afterComment(
-        Comments.CommentData calldata,
+        Comments.Comment calldata,
         address,
         bytes32
-    ) external payable returns (bool) {
-        return true;
+    ) external payable returns (string memory hookData) {
+        return "";
     }
 
     function getHookPermissions()
@@ -39,23 +31,21 @@ contract NoopHook is IHook {
         returns (Hooks.Permissions memory)
     {}
 
-    function beforeInitialize(
-        address channel
-    ) external override returns (bool success) {}
-
     function afterInitialize(
         address channel
     ) external override returns (bool success) {}
 
-    function beforeDeleteComment(
-        Comments.CommentData calldata commentData,
+    function afterDeleteComment(
+        Comments.Comment calldata commentData,
         address caller,
         bytes32 commentId
     ) external payable override returns (bool success) {}
 
-    function afterDeleteComment(
-        Comments.CommentData calldata commentData,
-        address caller,
-        bytes32 commentId
-    ) external override returns (bool success) {}
+    function afterEditComment(
+        Comments.Comment calldata,
+        address,
+        bytes32
+    ) external payable override returns (string memory commentHookData) {
+        return "";
+    }
 }

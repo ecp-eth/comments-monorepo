@@ -6,6 +6,8 @@ pragma solidity ^0.8.20;
 interface IProtocolFees {
     /// @notice Error thrown when fee percentage is invalid (>100%)
     error InvalidFee();
+    /// @notice Error thrown when insufficient fee is provided
+    error InsufficientFee();
 
     /// @notice Emitted when channel creation fee is updated
     /// @param newFee The new fee amount in wei
@@ -43,4 +45,11 @@ interface IProtocolFees {
     /// @param recipient The address to receive the fees
     /// @return amount The amount withdrawn
     function withdrawFees(address recipient) external returns (uint256 amount);
+
+    /// @notice Calculates the hook transaction fee by deducting the protocol fee
+    /// @param value The total value sent with the transaction
+    /// @return hookValue The amount that should be passed to the hook
+    function deductProtocolHookTransactionFee(
+        uint256 value
+    ) external view returns (uint256 hookValue);
 }

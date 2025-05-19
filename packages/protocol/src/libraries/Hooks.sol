@@ -11,19 +11,9 @@ library Hooks {
      * @dev Each boolean indicates whether the corresponding hook function is enabled
      */
     struct Permissions {
-        bool beforeInitialize;
         bool afterInitialize;
-        bool beforeComment;
         bool afterComment;
-        bool beforeDeleteComment;
         bool afterDeleteComment;
+        bool afterEditComment;
     }
-
-    /// @notice Enum defining the phase of hook execution
-    enum HookPhase {
-        BeforeComment,
-        AfterComment,
-        BeforeDeleteComment,
-        AfterDeleteComment
-    }
-} 
+}

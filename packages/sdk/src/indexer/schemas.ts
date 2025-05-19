@@ -60,6 +60,7 @@ export const IndexerAPICommentSchema = z.object({
   moderationStatusChangedAt: z.coerce.date(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  revision: z.number().int(),
 });
 
 export type IndexerAPICommentSchemaType = z.infer<

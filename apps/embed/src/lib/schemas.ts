@@ -33,6 +33,21 @@ export const SignCommentResponseServerSchema = z.object({
   data: CommentDataWithIdSchema,
 });
 
+/**
+ * Used for editing comments (gas is paid by the user)
+ */
+export const SignEditCommentPayloadRequestSchema = z.object({
+  commentId: HexSchema,
+  content: z.string().trim().nonempty(),
+  author: HexSchema,
+  metadata: z.string(),
+  chainId: z.number(),
+});
+
+export type SignEditCommentPayloadRequestSchemaType = z.infer<
+  typeof SignEditCommentPayloadRequestSchema
+>;
+
 export const EmbedConfigFromSearchParamsSchema = z.preprocess((value) => {
   try {
     if (typeof value === "string") {

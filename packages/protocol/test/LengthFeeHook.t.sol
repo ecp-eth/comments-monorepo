@@ -49,11 +49,11 @@ contract LengthFeeHook is BaseHook {
         channelManager = IChannelManager(_channelManager);
     }
 
-    function _beforeComment(
-        Comments.CommentData calldata commentData,
+    function _afterComment(
+        Comments.Comment calldata commentData,
         address,
         bytes32
-    ) internal override returns (bool) {
+    ) internal override returns (string memory hookData) {
         // Calculate fee based on content length
         uint256 contentLength = bytes(commentData.content).length;
         uint256 totalFee = contentLength * tokensPerCharacter;
@@ -77,15 +77,7 @@ contract LengthFeeHook is BaseHook {
         totalFeesCollected += hookFee;
         emit FeeCollected(commentData.author, hookFee);
 
-        return true;
-    }
-
-    function _afterComment(
-        Comments.CommentData calldata,
-        address,
-        bytes32
-    ) internal pure override returns (bool) {
-        return true;
+        return "";
     }
 
     function withdrawFees() external {
@@ -117,12 +109,10 @@ contract LengthFeeHook is BaseHook {
     {
         return
             Hooks.Permissions({
-                beforeInitialize: false,
                 afterInitialize: false,
-                beforeComment: true,
                 afterComment: true,
-                beforeDeleteComment: false,
-                afterDeleteComment: false
+                afterDeleteComment: false,
+                afterEditComment: false
             });
     }
 }
@@ -303,7 +293,7 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
     }
 
     function _signAppSignature(
-        Comments.CreateCommentData memory commentData
+        Comments.CreateComment memory commentData
     ) internal view returns (bytes memory) {
         bytes32 digest = comments.getCommentId(commentData);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
@@ -326,19 +316,18 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
             ((expectedTotalFee * PROTOCOL_FEE_PERCENTAGE) / 10000);
 
         // Create comment data using direct construction
-        Comments.CreateCommentData memory commentData = Comments
-            .CreateCommentData({
-                content: content,
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory commentData = Comments.CreateComment({
+            content: content,
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: comments.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         bytes memory appSignature = _signAppSignature(commentData);
 
@@ -375,19 +364,18 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
         string memory content = "Test comment";
 
         // Create comment data using direct construction
-        Comments.CreateCommentData memory commentData = Comments
-            .CreateCommentData({
-                content: content,
-                metadata: "{}",
-                targetUri: "",
-                commentType: "comment",
-                author: user1,
-                app: user2,
-                channelId: channelId,
-                nonce: comments.nonces(user1, user2),
-                deadline: block.timestamp + 1 days,
-                parentId: bytes32(0)
-            });
+        Comments.CreateComment memory commentData = Comments.CreateComment({
+            content: content,
+            metadata: "{}",
+            targetUri: "",
+            commentType: "comment",
+            author: user1,
+            app: user2,
+            channelId: channelId,
+            nonce: comments.getNonce(user1, user2),
+            deadline: block.timestamp + 1 days,
+            parentId: bytes32(0)
+        });
 
         // Make a few comments to collect fees
         for (uint i = 0; i < 3; i++) {

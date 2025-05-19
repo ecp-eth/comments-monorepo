@@ -11,6 +11,7 @@ import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import {
   CommentInputData,
   CreateCommentDataSchema,
+  EditCommentDataSchema,
 } from "@ecp.eth/sdk/comments/schemas";
 import { z } from "zod";
 
@@ -32,6 +33,19 @@ export const SignCommentResponseClientSchema = z.object({
 
 export type SignCommentResponseClientSchemaType = z.infer<
   typeof SignCommentResponseClientSchema
+>;
+
+/**
+ * Parses response from API endpoint for usage in client
+ */
+export const SignEditCommentResponseClientSchema = z.object({
+  signature: HexSchema,
+  hash: HexSchema,
+  data: EditCommentDataSchema,
+});
+
+export type SignEditCommentResponseClientSchemaType = z.infer<
+  typeof SignEditCommentResponseClientSchema
 >;
 
 export const PendingOperationTypeSchema = z.enum([
@@ -69,6 +83,30 @@ export type PendingPostCommentOperationSchemaType = z.infer<
   typeof PendingPostCommentOperationSchema
 >;
 
+export const PendingEditCommentOperationSchema = z.object({
+  type: PendingOperationTypeSchema,
+  action: z.literal("edit"),
+  txHash: HexSchema,
+  chainId: z.number().positive().int(),
+  response: SignEditCommentResponseClientSchema,
+  state: z.discriminatedUnion("status", [
+    z.object({
+      status: z.literal("pending"),
+    }),
+    z.object({
+      status: z.literal("success"),
+    }),
+    z.object({
+      status: z.literal("error"),
+      error: z.instanceof(Error),
+    }),
+  ]),
+});
+
+export type PendingEditCommentOperationSchemaType = z.infer<
+  typeof PendingEditCommentOperationSchema
+>;
+
 export const PendingDeleteCommentOperationSchema = z.object({
   type: PendingOperationTypeSchema,
   action: z.literal("delete"),
@@ -96,6 +134,7 @@ export type PendingDeleteCommentOperationSchemaType = z.infer<
 export const PendingCommentOperationSchema = z.discriminatedUnion("action", [
   PendingPostCommentOperationSchema,
   PendingDeleteCommentOperationSchema,
+  PendingEditCommentOperationSchema,
 ]);
 
 export type PendingCommentOperationSchemaType = z.infer<

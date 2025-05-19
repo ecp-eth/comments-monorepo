@@ -8,6 +8,13 @@ import type { ChannelManagerABI } from "../abis.js";
 
 export type ChannelManagerABIType = typeof ChannelManagerABI;
 
+export type ChannelPermissions = {
+  afterInitialize: boolean;
+  afterComment: boolean;
+  afterDeleteComment: boolean;
+  afterEditComment: boolean;
+};
+
 // we can't use generics and mapped type because the API would be lazy resolved
 // causing type errors in userland.
 export type ContractWriteFunctions = {
@@ -76,26 +83,6 @@ export type ContractWriteFunctions = {
       "withdrawFees"
     >
   ) => Promise<Hex>;
-
-  executeHook: (
-    args: ContractFunctionParameters<
-      ChannelManagerABIType,
-      "payable",
-      "executeHook"
-    > & {
-      value?: bigint;
-    }
-  ) => Promise<Hex>;
-
-  collectChannelCreationFee: (
-    args: ContractFunctionParameters<
-      ChannelManagerABIType,
-      "payable",
-      "collectChannelCreationFee"
-    > & {
-      value?: bigint;
-    }
-  ) => Promise<Hex>;
 };
 
 export type ContractReadFunctions = {
@@ -125,12 +112,15 @@ export type ContractReadFunctions = {
     ReadContractReturnType<ChannelManagerABIType, "getHookTransactionFee">
   >;
 
-  calculateHookTransactionFee: (
+  deductProtocolHookTransactionFee: (
     args: ReadContractParameters<
       ChannelManagerABIType,
-      "calculateHookTransactionFee"
+      "deductProtocolHookTransactionFee"
     >
   ) => Promise<
-    ReadContractReturnType<ChannelManagerABIType, "calculateHookTransactionFee">
+    ReadContractReturnType<
+      ChannelManagerABIType,
+      "deductProtocolHookTransactionFee"
+    >
   >;
 };

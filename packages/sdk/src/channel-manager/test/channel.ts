@@ -21,7 +21,6 @@ import {
   withdrawFees,
   updateCommentsContract,
   setBaseURI,
-  collectChannelCreationFee,
 } from "../channel.js";
 import { ChannelManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
@@ -148,6 +147,12 @@ describe("getChannel()", () => {
       description: undefined,
       metadata: undefined,
       hook: undefined,
+      permissions: {
+        afterComment: false,
+        afterDeleteComment: false,
+        afterEditComment: false,
+        afterInitialize: false,
+      },
     });
   });
 });
@@ -286,6 +291,12 @@ describe("updateChannel()", () => {
       description: "New description",
       metadata: "New metadata",
       hook: undefined,
+      permissions: {
+        afterComment: false,
+        afterDeleteComment: false,
+        afterEditComment: false,
+        afterInitialize: false,
+      },
     });
   });
 });
@@ -396,70 +407,5 @@ describe("setBaseURI()", () => {
     });
 
     assert.equal(receipt.status, "success");
-  });
-});
-
-describe("collectChannelCreationFee()", () => {
-  it("collects fee with exact amount", async () => {
-    const fee = await getChannelCreationFee({
-      readContract: client.readContract,
-      channelManagerAddress,
-    });
-
-    const result = await collectChannelCreationFee({
-      value: fee.fee,
-      writeContract: client.writeContract,
-      channelManagerAddress,
-    });
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-  });
-
-  it("collects fee with excess amount (should refund)", async () => {
-    const fee = await getChannelCreationFee({
-      readContract: client.readContract,
-      channelManagerAddress,
-    });
-
-    const excessAmount = fee.fee + parseEther("0.01"); // 0.01 ETH more than required
-
-    const result = await collectChannelCreationFee({
-      value: excessAmount,
-      writeContract: client.writeContract,
-      channelManagerAddress,
-    });
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-  });
-
-  it("fails with insufficient fee", async () => {
-    const fee = await getChannelCreationFee({
-      readContract: client.readContract,
-      channelManagerAddress,
-    });
-
-    const insufficientAmount = fee.fee - parseEther("0.01"); // 0.01 ETH less than required
-
-    await assert.rejects(
-      () =>
-        collectChannelCreationFee({
-          value: insufficientAmount,
-          writeContract: client.writeContract,
-          channelManagerAddress,
-        }),
-      (err) => {
-        assert.ok(err instanceof ContractFunctionExecutionError);
-        assert.ok(err.message.includes("Error: InsufficientFee()"));
-        return true;
-      }
-    );
   });
 });

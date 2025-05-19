@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
+import {Vm} from "forge-std/Vm.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {LibString} from "solady/utils/LibString.sol";
@@ -9,6 +10,7 @@ import {CommentManager} from "../src/CommentManager.sol";
 import {ChannelManager} from "../src/ChannelManager.sol";
 import {IHook} from "../src/interfaces/IHook.sol";
 import {IChannelManager} from "../src/interfaces/IChannelManager.sol";
+import {ICommentManager} from "../src/interfaces/ICommentManager.sol";
 import {BaseHook} from "../src/hooks/BaseHook.sol";
 import {Hooks} from "../src/libraries/Hooks.sol";
 import {Comments} from "../src/libraries/Comments.sol";
@@ -143,7 +145,7 @@ library TestUtils {
      * @notice Parse and convert an amount to wei
      * @param contentBytes The bytes of the content to parse
      * @param startNum The position where the number starts
-     * @param endPos The position where the number ends
+     * @param endPos The position where the number ends - exclusive of endPos
      * @return found Whether a valid amount was found
      * @return amount The amount in wei
      */
@@ -157,8 +159,8 @@ library TestUtils {
         }
 
         if (endPos == startNum) {
-            // Handle case where there's no number after the "ETH"
-            return (true, 0);
+            // Handle case where there's no number
+            return (false, 0);
         }
 
         // Convert the parsed number to wei
@@ -170,10 +172,11 @@ library TestUtils {
         // Parse whole number part
         while (currentPos < endPos && contentBytes[currentPos] != 0x2e) {
             // 0x2e is '.'
-            wholeNumber =
-                wholeNumber *
-                10 +
-                (uint8(contentBytes[currentPos]) - 0x30); // 0x30 is '0'
+            uint8 currentByte = uint8(contentBytes[currentPos]);
+            if (currentByte < 0x30 || currentByte > 0x39) {
+                return (false, 0); // Invalid digit found
+            }
+            wholeNumber = wholeNumber * 10 + (currentByte - 0x30); // 0x30 is '0'
             currentPos++;
         }
 
@@ -183,40 +186,45 @@ library TestUtils {
             currentPos++; // Skip decimal point
             while (currentPos < endPos) {
                 uint8 currentByte = uint8(contentBytes[currentPos]);
-                if (currentByte >= 0x30 && currentByte <= 0x39) {
-                    // ASCII '0' to '9'
-                    fractionalPart = fractionalPart * 10 + (currentByte - 0x30); // 0x30 is '0'
-                    decimalsCount++;
-                    currentPos++;
-                } else {
-                    break;
+                if (currentByte < 0x30 || currentByte > 0x39) {
+                    return (false, 0); // Invalid digit found
                 }
+                fractionalPart = fractionalPart * 10 + (currentByte - 0x30); // 0x30 is '0'
+                decimalsCount++;
+                currentPos++;
             }
         }
 
         // Convert to wei
         if (fractionalPart == 0 && decimalsCount == 0) {
-            // For whole numbers, simply multiply by 1 ether
+            // For whole numbers, multiply by 1 ether safely
+            if (wholeNumber == 0) {
+                return (true, 0);
+            }
+            // Check for overflow before multiplication
+            if (wholeNumber > type(uint256).max / 1 ether) {
+                return (false, 0);
+            }
             return (true, wholeNumber * 1 ether);
-        } else {
-            // For decimal numbers, calculate the fractional part separately
-            // to avoid precision issues
-            uint256 wholePart = wholeNumber * 1 ether;
-            uint256 fractionalPartInWei = (fractionalPart * 1 ether) /
-                (10 ** decimalsCount);
-            return (true, wholePart + fractionalPartInWei);
         }
+
+        // For decimal numbers, calculate the amount in wei
+        uint256 baseAmount = wholeNumber * 1 ether;
+        uint256 fractionalAmount = fractionalPart *
+            (1 ether / (10 ** decimalsCount));
+        return (true, baseAmount + fractionalAmount);
     }
 
-    /**
-     * @notice create the Comments and ChannelManager contracts and update the reference addresses accordingly
-     * @param owner The owner of the contracts
-     * @return comments The Comments contract
-     * @return channelManager The ChannelManager contract
-     */
+    /// @notice create the Comments and ChannelManager contracts and update the reference addresses accordingly
+    /// @param owner The owner of the contracts
+    /// @return comments The Comments contract
+    /// @return channelManager The ChannelManager contract
     function createContracts(
         address owner
-    ) internal returns (CommentManager comments, ChannelManager channelManager) {
+    )
+        internal
+        returns (CommentManager comments, ChannelManager channelManager)
+    {
         comments = new CommentManager(owner);
         channelManager = new ChannelManager(owner);
 
@@ -226,40 +234,61 @@ library TestUtils {
 
         return (comments, channelManager);
     }
+
+    /// @notice Helper function to sign EIP-712 messages
+    function signEIP712(
+        Vm vm,
+        uint256 privateKey,
+        bytes32 digest
+    ) internal pure returns (bytes memory) {
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, digest);
+        return abi.encodePacked(r, s, v);
+    }
+
+    function generateAppSignature(
+        Vm vm,
+        Comments.CreateComment memory commentData,
+        ICommentManager comments
+    ) internal view returns (bytes memory) {
+        uint256 appPrivateKey = 0x2;
+        address app = vm.addr(appPrivateKey);
+
+        commentData.app = app;
+        bytes32 commentId = comments.getCommentId(commentData);
+        bytes memory appSignature = signEIP712(vm, appPrivateKey, commentId);
+
+        return appSignature;
+    }
 }
 
 // Mock hook contract for testing
 contract MockHook is BaseHook {
-    bool public shouldReturnTrue = true;
+    string public returningHookData;
 
-    function setShouldReturnTrue(bool _shouldReturn) external {
-        shouldReturnTrue = _shouldReturn;
+    function setReturningHookData(string memory _returningHookData) external {
+        returningHookData = _returningHookData;
     }
 
-    function getHookPermissions() external pure override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            beforeInitialize: false,
-            afterInitialize: false,
-            beforeComment: true,
-            afterComment: true,
-            beforeDeleteComment: false,
-            afterDeleteComment: false
-        });
-    }
-
-    function _beforeComment(
-        Comments.CommentData calldata,
-        address,
-        bytes32
-    ) internal virtual override returns (bool) {
-        return shouldReturnTrue;
+    function getHookPermissions()
+        external
+        pure
+        override
+        returns (Hooks.Permissions memory)
+    {
+        return
+            Hooks.Permissions({
+                afterInitialize: false,
+                afterComment: true,
+                afterDeleteComment: false,
+                afterEditComment: false
+            });
     }
 
     function _afterComment(
-        Comments.CommentData calldata,
+        Comments.Comment calldata,
         address,
         bytes32
-    ) internal virtual override returns (bool) {
-        return shouldReturnTrue;
+    ) internal virtual override returns (string memory) {
+        return returningHookData;
     }
 }

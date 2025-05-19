@@ -5,7 +5,7 @@ import type {
   OnPostComment,
   OnRetryPostComment,
 } from "../../core/CommentActionsContext";
-import { concat, numberToHex, size } from "viem";
+import { concat, type Hex, numberToHex, size } from "viem";
 import {
   useSendTransaction,
   useSwitchChain,
@@ -22,18 +22,29 @@ import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/sc
 import type { QuoteResponseLiquidityAvailableSchemaType } from "../0x/schemas";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { useDeleteCommentAsAuthor } from "@ecp.eth/sdk/comments/react";
+import { useCommentActions as useStandardCommentActions } from "../../standard/hooks/useCommentActions";
 
 export type SwapWithCommentExtra = {
   quote: QuoteResponseLiquidityAvailableSchemaType;
 };
 
-export function useCommentActions(): CommentActionsContextType<SwapWithCommentExtra> {
+type UseCommentActionsProps = {
+  connectedAddress: Hex | undefined;
+};
+
+export function useCommentActions({
+  connectedAddress,
+}: UseCommentActionsProps): CommentActionsContextType<SwapWithCommentExtra> {
+  const { editComment, retryEditComment } = useStandardCommentActions({
+    connectedAddress,
+  });
   const wagmiConfig = useConfig();
   const { sendTransactionAsync } = useSendTransaction();
   const { switchChainAsync } = useSwitchChain();
   const { signTypedDataAsync } = useSignTypedData();
   const commentDeletion = useCommentDeletion();
   const commentSubmission = useCommentSubmission();
+
   const { mutateAsync: deleteCommentAsAuthor } = useDeleteCommentAsAuthor();
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
@@ -197,7 +208,15 @@ export function useCommentActions(): CommentActionsContextType<SwapWithCommentEx
       deleteComment,
       retryPostComment,
       postComment,
+      editComment,
+      retryEditComment,
     }),
-    [deleteComment, retryPostComment, postComment]
+    [
+      deleteComment,
+      retryPostComment,
+      postComment,
+      editComment,
+      retryEditComment,
+    ]
   );
 }
