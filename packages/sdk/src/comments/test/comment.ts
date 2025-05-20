@@ -1,13 +1,12 @@
-import { describe, it, beforeEach } from "node:test";
+import { describe, it, beforeEach, before } from "node:test";
 import assert from "node:assert";
 import {
+  ContractFunctionExecutionError,
   createWalletClient,
   http,
-  publicActions,
-  ContractFunctionExecutionError,
   parseEventLogs,
+  publicActions,
 } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
 import { anvil } from "viem/chains";
 import {
   postComment,
@@ -32,779 +31,786 @@ import { CommentManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
 import type { CreateCommentData } from "../schemas.js";
+import { privateKeyToAccount } from "viem/accounts";
 
-const { commentsAddress } = deployContracts();
+describe("comment", () => {
+  let commentsAddress: Hex;
 
-// Test account setup
-const testPrivateKey =
-  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // Anvil's first private key
-const account = privateKeyToAccount(testPrivateKey);
-
-const appPrivateKey =
-  "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"; // Anvil's second private key
-const appAccount = privateKeyToAccount(appPrivateKey);
-
-// Create wallet client
-const client = createWalletClient({
-  chain: anvil,
-  transport: http("http://localhost:8545"),
-  account,
-}).extend(publicActions);
-
-const appClient = createWalletClient({
-  chain: anvil,
-  transport: http("http://localhost:8545"),
-  account: appAccount,
-}).extend(publicActions);
-
-describe("postComment()", () => {
-  it("posts a comment as author", async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    const commentData = createCommentData({
-      author: account.address,
-      app: appAccount.address,
-      content: "Test comment content",
-      targetUri: "https://example.com",
-      nonce,
-    });
-
-    const typedData = createCommentTypedData({
-      chainId: anvil.id,
-      commentData,
-      commentsAddress,
-    });
-
-    const appSignature = await appClient.signTypedData(typedData);
-
-    const result = await postComment({
-      comment: commentData,
-      appSignature,
-      writeContract: client.writeContract,
-      commentsAddress,
-    });
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-  });
-});
-
-describe("postCommentWithApproval()", () => {
-  let appSignature: Hex;
-  let commentData: CreateCommentData;
-
-  beforeEach(async () => {
-    const approvalResult = await addApprovalAsAuthor({
-      app: appAccount.address,
-      writeContract: client.writeContract,
-      commentsAddress,
-    });
-
-    await client.waitForTransactionReceipt({
-      hash: approvalResult.txHash,
-    });
-
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    commentData = createCommentData({
-      author: account.address,
-      app: appAccount.address,
-      content: "Test comment content",
-      targetUri: "https://example.com",
-      nonce,
-    });
-
-    const typedData = createCommentTypedData({
-      chainId: anvil.id,
-      commentData,
-      commentsAddress,
-    });
-
-    appSignature = await appClient.signTypedData(typedData);
+  before(async () => {
+    commentsAddress = deployContracts().commentsAddress;
   });
 
-  it("posts a comment with signatures", async () => {
-    const result = await postCommentWithApproval({
-      comment: commentData,
-      appSignature,
-      writeContract: appClient.writeContract,
-      commentsAddress,
-    });
+  // Test account setup
+  const testPrivateKey =
+    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // Anvil's first private key
+  const account = privateKeyToAccount(testPrivateKey);
 
-    const receipt = await appClient.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
+  const appPrivateKey =
+    "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"; // Anvil's second private key
+  const appAccount = privateKeyToAccount(appPrivateKey);
 
-    assert.equal(receipt.status, "success");
-  });
+  // Create wallet client
+  const client = createWalletClient({
+    chain: anvil,
+    transport: http("http://localhost:8545"),
+    account,
+  }).extend(publicActions);
 
-  it("posts a comment with author signature when no approval exists", async () => {
-    const revokeApprovalResult = await revokeApprovalAsAuthor({
-      app: appAccount.address,
-      writeContract: client.writeContract,
-      commentsAddress,
-    });
+  const appClient = createWalletClient({
+    chain: anvil,
+    transport: http("http://localhost:8545"),
+    account: appAccount,
+  }).extend(publicActions);
 
-    await client.waitForTransactionReceipt({
-      hash: revokeApprovalResult.txHash,
-    });
-
-    await revokeApprovalAsAuthor({
-      app: appAccount.address,
-      writeContract: client.writeContract,
-      commentsAddress,
-    });
-
-    // Get a fresh nonce since we're not using the beforeEach setup
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    const commentData = createCommentData({
-      author: account.address,
-      app: appAccount.address,
-      content: "Test comment content",
-      targetUri: "https://example.com",
-      nonce,
-    });
-
-    const typedData = createCommentTypedData({
-      chainId: anvil.id,
-      commentData,
-      commentsAddress,
-    });
-
-    const appSignature = await appClient.signTypedData(typedData);
-    const authorSignature = await client.signTypedData(typedData);
-
-    const result = await postCommentWithApproval({
-      comment: commentData,
-      appSignature,
-      authorSignature,
-      writeContract: appClient.writeContract,
-      commentsAddress,
-    });
-
-    const receipt = await appClient.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-  });
-
-  it("fails with invalid app signature", async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    await assert.rejects(
-      () =>
-        postCommentWithApproval({
-          comment: createCommentData({
-            app: appAccount.address,
-            author: account.address,
-            content: "Test comment content",
-            metadata: { test: true },
-            nonce,
-            targetUri: "https://example.com",
-          }),
-          appSignature,
-          writeContract: client.writeContract,
-          commentsAddress,
-        }),
-      (err) => {
-        assert.ok(err instanceof ContractFunctionExecutionError);
-        return true;
-      },
-    );
-  });
-});
-
-describe("getComment()", () => {
-  let commentId: Hex;
-
-  beforeEach(async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    const commentData = createCommentData({
-      author: account.address,
-      app: appAccount.address,
-      content: "Test comment content",
-      targetUri: "https://example.com",
-      nonce,
-    });
-
-    const typedData = createCommentTypedData({
-      chainId: anvil.id,
-      commentData,
-      commentsAddress,
-    });
-
-    const appSignature = await appClient.signTypedData(typedData);
-
-    const result = await postComment({
-      comment: commentData,
-      appSignature,
-      writeContract: client.writeContract,
-      commentsAddress,
-    });
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    const logs = parseEventLogs({
-      abi: CommentManagerABI,
-      logs: receipt.logs,
-      eventName: "CommentAdded",
-    });
-
-    assert.ok(logs.length > 0, "CommentAdded event should be found");
-    commentId = logs[0]!.args.commentId;
-  });
-
-  it("gets a comment by ID", async () => {
-    const result = await getComment({
-      commentId,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    assert.equal(result.comment.author, account.address);
-    assert.equal(result.comment.content, "Test comment content");
-  });
-});
-
-describe("getCommentId()", () => {
-  it("returns comment ID", async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    const commentId = await getCommentId({
-      commentData: {
-        app: appAccount.address,
+  describe("postComment()", () => {
+    it("posts a comment as author", async () => {
+      const nonce = await getNonce({
         author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const commentData = createCommentData({
+        author: account.address,
+        app: appAccount.address,
+        content: "Test comment content",
+        targetUri: "https://example.com",
+        nonce,
+      });
+
+      const typedData = createCommentTypedData({
+        chainId: anvil.id,
+        commentData,
+        commentsAddress: commentsAddress,
+      });
+
+      const appSignature = await appClient.signTypedData(typedData);
+
+      const result = await postComment({
+        comment: commentData,
+        appSignature,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      assert.equal(receipt.status, "success");
+    });
+  });
+
+  describe("postCommentWithApproval()", () => {
+    let appSignature: Hex;
+    let commentData: CreateCommentData;
+
+    beforeEach(async () => {
+      const approvalResult = await addApprovalAsAuthor({
+        app: appAccount.address,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      await client.waitForTransactionReceipt({
+        hash: approvalResult.txHash,
+      });
+
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      commentData = createCommentData({
+        author: account.address,
+        app: appAccount.address,
+        content: "Test comment content",
+        targetUri: "https://example.com",
+        nonce,
+      });
+
+      const typedData = createCommentTypedData({
+        chainId: anvil.id,
+        commentData,
+        commentsAddress: commentsAddress,
+      });
+
+      appSignature = await appClient.signTypedData(typedData);
+    });
+
+    it("posts a comment with signatures", async () => {
+      const result = await postCommentWithApproval({
+        comment: commentData,
+        appSignature,
+        writeContract: appClient.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const receipt = await appClient.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      assert.equal(receipt.status, "success");
+    });
+
+    it("posts a comment with author signature when no approval exists", async () => {
+      const revokeApprovalResult = await revokeApprovalAsAuthor({
+        app: appAccount.address,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      await client.waitForTransactionReceipt({
+        hash: revokeApprovalResult.txHash,
+      });
+
+      await revokeApprovalAsAuthor({
+        app: appAccount.address,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      // Get a fresh nonce since we're not using the beforeEach setup
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const commentData = createCommentData({
+        author: account.address,
+        app: appAccount.address,
+        content: "Test comment content",
+        targetUri: "https://example.com",
+        nonce,
+      });
+
+      const typedData = createCommentTypedData({
+        chainId: anvil.id,
+        commentData,
+        commentsAddress: commentsAddress,
+      });
+
+      const appSignature = await appClient.signTypedData(typedData);
+      const authorSignature = await client.signTypedData(typedData);
+
+      const result = await postCommentWithApproval({
+        comment: commentData,
+        appSignature,
+        authorSignature,
+        writeContract: appClient.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const receipt = await appClient.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      assert.equal(receipt.status, "success");
+    });
+
+    it("fails with invalid app signature", async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      await assert.rejects(
+        () =>
+          postCommentWithApproval({
+            comment: createCommentData({
+              app: appAccount.address,
+              author: account.address,
+              content: "Test comment content",
+              metadata: { test: true },
+              nonce,
+              targetUri: "https://example.com",
+            }),
+            appSignature,
+            writeContract: client.writeContract,
+            commentsAddress: commentsAddress,
+          }),
+        (err) => {
+          assert.ok(err instanceof ContractFunctionExecutionError);
+          return true;
+        },
+      );
+    });
+  });
+
+  describe("getComment()", () => {
+    let commentId: Hex;
+
+    beforeEach(async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const commentData = createCommentData({
+        author: account.address,
+        app: appAccount.address,
+        content: "Test comment content",
+        targetUri: "https://example.com",
+        nonce,
+      });
+
+      const typedData = createCommentTypedData({
+        chainId: anvil.id,
+        commentData,
+        commentsAddress: commentsAddress,
+      });
+
+      const appSignature = await appClient.signTypedData(typedData);
+
+      const result = await postComment({
+        comment: commentData,
+        appSignature,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      const logs = parseEventLogs({
+        abi: CommentManagerABI,
+        logs: receipt.logs,
+        eventName: "CommentAdded",
+      });
+
+      assert.ok(logs.length > 0, "CommentAdded event should be found");
+      commentId = logs[0]!.args.commentId;
+    });
+
+    it("gets a comment by ID", async () => {
+      const result = await getComment({
+        commentId,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      assert.equal(result.comment.author, account.address);
+      assert.equal(result.comment.content, "Test comment content");
+    });
+  });
+
+  describe("getCommentId()", () => {
+    it("returns comment ID", async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const commentId = await getCommentId({
+        commentData: {
+          app: appAccount.address,
+          author: account.address,
+          content: "Test comment content",
+          metadata: { test: true },
+          nonce,
+          targetUri: "https://example.com",
+        },
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      assert.ok(commentId.startsWith("0x"), "should return a hex string");
+      assert.equal(commentId.length, 66, "should be 32 bytes + 0x prefix");
+    });
+  });
+
+  describe("deleteComment()", () => {
+    let commentId: Hex;
+
+    beforeEach(async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const commentData = createCommentData({
+        author: account.address,
+        app: appAccount.address,
         content: "Test comment content",
         metadata: { test: true },
         nonce,
         targetUri: "https://example.com",
-      },
-      readContract: client.readContract,
-      commentsAddress,
-    });
+      });
 
-    assert.ok(commentId.startsWith("0x"), "should return a hex string");
-    assert.equal(commentId.length, 66, "should be 32 bytes + 0x prefix");
-  });
-});
-
-describe("deleteComment()", () => {
-  let commentId: Hex;
-
-  beforeEach(async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    const commentData = createCommentData({
-      author: account.address,
-      app: appAccount.address,
-      content: "Test comment content",
-      metadata: { test: true },
-      nonce,
-      targetUri: "https://example.com",
-    });
-
-    const typedData = createCommentTypedData({
-      chainId: anvil.id,
-      commentData,
-      commentsAddress,
-    });
-
-    const appSignature = await appClient.signTypedData(typedData);
-
-    const result = await postComment({
-      comment: commentData,
-      appSignature,
-      writeContract: client.writeContract,
-      commentsAddress,
-    });
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    const logs = parseEventLogs({
-      abi: CommentManagerABI,
-      logs: receipt.logs,
-      eventName: "CommentAdded",
-    });
-
-    assert.ok(logs.length > 0, "CommentAdded event should be found");
-    commentId = logs[0]!.args.commentId;
-  });
-
-  it("deletes a comment as author", async () => {
-    const result = await deleteComment({
-      commentId,
-      writeContract: client.writeContract,
-      commentsAddress,
-    });
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-  });
-});
-
-describe("deleteCommentWithApproval()", () => {
-  let commentId: Hex;
-
-  beforeEach(async () => {
-    const approvalResult = await addApprovalAsAuthor({
-      app: appAccount.address,
-      writeContract: client.writeContract,
-      commentsAddress,
-    });
-
-    await client.waitForTransactionReceipt({
-      hash: approvalResult.txHash,
-    });
-
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    const commentData = createCommentData({
-      author: account.address,
-      app: appAccount.address,
-      content: "Test comment content",
-      targetUri: "https://example.com",
-      nonce,
-    });
-
-    const appSignature = await appClient.signTypedData(
-      createCommentTypedData({
+      const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress,
-      }),
-    );
+        commentsAddress: commentsAddress,
+      });
 
-    const postResult = await postComment({
-      comment: commentData,
-      appSignature,
-      writeContract: client.writeContract,
-      commentsAddress,
+      const appSignature = await appClient.signTypedData(typedData);
+
+      const result = await postComment({
+        comment: commentData,
+        appSignature,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      const logs = parseEventLogs({
+        abi: CommentManagerABI,
+        logs: receipt.logs,
+        eventName: "CommentAdded",
+      });
+
+      assert.ok(logs.length > 0, "CommentAdded event should be found");
+      commentId = logs[0]!.args.commentId;
     });
 
-    const receipt = await client.waitForTransactionReceipt({
-      hash: postResult.txHash,
-    });
+    it("deletes a comment as author", async () => {
+      const result = await deleteComment({
+        commentId,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
 
-    const logs = parseEventLogs({
-      abi: CommentManagerABI,
-      logs: receipt.logs,
-      eventName: "CommentAdded",
-    });
+      const receipt = await client.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
 
-    assert.ok(logs.length > 0, "CommentAdded event should be found");
-    commentId = logs[0]!.args.commentId;
+      assert.equal(receipt.status, "success");
+    });
   });
 
-  it("deletes a comment with signatures", async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
+  describe("deleteCommentWithApproval()", () => {
+    let commentId: Hex;
 
-    const typedData = createDeleteCommentTypedData({
-      commentId,
-      chainId: anvil.id,
-      author: account.address,
-      app: appAccount.address,
-      nonce,
-      commentsAddress,
-    });
+    beforeEach(async () => {
+      const approvalResult = await addApprovalAsAuthor({
+        app: appAccount.address,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
 
-    const appSignature = await appClient.signTypedData(typedData);
+      await client.waitForTransactionReceipt({
+        hash: approvalResult.txHash,
+      });
 
-    const result = await deleteCommentWithApproval({
-      commentId,
-      app: appAccount.address,
-      nonce,
-      deadline: typedData.message.deadline,
-      appSignature,
-      writeContract: appClient.writeContract,
-      commentsAddress,
-    });
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
 
-    const receipt = await appClient.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
+      const commentData = createCommentData({
+        author: account.address,
+        app: appAccount.address,
+        content: "Test comment content",
+        targetUri: "https://example.com",
+        nonce,
+      });
 
-    assert.equal(receipt.status, "success");
-  });
-
-  it("fails with invalid signatures", async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    const typedData = createDeleteCommentTypedData({
-      commentId,
-      chainId: anvil.id,
-      author: account.address,
-      app: appAccount.address,
-      nonce,
-      commentsAddress,
-    });
-
-    await assert.rejects(
-      () =>
-        deleteCommentWithApproval({
-          commentId,
-          app: appAccount.address,
-          nonce,
-          deadline: typedData.message.deadline,
-          appSignature: "0x1234", // Invalid signature
-          writeContract: appClient.writeContract,
-          commentsAddress,
+      const appSignature = await appClient.signTypedData(
+        createCommentTypedData({
+          chainId: anvil.id,
+          commentData,
+          commentsAddress: commentsAddress,
         }),
-      (err) => {
-        assert.ok(err instanceof ContractFunctionExecutionError);
-        return true;
-      },
-    );
+      );
+
+      const postResult = await postComment({
+        comment: commentData,
+        appSignature,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: postResult.txHash,
+      });
+
+      const logs = parseEventLogs({
+        abi: CommentManagerABI,
+        logs: receipt.logs,
+        eventName: "CommentAdded",
+      });
+
+      assert.ok(logs.length > 0, "CommentAdded event should be found");
+      commentId = logs[0]!.args.commentId;
+    });
+
+    it("deletes a comment with signatures", async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const typedData = createDeleteCommentTypedData({
+        commentId,
+        chainId: anvil.id,
+        author: account.address,
+        app: appAccount.address,
+        nonce,
+        commentsAddress: commentsAddress,
+      });
+
+      const appSignature = await appClient.signTypedData(typedData);
+
+      const result = await deleteCommentWithApproval({
+        commentId,
+        app: appAccount.address,
+        nonce,
+        deadline: typedData.message.deadline,
+        appSignature,
+        writeContract: appClient.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const receipt = await appClient.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      assert.equal(receipt.status, "success");
+    });
+
+    it("fails with invalid signatures", async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const typedData = createDeleteCommentTypedData({
+        commentId,
+        chainId: anvil.id,
+        author: account.address,
+        app: appAccount.address,
+        nonce,
+        commentsAddress: commentsAddress,
+      });
+
+      await assert.rejects(
+        () =>
+          deleteCommentWithApproval({
+            commentId,
+            app: appAccount.address,
+            nonce,
+            deadline: typedData.message.deadline,
+            appSignature: "0x1234", // Invalid signature
+            writeContract: appClient.writeContract,
+            commentsAddress: commentsAddress,
+          }),
+        (err) => {
+          assert.ok(err instanceof ContractFunctionExecutionError);
+          return true;
+        },
+      );
+    });
   });
-});
 
-describe("getDeleteCommentHash()", () => {
-  it("returns hash for comment deletion", async () => {
-    const result = await getDeleteCommentHash({
-      commentId:
-        "0x1234567890123456789012345678901234567890123456789012345678901234",
-      author: account.address,
-      app: appAccount.address,
-      nonce: 0n,
-      deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
-      readContract: client.readContract,
-      commentsAddress,
+  describe("getDeleteCommentHash()", () => {
+    it("returns hash for comment deletion", async () => {
+      const result = await getDeleteCommentHash({
+        commentId:
+          "0x1234567890123456789012345678901234567890123456789012345678901234",
+        author: account.address,
+        app: appAccount.address,
+        nonce: 0n,
+        deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      assert.ok(result.startsWith("0x"), "should return a hex string");
+      assert.equal(result.length, 66, "should be 32 bytes + 0x prefix");
     });
-
-    assert.ok(result.startsWith("0x"), "should return a hex string");
-    assert.equal(result.length, 66, "should be 32 bytes + 0x prefix");
-  });
-});
-
-describe("getNonce()", () => {
-  it("returns current nonce", async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    assert.ok(typeof nonce === "bigint", "should return a bigint");
-  });
-});
-
-describe("editComment()", () => {
-  let commentId: Hex;
-
-  beforeEach(async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    const commentData = createCommentData({
-      author: account.address,
-      app: appAccount.address,
-      content: "Test comment content",
-      metadata: { test: true },
-      nonce,
-      targetUri: "https://example.com",
-    });
-
-    const typedData = createCommentTypedData({
-      chainId: anvil.id,
-      commentData,
-      commentsAddress,
-    });
-
-    const appSignature = await appClient.signTypedData(typedData);
-
-    const result = await postComment({
-      comment: commentData,
-      appSignature,
-      writeContract: client.writeContract,
-      commentsAddress,
-    });
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    const logs = parseEventLogs({
-      abi: CommentManagerABI,
-      logs: receipt.logs,
-      eventName: "CommentAdded",
-    });
-
-    assert.ok(logs.length > 0, "CommentAdded event should be found");
-    commentId = logs[0]!.args.commentId;
   });
 
-  it("edits a comment as author", async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
+  describe("getNonce()", () => {
+    it("returns current nonce", async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      assert.ok(typeof nonce === "bigint", "should return a bigint");
     });
-    const edit = createEditCommentData({
-      app: appAccount.address,
-      commentId,
-      nonce,
-      content: "Updated comment content",
-      metadataObject: { test: true, updated: true },
-    });
-
-    const typedData = createEditCommentTypedData({
-      author: account.address,
-      edit,
-      chainId: anvil.id,
-      commentsAddress,
-    });
-
-    const appSignature = await appClient.signTypedData(typedData);
-
-    const result = await editComment({
-      edit,
-      writeContract: client.writeContract,
-      commentsAddress,
-      appSignature,
-    });
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-
-    // Verify the comment was updated
-    const updatedComment = await getComment({
-      commentId,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    assert.equal(updatedComment.comment.content, "Updated comment content");
   });
-});
 
-describe("editCommentWithApproval()", () => {
-  let commentId: Hex;
+  describe("editComment()", () => {
+    let commentId: Hex;
 
-  beforeEach(async () => {
-    const approvalResult = await addApprovalAsAuthor({
-      app: appAccount.address,
-      writeContract: client.writeContract,
-      commentsAddress,
-    });
+    beforeEach(async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
 
-    await client.waitForTransactionReceipt({
-      hash: approvalResult.txHash,
-    });
+      const commentData = createCommentData({
+        author: account.address,
+        app: appAccount.address,
+        content: "Test comment content",
+        metadata: { test: true },
+        nonce,
+        targetUri: "https://example.com",
+      });
 
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    const commentData = createCommentData({
-      author: account.address,
-      app: appAccount.address,
-      content: "Test comment content",
-      targetUri: "https://example.com",
-      nonce,
-    });
-
-    const appSignature = await appClient.signTypedData(
-      createCommentTypedData({
+      const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress,
-      }),
-    );
+        commentsAddress: commentsAddress,
+      });
 
-    const postResult = await postComment({
-      comment: commentData,
-      appSignature,
-      writeContract: client.writeContract,
-      commentsAddress,
+      const appSignature = await appClient.signTypedData(typedData);
+
+      const result = await postComment({
+        comment: commentData,
+        appSignature,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      const logs = parseEventLogs({
+        abi: CommentManagerABI,
+        logs: receipt.logs,
+        eventName: "CommentAdded",
+      });
+
+      assert.ok(logs.length > 0, "CommentAdded event should be found");
+      commentId = logs[0]!.args.commentId;
     });
 
-    const receipt = await client.waitForTransactionReceipt({
-      hash: postResult.txHash,
-    });
+    it("edits a comment as author", async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+      const edit = createEditCommentData({
+        app: appAccount.address,
+        commentId,
+        nonce,
+        content: "Updated comment content",
+        metadataObject: { test: true, updated: true },
+      });
 
-    const logs = parseEventLogs({
-      abi: CommentManagerABI,
-      logs: receipt.logs,
-      eventName: "CommentAdded",
-    });
+      const typedData = createEditCommentTypedData({
+        author: account.address,
+        edit,
+        chainId: anvil.id,
+        commentsAddress: commentsAddress,
+      });
 
-    assert.ok(logs.length > 0, "CommentAdded event should be found");
-    commentId = logs[0]!.args.commentId;
+      const appSignature = await appClient.signTypedData(typedData);
+
+      const result = await editComment({
+        edit,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+        appSignature,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      assert.equal(receipt.status, "success");
+
+      // Verify the comment was updated
+      const updatedComment = await getComment({
+        commentId,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      assert.equal(updatedComment.comment.content, "Updated comment content");
+    });
   });
 
-  it("edits a comment with signatures", async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
+  describe("editCommentWithApproval()", () => {
+    let commentId: Hex;
 
-    const edit = createEditCommentData({
-      app: appAccount.address,
-      commentId,
-      nonce,
-      content: "Updated comment content",
-      metadataObject: { test: true, updated: true },
-    });
+    beforeEach(async () => {
+      const approvalResult = await addApprovalAsAuthor({
+        app: appAccount.address,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
 
-    const typedData = createEditCommentTypedData({
-      author: account.address,
-      chainId: anvil.id,
-      edit,
-      commentsAddress,
-    });
+      await client.waitForTransactionReceipt({
+        hash: approvalResult.txHash,
+      });
 
-    const appSignature = await appClient.signTypedData(typedData);
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
 
-    const result = await editCommentWithApproval({
-      edit,
-      appSignature,
-      writeContract: appClient.writeContract,
-      commentsAddress,
-    });
+      const commentData = createCommentData({
+        author: account.address,
+        app: appAccount.address,
+        content: "Test comment content",
+        targetUri: "https://example.com",
+        nonce,
+      });
 
-    const receipt = await appClient.waitForTransactionReceipt({
-      hash: result.txHash,
-    });
-
-    assert.equal(receipt.status, "success");
-
-    // Verify the comment was updated
-    const updatedComment = await getComment({
-      commentId,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    assert.equal(updatedComment.comment.content, "Updated comment content");
-  });
-
-  it("fails with invalid signatures", async () => {
-    const nonce = await getNonce({
-      author: account.address,
-      app: appAccount.address,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    const edit = createEditCommentData({
-      app: appAccount.address,
-      commentId,
-      nonce,
-      content: "Updated comment content",
-      metadataObject: { test: true, updated: true },
-    });
-
-    await assert.rejects(
-      () =>
-        editCommentWithApproval({
-          edit,
-          appSignature: "0x1234", // Invalid signature
-          writeContract: appClient.writeContract,
-          commentsAddress,
+      const appSignature = await appClient.signTypedData(
+        createCommentTypedData({
+          chainId: anvil.id,
+          commentData,
+          commentsAddress: commentsAddress,
         }),
-      (err) => {
-        assert.ok(err instanceof ContractFunctionExecutionError);
-        return true;
-      },
-    );
+      );
+
+      const postResult = await postComment({
+        comment: commentData,
+        appSignature,
+        writeContract: client.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: postResult.txHash,
+      });
+
+      const logs = parseEventLogs({
+        abi: CommentManagerABI,
+        logs: receipt.logs,
+        eventName: "CommentAdded",
+      });
+
+      assert.ok(logs.length > 0, "CommentAdded event should be found");
+      commentId = logs[0]!.args.commentId;
+    });
+
+    it("edits a comment with signatures", async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const edit = createEditCommentData({
+        app: appAccount.address,
+        commentId,
+        nonce,
+        content: "Updated comment content",
+        metadataObject: { test: true, updated: true },
+      });
+
+      const typedData = createEditCommentTypedData({
+        author: account.address,
+        chainId: anvil.id,
+        edit,
+        commentsAddress: commentsAddress,
+      });
+
+      const appSignature = await appClient.signTypedData(typedData);
+
+      const result = await editCommentWithApproval({
+        edit,
+        appSignature,
+        writeContract: appClient.writeContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const receipt = await appClient.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      assert.equal(receipt.status, "success");
+
+      // Verify the comment was updated
+      const updatedComment = await getComment({
+        commentId,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      assert.equal(updatedComment.comment.content, "Updated comment content");
+    });
+
+    it("fails with invalid signatures", async () => {
+      const nonce = await getNonce({
+        author: account.address,
+        app: appAccount.address,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      const edit = createEditCommentData({
+        app: appAccount.address,
+        commentId,
+        nonce,
+        content: "Updated comment content",
+        metadataObject: { test: true, updated: true },
+      });
+
+      await assert.rejects(
+        () =>
+          editCommentWithApproval({
+            edit,
+            appSignature: "0x1234", // Invalid signature
+            writeContract: appClient.writeContract,
+            commentsAddress: commentsAddress,
+          }),
+        (err) => {
+          assert.ok(err instanceof ContractFunctionExecutionError);
+          return true;
+        },
+      );
+    });
   });
-});
 
-describe("getEditCommentHash()", () => {
-  it("returns hash for comment edit", async () => {
-    const edit = createEditCommentData({
-      app: appAccount.address,
-      commentId:
-        "0x1234567890123456789012345678901234567890123456789012345678901234",
-      nonce: 1n,
-      content: "Updated comment content",
-      metadataObject: { test: true, updated: true },
+  describe("getEditCommentHash()", () => {
+    it("returns hash for comment edit", async () => {
+      const edit = createEditCommentData({
+        app: appAccount.address,
+        commentId:
+          "0x1234567890123456789012345678901234567890123456789012345678901234",
+        nonce: 1n,
+        content: "Updated comment content",
+        metadataObject: { test: true, updated: true },
+      });
+
+      const result = await getEditCommentHash({
+        author: account.address,
+        edit,
+        readContract: client.readContract,
+        commentsAddress: commentsAddress,
+      });
+
+      assert.ok(result.startsWith("0x"), "should return a hex string");
+      assert.equal(result.length, 66, "should be 32 bytes + 0x prefix");
     });
-
-    const result = await getEditCommentHash({
-      author: account.address,
-      edit,
-      readContract: client.readContract,
-      commentsAddress,
-    });
-
-    assert.ok(result.startsWith("0x"), "should return a hex string");
-    assert.equal(result.length, 66, "should be 32 bytes + 0x prefix");
   });
 });
