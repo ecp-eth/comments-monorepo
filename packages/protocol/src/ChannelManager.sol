@@ -183,8 +183,8 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
       channels[channelId].permissions = permissions;
 
       // Call afterInitialize hook if permitted
-      if (permissions.afterInitialize) {
-        IHook(hook).afterInitialize(
+      if (permissions.onInitialized) {
+        IHook(hook).onInitialized(
           address(this),
           channels[channelId],
           channelId

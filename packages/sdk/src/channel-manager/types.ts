@@ -9,10 +9,10 @@ import type { ChannelManagerABI } from "../abis.js";
 export type ChannelManagerABIType = typeof ChannelManagerABI;
 
 export type ChannelPermissions = {
-  afterInitialize: boolean;
-  afterComment: boolean;
-  afterDeleteComment: boolean;
-  afterEditComment: boolean;
+  onInitialized: boolean;
+  onCommentAdded: boolean;
+  onCommentDeleted: boolean;
+  onCommentEdited: boolean;
   onChannelUpdated: boolean;
 };
 

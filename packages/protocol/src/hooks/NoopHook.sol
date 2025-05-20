@@ -16,14 +16,6 @@ contract NoopHook is IHook {
     return interfaceId == type(IHook).interfaceId;
   }
 
-  function afterComment(
-    Comments.Comment calldata,
-    address,
-    bytes32
-  ) external payable returns (string memory hookData) {
-    return "";
-  }
-
   function getHookPermissions()
     external
     pure
@@ -31,19 +23,27 @@ contract NoopHook is IHook {
     returns (Hooks.Permissions memory)
   {}
 
-  function afterInitialize(
-    address channelManager,
+  function onCommentAdded(
+    Comments.Comment calldata,
+    address,
+    bytes32
+  ) external payable returns (string memory hookData) {
+    return "";
+  }
+
+  function onInitialized(
+    address channel,
     Channels.Channel memory channelData,
     uint256 channelId
   ) external override returns (bool success) {}
 
-  function afterDeleteComment(
+  function onCommentDeleted(
     Comments.Comment calldata commentData,
     address caller,
     bytes32 commentId
   ) external payable override returns (bool success) {}
 
-  function afterEditComment(
+  function onCommentEdited(
     Comments.Comment calldata,
     address,
     bytes32

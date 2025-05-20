@@ -48,24 +48,24 @@ abstract contract BaseHook is IHook, ERC165 {
   {
     return
       Hooks.Permissions({
-        afterInitialize: false,
-        afterComment: false,
-        afterDeleteComment: false,
-        afterEditComment: false,
+        onInitialized: false,
+        onCommentAdded: false,
+        onCommentDeleted: false,
+        onCommentEdited: false,
         onChannelUpdated: false
       });
   }
 
   /// @inheritdoc IHook
-  function afterInitialize(
-    address channelManager,
+  function onInitialized(
+    address channel,
     Channels.Channel memory channelData,
     uint256 channelId
   ) external virtual returns (bool) {
-    return _afterInitialize(channelManager, channelData, channelId);
+    return _onInitialized(channel, channelData, channelId);
   }
 
-  function _afterInitialize(
+  function _onInitialized(
     address,
     Channels.Channel memory,
     uint256
@@ -74,15 +74,15 @@ abstract contract BaseHook is IHook, ERC165 {
   }
 
   /// @inheritdoc IHook
-  function afterComment(
+  function onCommentAdded(
     Comments.Comment calldata commentData,
     address caller,
     bytes32 commentId
   ) external payable virtual returns (string memory) {
-    return _afterComment(commentData, caller, commentId);
+    return _onCommentAdded(commentData, caller, commentId);
   }
 
-  function _afterComment(
+  function _onCommentAdded(
     Comments.Comment calldata,
     address,
     bytes32
@@ -91,15 +91,15 @@ abstract contract BaseHook is IHook, ERC165 {
   }
 
   /// @inheritdoc IHook
-  function afterDeleteComment(
+  function onCommentDeleted(
     Comments.Comment calldata commentData,
     address caller,
     bytes32 commentId
   ) external payable virtual returns (bool) {
-    return _afterDeleteComment(commentData, caller, commentId);
+    return _onCommentDeleted(commentData, caller, commentId);
   }
 
-  function _afterDeleteComment(
+  function _onCommentDeleted(
     Comments.Comment calldata,
     address,
     bytes32
@@ -108,15 +108,15 @@ abstract contract BaseHook is IHook, ERC165 {
   }
 
   /// @inheritdoc IHook
-  function afterEditComment(
+  function onCommentEdited(
     Comments.Comment calldata commentData,
     address caller,
     bytes32 commentId
   ) external payable virtual returns (string memory) {
-    return _afterEditComment(commentData, caller, commentId);
+    return _onCommentEdited(commentData, caller, commentId);
   }
 
-  function _afterEditComment(
+  function _onCommentEdited(
     Comments.Comment calldata,
     address,
     bytes32

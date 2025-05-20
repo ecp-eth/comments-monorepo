@@ -8,57 +8,17 @@
 
 ```ts
 type ChannelPermissions = {
-  afterComment: boolean;
-  afterDeleteComment: boolean;
-  afterEditComment: boolean;
-  afterInitialize: boolean;
   onChannelUpdated: boolean;
+  onCommentAdded: boolean;
+  onCommentDeleted: boolean;
+  onCommentEdited: boolean;
+  onInitialized: boolean;
 };
 ```
 
 Defined in: [packages/sdk/src/channel-manager/types.ts:11](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L11)
 
 ## Properties
-
-### afterComment
-
-```ts
-afterComment: boolean;
-```
-
-Defined in: [packages/sdk/src/channel-manager/types.ts:13](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L13)
-
-***
-
-### afterDeleteComment
-
-```ts
-afterDeleteComment: boolean;
-```
-
-Defined in: [packages/sdk/src/channel-manager/types.ts:14](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L14)
-
-***
-
-### afterEditComment
-
-```ts
-afterEditComment: boolean;
-```
-
-Defined in: [packages/sdk/src/channel-manager/types.ts:15](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L15)
-
-***
-
-### afterInitialize
-
-```ts
-afterInitialize: boolean;
-```
-
-Defined in: [packages/sdk/src/channel-manager/types.ts:12](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L12)
-
-***
 
 ### onChannelUpdated
 
@@ -67,3 +27,43 @@ onChannelUpdated: boolean;
 ```
 
 Defined in: [packages/sdk/src/channel-manager/types.ts:16](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L16)
+
+***
+
+### onCommentAdded
+
+```ts
+onCommentAdded: boolean;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:13](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L13)
+
+***
+
+### onCommentDeleted
+
+```ts
+onCommentDeleted: boolean;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:14](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L14)
+
+***
+
+### onCommentEdited
+
+```ts
+onCommentEdited: boolean;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:15](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L15)
+
+***
+
+### onInitialized
+
+```ts
+onInitialized: boolean;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:12](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L12)

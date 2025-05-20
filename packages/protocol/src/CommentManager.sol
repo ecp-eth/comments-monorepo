@@ -176,13 +176,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
       emit CommentAdded(commentId, comment.author, comment.app, comment);
 
-      if (channel.hook != address(0) && channel.permissions.afterComment) {
+      if (channel.hook != address(0) && channel.permissions.onCommentAdded) {
         IHook hook = IHook(channel.hook);
         // Calculate hook value after protocol fee
         uint256 msgValueAfterFee = channelManager
           .deductProtocolHookTransactionFee(msg.value);
 
-        string memory hookData = hook.afterComment{ value: msgValueAfterFee }(
+        string memory hookData = hook.onCommentAdded{ value: msgValueAfterFee }(
           comment,
           msg.sender,
           commentId
@@ -285,14 +285,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     emit CommentEdited(commentId, comment.author, editData.app, comment);
 
-    if (channel.hook != address(0) && channel.permissions.afterEditComment) {
+    if (channel.hook != address(0) && channel.permissions.onCommentEdited) {
       IHook hook = IHook(channel.hook);
 
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      string memory hookData = hook.afterEditComment{ value: msgValueAfterFee }(
+      string memory hookData = hook.onCommentEdited{ value: msgValueAfterFee }(
         comment,
         msg.sender,
         commentId
@@ -380,13 +380,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     emit CommentDeleted(commentId, author);
 
-    if (channel.hook != address(0) && channel.permissions.afterDeleteComment) {
+    if (channel.hook != address(0) && channel.permissions.onCommentDeleted) {
       IHook hook = IHook(channel.hook);
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      hook.afterDeleteComment{ value: msgValueAfterFee }(
+      hook.onCommentDeleted{ value: msgValueAfterFee }(
         commentToDelete,
         msg.sender,
         commentId

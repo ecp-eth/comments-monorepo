@@ -22,28 +22,28 @@
 
 
 
-### `afterInitialize(address channel, uint256 channelId) → bool success` (external)
+### `onInitialized(address channel, uint256 channelId) → bool success` (external)
 
 Execute after a hook is initialized on a channel
 
 
 
 
-### `afterComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → string hookData` (external)
+### `onCommentAdded(struct Comments.Comment commentData, address caller, bytes32 commentId) → string hookData` (external)
 
 Execute after a comment is processed
 
 
 
 
-### `afterDeleteComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → bool success` (external)
+### `onCommentDeleted(struct Comments.Comment commentData, address caller, bytes32 commentId) → bool success` (external)
 
 Execute after a comment is deleted
 
 
 
 
-### `afterEditComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → string commentHookData` (external)
+### `onCommentEdited(struct Comments.Comment commentData, address caller, bytes32 commentId) → string commentHookData` (external)
 
 Execute after a comment is edited
 
