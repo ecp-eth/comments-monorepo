@@ -22,9 +22,9 @@ import {
   submitEditCommentMutationFunction,
 } from "../queries";
 import {
-  useDeleteCommentAsAuthor,
-  usePostCommentAsAuthor,
-  useEditCommentAsAuthor,
+  useDeleteComment,
+  usePostComment,
+  useEditComment,
 } from "@ecp.eth/sdk/comments/react";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
@@ -43,9 +43,9 @@ export function useCommentActions({
   const commentSubmission = useCommentSubmission();
   const commentEdition = useCommentEdition();
   const commentRetryEdition = useCommentRetryEdition();
-  const { mutateAsync: deleteCommentAsAuthor } = useDeleteCommentAsAuthor();
-  const { mutateAsync: postCommentAsAuthor } = usePostCommentAsAuthor();
-  const { mutateAsync: editCommentAsAuthor } = useEditCommentAsAuthor();
+  const { mutateAsync: deleteCommentAsAuthor } = useDeleteComment();
+  const { mutateAsync: postCommentAsAuthor } = usePostComment();
+  const { mutateAsync: editCommentAsAuthor } = useEditComment();
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {

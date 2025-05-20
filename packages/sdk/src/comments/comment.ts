@@ -34,7 +34,7 @@ import {
   DOMAIN_VERSION,
 } from "./eip712.js";
 
-export type PostCommentAsAuthorParams = {
+export type PostCommentParams = {
   /**
    * The comment data
    *
@@ -57,14 +57,14 @@ export type PostCommentAsAuthorParams = {
   /**
    * The write contract function
    */
-  writeContract: ContractWriteFunctions["postCommentAsAuthor"];
+  writeContract: ContractWriteFunctions["postComment"];
 };
 
-export type PostCommentAsAuthorResult = {
+export type PostCommentResult = {
   txHash: Hex;
 };
 
-const PostCommentAsAuthorParamsSchema = z.object({
+const PostCommentParamsSchema = z.object({
   // we don't care here because comment is validated internally by createCommentData()
   comment: CommentInputDataSchema,
   appSignature: HexSchema,
@@ -78,17 +78,17 @@ const PostCommentAsAuthorParamsSchema = z.object({
  * @param params - The parameters for posting a comment as an author
  * @returns The transaction hash
  */
-export async function postCommentAsAuthor(
-  params: PostCommentAsAuthorParams,
-): Promise<PostCommentAsAuthorResult> {
-  const validatedParams = PostCommentAsAuthorParamsSchema.parse(params);
+export async function postComment(
+  params: PostCommentParams,
+): Promise<PostCommentResult> {
+  const validatedParams = PostCommentParamsSchema.parse(params);
 
   const { comment, commentsAddress, fee, appSignature } = validatedParams;
 
   const txHash = await params.writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "postCommentAsAuthor",
+    functionName: "postComment",
     args: [comment, appSignature],
     value: fee,
   });
@@ -98,7 +98,7 @@ export async function postCommentAsAuthor(
   };
 }
 
-export type PostCommentParams = {
+export type PostCommentWithApprovalParams = {
   /**
    * The comment data
    *
@@ -125,14 +125,14 @@ export type PostCommentParams = {
   /**
    * The write contract function
    */
-  writeContract: ContractWriteFunctions["postComment"];
+  writeContract: ContractWriteFunctions["postCommentWithApproval"];
 };
 
-export type PostCommentResult = {
+export type PostCommentWithApprovalResult = {
   txHash: Hex;
 };
 
-const PostCommentParamsSchema = z.object({
+const PostCommentWithApprovalParamsSchema = z.object({
   comment: CommentInputDataSchema,
   appSignature: HexSchema,
   authorSignature: HexSchema.optional(),
@@ -146,8 +146,10 @@ const PostCommentParamsSchema = z.object({
  * @param params - The parameters for posting a comment
  * @returns The transaction hash
  */
-export async function postComment(params: PostCommentParams) {
-  const validatedParams = PostCommentParamsSchema.parse(params);
+export async function postCommentWithApproval(
+  params: PostCommentWithApprovalParams,
+): Promise<PostCommentWithApprovalResult> {
+  const validatedParams = PostCommentWithApprovalParamsSchema.parse(params);
 
   const { comment, appSignature, authorSignature, commentsAddress, fee } =
     validatedParams;
@@ -155,7 +157,7 @@ export async function postComment(params: PostCommentParams) {
   const txHash = await params.writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "postComment",
+    functionName: "postCommentWithApproval",
     args: [comment, authorSignature ?? stringToHex(""), appSignature],
     value: fee,
   });
@@ -248,7 +250,7 @@ export async function getCommentId(params: GetCommentIdParams): Promise<Hex> {
   return commentId;
 }
 
-export type DeleteCommentAsAuthorParams = {
+export type DeleteCommentParams = {
   /**
    * The ID of the comment to delete
    */
@@ -258,10 +260,10 @@ export type DeleteCommentAsAuthorParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  writeContract: ContractWriteFunctions["deleteCommentAsAuthor"];
+  writeContract: ContractWriteFunctions["deleteComment"];
 };
 
-export type DeleteCommentAsAuthorResult = {
+export type DeleteCommentResult = {
   txHash: Hex;
 };
 
@@ -276,16 +278,16 @@ const DeleteCommentAsAuthorParamsSchema = z.object({
  * @param params - The parameters for deleting a comment as an author
  * @returns The transaction hash
  */
-export async function deleteCommentAsAuthor(
-  params: DeleteCommentAsAuthorParams,
-): Promise<DeleteCommentAsAuthorResult> {
+export async function deleteComment(
+  params: DeleteCommentParams,
+): Promise<DeleteCommentResult> {
   const { commentId, commentsAddress } =
     DeleteCommentAsAuthorParamsSchema.parse(params);
 
   const txHash = await params.writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "deleteCommentAsAuthor",
+    functionName: "deleteComment",
     args: [commentId],
   });
 
@@ -294,7 +296,7 @@ export async function deleteCommentAsAuthor(
   };
 }
 
-export type DeleteCommentParams = {
+export type DeleteCommentWithApprovalParams = {
   /**
    * The ID of the comment to delete
    */
@@ -331,10 +333,14 @@ export type DeleteCommentParams = {
   /**
    * The write contract function
    */
-  writeContract: ContractWriteFunctions["deleteComment"];
+  writeContract: ContractWriteFunctions["deleteCommentWithApproval"];
 };
 
-const DeleteCommentParamsSchema = z.object({
+export type DeleteCommentWithApprovalResult = {
+  txHash: Hex;
+};
+
+const DeleteCommentWithApprovalParamsSchema = z.object({
   commentId: HexSchema,
   author: HexSchema,
   app: HexSchema,
@@ -351,8 +357,10 @@ const DeleteCommentParamsSchema = z.object({
  * @param params - The parameters for deleting a comment
  * @returns The transaction hash
  */
-export async function deleteComment(params: DeleteCommentParams) {
-  const validatedParams = DeleteCommentParamsSchema.parse(params);
+export async function deleteCommentWithApproval(
+  params: DeleteCommentWithApprovalParams,
+): Promise<DeleteCommentWithApprovalResult> {
+  const validatedParams = DeleteCommentWithApprovalParamsSchema.parse(params);
 
   const {
     commentId,
@@ -796,7 +804,7 @@ export function createEditCommentTypedData(
   });
 }
 
-export type EditCommentAsAuthorParams = {
+export type EditCommentParams = {
   /**
    * The edit data
    *
@@ -819,17 +827,17 @@ export type EditCommentAsAuthorParams = {
   /**
    * The write contract function
    */
-  writeContract: ContractWriteFunctions["editCommentAsAuthor"];
+  writeContract: ContractWriteFunctions["editComment"];
 };
 
-const EditCommentAsAuthorParamsSchema = z.object({
+const EditCommentParamsSchema = z.object({
   edit: EditCommentDataSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   appSignature: HexSchema,
   fee: z.bigint().optional(),
 });
 
-export type EditCommentAsAuthorResult = {
+export type EditCommentResult = {
   txHash: Hex;
 };
 
@@ -839,17 +847,17 @@ export type EditCommentAsAuthorResult = {
  * @param params - The parameters for editing a comment as an author
  * @returns The transaction hash
  */
-export async function editCommentAsAuthor(
-  params: EditCommentAsAuthorParams,
-): Promise<EditCommentAsAuthorResult> {
-  const validatedParams = EditCommentAsAuthorParamsSchema.parse(params);
+export async function editComment(
+  params: EditCommentParams,
+): Promise<EditCommentResult> {
+  const validatedParams = EditCommentParamsSchema.parse(params);
 
   const { edit, commentsAddress, appSignature, fee } = validatedParams;
 
   const txHash = await params.writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "editCommentAsAuthor",
+    functionName: "editComment",
     args: [edit.commentId, edit, appSignature],
     value: fee,
   });
@@ -859,7 +867,7 @@ export async function editCommentAsAuthor(
   };
 }
 
-export type EditCommentParams = {
+export type EditCommentWithApprovalParams = {
   /**
    * The edit data
    *
@@ -886,10 +894,10 @@ export type EditCommentParams = {
   /**
    * The write contract function
    */
-  writeContract: ContractWriteFunctions["editComment"];
+  writeContract: ContractWriteFunctions["editCommentWithApproval"];
 };
 
-const EditCommentParamsSchema = z.object({
+const EditCommentWithApprovalParamsSchema = z.object({
   edit: EditCommentDataSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   appSignature: HexSchema,
@@ -897,7 +905,7 @@ const EditCommentParamsSchema = z.object({
   fee: z.bigint().optional(),
 });
 
-export type EditCommentResult = {
+export type EditCommentWithApprovalResult = {
   txHash: Hex;
 };
 
@@ -907,10 +915,10 @@ export type EditCommentResult = {
  * @param params - The parameters for editing a comment
  * @returns The transaction hash
  */
-export async function editComment(
-  params: EditCommentParams,
-): Promise<EditCommentResult> {
-  const validatedParams = EditCommentParamsSchema.parse(params);
+export async function editCommentWithApproval(
+  params: EditCommentWithApprovalParams,
+): Promise<EditCommentWithApprovalResult> {
+  const validatedParams = EditCommentWithApprovalParamsSchema.parse(params);
 
   const { edit, commentsAddress, appSignature, authorSignature, fee } =
     validatedParams;
@@ -918,7 +926,7 @@ export async function editComment(
   const txHash = await params.writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "editComment",
+    functionName: "editCommentWithApproval",
     args: [
       edit.commentId,
       edit,

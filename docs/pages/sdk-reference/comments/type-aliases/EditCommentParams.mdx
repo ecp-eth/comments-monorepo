@@ -9,7 +9,6 @@
 ```ts
 type EditCommentParams = {
   appSignature: Hex;
-  authorSignature?: Hex;
   commentsAddress?: Hex;
   edit: EditCommentData;
   fee?: bigint;
@@ -17,7 +16,7 @@ type EditCommentParams = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:862](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L862)
+Defined in: [packages/sdk/src/comments/comment.ts:807](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L807)
 
 ## Properties
 
@@ -27,21 +26,9 @@ Defined in: [packages/sdk/src/comments/comment.ts:862](https://github.com/ecp-et
 appSignature: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:881](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L881)
+Defined in: [packages/sdk/src/comments/comment.ts:826](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L826)
 
-The app signature
-
-***
-
-### authorSignature?
-
-```ts
-optional authorSignature: Hex;
-```
-
-Defined in: [packages/sdk/src/comments/comment.ts:885](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L885)
-
-The author signature. Necessary if the author hasn't approved the signer to edit comments on their behalf.
+The author signature.
 
 ***
 
@@ -51,7 +38,7 @@ The author signature. Necessary if the author hasn't approved the signer to edit
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:877](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L877)
+Defined in: [packages/sdk/src/comments/comment.ts:822](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L822)
 
 The address of the comments contract
 
@@ -69,7 +56,7 @@ COMMENT_MANAGER_ADDRESS
 edit: EditCommentData;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:868](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L868)
+Defined in: [packages/sdk/src/comments/comment.ts:813](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L813)
 
 The edit data
 
@@ -83,7 +70,7 @@ You can obtain this by using the `createEditCommentData()` function
 optional fee: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:872](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L872)
+Defined in: [packages/sdk/src/comments/comment.ts:817](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L817)
 
 The fee for the edit operation
 
@@ -95,6 +82,6 @@ The fee for the edit operation
 writeContract: ContractWriteFunctions["editComment"];
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:889](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L889)
+Defined in: [packages/sdk/src/comments/comment.ts:830](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L830)
 
 The write contract function

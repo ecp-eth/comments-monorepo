@@ -126,6 +126,16 @@ const CommentManagerABI: readonly [{
      internalType: "bytes32";
      name: "commentId";
      type: "bytes32";
+  }];
+  name: "deleteComment";
+  outputs: readonly [];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
    }, {
      internalType: "address";
      name: "author";
@@ -151,17 +161,7 @@ const CommentManagerABI: readonly [{
      name: "appSignature";
      type: "bytes";
   }];
-  name: "deleteComment";
-  outputs: readonly [];
-  stateMutability: "nonpayable";
-  type: "function";
-}, {
-  inputs: readonly [{
-     internalType: "bytes32";
-     name: "commentId";
-     type: "bytes32";
-  }];
-  name: "deleteCommentAsAuthor";
+  name: "deleteCommentWithApproval";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -195,10 +195,6 @@ const CommentManagerABI: readonly [{
      internalType: "struct Comments.EditComment";
      name: "editData";
      type: "tuple";
-   }, {
-     internalType: "bytes";
-     name: "authorSignature";
-     type: "bytes";
    }, {
      internalType: "bytes";
      name: "appSignature";
@@ -240,10 +236,14 @@ const CommentManagerABI: readonly [{
      type: "tuple";
    }, {
      internalType: "bytes";
+     name: "authorSignature";
+     type: "bytes";
+   }, {
+     internalType: "bytes";
      name: "appSignature";
      type: "bytes";
   }];
-  name: "editCommentAsAuthor";
+  name: "editCommentWithApproval";
   outputs: readonly [];
   stateMutability: "payable";
   type: "function";
@@ -614,10 +614,6 @@ const CommentManagerABI: readonly [{
      type: "tuple";
    }, {
      internalType: "bytes";
-     name: "authorSignature";
-     type: "bytes";
-   }, {
-     internalType: "bytes";
      name: "appSignature";
      type: "bytes";
   }];
@@ -673,10 +669,14 @@ const CommentManagerABI: readonly [{
      type: "tuple";
    }, {
      internalType: "bytes";
+     name: "authorSignature";
+     type: "bytes";
+   }, {
+     internalType: "bytes";
      name: "appSignature";
      type: "bytes";
   }];
-  name: "postCommentAsAuthor";
+  name: "postCommentWithApproval";
   outputs: readonly [];
   stateMutability: "payable";
   type: "function";

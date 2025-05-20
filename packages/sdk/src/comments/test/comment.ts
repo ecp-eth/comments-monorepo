@@ -10,19 +10,19 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import { anvil } from "viem/chains";
 import {
-  postCommentAsAuthor,
   postComment,
+  postCommentWithApproval,
   getComment,
   getCommentId,
-  deleteCommentAsAuthor,
   deleteComment,
+  deleteCommentWithApproval,
   getDeleteCommentHash,
   getNonce,
   createCommentTypedData,
   createDeleteCommentTypedData,
   createCommentData,
+  editCommentWithApproval,
   editComment,
-  editCommentAsAuthor,
   createEditCommentTypedData,
   createEditCommentData,
   getEditCommentHash,
@@ -57,7 +57,7 @@ const appClient = createWalletClient({
   account: appAccount,
 }).extend(publicActions);
 
-describe("postCommentAsAuthor()", () => {
+describe("postComment()", () => {
   it("posts a comment as author", async () => {
     const nonce = await getNonce({
       author: account.address,
@@ -82,7 +82,7 @@ describe("postCommentAsAuthor()", () => {
 
     const appSignature = await appClient.signTypedData(typedData);
 
-    const result = await postCommentAsAuthor({
+    const result = await postComment({
       comment: commentData,
       appSignature,
       writeContract: client.writeContract,
@@ -97,7 +97,7 @@ describe("postCommentAsAuthor()", () => {
   });
 });
 
-describe("postComment()", () => {
+describe("postCommentWithApproval()", () => {
   let appSignature: Hex;
   let commentData: CreateCommentData;
 
@@ -137,7 +137,7 @@ describe("postComment()", () => {
   });
 
   it("posts a comment with signatures", async () => {
-    const result = await postComment({
+    const result = await postCommentWithApproval({
       comment: commentData,
       appSignature,
       writeContract: appClient.writeContract,
@@ -193,7 +193,7 @@ describe("postComment()", () => {
     const appSignature = await appClient.signTypedData(typedData);
     const authorSignature = await client.signTypedData(typedData);
 
-    const result = await postComment({
+    const result = await postCommentWithApproval({
       comment: commentData,
       appSignature,
       authorSignature,
@@ -218,7 +218,7 @@ describe("postComment()", () => {
 
     await assert.rejects(
       () =>
-        postComment({
+        postCommentWithApproval({
           comment: createCommentData({
             app: appAccount.address,
             author: account.address,
@@ -266,7 +266,7 @@ describe("getComment()", () => {
 
     const appSignature = await appClient.signTypedData(typedData);
 
-    const result = await postCommentAsAuthor({
+    const result = await postComment({
       comment: commentData,
       appSignature,
       writeContract: client.writeContract,
@@ -326,7 +326,7 @@ describe("getCommentId()", () => {
   });
 });
 
-describe("deleteCommentAsAuthor()", () => {
+describe("deleteComment()", () => {
   let commentId: Hex;
 
   beforeEach(async () => {
@@ -354,7 +354,7 @@ describe("deleteCommentAsAuthor()", () => {
 
     const appSignature = await appClient.signTypedData(typedData);
 
-    const result = await postCommentAsAuthor({
+    const result = await postComment({
       comment: commentData,
       appSignature,
       writeContract: client.writeContract,
@@ -376,7 +376,7 @@ describe("deleteCommentAsAuthor()", () => {
   });
 
   it("deletes a comment as author", async () => {
-    const result = await deleteCommentAsAuthor({
+    const result = await deleteComment({
       commentId,
       writeContract: client.writeContract,
       commentsAddress,
@@ -390,7 +390,7 @@ describe("deleteCommentAsAuthor()", () => {
   });
 });
 
-describe("deleteComment()", () => {
+describe("deleteCommentWithApproval()", () => {
   let commentId: Hex;
 
   beforeEach(async () => {
@@ -427,7 +427,7 @@ describe("deleteComment()", () => {
       }),
     );
 
-    const postResult = await postCommentAsAuthor({
+    const postResult = await postComment({
       comment: commentData,
       appSignature,
       writeContract: client.writeContract,
@@ -467,7 +467,7 @@ describe("deleteComment()", () => {
 
     const appSignature = await appClient.signTypedData(typedData);
 
-    const result = await deleteComment({
+    const result = await deleteCommentWithApproval({
       commentId,
       author: account.address,
       app: appAccount.address,
@@ -504,7 +504,7 @@ describe("deleteComment()", () => {
 
     await assert.rejects(
       () =>
-        deleteComment({
+        deleteCommentWithApproval({
           commentId,
           author: account.address,
           app: appAccount.address,
@@ -553,7 +553,7 @@ describe("getNonce()", () => {
   });
 });
 
-describe("editCommentAsAuthor()", () => {
+describe("editComment()", () => {
   let commentId: Hex;
 
   beforeEach(async () => {
@@ -581,7 +581,7 @@ describe("editCommentAsAuthor()", () => {
 
     const appSignature = await appClient.signTypedData(typedData);
 
-    const result = await postCommentAsAuthor({
+    const result = await postComment({
       comment: commentData,
       appSignature,
       writeContract: client.writeContract,
@@ -626,7 +626,7 @@ describe("editCommentAsAuthor()", () => {
 
     const appSignature = await appClient.signTypedData(typedData);
 
-    const result = await editCommentAsAuthor({
+    const result = await editComment({
       edit,
       writeContract: client.writeContract,
       commentsAddress,
@@ -650,7 +650,7 @@ describe("editCommentAsAuthor()", () => {
   });
 });
 
-describe("editComment()", () => {
+describe("editCommentWithApproval()", () => {
   let commentId: Hex;
 
   beforeEach(async () => {
@@ -687,7 +687,7 @@ describe("editComment()", () => {
       }),
     );
 
-    const postResult = await postCommentAsAuthor({
+    const postResult = await postComment({
       comment: commentData,
       appSignature,
       writeContract: client.writeContract,
@@ -733,7 +733,7 @@ describe("editComment()", () => {
 
     const appSignature = await appClient.signTypedData(typedData);
 
-    const result = await editComment({
+    const result = await editCommentWithApproval({
       edit,
       appSignature,
       writeContract: appClient.writeContract,
@@ -774,7 +774,7 @@ describe("editComment()", () => {
 
     await assert.rejects(
       () =>
-        editComment({
+        editCommentWithApproval({
           edit,
           appSignature: "0x1234", // Invalid signature
           writeContract: appClient.writeContract,

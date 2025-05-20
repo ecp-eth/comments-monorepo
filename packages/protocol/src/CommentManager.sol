@@ -70,7 +70,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function postCommentAsAuthor(
+  function postComment(
     Comments.CreateComment calldata commentData,
     bytes calldata appSignature
   ) external payable {
@@ -78,7 +78,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function postComment(
+  function postCommentWithApproval(
     Comments.CreateComment calldata commentData,
     bytes calldata authorSignature,
     bytes calldata appSignature
@@ -200,7 +200,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function editCommentAsAuthor(
+  function editComment(
     bytes32 commentId,
     Comments.EditComment calldata editData,
     bytes calldata appSignature
@@ -209,7 +209,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function editComment(
+  function editCommentWithApproval(
     bytes32 commentId,
     Comments.EditComment calldata editData,
     bytes calldata authorSignature,
@@ -305,7 +305,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function deleteCommentAsAuthor(bytes32 commentId) external {
+  function deleteComment(bytes32 commentId) external {
     Comments.Comment storage comment = comments[commentId];
     require(comment.author != address(0), "Comment does not exist");
     require(comment.author == msg.sender, "Not comment author");
@@ -313,7 +313,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function deleteComment(
+  function deleteCommentWithApproval(
     bytes32 commentId,
     address author,
     address app,

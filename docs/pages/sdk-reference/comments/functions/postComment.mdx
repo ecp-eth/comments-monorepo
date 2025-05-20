@@ -7,14 +7,12 @@
 # Function: postComment()
 
 ```ts
-function postComment(params): Promise<{
-  txHash: `0x${string}`;
-}>;
+function postComment(params): Promise<PostCommentResult>;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:149](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L149)
+Defined in: [packages/sdk/src/comments/comment.ts:81](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L81)
 
-Posts a comment with author signature verification
+Posts a comment as an author
 
 ## Parameters
 
@@ -22,12 +20,10 @@ Posts a comment with author signature verification
 
 [`PostCommentParams`](/sdk-reference/comments/type-aliases/PostCommentParams.mdx)
 
-The parameters for posting a comment
+The parameters for posting a comment as an author
 
 ## Returns
 
-`Promise`\<\{
-  `txHash`: `` `0x${string}` ``;
-\}\>
+`Promise`\<[`PostCommentResult`](/sdk-reference/comments/type-aliases/PostCommentResult.mdx)\>
 
 The transaction hash

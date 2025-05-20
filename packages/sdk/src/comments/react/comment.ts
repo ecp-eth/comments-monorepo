@@ -9,75 +9,35 @@ import {
 import { usePublicClient, useWriteContract } from "wagmi";
 import type { Hex } from "../../core/schemas.js";
 import {
-  type PostCommentAsAuthorParams,
-  type PostCommentAsAuthorResult,
-  postCommentAsAuthor,
   type PostCommentParams,
   type PostCommentResult,
   postComment,
+  type PostCommentWithApprovalParams,
+  type PostCommentWithApprovalResult,
+  postCommentWithApproval,
   type GetCommentParams,
   type GetCommentResult,
   getComment,
   type GetCommentIdParams,
   getCommentId,
-  type DeleteCommentAsAuthorParams,
-  type DeleteCommentAsAuthorResult,
-  deleteCommentAsAuthor,
   type DeleteCommentParams,
+  type DeleteCommentResult,
   deleteComment,
+  type DeleteCommentWithApprovalParams,
+  deleteCommentWithApproval,
   getNonce,
+  editCommentWithApproval,
+  type EditCommentWithApprovalParams,
+  type EditCommentWithApprovalResult,
   editComment,
   type EditCommentParams,
   type EditCommentResult,
-  editCommentAsAuthor,
-  type EditCommentAsAuthorParams,
-  type EditCommentAsAuthorResult,
   getDeleteCommentHash,
   type GetEditCommentHashParams,
   getEditCommentHash,
   type GetDeleteCommentHashParams,
 } from "../comment.js";
 import { useCallback } from "react";
-
-export type UsePostCommentAsAuthorParams = Omit<
-  PostCommentAsAuthorParams,
-  "writeContract"
->;
-export type UsePostCommentAsAuthorOptions = Omit<
-  UseMutationOptions<
-    PostCommentAsAuthorResult,
-    Error,
-    UsePostCommentAsAuthorParams
-  >,
-  "mutationFn"
->;
-export type UsePostCommentAsAuthorResult = UseMutationResult<
-  PostCommentAsAuthorResult,
-  Error,
-  UsePostCommentAsAuthorParams
->;
-
-/**
- * React hook to post a comment as an author
- *
- * @param options - The options for the mutation
- * @returns The result of the mutation
- */
-export function usePostCommentAsAuthor(
-  options: UsePostCommentAsAuthorOptions = {},
-): UsePostCommentAsAuthorResult {
-  const { writeContractAsync } = useWriteContract();
-
-  return useMutation({
-    ...options,
-    mutationFn: (params) => {
-      return postCommentAsAuthor({
-        ...params,
-        writeContract: writeContractAsync,
-      });
-    },
-  });
-}
 
 export type UsePostCommentParams = Omit<PostCommentParams, "writeContract">;
 export type UsePostCommentOptions = Omit<
@@ -91,7 +51,7 @@ export type UsePostCommentResult = UseMutationResult<
 >;
 
 /**
- * React hook to post a comment with author signature verification
+ * React hook to post a comment as an author
  *
  * @param options - The options for the mutation
  * @returns The result of the mutation
@@ -105,6 +65,46 @@ export function usePostComment(
     ...options,
     mutationFn: (params) => {
       return postComment({
+        ...params,
+        writeContract: writeContractAsync,
+      });
+    },
+  });
+}
+
+export type UsePostCommentWithApprovalParams = Omit<
+  PostCommentWithApprovalParams,
+  "writeContract"
+>;
+export type UsePostCommentWithApprovalOptions = Omit<
+  UseMutationOptions<
+    PostCommentWithApprovalResult,
+    Error,
+    UsePostCommentWithApprovalParams
+  >,
+  "mutationFn"
+>;
+export type UsePostCommentWithApprovalResult = UseMutationResult<
+  PostCommentWithApprovalResult,
+  Error,
+  UsePostCommentWithApprovalParams
+>;
+
+/**
+ * React hook to post a comment with author signature verification
+ *
+ * @param options - The options for the mutation
+ * @returns The result of the mutation
+ */
+export function usePostCommentWithApproval(
+  options: UsePostCommentWithApprovalOptions = {},
+): UsePostCommentWithApprovalResult {
+  const { writeContractAsync } = useWriteContract();
+
+  return useMutation({
+    ...options,
+    mutationFn: (params) => {
+      return postCommentWithApproval({
         ...params,
         writeContract: writeContractAsync,
       });
@@ -192,59 +192,19 @@ export function useGetCommentId(
   });
 }
 
-export type UseDeleteCommentAsAuthorParams = Omit<
-  DeleteCommentAsAuthorParams,
-  "writeContract"
->;
-export type UseDeleteCommentAsAuthorOptions = Omit<
-  UseMutationOptions<
-    DeleteCommentAsAuthorResult,
-    Error,
-    UseDeleteCommentAsAuthorParams
-  >,
-  "mutationFn"
->;
-export type UseDeleteCommentAsAuthorResult = UseMutationResult<
-  DeleteCommentAsAuthorResult,
-  Error,
-  UseDeleteCommentAsAuthorParams
->;
-
-/**
- * React hook to delete a comment as an author
- *
- * @param options - The options for the mutation
- * @returns The result of the mutation
- */
-export function useDeleteCommentAsAuthor(
-  options: UseDeleteCommentAsAuthorOptions = {},
-): UseDeleteCommentAsAuthorResult {
-  const { writeContractAsync } = useWriteContract();
-
-  return useMutation({
-    ...options,
-    mutationFn: (params) => {
-      return deleteCommentAsAuthor({
-        ...params,
-        writeContract: writeContractAsync,
-      });
-    },
-  });
-}
-
 export type UseDeleteCommentParams = Omit<DeleteCommentParams, "writeContract">;
 export type UseDeleteCommentOptions = Omit<
-  UseMutationOptions<{ txHash: Hex }, Error, UseDeleteCommentParams>,
+  UseMutationOptions<DeleteCommentResult, Error, UseDeleteCommentParams>,
   "mutationFn"
 >;
 export type UseDeleteCommentResult = UseMutationResult<
-  { txHash: Hex },
+  DeleteCommentResult,
   Error,
   UseDeleteCommentParams
 >;
 
 /**
- * React hook to delete a comment with app signature verification
+ * React hook to delete a comment as an author
  *
  * @param options - The options for the mutation
  * @returns The result of the mutation
@@ -258,6 +218,46 @@ export function useDeleteComment(
     ...options,
     mutationFn: (params) => {
       return deleteComment({
+        ...params,
+        writeContract: writeContractAsync,
+      });
+    },
+  });
+}
+
+export type UseDeleteCommentWithApprovalParams = Omit<
+  DeleteCommentWithApprovalParams,
+  "writeContract"
+>;
+export type UseDeleteCommentWithApprovalOptions = Omit<
+  UseMutationOptions<
+    { txHash: Hex },
+    Error,
+    UseDeleteCommentWithApprovalParams
+  >,
+  "mutationFn"
+>;
+export type UseDeleteCommentWithApprovalResult = UseMutationResult<
+  { txHash: Hex },
+  Error,
+  UseDeleteCommentWithApprovalParams
+>;
+
+/**
+ * React hook to delete a comment with app signature verification
+ *
+ * @param options - The options for the mutation
+ * @returns The result of the mutation
+ */
+export function useDeleteCommentWithApproval(
+  options: UseDeleteCommentWithApprovalOptions = {},
+): UseDeleteCommentWithApprovalResult {
+  const { writeContractAsync } = useWriteContract();
+
+  return useMutation({
+    ...options,
+    mutationFn: (params) => {
+      return deleteCommentWithApproval({
         ...params,
         writeContract: writeContractAsync,
       });
@@ -290,6 +290,46 @@ export function useGetNonce(): typeof getNonce {
   );
 }
 
+export type UseEditCommentWithApprovalParams = Omit<
+  EditCommentWithApprovalParams,
+  "writeContract"
+>;
+export type UseEditCommentWithApprovalOptions = Omit<
+  UseMutationOptions<
+    EditCommentWithApprovalResult,
+    Error,
+    UseEditCommentWithApprovalParams
+  >,
+  "mutationFn"
+>;
+export type UseEditCommentWithApprovalResult = UseMutationResult<
+  EditCommentWithApprovalResult,
+  Error,
+  UseEditCommentWithApprovalParams
+>;
+
+/**
+ * React hook to edit a comment with app signature verification
+ *
+ * @param options - The options for the mutation
+ * @returns The result of the mutation
+ */
+export function useEditCommentWithApproval(
+  options: UseEditCommentWithApprovalOptions = {},
+): UseEditCommentWithApprovalResult {
+  const { writeContractAsync } = useWriteContract();
+
+  return useMutation({
+    ...options,
+    mutationFn: (params) => {
+      return editCommentWithApproval({
+        ...params,
+        writeContract: writeContractAsync,
+      });
+    },
+  });
+}
+
 export type UseEditCommentParams = Omit<EditCommentParams, "writeContract">;
 export type UseEditCommentOptions = Omit<
   UseMutationOptions<EditCommentResult, Error, UseEditCommentParams>,
@@ -302,7 +342,7 @@ export type UseEditCommentResult = UseMutationResult<
 >;
 
 /**
- * React hook to edit a comment with app signature verification
+ * React hook to edit a comment as an author
  *
  * @param options - The options for the mutation
  * @returns The result of the mutation
@@ -316,46 +356,6 @@ export function useEditComment(
     ...options,
     mutationFn: (params) => {
       return editComment({
-        ...params,
-        writeContract: writeContractAsync,
-      });
-    },
-  });
-}
-
-export type UseEditCommentAsAuthorParams = Omit<
-  EditCommentAsAuthorParams,
-  "writeContract"
->;
-export type UseEditCommentAsAuthorOptions = Omit<
-  UseMutationOptions<
-    EditCommentAsAuthorResult,
-    Error,
-    UseEditCommentAsAuthorParams
-  >,
-  "mutationFn"
->;
-export type UseEditCommentAsAuthorResult = UseMutationResult<
-  EditCommentAsAuthorResult,
-  Error,
-  UseEditCommentAsAuthorParams
->;
-
-/**
- * React hook to edit a comment as an author
- *
- * @param options - The options for the mutation
- * @returns The result of the mutation
- */
-export function useEditCommentAsAuthor(
-  options: UseEditCommentAsAuthorOptions = {},
-): UseEditCommentAsAuthorResult {
-  const { writeContractAsync } = useWriteContract();
-
-  return useMutation({
-    ...options,
-    mutationFn: (params) => {
-      return editCommentAsAuthor({
         ...params,
         writeContract: writeContractAsync,
       });

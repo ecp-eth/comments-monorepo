@@ -11,7 +11,7 @@ import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import { chain, transport } from "@/lib/wagmi";
 import {
   createDeleteCommentTypedData,
-  deleteComment,
+  deleteCommentWithApproval,
   getNonce,
   isApproved,
 } from "@ecp.eth/sdk/comments";
@@ -102,7 +102,7 @@ export async function POST(
       }
 
       try {
-        const { txHash } = await deleteComment({
+        const { txHash } = await deleteCommentWithApproval({
           ...typedDeleteCommentData.message,
           appSignature: signature,
           writeContract: walletClient.writeContract,

@@ -115,21 +115,21 @@ export type CommentData = {
 };
 
 export type ContractWriteFunctions = {
-  postComment: (
+  postCommentWithApproval: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
       "payable",
-      "postComment"
+      "postCommentWithApproval"
     > & {
       value?: bigint;
     },
   ) => Promise<Hex>;
 
-  postCommentAsAuthor: (
+  postComment: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
       "payable",
-      "postCommentAsAuthor"
+      "postComment"
     > & {
       value?: bigint;
     },
@@ -151,6 +151,14 @@ export type ContractWriteFunctions = {
     >,
   ) => Promise<Hex>;
 
+  deleteCommentWithApproval: (
+    args: ContractFunctionParameters<
+      CommentManagerABIType,
+      "nonpayable",
+      "deleteCommentWithApproval"
+    >,
+  ) => Promise<Hex>;
+
   deleteComment: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
@@ -159,12 +167,14 @@ export type ContractWriteFunctions = {
     >,
   ) => Promise<Hex>;
 
-  deleteCommentAsAuthor: (
+  editCommentWithApproval: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
-      "nonpayable",
-      "deleteCommentAsAuthor"
-    >,
+      "payable",
+      "editCommentWithApproval"
+    > & {
+      value?: bigint;
+    },
   ) => Promise<Hex>;
 
   editComment: (
@@ -172,16 +182,6 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "payable",
       "editComment"
-    > & {
-      value?: bigint;
-    },
-  ) => Promise<Hex>;
-
-  editCommentAsAuthor: (
-    args: ContractFunctionParameters<
-      CommentManagerABIType,
-      "payable",
-      "editCommentAsAuthor"
     > & {
       value?: bigint;
     },
