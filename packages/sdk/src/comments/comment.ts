@@ -376,7 +376,7 @@ export async function deleteCommentWithApproval(
   const txHash = await params.writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "deleteComment",
+    functionName: "deleteCommentWithApproval",
     args: [
       commentId,
       author,
