@@ -5,13 +5,12 @@ import { Test } from "forge-std/Test.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
-import {
-  IERC721Receiver
-} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { TestUtils, MockHook } from "./utils.sol";
 import { Comments } from "../src/libraries/Comments.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
 import { Channels } from "../src/libraries/Channels.sol";
+import { IHook } from "../src/interfaces/IHook.sol";
 
 // Invalid hook that doesn't support the interface
 contract InvalidHook {
