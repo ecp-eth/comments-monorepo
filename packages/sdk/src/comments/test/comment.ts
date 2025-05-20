@@ -469,7 +469,6 @@ describe("deleteCommentWithApproval()", () => {
 
     const result = await deleteCommentWithApproval({
       commentId,
-      author: account.address,
       app: appAccount.address,
       nonce,
       deadline: typedData.message.deadline,
@@ -506,7 +505,6 @@ describe("deleteCommentWithApproval()", () => {
       () =>
         deleteCommentWithApproval({
           commentId,
-          author: account.address,
           app: appAccount.address,
           nonce,
           deadline: typedData.message.deadline,

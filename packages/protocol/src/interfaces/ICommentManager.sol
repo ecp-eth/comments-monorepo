@@ -104,7 +104,6 @@ interface ICommentManager {
 
   /// @notice Deletes a comment with author signature verification
   /// @param commentId The unique identifier of the comment to delete
-  /// @param author The address of the comment author
   /// @param app The address of the app signer
   /// @param nonce The current nonce for the author
   /// @param deadline Timestamp after which the signature becomes invalid
@@ -112,7 +111,6 @@ interface ICommentManager {
   /// @param appSignature The signature from the app signer authorizing deletion (empty if author)
   function deleteCommentWithApproval(
     bytes32 commentId,
-    address author,
     address app,
     uint256 nonce,
     uint256 deadline,

@@ -302,10 +302,6 @@ export type DeleteCommentWithApprovalParams = {
    */
   commentId: Hex;
   /**
-   * The author of the comment
-   */
-  author: Hex;
-  /**
    * The app signer
    */
   app: Hex;
@@ -342,7 +338,6 @@ export type DeleteCommentWithApprovalResult = {
 
 const DeleteCommentWithApprovalParamsSchema = z.object({
   commentId: HexSchema,
-  author: HexSchema,
   app: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint(),
@@ -364,7 +359,6 @@ export async function deleteCommentWithApproval(
 
   const {
     commentId,
-    author,
     app,
     nonce,
     deadline,
@@ -379,7 +373,6 @@ export async function deleteCommentWithApproval(
     functionName: "deleteCommentWithApproval",
     args: [
       commentId,
-      author,
       app,
       nonce,
       deadline,
