@@ -268,15 +268,15 @@ contract MockHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        afterInitialize: false,
-        afterComment: true,
-        afterDeleteComment: false,
-        afterEditComment: false,
+        onInitialized: false,
+        onCommentAdded: true,
+        onCommentDeleted: false,
+        onCommentEdited: false,
         onChannelUpdated: false
       });
   }
 
-  function _afterComment(
+  function _onCommentAdded(
     Comments.Comment calldata,
     address,
     bytes32

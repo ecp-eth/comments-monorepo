@@ -36,53 +36,53 @@ Checks if the contract implements the specified interface
 
 
 
-### `afterInitialize(address channel, uint256 channelId) → bool` (external)
+### `onInitialized(address channel, uint256 channelId) → bool` (external)
 
 Execute after a hook is initialized on a channel
 
 
 
 
-### `_afterInitialize(address, uint256) → bool` (internal)
+### `_onInitialized(address, uint256) → bool` (internal)
 
 
 
 
 
-### `afterComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → string` (external)
+### `onCommentAdded(struct Comments.Comment commentData, address caller, bytes32 commentId) → string` (external)
 
 Execute after a comment is processed
 
 
 
 
-### `_afterComment(struct Comments.Comment, address, bytes32) → string` (internal)
+### `_onCommentAdded(struct Comments.Comment, address, bytes32) → string` (internal)
 
 
 
 
 
-### `afterDeleteComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → bool` (external)
+### `onCommentDeleted(struct Comments.Comment commentData, address caller, bytes32 commentId) → bool` (external)
 
 Execute after a comment is deleted
 
 
 
 
-### `_afterDeleteComment(struct Comments.Comment, address, bytes32) → bool` (internal)
+### `_onCommentDeleted(struct Comments.Comment, address, bytes32) → bool` (internal)
 
 
 
 
 
-### `afterEditComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → string` (external)
+### `onCommentEdited(struct Comments.Comment commentData, address caller, bytes32 commentId) → string` (external)
 
 Execute after a comment is edited
 
 
 
 
-### `_afterEditComment(struct Comments.Comment, address, bytes32) → string` (internal)
+### `_onCommentEdited(struct Comments.Comment, address, bytes32) → string` (internal)
 
 
 

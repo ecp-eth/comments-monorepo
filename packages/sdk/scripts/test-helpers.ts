@@ -39,7 +39,6 @@ export async function deployContractsAsync(deployEnv: "test" | "dev"): Promise<{
 }
 
 export function extractContractAddresses(output: string, hasNoopHook: boolean) {
-  console.log("deploy output", output);
   const commentsAddress = output.match(
     /CommentManager deployed at (0x[a-fA-F0-9]{40})/,
   )?.[1];

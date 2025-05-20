@@ -148,10 +148,10 @@ describe("getChannel()", () => {
       metadata: undefined,
       hook: undefined,
       permissions: {
-        afterComment: false,
-        afterDeleteComment: false,
-        afterEditComment: false,
-        afterInitialize: false,
+        onCommentAdded: false,
+        onCommentDeleted: false,
+        onCommentEdited: false,
+        onInitialized: false,
         onChannelUpdated: false,
       },
     });
@@ -293,10 +293,10 @@ describe("updateChannel()", () => {
       metadata: "New metadata",
       hook: undefined,
       permissions: {
-        afterComment: false,
-        afterDeleteComment: false,
-        afterEditComment: false,
-        afterInitialize: false,
+        onCommentAdded: false,
+        onCommentDeleted: false,
+        onCommentEdited: false,
+        onInitialized: false,
         onChannelUpdated: false,
       },
     });

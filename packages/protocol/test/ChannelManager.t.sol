@@ -30,10 +30,10 @@ contract RejectChannelUpdateHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        afterInitialize: false,
-        afterComment: false,
-        afterDeleteComment: false,
-        afterEditComment: false,
+        onInitialized: false,
+        onCommentAdded: false,
+        onCommentDeleted: false,
+        onCommentEdited: false,
         onChannelUpdated: true
       });
   }

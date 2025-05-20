@@ -1589,22 +1589,22 @@ export const ChannelManagerABI = [
             internalType: "struct Hooks.Permissions",
             components: [
               {
-                name: "afterInitialize",
+                name: "onInitialized",
                 type: "bool",
                 internalType: "bool",
               },
               {
-                name: "afterComment",
+                name: "onCommentAdded",
                 type: "bool",
                 internalType: "bool",
               },
               {
-                name: "afterDeleteComment",
+                name: "onCommentDeleted",
                 type: "bool",
                 internalType: "bool",
               },
               {
-                name: "afterEditComment",
+                name: "onCommentEdited",
                 type: "bool",
                 internalType: "bool",
               },

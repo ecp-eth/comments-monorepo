@@ -53,7 +53,7 @@ contract LengthFeeHook is BaseHook {
     channelManager = IChannelManager(_channelManager);
   }
 
-  function _afterComment(
+  function _onCommentAdded(
     Comments.Comment calldata commentData,
     address,
     bytes32
@@ -109,10 +109,10 @@ contract LengthFeeHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        afterInitialize: false,
-        afterComment: true,
-        afterDeleteComment: false,
-        afterEditComment: false,
+        onInitialized: false,
+        onCommentAdded: true,
+        onCommentDeleted: false,
+        onCommentEdited: false,
         onChannelUpdated: false
       });
   }
