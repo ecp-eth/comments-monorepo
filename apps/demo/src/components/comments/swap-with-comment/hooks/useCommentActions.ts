@@ -21,7 +21,7 @@ import { submitCommentMutationFunction } from "../../standard/queries";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import type { QuoteResponseLiquidityAvailableSchemaType } from "../0x/schemas";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
-import { useDeleteCommentAsAuthor } from "@ecp.eth/sdk/comments/react";
+import { useDeleteComment } from "@ecp.eth/sdk/comments/react";
 import { useCommentActions as useStandardCommentActions } from "../../standard/hooks/useCommentActions";
 
 export type SwapWithCommentExtra = {
@@ -45,7 +45,7 @@ export function useCommentActions({
   const commentDeletion = useCommentDeletion();
   const commentSubmission = useCommentSubmission();
 
-  const { mutateAsync: deleteCommentAsAuthor } = useDeleteCommentAsAuthor();
+  const { mutateAsync: deleteCommentAsAuthor } = useDeleteComment();
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {

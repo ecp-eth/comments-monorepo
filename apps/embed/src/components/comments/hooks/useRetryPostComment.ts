@@ -6,7 +6,7 @@ import { useConfig, useSwitchChain } from "wagmi";
 import { submitCommentMutationFunction } from "../queries";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
-import { usePostCommentAsAuthor } from "@ecp.eth/sdk/comments/react";
+import { usePostComment as usePostCommentSdk } from "@ecp.eth/sdk/comments/react";
 import { waitForTransactionReceipt } from "@wagmi/core";
 
 export type OnRetryPostCommentParams = {
@@ -35,7 +35,7 @@ export function useRetryPostComment({
   const wagmiConfig = useConfig();
   const commentRetrySubmission = useCommentRetrySubmission();
   const { switchChainAsync } = useSwitchChain();
-  const { mutateAsync: postCommentAsAuthor } = usePostCommentAsAuthor();
+  const { mutateAsync: postComment } = usePostCommentSdk();
 
   return useCallback<OnRetryPostComment>(
     async (params) => {
@@ -72,7 +72,7 @@ export function useRetryPostComment({
         async writeContractAsync({
           signCommentResponse: { signature: appSignature, data: commentData },
         }) {
-          const { txHash } = await postCommentAsAuthor({
+          const { txHash } = await postComment({
             appSignature,
             comment: commentData,
           });
@@ -115,7 +115,7 @@ export function useRetryPostComment({
     [
       connectedAddress,
       switchChainAsync,
-      postCommentAsAuthor,
+      postComment,
       commentRetrySubmission,
       wagmiConfig,
     ],

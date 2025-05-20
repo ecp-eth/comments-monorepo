@@ -7,9 +7,7 @@
 # Type Alias: UseDeleteCommentOptions
 
 ```ts
-type UseDeleteCommentOptions = Omit<UseMutationOptions<{
-  txHash: Hex;
-}, Error, UseDeleteCommentParams>, "mutationFn">;
+type UseDeleteCommentOptions = Omit<UseMutationOptions<DeleteCommentResult, Error, UseDeleteCommentParams>, "mutationFn">;
 ```
 
-Defined in: [packages/sdk/src/comments/react/comment.ts:236](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/react/comment.ts#L236)
+Defined in: [packages/sdk/src/comments/react/comment.ts:196](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/react/comment.ts#L196)

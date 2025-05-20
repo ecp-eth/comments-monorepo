@@ -11,11 +11,11 @@ type ContractWriteFunctions = {
   addApproval: (args) => Promise<Hex>;
   addApprovalAsAuthor: (args) => Promise<Hex>;
   deleteComment: (args) => Promise<Hex>;
-  deleteCommentAsAuthor: (args) => Promise<Hex>;
+  deleteCommentWithApproval: (args) => Promise<Hex>;
   editComment: (args) => Promise<Hex>;
-  editCommentAsAuthor: (args) => Promise<Hex>;
+  editCommentWithApproval: (args) => Promise<Hex>;
   postComment: (args) => Promise<Hex>;
-  postCommentAsAuthor: (args) => Promise<Hex>;
+  postCommentWithApproval: (args) => Promise<Hex>;
   removeApproval: (args) => Promise<Hex>;
   renounceOwnership: (args) => Promise<Hex>;
   revokeApprovalAsAuthor: (args) => Promise<Hex>;
@@ -74,7 +74,7 @@ Defined in: [packages/sdk/src/comments/types.ts:146](https://github.com/ecp-eth/
 deleteComment: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:154](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L154)
+Defined in: [packages/sdk/src/comments/types.ts:162](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L162)
 
 #### Parameters
 
@@ -88,19 +88,19 @@ Defined in: [packages/sdk/src/comments/types.ts:154](https://github.com/ecp-eth/
 
 ***
 
-### deleteCommentAsAuthor()
+### deleteCommentWithApproval()
 
 ```ts
-deleteCommentAsAuthor: (args) => Promise<Hex>;
+deleteCommentWithApproval: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:162](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L162)
+Defined in: [packages/sdk/src/comments/types.ts:154](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L154)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"nonpayable"`, `"deleteCommentAsAuthor"`\>
+`ContractFunctionParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"nonpayable"`, `"deleteCommentWithApproval"`\>
 
 #### Returns
 
@@ -114,7 +114,7 @@ Defined in: [packages/sdk/src/comments/types.ts:162](https://github.com/ecp-eth/
 editComment: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:170](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L170)
+Defined in: [packages/sdk/src/comments/types.ts:180](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L180)
 
 #### Parameters
 
@@ -130,19 +130,19 @@ Defined in: [packages/sdk/src/comments/types.ts:170](https://github.com/ecp-eth/
 
 ***
 
-### editCommentAsAuthor()
+### editCommentWithApproval()
 
 ```ts
-editCommentAsAuthor: (args) => Promise<Hex>;
+editCommentWithApproval: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:180](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L180)
+Defined in: [packages/sdk/src/comments/types.ts:170](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L170)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"payable"`, `"editCommentAsAuthor"`\> & \{
+`ContractFunctionParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"payable"`, `"editCommentWithApproval"`\> & \{
   `value?`: `bigint`;
 \}
 
@@ -158,7 +158,7 @@ Defined in: [packages/sdk/src/comments/types.ts:180](https://github.com/ecp-eth/
 postComment: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:118](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L118)
+Defined in: [packages/sdk/src/comments/types.ts:128](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L128)
 
 #### Parameters
 
@@ -174,19 +174,19 @@ Defined in: [packages/sdk/src/comments/types.ts:118](https://github.com/ecp-eth/
 
 ***
 
-### postCommentAsAuthor()
+### postCommentWithApproval()
 
 ```ts
-postCommentAsAuthor: (args) => Promise<Hex>;
+postCommentWithApproval: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:128](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L128)
+Defined in: [packages/sdk/src/comments/types.ts:118](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L118)
 
 #### Parameters
 
 ##### args
 
-`ContractFunctionParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"payable"`, `"postCommentAsAuthor"`\> & \{
+`ContractFunctionParameters`\<[`CommentManagerABIType`](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx), `"payable"`, `"postCommentWithApproval"`\> & \{
   `value?`: `bigint`;
 \}
 

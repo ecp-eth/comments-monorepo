@@ -161,7 +161,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     // Post comment as user1 with exact fee plus protocol fee
     vm.prank(user1);
-    comments.postCommentAsAuthor{ value: TOTAL_FEE_WITH_PROTOCOL }(
+    comments.postComment{ value: TOTAL_FEE_WITH_PROTOCOL }(
       commentData,
       appSignature
     );
@@ -203,7 +203,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     uint256 excessAmount = 0.001 ether;
     uint256 totalSent = TOTAL_FEE_WITH_PROTOCOL + excessAmount;
     vm.prank(user1);
-    comments.postCommentAsAuthor{ value: totalSent }(commentData, appSignature);
+    comments.postComment{ value: totalSent }(commentData, appSignature);
 
     // Check that the hook received the hook fee (after protocol fee)
     assertEq(address(feeHook).balance - hookBalanceBefore, HOOK_FEE);
@@ -242,10 +242,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     // Try to post comment with insufficient fee
     vm.prank(user1);
     vm.expectRevert("Insufficient fee");
-    comments.postCommentAsAuthor{ value: 0.0005 ether }(
-      commentData,
-      appSignature
-    );
+    comments.postComment{ value: 0.0005 ether }(commentData, appSignature);
   }
 
   function test_FeeWithdrawal() public {
@@ -273,7 +270,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
       commentData.nonce = i;
       bytes memory appSignature = _signAppSignature(commentData);
       vm.prank(user1);
-      comments.postCommentAsAuthor{ value: TOTAL_FEE_WITH_PROTOCOL }(
+      comments.postComment{ value: TOTAL_FEE_WITH_PROTOCOL }(
         commentData,
         appSignature
       );

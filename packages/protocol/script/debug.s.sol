@@ -111,7 +111,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
   }
 
   function runPostComment() internal {
-    comments.postCommentAsAuthor{ value: 0 }(createCommentData, "");
+    comments.postComment{ value: 0 }(createCommentData, "");
   }
 
   // Internal function to measure gas usage
