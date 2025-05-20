@@ -1,0 +1,85 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / BaseEditCommentDataParams
+
+# Type Alias: BaseEditCommentDataParams
+
+```ts
+type BaseEditCommentDataParams = {
+  app: Hex;
+  commentId: Hex;
+  content: string;
+  deadline?: bigint;
+  nonce: bigint;
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:680](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L680)
+
+## Properties
+
+### app
+
+```ts
+app: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:688](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L688)
+
+The app
+
+***
+
+### commentId
+
+```ts
+commentId: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:684](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L684)
+
+The ID of the comment to edit
+
+***
+
+### content
+
+```ts
+content: string;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:692](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L692)
+
+The content of the comment (either updated or original)
+
+***
+
+### deadline?
+
+```ts
+optional deadline: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:702](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L702)
+
+The deadline of the comment
+
+#### Default
+
+```ts
+1 day from now
+```
+
+***
+
+### nonce
+
+```ts
+nonce: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:696](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L696)
+
+The nonce for the signature
