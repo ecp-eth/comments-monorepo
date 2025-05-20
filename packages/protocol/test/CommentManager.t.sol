@@ -24,10 +24,10 @@ contract NoHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        afterInitialize: false,
-        afterComment: false,
-        afterDeleteComment: false,
-        afterEditComment: false,
+        onInitialized: false,
+        onCommentAdded: false,
+        onCommentDeleted: false,
+        onCommentEdited: false,
         onChannelUpdated: false
       });
   }
@@ -42,15 +42,15 @@ contract RejectEditHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        afterInitialize: false,
-        afterComment: false,
-        afterDeleteComment: false,
-        afterEditComment: true,
+        onInitialized: false,
+        onCommentAdded: false,
+        onCommentDeleted: false,
+        onCommentEdited: true,
         onChannelUpdated: false
       });
   }
 
-  function afterEditComment(
+  function onCommentEdited(
     Comments.Comment calldata,
     address,
     bytes32
@@ -68,15 +68,15 @@ contract AlwaysReturningDataHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        afterInitialize: false,
-        afterComment: true,
-        afterDeleteComment: false,
-        afterEditComment: true,
+        onInitialized: false,
+        onCommentAdded: true,
+        onCommentDeleted: false,
+        onCommentEdited: true,
         onChannelUpdated: false
       });
   }
 
-  function afterEditComment(
+  function onCommentEdited(
     Comments.Comment calldata,
     address,
     bytes32
@@ -84,7 +84,7 @@ contract AlwaysReturningDataHook is BaseHook {
     return "hook data";
   }
 
-  function afterComment(
+  function onCommentAdded(
     Comments.Comment calldata,
     address,
     bytes32
@@ -1654,7 +1654,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
 // Mock malicious fee collector that reverts on collection
 contract MaliciousFeeCollector is BaseHook {
-  function _afterComment(
+  function _onCommentAdded(
     Comments.Comment calldata,
     address,
     bytes32
@@ -1670,10 +1670,10 @@ contract MaliciousFeeCollector is BaseHook {
   {
     return
       Hooks.Permissions({
-        afterComment: true,
-        afterDeleteComment: false,
-        afterInitialize: false,
-        afterEditComment: false,
+        onCommentAdded: true,
+        onCommentDeleted: false,
+        onInitialized: false,
+        onCommentEdited: false,
         onChannelUpdated: false
       });
   }

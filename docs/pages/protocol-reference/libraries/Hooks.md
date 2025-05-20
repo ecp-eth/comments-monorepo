@@ -13,16 +13,16 @@ Library containing hook-related types and utilities
 ### `Permissions`
 
 
-- **afterInitialize:** (bool) 
+- **onInitialized:** (bool) 
 
 
-- **afterComment:** (bool) 
+- **onCommentAdded:** (bool) 
 
 
-- **afterDeleteComment:** (bool) 
+- **onCommentDeleted:** (bool) 
 
 
-- **afterEditComment:** (bool) 
+- **onCommentEdited:** (bool) 
 
 
 - **onChannelUpdated:** (bool) 

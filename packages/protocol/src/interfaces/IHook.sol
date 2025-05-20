@@ -16,7 +16,7 @@ interface IHook is IERC165 {
   /// @param channel The address of the channel the hook was added to
   /// @param channelId The unique identifier of the channel the hook was added to
   /// @return success Whether the hook initialization was successful
-  function afterInitialize(
+  function onInitialized(
     address channel,
     uint256 channelId
   ) external returns (bool success);
@@ -26,7 +26,7 @@ interface IHook is IERC165 {
   /// @param caller The original msg.sender that initiated the transaction
   /// @param commentId The unique identifier of the processed comment
   /// @return hookData The comment hook data that was generated
-  function afterComment(
+  function onCommentAdded(
     Comments.Comment calldata commentData,
     address caller,
     bytes32 commentId
@@ -37,7 +37,7 @@ interface IHook is IERC165 {
   /// @param caller The original msg.sender that initiated the transaction
   /// @param commentId The unique identifier of the deleted comment
   /// @return success Whether the hook execution was successful
-  function afterDeleteComment(
+  function onCommentDeleted(
     Comments.Comment calldata commentData,
     address caller,
     bytes32 commentId
@@ -48,7 +48,7 @@ interface IHook is IERC165 {
   /// @param caller The original msg.sender that initiated the transaction
   /// @param commentId The unique identifier of the edited comment
   /// @return commentHookData The comment hook data that was generated
-  function afterEditComment(
+  function onCommentEdited(
     Comments.Comment calldata commentData,
     address caller,
     bytes32 commentId

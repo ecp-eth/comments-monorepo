@@ -46,10 +46,10 @@ contract TipHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        afterInitialize: false,
-        afterComment: true,
-        afterDeleteComment: false,
-        afterEditComment: false,
+        onInitialized: false,
+        onCommentAdded: true,
+        onCommentDeleted: false,
+        onCommentEdited: false,
         onChannelUpdated: false
       });
   }
@@ -57,7 +57,7 @@ contract TipHook is BaseHook {
   /// @notice Execute after a comment is processed to handle ETH tips
   /// @param commentData The comment data to process
   /// @return hookData The comment hook data that was generated
-  function _afterComment(
+  function _onCommentAdded(
     Comments.Comment calldata commentData,
     address,
     bytes32 commentId
