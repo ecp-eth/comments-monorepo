@@ -677,7 +677,7 @@ export async function getEditCommentHash(
   return hash;
 }
 
-type BaseEditCommentDataParams = {
+export type BaseEditCommentDataParams = {
   /**
    * The ID of the comment to edit
    */
@@ -702,21 +702,22 @@ type BaseEditCommentDataParams = {
   deadline?: bigint;
 };
 
-type EditCommentDataParamsWithMetadataRaw = BaseEditCommentDataParams & {
+export type EditCommentDataParamsWithMetadataRaw = BaseEditCommentDataParams & {
   /**
    * The metadata of the comment as a raw string (already json serialized)
    */
   metadataRaw: string;
 };
 
-type EditCommentDataParamsWithMetadataObject = BaseEditCommentDataParams & {
-  /**
-   * The metadata of the comment as an object
-   */
-  metadataObject: object;
-};
+export type EditCommentDataParamsWithMetadataObject =
+  BaseEditCommentDataParams & {
+    /**
+     * The metadata of the comment as an object
+     */
+    metadataObject: object;
+  };
 
-type EditCommentDataParams =
+export type EditCommentDataParams =
   | EditCommentDataParamsWithMetadataRaw
   | EditCommentDataParamsWithMetadataObject;
 

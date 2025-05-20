@@ -49,7 +49,8 @@ contract TipHook is BaseHook {
         afterInitialize: false,
         afterComment: true,
         afterDeleteComment: false,
-        afterEditComment: false
+        afterEditComment: false,
+        onChannelUpdated: false
       });
   }
 

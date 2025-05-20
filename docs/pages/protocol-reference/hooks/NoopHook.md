@@ -34,7 +34,7 @@
 
 
 
-### `afterInitialize(address channel) → bool success` (external)
+### `afterInitialize(address channel, uint256 channelId) → bool success` (external)
 
 
 
@@ -47,6 +47,12 @@
 
 
 ### `afterEditComment(struct Comments.Comment, address, bytes32) → string commentHookData` (external)
+
+
+
+
+
+### `onChannelUpdated(address channel, uint256 channelId, struct Channels.Channel channelData) → bool success` (external)
 
 
 

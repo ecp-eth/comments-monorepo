@@ -5,6 +5,7 @@ import { ChannelManager } from "../ChannelManager.sol";
 import { IHook } from "../interfaces/IHook.sol";
 import { Hooks } from "../libraries/Hooks.sol";
 import { Comments } from "../libraries/Comments.sol";
+import { Channels } from "../libraries/Channels.sol";
 import { IChannelManager } from "../interfaces/IChannelManager.sol";
 import {
   IERC721Receiver
@@ -32,7 +33,8 @@ contract NoopHook is IHook {
   {}
 
   function afterInitialize(
-    address channel
+    address channel,
+    uint256 channelId
   ) external override returns (bool success) {}
 
   function afterDeleteComment(
@@ -48,4 +50,10 @@ contract NoopHook is IHook {
   ) external payable override returns (string memory commentHookData) {
     return "";
   }
+
+  function onChannelUpdated(
+    address channel,
+    uint256 channelId,
+    Channels.Channel calldata channelData
+  ) external override returns (bool success) {}
 }

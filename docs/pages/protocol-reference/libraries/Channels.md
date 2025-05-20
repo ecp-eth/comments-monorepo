@@ -25,7 +25,7 @@
 
 
 
-- **hook:** (contract IHook) The hook of the channel
+- **hook:** (address) The hook of the channel. Hook must implement IHook interface.
 
 
 

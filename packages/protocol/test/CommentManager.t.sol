@@ -27,7 +27,8 @@ contract NoHook is BaseHook {
         afterInitialize: false,
         afterComment: false,
         afterDeleteComment: false,
-        afterEditComment: false
+        afterEditComment: false,
+        onChannelUpdated: false
       });
   }
 }
@@ -44,7 +45,8 @@ contract RejectEditHook is BaseHook {
         afterInitialize: false,
         afterComment: false,
         afterDeleteComment: false,
-        afterEditComment: true
+        afterEditComment: true,
+        onChannelUpdated: false
       });
   }
 
@@ -69,7 +71,8 @@ contract AlwaysReturningDataHook is BaseHook {
         afterInitialize: false,
         afterComment: true,
         afterDeleteComment: false,
-        afterEditComment: true
+        afterEditComment: true,
+        onChannelUpdated: false
       });
   }
 
@@ -1617,7 +1620,8 @@ contract MaliciousFeeCollector is BaseHook {
         afterComment: true,
         afterDeleteComment: false,
         afterInitialize: false,
-        afterEditComment: false
+        afterEditComment: false,
+        onChannelUpdated: false
       });
   }
 }

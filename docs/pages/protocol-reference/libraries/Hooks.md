@@ -25,6 +25,9 @@ Library containing hook-related types and utilities
 - **afterEditComment:** (bool) 
 
 
+- **onChannelUpdated:** (bool) 
+
+
 
 
 

@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../libraries/Hooks.sol";
 import "../libraries/Comments.sol";
+import "../libraries/Channels.sol";
 
 interface IHook is IERC165 {
   function getHookPermissions()
@@ -13,8 +14,12 @@ interface IHook is IERC165 {
 
   /// @notice Execute after a hook is initialized on a channel
   /// @param channel The address of the channel the hook was added to
+  /// @param channelId The unique identifier of the channel the hook was added to
   /// @return success Whether the hook initialization was successful
-  function afterInitialize(address channel) external returns (bool success);
+  function afterInitialize(
+    address channel,
+    uint256 channelId
+  ) external returns (bool success);
 
   /// @notice Execute after a comment is processed
   /// @param commentData The comment data that was processed
@@ -48,4 +53,15 @@ interface IHook is IERC165 {
     address caller,
     bytes32 commentId
   ) external payable returns (string memory commentHookData);
+
+  /// @notice Execute after a channel is updated
+  /// @param channel The address of the channel that was updated
+  /// @param channelId The unique identifier of the channel that was updated
+  /// @param channelData The data of the channel that was updated
+  /// @return success Whether the channel update was successful
+  function onChannelUpdated(
+    address channel,
+    uint256 channelId,
+    Channels.Channel calldata channelData
+  ) external returns (bool success);
 }

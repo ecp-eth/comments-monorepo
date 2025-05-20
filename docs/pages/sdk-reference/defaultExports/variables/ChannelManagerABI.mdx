@@ -132,7 +132,7 @@ const ChannelManagerABI: readonly [{
         name: "metadata";
         type: "string";
       }, {
-        internalType: "contract IHook";
+        internalType: "address";
         name: "hook";
         type: "address";
       }, {
@@ -151,6 +151,10 @@ const ChannelManagerABI: readonly [{
          }, {
            internalType: "bool";
            name: "afterEditComment";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onChannelUpdated";
            type: "bool";
         }];
         internalType: "struct Hooks.Permissions";

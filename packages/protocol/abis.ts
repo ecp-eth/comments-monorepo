@@ -1586,7 +1586,7 @@ export const ChannelManagerABI = [
           {
             name: "hook",
             type: "address",
-            internalType: "contract IHook",
+            internalType: "address",
           },
           {
             name: "permissions",
@@ -1610,6 +1610,11 @@ export const ChannelManagerABI = [
               },
               {
                 name: "afterEditComment",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "onChannelUpdated",
                 type: "bool",
                 internalType: "bool",
               },
