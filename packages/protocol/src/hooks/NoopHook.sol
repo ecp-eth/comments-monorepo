@@ -5,11 +5,10 @@ import { ChannelManager } from "../ChannelManager.sol";
 import { IHook } from "../interfaces/IHook.sol";
 import { Hooks } from "../libraries/Hooks.sol";
 import { Comments } from "../libraries/Comments.sol";
+import { Channels } from "../libraries/Channels.sol";
 import { IChannelManager } from "../interfaces/IChannelManager.sol";
-import {
-  IERC721Receiver
-} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import {Channels} from "../libraries/Channels.sol";
+import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import { Channels } from "../libraries/Channels.sol";
 
 // Fee basic hook that does nothing
 contract NoopHook is IHook {
@@ -32,11 +31,11 @@ contract NoopHook is IHook {
     returns (Hooks.Permissions memory)
   {}
 
-    function afterInitialize(
-        address channelManager,
-        Channels.Channel memory channelData,
-        uint256 channelId
-    ) external override returns (bool success) {}
+  function afterInitialize(
+    address channelManager,
+    Channels.Channel memory channelData,
+    uint256 channelId
+  ) external override returns (bool success) {}
 
   function afterDeleteComment(
     Comments.Comment calldata commentData,
@@ -51,4 +50,10 @@ contract NoopHook is IHook {
   ) external payable override returns (string memory commentHookData) {
     return "";
   }
+
+  function onChannelUpdated(
+    address channel,
+    uint256 channelId,
+    Channels.Channel calldata channelData
+  ) external override returns (bool success) {}
 }

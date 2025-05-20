@@ -5,7 +5,7 @@ import { useConnectorClient } from "wagmi";
 import { useCommentDeletion } from "@ecp.eth/shared/hooks";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
-import { useDeleteCommentAsAuthor } from "@ecp.eth/sdk/comments/react";
+import { useDeleteComment as useDeleteCommentSdk } from "@ecp.eth/sdk/comments/react";
 
 type OnCommentDeleteParams = {
   commentId: Hex;
@@ -17,7 +17,7 @@ type OnCommentDelete = (params: OnCommentDeleteParams) => Promise<void>;
 export function useDeleteComment(): OnCommentDelete {
   const commentDeletion = useCommentDeletion();
   const { data: client } = useConnectorClient();
-  const { mutateAsync: deleteCommentAsAuthor } = useDeleteCommentAsAuthor();
+  const { mutateAsync: deleteComment } = useDeleteCommentSdk();
 
   return useCallback(
     async (params: OnCommentDeleteParams) => {
@@ -26,7 +26,7 @@ export function useDeleteComment(): OnCommentDelete {
           throw new Error("No client");
         }
 
-        const { txHash } = await deleteCommentAsAuthor({
+        const { txHash } = await deleteComment({
           commentId: params.commentId,
         });
 
@@ -68,6 +68,6 @@ export function useDeleteComment(): OnCommentDelete {
         throw e;
       }
     },
-    [client],
+    [client, commentDeletion, deleteComment],
   );
 }

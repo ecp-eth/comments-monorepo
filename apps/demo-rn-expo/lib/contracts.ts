@@ -15,7 +15,7 @@ export const postCommentAsAuthorViaCommentsV1 = async ({
 }: PostCommentViaCommentsV1Params) => {
   return await writeContract(config, {
     abi: CommentManagerABI,
-    functionName: "postCommentAsAuthor",
+    functionName: "postComment",
     address: COMMENT_MANAGER_ADDRESS,
     args: [commentData, appSignature],
   });
@@ -30,7 +30,7 @@ export const deleteCommentAsAuthorViaCommentsV1 = async ({
 }: DeleteCommentViaCommentsV1Params) => {
   return await writeContract(config, {
     abi: CommentManagerABI,
-    functionName: "deleteCommentAsAuthor",
+    functionName: "deleteComment",
     address: COMMENT_MANAGER_ADDRESS,
     args: [commentId],
   });

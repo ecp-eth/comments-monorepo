@@ -83,7 +83,7 @@ interface ICommentManager {
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata
   /// @param appSignature Signature from the app signer authorizing the comment
-  function postCommentAsAuthor(
+  function postComment(
     Comments.CreateComment calldata commentData,
     bytes calldata appSignature
   ) external payable;
@@ -92,7 +92,7 @@ interface ICommentManager {
   /// @param commentData The comment data struct containing content and metadata
   /// @param authorSignature Signature from the author authorizing the comment
   /// @param appSignature Signature from the app signer authorizing the comment
-  function postComment(
+  function postCommentWithApproval(
     Comments.CreateComment calldata commentData,
     bytes calldata authorSignature,
     bytes calldata appSignature
@@ -100,19 +100,17 @@ interface ICommentManager {
 
   /// @notice Deletes a comment when called by the author directly
   /// @param commentId The unique identifier of the comment to delete
-  function deleteCommentAsAuthor(bytes32 commentId) external;
+  function deleteComment(bytes32 commentId) external;
 
   /// @notice Deletes a comment with author signature verification
   /// @param commentId The unique identifier of the comment to delete
-  /// @param author The address of the comment author
   /// @param app The address of the app signer
   /// @param nonce The current nonce for the author
   /// @param deadline Timestamp after which the signature becomes invalid
   /// @param authorSignature The signature from the author authorizing deletion (empty if app)
   /// @param appSignature The signature from the app signer authorizing deletion (empty if author)
-  function deleteComment(
+  function deleteCommentWithApproval(
     bytes32 commentId,
-    address author,
     address app,
     uint256 nonce,
     uint256 deadline,
@@ -124,7 +122,7 @@ interface ICommentManager {
   /// @param commentId The unique identifier of the comment to edit
   /// @param editData The comment data struct containing content and metadata
   /// @param appSignature The signature from the app signer authorizing the edit
-  function editCommentAsAuthor(
+  function editComment(
     bytes32 commentId,
     Comments.EditComment calldata editData,
     bytes calldata appSignature
@@ -135,7 +133,7 @@ interface ICommentManager {
   /// @param editData The comment data struct containing content and metadata
   /// @param authorSignature The signature from the author authorizing the edit (empty if app)
   /// @param appSignature The signature from the app signer authorizing the edit (empty if author)
-  function editComment(
+  function editCommentWithApproval(
     bytes32 commentId,
     Comments.EditComment calldata editData,
     bytes calldata authorSignature,

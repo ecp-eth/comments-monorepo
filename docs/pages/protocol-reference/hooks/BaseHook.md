@@ -36,14 +36,14 @@ Checks if the contract implements the specified interface
 
 
 
-### `afterInitialize(address channel) → bool` (external)
+### `afterInitialize(address channel, uint256 channelId) → bool` (external)
 
 Execute after a hook is initialized on a channel
 
 
 
 
-### `_afterInitialize(address) → bool` (internal)
+### `_afterInitialize(address, uint256) → bool` (internal)
 
 
 
@@ -83,6 +83,19 @@ Execute after a comment is edited
 
 
 ### `_afterEditComment(struct Comments.Comment, address, bytes32) → string` (internal)
+
+
+
+
+
+### `onChannelUpdated(address channel, uint256 channelId, struct Channels.Channel channelData) → bool` (external)
+
+Execute after a channel is updated
+
+
+
+
+### `_onChannelUpdated(address, uint256, struct Channels.Channel) → bool` (internal)
 
 
 

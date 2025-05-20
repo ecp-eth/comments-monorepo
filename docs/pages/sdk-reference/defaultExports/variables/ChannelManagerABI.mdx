@@ -132,7 +132,7 @@ const ChannelManagerABI: readonly [{
         name: "metadata";
         type: "string";
       }, {
-        internalType: "contract IHook";
+        internalType: "address";
         name: "hook";
         type: "address";
       }, {
@@ -151,6 +151,10 @@ const ChannelManagerABI: readonly [{
          }, {
            internalType: "bool";
            name: "afterEditComment";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onChannelUpdated";
            type: "bool";
         }];
         internalType: "struct Hooks.Permissions";
@@ -854,6 +858,6 @@ const ChannelManagerABI: readonly [{
 }];
 ```
 
-Defined in: [packages/sdk/src/abis.ts:1415](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L1415)
+Defined in: [packages/sdk/src/abis.ts:1410](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L1410)
 
 ABI of the ChannelManager contract.

@@ -33,10 +33,7 @@ import { publicEnv } from "@/publicEnv";
 import { CommentFormErrors } from "./CommentFormErrors";
 import { InvalidCommentError } from "./errors";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
-import {
-  useEditCommentAsAuthor,
-  usePostCommentAsAuthor,
-} from "@ecp.eth/sdk/comments/react";
+import { useEditComment, usePostComment } from "@ecp.eth/sdk/comments/react";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 
@@ -202,7 +199,7 @@ export function CommentForm({
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const onSubmitStartRef = useFreshRef(onSubmitStart);
 
-  const { mutateAsync: postCommentAsAuthor } = usePostCommentAsAuthor();
+  const { mutateAsync: postCommentAsAuthor } = usePostComment();
 
   const submitCommentMutation = useCallback<OnSubmitFunction>(
     async ({ author, content }) => {
@@ -348,7 +345,7 @@ export function CommentEditForm({
   const { chainId } = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const onSubmitStartRef = useFreshRef(onSubmitStart);
 
-  const { mutateAsync: editCommentAsAuthor } = useEditCommentAsAuthor();
+  const { mutateAsync: editCommentAsAuthor } = useEditComment();
 
   const submitCommentMutation = useCallback<OnSubmitFunction>(
     async ({ author, content }) => {

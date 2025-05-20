@@ -2,9 +2,7 @@
 pragma solidity ^0.8.20;
 
 import { Test, console } from "forge-std/Test.sol";
-import {
-  IERC721Receiver
-} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { TestUtils, MockHook } from "../test/utils.sol";
@@ -36,14 +34,14 @@ contract DebugGasUsage is Test, IERC721Receiver {
     vm.deal(address(this), 10 ether);
   }
 
-    function run() public {
-        debugSetupChannel();
-        debugConstructChannelManager();
-        debugCreateChannel();
-        debugUpdateChannel();
-        debugPostComment();
-        debugParseCAIP19();
-    }
+  function run() public {
+    debugSetupChannel();
+    debugConstructChannelManager();
+    debugCreateChannel();
+    debugUpdateChannel();
+    debugPostComment();
+    debugParseCAIP19();
+  }
 
   function debugSetupChannel() public {
     mockHook = new MockHook();
@@ -109,26 +107,28 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Post comment directly as author
     vm.prank(user1);
     measureGas("postComment", runPostComment);
-}
+  }
 
-function debugParseCAIP19() public {
+  function debugParseCAIP19() public {
     measureGas("parseCAIP19", runParseCAIP19);
-}
+  }
 
-function runParseCAIP19() internal {
+  function runParseCAIP19() internal {
     // Test a single CAIP-19 URL parse operation
-    string memory testCase = "eip155:1/erc721:0x06012c8cf97BEaD5deAe237070F9587f8E7A266d/771769"; // CryptoKitties Collectible
-    (TestUtils.CAIP19Components memory components, bool valid) = TestUtils.parseCAIP19(testCase);
+    string
+      memory testCase = "eip155:1/erc721:0x06012c8cf97BEaD5deAe237070F9587f8E7A266d/771769"; // CryptoKitties Collectible
+    (TestUtils.CAIP19Components memory components, bool valid) = TestUtils
+      .parseCAIP19(testCase);
     require(valid, "Invalid CAIP-19 URL");
     console.log("Parsed CAIP-19 URL:", testCase);
     console.log("Chain ID:", components.chainId);
     console.log("Asset Namespace:", components.assetNamespace);
     console.log("Asset Reference:", components.assetReference);
     console.log("Token ID:", components.tokenId);
-}
+  }
 
-    function runPostComment() internal {
-    comments.postCommentAsAuthor{ value: 0 }(createCommentData, "");
+  function runPostComment() internal {
+    comments.postComment{ value: 0 }(createCommentData, "");
   }
 
   // Internal function to measure gas usage

@@ -112,7 +112,8 @@ contract LengthFeeHook is BaseHook {
         afterInitialize: false,
         afterComment: true,
         afterDeleteComment: false,
-        afterEditComment: false
+        afterEditComment: false,
+        onChannelUpdated: false
       });
   }
 }
@@ -327,7 +328,7 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
 
     // Post comment as user1
     vm.prank(user1);
-    comments.postCommentAsAuthor(commentData, appSignature);
+    comments.postComment(commentData, appSignature);
 
     // Check that the hook received the correct token amount
     assertEq(
@@ -373,7 +374,7 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
       commentData.nonce = i;
       bytes memory appSignature = _signAppSignature(commentData);
       vm.prank(user1);
-      comments.postCommentAsAuthor(commentData, appSignature);
+      comments.postComment(commentData, appSignature);
     }
 
     uint256 feeCollectorBalanceBefore = paymentToken.balanceOf(feeCollector);

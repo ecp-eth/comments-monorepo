@@ -7,14 +7,12 @@
 # Function: deleteComment()
 
 ```ts
-function deleteComment(params): Promise<{
-  txHash: `0x${string}`;
-}>;
+function deleteComment(params): Promise<DeleteCommentResult>;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:354](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L354)
+Defined in: [packages/sdk/src/comments/comment.ts:281](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L281)
 
-Delete a comment with app signature verification
+Delete a comment as an author
 
 ## Parameters
 
@@ -22,12 +20,10 @@ Delete a comment with app signature verification
 
 [`DeleteCommentParams`](/sdk-reference/comments/type-aliases/DeleteCommentParams.mdx)
 
-The parameters for deleting a comment
+The parameters for deleting a comment as an author
 
 ## Returns
 
-`Promise`\<\{
-  `txHash`: `` `0x${string}` ``;
-\}\>
+`Promise`\<[`DeleteCommentResult`](/sdk-reference/comments/type-aliases/DeleteCommentResult.mdx)\>
 
 The transaction hash

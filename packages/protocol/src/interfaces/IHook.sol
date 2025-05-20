@@ -12,11 +12,15 @@ interface IHook is IERC165 {
     pure
     returns (Hooks.Permissions memory);
 
-    /// @notice Execute after a hook is initialized on a channel
-    /// @param channel The address of the channel the hook was added to
-    /// @param channelData The channel data that was used to initialize the hook
-    /// @return success Whether the hook initialization was successful
-    function afterInitialize(address channel, Channels.Channel memory channelData, uint256 channelId) external returns (bool success);
+  /// @notice Execute after a hook is initialized on a channel
+  /// @param channel The address of the channel the hook was added to
+  /// @param channelData The channel data that was used to initialize the hook
+  /// @return success Whether the hook initialization was successful
+  function afterInitialize(
+    address channel,
+    Channels.Channel memory channelData,
+    uint256 channelId
+  ) external returns (bool success);
 
   /// @notice Execute after a comment is processed
   /// @param commentData The comment data that was processed
@@ -50,4 +54,15 @@ interface IHook is IERC165 {
     address caller,
     bytes32 commentId
   ) external payable returns (string memory commentHookData);
+
+  /// @notice Execute after a channel is updated
+  /// @param channel The address of the channel that was updated
+  /// @param channelId The unique identifier of the channel that was updated
+  /// @param channelData The data of the channel that was updated
+  /// @return success Whether the channel update was successful
+  function onChannelUpdated(
+    address channel,
+    uint256 channelId,
+    Channels.Channel calldata channelData
+  ) external returns (bool success);
 }

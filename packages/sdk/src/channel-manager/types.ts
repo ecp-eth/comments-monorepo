@@ -13,6 +13,7 @@ export type ChannelPermissions = {
   afterComment: boolean;
   afterDeleteComment: boolean;
   afterEditComment: boolean;
+  onChannelUpdated: boolean;
 };
 
 // we can't use generics and mapped type because the API would be lazy resolved

@@ -71,7 +71,8 @@ contract SharedFeeHook is BaseHook {
         afterComment: true,
         afterDeleteComment: false,
         afterEditComment: false,
-        afterInitialize: false
+        afterInitialize: false,
+        onChannelUpdated: false
       });
   }
 
@@ -387,7 +388,7 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
 
     // Post comment as user1
     vm.prank(user1);
-    comments.postCommentAsAuthor(commentData, appSignature);
+    comments.postComment(commentData, appSignature);
 
     // Calculate expected fees
     uint256 expectedHookFee = FEE_AMOUNT -

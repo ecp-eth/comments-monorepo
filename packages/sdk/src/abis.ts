@@ -159,10 +159,18 @@ export const CommentManagerABI = [
         type: "bytes32",
         internalType: "bytes32",
       },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "deleteCommentWithApproval",
+    inputs: [
       {
-        name: "author",
-        type: "address",
-        internalType: "address",
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
       },
       {
         name: "app",
@@ -188,19 +196,6 @@ export const CommentManagerABI = [
         name: "appSignature",
         type: "bytes",
         internalType: "bytes",
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "deleteCommentAsAuthor",
-    inputs: [
-      {
-        name: "commentId",
-        type: "bytes32",
-        internalType: "bytes32",
       },
     ],
     outputs: [],
@@ -248,11 +243,6 @@ export const CommentManagerABI = [
         ],
       },
       {
-        name: "authorSignature",
-        type: "bytes",
-        internalType: "bytes",
-      },
-      {
         name: "appSignature",
         type: "bytes",
         internalType: "bytes",
@@ -263,7 +253,7 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
-    name: "editCommentAsAuthor",
+    name: "editCommentWithApproval",
     inputs: [
       {
         name: "commentId",
@@ -301,6 +291,11 @@ export const CommentManagerABI = [
             internalType: "string",
           },
         ],
+      },
+      {
+        name: "authorSignature",
+        type: "bytes",
+        internalType: "bytes",
       },
       {
         name: "appSignature",
@@ -789,11 +784,6 @@ export const CommentManagerABI = [
         ],
       },
       {
-        name: "authorSignature",
-        type: "bytes",
-        internalType: "bytes",
-      },
-      {
         name: "appSignature",
         type: "bytes",
         internalType: "bytes",
@@ -804,7 +794,7 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
-    name: "postCommentAsAuthor",
+    name: "postCommentWithApproval",
     inputs: [
       {
         name: "commentData",
@@ -862,6 +852,11 @@ export const CommentManagerABI = [
             internalType: "string",
           },
         ],
+      },
+      {
+        name: "authorSignature",
+        type: "bytes",
+        internalType: "bytes",
       },
       {
         name: "appSignature",
@@ -1586,7 +1581,7 @@ export const ChannelManagerABI = [
           {
             name: "hook",
             type: "address",
-            internalType: "contract IHook",
+            internalType: "address",
           },
           {
             name: "permissions",
@@ -1610,6 +1605,11 @@ export const ChannelManagerABI = [
               },
               {
                 name: "afterEditComment",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "onChannelUpdated",
                 type: "bool",
                 internalType: "bool",
               },

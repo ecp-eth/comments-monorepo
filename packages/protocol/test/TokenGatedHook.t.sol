@@ -54,7 +54,8 @@ contract TokenGatedHook is BaseHook {
         afterInitialize: false,
         afterComment: true,
         afterDeleteComment: false,
-        afterEditComment: false
+        afterEditComment: false,
+        onChannelUpdated: false
       });
   }
 }
@@ -121,10 +122,7 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
       comments
     );
     vm.prank(user1);
-    comments.postCommentAsAuthor{ value: 0.01 ether }(
-      commentData,
-      appSignature
-    );
+    comments.postComment{ value: 0.01 ether }(commentData, appSignature);
   }
 
   function test_TokenGatedHookBlocksCommentWithoutEnoughTokens() public {
@@ -161,10 +159,7 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     );
     vm.prank(user1);
     vm.expectRevert(TokenGatedHook.NotEnoughTokens.selector);
-    comments.postCommentAsAuthor{ value: 0.01 ether }(
-      commentData,
-      appSignature
-    );
+    comments.postComment{ value: 0.01 ether }(commentData, appSignature);
   }
 
   function test_TokenGatedHookAllowsCommentAfterReceivingTokens() public {
@@ -198,10 +193,7 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     );
     vm.prank(user1);
     vm.expectRevert(TokenGatedHook.NotEnoughTokens.selector);
-    comments.postCommentAsAuthor{ value: 0.01 ether }(
-      commentData,
-      appSignature
-    );
+    comments.postComment{ value: 0.01 ether }(commentData, appSignature);
 
     // Transfer 1000 tokens to user1
     testToken.transfer(user1, 1000 * 10 ** 18);
@@ -209,10 +201,7 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     // Try again with tokens - should succeed
     appSignature = TestUtils.generateAppSignature(vm, commentData, comments);
     vm.prank(user1);
-    comments.postCommentAsAuthor{ value: 0.01 ether }(
-      commentData,
-      appSignature
-    );
+    comments.postComment{ value: 0.01 ether }(commentData, appSignature);
   }
 
   function onERC721Received(

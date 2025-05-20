@@ -2,13 +2,11 @@
 pragma solidity ^0.8.20;
 
 import { IHook } from "../interfaces/IHook.sol";
-import {
-  IERC165
-} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { ERC165 } from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import { Hooks } from "../libraries/Hooks.sol";
 import { Comments } from "../libraries/Comments.sol";
-import {Channels} from "../libraries/Channels.sol";
+import { Channels } from "../libraries/Channels.sol";
 
 /**
  * @title BaseHook
@@ -53,16 +51,25 @@ abstract contract BaseHook is IHook, ERC165 {
         afterInitialize: false,
         afterComment: false,
         afterDeleteComment: false,
-        afterEditComment: false
+        afterEditComment: false,
+        onChannelUpdated: false
       });
   }
 
-    /// @inheritdoc IHook
-    function afterInitialize(address channelManager, Channels.Channel memory channelData, uint256 channelId) external virtual returns (bool) {
-        return _afterInitialize(channelManager, channelData, channelId);
-    }
+  /// @inheritdoc IHook
+  function afterInitialize(
+    address channelManager,
+    Channels.Channel memory channelData,
+    uint256 channelId
+  ) external virtual returns (bool) {
+    return _afterInitialize(channelManager, channelData, channelId);
+  }
 
-  function _afterInitialize(address, Channels.Channel memory, uint256) internal virtual returns (bool) {
+  function _afterInitialize(
+    address,
+    Channels.Channel memory,
+    uint256
+  ) internal virtual returns (bool) {
     revert HookNotImplemented();
   }
 
@@ -114,6 +121,23 @@ abstract contract BaseHook is IHook, ERC165 {
     address,
     bytes32
   ) internal virtual returns (string memory) {
+    revert HookNotImplemented();
+  }
+
+  /// @inheritdoc IHook
+  function onChannelUpdated(
+    address channel,
+    uint256 channelId,
+    Channels.Channel calldata channelData
+  ) external virtual returns (bool) {
+    return _onChannelUpdated(channel, channelId, channelData);
+  }
+
+  function _onChannelUpdated(
+    address,
+    uint256,
+    Channels.Channel calldata
+  ) internal virtual returns (bool) {
     revert HookNotImplemented();
   }
 }

@@ -59,42 +59,42 @@ Emitted when an author removes an app signer's approval
 
 ## Functions
 
-### `postCommentAsAuthor(struct Comments.CreateComment commentData, bytes appSignature)` (external)
+### `postComment(struct Comments.CreateComment commentData, bytes appSignature)` (external)
 
 Posts a comment directly from the author's address
 
 
 
 
-### `postComment(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature)` (external)
+### `postCommentWithApproval(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature)` (external)
 
 Posts a comment with both author and app signer signatures
 
 
 
 
-### `deleteCommentAsAuthor(bytes32 commentId)` (external)
+### `deleteComment(bytes32 commentId)` (external)
 
 Deletes a comment when called by the author directly
 
 
 
 
-### `deleteComment(bytes32 commentId, address author, address app, uint256 nonce, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
+### `deleteCommentWithApproval(bytes32 commentId, address app, uint256 nonce, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
 
 Deletes a comment with author signature verification
 
 
 
 
-### `editCommentAsAuthor(bytes32 commentId, struct Comments.EditComment editData, bytes appSignature)` (external)
+### `editComment(bytes32 commentId, struct Comments.EditComment editData, bytes appSignature)` (external)
 
 Edits a comment when called by the author directly
 
 
 
 
-### `editComment(bytes32 commentId, struct Comments.EditComment editData, bytes authorSignature, bytes appSignature)` (external)
+### `editCommentWithApproval(bytes32 commentId, struct Comments.EditComment editData, bytes authorSignature, bytes appSignature)` (external)
 
 Edits a comment with both author and app signer signatures
 

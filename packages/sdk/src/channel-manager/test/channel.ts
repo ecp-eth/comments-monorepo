@@ -152,6 +152,7 @@ describe("getChannel()", () => {
         afterDeleteComment: false,
         afterEditComment: false,
         afterInitialize: false,
+        onChannelUpdated: false,
       },
     });
   });
@@ -296,6 +297,7 @@ describe("updateChannel()", () => {
         afterDeleteComment: false,
         afterEditComment: false,
         afterInitialize: false,
+        onChannelUpdated: false,
       },
     });
   });

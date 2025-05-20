@@ -22,7 +22,7 @@
 
 
 
-### `afterInitialize(address channel) → bool success` (external)
+### `afterInitialize(address channel, uint256 channelId) → bool success` (external)
 
 Execute after a hook is initialized on a channel
 
@@ -46,6 +46,13 @@ Execute after a comment is deleted
 ### `afterEditComment(struct Comments.Comment commentData, address caller, bytes32 commentId) → string commentHookData` (external)
 
 Execute after a comment is edited
+
+
+
+
+### `onChannelUpdated(address channel, uint256 channelId, struct Channels.Channel channelData) → bool success` (external)
+
+Execute after a channel is updated
 
 
 

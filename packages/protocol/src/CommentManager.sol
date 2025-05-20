@@ -70,7 +70,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function postCommentAsAuthor(
+  function postComment(
     Comments.CreateComment calldata commentData,
     bytes calldata appSignature
   ) external payable {
@@ -78,7 +78,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function postComment(
+  function postCommentWithApproval(
     Comments.CreateComment calldata commentData,
     bytes calldata authorSignature,
     bytes calldata appSignature
@@ -173,18 +173,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       Channels.Channel memory channel = channelManager.getChannel(
         commentData.channelId
       );
-      address hookAddress = address(channel.hook);
 
       emit CommentAdded(commentId, comment.author, comment.app, comment);
 
-      if (hookAddress != address(0) && channel.permissions.afterComment) {
+      if (channel.hook != address(0) && channel.permissions.afterComment) {
+        IHook hook = IHook(channel.hook);
         // Calculate hook value after protocol fee
         uint256 msgValueAfterFee = channelManager
           .deductProtocolHookTransactionFee(msg.value);
 
-        string memory hookData = channel.hook.afterComment{
-          value: msgValueAfterFee
-        }(comment, msg.sender, commentId);
+        string memory hookData = hook.afterComment{ value: msgValueAfterFee }(
+          comment,
+          msg.sender,
+          commentId
+        );
 
         comment.hookData = hookData;
 
@@ -198,7 +200,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function editCommentAsAuthor(
+  function editComment(
     bytes32 commentId,
     Comments.EditComment calldata editData,
     bytes calldata appSignature
@@ -207,7 +209,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function editComment(
+  function editCommentWithApproval(
     bytes32 commentId,
     Comments.EditComment calldata editData,
     bytes calldata authorSignature,
@@ -280,18 +282,21 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Channels.Channel memory channel = channelManager.getChannel(
       comment.channelId
     );
-    address hookAddress = address(channel.hook);
 
     emit CommentEdited(commentId, comment.author, editData.app, comment);
 
-    if (hookAddress != address(0) && channel.permissions.afterEditComment) {
+    if (channel.hook != address(0) && channel.permissions.afterEditComment) {
+      IHook hook = IHook(channel.hook);
+
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      string memory hookData = channel.hook.afterEditComment{
-        value: msgValueAfterFee
-      }(comment, msg.sender, commentId);
+      string memory hookData = hook.afterEditComment{ value: msgValueAfterFee }(
+        comment,
+        msg.sender,
+        commentId
+      );
 
       comment.hookData = hookData;
 
@@ -300,7 +305,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function deleteCommentAsAuthor(bytes32 commentId) external {
+  function deleteComment(bytes32 commentId) external {
     Comments.Comment storage comment = comments[commentId];
     require(comment.author != address(0), "Comment does not exist");
     require(comment.author == msg.sender, "Not comment author");
@@ -308,9 +313,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function deleteComment(
+  function deleteCommentWithApproval(
     bytes32 commentId,
-    address author,
     address app,
     uint256 nonce,
     uint256 deadline,
@@ -321,13 +325,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       revert SignatureDeadlineReached(deadline, block.timestamp);
     }
 
+    Comments.Comment storage comment = comments[commentId];
+    address author = comment.author;
+    require(author != address(0), "Comment does not exist");
+
     if (nonces[author][app] != nonce) {
       revert InvalidNonce(author, app, nonces[author][app], nonce);
     }
 
-    Comments.Comment storage comment = comments[commentId];
-    require(comment.author != address(0), "Comment does not exist");
-    require(comment.author == author, "Author does not match comment author");
     nonces[author][app]++;
 
     bytes32 deleteHash = getDeleteCommentHash(
@@ -372,16 +377,16 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Channels.Channel memory channel = channelManager.getChannel(
       commentToDelete.channelId
     );
-    address hookAddress = address(channel.hook);
 
     emit CommentDeleted(commentId, author);
 
-    if (hookAddress != address(0) && channel.permissions.afterDeleteComment) {
+    if (channel.hook != address(0) && channel.permissions.afterDeleteComment) {
+      IHook hook = IHook(channel.hook);
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      channel.hook.afterDeleteComment{ value: msgValueAfterFee }(
+      hook.afterDeleteComment{ value: msgValueAfterFee }(
         commentToDelete,
         msg.sender,
         commentId
