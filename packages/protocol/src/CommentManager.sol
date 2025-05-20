@@ -315,7 +315,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @inheritdoc ICommentManager
   function deleteCommentWithApproval(
     bytes32 commentId,
-    address author,
     address app,
     uint256 nonce,
     uint256 deadline,
@@ -326,13 +325,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       revert SignatureDeadlineReached(deadline, block.timestamp);
     }
 
+    Comments.Comment storage comment = comments[commentId];
+    address author = comment.author;
+    require(author != address(0), "Comment does not exist");
+
     if (nonces[author][app] != nonce) {
       revert InvalidNonce(author, app, nonces[author][app], nonce);
     }
 
-    Comments.Comment storage comment = comments[commentId];
-    require(comment.author != address(0), "Comment does not exist");
-    require(comment.author == author, "Author does not match comment author");
     nonces[author][app]++;
 
     bytes32 deleteHash = getDeleteCommentHash(

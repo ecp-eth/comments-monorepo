@@ -320,7 +320,6 @@ contract CommentsTest is Test, IERC721Receiver {
     emit CommentDeleted(commentId, author);
     comments.deleteCommentWithApproval(
       commentId,
-      author,
       app,
       comments.getNonce(author, app),
       block.timestamp + 1 days,
@@ -368,7 +367,6 @@ contract CommentsTest is Test, IERC721Receiver {
     );
     comments.deleteCommentWithApproval(
       commentId,
-      author,
       app,
       nonce,
       deadline,
@@ -646,7 +644,6 @@ contract CommentsTest is Test, IERC721Receiver {
     );
     comments.deleteCommentWithApproval(
       commentId,
-      author,
       app,
       wrongNonce,
       deadline,
@@ -690,7 +687,6 @@ contract CommentsTest is Test, IERC721Receiver {
     emit CommentDeleted(commentId, author);
     comments.deleteCommentWithApproval(
       commentId,
-      author,
       app,
       comments.getNonce(author, app),
       block.timestamp + 1 days,

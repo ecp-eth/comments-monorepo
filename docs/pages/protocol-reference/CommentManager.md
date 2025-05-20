@@ -74,7 +74,7 @@ Deletes a comment when called by the author directly
 
 
 
-### `deleteCommentWithApproval(bytes32 commentId, address author, address app, uint256 nonce, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
+### `deleteCommentWithApproval(bytes32 commentId, address app, uint256 nonce, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
 
 Deletes a comment with author signature verification
 

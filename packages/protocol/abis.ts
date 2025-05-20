@@ -173,11 +173,6 @@ export const CommentManagerABI = [
         internalType: "bytes32",
       },
       {
-        name: "author",
-        type: "address",
-        internalType: "address",
-      },
-      {
         name: "app",
         type: "address",
         internalType: "address",
