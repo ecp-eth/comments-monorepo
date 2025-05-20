@@ -12,12 +12,28 @@ interface ICommentManager {
   /// @param commentId Unique identifier of the comment
   /// @param author Address of the comment author
   /// @param app Address of the application signer
-  /// @param commentData Struct containing all comment data
+  /// @param channelId The channel ID associated with the comment
+  /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
+  /// @param createdAt The timestamp when the comment was created
+  /// @param updatedAt The timestamp when the comment was last updated
+  /// @param content The text content of the comment - may contain urls, images and mentions
+  /// @param metadata Additional JSON data that shouldn't be displayed to the user
+  /// @param targetUri the URI about which the comment is being made
+  /// @param commentType The type of the comment (e.g. "comment", "like", etc.)
+  /// @param hookData Additional data for the comment, added by a hook.
   event CommentAdded(
     bytes32 indexed commentId,
     address indexed author,
     address indexed app,
-    Comments.Comment commentData
+    uint256 channelId,
+    bytes32 parentId,
+    uint80 createdAt,
+    uint80 updatedAt,
+    string content,
+    string metadata,
+    string targetUri,
+    string commentType,
+    string hookData
   );
 
   /// @notice Emitted when a comment is deleted
@@ -27,14 +43,30 @@ interface ICommentManager {
 
   /// @notice Emitted when a comment is edited
   /// @param commentId Unique identifier of the edited comment
+  /// @param editedByApp Address of the app signer that changed the comment
   /// @param author Address of the comment author
-  /// @param app Address of the app signer
-  /// @param comment Struct containing all comment data
+  /// @param app Address of the app signer that created the comment
+  /// @param channelId The channel ID associated with the comment
+  /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
+  /// @param createdAt The timestamp when the comment was created
+  /// @param updatedAt The timestamp when the comment was last updated
+  /// @param content The text content of the comment - may contain urls, images and mentions
+  /// @param metadata Additional JSON data that shouldn't be displayed to the user
+  /// @param targetUri the URI about which the comment is being made
   event CommentEdited(
     bytes32 indexed commentId,
+    address indexed editedByApp,
     address indexed author,
-    address indexed app,
-    Comments.Comment comment
+    address app,
+    uint256 channelId,
+    bytes32 parentId,
+    uint80 createdAt,
+    uint80 updatedAt,
+    string content,
+    string metadata,
+    string targetUri,
+    string commentType,
+    string hookData
   );
 
   /// @notice Emitted when a comment's hook data is updated

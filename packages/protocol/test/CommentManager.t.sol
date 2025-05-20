@@ -81,7 +81,7 @@ contract AlwaysReturningDataHook is BaseHook {
     address,
     bytes32
   ) external payable override returns (string memory) {
-    return "hook data";
+    return "hook data edited";
   }
 
   function onCommentAdded(
@@ -98,16 +98,33 @@ contract CommentsTest is Test, IERC721Receiver {
     bytes32 indexed commentId,
     address indexed author,
     address indexed app,
-    Comments.Comment commentData
+    uint256 channelId,
+    bytes32 parentId,
+    uint80 createdAt,
+    uint80 updatedAt,
+    string content,
+    string metadata,
+    string targetUri,
+    string commentType,
+    string hookData
   );
   event CommentDeleted(bytes32 indexed commentId, address indexed author);
   event ApprovalAdded(address indexed approver, address indexed approved);
   event ApprovalRemoved(address indexed approver, address indexed approved);
   event CommentEdited(
     bytes32 indexed commentId,
+    address indexed editedByApp,
     address indexed author,
-    address indexed app,
-    Comments.Comment commentData
+    address app,
+    uint256 channelId,
+    bytes32 parentId,
+    uint80 createdAt,
+    uint80 updatedAt,
+    string content,
+    string metadata,
+    string targetUri,
+    string commentType,
+    string hookData
   );
   event CommentHookDataUpdated(bytes32 indexed commentId, string hookData);
   CommentManager public comments;
@@ -1082,19 +1099,15 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      Comments.Comment({
-        author: commentData.author,
-        app: commentData.app,
-        content: commentData.content,
-        commentType: commentData.commentType,
-        createdAt: uint80(block.timestamp),
-        updatedAt: uint80(block.timestamp),
-        metadata: commentData.metadata,
-        channelId: commentData.channelId,
-        parentId: commentData.parentId,
-        targetUri: commentData.targetUri,
-        hookData: ""
-      })
+      channelId,
+      commentData.parentId,
+      uint80(block.timestamp),
+      uint80(block.timestamp),
+      commentData.content,
+      commentData.metadata,
+      commentData.targetUri,
+      commentData.commentType,
+      ""
     );
     vm.expectEmit(true, true, true, true);
     emit CommentHookDataUpdated(commentId, "hook data");
@@ -1160,7 +1173,21 @@ contract CommentsTest is Test, IERC721Receiver {
 
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
-    emit CommentEdited(commentId, author, app, expectedCommentData);
+    emit CommentEdited(
+      commentId,
+      editData.app,
+      author,
+      app,
+      commentData.channelId,
+      commentData.parentId,
+      uint80(block.timestamp),
+      uint80(block.timestamp),
+      editData.content,
+      editData.metadata,
+      commentData.targetUri,
+      commentData.commentType,
+      ""
+    );
     comments.editComment(commentId, editData, editAppSignature);
 
     // Verify the comment was edited
@@ -1216,9 +1243,23 @@ contract CommentsTest is Test, IERC721Receiver {
 
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
-    emit CommentEdited(commentId, author, app, expectedCommentData);
+    emit CommentEdited(
+      commentId,
+      editData.app,
+      author,
+      app,
+      commentData.channelId,
+      commentData.parentId,
+      uint80(block.timestamp),
+      uint80(block.timestamp),
+      editData.content,
+      editData.metadata,
+      commentData.targetUri,
+      commentData.commentType,
+      "hook data"
+    );
     vm.expectEmit(true, true, true, true);
-    emit CommentHookDataUpdated(commentId, "hook data");
+    emit CommentHookDataUpdated(commentId, "hook data edited");
     comments.editComment(commentId, editData, editAppSignature);
 
     // Verify the comment was edited
@@ -1226,7 +1267,7 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(editedComment.content, editData.content);
     assertEq(editedComment.metadata, editData.metadata);
     assertEq(editedComment.updatedAt, uint80(block.timestamp));
-    assertEq(editedComment.hookData, "hook data");
+    assertEq(editedComment.hookData, "hook data edited");
   }
 
   function test_EditCommentAsAuthor_RejectedByHook() public {
@@ -1356,7 +1397,21 @@ contract CommentsTest is Test, IERC721Receiver {
     expectedCommentData.updatedAt = uint80(block.timestamp);
 
     vm.expectEmit(true, true, true, true);
-    emit CommentEdited(commentId, author, app, expectedCommentData);
+    emit CommentEdited(
+      commentId,
+      editData.app,
+      author,
+      app,
+      commentData.channelId,
+      commentData.parentId,
+      uint80(block.timestamp),
+      uint80(block.timestamp),
+      editData.content,
+      editData.metadata,
+      commentData.targetUri,
+      commentData.commentType,
+      ""
+    );
     comments.editCommentWithApproval(
       commentId,
       editData,
@@ -1501,7 +1556,21 @@ contract CommentsTest is Test, IERC721Receiver {
     expectedCommentData.updatedAt = uint80(block.timestamp);
 
     vm.expectEmit(true, true, true, true);
-    emit CommentEdited(commentId, author, app, expectedCommentData);
+    emit CommentEdited(
+      commentId,
+      editData.app,
+      author,
+      app,
+      commentData.channelId,
+      commentData.parentId,
+      uint80(block.timestamp),
+      uint80(block.timestamp),
+      editData.content,
+      editData.metadata,
+      commentData.targetUri,
+      commentData.commentType,
+      ""
+    );
     comments.editCommentWithApproval(
       commentId,
       editData,

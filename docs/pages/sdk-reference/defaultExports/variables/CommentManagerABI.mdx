@@ -796,55 +796,50 @@ const CommentManagerABI: readonly [{
      name: "app";
      type: "address";
    }, {
-     components: readonly [{
-        internalType: "address";
-        name: "author";
-        type: "address";
-      }, {
-        internalType: "address";
-        name: "app";
-        type: "address";
-      }, {
-        internalType: "uint80";
-        name: "createdAt";
-        type: "uint80";
-      }, {
-        internalType: "uint80";
-        name: "updatedAt";
-        type: "uint80";
-      }, {
-        internalType: "uint256";
-        name: "channelId";
-        type: "uint256";
-      }, {
-        internalType: "bytes32";
-        name: "parentId";
-        type: "bytes32";
-      }, {
-        internalType: "string";
-        name: "content";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "metadata";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "hookData";
-        type: "string";
-     }];
      indexed: false;
-     internalType: "struct Comments.Comment";
-     name: "commentData";
-     type: "tuple";
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+   }, {
+     indexed: false;
+     internalType: "bytes32";
+     name: "parentId";
+     type: "bytes32";
+   }, {
+     indexed: false;
+     internalType: "uint80";
+     name: "createdAt";
+     type: "uint80";
+   }, {
+     indexed: false;
+     internalType: "uint80";
+     name: "updatedAt";
+     type: "uint80";
+   }, {
+     indexed: false;
+     internalType: "string";
+     name: "content";
+     type: "string";
+   }, {
+     indexed: false;
+     internalType: "string";
+     name: "metadata";
+     type: "string";
+   }, {
+     indexed: false;
+     internalType: "string";
+     name: "targetUri";
+     type: "string";
+   }, {
+     indexed: false;
+     internalType: "string";
+     name: "commentType";
+     type: "string";
+   }, {
+     indexed: false;
+     internalType: "string";
+     name: "hookData";
+     type: "string";
   }];
   name: "CommentAdded";
   type: "event";
@@ -873,63 +868,63 @@ const CommentManagerABI: readonly [{
    }, {
      indexed: true;
      internalType: "address";
-     name: "author";
+     name: "editedByApp";
      type: "address";
    }, {
      indexed: true;
      internalType: "address";
+     name: "author";
+     type: "address";
+   }, {
+     indexed: false;
+     internalType: "address";
      name: "app";
      type: "address";
    }, {
-     components: readonly [{
-        internalType: "address";
-        name: "author";
-        type: "address";
-      }, {
-        internalType: "address";
-        name: "app";
-        type: "address";
-      }, {
-        internalType: "uint80";
-        name: "createdAt";
-        type: "uint80";
-      }, {
-        internalType: "uint80";
-        name: "updatedAt";
-        type: "uint80";
-      }, {
-        internalType: "uint256";
-        name: "channelId";
-        type: "uint256";
-      }, {
-        internalType: "bytes32";
-        name: "parentId";
-        type: "bytes32";
-      }, {
-        internalType: "string";
-        name: "content";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "metadata";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "hookData";
-        type: "string";
-     }];
      indexed: false;
-     internalType: "struct Comments.Comment";
-     name: "comment";
-     type: "tuple";
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+   }, {
+     indexed: false;
+     internalType: "bytes32";
+     name: "parentId";
+     type: "bytes32";
+   }, {
+     indexed: false;
+     internalType: "uint80";
+     name: "createdAt";
+     type: "uint80";
+   }, {
+     indexed: false;
+     internalType: "uint80";
+     name: "updatedAt";
+     type: "uint80";
+   }, {
+     indexed: false;
+     internalType: "string";
+     name: "content";
+     type: "string";
+   }, {
+     indexed: false;
+     internalType: "string";
+     name: "metadata";
+     type: "string";
+   }, {
+     indexed: false;
+     internalType: "string";
+     name: "targetUri";
+     type: "string";
+   }, {
+     indexed: false;
+     internalType: "string";
+     name: "commentType";
+     type: "string";
+   }, {
+     indexed: false;
+     internalType: "string";
+     name: "hookData";
+     type: "string";
   }];
   name: "CommentEdited";
   type: "event";

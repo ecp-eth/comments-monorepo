@@ -174,7 +174,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         commentData.channelId
       );
 
-      emit CommentAdded(commentId, comment.author, comment.app, comment);
+      emit CommentAdded(
+        commentId,
+        comment.author,
+        comment.app,
+        comment.channelId,
+        comment.parentId,
+        comment.createdAt,
+        comment.updatedAt,
+        comment.content,
+        comment.metadata,
+        comment.targetUri,
+        comment.commentType,
+        comment.hookData
+      );
 
       if (channel.hook != address(0) && channel.permissions.onCommentAdded) {
         IHook hook = IHook(channel.hook);
@@ -283,7 +296,21 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       comment.channelId
     );
 
-    emit CommentEdited(commentId, comment.author, editData.app, comment);
+    emit CommentEdited(
+      commentId,
+      editData.app,
+      comment.author,
+      comment.app,
+      comment.channelId,
+      comment.parentId,
+      comment.createdAt,
+      comment.updatedAt,
+      comment.content,
+      comment.metadata,
+      comment.targetUri,
+      comment.commentType,
+      comment.hookData
+    );
 
     if (channel.hook != address(0) && channel.permissions.onCommentEdited) {
       IHook hook = IHook(channel.hook);
