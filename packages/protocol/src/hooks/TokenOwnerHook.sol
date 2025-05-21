@@ -180,25 +180,30 @@ contract TokenOwnerHook is BaseHook {
   ) internal view override returns (string memory) {
     // Get token info for this channel
     TokenInfo memory tokenInfo = _channelTokenInfo[commentData.channelId];
-    if (tokenInfo.tokenAddress == address(0)) revert InvalidTokenAddress();
+
+    if (tokenInfo.tokenAddress == address(0)) {
+      revert InvalidTokenAddress();
+    }
 
     // Check if this is a top-level comment (no parent)
-    if (commentData.parentId == bytes32(0)) {
-      // Only token creator can post top-level comments
-      if (commentData.author != tokenInfo.tokenCreator) {
-        revert UnauthorizedCommenter();
-      }
+    if (commentData.parentId != bytes32(0)) {
+      return "";
+    }
 
-      // Verify targetUri is a valid CAIP-19 for the token
-      if (
-        !_isValidTokenCAIP19(
-          commentData.targetUri,
-          tokenInfo.tokenAddress,
-          tokenInfo.tokenChainId
-        )
-      ) {
-        revert InvalidTargetUri();
-      }
+    // Only token creator can post top-level comments
+    if (commentData.author != tokenInfo.tokenCreator) {
+      revert UnauthorizedCommenter();
+    }
+
+    // Verify targetUri is a valid CAIP-19 for the token
+    if (
+      !_isValidTokenCAIP19(
+        commentData.targetUri,
+        tokenInfo.tokenAddress,
+        tokenInfo.tokenChainId
+      )
+    ) {
+      revert InvalidTargetUri();
     }
 
     return "";
