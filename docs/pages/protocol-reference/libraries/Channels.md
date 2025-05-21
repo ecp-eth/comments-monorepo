@@ -21,7 +21,7 @@
 
 
 
-- **metadata:** (string) The metadata of the channel
+- **metadata:** (string) The metadata of the channel. Should be a normalized JSON object, stringified.
 
 
 

@@ -6,7 +6,9 @@ import { Hooks } from "../libraries/Hooks.sol";
 import { Comments } from "../libraries/Comments.sol";
 import { Channels } from "../libraries/Channels.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { EnumerableMap } from "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
+import {
+  EnumerableMap
+} from "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
 /**
  * @title TokenCreatorHook
