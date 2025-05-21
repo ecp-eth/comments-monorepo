@@ -2,12 +2,12 @@
  * The address of the ChannelManager contract on the dev chain
  */
 export const CHANNEL_MANAGER_ADDRESS =
-  "0xe5d535029F18292eb2EAA2Bb603d1d1223d25613";
+  "0x7950f5fEb11687bdA31341E956e299850Fc9594E";
 
 /**
  * The address of the Comments contract on the dev chain
  */
-export const COMMENTS_ADDRESS = "0xf20fA0F5B39b3502b497b211896De77a861505E6";
+export const COMMENTS_ADDRESS = "0x65673E54Eea755D6aE7EBD523125886a1342316a";
 
 /**
  * The address of the NoopHook contract on the dev chain
