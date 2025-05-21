@@ -36,14 +36,14 @@ Checks if the contract implements the specified interface
 
 
 
-### `onInitialized(address channel, uint256 channelId) → bool` (external)
+### `onInitialized(address channel, struct Channels.Channel channelData, uint256 channelId) → bool` (external)
 
 Execute after a hook is initialized on a channel
 
 
 
 
-### `_onInitialized(address, uint256) → bool` (internal)
+### `_onInitialized(address, struct Channels.Channel, uint256) → bool` (internal)
 
 
 

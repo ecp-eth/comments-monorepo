@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import "../interfaces/IHook.sol";
 import "./Hooks.sol";
 
 /// @title Channels - Library defining channel-related types
