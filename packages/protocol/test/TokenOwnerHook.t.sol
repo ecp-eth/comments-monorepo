@@ -186,7 +186,7 @@ contract TokenOwnerHookTest is Test {
 
     // Post comment as token creator
     vm.prank(tokenCreator);
-    commentManager.postCommentAsAuthor(commentData, "");
+    commentManager.postComment(commentData, "");
   }
 
   function test_AnyoneCanReplyToTokenCreatorComment() public {
@@ -212,7 +212,7 @@ contract TokenOwnerHookTest is Test {
     });
 
     vm.prank(tokenCreator);
-    commentManager.postCommentAsAuthor(parentComment, "");
+    commentManager.postComment(parentComment, "");
 
     // Now create a reply as someone else
     address replier = makeAddr("replier");
@@ -230,7 +230,7 @@ contract TokenOwnerHookTest is Test {
     });
 
     vm.prank(replier);
-    commentManager.postCommentAsAuthor(replyData, "");
+    commentManager.postComment(replyData, "");
   }
 
   function test_TokenCreatorCannotPostInvalidCAIP19() public {
@@ -257,7 +257,7 @@ contract TokenOwnerHookTest is Test {
     // Attempt to post comment
     vm.prank(tokenCreator);
     vm.expectRevert(TokenOwnerHook.InvalidTargetUri.selector);
-    commentManager.postCommentAsAuthor(commentData, "");
+    commentManager.postComment(commentData, "");
   }
 
   function test_NonTokenCreatorCannotPostTopLevelComment() public {
@@ -286,7 +286,7 @@ contract TokenOwnerHookTest is Test {
     // Attempt to post comment as non-creator
     vm.prank(makeAddr("nonCreator"));
     vm.expectRevert(TokenOwnerHook.UnauthorizedCommenter.selector);
-    commentManager.postCommentAsAuthor(commentData, "");
+    commentManager.postComment(commentData, "");
   }
 
   // Helper functions
@@ -298,12 +298,13 @@ contract TokenOwnerHookTest is Test {
         name: "",
         description: "",
         metadata: metadata,
-        hook: IHook(address(0)),
+        hook: address(0),
         permissions: Hooks.Permissions({
-          afterInitialize: false,
-          afterComment: false,
-          afterEditComment: false,
-          afterDeleteComment: false
+          onInitialized: false,
+          onCommentAdded: false,
+          onCommentEdited: false,
+          onCommentDeleted: false,
+          onChannelUpdated: false
         })
       });
   }

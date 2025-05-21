@@ -6,9 +6,7 @@ import { Hooks } from "../libraries/Hooks.sol";
 import { Comments } from "../libraries/Comments.sol";
 import { Channels } from "../libraries/Channels.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import {
-  EnumerableMap
-} from "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
+import { EnumerableMap } from "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
 /**
  * @title TokenOwnerHook
@@ -95,15 +93,15 @@ contract TokenOwnerHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        afterInitialize: true,
-        afterComment: true,
-        afterEditComment: false,
-        afterDeleteComment: false,
+        onInitialized: true,
+        onCommentAdded: true,
+        onCommentEdited: false,
+        onCommentDeleted: false,
         onChannelUpdated: false
       });
   }
 
-  function _afterInitialize(
+  function _onInitialized(
     address,
     Channels.Channel memory channel,
     uint256 channelId
@@ -176,7 +174,7 @@ contract TokenOwnerHook is BaseHook {
     return keccak256(bytes(targetUri)) == keccak256(bytes(expectedUri));
   }
 
-  function _afterComment(
+  function _onCommentAdded(
     Comments.Comment calldata commentData,
     address /* caller */,
     bytes32 /* commentId */
