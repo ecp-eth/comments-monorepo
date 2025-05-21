@@ -9,11 +9,11 @@ import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { EnumerableMap } from "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
 /**
- * @title TokenOwnerHook
+ * @title TokenCreatorHook
  * @notice Hook that gates channels to only allow token creators to post top-level comments. Similar to telegram channels.
  * @dev Requires channel metadata to contain tokenAddress and tokenCreator fields
  */
-contract TokenOwnerHook is BaseHook {
+contract TokenCreatorHook is BaseHook {
   using Strings for string;
   using Strings for uint256;
   using EnumerableMap for EnumerableMap.UintToAddressMap;

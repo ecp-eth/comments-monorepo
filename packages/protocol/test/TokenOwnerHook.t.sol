@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import { Test } from "forge-std/Test.sol";
-import { TokenOwnerHook } from "../src/hooks/TokenOwnerHook.sol";
+import { TokenCreatorHook } from "../src/hooks/TokenCreatorHook.sol";
 import { Channels } from "../src/libraries/Channels.sol";
 import { Comments } from "../src/libraries/Comments.sol";
 import { CommentManager } from "../src/CommentManager.sol";
@@ -12,8 +12,8 @@ import { Hooks } from "../src/libraries/Hooks.sol";
 import { console } from "forge-std/console.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 
-contract TokenOwnerHookTest is Test {
-  TokenOwnerHook public hook;
+contract TokenCreatorHookTest is Test {
+  TokenCreatorHook public hook;
   CommentManager public commentManager;
   ChannelManager public channelManager;
   address public tokenAddress;
@@ -38,7 +38,7 @@ contract TokenOwnerHookTest is Test {
     commentManager.updateChannelContract(address(channelManager));
 
     // Deploy and set up hook
-    hook = new TokenOwnerHook();
+    hook = new TokenCreatorHook();
     tokenAddress = makeAddr("token");
     tokenCreator = makeAddr("creator");
     tokenChainId = 1; // Ethereum mainnet
@@ -91,7 +91,7 @@ contract TokenOwnerHookTest is Test {
       "Test Description",
       invalidMetadata
     );
-    vm.expectRevert(TokenOwnerHook.InvalidMetadata.selector);
+    vm.expectRevert(TokenCreatorHook.InvalidMetadata.selector);
 
     channelManager.setHook(channelId, address(hook));
     vm.stopPrank();
@@ -113,7 +113,7 @@ contract TokenOwnerHookTest is Test {
       "Test Description",
       invalidMetadata
     );
-    vm.expectRevert(TokenOwnerHook.InvalidMetadata.selector);
+    vm.expectRevert(TokenCreatorHook.InvalidMetadata.selector);
 
     channelManager.setHook(channelId, address(hook));
     vm.stopPrank();
@@ -135,7 +135,7 @@ contract TokenOwnerHookTest is Test {
       "Test Description",
       invalidMetadata
     );
-    vm.expectRevert(TokenOwnerHook.InvalidMetadata.selector);
+    vm.expectRevert(TokenCreatorHook.InvalidMetadata.selector);
 
     channelManager.setHook(channelId, address(hook));
     vm.stopPrank();
@@ -153,7 +153,7 @@ contract TokenOwnerHookTest is Test {
     vm.stopPrank();
 
     // Verify stored data
-    TokenOwnerHook.TokenInfo memory tokenInfo = hook.getChannelTokenInfo(
+    TokenCreatorHook.TokenInfo memory tokenInfo = hook.getChannelTokenInfo(
       channelId
     );
     assertEq(tokenInfo.tokenAddress, tokenAddress);
@@ -256,7 +256,7 @@ contract TokenOwnerHookTest is Test {
 
     // Attempt to post comment
     vm.prank(tokenCreator);
-    vm.expectRevert(TokenOwnerHook.InvalidTargetUri.selector);
+    vm.expectRevert(TokenCreatorHook.InvalidTargetUri.selector);
     commentManager.postComment(commentData, "");
   }
 
@@ -285,7 +285,7 @@ contract TokenOwnerHookTest is Test {
 
     // Attempt to post comment as non-creator
     vm.prank(makeAddr("nonCreator"));
-    vm.expectRevert(TokenOwnerHook.UnauthorizedCommenter.selector);
+    vm.expectRevert(TokenCreatorHook.UnauthorizedCommenter.selector);
     commentManager.postComment(commentData, "");
   }
 

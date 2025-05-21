@@ -2,7 +2,7 @@
 
 ----
 
-# `TokenOwnerHook`
+# `TokenCreatorHook`
 
 Hook that gates channels to only allow token creators to post top-level comments. Similar to telegram channels.
 
@@ -49,7 +49,7 @@ Requires channel metadata to contain tokenAddress and tokenCreator fields
 
 
 
-### `getChannelTokenInfo(uint256 channelId) → struct TokenOwnerHook.TokenInfo` (public)
+### `getChannelTokenInfo(uint256 channelId) → struct TokenCreatorHook.TokenInfo` (public)
 
 
 
@@ -61,7 +61,7 @@ Requires channel metadata to contain tokenAddress and tokenCreator fields
 
 
 
-### `getAllChannels() → uint256[] channelIds, struct TokenOwnerHook.TokenInfo[] tokenInfos` (public)
+### `getAllChannels() → uint256[] channelIds, struct TokenCreatorHook.TokenInfo[] tokenInfos` (public)
 
 
 
