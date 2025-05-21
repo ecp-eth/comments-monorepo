@@ -19,18 +19,16 @@ const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
-    const targetUri = transformCommentTargetUri(
-      event.args.commentData.targetUri,
-    );
+    const targetUri = transformCommentTargetUri(event.args.targetUri);
 
-    if (await getMutedAccount(event.args.commentData.author)) {
+    if (await getMutedAccount(event.args.author)) {
       return;
     }
 
-    const createdAt = new Date(Number(event.args.commentData.createdAt) * 1000);
-    const updatedAt = new Date(Number(event.args.commentData.updatedAt) * 1000);
+    const createdAt = new Date(Number(event.args.createdAt) * 1000);
+    const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
 
-    const parentId = transformCommentParentId(event.args.commentData.parentId);
+    const parentId = transformCommentParentId(event.args.parentId);
     let rootCommentId: Hex | null = null;
 
     if (parentId) {
@@ -47,14 +45,14 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
               commentId: event.args.commentId,
               parentId,
               targetUri,
-              app: event.args.commentData.app,
+              app: event.args.app,
               chainId: context.network.chainId,
-              author: event.args.commentData.author,
+              author: event.args.author,
               txHash: event.transaction.hash,
               logIndex: event.log.logIndex,
               createdAt,
               updatedAt,
-              parentCommentId: event.args.commentData.parentId,
+              parentCommentId: event.args.parentId,
             },
           },
         );
@@ -74,20 +72,20 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
     await context.db.insert(schema.comments).values({
       id: event.args.commentId,
-      content: event.args.commentData.content,
-      metadata: event.args.commentData.metadata,
+      content: event.args.content,
+      metadata: event.args.metadata,
       targetUri,
       parentId,
       rootCommentId,
-      author: event.args.commentData.author,
+      author: event.args.author,
       txHash: event.transaction.hash,
       createdAt,
       updatedAt,
       chainId: context.network.chainId,
-      app: event.args.commentData.app,
+      app: event.args.app,
       logIndex: event.log.logIndex,
-      channelId: event.args.commentData.channelId,
-      commentType: event.args.commentData.commentType,
+      channelId: event.args.channelId,
+      commentType: event.args.commentType,
       ...(moderationStatus
         ? {
             moderationStatus: moderationStatus.status,
@@ -108,8 +106,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
       await notifyCommentPendingModeration({
         id: event.args.commentId,
-        authorAddress: event.args.commentData.author,
-        content: event.args.commentData.content,
+        authorAddress: event.args.author,
+        content: event.args.content,
         targetUri,
       });
     }
@@ -144,15 +142,15 @@ ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
     return;
   }
 
-  const updatedAt = new Date(Number(event.args.comment.updatedAt) * 1000);
+  const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
 
   await context.db
     .update(schema.comments, {
       id: event.args.commentId,
     })
     .set({
-      content: event.args.comment.content,
-      metadata: event.args.comment.metadata,
+      content: event.args.content,
+      metadata: event.args.metadata,
       revision: existingComment.revision + 1,
       updatedAt,
     });
