@@ -29,21 +29,21 @@ Execute after a hook is initialized on a channel
 
 
 
-### `onCommentAdded(struct Comments.Comment commentData, address caller, bytes32 commentId) → string hookData` (external)
+### `onCommentAdded(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → string hookData` (external)
 
 Execute after a comment is processed
 
 
 
 
-### `onCommentDeleted(struct Comments.Comment commentData, address caller, bytes32 commentId) → bool success` (external)
+### `onCommentDeleted(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → bool success` (external)
 
 Execute after a comment is deleted
 
 
 
 
-### `onCommentEdited(struct Comments.Comment commentData, address caller, bytes32 commentId) → string commentHookData` (external)
+### `onCommentEdited(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → string commentHookData` (external)
 
 Execute after a comment is edited
 

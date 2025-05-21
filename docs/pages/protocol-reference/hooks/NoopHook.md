@@ -40,7 +40,7 @@
 
 
 
-### `onCommentDeleted(struct Comments.Comment commentData, address caller, bytes32 commentId) → bool success` (external)
+### `onCommentDeleted(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → bool success` (external)
 
 
 
