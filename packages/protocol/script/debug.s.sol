@@ -2,7 +2,9 @@
 pragma solidity ^0.8.20;
 
 import { Test, console } from "forge-std/Test.sol";
-import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {
+  IERC721Receiver
+} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { TestUtils, MockHook } from "../test/utils.sol";
@@ -19,15 +21,19 @@ contract DebugGasUsage is Test, IERC721Receiver {
   address public owner;
   address public user1;
   address public user2;
+  uint256 public user2PrivateKey;
 
   uint256 channelId;
   Comments.Comment commentData;
   Comments.CreateComment createCommentData;
+  bytes signature;
 
   function setUp() public {
     owner = address(this);
     user1 = makeAddr("user1");
-    user2 = makeAddr("user2");
+    (address _user2, uint256 _user2PrivateKey) = makeAddrAndKey("user2");
+    user2 = _user2;
+    user2PrivateKey = _user2PrivateKey;
 
     (comments, channelManager) = TestUtils.createContracts(owner);
 
@@ -104,16 +110,23 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
+    bytes32 commentId = comments.getCommentId(createCommentData);
+    signature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+
     // Post comment directly as author
     vm.prank(user1);
     measureGas("postComment", runPostComment);
+  }
+
+  function runPostComment() internal {
+    comments.postComment{ value: 0 }(createCommentData, signature);
   }
 
   function debugParseCAIP19() public {
     measureGas("parseCAIP19", runParseCAIP19);
   }
 
-  function runParseCAIP19() internal {
+  function runParseCAIP19() internal pure {
     // Test a single CAIP-19 URL parse operation
     string
       memory testCase = "eip155:1/erc721:0x06012c8cf97BEaD5deAe237070F9587f8E7A266d/771769"; // CryptoKitties Collectible
@@ -125,10 +138,6 @@ contract DebugGasUsage is Test, IERC721Receiver {
     console.log("Asset Namespace:", components.assetNamespace);
     console.log("Asset Reference:", components.assetReference);
     console.log("Token ID:", components.tokenId);
-  }
-
-  function runPostComment() internal {
-    comments.postComment{ value: 0 }(createCommentData, "");
   }
 
   // Internal function to measure gas usage
