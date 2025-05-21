@@ -21,15 +21,19 @@ contract DebugGasUsage is Test, IERC721Receiver {
   address public owner;
   address public user1;
   address public user2;
+  uint256 public user2PrivateKey;
 
   uint256 channelId;
   Comments.Comment commentData;
   Comments.CreateComment createCommentData;
+  bytes signature;
 
   function setUp() public {
     owner = address(this);
     user1 = makeAddr("user1");
-    user2 = makeAddr("user2");
+    (address _user2, uint256 _user2PrivateKey) = makeAddrAndKey("user2");
+    user2 = _user2;
+    user2PrivateKey = _user2PrivateKey;
 
     (comments, channelManager) = TestUtils.createContracts(owner);
 
@@ -42,6 +46,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     debugCreateChannel();
     debugUpdateChannel();
     debugPostComment();
+    debugParseCAIP19();
   }
 
   function debugSetupChannel() public {
@@ -105,13 +110,34 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
+    bytes32 commentId = comments.getCommentId(createCommentData);
+    signature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+
     // Post comment directly as author
     vm.prank(user1);
     measureGas("postComment", runPostComment);
   }
 
   function runPostComment() internal {
-    comments.postComment{ value: 0 }(createCommentData, "");
+    comments.postComment{ value: 0 }(createCommentData, signature);
+  }
+
+  function debugParseCAIP19() public {
+    measureGas("parseCAIP19", runParseCAIP19);
+  }
+
+  function runParseCAIP19() internal pure {
+    // Test a single CAIP-19 URL parse operation
+    string
+      memory testCase = "eip155:1/erc721:0x06012c8cf97BEaD5deAe237070F9587f8E7A266d/771769"; // CryptoKitties Collectible
+    (TestUtils.CAIP19Components memory components, bool valid) = TestUtils
+      .parseCAIP19(testCase);
+    require(valid, "Invalid CAIP-19 URL");
+    console.log("Parsed CAIP-19 URL:", testCase);
+    console.log("Chain ID:", components.chainId);
+    console.log("Asset Namespace:", components.assetNamespace);
+    console.log("Asset Reference:", components.assetReference);
+    console.log("Token ID:", components.tokenId);
   }
 
   // Internal function to measure gas usage

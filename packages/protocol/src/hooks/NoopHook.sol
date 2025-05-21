@@ -7,9 +7,8 @@ import { Hooks } from "../libraries/Hooks.sol";
 import { Comments } from "../libraries/Comments.sol";
 import { Channels } from "../libraries/Channels.sol";
 import { IChannelManager } from "../interfaces/IChannelManager.sol";
-import {
-  IERC721Receiver
-} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import { Channels } from "../libraries/Channels.sol";
 
 // Fee basic hook that does nothing
 contract NoopHook is IHook {
@@ -34,6 +33,7 @@ contract NoopHook is IHook {
 
   function onInitialized(
     address channel,
+    Channels.Channel memory channelData,
     uint256 channelId
   ) external override returns (bool success) {}
 

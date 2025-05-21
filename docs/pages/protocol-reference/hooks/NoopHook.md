@@ -34,7 +34,7 @@
 
 
 
-### `onInitialized(address channel, uint256 channelId) → bool success` (external)
+### `onInitialized(address channel, struct Channels.Channel channelData, uint256 channelId) → bool success` (external)
 
 
 

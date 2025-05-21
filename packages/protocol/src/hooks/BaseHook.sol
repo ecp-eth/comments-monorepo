@@ -2,9 +2,7 @@
 pragma solidity ^0.8.20;
 
 import { IHook } from "../interfaces/IHook.sol";
-import {
-  IERC165
-} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { ERC165 } from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import { Hooks } from "../libraries/Hooks.sol";
 import { Comments } from "../libraries/Comments.sol";
@@ -61,12 +59,17 @@ abstract contract BaseHook is IHook, ERC165 {
   /// @inheritdoc IHook
   function onInitialized(
     address channel,
+    Channels.Channel memory channelData,
     uint256 channelId
   ) external virtual returns (bool) {
-    return _onInitialized(channel, channelId);
+    return _onInitialized(channel, channelData, channelId);
   }
 
-  function _onInitialized(address, uint256) internal virtual returns (bool) {
+  function _onInitialized(
+    address,
+    Channels.Channel memory,
+    uint256
+  ) internal virtual returns (bool) {
     revert HookNotImplemented();
   }
 

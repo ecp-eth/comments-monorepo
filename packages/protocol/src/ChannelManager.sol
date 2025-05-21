@@ -10,6 +10,7 @@ import "./interfaces/IProtocolFees.sol";
 import "./ProtocolFees.sol";
 import "./libraries/Comments.sol";
 import "./libraries/Channels.sol";
+import "./interfaces/IHook.sol";
 
 /// @title ChannelManager - A contract for managing comment channels and their hooks as NFTs
 /// @notice This contract allows creation and management of channels with configurable hooks, where each channel is an NFT
@@ -183,7 +184,11 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
       // Call afterInitialize hook if permitted
       if (permissions.onInitialized) {
-        IHook(hook).onInitialized(address(this), channelId);
+        IHook(hook).onInitialized(
+          address(this),
+          channels[channelId],
+          channelId
+        );
       }
     } else {
       delete channels[channelId].hook; // Properly reset to default value

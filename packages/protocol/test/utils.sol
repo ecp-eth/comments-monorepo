@@ -3,9 +3,7 @@ pragma solidity ^0.8.20;
 
 import { Test } from "forge-std/Test.sol";
 import { Vm } from "forge-std/Vm.sol";
-import {
-  IERC721Receiver
-} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { LibString } from "solady/utils/LibString.sol";
 import { CommentManager } from "../src/CommentManager.sol";
@@ -249,6 +247,108 @@ library TestUtils {
     bytes memory appSignature = signEIP712(vm, appPrivateKey, commentId);
 
     return appSignature;
+  }
+  /**
+   * @notice Struct to hold parsed CAIP-19 components
+   * @param chainId The chain ID (e.g. "eip155:1")
+   * @param assetNamespace The asset namespace (e.g. "erc20")
+   * @param assetReference The asset reference (e.g. contract address)
+   * @param tokenId Optional token ID for NFTs
+   */
+  struct CAIP19Components {
+    string chainId;
+    string assetNamespace;
+    string assetReference;
+    string tokenId;
+  }
+
+  /**
+   * @notice Parse a CAIP-19 URL into its components
+   * @param caip19Url The CAIP-19 URL to parse (e.g. "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f")
+   * @return components The parsed CAIP-19 components
+   * @return valid Whether the URL is valid
+   */
+  function parseCAIP19(
+    string memory caip19Url
+  ) internal pure returns (CAIP19Components memory components, bool valid) {
+    bytes memory urlBytes = bytes(caip19Url);
+    if (urlBytes.length == 0) return (components, false);
+
+    // Find the first slash which separates chainId from assetNamespace:assetReference
+    uint256 firstSlash = 0;
+    for (uint256 i = 0; i < urlBytes.length; i++) {
+      if (urlBytes[i] == "/") {
+        firstSlash = i;
+        break;
+      }
+    }
+    if (firstSlash == 0) return (components, false);
+
+    // Parse chainId
+    bytes memory chainIdBytes = new bytes(firstSlash);
+    for (uint256 i = 0; i < firstSlash; i++) {
+      chainIdBytes[i] = urlBytes[i];
+    }
+    components.chainId = string(chainIdBytes);
+
+    // Find the colon which separates assetNamespace from assetReference
+    uint256 colon = 0;
+    for (uint256 i = firstSlash + 1; i < urlBytes.length; i++) {
+      if (urlBytes[i] == ":") {
+        colon = i;
+        break;
+      }
+    }
+    if (colon == 0) return (components, false);
+
+    // Parse assetNamespace
+    bytes memory namespaceBytes = new bytes(colon - firstSlash - 1);
+    for (uint256 i = 0; i < namespaceBytes.length; i++) {
+      namespaceBytes[i] = urlBytes[firstSlash + 1 + i];
+    }
+    components.assetNamespace = string(namespaceBytes);
+
+    // Check for tokenId (second slash)
+    uint256 secondSlash = 0;
+    for (uint256 i = colon + 1; i < urlBytes.length; i++) {
+      if (urlBytes[i] == "/") {
+        secondSlash = i;
+        break;
+      }
+    }
+
+    if (secondSlash > 0) {
+      // Has tokenId
+      bytes memory referenceBytes = new bytes(secondSlash - colon - 1);
+      for (uint256 i = 0; i < referenceBytes.length; i++) {
+        referenceBytes[i] = urlBytes[colon + 1 + i];
+      }
+      components.assetReference = string(referenceBytes);
+
+      bytes memory tokenIdBytes = new bytes(urlBytes.length - secondSlash - 1);
+      for (uint256 i = 0; i < tokenIdBytes.length; i++) {
+        tokenIdBytes[i] = urlBytes[secondSlash + 1 + i];
+      }
+      components.tokenId = string(tokenIdBytes);
+    } else {
+      // No tokenId
+      bytes memory referenceBytes = new bytes(urlBytes.length - colon - 1);
+      for (uint256 i = 0; i < referenceBytes.length; i++) {
+        referenceBytes[i] = urlBytes[colon + 1 + i];
+      }
+      components.assetReference = string(referenceBytes);
+    }
+
+    // Validate components
+    if (
+      bytes(components.chainId).length == 0 ||
+      bytes(components.assetNamespace).length == 0 ||
+      bytes(components.assetReference).length == 0
+    ) {
+      return (components, false);
+    }
+
+    return (components, true);
   }
 }
 
