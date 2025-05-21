@@ -1,0 +1,5 @@
+[profile.default]
+src = "solidity"
+out = "out"
+libs = ["node_modules", "lib"]
+solc = "0.8.28"

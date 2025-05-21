@@ -1,7 +1,7 @@
 import React from "react";
 import { defineConfig } from "vocs";
 import { remarkMermaid } from "@theguild/remark-mermaid";
-import { COMMENT_MANAGER_ADDRESS } from "@ecp.eth/sdk";
+import { CHANNEL_MANAGER_ADDRESS, COMMENT_MANAGER_ADDRESS } from "@ecp.eth/sdk";
 import remarkFindAndReplace from "./plugins/remark-find-replace";
 
 export default defineConfig({
@@ -81,6 +81,10 @@ export default defineConfig({
         {
           text: "Post comment flows",
           link: "/post-comment-flows",
+        },
+        {
+          text: "Channels & Hooks",
+          link: "/channels-and-hooks",
         },
       ],
     },
@@ -174,8 +178,8 @@ export default defineConfig({
           link: "/logo-assets",
         },
         {
-          text: "Contract",
-          link: "/contract",
+          text: "Contracts",
+          link: "/contracts",
         },
         {
           text: "Gas Costs",
@@ -270,6 +274,7 @@ export default defineConfig({
         {
           replacements: {
             COMMENT_MANAGER_ADDRESS: COMMENT_MANAGER_ADDRESS,
+            CHANNEL_MANAGER_ADDRESS: CHANNEL_MANAGER_ADDRESS,
           },
         },
       ],
@@ -280,6 +285,9 @@ export default defineConfig({
     define: {
       "import.meta.env.COMMENT_MANAGER_ADDRESS": JSON.stringify(
         COMMENT_MANAGER_ADDRESS,
+      ),
+      "import.meta.env.CHANNEL_MANAGER_ADDRESS": JSON.stringify(
+        CHANNEL_MANAGER_ADDRESS,
       ),
     },
   },
