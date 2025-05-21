@@ -39,7 +39,7 @@ contract NoopHook is IHook {
 
   function onCommentDeleted(
     Comments.Comment calldata commentData,
-    address caller,
+    address msgSender,
     bytes32 commentId
   ) external payable override returns (bool success) {}
 

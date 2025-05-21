@@ -49,7 +49,7 @@ Execute after a hook is initialized on a channel
 
 
 
-### `onCommentAdded(struct Comments.Comment commentData, address caller, bytes32 commentId) → string` (external)
+### `onCommentAdded(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → string` (external)
 
 Execute after a comment is processed
 
@@ -62,7 +62,7 @@ Execute after a comment is processed
 
 
 
-### `onCommentDeleted(struct Comments.Comment commentData, address caller, bytes32 commentId) → bool` (external)
+### `onCommentDeleted(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → bool` (external)
 
 Execute after a comment is deleted
 
@@ -75,7 +75,7 @@ Execute after a comment is deleted
 
 
 
-### `onCommentEdited(struct Comments.Comment commentData, address caller, bytes32 commentId) → string` (external)
+### `onCommentEdited(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → string` (external)
 
 Execute after a comment is edited
 

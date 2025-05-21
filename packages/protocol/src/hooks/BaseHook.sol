@@ -76,10 +76,10 @@ abstract contract BaseHook is IHook, ERC165 {
   /// @inheritdoc IHook
   function onCommentAdded(
     Comments.Comment calldata commentData,
-    address caller,
+    address msgSender,
     bytes32 commentId
   ) external payable virtual returns (string memory) {
-    return _onCommentAdded(commentData, caller, commentId);
+    return _onCommentAdded(commentData, msgSender, commentId);
   }
 
   function _onCommentAdded(
@@ -93,10 +93,10 @@ abstract contract BaseHook is IHook, ERC165 {
   /// @inheritdoc IHook
   function onCommentDeleted(
     Comments.Comment calldata commentData,
-    address caller,
+    address msgSender,
     bytes32 commentId
   ) external payable virtual returns (bool) {
-    return _onCommentDeleted(commentData, caller, commentId);
+    return _onCommentDeleted(commentData, msgSender, commentId);
   }
 
   function _onCommentDeleted(
@@ -110,10 +110,10 @@ abstract contract BaseHook is IHook, ERC165 {
   /// @inheritdoc IHook
   function onCommentEdited(
     Comments.Comment calldata commentData,
-    address caller,
+    address msgSender,
     bytes32 commentId
   ) external payable virtual returns (string memory) {
-    return _onCommentEdited(commentData, caller, commentId);
+    return _onCommentEdited(commentData, msgSender, commentId);
   }
 
   function _onCommentEdited(

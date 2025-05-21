@@ -24,34 +24,34 @@ interface IHook is IERC165 {
 
   /// @notice Execute after a comment is processed
   /// @param commentData The comment data that was processed
-  /// @param caller The original msg.sender that initiated the transaction
+  /// @param msgSender The original msg.sender that initiated the transaction
   /// @param commentId The unique identifier of the processed comment
   /// @return hookData The comment hook data that was generated
   function onCommentAdded(
     Comments.Comment calldata commentData,
-    address caller,
+    address msgSender,
     bytes32 commentId
   ) external payable returns (string memory hookData);
 
   /// @notice Execute after a comment is deleted
   /// @param commentData The comment data that was deleted
-  /// @param caller The original msg.sender that initiated the transaction
+  /// @param msgSender The original msg.sender that initiated the transaction
   /// @param commentId The unique identifier of the deleted comment
   /// @return success Whether the hook execution was successful
   function onCommentDeleted(
     Comments.Comment calldata commentData,
-    address caller,
+    address msgSender,
     bytes32 commentId
   ) external payable returns (bool success);
 
   /// @notice Execute after a comment is edited
   /// @param commentData The comment data that was edited
-  /// @param caller The original msg.sender that initiated the transaction
+  /// @param msgSender The original msg.sender that initiated the transaction
   /// @param commentId The unique identifier of the edited comment
   /// @return commentHookData The comment hook data that was generated
   function onCommentEdited(
     Comments.Comment calldata commentData,
-    address caller,
+    address msgSender,
     bytes32 commentId
   ) external payable returns (string memory commentHookData);
 
