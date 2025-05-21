@@ -40,6 +40,6 @@
     }
   },
   "lint-staged": {
-    "*.{js,ts,tsx,sol}": "pnpm run format"
+    "*.{js,ts,tsx,sol}": "prettier --write"
   }
 }
