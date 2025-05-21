@@ -111,7 +111,6 @@ contract TokenOwnerHook is BaseHook {
     if (metadata.length == 0) revert InvalidMetadata();
 
     // Simple JSON parsing for tokenAddress and tokenCreator
-    // Note: In production, you'd want to use a proper JSON parser
     string memory metadataStr = string(metadata);
     bytes memory tokenAddressBytes = _extractJsonValue(
       metadataStr,
