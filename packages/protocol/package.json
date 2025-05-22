@@ -11,7 +11,8 @@
     "dev": "node dev.js",
     "deploy:dev": "forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"dev\" --rpc-url http://localhost:8545 --broadcast --force",
     "deploy:test": "forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"test\" --rpc-url http://localhost:8545 --broadcast --force",
-    "deploy": " forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"prod\" --rpc-url http://localhost:8545 --broadcast"
+    "//": "call with the flag --rpc-url https://<CHAIN>.g.alchemy.com/v2/<APIKEY>",
+    "deploy": "NODE_ENV=production forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"prod\" --broadcast"
   },
   "dependencies": {
     "@account-abstraction/contracts": "^0.8.0",
