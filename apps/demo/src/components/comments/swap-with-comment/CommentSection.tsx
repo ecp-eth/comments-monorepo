@@ -108,7 +108,7 @@ export function CommentSection() {
         <h2 className="text-lg font-semibold mb-4">Comments</h2>
         {!isEIP7702Supported && (
           <div className="text-red-500">
-            Your wallet doesn't support atomic transactions
+            Your wallet doesn&apos;t support atomic transactions
           </div>
         )}
         <CommentForm disabled={!isEIP7702Supported} />
