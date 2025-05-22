@@ -42,6 +42,12 @@ export function CommentForm({ disabled, ...props }: CommentFormProps) {
         submitIdleLabel="Swap"
         submitPendingLabel="Posting..."
         extra={quote ? { quote } : undefined}
+        onSubmitSuccess={() => {
+          setQuote(null);
+          setFinalize(null);
+
+          props.onSubmitSuccess?.();
+        }}
       />
     </>
   );
