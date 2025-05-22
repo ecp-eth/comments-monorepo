@@ -201,11 +201,11 @@ export function useCommentActions({
       }
     },
     [
-      wagmiConfig,
-      commentSubmission,
-      switchChainAsync,
       signTypedDataAsync,
-      sendTransactionAsync,
+      switchChainAsync,
+      sendCallsAsync,
+      commentSubmission,
+      wagmiConfig,
     ],
   );
 
