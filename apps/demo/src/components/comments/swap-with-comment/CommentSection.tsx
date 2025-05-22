@@ -100,7 +100,9 @@ export function CommentSection() {
   }, [data]);
 
   const isEIP7702Supported =
-    !!capabilities && capabilities[chainId]?.atomic?.status === "supported";
+    !!capabilities &&
+    (capabilities[chainId]?.atomic?.status === "supported" ||
+      capabilities[chainId]?.atomic?.status === "ready");
 
   return (
     <CommentActionsProvider value={commentActions}>
