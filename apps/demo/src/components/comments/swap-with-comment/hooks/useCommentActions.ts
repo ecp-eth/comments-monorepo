@@ -7,7 +7,6 @@ import type {
 } from "../../core/CommentActionsContext";
 import { concat, type Hex, encodeFunctionData, numberToHex, size } from "viem";
 import {
-  useSendTransaction,
   useSwitchChain,
   useSignTypedData,
   useConfig,
@@ -42,7 +41,6 @@ export function useCommentActions({
   });
   const wagmiConfig = useConfig();
   const { sendCallsAsync } = useSendCalls();
-  const { sendTransactionAsync } = useSendTransaction();
   const { switchChainAsync } = useSwitchChain();
   const { signTypedDataAsync } = useSignTypedData();
   const commentDeletion = useCommentDeletion();
