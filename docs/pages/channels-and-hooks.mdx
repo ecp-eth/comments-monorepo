@@ -2,11 +2,11 @@
 
 **Channels and Hooks are the core building blocks of the Comments Protocol.**
 
-- A **Channel** lets you build your own community on the Comments Protocol, and since each channel is actually an NFT,
-  you can even sell it on an NFT marketplace if you really want to (in case you decided to retire early).
-  You can also set a **Hook** on a channel to define the rules of commenting on the channel.
+- A **Channel** lets you build your own community on the Comments Protocol.
+  Since each channel is actually an NFT, it can be owned, transferred, or traded.
+  You can also set a **Hook** on a channel to define the rules for commenting on it.
 
-- **Hooks** are smart contracts that can be set on a channel, **Hook** defines the rules of commenting on the specified **Channel**. They unlock flexible and powerful behaviors, such as:
+- **Hooks** are smart contracts that can be set on a channel. A **Hook** defines the rules for commenting on the specified **Channel**. They unlock flexible and powerful behaviors, such as:
 
   1. Defining who can comment and how comments behave
   1. Charging a small fee to post a comment
@@ -18,7 +18,7 @@ Together, they create a flexible system for building on-chain communities with c
 
 You can create channels and hooks using our [TypeScript SDK](/sdk-reference) or by interacting with our [smart contracts](/contracts).
 
-For full examples of the code used in this guide, check out the [examples](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/channels-and-hooks).
+For full code examples used in this guide, check out the [examples](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/channels-and-hooks).
 
 ## TypeScript Examples
 
@@ -35,13 +35,13 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 ```
 
-Initialize account using `viem`, ensure the account has enough balance to pay for the channel creation fee
+Initialize the account using `viem`. Ensure the account has enough balance to cover the channel creation fee:
 
 ```typescript
 const account = privateKeyToAccount(privateKey);
 ```
 
-Creating a channel requires paying a fee, the code below retrieves the channel creation fee and
+Creating a channel requires paying a fee. The code below retrieves the channel creation fee and
 calls the `createChannel` function from the SDK to create a new channel:
 
 ```typescript
@@ -62,41 +62,50 @@ const { txHash } = await createChannel({
 });
 ```
 
-#### Retrieve the Channel Id from event logs
+#### Retrieve the Channel ID from Event Logs
 
 Due to EVM limitations, return values from state-changing (write) contract calls are not propagated to off-chain callers.
 
-To get the channel id, you will need to loop through the events within the block that the transaction was mined in.
+To get the channel ID, you will need to loop through the events in the block where the transaction was mined.
 
 ```typescript
 const events = await publicClient.getContractEvents({
   address: CHANNEL_MANAGER_ADDRESS,
   abi: ChannelManagerABI,
   eventName: "ChannelCreated",
-  // search for the event in the block that the transaction was mined in
+  // Search for the event in the block where the transaction was mined
   fromBlock: receipt.blockNumber,
   toBlock: receipt.blockNumber,
 });
+
+let channelId: bigint | undefined;
 
 for (const event of events) {
   if (
     event.eventName === "ChannelCreated" &&
     event.transactionHash === txHash
   ) {
-    console.log("Channel created, id:", event.args.channelId);
+    channelId = event.args.channelId;
+
     return;
   }
 }
+
+if (!channelId) {
+  throw new Error("Channel id not found");
+}
+
+console.log("Channel created, id:", channelId);
 ```
 
-- See full example [here](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/channels-and-hooks/typescript/create-channel.ts)
+- See the full example [here](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/channels-and-hooks/typescript/create-channel.ts).
 - For more details about the SDK functionality, check out our [SDK Reference](/sdk-reference).
 
 ## Solidity Examples
 
 ### Creating a Channel
 
-First, retrieve current channel creation fee:
+First, retrieve the current channel creation fee:
 
 ```solidity
 uint256 fee = channelManager.getChannelCreationFee();
@@ -113,7 +122,7 @@ uint256 channelId = channelManager.createChannel{value: fee}(
 );
 ```
 
-- See full example [here](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/channels-and-hooks/solidity/CreateChannel.s.sol)
+- See the full example [here](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/channels-and-hooks/solidity/CreateChannel.s.sol).
 
 ### Modifying the Hook on a Channel
 
@@ -121,7 +130,7 @@ uint256 channelId = channelManager.createChannel{value: fee}(
 channelManager.setHook(channelId, hookAddress);
 ```
 
-## Writing your own Hooks
+## Writing Your Own Hooks
 
 Hooks allow you to customize channel behavior. To create a custom hook:
 
@@ -132,7 +141,7 @@ Hooks allow you to customize channel behavior. To create a custom hook:
 For all available hook functions, see:
 
 - [IHook](/protocol-reference/interfaces/IHook)
-- [BaseHook](/protocol-reference/interfaces/BaseHook).
+- [BaseHook](/protocol-reference/hooks/BaseHook)
 
 ### Basic Hook Implementation
 
@@ -198,7 +207,7 @@ contract MyCustomHook is BaseHook {
 3. **Security**
 
    - Validate all inputs in hooks
-   - Be careful with external calls
+   - Be cautious with external calls
    - Consider reentrancy risks
    - Test hooks thoroughly
 
@@ -259,19 +268,20 @@ contract TokenCreatorHook is BaseHook {
 1. **Hook Not Working**
 
    - Check if hook permissions are set correctly
-   - Verify hook implementation
-   - Check if hook is properly set on channel
-   - Hooks are called after modifying the contract state, and that any revert from a hook will revert the whole transaction
+   - Verify the hook implementation
+   - Ensure the hook is properly set on the channel
+   - Remember that hooks are called after modifying contract state, and any revert in a hook will revert the entire transaction
 
-1. **Channel Creation Fails**
+2. **Channel Creation Fails**
 
    - Ensure you have enough ETH for the creation fee
-   - Check if channel name/description is valid
-   - Verify metadata is valid JSON
-   - Verify the hook is approved by ECP team
+   - Check if the channel name/description is valid
+   - Verify that metadata is valid JSON
+   - Verify the hook is approved by the ECP team
 
-1. **Hook Reverts**
-   - Check hook implementation for errors
+3. **Hook Reverts**
+
+   - Check the hook implementation for errors
    - Verify input validation
    - Check gas limits
 

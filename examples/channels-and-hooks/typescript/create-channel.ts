@@ -56,8 +56,6 @@ async function main() {
       hash: txHash,
     });
 
-    console.log("Receipt:", receipt);
-
     // Due to EVM limitations,
     // return values from state-changing (write) contract calls are not propagated to off-chain callers,
     // Hence we need to get the channel id from the event logs.
@@ -70,18 +68,24 @@ async function main() {
       toBlock: receipt.blockNumber,
     });
 
+    let channelId: bigint | undefined;
+
     for (const event of events) {
       if (
         event.eventName === "ChannelCreated" &&
         event.transactionHash === txHash
       ) {
-        console.log(event);
-        console.log("Channel created, id:", event.args.channelId);
+        channelId = event.args.channelId;
+
         return;
       }
     }
 
-    console.error("Channel Id not found");
+    if (!channelId) {
+      throw new Error("Channel id not found");
+    }
+
+    console.log("Channel created, id:", channelId);
   } catch (error) {
     console.error("Error:", error);
     process.exit(1);
