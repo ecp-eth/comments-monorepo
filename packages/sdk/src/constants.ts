@@ -1,17 +1,24 @@
 import { toHex } from "viem/utils";
+import type { Hex } from "./core/schemas.js";
 
 /**
  * The address of the `CommentManager` contract.
  * It is created using the CREATE2 opcode so should be identical across chains if no collisions occur.
  */
-export const COMMENT_MANAGER_ADDRESS =
-  "0x65673E54Eea755D6aE7EBD523125886a1342316a" as const;
+export const COMMENT_MANAGER_ADDRESS = (
+  __DEV__
+    ? "0x65673E54Eea755D6aE7EBD523125886a1342316a"
+    : "0x20CD999dB3820957DcbEec62c73e084637B44d08"
+) as Hex;
 
 /**
  * The address of the ChannelManager contract.
  */
-export const CHANNEL_MANAGER_ADDRESS =
-  "0x7950f5fEb11687bdA31341E956e299850Fc9594E" as const;
+export const CHANNEL_MANAGER_ADDRESS = (
+  __DEV__
+    ? "0x7950f5fEb11687bdA31341E956e299850Fc9594E"
+    : "0xBf9f1722Be63863021Cb676e4C024a03bAA0657c"
+) as Hex;
 
 /**
  * The zero address.

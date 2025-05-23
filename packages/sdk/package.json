@@ -90,7 +90,8 @@
     "dev": "tsup --format esm --out-dir dist/esm --watch",
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
-    "build": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
+    "build": "rm -rf dist && NODE_ENV=production npm run build:cjs && NODE_ENV=production npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
+    "build:dev": "rm -rf dist && NODE_ENV=development npm run build:cjs && NODE_ENV=development npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
     "test": "node --experimental-strip-types --no-warnings ./scripts/run-tests.ts",
     "test:watch": "pnpm run test --watch",
     "lint": "eslint \"./src/**/*.ts\""

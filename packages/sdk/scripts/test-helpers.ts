@@ -19,13 +19,16 @@ export function deployContracts(): {
   return extractContractAddresses(deployProcessOutput, true);
 }
 
-export async function deployContractsAsync(deployEnv: "test" | "dev"): Promise<{
+export async function deployContractsAsync(
+  deployEnv: "test" | "dev" | "prod",
+  isSimulation: boolean = false,
+): Promise<{
   commentsAddress: Hex;
   channelManagerAddress: Hex;
   noopHookAddress: Hex;
 }> {
   const deployProcessRawOutput = await promisify(exec)(
-    "pnpm run deploy:" + deployEnv,
+    "pnpm run deploy:" + deployEnv + (isSimulation ? ":simulation" : ""),
     {
       cwd,
       env: process.env,
