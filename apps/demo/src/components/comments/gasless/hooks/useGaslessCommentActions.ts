@@ -123,6 +123,7 @@ export function useGaslessCommentActions({
         isApproved: comment.pendingOperation.type === "gasless-preapproved",
         targetUri: comment.targetUri,
         parentId: comment.parentId ?? undefined,
+        metadata: comment.metadata,
       });
 
       try {
@@ -164,6 +165,7 @@ export function useGaslessCommentActions({
       const pendingOperation = await submitComment({
         content: params.comment.content,
         isApproved: hasApproval,
+        metadata: params.comment.metadata ?? "",
         ...("targetUri" in params.comment
           ? {
               targetUri: params.comment.targetUri,

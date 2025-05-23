@@ -1,4 +1,5 @@
 import { index, onchainTable, relations } from "ponder";
+import type { IndexerAPICommentZeroExSwapOutputSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 export const comments = onchainTable(
   "comments",
@@ -27,6 +28,10 @@ export const comments = onchainTable(
       .notNull(),
     moderationStatusChangedAt: t.timestamp({ withTimezone: true }).notNull(),
     revision: t.integer().notNull().default(0),
+    // find a way to define the column value as object or null
+    zeroExSwap: t
+      .jsonb()
+      .$type<IndexerAPICommentZeroExSwapOutputSchemaType | null>(),
   }),
   (table) => ({
     targetUriIdx: index().on(table.targetUri),

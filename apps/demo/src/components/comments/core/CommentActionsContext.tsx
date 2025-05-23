@@ -1,3 +1,4 @@
+import type { IndexerAPICommentZeroExSwapSchemaType } from "@ecp.eth/sdk/indexer";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
@@ -35,11 +36,13 @@ export type OnPostCommentParams<TExtra = unknown> = {
         author: Hex;
         parentId: Hex;
         content: string;
+        metadata?: string;
       }
     | {
         author: Hex;
         content: string;
         targetUri: string;
+        metadata?: string;
       };
   /**
    * Query key to a query where comment is stored

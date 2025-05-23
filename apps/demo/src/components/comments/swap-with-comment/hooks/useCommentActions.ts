@@ -24,6 +24,7 @@ import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { useDeleteComment } from "@ecp.eth/sdk/comments/react";
 import { useCommentActions as useStandardCommentActions } from "../../standard/hooks/useCommentActions";
 import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
 
 export type SwapWithCommentExtra = {
   quote: QuoteResponseLiquidityAvailableSchemaType;
@@ -127,8 +128,31 @@ export function useCommentActions({
 
       const pendingOperation = await submitCommentMutationFunction({
         address: params.address,
+        zeroExSwap: {
+          from: {
+            amount: quote.sellAmount,
+            address: quote.sellToken,
+            symbol: "",
+          },
+          to: {
+            amount: quote.buyAmount,
+            address: quote.buyToken,
+            symbol: "",
+          },
+        },
         commentRequest: {
           content: comment.content,
+          metadata: JSON.stringify(
+            {
+              swap: true,
+              provider: "0x",
+              from: quote.sellToken,
+              fromAmount: quote.sellAmount.toString(),
+              to: quote.buyToken,
+              toAmount: quote.buyAmount.toString(),
+            },
+            bigintReplacer,
+          ),
           ...("parentId" in comment
             ? {
                 parentId: comment.parentId,

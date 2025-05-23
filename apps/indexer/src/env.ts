@@ -29,6 +29,8 @@ const EnvSchema = z
     MODERATION_TELEGRAM_BOT_TOKEN: z.string().optional(),
     MODERATION_TELEGRAM_CHANNEL_ID: z.string().optional(),
     MODERATION_INDEXER_URL: z.string().url().optional(),
+    PONDER_RPC_URL_8453: z.string().url().optional(),
+    PONDER_START_BLOCK_8453: z.coerce.number().optional(),
   })
   .superRefine((vars, ctx) => {
     if (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) {

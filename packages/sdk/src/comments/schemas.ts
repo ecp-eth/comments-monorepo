@@ -10,7 +10,50 @@ import type {
   CommentData,
   CreateReplyCommentDataParams,
   CreateRootCommentDataParams,
+  Json,
+  JsonObject,
 } from "./types.js";
+
+export const JsonLiteralSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.null(),
+]);
+
+export const JsonSchema: z.ZodType<Json> = z.lazy(() =>
+  z.union([JsonLiteralSchema, z.array(JsonSchema), z.record(JsonSchema)]),
+);
+
+export const JsonObjectSchema: z.ZodType<JsonObject> = z.record(
+  z.string(),
+  JsonSchema,
+);
+
+export const CommentMetadataSchema = z.string().refine(
+  (val) => {
+    if (!val) {
+      return true;
+    }
+
+    try {
+      const parsedValue = JSON.parse(val);
+
+      const parsedValueSchema = JsonObjectSchema.safeParse(parsedValue);
+
+      if (!parsedValueSchema.success) {
+        return false;
+      }
+
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  {
+    message: "Invalid JSON, expecting object",
+  },
+);
 
 export const CommentDataSchema = z.object({
   author: HexSchema,
@@ -22,7 +65,7 @@ export const CommentDataSchema = z.object({
   parentId: HexSchema,
 
   content: z.string(),
-  metadata: z.string(),
+  metadata: CommentMetadataSchema,
   targetUri: z.string(),
   commentType: z.string(),
 
@@ -52,7 +95,7 @@ const BaseCommentInputDataSchema = z.object({
   parentId: HexSchema,
 
   content: z.string(),
-  metadata: z.string(),
+  metadata: CommentMetadataSchema,
   targetUri: z.string(),
   commentType: z.string().default(DEFAULT_COMMENT_TYPE),
 
@@ -106,7 +149,7 @@ export type CommentInputData = z.infer<typeof CommentInputDataSchema>;
 export const EditCommentDataSchema = z.object({
   commentId: HexSchema,
   content: z.string(),
-  metadata: z.string(),
+  metadata: CommentMetadataSchema,
   app: HexSchema,
   nonce: z.coerce.bigint(),
   deadline: z.coerce.bigint(),
@@ -188,7 +231,7 @@ export const EditCommentTypedDataSchema = z.object({
   message: z.object({
     commentId: HexSchema,
     content: z.string(),
-    metadata: z.string(),
+    metadata: CommentMetadataSchema,
     author: HexSchema,
     app: HexSchema,
     nonce: z.coerce.bigint(),

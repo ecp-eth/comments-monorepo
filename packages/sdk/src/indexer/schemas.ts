@@ -41,6 +41,23 @@ export type IndexerAPICommentModerationStatusSchemaType = z.infer<
   typeof IndexerAPICommentModerationStatusSchema
 >;
 
+export const IndexerAPICommentZeroExSwapSchema = z.object({
+  from: z.object({
+    address: HexSchema,
+    amount: z.coerce.bigint(),
+    symbol: z.string(),
+  }),
+  to: z.object({
+    address: HexSchema,
+    amount: z.coerce.bigint(),
+    symbol: z.string(),
+  }),
+});
+
+export type IndexerAPICommentZeroExSwapSchemaType = z.infer<
+  typeof IndexerAPICommentZeroExSwapSchema
+>;
+
 export const IndexerAPICommentSchema = z.object({
   app: HexSchema,
   author: IndexerAPIAuthorDataSchema,
@@ -61,6 +78,7 @@ export const IndexerAPICommentSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   revision: z.number().int(),
+  zeroExSwap: IndexerAPICommentZeroExSwapSchema.nullable(),
 });
 
 export type IndexerAPICommentSchemaType = z.infer<
@@ -73,12 +91,30 @@ export type IndexerAPICommentSchemaType = z.infer<
 const bigintToString = z.coerce.bigint().transform((val) => val.toString());
 const dateToString = z.coerce.date().transform((val) => val.toISOString());
 
+export const IndexerAPICommentZeroExSwapOutputSchema = z.object({
+  from: z.object({
+    address: HexSchema,
+    amount: bigintToString,
+    symbol: z.string(),
+  }),
+  to: z.object({
+    address: HexSchema,
+    amount: bigintToString,
+    symbol: z.string(),
+  }),
+});
+
+export type IndexerAPICommentZeroExSwapOutputSchemaType = z.infer<
+  typeof IndexerAPICommentZeroExSwapOutputSchema
+>;
+
 export const IndexerAPICommentOutputSchema = IndexerAPICommentSchema.extend({
   channelId: bigintToString,
   createdAt: dateToString,
   updatedAt: dateToString,
   moderationStatusChangedAt: dateToString,
   deletedAt: dateToString.nullable(),
+  zeroExSwap: IndexerAPICommentZeroExSwapOutputSchema.nullable(),
 });
 
 export type IndexerAPICommentOutputSchemaType = z.infer<
