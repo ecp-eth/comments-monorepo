@@ -68,6 +68,8 @@ run({
   execArgv: [
     "--experimental-strip-types",
     "--import",
+    "./scripts/test-globals.js",
+    "--import",
     "node-resolve-ts/register",
   ],
 })

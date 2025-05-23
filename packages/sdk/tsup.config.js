@@ -1,4 +1,5 @@
 import { defineConfig } from "tsup";
+import process from "node:process";
 import path from "node:path";
 import fs from "node:fs/promises";
 
@@ -33,4 +34,7 @@ export default defineConfig({
   clean: true,
   sourcemap: false,
   minify: false,
+  define: {
+    __DEV__: JSON.stringify(process.env.NODE_ENV !== "production"),
+  },
 });

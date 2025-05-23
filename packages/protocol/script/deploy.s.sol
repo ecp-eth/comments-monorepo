@@ -20,22 +20,32 @@ contract DeployScript is Script {
   function setUp() public {}
 
   function run(string calldata envInput) public {
+    uint256 fallbackPrivateKey = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
     Env env = getEnv(envInput);
     uint256 salt = uint256(0);
 
+    bool isSimulation = vm.envOr("SIM", false);
+
     address ownerAddress = vm.envAddress("CONTRACT_OWNER_ADDRESS");
     uint256 deployerPrivateKey = env == Env.Prod
-      ? vm.envUint("PRIVATE_KEY") // Anvil test account private key
-      : 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+      ? vm.envOr("PRIVATE_KEY", uint256(fallbackPrivateKey))
+      : fallbackPrivateKey; // Anvil test account private key
+    address deployerAddressFromPrivateKey = vm.addr(deployerPrivateKey);
+    address deployerAddress = vm.envOr(
+      "PROD_DEPLOYER_ADDRESS",
+      deployerAddressFromPrivateKey
+    );
 
-    // by default, foundry runs the script with address 0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38
-    // (although this can be changed by setting --private-key or --sender)
-    // that means `msg.sender` with this in `run()` script function is not the same as the deployer address
-    // we need to set the contract owners to the deployer address initially so that we can call `ownerOnly` functions
-    address deployerAddress = vm.addr(deployerPrivateKey);
-    console.log("Deployer address:", deployerAddress);
+    console.log(
+      string.concat(isSimulation ? "Simulation " : "", "Deployer Address:"),
+      deployerAddress
+    );
 
-    vm.startBroadcast(deployerPrivateKey);
+    if (isSimulation) {
+      vm.startBroadcast(deployerAddress);
+    } else {
+      vm.startBroadcast(deployerPrivateKey);
+    }
 
     if (env == Env.Dev || env == Env.Test) {
       // Fund wallet with real identity for testing
@@ -67,18 +77,24 @@ contract DeployScript is Script {
     }
 
     // Deploy CommentManager first
+    // by default, foundry runs the script with address 0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38
+    // (although this can be changed by setting --private-key or --sender)
+    // that means `msg.sender` with this in `run()` script function is not the same as the deployer address
+    // we need to set the contract owners to the deployer address initially so we can call `ownerOnly` functions
     comments = new CommentManager{ salt: bytes32(salt) }(deployerAddress);
 
     // Deploy ChannelManager with CommentManager address
     channelManager = new ChannelManager{ salt: bytes32(salt) }(deployerAddress);
 
-    // Update contract addresses
-    channelManager.updateCommentsContract(address(comments));
-    comments.updateChannelContract(address(channelManager));
+    if (!isSimulation) {
+      // Update contract addresses
+      channelManager.updateCommentsContract(address(comments));
+      comments.updateChannelContract(address(channelManager));
 
-    // Set contract owners
-    channelManager.transferOwnership(ownerAddress);
-    comments.transferOwnership(ownerAddress);
+      // Set contract owners
+      channelManager.transferOwnership(ownerAddress);
+      comments.transferOwnership(ownerAddress);
+    }
 
     console.log("ChannelManager deployed at", address(channelManager));
     console.log("CommentManager deployed at", address(comments));

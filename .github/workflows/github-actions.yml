@@ -146,9 +146,19 @@ jobs:
           fi
         shell: bash
 
-      - name: "SDK: Ensure SDK contract addreses are up to date"
+      - name: "SDK: Ensure SDK production contract addreses are up to date"
         run: node --experimental-strip-types --no-warnings ./scripts/check-contract-addresses.ts
         working-directory: packages/sdk
+        env:
+          NODE_ENV: "production"
+
+      - name: "SDK: Ensure SDK development contract addreses are up to date"
+        run: |
+          pnpm run build:dev
+          node --experimental-strip-types --no-warnings ./scripts/check-contract-addresses.ts
+        working-directory: packages/sdk
+        env:
+          NODE_ENV: "development"
 
   build-docs:
     timeout-minutes: 15

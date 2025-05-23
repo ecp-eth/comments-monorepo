@@ -63,6 +63,7 @@ async function startAnvil() {
 }
 
 async function checkContractAddresses() {
+  const isProd = process.env.NODE_ENV === "production";
   function exit(code: number) {
     killProcess();
     process.exit(code);
@@ -76,14 +77,17 @@ async function checkContractAddresses() {
     process.exit(1);
   });
 
-  const deployResult = await deployContractsAsync("dev");
+  const deployResult = await deployContractsAsync(
+    isProd ? "prod" : "dev",
+    true,
+  );
 
   if (
     deployResult.channelManagerAddress !== CHANNEL_MANAGER_ADDRESS ||
     deployResult.commentsAddress !== COMMENT_MANAGER_ADDRESS
   ) {
     console.error(
-      `Contract addresses are not up to date:
+      `${isProd ? "Production" : "Development"} contract addresses are out of sync:
       - COMMENT_MANAGER_ADDRESS: Latest address ${deployResult.commentsAddress}, current SDK address ${COMMENT_MANAGER_ADDRESS}
       - CHANNEL_MANAGER_ADDRESS: Latest address ${deployResult.channelManagerAddress}, current SDK address ${CHANNEL_MANAGER_ADDRESS}`,
     );
