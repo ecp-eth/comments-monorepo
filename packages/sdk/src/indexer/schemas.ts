@@ -41,15 +41,21 @@ export type IndexerAPICommentModerationStatusSchemaType = z.infer<
   typeof IndexerAPICommentModerationStatusSchema
 >;
 
+export const IndexerAPIZeroExTokenAmountSchema = z.coerce
+  .string()
+  .regex(/^\d+(\.\d+)?$/, {
+    message: "Amount must be a number with optional decimal part",
+  });
+
 export const IndexerAPICommentZeroExSwapSchema = z.object({
   from: z.object({
     address: HexSchema,
-    amount: z.coerce.bigint(),
+    amount: IndexerAPIZeroExTokenAmountSchema,
     symbol: z.string(),
   }),
   to: z.object({
     address: HexSchema,
-    amount: z.coerce.bigint(),
+    amount: IndexerAPIZeroExTokenAmountSchema,
     symbol: z.string(),
   }),
 });
@@ -91,30 +97,12 @@ export type IndexerAPICommentSchemaType = z.infer<
 const bigintToString = z.coerce.bigint().transform((val) => val.toString());
 const dateToString = z.coerce.date().transform((val) => val.toISOString());
 
-export const IndexerAPICommentZeroExSwapOutputSchema = z.object({
-  from: z.object({
-    address: HexSchema,
-    amount: bigintToString,
-    symbol: z.string(),
-  }),
-  to: z.object({
-    address: HexSchema,
-    amount: bigintToString,
-    symbol: z.string(),
-  }),
-});
-
-export type IndexerAPICommentZeroExSwapOutputSchemaType = z.infer<
-  typeof IndexerAPICommentZeroExSwapOutputSchema
->;
-
 export const IndexerAPICommentOutputSchema = IndexerAPICommentSchema.extend({
   channelId: bigintToString,
   createdAt: dateToString,
   updatedAt: dateToString,
   moderationStatusChangedAt: dateToString,
   deletedAt: dateToString.nullable(),
-  zeroExSwap: IndexerAPICommentZeroExSwapOutputSchema.nullable(),
 });
 
 export type IndexerAPICommentOutputSchemaType = z.infer<

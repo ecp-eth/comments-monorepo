@@ -3,7 +3,8 @@ import { env } from "../env";
 import { base } from "viem/chains";
 import { Chain, createPublicClient, http, PublicClient } from "viem";
 import { parseSwap } from "@0x/0x-parser";
-import { HexSchema, type Hex } from "@ecp.eth/sdk/core";
+import { type Hex } from "@ecp.eth/sdk/core";
+import { IndexerAPICommentZeroExSwapSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { z } from "zod";
 
 const ZeroExCommentMetadataSchema = z.preprocess(
@@ -19,12 +20,9 @@ const ZeroExCommentMetadataSchema = z.preprocess(
     }
   },
   z.object({
-    from: HexSchema,
-    to: HexSchema,
-    fromAmount: z.coerce.bigint().transform((value) => value.toString()),
-    toAmount: z.coerce.bigint().transform((value) => value.toString()),
     swap: z.literal(true),
     provider: z.literal("0x"),
+    data: IndexerAPICommentZeroExSwapSchema,
   }),
 );
 
@@ -32,17 +30,11 @@ type ZeroExSwap = {
   from: {
     symbol: string;
     address: Hex;
-    /**
-     * Big int as string
-     */
     amount: string;
   };
   to: {
     symbol: string;
     address: Hex;
-    /**
-     * Big int as string
-     */
     amount: string;
   };
 };
@@ -110,8 +102,6 @@ export function createZeroExSwapResolver(
         return null;
       }
 
-      // @todo fix, this parses a float instead of bigint
-      // so essentially it uses the value you entered
       const swap = await parseSwap({
         publicClient,
         transactionHash: event.transaction.hash,
@@ -123,14 +113,14 @@ export function createZeroExSwapResolver(
 
       return {
         from: {
-          symbol: swap.tokenOut.symbol,
-          address: swap.tokenOut.address as Hex,
-          amount: swap.tokenOut.amount,
-        },
-        to: {
           symbol: swap.tokenIn.symbol,
           address: swap.tokenIn.address as Hex,
           amount: swap.tokenIn.amount,
+        },
+        to: {
+          symbol: swap.tokenOut.symbol,
+          address: swap.tokenOut.address as Hex,
+          amount: swap.tokenOut.amount,
         },
       };
     },

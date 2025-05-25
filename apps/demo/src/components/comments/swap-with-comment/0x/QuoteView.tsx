@@ -6,9 +6,8 @@ import {
 } from "./constants";
 import Image from "next/image";
 import {
-  PriceResponseLiquidityAvailableSchemaType,
   QuoteRequestQueryParamsSchema,
-  QuoteResponseLiquidityAvailableSchemaType,
+  type QuoteResponseLiquidityAvailableSchemaType,
   QuoteResponseSchema,
   SwapAPIBadRequestResponseSchema,
 } from "./schemas";
@@ -21,18 +20,27 @@ import {
   SwapAPITokenNotSupportedError,
 } from "./errors";
 import { useEffect } from "react";
+import type { PriceViewState } from "./PriceView";
 
-export default function QuoteView({
+export type QuoteViewState = {
+  quote: QuoteResponseLiquidityAvailableSchemaType;
+  price: PriceViewState;
+};
+
+export type OnQuoteFunction = (state: QuoteViewState) => void;
+
+export function QuoteView({
   taker,
-  price,
-  setQuote,
+  priceViewState,
+  onQuote,
   chainId,
 }: {
   taker: Address | undefined;
-  price: PriceResponseLiquidityAvailableSchemaType;
-  setQuote: (quote: QuoteResponseLiquidityAvailableSchemaType) => void;
+  priceViewState: PriceViewState;
+  onQuote: OnQuoteFunction;
   chainId: number;
 }) {
+  const { price } = priceViewState;
   const sellTokenInfo = BASE_TOKENS_BY_ADDRESS[price.sellToken.toLowerCase()];
   const buyTokenInfo = BASE_TOKENS_BY_ADDRESS[price.buyToken.toLowerCase()];
 
@@ -101,9 +109,9 @@ export default function QuoteView({
 
   useEffect(() => {
     if (quoteQuery.data) {
-      setQuote(quoteQuery.data);
+      onQuote({ quote: quoteQuery.data, price: priceViewState });
     }
-  }, [quoteQuery.data, setQuote]);
+  }, [onQuote, priceViewState, quoteQuery.data]);
 
   if (quoteQuery.isLoading) {
     return <div>Getting best quote...</div>;

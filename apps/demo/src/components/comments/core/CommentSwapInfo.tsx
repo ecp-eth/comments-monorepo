@@ -1,7 +1,6 @@
 import type { Comment } from "@ecp.eth/shared/schemas";
 import Image from "next/image";
 import { BASE_TOKENS_BY_ADDRESS } from "../swap-with-comment/0x/constants";
-import { formatUnits } from "viem";
 
 type CommentSwapInfoProps = {
   swap: NonNullable<Comment["zeroExSwap"]>;
@@ -15,12 +14,6 @@ export function CommentSwapInfo({ swap }: CommentSwapInfoProps) {
     return null;
   }
 
-  const sellAmount = formatUnits(
-    BigInt(swap.from.amount),
-    sellTokenInfo.decimals,
-  );
-  const buyAmount = formatUnits(BigInt(swap.to.amount), buyTokenInfo.decimals);
-
   return (
     <div className="flex items-center gap-2">
       <div className="flex items-center gap-1">
@@ -32,7 +25,7 @@ export function CommentSwapInfo({ swap }: CommentSwapInfoProps) {
           height={16}
         />
         <div className="text-sm text-gray-500">
-          {sellAmount} {sellTokenInfo.symbol}
+          {swap.from.amount} {sellTokenInfo.symbol}
         </div>
       </div>
 
@@ -47,7 +40,7 @@ export function CommentSwapInfo({ swap }: CommentSwapInfoProps) {
           height={16}
         />
         <div className="text-sm text-gray-500">
-          {buyAmount} {buyTokenInfo.symbol}
+          {swap.to.amount} {buyTokenInfo.symbol}
         </div>
       </div>
     </div>

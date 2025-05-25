@@ -4,44 +4,36 @@ import {
 } from "../core/CommentForm";
 import { useState } from "react";
 import { useAccount, useChainId } from "wagmi";
-import { PriceView } from "./0x/PriceView";
-import QuoteView from "./0x/QuoteView";
-import type {
-  PriceResponseLiquidityAvailableSchemaType,
-  QuoteResponseLiquidityAvailableSchemaType,
-} from "./0x/schemas";
+import { PriceView, type PriceViewState } from "./0x/PriceView";
+import { QuoteView, type QuoteViewState } from "./0x/QuoteView";
 import { SwapWithCommentExtra } from "./hooks/useCommentActions";
 
 export function CommentForm({ disabled, ...props }: CommentFormProps) {
-  const [finalizedPrice, setFinalize] =
-    useState<PriceResponseLiquidityAvailableSchemaType | null>(null);
-  const [quote, setQuote] =
-    useState<QuoteResponseLiquidityAvailableSchemaType | null>(null);
+  const [finalizedPriceState, setFinalize] = useState<PriceViewState | null>(
+    null,
+  );
+  const [quoteViewState, setQuote] = useState<QuoteViewState | null>(null);
   const { address } = useAccount();
   const chainId = useChainId();
 
   return (
     <>
-      {finalizedPrice ? (
+      {finalizedPriceState ? (
         <QuoteView
           taker={address}
-          price={finalizedPrice}
-          setQuote={setQuote}
+          priceViewState={finalizedPriceState}
+          onQuote={setQuote}
           chainId={chainId}
         />
       ) : (
-        <PriceView
-          taker={address}
-          setFinalize={setFinalize}
-          chainId={chainId}
-        />
+        <PriceView taker={address} onFinalize={setFinalize} chainId={chainId} />
       )}
       <BaseCommentForm<SwapWithCommentExtra>
         {...props}
-        disabled={!finalizedPrice || !quote || disabled}
+        disabled={!finalizedPriceState || !quoteViewState || disabled}
         submitIdleLabel="Swap"
         submitPendingLabel="Posting..."
-        extra={quote ? { quote } : undefined}
+        extra={quoteViewState ? { quoteViewState: quoteViewState } : undefined}
         onSubmitSuccess={() => {
           setQuote(null);
           setFinalize(null);

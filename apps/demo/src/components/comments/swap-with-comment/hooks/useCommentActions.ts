@@ -19,15 +19,16 @@ import {
 } from "@ecp.eth/shared/hooks";
 import { submitCommentMutationFunction } from "../../standard/queries";
 import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-import type { QuoteResponseLiquidityAvailableSchemaType } from "../0x/schemas";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { useDeleteComment } from "@ecp.eth/sdk/comments/react";
 import { useCommentActions as useStandardCommentActions } from "../../standard/hooks/useCommentActions";
 import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
+import type { QuoteViewState } from "../0x/QuoteView";
+import type { IndexerAPICommentZeroExSwapSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 export type SwapWithCommentExtra = {
-  quote: QuoteResponseLiquidityAvailableSchemaType;
+  quoteViewState: QuoteViewState;
 };
 
 type UseCommentActionsProps = {
@@ -111,7 +112,9 @@ export function useCommentActions({
         throw new Error("Missing extra data");
       }
 
-      const { quote } = params.extra;
+      const { quoteViewState } = params.extra;
+
+      const { quote, price } = quoteViewState;
 
       // (1) Sign the Permit2 EIP-712 message returned from quote
       const signature = await signTypedDataAsync(quote.permit2.eip712);
@@ -126,30 +129,29 @@ export function useCommentActions({
       const sigLengthHex = signatureLengthInHex;
       const sig = signature;
 
+      const zeroExSwap: IndexerAPICommentZeroExSwapSchemaType = {
+        from: {
+          amount: price.from.amount,
+          address: quote.sellToken,
+          symbol: price.from.token.symbol,
+        },
+        to: {
+          amount: price.to.amount,
+          address: quote.buyToken,
+          symbol: price.to.token.symbol,
+        },
+      };
+
       const pendingOperation = await submitCommentMutationFunction({
         address: params.address,
-        zeroExSwap: {
-          from: {
-            amount: quote.sellAmount,
-            address: quote.sellToken,
-            symbol: "",
-          },
-          to: {
-            amount: quote.buyAmount,
-            address: quote.buyToken,
-            symbol: "",
-          },
-        },
+        zeroExSwap,
         commentRequest: {
           content: comment.content,
           metadata: JSON.stringify(
             {
               swap: true,
               provider: "0x",
-              from: quote.sellToken,
-              fromAmount: quote.sellAmount.toString(),
-              to: quote.buyToken,
-              toAmount: quote.buyAmount.toString(),
+              data: zeroExSwap,
             },
             bigintReplacer,
           ),

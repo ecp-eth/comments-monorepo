@@ -175,20 +175,9 @@ export function formatAuthor(
 }
 
 function formatComment(comment: CommentSelectType) {
+  console.log(comment.zeroExSwap);
   return {
     ...comment,
-    zeroExSwap: comment.zeroExSwap
-      ? {
-          from: {
-            ...comment.zeroExSwap.from,
-            amount: BigInt(comment.zeroExSwap.from.amount),
-          },
-          to: {
-            ...comment.zeroExSwap.to,
-            amount: BigInt(comment.zeroExSwap.to.amount),
-          },
-        }
-      : null,
     id: HexSchema.parse(comment.id),
     content: comment.deletedAt ? "[deleted]" : comment.content,
     cursor: getCommentCursor(comment.id as Hex, comment.createdAt),
