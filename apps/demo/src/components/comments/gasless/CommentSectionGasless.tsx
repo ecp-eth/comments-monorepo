@@ -38,10 +38,10 @@ import { useApprovalStatus } from "@/hooks/useApprovalStatus";
 import { chain } from "@/lib/wagmi";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { useGaslessCommentActions } from "./hooks/useGaslessCommentActions";
-import { CommentActionsProvider } from "../core/CommentActionsContext";
 import { CommentItem } from "../core/CommentItem";
 import { CommentForm } from "../core/CommentForm";
 import { createRootCommentsQueryKey } from "../core/queries";
+import { CommentActionsProvider } from "./context";
 
 export function CommentSectionGasless() {
   const { address: viewer } = useAccount();

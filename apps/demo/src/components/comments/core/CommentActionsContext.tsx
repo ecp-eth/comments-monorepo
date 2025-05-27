@@ -122,20 +122,6 @@ export type CommentActionsContextType<TExtraPostComment = unknown> = {
 export const CommentActionsContext =
   createContext<CommentActionsContextType<any> | null>(null);
 
-export function CommentActionsProvider<TExtraPostComment = unknown>({
-  children,
-  value,
-}: {
-  children: React.ReactNode;
-  value: CommentActionsContextType<TExtraPostComment>;
-}) {
-  return (
-    <CommentActionsContext.Provider value={value}>
-      {children}
-    </CommentActionsContext.Provider>
-  );
-}
-
 export function useCommentActions<
   TExtraPostComment = unknown,
 >(): CommentActionsContextType<TExtraPostComment> {
@@ -148,4 +134,34 @@ export function useCommentActions<
   }
 
   return context;
+}
+
+export function createCommentActionsContext<TExtraPostComment>() {
+  return {
+    CommentActionsProvider({
+      children,
+      value,
+    }: {
+      children: React.ReactNode;
+      value: CommentActionsContextType<TExtraPostComment>;
+    }) {
+      return (
+        <CommentActionsContext.Provider value={value}>
+          {children}
+        </CommentActionsContext.Provider>
+      );
+    },
+
+    useCommentActions(): CommentActionsContextType<TExtraPostComment> {
+      const context = useContext(CommentActionsContext);
+
+      if (!context) {
+        throw new Error(
+          "useCommentActions must be used within a CommentActionsProvider",
+        );
+      }
+
+      return context;
+    },
+  };
 }
