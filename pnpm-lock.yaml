@@ -448,6 +448,9 @@ importers:
 
   apps/indexer:
     dependencies:
+      '@0x/0x-parser':
+        specifier: ^2.10.1
+        version: 2.10.1(viem@2.29.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.2))
       '@ecp.eth/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
@@ -850,6 +853,12 @@ packages:
     peerDependenciesMeta:
       graphql:
         optional: true
+
+  '@0x/0x-parser@2.10.1':
+    resolution: {integrity: sha512-0bE9nAv5ygOHIesD3JQuOHElwXk3uiuebAf41I1wxvyWBL749m6u4uLstRFu2vLVZx9qLR3AGhgPXpaMWQVzIg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      viem: ~2.29.2
 
   '@account-abstraction/contracts@0.8.0':
     resolution: {integrity: sha512-8krPx/gpnoT+5xAroagVCbeA7FbUigMZWXFKKPm+oghyr29Dksssdx5sI7xGv9212i4JPaDDUGFk58dpuwVgHA==}
@@ -11488,6 +11497,10 @@ snapshots:
   '@0no-co/graphql.web@1.1.2(graphql@16.10.0)':
     optionalDependencies:
       graphql: 16.10.0
+
+  '@0x/0x-parser@2.10.1(viem@2.29.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.2))':
+    dependencies:
+      viem: 2.29.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.2)
 
   '@account-abstraction/contracts@0.8.0':
     dependencies:

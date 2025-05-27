@@ -50,6 +50,19 @@ function fetchCommentReplies(options): Promise<{
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
   }[];
 }>;
 ```
@@ -109,6 +122,19 @@ Fetch replies for a comment from the Indexer API
      `targetUri`: `string`;
      `txHash`: `` `0x${string}` ``;
      `updatedAt`: `Date`;
+     `zeroExSwap`:   \| `null`
+        \| \{
+        `from`: \{
+           `address`: `` `0x${string}` ``;
+           `amount`: `string`;
+           `symbol`: `string`;
+        \};
+        `to`: \{
+           `address`: `` `0x${string}` ``;
+           `amount`: `string`;
+           `symbol`: `string`;
+        \};
+      \};
   \}[];
 \}\>
 

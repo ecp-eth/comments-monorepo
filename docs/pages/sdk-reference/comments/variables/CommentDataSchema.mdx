@@ -16,7 +16,7 @@ const CommentDataSchema: ZodObject<{
   createdAt: ZodBigInt;
   deadline: ZodBigInt;
   hookData: ZodString;
-  metadata: ZodString;
+  metadata: ZodEffects<ZodString, string, string>;
   nonce: ZodBigInt;
   parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
   targetUri: ZodString;
@@ -52,4 +52,4 @@ const CommentDataSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:15](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L15)
+Defined in: [packages/sdk/src/comments/schemas.ts:58](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L58)

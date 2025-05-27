@@ -35,11 +35,13 @@ export type OnPostCommentParams<TExtra = unknown> = {
         author: Hex;
         parentId: Hex;
         content: string;
+        metadata?: string;
       }
     | {
         author: Hex;
         content: string;
         targetUri: string;
+        metadata?: string;
       };
   /**
    * Query key to a query where comment is stored
@@ -118,21 +120,7 @@ export type CommentActionsContextType<TExtraPostComment = unknown> = {
 };
 
 export const CommentActionsContext =
-  createContext<CommentActionsContextType | null>(null);
-
-export function CommentActionsProvider({
-  children,
-  value,
-}: {
-  children: React.ReactNode;
-  value: CommentActionsContextType;
-}) {
-  return (
-    <CommentActionsContext.Provider value={value}>
-      {children}
-    </CommentActionsContext.Provider>
-  );
-}
+  createContext<CommentActionsContextType<any> | null>(null);
 
 export function useCommentActions<
   TExtraPostComment = unknown,
@@ -146,4 +134,34 @@ export function useCommentActions<
   }
 
   return context;
+}
+
+export function createCommentActionsContext<TExtraPostComment>() {
+  return {
+    CommentActionsProvider({
+      children,
+      value,
+    }: {
+      children: React.ReactNode;
+      value: CommentActionsContextType<TExtraPostComment>;
+    }) {
+      return (
+        <CommentActionsContext.Provider value={value}>
+          {children}
+        </CommentActionsContext.Provider>
+      );
+    },
+
+    useCommentActions(): CommentActionsContextType<TExtraPostComment> {
+      const context = useContext(CommentActionsContext);
+
+      if (!context) {
+        throw new Error(
+          "useCommentActions must be used within a CommentActionsProvider",
+        );
+      }
+
+      return context;
+    },
+  };
 }

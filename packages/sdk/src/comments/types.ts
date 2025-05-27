@@ -6,6 +6,14 @@ import type {
 import type { CommentManagerABI } from "../abis.js";
 import type { Hex } from "../core/schemas.js";
 
+export type JsonLiteral = string | number | boolean | null;
+
+export type JsonArray = Json[];
+
+export type JsonObject = { [key: string]: Json };
+
+export type Json = JsonLiteral | JsonArray | JsonObject;
+
 export type CommentManagerABIType = typeof CommentManagerABI;
 
 /**
@@ -31,7 +39,7 @@ export type CreateCommentDataParamsShared = {
    */
   commentType?: string;
   /** Metadata about the comment */
-  metadata?: object;
+  metadata?: JsonObject;
   /** The address of the author of the comment */
   author: Hex;
   /** The address of the app signer */

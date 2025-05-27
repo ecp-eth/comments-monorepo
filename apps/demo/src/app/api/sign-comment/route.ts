@@ -40,7 +40,7 @@ export async function POST(
 
   const passedCommentData = parsedBodyResult.data;
 
-  const { content, author } = passedCommentData;
+  const { content, author, metadata } = passedCommentData;
 
   // const { content, targetUri, parentId, author } = parsedBodyResult.data;
 
@@ -97,6 +97,7 @@ export async function POST(
 
   const commentData = createCommentData({
     content,
+    metadata: metadata ? JSON.parse(metadata) : undefined,
     author,
     app: app.address,
     nonce,

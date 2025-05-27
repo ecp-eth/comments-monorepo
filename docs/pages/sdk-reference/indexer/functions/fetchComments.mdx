@@ -89,12 +89,38 @@ function fetchComments(options): Promise<{
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
+           zeroExSwap:   | null
+              | {
+              from: {
+                 address: `0x${(...)}`;
+                 amount: string;
+                 symbol: string;
+              };
+              to: {
+                 address: `0x${(...)}`;
+                 amount: string;
+                 symbol: string;
+              };
+            };
         }[];
      };
      revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
   }[];
 }>;
 ```
@@ -193,12 +219,38 @@ Fetch comments from the Indexer API
            `targetUri`: `string`;
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
+           `zeroExSwap`:   \| `null`
+              \| \{
+              `from`: \{
+                 `address`: `` `0x${(...)}` ``;
+                 `amount`: `string`;
+                 `symbol`: `string`;
+              \};
+              `to`: \{
+                 `address`: `` `0x${(...)}` ``;
+                 `amount`: `string`;
+                 `symbol`: `string`;
+              \};
+            \};
         \}[];
      \};
      `revision`: `number`;
      `targetUri`: `string`;
      `txHash`: `` `0x${string}` ``;
      `updatedAt`: `Date`;
+     `zeroExSwap`:   \| `null`
+        \| \{
+        `from`: \{
+           `address`: `` `0x${string}` ``;
+           `amount`: `string`;
+           `symbol`: `string`;
+        \};
+        `to`: \{
+           `address`: `` `0x${string}` ``;
+           `amount`: `string`;
+           `symbol`: `string`;
+        \};
+      \};
   \}[];
 \}\>
 

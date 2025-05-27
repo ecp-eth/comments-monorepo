@@ -2,6 +2,7 @@ import {
   IndexerAPIAuthorDataSchema,
   IndexerAPICommentSchema,
   type IndexerAPICommentSchemaType,
+  IndexerAPICommentZeroExSwapSchema,
   IndexerAPICursorPaginationSchema,
   type IndexerAPICursorPaginationSchemaType,
   IndexerAPIExtraSchema,
@@ -65,6 +66,7 @@ export const PendingPostCommentOperationSchema = z.object({
   chainId: z.number().positive().int(),
   response: SignCommentResponseClientSchema,
   resolvedAuthor: IndexerAPIAuthorDataSchema.optional(),
+  zeroExSwap: IndexerAPICommentZeroExSwapSchema.optional(),
   state: z.discriminatedUnion("status", [
     z.object({
       status: z.literal("pending"),

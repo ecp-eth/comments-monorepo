@@ -30,3 +30,21 @@ pnpm dev
 ```
 
 This will start a local anvil node, deploy the contracts, start the indexer with API, and a demo frontend that integrates ECP.
+
+### Set up guide for Swap example
+
+#### Demo app:
+
+If you are running locally, you need to make sure you are using a chain that:
+
+- supports EIP 7702
+- our contract is deployed on it
+- supports [0x swaps](https://0x.org)
+
+Then make sure you are using that chain in the demo app. In `lib/wagmi.ts` change the `chain` to the chain you are using.
+
+**Important: We used Metamask and `base` to test the EIP 7702. Make sure that chain you are testing is also supported by Metamask.**
+
+#### Indexer:
+
+Based on chain you choose, you need to provide `PONDER_RPC_URL_{chain_id}` in `.env` file to enable indexing of the chain.

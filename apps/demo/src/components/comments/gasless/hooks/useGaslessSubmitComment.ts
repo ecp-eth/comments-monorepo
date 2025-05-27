@@ -30,11 +30,13 @@ type SubmitGaslessCommentVariables =
       isApproved: boolean;
       content: string;
       targetUri: string;
+      metadata: string;
     }
   | {
       isApproved: boolean;
       content: string;
       parentId: Hex;
+      metadata: string;
     };
 
 type SubmitGaslessCommentVariablesInternal =
@@ -42,11 +44,13 @@ type SubmitGaslessCommentVariablesInternal =
       author: Hex;
       content: string;
       targetUri: string;
+      metadata: string;
     }
   | {
       author: Hex;
       content: string;
       parentId: Hex;
+      metadata: string;
     };
 
 type PostPriorNotApprovedResult = GaslessPostCommentResponseSchemaType &

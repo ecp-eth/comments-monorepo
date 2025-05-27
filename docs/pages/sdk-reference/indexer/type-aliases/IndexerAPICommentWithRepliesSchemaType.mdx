@@ -78,16 +78,42 @@ type IndexerAPICommentWithRepliesSchemaType = {
         targetUri: string;
         txHash: `0x${string}`;
         updatedAt: Date;
+        zeroExSwap:   | null
+           | {
+           from: {
+              address: `0x${string}`;
+              amount: string;
+              symbol: string;
+           };
+           to: {
+              address: `0x${string}`;
+              amount: string;
+              symbol: string;
+           };
+         };
      }[];
   };
   revision: number;
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: Date;
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:125](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L125)
+Defined in: [packages/sdk/src/indexer/schemas.ts:149](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L149)
 
 ## Type declaration
 
@@ -301,6 +327,19 @@ replies: {
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
   }[];
 };
 ```
@@ -396,6 +435,19 @@ results: {
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: Date;
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
 }[];
 ```
 
@@ -421,4 +473,23 @@ txHash: `0x${string}` = HexSchema;
 
 ```ts
 updatedAt: Date;
+```
+
+### zeroExSwap
+
+```ts
+zeroExSwap: 
+  | null
+  | {
+  from: {
+     address: `0x${string}`;
+     amount: string;
+     symbol: string;
+  };
+  to: {
+     address: `0x${string}`;
+     amount: string;
+     symbol: string;
+  };
+};
 ```

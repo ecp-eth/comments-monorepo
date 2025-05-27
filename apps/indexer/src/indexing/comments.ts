@@ -13,7 +13,8 @@ import {
   insertCommentModerationStatus,
 } from "../management/services/moderation";
 import { notifyCommentPendingModeration } from "../lib/telegram-notifications";
-import type { Hex } from "@ecp.eth/sdk/core/schemas";
+import { type Hex } from "@ecp.eth/sdk/core/schemas";
+import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
 
 const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
 
@@ -24,6 +25,11 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     if (await getMutedAccount(event.args.author)) {
       return;
     }
+
+    const zeroExSwap = await zeroExSwapResolver.resolveFromCommentAddedEvent({
+      event,
+      context,
+    });
 
     const createdAt = new Date(Number(event.args.createdAt) * 1000);
     const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
@@ -95,6 +101,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
             moderationStatus: defaultModerationStatus,
             moderationStatusChangedAt: createdAt,
           }),
+      zeroExSwap,
     });
 
     // this is new comment so ensure we use correct default moderation status

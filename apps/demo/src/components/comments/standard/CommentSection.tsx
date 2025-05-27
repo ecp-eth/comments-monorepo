@@ -19,8 +19,8 @@ import { useAccount } from "wagmi";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { CommentItem } from "../core/CommentItem";
 import { useCommentActions } from "./hooks/useCommentActions";
-import { CommentActionsProvider } from "../core/CommentActionsContext";
 import { createRootCommentsQueryKey } from "../core/queries";
+import { CommentActionsProvider } from "./context";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();

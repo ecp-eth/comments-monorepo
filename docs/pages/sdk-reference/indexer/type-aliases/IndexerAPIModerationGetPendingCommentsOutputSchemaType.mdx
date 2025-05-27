@@ -47,11 +47,24 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: string;
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
   }[];
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:199](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L199)
+Defined in: [packages/sdk/src/indexer/schemas.ts:223](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L223)
 
 ## Type declaration
 
@@ -132,5 +145,18 @@ results: {
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: string;
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
 }[];
 ```

@@ -12,6 +12,7 @@ import { MoreVerticalIcon } from "lucide-react";
 import { CommentAuthor } from "./CommentAuthor";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
+import { CommentSwapInfo } from "./CommentSwapInfo";
 
 type CommentProps = {
   comment: CommentType;
@@ -82,6 +83,11 @@ export function Comment({
             </DropdownMenu>
           )}
       </div>
+      {comment.zeroExSwap && (
+        <div className="mb-2">
+          <CommentSwapInfo swap={comment.zeroExSwap} />
+        </div>
+      )}
       <div
         className={cn(
           "mb-2 break-words hyphens-auto text-foreground",
