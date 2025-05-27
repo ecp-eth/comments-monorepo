@@ -2,12 +2,17 @@ import { z } from "zod";
 import { CHANNEL_MANAGER_ADDRESS, ZERO_ADDRESS } from "../constants.js";
 import { HexSchema } from "../core/schemas.js";
 import type { Hex } from "../core/schemas.js";
+import type {
+  WaitableWriteContractHelperResult,
+  WriteContractHelperResult,
+} from "../core/types.js";
 import { ChannelManagerABI } from "../abis.js";
-import { isZeroHex } from "../core/utils.js";
+import { createWaitableWriteContractHelper, isZeroHex } from "../core/utils.js";
 import type {
   ContractWriteFunctions,
   ContractReadFunctions,
   ChannelPermissions,
+  ChannelManagerABIType,
 } from "./types.js";
 
 export type CreateChannelParams = {
@@ -40,9 +45,10 @@ export type CreateChannelParams = {
   writeContract: ContractWriteFunctions["createChannel"];
 };
 
-export type CreateChannelResult = {
-  txHash: Hex;
-};
+export type CreateChannelResult = WaitableWriteContractHelperResult<
+  ChannelManagerABIType,
+  "ChannelCreated"
+>;
 
 const CreateChannelParamsSchema = z.object({
   name: z.string().trim().min(1),
@@ -59,24 +65,28 @@ const CreateChannelParamsSchema = z.object({
  * @param params - The parameters for creating a new channel
  * @returns The transaction hash of the created channel
  */
-export async function createChannel(
-  params: CreateChannelParams,
-): Promise<CreateChannelResult> {
-  const { name, description, metadata, hook, channelManagerAddress, fee } =
-    CreateChannelParamsSchema.parse(params);
+export const createChannel = createWaitableWriteContractHelper(
+  async (params: CreateChannelParams): Promise<WriteContractHelperResult> => {
+    const { name, description, metadata, hook, channelManagerAddress, fee } =
+      CreateChannelParamsSchema.parse(params);
 
-  const txHash = await params.writeContract({
-    address: channelManagerAddress,
+    const txHash = await params.writeContract({
+      address: channelManagerAddress,
+      abi: ChannelManagerABI,
+      functionName: "createChannel",
+      args: [name, description, metadata, hook],
+      value: fee,
+    });
+
+    return {
+      txHash,
+    };
+  },
+  {
     abi: ChannelManagerABI,
-    functionName: "createChannel",
-    args: [name, description, metadata, hook],
-    value: fee,
-  });
-
-  return {
-    txHash,
-  };
-}
+    eventName: "ChannelCreated",
+  },
+);
 
 export type GetChannelParams = {
   /**
@@ -161,9 +171,10 @@ export type UpdateChannelParams = {
   writeContract: ContractWriteFunctions["updateChannel"];
 };
 
-export type UpdateChannelResult = {
-  txHash: Hex;
-};
+export type UpdateChannelResult = WaitableWriteContractHelperResult<
+  ChannelManagerABIType,
+  "ChannelUpdated"
+>;
 
 const UpdateChannelParamsSchema = z.object({
   channelId: z.bigint(),
@@ -179,23 +190,27 @@ const UpdateChannelParamsSchema = z.object({
  * @param params - The parameters for updating a channel
  * @returns The transaction hash of the updated channel
  */
-export async function updateChannel(
-  params: UpdateChannelParams,
-): Promise<UpdateChannelResult> {
-  const { channelId, name, description, metadata, channelManagerAddress } =
-    UpdateChannelParamsSchema.parse(params);
+export const updateChannel = createWaitableWriteContractHelper(
+  async (params: UpdateChannelParams): Promise<WriteContractHelperResult> => {
+    const { channelId, name, description, metadata, channelManagerAddress } =
+      UpdateChannelParamsSchema.parse(params);
 
-  const txHash = await params.writeContract({
-    address: channelManagerAddress,
+    const txHash = await params.writeContract({
+      address: channelManagerAddress,
+      abi: ChannelManagerABI,
+      functionName: "updateChannel",
+      args: [channelId, name, description, metadata],
+    });
+
+    return {
+      txHash,
+    };
+  },
+  {
     abi: ChannelManagerABI,
-    functionName: "updateChannel",
-    args: [channelId, name, description, metadata],
-  });
-
-  return {
-    txHash,
-  };
-}
+    eventName: "ChannelUpdated",
+  },
+);
 
 export type ChannelExistsParams = {
   /**
