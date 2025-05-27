@@ -1,0 +1,25 @@
+{
+  "name": "@ecp.eth/examples-channels-and-hooks",
+  "private": true,
+  "scripts": {
+    "ts:create-channel": "tsx typescript/create-channel.ts",
+    "ts:create-hook": "tsx typescript/create-hook.ts",
+    "sol:create-channel": "dotenv -c .local -- bash -c 'forge script solidity/CreateChannel.s.sol --rpc-url $RPC_URL --broadcast --force'"
+  },
+  "dependencies": {
+    "@ecp.eth/sdk": "workspace:*",
+    "@ecp.eth/protocol": "workspace:*",
+    "dotenv": "^16.0.3",
+    "@account-abstraction/contracts": "^0.8.0",
+    "@openzeppelin/contracts": "^5.3.0",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.6",
+    "solady": "^0.1.14",
+    "never": "^1.1.0",
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^8.0.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}

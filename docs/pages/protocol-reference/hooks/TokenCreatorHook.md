@@ -14,13 +14,15 @@ Requires channel metadata to contain tokenAddress and tokenCreator fields
 ### `TokenInfo`
 
 
-- **tokenAddress:** (address) 
+- **tokenAddress:** (address) The address of the token contract
 
 
-- **tokenCreator:** (address) 
+
+- **tokenCreator:** (address) The address of the token creator
 
 
-- **tokenChainId:** (uint256) 
+
+- **tokenChainId:** (uint256) The chain ID where the token exists
 
 
 
@@ -30,6 +32,7 @@ Requires channel metadata to contain tokenAddress and tokenCreator fields
 
 ### `ChannelSetup(uint256 channelId, address tokenAddress, address tokenCreator, uint256 tokenChainId)`
 
+Event emitted when token info for a channel is set up
 
 
 
@@ -39,30 +42,35 @@ Requires channel metadata to contain tokenAddress and tokenCreator fields
 
 ### `getChannelCount() → uint256` (public)
 
+Get the total number of channels
 
 
 
 
 ### `getChannelIdAt(uint256 index) → uint256` (public)
 
+Get the channel ID at a specific index
 
 
 
 
 ### `getChannelTokenInfo(uint256 channelId) → struct TokenCreatorHook.TokenInfo` (public)
 
+Get token information for a specific channel
 
 
 
 
 ### `channelExists(uint256 channelId) → bool` (public)
 
+Check if a channel exists
 
 
 
 
 ### `getAllChannels() → uint256[] channelIds, struct TokenCreatorHook.TokenInfo[] tokenInfos` (public)
 
+Get all channels with their token information
 
 
 
@@ -93,24 +101,28 @@ Requires channel metadata to contain tokenAddress and tokenCreator fields
 
 ### `_bytesToUint(bytes b) → uint256` (internal)
 
+Convert bytes to uint256
 
 
 
 
 ### `_bytesToAddress(bytes b) → address` (internal)
 
+Convert bytes to address
 
 
 
 
 ### `_bytesToAddressAlternative(bytes b) → address` (internal)
 
+Alternative implementation of bytes to address conversion
 
 
 
 
 ### `_extractJsonValue(string json, string key) → bytes` (internal)
 
+Extract a value from a JSON string
 
 
 

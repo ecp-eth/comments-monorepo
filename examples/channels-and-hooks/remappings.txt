@@ -1,0 +1,5 @@
+@ecp.eth/protocol/=node_modules/@ecp.eth/protocol
+@account-abstraction/contracts/=node_modules/@account-abstraction/contracts/
+@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/
+forge-std/=node_modules/forge-std/src
+solady/=node_modules/solady/src/

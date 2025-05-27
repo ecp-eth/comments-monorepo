@@ -1,0 +1,32 @@
+# Protocol Reference
+
+## Core Contracts
+
+- [CommentManager](/protocol-reference/CommentManager) - Comment posting and management with signature verification
+- [ChannelManager](/protocol-reference/ChannelManager) - NFT-based channel creation and management
+- [ProtocolFees](/protocol-reference/ProtocolFees) - Fee management for protocol operations
+
+## Hooks
+
+- [BaseHook](/protocol-reference/hooks/BaseHook/) - Abstract base contract for hook implementations
+- [NoopHook](/protocol-reference/hooks/NoopHook/) - No-operation hook implementation for testing
+- [TokenCreatorHook](/protocol-reference/hooks/TokenCreatorHook/) - Hook that restricts top-level comments to predefined token creators
+
+## Interfaces
+
+### Core
+
+- [IChannelManager](/protocol-reference/interfaces/IChannelManager/) - Channel management interface
+- [ICommentManager](/protocol-reference/interfaces/ICommentManager/) - Comment management interface
+- [IProtocolFees](/protocol-reference/interfaces/IProtocolFees/) - Protocol fee management interface
+- [IFeeManager](/protocol-reference/interfaces/IFeeManager/) - Extended fee management interface
+
+### Hooks
+
+- [IHook](/protocol-reference/interfaces/IHook/) - Base hook interface
+
+### Types
+
+- [ICommentTypes](/protocol-reference/interfaces/ICommentTypes/) - Comment data structures
+- [Comments](/protocol-reference/libraries/Comments/) - Comment-related types and utilities
+- [Hooks](/protocol-reference/libraries/Hooks/) - Hook-related types and utilities

@@ -10,30 +10,42 @@ import {
   EnumerableMap
 } from "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
-/**
- * @title TokenCreatorHook
- * @notice Hook that gates channels to only allow token creators to post top-level comments. Similar to telegram channels.
- * @dev Requires channel metadata to contain tokenAddress and tokenCreator fields
- */
+/// @title TokenCreatorHook
+/// @notice Hook that gates channels to only allow token creators to post top-level comments. Similar to telegram channels.
+/// @dev Requires channel metadata to contain tokenAddress and tokenCreator fields
 contract TokenCreatorHook is BaseHook {
   using Strings for string;
   using Strings for uint256;
   using EnumerableMap for EnumerableMap.UintToAddressMap;
 
+  /// @notice Error thrown when token address is invalid
   error InvalidTokenAddress();
+  /// @notice Error thrown when token creator is invalid
   error InvalidTokenCreator();
+  /// @notice Error thrown when commenter does not match token creator
   error UnauthorizedCommenter();
+  /// @notice Error thrown when target URI is invalid
   error InvalidTargetUri();
+  /// @notice Error thrown when metadata is invalid
   error InvalidMetadata();
+  /// @notice Error thrown when token chain ID is invalid
   error InvalidTokenChainId();
 
+  /// @notice Structure to store token information
+  /// @param tokenAddress The address of the token contract
+  /// @param tokenCreator The address of the token creator
+  /// @param tokenChainId The chain ID where the token exists
   struct TokenInfo {
     address tokenAddress;
     address tokenCreator;
     uint256 tokenChainId;
   }
 
-  // Event emitted when a channel is set up
+  /// @notice Event emitted when token info for a channel is set up
+  /// @param channelId The ID of the channel
+  /// @param tokenAddress The address of the token contract
+  /// @param tokenCreator The address of the token creator
+  /// @param tokenChainId The chain ID where the token exists
   event ChannelSetup(
     uint256 indexed channelId,
     address tokenAddress,
@@ -45,30 +57,39 @@ contract TokenCreatorHook is BaseHook {
   EnumerableMap.UintToAddressMap private _channelIds;
   mapping(uint256 => TokenInfo) private _channelTokenInfo;
 
-  // Function to get total number of channels
+  /// @notice Get the total number of channels
+  /// @return The number of channels
   function getChannelCount() public view returns (uint256) {
     return _channelIds.length();
   }
 
-  // Function to get channel ID at index
+  /// @notice Get the channel ID at a specific index
+  /// @param index The index to query
+  /// @return The channel ID at the specified index
   function getChannelIdAt(uint256 index) public view returns (uint256) {
     (uint256 channelId, ) = _channelIds.at(index);
     return channelId;
   }
 
-  // Function to get token info for a channel
+  /// @notice Get token information for a specific channel
+  /// @param channelId The ID of the channel to query
+  /// @return The token information for the channel
   function getChannelTokenInfo(
     uint256 channelId
   ) public view returns (TokenInfo memory) {
     return _channelTokenInfo[channelId];
   }
 
-  // Function to check if channel exists
+  /// @notice Check if a channel exists
+  /// @param channelId The ID of the channel to check
+  /// @return True if the channel exists, false otherwise
   function channelExists(uint256 channelId) public view returns (bool) {
     return _channelIds.contains(channelId);
   }
 
-  // Function to get all channels with their token info
+  /// @notice Get all channels with their token information
+  /// @return channelIds Array of channel IDs
+  /// @return tokenInfos Array of token information for each channel
   function getAllChannels()
     public
     view
@@ -211,6 +232,9 @@ contract TokenCreatorHook is BaseHook {
     return "";
   }
 
+  /// @notice Convert bytes to uint256
+  /// @param b The bytes to convert
+  /// @return The converted uint256 value
   function _bytesToUint(bytes memory b) internal pure returns (uint256) {
     uint256 result = 0;
     for (uint256 i = 0; i < b.length; i++) {
@@ -220,6 +244,9 @@ contract TokenCreatorHook is BaseHook {
     return result;
   }
 
+  /// @notice Convert bytes to address
+  /// @param b The bytes to convert
+  /// @return The converted address
   function _bytesToAddress(bytes memory b) internal pure returns (address) {
     // Check length (0x + 40 hex chars)
     if (b.length != 42) return address(0);
@@ -267,7 +294,9 @@ contract TokenCreatorHook is BaseHook {
     return address(result);
   }
 
-  // Helper for the alternative approach mentioned in comments - more explicit byte building
+  /// @notice Convert hex character to uint8
+  /// @param char The hex character to convert
+  /// @return The converted uint8 value
   function _hexCharToUint8(bytes1 char) private pure returns (uint8) {
     if (char >= bytes1("0") && char <= bytes1("9")) {
       return uint8(char) - uint8(bytes1("0"));
@@ -281,6 +310,9 @@ contract TokenCreatorHook is BaseHook {
     revert("Invalid hex character"); // Should not happen if pre-validated
   }
 
+  /// @notice Alternative implementation of bytes to address conversion
+  /// @param b The bytes to convert
+  /// @return The converted address
   function _bytesToAddressAlternative(
     bytes memory b
   ) internal pure returns (address) {
@@ -310,6 +342,10 @@ contract TokenCreatorHook is BaseHook {
     return address(out);
   }
 
+  /// @notice Extract a value from a JSON string
+  /// @param json The JSON string to parse
+  /// @param key The key to extract
+  /// @return The extracted value as bytes
   function _extractJsonValue(
     string memory json,
     string memory key
