@@ -139,7 +139,7 @@ describe("approval", () => {
       const approved = await isApproved({
         author: account.address,
         app: app.address,
-        readContract: client.readContract,
+        readContract: appClient.readContract,
         commentsAddress,
       });
 
@@ -152,7 +152,7 @@ describe("approval", () => {
           addApproval({
             typedData,
             signature: "0x1234", // Invalid signature
-            writeContract: client.writeContract,
+            writeContract: appClient.writeContract,
             commentsAddress,
           }),
         (err) => {
@@ -239,11 +239,11 @@ describe("approval", () => {
       const result = await revokeApproval({
         typedData,
         signature,
-        writeContract: client.writeContract,
+        writeContract: appClient.writeContract,
         commentsAddress,
       });
 
-      const receipt = await client.waitForTransactionReceipt({
+      const receipt = await appClient.waitForTransactionReceipt({
         hash: result.txHash,
       });
 
@@ -253,7 +253,7 @@ describe("approval", () => {
       const approved = await isApproved({
         author: account.address,
         app: app.address,
-        readContract: client.readContract,
+        readContract: appClient.readContract,
         commentsAddress,
       });
 
@@ -266,7 +266,7 @@ describe("approval", () => {
           revokeApproval({
             typedData,
             signature: "0x1234", // Invalid signature
-            writeContract: client.writeContract,
+            writeContract: appClient.writeContract,
             commentsAddress,
           }),
         (err) => {

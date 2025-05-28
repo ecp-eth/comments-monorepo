@@ -1355,7 +1355,7 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
-    name: "ParentCommentDoesNotExist",
+    name: "ParentCommentHasNeverExisted",
     inputs: [],
   },
   {
