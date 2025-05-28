@@ -1,0 +1,5 @@
+{
+  "type": "module",
+  "types": "../dist/esm/token-list.d.ts",
+  "main": "../dist/cjs/token-list.cjs"
+}
