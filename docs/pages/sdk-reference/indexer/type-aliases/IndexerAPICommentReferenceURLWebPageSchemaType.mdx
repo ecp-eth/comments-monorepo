@@ -1,0 +1,96 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentReferenceURLWebPageSchemaType
+
+# Type Alias: IndexerAPICommentReferenceURLWebPageSchemaType
+
+```ts
+type IndexerAPICommentReferenceURLWebPageSchemaType = {
+  description: null | string;
+  favicon: null | string;
+  opengraph:   | null
+     | {
+     description: null | string;
+     image: string;
+     title: string;
+     url: string;
+   };
+  position: {
+     end: number;
+     start: number;
+  };
+  title: string;
+  type: "webpage";
+  url: string;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:225](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L225)
+
+## Type declaration
+
+### description
+
+```ts
+description: null | string;
+```
+
+### favicon
+
+```ts
+favicon: null | string;
+```
+
+### opengraph
+
+```ts
+opengraph: 
+  | null
+  | {
+  description: null | string;
+  image: string;
+  title: string;
+  url: string;
+};
+```
+
+### position
+
+```ts
+position: {
+  end: number;
+  start: number;
+} = IndexerAPICommentReferencePositionSchema;
+```
+
+#### position.end
+
+```ts
+end: number;
+```
+
+#### position.start
+
+```ts
+start: number;
+```
+
+### title
+
+```ts
+title: string;
+```
+
+### type
+
+```ts
+type: "webpage";
+```
+
+### url
+
+```ts
+url: string;
+```

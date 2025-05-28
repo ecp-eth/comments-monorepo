@@ -28,6 +28,11 @@
       "import": "./dist/esm/hooks/index.js",
       "default": "./dist/cjs/hooks/index.cjs"
     },
+    "./resolvers": {
+      "types": "./dist/esm/resolvers/index.d.ts",
+      "import": "./dist/esm/resolvers/index.js",
+      "default": "./dist/cjs/resolvers/index.cjs"
+    },
     "./schemas": {
       "types": "./dist/esm/schemas.d.ts",
       "import": "./dist/esm/schemas.js",
@@ -41,22 +46,25 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "dev": "tsup --format esm --out-dir dist/esm --watch",
+    "dev": "npm run gen:token-list && tsup --format esm --out-dir dist/esm --watch",
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
-    "build": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
+    "build": "rm -rf dist && npm run gen:token-list && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
     "test": "echo 'Add test script here'",
-    "lint": "eslint \"./src/**/*.ts\""
+    "lint": "eslint \"./src/**/*.ts\"",
+    "gen:token-list": "node --experimental-strip-types scripts/token-list.ts"
   },
   "devDependencies": {
-    "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/build-tools": "workspace:^",
     "@ecp.eth/eslint-config": "workspace:*",
+    "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/typescript-config": "workspace:*",
+    "@neynar/nodejs-sdk": "^2.13.1",
     "@rainbow-me/rainbowkit": "^2.2.4",
     "@tanstack/react-query": "^5.75.6",
     "@types/react": "^19.0.8",
     "clsx": "^2.1.1",
+    "dataloader": "^2.2.3",
     "eslint": "^9.19.0",
     "next": "^15.3.0",
     "nock": "^14.0.5",
@@ -70,9 +78,11 @@
   },
   "peerDependencies": {
     "@ecp.eth/sdk": ">=0.0.19",
+    "@neynar/nodejs-sdk": "^2.13.1",
     "@rainbow-me/rainbowkit": "^2.2.4",
     "@tanstack/react-query": ">=5.0.0",
     "clsx": "^2.1.1",
+    "dataloader": "^2.2.3",
     "next": ">=15.0.0",
     "react": "18 || 19",
     "sonner": "^1.7.4",

@@ -4,12 +4,15 @@ import {
   type IndexerAPIModerationChangeModerationStatusOnCommentSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
-import { ensDataResolver, type ResolvedEnsData } from "./ens-data-resolver";
 import type { CommentSelectType } from "ponder:schema";
 import {
-  farcasterDataResolver,
-  ResolvedFarcasterData,
-} from "./farcaster-data-resolver";
+  ensByAddressResolver,
+  type ResolvedENSData,
+} from "../resolvers/ens-by-address-resolver";
+import {
+  farcasterByAddressResolver,
+  type ResolvedFarcasterData,
+} from "../resolvers/farcaster-by-address-resolver";
 import { getCommentCursor } from "@ecp.eth/sdk/indexer";
 import { env } from "../env";
 
@@ -46,24 +49,24 @@ export async function resolveUserDataAndFormatListCommentsResponse({
     };
   }
 
-  const authorIds = new Set<Hex>();
+  const authorAddresses = new Set<Hex>();
 
   for (const comment of comments) {
     if (comment.author) {
-      authorIds.add(comment.author);
+      authorAddresses.add(comment.author);
     }
 
     for (const reply of comment.replies ?? []) {
       if (reply.author) {
-        authorIds.add(reply.author);
+        authorAddresses.add(reply.author);
       }
     }
   }
 
   const [resolvedAuthorsEnsData, resolvedAuthorsFarcasterData] =
     await Promise.all([
-      ensDataResolver.loadMany([...authorIds]),
-      farcasterDataResolver.loadMany([...authorIds]),
+      ensByAddressResolver.loadMany([...authorAddresses]),
+      farcasterByAddressResolver.loadMany([...authorAddresses]),
     ]);
 
   const nextComment = comments[comments.length - 1];
@@ -164,13 +167,13 @@ export async function resolveUserDataAndFormatListCommentsResponse({
  */
 export function formatAuthor(
   author: Hex,
-  resolvedEnsData: ResolvedEnsData | null | undefined,
+  resolvedEnsData: ResolvedENSData | null | undefined,
   resolvedFarcasterData: ResolvedFarcasterData | null | undefined,
 ): IndexerAPIAuthorDataSchemaType {
   return {
     address: author,
-    ens: resolvedEnsData?.ens,
-    farcaster: resolvedFarcasterData?.farcaster,
+    ens: resolvedEnsData ?? undefined,
+    farcaster: resolvedFarcasterData ?? undefined,
   };
 }
 
@@ -186,13 +189,17 @@ function formatComment(comment: CommentSelectType) {
 }
 
 function resolveUserData<
-  TListItem extends ResolvedEnsData | ResolvedFarcasterData,
->(list: (TListItem | Error)[], address: Hex): TListItem | null {
+  TListItem extends ResolvedENSData | ResolvedFarcasterData,
+>(
+  list: (TListItem | Error | null | undefined)[],
+  address: Hex,
+): TListItem | null {
   const lowercasedAddress = address.toLowerCase();
 
   return (
     list.find(
       (item): item is TListItem =>
+        item != null &&
         !(item instanceof Error) &&
         item.address.toLowerCase() === lowercasedAddress,
     ) ?? null
@@ -203,8 +210,8 @@ export async function resolveAuthorDataAndFormatCommentChangeModerationStatusRes
   comment: CommentSelectType,
 ): Promise<IndexerAPIModerationChangeModerationStatusOnCommentSchemaType> {
   const [resolvedEnsData, resolvedFarcasterData] = await Promise.all([
-    ensDataResolver.load(comment.author),
-    farcasterDataResolver.load(comment.author),
+    ensByAddressResolver.load(comment.author),
+    farcasterByAddressResolver.load(comment.author),
   ]);
 
   return {

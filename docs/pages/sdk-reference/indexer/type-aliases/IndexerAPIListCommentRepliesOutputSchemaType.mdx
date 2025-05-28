@@ -30,7 +30,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
            displayName?: string;
            fid: number;
            pfpUrl?: string;
-           username?: string;
+           username: string;
         };
      };
      chainId: number;
@@ -53,6 +53,90 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
+     references: (
+        | {
+        address: `0x${string}`;
+        avatarUrl: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "ens";
+        url: string;
+      }
+        | {
+        address: `0x${string}`;
+        displayName: null | string;
+        fid: number;
+        pfpUrl: null | string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "farcaster";
+        url: string;
+        username: string;
+      }
+        | {
+        address: `0x${string}`;
+        caip19: string;
+        chainId: number;
+        logoURI: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        symbol: string;
+        type: "erc20";
+        url: string;
+      }
+        | {
+        description: null | string;
+        favicon: null | string;
+        opengraph:   | null
+           | {
+           description: null | string;
+           image: string;
+           title: string;
+           url: string;
+         };
+        position: {
+           end: number;
+           start: number;
+        };
+        title: string;
+        type: "webpage";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "file";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "image";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "video";
+        url: string;
+     })[];
      replies: {
         extra: {
            moderationEnabled: boolean;
@@ -76,7 +160,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
                  displayName?: string;
                  fid: number;
                  pfpUrl?: string;
-                 username?: string;
+                 username: string;
               };
            };
            chainId: number;
@@ -99,6 +183,90 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: string;
            parentId: null | `0x${string}`;
+           references: (
+              | {
+              address: `0x${string}`;
+              avatarUrl: null | string;
+              name: string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "ens";
+              url: string;
+            }
+              | {
+              address: `0x${string}`;
+              displayName: null | string;
+              fid: number;
+              pfpUrl: null | string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "farcaster";
+              url: string;
+              username: string;
+            }
+              | {
+              address: `0x${string}`;
+              caip19: string;
+              chainId: number;
+              logoURI: null | string;
+              name: string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              symbol: string;
+              type: "erc20";
+              url: string;
+            }
+              | {
+              description: null | string;
+              favicon: null | string;
+              opengraph:   | null
+                 | {
+                 description: ...;
+                 image: ...;
+                 title: ...;
+                 url: ...;
+               };
+              position: {
+                 end: number;
+                 start: number;
+              };
+              title: string;
+              type: "webpage";
+              url: string;
+            }
+              | {
+              mediaType: string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "file";
+              url: string;
+            }
+              | {
+              mediaType: string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "image";
+              url: string;
+            }
+              | {
+              mediaType: string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "video";
+              url: string;
+           })[];
            revision: number;
            targetUri: string;
            txHash: `0x${string}`;
@@ -139,7 +307,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:279](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L279)
+Defined in: [packages/sdk/src/indexer/schemas.ts:405](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L405)
 
 ## Type declaration
 
@@ -214,7 +382,7 @@ results: {
         displayName?: string;
         fid: number;
         pfpUrl?: string;
-        username?: string;
+        username: string;
      };
   };
   chainId: number;
@@ -237,6 +405,90 @@ results: {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     caip19: string;
+     chainId: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+     url: string;
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+  })[];
   replies: {
      extra: {
         moderationEnabled: boolean;
@@ -260,7 +512,7 @@ results: {
               displayName?: string;
               fid: number;
               pfpUrl?: string;
-              username?: string;
+              username: string;
            };
         };
         chainId: number;
@@ -283,6 +535,90 @@ results: {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: string;
         parentId: null | `0x${string}`;
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           caip19: string;
+           chainId: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+           url: string;
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           opengraph:   | null
+              | {
+              description: ...;
+              image: ...;
+              title: ...;
+              url: ...;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+        })[];
         revision: number;
         targetUri: string;
         txHash: `0x${string}`;

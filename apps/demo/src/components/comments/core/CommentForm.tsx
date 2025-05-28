@@ -1,6 +1,5 @@
-import { Textarea } from "@/components/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { z } from "zod";
@@ -17,6 +16,10 @@ import {
   createRootCommentsQueryKey,
 } from "./queries";
 import type { Comment } from "@ecp.eth/shared/schemas";
+import { Editor, EditorRef } from "./CommentTextEditor/Editor";
+import { useUploadFiles } from "./CommentTextEditor/hooks/useUploadFiles";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import { isContentEqual } from "./CommentTextEditor/utils";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -29,7 +32,13 @@ type BaseCommentFormProps = {
    */
   autoFocus?: boolean;
   disabled?: boolean;
-  defaultContent?: string;
+  /**
+   * Default comment content, will be parsed as markdown.
+   */
+  defaultContent?: {
+    content: string;
+    references: IndexerAPICommentReferencesSchemaType;
+  };
   /**
    * Called when user pressed escape or left the form empty or unchanged (blurred with empty or unchanged content)
    */
@@ -67,9 +76,9 @@ function BaseCommentForm({
   const [formState, setFormState] = useState<"idle" | "post">("idle");
   const { address } = useAccount();
   const connectAccount = useConnectAccount();
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [content, setContent] = useState(defaultContent || "");
+  const editorRef = useRef<EditorRef>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
+  const { uploadFiles } = useUploadFiles();
 
   const submitMutation = useMutation({
     mutationFn: async (formData: FormData): Promise<void> => {
@@ -78,6 +87,31 @@ function BaseCommentForm({
         const submitAction = formData.get("action") as "post";
 
         setFormState(submitAction);
+
+        if (!editorRef.current?.editor) {
+          throw new Error("Editor is not initialized");
+        }
+
+        const filesToUpload = editorRef.current?.getFilesForUpload() || [];
+
+        await uploadFiles(filesToUpload, {
+          onSuccess(uploadedFile) {
+            editorRef.current?.setFileAsUploaded(uploadedFile);
+          },
+          onError(fileId) {
+            editorRef.current?.setFileUploadAsFailed(fileId);
+          },
+        });
+
+        // validate content
+        const content = z
+          .string()
+          .trim()
+          .parse(
+            editorRef.current.editor.getText({
+              blockSeparator: "\n",
+            }),
+          );
 
         const result = await onSubmit({ author, content });
 
@@ -95,62 +129,66 @@ function BaseCommentForm({
       }
     },
     onSuccess() {
-      setContent("");
+      editorRef.current?.clear();
       submitMutation.reset();
       onSubmitSuccessRef.current?.();
     },
+    onError(error) {
+      if (error instanceof InvalidCommentError) {
+        editorRef.current?.focus();
+      }
+    },
   });
 
-  useEffect(() => {
-    if (submitMutation.error instanceof InvalidCommentError) {
-      textAreaRef.current?.focus();
-    }
-  }, [submitMutation.error]);
-
   const isSubmitting = submitMutation.isPending;
-  const trimmedContent = content.trim();
-  const isContentValid = trimmedContent.length > 0;
 
   return (
     <form
-      action={(formData) => {
+      action={async (formData: FormData) => {
         try {
-          submitMutation.mutateAsync(formData);
-        } catch (e) {
-          // do not rethrow because we already handle the error in the mutation and also effect
-          // we don't need to also propagate the error to React
-          console.error(e);
+          await submitMutation.mutateAsync(formData);
+        } catch {
+          /* empty - handled by useMutation */
         }
       }}
       className="mb-4 flex flex-col gap-2"
     >
-      <Textarea
+      <Editor
         autoFocus={autoFocus}
         onBlur={() => {
           if (isSubmitting) {
             return;
           }
 
+          const editor = editorRef.current;
+
+          if (!editor) {
+            return;
+          }
+
+          const isEmpty = editor.editor?.isEmpty ?? true;
+          const defaultContent = editor.getDefaultContent();
+          const currentContent = editor.editor?.getJSON();
+
           if (
-            !content ||
-            (defaultContent != null && content === defaultContent)
+            isEmpty ||
+            isContentEqual(currentContent ?? {}, defaultContent ?? {})
           ) {
             onCancel?.();
           }
         }}
-        name="comment"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onKeyUp={(e) => {
-          if (!isSubmitting && e.key === "Escape") {
-            onCancel?.();
-          }
-        }}
-        placeholder={placeholder}
         className="w-full p-2 border border-gray-300 rounded"
         disabled={isSubmitting || disabled}
-        required
-        ref={textAreaRef}
+        placeholder={placeholder}
+        defaultValue={defaultContent}
+        ref={editorRef}
+        onEscapePress={() => {
+          if (isSubmitting) {
+            return;
+          }
+
+          onCancel?.();
+        }}
       />
       <div className="flex gap-2 justify-between">
         {address && <CommentBoxAuthor address={address} />}
@@ -160,7 +198,7 @@ function BaseCommentForm({
             value="post"
             type="submit"
             className="px-4 py-2 rounded"
-            disabled={isSubmitting || !isContentValid}
+            disabled={isSubmitting}
           >
             {formState === "post" ? submitPendingLabel : submitIdleLabel}
           </Button>
@@ -287,7 +325,10 @@ export function CommentEditForm<TExtraEditData = unknown>({
   return (
     <BaseCommentForm
       {...props}
-      defaultContent={comment.content}
+      defaultContent={{
+        content: comment.content,
+        references: comment.references,
+      }}
       onSubmit={handleSubmit}
       submitIdleLabel={submitIdleLabel}
       submitPendingLabel={submitPendingLabel}
