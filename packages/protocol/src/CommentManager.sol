@@ -181,7 +181,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         comment.channelId,
         comment.parentId,
         comment.createdAt,
-        comment.updatedAt,
         comment.content,
         comment.metadata,
         comment.targetUri,
