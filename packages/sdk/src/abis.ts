@@ -1038,12 +1038,6 @@ export const CommentManagerABI = [
         internalType: "uint80",
       },
       {
-        name: "updatedAt",
-        type: "uint80",
-        indexed: false,
-        internalType: "uint80",
-      },
-      {
         name: "content",
         type: "string",
         indexed: false,

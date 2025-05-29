@@ -14,7 +14,7 @@ This interface defines the functions and events for the Comments contract
 
 ## Events
 
-### `CommentAdded(bytes32 commentId, address author, address app, uint256 channelId, bytes32 parentId, uint80 createdAt, uint80 updatedAt, string content, string metadata, string targetUri, string commentType, string hookData)`
+### `CommentAdded(bytes32 commentId, address author, address app, uint256 channelId, bytes32 parentId, uint80 createdAt, string content, string metadata, string targetUri, string commentType, string hookData)`
 
 Emitted when a new comment is added
 
