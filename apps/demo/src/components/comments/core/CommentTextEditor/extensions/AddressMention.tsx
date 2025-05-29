@@ -3,26 +3,42 @@ import { Plugin, PluginKey } from "prosemirror-state";
 import type { EditorView } from "prosemirror-view";
 import type { Hex } from "viem";
 import type { EnsResolverService } from "./types";
+import type { Node, NodeType } from "prosemirror-model";
 
-type AddressSuggestionItem = {
-  id: string;
-  label: string;
-};
-
-type AddressItem = {
-  id: string;
-  label: string;
-};
+export type AddressItem =
+  | {
+      /**
+       * Hex
+       */
+      id: Hex;
+      /**
+       * Hex or ENS name
+       */
+      label: string;
+      resolved: true;
+    }
+  | {
+      /**
+       * Hex or ENS name
+       */
+      id: string | Hex;
+      /**
+       * Hex or ENS name
+       */
+      label: string | Hex;
+      resolved: false;
+    };
 
 type AddressMentionExtensionOptions = MentionOptions<
-  AddressSuggestionItem,
+  AddressItem,
   AddressItem
 > & {
-  ensResolver: EnsResolverService | null;
+  ensResolver: EnsResolverService;
 };
 
 export const AddressMentionExtension =
   Mention.extend<AddressMentionExtensionOptions>({
+    name: "addressMention",
     addAttributes() {
       return {
         id: {
@@ -52,7 +68,6 @@ export const AddressMentionExtension =
       };
     },
     renderText({ node }) {
-      console.log("renderText", this.options, node);
       return `${this.options.suggestion.char}${node.attrs.label ?? node.attrs.id}`;
     },
     addOptions() {
@@ -60,7 +75,14 @@ export const AddressMentionExtension =
 
       return {
         ...parent,
-        ensResolver: null as EnsResolverService | null,
+        ensResolver: {
+          resolveAddress() {
+            return Promise.resolve(null);
+          },
+          resolveName() {
+            return Promise.resolve(null);
+          },
+        },
         suggestion: {
           char: "@",
           startOfLine: false,
@@ -92,45 +114,43 @@ export const AddressMentionExtension =
 
       return [
         {
-          find: /(?:^|\s)(@0x[a-fA-F0-9]{40})(\s)$/,
+          find: /(?:^|\s)(@0x[a-fA-F0-9]{40})\s$/,
           handler: ({ state, match, range }) => {
             const address = match[1].slice(1) as Hex;
-            const hasSpace = !!match[2];
 
             const node = mentionType.create({
               id: address,
               label: address,
               resolved: false,
-            });
+            } satisfies AddressItem);
 
             const tr = state.tr;
-            tr.replaceWith(range.from, range.to, node);
 
-            if (hasSpace) {
-              tr.insert(range.from + 1, state.schema.text(" "));
-            }
+            tr.replaceWith(range.from, range.to, [
+              node,
+              state.schema.text(" "),
+            ]);
 
             state.apply(tr);
           },
         },
         {
-          find: /(?:^|\s)(@[a-z0-9-]+\.eth)(\s)$/,
+          find: /(?:^|\s)(@[a-z0-9-]+\.eth)\s$/,
           handler: ({ state, match, range }) => {
             const name = match[1].slice(1);
-            const hasSpace = !!match[2];
 
             const node = mentionType.create({
               id: name,
               label: name,
               resolved: false,
-            });
+            } satisfies AddressItem);
 
             const tr = state.tr;
-            tr.replaceWith(range.from, range.to, node);
 
-            if (hasSpace) {
-              tr.insert(range.from + 1, state.schema.text(" "));
-            }
+            tr.replaceWith(range.from, range.to, [
+              node,
+              state.schema.text(" "),
+            ]);
 
             state.apply(tr);
           },
@@ -139,139 +159,101 @@ export const AddressMentionExtension =
     },
 
     addProseMirrorPlugins() {
-      const mentionType = this.type;
-      const ensService = this.options.ensResolver;
-      const pluginKey = new PluginKey("address-mention-resolver");
-
-      let editorView: EditorView | null = null;
-
       return [
-        new Plugin({
-          key: pluginKey,
-
-          view: (view) => {
-            editorView = view;
-            return {
-              update: (view) => {
-                // Check for mentions in the document and resolve them
-                const doc = view.state.doc;
-
-                doc.descendants((node, pos) => {
-                  if (node.type === mentionType && !node.attrs.resolved) {
-                    const id = node.attrs.id;
-
-                    if (id && ensService) {
-                      if (id.startsWith("0x")) {
-                        ensService
-                          .resolveAddress(id as Hex)
-                          .then((resolution) => {
-                            if (resolution && editorView) {
-                              const tr = view.state.tr;
-
-                              tr.setNodeMarkup(pos, mentionType, {
-                                id: resolution.address,
-                                label: resolution.label,
-                                // prevent infinite update loop
-                                resolved: true,
-                              });
-
-                              editorView.dispatch(tr);
-                            }
-                          });
-                      } else if (id.endsWith(".eth")) {
-                        ensService.resolveName(id).then((resolution) => {
-                          if (resolution && editorView) {
-                            const tr = view.state.tr;
-
-                            tr.setNodeMarkup(pos, mentionType, {
-                              id: resolution.address,
-                              label: resolution.label,
-                              // prevent infinite update loop
-                              resolved: true,
-                            });
-
-                            editorView.dispatch(tr);
-                          }
-                        });
-                      }
-                    }
-                  }
-
-                  return true;
-                });
-              },
-              destroy: () => {
-                editorView = null;
-              },
-            };
-          },
-
-          props: {
-            handlePaste: (view, event) => {
-              const text = event.clipboardData?.getData("text/plain");
-              if (!text) return false;
-
-              // Find all Ethereum addresses and ENS names in the pasted text
-              const addressRegex = /(@0x[a-fA-F0-9]{40})|(@[a-z0-9-]+\.eth)/g;
-              let match;
-              const tr = view.state.tr;
-              const insertPos = view.state.selection.from;
-
-              // First insert the full text
-              tr.insertText(text, insertPos);
-
-              // Then find and replace all matches
-              const offset = insertPos;
-              const updates: Promise<void>[] = [];
-
-              while ((match = addressRegex.exec(text)) !== null) {
-                const matchStart = match.index;
-                const fullMatch = match[0];
-                const address = fullMatch.slice(1); // Remove the @ from the match
-                const isEns = address.endsWith(".eth");
-
-                // Calculate the actual position in the document
-                const from = offset + matchStart;
-                const to = from + fullMatch.length;
-
-                // Create initial node
-                const node = mentionType.create({
-                  id: address,
-                  label: address,
-                });
-
-                tr.replaceWith(from, to, node);
-
-                // Queue async resolution
-                if (ensService) {
-                  const updatePromise = (
-                    isEns
-                      ? ensService.resolveName(address)
-                      : ensService.resolveAddress(address as Hex)
-                  ).then((resolution) => {
-                    if (resolution) {
-                      const updateTr = view.state.tr;
-                      updateTr.setNodeMarkup(from, mentionType, {
-                        id: resolution.address,
-                        label: resolution.label,
-                      });
-                      view.dispatch(updateTr);
-                    }
-                  });
-                  updates.push(updatePromise);
-                }
-              }
-
-              // Dispatch the initial transaction
-              view.dispatch(tr);
-
-              // Handle all async updates
-              Promise.all(updates).catch(console.error);
-
-              return true;
-            },
-          },
+        new AddressMentionResolverPlugin({
+          ensResolver: this.options.ensResolver,
+          nodeType: this.type,
         }),
       ];
     },
   });
+
+type AddressMentionResolverPluginOptions = {
+  ensResolver: EnsResolverService;
+  nodeType: NodeType;
+};
+
+const addressMentionResolverPluginKey = new PluginKey(
+  "address-mention-resolver",
+);
+
+class AddressMentionResolverPlugin extends Plugin {
+  constructor({ ensResolver, nodeType }: AddressMentionResolverPluginOptions) {
+    let editorView: EditorView | null = null;
+
+    super({
+      key: addressMentionResolverPluginKey,
+      view: (view) => {
+        editorView = view;
+
+        return {
+          update: (view) => {
+            // Check for mentions in the document and resolve them
+            const doc = view.state.doc;
+
+            doc.descendants((node, pos) => {
+              const attributes = getAddressMentionNodeAttributes(
+                node,
+                nodeType,
+              );
+
+              if (!attributes || attributes.resolved) {
+                return true;
+              }
+
+              if (attributes.id.startsWith("0x")) {
+                ensResolver
+                  .resolveAddress(attributes.id as Hex)
+                  .then((resolution) => {
+                    if (resolution && editorView) {
+                      const tr = view.state.tr;
+
+                      tr.setNodeMarkup(pos, nodeType, {
+                        id: resolution.address,
+                        label: resolution.label,
+                        // prevent infinite update loop
+                        resolved: true,
+                      });
+
+                      editorView.dispatch(tr);
+                    }
+                  });
+              } else if (attributes.id.endsWith(".eth")) {
+                ensResolver.resolveName(attributes.id).then((resolution) => {
+                  if (resolution && editorView) {
+                    const tr = view.state.tr;
+
+                    tr.setNodeMarkup(pos, nodeType, {
+                      id: resolution.address,
+                      label: resolution.label,
+                      // prevent infinite update loop
+                      resolved: true,
+                    });
+
+                    editorView.dispatch(tr);
+                  }
+                });
+              }
+
+              return true;
+            });
+          },
+          destroy: () => {
+            editorView = null;
+          },
+        };
+      },
+    });
+  }
+}
+
+function getAddressMentionNodeAttributes(
+  node: Node,
+  expectedNodeType: NodeType,
+): AddressItem | null {
+  if (node.type !== expectedNodeType) {
+    return null;
+  }
+
+  return node.attrs as AddressItem;
+}

@@ -4,7 +4,10 @@ import { Paragraph } from "@tiptap/extension-paragraph";
 import { Text } from "@tiptap/extension-text";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { AddressMentionExtension } from "./extensions/AddressMention";
+import { TokenMentionExtension } from "./extensions/TokenMention";
 import { useEnsResolver } from "./hooks/useEnsResolver";
+import { useTokenResolver } from "./hooks/useTokenResolver";
+import { base } from "viem/chains";
 
 type EditorProps = {
   placeholder: string;
@@ -12,6 +15,11 @@ type EditorProps = {
 
 export function Editor({ placeholder }: EditorProps) {
   const ensResolver = useEnsResolver();
+  const tokenResolver = useTokenResolver({
+    // @todo use the chain from the context instead of hardcoding it
+    // because chain can be changed
+    chainId: base.id,
+  });
   const editor = useEditor({
     // fix ssr hydration error
     immediatelyRender: false,
@@ -24,6 +32,9 @@ export function Editor({ placeholder }: EditorProps) {
       }),
       AddressMentionExtension.configure({
         ensResolver,
+      }),
+      TokenMentionExtension.configure({
+        tokenResolver,
       }),
     ],
     editorProps: {
