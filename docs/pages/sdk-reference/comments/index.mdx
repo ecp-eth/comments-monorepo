@@ -93,12 +93,18 @@ Core functionality for managing comments and approvals
 | [CommentInputDataSchema](/sdk-reference/comments/variables/CommentInputDataSchema.mdx) | Comment input data schema. This is used as input of the functions. |
 | [CommentMetadataSchema](/sdk-reference/comments/variables/CommentMetadataSchema.mdx) | - |
 | [CreateCommentDataSchema](/sdk-reference/comments/variables/CreateCommentDataSchema.mdx) | - |
+| [deleteComment](/sdk-reference/comments/variables/deleteComment.mdx) | Delete a comment as an author |
 | [DeleteCommentTypedDataSchema](/sdk-reference/comments/variables/DeleteCommentTypedDataSchema.mdx) | - |
+| [deleteCommentWithApproval](/sdk-reference/comments/variables/deleteCommentWithApproval.mdx) | Delete a comment with app signature verification |
+| [editComment](/sdk-reference/comments/variables/editComment.mdx) | Edit a comment as an author |
 | [EditCommentDataSchema](/sdk-reference/comments/variables/EditCommentDataSchema.mdx) | Edit comment data schema. This is used as input of the functions. |
 | [EditCommentTypedDataSchema](/sdk-reference/comments/variables/EditCommentTypedDataSchema.mdx) | - |
+| [editCommentWithApproval](/sdk-reference/comments/variables/editCommentWithApproval.mdx) | Edit a comment |
 | [JsonLiteralSchema](/sdk-reference/comments/variables/JsonLiteralSchema.mdx) | - |
 | [JsonObjectSchema](/sdk-reference/comments/variables/JsonObjectSchema.mdx) | - |
 | [JsonSchema](/sdk-reference/comments/variables/JsonSchema.mdx) | - |
+| [postComment](/sdk-reference/comments/variables/postComment.mdx) | Posts a comment as an author |
+| [postCommentWithApproval](/sdk-reference/comments/variables/postCommentWithApproval.mdx) | Posts a comment with author signature verification |
 | [RemoveApprovalTypedDataSchema](/sdk-reference/comments/variables/RemoveApprovalTypedDataSchema.mdx) | - |
 | [ReplyCommentInputDataSchema](/sdk-reference/comments/variables/ReplyCommentInputDataSchema.mdx) | - |
 | [RootCommentInputDataSchema](/sdk-reference/comments/variables/RootCommentInputDataSchema.mdx) | - |
@@ -116,10 +122,6 @@ Core functionality for managing comments and approvals
 | [createEditCommentData](/sdk-reference/comments/functions/createEditCommentData.mdx) | Create the data structure of a comment for editing |
 | [createEditCommentTypedData](/sdk-reference/comments/functions/createEditCommentTypedData.mdx) | Create the EIP-712 typed data structure for editing comment |
 | [createRemoveApprovalTypedData](/sdk-reference/comments/functions/createRemoveApprovalTypedData.mdx) | Create the EIP-712 typed data structure for removing approval |
-| [deleteComment](/sdk-reference/comments/functions/deleteComment.mdx) | Delete a comment as an author |
-| [deleteCommentWithApproval](/sdk-reference/comments/functions/deleteCommentWithApproval.mdx) | Delete a comment with app signature verification |
-| [editComment](/sdk-reference/comments/functions/editComment.mdx) | Edit a comment as an author |
-| [editCommentWithApproval](/sdk-reference/comments/functions/editCommentWithApproval.mdx) | Edit a comment |
 | [getAddApprovalHash](/sdk-reference/comments/functions/getAddApprovalHash.mdx) | Gets the EIP-712 hash for adding approval |
 | [getChannelManager](/sdk-reference/comments/functions/getChannelManager.mdx) | Gets the channel manager contract address |
 | [getComment](/sdk-reference/comments/functions/getComment.mdx) | Get a comment by ID |
@@ -132,8 +134,6 @@ Core functionality for managing comments and approvals
 | [getNonce](/sdk-reference/comments/functions/getNonce.mdx) | Get the nonce for the author and app signer |
 | [getRemoveApprovalHash](/sdk-reference/comments/functions/getRemoveApprovalHash.mdx) | Gets the EIP-712 hash for removing approval |
 | [isApproved](/sdk-reference/comments/functions/isApproved.mdx) | Checks if an app signer is approved for an author |
-| [postComment](/sdk-reference/comments/functions/postComment.mdx) | Posts a comment as an author |
-| [postCommentWithApproval](/sdk-reference/comments/functions/postCommentWithApproval.mdx) | Posts a comment with author signature verification |
 | [revokeApproval](/sdk-reference/comments/functions/revokeApproval.mdx) | Removes an app signer approval with signature verification |
 | [revokeApprovalAsAuthor](/sdk-reference/comments/functions/revokeApprovalAsAuthor.mdx) | Revokes an app signer approval directly as author |
 | [updateChannelContract](/sdk-reference/comments/functions/updateChannelContract.mdx) | Updates the channel manager contract address (only owner) |
