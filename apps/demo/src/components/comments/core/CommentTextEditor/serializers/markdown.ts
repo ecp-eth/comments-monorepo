@@ -58,26 +58,6 @@ const schema = new Schema({
       },
     },
     text: { group: "inline" },
-    link: {
-      inline: true,
-      group: "inline",
-      attrs: { href: {}, title: { default: null } },
-      inclusive: false,
-      parseDOM: [
-        {
-          tag: "a[href]",
-          getAttrs(dom) {
-            return {
-              href: dom.getAttribute("href"),
-              title: dom.getAttribute("title"),
-            };
-          },
-        },
-      ],
-      toDOM(node) {
-        return ["a", node.attrs, 0];
-      },
-    },
     addressMention: {
       group: "inline",
       inline: true,
@@ -134,6 +114,24 @@ const schema = new Schema({
         return ["em", 0];
       },
     },
+    link: {
+      attrs: { href: {}, title: { default: null } },
+      inclusive: false,
+      parseDOM: [
+        {
+          tag: "a[href]",
+          getAttrs(dom) {
+            return {
+              href: dom.getAttribute("href"),
+              title: dom.getAttribute("title"),
+            };
+          },
+        },
+      ],
+      toDOM(node) {
+        return ["a", node.attrs, 0];
+      },
+    },
   },
 });
 
@@ -185,11 +183,6 @@ export const customMarkdownSerializer = new MarkdownSerializer(
         return state.write(`$${attrs.caip19}`);
       }
     },
-    link(state, node) {
-      state.write(`[`);
-      state.renderInline(node);
-      state.write(`](${node.attrs.href})`);
-    },
   },
   {
     bold: {
@@ -203,6 +196,12 @@ export const customMarkdownSerializer = new MarkdownSerializer(
       close: "*",
       mixable: true,
       expelEnclosingWhitespace: true,
+    },
+    link: {
+      open: "[",
+      close(state, mark) {
+        return `](${mark.attrs.href})`;
+      },
     },
   },
 );

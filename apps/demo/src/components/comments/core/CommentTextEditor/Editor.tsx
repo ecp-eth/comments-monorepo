@@ -67,7 +67,11 @@ export function Editor({
       Text,
       Bold,
       Italic,
-      Link,
+      Link.configure({
+        HTMLAttributes: {
+          class: "underline cursor-pointer",
+        },
+      }),
       Placeholder.configure({
         placeholder,
         emptyEditorClass:
