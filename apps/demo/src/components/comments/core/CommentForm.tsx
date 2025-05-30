@@ -1,4 +1,3 @@
-import { Textarea } from "@/components/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
@@ -17,6 +16,12 @@ import {
   createRootCommentsQueryKey,
 } from "./queries";
 import type { Comment } from "@ecp.eth/shared/schemas";
+import { Editor, EditorRef } from "./CommentTextEditor/Editor";
+import {
+  customMarkdownParser,
+  customMarkdownSerializer,
+} from "./CommentTextEditor/serializers/markdown";
+import type { Content } from "@tiptap/react";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -29,6 +34,9 @@ type BaseCommentFormProps = {
    */
   autoFocus?: boolean;
   disabled?: boolean;
+  /**
+   * Default comment content, will be parsed as markdown.
+   */
   defaultContent?: string;
   /**
    * Called when user pressed escape or left the form empty or unchanged (blurred with empty or unchanged content)
@@ -67,9 +75,18 @@ function BaseCommentForm({
   const [formState, setFormState] = useState<"idle" | "post">("idle");
   const { address } = useAccount();
   const connectAccount = useConnectAccount();
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [content, setContent] = useState(defaultContent || "");
+  const editorRef = useRef<EditorRef>(null);
+  const [content, setContent] = useState<Content>(() =>
+    defaultContent ? customMarkdownParser.parse(defaultContent).toJSON() : null,
+  );
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
+
+  useEffect(() => {
+    if (defaultContent) {
+      console.log("defaultContent", defaultContent);
+      setContent(customMarkdownParser.parse(defaultContent).toJSON());
+    }
+  }, [defaultContent]);
 
   const submitMutation = useMutation({
     mutationFn: async (formData: FormData): Promise<void> => {
@@ -79,7 +96,18 @@ function BaseCommentForm({
 
         setFormState(submitAction);
 
-        const result = await onSubmit({ author, content });
+        if (!editorRef.current?.editor) {
+          throw new Error("Editor is not initialized");
+        }
+
+        const serializedContent = customMarkdownSerializer.serialize(
+          editorRef.current.editor.state.doc,
+        );
+
+        // validate content
+        z.string().trim().parse(serializedContent);
+
+        const result = await onSubmit({ author, content: serializedContent });
 
         return result;
       } catch (e) {
@@ -99,37 +127,40 @@ function BaseCommentForm({
       submitMutation.reset();
       onSubmitSuccessRef.current?.();
     },
+    onError(error) {
+      if (error instanceof InvalidCommentError) {
+        editorRef.current?.focus();
+      }
+    },
   });
 
-  useEffect(() => {
-    if (submitMutation.error instanceof InvalidCommentError) {
-      textAreaRef.current?.focus();
-    }
-  }, [submitMutation.error]);
-
   const isSubmitting = submitMutation.isPending;
-  const trimmedContent = content.trim();
-  const isContentValid = trimmedContent.length > 0;
 
   return (
     <form
-      action={(formData) => {
+      action={async (formData: FormData) => {
         try {
-          submitMutation.mutateAsync(formData);
-        } catch (e) {
-          // do not rethrow because we already handle the error in the mutation and also effect
-          // we don't need to also propagate the error to React
-          console.error(e);
+          await submitMutation.mutateAsync(formData);
+        } catch {
+          /* empty - handled by useMutation */
         }
       }}
       className="mb-4 flex flex-col gap-2"
     >
-      <Textarea
+      <Editor
         autoFocus={autoFocus}
         onBlur={() => {
           if (isSubmitting) {
             return;
           }
+
+          const editor = editorRef.current?.editor;
+
+          if (!editor) {
+            return;
+          }
+
+          const content = customMarkdownSerializer.serialize(editor.state.doc);
 
           if (
             !content ||
@@ -138,19 +169,18 @@ function BaseCommentForm({
             onCancel?.();
           }
         }}
-        name="comment"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onKeyUp={(e) => {
-          if (!isSubmitting && e.key === "Escape") {
-            onCancel?.();
-          }
-        }}
-        placeholder={placeholder}
         className="w-full p-2 border border-gray-300 rounded"
         disabled={isSubmitting || disabled}
-        required
-        ref={textAreaRef}
+        placeholder={placeholder}
+        defaultValue={content}
+        ref={editorRef}
+        onEscapePress={() => {
+          if (isSubmitting) {
+            return;
+          }
+
+          onCancel?.();
+        }}
       />
       <div className="flex gap-2 justify-between">
         {address && <CommentBoxAuthor address={address} />}
@@ -160,7 +190,7 @@ function BaseCommentForm({
             value="post"
             type="submit"
             className="px-4 py-2 rounded"
-            disabled={isSubmitting || !isContentValid}
+            disabled={isSubmitting}
           >
             {formState === "post" ? submitPendingLabel : submitIdleLabel}
           </Button>
