@@ -1,14 +1,16 @@
 import { MarkdownParser, MarkdownSerializer } from "prosemirror-markdown";
 import { Schema } from "prosemirror-model";
 import MarkdownIt from "markdown-it";
-import { TokenItem } from "../extensions/TokenMention";
-import { AddressItem } from "../extensions/AddressMention";
+import type { TokenItem } from "../extensions/TokenMention";
+import type { AddressItem } from "../extensions/AddressMention";
+import type { Hex } from "viem";
 
 const md = new MarkdownIt();
 
-const ADDRESS_MENTION_REGEX = /^@(0x[a-fA-F0-9]{40}|[a-z0-9-]+\.eth)\s?/;
+const ADDRESS_MENTION_REGEX =
+  /^\[@(0x[a-fA-F0-9]{40}|[a-z0-9-]+\.eth)\]\((0x[a-fA-F0-9]{40})\)/;
 
-md.inline.ruler.push("addressMention", (state, silent) => {
+md.inline.ruler.before("link", "addressMention", (state, silent) => {
   const match = ADDRESS_MENTION_REGEX.exec(state.src.slice(state.pos));
 
   if (!match) {
@@ -18,6 +20,12 @@ md.inline.ruler.push("addressMention", (state, silent) => {
   if (!silent) {
     const token = state.push("addressMention", "", 0);
     token.content = match[0];
+
+    token.meta = {
+      id: match[2] as Hex,
+      label: match[1],
+      resolved: true,
+    } satisfies AddressItem;
   }
 
   state.pos += match[0].length;
@@ -25,10 +33,14 @@ md.inline.ruler.push("addressMention", (state, silent) => {
   return true;
 });
 
-const TOKEN_MENTION_REGEX =
-  /^\$(eip155:\d+\/erc20:0x[a-fA-F0-9]{40}|[A-Z]+)\s?/;
+const EIP_ERC20_TOKEN_REGEX_STRING = "eip155:\\d+/erc20:0x[a-fA-F0-9]{40}";
+const SYMBOL_TOKEN_REGEX_STRING = "\\$[A-Z]+";
 
-md.inline.ruler.push("tokenMention", (state, silent) => {
+const TOKEN_MENTION_REGEX = new RegExp(
+  `^(${SYMBOL_TOKEN_REGEX_STRING}|\\[(${SYMBOL_TOKEN_REGEX_STRING}|\\$${EIP_ERC20_TOKEN_REGEX_STRING})\\]\\((${EIP_ERC20_TOKEN_REGEX_STRING})\\))`,
+);
+
+md.inline.ruler.before("link", "tokenMention", (state, silent) => {
   const match = TOKEN_MENTION_REGEX.exec(state.src.slice(state.pos));
 
   if (!match) {
@@ -38,6 +50,24 @@ md.inline.ruler.push("tokenMention", (state, silent) => {
   if (!silent) {
     const token = state.push("tokenMention", "", 0);
     token.content = match[0];
+
+    if (match[1].startsWith("$")) {
+      token.meta = {
+        type: "unresolved-symbol",
+        symbol: match[1].slice(1),
+      } satisfies TokenItem;
+    } else if (match[2]?.startsWith("$")) {
+      token.meta = {
+        type: "resolved",
+        id: match[3],
+        label: match[2].slice(1),
+      } satisfies TokenItem;
+    } else {
+      token.meta = {
+        type: "unresolved-caip19",
+        caip19: match[2],
+      } satisfies TokenItem;
+    }
   }
 
   state.pos += match[0].length;
@@ -141,11 +171,11 @@ export const customMarkdownParser = new MarkdownParser(schema, md, {
   text: { node: "text" },
   addressMention: {
     node: "addressMention",
-    getAttrs: (tok) => ({ id: tok.content.slice(1) }),
+    getAttrs: (tok) => tok.meta as AddressItem,
   },
   tokenMention: {
     node: "tokenMention",
-    getAttrs: (tok) => ({ caip19: tok.content.slice(1) }),
+    getAttrs: (tok) => tok.meta as TokenItem,
   },
   strong: { mark: "bold" },
   em: { mark: "italic" },
@@ -170,17 +200,17 @@ export const customMarkdownSerializer = new MarkdownSerializer(
     addressMention(state, node) {
       const attrs = node.attrs as AddressItem;
 
-      state.write(`@${attrs.id}`);
+      state.write(`[@${attrs.label}](${attrs.id})`);
     },
     tokenMention(state, node) {
       const attrs = node.attrs as TokenItem;
 
       if (attrs.type === "resolved") {
-        return state.write(`$${attrs.id}`);
+        return state.write(`[$${attrs.label}](${attrs.id})`);
       } else if (attrs.type === "unresolved-symbol") {
         return state.write(`$${attrs.symbol}`);
       } else if (attrs.type === "unresolved-caip19") {
-        return state.write(`$${attrs.caip19}`);
+        return state.write(`[$${attrs.caip19}](${attrs.caip19})`);
       }
     },
   },

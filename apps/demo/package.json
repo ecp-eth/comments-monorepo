@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "check-types": "tsc --noEmit",
-    "gen:token-list": "node --experimental-strip-types scripts/token-list.ts"
+    "gen:token-list": "node --experimental-strip-types scripts/token-list.ts",
+    "test": "vitest"
   },
   "dependencies": {
     "@ecp.eth/sdk": "workspace:*",
@@ -66,11 +67,14 @@
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^20",
+    "@types/node": "^22.14.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.5.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.1.4"
   }
 }
