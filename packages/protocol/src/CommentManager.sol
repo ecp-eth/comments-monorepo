@@ -19,23 +19,23 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   bytes32 public immutable DOMAIN_SEPARATOR;
   bytes32 public constant ADD_COMMENT_TYPEHASH =
     keccak256(
-      "AddComment(string content,string metadata,string targetUri,string commentType,address author,address app,uint256 channelId,uint256 deadline,bytes32 parentId)"
+      "AddComment(string content,string metadata,string targetUri,string commentType,address author,address app,uint256 channelId,uint64 deadline,bytes32 parentId)"
     );
   bytes32 public constant DELETE_COMMENT_TYPEHASH =
     keccak256(
-      "DeleteComment(bytes32 commentId,address author,address app,uint256 deadline)"
+      "DeleteComment(bytes32 commentId,address author,address app,uint64 deadline)"
     );
   bytes32 public constant EDIT_COMMENT_TYPEHASH =
     keccak256(
-      "EditComment(bytes32 commentId,string content,string metadata,address author,address app,uint256 nonce,uint256 deadline)"
+      "EditComment(bytes32 commentId,string content,string metadata,address author,address app,uint256 nonce,uint64 deadline)"
     );
   bytes32 public constant ADD_APPROVAL_TYPEHASH =
     keccak256(
-      "AddApproval(address author,address app,uint256 nonce,uint256 deadline)"
+      "AddApproval(address author,address app,uint256 nonce,uint64 deadline)"
     );
   bytes32 public constant REMOVE_APPROVAL_TYPEHASH =
     keccak256(
-      "RemoveApproval(address author,address app,uint256 nonce,uint256 deadline)"
+      "RemoveApproval(address author,address app,uint256 nonce,uint64 deadline)"
     );
 
   // On-chain storage mappings
@@ -120,7 +120,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     Comments.Comment storage comment = comments[commentId];
 
-    uint80 timestampNow = uint80(block.timestamp);
+    uint64 timestampNow = uint64(block.timestamp);
 
     comment.author = author;
     comment.app = app;
@@ -220,7 +220,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     string calldata content = editData.content;
     string calldata metadata = editData.metadata;
-    uint80 timestampNow = uint80(block.timestamp);
+    uint64 timestampNow = uint64(block.timestamp);
 
     comment.content = content;
     comment.metadata = metadata;
@@ -280,7 +280,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   function deleteCommentWithSig(
     bytes32 commentId,
     address app,
-    uint256 deadline,
+    uint64 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
   ) external {
@@ -369,7 +369,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     address author,
     address app,
     uint256 nonce,
-    uint256 deadline,
+    uint64 deadline,
     bytes calldata signature
   ) external {
     guardBlockTimestamp(deadline);
@@ -388,7 +388,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     address author,
     address app,
     uint256 nonce,
-    uint256 deadline,
+    uint64 deadline,
     bytes calldata signature
   ) external {
     guardBlockTimestamp(deadline);
@@ -412,7 +412,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     address author,
     address app,
     uint256 nonce,
-    uint256 deadline
+    uint64 deadline
   ) public view returns (bytes32) {
     bytes32 structHash = keccak256(
       abi.encode(ADD_APPROVAL_TYPEHASH, author, app, nonce, deadline)
@@ -427,7 +427,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     address author,
     address app,
     uint256 nonce,
-    uint256 deadline
+    uint64 deadline
   ) public view returns (bytes32) {
     bytes32 structHash = keccak256(
       abi.encode(REMOVE_APPROVAL_TYPEHASH, author, app, nonce, deadline)
@@ -442,7 +442,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     bytes32 commentId,
     address author,
     address app,
-    uint256 deadline
+    uint64 deadline
   ) public view returns (bytes32) {
     bytes32 structHash = keccak256(
       abi.encode(DELETE_COMMENT_TYPEHASH, commentId, author, app, deadline)
@@ -538,7 +538,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
   /// @notice Internal function to guard against timestamp expiration
   /// @param deadline The timestamp after which the operation is no longer valid
-  function guardBlockTimestamp(uint256 deadline) internal view {
+  function guardBlockTimestamp(uint64 deadline) internal view {
     if (block.timestamp > deadline) {
       revert SignatureDeadlineReached(deadline, block.timestamp);
     }

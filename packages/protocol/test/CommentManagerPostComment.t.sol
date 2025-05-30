@@ -38,7 +38,7 @@ contract CommentsTest is Test, IERC721Receiver {
     address indexed app,
     uint256 channelId,
     bytes32 parentId,
-    uint80 createdAt,
+    uint64 createdAt,
     string content,
     string metadata,
     string targetUri,
@@ -322,7 +322,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_PostComment_ExpiredDeadline() public {
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(author, app);
-    commentData.deadline = block.timestamp - 1; // Expired deadline
+    commentData.deadline = uint64(block.timestamp - 1); // Expired deadline
 
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSignature = TestUtils.signEIP712(
@@ -470,7 +470,7 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       channelId,
       commentData.parentId,
-      uint80(block.timestamp),
+      uint64(block.timestamp),
       commentData.content,
       commentData.metadata,
       commentData.targetUri,

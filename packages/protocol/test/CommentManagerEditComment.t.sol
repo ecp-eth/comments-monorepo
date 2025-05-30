@@ -22,8 +22,8 @@ contract CommentsTest is Test, IERC721Receiver {
     address app,
     uint256 channelId,
     bytes32 parentId,
-    uint80 createdAt,
-    uint80 updatedAt,
+    uint64 createdAt,
+    uint64 updatedAt,
     string content,
     string metadata,
     string targetUri,
@@ -97,7 +97,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     expectedCommentData.content = editData.content;
     expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint80(block.timestamp);
+    expectedCommentData.updatedAt = uint64(block.timestamp);
 
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
@@ -108,8 +108,8 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       commentData.channelId,
       commentData.parentId,
-      uint80(block.timestamp),
-      uint80(block.timestamp),
+      uint64(block.timestamp),
+      uint64(block.timestamp),
       editData.content,
       editData.metadata,
       commentData.targetUri,
@@ -122,7 +122,7 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
     assertEq(editedComment.metadata, editData.metadata);
-    assertEq(editedComment.updatedAt, uint80(block.timestamp));
+    assertEq(editedComment.updatedAt, uint64(block.timestamp));
   }
 
   function test_EditComment_AsAuthor_UpdatedWithHookData() public {
@@ -172,7 +172,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     expectedCommentData.content = editData.content;
     expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint80(block.timestamp);
+    expectedCommentData.updatedAt = uint64(block.timestamp);
 
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
@@ -183,8 +183,8 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       commentData.channelId,
       commentData.parentId,
-      uint80(block.timestamp),
-      uint80(block.timestamp),
+      uint64(block.timestamp),
+      uint64(block.timestamp),
       editData.content,
       editData.metadata,
       commentData.targetUri,
@@ -199,7 +199,7 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
     assertEq(editedComment.metadata, editData.metadata);
-    assertEq(editedComment.updatedAt, uint80(block.timestamp));
+    assertEq(editedComment.updatedAt, uint64(block.timestamp));
     assertEq(editedComment.hookData, "hook data edited");
   }
 
@@ -342,7 +342,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     expectedCommentData.content = editData.content;
     expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint80(block.timestamp);
+    expectedCommentData.updatedAt = uint64(block.timestamp);
 
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
@@ -352,8 +352,8 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       commentData.channelId,
       commentData.parentId,
-      uint80(block.timestamp),
-      uint80(block.timestamp),
+      uint64(block.timestamp),
+      uint64(block.timestamp),
       editData.content,
       editData.metadata,
       commentData.targetUri,
@@ -371,7 +371,7 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
     assertEq(editedComment.metadata, editData.metadata);
-    assertEq(editedComment.updatedAt, uint80(block.timestamp));
+    assertEq(editedComment.updatedAt, uint64(block.timestamp));
   }
 
   function test_EditComment_InvalidAppSignature() public {
@@ -516,7 +516,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     expectedCommentData.content = editData.content;
     expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint80(block.timestamp);
+    expectedCommentData.updatedAt = uint64(block.timestamp);
 
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
@@ -526,8 +526,8 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       commentData.channelId,
       commentData.parentId,
-      uint80(block.timestamp),
-      uint80(block.timestamp),
+      uint64(block.timestamp),
+      uint64(block.timestamp),
       editData.content,
       editData.metadata,
       commentData.targetUri,
@@ -545,7 +545,7 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
     assertEq(editedComment.metadata, editData.metadata);
-    assertEq(editedComment.updatedAt, uint80(block.timestamp));
+    assertEq(editedComment.updatedAt, uint64(block.timestamp));
   }
 
   function test_EditComment_ExpiredDeadline() public {
@@ -568,7 +568,7 @@ contract CommentsTest is Test, IERC721Receiver {
       author,
       app
     );
-    editData.deadline = block.timestamp - 1; // Set expired deadline
+    editData.deadline = uint64(block.timestamp - 1); // Set expired deadline
 
     bytes32 editHash = comments.getEditCommentHash(
       commentId,

@@ -149,7 +149,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: bytes32(0)
     });
 
@@ -188,7 +188,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: bytes32(0)
     });
 
@@ -230,7 +230,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: bytes32(0)
     });
 
@@ -257,7 +257,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: bytes32(0)
     });
 

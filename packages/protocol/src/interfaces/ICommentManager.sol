@@ -26,7 +26,7 @@ interface ICommentManager {
     address indexed app,
     uint256 channelId,
     bytes32 parentId,
-    uint80 createdAt,
+    uint64 createdAt,
     string content,
     string metadata,
     string targetUri,
@@ -58,8 +58,8 @@ interface ICommentManager {
     address app,
     uint256 channelId,
     bytes32 parentId,
-    uint80 createdAt,
-    uint80 updatedAt,
+    uint64 createdAt,
+    uint64 updatedAt,
     string content,
     string metadata,
     string targetUri,
@@ -94,7 +94,7 @@ interface ICommentManager {
     uint256 provided
   );
   /// @notice Error thrown when deadline has passed
-  error SignatureDeadlineReached(uint256 deadline, uint256 currentTime);
+  error SignatureDeadlineReached(uint64 deadline, uint256 currentTime);
   /// @notice Error thrown when caller is not authorized
   error NotAuthorized(address caller, address requiredCaller);
   /// @notice Error thrown when signature length is invalid
@@ -142,7 +142,7 @@ interface ICommentManager {
   function deleteCommentWithSig(
     bytes32 commentId,
     address app,
-    uint256 deadline,
+    uint64 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
   ) external;
@@ -187,7 +187,7 @@ interface ICommentManager {
     address author,
     address app,
     uint256 nonce,
-    uint256 deadline,
+    uint64 deadline,
     bytes calldata signature
   ) external;
 
@@ -201,7 +201,7 @@ interface ICommentManager {
     address author,
     address app,
     uint256 nonce,
-    uint256 deadline,
+    uint64 deadline,
     bytes calldata signature
   ) external;
 
@@ -215,7 +215,7 @@ interface ICommentManager {
     address author,
     address app,
     uint256 nonce,
-    uint256 deadline
+    uint64 deadline
   ) external view returns (bytes32);
 
   /// @notice Calculates the EIP-712 hash for removing an approval
@@ -228,7 +228,7 @@ interface ICommentManager {
     address author,
     address app,
     uint256 nonce,
-    uint256 deadline
+    uint64 deadline
   ) external view returns (bytes32);
 
   /// @notice Calculates the EIP-712 hash for deleting a comment
@@ -241,7 +241,7 @@ interface ICommentManager {
     bytes32 commentId,
     address author,
     address app,
-    uint256 deadline
+    uint64 deadline
   ) external view returns (bytes32);
 
   /// @notice Calculates the EIP-712 hash for editing a comment

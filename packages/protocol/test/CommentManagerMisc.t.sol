@@ -22,7 +22,7 @@ contract CommentsTest is Test, IERC721Receiver {
     address indexed app,
     uint256 channelId,
     bytes32 parentId,
-    uint80 createdAt,
+    uint64 createdAt,
     string content,
     string metadata,
     string targetUri,
@@ -78,7 +78,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
   function test_AddApproval_WithSignature() public {
     uint256 nonce = 0;
-    uint256 deadline = block.timestamp + 1 days;
+    uint64 deadline = uint64(block.timestamp + 1 days);
 
     bytes32 addApprovalHash = comments.getAddApprovalHash(
       author,
@@ -106,7 +106,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.addApproval(app);
 
     uint256 nonce = 0;
-    uint256 deadline = block.timestamp + 1 days;
+    uint64 deadline = uint64(block.timestamp + 1 days);
 
     bytes32 removeHash = comments.getRemoveApprovalHash(
       author,
@@ -130,7 +130,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
   function test_AddApproval_InvalidNonce() public {
     uint256 wrongNonce = 1;
-    uint256 deadline = block.timestamp + 1 days;
+    uint64 deadline = uint64(block.timestamp + 1 days);
 
     bytes32 addApprovalHash = comments.getAddApprovalHash(
       author,
@@ -161,7 +161,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.addApproval(app);
 
     uint256 wrongNonce = 1;
-    uint256 deadline = block.timestamp + 1 days;
+    uint64 deadline = uint64(block.timestamp + 1 days);
 
     bytes32 removeApprovalHash = comments.getRemoveApprovalHash(
       author,
@@ -252,7 +252,6 @@ contract CommentsTest is Test, IERC721Receiver {
 
     assertEq(comments.getNonce(author, app), initialNonce);
 
-    // Try to reuse the same nonce
     vm.expectEmit(true, true, true, true);
     emit CommentAdded(
       commentId,
@@ -260,7 +259,7 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       0,
       commentData.parentId,
-      uint80(block.timestamp),
+      uint64(block.timestamp),
       commentData.content,
       commentData.metadata,
       commentData.targetUri,

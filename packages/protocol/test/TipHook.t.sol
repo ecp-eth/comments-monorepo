@@ -112,7 +112,7 @@ contract TipHook is BaseHook {
         author: address(this),
         app: address(this),
         channelId: commentData.channelId,
-        deadline: block.timestamp + 1 days,
+        deadline: uint64(block.timestamp + 1 days),
         parentId: commentId
       });
 
@@ -316,7 +316,7 @@ contract TipHookTest is Test, IERC721Receiver {
     address indexed app,
     uint256 channelId,
     bytes32 parentId,
-    uint80 createdAt,
+    uint64 createdAt,
     string content,
     string metadata,
     string targetUri,
@@ -375,7 +375,7 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: bytes32(0)
     });
 
@@ -408,7 +408,7 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user2,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: parentId
     });
 
@@ -444,7 +444,7 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: bytes32(0)
     });
 
@@ -473,7 +473,7 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user2,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: parentCommentId
     });
 
@@ -499,7 +499,7 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: bytes32(0)
     });
 
@@ -528,7 +528,7 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user2,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: parentCommentId
     });
 
@@ -554,7 +554,7 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: bytes32(0)
     });
 
@@ -579,7 +579,7 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user2,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: parentCommentId
     });
 
@@ -610,7 +610,7 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: bytes32(0)
     });
 
@@ -641,7 +641,7 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user2,
       app: user2,
       channelId: channelId,
-      deadline: block.timestamp + 1 days,
+      deadline: uint64(block.timestamp + 1 days),
       parentId: parentId
     });
 
@@ -662,7 +662,7 @@ contract TipHookTest is Test, IERC721Receiver {
       replyComment.app,
       replyComment.channelId,
       replyComment.parentId,
-      uint80(block.timestamp),
+      uint64(block.timestamp),
       replyComment.content,
       replyComment.metadata,
       replyComment.targetUri,

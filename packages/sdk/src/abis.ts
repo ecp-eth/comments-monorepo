@@ -125,8 +125,8 @@ export const CommentManagerABI = [
       },
       {
         name: "deadline",
-        type: "uint256",
-        internalType: "uint256",
+        type: "uint64",
+        internalType: "uint64",
       },
       {
         name: "signature",
@@ -179,8 +179,8 @@ export const CommentManagerABI = [
       },
       {
         name: "deadline",
-        type: "uint256",
-        internalType: "uint256",
+        type: "uint64",
+        internalType: "uint64",
       },
       {
         name: "authorSignature",
@@ -222,8 +222,8 @@ export const CommentManagerABI = [
           },
           {
             name: "deadline",
-            type: "uint256",
-            internalType: "uint256",
+            type: "uint64",
+            internalType: "uint64",
           },
           {
             name: "content",
@@ -272,8 +272,8 @@ export const CommentManagerABI = [
           },
           {
             name: "deadline",
-            type: "uint256",
-            internalType: "uint256",
+            type: "uint64",
+            internalType: "uint64",
           },
           {
             name: "content",
@@ -322,8 +322,8 @@ export const CommentManagerABI = [
       },
       {
         name: "deadline",
-        type: "uint256",
-        internalType: "uint256",
+        type: "uint64",
+        internalType: "uint64",
       },
     ],
     outputs: [
@@ -363,13 +363,13 @@ export const CommentManagerABI = [
           },
           {
             name: "createdAt",
-            type: "uint80",
-            internalType: "uint80",
+            type: "uint64",
+            internalType: "uint64",
           },
           {
             name: "updatedAt",
-            type: "uint80",
-            internalType: "uint80",
+            type: "uint64",
+            internalType: "uint64",
           },
           {
             name: "channelId",
@@ -437,8 +437,8 @@ export const CommentManagerABI = [
           },
           {
             name: "deadline",
-            type: "uint256",
-            internalType: "uint256",
+            type: "uint64",
+            internalType: "uint64",
           },
           {
             name: "parentId",
@@ -498,8 +498,8 @@ export const CommentManagerABI = [
       },
       {
         name: "deadline",
-        type: "uint256",
-        internalType: "uint256",
+        type: "uint64",
+        internalType: "uint64",
       },
     ],
     outputs: [
@@ -542,8 +542,8 @@ export const CommentManagerABI = [
           },
           {
             name: "deadline",
-            type: "uint256",
-            internalType: "uint256",
+            type: "uint64",
+            internalType: "uint64",
           },
           {
             name: "content",
@@ -612,8 +612,8 @@ export const CommentManagerABI = [
       },
       {
         name: "deadline",
-        type: "uint256",
-        internalType: "uint256",
+        type: "uint64",
+        internalType: "uint64",
       },
     ],
     outputs: [
@@ -733,8 +733,8 @@ export const CommentManagerABI = [
           },
           {
             name: "deadline",
-            type: "uint256",
-            internalType: "uint256",
+            type: "uint64",
+            internalType: "uint64",
           },
           {
             name: "parentId",
@@ -798,8 +798,8 @@ export const CommentManagerABI = [
           },
           {
             name: "deadline",
-            type: "uint256",
-            internalType: "uint256",
+            type: "uint64",
+            internalType: "uint64",
           },
           {
             name: "parentId",
@@ -863,8 +863,8 @@ export const CommentManagerABI = [
       },
       {
         name: "deadline",
-        type: "uint256",
-        internalType: "uint256",
+        type: "uint64",
+        internalType: "uint64",
       },
       {
         name: "signature",
@@ -1008,9 +1008,9 @@ export const CommentManagerABI = [
       },
       {
         name: "createdAt",
-        type: "uint80",
+        type: "uint64",
         indexed: false,
-        internalType: "uint80",
+        internalType: "uint64",
       },
       {
         name: "content",
@@ -1106,15 +1106,15 @@ export const CommentManagerABI = [
       },
       {
         name: "createdAt",
-        type: "uint80",
+        type: "uint64",
         indexed: false,
-        internalType: "uint80",
+        internalType: "uint64",
       },
       {
         name: "updatedAt",
-        type: "uint80",
+        type: "uint64",
         indexed: false,
-        internalType: "uint80",
+        internalType: "uint64",
       },
       {
         name: "content",
@@ -1344,8 +1344,8 @@ export const CommentManagerABI = [
     inputs: [
       {
         name: "deadline",
-        type: "uint256",
-        internalType: "uint256",
+        type: "uint64",
+        internalType: "uint64",
       },
       {
         name: "currentTime",

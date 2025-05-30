@@ -82,7 +82,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      block.timestamp + 1 days
+      uint64(block.timestamp + 1 days)
     );
     bytes memory authorDeleteSignature = TestUtils.signEIP712(
       vm,
@@ -95,7 +95,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      block.timestamp + 1 days,
+      uint64(block.timestamp + 1 days),
       authorDeleteSignature,
       ""
     );
@@ -116,8 +116,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postComment(commentData, appSignature);
 
     // Try to delete with wrong signature
-    uint256 nonce = comments.getNonce(author, app);
-    uint256 deadline = block.timestamp + 1 days;
+    uint64 deadline = uint64(block.timestamp + 1 days);
     bytes32 deleteHash = comments.getDeleteCommentHash(
       commentId,
       author,
@@ -165,7 +164,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      block.timestamp + 1 days
+      uint64(block.timestamp + 1 days)
     );
     bytes memory appDeleteSignature = TestUtils.signEIP712(
       vm,
@@ -178,7 +177,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      block.timestamp + 1 days,
+      uint64(block.timestamp + 1 days),
       "",
       appDeleteSignature
     );
@@ -203,7 +202,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      block.timestamp + 1 days
+      uint64(block.timestamp + 1 days)
     );
     bytes memory appDeleteSignature = TestUtils.signEIP712(
       vm,
@@ -222,7 +221,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      block.timestamp + 1 days,
+      uint64(block.timestamp + 1 days),
       "",
       appDeleteSignature
     );
@@ -245,7 +244,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.addApproval(app);
 
     // Try to delete with wrong signature
-    uint256 deadline = block.timestamp + 1 days;
+    uint64 deadline = uint64(block.timestamp + 1 days);
     bytes32 deleteHash = comments.getDeleteCommentHash(
       commentId,
       author,
@@ -293,7 +292,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      block.timestamp + 1 days
+      uint64(block.timestamp + 1 days)
     );
     bytes memory appDeleteSignature = TestUtils.signEIP712(
       vm,
@@ -307,7 +306,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      block.timestamp + 1 days,
+      uint64(block.timestamp + 1 days),
       "",
       appDeleteSignature
     );
@@ -332,7 +331,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      block.timestamp + 1 days
+      uint64(block.timestamp + 1 days)
     );
     bytes memory appDeleteSignature = TestUtils.signEIP712(
       vm,
@@ -351,7 +350,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      block.timestamp + 1 days,
+      uint64(block.timestamp + 1 days),
       "",
       appDeleteSignature
     );
@@ -413,7 +412,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      block.timestamp + 1 days
+      uint64(block.timestamp + 1 days)
     );
     bytes memory appDeleteSignature = TestUtils.signEIP712(
       vm,
@@ -426,7 +425,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      block.timestamp + 1 days,
+      uint64(block.timestamp + 1 days),
       bytes(""), // Empty author signature
       appDeleteSignature
     );

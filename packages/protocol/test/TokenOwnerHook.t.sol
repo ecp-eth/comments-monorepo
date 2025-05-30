@@ -180,7 +180,7 @@ contract TokenCreatorHookTest is Test {
       metadata: "",
       targetUri: validTargetUri,
       commentType: "comment",
-      deadline: block.timestamp + 1 hours
+      deadline: uint64(block.timestamp + 1 hours)
     });
 
     // Post comment as token creator
@@ -206,7 +206,7 @@ contract TokenCreatorHookTest is Test {
       metadata: "",
       targetUri: validTargetUri,
       commentType: "comment",
-      deadline: block.timestamp + 1 hours
+      deadline: uint64(block.timestamp + 1 hours)
     });
 
     vm.prank(tokenCreator);
@@ -223,7 +223,7 @@ contract TokenCreatorHookTest is Test {
       metadata: "",
       targetUri: "", // No target URI needed for replies
       commentType: "comment",
-      deadline: block.timestamp + 1 hours
+      deadline: uint64(block.timestamp + 1 hours)
     });
 
     vm.prank(replier);
@@ -247,7 +247,7 @@ contract TokenCreatorHookTest is Test {
       metadata: "",
       targetUri: invalidTargetUri,
       commentType: "comment",
-      deadline: block.timestamp + 1 hours
+      deadline: uint64(block.timestamp + 1 hours)
     });
 
     // Attempt to post comment
@@ -275,7 +275,7 @@ contract TokenCreatorHookTest is Test {
       metadata: "",
       targetUri: validTargetUri,
       commentType: "comment",
-      deadline: block.timestamp + 1 hours
+      deadline: uint64(block.timestamp + 1 hours)
     });
 
     // Attempt to post comment as non-creator

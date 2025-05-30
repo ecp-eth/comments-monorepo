@@ -264,7 +264,7 @@ library TestUtils {
         author: author,
         app: app,
         channelId: 0,
-        deadline: block.timestamp + 1 days,
+        deadline: uint64(block.timestamp + 1 days),
         parentId: bytes32(0)
       });
   }
@@ -280,7 +280,7 @@ library TestUtils {
         metadata: '{"edited":true}',
         app: app,
         nonce: comments.getNonce(author, app),
-        deadline: block.timestamp + 1 days
+        deadline: uint64(block.timestamp + 1 days)
       });
   }
   /**
