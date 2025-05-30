@@ -1,6 +1,16 @@
 import { useMemo, useState } from "react";
-import type { EnsResolverService, ResolvedAddress } from "../extensions/types";
+import { Hex } from "viem";
 import { usePublicClient } from "wagmi";
+
+export type ResolvedAddress = {
+  address: Hex;
+  label: string;
+};
+
+export type EnsResolverService = {
+  resolveAddress(address: Hex): Promise<ResolvedAddress | null>;
+  resolveName(name: string): Promise<ResolvedAddress | null>;
+};
 
 export function useEnsResolver(): EnsResolverService {
   const client = usePublicClient();
