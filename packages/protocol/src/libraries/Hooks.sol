@@ -11,10 +11,10 @@ library Hooks {
    * @dev Each boolean indicates whether the corresponding hook function is enabled
    */
   struct Permissions {
-    bool onInitialized;
-    bool onCommentAdded;
-    bool onCommentDeleted;
-    bool onCommentEdited;
-    bool onChannelUpdated;
+    bool onInitialize;
+    bool onCommentAdd;
+    bool onCommentDelete;
+    bool onCommentEdit;
+    bool onChannelUpdate;
   }
 }

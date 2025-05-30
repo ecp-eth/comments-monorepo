@@ -300,11 +300,11 @@ contract TokenCreatorHookTest is Test {
         metadata: metadata,
         hook: address(0),
         permissions: Hooks.Permissions({
-          onInitialized: false,
-          onCommentAdded: false,
-          onCommentEdited: false,
-          onCommentDeleted: false,
-          onChannelUpdated: false
+          onInitialize: false,
+          onCommentAdd: false,
+          onCommentEdit: false,
+          onCommentDelete: false,
+          onChannelUpdate: false
         })
       });
   }

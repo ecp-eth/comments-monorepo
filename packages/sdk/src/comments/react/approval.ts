@@ -10,18 +10,18 @@ import { usePublicClient, useWriteContract } from "wagmi";
 import {
   type IsApprovedParams,
   isApproved,
-  type AddApprovalAsAuthorParams,
-  type AddApprovalAsAuthorResult,
-  addApprovalAsAuthor,
   type AddApprovalParams,
   type AddApprovalResult,
   addApproval,
-  type RevokeApprovalAsAuthorParams,
-  type RevokeApprovalAsAuthorResult,
-  revokeApprovalAsAuthor,
+  type AddApprovalWithSigParams,
+  type AddApprovalWithSigResult,
+  addApprovalWithSig,
   type RevokeApprovalParams,
   type RevokeApprovalResult,
   revokeApproval,
+  type RevokeApprovalWithSigParams,
+  type RevokeApprovalWithSigResult,
+  revokeApprovalWithSig,
 } from "../approval.js";
 
 export type UseIsApprovedParams = Omit<IsApprovedParams, "readContract">;
@@ -64,46 +64,6 @@ export function useIsApproved(
   });
 }
 
-export type UseAddApprovalAsAuthorParams = Omit<
-  AddApprovalAsAuthorParams,
-  "writeContract"
->;
-export type UseAddApprovalAsAuthorOptions = Omit<
-  UseMutationOptions<
-    AddApprovalAsAuthorResult,
-    Error,
-    UseAddApprovalAsAuthorParams
-  >,
-  "mutationFn"
->;
-export type UseAddApprovalAsAuthorResult = UseMutationResult<
-  AddApprovalAsAuthorResult,
-  Error,
-  UseAddApprovalAsAuthorParams
->;
-
-/**
- * React hook to approve an app signer directly as author
- *
- * @param options - The options for the mutation
- * @returns The result of the mutation
- */
-export function useAddApprovalAsAuthor(
-  options: UseAddApprovalAsAuthorOptions = {},
-): UseAddApprovalAsAuthorResult {
-  const { writeContractAsync } = useWriteContract();
-
-  return useMutation({
-    ...options,
-    mutationFn: (params) => {
-      return addApprovalAsAuthor({
-        ...params,
-        writeContract: writeContractAsync,
-      });
-    },
-  });
-}
-
 export type UseAddApprovalParams = Omit<AddApprovalParams, "writeContract">;
 export type UseAddApprovalOptions = Omit<
   UseMutationOptions<AddApprovalResult, Error, UseAddApprovalParams>,
@@ -116,7 +76,7 @@ export type UseAddApprovalResult = UseMutationResult<
 >;
 
 /**
- * React hook to add an app signer approval with signature verification
+ * React hook to approve an app signer directly as author
  *
  * @param options - The options for the mutation
  * @returns The result of the mutation
@@ -137,39 +97,39 @@ export function useAddApproval(
   });
 }
 
-export type UseRevokeApprovalAsAuthorParams = Omit<
-  RevokeApprovalAsAuthorParams,
+export type UseAddApprovalWithSigParams = Omit<
+  AddApprovalWithSigParams,
   "writeContract"
 >;
-export type UseRevokeApprovalAsAuthorOptions = Omit<
+export type UseAddApprovalWithSigOptions = Omit<
   UseMutationOptions<
-    RevokeApprovalAsAuthorResult,
+    AddApprovalWithSigResult,
     Error,
-    UseRevokeApprovalAsAuthorParams
+    UseAddApprovalWithSigParams
   >,
   "mutationFn"
 >;
-export type UseRevokeApprovalAsAuthorResult = UseMutationResult<
-  RevokeApprovalAsAuthorResult,
+export type UseAddApprovalWithSigResult = UseMutationResult<
+  AddApprovalWithSigResult,
   Error,
-  UseRevokeApprovalAsAuthorParams
+  UseAddApprovalWithSigParams
 >;
 
 /**
- * React hook to revoke an app signer approval directly as author
+ * React hook to add an app signer approval with signature verification
  *
  * @param options - The options for the mutation
  * @returns The result of the mutation
  */
-export function useRevokeApprovalAsAuthor(
-  options: UseRevokeApprovalAsAuthorOptions = {},
-): UseRevokeApprovalAsAuthorResult {
+export function useAddApprovalWithSig(
+  options: UseAddApprovalWithSigOptions = {},
+): UseAddApprovalWithSigResult {
   const { writeContractAsync } = useWriteContract();
 
   return useMutation({
     ...options,
     mutationFn: (params) => {
-      return revokeApprovalAsAuthor({
+      return addApprovalWithSig({
         ...params,
         writeContract: writeContractAsync,
       });
@@ -192,7 +152,7 @@ export type UseRevokeApprovalResult = UseMutationResult<
 >;
 
 /**
- * React hook to remove an app signer approval with signature verification
+ * React hook to revoke an app signer approval directly as author
  *
  * @param options - The options for the mutation
  * @returns The result of the mutation
@@ -206,6 +166,46 @@ export function useRevokeApproval(
     ...options,
     mutationFn: (params) => {
       return revokeApproval({
+        ...params,
+        writeContract: writeContractAsync,
+      });
+    },
+  });
+}
+
+export type UseRevokeApprovalWithSigParams = Omit<
+  RevokeApprovalWithSigParams,
+  "writeContract"
+>;
+export type UseRevokeApprovalWithSigOptions = Omit<
+  UseMutationOptions<
+    RevokeApprovalWithSigResult,
+    Error,
+    UseRevokeApprovalWithSigParams
+  >,
+  "mutationFn"
+>;
+export type UseRevokeApprovalWithSigResult = UseMutationResult<
+  RevokeApprovalWithSigResult,
+  Error,
+  UseRevokeApprovalWithSigParams
+>;
+
+/**
+ * React hook to remove an app signer approval with signature verification
+ *
+ * @param options - The options for the mutation
+ * @returns The result of the mutation
+ */
+export function useRevokeApprovalWithSig(
+  options: UseRevokeApprovalWithSigOptions = {},
+): UseRevokeApprovalWithSigResult {
+  const { writeContractAsync } = useWriteContract();
+
+  return useMutation({
+    ...options,
+    mutationFn: (params) => {
+      return revokeApprovalWithSig({
         ...params,
         writeContract: writeContractAsync,
       });

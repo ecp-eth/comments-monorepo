@@ -146,8 +146,8 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
       IHook hook = IHook(channel.hook);
       Hooks.Permissions memory permissions = hook.getHookPermissions();
 
-      if (permissions.onChannelUpdated) {
-        hook.onChannelUpdated(address(this), channelId, channel);
+      if (permissions.onChannelUpdate) {
+        hook.onChannelUpdate(address(this), channelId, channel);
       }
     }
   }
@@ -183,12 +183,8 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
       channels[channelId].permissions = permissions;
 
       // Call afterInitialize hook if permitted
-      if (permissions.onInitialized) {
-        IHook(hook).onInitialized(
-          address(this),
-          channels[channelId],
-          channelId
-        );
+      if (permissions.onInitialize) {
+        IHook(hook).onInitialize(address(this), channels[channelId], channelId);
       }
     } else {
       delete channels[channelId].hook; // Properly reset to default value

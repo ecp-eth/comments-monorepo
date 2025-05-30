@@ -7,8 +7,8 @@ import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
 import { fetchAPI } from "./fetch";
 import { SignCommentPayloadRequestSchemaType } from "./generated/schemas";
 import {
-  deleteCommentAsAuthorViaCommentsV1,
-  postCommentAsAuthorViaCommentsV1,
+  deleteCommentViaCommentsV1,
+  postCommentAsViaCommentsV1,
 } from "./contracts";
 import { chain, config } from "../wagmi.config";
 import { FetchCommentInfinityQuerySchema } from "../hooks/useOptimisticCommentingManager/schemas";
@@ -45,7 +45,7 @@ export const postComment = async (
     hash: commentId,
   } = signed;
 
-  const txHash = await postCommentAsAuthorViaCommentsV1({
+  const txHash = await postCommentAsViaCommentsV1({
     commentData,
     appSignature,
   });
@@ -65,7 +65,7 @@ export const postComment = async (
 };
 
 export const deleteComment = async ({ commentId }: { commentId: Hex }) => {
-  await deleteCommentAsAuthorViaCommentsV1({
+  await deleteCommentViaCommentsV1({
     commentId,
   });
 };

@@ -5,7 +5,9 @@ import { Test } from "forge-std/Test.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
-import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {
+  IERC721Receiver
+} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { TestUtils, MockHook } from "./utils.sol";
 import { Comments } from "../src/libraries/Comments.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
@@ -29,15 +31,15 @@ contract RejectChannelUpdateHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        onInitialized: false,
-        onCommentAdded: false,
-        onCommentDeleted: false,
-        onCommentEdited: false,
-        onChannelUpdated: true
+        onInitialize: false,
+        onCommentAdd: false,
+        onCommentDelete: false,
+        onCommentEdit: false,
+        onChannelUpdate: true
       });
   }
 
-  function onChannelUpdated(
+  function onChannelUpdate(
     address,
     uint256,
     Channels.Channel calldata

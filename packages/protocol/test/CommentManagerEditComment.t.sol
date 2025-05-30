@@ -60,7 +60,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.deal(app, 100 ether);
   }
 
-  function test_EditCommentAsAuthor() public {
+  function test_EditComment_AsAuthor() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(comments, author, app);
@@ -125,7 +125,7 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(editedComment.updatedAt, uint80(block.timestamp));
   }
 
-  function test_EditCommentAsAuthor_UpdatedWithHookData() public {
+  function test_EditComment_AsAuthor_UpdatedWithHookData() public {
     // Create a channel with the reject hook
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
@@ -203,7 +203,7 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(editedComment.hookData, "hook data edited");
   }
 
-  function test_EditCommentAsAuthor_RejectedByHook() public {
+  function test_EditComment_AsAuthor_RejectedByHook() public {
     // Create a channel with the reject hook
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
@@ -249,7 +249,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.editComment(commentId, editData, editAppSignature);
   }
 
-  function test_EditCommentAsAuthor_InvalidAuthor() public {
+  function test_EditComment_AsAuthor_InvalidAuthor() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(comments, author, app);
@@ -360,7 +360,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentData.commentType,
       ""
     );
-    comments.editCommentWithApproval(
+    comments.editCommentWithSig(
       commentId,
       editData,
       editAuthorSignature,
@@ -411,7 +411,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
 
     vm.expectRevert(ICommentManager.InvalidAppSignature.selector);
-    comments.editCommentWithApproval(
+    comments.editCommentWithSig(
       commentId,
       editData,
       editAuthorSignature,
@@ -467,7 +467,7 @@ contract CommentsTest is Test, IERC721Receiver {
         editData.nonce
       )
     );
-    comments.editCommentWithApproval(
+    comments.editCommentWithSig(
       commentId,
       editData,
       editAuthorSignature,
@@ -475,10 +475,10 @@ contract CommentsTest is Test, IERC721Receiver {
     );
   }
 
-  function test_EditComment_WithApproval() public {
+  function test_EditComment_WithSigs() public {
     // First add approval
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     // Create and post a comment
     Comments.CreateComment memory commentData = TestUtils
@@ -534,7 +534,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentData.commentType,
       ""
     );
-    comments.editCommentWithApproval(
+    comments.editCommentWithSig(
       commentId,
       editData,
       bytes(""),
@@ -593,7 +593,7 @@ contract CommentsTest is Test, IERC721Receiver {
         block.timestamp
       )
     );
-    comments.editCommentWithApproval(
+    comments.editCommentWithSig(
       commentId,
       editData,
       editAuthorSignature,
@@ -625,7 +625,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
 
     vm.expectRevert("Comment does not exist");
-    comments.editCommentWithApproval(
+    comments.editCommentWithSig(
       nonExistentId,
       editData,
       editAuthorSignature,
@@ -680,7 +680,7 @@ contract CommentsTest is Test, IERC721Receiver {
         author
       )
     );
-    comments.editCommentWithApproval(
+    comments.editCommentWithSig(
       commentId,
       editData,
       editAuthorSignature,
@@ -707,15 +707,15 @@ contract RejectEditHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        onInitialized: false,
-        onCommentAdded: false,
-        onCommentDeleted: false,
-        onCommentEdited: true,
-        onChannelUpdated: false
+        onInitialize: false,
+        onCommentAdd: false,
+        onCommentDelete: false,
+        onCommentEdit: true,
+        onChannelUpdate: false
       });
   }
 
-  function onCommentEdited(
+  function onCommentEdit(
     Comments.Comment calldata,
     address,
     bytes32

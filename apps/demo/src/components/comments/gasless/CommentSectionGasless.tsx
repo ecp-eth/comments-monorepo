@@ -12,7 +12,7 @@ import {
 import { createApprovalTypedData } from "@ecp.eth/sdk/comments";
 import {
   useGaslessTransaction,
-  useRevokeApprovalAsAuthor,
+  useRevokeApproval,
 } from "@ecp.eth/sdk/comments/react";
 import { fetchComments } from "@ecp.eth/sdk/indexer";
 import {
@@ -52,7 +52,7 @@ export function CommentSectionGasless() {
     [currentUrl, viewer],
   );
 
-  const { mutateAsync: revokeApproval } = useRevokeApprovalAsAuthor();
+  const { mutateAsync: revokeApproval } = useRevokeApproval();
 
   const removeApprovalContract = useWriteContract();
 

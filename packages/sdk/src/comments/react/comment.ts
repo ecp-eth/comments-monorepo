@@ -12,9 +12,9 @@ import {
   type PostCommentParams,
   type PostCommentResult,
   postComment,
-  type PostCommentWithApprovalParams,
-  type PostCommentWithApprovalResult,
-  postCommentWithApproval,
+  type PostCommentWithSigParams,
+  type PostCommentWithSigResult,
+  postCommentWithSig,
   type GetCommentParams,
   type GetCommentResult,
   getComment,
@@ -23,12 +23,12 @@ import {
   type DeleteCommentParams,
   type DeleteCommentResult,
   deleteComment,
-  type DeleteCommentWithApprovalParams,
-  deleteCommentWithApproval,
+  type DeleteCommentWithSigParams,
+  deleteCommentWithSig,
   getNonce,
-  editCommentWithApproval,
-  type EditCommentWithApprovalParams,
-  type EditCommentWithApprovalResult,
+  editCommentWithSig,
+  type EditCommentWithSigParams,
+  type EditCommentWithSigResult,
   editComment,
   type EditCommentParams,
   type EditCommentResult,
@@ -72,22 +72,22 @@ export function usePostComment(
   });
 }
 
-export type UsePostCommentWithApprovalParams = Omit<
-  PostCommentWithApprovalParams,
+export type UsePostCommentWithSigParams = Omit<
+  PostCommentWithSigParams,
   "writeContract"
 >;
-export type UsePostCommentWithApprovalOptions = Omit<
+export type UsePostCommentWithSigOptions = Omit<
   UseMutationOptions<
-    PostCommentWithApprovalResult,
+    PostCommentWithSigResult,
     Error,
-    UsePostCommentWithApprovalParams
+    UsePostCommentWithSigParams
   >,
   "mutationFn"
 >;
-export type UsePostCommentWithApprovalResult = UseMutationResult<
-  PostCommentWithApprovalResult,
+export type UsePostCommentWithSigResult = UseMutationResult<
+  PostCommentWithSigResult,
   Error,
-  UsePostCommentWithApprovalParams
+  UsePostCommentWithSigParams
 >;
 
 /**
@@ -96,15 +96,15 @@ export type UsePostCommentWithApprovalResult = UseMutationResult<
  * @param options - The options for the mutation
  * @returns The result of the mutation
  */
-export function usePostCommentWithApproval(
-  options: UsePostCommentWithApprovalOptions = {},
-): UsePostCommentWithApprovalResult {
+export function usePostCommentWithSig(
+  options: UsePostCommentWithSigOptions = {},
+): UsePostCommentWithSigResult {
   const { writeContractAsync } = useWriteContract();
 
   return useMutation({
     ...options,
     mutationFn: (params) => {
-      return postCommentWithApproval({
+      return postCommentWithSig({
         ...params,
         writeContract: writeContractAsync,
       });
@@ -225,22 +225,18 @@ export function useDeleteComment(
   });
 }
 
-export type UseDeleteCommentWithApprovalParams = Omit<
-  DeleteCommentWithApprovalParams,
+export type UseDeleteCommentWithSigParams = Omit<
+  DeleteCommentWithSigParams,
   "writeContract"
 >;
-export type UseDeleteCommentWithApprovalOptions = Omit<
-  UseMutationOptions<
-    { txHash: Hex },
-    Error,
-    UseDeleteCommentWithApprovalParams
-  >,
+export type UseDeleteCommentWithSigOptions = Omit<
+  UseMutationOptions<{ txHash: Hex }, Error, UseDeleteCommentWithSigParams>,
   "mutationFn"
 >;
-export type UseDeleteCommentWithApprovalResult = UseMutationResult<
+export type UseDeleteCommentWithSigResult = UseMutationResult<
   { txHash: Hex },
   Error,
-  UseDeleteCommentWithApprovalParams
+  UseDeleteCommentWithSigParams
 >;
 
 /**
@@ -249,15 +245,15 @@ export type UseDeleteCommentWithApprovalResult = UseMutationResult<
  * @param options - The options for the mutation
  * @returns The result of the mutation
  */
-export function useDeleteCommentWithApproval(
-  options: UseDeleteCommentWithApprovalOptions = {},
-): UseDeleteCommentWithApprovalResult {
+export function useDeleteCommentWithSig(
+  options: UseDeleteCommentWithSigOptions = {},
+): UseDeleteCommentWithSigResult {
   const { writeContractAsync } = useWriteContract();
 
   return useMutation({
     ...options,
     mutationFn: (params) => {
-      return deleteCommentWithApproval({
+      return deleteCommentWithSig({
         ...params,
         writeContract: writeContractAsync,
       });
@@ -290,22 +286,22 @@ export function useGetNonce(): typeof getNonce {
   );
 }
 
-export type UseEditCommentWithApprovalParams = Omit<
-  EditCommentWithApprovalParams,
+export type UseEditCommentWithSigParams = Omit<
+  EditCommentWithSigParams,
   "writeContract"
 >;
-export type UseEditCommentWithApprovalOptions = Omit<
+export type UseEditCommentWithSigOptions = Omit<
   UseMutationOptions<
-    EditCommentWithApprovalResult,
+    EditCommentWithSigResult,
     Error,
-    UseEditCommentWithApprovalParams
+    UseEditCommentWithSigParams
   >,
   "mutationFn"
 >;
-export type UseEditCommentWithApprovalResult = UseMutationResult<
-  EditCommentWithApprovalResult,
+export type UseEditCommentWithSigResult = UseMutationResult<
+  EditCommentWithSigResult,
   Error,
-  UseEditCommentWithApprovalParams
+  UseEditCommentWithSigParams
 >;
 
 /**
@@ -314,15 +310,15 @@ export type UseEditCommentWithApprovalResult = UseMutationResult<
  * @param options - The options for the mutation
  * @returns The result of the mutation
  */
-export function useEditCommentWithApproval(
-  options: UseEditCommentWithApprovalOptions = {},
-): UseEditCommentWithApprovalResult {
+export function useEditCommentWithSig(
+  options: UseEditCommentWithSigOptions = {},
+): UseEditCommentWithSigResult {
   const { writeContractAsync } = useWriteContract();
 
   return useMutation({
     ...options,
     mutationFn: (params) => {
-      return editCommentWithApproval({
+      return editCommentWithSig({
         ...params,
         writeContract: writeContractAsync,
       });

@@ -43,13 +43,13 @@ export function useCommentActions({
   const commentSubmission = useCommentSubmission();
   const commentEdition = useCommentEdition();
   const commentRetryEdition = useCommentRetryEdition();
-  const { mutateAsync: deleteCommentAsAuthor } = useDeleteComment();
-  const { mutateAsync: postCommentAsAuthor } = usePostComment();
-  const { mutateAsync: editCommentAsAuthor } = useEditComment();
+  const { mutateAsync: deleteCommentMutation } = useDeleteComment();
+  const { mutateAsync: postCommentMutation } = usePostComment();
+  const { mutateAsync: editCommentMutation } = useEditComment();
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {
-        const { txHash } = await deleteCommentAsAuthor({
+        const { txHash } = await deleteCommentMutation({
           commentId: params.comment.id,
         });
 
@@ -92,7 +92,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentDeletion, deleteCommentAsAuthor],
+    [wagmiConfig, commentDeletion, deleteCommentMutation],
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(
@@ -131,7 +131,7 @@ export function useCommentActions({
         async writeContractAsync({
           signCommentResponse: { signature: appSignature, data: commentData },
         }) {
-          const { txHash } = await postCommentAsAuthor({
+          const { txHash } = await postCommentMutation({
             appSignature,
             comment: commentData,
           });
@@ -176,7 +176,7 @@ export function useCommentActions({
       connectedAddress,
       commentRetrySubmission,
       switchChainAsync,
-      postCommentAsAuthor,
+      postCommentMutation,
     ],
   );
 
@@ -205,7 +205,7 @@ export function useCommentActions({
         async writeContractAsync({
           signCommentResponse: { signature: appSignature, data: commentData },
         }) {
-          const { txHash } = await postCommentAsAuthor({
+          const { txHash } = await postCommentMutation({
             appSignature,
             comment: commentData,
           });
@@ -245,7 +245,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentSubmission, postCommentAsAuthor, switchChainAsync],
+    [wagmiConfig, commentSubmission, postCommentMutation, switchChainAsync],
   );
 
   const editComment = useCallback<OnEditComment>(
@@ -262,7 +262,7 @@ export function useCommentActions({
         async writeContractAsync({
           signEditCommentResponse: { signature: appSignature, data },
         }) {
-          const { txHash } = await editCommentAsAuthor({
+          const { txHash } = await editCommentMutation({
             appSignature,
             edit: data,
           });
@@ -302,7 +302,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [commentEdition, editCommentAsAuthor, switchChainAsync, wagmiConfig],
+    [commentEdition, editCommentMutation, switchChainAsync, wagmiConfig],
   );
 
   const retryEditComment = useCallback<OnRetryEditComment>(
@@ -331,7 +331,7 @@ export function useCommentActions({
         async writeContractAsync({
           signEditCommentResponse: { signature: appSignature, data },
         }) {
-          const { txHash } = await editCommentAsAuthor({
+          const { txHash } = await editCommentMutation({
             appSignature,
             edit: data,
           });
@@ -372,7 +372,7 @@ export function useCommentActions({
     },
     [
       connectedAddress,
-      editCommentAsAuthor,
+      editCommentMutation,
       switchChainAsync,
       wagmiConfig,
       commentRetryEdition,

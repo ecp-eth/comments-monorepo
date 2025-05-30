@@ -39,15 +39,15 @@ contract FlatFeeHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        onInitialized: false,
-        onCommentAdded: true,
-        onCommentDeleted: false,
-        onCommentEdited: false,
-        onChannelUpdated: false
+        onInitialize: false,
+        onCommentAdd: true,
+        onCommentDelete: false,
+        onCommentEdit: false,
+        onChannelUpdate: false
       });
   }
 
-  function _onCommentAdded(
+  function _onCommentAdd(
     Comments.Comment calldata commentData,
     address,
     bytes32
@@ -57,7 +57,7 @@ contract FlatFeeHook is BaseHook {
     totalFeesCollected += HOOK_FEE;
     emit FeeCollected(commentData.author, HOOK_FEE);
 
-    // Store any excess payment for refund in onCommentAdded
+    // Store any excess payment for refund in onCommentAdd
     if (msg.value > HOOK_FEE) {
       // Process any pending refunds
       uint256 refundAmount = msg.value - HOOK_FEE;
