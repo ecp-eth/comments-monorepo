@@ -42,7 +42,7 @@ type TokenSuggestionsProps = SuggestionProps<TokenSuggestionItem>;
 export const TokenSuggestions = forwardRef<
   TokenMentionSuggestionsRef,
   TokenSuggestionsProps
->(({ command, items }, ref) => {
+>(({ command, items, query }, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const selectItem = (index: number) => {
@@ -86,6 +86,10 @@ export const TokenSuggestions = forwardRef<
       return false;
     },
   }));
+
+  if (!query) {
+    return null;
+  }
 
   return (
     <div className="dropdown-menu">
@@ -171,10 +175,10 @@ export const TokenMentionExtension = Mention.extend<TokenMentionOptions>({
     return {
       ...parent,
       tokenResolver: {
-        resolverCaip19(caip19) {
+        resolverCaip19() {
           return Promise.resolve(null);
         },
-        resolveSymbol(symbol) {
+        resolveSymbol() {
           return Promise.resolve(null);
         },
         searchTokens: async () => [],
@@ -273,14 +277,16 @@ export const TokenMentionExtension = Mention.extend<TokenMentionOptions>({
     };
   },
 
-  addInputRules() {
+  // we probably don't need input rules because the suggestions are handled as you type
+  // and if content is loaded from source it is already parsed and resolved
+  /* addInputRules() {
     const nodeType = this.type;
 
     return [
       {
-        find: /\$([A-Z]+)\s$/,
+        find: /(?<=^|\s)(?:\$)([A-Z]+)([^\w\d])?$/,
         handler: ({ state, match, range }) => {
-          const [, symbol] = match;
+          const [, , symbol, trailingChar] = match;
 
           const node = nodeType.create({
             symbol,
@@ -289,17 +295,21 @@ export const TokenMentionExtension = Mention.extend<TokenMentionOptions>({
 
           const tr = state.tr;
 
-          tr.replaceWith(range.from, range.to, node);
+          const replacement = [node];
 
-          tr.insert(range.from + 1, state.schema.text(" "));
+          if (trailingChar) {
+            replacement.push(state.schema.text(trailingChar));
+          }
+
+          tr.replaceWith(range.from, range.to, replacement);
 
           state.apply(tr);
         },
       },
       {
-        find: /\$eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40})\s$/,
+        find: /(?<=^|\s)(?:\$)(eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40}))([^\w\d])?$/,
         handler: ({ state, match, range }) => {
-          const [, chainId, address] = match;
+          const [, , chainId, address, trailingChar] = match;
 
           const node = nodeType.create({
             caip19: `${chainId}:${address}`,
@@ -308,14 +318,19 @@ export const TokenMentionExtension = Mention.extend<TokenMentionOptions>({
 
           const tr = state.tr;
 
-          tr.replaceWith(range.from, range.to, node);
-          tr.insert(range.from + 1, state.schema.text(" "));
+          const replacement = [node];
+
+          if (trailingChar) {
+            replacement.push(state.schema.text(trailingChar));
+          }
+
+          tr.replaceWith(range.from, range.to, replacement);
 
           state.apply(tr);
         },
       },
     ];
-  },
+  },*/
 
   addProseMirrorPlugins() {
     return [
