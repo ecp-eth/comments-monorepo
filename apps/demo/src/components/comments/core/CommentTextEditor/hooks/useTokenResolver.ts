@@ -25,7 +25,7 @@ export type TokenResolverService = {
   resolverCaip19(caip19: string): Promise<Token | null>;
 
   /**
-   * Searches for tokens by query string (e.g. symbol or name)
+   * Searches for tokens by query string (e.g. symbol or caip19)
    * @param query The search query
    *
    * @returns Array of matching tokens
@@ -65,6 +65,19 @@ export function useTokenResolver({
         return token ?? null;
       },
       async searchTokens(query) {
+        const [, chainId, address] =
+          query.match(/^eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40})$/) ?? [];
+
+        if (chainId && address) {
+          const chainIdNumber = z.coerce.number().int().parse(chainId);
+
+          return tokens.filter(
+            (token) =>
+              token.chainId === chainIdNumber &&
+              isAddressEqual(token.address as Hex, address as Hex),
+          );
+        }
+
         return tokensByChainId.filter((token) =>
           token.symbol.toLowerCase().includes(query.toLowerCase()),
         );
