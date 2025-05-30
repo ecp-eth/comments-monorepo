@@ -8,6 +8,7 @@ import tippy, { Instance } from "tippy.js";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import Suggestion, { SuggestionProps } from "@tiptap/suggestion";
 import { EnsResolverService } from "../hooks/useEnsResolver";
+import { cn } from "@/lib/utils";
 
 export type AddressItem =
   | {
@@ -100,13 +101,14 @@ export const AddressSuggestions = forwardRef<
   }
 
   return (
-    <div className="dropdown-menu">
+    <div className="flex flex-col z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
       {items.length ? (
         items.map((address, index) => (
           <button
-            className={`flex items-center gap-2 w-full p-2 ${
-              index === selectedIndex ? "bg-gray-100" : "hover:bg-gray-50"
-            }`}
+            className={cn(
+              "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
+              index === selectedIndex ? "bg-accent text-accent-foreground" : "",
+            )}
             key={address.id}
             onClick={() => selectItem(index)}
           >
@@ -114,7 +116,9 @@ export const AddressSuggestions = forwardRef<
           </button>
         ))
       ) : (
-        <div className="item">Invalid address</div>
+        <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
+          Invalid address
+        </div>
       )}
     </div>
   );

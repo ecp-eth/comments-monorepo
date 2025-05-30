@@ -8,6 +8,7 @@ import type { Token, TokenResolverService } from "../hooks/useTokenResolver";
 import { Plugin } from "prosemirror-state";
 import type { EditorView } from "prosemirror-view";
 import type { Node, NodeType } from "prosemirror-model";
+import { cn } from "@/lib/utils";
 
 export type TokenMentionSuggestionsRef = {
   onKeyDown: (props: { event: KeyboardEvent }) => boolean;
@@ -92,13 +93,14 @@ export const TokenSuggestions = forwardRef<
   }
 
   return (
-    <div className="dropdown-menu">
+    <div className="flex flex-col z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
       {items.length ? (
         items.map((token, index) => (
           <button
-            className={`flex items-center gap-2 w-full p-2 ${
-              index === selectedIndex ? "bg-gray-100" : "hover:bg-gray-50"
-            }`}
+            className={cn(
+              "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
+              index === selectedIndex ? "bg-accent text-accent-foreground" : "",
+            )}
             key={token.address}
             onClick={() => selectItem(index)}
           >
@@ -113,7 +115,9 @@ export const TokenSuggestions = forwardRef<
           </button>
         ))
       ) : (
-        <div className="item">No tokens found</div>
+        <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
+          No tokens found
+        </div>
       )}
     </div>
   );
