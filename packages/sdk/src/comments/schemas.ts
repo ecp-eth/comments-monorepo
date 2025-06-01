@@ -201,7 +201,6 @@ export const DeleteCommentTypedDataSchema = z.object({
     app: HexSchema,
     author: HexSchema,
     deadline: z.coerce.bigint(),
-    nonce: z.coerce.bigint(),
   }),
   types: z.object({
     DeleteComment: z.array(
@@ -209,7 +208,6 @@ export const DeleteCommentTypedDataSchema = z.object({
         z.object({ name: z.literal("commentId"), type: z.literal("bytes32") }),
         z.object({ name: z.literal("author"), type: z.literal("address") }),
         z.object({ name: z.literal("app"), type: z.literal("address") }),
-        z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
       ]),
     ),

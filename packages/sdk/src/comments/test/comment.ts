@@ -464,19 +464,11 @@ describe("comment", () => {
     });
 
     it("deletes a comment with signatures", async () => {
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const typedData = createDeleteCommentTypedData({
         commentId,
         chainId: anvil.id,
         author: account.address,
         app: appAccount.address,
-        nonce,
         commentsAddress: commentsAddress,
       });
 
@@ -485,7 +477,6 @@ describe("comment", () => {
       const result = await deleteCommentWithSig({
         commentId,
         app: appAccount.address,
-        nonce,
         deadline: typedData.message.deadline,
         appSignature,
         writeContract: appClient.writeContract,
@@ -500,28 +491,21 @@ describe("comment", () => {
     });
 
     it("fails with invalid signatures", async () => {
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
+      console.log("test");
       const typedData = createDeleteCommentTypedData({
         commentId,
         chainId: anvil.id,
         author: account.address,
         app: appAccount.address,
-        nonce,
         commentsAddress: commentsAddress,
       });
+      console.log("test1");
 
       await assert.rejects(
         () =>
           deleteCommentWithSig({
             commentId,
             app: appAccount.address,
-            nonce,
             deadline: typedData.message.deadline,
             appSignature: "0x1234", // Invalid signature
             writeContract: thirdPartyClient.writeContract,
@@ -542,7 +526,6 @@ describe("comment", () => {
           "0x1234567890123456789012345678901234567890123456789012345678901234",
         author: account.address,
         app: appAccount.address,
-        nonce: 0n,
         deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
         readContract: client.readContract,
         commentsAddress: commentsAddress,

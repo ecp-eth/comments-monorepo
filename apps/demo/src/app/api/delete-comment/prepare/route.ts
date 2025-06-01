@@ -12,10 +12,9 @@ import { chain, transport } from "@/lib/wagmi";
 import {
   createDeleteCommentTypedData,
   deleteCommentWithSig,
-  getNonce,
   isApproved,
 } from "@ecp.eth/sdk/comments";
-import { createPublicClient, createWalletClient, publicActions } from "viem";
+import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export async function POST(
@@ -48,16 +47,6 @@ export async function POST(
   const account = privateKeyToAccount(
     env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`,
   );
-  const publicClient = createPublicClient({
-    chain,
-    transport,
-  });
-
-  const nonce = await getNonce({
-    author: authorAddress,
-    app: account.address,
-    readContract: publicClient.readContract,
-  });
 
   // Construct deletion signature data
   const typedDeleteCommentData = createDeleteCommentTypedData({
@@ -65,7 +54,6 @@ export async function POST(
     chainId: chain.id,
     author: authorAddress,
     app: account.address,
-    nonce: nonce,
   });
 
   const signature = await account.signTypedData(typedDeleteCommentData);

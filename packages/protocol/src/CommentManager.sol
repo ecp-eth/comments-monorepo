@@ -23,7 +23,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     );
   bytes32 public constant DELETE_COMMENT_TYPEHASH =
     keccak256(
-      "DeleteComment(bytes32 commentId,address author,address app,uint256 nonce,uint256 deadline)"
+      "DeleteComment(bytes32 commentId,address author,address app,uint256 deadline)"
     );
   bytes32 public constant EDIT_COMMENT_TYPEHASH =
     keccak256(
@@ -281,7 +281,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   function deleteCommentWithSig(
     bytes32 commentId,
     address app,
-    uint256 nonce,
     uint256 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
@@ -293,15 +292,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     require(author != address(0), "Comment does not exist");
 
-    guardNonceAndIncrement(author, app, nonce);
-
-    bytes32 deleteHash = getDeleteCommentHash(
-      commentId,
-      author,
-      app,
-      nonce,
-      deadline
-    );
+    bytes32 deleteHash = getDeleteCommentHash(commentId, author, app, deadline);
 
     // for deleting comment, only single party (either author or app) is needed for authorization
     guardAuthorizedByAuthorOrApp(
@@ -452,18 +443,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     bytes32 commentId,
     address author,
     address app,
-    uint256 nonce,
     uint256 deadline
   ) public view returns (bytes32) {
     bytes32 structHash = keccak256(
-      abi.encode(
-        DELETE_COMMENT_TYPEHASH,
-        commentId,
-        author,
-        app,
-        nonce,
-        deadline
-      )
+      abi.encode(DELETE_COMMENT_TYPEHASH, commentId, author, app, deadline)
     );
 
     return

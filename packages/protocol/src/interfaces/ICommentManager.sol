@@ -136,14 +136,12 @@ interface ICommentManager {
   /// @notice Deletes a comment with author signature verification
   /// @param commentId The unique identifier of the comment to delete
   /// @param app The address of the app signer
-  /// @param nonce The current nonce for the author
   /// @param deadline Timestamp after which the signature becomes invalid
   /// @param authorSignature The signature from the author authorizing deletion (empty if app)
   /// @param appSignature The signature from the app signer authorizing deletion (empty if author)
   function deleteCommentWithSig(
     bytes32 commentId,
     address app,
-    uint256 nonce,
     uint256 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
@@ -237,14 +235,12 @@ interface ICommentManager {
   /// @param commentId The unique identifier of the comment to delete
   /// @param author The address of the comment author
   /// @param app The address of the app signer
-  /// @param nonce The current nonce for the author
   /// @param deadline Timestamp after which the signature becomes invalid
   /// @return The computed hash
   function getDeleteCommentHash(
     bytes32 commentId,
     address author,
     address app,
-    uint256 nonce,
     uint256 deadline
   ) external view returns (bytes32);
 
