@@ -49,6 +49,10 @@ describe("comment", () => {
     "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"; // Anvil's second private key
   const appAccount = privateKeyToAccount(appPrivateKey);
 
+  const thirdPartyPrivateKey =
+    "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"; // Anvil's third private key
+  const thirdPartyAccount = privateKeyToAccount(thirdPartyPrivateKey);
+
   // Create wallet client
   const client = createWalletClient({
     chain: anvil,
@@ -60,6 +64,12 @@ describe("comment", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: appAccount,
+  }).extend(publicActions);
+
+  const thirdPartyClient = createWalletClient({
+    chain: anvil,
+    transport: http("http://localhost:8545"),
+    account: thirdPartyAccount,
   }).extend(publicActions);
 
   describe("postComment()", () => {
@@ -514,7 +524,7 @@ describe("comment", () => {
             nonce,
             deadline: typedData.message.deadline,
             appSignature: "0x1234", // Invalid signature
-            writeContract: appClient.writeContract,
+            writeContract: thirdPartyClient.writeContract,
             commentsAddress: commentsAddress,
           }),
         (err) => {
@@ -780,7 +790,7 @@ describe("comment", () => {
           editCommentWithApproval({
             edit,
             appSignature: "0x1234", // Invalid signature
-            writeContract: appClient.writeContract,
+            writeContract: thirdPartyClient.writeContract,
             commentsAddress: commentsAddress,
           }),
         (err) => {

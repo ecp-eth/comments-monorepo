@@ -3,7 +3,9 @@ pragma solidity ^0.8.20;
 
 import { Test } from "forge-std/Test.sol";
 import { Vm } from "forge-std/Vm.sol";
-import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {
+  IERC721Receiver
+} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { LibString } from "solady/utils/LibString.sol";
 import { CommentManager } from "../src/CommentManager.sol";
@@ -248,6 +250,43 @@ library TestUtils {
 
     return appSignature;
   }
+
+  function generateDummyCreateComment(
+    ICommentManager comments,
+    address author,
+    address app
+  ) internal view returns (Comments.CreateComment memory) {
+    uint256 nonce = comments.getNonce(author, app);
+
+    return
+      Comments.CreateComment({
+        content: "Test comment",
+        metadata: "{}",
+        targetUri: "",
+        commentType: "comment",
+        author: author,
+        app: app,
+        channelId: 0,
+        nonce: nonce,
+        deadline: block.timestamp + 1 days,
+        parentId: bytes32(0)
+      });
+  }
+
+  function generateDummyEditComment(
+    ICommentManager comments,
+    address author,
+    address app
+  ) internal view returns (Comments.EditComment memory) {
+    return
+      Comments.EditComment({
+        content: "Edited content",
+        metadata: '{"edited":true}',
+        app: app,
+        nonce: comments.getNonce(author, app),
+        deadline: block.timestamp + 1 days
+      });
+  }
   /**
    * @notice Struct to hold parsed CAIP-19 components
    * @param chainId The chain ID (e.g. "eip155:1")
@@ -382,5 +421,39 @@ contract MockHook is BaseHook {
     bytes32
   ) internal virtual override returns (string memory) {
     return returningHookData;
+  }
+}
+
+contract AlwaysReturningDataHook is BaseHook {
+  function getHookPermissions()
+    external
+    pure
+    override
+    returns (Hooks.Permissions memory)
+  {
+    return
+      Hooks.Permissions({
+        onInitialized: false,
+        onCommentAdded: true,
+        onCommentDeleted: false,
+        onCommentEdited: true,
+        onChannelUpdated: false
+      });
+  }
+
+  function onCommentEdited(
+    Comments.Comment calldata,
+    address,
+    bytes32
+  ) external payable override returns (string memory) {
+    return "hook data edited";
+  }
+
+  function onCommentAdded(
+    Comments.Comment calldata,
+    address,
+    bytes32
+  ) external payable override returns (string memory) {
+    return "hook data";
   }
 }

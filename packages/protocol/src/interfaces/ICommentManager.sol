@@ -101,8 +101,9 @@ interface ICommentManager {
   error InvalidSignatureLength();
   /// @notice Error thrown when signature s value is invalid
   error InvalidSignatureS();
-  /// @notice Error thrown when parent comment does not exist
-  error ParentCommentDoesNotExist();
+  /// @notice Error thrown when parent comment does not ever existed
+  /// @dev It reverts only if the comment has never been created, will not revert if the comment is deleted
+  error ParentCommentHasNeverExisted();
   /// @notice Error thrown when both parentId and targetUri are set
   error InvalidCommentReference(string message);
   /// @notice Error thrown when address is zero
