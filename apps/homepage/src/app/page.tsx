@@ -103,12 +103,13 @@ export default function HomePage() {
       <section className="py-20 px-4">
         <div className="container mx-auto text-center max-w-4xl">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight bg-clip-text bg-gradient-to-b from-white to-gray-400">
-            Add social features to your ethereum app in 5 minutes
+            Add social to your ethereum app in 5 minutes
           </h1>
           <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
             main benefits
           </p>
           FIXME: Add a demo/screenshot/snippet here to make it more concrete.
+          Swap with comment feed?
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button
               variant="ghost"
@@ -439,7 +440,7 @@ await fetchComments({
         <div className="container mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-4">
-              Simple by default, but powerful with hooks
+              Simple by default, powerful with hooks
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Add custom functionality to your comments through smart contract
@@ -497,8 +498,8 @@ await fetchComments({
 
       {/* Newsletter Section */}
       <section className="py-16 px-4">
-        <div className="container mx-auto text-center max-w-2xl">
-          <h2 className="text-3xl font-bold text-white mb-4">Stay Updated</h2>
+        <div className="container mx-auto text-center max-w-2xl bg-white rounded-lg p-8">
+          <h2 className="text-3xl font-bold text-black mb-4">Stay Updated</h2>
           <p className="text-lg text-gray-400 mb-8">
             Get the latest updates on protocol development, new features, and
             integration guides.
