@@ -436,11 +436,6 @@ export const CommentManagerABI = [
             internalType: "uint256",
           },
           {
-            name: "nonce",
-            type: "uint256",
-            internalType: "uint256",
-          },
-          {
             name: "deadline",
             type: "uint256",
             internalType: "uint256",
@@ -737,11 +732,6 @@ export const CommentManagerABI = [
             internalType: "uint256",
           },
           {
-            name: "nonce",
-            type: "uint256",
-            internalType: "uint256",
-          },
-          {
             name: "deadline",
             type: "uint256",
             internalType: "uint256",
@@ -803,11 +793,6 @@ export const CommentManagerABI = [
           },
           {
             name: "channelId",
-            type: "uint256",
-            internalType: "uint256",
-          },
-          {
-            name: "nonce",
             type: "uint256",
             internalType: "uint256",
           },

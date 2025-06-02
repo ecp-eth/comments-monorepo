@@ -112,7 +112,6 @@ contract TipHook is BaseHook {
         author: address(this),
         app: address(this),
         channelId: commentData.channelId,
-        nonce: commentManager.getNonce(address(this), address(this)),
         deadline: block.timestamp + 1 days,
         parentId: commentId
       });
@@ -311,6 +310,20 @@ contract TipHookTest is Test, IERC721Receiver {
   using TestUtils for string;
   using LibString for string;
 
+  event CommentAdded(
+    bytes32 indexed commentId,
+    address indexed author,
+    address indexed app,
+    uint256 channelId,
+    bytes32 parentId,
+    uint80 createdAt,
+    string content,
+    string metadata,
+    string targetUri,
+    string commentType,
+    string hookData
+  );
+
   IChannelManager public channelManager;
   TipHook public tipHook;
   ICommentManager public commentManager;
@@ -362,7 +375,6 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      nonce: commentManager.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
@@ -396,7 +408,6 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user2,
       app: user2,
       channelId: channelId,
-      nonce: commentManager.getNonce(user2, user2),
       deadline: block.timestamp + 1 days,
       parentId: parentId
     });
@@ -433,7 +444,6 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      nonce: commentManager.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
@@ -463,7 +473,6 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user2,
       app: user2,
       channelId: channelId,
-      nonce: commentManager.getNonce(user2, user2),
       deadline: block.timestamp + 1 days,
       parentId: parentCommentId
     });
@@ -490,7 +499,6 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      nonce: commentManager.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
@@ -520,7 +528,6 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user2,
       app: user2,
       channelId: channelId,
-      nonce: commentManager.getNonce(user2, user2),
       deadline: block.timestamp + 1 days,
       parentId: parentCommentId
     });
@@ -547,7 +554,6 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      nonce: commentManager.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
@@ -573,7 +579,6 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user2,
       app: user2,
       channelId: channelId,
-      nonce: commentManager.getNonce(user2, user2),
       deadline: block.timestamp + 1 days,
       parentId: parentCommentId
     });
@@ -605,7 +610,6 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      nonce: commentManager.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
@@ -637,7 +641,6 @@ contract TipHookTest is Test, IERC721Receiver {
       author: user2,
       app: user2,
       channelId: channelId,
-      nonce: commentManager.getNonce(user2, user2),
       deadline: block.timestamp + 1 days,
       parentId: parentId
     });
@@ -648,18 +651,25 @@ contract TipHookTest is Test, IERC721Receiver {
       replyComment,
       commentManager
     );
+
+    bytes32 commentId = commentManager.getCommentId(replyComment);
+
     vm.prank(user2);
-
-    // FIXME: assert no revert.
-
-    commentManager.postComment{ value: tipAmount }(replyComment, appSignature);
-
-    // Verify the nonce for the tip acknowledgment comment
-    assertEq(
-      commentManager.getNonce(address(tipHook), address(tipHook)),
-      1,
-      "Tip hook nonce should be 1 after posting acknowledgment"
+    vm.expectEmit(true, true, true, true);
+    emit CommentAdded(
+      commentId,
+      replyComment.author,
+      replyComment.app,
+      replyComment.channelId,
+      replyComment.parentId,
+      uint80(block.timestamp),
+      replyComment.content,
+      replyComment.metadata,
+      replyComment.targetUri,
+      replyComment.commentType,
+      ""
     );
+    commentManager.postComment{ value: tipAmount }(replyComment, appSignature);
   }
 
   /// @notice Test suite for the parseTipMention function - Basic valid cases

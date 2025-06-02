@@ -16,6 +16,19 @@ import { Hooks } from "../src/libraries/Hooks.sol";
 contract CommentsTest is Test, IERC721Receiver {
   event ApprovalAdded(address indexed approver, address indexed approved);
   event ApprovalRemoved(address indexed approver, address indexed approved);
+  event CommentAdded(
+    bytes32 indexed commentId,
+    address indexed author,
+    address indexed app,
+    uint256 channelId,
+    bytes32 parentId,
+    uint80 createdAt,
+    string content,
+    string metadata,
+    string targetUri,
+    string commentType,
+    string hookData
+  );
 
   CommentManager public comments;
   ChannelManager public channelManager;
@@ -188,7 +201,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     // Post comment without author signature (using approval)
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -204,7 +217,6 @@ contract CommentsTest is Test, IERC721Receiver {
     assertFalse(comments.isApproved(author, app));
 
     // Try to post again without approval (should fail)
-    commentData.nonce = comments.getNonce(author, app);
     commentId = comments.getCommentId(commentData);
     appSignature = TestUtils.signEIP712(vm, appPrivateKey, commentId);
 
@@ -218,12 +230,12 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postCommentWithSig(commentData, bytes(""), appSignature);
   }
 
-  function test_NonceIncrement() public {
+  function test_NonceNotIncrement() public {
     uint256 initialNonce = comments.getNonce(author, app);
 
     // Post comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSignature = TestUtils.signEIP712(
       vm,
@@ -238,17 +250,22 @@ contract CommentsTest is Test, IERC721Receiver {
 
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
 
-    assertEq(comments.getNonce(author, app), initialNonce + 1);
+    assertEq(comments.getNonce(author, app), initialNonce);
 
     // Try to reuse the same nonce
-    vm.expectRevert(
-      abi.encodeWithSelector(
-        ICommentManager.InvalidNonce.selector,
-        author,
-        app,
-        initialNonce + 1,
-        initialNonce
-      )
+    vm.expectEmit(true, true, true, true);
+    emit CommentAdded(
+      commentId,
+      author,
+      app,
+      0,
+      commentData.parentId,
+      uint80(block.timestamp),
+      commentData.content,
+      commentData.metadata,
+      commentData.targetUri,
+      commentData.commentType,
+      ""
     );
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }

@@ -558,7 +558,6 @@ export function createCommentData({
   metadata,
   author,
   app,
-  nonce,
   deadline,
   channelId = DEFAULT_CHANNEL_ID,
   commentType = DEFAULT_COMMENT_TYPE,
@@ -573,7 +572,6 @@ export function createCommentData({
     app,
     channelId,
     commentType,
-    nonce,
     deadline: deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day
   });
 }

@@ -60,7 +60,6 @@ export const CommentDataSchema = z.object({
   app: HexSchema,
 
   channelId: z.coerce.bigint(),
-  nonce: z.coerce.bigint(),
   deadline: z.coerce.bigint(),
   parentId: HexSchema,
 
@@ -90,7 +89,6 @@ const BaseCommentInputDataSchema = z.object({
   app: HexSchema,
 
   channelId: z.bigint().default(DEFAULT_CHANNEL_ID),
-  nonce: z.bigint(),
   deadline: z.bigint(),
   parentId: HexSchema,
 
@@ -176,7 +174,6 @@ export const AddCommentTypedDataSchema = z.object({
         z.object({ name: z.literal("author"), type: z.literal("address") }),
         z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("channelId"), type: z.literal("uint256") }),
-        z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
         z.object({ name: z.literal("parentId"), type: z.literal("bytes32") }),
       ]),

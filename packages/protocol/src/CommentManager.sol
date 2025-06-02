@@ -19,7 +19,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   bytes32 public immutable DOMAIN_SEPARATOR;
   bytes32 public constant ADD_COMMENT_TYPEHASH =
     keccak256(
-      "AddComment(string content,string metadata,string targetUri,string commentType,address author,address app,uint256 channelId,uint256 nonce,uint256 deadline,bytes32 parentId)"
+      "AddComment(string content,string metadata,string targetUri,string commentType,address author,address app,uint256 channelId,uint256 deadline,bytes32 parentId)"
     );
   bytes32 public constant DELETE_COMMENT_TYPEHASH =
     keccak256(
@@ -106,7 +106,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     guardBlockTimestamp(commentData.deadline);
     guardParentCommentAndTargetUri(parentId, targetUri);
-    guardNonceAndIncrement(author, app, commentData.nonce);
     guardChannelExists(channelId);
 
     bytes32 commentId = getCommentId(commentData);
@@ -490,7 +489,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         commentData.author,
         commentData.app,
         commentData.channelId,
-        commentData.nonce,
         commentData.deadline,
         commentData.parentId
       )

@@ -10,7 +10,6 @@ export const ADD_COMMENT_TYPE = {
     { name: "author", type: "address" },
     { name: "app", type: "address" },
     { name: "channelId", type: "uint256" },
-    { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
     { name: "parentId", type: "bytes32" },
   ],

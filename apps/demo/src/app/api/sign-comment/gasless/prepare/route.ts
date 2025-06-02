@@ -12,17 +12,11 @@ import { chain, transport } from "@/lib/wagmi";
 import {
   createCommentData,
   createCommentTypedData,
-  getNonce,
   isApproved,
   postCommentWithSig,
 } from "@ecp.eth/sdk/comments";
 import { isMuted } from "@ecp.eth/sdk/indexer";
-import {
-  createPublicClient,
-  createWalletClient,
-  hashTypedData,
-  publicActions,
-} from "viem";
+import { createWalletClient, hashTypedData, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
 
@@ -81,22 +75,12 @@ export async function POST(
   }
 
   const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
-  const publicClient = createPublicClient({
-    chain,
-    transport,
-  });
-
-  const nonce = await getNonce({
-    author,
-    app: app.address,
-    readContract: publicClient.readContract,
-  });
 
   const commentData = createCommentData({
     content,
     author,
     app: app.address,
-    nonce,
+
     ...("parentId" in passedCommentData
       ? {
           parentId: passedCommentData.parentId,

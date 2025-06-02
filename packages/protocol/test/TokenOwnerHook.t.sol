@@ -180,7 +180,6 @@ contract TokenCreatorHookTest is Test {
       metadata: "",
       targetUri: validTargetUri,
       commentType: "comment",
-      nonce: 0,
       deadline: block.timestamp + 1 hours
     });
 
@@ -207,7 +206,6 @@ contract TokenCreatorHookTest is Test {
       metadata: "",
       targetUri: validTargetUri,
       commentType: "comment",
-      nonce: 0,
       deadline: block.timestamp + 1 hours
     });
 
@@ -225,7 +223,6 @@ contract TokenCreatorHookTest is Test {
       metadata: "",
       targetUri: "", // No target URI needed for replies
       commentType: "comment",
-      nonce: 0,
       deadline: block.timestamp + 1 hours
     });
 
@@ -250,7 +247,6 @@ contract TokenCreatorHookTest is Test {
       metadata: "",
       targetUri: invalidTargetUri,
       commentType: "comment",
-      nonce: 0,
       deadline: block.timestamp + 1 hours
     });
 
@@ -279,7 +275,6 @@ contract TokenCreatorHookTest is Test {
       metadata: "",
       targetUri: validTargetUri,
       commentType: "comment",
-      nonce: 0,
       deadline: block.timestamp + 1 hours
     });
 

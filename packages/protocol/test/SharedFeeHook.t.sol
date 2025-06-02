@@ -373,7 +373,6 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      nonce: comments.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
