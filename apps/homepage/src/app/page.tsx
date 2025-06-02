@@ -105,10 +105,10 @@ export default function HomePage() {
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight bg-clip-text bg-gradient-to-b from-white to-gray-400">
             Add social to your ethereum app in 5 minutes
           </h1>
-          <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
+          {/* <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
             main benefits
           </p>
-          FIXME: Add swap with comment & swap w comment feed. Live?
+          FIXME: Add swap with comment & swap w comment feed. Live? */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button
               variant="ghost"
