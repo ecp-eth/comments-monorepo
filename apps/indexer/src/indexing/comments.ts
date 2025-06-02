@@ -32,7 +32,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     });
 
     const createdAt = new Date(Number(event.args.createdAt) * 1000);
-    const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
+    const updatedAt = new Date(Number(event.args.createdAt) * 1000);
 
     const parentId = transformCommentParentId(event.args.parentId);
     let rootCommentId: Hex | null = null;

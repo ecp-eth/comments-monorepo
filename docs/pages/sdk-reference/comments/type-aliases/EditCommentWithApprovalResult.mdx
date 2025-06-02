@@ -7,19 +7,7 @@
 # Type Alias: EditCommentWithApprovalResult
 
 ```ts
-type EditCommentWithApprovalResult = {
-  txHash: Hex;
-};
+type EditCommentWithApprovalResult = WaitableWriteContractHelperResult<CommentManagerABIType, "CommentEdited">;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:901](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L901)
-
-## Properties
-
-### txHash
-
-```ts
-txHash: Hex;
-```
-
-Defined in: [packages/sdk/src/comments/comment.ts:902](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L902)
+Defined in: [packages/sdk/src/comments/comment.ts:936](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L936)

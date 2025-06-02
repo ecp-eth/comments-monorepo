@@ -36,7 +36,7 @@ async function main() {
     console.log("Channel creation fee:", fee.toString());
 
     // Create a new channel
-    const { txHash } = await createChannel({
+    const { txHash, wait } = await createChannel({
       name: "Ethereum Comments Protocol Updates",
       description:
         "Latest updates and announcements from the Ethereum Comments Protocol",
@@ -51,41 +51,18 @@ async function main() {
 
     console.log("Channel creation transaction:", txHash);
 
-    // Wait for transaction to be mined
-    const receipt = await publicClient.waitForTransactionReceipt({
-      hash: txHash,
+    // Due to EVM limitations, return values from state-changing (write) contract calls are not propagated to off-chain callers directly,
+    // For getting channel creation data, the SDK provides a `wait` method to wait for the transaction to be mined and return the event arguments.
+    const createChannelEvent = await wait({
+      getContractEvents: publicClient.getContractEvents,
+      waitForTransactionReceipt: publicClient.waitForTransactionReceipt,
     });
 
-    // Due to EVM limitations,
-    // return values from state-changing (write) contract calls are not propagated to off-chain callers,
-    // Hence we need to get the channel id from the event logs.
-    const events = await publicClient.getContractEvents({
-      address: CHANNEL_MANAGER_ADDRESS,
-      abi: ChannelManagerABI,
-      eventName: "ChannelCreated",
-      // search for the event in the block that the transaction was mined in
-      fromBlock: receipt.blockNumber,
-      toBlock: receipt.blockNumber,
-    });
-
-    let channelId: bigint | undefined;
-
-    for (const event of events) {
-      if (
-        event.eventName === "ChannelCreated" &&
-        event.transactionHash === txHash
-      ) {
-        channelId = event.args.channelId;
-
-        return;
-      }
+    if (!createChannelEvent) {
+      throw new Error("Channel creation event not found");
     }
 
-    if (!channelId) {
-      throw new Error("Channel id not found");
-    }
-
-    console.log("Channel created, id:", channelId);
+    console.log("Channel created, id:", createChannelEvent.channelId);
   } catch (error) {
     console.error("Error:", error);
     process.exit(1);

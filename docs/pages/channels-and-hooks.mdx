@@ -48,7 +48,7 @@ calls the `createChannel` function from the SDK to create a new channel:
 const { fee } = await getChannelCreationFee({
   readContract: publicClient.readContract,
 });
-const { txHash } = await createChannel({
+const { wait } = await createChannel({
   name: "Ethereum Comments Protocol Updates",
   description:
     "Latest updates and announcements from the Ethereum Comments Protocol",
@@ -66,36 +66,21 @@ const { txHash } = await createChannel({
 
 Due to EVM limitations, return values from state-changing (write) contract calls are not propagated to off-chain callers.
 
-To get the channel ID, you will need to loop through the events in the block where the transaction was mined.
+To make things easier, the SDK provides a helper function to wait for the transaction to be mined and return the channel data from the event logs:
 
 ```typescript
-const events = await publicClient.getContractEvents({
-  address: CHANNEL_MANAGER_ADDRESS,
-  abi: ChannelManagerABI,
-  eventName: "ChannelCreated",
-  // Search for the event in the block where the transaction was mined
-  fromBlock: receipt.blockNumber,
-  toBlock: receipt.blockNumber,
+const { wait } = await createChannel({...});
+
+const createChannelEvent = await wait({
+  getContractEvents: publicClient.getContractEvents,
+  waitForTransactionReceipt: publicClient.waitForTransactionReceipt,
 });
 
-let channelId: bigint | undefined;
-
-for (const event of events) {
-  if (
-    event.eventName === "ChannelCreated" &&
-    event.transactionHash === txHash
-  ) {
-    channelId = event.args.channelId;
-
-    return;
-  }
+if (!createChannelEvent) {
+  throw new Error("Channel creation event not found");
 }
 
-if (!channelId) {
-  throw new Error("Channel id not found");
-}
-
-console.log("Channel created, id:", channelId);
+console.log("Channel created, id:", createChannelEvent.channelId);
 ```
 
 - See the full example [here](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/channels-and-hooks/typescript/create-channel.ts).

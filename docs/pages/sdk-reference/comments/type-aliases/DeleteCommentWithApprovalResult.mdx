@@ -7,19 +7,7 @@
 # Type Alias: DeleteCommentWithApprovalResult
 
 ```ts
-type DeleteCommentWithApprovalResult = {
-  txHash: Hex;
-};
+type DeleteCommentWithApprovalResult = WaitableWriteContractHelperResult<CommentManagerABIType, "CommentDeleted">;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:335](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L335)
-
-## Properties
-
-### txHash
-
-```ts
-txHash: Hex;
-```
-
-Defined in: [packages/sdk/src/comments/comment.ts:336](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L336)
+Defined in: [packages/sdk/src/comments/comment.ts:358](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L358)

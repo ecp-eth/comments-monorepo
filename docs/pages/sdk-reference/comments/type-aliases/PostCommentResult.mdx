@@ -7,19 +7,7 @@
 # Type Alias: PostCommentResult
 
 ```ts
-type PostCommentResult = {
-  txHash: Hex;
-};
+type PostCommentResult = WaitableWriteContractHelperResult<CommentManagerABIType, "CommentAdded">;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L63)
-
-## Properties
-
-### txHash
-
-```ts
-txHash: Hex;
-```
-
-Defined in: [packages/sdk/src/comments/comment.ts:64](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L64)
+Defined in: [packages/sdk/src/comments/comment.ts:69](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L69)

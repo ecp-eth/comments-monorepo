@@ -19,7 +19,7 @@ type DeleteCommentWithApprovalParams = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:299](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L299)
+Defined in: [packages/sdk/src/comments/comment.ts:322](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L322)
 
 ## Properties
 
@@ -29,7 +29,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:299](https://github.com/ecp-et
 app: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:307](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L307)
+Defined in: [packages/sdk/src/comments/comment.ts:330](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L330)
 
 The app signer
 
@@ -41,7 +41,7 @@ The app signer
 appSignature: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:324](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L324)
+Defined in: [packages/sdk/src/comments/comment.ts:347](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L347)
 
 The app signature
 
@@ -53,7 +53,7 @@ The app signature
 optional authorSignature: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:328](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L328)
+Defined in: [packages/sdk/src/comments/comment.ts:351](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L351)
 
 The author signature. Necessary if the author hasn't approved the signer to delete comments on their behalf.
 
@@ -65,7 +65,7 @@ The author signature. Necessary if the author hasn't approved the signer to dele
 commentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:303](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L303)
+Defined in: [packages/sdk/src/comments/comment.ts:326](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L326)
 
 The ID of the comment to delete
 
@@ -77,7 +77,7 @@ The ID of the comment to delete
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:320](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L320)
+Defined in: [packages/sdk/src/comments/comment.ts:343](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L343)
 
 The address of the comments contract
 
@@ -95,7 +95,7 @@ COMMENT_MANAGER_ADDRESS
 deadline: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:315](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L315)
+Defined in: [packages/sdk/src/comments/comment.ts:338](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L338)
 
 The deadline for the signature
 
@@ -107,7 +107,7 @@ The deadline for the signature
 nonce: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:311](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L311)
+Defined in: [packages/sdk/src/comments/comment.ts:334](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L334)
 
 The nonce for the signature
 
@@ -119,6 +119,6 @@ The nonce for the signature
 writeContract: ContractWriteFunctions["deleteCommentWithApproval"];
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:332](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L332)
+Defined in: [packages/sdk/src/comments/comment.ts:355](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L355)
 
 The write contract function

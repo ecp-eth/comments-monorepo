@@ -13,6 +13,7 @@ import type {
   ContractReadFunctions,
   CreateCommentDataParams,
   CommentData,
+  CommentManagerABIType,
 } from "./types.js";
 import {
   AddCommentTypedDataSchema,
@@ -33,6 +34,11 @@ import {
   DOMAIN_NAME,
   DOMAIN_VERSION,
 } from "./eip712.js";
+import type {
+  WaitableWriteContractHelperResult,
+  WriteContractHelperResult,
+} from "../core/types.js";
+import { createWaitableWriteContractHelper } from "../core/utils.js";
 
 export type PostCommentParams = {
   /**
@@ -60,9 +66,10 @@ export type PostCommentParams = {
   writeContract: ContractWriteFunctions["postComment"];
 };
 
-export type PostCommentResult = {
-  txHash: Hex;
-};
+export type PostCommentResult = WaitableWriteContractHelperResult<
+  CommentManagerABIType,
+  "CommentAdded"
+>;
 
 const PostCommentParamsSchema = z.object({
   // we don't care here because comment is validated internally by createCommentData()
@@ -78,25 +85,29 @@ const PostCommentParamsSchema = z.object({
  * @param params - The parameters for posting a comment as an author
  * @returns The transaction hash
  */
-export async function postComment(
-  params: PostCommentParams,
-): Promise<PostCommentResult> {
-  const validatedParams = PostCommentParamsSchema.parse(params);
+export const postComment = createWaitableWriteContractHelper(
+  async (params: PostCommentParams): Promise<WriteContractHelperResult> => {
+    const validatedParams = PostCommentParamsSchema.parse(params);
 
-  const { comment, commentsAddress, fee, appSignature } = validatedParams;
+    const { comment, commentsAddress, fee, appSignature } = validatedParams;
 
-  const txHash = await params.writeContract({
-    address: commentsAddress,
+    const txHash = await params.writeContract({
+      address: commentsAddress,
+      abi: CommentManagerABI,
+      functionName: "postComment",
+      args: [comment, appSignature],
+      value: fee,
+    });
+
+    return {
+      txHash,
+    };
+  },
+  {
     abi: CommentManagerABI,
-    functionName: "postComment",
-    args: [comment, appSignature],
-    value: fee,
-  });
-
-  return {
-    txHash,
-  };
-}
+    eventName: "CommentAdded",
+  },
+);
 
 export type PostCommentWithApprovalParams = {
   /**
@@ -128,9 +139,10 @@ export type PostCommentWithApprovalParams = {
   writeContract: ContractWriteFunctions["postCommentWithApproval"];
 };
 
-export type PostCommentWithApprovalResult = {
-  txHash: Hex;
-};
+export type PostCommentWithApprovalResult = WaitableWriteContractHelperResult<
+  CommentManagerABIType,
+  "CommentAdded"
+>;
 
 const PostCommentWithApprovalParamsSchema = z.object({
   comment: CommentInputDataSchema,
@@ -146,26 +158,32 @@ const PostCommentWithApprovalParamsSchema = z.object({
  * @param params - The parameters for posting a comment
  * @returns The transaction hash
  */
-export async function postCommentWithApproval(
-  params: PostCommentWithApprovalParams,
-): Promise<PostCommentWithApprovalResult> {
-  const validatedParams = PostCommentWithApprovalParamsSchema.parse(params);
+export const postCommentWithApproval = createWaitableWriteContractHelper(
+  async (
+    params: PostCommentWithApprovalParams,
+  ): Promise<WriteContractHelperResult> => {
+    const validatedParams = PostCommentWithApprovalParamsSchema.parse(params);
 
-  const { comment, appSignature, authorSignature, commentsAddress, fee } =
-    validatedParams;
+    const { comment, appSignature, authorSignature, commentsAddress, fee } =
+      validatedParams;
 
-  const txHash = await params.writeContract({
-    address: commentsAddress,
+    const txHash = await params.writeContract({
+      address: commentsAddress,
+      abi: CommentManagerABI,
+      functionName: "postCommentWithApproval",
+      args: [comment, authorSignature ?? stringToHex(""), appSignature],
+      value: fee,
+    });
+
+    return {
+      txHash,
+    };
+  },
+  {
     abi: CommentManagerABI,
-    functionName: "postCommentWithApproval",
-    args: [comment, authorSignature ?? stringToHex(""), appSignature],
-    value: fee,
-  });
-
-  return {
-    txHash,
-  };
-}
+    eventName: "CommentAdded",
+  },
+);
 
 export type GetCommentParams = {
   /**
@@ -263,9 +281,10 @@ export type DeleteCommentParams = {
   writeContract: ContractWriteFunctions["deleteComment"];
 };
 
-export type DeleteCommentResult = {
-  txHash: Hex;
-};
+export type DeleteCommentResult = WaitableWriteContractHelperResult<
+  CommentManagerABIType,
+  "CommentDeleted"
+>;
 
 const DeleteCommentAsAuthorParamsSchema = z.object({
   commentId: HexSchema,
@@ -278,23 +297,27 @@ const DeleteCommentAsAuthorParamsSchema = z.object({
  * @param params - The parameters for deleting a comment as an author
  * @returns The transaction hash
  */
-export async function deleteComment(
-  params: DeleteCommentParams,
-): Promise<DeleteCommentResult> {
-  const { commentId, commentsAddress } =
-    DeleteCommentAsAuthorParamsSchema.parse(params);
+export const deleteComment = createWaitableWriteContractHelper(
+  async (params: DeleteCommentParams): Promise<WriteContractHelperResult> => {
+    const { commentId, commentsAddress } =
+      DeleteCommentAsAuthorParamsSchema.parse(params);
 
-  const txHash = await params.writeContract({
-    address: commentsAddress,
+    const txHash = await params.writeContract({
+      address: commentsAddress,
+      abi: CommentManagerABI,
+      functionName: "deleteComment",
+      args: [commentId],
+    });
+
+    return {
+      txHash,
+    };
+  },
+  {
     abi: CommentManagerABI,
-    functionName: "deleteComment",
-    args: [commentId],
-  });
-
-  return {
-    txHash,
-  };
-}
+    eventName: "CommentDeleted",
+  },
+);
 
 export type DeleteCommentWithApprovalParams = {
   /**
@@ -332,9 +355,10 @@ export type DeleteCommentWithApprovalParams = {
   writeContract: ContractWriteFunctions["deleteCommentWithApproval"];
 };
 
-export type DeleteCommentWithApprovalResult = {
-  txHash: Hex;
-};
+export type DeleteCommentWithApprovalResult = WaitableWriteContractHelperResult<
+  CommentManagerABIType,
+  "CommentDeleted"
+>;
 
 const DeleteCommentWithApprovalParamsSchema = z.object({
   commentId: HexSchema,
@@ -352,39 +376,45 @@ const DeleteCommentWithApprovalParamsSchema = z.object({
  * @param params - The parameters for deleting a comment
  * @returns The transaction hash
  */
-export async function deleteCommentWithApproval(
-  params: DeleteCommentWithApprovalParams,
-): Promise<DeleteCommentWithApprovalResult> {
-  const validatedParams = DeleteCommentWithApprovalParamsSchema.parse(params);
+export const deleteCommentWithApproval = createWaitableWriteContractHelper(
+  async (
+    params: DeleteCommentWithApprovalParams,
+  ): Promise<WriteContractHelperResult> => {
+    const validatedParams = DeleteCommentWithApprovalParamsSchema.parse(params);
 
-  const {
-    commentId,
-    app,
-    nonce,
-    deadline,
-    commentsAddress,
-    appSignature,
-    authorSignature,
-  } = validatedParams;
-
-  const txHash = await params.writeContract({
-    address: commentsAddress,
-    abi: CommentManagerABI,
-    functionName: "deleteCommentWithApproval",
-    args: [
+    const {
       commentId,
       app,
       nonce,
       deadline,
-      authorSignature ?? stringToHex(""),
+      commentsAddress,
       appSignature,
-    ],
-  });
+      authorSignature,
+    } = validatedParams;
 
-  return {
-    txHash,
-  };
-}
+    const txHash = await params.writeContract({
+      address: commentsAddress,
+      abi: CommentManagerABI,
+      functionName: "deleteCommentWithApproval",
+      args: [
+        commentId,
+        app,
+        nonce,
+        deadline,
+        authorSignature ?? stringToHex(""),
+        appSignature,
+      ],
+    });
+
+    return {
+      txHash,
+    };
+  },
+  {
+    abi: CommentManagerABI,
+    eventName: "CommentDeleted",
+  },
+);
 
 export type GetDeleteCommentHashParams = {
   /**
@@ -830,9 +860,10 @@ const EditCommentParamsSchema = z.object({
   fee: z.bigint().optional(),
 });
 
-export type EditCommentResult = {
-  txHash: Hex;
-};
+export type EditCommentResult = WaitableWriteContractHelperResult<
+  CommentManagerABIType,
+  "CommentEdited"
+>;
 
 /**
  * Edit a comment as an author
@@ -840,25 +871,29 @@ export type EditCommentResult = {
  * @param params - The parameters for editing a comment as an author
  * @returns The transaction hash
  */
-export async function editComment(
-  params: EditCommentParams,
-): Promise<EditCommentResult> {
-  const validatedParams = EditCommentParamsSchema.parse(params);
+export const editComment = createWaitableWriteContractHelper(
+  async (params: EditCommentParams): Promise<WriteContractHelperResult> => {
+    const validatedParams = EditCommentParamsSchema.parse(params);
 
-  const { edit, commentsAddress, appSignature, fee } = validatedParams;
+    const { edit, commentsAddress, appSignature, fee } = validatedParams;
 
-  const txHash = await params.writeContract({
-    address: commentsAddress,
+    const txHash = await params.writeContract({
+      address: commentsAddress,
+      abi: CommentManagerABI,
+      functionName: "editComment",
+      args: [edit.commentId, edit, appSignature],
+      value: fee,
+    });
+
+    return {
+      txHash,
+    };
+  },
+  {
     abi: CommentManagerABI,
-    functionName: "editComment",
-    args: [edit.commentId, edit, appSignature],
-    value: fee,
-  });
-
-  return {
-    txHash,
-  };
-}
+    eventName: "CommentEdited",
+  },
+);
 
 export type EditCommentWithApprovalParams = {
   /**
@@ -898,9 +933,10 @@ const EditCommentWithApprovalParamsSchema = z.object({
   fee: z.bigint().optional(),
 });
 
-export type EditCommentWithApprovalResult = {
-  txHash: Hex;
-};
+export type EditCommentWithApprovalResult = WaitableWriteContractHelperResult<
+  CommentManagerABIType,
+  "CommentEdited"
+>;
 
 /**
  * Edit a comment
@@ -908,28 +944,34 @@ export type EditCommentWithApprovalResult = {
  * @param params - The parameters for editing a comment
  * @returns The transaction hash
  */
-export async function editCommentWithApproval(
-  params: EditCommentWithApprovalParams,
-): Promise<EditCommentWithApprovalResult> {
-  const validatedParams = EditCommentWithApprovalParamsSchema.parse(params);
+export const editCommentWithApproval = createWaitableWriteContractHelper(
+  async (
+    params: EditCommentWithApprovalParams,
+  ): Promise<WriteContractHelperResult> => {
+    const validatedParams = EditCommentWithApprovalParamsSchema.parse(params);
 
-  const { edit, commentsAddress, appSignature, authorSignature, fee } =
-    validatedParams;
+    const { edit, commentsAddress, appSignature, authorSignature, fee } =
+      validatedParams;
 
-  const txHash = await params.writeContract({
-    address: commentsAddress,
+    const txHash = await params.writeContract({
+      address: commentsAddress,
+      abi: CommentManagerABI,
+      functionName: "editCommentWithApproval",
+      args: [
+        edit.commentId,
+        edit,
+        authorSignature ?? stringToHex(""),
+        appSignature,
+      ],
+      value: fee,
+    });
+
+    return {
+      txHash,
+    };
+  },
+  {
     abi: CommentManagerABI,
-    functionName: "editCommentWithApproval",
-    args: [
-      edit.commentId,
-      edit,
-      authorSignature ?? stringToHex(""),
-      appSignature,
-    ],
-    value: fee,
-  });
-
-  return {
-    txHash,
-  };
-}
+    eventName: "CommentEdited",
+  },
+);

@@ -15,7 +15,6 @@ interface ICommentManager {
   /// @param channelId The channel ID associated with the comment
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param createdAt The timestamp when the comment was created
-  /// @param updatedAt The timestamp when the comment was last updated
   /// @param content The text content of the comment - may contain urls, images and mentions
   /// @param metadata Additional JSON data that shouldn't be displayed to the user
   /// @param targetUri the URI about which the comment is being made
@@ -28,7 +27,6 @@ interface ICommentManager {
     uint256 channelId,
     bytes32 parentId,
     uint80 createdAt,
-    uint80 updatedAt,
     string content,
     string metadata,
     string targetUri,

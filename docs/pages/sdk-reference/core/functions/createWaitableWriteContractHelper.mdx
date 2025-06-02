@@ -1,0 +1,70 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [core](/sdk-reference/core/index.mdx) / createWaitableWriteContractHelper
+
+# Function: createWaitableWriteContractHelper()
+
+```ts
+function createWaitableWriteContractHelper<TArgs, TAbi, TEventName, TWriteContractHelperResult>(writeFunc, __namedParameters): (...args) => Promise<WaitableWriteContractHelperResult<TAbi, TEventName>>;
+```
+
+Defined in: [packages/sdk/src/core/utils.ts:86](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L86)
+
+This function wraps the write function to add a `wait()` method in the returned object.
+The `wait()` method waits the transaction receipt and
+returns the event arguments specified by the write function, within the transaction.
+
+This is due to EVM limitations, the return value of a contract write cannot be returned directly.
+We had to use the events to expose certain useful values related to the write.
+
+## Type Parameters
+
+### TArgs
+
+`TArgs` *extends* `unknown`[]
+
+### TAbi
+
+`TAbi` *extends* `Abi`
+
+### TEventName
+
+`TEventName` *extends* `string`
+
+### TWriteContractHelperResult
+
+`TWriteContractHelperResult` *extends* `WriteContractHelperResult`
+
+## Parameters
+
+### writeFunc
+
+(...`args`) => `Promise`\<`TWriteContractHelperResult`\>
+
+### \_\_namedParameters
+
+#### abi
+
+`TAbi`
+
+#### eventName
+
+`TEventName`
+
+## Returns
+
+```ts
+(...args): Promise<WaitableWriteContractHelperResult<TAbi, TEventName>>;
+```
+
+### Parameters
+
+#### args
+
+...`TArgs`
+
+### Returns
+
+`Promise`\<`WaitableWriteContractHelperResult`\<`TAbi`, `TEventName`\>\>
