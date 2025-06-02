@@ -200,5 +200,54 @@ Get the deleted status for a comment
 
 
 
+### `guardBlockTimestamp(uint256 deadline)` (internal)
+
+Internal function to guard against timestamp expiration
+
+
+
+
+### `guardNonceAndIncrement(address author, address app, uint256 nonce)` (internal)
+
+Internal function prevent replay attack by check nonce and increment it
+
+
+
+
+### `guardParentCommentAndTargetUri(bytes32 parentId, string targetUri)` (internal)
+
+Internal function to validate 1) parent comment ever existed 2) prevent parentId and targetUri from being set together
+
+
+
+
+### `guardChannelExists(uint256 channelId)` (internal)
+
+Internal function to validate channel exists
+
+
+
+
+### `guardAuthorizedByAuthorAndApp(address author, address app, bytes32 sigHash, bytes authorSignature, bytes appSignature)` (internal)
+
+Internal function to ensure both author and app are authorized to perform the action
+
+
+
+
+### `guardAuthorizedByAuthorOrApp(address author, address app, bytes32 sigHash, bytes authorSignature, bytes appSignature)` (internal)
+
+Internal function to ensure either author or app is authorized to perform the action
+
+
+
+
+### `guardAuthorizedByAuthor(address author, bytes32 sigHash, bytes authorSignature)` (internal)
+
+Internal function to ensure either author is authorized to perform the action
+
+
+
+
 
 
