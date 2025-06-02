@@ -33,6 +33,11 @@
       "import": "./dist/esm/schemas.js",
       "default": "./dist/cjs/schemas.cjs"
     },
+    "./token-list": {
+      "types": "./dist/esm/token-list.d.ts",
+      "import": "./dist/esm/token-list.js",
+      "default": "./dist/cjs/token-list.cjs"
+    },
     "./types": {
       "types": "./dist/esm/types.d.ts",
       "import": "./dist/esm/types.js",
@@ -41,12 +46,13 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "dev": "tsup --format esm --out-dir dist/esm --watch",
+    "dev": "npm run gen:token-list && tsup --format esm --out-dir dist/esm --watch",
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
-    "build": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
+    "build": "rm -rf dist && npm run gen:token-list && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
     "test": "echo 'Add test script here'",
-    "lint": "eslint \"./src/**/*.ts\""
+    "lint": "eslint \"./src/**/*.ts\"",
+    "gen:token-list": "node --experimental-strip-types scripts/token-list.ts"
   },
   "devDependencies": {
     "@ecp.eth/sdk": "workspace:*",

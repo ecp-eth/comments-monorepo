@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@0x/0x-parser": "^2.10.1",
+    "@ecp.eth/shared": "workspace:*",
     "@ecp.eth/sdk": "workspace:*",
     "@hono/node-server": "^1.13.8",
     "@hono/zod-openapi": "^0.18.4",

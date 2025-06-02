@@ -77,6 +77,67 @@ export type IndexerAPICommentZeroExSwapSchemaType = z.infer<
   typeof IndexerAPICommentZeroExSwapSchema
 >;
 
+export const IndexerAPICommentReferencePositionSchema = z.object({
+  start: z.number().int(),
+  end: z.number().int(),
+});
+
+export const IndexerAPICommentReferenceENSSchema = z.object({
+  type: z.literal("ens"),
+  avatarUrl: z.string().nullable(),
+  name: z.string(),
+  address: HexSchema,
+  position: IndexerAPICommentReferencePositionSchema,
+});
+
+export type IndexerAPICommentReferenceENSSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceENSSchema
+>;
+
+export const IndexerAPICommentReferenceFarcasterSchema = z.object({
+  type: z.literal("farcaster"),
+  fid: z.number().int(),
+  username: z.string().nullable(),
+  displayName: z.string().nullable(),
+  pfpUrl: z.string().nullable(),
+  position: IndexerAPICommentReferencePositionSchema,
+});
+
+export type IndexerAPICommentReferenceFarcasterSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceFarcasterSchema
+>;
+
+export const IndexerAPICommentReferenceERC20Schema = z.object({
+  type: z.literal("erc20"),
+  symbol: z.string(),
+  logoURI: z.string().nullable(),
+  name: z.string(),
+  address: HexSchema,
+  position: IndexerAPICommentReferencePositionSchema,
+});
+
+export type IndexerAPICommentReferenceERC20SchemaType = z.infer<
+  typeof IndexerAPICommentReferenceERC20Schema
+>;
+
+export const IndexerAPICommentReferenceSchema = z.union([
+  IndexerAPICommentReferenceENSSchema,
+  IndexerAPICommentReferenceERC20Schema,
+  IndexerAPICommentReferenceFarcasterSchema,
+]);
+
+export type IndexerAPICommentReferenceSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceSchema
+>;
+
+export const IndexerAPICommentReferencesSchema = z.array(
+  IndexerAPICommentReferenceSchema,
+);
+
+export type IndexerAPICommentReferencesSchemaType = z.infer<
+  typeof IndexerAPICommentReferencesSchema
+>;
+
 export const IndexerAPICommentSchema = z.object({
   app: HexSchema,
   author: IndexerAPIAuthorDataSchema,
@@ -99,6 +160,7 @@ export const IndexerAPICommentSchema = z.object({
   updatedAt: z.coerce.date(),
   revision: z.number().int(),
   zeroExSwap: IndexerAPICommentZeroExSwapSchema.nullable(),
+  references: IndexerAPICommentReferencesSchema,
 });
 
 export type IndexerAPICommentSchemaType = z.infer<

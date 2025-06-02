@@ -12,6 +12,15 @@ import {
 } from "./farcaster-data-resolver";
 import { getCommentCursor } from "@ecp.eth/sdk/indexer";
 import { env } from "../env";
+import {
+  resolveCommentReferences,
+  resolveCommentsReferences,
+} from "./resolve-comment-references";
+import { ensByAddressResolver } from "../resolvers/ens-by-address-resolver";
+import { ensByNameResolver } from "../resolvers/ens-by-name-resolver";
+import { erc20ByAddressResolver } from "../resolvers/erc20-by-address-resolver";
+import { erc20ByTickerResolver } from "../resolvers/erc20-by-ticker-resolver";
+import { farcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
 
 type CommentFromDB = CommentSelectType & {
   replies?: CommentSelectType[];
@@ -71,6 +80,20 @@ export async function resolveUserDataAndFormatListCommentsResponse({
   const startComment = results[0];
   const endComment = results[results.length - 1];
 
+  const options = {
+    ensByAddressResolver,
+    ensByNameResolver,
+    erc20ByAddressResolver,
+    erc20ByTickerResolver,
+    farcasterByAddressResolver,
+  };
+
+  const resolvedReferences = await resolveCommentsReferences(results, options);
+  const resolvedReplies = await resolveCommentsReferences(
+    results.flatMap((comment) => comment.replies ?? []),
+    options,
+  );
+
   return {
     results: results.map(
       ({ replies: nestedReplies, flatReplies, ...comment }) => {
@@ -90,6 +113,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
 
         return {
           ...formatComment(comment),
+          references: resolvedReferences[comment.id as Hex] ?? [],
           author: formatAuthor(
             comment.author,
             resolvedAuthorEnsData,
@@ -111,6 +135,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
 
               return {
                 ...formatComment(reply),
+                references: resolvedReplies[reply.id as Hex] ?? [],
                 author: formatAuthor(
                   reply.author,
                   resolvedAuthorEnsData,
@@ -207,8 +232,17 @@ export async function resolveAuthorDataAndFormatCommentChangeModerationStatusRes
     farcasterDataResolver.load(comment.author),
   ]);
 
+  const references = await resolveCommentReferences(comment, {
+    ensByAddressResolver,
+    ensByNameResolver,
+    erc20ByAddressResolver,
+    erc20ByTickerResolver,
+    farcasterByAddressResolver,
+  });
+
   return {
     ...formatComment(comment),
+    references,
     author: formatAuthor(
       comment.author,
       resolvedEnsData,
