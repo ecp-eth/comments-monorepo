@@ -18,10 +18,21 @@ if (!prodChain) {
 // swap works only with base, locally it doesn't work
 export const chain = publicEnv.NODE_ENV === "development" ? anvil : prodChain;
 
-export const transport =
-  chain.id === prodChain.id
-    ? http(publicEnv.NEXT_PUBLIC_RPC_URL)
-    : http("http://localhost:8545");
+/**
+ * Chains that are used to resolve address when typing a comment
+ */
+export const supportedChains = {
+  [prodChain.id]: {
+    chain: prodChain,
+    transport: http(publicEnv.NEXT_PUBLIC_RPC_URL),
+  },
+  [anvil.id]: {
+    chain: anvil,
+    transport: http("http://localhost:8545"),
+  },
+};
+
+export const transport = supportedChains[chain.id].transport;
 
 export const getConfig = () =>
   getDefaultConfig({

@@ -60,6 +60,8 @@ const EnvSchema = z
       .enum(["1", "0"])
       .default("0")
       .transform((val) => val === "1"),
+    PINATA_JWT: z.string().nonempty(),
+    ENS_RPC_URL: z.string().url(),
   })
   .merge(publicEnvSchema)
   .merge(EthSubmitterEnvSchema.partial())

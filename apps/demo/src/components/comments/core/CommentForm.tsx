@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { z } from "zod";
@@ -17,10 +17,6 @@ import {
 } from "./queries";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { Editor, EditorRef } from "./CommentTextEditor/Editor";
-import {
-  customMarkdownParser,
-  customMarkdownSerializer,
-} from "./CommentTextEditor/serializers/markdown";
 import type { Content } from "@tiptap/react";
 
 type OnSubmitFunction = (params: {
@@ -76,17 +72,8 @@ function BaseCommentForm({
   const { address } = useAccount();
   const connectAccount = useConnectAccount();
   const editorRef = useRef<EditorRef>(null);
-  const [content, setContent] = useState<Content>(() =>
-    defaultContent ? customMarkdownParser.parse(defaultContent).toJSON() : null,
-  );
+  const [content, setContent] = useState<Content>(() => defaultContent);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
-
-  useEffect(() => {
-    if (defaultContent) {
-      console.log("defaultContent", defaultContent);
-      setContent(customMarkdownParser.parse(defaultContent).toJSON());
-    }
-  }, [defaultContent]);
 
   const submitMutation = useMutation({
     mutationFn: async (formData: FormData): Promise<void> => {
@@ -100,14 +87,17 @@ function BaseCommentForm({
           throw new Error("Editor is not initialized");
         }
 
-        const serializedContent = customMarkdownSerializer.serialize(
-          editorRef.current.editor.state.doc,
-        );
-
         // validate content
-        z.string().trim().parse(serializedContent);
+        const content = z
+          .string()
+          .trim()
+          .parse(
+            editorRef.current.editor.getText({
+              blockSeparator: "\n",
+            }),
+          );
 
-        const result = await onSubmit({ author, content: serializedContent });
+        const result = await onSubmit({ author, content });
 
         return result;
       } catch (e) {
@@ -161,7 +151,7 @@ function BaseCommentForm({
             return;
           }
 
-          const content = customMarkdownSerializer.serialize(editor.state.doc);
+          const content = editor.getText().trim();
 
           if (
             !content ||

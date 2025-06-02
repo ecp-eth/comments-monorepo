@@ -104,13 +104,7 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.75.6
         version: 5.80.2(react@19.1.0)
-      '@tiptap/extension-bold':
-        specifier: ^2.12.0
-        version: 2.14.0(@tiptap/core@2.14.0(@tiptap/pm@2.14.0))
       '@tiptap/extension-document':
-        specifier: ^2.12.0
-        version: 2.14.0(@tiptap/core@2.14.0(@tiptap/pm@2.14.0))
-      '@tiptap/extension-italic':
         specifier: ^2.12.0
         version: 2.14.0(@tiptap/core@2.14.0(@tiptap/pm@2.14.0))
       '@tiptap/extension-link':
@@ -170,6 +164,9 @@ importers:
       next-themes:
         specifier: ^0.4.4
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      pinata:
+        specifier: ^2.4.3
+        version: 2.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       prosemirror-markdown:
         specifier: ^1.13.2
         version: 1.13.2
@@ -179,9 +176,6 @@ importers:
       prosemirror-state:
         specifier: ^1.4.3
         version: 1.4.3
-      prosemirror-view:
-        specifier: ^1.39.3
-        version: 1.40.0
       react:
         specifier: ~19.1.0
         version: 19.1.0
@@ -592,6 +586,9 @@ importers:
       '@ecp.eth/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
+      '@ecp.eth/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@hono/node-server':
         specifier: ^1.13.8
         version: 1.14.3(hono@4.7.11)
@@ -4808,11 +4805,6 @@ packages:
     peerDependencies:
       '@tiptap/pm': ^2.7.0
 
-  '@tiptap/extension-bold@2.14.0':
-    resolution: {integrity: sha512-8DWwelH55H8KtLECSIv0wh8x/F/6lpagV/pMvT+Azujad0oqK+1iAPKU/kLgjXbFSkisrpV6KSwQts5neCtfRQ==}
-    peerDependencies:
-      '@tiptap/core': ^2.7.0
-
   '@tiptap/extension-bubble-menu@2.14.0':
     resolution: {integrity: sha512-sN15n0RjPh+2Asvxs7l47hVEvX6c0aPempU8QQWcPUlHoGf1D/XkyHXy6GWVPSxZ5Rj5uAwgKvhHsG/FJ/YGKQ==}
     peerDependencies:
@@ -4829,11 +4821,6 @@ packages:
     peerDependencies:
       '@tiptap/core': ^2.7.0
       '@tiptap/pm': ^2.7.0
-
-  '@tiptap/extension-italic@2.14.0':
-    resolution: {integrity: sha512-yEw2S+smoVR8DMYQMAWckVW2Sstf7z5+GBZ8zm8NMGhMKb1JFCPZUv5KTTIPnq7ZrKuuZHvjN9+Ef1dRYD8T2A==}
-    peerDependencies:
-      '@tiptap/core': ^2.7.0
 
   '@tiptap/extension-link@2.14.0':
     resolution: {integrity: sha512-fsqW7eRD2xoD6xy7eFrNPAdIuZ3eicA4jKC45Vcft/Xky0DJoIehlVBLxsPbfmv3f27EBrtPkg5+msLXkLyzJA==}
@@ -9978,6 +9965,18 @@ packages:
   pify@5.0.0:
     resolution: {integrity: sha512-eW/gHNMlxdSP6dmG6uJip6FXN0EQBwm2clYYd8Wul42Cwu/DK8HEftzsapcNdYe2MfLiIwZqsDk2RDEsTE79hA==}
     engines: {node: '>=10'}
+
+  pinata@2.4.3:
+    resolution: {integrity: sha512-06W8Ey9grNqkxYpVO6HuEb4UZ9MK4y10yFJSCkBYvKTfh17uN1QEPi+XDTeKGcYNcRdXh1eyPyItIn4KfenSkg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
 
   pino-abstract-transport@0.5.0:
     resolution: {integrity: sha512-+KAgmVeqXYbTtU2FScx1XS3kNyfZ5TrXY07V96QnUSFqo2gAqlvmaxH67Lj7SWazqsMabf+58ctdTcBgnOLUOQ==}
@@ -17699,10 +17698,6 @@ snapshots:
     dependencies:
       '@tiptap/pm': 2.14.0
 
-  '@tiptap/extension-bold@2.14.0(@tiptap/core@2.14.0(@tiptap/pm@2.14.0))':
-    dependencies:
-      '@tiptap/core': 2.14.0(@tiptap/pm@2.14.0)
-
   '@tiptap/extension-bubble-menu@2.14.0(@tiptap/core@2.14.0(@tiptap/pm@2.14.0))(@tiptap/pm@2.14.0)':
     dependencies:
       '@tiptap/core': 2.14.0(@tiptap/pm@2.14.0)
@@ -17718,10 +17713,6 @@ snapshots:
       '@tiptap/core': 2.14.0(@tiptap/pm@2.14.0)
       '@tiptap/pm': 2.14.0
       tippy.js: 6.3.7
-
-  '@tiptap/extension-italic@2.14.0(@tiptap/core@2.14.0(@tiptap/pm@2.14.0))':
-    dependencies:
-      '@tiptap/core': 2.14.0(@tiptap/pm@2.14.0)
 
   '@tiptap/extension-link@2.14.0(@tiptap/core@2.14.0(@tiptap/pm@2.14.0))(@tiptap/pm@2.14.0)':
     dependencies:
@@ -24098,6 +24089,11 @@ snapshots:
   pify@4.0.1: {}
 
   pify@5.0.0: {}
+
+  pinata@2.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    optionalDependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   pino-abstract-transport@0.5.0:
     dependencies:

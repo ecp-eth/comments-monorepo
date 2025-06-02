@@ -40,5 +40,9 @@ const outputPath = path.resolve(process.cwd(), "./src/token-list.ts");
 
 await writeFile(
   outputPath,
-  `export const tokenList = ${JSON.stringify(tokens, null, 2)};`,
+  `
+/* eslint-disable */
+// prettier-ignore
+export const tokenList = ${JSON.stringify(tokens, null, 2)};
+`.trim(),
 );

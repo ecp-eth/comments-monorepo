@@ -1,46 +1,18 @@
-import { Mention, MentionOptions } from "@tiptap/extension-mention";
-import { Plugin, PluginKey } from "prosemirror-state";
-import type { EditorView } from "prosemirror-view";
-import type { Hex } from "viem";
-import type { Node, NodeType } from "prosemirror-model";
+import { Mention, type MentionOptions } from "@tiptap/extension-mention";
+import { PluginKey } from "prosemirror-state";
 import { ReactRenderer } from "@tiptap/react";
-import tippy, { Instance } from "tippy.js";
+import tippy, { type Instance } from "tippy.js";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import Suggestion, { SuggestionProps } from "@tiptap/suggestion";
-import { EnsResolverService } from "../hooks/useEnsResolver";
+import type { SuggestionProps } from "@tiptap/suggestion";
 import { cn } from "@/lib/utils";
+import type {
+  AddressSuggestionsResponseSchemaType,
+  AddressSuggestionSchemaType,
+} from "@/app/api/address-suggestions/route";
 
-export type AddressItem =
-  | {
-      /**
-       * Hex
-       */
-      id: Hex;
-      /**
-       * Hex or ENS name
-       */
-      label: string;
-      resolved: true;
-    }
-  | {
-      /**
-       * Hex or ENS name
-       */
-      id: string | Hex;
-      /**
-       * Hex or ENS name
-       */
-      label: string | Hex;
-      resolved: false;
-    };
+export type AddressItem = AddressSuggestionSchemaType;
 
-type AddressSuggestionItem = {
-  id: Hex;
-  /**
-   * Hex or ENS name
-   */
-  label: string | Hex;
-};
+type AddressSuggestionItem = AddressSuggestionSchemaType;
 
 type AddressSuggestionsProps = SuggestionProps<AddressSuggestionItem>;
 
@@ -96,28 +68,30 @@ export const AddressSuggestions = forwardRef<
     },
   }));
 
-  if (!query) {
+  if (!query || !items.length) {
     return null;
   }
 
   return (
     <div className="flex flex-col z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
       {items.length ? (
-        items.map((address, index) => (
+        items.map((item, index) => (
           <button
             className={cn(
               "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
               index === selectedIndex ? "bg-accent text-accent-foreground" : "",
             )}
-            key={address.id}
+            key={item.type + item.address}
             onClick={() => selectItem(index)}
           >
-            <span>{address.label}</span>
+            <span>
+              {item.type === "ens" ? item.name : item.symbol || item.name}
+            </span>
           </button>
         ))
       ) : (
         <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
-          Invalid address
+          Could not resolve
         </div>
       )}
     </div>
@@ -130,7 +104,9 @@ type AddressMentionExtensionOptions = MentionOptions<
   AddressSuggestionItem,
   AddressItem
 > & {
-  ensResolver: EnsResolverService;
+  searchAddressSuggestions: (
+    query: string,
+  ) => Promise<AddressSuggestionsResponseSchemaType>;
 };
 
 const pluginKey = new PluginKey("address-mention");
@@ -140,52 +116,87 @@ export const AddressMentionExtension =
     name: "addressMention",
     addAttributes() {
       return {
-        id: {
+        address: {
           default: null,
-          parseHTML: (element) => element.getAttribute("data-id"),
+          parseHTML: (element) => element.getAttribute("data-address"),
           renderHTML: (attributes) => {
             return {
-              "data-id": attributes.id,
+              "data-address": attributes.address,
             };
           },
         },
-        label: {
+        name: {
           default: null,
-          parseHTML: (element) => element.getAttribute("data-label"),
+          parseHTML: (element) => element.getAttribute("data-name"),
           renderHTML: (attributes) => {
             return {
-              "data-label": attributes.label,
+              "data-name": attributes.name,
             };
           },
         },
-        resolved: {
-          // Add this new attribute
-          default: false,
-          parseHTML: (element) =>
-            element.getAttribute("data-resolved") === "true",
+        symbol: {
+          default: null,
+          parseHTML: (element) => element.getAttribute("data-symbol"),
           renderHTML: (attributes) => {
             return {
-              "data-resolved": attributes.resolved,
+              "data-symbol": attributes.symbol,
+            };
+          },
+        },
+        type: {
+          default: null,
+          parseHTML: (element) => element.getAttribute("data-type"),
+          renderHTML: (attributes) => {
+            return {
+              "data-type": attributes.type,
             };
           },
         },
       };
     },
     renderText({ node }) {
-      return `@${node.attrs.label ?? node.attrs.id}`;
+      const attrs = node.attrs as AddressItem;
+
+      // render address so we can easily resolve it in indexer
+      return attrs.address;
+    },
+    renderHTML({ node }) {
+      const attrs = node.attrs as AddressItem;
+
+      if (attrs.type === "ens") {
+        return [
+          "span",
+          {
+            "data-type": attrs.type,
+            "data-name": attrs.name,
+            "data-address": attrs.address,
+            class: "mention font-medium",
+          },
+          attrs.name,
+        ];
+      }
+
+      return [
+        "span",
+        {
+          "data-type": attrs.type,
+          "data-name": attrs.name,
+          "data-address": attrs.address,
+          "data-symbol": attrs.symbol,
+          class: "mention font-medium",
+        },
+        attrs.symbol || attrs.name,
+      ];
     },
     addOptions() {
       const parent = this.parent?.();
 
       return {
         ...parent,
-        ensResolver: {
-          resolveAddress() {
-            return Promise.resolve(null);
-          },
-          resolveName() {
-            return Promise.resolve(null);
-          },
+        async searchAddressSuggestions() {
+          return {
+            suggestions: [],
+          };
         },
         suggestion: {
           char: "@",
@@ -197,11 +208,7 @@ export const AddressMentionExtension =
               .insertContentAt(range, [
                 {
                   type: this.name,
-                  attrs: {
-                    resolved: true,
-                    id: props.id as Hex,
-                    label: props.label,
-                  } satisfies AddressItem,
+                  attrs: props,
                 },
               ])
               .run();
@@ -278,210 +285,14 @@ export const AddressMentionExtension =
 
     onBeforeCreate() {
       this.options.suggestion.items = async ({ query }) => {
-        if (!query) {
+        if (query.trim().length < 3) {
           return [];
         }
 
-        if (query.endsWith(".eth")) {
-          const resolved = await this.options.ensResolver.resolveName(query);
+        const { suggestions } =
+          await this.options.searchAddressSuggestions(query);
 
-          if (!resolved) {
-            // invalid ens name
-            return [];
-          }
-
-          return [
-            {
-              id: resolved.address,
-              label: resolved.label,
-            },
-          ];
-        }
-
-        if (query.match(/^0x[a-fA-F0-9]{40}$/)) {
-          const resolved = await this.options.ensResolver.resolveAddress(
-            query as Hex,
-          );
-
-          if (!resolved) {
-            return [
-              {
-                id: query as Hex,
-                label: query,
-              },
-            ];
-          }
-
-          return [
-            {
-              id: resolved.address,
-              label: resolved.label,
-            },
-          ];
-        }
-
-        // invalid input
-        return [];
+        return suggestions;
       };
     },
-
-    // we probably don't need input rules because the suggestions are handled as you type
-    // and if content is loaded from source it is already parsed and resolved
-    /* addInputRules() {
-      const mentionType = this.type;
-
-      return [
-        {
-          find: /(?<=^|\s)(?:@)(0x[a-fA-F0-9]{40})([^\w\d])?$/,
-          handler: ({ state, match, range }) => {
-            const [, address, trailingChar] = match;
-
-            const node = mentionType.create({
-              id: address,
-              label: address,
-              resolved: false,
-            } satisfies AddressItem);
-
-            const tr = state.tr;
-
-            const replacement = [node];
-
-            if (trailingChar) {
-              replacement.push(state.schema.text(trailingChar));
-            }
-
-            tr.replaceWith(range.from, range.to, replacement);
-
-            state.apply(tr);
-          },
-        },
-        {
-          find: /(?<=^|\s)(?:@)([a-z0-9-]+\.eth)([^\w\d])?$/,
-          handler: ({ state, match, range }) => {
-            const [, name, trailingChar] = match;
-
-            const node = mentionType.create({
-              id: name,
-              label: name,
-              resolved: false,
-            } satisfies AddressItem);
-
-            const tr = state.tr;
-
-            const replacement = [node];
-
-            if (trailingChar) {
-              replacement.push(state.schema.text(trailingChar));
-            }
-
-            tr.replaceWith(range.from, range.to, replacement);
-
-            state.apply(tr);
-          },
-        },
-      ];
-    },*/
-
-    addProseMirrorPlugins() {
-      return [
-        Suggestion({
-          ...this.options.suggestion,
-          editor: this.editor,
-        }),
-        new AddressMentionResolverPlugin({
-          ensResolver: this.options.ensResolver,
-          nodeType: this.type,
-        }),
-      ];
-    },
   });
-
-type AddressMentionResolverPluginOptions = {
-  ensResolver: EnsResolverService;
-  nodeType: NodeType;
-};
-
-const addressMentionResolverPluginKey = new PluginKey(
-  "address-mention-resolver",
-);
-
-class AddressMentionResolverPlugin extends Plugin {
-  constructor({ ensResolver, nodeType }: AddressMentionResolverPluginOptions) {
-    let editorView: EditorView | null = null;
-
-    super({
-      key: addressMentionResolverPluginKey,
-      view: (view) => {
-        editorView = view;
-
-        return {
-          update: (view) => {
-            // Check for mentions in the document and resolve them
-            const doc = view.state.doc;
-
-            doc.descendants((node, pos) => {
-              const attributes = getAddressMentionNodeAttributes(
-                node,
-                nodeType,
-              );
-
-              if (!attributes || attributes.resolved) {
-                return true;
-              }
-
-              if (attributes.id.startsWith("0x")) {
-                ensResolver
-                  .resolveAddress(attributes.id as Hex)
-                  .then((resolution) => {
-                    if (resolution && editorView) {
-                      const tr = view.state.tr;
-
-                      tr.setNodeMarkup(pos, nodeType, {
-                        id: resolution.address,
-                        label: resolution.label,
-                        // prevent infinite update loop
-                        resolved: true,
-                      });
-
-                      editorView.dispatch(tr);
-                    }
-                  });
-              } else if (attributes.id.endsWith(".eth")) {
-                ensResolver.resolveName(attributes.id).then((resolution) => {
-                  if (resolution && editorView) {
-                    const tr = view.state.tr;
-
-                    tr.setNodeMarkup(pos, nodeType, {
-                      id: resolution.address,
-                      label: resolution.label,
-                      // prevent infinite update loop
-                      resolved: true,
-                    });
-
-                    editorView.dispatch(tr);
-                  }
-                });
-              }
-
-              return true;
-            });
-          },
-          destroy: () => {
-            editorView = null;
-          },
-        };
-      },
-    });
-  }
-}
-
-function getAddressMentionNodeAttributes(
-  node: Node,
-  expectedNodeType: NodeType,
-): AddressItem | null {
-  if (node.type !== expectedNodeType) {
-    return null;
-  }
-
-  return node.attrs as AddressItem;
-}

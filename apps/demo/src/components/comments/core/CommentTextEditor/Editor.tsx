@@ -6,18 +6,13 @@ import {
 } from "@tiptap/react";
 import { Document } from "@tiptap/extension-document";
 import { Paragraph } from "@tiptap/extension-paragraph";
-import { Bold } from "@tiptap/extension-bold";
-import { Italic } from "@tiptap/extension-italic";
 import { Text } from "@tiptap/extension-text";
 import { Link } from "@tiptap/extension-link";
 import { Placeholder } from "@tiptap/extension-placeholder";
-import { AddressMentionExtension } from "./extensions/AddressMention";
-import { TokenMentionExtension } from "./extensions/TokenMention";
-import { useEnsResolver } from "./hooks/useEnsResolver";
-import { useTokenResolver } from "./hooks/useTokenResolver";
-import { base } from "viem/chains";
 import { cn } from "@/lib/utils";
 import { useImperativeHandle } from "react";
+import { useAddressSuggestions } from "./hooks/useAddressSuggestions";
+import { AddressMentionExtension } from "./extensions/AddressMention";
 
 export type EditorRef = {
   focus: () => void;
@@ -48,12 +43,8 @@ export function Editor({
   onEscapePress,
   defaultValue,
 }: EditorProps) {
-  const ensResolver = useEnsResolver();
-  const tokenResolver = useTokenResolver({
-    // @todo use the chain from the context instead of hardcoding it
-    // because chain can be changed
-    chainId: base.id,
-  });
+  const searchAddressSuggestions = useAddressSuggestions();
+
   const editor = useEditor({
     content: defaultValue,
     // fix ssr hydration error
@@ -65,8 +56,6 @@ export function Editor({
       Document,
       Paragraph,
       Text,
-      Bold,
-      Italic,
       Link.configure({
         HTMLAttributes: {
           class: "underline cursor-pointer",
@@ -78,10 +67,7 @@ export function Editor({
           "is-editor-empty before:text-muted-foreground before:content-[attr(data-placeholder)] before:float-left before:h-0 before:pointer-events-none",
       }),
       AddressMentionExtension.configure({
-        ensResolver,
-      }),
-      TokenMentionExtension.configure({
-        tokenResolver,
+        searchAddressSuggestions,
       }),
     ],
     editorProps: {

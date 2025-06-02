@@ -6,14 +6,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { type Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { getAddress } from "viem";
-// import { CommentText } from "@ecp.eth/shared/components";
+import { CommentText } from "@ecp.eth/shared/components";
 import { CommentActionOrStatus } from "./CommentActionOrStatus";
 import { MoreVerticalIcon } from "lucide-react";
 import { CommentAuthor } from "./CommentAuthor";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import { CommentSwapInfo } from "./CommentSwapInfo";
-import { CommentText } from "./CommentText";
 
 type CommentProps = {
   comment: CommentType;
