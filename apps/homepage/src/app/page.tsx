@@ -108,8 +108,7 @@ export default function HomePage() {
           <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
             main benefits
           </p>
-          FIXME: Add a demo/screenshot/snippet here to make it more concrete.
-          Swap with comment feed?
+          FIXME: Add swap with comment & swap w comment feed. Live?
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button
               variant="ghost"
@@ -431,8 +430,8 @@ await fetchComments({
           </div>
 
           <p className="text-gray-400">
-            Building something cool with ECP? We'd love to hear about it and
-            feature your project!
+            Building something cool with ECP? We&apos;d love to hear about it
+            and feature your project!
           </p>
         </div>
       </section>
