@@ -13,12 +13,11 @@ type GetDeleteCommentHashParams = {
   commentId: Hex;
   commentsAddress?: Hex;
   deadline: bigint;
-  nonce: bigint;
   readContract: ContractReadFunctions["getDeleteCommentHash"];
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:419](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L419)
+Defined in: [packages/sdk/src/comments/comment.ts:412](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L412)
 
 ## Properties
 
@@ -28,7 +27,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:419](https://github.com/ecp-et
 app: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:431](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L431)
+Defined in: [packages/sdk/src/comments/comment.ts:424](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L424)
 
 The app signer
 
@@ -40,7 +39,7 @@ The app signer
 author: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:427](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L427)
+Defined in: [packages/sdk/src/comments/comment.ts:420](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L420)
 
 The author of the comment
 
@@ -52,7 +51,7 @@ The author of the comment
 commentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:423](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L423)
+Defined in: [packages/sdk/src/comments/comment.ts:416](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L416)
 
 The ID of the comment to delete
 
@@ -64,7 +63,7 @@ The ID of the comment to delete
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:446](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L446)
+Defined in: [packages/sdk/src/comments/comment.ts:435](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L435)
 
 The address of the comments contract
 
@@ -82,7 +81,7 @@ COMMENT_MANAGER_ADDRESS
 deadline: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:441](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L441)
+Defined in: [packages/sdk/src/comments/comment.ts:430](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L430)
 
 The deadline for the signature
 
@@ -94,22 +93,10 @@ The deadline for the signature
 
 ***
 
-### nonce
-
-```ts
-nonce: bigint;
-```
-
-Defined in: [packages/sdk/src/comments/comment.ts:435](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L435)
-
-The nonce for the signature
-
-***
-
 ### readContract
 
 ```ts
 readContract: ContractReadFunctions["getDeleteCommentHash"];
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:447](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L447)
+Defined in: [packages/sdk/src/comments/comment.ts:436](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L436)

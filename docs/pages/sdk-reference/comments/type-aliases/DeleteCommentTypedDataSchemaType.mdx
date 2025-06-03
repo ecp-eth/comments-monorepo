@@ -19,7 +19,6 @@ type DeleteCommentTypedDataSchemaType = {
      author: `0x${string}`;
      commentId: `0x${string}`;
      deadline: bigint;
-     nonce: bigint;
   };
   primaryType: "DeleteComment";
   types: {
@@ -37,10 +36,6 @@ type DeleteCommentTypedDataSchemaType = {
         type: "address";
       }
         | {
-        name: "nonce";
-        type: "uint256";
-      }
-        | {
         name: "deadline";
         type: "uint256";
      })[];
@@ -48,7 +43,7 @@ type DeleteCommentTypedDataSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:219](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L219)
+Defined in: [packages/sdk/src/comments/schemas.ts:214](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L214)
 
 ## Type declaration
 
@@ -95,7 +90,6 @@ message: {
   author: `0x${string}`;
   commentId: `0x${string}`;
   deadline: bigint;
-  nonce: bigint;
 };
 ```
 
@@ -123,12 +117,6 @@ commentId: `0x${string}` = HexSchema;
 deadline: bigint;
 ```
 
-#### message.nonce
-
-```ts
-nonce: bigint;
-```
-
 ### primaryType
 
 ```ts
@@ -153,10 +141,6 @@ types: {
      type: "address";
    }
      | {
-     name: "nonce";
-     type: "uint256";
-   }
-     | {
      name: "deadline";
      type: "uint256";
   })[];
@@ -178,10 +162,6 @@ DeleteComment: (
   | {
   name: "app";
   type: "address";
-}
-  | {
-  name: "nonce";
-  type: "uint256";
 }
   | {
   name: "deadline";

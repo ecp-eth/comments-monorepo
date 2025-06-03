@@ -80,7 +80,7 @@ Deletes a comment when called by the author directly
 
 
 
-### `deleteCommentWithSig(bytes32 commentId, address app, uint256 nonce, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
+### `deleteCommentWithSig(bytes32 commentId, address app, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
 
 Deletes a comment with author signature verification
 
@@ -143,7 +143,7 @@ Calculates the EIP-712 hash for removing an approval
 
 
 
-### `getDeleteCommentHash(bytes32 commentId, address author, address app, uint256 nonce, uint256 deadline) → bytes32` (external)
+### `getDeleteCommentHash(bytes32 commentId, address author, address app, uint256 deadline) → bytes32` (external)
 
 Calculates the EIP-712 hash for deleting a comment
 
