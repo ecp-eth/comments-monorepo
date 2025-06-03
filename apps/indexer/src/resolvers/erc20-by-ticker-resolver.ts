@@ -18,9 +18,9 @@ async function resolveErc20Data(
   ticker: string,
   chainId: ChainID,
 ): Promise<ResolvedERC20Data | null> {
-  const client = erc20RpcClientsByChainId[chainId];
+  const config = erc20RpcClientsByChainId[chainId];
 
-  if (!client) {
+  if (!config) {
     return null;
   }
 
@@ -40,6 +40,8 @@ async function resolveErc20Data(
     logoURI: token.logoURI,
     name: token.name,
     symbol: token.symbol,
+    caip19: token.caip19,
+    url: config.tokenAddressURL(token.address as Hex),
   };
 }
 

@@ -1,87 +1,134 @@
-import type { Node } from "prosemirror-model";
-import { Fragment } from "react";
-import type { AddressItem } from "../extensions/AddressMention";
-import type { TokenItem } from "../extensions/TokenMention";
+import { cloneElement, Fragment } from "react";
+import type {
+  IndexerAPICommentReferenceSchemaType,
+  IndexerAPICommentReferencesSchemaType,
+} from "@ecp.eth/sdk/indexer";
 
-export function renderModel(root: Node): React.ReactNode {
-  return renderNode(root);
-}
+const KEEP_ORIGINAL_TEXT = Symbol("KEEP_ORIGINAL_TEXT");
 
-function renderNode(node: Node): React.ReactNode {
-  switch (node.type.name) {
-    case "doc":
-      return renderDoc(node);
-    case "paragraph":
-      return renderParagraph(node);
-    case "text":
-      return renderText(node);
-    case "addressMention":
-      return renderAddressMention(node);
-    case "tokenMention":
-      return renderTokenMention(node);
-    default:
-      throw new Error(`Unknown node type: ${node.type.name}`);
-  }
-}
+type ReferenceRenderer<
+  TReference extends IndexerAPICommentReferenceSchemaType,
+> = (reference: TReference) => React.ReactElement | typeof KEEP_ORIGINAL_TEXT;
 
-function renderDoc(node: Node): React.ReactNode {
-  return (
-    <>
-      {node.children.map((child, index) => (
-        <Fragment key={index}>{renderNode(child)}</Fragment>
-      ))}
-    </>
-  );
-}
+type ReferenceRendererKey = {
+  [K in IndexerAPICommentReferenceSchemaType["type"]]: ReferenceRenderer<
+    Extract<IndexerAPICommentReferenceSchemaType, { type: K }>
+  >;
+};
 
-function renderParagraph(node: Node): React.ReactElement {
-  return (
-    <p>
-      {node.children.map((child, index) => (
-        <Fragment key={index}>{renderNode(child)}</Fragment>
-      ))}
-    </p>
-  );
-}
-
-function renderText(node: Node): React.ReactNode {
-  if (node.marks.length > 0) {
-    return node.marks.reduce(
-      (acc, mark) => {
-        switch (mark.type.name) {
-          case "bold": {
-            return <strong>{acc}</strong>;
-          }
-          case "italic": {
-            return <em>{acc}</em>;
-          }
-          case "link": {
-            return <a {...mark.attrs}>{acc}</a>;
-          }
-          default:
-            console.warn(`Unknown mark type: ${mark.type.name}`);
-            return acc;
-        }
-      },
-      <>{node.text}</>,
+const referenceRenderers: Partial<ReferenceRendererKey> = {
+  ens(reference) {
+    return (
+      <a href={reference.url} rel="noopener noreferrer" target="_blank">
+        {reference.name}
+      </a>
     );
+  },
+  farcaster(reference) {
+    return (
+      <a href={reference.url} rel="noopener noreferrer" target="_blank">
+        {reference.displayName}
+      </a>
+    );
+  },
+  erc20(reference) {
+    return (
+      <a
+        href={reference.url}
+        rel="noopener noreferrer"
+        target="_blank"
+        title={reference.name || reference.address}
+      >
+        ${reference.symbol}
+      </a>
+    );
+  },
+};
+
+type RenderToReactProps = {
+  content: string;
+  references: IndexerAPICommentReferencesSchemaType;
+};
+
+export function renderToReact({
+  content,
+  references,
+}: RenderToReactProps): React.ReactElement {
+  const referencesByPosition: Map<
+    number,
+    IndexerAPICommentReferenceSchemaType
+  > = new Map();
+
+  for (const reference of references) {
+    referencesByPosition.set(reference.position.start, reference);
   }
 
-  return node.text || "";
-}
+  const elements: React.ReactNode[] = [];
+  const chars = Array.from(content); // respect unicode
+  let currentParagraphText = "";
+  let currentParagraph: React.ReactElement[] = [];
+  let consecutiveNewLines = 0;
 
-function renderAddressMention(node: Node): React.ReactNode {
-  const attrs = node.attrs as AddressItem;
+  const flushParagraphText = () => {
+    if (currentParagraphText.length > 0) {
+      currentParagraph.push(<Fragment>{currentParagraphText}</Fragment>);
+      currentParagraphText = "";
+    }
+  };
 
-  return <>@{attrs.label}</>;
-}
+  const flushParagraph = () => {
+    flushParagraphText();
 
-function renderTokenMention(node: Node): React.ReactNode {
-  const attrs = node.attrs as TokenItem;
+    if (currentParagraph.length > 0) {
+      elements.push(
+        <p key={elements.length}>
+          {currentParagraph.map((el, i) => cloneElement(el, { key: i }))}
+        </p>,
+      );
+      currentParagraph = [];
+    }
+  };
 
-  if (attrs.type === "unresolved-symbol") {
-    return <>${attrs.symbol}</>;
+  for (let i = 0; i < chars.length; i++) {
+    const char = chars[i];
+    const reference = referencesByPosition.get(i);
+
+    if (reference) {
+      const renderer = referenceRenderers[reference.type] as
+        | ReferenceRenderer<typeof reference>
+        | undefined;
+
+      if (renderer) {
+        const result = renderer(reference);
+
+        if (result !== KEEP_ORIGINAL_TEXT) {
+          i = reference.position.end - 1;
+          flushParagraphText();
+          currentParagraph.push(result);
+
+          continue;
+        }
+      }
+    }
+
+    if (char === "\n" || char === "\r") {
+      // skip the \r in \r\n
+      if (char === "\r" && chars[i + 1] === "\n") {
+        i++;
+      }
+
+      consecutiveNewLines++;
+
+      if (consecutiveNewLines === 1) {
+        flushParagraph();
+      }
+    } else {
+      consecutiveNewLines = 0;
+      currentParagraphText += char;
+    }
   }
 
-  return <>${attrs.type === "resolved" ? attrs.label : attrs.caip19}</>;
+  flushParagraph();
+
+  return <Fragment>{elements}</Fragment>;
 }

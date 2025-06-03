@@ -65,6 +65,7 @@ export const farcasterByAddressResolver = new DataLoader<
 
         return {
           address: normalizedAddress,
+          url: `https://farcaster.xyz/${parseUserDataResult.data.username || parseUserDataResult.data.fid}`,
           ...parseUserDataResult.data,
         };
       });

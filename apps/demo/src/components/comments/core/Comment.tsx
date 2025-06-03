@@ -6,13 +6,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { type Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { getAddress } from "viem";
-import { CommentText } from "@ecp.eth/shared/components";
 import { CommentActionOrStatus } from "./CommentActionOrStatus";
 import { MoreVerticalIcon } from "lucide-react";
 import { CommentAuthor } from "./CommentAuthor";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import { CommentSwapInfo } from "./CommentSwapInfo";
+import { CommentText } from "./CommentText";
 
 type CommentProps = {
   comment: CommentType;
@@ -94,7 +94,10 @@ export function Comment({
           comment.deletedAt && "text-muted-foreground",
         )}
       >
-        <CommentText text={comment.content} />
+        <CommentText
+          content={comment.content}
+          references={comment.references}
+        />
       </div>
       <div className="mb-2">
         <CommentActionOrStatus

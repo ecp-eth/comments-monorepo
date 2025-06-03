@@ -88,6 +88,7 @@ export const IndexerAPICommentReferenceENSSchema = z.object({
   name: z.string(),
   address: HexSchema,
   position: IndexerAPICommentReferencePositionSchema,
+  url: z.string().url(),
 });
 
 export type IndexerAPICommentReferenceENSSchemaType = z.infer<
@@ -101,6 +102,7 @@ export const IndexerAPICommentReferenceFarcasterSchema = z.object({
   displayName: z.string().nullable(),
   pfpUrl: z.string().nullable(),
   position: IndexerAPICommentReferencePositionSchema,
+  url: z.string().url(),
 });
 
 export type IndexerAPICommentReferenceFarcasterSchemaType = z.infer<
@@ -113,6 +115,8 @@ export const IndexerAPICommentReferenceERC20Schema = z.object({
   logoURI: z.string().nullable(),
   name: z.string(),
   address: HexSchema,
+  caip19: z.string(),
+  url: z.string().url(),
   position: IndexerAPICommentReferencePositionSchema,
 });
 

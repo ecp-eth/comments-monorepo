@@ -4,6 +4,7 @@ export type ResolvedENSData = {
   address: Hex;
   name: string;
   avatarUrl: string | null;
+  url: string;
 };
 
 export type ResolvedFarcasterData = {
@@ -12,6 +13,7 @@ export type ResolvedFarcasterData = {
   username?: string | null;
   displayName?: string | null;
   pfpUrl?: string | null;
+  url: string;
 };
 
 export type ResolvedERC20Data = {
@@ -20,4 +22,6 @@ export type ResolvedERC20Data = {
   name: string;
   decimals: number;
   logoURI: string | null;
+  url: string;
+  caip19: string;
 };

@@ -1,9 +1,12 @@
 import DataLoader from "dataloader";
-import { getAddress, isAddressEqual, type PublicClient, type Hex } from "viem";
+import { getAddress, isAddressEqual, type Hex } from "viem";
 import type { ResolvedERC20Data } from "./types";
 import { LRUCache } from "lru-cache";
 import { tokenList } from "@ecp.eth/shared/token-list";
-import { erc20RpcClientsByChainId } from "./erc20-rpc-clients";
+import {
+  type ChainClientConfig,
+  erc20RpcClientsByChainId,
+} from "./erc20-rpc-clients";
 
 type ChainID = number;
 
@@ -18,9 +21,9 @@ async function resolveErc20Data(
   address: Hex,
   chainId: ChainID,
 ): Promise<ResolvedERC20Data | null> {
-  const client = erc20RpcClientsByChainId[chainId];
+  const config = erc20RpcClientsByChainId[chainId];
 
-  if (!client) {
+  if (!config) {
     return null;
   }
 
@@ -37,10 +40,12 @@ async function resolveErc20Data(
       logoURI: token.logoURI,
       name: token.name,
       symbol: token.symbol,
+      caip19: token.caip19,
+      url: config.tokenAddressURL(address),
     };
   }
 
-  const code = await client.getCode({
+  const code = await config.client.getCode({
     address,
   });
 
@@ -48,7 +53,10 @@ async function resolveErc20Data(
     return null;
   }
 
-  return resolveERC20Token(address, client);
+  return resolveERC20Token(address, {
+    ...config,
+    chainId,
+  });
 }
 
 function createERC20ByAddressResolver(): ERC20ByAddressResolver {
@@ -109,28 +117,28 @@ const ERC20_ABI = [
 
 async function resolveERC20Token(
   address: Hex,
-  client: PublicClient,
+  config: ChainClientConfig & { chainId: number },
 ): Promise<null | ResolvedERC20Data> {
-  const bytecode = await client.getCode({ address });
+  const bytecode = await config.client.getCode({ address });
 
   if (!bytecode) {
     return null;
   }
 
   try {
-    const name = await client.readContract({
+    const name = await config.client.readContract({
       address,
       abi: ERC20_ABI,
       functionName: "name",
     });
 
-    const symbol = await client.readContract({
+    const symbol = await config.client.readContract({
       address,
       abi: ERC20_ABI,
       functionName: "symbol",
     });
 
-    const decimals = await client.readContract({
+    const decimals = await config.client.readContract({
       address,
       abi: ERC20_ABI,
       functionName: "decimals",
@@ -142,6 +150,8 @@ async function resolveERC20Token(
       symbol,
       decimals,
       logoURI: null,
+      url: config.tokenAddressURL(address),
+      caip19: `eip155:${config.chainId}/erc20:${address}`,
     };
   } catch (e) {
     console.warn("Resolving ERC20 token from chain failed with", e);

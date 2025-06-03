@@ -48,9 +48,29 @@ export async function resolveCommentReferences(
 
     if (match) {
       const position = { start: pos, end: pos + match[0].length };
+      const address = match[0].startsWith("@") ? match[0].slice(1) : match[0];
 
       promises.push(
-        resolveEthAddress(match[0] as Hex, comment.chainId, position, options),
+        resolveEthAddress(address as Hex, comment.chainId, position, options),
+      );
+      pos += match[0].length;
+
+      continue;
+    }
+
+    match = restOfContent.match(ERC20_TOKEN_ETH_ADDRESS_REGEX);
+
+    if (match) {
+      const position = { start: pos, end: pos + match[0].length };
+      const address = match[0].slice(1);
+
+      promises.push(
+        resolveERC20TokenEthAddress(
+          address as Hex,
+          comment.chainId,
+          position,
+          options,
+        ),
       );
       pos += match[0].length;
 
@@ -61,21 +81,22 @@ export async function resolveCommentReferences(
 
     if (match) {
       const position = { start: pos, end: pos + match[0].length };
+      const ensName = match[0].startsWith("@") ? match[0].slice(1) : match[0];
 
-      promises.push(resolveEnsName(match[1] as string, position, options));
+      promises.push(resolveEnsName(ensName, position, options));
       pos += match[0].length;
 
       continue;
     }
 
-    match = restOfContent.match(ERC20_TICKER_REGEX);
+    match = restOfContent.match(ERC20_TOKEN_TICKER_REGEX);
 
     if (match) {
       const position = { start: pos, end: pos + match[0].length };
 
       promises.push(
-        resolveERC20Ticker(
-          match[1] as string,
+        resolveERC20TokenTicker(
+          match[0].slice(1),
           comment.chainId,
           position,
           options,
@@ -126,25 +147,23 @@ type ResolverPosition = {
   end: number;
 };
 
-const ETH_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}/;
-const ENS_NAME_REGEX = /^@([a-zA-Z0-9.-]+\.eth)/;
-const ERC20_TICKER_REGEX = /^\$([a-zA-Z0-9.-]+)/;
+const ETH_ADDRESS_REGEX = /^@?0x[a-fA-F0-9]{40}/;
+const ERC20_TOKEN_ETH_ADDRESS_REGEX = /^\$0x[a-fA-F0-9]{40}/;
+const ENS_NAME_REGEX = /^@?[a-zA-Z0-9.-]+\.eth/;
+const ERC20_TOKEN_TICKER_REGEX = /^\$[a-zA-Z0-9.-]+/;
 
 async function resolveEthAddress(
   address: Hex,
   chainId: number,
   position: ResolverPosition,
-  {
-    ensByAddressResolver,
-    erc20ByAddressResolver,
-    farcasterByAddressResolver,
-  }: Options,
+  options: Options,
 ): Promise<
   | IndexerAPICommentReferenceENSSchemaType
   | IndexerAPICommentReferenceERC20SchemaType
   | IndexerAPICommentReferenceFarcasterSchemaType
   | null
 > {
+  const { ensByAddressResolver, farcasterByAddressResolver } = options;
   const ensData = await ensByAddressResolver.load(address);
 
   if (ensData) {
@@ -154,6 +173,7 @@ async function resolveEthAddress(
       address,
       avatarUrl: ensData.avatarUrl,
       position,
+      url: ensData.url,
     };
   }
 
@@ -166,16 +186,26 @@ async function resolveEthAddress(
       fid: farcasterData.fid,
       pfpUrl: farcasterData.pfpUrl ?? null,
       username: farcasterData.username ?? null,
+      url: farcasterData.url,
       position,
     };
   }
 
-  const erc20Data = await erc20ByAddressResolver.load([address, chainId]);
+  return resolveERC20TokenEthAddress(address, chainId, position, options);
+}
 
-  if (erc20Data) {
+async function resolveERC20TokenEthAddress(
+  address: Hex,
+  chainId: number,
+  position: ResolverPosition,
+  { erc20ByAddressResolver }: Options,
+): Promise<IndexerAPICommentReferenceERC20SchemaType | null> {
+  const result = await erc20ByAddressResolver.load([address, chainId]);
+
+  if (result) {
     return {
       type: "erc20",
-      ...erc20Data,
+      ...result,
       position,
     };
   }
@@ -197,13 +227,14 @@ async function resolveEnsName(
       avatarUrl: result.avatarUrl,
       name: result.name,
       position,
+      url: result.url,
     };
   }
 
   return null;
 }
 
-async function resolveERC20Ticker(
+async function resolveERC20TokenTicker(
   ticker: string,
   chainId: number,
   position: ResolverPosition,
@@ -219,6 +250,8 @@ async function resolveERC20Ticker(
       name: result.name,
       position,
       logoURI: result.logoURI,
+      url: result.url,
+      caip19: result.caip19,
     };
   }
 

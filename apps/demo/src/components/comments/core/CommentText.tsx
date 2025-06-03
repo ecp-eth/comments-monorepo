@@ -1,11 +1,20 @@
 import { useMemo } from "react";
-import { customMarkdownParser } from "./CommentTextEditor/serializers/markdown";
-import { renderModel } from "./CommentTextEditor/serializers/renderer";
+import { renderToReact } from "./CommentTextEditor/serializers/renderer";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 
-export function CommentText({ text }: { text: string }) {
-  const content = useMemo(() => {
-    return renderModel(customMarkdownParser.parse(text));
-  }, [text]);
+export function CommentText({
+  content,
+  references,
+}: {
+  content: string;
+  references: IndexerAPICommentReferencesSchemaType;
+}) {
+  const elements = useMemo(() => {
+    return renderToReact({
+      content,
+      references,
+    });
+  }, [content, references]);
 
-  return <div>{content}</div>;
+  return <div>{elements}</div>;
 }

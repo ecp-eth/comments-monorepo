@@ -25,6 +25,7 @@ async function resolveEnsData(
     address: ensAddress,
     name: normalizedName,
     avatarUrl,
+    url: `https://app.ens.domains/${ensAddress}`,
   };
 }
 

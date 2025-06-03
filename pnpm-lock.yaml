@@ -155,9 +155,6 @@ importers:
       lucide-react:
         specifier: ^0.474.0
         version: 0.474.0(react@19.1.0)
-      markdown-it:
-        specifier: ^14.1.0
-        version: 14.1.0
       never:
         specifier: ^1.1.0
         version: 1.1.0
@@ -170,9 +167,6 @@ importers:
       pinata:
         specifier: ^2.4.3
         version: 2.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      prosemirror-markdown:
-        specifier: ^1.13.2
-        version: 1.13.2
       prosemirror-model:
         specifier: ^1.25.1
         version: 1.25.1
@@ -210,9 +204,6 @@ importers:
       '@ecp.eth/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@types/markdown-it':
-        specifier: ^14.1.2
-        version: 14.1.2
       '@types/node':
         specifier: ^22.14.1
         version: 22.15.29
