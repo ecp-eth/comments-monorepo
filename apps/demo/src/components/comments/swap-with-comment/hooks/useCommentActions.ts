@@ -48,11 +48,11 @@ export function useCommentActions({
   const commentDeletion = useCommentDeletion();
   const commentSubmission = useCommentSubmission();
 
-  const { mutateAsync: deleteCommentAsAuthor } = useDeleteComment();
+  const { mutateAsync: deleteCommentMutation } = useDeleteComment();
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {
-        const { txHash } = await deleteCommentAsAuthor({
+        const { txHash } = await deleteCommentMutation({
           commentId: params.comment.id,
         });
 
@@ -95,7 +95,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentDeletion, deleteCommentAsAuthor],
+    [wagmiConfig, commentDeletion, deleteCommentMutation],
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(async () => {

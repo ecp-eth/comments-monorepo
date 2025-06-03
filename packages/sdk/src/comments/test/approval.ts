@@ -10,10 +10,10 @@ import { privateKeyToAccount } from "viem/accounts";
 import { anvil } from "viem/chains";
 import {
   isApproved,
-  addApprovalAsAuthor,
   addApproval,
-  revokeApprovalAsAuthor,
+  addApprovalWithSig,
   revokeApproval,
+  revokeApprovalWithSig,
   getAddApprovalHash,
   getRemoveApprovalHash,
   createApprovalTypedData,
@@ -73,9 +73,9 @@ describe("approval", () => {
     });
   });
 
-  describe("addApprovalAsAuthor()", () => {
+  describe("addApproval()", () => {
     it("approves app signer", async () => {
-      const result = await addApprovalAsAuthor({
+      const result = await addApproval({
         app: app.address,
         writeContract: client.writeContract,
         commentsAddress,
@@ -99,7 +99,7 @@ describe("approval", () => {
     });
   });
 
-  describe("addApproval()", () => {
+  describe("addApprovalWithSig()", () => {
     let authorSignature: Hex;
     let typedData: AddApprovalTypedDataSchemaType;
 
@@ -123,7 +123,7 @@ describe("approval", () => {
     });
 
     it("adds approval with signature", async () => {
-      const result = await addApproval({
+      const result = await addApprovalWithSig({
         typedData,
         signature: authorSignature,
         writeContract: appClient.writeContract,
@@ -149,7 +149,7 @@ describe("approval", () => {
     it("fails with invalid signature", async () => {
       await assert.rejects(
         () =>
-          addApproval({
+          addApprovalWithSig({
             typedData,
             signature: "0x1234", // Invalid signature
             writeContract: appClient.writeContract,
@@ -163,10 +163,10 @@ describe("approval", () => {
     });
   });
 
-  describe("revokeApprovalAsAuthor()", () => {
+  describe("revokeApproval()", () => {
     beforeEach(async () => {
       // First approve the app signer
-      const result = await addApprovalAsAuthor({
+      const result = await addApproval({
         app: app.address,
         writeContract: client.writeContract,
         commentsAddress,
@@ -178,7 +178,7 @@ describe("approval", () => {
     });
 
     it("revokes approval", async () => {
-      const result = await revokeApprovalAsAuthor({
+      const result = await revokeApproval({
         app: app.address,
         writeContract: client.writeContract,
         commentsAddress,
@@ -202,12 +202,12 @@ describe("approval", () => {
     });
   });
 
-  describe("revokeApproval()", () => {
+  describe("revokeApprovalWithSig()", () => {
     let signature: Hex;
     let typedData: RemoveApprovalTypedDataSchemaType;
 
     beforeEach(async () => {
-      const result = await addApprovalAsAuthor({
+      const result = await addApproval({
         app: app.address,
         writeContract: client.writeContract,
         commentsAddress,
@@ -236,7 +236,7 @@ describe("approval", () => {
     });
 
     it("revokes approval with signature", async () => {
-      const result = await revokeApproval({
+      const result = await revokeApprovalWithSig({
         typedData,
         signature,
         writeContract: appClient.writeContract,
@@ -263,7 +263,7 @@ describe("approval", () => {
     it("fails with invalid signature", async () => {
       await assert.rejects(
         () =>
-          revokeApproval({
+          revokeApprovalWithSig({
             typedData,
             signature: "0x1234", // Invalid signature
             writeContract: appClient.writeContract,

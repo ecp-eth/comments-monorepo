@@ -8,16 +8,27 @@
 
 ```ts
 type AddApprovalParams = {
+  app: Hex;
   commentsAddress?: Hex;
-  signature: Hex;
-  typedData: AddApprovalTypedDataSchemaType;
   writeContract: ContractWriteFunctions["addApproval"];
 };
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:112](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L112)
+Defined in: [packages/sdk/src/comments/approval.ts:61](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L61)
 
 ## Properties
+
+### app
+
+```ts
+app: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:65](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L65)
+
+The address of the app signer being approved
+
+***
 
 ### commentsAddress?
 
@@ -25,7 +36,7 @@ Defined in: [packages/sdk/src/comments/approval.ts:112](https://github.com/ecp-e
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:128](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L128)
+Defined in: [packages/sdk/src/comments/approval.ts:71](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L71)
 
 The address of the comments contract
 
@@ -37,36 +48,10 @@ COMMENT_MANAGER_ADDRESS
 
 ***
 
-### signature
-
-```ts
-signature: Hex;
-```
-
-Defined in: [packages/sdk/src/comments/approval.ts:122](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L122)
-
-Author's signature for typed data
-
-***
-
-### typedData
-
-```ts
-typedData: AddApprovalTypedDataSchemaType;
-```
-
-Defined in: [packages/sdk/src/comments/approval.ts:118](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L118)
-
-The typed data for the approval
-
-You can obtain this value by using createApprovalTypedData()
-
-***
-
 ### writeContract
 
 ```ts
 writeContract: ContractWriteFunctions["addApproval"];
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:129](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L129)
+Defined in: [packages/sdk/src/comments/approval.ts:72](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L72)

@@ -93,7 +93,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     vm.expectEmit(true, true, true, true);
     emit CommentDeleted(commentId, author);
-    comments.deleteCommentWithApproval(
+    comments.deleteCommentWithSig(
       commentId,
       app,
       comments.getNonce(author, app),
@@ -141,7 +141,7 @@ contract CommentsTest is Test, IERC721Receiver {
         author
       )
     );
-    comments.deleteCommentWithApproval(
+    comments.deleteCommentWithSig(
       commentId,
       app,
       nonce,
@@ -168,7 +168,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.prank(author);
     comments.postComment(commentData, appSignature);
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     // Delete the comment with signature
     bytes32 deleteHash = comments.getDeleteCommentHash(
@@ -186,7 +186,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     vm.expectEmit(true, true, true, true);
     emit CommentDeleted(commentId, author);
-    comments.deleteCommentWithApproval(
+    comments.deleteCommentWithSig(
       commentId,
       app,
       comments.getNonce(author, app),
@@ -233,7 +233,7 @@ contract CommentsTest is Test, IERC721Receiver {
         author
       )
     );
-    comments.deleteCommentWithApproval(
+    comments.deleteCommentWithSig(
       commentId,
       app,
       nonce,
@@ -257,7 +257,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.prank(author);
     comments.postComment(commentData, appSignature);
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     // Try to delete with wrong signature
     uint256 nonce = comments.getNonce(author, app);
@@ -283,7 +283,7 @@ contract CommentsTest is Test, IERC721Receiver {
         author
       )
     );
-    comments.deleteCommentWithApproval(
+    comments.deleteCommentWithSig(
       commentId,
       app,
       nonce,
@@ -310,7 +310,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.prank(author);
     comments.postComment(commentData, appSignature);
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     // Delete the comment with signature
     uint256 nonce = comments.getNonce(author, app);
@@ -330,7 +330,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.prank(app);
     vm.expectEmit(true, true, true, true);
     emit CommentDeleted(commentId, author);
-    comments.deleteCommentWithApproval(
+    comments.deleteCommentWithSig(
       commentId,
       app,
       nonce,
@@ -377,7 +377,7 @@ contract CommentsTest is Test, IERC721Receiver {
         author
       )
     );
-    comments.deleteCommentWithApproval(
+    comments.deleteCommentWithSig(
       commentId,
       app,
       nonce,
@@ -411,11 +411,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId
     );
 
-    comments.postCommentWithApproval(
-      commentData,
-      authorSignature,
-      appSignature
-    );
+    comments.postCommentWithSig(commentData, authorSignature, appSignature);
 
     // Try to delete as non-author
     address nonAuthor = address(0x4);
@@ -461,7 +457,7 @@ contract CommentsTest is Test, IERC721Receiver {
         100
       )
     );
-    comments.deleteCommentWithApproval(
+    comments.deleteCommentWithSig(
       commentId,
       app,
       wrongNonce,
@@ -474,7 +470,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_WithApprovedSigner() public {
     // First add approval
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     // Create and post a comment
     Comments.CreateComment memory commentData = TestUtils
@@ -505,7 +501,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     vm.expectEmit(true, true, true, true);
     emit CommentDeleted(commentId, author);
-    comments.deleteCommentWithApproval(
+    comments.deleteCommentWithSig(
       commentId,
       app,
       comments.getNonce(author, app),

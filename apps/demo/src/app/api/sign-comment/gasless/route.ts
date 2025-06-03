@@ -7,7 +7,7 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { chain, transport } from "@/lib/wagmi";
-import { postCommentWithApproval } from "@ecp.eth/sdk/comments";
+import { postCommentWithSig } from "@ecp.eth/sdk/comments";
 import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { createWalletClient, publicActions } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -69,7 +69,7 @@ export async function POST(
   }
 
   try {
-    const { txHash } = await postCommentWithApproval({
+    const { txHash } = await postCommentWithSig({
       appSignature,
       authorSignature,
       comment: signTypedDataParams.message,

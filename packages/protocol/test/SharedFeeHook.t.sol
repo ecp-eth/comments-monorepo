@@ -68,15 +68,15 @@ contract SharedFeeHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        onCommentAdded: true,
-        onCommentDeleted: false,
-        onCommentEdited: false,
-        onInitialized: false,
-        onChannelUpdated: false
+        onCommentAdd: true,
+        onCommentDelete: false,
+        onCommentEdit: false,
+        onInitialize: false,
+        onChannelUpdate: false
       });
   }
 
-  function _onCommentAdded(
+  function _onCommentAdd(
     Comments.Comment calldata commentData,
     address,
     bytes32

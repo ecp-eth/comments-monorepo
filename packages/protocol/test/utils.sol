@@ -407,15 +407,15 @@ contract MockHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        onInitialized: false,
-        onCommentAdded: true,
-        onCommentDeleted: false,
-        onCommentEdited: false,
-        onChannelUpdated: false
+        onInitialize: false,
+        onCommentAdd: true,
+        onCommentDelete: false,
+        onCommentEdit: false,
+        onChannelUpdate: false
       });
   }
 
-  function _onCommentAdded(
+  function _onCommentAdd(
     Comments.Comment calldata,
     address,
     bytes32
@@ -433,15 +433,15 @@ contract AlwaysReturningDataHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        onInitialized: false,
-        onCommentAdded: true,
-        onCommentDeleted: false,
-        onCommentEdited: true,
-        onChannelUpdated: false
+        onInitialize: false,
+        onCommentAdd: true,
+        onCommentDelete: false,
+        onCommentEdit: true,
+        onChannelUpdate: false
       });
   }
 
-  function onCommentEdited(
+  function onCommentEdit(
     Comments.Comment calldata,
     address,
     bytes32
@@ -449,7 +449,7 @@ contract AlwaysReturningDataHook is BaseHook {
     return "hook data edited";
   }
 
-  function onCommentAdded(
+  function onCommentAdd(
     Comments.Comment calldata,
     address,
     bytes32

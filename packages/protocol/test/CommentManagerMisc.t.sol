@@ -40,25 +40,25 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.deal(app, 100 ether);
   }
 
-  function test_AddApprovalAsAuthor() public {
+  function test_AddApproval() public {
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
     emit ApprovalAdded(author, app);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     assertTrue(comments.isApproved(author, app));
   }
 
-  function test_revokeApprovalAsAuthor() public {
+  function test_revokeApproval() public {
     // First add approval
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     // Then remove it
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
     emit ApprovalRemoved(author, app);
-    comments.revokeApprovalAsAuthor(app);
+    comments.revokeApproval(app);
 
     assertFalse(comments.isApproved(author, app));
   }
@@ -82,7 +82,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
     emit ApprovalAdded(author, app);
-    comments.addApproval(author, app, nonce, deadline, signature);
+    comments.addApprovalWithSig(author, app, nonce, deadline, signature);
 
     assertTrue(comments.isApproved(author, app));
   }
@@ -90,7 +90,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_revokeApproval_WithSignature() public {
     // First add approval
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     uint256 nonce = 0;
     uint256 deadline = block.timestamp + 1 days;
@@ -110,7 +110,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
     emit ApprovalRemoved(author, app);
-    comments.removeApproval(author, app, nonce, deadline, signature);
+    comments.removeApprovalWithSig(author, app, nonce, deadline, signature);
 
     assertFalse(comments.isApproved(author, app));
   }
@@ -140,12 +140,12 @@ contract CommentsTest is Test, IERC721Receiver {
         1
       )
     );
-    comments.addApproval(author, app, wrongNonce, deadline, signature);
+    comments.addApprovalWithSig(author, app, wrongNonce, deadline, signature);
   }
 
   function test_revokeApproval_InvalidNonce() public {
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     uint256 wrongNonce = 1;
     uint256 deadline = block.timestamp + 1 days;
@@ -171,13 +171,19 @@ contract CommentsTest is Test, IERC721Receiver {
         1
       )
     );
-    comments.removeApproval(author, app, wrongNonce, deadline, signature);
+    comments.removeApprovalWithSig(
+      author,
+      app,
+      wrongNonce,
+      deadline,
+      signature
+    );
   }
 
   function test_ApprovalLifecycle() public {
     // Add approval
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
     assertTrue(comments.isApproved(author, app));
 
     // Post comment without author signature (using approval)
@@ -190,11 +196,11 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId
     );
 
-    comments.postCommentWithApproval(commentData, bytes(""), appSignature);
+    comments.postCommentWithSig(commentData, bytes(""), appSignature);
 
     // Remove approval
     vm.prank(author);
-    comments.revokeApprovalAsAuthor(app);
+    comments.revokeApproval(app);
     assertFalse(comments.isApproved(author, app));
 
     // Try to post again without approval (should fail)
@@ -209,7 +215,7 @@ contract CommentsTest is Test, IERC721Receiver {
         author
       )
     );
-    comments.postCommentWithApproval(commentData, bytes(""), appSignature);
+    comments.postCommentWithSig(commentData, bytes(""), appSignature);
   }
 
   function test_NonceIncrement() public {
@@ -230,11 +236,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId
     );
 
-    comments.postCommentWithApproval(
-      commentData,
-      authorSignature,
-      appSignature
-    );
+    comments.postCommentWithSig(commentData, authorSignature, appSignature);
 
     assertEq(comments.getNonce(author, app), initialNonce + 1);
 
@@ -248,11 +250,7 @@ contract CommentsTest is Test, IERC721Receiver {
         initialNonce
       )
     );
-    comments.postCommentWithApproval(
-      commentData,
-      authorSignature,
-      appSignature
-    );
+    comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
 
   function onERC721Received(
@@ -267,7 +265,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
 // Mock malicious fee collector that reverts on collection
 contract MaliciousFeeCollector is BaseHook {
-  function _onCommentAdded(
+  function _onCommentAdd(
     Comments.Comment calldata,
     address,
     bytes32
@@ -283,11 +281,11 @@ contract MaliciousFeeCollector is BaseHook {
   {
     return
       Hooks.Permissions({
-        onCommentAdded: true,
-        onCommentDeleted: false,
-        onInitialized: false,
-        onCommentEdited: false,
-        onChannelUpdated: false
+        onCommentAdd: true,
+        onCommentDelete: false,
+        onInitialize: false,
+        onCommentEdit: false,
+        onChannelUpdate: false
       });
   }
 }

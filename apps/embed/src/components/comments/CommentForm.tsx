@@ -199,7 +199,7 @@ export function CommentForm({
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const onSubmitStartRef = useFreshRef(onSubmitStart);
 
-  const { mutateAsync: postCommentAsAuthor } = usePostComment();
+  const { mutateAsync: postComment } = usePostComment();
 
   const submitCommentMutation = useCallback<OnSubmitFunction>(
     async ({ author, content }) => {
@@ -224,7 +224,7 @@ export function CommentForm({
           return switchChainAsync({ chainId });
         },
         async writeContractAsync({ signCommentResponse }) {
-          const { txHash } = await postCommentAsAuthor({
+          const { txHash } = await postComment({
             comment: signCommentResponse.data,
             appSignature: signCommentResponse.signature,
           });
@@ -269,7 +269,7 @@ export function CommentForm({
       commentSubmission,
       onSubmitStartRef,
       parentId,
-      postCommentAsAuthor,
+      postComment,
       switchChainAsync,
       targetUri,
       wagmiConfig,
@@ -345,7 +345,7 @@ export function CommentEditForm({
   const { chainId } = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const onSubmitStartRef = useFreshRef(onSubmitStart);
 
-  const { mutateAsync: editCommentAsAuthor } = useEditComment();
+  const { mutateAsync: editComment } = useEditComment();
 
   const submitCommentMutation = useCallback<OnSubmitFunction>(
     async ({ author, content }) => {
@@ -360,7 +360,7 @@ export function CommentEditForm({
           return switchChainAsync({ chainId });
         },
         async writeContractAsync({ signEditCommentResponse }) {
-          const { txHash } = await editCommentAsAuthor({
+          const { txHash } = await editComment({
             edit: signEditCommentResponse.data,
             appSignature: signEditCommentResponse.signature,
           });
@@ -404,7 +404,7 @@ export function CommentEditForm({
       chainId,
       comment,
       commentEdition,
-      editCommentAsAuthor,
+      editComment,
       onSubmitStartRef,
       queryKey,
       switchChainAsync,

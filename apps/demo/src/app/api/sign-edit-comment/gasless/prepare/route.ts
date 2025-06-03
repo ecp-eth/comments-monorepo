@@ -14,7 +14,7 @@ import {
   createEditCommentTypedData,
   getNonce,
   isApproved,
-  editCommentWithApproval,
+  editCommentWithSig,
 } from "@ecp.eth/sdk/comments";
 import { isMuted } from "@ecp.eth/sdk/indexer";
 import { createPublicClient, createWalletClient, publicActions } from "viem";
@@ -142,7 +142,7 @@ export async function POST(
       }
 
       try {
-        const { txHash } = await editCommentWithApproval({
+        const { txHash } = await editCommentWithSig({
           edit: typedCommentData.message,
           appSignature: signature,
           writeContract: walletClient.writeContract,

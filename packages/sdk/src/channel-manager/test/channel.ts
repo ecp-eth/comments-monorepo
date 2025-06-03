@@ -154,11 +154,11 @@ describe("channel", () => {
         metadata: undefined,
         hook: undefined,
         permissions: {
-          onCommentAdded: false,
-          onCommentDeleted: false,
-          onCommentEdited: false,
-          onInitialized: false,
-          onChannelUpdated: false,
+          onCommentAdd: false,
+          onCommentDelete: false,
+          onCommentEdit: false,
+          onInitialize: false,
+          onChannelUpdate: false,
         },
       });
     });
@@ -299,11 +299,11 @@ describe("channel", () => {
         metadata: "New metadata",
         hook: undefined,
         permissions: {
-          onCommentAdded: false,
-          onCommentDeleted: false,
-          onCommentEdited: false,
-          onInitialized: false,
-          onChannelUpdated: false,
+          onCommentAdd: false,
+          onCommentDelete: false,
+          onCommentEdit: false,
+          onInitialize: false,
+          onChannelUpdate: false,
         },
       });
     });

@@ -22,11 +22,11 @@ contract NoHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        onInitialized: false,
-        onCommentAdded: false,
-        onCommentDeleted: false,
-        onCommentEdited: false,
-        onChannelUpdated: false
+        onInitialize: false,
+        onCommentAdd: false,
+        onCommentDelete: false,
+        onCommentEdit: false,
+        onChannelUpdate: false
       });
   }
 }
@@ -74,7 +74,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.deal(app, 100 ether);
   }
 
-  function test_PostCommentAsAuthor() public {
+  function test_PostComment_AsAuthor() public {
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(comments, author, app);
     commentData.app = app;
@@ -92,7 +92,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postComment(commentData, appSignature);
   }
 
-  function test_PostCommentAsAuthor_InvalidAuthor() public {
+  function test_PostComment_AsAuthor_InvalidAuthor() public {
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(comments, author, app);
     commentData.app = app;
@@ -117,13 +117,13 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postComment(commentData, appSignature);
   }
 
-  function test_PostCommentAsAuthor_InvalidAppSignature() public {
+  function test_PostComment_AsAuthor_InvalidAppSignature() public {
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(comments, author, app);
     commentData.app = app;
 
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     // Send transaction as author
     vm.prank(author);
@@ -148,11 +148,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId
     );
 
-    comments.postCommentWithApproval(
-      commentData,
-      authorSignature,
-      appSignature
-    );
+    comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
 
   function test_PostComment_InvalidAppSignature() public {
@@ -169,14 +165,10 @@ contract CommentsTest is Test, IERC721Receiver {
     bytes memory wrongSignature = TestUtils.signEIP712(vm, 0x3, commentId); // Wrong private key
 
     vm.expectRevert(ICommentManager.InvalidAppSignature.selector);
-    comments.postCommentWithApproval(
-      commentData,
-      authorSignature,
-      wrongSignature
-    );
+    comments.postCommentWithSig(commentData, authorSignature, wrongSignature);
   }
 
-  function test_PostCommentAsAuthor_InvalidNonce() public {
+  function test_PostComment_AsAuthor_InvalidNonce() public {
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(comments, author, app);
     commentData.nonce = commentData.nonce + 1;
@@ -227,17 +219,13 @@ contract CommentsTest is Test, IERC721Receiver {
         1
       )
     );
-    comments.postCommentWithApproval(
-      commentData,
-      authorSignature,
-      appSignature
-    );
+    comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
 
-  function test_PostComment_WithApproval() public {
+  function test_PostComment_WithSigs() public {
     // First add approval
     vm.prank(author);
-    comments.addApprovalAsAuthor(app);
+    comments.addApproval(app);
 
     // Create and post comment
     Comments.CreateComment memory commentData = TestUtils
@@ -250,7 +238,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
 
     // Post comment from any address since we have approval
-    comments.postCommentWithApproval(commentData, bytes(""), appSignature);
+    comments.postCommentWithSig(commentData, bytes(""), appSignature);
   }
 
   function test_PostComment_WithoutApproval() public {
@@ -271,7 +259,7 @@ contract CommentsTest is Test, IERC721Receiver {
         author
       )
     );
-    comments.postCommentWithApproval(commentData, bytes(""), appSignature);
+    comments.postCommentWithSig(commentData, bytes(""), appSignature);
   }
 
   function test_PostComment_WithFeeCollection() public {
@@ -300,7 +288,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Post comment with fee
     vm.prank(author);
     vm.deal(author, 1 ether);
-    comments.postCommentWithApproval{ value: 0.1 ether }(
+    comments.postCommentWithSig{ value: 0.1 ether }(
       commentData,
       authorSignature,
       appSignature
@@ -336,7 +324,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Try to post comment with insufficient fee
     vm.prank(author);
     vm.expectRevert("Malicious revert");
-    comments.postCommentWithApproval{ value: 0.1 ether }(
+    comments.postCommentWithSig{ value: 0.1 ether }(
       commentData,
       authorSignature,
       appSignature
@@ -359,11 +347,7 @@ contract CommentsTest is Test, IERC721Receiver {
       parentId
     );
 
-    comments.postCommentWithApproval(
-      parentComment,
-      parentAuthorSig,
-      parentAppSig
-    );
+    comments.postCommentWithSig(parentComment, parentAuthorSig, parentAppSig);
 
     // Post reply comment
     Comments.CreateComment memory replyComment = TestUtils
@@ -379,7 +363,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
     bytes memory replyAppSig = TestUtils.signEIP712(vm, appPrivateKey, replyId);
 
-    comments.postCommentWithApproval(replyComment, replyAuthorSig, replyAppSig);
+    comments.postCommentWithSig(replyComment, replyAuthorSig, replyAppSig);
 
     // Verify thread relationship
     Comments.Comment memory storedReply = comments.getComment(replyId);
@@ -414,11 +398,7 @@ contract CommentsTest is Test, IERC721Receiver {
         block.timestamp
       )
     );
-    comments.postCommentWithApproval(
-      commentData,
-      authorSignature,
-      appSignature
-    );
+    comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
 
   function test_PostComment_ReplyToDeletedComment() public {
@@ -437,11 +417,7 @@ contract CommentsTest is Test, IERC721Receiver {
       parentId
     );
 
-    comments.postCommentWithApproval(
-      parentComment,
-      parentAuthorSig,
-      parentAppSig
-    );
+    comments.postCommentWithSig(parentComment, parentAuthorSig, parentAppSig);
 
     // Delete the parent comment
     vm.prank(author);
@@ -462,7 +438,7 @@ contract CommentsTest is Test, IERC721Receiver {
     bytes memory replyAppSig = TestUtils.signEIP712(vm, appPrivateKey, replyId);
 
     // This should succeed even though parent is deleted
-    comments.postCommentWithApproval(replyComment, replyAuthorSig, replyAppSig);
+    comments.postCommentWithSig(replyComment, replyAuthorSig, replyAppSig);
 
     // Verify reply was created with correct parent ID
     Comments.Comment memory storedReply = comments.getComment(replyId);
@@ -488,11 +464,7 @@ contract CommentsTest is Test, IERC721Receiver {
       appPrivateKey,
       parentId
     );
-    comments.postCommentWithApproval(
-      parentComment,
-      parentAuthorSig,
-      parentAppSig
-    );
+    comments.postCommentWithSig(parentComment, parentAuthorSig, parentAppSig);
 
     // Create a comment with both parentId and targetUri set
     Comments.CreateComment memory commentData = TestUtils
@@ -519,11 +491,7 @@ contract CommentsTest is Test, IERC721Receiver {
         "Parent comment and targetUri cannot both be set"
       )
     );
-    comments.postCommentWithApproval(
-      commentData,
-      authorSignature,
-      appSignature
-    );
+    comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
 
   function test_PostComment_WithHookData() public {
@@ -567,11 +535,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
     vm.expectEmit(true, true, true, true);
     emit CommentHookDataUpdated(commentId, "hook data");
-    comments.postCommentWithApproval(
-      commentData,
-      authorSignature,
-      appSignature
-    );
+    comments.postCommentWithSig(commentData, authorSignature, appSignature);
 
     // Verify the comment was created with hook data
     Comments.Comment memory createdComment = comments.getComment(commentId);
@@ -590,7 +554,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
 // Mock malicious fee collector that reverts on collection
 contract MaliciousFeeCollector is BaseHook {
-  function _onCommentAdded(
+  function _onCommentAdd(
     Comments.Comment calldata,
     address,
     bytes32
@@ -606,11 +570,11 @@ contract MaliciousFeeCollector is BaseHook {
   {
     return
       Hooks.Permissions({
-        onCommentAdded: true,
-        onCommentDeleted: false,
-        onInitialized: false,
-        onCommentEdited: false,
-        onChannelUpdated: false
+        onCommentAdd: true,
+        onCommentDelete: false,
+        onInitialize: false,
+        onCommentEdit: false,
+        onChannelUpdate: false
       });
   }
 }

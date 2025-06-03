@@ -1,0 +1,72 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / AddApprovalWithSigParams
+
+# Type Alias: AddApprovalWithSigParams
+
+```ts
+type AddApprovalWithSigParams = {
+  commentsAddress?: Hex;
+  signature: Hex;
+  typedData: AddApprovalTypedDataSchemaType;
+  writeContract: ContractWriteFunctions["addApproval"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:110](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L110)
+
+## Properties
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:126](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L126)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENT_MANAGER_ADDRESS
+```
+
+***
+
+### signature
+
+```ts
+signature: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:120](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L120)
+
+Author's signature for typed data
+
+***
+
+### typedData
+
+```ts
+typedData: AddApprovalTypedDataSchemaType;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:116](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L116)
+
+The typed data for the approval
+
+You can obtain this value by using createApprovalTypedData()
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["addApproval"];
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:127](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L127)

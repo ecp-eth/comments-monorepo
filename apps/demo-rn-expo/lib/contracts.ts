@@ -9,7 +9,7 @@ type PostCommentViaCommentsV1Params = {
   appSignature: Hex;
 };
 
-export const postCommentAsAuthorViaCommentsV1 = async ({
+export const postCommentAsViaCommentsV1 = async ({
   appSignature,
   commentData,
 }: PostCommentViaCommentsV1Params) => {
@@ -25,7 +25,7 @@ type DeleteCommentViaCommentsV1Params = {
   commentId: Hex;
 };
 
-export const deleteCommentAsAuthorViaCommentsV1 = async ({
+export const deleteCommentViaCommentsV1 = async ({
   commentId,
 }: DeleteCommentViaCommentsV1Params) => {
   return await writeContract(config, {

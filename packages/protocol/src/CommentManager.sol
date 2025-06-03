@@ -78,7 +78,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function postCommentWithApproval(
+  function postCommentWithSig(
     Comments.CreateComment calldata commentData,
     bytes calldata authorSignature,
     bytes calldata appSignature
@@ -88,7 +88,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
   /// @notice Internal function to handle comment posting logic
   /// @param commentData The comment data struct containing content and metadata
-  /// @param authorSignature Signature from the author (empty if called via postCommentAsAuthor)
+  /// @param authorSignature Signature from the author (empty if called via postComment)
   /// @param appSignature Signature from the app signer
   function _postComment(
     Comments.CreateComment calldata commentData,
@@ -151,13 +151,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       comment.hookData
     );
 
-    if (channel.hook != address(0) && channel.permissions.onCommentAdded) {
+    if (channel.hook != address(0) && channel.permissions.onCommentAdd) {
       IHook hook = IHook(channel.hook);
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      string memory hookData = hook.onCommentAdded{ value: msgValueAfterFee }(
+      string memory hookData = hook.onCommentAdd{ value: msgValueAfterFee }(
         comment,
         msg.sender,
         commentId
@@ -179,7 +179,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function editCommentWithApproval(
+  function editCommentWithSig(
     bytes32 commentId,
     Comments.EditComment calldata editData,
     bytes calldata authorSignature,
@@ -191,7 +191,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @notice Internal function to handle comment editing logic
   /// @param commentId The unique identifier of the comment to edit
   /// @param editData The comment data struct containing content and metadata
-  /// @param authorSignature Signature from the author (empty if called via editCommentAsAuthor)
+  /// @param authorSignature Signature from the author (empty if called via editComment)
   /// @param appSignature Signature from the app signer
   function _editComment(
     bytes32 commentId,
@@ -247,14 +247,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       comment.hookData
     );
 
-    if (channel.hook != address(0) && channel.permissions.onCommentEdited) {
+    if (channel.hook != address(0) && channel.permissions.onCommentEdit) {
       IHook hook = IHook(channel.hook);
 
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      string memory hookData = hook.onCommentEdited{ value: msgValueAfterFee }(
+      string memory hookData = hook.onCommentEdit{ value: msgValueAfterFee }(
         comment,
         msg.sender,
         commentId
@@ -278,7 +278,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function deleteCommentWithApproval(
+  function deleteCommentWithSig(
     bytes32 commentId,
     address app,
     uint256 nonce,
@@ -334,13 +334,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     emit CommentDeleted(commentId, author);
 
-    if (channel.hook != address(0) && channel.permissions.onCommentDeleted) {
+    if (channel.hook != address(0) && channel.permissions.onCommentDelete) {
       IHook hook = IHook(channel.hook);
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      hook.onCommentDeleted{ value: msgValueAfterFee }(
+      hook.onCommentDelete{ value: msgValueAfterFee }(
         commentToDelete,
         msg.sender,
         commentId
@@ -365,17 +365,17 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function addApprovalAsAuthor(address app) external {
+  function addApproval(address app) external {
     _addApproval(msg.sender, app);
   }
 
   /// @inheritdoc ICommentManager
-  function revokeApprovalAsAuthor(address app) external {
+  function revokeApproval(address app) external {
     _revokeApproval(msg.sender, app);
   }
 
   /// @inheritdoc ICommentManager
-  function addApproval(
+  function addApprovalWithSig(
     address author,
     address app,
     uint256 nonce,
@@ -394,7 +394,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function removeApproval(
+  function removeApprovalWithSig(
     address author,
     address app,
     uint256 nonce,

@@ -58,7 +58,7 @@ export async function isApproved(params: IsApprovedParams): Promise<boolean> {
   return approved;
 }
 
-export type AddApprovalAsAuthorParams = {
+export type AddApprovalParams = {
   /**
    * The address of the app signer being approved
    */
@@ -69,19 +69,17 @@ export type AddApprovalAsAuthorParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  writeContract: ContractWriteFunctions["addApprovalAsAuthor"];
+  writeContract: ContractWriteFunctions["addApproval"];
 };
 
-export type AddApprovalAsAuthorResult = {
+export type AddApprovalResult = {
   txHash: Hex;
 };
 
-const AddApprovalAsAuthorParamsSchema = z.object({
+const AddApprovalParamsSchema = z.object({
   app: HexSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
-  writeContract: z.custom<ContractWriteFunctions["addApprovalAsAuthor"]>(
-    () => true,
-  ),
+  writeContract: z.custom<ContractWriteFunctions["addApproval"]>(() => true),
 });
 
 /**
@@ -90,17 +88,17 @@ const AddApprovalAsAuthorParamsSchema = z.object({
  * @param params - The parameters for approving an app signer
  * @returns The transaction hash of the approval
  */
-export async function addApprovalAsAuthor(
-  params: AddApprovalAsAuthorParams,
-): Promise<AddApprovalAsAuthorResult> {
-  const validatedParams = AddApprovalAsAuthorParamsSchema.parse(params);
+export async function addApproval(
+  params: AddApprovalParams,
+): Promise<AddApprovalResult> {
+  const validatedParams = AddApprovalParamsSchema.parse(params);
 
   const { app, commentsAddress, writeContract } = validatedParams;
 
   const txHash = await writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "addApprovalAsAuthor",
+    functionName: "addApproval",
     args: [app],
   });
 
@@ -109,7 +107,7 @@ export async function addApprovalAsAuthor(
   };
 }
 
-export type AddApprovalParams = {
+export type AddApprovalWithSigParams = {
   /**
    * The typed data for the approval
    *
@@ -129,15 +127,17 @@ export type AddApprovalParams = {
   writeContract: ContractWriteFunctions["addApproval"];
 };
 
-export type AddApprovalResult = {
+export type AddApprovalWithSigResult = {
   txHash: Hex;
 };
 
-const AddApprovalParamsSchema = z.object({
+const AddApprovalWithSigParamsSchema = z.object({
   typedData: AddApprovalTypedDataSchema,
   signature: HexSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
-  writeContract: z.custom<ContractWriteFunctions["addApproval"]>(() => true),
+  writeContract: z.custom<ContractWriteFunctions["addApprovalWithSig"]>(
+    () => true,
+  ),
 });
 
 /**
@@ -146,16 +146,16 @@ const AddApprovalParamsSchema = z.object({
  * @param params - The parameters for adding an app signer approval
  * @returns The transaction hash of the approval
  */
-export async function addApproval(
-  params: AddApprovalParams,
-): Promise<AddApprovalResult> {
+export async function addApprovalWithSig(
+  params: AddApprovalWithSigParams,
+): Promise<AddApprovalWithSigResult> {
   const { typedData, signature, commentsAddress, writeContract } =
-    AddApprovalParamsSchema.parse(params);
+    AddApprovalWithSigParamsSchema.parse(params);
 
   const txHash = await writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "addApproval",
+    functionName: "addApprovalWithSig",
     args: [
       typedData.message.author,
       typedData.message.app,
@@ -170,7 +170,7 @@ export async function addApproval(
   };
 }
 
-export type RevokeApprovalAsAuthorParams = {
+export type RevokeApprovalParams = {
   /**
    * The address of the app signer being unapproved
    */
@@ -181,19 +181,17 @@ export type RevokeApprovalAsAuthorParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  writeContract: ContractWriteFunctions["revokeApprovalAsAuthor"];
+  writeContract: ContractWriteFunctions["revokeApproval"];
 };
 
-export type RevokeApprovalAsAuthorResult = {
+export type RevokeApprovalResult = {
   txHash: Hex;
 };
 
-const RevokeApprovalAsAuthorParamsSchema = z.object({
+const RevokeApprovalParamsSchema = z.object({
   app: HexSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
-  writeContract: z.custom<ContractWriteFunctions["revokeApprovalAsAuthor"]>(
-    () => true,
-  ),
+  writeContract: z.custom<ContractWriteFunctions["revokeApproval"]>(() => true),
 });
 
 /**
@@ -202,17 +200,17 @@ const RevokeApprovalAsAuthorParamsSchema = z.object({
  * @param params - The parameters for revoking an app signer approval
  * @returns The transaction hash of the revocation
  */
-export async function revokeApprovalAsAuthor(
-  params: RevokeApprovalAsAuthorParams,
-): Promise<RevokeApprovalAsAuthorResult> {
-  const validatedParams = RevokeApprovalAsAuthorParamsSchema.parse(params);
+export async function revokeApproval(
+  params: RevokeApprovalParams,
+): Promise<RevokeApprovalResult> {
+  const validatedParams = RevokeApprovalParamsSchema.parse(params);
 
   const { app, commentsAddress, writeContract } = validatedParams;
 
   const txHash = await writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "revokeApprovalAsAuthor",
+    functionName: "revokeApproval",
     args: [app],
   });
 
@@ -221,7 +219,7 @@ export async function revokeApprovalAsAuthor(
   };
 }
 
-export type RevokeApprovalParams = {
+export type RevokeApprovalWithSigParams = {
   /**
    * The typed data for the removal
    *
@@ -238,18 +236,20 @@ export type RevokeApprovalParams = {
    * @default COMMENT_MANAGER_ADDRESS
    */
   commentsAddress?: Hex;
-  writeContract: ContractWriteFunctions["removeApproval"];
+  writeContract: ContractWriteFunctions["removeApprovalWithSig"];
 };
 
-export type RevokeApprovalResult = {
+export type RevokeApprovalWithSigResult = {
   txHash: Hex;
 };
 
-const RevokeApprovalParamsSchema = z.object({
+const RevokeApprovalWithSigParamsSchema = z.object({
   typedData: RemoveApprovalTypedDataSchema,
   signature: HexSchema,
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
-  writeContract: z.custom<ContractWriteFunctions["removeApproval"]>(() => true),
+  writeContract: z.custom<ContractWriteFunctions["removeApprovalWithSig"]>(
+    () => true,
+  ),
 });
 
 /**
@@ -258,10 +258,10 @@ const RevokeApprovalParamsSchema = z.object({
  * @param params - The parameters for removing an app signer approval
  * @returns The transaction hash of the removal
  */
-export async function revokeApproval(
-  params: RevokeApprovalParams,
-): Promise<RevokeApprovalResult> {
-  const validatedParams = RevokeApprovalParamsSchema.parse(params);
+export async function revokeApprovalWithSig(
+  params: RevokeApprovalWithSigParams,
+): Promise<RevokeApprovalWithSigResult> {
+  const validatedParams = RevokeApprovalWithSigParamsSchema.parse(params);
 
   const { typedData, signature, commentsAddress, writeContract } =
     validatedParams;
@@ -269,7 +269,7 @@ export async function revokeApproval(
   const txHash = await writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
-    functionName: "removeApproval",
+    functionName: "removeApprovalWithSig",
     args: [
       typedData.message.author,
       typedData.message.app,
