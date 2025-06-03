@@ -1,6 +1,5 @@
 import { type CommandProps } from "@tiptap/core";
 import { Node, NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
-import { Plugin, PluginKey } from "prosemirror-state";
 import { type Node as ProseMirrorNode } from "prosemirror-model";
 import { useEffect, useState, useRef } from "react";
 import { FileIcon } from "lucide-react";
@@ -82,8 +81,6 @@ export const UploadTracker = Node.create({
             const currentUploads = node.attrs.uploads || [];
             const pos = state.doc.content.size - node.nodeSize;
 
-            console.log("currentUploads", currentUploads);
-
             tr.setNodeAttribute(pos, "uploads", [...currentUploads, file]);
 
             state.apply(tr);
@@ -91,7 +88,16 @@ export const UploadTracker = Node.create({
             return true;
           }
 
-          return false;
+          tr.insert(
+            state.doc.content.size,
+            this.type.create({
+              uploads: [file],
+            }),
+          );
+
+          state.apply(tr);
+
+          return true;
         },
       removeUploadedFile:
         (fileId: string) =>
@@ -101,8 +107,6 @@ export const UploadTracker = Node.create({
           if (node?.type.name === UPLOAD_TRACKER_NODE_NAME) {
             const currentUploads = node.attrs.uploads || [];
             const pos = state.doc.content.size - node.nodeSize;
-
-            console.log("currentUploads", currentUploads);
 
             tr.setNodeAttribute(
               pos,
@@ -120,7 +124,7 @@ export const UploadTracker = Node.create({
     };
   },
 
-  addProseMirrorPlugins() {
+  /* addProseMirrorPlugins() {
     return [
       new Plugin({
         key: new PluginKey("uploadTracker"),
@@ -143,7 +147,7 @@ export const UploadTracker = Node.create({
         },
       }),
     ];
-  },
+  },*/
 });
 
 function FilePreview({ file }: { file: UploadedFile }) {
