@@ -136,25 +136,25 @@ export default function HomePage() {
             <nav className="flex items-center space-x-6">
               <Link
                 href="https://docs.ethcomments.xyz/"
-                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors hidden md:block"
+                className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors hidden md:block"
               >
                 Docs
               </Link>
               <Link
                 href="https://demo.ethcomments.xyz"
-                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors hidden md:block"
+                className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors hidden md:block"
               >
                 Demo
               </Link>
               <Link
                 href="https://t.me/+LkTGo4MdO_1lZDlk"
-                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors hidden md:block"
+                className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors hidden md:block"
               >
                 Community
               </Link>
               <Button
                 asChild
-                className="px-8 py-3 bg-lime-400 text-black hover:bg-lime-500"
+                className="px-8 py-3 bg-indigo-400 text-black hover:bg-indigo-500 hidden md:block"
               >
                 <Link href="https://docs.ethcomments.xyz">
                   <Zap className="w-5 h-5 mr-1" />
@@ -190,7 +190,7 @@ export default function HomePage() {
               <Button
                 variant="default"
                 size="lg"
-                className="px-8 py-3 bg-lime-400 text-black hover:bg-lime-500"
+                className="px-8 py-3 bg-indigo-400 text-black hover:bg-indigo-500"
                 asChild
               >
                 <Link href="https://docs.ethcomments.xyz/">
@@ -213,10 +213,10 @@ export default function HomePage() {
             </div>
 
             <div className="grid md:grid-cols-2 2xl:grid-cols-4 gap-8 2xl:max-w-8xl mx-auto">
-              <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700 justify-start">
+              <Card className="border-2 hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700 justify-start">
                 <CardHeader className="flex-1">
                   <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
-                    <Palette className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                    <Palette className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                   </div>
 
                   <CardTitle className="text-gray-900 dark:text-white">
@@ -252,10 +252,10 @@ export default function HomePage() {
                 </CardFooter>
               </Card>
 
-              <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+              <Card className="border-2 hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
                 <CardHeader className="flex-1">
                   <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
-                    <Component className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                    <Component className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                   </div>
 
                   <CardTitle className="text-gray-900 dark:text-white">
@@ -294,10 +294,10 @@ export default function HomePage() {
                 </CardFooter>
               </Card>
 
-              <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+              <Card className="border-2 hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
                 <CardHeader className="flex-1">
                   <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
-                    <Layers className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                    <Layers className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                   </div>
 
                   <CardTitle className="text-gray-900 dark:text-white">
@@ -337,10 +337,10 @@ await fetchComments({
                 </CardFooter>
               </Card>
 
-              <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+              <Card className="border-2 hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
                 <CardHeader className="flex-1">
                   <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
-                    <Parentheses className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                    <Parentheses className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                   </div>
                   <CardTitle className="text-gray-900 dark:text-white">
                     Smart Contracts
@@ -391,7 +391,7 @@ await fetchComments({
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <div className="text-center group p-4">
               <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Globe className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                <Globe className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
                 Permissionless & Available
@@ -405,7 +405,7 @@ await fetchComments({
 
             <div className="text-center group p-4">
               <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Waypoints className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                <Waypoints className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
                 Composable & Programmable
@@ -418,7 +418,7 @@ await fetchComments({
 
             <div className="text-center group p-4">
               <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BadgeCheck className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                <BadgeCheck className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
                 Verifiable
@@ -431,7 +431,7 @@ await fetchComments({
 
             <div className="text-center group p-4">
               <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Expand className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                <Expand className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
                 Censorship Resistant
@@ -444,7 +444,7 @@ await fetchComments({
 
             <div className="text-center group p-4">
               <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                <Zap className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
                 Cheap & Fast
@@ -457,7 +457,7 @@ await fetchComments({
 
             <div className="text-center group p-4">
               <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TicketCheck className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                <TicketCheck className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
                 Attributable to your App
@@ -487,9 +487,9 @@ await fetchComments({
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-8">
-            <Card className="border-2 hover:border-lime-400 transition-colors bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+            <Card className="border-2 hover:border-indigo-400 transition-colors bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
               <CardContent className="pt-4 text-center">
-                <Send className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400 mx-auto mb-3" />
+                <Send className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 mx-auto mb-3" />
                 <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">
                   Telegram
                 </h3>
@@ -504,9 +504,9 @@ await fetchComments({
               </CardContent>
             </Card>
 
-            <Card className="border-2 hover:border-lime-400 transition-colors bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+            <Card className="border-2 hover:border-indigo-400 transition-colors bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
               <CardContent className="pt-4 text-center">
-                <GithubIcon className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400 mx-auto mb-3" />
+                <GithubIcon className="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 mx-auto mb-3" />
                 <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">
                   GitHub
                 </h3>
@@ -644,7 +644,7 @@ await fetchComments({
             <Button
               variant="default"
               size="lg"
-              className="px-8 py-3 bg-lime-400 text-black hover:bg-lime-500"
+              className="px-8 py-3 bg-indigo-400 text-black hover:bg-indigo-500"
               asChild
             >
               <Link href="https://docs.ethcomments.xyz/">
@@ -741,31 +741,31 @@ await fetchComments({
             <div className="flex flex-col items-center md:items-end space-y-4 md:space-y-0 md:flex-row md:space-x-6">
               <Link
                 href="https://demo.ethcomments.xyz"
-                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors"
+                className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
               >
                 Demo
               </Link>
               <Link
                 href="https://docs.ethcomments.xyz"
-                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors"
+                className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
               >
                 Quickstart
               </Link>
               <Link
                 href="https://t.me/+LkTGo4MdO_1lZDlk"
-                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors"
+                className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
               >
                 Community
               </Link>
               <Link
                 href="https://docs.ethcomments.xyz/"
-                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors"
+                className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
               >
                 Documentation
               </Link>
               <Link
                 href="https://github.com/ecp-eth/comments-monorepo"
-                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors"
+                className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
               >
                 <GithubIcon className="w-5 h-5" />
               </Link>

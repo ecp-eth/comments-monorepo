@@ -3,24 +3,20 @@ import { defineConfig } from "vocs";
 import { remarkMermaid } from "@theguild/remark-mermaid";
 import { CHANNEL_MANAGER_ADDRESS, COMMENT_MANAGER_ADDRESS } from "@ecp.eth/sdk";
 import remarkFindAndReplace from "./plugins/remark-find-replace";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  theme: {
-    variables: {
-      color: {
-        border: {
-          light: "#E5E7EB",
-          dark: "#374151",
-        },
-      },
-    },
-  },
   title: "Ethereum Comments Protocol",
   description:
     "A decentralized protocol for adding comments to any Ethereum address or transaction",
-  logoUrl: { light: "/logo-light.svg", dark: "/logo-dark.svg" },
+  logoUrl: { light: "/logo-ecp-light.svg", dark: "/logo-ecp-dark.svg" },
   iconUrl: { light: "/logo-light.svg", dark: "/logo-dark.svg" },
   rootDir: ".",
+  ogImageUrl:
+    "https://vocs.dev/api/og?logo=%logo&title=%title&description=%description",
+  theme: {
+    colorScheme: "system",
+  },
   head: () => {
     return (
       <>
@@ -282,6 +278,7 @@ export default defineConfig({
   },
   vite: {
     envPrefix: "VITE_",
+    plugins: [react()],
     define: {
       "import.meta.env.COMMENT_MANAGER_ADDRESS": JSON.stringify(
         COMMENT_MANAGER_ADDRESS,

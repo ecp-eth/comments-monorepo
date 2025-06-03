@@ -1,38 +1,57 @@
 # Integration Options
 
-## React Component Library
+## React Components
 
 The React component library provides pre-built, customizable UI components for seamless integration into your React applications.
 This is the recommended approach for most web applications.
 
-```tsx
-import { CommentsEmbed } from "@ecp.eth/sdk/embed";
+## Installation
 
-const baseOrigin = "https://blog.example.com";
+:::code-group
+
+```bash [npm]
+npm install @ecp.eth/sdk
+# install peer dependencies
+npm install viem wagmi @tanstack/react-query @tanstack/query-core
+```
+
+```bash [yarn]
+yarn add @ecp.eth/sdk
+# install peer dependencies
+yarn add viem wagmi @tanstack/react-query @tanstack/query-core
+```
+
+```bash [pnpm]
+pnpm add @ecp.eth/sdk
+# install peer dependencies
+pnpm add viem wagmi @tanstack/react-query @tanstack/query-core
+```
+
+:::
+
+## Usage
+
+```tsx twoslash
+/// <reference types="@ecp.eth/sdk" />
+// ---cut---
+import React from "react";
+import { CommentsEmbed } from "@ecp.eth/sdk/embed";
 
 export function Comments() {
   return (
     <div>
       <h3>Comments</h3>
       <CommentsEmbed
-        // the uri for commenting
-        uri={new URL(window.location.pathname, baseOrigin)}
-        // the config object allows you to customize the CommentsEmbed's appearance
+        uri={
+          new URL(
+            window.location.pathname,
+            // replace with your url
+            "https://demo.ethcomments.xyz",
+          )
+        }
         theme={{
-          {
-            // mode controls which theme to use, it can be 'light' or 'dark'
-            mode: "light",
-            colors: {
-              dark: {
-                background: "black",
-                foreground: "#e9e9ea",
-              },
-              light: {
-                background: "white",
-                foreground: "#4c4c4c",
-              },
-            },
-          },
+          mode: "light",
+          // ...
         }}
       />
     </div>

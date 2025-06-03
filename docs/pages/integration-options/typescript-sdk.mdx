@@ -6,25 +6,23 @@ You can use our TypeScript SDK `@ecp.eth/sdk` to access data on chain, comments 
 
 ### Installation
 
-The SDK is built on top of [viem](https://viem.sh/) and [wagmi](https://wagmi.sh/), and therefore requires both to be installed.
-
 :::code-group
 
 ```bash [npm]
 npm install @ecp.eth/sdk
-# install peer dependencies
+# install required peer dependencies
 npm install viem wagmi @tanstack/react-query @tanstack/query-core
 ```
 
 ```bash [yarn]
 yarn add @ecp.eth/sdk
-# install peer dependencies
+# install required peer dependencies
 yarn add viem wagmi @tanstack/react-query @tanstack/query-core
 ```
 
 ```bash [pnpm]
 pnpm add @ecp.eth/sdk
-# install peer dependencies
+# install required peer dependencies
 pnpm add viem wagmi @tanstack/react-query @tanstack/query-core
 ```
 
@@ -34,7 +32,9 @@ pnpm add viem wagmi @tanstack/react-query @tanstack/query-core
 
 #### Fetch comments
 
-```ts
+```ts twoslash
+/// <reference types="@ecp.eth/sdk" />
+// ---cut---
 import { fetchComments } from "@ecp.eth/sdk/indexer";
 
 console.log("fetching comments...");
@@ -42,7 +42,7 @@ console.log("fetching comments...");
 const comments = await fetchComments({
   // the url of indexer api
   apiUrl: "https://api.ethcomments.xyz",
-  // the uri of commenting target
+  // the uri of commenting target - replace with your own url to limit comments to a specific page
   targetUri: "https://demo.ethcomments.xyz",
 });
 
@@ -62,20 +62,17 @@ The response is a list of comments and pagination information, see [`IndexerAPIL
 
 #### Fetch replies
 
-```ts
+```ts twoslash
+/// <reference types="@ecp.eth/sdk" />
+// ---cut---
 import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
-
-console.log("fetching replies...");
 
 // fetch replies for a comment based on its id
 const replies = await fetchCommentReplies({
-  // the url of embed api
-  apiUrl: "https://embed.ethcomments.xyz",
+  apiUrl: "https://api.ethcomments.xyz",
   commentId:
     "0xdce24de208a5e15b6b9b7e7c1ccdc5c08d8a7d8ab20c37c60e1d96a2aa1f9941",
 });
-
-console.log("here is a list of replies", replies);
 ```
 
 ##### API reference
