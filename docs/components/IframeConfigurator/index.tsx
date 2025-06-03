@@ -15,6 +15,15 @@ import LabelWithHelp from "./LabelWithHelp";
 import { publicEnv } from "../../publicEnv";
 import CommentsEmbedPreview from "./CommentsEmbedPreview";
 import GeneratedURL from "./GeneratedURL";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 export default function IframeConfigurator() {
   const [mode, setMode] = React.useState<"post" | "author">("post");
@@ -128,15 +137,20 @@ export default function IframeConfigurator() {
           >
             Mode
           </label>
-          <select
-            id="mode-select"
+          <Select
             value={mode}
-            onChange={(e) => setMode(e.target.value as "post" | "author")}
-            className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
+            onValueChange={(value) => setMode(value as "post" | "author")}
           >
-            <option value="post">Show comments by web page</option>
-            <option value="author">Show all comments by an author</option>
-          </select>
+            <SelectTrigger className="w-[300px]">
+              <SelectValue placeholder="Mode" />
+            </SelectTrigger>
+            <SelectContent id="mode-select">
+              <SelectItem value="post">Show comments by web page</SelectItem>
+              <SelectItem value="author">
+                Show all comments by an author
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {mode === "post" ? (
@@ -147,12 +161,11 @@ export default function IframeConfigurator() {
             >
               Web page for unique comments url
             </label>
-            <input
+            <Input
               id="target-uri-input"
               type="text"
               value={uri}
               onChange={(e) => setUri(e.target.value)}
-              className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
               placeholder="https://example.com"
             />
           </div>
@@ -164,27 +177,24 @@ export default function IframeConfigurator() {
             >
               Author Address
             </label>
-            <input
+            <Input
               id="author-input"
               type="text"
               value={author}
               onChange={(e) => setAuthor(e.target.value as Hex)}
-              className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
               placeholder="0x..."
             />
           </div>
         )}
 
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full p-2 text-left border rounded border-input-border bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors flex items-center gap-2"
+          className="w-full justify-start"
         >
-          <span className="font-medium">
-            {showAdvanced ? "Hide" : "Show"} Advanced theming options
-          </span>
-          <span className="text-sm text-muted-foreground ml-auto"></span>
-        </button>
+          {showAdvanced ? "Hide" : "Show"} Advanced theming options
+        </Button>
 
         {showAdvanced && (
           <>
@@ -195,24 +205,26 @@ export default function IframeConfigurator() {
               >
                 Theme Mode
               </label>
-              <select
-                id="theme-mode-select"
-                value={config.theme?.mode}
-                onChange={(e) =>
+              <Select
+                value={config.theme?.mode || "light"}
+                onValueChange={(value) =>
                   setConfig((prev) => ({
                     ...prev,
                     theme: {
                       ...prev.theme,
-                      mode: e.target.value as "light" | "dark",
+                      mode: value as "light" | "dark",
                     },
                   }))
                 }
-                className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
               >
-                <option>Auto</option>
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Theme Mode" />
+                </SelectTrigger>
+                <SelectContent id="theme-mode-select" className="bg-white">
+                  <SelectItem value="light">Light</SelectItem>
+                  <SelectItem value="dark">Dark</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -222,17 +234,23 @@ export default function IframeConfigurator() {
               >
                 Auto Height Adjustment
               </label>
-              <select
-                id="auto-height-adjust-select"
+              <Select
                 value={autoHeightAdjustment ? "enabled" : "disabled"}
-                onChange={(e) =>
-                  setAutoHeightAdjustment(e.target.value === "enabled")
+                onValueChange={(value) =>
+                  setAutoHeightAdjustment(value === "enabled")
                 }
-                className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
               >
-                <option value="enabled">Enabled</option>
-                <option value="disabled">Disabled</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Auto Height Adjustment" />
+                </SelectTrigger>
+                <SelectContent
+                  id="auto-height-adjust-select"
+                  className="bg-white"
+                >
+                  <SelectItem value="enabled">Enabled</SelectItem>
+                  <SelectItem value="disabled">Disabled</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -242,20 +260,26 @@ export default function IframeConfigurator() {
               >
                 Hide "Powered by ECP" link
               </label>
-              <select
-                id="disable-promotion-select"
+              <Select
                 value={config.disablePromotion ? "1" : "0"}
-                onChange={(e) => {
+                onValueChange={(value) => {
                   setConfig((prev) => ({
                     ...prev,
-                    disablePromotion: e.target.value === "1",
+                    disablePromotion: value === "1",
                   }));
                 }}
-                className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
               >
-                <option value="0">No</option>
-                <option value="1">Yes</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Hide Powered by ECP" />
+                </SelectTrigger>
+                <SelectContent
+                  id="disable-promotion-select"
+                  className="bg-white"
+                >
+                  <SelectItem value="0">No</SelectItem>
+                  <SelectItem value="1">Yes</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -265,27 +289,32 @@ export default function IframeConfigurator() {
               >
                 Maximum container width
               </label>
-              <select
-                id="maximum-container-width-select"
+              <Select
                 value={
                   config.restrictMaximumContainerWidth
                     ? "restricted"
                     : "unrestricted"
                 }
-                onChange={(e) => {
+                onValueChange={(value) => {
                   setConfig((prev) => ({
                     ...prev,
-                    restrictMaximumContainerWidth:
-                      e.target.value === "restricted",
+                    restrictMaximumContainerWidth: value === "restricted",
                   }));
                 }}
-                className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
               >
-                <option value="restricted">Restricted (672px)</option>
-                <option value="unrestricted">
-                  Unrestricted (taking up all available horizontal space)
-                </option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Maximum container width" />
+                </SelectTrigger>
+                <SelectContent
+                  id="maximum-container-width-select"
+                  className="bg-white"
+                >
+                  <SelectItem value="restricted">Restricted (672px)</SelectItem>
+                  <SelectItem value="unrestricted">
+                    Unrestricted (taking up all available horizontal space)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -293,14 +322,14 @@ export default function IframeConfigurator() {
                 <h3 className="text-md font-medium">Light Theme Colors</h3>
                 {COLOR_FIELDS.map(({ key, label, help }) => (
                   <div className="flex gap-2 items-center" key={`light-${key}`}>
-                    <input
+                    <Input
                       id={`light-${key}-input`}
                       type="color"
                       value={config.theme?.colors?.light?.[key] || "#ffffff"}
                       onChange={(e) =>
                         updateThemeColor("light", key, e.target.value)
                       }
-                      className="w-8 h-8 cursor-pointer"
+                      className="w-8 h-8 cursor-pointer p-0"
                     />
                     <LabelWithHelp
                       label={label}
@@ -315,14 +344,14 @@ export default function IframeConfigurator() {
                 <h3 className="text-md font-medium">Dark Theme Colors</h3>
                 {COLOR_FIELDS.map(({ key, label, help }) => (
                   <div className="flex gap-2 items-center" key={`dark-${key}`}>
-                    <input
+                    <Input
                       id={`dark-${key}-input`}
                       type="color"
                       value={config.theme?.colors?.dark?.[key] || "#000000"}
                       onChange={(e) =>
                         updateThemeColor("dark", key, e.target.value)
                       }
-                      className="w-8 h-8 cursor-pointer"
+                      className="w-8 h-8 cursor-pointer p-0"
                     />
                     <LabelWithHelp
                       label={label}
@@ -344,17 +373,15 @@ export default function IframeConfigurator() {
                 >
                   Font Family Type
                 </label>
-                <select
-                  id="font-family-type-select"
+                <Select
                   value={
                     !!config.theme?.font?.fontFamily &&
                     "google" in config.theme?.font?.fontFamily
                       ? "google"
                       : "system"
                   }
-                  onChange={(e) => {
-                    const type = e.target.value as "system" | "google";
-
+                  onValueChange={(value) => {
+                    const type = value as "system" | "google";
                     updateFontFamily(
                       type,
                       type === "system"
@@ -362,11 +389,18 @@ export default function IframeConfigurator() {
                         : "",
                     );
                   }}
-                  className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
                 >
-                  <option value="system">System Font</option>
-                  <option value="google">Google Font</option>
-                </select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Font Family Type" />
+                  </SelectTrigger>
+                  <SelectContent
+                    id="font-family-type-select"
+                    className="bg-white"
+                  >
+                    <SelectItem value="system">System Font</SelectItem>
+                    <SelectItem value="google">Google Font</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {!!config.theme?.font?.fontFamily &&
@@ -378,23 +412,29 @@ export default function IframeConfigurator() {
                     >
                       Google Font
                     </label>
-                    <select
-                      id="google-font-input"
+                    <Select
                       value={config.theme.font.fontFamily.google}
-                      onChange={(e) =>
-                        updateFontFamily("google", e.target.value)
+                      onValueChange={(value) =>
+                        updateFontFamily("google", value)
                       }
-                      className="w-full p-2 border rounded !bg-input border-input-border text-input-text text-iframe-configurator-input"
                     >
-                      <option value="">Select a font</option>
-                      {Object.values(EmbedConfigSupportedFont.enum).map(
-                        (font) => (
-                          <option key={font} value={font}>
-                            {font}
-                          </option>
-                        ),
-                      )}
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a font" />
+                      </SelectTrigger>
+                      <SelectContent
+                        id="google-font-input"
+                        className="bg-white"
+                      >
+                        <SelectItem value="">Select a font</SelectItem>
+                        {Object.values(EmbedConfigSupportedFont.enum).map(
+                          (font) => (
+                            <SelectItem key={font} value={font}>
+                              {font}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
 
@@ -407,14 +447,13 @@ export default function IframeConfigurator() {
                     >
                       System Font
                     </label>
-                    <input
+                    <Input
                       id="system-font-input"
                       type="text"
                       value={config.theme?.font?.fontFamily?.system || ""}
                       onChange={(e) =>
                         updateFontFamily("system", e.target.value)
                       }
-                      className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
                       placeholder="Geist, Arial, Helvetica, sans-serif"
                     />
                   </div>
@@ -438,14 +477,13 @@ export default function IframeConfigurator() {
                           >
                             Size
                           </label>
-                          <input
+                          <Input
                             id={`${key}-size-input`}
                             type="text"
                             value={config.theme?.font?.sizes?.[key]?.size || ""}
                             onChange={(e) =>
                               updateFontSize(key, "size", e.target.value)
                             }
-                            className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
                             placeholder="1rem"
                           />
                         </div>
@@ -456,7 +494,7 @@ export default function IframeConfigurator() {
                           >
                             Line Height
                           </label>
-                          <input
+                          <Input
                             id={`${key}-line-height-input`}
                             type="text"
                             value={
@@ -465,7 +503,6 @@ export default function IframeConfigurator() {
                             onChange={(e) =>
                               updateFontSize(key, "lineHeight", e.target.value)
                             }
-                            className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
                             placeholder="1.5"
                           />
                         </div>
@@ -486,12 +523,11 @@ export default function IframeConfigurator() {
                       help={help}
                       htmlFor={`${key}-input`}
                     />
-                    <input
+                    <Input
                       id={`${key}-input`}
                       type="text"
                       value={config.theme?.other?.[key] || ""}
                       onChange={(e) => updateOther(key, e.target.value)}
-                      className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
                       placeholder="0.5rem"
                     />
                   </div>
@@ -505,12 +541,11 @@ export default function IframeConfigurator() {
               >
                 Override the iframe Embed URI
               </label>
-              <input
+              <Input
                 id="target-embed-uri-input"
                 type="text"
                 value={embedUri}
                 onChange={(e) => setEmbedUri(e.target.value)}
-                className="w-full p-2 border rounded bg-input border-input-border text-input-text text-iframe-configurator-input"
                 placeholder={
                   mode === "post"
                     ? "https://embed.ethcomments.xyz"

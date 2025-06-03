@@ -8,6 +8,7 @@ import {
 import { Info } from "lucide-react";
 import { DEFAULT_CONFIG } from "./constants";
 import { useMemo } from "react";
+import { Button } from "../ui/button";
 
 function CodeSnippet({
   url,
@@ -126,15 +127,11 @@ export default function GeneratedURL({
           onClick={copyToClipboard}
           rows={6}
         />
-        <button
-          onClick={copyToClipboard}
-          className="px-4 py-2 border rounded block m-auto"
-          type="button"
-        >
+        <Button onClick={copyToClipboard} type="button" variant="default">
           <span className="block w-[7ch] truncate">
             {copied ? "Copied!" : "Copy"}
           </span>
-        </button>
+        </Button>
       </div>
     );
   } catch (e) {
