@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { renderToReact } from "./CommentTextEditor/serializers/renderer";
+import { renderToReact } from "./renderer";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 
 export function CommentText({
