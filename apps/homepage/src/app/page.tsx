@@ -27,6 +27,59 @@ import {
 import Link from "next/link";
 import { Metadata } from "next";
 
+function GraphPaper({ children }: { children: React.ReactNode }) {
+  return (
+    <section className="relative overflow-hidden">
+      {/* Grid pattern */}
+      <div
+        className="absolute inset-0 dark:hidden"
+        style={{
+          zIndex: 0,
+          backgroundImage: `
+            linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+            linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: "10px 10px, 10px 10px, 50px 50px, 50px 50px",
+        }}
+      />
+      <div
+        className="absolute inset-0 hidden dark:block"
+        style={{
+          zIndex: 0,
+          backgroundImage: `
+            linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+            linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: "10px 10px, 10px 10px, 50px 50px, 50px 50px",
+        }}
+      />
+      {/* Gradient mask */}
+      <div
+        className="absolute inset-0 pointer-events-none dark:hidden"
+        style={{
+          zIndex: 1,
+          background:
+            "linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%)",
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none hidden dark:block"
+        style={{
+          zIndex: 1,
+          background:
+            "linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%)",
+        }}
+      />
+      {/* Content */}
+      <div className="relative z-10">{children}</div>
+    </section>
+  );
+}
+
 export const metadata: Metadata = {
   title: "ECP",
   description:
@@ -61,122 +114,121 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white">
       {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-800">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <img
-              src="/logo-light.svg"
-              alt="ECP Logo"
-              className="w-8 h-8 dark:hidden"
-            />
-            <img
-              src="/logo-dark.svg"
-              alt="ECP Logo"
-              className="w-8 h-8 hidden dark:block"
-            />
-            <span className="font-semibold text-lg text-gray-900 dark:text-white">
-              Ethereum Comments Protocol
-            </span>
-          </div>
+      <GraphPaper>
+        <header className="">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <img
+                src="/logo-light.svg"
+                alt="ECP Logo"
+                className="w-8 h-8 dark:hidden"
+              />
+              <img
+                src="/logo-dark.svg"
+                alt="ECP Logo"
+                className="w-8 h-8 hidden dark:block"
+              />
+              <span className="font-semibold text-lg text-gray-900 dark:text-white">
+                Ethereum Comments Protocol
+              </span>
+            </div>
 
-          <nav className="flex items-center space-x-6">
-            <Link
-              href="https://docs.ethcomments.xyz/"
-              className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors hidden md:block"
-            >
-              Docs
-            </Link>
-            <Link
-              href="https://demo.ethcomments.xyz"
-              className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors hidden md:block"
-            >
-              Demo
-            </Link>
-            <Link
-              href="https://t.me/+LkTGo4MdO_1lZDlk"
-              className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors hidden md:block"
-            >
-              Community
-            </Link>
-            <Button
-              asChild
-              className="px-8 py-3 bg-lime-400 text-black hover:bg-lime-500"
-            >
-              <Link href="https://docs.ethcomments.xyz">
-                <Zap className="w-5 h-5 mr-1" />
-                Quickstart
+            <nav className="flex items-center space-x-6">
+              <Link
+                href="https://docs.ethcomments.xyz/"
+                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors hidden md:block"
+              >
+                Docs
               </Link>
-            </Button>
-          </nav>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-10 md:py-20 px-4">
-        <div className="container mx-auto text-center max-w-4xl">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight bg-clip-text bg-gradient-to-b from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
-            Add social to your ethereum app in 5 minutes
-          </h1>
-          {/* <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
+              <Link
+                href="https://demo.ethcomments.xyz"
+                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors hidden md:block"
+              >
+                Demo
+              </Link>
+              <Link
+                href="https://t.me/+LkTGo4MdO_1lZDlk"
+                className="text-gray-600 hover:text-lime-600 dark:text-gray-400 dark:hover:text-lime-400 transition-colors hidden md:block"
+              >
+                Community
+              </Link>
+              <Button
+                asChild
+                className="px-8 py-3 bg-lime-400 text-black hover:bg-lime-500"
+              >
+                <Link href="https://docs.ethcomments.xyz">
+                  <Zap className="w-5 h-5 mr-1" />
+                  Quickstart
+                </Link>
+              </Button>
+            </nav>
+          </div>
+        </header>
+        {/* Hero Section */}
+        <section className="py-10 md:py-20 px-4">
+          <div className="container mx-auto text-center max-w-4xl">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight bg-clip-text bg-gradient-to-b from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+              Add social to your ethereum app in 5 minutes
+            </h1>
+            {/* <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
             main benefits
           </p>
           FIXME: Add swap with comment & swap w comment feed. Live? */}
-          <div className="flex flex-row gap-4 justify-center items-center mb-12">
-            <Button
-              variant="ghost"
-              size="lg"
-              asChild
-              className="px-8 py-3 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
-            >
-              <Link href="https://github.com/ecp-eth/comments-monorepo">
-                <GithubIcon className="w-5 h-5 mr-2" />
-                Github
-              </Link>
-            </Button>
+            <div className="flex flex-row gap-4 justify-center items-center mb-12">
+              <Button
+                variant="ghost"
+                size="lg"
+                asChild
+                className="px-8 py-3 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
+              >
+                <Link href="https://github.com/ecp-eth/comments-monorepo">
+                  <GithubIcon className="w-5 h-5 mr-2" />
+                  Github
+                </Link>
+              </Button>
 
-            <Button
-              variant="default"
-              size="lg"
-              className="px-8 py-3 bg-lime-400 text-black hover:bg-lime-500"
-              asChild
-            >
-              <Link href="https://docs.ethcomments.xyz/">
-                <Zap className="w-5 h-5 mr-2" />
-                Quickstart
-              </Link>
-            </Button>
+              <Button
+                variant="default"
+                size="lg"
+                className="px-8 py-3 bg-lime-400 text-black hover:bg-lime-500"
+                asChild
+              >
+                <Link href="https://docs.ethcomments.xyz/">
+                  <Zap className="w-5 h-5 mr-2" />
+                  Quickstart
+                </Link>
+              </Button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+        <section className="py-16 px-4">
+          <div className="container mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Integration Options
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                We made it simple to put comments onchain.
+              </p>
+            </div>
 
-      <section className="py-16 px-4 bg-gray-100 dark:bg-gray-900">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Integration Options
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              We made it simple to put comments onchain.
-            </p>
-          </div>
+            <div className="grid md:grid-cols-2 2xl:grid-cols-4 gap-8 2xl:max-w-8xl mx-auto">
+              <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700 justify-start">
+                <CardHeader className="flex-1">
+                  <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
+                    <Palette className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                  </div>
 
-          <div className="grid md:grid-cols-2 2xl:grid-cols-4 gap-8 2xl:max-w-8xl mx-auto">
-            <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700 justify-start">
-              <CardHeader className="flex-1">
-                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
-                  <Palette className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
-                </div>
-
-                <CardTitle className="text-gray-900 dark:text-white">
-                  No Code
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Single-line, copy and paste implementation for static sites,
-                  blogs, and basic integrations.
-                  <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
-                    {`<iframe
+                  <CardTitle className="text-gray-900 dark:text-white">
+                    No Code
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <CardDescription className="text-gray-600 dark:text-gray-400">
+                    Single-line, copy and paste implementation for static sites,
+                    blogs, and basic integrations.
+                    <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
+                      {`<iframe
   src="https://embed.ethcomments.xyz
 ?uri=https://example.com
 &config=..."
@@ -184,41 +236,41 @@ export default function HomePage() {
   title="Comments"
 >
 </iframe>`}
-                  </code>
-                </CardDescription>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  variant="outline"
-                  className="w-full dark:text-white hover:dark:text-white dark:border-gray-400"
-                  asChild
-                >
-                  <Link href="https://docs.ethcomments.xyz/integration-options/embed-comments">
-                    Get Started
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+                    </code>
+                  </CardDescription>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    variant="outline"
+                    className="w-full dark:text-white hover:dark:text-white dark:border-gray-400"
+                    asChild
+                  >
+                    <Link href="https://docs.ethcomments.xyz/integration-options/embed-comments">
+                      Get Started
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
 
-            <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
-              <CardHeader className="flex-1">
-                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
-                  <Component className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
-                </div>
+              <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+                <CardHeader className="flex-1">
+                  <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
+                    <Component className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                  </div>
 
-                <CardTitle className="text-gray-900 dark:text-white">
-                  React Components
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Customize your own commenting UI, using an open source Ponder
-                  indexer and example code for React and React Native.
-                  <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
-                    {`npm install @ecp.eth/sdk`}
-                  </code>
-                  <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
-                    {`import { CommentsEmbed }
+                  <CardTitle className="text-gray-900 dark:text-white">
+                    React Components
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <CardDescription className="text-gray-600 dark:text-gray-400">
+                    Customize your own commenting UI, using an open source
+                    Ponder indexer and example code for React and React Native.
+                    <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
+                      {`npm install @ecp.eth/sdk`}
+                    </code>
+                    <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
+                      {`import { CommentsEmbed }
   from "@ecp.eth/sdk/embed"
 
 <CommentsEmbed
@@ -226,41 +278,41 @@ export default function HomePage() {
   theme={{...}}
   // ...
 />`}
-                  </code>
-                </CardDescription>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  variant="outline"
-                  className="w-full dark:text-white hover:dark:text-white dark:border-gray-400"
-                  asChild
-                >
-                  <Link href="https://docs.ethcomments.xyz/integration-options/contract-interactions">
-                    Get Started
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+                    </code>
+                  </CardDescription>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    variant="outline"
+                    className="w-full dark:text-white hover:dark:text-white dark:border-gray-400"
+                    asChild
+                  >
+                    <Link href="https://docs.ethcomments.xyz/integration-options/contract-interactions">
+                      Get Started
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
 
-            <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
-              <CardHeader className="flex-1">
-                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
-                  <Layers className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
-                </div>
+              <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+                <CardHeader className="flex-1">
+                  <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
+                    <Layers className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                  </div>
 
-                <CardTitle className="text-gray-900 dark:text-white">
-                  TypeScript SDK
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Customize your own commenting UI, using an open source Ponder
-                  indexer and example code for React and React Native.
-                  <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
-                    {`npm install @ecp.eth/sdk`}
-                  </code>
-                  <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
-                    {`import { fetchComments }
+                  <CardTitle className="text-gray-900 dark:text-white">
+                    TypeScript SDK
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <CardDescription className="text-gray-600 dark:text-gray-400">
+                    Customize your own commenting UI, using an open source
+                    Ponder indexer and example code for React and React Native.
+                    <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
+                      {`npm install @ecp.eth/sdk`}
+                    </code>
+                    <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
+                      {`import { fetchComments }
   from "@ecp.eth/sdk/indexer"
 
 await fetchComments({
@@ -269,37 +321,37 @@ await fetchComments({
   targetUri:
     "https://demo.ethcomments.xyz",
 });`}
-                  </code>
-                </CardDescription>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  variant="outline"
-                  className="w-full dark:text-white hover:dark:text-white dark:border-gray-400"
-                  asChild
-                >
-                  <Link href="https://docs.ethcomments.xyz/integration-options/contract-interactions">
-                    Get Started
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+                    </code>
+                  </CardDescription>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    variant="outline"
+                    className="w-full dark:text-white hover:dark:text-white dark:border-gray-400"
+                    asChild
+                  >
+                    <Link href="https://docs.ethcomments.xyz/integration-options/contract-interactions">
+                      Get Started
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
 
-            <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
-              <CardHeader className="flex-1">
-                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
-                  <Parentheses className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
-                </div>
-                <CardTitle className="text-gray-900 dark:text-white">
-                  Smart Contracts
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Direct contract integration for custom implementations and
-                  advanced use cases.
-                  <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
-                    {`CommentManager.postComment(
+              <Card className="border-2 hover:border-lime-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+                <CardHeader className="flex-1">
+                  <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
+                    <Parentheses className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-lime-600 dark:group-hover:text-lime-400" />
+                  </div>
+                  <CardTitle className="text-gray-900 dark:text-white">
+                    Smart Contracts
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <CardDescription className="text-gray-600 dark:text-gray-400">
+                    Direct contract integration for custom implementations and
+                    advanced use cases.
+                    <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 block mt-4 whitespace-pre text-gray-700 dark:text-gray-300">
+                      {`CommentManager.postComment(
   CommentData({
     content: "Hello World!",
     author: msg.sender,
@@ -307,24 +359,25 @@ await fetchComments({
   }),
   appSignature
 );`}
-                  </code>
-                </CardDescription>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  variant="outline"
-                  className="w-full dark:text-white hover:dark:text-white dark:border-gray-400"
-                  asChild
-                >
-                  <Link href="https://docs.ethcomments.xyz/integration-options/contract-interactions">
-                    Get Started
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+                    </code>
+                  </CardDescription>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    variant="outline"
+                    className="w-full dark:text-white hover:dark:text-white dark:border-gray-400"
+                    asChild
+                  >
+                    <Link href="https://docs.ethcomments.xyz/integration-options/contract-interactions">
+                      Get Started
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </GraphPaper>
 
       {/* Technical Overview */}
       <section className="py-16 px-4">
