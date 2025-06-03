@@ -39,7 +39,7 @@ export default defineConfig({
   sidebar: [
     {
       text: "Quick Start",
-      link: "/quick-start",
+      link: "/",
     },
 
     {

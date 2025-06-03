@@ -1,176 +1,73 @@
----
-layout: landing
----
+# Quick Start
 
-import { HomePage } from "vocs/components";
+Get started with the Ethereum Comments Protocol in minutes.
 
-<HomePage.Root>
-  <div className="flex flex-col items-center justify-center py-4 md:py-8 text-center">
-    <h1 className="ecp_H1 vocs_Heading">
-      Ethereum Comments Protocol <HomePage.Logo className="w-[48px] h-[48px] absolute bottom-[20%] left-[103%]" />
-    </h1>
-    
-    <p className="mt-4 md:mt-6 text-lg md:text-xl max-w-2xl ecp_Paragraph_secondary">
-      An open protocol and toolkit for onchain comments.
-    </p>
+## Installation
 
-    <div className="mt-6 md:mt-8 text-sm">
-      <code className="px-2 py-1 rounded bg-[var(--vocs-color_background3)] border-[var(--vocs-color_border)]">npm install @ecp.eth/sdk</code>
-    </div>
+Run one of the commands below based on your preferred package manager and then follow the steps in the terminal.
 
-    <div className="flex gap-4 mt-8 md:mt-10">
-      <HomePage.Button href="./quick-start" variant="accent">
-        Documentation
-      </HomePage.Button>
-      <HomePage.Button href="https://github.com/mod-protocol/comments-sdk">
-        GitHub
-      </HomePage.Button>
-    </div>
+:::code-group
 
-  </div>
+```bash [npm]
+npm install @ecp.eth/sdk
+# install peer dependencies
+npm install viem wagmi @tanstack/react-query @tanstack/query-core
+```
 
-  <section className="py-4 md:py-8">
-    <div>
-      <h2 className="ecp_H2 vocs_Heading">
-        Implementation Options
-      </h2>
+```bash [yarn]
+yarn add @ecp.eth/sdk
+# install peer dependencies
+yarn add viem wagmi @tanstack/react-query @tanstack/query-core
+```
 
-      <div className="grid md:grid-cols-3 gap-6 md:gap-2">
-        <div className="gap-2 p-8 rounded-lg border border-gray-300 hover:border-blue-500/50 transition-colors flex flex-col">
-          <h3 className="text-xl font-semibold mb-4">iframe (no code)</h3>
-          <p className="mb-6 text-sm ecp_Paragraph_secondary">
-            Single-line, copy and paste implementation for static sites, blogs, and basic integrations.
-          </p>
-          <div className="mt-auto flex justify-center">
-            <HomePage.Button href="/integration-options/embed-comments" variant="accent">
-              Get Started
-            </HomePage.Button>
-          </div>
-        </div>
+```bash [pnpm]
+pnpm add @ecp.eth/sdk
+# install peer dependencies
+pnpm add viem wagmi @tanstack/react-query @tanstack/query-core
+```
 
-        <div className="gap-2 p-8 rounded-lg border border-gray-300 hover:border-blue-500/50 transition-colors flex flex-col">
-          <h3 className="text-xl font-semibold mb-4">TypeScript SDK</h3>
-          <p className="mb-6 text-sm ecp_Paragraph_secondary">
-            Customize your own commenting UI, using an open source Ponder indexer and example code for React and React Native.
-          </p>
-          <div className="mt-auto flex justify-center">
-            <HomePage.Button href="/quick-start" variant="accent">
-              Get Started
-            </HomePage.Button>
-          </div>
-        </div>
+:::
 
-        <div className="gap-2 p-8 rounded-lg border border-gray-300 hover:border-blue-500/50 transition-colors flex flex-col">
-          <h3 className="text-xl font-semibold mb-4">Smart Contracts</h3>
-          <p className="mb-6 text-sm ecp_Paragraph_secondary">
-            Direct contract integration for custom implementations and advanced use cases.
-          </p>
-          <div className="mt-auto flex justify-center">
-            <HomePage.Button href="/integration-options/contract-interactions" variant="accent">
-              Get Started
-            </HomePage.Button>
-          </div>
-        </div>
-      </div>
+## Basic Usage
 
-    </div>
+::::steps
 
-  </section>
+### Install dependencies
 
-  <section className="py-4 md:py-8 px-4 bg-[var(--vocs-color_background3)] rounded-lg">
-    <div>
-      <h2 className="ecp_H2 vocs_Heading">Technical Overview</h2>
+```bash
+npm install @ecp.eth/sdk wagmi
+```
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-2">
-        <div className="p-4">
-          <h3 className="text-lg font-semibold mb-3">Chain Agnostic</h3>
-          <p className="ecp_Paragraph_secondary">
-            Identical contract interfaces across all EVM chains. Deploy on your
-            existing chain or index across multiple.
-          </p>
-        </div>
+### Render the comment box
 
-        <div className="p-4">
-          <h3 className="text-lg font-semibold mb-3">Modular Architecture</h3>
-          <p className="ecp_Paragraph_secondary">
-            Integrate specific components without dependencies on a full vertical
-            stack. No vendor lock-in.
-          </p>
-        </div>
+Render `<CommentsEmbed />` component with a unique url for current page.
 
-        <div className="p-4">
-          <h3 className="text-lg font-semibold mb-3">Infrastructure Layer</h3>
-          <p className="ecp_Paragraph_secondary">
-            Functions as backend infrastructure without user-facing branding
-            requirements or network effects.
-          </p>
-        </div>
-
-        <div className="p-4">
-          <h3 className="text-lg font-semibold mb-3">Contract Stability</h3>
-          <p className="ecp_Paragraph_secondary">
-            Non-upgradeable contracts and standardized interfaces ensure long-term
-            API stability and predictable behavior.
-          </p>
-        </div>
-
-        <div className="p-4">
-          <h3 className="text-lg font-semibold mb-3">EVM Standards</h3>
-          <p className="ecp_Paragraph_secondary">
-            Built on established Ethereum standards and tooling. Compatible with
-            existing infrastructure and wallets.
-          </p>
-        </div>
-
-        <div className="p-4">
-          <h3 className="text-lg font-semibold mb-3">Gas Optimization</h3>
-          <p className="ecp_Paragraph_secondary">
-            Optimized for L2s: ~$0.001 per comment on Base. Optional delegated
-            signing and calldata suffix for UX.
-          </p>
-        </div>
-      </div>
-
-    </div>
-
-  </section>
-
-  <div className="py-4 md:py-8">
-    <div className="mx-auto px-4">
-      <div className="p-6 md:p-12 flex flex-col gap-2">
-        <div className="max-w-2xl">
-          <h2 className="ecp_H2 vocs_Heading">Integration Example</h2>
-            <div className="font-mono text-sm rounded text-left">
 ```tsx
-import { CommentsEmbed } from '@ecp.eth/sdk/embed'
+import { CommentsEmbed } from "@ecp.eth/sdk/embed";
 
-const baseOrigin = 'https://blog.example.com'
+const baseOrigin = "https://blog.example.com";
 
 export function Comments() {
   return (
     <div>
       <h3>Comments</h3>
       <CommentsEmbed
-        uri={new URL(
-          window.location.pathname,
-          baseOrigin
-        )}
+        // the uri for commenting
+        uri={new URL(window.location.pathname, baseOrigin)}
       />
     </div>
   );
 }
 ```
-          </div>
-          <div className="my-4 flex flex-row justify-center items-center gap-4">
-            <HomePage.Button href="./quick-start" variant="accent">
-              View Documentation
-            </HomePage.Button>
-            <HomePage.Button href="#ecp-embed-footer" >
-              See it in action 👇
-            </HomePage.Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</HomePage.Root>
+
+For more details, see [integration options: react component library](/integration-options/react-component-library) and [`<CommentsEmbed />`](/sdk-reference/embed/functions/CommentsEmbed).
+
+### Deploy and start interacting with your community!
+
+::::
+
+## Next Steps
+
+- Learn more about [architecture overview](/architecture-overview) and [post comment flows](/post-comment-flows)
+- Explore [integration options](/integration-options/)
+- Check out our [demo repository](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo)
