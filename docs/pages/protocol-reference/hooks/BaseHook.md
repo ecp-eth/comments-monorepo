@@ -36,66 +36,66 @@ Checks if the contract implements the specified interface
 
 
 
-### `onInitialized(address channel, struct Channels.Channel channelData, uint256 channelId) → bool` (external)
+### `onInitialize(address channel, struct Channels.Channel channelData, uint256 channelId) → bool` (external)
 
 Execute after a hook is initialized on a channel
 
 
 
 
-### `_onInitialized(address, struct Channels.Channel, uint256) → bool` (internal)
+### `_onInitialize(address, struct Channels.Channel, uint256) → bool` (internal)
 
 
 
 
 
-### `onCommentAdded(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → string` (external)
+### `onCommentAdd(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → string` (external)
 
 Execute after a comment is processed
 
 
 
 
-### `_onCommentAdded(struct Comments.Comment, address, bytes32) → string` (internal)
+### `_onCommentAdd(struct Comments.Comment, address, bytes32) → string` (internal)
 
 
 
 
 
-### `onCommentDeleted(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → bool` (external)
+### `onCommentDelete(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → bool` (external)
 
 Execute after a comment is deleted
 
 
 
 
-### `_onCommentDeleted(struct Comments.Comment, address, bytes32) → bool` (internal)
+### `_onCommentDelete(struct Comments.Comment, address, bytes32) → bool` (internal)
 
 
 
 
 
-### `onCommentEdited(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → string` (external)
+### `onCommentEdit(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → string` (external)
 
 Execute after a comment is edited
 
 
 
 
-### `_onCommentEdited(struct Comments.Comment, address, bytes32) → string` (internal)
+### `_onCommentEdit(struct Comments.Comment, address, bytes32) → string` (internal)
 
 
 
 
 
-### `onChannelUpdated(address channel, uint256 channelId, struct Channels.Channel channelData) → bool` (external)
+### `onChannelUpdate(address channel, uint256 channelId, struct Channels.Channel channelData) → bool` (external)
 
 Execute after a channel is updated
 
 
 
 
-### `_onChannelUpdated(address, uint256, struct Channels.Channel) → bool` (internal)
+### `_onChannelUpdate(address, uint256, struct Channels.Channel) → bool` (internal)
 
 
 

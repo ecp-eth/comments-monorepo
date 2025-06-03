@@ -1,0 +1,72 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / RevokeApprovalWithSigParams
+
+# Type Alias: RevokeApprovalWithSigParams
+
+```ts
+type RevokeApprovalWithSigParams = {
+  commentsAddress?: Hex;
+  signature: Hex;
+  typedData: RemoveApprovalTypedDataSchemaType;
+  writeContract: ContractWriteFunctions["removeApprovalWithSig"];
+};
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:222](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L222)
+
+## Properties
+
+### commentsAddress?
+
+```ts
+optional commentsAddress: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:238](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L238)
+
+The address of the comments contract
+
+#### Default
+
+```ts
+COMMENT_MANAGER_ADDRESS
+```
+
+***
+
+### signature
+
+```ts
+signature: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:232](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L232)
+
+The signature of the author
+
+***
+
+### typedData
+
+```ts
+typedData: RemoveApprovalTypedDataSchemaType;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:228](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L228)
+
+The typed data for the removal
+
+You can obtain this value by using createRemoveApprovalTypedData()
+
+***
+
+### writeContract
+
+```ts
+writeContract: ContractWriteFunctions["removeApprovalWithSig"];
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:239](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L239)

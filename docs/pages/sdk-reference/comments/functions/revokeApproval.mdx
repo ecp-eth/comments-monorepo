@@ -10,9 +10,9 @@
 function revokeApproval(params): Promise<RevokeApprovalResult>;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:261](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L261)
+Defined in: [packages/sdk/src/comments/approval.ts:203](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L203)
 
-Removes an app signer approval with signature verification
+Revokes an app signer approval directly as author
 
 ## Parameters
 
@@ -20,10 +20,10 @@ Removes an app signer approval with signature verification
 
 [`RevokeApprovalParams`](/sdk-reference/comments/type-aliases/RevokeApprovalParams.mdx)
 
-The parameters for removing an app signer approval
+The parameters for revoking an app signer approval
 
 ## Returns
 
 `Promise`\<[`RevokeApprovalResult`](/sdk-reference/comments/type-aliases/RevokeApprovalResult.mdx)\>
 
-The transaction hash of the removal
+The transaction hash of the revocation

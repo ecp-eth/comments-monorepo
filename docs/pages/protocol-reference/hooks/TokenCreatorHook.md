@@ -81,7 +81,7 @@ Get all channels with their token information
 
 
 
-### `_onInitialized(address, struct Channels.Channel channel, uint256 channelId) → bool` (internal)
+### `_onInitialize(address, struct Channels.Channel channel, uint256 channelId) → bool` (internal)
 
 
 
@@ -93,7 +93,7 @@ Get all channels with their token information
 
 
 
-### `_onCommentAdded(struct Comments.Comment commentData, address, bytes32) → string` (internal)
+### `_onCommentAdd(struct Comments.Comment commentData, address, bytes32) → string` (internal)
 
 
 

@@ -66,7 +66,7 @@ Posts a comment directly from the author's address
 
 
 
-### `postCommentWithApproval(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature)` (external)
+### `postCommentWithSig(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature)` (external)
 
 Posts a comment with both author and app signer signatures
 
@@ -80,7 +80,7 @@ Deletes a comment when called by the author directly
 
 
 
-### `deleteCommentWithApproval(bytes32 commentId, address app, uint256 nonce, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
+### `deleteCommentWithSig(bytes32 commentId, address app, uint256 nonce, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
 
 Deletes a comment with author signature verification
 
@@ -94,35 +94,35 @@ Edits a comment when called by the author directly
 
 
 
-### `editCommentWithApproval(bytes32 commentId, struct Comments.EditComment editData, bytes authorSignature, bytes appSignature)` (external)
+### `editCommentWithSig(bytes32 commentId, struct Comments.EditComment editData, bytes authorSignature, bytes appSignature)` (external)
 
 Edits a comment with both author and app signer signatures
 
 
 
 
-### `addApprovalAsAuthor(address app)` (external)
+### `addApproval(address app)` (external)
 
 Approves an app signer when called directly by the author
 
 
 
 
-### `revokeApprovalAsAuthor(address app)` (external)
+### `revokeApproval(address app)` (external)
 
 Removes an app signer approval when called directly by the author
 
 
 
 
-### `addApproval(address author, address app, uint256 nonce, uint256 deadline, bytes signature)` (external)
+### `addApprovalWithSig(address author, address app, uint256 nonce, uint256 deadline, bytes signature)` (external)
 
 Approves an app signer with signature verification
 
 
 
 
-### `removeApproval(address author, address app, uint256 nonce, uint256 deadline, bytes signature)` (external)
+### `removeApprovalWithSig(address author, address app, uint256 nonce, uint256 deadline, bytes signature)` (external)
 
 Removes an app signer approval with signature verification
 

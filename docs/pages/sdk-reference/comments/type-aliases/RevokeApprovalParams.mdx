@@ -8,16 +8,27 @@
 
 ```ts
 type RevokeApprovalParams = {
+  app: Hex;
   commentsAddress?: Hex;
-  signature: Hex;
-  typedData: RemoveApprovalTypedDataSchemaType;
-  writeContract: ContractWriteFunctions["removeApproval"];
+  writeContract: ContractWriteFunctions["revokeApproval"];
 };
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:224](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L224)
+Defined in: [packages/sdk/src/comments/approval.ts:173](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L173)
 
 ## Properties
+
+### app
+
+```ts
+app: Hex;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:177](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L177)
+
+The address of the app signer being unapproved
+
+***
 
 ### commentsAddress?
 
@@ -25,7 +36,7 @@ Defined in: [packages/sdk/src/comments/approval.ts:224](https://github.com/ecp-e
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:240](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L240)
+Defined in: [packages/sdk/src/comments/approval.ts:183](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L183)
 
 The address of the comments contract
 
@@ -37,36 +48,10 @@ COMMENT_MANAGER_ADDRESS
 
 ***
 
-### signature
-
-```ts
-signature: Hex;
-```
-
-Defined in: [packages/sdk/src/comments/approval.ts:234](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L234)
-
-The signature of the author
-
-***
-
-### typedData
-
-```ts
-typedData: RemoveApprovalTypedDataSchemaType;
-```
-
-Defined in: [packages/sdk/src/comments/approval.ts:230](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L230)
-
-The typed data for the removal
-
-You can obtain this value by using createRemoveApprovalTypedData()
-
-***
-
 ### writeContract
 
 ```ts
-writeContract: ContractWriteFunctions["removeApproval"];
+writeContract: ContractWriteFunctions["revokeApproval"];
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:241](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L241)
+Defined in: [packages/sdk/src/comments/approval.ts:184](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L184)
