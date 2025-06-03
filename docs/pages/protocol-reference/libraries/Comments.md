@@ -71,10 +71,6 @@
 
 
 
-- **nonce:** (uint256) The nonce for the comment
-
-
-
 - **deadline:** (uint256) Timestamp after which the signatures for this comment become invalid
 
 

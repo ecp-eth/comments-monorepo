@@ -10,7 +10,6 @@ library Comments {
   /// @param createdAt The timestamp when the comment was created
   /// @param updatedAt The timestamp when the comment was last updated
   /// @param channelId The channel ID associated with the comment
-  /// @param nonce The nonce for the comment
   /// @param deadline Timestamp after which the signatures for this comment become invalid
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param content The text content of the comment - may contain urls, images and mentions
@@ -39,7 +38,6 @@ library Comments {
   /// @param author The address of the comment author
   /// @param app The address of the application signer that authorized this comment
   /// @param channelId The channel ID associated with the comment
-  /// @param nonce The nonce for the comment
   /// @param deadline Timestamp after which the signatures for this comment become invalid
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param content The actual text content of the comment
@@ -50,7 +48,6 @@ library Comments {
     address author;
     address app;
     uint256 channelId;
-    uint256 nonce;
     uint256 deadline;
     bytes32 parentId;
     // Dynamic types last (conventional pattern)

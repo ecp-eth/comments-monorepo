@@ -252,12 +252,9 @@ library TestUtils {
   }
 
   function generateDummyCreateComment(
-    ICommentManager comments,
     address author,
     address app
   ) internal view returns (Comments.CreateComment memory) {
-    uint256 nonce = comments.getNonce(author, app);
-
     return
       Comments.CreateComment({
         content: "Test comment",
@@ -267,7 +264,6 @@ library TestUtils {
         author: author,
         app: app,
         channelId: 0,
-        nonce: nonce,
         deadline: block.timestamp + 1 days,
         parentId: bytes32(0)
       });

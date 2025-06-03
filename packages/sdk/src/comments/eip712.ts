@@ -10,7 +10,6 @@ export const ADD_COMMENT_TYPE = {
     { name: "author", type: "address" },
     { name: "app", type: "address" },
     { name: "channelId", type: "uint256" },
-    { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
     { name: "parentId", type: "bytes32" },
   ],
@@ -21,7 +20,6 @@ export const DELETE_COMMENT_TYPE = {
     { name: "commentId", type: "bytes32" },
     { name: "author", type: "address" },
     { name: "app", type: "address" },
-    { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
   ],
 } as const;

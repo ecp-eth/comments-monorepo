@@ -67,6 +67,8 @@ An integer value that prevents replay attacks, this value is automatically incre
 - It is used to prevent replay attacks.
 - It is used as part of the hashing process to generate a unique comment id.
 
+Note: `nonce` is no longer required for creating or deleting comments, but it is still necessary for editing comments.
+
 ## `deadline`
 
 The deadline is a timestamp in seconds since the epoch. Posting a comment with an expired deadline will result in the transaction being reverted.
