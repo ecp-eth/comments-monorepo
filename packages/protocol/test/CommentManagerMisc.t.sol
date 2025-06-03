@@ -252,7 +252,6 @@ contract CommentsTest is Test, IERC721Receiver {
 
     assertEq(comments.getNonce(author, app), initialNonce);
 
-    // Try to reuse the same nonce
     vm.expectEmit(true, true, true, true);
     emit CommentAdded(
       commentId,
