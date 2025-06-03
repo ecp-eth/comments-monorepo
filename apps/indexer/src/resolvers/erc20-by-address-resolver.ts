@@ -1,5 +1,5 @@
 import DataLoader from "dataloader";
-import { getAddress, isAddressEqual, PublicClient, type Hex } from "viem";
+import { getAddress, isAddressEqual, type PublicClient, type Hex } from "viem";
 import type { ResolvedERC20Data } from "./types";
 import { LRUCache } from "lru-cache";
 import { tokenList } from "@ecp.eth/shared/token-list";

@@ -1,5 +1,5 @@
 import DataLoader from "dataloader";
-import { Address, getAddress, type Hex } from "viem";
+import { type Address, getAddress, type Hex } from "viem";
 import type { ResolvedFarcasterData } from "./types";
 import { LRUCache } from "lru-cache";
 import {
@@ -73,8 +73,7 @@ export const farcasterByAddressResolver = new DataLoader<
 
       const err = e instanceof Error ? e : new Error(String(e));
 
-      // return the error for all addresses because whole bulk load failed
-      return addresses.map(() => err);
+      throw err;
     }
   },
   {

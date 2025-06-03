@@ -31,9 +31,12 @@ type Options = {
  * @returns The resolved references.
  */
 export async function resolveCommentReferences(
-  comment: CommentSelectType,
+  comment: Pick<CommentSelectType, "content" | "chainId">,
   options: Options,
-): Promise<IndexerAPICommentReferencesSchemaType> {
+): Promise<{
+  references: IndexerAPICommentReferencesSchemaType;
+  status: CommentSelectType["referencesResolutionStatus"];
+}> {
   const promises: Promise<IndexerAPICommentReferenceSchemaType | null>[] = [];
 
   let pos = 0;
@@ -86,29 +89,36 @@ export async function resolveCommentReferences(
     pos += 1;
   }
 
-  return (await Promise.all(promises)).filter(
-    (val: unknown): val is IndexerAPICommentReferenceSchemaType => !!val,
-  );
-}
+  const results = await Promise.allSettled(promises);
+  const references: IndexerAPICommentReferencesSchemaType = [];
+  const count = promises.length;
+  let resolved = 0;
+  let failed = 0;
 
-export async function resolveCommentsReferences(
-  comments: CommentSelectType[],
-  options: Options,
-): Promise<
-  Record<CommentSelectType["id"], IndexerAPICommentReferencesSchemaType>
-> {
-  const promises: Promise<IndexerAPICommentReferencesSchemaType>[] = [];
+  for (const result of results) {
+    if (result.status === "fulfilled") {
+      resolved++;
 
-  for (const comment of comments) {
-    promises.push(resolveCommentReferences(comment, options));
+      if (result.value) {
+        references.push(result.value);
+      }
+    } else {
+      failed++;
+    }
   }
 
-  return Object.fromEntries(
-    (await Promise.all(promises)).map((references, index) => [
-      comments[index]!.id as Hex,
-      references,
-    ]),
-  );
+  let status: CommentSelectType["referencesResolutionStatus"] = "partial";
+
+  if (failed === count) {
+    status = "failed";
+  } else if (resolved === count) {
+    status = "success";
+  }
+
+  return {
+    references,
+    status,
+  };
 }
 
 type ResolverPosition = {
