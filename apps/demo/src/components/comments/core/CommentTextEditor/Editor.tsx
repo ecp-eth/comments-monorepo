@@ -10,13 +10,22 @@ import { Text } from "@tiptap/extension-text";
 import { Link } from "@tiptap/extension-link";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { cn } from "@/lib/utils";
-import { useImperativeHandle } from "react";
+import { useImperativeHandle, useState } from "react";
 import { useAddressSuggestions } from "./hooks/useAddressSuggestions";
 import { AddressMentionExtension } from "./extensions/AddressMention";
+import {
+  type UploadedFile,
+  type UploadTrackerAttributes,
+  UPLOAD_TRACKER_NODE_NAME,
+  UploadTracker,
+} from "./extensions/UploadTracker";
+import { useUploadFiles } from "./hooks/useUploadFiles";
+import { ALLOWED_UPLOAD_MIME_TYPES } from "@/lib/constants";
 
 export type EditorRef = {
   focus: () => void;
   editor: TipTapEditor | null;
+  getUploadedFiles: () => UploadedFile[];
 };
 
 type EditorProps = {
@@ -43,7 +52,9 @@ export function Editor({
   onEscapePress,
   defaultValue,
 }: EditorProps) {
+  const [isDragging, setIsDragging] = useState(false);
   const searchAddressSuggestions = useAddressSuggestions();
+  const { uploadFiles } = useUploadFiles();
 
   const editor = useEditor({
     content: defaultValue,
@@ -69,6 +80,7 @@ export function Editor({
       AddressMentionExtension.configure({
         searchAddressSuggestions,
       }),
+      UploadTracker,
     ],
     editorProps: {
       attributes: {
@@ -97,13 +109,88 @@ export function Editor({
         editor?.commands.focus();
       },
       editor,
+      getUploadedFiles: () => {
+        const node = editor?.state.doc.lastChild;
+
+        if (node?.type.name === UPLOAD_TRACKER_NODE_NAME) {
+          return (node.attrs as UploadTrackerAttributes).uploads || [];
+        }
+
+        console.warn("Last node is not a upload tracker node");
+
+        return [];
+      },
     }),
     [editor],
   );
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+
+    const files = Array.from(e.dataTransfer.items);
+
+    if (files.length === 0) {
+      return;
+    }
+
+    const isAllowed = files.every((file) =>
+      ALLOWED_UPLOAD_MIME_TYPES.includes(file.type),
+    );
+
+    if (!isAllowed) {
+      e.dataTransfer.dropEffect = "none";
+      setIsDragging(false);
+    } else {
+      e.dataTransfer.dropEffect = "copy";
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files);
+
+    if (files.length === 0) {
+      return;
+    }
+
+    const isAllowed = files.every((file) =>
+      ALLOWED_UPLOAD_MIME_TYPES.includes(file.type),
+    );
+
+    if (!isAllowed) {
+      return;
+    }
+
+    // Upload files and track progress
+    uploadFiles(files, {
+      onSuccess: (file) => {
+        editor?.commands.addUploadedFile(file);
+      },
+      onError: (fileId) => {
+        editor?.commands.removeUploadedFile(fileId);
+      },
+    });
+  };
+
   return (
-    <>
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className={cn(
+        "relative",
+        isDragging &&
+          "after:absolute after:inset-0 after:bg-primary/10 after:border-2 after:border-dashed after:border-primary",
+      )}
+    >
       <EditorContent editor={editor} />
-    </>
+    </div>
   );
 }
