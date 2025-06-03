@@ -1,6 +1,7 @@
 import { z } from "zod";
 import path from "path";
-import { writeFile } from "fs/promises";
+import { writeFile, readFile } from "fs/promises";
+import { existsSync } from "fs";
 
 const tokenListResponse = await fetch(
   "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokens.1inch.eth.link",
@@ -38,11 +39,20 @@ const tokens = z.array(tokenWithCaip19IdSchema).parse(
 
 const outputPath = path.resolve(process.cwd(), "./src/token-list.ts");
 
-await writeFile(
-  outputPath,
-  `
-/* eslint-disable */
+const newContent = `/* eslint-disable */
 // prettier-ignore
 export const tokenList = ${JSON.stringify(tokens, null, 2)};
-`.trim(),
-);
+`;
+
+// Only write if content is different
+if (existsSync(outputPath)) {
+  const existingContent = await readFile(outputPath, "utf-8");
+
+  if (existingContent === newContent) {
+    console.log("File content unchanged, skipping write");
+    process.exit(0);
+  }
+}
+
+await writeFile(outputPath, newContent);
+console.log("Token list updated successfully");

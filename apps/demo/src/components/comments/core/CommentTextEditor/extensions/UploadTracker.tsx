@@ -3,6 +3,7 @@ import { Node, NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { type Node as ProseMirrorNode } from "prosemirror-model";
 import { useEffect, useState, useRef } from "react";
+import { FileIcon } from "lucide-react";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -151,7 +152,7 @@ function FilePreview({ file }: { file: UploadedFile }) {
 
   if (isImage) {
     return (
-      <div className="w-[200px] h-[200px] p-2 border rounded-md bg-muted/30">
+      <div className="w-[100px] h-[100px] p-2 border rounded-md bg-muted/30">
         <Image file={file} />
       </div>
     );
@@ -159,28 +160,16 @@ function FilePreview({ file }: { file: UploadedFile }) {
 
   if (isVideo) {
     return (
-      <div className="w-[200px] h-[200px] p-2 border rounded-md bg-muted/30">
+      <div className="w-[100px] h-[100px] p-2 border rounded-md bg-muted/30">
         <Video file={file} />
       </div>
     );
   }
 
   return (
-    <div className="w-[200px] h-[200px] flex items-center gap-2 p-2 border rounded-md bg-muted/30">
-      <svg
-        className="w-6 h-6 text-muted-foreground"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
-      <span className="text-sm truncate max-w-[150px]">{file.name}</span>
+    <div className="w-[100px] h-[100px] flex flex-col items-center justify-center gap-2 p-2 border rounded-md bg-muted/30 overflow-hidden">
+      <FileIcon className="text-muted-foreground" size={40} />
+      <span className="text-xs truncate max-w-[90px]">{file.name}</span>
     </div>
   );
 }
@@ -301,7 +290,7 @@ export function UploadTrackerView({ node }: UploadTrackerViewProps) {
 
   return (
     <NodeViewWrapper>
-      <div className="mt-2 flex flex-wrap gap-2 p-2 border-t">
+      <div className="mt-2 flex flex-wrap gap-2 p-2">
         {uploads.map((file: UploadedFile) => (
           <FilePreview key={file.id} file={file} />
         ))}
