@@ -41,8 +41,10 @@ export async function resolveCommentReferences(
 
   let pos = 0;
 
-  while (pos < comment.content.length) {
-    const restOfContent = comment.content.slice(pos);
+  const content = comment.content;
+
+  while (pos < content.length) {
+    const restOfContent = content.slice(pos);
 
     let match = restOfContent.match(ETH_ADDRESS_REGEX);
 
@@ -53,7 +55,7 @@ export async function resolveCommentReferences(
       promises.push(
         resolveEthAddress(address as Hex, comment.chainId, position, options),
       );
-      pos += match[0].length;
+      pos += [...match[0]].length;
 
       continue;
     }
@@ -72,7 +74,7 @@ export async function resolveCommentReferences(
           options,
         ),
       );
-      pos += match[0].length;
+      pos += [...match[0]].length;
 
       continue;
     }
@@ -84,7 +86,7 @@ export async function resolveCommentReferences(
       const ensName = match[0].startsWith("@") ? match[0].slice(1) : match[0];
 
       promises.push(resolveEnsName(ensName, position, options));
-      pos += match[0].length;
+      pos += [...match[0]].length;
 
       continue;
     }
@@ -102,12 +104,13 @@ export async function resolveCommentReferences(
           options,
         ),
       );
-      pos += match[0].length;
+      pos += [...match[0]].length;
 
       continue;
     }
 
-    pos += 1;
+    const codePoint = content.codePointAt(pos);
+    pos += codePoint != null && codePoint > 0xffff ? 2 : 1;
   }
 
   const results = await Promise.allSettled(promises);
@@ -147,10 +150,10 @@ type ResolverPosition = {
   end: number;
 };
 
-const ETH_ADDRESS_REGEX = /^@?0x[a-fA-F0-9]{40}/;
-const ERC20_TOKEN_ETH_ADDRESS_REGEX = /^\$0x[a-fA-F0-9]{40}/;
-const ENS_NAME_REGEX = /^@?[a-zA-Z0-9.-]+\.eth/;
-const ERC20_TOKEN_TICKER_REGEX = /^\$[a-zA-Z0-9.-]+/;
+const ETH_ADDRESS_REGEX = /^@?0x[a-fA-F0-9]{40}/u;
+const ERC20_TOKEN_ETH_ADDRESS_REGEX = /^\$0x[a-fA-F0-9]{40}/u;
+const ENS_NAME_REGEX = /^@?[a-zA-Z0-9.-]+\.eth/u;
+const ERC20_TOKEN_TICKER_REGEX = /^\$[a-zA-Z0-9.-]+/u;
 
 async function resolveEthAddress(
   address: Hex,

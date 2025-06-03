@@ -14,7 +14,8 @@
     "codegen": "ponder codegen",
     "serve": "ponder serve",
     "lint": "eslint \"./src/**/*.ts\"",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "vitest"
   },
   "dependencies": {
     "@0x/0x-parser": "^2.10.1",
@@ -46,6 +47,8 @@
     "@types/node": "^22.13.1",
     "@types/pg": "^8.11.11",
     "eslint": "^9.19.0",
-    "globals": "^15.14.0"
+    "globals": "^15.14.0",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.1.4"
   }
 }

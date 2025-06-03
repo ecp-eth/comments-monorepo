@@ -68,4 +68,55 @@ describe("renderToReact", () => {
       '<p>Test <a href="https://app.ens.domains/0x225f137127d9067788314bc7fcc1f36746a3c3B5" rel="noopener noreferrer" target="_blank">luc.eth</a> <a href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">mskr</a> $USDC</p>',
     );
   });
+
+  it("correctly renders unicode characters", () => {
+    const result = renderToReact({
+      content:
+        "👀 what is 🎶 luc.eth this $USDC 💻   @0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d.",
+      references: [
+        {
+          type: "ens",
+          address: "0x225f137127d9067788314bc7fcc1f36746a3c3B5",
+          name: "luc.eth",
+          avatarUrl:
+            "https://ipfs.io/ipfs/bafkreifnrjhkl7ccr2ifwn2n7ap6dh2way25a6w5x2szegvj5pt4b5nvfu",
+          url: "https://app.ens.domains/luc.eth",
+          position: {
+            start: 14,
+            end: 21,
+          },
+        },
+        {
+          type: "erc20",
+          address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          name: "USD Coin",
+          symbol: "USDC",
+          logoURI:
+            "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
+          caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          position: {
+            start: 27,
+            end: 32,
+          },
+        },
+        {
+          type: "farcaster",
+          fid: 341794,
+          url: "https://farcaster.xyz/mskr",
+          username: "mskr",
+          displayName: "mskr",
+          pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
+          position: {
+            start: 38,
+            end: 81,
+          },
+        },
+      ],
+    });
+
+    expect(renderToStaticMarkup(result)).toBe(
+      '<p>👀 what is 🎶 <a href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">luc.eth</a> this <a href="https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" rel="noopener noreferrer" target="_blank" title="USD Coin">$USDC</a> 💻   <a href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">mskr</a>.</p>',
+    );
+  });
 });

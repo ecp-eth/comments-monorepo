@@ -64,7 +64,9 @@ export function renderToReact({
   }
 
   const elements: React.ReactNode[] = [];
-  const chars = Array.from(content); // respect unicode
+  // we don't need to do Array.from(content) for unicode support because positions of references are
+  // already computed as byte offsets respecting unicode
+  const chars = content;
   let currentParagraphText = "";
   let currentParagraph: React.ReactElement[] = [];
   let consecutiveNewLines = 0;
