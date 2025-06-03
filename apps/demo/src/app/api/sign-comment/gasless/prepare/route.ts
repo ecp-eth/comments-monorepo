@@ -14,7 +14,7 @@ import {
   createCommentTypedData,
   getNonce,
   isApproved,
-  postCommentWithApproval,
+  postCommentWithSig,
 } from "@ecp.eth/sdk/comments";
 import { isMuted } from "@ecp.eth/sdk/indexer";
 import {
@@ -150,7 +150,7 @@ export async function POST(
       }
 
       try {
-        const { txHash } = await postCommentWithApproval({
+        const { txHash } = await postCommentWithSig({
           comment: typedCommentData.message,
           appSignature: signature,
           writeContract: walletClient.writeContract,

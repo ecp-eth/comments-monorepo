@@ -116,15 +116,15 @@ contract TokenCreatorHook is BaseHook {
   {
     return
       Hooks.Permissions({
-        onInitialized: true,
-        onCommentAdded: true,
-        onCommentEdited: false,
-        onCommentDeleted: false,
-        onChannelUpdated: false
+        onInitialize: true,
+        onCommentAdd: true,
+        onCommentEdit: false,
+        onCommentDelete: false,
+        onChannelUpdate: false
       });
   }
 
-  function _onInitialized(
+  function _onInitialize(
     address,
     Channels.Channel memory channel,
     uint256 channelId
@@ -196,7 +196,7 @@ contract TokenCreatorHook is BaseHook {
     return keccak256(bytes(targetUri)) == keccak256(bytes(expectedUri));
   }
 
-  function _onCommentAdded(
+  function _onCommentAdd(
     Comments.Comment calldata commentData,
     address /* caller */,
     bytes32 /* commentId */

@@ -123,11 +123,11 @@ export type CommentData = {
 };
 
 export type ContractWriteFunctions = {
-  postCommentWithApproval: (
+  postCommentWithSig: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
       "payable",
-      "postCommentWithApproval"
+      "postCommentWithSig"
     > & {
       value?: bigint;
     },
@@ -143,6 +143,14 @@ export type ContractWriteFunctions = {
     },
   ) => Promise<Hex>;
 
+  addApprovalWithSig: (
+    args: ContractFunctionParameters<
+      CommentManagerABIType,
+      "nonpayable",
+      "addApprovalWithSig"
+    >,
+  ) => Promise<Hex>;
+
   addApproval: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
@@ -151,19 +159,11 @@ export type ContractWriteFunctions = {
     >,
   ) => Promise<Hex>;
 
-  addApprovalAsAuthor: (
+  deleteCommentWithSig: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
       "nonpayable",
-      "addApprovalAsAuthor"
-    >,
-  ) => Promise<Hex>;
-
-  deleteCommentWithApproval: (
-    args: ContractFunctionParameters<
-      CommentManagerABIType,
-      "nonpayable",
-      "deleteCommentWithApproval"
+      "deleteCommentWithSig"
     >,
   ) => Promise<Hex>;
 
@@ -175,11 +175,11 @@ export type ContractWriteFunctions = {
     >,
   ) => Promise<Hex>;
 
-  editCommentWithApproval: (
+  editCommentWithSig: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
       "payable",
-      "editCommentWithApproval"
+      "editCommentWithSig"
     > & {
       value?: bigint;
     },
@@ -195,11 +195,19 @@ export type ContractWriteFunctions = {
     },
   ) => Promise<Hex>;
 
-  removeApproval: (
+  removeApprovalWithSig: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
       "nonpayable",
-      "removeApproval"
+      "removeApprovalWithSig"
+    >,
+  ) => Promise<Hex>;
+
+  revokeApproval: (
+    args: ContractFunctionParameters<
+      CommentManagerABIType,
+      "nonpayable",
+      "revokeApproval"
     >,
   ) => Promise<Hex>;
 
@@ -208,14 +216,6 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "renounceOwnership"
-    >,
-  ) => Promise<Hex>;
-
-  revokeApprovalAsAuthor: (
-    args: ContractFunctionParameters<
-      CommentManagerABIType,
-      "nonpayable",
-      "revokeApprovalAsAuthor"
     >,
   ) => Promise<Hex>;
 

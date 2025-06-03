@@ -78,6 +78,16 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
 }, {
   inputs: readonly [{
      internalType: "address";
+     name: "app";
+     type: "address";
+  }];
+  name: "addApproval";
+  outputs: readonly [];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "address";
      name: "author";
      type: "address";
    }, {
@@ -97,17 +107,7 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      name: "signature";
      type: "bytes";
   }];
-  name: "addApproval";
-  outputs: readonly [];
-  stateMutability: "nonpayable";
-  type: "function";
-}, {
-  inputs: readonly [{
-     internalType: "address";
-     name: "app";
-     type: "address";
-  }];
-  name: "addApprovalAsAuthor";
+  name: "addApprovalWithSig";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -157,7 +157,7 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      name: "appSignature";
      type: "bytes";
   }];
-  name: "deleteCommentWithApproval";
+  name: "deleteCommentWithSig";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -239,7 +239,7 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      name: "appSignature";
      type: "bytes";
   }];
-  name: "editCommentWithApproval";
+  name: "editCommentWithSig";
   outputs: readonly [];
   stateMutability: "payable";
   type: "function";
@@ -672,7 +672,7 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      name: "appSignature";
      type: "bytes";
   }];
-  name: "postCommentWithApproval";
+  name: "postCommentWithSig";
   outputs: readonly [];
   stateMutability: "payable";
   type: "function";
@@ -698,7 +698,7 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      name: "signature";
      type: "bytes";
   }];
-  name: "removeApproval";
+  name: "removeApprovalWithSig";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -714,7 +714,7 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      name: "app";
      type: "address";
   }];
-  name: "revokeApprovalAsAuthor";
+  name: "revokeApproval";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -1063,7 +1063,7 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
   type: "error";
 }, {
   inputs: readonly [];
-  name: "ParentCommentDoesNotExist";
+  name: "ParentCommentHasNeverExisted";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1171,6 +1171,16 @@ Edit a comment as an author
 \}, \{
   `inputs`: readonly \[\{
      `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"addApproval"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
      `name`: `"author"`;
      `type`: `"address"`;
    \}, \{
@@ -1190,17 +1200,7 @@ Edit a comment as an author
      `name`: `"signature"`;
      `type`: `"bytes"`;
   \}\];
-  `name`: `"addApproval"`;
-  `outputs`: readonly \[\];
-  `stateMutability`: `"nonpayable"`;
-  `type`: `"function"`;
-\}, \{
-  `inputs`: readonly \[\{
-     `internalType`: `"address"`;
-     `name`: `"app"`;
-     `type`: `"address"`;
-  \}\];
-  `name`: `"addApprovalAsAuthor"`;
+  `name`: `"addApprovalWithSig"`;
   `outputs`: readonly \[\];
   `stateMutability`: `"nonpayable"`;
   `type`: `"function"`;
@@ -1250,7 +1250,7 @@ Edit a comment as an author
      `name`: `"appSignature"`;
      `type`: `"bytes"`;
   \}\];
-  `name`: `"deleteCommentWithApproval"`;
+  `name`: `"deleteCommentWithSig"`;
   `outputs`: readonly \[\];
   `stateMutability`: `"nonpayable"`;
   `type`: `"function"`;
@@ -1332,7 +1332,7 @@ Edit a comment as an author
      `name`: `"appSignature"`;
      `type`: `"bytes"`;
   \}\];
-  `name`: `"editCommentWithApproval"`;
+  `name`: `"editCommentWithSig"`;
   `outputs`: readonly \[\];
   `stateMutability`: `"payable"`;
   `type`: `"function"`;
@@ -1765,7 +1765,7 @@ Edit a comment as an author
      `name`: `"appSignature"`;
      `type`: `"bytes"`;
   \}\];
-  `name`: `"postCommentWithApproval"`;
+  `name`: `"postCommentWithSig"`;
   `outputs`: readonly \[\];
   `stateMutability`: `"payable"`;
   `type`: `"function"`;
@@ -1791,7 +1791,7 @@ Edit a comment as an author
      `name`: `"signature"`;
      `type`: `"bytes"`;
   \}\];
-  `name`: `"removeApproval"`;
+  `name`: `"removeApprovalWithSig"`;
   `outputs`: readonly \[\];
   `stateMutability`: `"nonpayable"`;
   `type`: `"function"`;
@@ -1807,7 +1807,7 @@ Edit a comment as an author
      `name`: `"app"`;
      `type`: `"address"`;
   \}\];
-  `name`: `"revokeApprovalAsAuthor"`;
+  `name`: `"revokeApproval"`;
   `outputs`: readonly \[\];
   `stateMutability`: `"nonpayable"`;
   `type`: `"function"`;
@@ -2156,7 +2156,7 @@ Edit a comment as an author
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
-  `name`: `"ParentCommentDoesNotExist"`;
+  `name`: `"ParentCommentHasNeverExisted"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];

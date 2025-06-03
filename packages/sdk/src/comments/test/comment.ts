@@ -10,23 +10,23 @@ import {
 import { anvil } from "viem/chains";
 import {
   postComment,
-  postCommentWithApproval,
+  postCommentWithSig,
   getComment,
   getCommentId,
   deleteComment,
-  deleteCommentWithApproval,
+  deleteCommentWithSig,
   getDeleteCommentHash,
   getNonce,
   createCommentTypedData,
   createDeleteCommentTypedData,
   createCommentData,
-  editCommentWithApproval,
+  editCommentWithSig,
   editComment,
   createEditCommentTypedData,
   createEditCommentData,
   getEditCommentHash,
 } from "../comment.js";
-import { addApprovalAsAuthor, revokeApprovalAsAuthor } from "../approval.js";
+import { addApproval, revokeApproval } from "../approval.js";
 import { CommentManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
@@ -49,6 +49,10 @@ describe("comment", () => {
     "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"; // Anvil's second private key
   const appAccount = privateKeyToAccount(appPrivateKey);
 
+  const thirdPartyPrivateKey =
+    "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"; // Anvil's third private key
+  const thirdPartyAccount = privateKeyToAccount(thirdPartyPrivateKey);
+
   // Create wallet client
   const client = createWalletClient({
     chain: anvil,
@@ -60,6 +64,12 @@ describe("comment", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: appAccount,
+  }).extend(publicActions);
+
+  const thirdPartyClient = createWalletClient({
+    chain: anvil,
+    transport: http("http://localhost:8545"),
+    account: thirdPartyAccount,
   }).extend(publicActions);
 
   describe("postComment()", () => {
@@ -102,12 +112,12 @@ describe("comment", () => {
     });
   });
 
-  describe("postCommentWithApproval()", () => {
+  describe("postCommentWithSig()", () => {
     let appSignature: Hex;
     let commentData: CreateCommentData;
 
     beforeEach(async () => {
-      const approvalResult = await addApprovalAsAuthor({
+      const approvalResult = await addApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
         commentsAddress: commentsAddress,
@@ -142,7 +152,7 @@ describe("comment", () => {
     });
 
     it("posts a comment with signatures", async () => {
-      const result = await postCommentWithApproval({
+      const result = await postCommentWithSig({
         comment: commentData,
         appSignature,
         writeContract: appClient.writeContract,
@@ -157,7 +167,7 @@ describe("comment", () => {
     });
 
     it("posts a comment with author signature when no approval exists", async () => {
-      const revokeApprovalResult = await revokeApprovalAsAuthor({
+      const revokeApprovalResult = await revokeApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
         commentsAddress: commentsAddress,
@@ -167,7 +177,7 @@ describe("comment", () => {
         hash: revokeApprovalResult.txHash,
       });
 
-      await revokeApprovalAsAuthor({
+      await revokeApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
         commentsAddress: commentsAddress,
@@ -198,7 +208,7 @@ describe("comment", () => {
       const appSignature = await appClient.signTypedData(typedData);
       const authorSignature = await client.signTypedData(typedData);
 
-      const result = await postCommentWithApproval({
+      const result = await postCommentWithSig({
         comment: commentData,
         appSignature,
         authorSignature,
@@ -223,7 +233,7 @@ describe("comment", () => {
 
       await assert.rejects(
         () =>
-          postCommentWithApproval({
+          postCommentWithSig({
             comment: createCommentData({
               app: appAccount.address,
               author: account.address,
@@ -395,11 +405,11 @@ describe("comment", () => {
     });
   });
 
-  describe("deleteCommentWithApproval()", () => {
+  describe("deleteCommentWithSig()", () => {
     let commentId: Hex;
 
     beforeEach(async () => {
-      const approvalResult = await addApprovalAsAuthor({
+      const approvalResult = await addApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
         commentsAddress: commentsAddress,
@@ -472,7 +482,7 @@ describe("comment", () => {
 
       const appSignature = await appClient.signTypedData(typedData);
 
-      const result = await deleteCommentWithApproval({
+      const result = await deleteCommentWithSig({
         commentId,
         app: appAccount.address,
         nonce,
@@ -508,13 +518,13 @@ describe("comment", () => {
 
       await assert.rejects(
         () =>
-          deleteCommentWithApproval({
+          deleteCommentWithSig({
             commentId,
             app: appAccount.address,
             nonce,
             deadline: typedData.message.deadline,
             appSignature: "0x1234", // Invalid signature
-            writeContract: appClient.writeContract,
+            writeContract: thirdPartyClient.writeContract,
             commentsAddress: commentsAddress,
           }),
         (err) => {
@@ -653,11 +663,11 @@ describe("comment", () => {
     });
   });
 
-  describe("editCommentWithApproval()", () => {
+  describe("editCommentWithSig()", () => {
     let commentId: Hex;
 
     beforeEach(async () => {
-      const approvalResult = await addApprovalAsAuthor({
+      const approvalResult = await addApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
         commentsAddress: commentsAddress,
@@ -736,7 +746,7 @@ describe("comment", () => {
 
       const appSignature = await appClient.signTypedData(typedData);
 
-      const result = await editCommentWithApproval({
+      const result = await editCommentWithSig({
         edit,
         appSignature,
         writeContract: appClient.writeContract,
@@ -777,10 +787,10 @@ describe("comment", () => {
 
       await assert.rejects(
         () =>
-          editCommentWithApproval({
+          editCommentWithSig({
             edit,
             appSignature: "0x1234", // Invalid signature
-            writeContract: appClient.writeContract,
+            writeContract: thirdPartyClient.writeContract,
             commentsAddress: commentsAddress,
           }),
         (err) => {

@@ -9,11 +9,11 @@ import type { ChannelManagerABI } from "../abis.js";
 export type ChannelManagerABIType = typeof ChannelManagerABI;
 
 export type ChannelPermissions = {
-  onInitialized: boolean;
-  onCommentAdded: boolean;
-  onCommentDeleted: boolean;
-  onCommentEdited: boolean;
-  onChannelUpdated: boolean;
+  onInitialize: boolean;
+  onCommentAdd: boolean;
+  onCommentDelete: boolean;
+  onCommentEdit: boolean;
+  onChannelUpdate: boolean;
 };
 
 // we can't use generics and mapped type because the API would be lazy resolved

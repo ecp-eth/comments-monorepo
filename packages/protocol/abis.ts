@@ -96,6 +96,19 @@ export const CommentManagerABI = [
     name: "addApproval",
     inputs: [
       {
+        name: "app",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "addApprovalWithSig",
+    inputs: [
+      {
         name: "author",
         type: "address",
         internalType: "address",
@@ -119,19 +132,6 @@ export const CommentManagerABI = [
         name: "signature",
         type: "bytes",
         internalType: "bytes",
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "addApprovalAsAuthor",
-    inputs: [
-      {
-        name: "app",
-        type: "address",
-        internalType: "address",
       },
     ],
     outputs: [],
@@ -165,7 +165,7 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
-    name: "deleteCommentWithApproval",
+    name: "deleteCommentWithSig",
     inputs: [
       {
         name: "commentId",
@@ -253,7 +253,7 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
-    name: "editCommentWithApproval",
+    name: "editCommentWithSig",
     inputs: [
       {
         name: "commentId",
@@ -794,7 +794,7 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
-    name: "postCommentWithApproval",
+    name: "postCommentWithSig",
     inputs: [
       {
         name: "commentData",
@@ -869,7 +869,7 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
-    name: "removeApproval",
+    name: "removeApprovalWithSig",
     inputs: [
       {
         name: "author",
@@ -909,7 +909,7 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
-    name: "revokeApprovalAsAuthor",
+    name: "revokeApproval",
     inputs: [
       {
         name: "app",
@@ -1355,7 +1355,7 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
-    name: "ParentCommentDoesNotExist",
+    name: "ParentCommentHasNeverExisted",
     inputs: [],
   },
   {
@@ -1571,27 +1571,27 @@ export const ChannelManagerABI = [
             internalType: "struct Hooks.Permissions",
             components: [
               {
-                name: "onInitialized",
+                name: "onInitialize",
                 type: "bool",
                 internalType: "bool",
               },
               {
-                name: "onCommentAdded",
+                name: "onCommentAdd",
                 type: "bool",
                 internalType: "bool",
               },
               {
-                name: "onCommentDeleted",
+                name: "onCommentDelete",
                 type: "bool",
                 internalType: "bool",
               },
               {
-                name: "onCommentEdited",
+                name: "onCommentEdit",
                 type: "bool",
                 internalType: "bool",
               },
               {
-                name: "onChannelUpdated",
+                name: "onChannelUpdate",
                 type: "bool",
                 internalType: "bool",
               },

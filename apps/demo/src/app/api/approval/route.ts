@@ -15,7 +15,7 @@ import {
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { chain, transport } from "@/lib/wagmi";
 import { getApprovalStatusAndNonce } from "@/lib/contract";
-import { addApproval } from "@ecp.eth/sdk/comments";
+import { addApprovalWithSig } from "@ecp.eth/sdk/comments";
 
 export async function POST(
   req: Request,
@@ -89,7 +89,7 @@ export async function POST(
   }).extend(publicActions);
 
   try {
-    const { txHash } = await addApproval({
+    const { txHash } = await addApprovalWithSig({
       signature: authorSignature,
       typedData: signTypedDataParams,
       writeContract: walletClient.writeContract,

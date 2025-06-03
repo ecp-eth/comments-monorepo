@@ -32,7 +32,7 @@ Posts a comment directly from the author's address
 
 
 
-### `postCommentWithApproval(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature)` (external)
+### `postCommentWithSig(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature)` (external)
 
 Posts a comment with both author and app signer signatures
 
@@ -53,7 +53,7 @@ Edits a comment when called by the author directly
 
 
 
-### `editCommentWithApproval(bytes32 commentId, struct Comments.EditComment editData, bytes authorSignature, bytes appSignature)` (external)
+### `editCommentWithSig(bytes32 commentId, struct Comments.EditComment editData, bytes authorSignature, bytes appSignature)` (external)
 
 Edits a comment with both author and app signer signatures
 
@@ -74,7 +74,7 @@ Deletes a comment when called by the author directly
 
 
 
-### `deleteCommentWithApproval(bytes32 commentId, address app, uint256 nonce, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
+### `deleteCommentWithSig(bytes32 commentId, address app, uint256 nonce, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
 
 Deletes a comment with author signature verification
 
@@ -102,28 +102,28 @@ Internal function to remove an app signer approval
 
 
 
-### `addApprovalAsAuthor(address app)` (external)
+### `addApproval(address app)` (external)
 
 Approves an app signer when called directly by the author
 
 
 
 
-### `revokeApprovalAsAuthor(address app)` (external)
+### `revokeApproval(address app)` (external)
 
 Removes an app signer approval when called directly by the author
 
 
 
 
-### `addApproval(address author, address app, uint256 nonce, uint256 deadline, bytes signature)` (external)
+### `addApprovalWithSig(address author, address app, uint256 nonce, uint256 deadline, bytes signature)` (external)
 
 Approves an app signer with signature verification
 
 
 
 
-### `removeApproval(address author, address app, uint256 nonce, uint256 deadline, bytes signature)` (external)
+### `removeApprovalWithSig(address author, address app, uint256 nonce, uint256 deadline, bytes signature)` (external)
 
 Removes an app signer approval with signature verification
 
@@ -196,6 +196,55 @@ Get the nonce for an author and app
 ### `isDeleted(bytes32 commentId) → bool` (external)
 
 Get the deleted status for a comment
+
+
+
+
+### `guardBlockTimestamp(uint256 deadline)` (internal)
+
+Internal function to guard against timestamp expiration
+
+
+
+
+### `guardNonceAndIncrement(address author, address app, uint256 nonce)` (internal)
+
+Internal function prevent replay attack by check nonce and increment it
+
+
+
+
+### `guardParentCommentAndTargetUri(bytes32 parentId, string targetUri)` (internal)
+
+Internal function to validate 1) parent comment ever existed 2) prevent parentId and targetUri from being set together
+
+
+
+
+### `guardChannelExists(uint256 channelId)` (internal)
+
+Internal function to validate channel exists
+
+
+
+
+### `guardAuthorizedByAuthorAndApp(address author, address app, bytes32 sigHash, bytes authorSignature, bytes appSignature)` (internal)
+
+Internal function to ensure both author and app are authorized to perform the action
+
+
+
+
+### `guardAuthorizedByAuthorOrApp(address author, address app, bytes32 sigHash, bytes authorSignature, bytes appSignature)` (internal)
+
+Internal function to ensure either author or app is authorized to perform the action
+
+
+
+
+### `guardAuthorizedByAuthor(address author, bytes32 sigHash, bytes authorSignature)` (internal)
+
+Internal function to ensure either author is authorized to perform the action
 
 
 
