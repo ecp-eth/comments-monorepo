@@ -42,5 +42,6 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx,sol}": "prettier --write"
-  }
+  },
+  "license": "MIT"
 }

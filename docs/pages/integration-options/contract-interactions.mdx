@@ -65,22 +65,15 @@ const response = await fetch("/api/sign-comment", {
 
 ##### The App Server signs the comment data
 
-Once the data reaches the app server, it creates a `CommentData` with `nonce` generated from `getNonce`, using `createCommentData` from `@ecp.eth/sdk`:
+Once the data reaches the app server, it creates a `CommentData` using `createCommentData` from `@ecp.eth/sdk`:
 
 ```typescript
-const nonce = await getNonce({
-  author,
-  app: app.address,
-  chain,
-});
-
 const commentData = createCommentData({
   content,
   targetUri,
   parentId,
   author,
   app: app.address,
-  nonce,
 });
 ```
 

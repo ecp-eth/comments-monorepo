@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
@@ -19,11 +19,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   bytes32 public immutable DOMAIN_SEPARATOR;
   bytes32 public constant ADD_COMMENT_TYPEHASH =
     keccak256(
-      "AddComment(string content,string metadata,string targetUri,string commentType,address author,address app,uint256 channelId,uint256 nonce,uint256 deadline,bytes32 parentId)"
+      "AddComment(string content,string metadata,string targetUri,string commentType,address author,address app,uint256 channelId,uint256 deadline,bytes32 parentId)"
     );
   bytes32 public constant DELETE_COMMENT_TYPEHASH =
     keccak256(
-      "DeleteComment(bytes32 commentId,address author,address app,uint256 nonce,uint256 deadline)"
+      "DeleteComment(bytes32 commentId,address author,address app,uint256 deadline)"
     );
   bytes32 public constant EDIT_COMMENT_TYPEHASH =
     keccak256(
@@ -106,7 +106,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     guardBlockTimestamp(commentData.deadline);
     guardParentCommentAndTargetUri(parentId, targetUri);
-    guardNonceAndIncrement(author, app, commentData.nonce);
     guardChannelExists(channelId);
 
     bytes32 commentId = getCommentId(commentData);
@@ -121,7 +120,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     Comments.Comment storage comment = comments[commentId];
 
-    uint80 timestampNow = uint80(block.timestamp);
+    uint96 timestampNow = uint96(block.timestamp);
 
     comment.author = author;
     comment.app = app;
@@ -221,7 +220,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     string calldata content = editData.content;
     string calldata metadata = editData.metadata;
-    uint80 timestampNow = uint80(block.timestamp);
+    uint96 timestampNow = uint96(block.timestamp);
 
     comment.content = content;
     comment.metadata = metadata;
@@ -281,7 +280,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   function deleteCommentWithSig(
     bytes32 commentId,
     address app,
-    uint256 nonce,
     uint256 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
@@ -293,15 +291,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     require(author != address(0), "Comment does not exist");
 
-    guardNonceAndIncrement(author, app, nonce);
-
-    bytes32 deleteHash = getDeleteCommentHash(
-      commentId,
-      author,
-      app,
-      nonce,
-      deadline
-    );
+    bytes32 deleteHash = getDeleteCommentHash(commentId, author, app, deadline);
 
     // for deleting comment, only single party (either author or app) is needed for authorization
     guardAuthorizedByAuthorOrApp(
@@ -452,18 +442,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     bytes32 commentId,
     address author,
     address app,
-    uint256 nonce,
     uint256 deadline
   ) public view returns (bytes32) {
     bytes32 structHash = keccak256(
-      abi.encode(
-        DELETE_COMMENT_TYPEHASH,
-        commentId,
-        author,
-        app,
-        nonce,
-        deadline
-      )
+      abi.encode(DELETE_COMMENT_TYPEHASH, commentId, author, app, deadline)
     );
 
     return
@@ -507,7 +489,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         commentData.author,
         commentData.app,
         commentData.channelId,
-        commentData.nonce,
         commentData.deadline,
         commentData.parentId
       )

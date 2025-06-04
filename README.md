@@ -48,3 +48,7 @@ Then make sure you are using that chain in the demo app. In `lib/wagmi.ts` chang
 #### Indexer:
 
 Based on chain you choose, you need to provide `PONDER_RPC_URL_{chain_id}` in `.env` file to enable indexing of the chain.
+
+# License
+
+[MIT](LICENSE)

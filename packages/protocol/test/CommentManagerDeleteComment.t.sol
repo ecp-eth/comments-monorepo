@@ -41,7 +41,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_AsAuthor() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -66,7 +66,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteCommentWithSig_ValidAuthorSig() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -82,7 +82,6 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      comments.getNonce(author, app),
       block.timestamp + 1 days
     );
     bytes memory authorDeleteSignature = TestUtils.signEIP712(
@@ -96,7 +95,6 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      comments.getNonce(author, app),
       block.timestamp + 1 days,
       authorDeleteSignature,
       ""
@@ -106,7 +104,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteCommentWithSig_InvalidAuthorSig() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -118,13 +116,11 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postComment(commentData, appSignature);
 
     // Try to delete with wrong signature
-    uint256 nonce = comments.getNonce(author, app);
     uint256 deadline = block.timestamp + 1 days;
     bytes32 deleteHash = comments.getDeleteCommentHash(
       commentId,
       author,
       app,
-      nonce,
       deadline
     );
     bytes memory wrongSignature = TestUtils.signEIP712(
@@ -141,14 +137,7 @@ contract CommentsTest is Test, IERC721Receiver {
         author
       )
     );
-    comments.deleteCommentWithSig(
-      commentId,
-      app,
-      nonce,
-      deadline,
-      wrongSignature,
-      ""
-    );
+    comments.deleteCommentWithSig(commentId, app, deadline, wrongSignature, "");
 
     // Verify comment still exists
     assertTrue(comments.getComment(commentId).author != address(0));
@@ -157,7 +146,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteCommentWithSig_ValidAppSig_AppApproved() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -175,7 +164,6 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      comments.getNonce(author, app),
       block.timestamp + 1 days
     );
     bytes memory appDeleteSignature = TestUtils.signEIP712(
@@ -189,7 +177,6 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      comments.getNonce(author, app),
       block.timestamp + 1 days,
       "",
       appDeleteSignature
@@ -199,7 +186,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteCommentWithSig_ValidAppSig_AppNotApproved() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -215,7 +202,6 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      comments.getNonce(author, app),
       block.timestamp + 1 days
     );
     bytes memory appDeleteSignature = TestUtils.signEIP712(
@@ -223,7 +209,6 @@ contract CommentsTest is Test, IERC721Receiver {
       appPrivateKey,
       deleteHash
     );
-    uint256 nonce = comments.getNonce(author, app);
 
     vm.prank(address(0xdead));
     vm.expectRevert(
@@ -236,7 +221,6 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      nonce,
       block.timestamp + 1 days,
       "",
       appDeleteSignature
@@ -246,7 +230,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteCommentWithSig_InvalidAppSig_AppApproved() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -260,13 +244,11 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.addApproval(app);
 
     // Try to delete with wrong signature
-    uint256 nonce = comments.getNonce(author, app);
     uint256 deadline = block.timestamp + 1 days;
     bytes32 deleteHash = comments.getDeleteCommentHash(
       commentId,
       author,
       app,
-      nonce,
       deadline
     );
     bytes memory wrongSignature = TestUtils.signEIP712(
@@ -283,14 +265,7 @@ contract CommentsTest is Test, IERC721Receiver {
         author
       )
     );
-    comments.deleteCommentWithSig(
-      commentId,
-      app,
-      nonce,
-      deadline,
-      "",
-      wrongSignature
-    );
+    comments.deleteCommentWithSig(commentId, app, deadline, "", wrongSignature);
 
     // Verify comment still exists
     assertTrue(comments.getComment(commentId).author != address(0));
@@ -299,7 +274,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_SenderIsApp_AppApproved() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -313,12 +288,10 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.addApproval(app);
 
     // Delete the comment with signature
-    uint256 nonce = comments.getNonce(author, app);
     bytes32 deleteHash = comments.getDeleteCommentHash(
       commentId,
       author,
       app,
-      nonce,
       block.timestamp + 1 days
     );
     bytes memory appDeleteSignature = TestUtils.signEIP712(
@@ -333,7 +306,6 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      nonce,
       block.timestamp + 1 days,
       "",
       appDeleteSignature
@@ -343,7 +315,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_SenderIsApp_AppNotApproved() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -355,12 +327,10 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postComment(commentData, appSignature);
 
     // Delete the comment with signature
-    uint256 nonce = comments.getNonce(author, app);
     bytes32 deleteHash = comments.getDeleteCommentHash(
       commentId,
       author,
       app,
-      nonce,
       block.timestamp + 1 days
     );
     bytes memory appDeleteSignature = TestUtils.signEIP712(
@@ -380,7 +350,6 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      nonce,
       block.timestamp + 1 days,
       "",
       appDeleteSignature
@@ -398,7 +367,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_NotAuthor() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSignature = TestUtils.signEIP712(
       vm,
@@ -420,53 +389,6 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteComment(commentId);
   }
 
-  function test_DeleteComment_InvalidNonce() public {
-    Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
-    bytes32 commentId = comments.getCommentId(commentData);
-    bytes memory appSignature = TestUtils.signEIP712(
-      vm,
-      appPrivateKey,
-      commentId
-    );
-
-    vm.prank(author);
-    comments.postComment(commentData, appSignature);
-
-    uint256 wrongNonce = 100;
-    uint256 deadline = block.timestamp + 1 days;
-    bytes32 deleteHash = comments.getDeleteCommentHash(
-      commentId,
-      author,
-      app,
-      wrongNonce,
-      deadline
-    );
-    bytes memory authorDeleteSignature = TestUtils.signEIP712(
-      vm,
-      authorPrivateKey,
-      deleteHash
-    );
-
-    vm.expectRevert(
-      abi.encodeWithSelector(
-        ICommentManager.InvalidNonce.selector,
-        author,
-        app,
-        1,
-        100
-      )
-    );
-    comments.deleteCommentWithSig(
-      commentId,
-      app,
-      wrongNonce,
-      deadline,
-      authorDeleteSignature,
-      ""
-    );
-  }
-
   function test_DeleteComment_WithApprovedSigner() public {
     // First add approval
     vm.prank(author);
@@ -474,7 +396,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     // Create and post a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -490,7 +412,6 @@ contract CommentsTest is Test, IERC721Receiver {
       commentId,
       author,
       app,
-      comments.getNonce(author, app),
       block.timestamp + 1 days
     );
     bytes memory appDeleteSignature = TestUtils.signEIP712(
@@ -504,7 +425,6 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteCommentWithSig(
       commentId,
       app,
-      comments.getNonce(author, app),
       block.timestamp + 1 days,
       bytes(""), // Empty author signature
       appDeleteSignature

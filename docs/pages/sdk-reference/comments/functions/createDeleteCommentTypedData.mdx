@@ -19,7 +19,6 @@ function createDeleteCommentTypedData(params): {
      author: `0x${string}`;
      commentId: `0x${string}`;
      deadline: bigint;
-     nonce: bigint;
   };
   primaryType: "DeleteComment";
   types: {
@@ -37,10 +36,6 @@ function createDeleteCommentTypedData(params): {
         type: "address";
       }
         | {
-        name: "nonce";
-        type: "uint256";
-      }
-        | {
         name: "deadline";
         type: "uint256";
      })[];
@@ -48,7 +43,7 @@ function createDeleteCommentTypedData(params): {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:639](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L639)
+Defined in: [packages/sdk/src/comments/comment.ts:620](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L620)
 
 Create the EIP-712 typed data structure for deleting comment
 
@@ -76,7 +71,6 @@ The purpose of this is to mark comment as deleted so indexers can do their logic
      author: `0x${string}`;
      commentId: `0x${string}`;
      deadline: bigint;
-     nonce: bigint;
   };
   primaryType: "DeleteComment";
   types: {
@@ -92,10 +86,6 @@ The purpose of this is to mark comment as deleted so indexers can do their logic
         | {
         name: "app";
         type: "address";
-      }
-        | {
-        name: "nonce";
-        type: "uint256";
       }
         | {
         name: "deadline";
@@ -150,7 +140,6 @@ message: {
   author: `0x${string}`;
   commentId: `0x${string}`;
   deadline: bigint;
-  nonce: bigint;
 };
 ```
 
@@ -178,12 +167,6 @@ commentId: `0x${string}` = HexSchema;
 deadline: bigint;
 ```
 
-#### message.nonce
-
-```ts
-nonce: bigint;
-```
-
 ### primaryType
 
 ```ts
@@ -208,10 +191,6 @@ types: {
      type: "address";
    }
      | {
-     name: "nonce";
-     type: "uint256";
-   }
-     | {
      name: "deadline";
      type: "uint256";
   })[];
@@ -233,10 +212,6 @@ DeleteComment: (
   | {
   name: "app";
   type: "address";
-}
-  | {
-  name: "nonce";
-  type: "uint256";
 }
   | {
   name: "deadline";

@@ -17,7 +17,6 @@ type CommentInputData =
   deadline: bigint;
   hookData: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: string;
 }
@@ -30,13 +29,12 @@ type CommentInputData =
   deadline: bigint;
   hookData: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: "";
 };
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:141](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L141)
+Defined in: [packages/sdk/src/comments/schemas.ts:139](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L139)
 
 Comment input data schema. This is used as input of the functions.
 

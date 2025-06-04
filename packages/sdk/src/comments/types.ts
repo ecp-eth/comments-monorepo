@@ -44,8 +44,6 @@ export type CreateCommentDataParamsShared = {
   author: Hex;
   /** The address of the app signer */
   app: Hex;
-  /** The current nonce for the user per app on the chain */
-  nonce: bigint;
   /** The deadline of the comment submission in seconds since epoch */
   deadline?: bigint;
 };

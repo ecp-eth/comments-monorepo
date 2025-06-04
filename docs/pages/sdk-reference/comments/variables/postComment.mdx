@@ -142,10 +142,6 @@ const postComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      type: "address";
    }, {
      internalType: "uint256";
-     name: "nonce";
-     type: "uint256";
-   }, {
-     internalType: "uint256";
      name: "deadline";
      type: "uint256";
    }, {
@@ -282,17 +278,17 @@ const postComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         name: "author";
         type: "address";
       }, {
+        internalType: "uint96";
+        name: "createdAt";
+        type: "uint96";
+      }, {
         internalType: "address";
         name: "app";
         type: "address";
       }, {
-        internalType: "uint80";
-        name: "createdAt";
-        type: "uint80";
-      }, {
-        internalType: "uint80";
+        internalType: "uint96";
         name: "updatedAt";
-        type: "uint80";
+        type: "uint96";
       }, {
         internalType: "uint256";
         name: "channelId";
@@ -344,10 +340,6 @@ const postComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         type: "uint256";
       }, {
         internalType: "uint256";
-        name: "nonce";
-        type: "uint256";
-      }, {
-        internalType: "uint256";
         name: "deadline";
         type: "uint256";
       }, {
@@ -396,10 +388,6 @@ const postComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      internalType: "address";
      name: "app";
      type: "address";
-   }, {
-     internalType: "uint256";
-     name: "nonce";
-     type: "uint256";
    }, {
      internalType: "uint256";
      name: "deadline";
@@ -578,10 +566,6 @@ const postComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         type: "uint256";
       }, {
         internalType: "uint256";
-        name: "nonce";
-        type: "uint256";
-      }, {
-        internalType: "uint256";
         name: "deadline";
         type: "uint256";
       }, {
@@ -630,10 +614,6 @@ const postComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
       }, {
         internalType: "uint256";
         name: "channelId";
-        type: "uint256";
-      }, {
-        internalType: "uint256";
-        name: "nonce";
         type: "uint256";
       }, {
         internalType: "uint256";
@@ -807,9 +787,9 @@ const postComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      type: "bytes32";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "createdAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
      internalType: "string";
@@ -887,14 +867,14 @@ const postComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      type: "bytes32";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "createdAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "updatedAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
      internalType: "string";
@@ -1235,10 +1215,6 @@ Posts a comment as an author
      `type`: `"address"`;
    \}, \{
      `internalType`: `"uint256"`;
-     `name`: `"nonce"`;
-     `type`: `"uint256"`;
-   \}, \{
-     `internalType`: `"uint256"`;
      `name`: `"deadline"`;
      `type`: `"uint256"`;
    \}, \{
@@ -1375,17 +1351,17 @@ Posts a comment as an author
         `name`: `"author"`;
         `type`: `"address"`;
       \}, \{
+        `internalType`: `"uint96"`;
+        `name`: `"createdAt"`;
+        `type`: `"uint96"`;
+      \}, \{
         `internalType`: `"address"`;
         `name`: `"app"`;
         `type`: `"address"`;
       \}, \{
-        `internalType`: `"uint80"`;
-        `name`: `"createdAt"`;
-        `type`: `"uint80"`;
-      \}, \{
-        `internalType`: `"uint80"`;
+        `internalType`: `"uint96"`;
         `name`: `"updatedAt"`;
-        `type`: `"uint80"`;
+        `type`: `"uint96"`;
       \}, \{
         `internalType`: `"uint256"`;
         `name`: `"channelId"`;
@@ -1437,10 +1413,6 @@ Posts a comment as an author
         `type`: `"uint256"`;
       \}, \{
         `internalType`: `"uint256"`;
-        `name`: `"nonce"`;
-        `type`: `"uint256"`;
-      \}, \{
-        `internalType`: `"uint256"`;
         `name`: `"deadline"`;
         `type`: `"uint256"`;
       \}, \{
@@ -1489,10 +1461,6 @@ Posts a comment as an author
      `internalType`: `"address"`;
      `name`: `"app"`;
      `type`: `"address"`;
-   \}, \{
-     `internalType`: `"uint256"`;
-     `name`: `"nonce"`;
-     `type`: `"uint256"`;
    \}, \{
      `internalType`: `"uint256"`;
      `name`: `"deadline"`;
@@ -1671,10 +1639,6 @@ Posts a comment as an author
         `type`: `"uint256"`;
       \}, \{
         `internalType`: `"uint256"`;
-        `name`: `"nonce"`;
-        `type`: `"uint256"`;
-      \}, \{
-        `internalType`: `"uint256"`;
         `name`: `"deadline"`;
         `type`: `"uint256"`;
       \}, \{
@@ -1723,10 +1687,6 @@ Posts a comment as an author
       \}, \{
         `internalType`: `"uint256"`;
         `name`: `"channelId"`;
-        `type`: `"uint256"`;
-      \}, \{
-        `internalType`: `"uint256"`;
-        `name`: `"nonce"`;
         `type`: `"uint256"`;
       \}, \{
         `internalType`: `"uint256"`;
@@ -1900,9 +1860,9 @@ Posts a comment as an author
      `type`: `"bytes32"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"createdAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;
@@ -1980,14 +1940,14 @@ Posts a comment as an author
      `type`: `"bytes32"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"createdAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"updatedAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;

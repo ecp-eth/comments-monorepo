@@ -17,7 +17,6 @@ const CommentDataSchema: ZodObject<{
   deadline: ZodBigInt;
   hookData: ZodString;
   metadata: ZodEffects<ZodString, string, string>;
-  nonce: ZodBigInt;
   parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
   targetUri: ZodString;
   updatedAt: ZodBigInt;
@@ -31,7 +30,6 @@ const CommentDataSchema: ZodObject<{
   deadline: bigint;
   hookData: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: string;
   updatedAt: bigint;
@@ -45,7 +43,6 @@ const CommentDataSchema: ZodObject<{
   deadline: bigint;
   hookData: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: string;
   updatedAt: bigint;

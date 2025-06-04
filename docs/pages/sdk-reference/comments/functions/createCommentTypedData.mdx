@@ -23,7 +23,6 @@ function createCommentTypedData(params): {
      deadline: bigint;
      hookData: string;
      metadata: string;
-     nonce: bigint;
      parentId: `0x${string}`;
      targetUri: string;
   };
@@ -59,10 +58,6 @@ function createCommentTypedData(params): {
         type: "uint256";
       }
         | {
-        name: "nonce";
-        type: "uint256";
-      }
-        | {
         name: "deadline";
         type: "uint256";
       }
@@ -74,7 +69,7 @@ function createCommentTypedData(params): {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:543](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L543)
+Defined in: [packages/sdk/src/comments/comment.ts:531](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L531)
 
 Create the EIP-712 typed data structure for adding comment
 
@@ -103,7 +98,6 @@ Create the EIP-712 typed data structure for adding comment
      deadline: bigint;
      hookData: string;
      metadata: string;
-     nonce: bigint;
      parentId: `0x${string}`;
      targetUri: string;
   };
@@ -136,10 +130,6 @@ Create the EIP-712 typed data structure for adding comment
       }
         | {
         name: "channelId";
-        type: "uint256";
-      }
-        | {
-        name: "nonce";
         type: "uint256";
       }
         | {
@@ -203,7 +193,6 @@ message: {
   deadline: bigint;
   hookData: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: string;
 } = CreateCommentDataSchema;
@@ -255,12 +244,6 @@ hookData: string;
 
 ```ts
 metadata: string = CommentMetadataSchema;
-```
-
-#### message.nonce
-
-```ts
-nonce: bigint;
 ```
 
 #### message.parentId
@@ -315,10 +298,6 @@ types: {
      type: "uint256";
    }
      | {
-     name: "nonce";
-     type: "uint256";
-   }
-     | {
      name: "deadline";
      type: "uint256";
    }
@@ -359,10 +338,6 @@ AddComment: (
 }
   | {
   name: "channelId";
-  type: "uint256";
-}
-  | {
-  name: "nonce";
   type: "uint256";
 }
   | {

@@ -15,7 +15,6 @@ type CreateCommentDataParamsShared = {
   content: string;
   deadline?: bigint;
   metadata?: JsonObject;
-  nonce: bigint;
 };
 ```
 
@@ -107,7 +106,7 @@ The content of the comment
 optional deadline: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:50](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L50)
+Defined in: [packages/sdk/src/comments/types.ts:48](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L48)
 
 The deadline of the comment submission in seconds since epoch
 
@@ -122,15 +121,3 @@ optional metadata: JsonObject;
 Defined in: [packages/sdk/src/comments/types.ts:42](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L42)
 
 Metadata about the comment
-
-***
-
-### nonce
-
-```ts
-nonce: bigint;
-```
-
-Defined in: [packages/sdk/src/comments/types.ts:48](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L48)
-
-The current nonce for the user per app on the chain
