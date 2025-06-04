@@ -14,18 +14,22 @@ import { useImperativeHandle, useState } from "react";
 import { useAddressSuggestions } from "./hooks/useAddressSuggestions";
 import { AddressMentionExtension } from "./extensions/AddressMention";
 import {
-  type UploadedFile,
+  type UploadTrackerUploadedFile,
   type UploadTrackerAttributes,
+  type UploadTrackerFileToUpload,
   UPLOAD_TRACKER_NODE_NAME,
   UploadTracker,
 } from "./extensions/UploadTracker";
-import { useUploadFiles } from "./hooks/useUploadFiles";
 import { ALLOWED_UPLOAD_MIME_TYPES } from "@/lib/constants";
+import { HardBreak } from "@tiptap/extension-hard-break";
 
 export type EditorRef = {
   focus: () => void;
   editor: TipTapEditor | null;
-  getUploadedFiles: () => UploadedFile[];
+  getUploadedFiles: () => UploadTrackerUploadedFile[];
+  getFilesForUpload: () => UploadTrackerFileToUpload[];
+  setFileAsUploaded: (file: UploadTrackerUploadedFile) => void;
+  setFileUploadAsFailed: (fileId: string) => void;
 };
 
 type EditorProps = {
@@ -54,7 +58,6 @@ export function Editor({
 }: EditorProps) {
   const [isDragging, setIsDragging] = useState(false);
   const searchAddressSuggestions = useAddressSuggestions();
-  const { uploadFiles } = useUploadFiles();
 
   const editor = useEditor({
     content: defaultValue,
@@ -67,6 +70,7 @@ export function Editor({
       Document,
       Paragraph,
       Text,
+      HardBreak,
       Link.configure({
         HTMLAttributes: {
           class: "underline cursor-pointer",
@@ -85,7 +89,7 @@ export function Editor({
     editorProps: {
       attributes: {
         class: cn(
-          "flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
+          "flex flex-col min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
           disabled && "cursor-not-allowed opacity-50",
           className,
         ),
@@ -109,11 +113,36 @@ export function Editor({
         editor?.commands.focus();
       },
       editor,
+      setFileAsUploaded: (file) => {
+        editor?.commands.updateFile(file);
+      },
+      setFileUploadAsFailed: (fileId: string) => {
+        editor?.commands.removeUploadedFile(fileId);
+      },
       getUploadedFiles: () => {
         const node = editor?.state.doc.lastChild;
 
         if (node?.type.name === UPLOAD_TRACKER_NODE_NAME) {
-          return (node.attrs as UploadTrackerAttributes).uploads || [];
+          const files = (node.attrs as UploadTrackerAttributes).uploads || [];
+
+          return files.filter(
+            (file): file is UploadTrackerUploadedFile => "url" in file,
+          );
+        }
+
+        console.warn("Last node is not a upload tracker node");
+
+        return [];
+      },
+      getFilesForUpload: () => {
+        const node = editor?.state.doc.lastChild;
+
+        if (node?.type.name === UPLOAD_TRACKER_NODE_NAME) {
+          const files = (node.attrs as UploadTrackerAttributes).uploads || [];
+
+          return files.filter(
+            (file): file is UploadTrackerFileToUpload => "file" in file,
+          );
         }
 
         console.warn("Last node is not a upload tracker node");
@@ -168,15 +197,16 @@ export function Editor({
       return;
     }
 
-    // Upload files and track progress
-    uploadFiles(files, {
-      onSuccess: (file) => {
-        editor?.commands.addUploadedFile(file);
-      },
-      onError: (fileId) => {
-        editor?.commands.removeUploadedFile(fileId);
-      },
-    });
+    for (const file of files) {
+      const fileId = crypto.randomUUID();
+
+      editor?.commands.addFile({
+        id: fileId,
+        name: file.name,
+        file,
+        mimeType: file.type,
+      });
+    }
   };
 
   return (

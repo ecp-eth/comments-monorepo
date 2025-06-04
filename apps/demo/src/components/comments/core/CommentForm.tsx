@@ -18,6 +18,7 @@ import {
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { Editor, EditorRef } from "./CommentTextEditor/Editor";
 import type { Content } from "@tiptap/react";
+import { useUploadFiles } from "./CommentTextEditor/hooks/useUploadFiles";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -74,6 +75,7 @@ function BaseCommentForm({
   const editorRef = useRef<EditorRef>(null);
   const [content, setContent] = useState<Content>(() => defaultContent);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
+  const { uploadFiles } = useUploadFiles();
 
   const submitMutation = useMutation({
     mutationFn: async (formData: FormData): Promise<void> => {
@@ -86,6 +88,17 @@ function BaseCommentForm({
         if (!editorRef.current?.editor) {
           throw new Error("Editor is not initialized");
         }
+
+        const filesToUpload = editorRef.current?.getFilesForUpload() || [];
+
+        await uploadFiles(filesToUpload, {
+          onSuccess(uploadedFile) {
+            editorRef.current?.setFileAsUploaded(uploadedFile);
+          },
+          onError(fileId) {
+            editorRef.current?.setFileUploadAsFailed(fileId);
+          },
+        });
 
         // validate content
         const content = z
