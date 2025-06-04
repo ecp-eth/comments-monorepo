@@ -27,7 +27,7 @@
     "@sentry/profiling-node": "^9.3.0",
     "commander": "^13.1.0",
     "dataloader": "^2.2.3",
-    "drizzle-orm": "^0.39.3",
+    "drizzle-orm": "~0.41.0",
     "hono": "^4.5.0",
     "hono-rate-limiter": "^0.4.2",
     "kysely": "^0.26.3",
