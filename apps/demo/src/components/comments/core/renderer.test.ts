@@ -65,7 +65,7 @@ describe("renderToReact", () => {
     });
 
     expect(renderToStaticMarkup(result)).toBe(
-      '<p>Test <a href="https://app.ens.domains/0x225f137127d9067788314bc7fcc1f36746a3c3B5" rel="noopener noreferrer" target="_blank">luc.eth</a> <a href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">mskr</a> $USDC</p>',
+      '<p>Test <a class="font-medium underline" href="https://app.ens.domains/0x225f137127d9067788314bc7fcc1f36746a3c3B5" rel="noopener noreferrer" target="_blank">luc.eth</a> <a class="font-medium underline" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">mskr</a> $USDC</p>',
     );
   });
 
@@ -116,7 +116,31 @@ describe("renderToReact", () => {
     });
 
     expect(renderToStaticMarkup(result)).toBe(
-      '<p>👀 what is 🎶 <a href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">luc.eth</a> this <a href="https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" rel="noopener noreferrer" target="_blank" title="USD Coin">$USDC</a> 💻   <a href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">mskr</a>.</p>',
+      '<p>👀 what is 🎶 <a class="font-medium underline" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">luc.eth</a> this <a class="font-medium underline" href="https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" rel="noopener noreferrer" target="_blank" title="USD Coin">$USDC</a> 💻   <a class="font-medium underline" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">mskr</a>.</p>',
+    );
+  });
+
+  it("renders urls", () => {
+    const result = renderToReact({
+      content: "🌎 https://example.com/test 💻 @luc.eth http://localhost:3000",
+      references: [
+        {
+          type: "ens",
+          address: "0x225f137127d9067788314bc7fcc1f36746a3c3B5",
+          name: "luc.eth",
+          avatarUrl:
+            "https://ipfs.io/ipfs/bafkreifnrjhkl7ccr2ifwn2n7ap6dh2way25a6w5x2szegvj5pt4b5nvfu",
+          url: "https://app.ens.domains/luc.eth",
+          position: {
+            start: 31,
+            end: 39,
+          },
+        },
+      ],
+    });
+
+    expect(renderToStaticMarkup(result)).toBe(
+      '<p>🌎 <a class="font-medium underline" href="https://example.com/test" rel="noopener noreferrer" target="_blank">https://example.com/test</a> 💻 <a class="font-medium underline" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">luc.eth</a> <a class="font-medium underline" href="http://localhost:3000" rel="noopener noreferrer" target="_blank">http://localhost:3000</a></p>',
     );
   });
 });
