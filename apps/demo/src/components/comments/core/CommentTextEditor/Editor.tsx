@@ -26,6 +26,10 @@ import { PluginKey } from "prosemirror-state";
 
 export type EditorRef = {
   focus: () => void;
+  /**
+   * Clears the editor content
+   */
+  clear: () => void;
   editor: TipTapEditor | null;
   getUploadedFiles: () => UploadTrackerUploadedFile[];
   getFilesForUpload: () => UploadTrackerFileToUpload[];
@@ -124,6 +128,13 @@ export function Editor({
   useImperativeHandle(
     ref,
     () => ({
+      clear: () => {
+        editor?.view.dispatch(
+          editor.view.state.tr
+            .setMeta("wantsToClearEditor", true)
+            .delete(0, editor.state.doc.content.size),
+        );
+      },
       focus: () => {
         editor?.commands.focus();
       },

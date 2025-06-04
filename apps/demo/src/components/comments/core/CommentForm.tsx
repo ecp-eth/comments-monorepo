@@ -127,7 +127,7 @@ function BaseCommentForm({
     },
     onSuccess() {
       setContent("");
-      editorRef.current?.editor?.commands.clearContent();
+      editorRef.current?.clear();
       submitMutation.reset();
       onSubmitSuccessRef.current?.();
     },

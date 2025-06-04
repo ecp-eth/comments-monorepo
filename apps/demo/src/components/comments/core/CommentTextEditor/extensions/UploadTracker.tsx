@@ -204,7 +204,12 @@ export const UploadTracker = Node.create({
           return tr;
         },
         filterTransaction: (tr, state) => {
-          if (tr.getMeta("isUploadUpdate")) {
+          // be careful, if you try to clear the editor using editor.commands.clearContent() it won't work
+          // unless you set `wantsToClearEditor` meta to true
+          if (
+            tr.getMeta("isUploadUpdate") ||
+            tr.getMeta("wantsToClearEditor")
+          ) {
             return true;
           }
 
