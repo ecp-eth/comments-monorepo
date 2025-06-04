@@ -1,5 +1,7 @@
 import { NodeViewProps, type CommandProps } from "@tiptap/core";
 import { Node, NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
+import { Plugin, PluginKey } from "prosemirror-state";
+import { type Node as ProseMirrorNode } from "prosemirror-model";
 import {
   type UploadTrackerFile,
   type UploadTrackerUploadedFile,
@@ -143,7 +145,7 @@ export const UploadTracker = Node.create({
               (node.attrs as UploadTrackerAttributes).uploads || [];
             const pos = state.doc.content.size - node.nodeSize;
 
-            tr.setNodeAttribute(
+            tr.setMeta("isUploadUpdate", true).setNodeAttribute(
               pos,
               "uploads",
               currentUploads.filter((f) => f.id !== fileId),
@@ -158,31 +160,87 @@ export const UploadTracker = Node.create({
         },
     };
   },
-
-  /* addProseMirrorPlugins() {
+  addProseMirrorPlugins() {
     return [
       new Plugin({
         key: new PluginKey("uploadTracker"),
         appendTransaction: (transactions, oldState, newState) => {
-          // Ensure the upload tracker is always at the end
-          const lastNode = newState.doc.lastChild;
+          // First check if we have any uploads in the document
+          let hasUploadsInDoc = false;
 
-          if (!lastNode || lastNode.type.name !== UPLOAD_TRACKER_NODE_NAME) {
-            const tr = newState.tr;
+          newState.doc.descendants((node) => {
+            if (
+              node.type.name === UPLOAD_TRACKER_NODE_NAME &&
+              (node.attrs as UploadTrackerAttributes).uploads?.length > 0
+            ) {
+              hasUploadsInDoc = true;
+              return false;
+            }
+          });
 
-            tr.insert(
-              newState.doc.content.size,
-              newState.schema.nodes.uploadTracker.create(),
-            );
-
-            return tr;
+          // If no uploads, don't do anything
+          if (!hasUploadsInDoc) {
+            return null;
           }
 
-          return null;
+          const lastNode = newState.doc.lastChild;
+
+          // If we have uploads but nothing else, prepend a paragraph
+          if (
+            newState.doc.firstChild !== lastNode ||
+            lastNode?.type.name !== UPLOAD_TRACKER_NODE_NAME
+          ) {
+            return null;
+          }
+
+          const tr = newState.tr;
+
+          // Add an empty paragraph before the upload tracker
+          tr.insert(
+            newState.doc.content.size - 1,
+            newState.schema.nodes.paragraph.create(),
+          );
+
+          return tr;
+        },
+        filterTransaction: (tr, state) => {
+          if (tr.getMeta("isUploadUpdate")) {
+            return true;
+          }
+
+          const findUploadTrackerNode = (
+            doc: ProseMirrorNode,
+          ): ProseMirrorNode | null => {
+            let found: ProseMirrorNode | null = null;
+
+            doc.descendants((node) => {
+              if (node.type.name === UPLOAD_TRACKER_NODE_NAME) {
+                found = node;
+              }
+            });
+
+            return found;
+          };
+
+          // Only prevent transactions that would delete the node itself while having uploads
+          const uploadTrackerInDoc = findUploadTrackerNode(state.doc);
+          const uploadTrackerInTr = findUploadTrackerNode(tr.doc);
+
+          const hasTrackerWithUploadsInDoc =
+            uploadTrackerInDoc &&
+            (uploadTrackerInDoc.attrs as UploadTrackerAttributes).uploads
+              ?.length > 0;
+
+          // Only block if we're removing the node itself while it has uploads
+          if (hasTrackerWithUploadsInDoc && !uploadTrackerInTr) {
+            return false;
+          }
+
+          return true;
         },
       }),
     ];
-  },*/
+  },
 });
 
 export function UploadTrackerView({ editor, node }: NodeViewProps) {
