@@ -149,7 +149,6 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      nonce: comments.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
@@ -189,7 +188,6 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      nonce: comments.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
@@ -232,7 +230,6 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      nonce: comments.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
@@ -260,14 +257,12 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
       author: user1,
       app: user2,
       channelId: channelId,
-      nonce: comments.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
 
     // Make a few comments to collect fees
     for (uint i = 0; i < 3; i++) {
-      commentData.nonce = i;
       bytes memory appSignature = _signAppSignature(commentData);
       vm.prank(user1);
       comments.postComment{ value: TOTAL_FEE_WITH_PROTOCOL }(

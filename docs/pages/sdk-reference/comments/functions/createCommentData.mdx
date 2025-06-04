@@ -17,7 +17,6 @@ function createCommentData(__namedParameters):
   deadline: bigint;
   hookData: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: string;
 }
@@ -30,13 +29,12 @@ function createCommentData(__namedParameters):
   deadline: bigint;
   hookData: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: "";
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:568](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L568)
+Defined in: [packages/sdk/src/comments/comment.ts:556](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L556)
 
 Create the data structure of a comment
 
@@ -57,7 +55,6 @@ Create the data structure of a comment
   `deadline`: `bigint`;
   `hookData`: `string`;
   `metadata`: `string`;
-  `nonce`: `bigint`;
   `parentId`: `` `0x${string}` ``;
   `targetUri`: `string`;
 \}
@@ -70,7 +67,6 @@ Create the data structure of a comment
   `deadline`: `bigint`;
   `hookData`: `string`;
   `metadata`: `string`;
-  `nonce`: `bigint`;
   `parentId`: `` `0x${string}` ``;
   `targetUri`: `""`;
 \}

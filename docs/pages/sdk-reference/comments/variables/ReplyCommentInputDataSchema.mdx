@@ -16,7 +16,6 @@ const ReplyCommentInputDataSchema: ZodObject<Omit<{
   deadline: ZodBigInt;
   hookData: ZodDefault<ZodString>;
   metadata: ZodEffects<ZodString, string, string>;
-  nonce: ZodBigInt;
   parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
   targetUri: ZodString;
 }, "targetUri"> & {
@@ -30,7 +29,6 @@ const ReplyCommentInputDataSchema: ZodObject<Omit<{
   deadline: bigint;
   hookData: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: "";
 }, {
@@ -42,10 +40,9 @@ const ReplyCommentInputDataSchema: ZodObject<Omit<{
   deadline: bigint;
   hookData?: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: "";
 }>;
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:119](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L119)
+Defined in: [packages/sdk/src/comments/schemas.ts:117](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L117)

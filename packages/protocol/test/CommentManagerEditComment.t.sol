@@ -22,8 +22,8 @@ contract CommentsTest is Test, IERC721Receiver {
     address app,
     uint256 channelId,
     bytes32 parentId,
-    uint80 createdAt,
-    uint80 updatedAt,
+    uint96 createdAt,
+    uint96 updatedAt,
     string content,
     string metadata,
     string targetUri,
@@ -63,7 +63,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_EditComment_AsAuthor() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -97,7 +97,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     expectedCommentData.content = editData.content;
     expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint80(block.timestamp);
+    expectedCommentData.updatedAt = uint96(block.timestamp);
 
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
@@ -108,8 +108,8 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       commentData.channelId,
       commentData.parentId,
-      uint80(block.timestamp),
-      uint80(block.timestamp),
+      uint96(block.timestamp),
+      uint96(block.timestamp),
       editData.content,
       editData.metadata,
       commentData.targetUri,
@@ -122,7 +122,7 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
     assertEq(editedComment.metadata, editData.metadata);
-    assertEq(editedComment.updatedAt, uint80(block.timestamp));
+    assertEq(editedComment.updatedAt, uint96(block.timestamp));
   }
 
   function test_EditComment_AsAuthor_UpdatedWithHookData() public {
@@ -136,7 +136,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     // Create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     commentData.channelId = channelId;
     bytes32 commentId = comments.getCommentId(commentData);
 
@@ -172,7 +172,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     expectedCommentData.content = editData.content;
     expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint80(block.timestamp);
+    expectedCommentData.updatedAt = uint96(block.timestamp);
 
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
@@ -183,8 +183,8 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       commentData.channelId,
       commentData.parentId,
-      uint80(block.timestamp),
-      uint80(block.timestamp),
+      uint96(block.timestamp),
+      uint96(block.timestamp),
       editData.content,
       editData.metadata,
       commentData.targetUri,
@@ -199,7 +199,7 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
     assertEq(editedComment.metadata, editData.metadata);
-    assertEq(editedComment.updatedAt, uint80(block.timestamp));
+    assertEq(editedComment.updatedAt, uint96(block.timestamp));
     assertEq(editedComment.hookData, "hook data edited");
   }
 
@@ -214,7 +214,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     // Create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     commentData.channelId = channelId;
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
@@ -252,7 +252,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_EditComment_AsAuthor_InvalidAuthor() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -303,7 +303,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_EditComment() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -342,7 +342,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     expectedCommentData.content = editData.content;
     expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint80(block.timestamp);
+    expectedCommentData.updatedAt = uint96(block.timestamp);
 
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
@@ -352,8 +352,8 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       commentData.channelId,
       commentData.parentId,
-      uint80(block.timestamp),
-      uint80(block.timestamp),
+      uint96(block.timestamp),
+      uint96(block.timestamp),
       editData.content,
       editData.metadata,
       commentData.targetUri,
@@ -371,13 +371,13 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
     assertEq(editedComment.metadata, editData.metadata);
-    assertEq(editedComment.updatedAt, uint80(block.timestamp));
+    assertEq(editedComment.updatedAt, uint96(block.timestamp));
   }
 
   function test_EditComment_InvalidAppSignature() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -422,7 +422,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_EditComment_InvalidNonce() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -482,7 +482,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     // Create and post a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -516,7 +516,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     expectedCommentData.content = editData.content;
     expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint80(block.timestamp);
+    expectedCommentData.updatedAt = uint96(block.timestamp);
 
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
@@ -526,8 +526,8 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       commentData.channelId,
       commentData.parentId,
-      uint80(block.timestamp),
-      uint80(block.timestamp),
+      uint96(block.timestamp),
+      uint96(block.timestamp),
       editData.content,
       editData.metadata,
       commentData.targetUri,
@@ -545,13 +545,13 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
     assertEq(editedComment.metadata, editData.metadata);
-    assertEq(editedComment.updatedAt, uint80(block.timestamp));
+    assertEq(editedComment.updatedAt, uint96(block.timestamp));
   }
 
   function test_EditComment_ExpiredDeadline() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -636,7 +636,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_EditComment_InvalidAuthor() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(comments, author, app);
+      .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,

@@ -14,7 +14,6 @@ type DeleteCommentWithSigParams = {
   commentId: Hex;
   commentsAddress?: Hex;
   deadline: bigint;
-  nonce: bigint;
   writeContract: ContractWriteFunctions["deleteCommentWithSig"];
 };
 ```
@@ -41,7 +40,7 @@ The app signer
 appSignature: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:347](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L347)
+Defined in: [packages/sdk/src/comments/comment.ts:343](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L343)
 
 The app signature
 
@@ -53,7 +52,7 @@ The app signature
 optional authorSignature: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:351](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L351)
+Defined in: [packages/sdk/src/comments/comment.ts:347](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L347)
 
 The author signature. Necessary if the author hasn't approved the signer to delete comments on their behalf.
 
@@ -77,7 +76,7 @@ The ID of the comment to delete
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:343](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L343)
+Defined in: [packages/sdk/src/comments/comment.ts:339](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L339)
 
 The address of the comments contract
 
@@ -95,21 +94,9 @@ COMMENT_MANAGER_ADDRESS
 deadline: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:338](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L338)
-
-The deadline for the signature
-
-***
-
-### nonce
-
-```ts
-nonce: bigint;
-```
-
 Defined in: [packages/sdk/src/comments/comment.ts:334](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L334)
 
-The nonce for the signature
+The deadline for the signature
 
 ***
 
@@ -119,6 +106,6 @@ The nonce for the signature
 writeContract: ContractWriteFunctions["deleteCommentWithSig"];
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:355](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L355)
+Defined in: [packages/sdk/src/comments/comment.ts:351](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L351)
 
 The write contract function

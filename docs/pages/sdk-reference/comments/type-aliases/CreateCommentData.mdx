@@ -16,13 +16,12 @@ type CreateCommentData = {
   deadline: bigint;
   hookData: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: string;
 };
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:86](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L86)
+Defined in: [packages/sdk/src/comments/schemas.ts:85](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L85)
 
 ## Type declaration
 
@@ -72,12 +71,6 @@ hookData: string;
 
 ```ts
 metadata: string = CommentMetadataSchema;
-```
-
-### nonce
-
-```ts
-nonce: bigint;
 ```
 
 ### parentId

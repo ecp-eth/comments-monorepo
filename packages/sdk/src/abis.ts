@@ -178,11 +178,6 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
-        name: "nonce",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
         name: "deadline",
         type: "uint256",
         internalType: "uint256",
@@ -362,19 +357,19 @@ export const CommentManagerABI = [
             internalType: "address",
           },
           {
+            name: "createdAt",
+            type: "uint96",
+            internalType: "uint96",
+          },
+          {
             name: "app",
             type: "address",
             internalType: "address",
           },
           {
-            name: "createdAt",
-            type: "uint80",
-            internalType: "uint80",
-          },
-          {
             name: "updatedAt",
-            type: "uint80",
-            internalType: "uint80",
+            type: "uint96",
+            internalType: "uint96",
           },
           {
             name: "channelId",
@@ -441,11 +436,6 @@ export const CommentManagerABI = [
             internalType: "uint256",
           },
           {
-            name: "nonce",
-            type: "uint256",
-            internalType: "uint256",
-          },
-          {
             name: "deadline",
             type: "uint256",
             internalType: "uint256",
@@ -505,11 +495,6 @@ export const CommentManagerABI = [
         name: "app",
         type: "address",
         internalType: "address",
-      },
-      {
-        name: "nonce",
-        type: "uint256",
-        internalType: "uint256",
       },
       {
         name: "deadline",
@@ -747,11 +732,6 @@ export const CommentManagerABI = [
             internalType: "uint256",
           },
           {
-            name: "nonce",
-            type: "uint256",
-            internalType: "uint256",
-          },
-          {
             name: "deadline",
             type: "uint256",
             internalType: "uint256",
@@ -813,11 +793,6 @@ export const CommentManagerABI = [
           },
           {
             name: "channelId",
-            type: "uint256",
-            internalType: "uint256",
-          },
-          {
-            name: "nonce",
             type: "uint256",
             internalType: "uint256",
           },
@@ -1033,9 +1008,9 @@ export const CommentManagerABI = [
       },
       {
         name: "createdAt",
-        type: "uint80",
+        type: "uint96",
         indexed: false,
-        internalType: "uint80",
+        internalType: "uint96",
       },
       {
         name: "content",
@@ -1131,15 +1106,15 @@ export const CommentManagerABI = [
       },
       {
         name: "createdAt",
-        type: "uint80",
+        type: "uint96",
         indexed: false,
-        internalType: "uint80",
+        internalType: "uint96",
       },
       {
         name: "updatedAt",
-        type: "uint80",
+        type: "uint96",
         indexed: false,
-        internalType: "uint80",
+        internalType: "uint96",
       },
       {
         name: "content",

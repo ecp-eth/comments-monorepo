@@ -23,7 +23,6 @@ type AddCommentTypedDataSchemaType = {
      deadline: bigint;
      hookData: string;
      metadata: string;
-     nonce: bigint;
      parentId: `0x${string}`;
      targetUri: string;
   };
@@ -59,10 +58,6 @@ type AddCommentTypedDataSchemaType = {
         type: "uint256";
       }
         | {
-        name: "nonce";
-        type: "uint256";
-      }
-        | {
         name: "deadline";
         type: "uint256";
       }
@@ -74,7 +69,7 @@ type AddCommentTypedDataSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:187](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L187)
+Defined in: [packages/sdk/src/comments/schemas.ts:184](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L184)
 
 ## Type declaration
 
@@ -125,7 +120,6 @@ message: {
   deadline: bigint;
   hookData: string;
   metadata: string;
-  nonce: bigint;
   parentId: `0x${string}`;
   targetUri: string;
 } = CreateCommentDataSchema;
@@ -177,12 +171,6 @@ hookData: string;
 
 ```ts
 metadata: string = CommentMetadataSchema;
-```
-
-#### message.nonce
-
-```ts
-nonce: bigint;
 ```
 
 #### message.parentId
@@ -237,10 +225,6 @@ types: {
      type: "uint256";
    }
      | {
-     name: "nonce";
-     type: "uint256";
-   }
-     | {
      name: "deadline";
      type: "uint256";
    }
@@ -281,10 +265,6 @@ AddComment: (
 }
   | {
   name: "channelId";
-  type: "uint256";
-}
-  | {
-  name: "nonce";
   type: "uint256";
 }
   | {

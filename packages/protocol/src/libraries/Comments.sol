@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
 /// @title Comments - Library defining comment-related types
@@ -10,7 +10,6 @@ library Comments {
   /// @param createdAt The timestamp when the comment was created
   /// @param updatedAt The timestamp when the comment was last updated
   /// @param channelId The channel ID associated with the comment
-  /// @param nonce The nonce for the comment
   /// @param deadline Timestamp after which the signatures for this comment become invalid
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param content The text content of the comment - may contain urls, images and mentions
@@ -20,10 +19,10 @@ library Comments {
   /// @param hookData Additional data for the comment, added by a hook.
   struct Comment {
     // Pack these two addresses together (saves 1 storage slot)
-    address author; // 20 bytes
-    address app; // 20 bytes
-    uint80 createdAt;
-    uint80 updatedAt;
+    address author; // 20 bytes   --┬-- 32 bytes
+    uint96 createdAt; // 12 bytes --┘
+    address app; // 20 bytes      --┬-- 32 bytes
+    uint96 updatedAt; // 12 bytes --┘
     // 32-byte types
     uint256 channelId;
     bytes32 parentId;
@@ -39,7 +38,6 @@ library Comments {
   /// @param author The address of the comment author
   /// @param app The address of the application signer that authorized this comment
   /// @param channelId The channel ID associated with the comment
-  /// @param nonce The nonce for the comment
   /// @param deadline Timestamp after which the signatures for this comment become invalid
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param content The actual text content of the comment
@@ -50,7 +48,6 @@ library Comments {
     address author;
     address app;
     uint256 channelId;
-    uint256 nonce;
     uint256 deadline;
     bytes32 parentId;
     // Dynamic types last (conventional pattern)

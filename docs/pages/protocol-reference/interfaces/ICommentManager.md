@@ -14,7 +14,7 @@ This interface defines the functions and events for the Comments contract
 
 ## Events
 
-### `CommentAdded(bytes32 commentId, address author, address app, uint256 channelId, bytes32 parentId, uint80 createdAt, string content, string metadata, string targetUri, string commentType, string hookData)`
+### `CommentAdded(bytes32 commentId, address author, address app, uint256 channelId, bytes32 parentId, uint96 createdAt, string content, string metadata, string targetUri, string commentType, string hookData)`
 
 Emitted when a new comment is added
 
@@ -28,7 +28,7 @@ Emitted when a comment is deleted
 
 
 
-### `CommentEdited(bytes32 commentId, address editedByApp, address author, address app, uint256 channelId, bytes32 parentId, uint80 createdAt, uint80 updatedAt, string content, string metadata, string targetUri, string commentType, string hookData)`
+### `CommentEdited(bytes32 commentId, address editedByApp, address author, address app, uint256 channelId, bytes32 parentId, uint96 createdAt, uint96 updatedAt, string content, string metadata, string targetUri, string commentType, string hookData)`
 
 Emitted when a comment is edited
 
@@ -80,7 +80,7 @@ Deletes a comment when called by the author directly
 
 
 
-### `deleteCommentWithSig(bytes32 commentId, address app, uint256 nonce, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
+### `deleteCommentWithSig(bytes32 commentId, address app, uint256 deadline, bytes authorSignature, bytes appSignature)` (external)
 
 Deletes a comment with author signature verification
 
@@ -143,7 +143,7 @@ Calculates the EIP-712 hash for removing an approval
 
 
 
-### `getDeleteCommentHash(bytes32 commentId, address author, address app, uint256 nonce, uint256 deadline) → bytes32` (external)
+### `getDeleteCommentHash(bytes32 commentId, address author, address app, uint256 deadline) → bytes32` (external)
 
 Calculates the EIP-712 hash for deleting a comment
 

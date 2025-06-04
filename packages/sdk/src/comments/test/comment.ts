@@ -74,19 +74,11 @@ describe("comment", () => {
 
   describe("postComment()", () => {
     it("posts a comment as author", async () => {
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
         targetUri: "https://example.com",
-        nonce,
       });
 
       const typedData = createCommentTypedData({
@@ -127,19 +119,11 @@ describe("comment", () => {
         hash: approvalResult.txHash,
       });
 
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
         targetUri: "https://example.com",
-        nonce,
       });
 
       const typedData = createCommentTypedData({
@@ -183,20 +167,11 @@ describe("comment", () => {
         commentsAddress: commentsAddress,
       });
 
-      // Get a fresh nonce since we're not using the beforeEach setup
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
         targetUri: "https://example.com",
-        nonce,
       });
 
       const typedData = createCommentTypedData({
@@ -224,13 +199,6 @@ describe("comment", () => {
     });
 
     it("fails with invalid app signature", async () => {
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       await assert.rejects(
         () =>
           postCommentWithSig({
@@ -239,7 +207,6 @@ describe("comment", () => {
               author: account.address,
               content: "Test comment content",
               metadata: { test: true },
-              nonce,
               targetUri: "https://example.com",
             }),
             appSignature,
@@ -258,19 +225,11 @@ describe("comment", () => {
     let commentId: Hex;
 
     beforeEach(async () => {
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
         targetUri: "https://example.com",
-        nonce,
       });
 
       const typedData = createCommentTypedData({
@@ -316,20 +275,13 @@ describe("comment", () => {
 
   describe("getCommentId()", () => {
     it("returns comment ID", async () => {
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const commentId = await getCommentId({
         commentData: {
           app: appAccount.address,
           author: account.address,
           content: "Test comment content",
           metadata: { test: true },
-          nonce,
+
           targetUri: "https://example.com",
         },
         readContract: client.readContract,
@@ -345,19 +297,11 @@ describe("comment", () => {
     let commentId: Hex;
 
     beforeEach(async () => {
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
         metadata: { test: true },
-        nonce,
         targetUri: "https://example.com",
       });
 
@@ -419,19 +363,11 @@ describe("comment", () => {
         hash: approvalResult.txHash,
       });
 
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
         targetUri: "https://example.com",
-        nonce,
       });
 
       const appSignature = await appClient.signTypedData(
@@ -464,19 +400,11 @@ describe("comment", () => {
     });
 
     it("deletes a comment with signatures", async () => {
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const typedData = createDeleteCommentTypedData({
         commentId,
         chainId: anvil.id,
         author: account.address,
         app: appAccount.address,
-        nonce,
         commentsAddress: commentsAddress,
       });
 
@@ -485,7 +413,6 @@ describe("comment", () => {
       const result = await deleteCommentWithSig({
         commentId,
         app: appAccount.address,
-        nonce,
         deadline: typedData.message.deadline,
         appSignature,
         writeContract: appClient.writeContract,
@@ -500,19 +427,11 @@ describe("comment", () => {
     });
 
     it("fails with invalid signatures", async () => {
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const typedData = createDeleteCommentTypedData({
         commentId,
         chainId: anvil.id,
         author: account.address,
         app: appAccount.address,
-        nonce,
         commentsAddress: commentsAddress,
       });
 
@@ -521,7 +440,6 @@ describe("comment", () => {
           deleteCommentWithSig({
             commentId,
             app: appAccount.address,
-            nonce,
             deadline: typedData.message.deadline,
             appSignature: "0x1234", // Invalid signature
             writeContract: thirdPartyClient.writeContract,
@@ -542,7 +460,6 @@ describe("comment", () => {
           "0x1234567890123456789012345678901234567890123456789012345678901234",
         author: account.address,
         app: appAccount.address,
-        nonce: 0n,
         deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
         readContract: client.readContract,
         commentsAddress: commentsAddress,
@@ -570,19 +487,11 @@ describe("comment", () => {
     let commentId: Hex;
 
     beforeEach(async () => {
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
         metadata: { test: true },
-        nonce,
         targetUri: "https://example.com",
       });
 
@@ -677,19 +586,11 @@ describe("comment", () => {
         hash: approvalResult.txHash,
       });
 
-      const nonce = await getNonce({
-        author: account.address,
-        app: appAccount.address,
-        readContract: client.readContract,
-        commentsAddress: commentsAddress,
-      });
-
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
         targetUri: "https://example.com",
-        nonce,
       });
 
       const appSignature = await appClient.signTypedData(
