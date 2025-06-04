@@ -21,6 +21,7 @@ import { ensByNameResolver } from "../resolvers/ens-by-name-resolver";
 import { erc20ByAddressResolver } from "../resolvers/erc20-by-address-resolver";
 import { erc20ByTickerResolver } from "../resolvers/erc20-by-ticker-resolver";
 import { farcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
+import { urlResolver } from "../resolvers/url-resolver";
 
 const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
 
@@ -93,6 +94,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         erc20ByAddressResolver,
         erc20ByTickerResolver,
         farcasterByAddressResolver,
+        urlResolver,
       },
     );
 
@@ -222,6 +224,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         erc20ByAddressResolver,
         erc20ByTickerResolver,
         farcasterByAddressResolver,
+        urlResolver,
       },
     );
 

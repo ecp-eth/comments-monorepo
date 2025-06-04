@@ -119,6 +119,7 @@ export async function resolveCommentReferences(
 
     if (match) {
       const position = { start: pos, end: pos + match[0].length };
+
       promises.push(resolveURL(match[0], position, options));
       pos += [...match[0]].length;
 
