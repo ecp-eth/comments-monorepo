@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { resolveCommentReferences } from "../src/lib/resolve-comment-references";
+import { resolveCommentReferences } from "../../src/lib/resolve-comment-references";
 import DataLoader from "dataloader";
-import type { ENSByNameResolver } from "../src/resolvers/ens-by-name-resolver";
-import { ENSByAddressResolver } from "../src/resolvers/ens-by-address-resolver";
-import { ERC20ByTickerResolver } from "../src/resolvers/erc20-by-ticker-resolver";
-import { FarcasterByAddressResolver } from "../src/resolvers/farcaster-by-address-resolver";
-import { ERC20ByAddressResolver } from "../src/resolvers/erc20-by-address-resolver";
+import type { ENSByNameResolver } from "../../src/resolvers/ens-by-name-resolver";
+import type { ENSByAddressResolver } from "../../src/resolvers/ens-by-address-resolver";
+import type { ERC20ByTickerResolver } from "../../src/resolvers/erc20-by-ticker-resolver";
+import type { FarcasterByAddressResolver } from "../../src/resolvers/farcaster-by-address-resolver";
+import type { ERC20ByAddressResolver } from "../../src/resolvers/erc20-by-address-resolver";
+import type { URLResolver } from "../../src/resolvers/url-resolver";
 
 const ensByNameResolver: ENSByNameResolver = new DataLoader(async (keys) =>
   keys.map(() => null),
@@ -22,12 +23,18 @@ const erc20ByTickerResolver: ERC20ByTickerResolver = new DataLoader(
 const erc20ByAddressResolver: ERC20ByAddressResolver = new DataLoader(
   async (keys) => keys.map(() => null),
 ) as unknown as ERC20ByAddressResolver;
+const urlResolver: URLResolver = new DataLoader(async (keys) =>
+  keys.map(() => null),
+) as unknown as URLResolver;
+
+const fetchMock = vi.spyOn(global, "fetch");
 
 const resolveEnsByName = vi.spyOn(ensByNameResolver, "load");
 const resolveEnsByAddress = vi.spyOn(ensByAddressResolver, "load");
 const resolveFarcasterByAddress = vi.spyOn(farcasterByAddressResolver, "load");
 const resolveERC20ByTicker = vi.spyOn(erc20ByTickerResolver, "load");
 const resolveERC20ByAddress = vi.spyOn(erc20ByAddressResolver, "load");
+const resolveUrl = vi.spyOn(urlResolver, "load");
 
 const options = {
   ensByAddressResolver,
@@ -35,6 +42,7 @@ const options = {
   farcasterByAddressResolver,
   erc20ByTickerResolver,
   erc20ByAddressResolver,
+  urlResolver,
 };
 
 describe("resolveCommentReferences", () => {
@@ -44,6 +52,8 @@ describe("resolveCommentReferences", () => {
     resolveFarcasterByAddress.mockReset();
     resolveERC20ByTicker.mockReset();
     resolveERC20ByAddress.mockReset();
+    resolveUrl.mockReset();
+    fetchMock.mockReset();
   });
 
   describe("ens name", () => {
@@ -308,6 +318,42 @@ describe("resolveCommentReferences", () => {
     });
   });
 
+  describe("url", () => {
+    it("resolves a url", async () => {
+      const resolvedValue = {
+        type: "webpage" as const,
+        url: "https://example.com/",
+        title: "Hello",
+        description: null,
+        opengraph: null,
+        favicon: null,
+      };
+
+      resolveUrl.mockResolvedValue(resolvedValue);
+
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content: "👀 https://example.com/?test=true#neheheh 💻",
+        },
+        options,
+      );
+
+      expect(resolveUrl).toHaveBeenCalledTimes(1);
+
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          ...resolvedValue,
+          position: {
+            start: 3,
+            end: 41,
+          },
+        },
+      ]);
+    });
+  });
+
   it("correctly resolves unicode string", async () => {
     const content =
       "👀 what is 🎶 luc.eth this $USDC 💻   @0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d.";
@@ -389,5 +435,98 @@ describe("resolveCommentReferences", () => {
         },
       },
     ]);
+  });
+
+  describe("status", () => {
+    it("resolves to success if all resolutions are successful", async () => {
+      resolveUrl.mockResolvedValueOnce({
+        type: "webpage",
+        url: "https://example.com/",
+        title: "Hello",
+        description: null,
+        opengraph: null,
+        favicon: null,
+      });
+      resolveEnsByName.mockResolvedValueOnce({
+        address: "0x225f137127d9067788314bc7fcc1f36746a3c3B5",
+        name: "luc.eth",
+        avatarUrl:
+          "https://ipfs.io/ipfs/bafkreifnrjhkl7ccr2ifwn2n7ap6dh2way25a6w5x2szegvj5pt4b5nvfu",
+        url: "https://app.ens.domains/luc.eth",
+      });
+      resolveERC20ByTicker.mockResolvedValueOnce({
+        address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        name: "USD Coin",
+        symbol: "USDC",
+        logoURI:
+          "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
+        caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        decimals: 6,
+      });
+
+      const result = await resolveCommentReferences(
+        {
+          content:
+            "👀 https://example.com/?test=true#neheheh 💻 @luc.eth $USDC",
+          chainId: 1,
+        },
+        options,
+      );
+
+      expect(result.status).toBe("success");
+    });
+
+    it("resolves to partial if some resolutions are successful", async () => {
+      resolveUrl.mockResolvedValueOnce({
+        type: "webpage",
+        url: "https://example.com/",
+        title: "Hello",
+        description: null,
+        opengraph: null,
+        favicon: null,
+      });
+      resolveEnsByName.mockRejectedValueOnce(new Error("Failed to resolve"));
+      resolveERC20ByTicker.mockResolvedValueOnce({
+        address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        name: "USD Coin",
+        symbol: "USDC",
+        logoURI:
+          "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
+        caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        decimals: 6,
+      });
+
+      const result = await resolveCommentReferences(
+        {
+          content:
+            "👀 https://example.com/?test=true#neheheh 💻 @luc.eth $USDC",
+          chainId: 1,
+        },
+        options,
+      );
+
+      expect(result.status).toBe("partial");
+    });
+
+    it("resolves to failed if all resolutions are failed", async () => {
+      resolveUrl.mockRejectedValueOnce(new Error("Failed to resolve"));
+      resolveEnsByName.mockRejectedValueOnce(new Error("Failed to resolve"));
+      resolveERC20ByTicker.mockRejectedValueOnce(
+        new Error("Failed to resolve"),
+      );
+
+      const result = await resolveCommentReferences(
+        {
+          content:
+            "👀 https://example.com/?test=true#neheheh 💻 @luc.eth $USDC",
+          chainId: 1,
+        },
+        options,
+      );
+
+      expect(result.status).toBe("failed");
+    });
   });
 });

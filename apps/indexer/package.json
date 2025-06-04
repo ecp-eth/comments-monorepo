@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "@0x/0x-parser": "^2.10.1",
-    "@ecp.eth/shared": "workspace:*",
     "@ecp.eth/sdk": "workspace:*",
+    "@ecp.eth/shared": "workspace:*",
     "@hono/node-server": "^1.13.8",
     "@hono/zod-openapi": "^0.18.4",
     "@neynar/nodejs-sdk": "^2.13.1",
@@ -35,6 +35,7 @@
     "hono-rate-limiter": "^0.4.2",
     "kysely": "^0.26.3",
     "lru-cache": "^11.0.2",
+    "node-html-parser": "^7.0.1",
     "normalize-url": "^8.0.1",
     "pg": "^8.11.3",
     "ponder": "^0.10.6",
@@ -48,6 +49,7 @@
     "@types/pg": "^8.11.11",
     "eslint": "^9.19.0",
     "globals": "^15.14.0",
+    "nock": "^14.0.5",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.1.4"
   }

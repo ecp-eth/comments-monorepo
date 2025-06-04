@@ -124,10 +124,68 @@ export type IndexerAPICommentReferenceERC20SchemaType = z.infer<
   typeof IndexerAPICommentReferenceERC20Schema
 >;
 
+export const IndexerAPICommentReferenceURLWebPageSchema = z.object({
+  type: z.literal("webpage"),
+  url: z.string().url(),
+  position: IndexerAPICommentReferencePositionSchema,
+  title: z.string(),
+  description: z.string().nullable(),
+  favicon: z.string().url().nullable(),
+  opengraph: z
+    .object({
+      title: z.string(),
+      description: z.string().nullable(),
+      image: z.string().url(),
+      url: z.string().url(),
+    })
+    .nullable(),
+});
+
+export type IndexerAPICommentReferenceURLWebPageSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceURLWebPageSchema
+>;
+
+export const IndexerAPICommentReferenceURLFileSchema = z.object({
+  type: z.literal("file"),
+  url: z.string().url(),
+  position: IndexerAPICommentReferencePositionSchema,
+  mediaType: z.string(),
+});
+
+export type IndexerAPICommentReferenceURLFileSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceURLFileSchema
+>;
+
+export const IndexerAPICommentReferenceURLImageSchema = z.object({
+  type: z.literal("image"),
+  url: z.string().url(),
+  position: IndexerAPICommentReferencePositionSchema,
+  mediaType: z.string(),
+});
+
+export type IndexerAPICommentReferenceURLImageSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceURLImageSchema
+>;
+
+export const IndexerAPICommentReferenceURLVideoSchema = z.object({
+  type: z.literal("video"),
+  url: z.string().url(),
+  position: IndexerAPICommentReferencePositionSchema,
+  mediaType: z.string(),
+});
+
+export type IndexerAPICommentReferenceURLVideoSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceURLVideoSchema
+>;
+
 export const IndexerAPICommentReferenceSchema = z.union([
   IndexerAPICommentReferenceENSSchema,
   IndexerAPICommentReferenceERC20Schema,
   IndexerAPICommentReferenceFarcasterSchema,
+  IndexerAPICommentReferenceURLWebPageSchema,
+  IndexerAPICommentReferenceURLFileSchema,
+  IndexerAPICommentReferenceURLImageSchema,
+  IndexerAPICommentReferenceURLVideoSchema,
 ]);
 
 export type IndexerAPICommentReferenceSchemaType = z.infer<

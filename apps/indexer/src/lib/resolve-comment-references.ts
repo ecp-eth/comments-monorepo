@@ -4,6 +4,10 @@ import type {
   IndexerAPICommentReferenceERC20SchemaType,
   IndexerAPICommentReferenceFarcasterSchemaType,
   IndexerAPICommentReferenceSchemaType,
+  IndexerAPICommentReferenceURLFileSchemaType,
+  IndexerAPICommentReferenceURLImageSchemaType,
+  IndexerAPICommentReferenceURLVideoSchemaType,
+  IndexerAPICommentReferenceURLWebPageSchemaType,
 } from "@ecp.eth/sdk/indexer";
 import type { CommentSelectType } from "ponder:schema";
 import type { Hex } from "viem";
@@ -12,6 +16,7 @@ import type { ENSByNameResolver } from "../resolvers/ens-by-name-resolver";
 import type { FarcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
 import type { ERC20ByTickerResolver } from "../resolvers/erc20-by-ticker-resolver";
 import type { ERC20ByAddressResolver } from "../resolvers/erc20-by-address-resolver";
+import type { URLResolver } from "../resolvers/url-resolver";
 
 type Options = {
   ensByAddressResolver: ENSByAddressResolver;
@@ -19,6 +24,7 @@ type Options = {
   farcasterByAddressResolver: FarcasterByAddressResolver;
   erc20ByTickerResolver: ERC20ByTickerResolver;
   erc20ByAddressResolver: ERC20ByAddressResolver;
+  urlResolver: URLResolver;
 };
 
 /**
@@ -109,6 +115,16 @@ export async function resolveCommentReferences(
       continue;
     }
 
+    match = restOfContent.match(URL_REGEX);
+
+    if (match) {
+      const position = { start: pos, end: pos + match[0].length };
+      promises.push(resolveURL(match[0], position, options));
+      pos += [...match[0]].length;
+
+      continue;
+    }
+
     const codePoint = content.codePointAt(pos);
     pos += codePoint != null && codePoint > 0xffff ? 2 : 1;
   }
@@ -154,6 +170,7 @@ const ETH_ADDRESS_REGEX = /^@?0x[a-fA-F0-9]{40}/u;
 const ERC20_TOKEN_ETH_ADDRESS_REGEX = /^\$0x[a-fA-F0-9]{40}/u;
 const ENS_NAME_REGEX = /^@?[a-zA-Z0-9.-]+\.eth/u;
 const ERC20_TOKEN_TICKER_REGEX = /^\$[a-zA-Z0-9.-]+/u;
+const URL_REGEX = /^https?:\/\/[^\s<>[\]{}|\\^]+/u;
 
 async function resolveEthAddress(
   address: Hex,
@@ -255,6 +272,29 @@ async function resolveERC20TokenTicker(
       logoURI: result.logoURI,
       url: result.url,
       caip19: result.caip19,
+    };
+  }
+
+  return null;
+}
+
+async function resolveURL(
+  url: string,
+  position: ResolverPosition,
+  { urlResolver }: Options,
+): Promise<
+  | IndexerAPICommentReferenceURLFileSchemaType
+  | IndexerAPICommentReferenceURLImageSchemaType
+  | IndexerAPICommentReferenceURLVideoSchemaType
+  | IndexerAPICommentReferenceURLWebPageSchemaType
+  | null
+> {
+  const result = await urlResolver.load(url);
+
+  if (result) {
+    return {
+      ...result,
+      position,
     };
   }
 
