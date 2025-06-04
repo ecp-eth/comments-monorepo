@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type UploadTrackerFile } from "../types";
-import { FileIcon } from "lucide-react";
+import { FileIcon, XIcon } from "lucide-react";
 
 export type MediaDimensions = {
   width: number;
@@ -10,24 +10,31 @@ export type MediaDimensions = {
 
 type UploadTrackerFileProps = {
   file: UploadTrackerFile;
+  onDeleteClick: () => void;
 };
 
-export function UploadTrackerFile({ file }: UploadTrackerFileProps) {
+export function UploadTrackerFile({
+  file,
+  onDeleteClick,
+}: UploadTrackerFileProps) {
   const isImage = file.mimeType.startsWith("image/");
   const isVideo = file.mimeType.startsWith("video/");
 
-  if (isImage) {
+  if (isVideo || isImage) {
     return (
-      <div className="w-[100px] h-[100px] p-2 border rounded-md bg-muted/30">
-        <Image file={file} />
-      </div>
-    );
-  }
+      <div className="w-[100px] h-[100px] p-2 border rounded-md bg-muted/30 relative">
+        <button
+          className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-muted shadow-sm border rounded-full p-1"
+          type="button"
+          onClick={onDeleteClick}
+          aria-label="Remove file"
+          title="Remove file"
+        >
+          <XIcon className="text-muted-foreground" size={12} />
+        </button>
 
-  if (isVideo) {
-    return (
-      <div className="w-[100px] h-[100px] p-2 border rounded-md bg-muted/30">
-        <Video file={file} />
+        {isVideo ? <Video file={file} /> : null}
+        {isImage ? <Image file={file} /> : null}
       </div>
     );
   }

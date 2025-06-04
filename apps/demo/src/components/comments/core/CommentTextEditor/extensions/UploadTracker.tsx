@@ -1,6 +1,5 @@
-import { type CommandProps } from "@tiptap/core";
+import { NodeViewProps, type CommandProps } from "@tiptap/core";
 import { Node, NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
-import { type Node as ProseMirrorNode } from "prosemirror-model";
 import {
   type UploadTrackerFile,
   type UploadTrackerUploadedFile,
@@ -186,11 +185,7 @@ export const UploadTracker = Node.create({
   },*/
 });
 
-type UploadTrackerViewProps = {
-  node: ProseMirrorNode;
-};
-
-export function UploadTrackerView({ node }: UploadTrackerViewProps) {
+export function UploadTrackerView({ editor, node }: NodeViewProps) {
   const attrs = node.attrs as UploadTrackerAttributes;
   const uploads = attrs.uploads || [];
 
@@ -202,7 +197,13 @@ export function UploadTrackerView({ node }: UploadTrackerViewProps) {
     <NodeViewWrapper>
       <div className="mt-2 flex flex-wrap gap-2 p-2">
         {uploads.map((file: UploadTrackerFile) => (
-          <UploadTrackerFileComponent key={file.id} file={file} />
+          <UploadTrackerFileComponent
+            key={file.id}
+            file={file}
+            onDeleteClick={() => {
+              editor.commands.removeUploadedFile(file.id);
+            }}
+          />
         ))}
       </div>
     </NodeViewWrapper>
