@@ -63,6 +63,29 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.getComment(commentId);
   }
 
+  function test_DeleteComment_AsNonAuthor() public {
+    // Create and post a comment first
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    vm.prank(author);
+    comments.postComment(commentData, appSignature);
+
+    // Delete the comment as non-author
+    vm.prank(address(0xdead));
+    vm.expectRevert("Not comment author");
+    comments.deleteComment(commentId);
+
+    // Verify comment is notdeleted
+    assertTrue(comments.getComment(commentId).author != address(0));
+  }
+
   function test_DeleteCommentWithSig_ValidAuthorSig() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
@@ -287,19 +310,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.prank(author);
     comments.addApproval(app);
 
-    // Delete the comment with signature
-    bytes32 deleteHash = comments.getDeleteCommentHash(
-      commentId,
-      author,
-      app,
-      block.timestamp + 1 days
-    );
-    bytes memory appDeleteSignature = TestUtils.signEIP712(
-      vm,
-      appPrivateKey,
-      deleteHash
-    );
-
+    // Delete the comment without signature if the sender is the app itself
     vm.prank(app);
     vm.expectEmit(true, true, true, true);
     emit CommentDeleted(commentId, author);
@@ -308,7 +319,7 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       block.timestamp + 1 days,
       "",
-      appDeleteSignature
+      ""
     );
   }
 
