@@ -352,6 +352,43 @@ describe("resolveCommentReferences", () => {
         },
       ]);
     });
+
+    it("resolves a url with port", async () => {
+      const resolvedValue = {
+        type: "webpage" as const,
+        url: "http://example.com:8080/",
+        title: "Hello",
+        description: null,
+        opengraph: null,
+        favicon: null,
+      };
+
+      resolveUrl.mockResolvedValue(resolvedValue);
+
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content: "👀 http://example.com:8080/?test=true#neheheh 💻",
+        },
+        options,
+      );
+
+      expect(resolveUrl).toHaveBeenCalledTimes(1);
+      expect(resolveUrl).toHaveBeenCalledWith(
+        "http://example.com:8080/?test=true#neheheh",
+      );
+
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          ...resolvedValue,
+          position: {
+            start: 3,
+            end: 45,
+          },
+        },
+      ]);
+    });
   });
 
   it("correctly resolves unicode string", async () => {
