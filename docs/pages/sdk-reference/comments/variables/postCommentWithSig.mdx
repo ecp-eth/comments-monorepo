@@ -278,17 +278,17 @@ const postCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
         name: "author";
         type: "address";
       }, {
+        internalType: "uint96";
+        name: "createdAt";
+        type: "uint96";
+      }, {
         internalType: "address";
         name: "app";
         type: "address";
       }, {
-        internalType: "uint80";
-        name: "createdAt";
-        type: "uint80";
-      }, {
-        internalType: "uint80";
+        internalType: "uint96";
         name: "updatedAt";
-        type: "uint80";
+        type: "uint96";
       }, {
         internalType: "uint256";
         name: "channelId";
@@ -787,9 +787,9 @@ const postCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
      type: "bytes32";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "createdAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
      internalType: "string";
@@ -867,14 +867,14 @@ const postCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
      type: "bytes32";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "createdAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "updatedAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
      internalType: "string";
@@ -1351,17 +1351,17 @@ Posts a comment with author signature verification
         `name`: `"author"`;
         `type`: `"address"`;
       \}, \{
+        `internalType`: `"uint96"`;
+        `name`: `"createdAt"`;
+        `type`: `"uint96"`;
+      \}, \{
         `internalType`: `"address"`;
         `name`: `"app"`;
         `type`: `"address"`;
       \}, \{
-        `internalType`: `"uint80"`;
-        `name`: `"createdAt"`;
-        `type`: `"uint80"`;
-      \}, \{
-        `internalType`: `"uint80"`;
+        `internalType`: `"uint96"`;
         `name`: `"updatedAt"`;
-        `type`: `"uint80"`;
+        `type`: `"uint96"`;
       \}, \{
         `internalType`: `"uint256"`;
         `name`: `"channelId"`;
@@ -1860,9 +1860,9 @@ Posts a comment with author signature verification
      `type`: `"bytes32"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"createdAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;
@@ -1940,14 +1940,14 @@ Posts a comment with author signature verification
      `type`: `"bytes32"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"createdAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"updatedAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;

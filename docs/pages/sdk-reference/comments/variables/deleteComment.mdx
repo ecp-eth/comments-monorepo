@@ -278,17 +278,17 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
         name: "author";
         type: "address";
       }, {
+        internalType: "uint96";
+        name: "createdAt";
+        type: "uint96";
+      }, {
         internalType: "address";
         name: "app";
         type: "address";
       }, {
-        internalType: "uint80";
-        name: "createdAt";
-        type: "uint80";
-      }, {
-        internalType: "uint80";
+        internalType: "uint96";
         name: "updatedAt";
-        type: "uint80";
+        type: "uint96";
       }, {
         internalType: "uint256";
         name: "channelId";
@@ -787,9 +787,9 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "bytes32";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "createdAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
      internalType: "string";
@@ -867,14 +867,14 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "bytes32";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "createdAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "updatedAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
      internalType: "string";
@@ -1351,17 +1351,17 @@ Delete a comment as an author
         `name`: `"author"`;
         `type`: `"address"`;
       \}, \{
+        `internalType`: `"uint96"`;
+        `name`: `"createdAt"`;
+        `type`: `"uint96"`;
+      \}, \{
         `internalType`: `"address"`;
         `name`: `"app"`;
         `type`: `"address"`;
       \}, \{
-        `internalType`: `"uint80"`;
-        `name`: `"createdAt"`;
-        `type`: `"uint80"`;
-      \}, \{
-        `internalType`: `"uint80"`;
+        `internalType`: `"uint96"`;
         `name`: `"updatedAt"`;
-        `type`: `"uint80"`;
+        `type`: `"uint96"`;
       \}, \{
         `internalType`: `"uint256"`;
         `name`: `"channelId"`;
@@ -1860,9 +1860,9 @@ Delete a comment as an author
      `type`: `"bytes32"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"createdAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;
@@ -1940,14 +1940,14 @@ Delete a comment as an author
      `type`: `"bytes32"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"createdAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"updatedAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;
