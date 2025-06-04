@@ -116,7 +116,6 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postComment(commentData, appSignature);
 
     // Try to delete with wrong signature
-    uint256 nonce = comments.getNonce(author, app);
     uint256 deadline = block.timestamp + 1 days;
     bytes32 deleteHash = comments.getDeleteCommentHash(
       commentId,
