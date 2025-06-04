@@ -25,7 +25,7 @@ export async function resolveSubmitterAccount() {
 
   return createViemAccount({
     address: submitterSettings.PRIVY_WALLET_ADDRESS,
-    privy,
+    privy: privy as any,
     walletId: submitterSettings.PRIVY_WALLET_ID,
   });
 }
