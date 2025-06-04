@@ -21,10 +21,11 @@ const ensResolverClient = createPublicClient({
 });
 
 const requestParamSchema = z.object({
-  query: z.string().trim().min(3).nonempty(),
+  query: z.string().trim().min(1).nonempty().toLowerCase(),
   chainId: z
     .enum(Object.keys(supportedChains) as [string, ...string[]])
     .transform((value) => Number(value)),
+  char: z.enum(["@", "$"]),
 });
 
 const ensSuggestionSchema = z.object({
@@ -45,100 +46,78 @@ const suggestionSchema = z.union([
   erc20TokenSuggestionSchema,
 ]);
 
-export type AddressSuggestionSchemaType = z.infer<typeof suggestionSchema>;
+export type MentionSuggestionSchemaType = z.infer<typeof suggestionSchema>;
 
 const responseSchema = z.object({
   suggestions: z.array(suggestionSchema),
 });
 
-export type AddressSuggestionsResponseSchemaType = z.infer<
+export type MentionSuggestionsResponseSchemaType = z.infer<
   typeof responseSchema
 >;
 
 const ETH_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 
+function isEthAddress(address: string): address is Hex {
+  return ETH_ADDRESS_REGEX.test(address);
+}
+
 /**
  * Resolves possible mentions based on given query
  */
-export async function GET(request: NextRequest) {
-  const { query, chainId } = requestParamSchema.parse(
+export async function GET(
+  request: NextRequest,
+): Promise<JSONResponse<typeof responseSchema>> {
+  const { query, chainId, char } = requestParamSchema.parse(
     Object.fromEntries(request.nextUrl.searchParams),
   );
 
-  if (ETH_ADDRESS_REGEX.test(query)) {
-    // check if has ENS name
-    const ensName = await ensResolverClient.getEnsName({
-      address: query as Hex,
-    });
+  if (char === "@") {
+    if (isEthAddress(query)) {
+      const ensName = await resolveENSNameByAddress(query as Hex);
 
-    if (ensName) {
+      if (ensName) {
+        return new JSONResponse(responseSchema, {
+          suggestions: [
+            { type: "ens", name: ensName, address: getAddress(query) },
+          ],
+        });
+      }
+
+      // @todo resolve farcaster
+      const token = await suggestERC20TokenByAddress(query as Hex, chainId);
+
+      if (token) {
+        return new JSONResponse(responseSchema, {
+          suggestions: [
+            {
+              type: "erc20",
+              symbol: token.symbol,
+              name: token.name,
+              address: query,
+            },
+          ],
+        });
+      }
+
       return new JSONResponse(responseSchema, {
-        suggestions: [
-          { type: "ens", name: ensName, address: getAddress(query) },
-        ],
+        suggestions: [],
       });
-    }
+    } else if (query.endsWith(".eth")) {
+      const ensName = await resolveENSAddressByName(query);
 
-    // there is no ens name, check if the token is ERC20 token on current chain (known token)
-    // if token is not known, try to resolve it from the chain
-    const token = tokenList.find(
-      (token) =>
-        isAddressEqual(token.address as Hex, query as Hex) &&
-        token.chainId === chainId,
-    );
-
-    if (token) {
-      return new JSONResponse(responseSchema, {
-        suggestions: [
-          {
-            type: "erc20",
-            name: token.symbol,
-            address: getAddress(token.address),
-            symbol: token.symbol,
-          },
-        ],
-      });
-    }
-
-    const resolvedToken = await resolveERC20Token(query as Hex, chainId);
-
-    if (resolvedToken) {
-      return new JSONResponse(responseSchema, {
-        suggestions: [
-          {
-            type: "erc20",
-            name: resolvedToken.name,
-            address: resolvedToken.address,
-            symbol: resolvedToken.symbol,
-          },
-        ],
-      });
-    }
-
-    return new JSONResponse(responseSchema, {
-      suggestions: [],
-    });
-  }
-
-  if (query.endsWith(".eth")) {
-    const resolved = await ensResolverClient.getEnsAddress({
-      name: normalize(query),
-    });
-
-    if (resolved) {
-      return new JSONResponse(responseSchema, {
-        suggestions: [{ type: "ens", name: query, address: resolved }],
-      });
+      if (ensName) {
+        return new JSONResponse(responseSchema, {
+          suggestions: [
+            { type: "ens", name: ensName.name, address: ensName.address },
+          ],
+        });
+      }
     }
   }
 
-  const lowerCaseQuery = query.toLowerCase();
-  // just try to check if it's a ticker for a token on the chain
-  const tokens = tokenList.filter(
-    (token) =>
-      token.symbol.toLowerCase().includes(lowerCaseQuery) &&
-      token.chainId === chainId,
-  );
+  // so we weren't able to resolve an address so now we don't care what the char actually is and we can just try to search for erc20 tokens
+  const tokens = await suggestERC20TokensBySymbol(query, chainId);
 
   return new JSONResponse(responseSchema, {
     suggestions: tokens.map((token) => ({
@@ -222,4 +201,69 @@ async function resolveERC20Token(
     console.warn("Resolving ERC20 token from chain failed with", e);
     return null;
   }
+}
+
+async function resolveENSNameByAddress(address: Hex) {
+  const ensName = await ensResolverClient.getEnsName({
+    address,
+  });
+
+  return ensName;
+}
+
+async function resolveENSAddressByName(name: string) {
+  const normalizedName = normalize(name);
+  const address = await ensResolverClient.getEnsAddress({
+    name: normalizedName,
+  });
+
+  if (address) {
+    return {
+      address,
+      name: normalizedName,
+    };
+  }
+
+  return null;
+}
+
+async function suggestERC20TokenByAddress(
+  address: Hex,
+  chainId: number,
+): Promise<null | {
+  name: string;
+  symbol: string;
+  logoURI?: string | null;
+}> {
+  let token:
+    | {
+        name: string;
+        symbol: string;
+        logoURI?: string | null;
+      }
+    | undefined
+    | null = tokenList.find(
+    (token) =>
+      isAddressEqual(token.address as Hex, address) &&
+      token.chainId === chainId,
+  );
+
+  if (!token) {
+    token = await resolveERC20Token(address, chainId);
+  }
+
+  return token ?? null;
+}
+
+async function suggestERC20TokensBySymbol(
+  lowerCasedSymbol: string,
+  chainId: number,
+) {
+  const tokens = tokenList.filter(
+    (token) =>
+      token.symbol.toLowerCase().includes(lowerCasedSymbol) &&
+      token.chainId === chainId,
+  );
+
+  return tokens;
 }

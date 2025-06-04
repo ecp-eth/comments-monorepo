@@ -11,8 +11,8 @@ import { Link } from "@tiptap/extension-link";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { cn } from "@/lib/utils";
 import { useImperativeHandle, useState } from "react";
-import { useAddressSuggestions } from "./hooks/useAddressSuggestions";
-import { AddressMentionExtension } from "./extensions/AddressMention";
+import { useMentionSuggestions } from "./hooks/useMentionSuggestions";
+import { MentionExtension } from "./extensions/Mention";
 import {
   type UploadTrackerUploadedFile,
   type UploadTrackerAttributes,
@@ -22,6 +22,7 @@ import {
 } from "./extensions/UploadTracker";
 import { ALLOWED_UPLOAD_MIME_TYPES } from "@/lib/constants";
 import { HardBreak } from "@tiptap/extension-hard-break";
+import { PluginKey } from "prosemirror-state";
 
 export type EditorRef = {
   focus: () => void;
@@ -57,7 +58,8 @@ export function Editor({
   defaultValue,
 }: EditorProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const searchAddressSuggestions = useAddressSuggestions();
+  const searchAddressSuggestions = useMentionSuggestions("@");
+  const searchERC20TokenSuggestions = useMentionSuggestions("$");
 
   const editor = useEditor({
     content: defaultValue,
@@ -81,8 +83,21 @@ export function Editor({
         emptyEditorClass:
           "is-editor-empty before:text-muted-foreground before:content-[attr(data-placeholder)] before:float-left before:h-0 before:pointer-events-none",
       }),
-      AddressMentionExtension.configure({
-        searchAddressSuggestions,
+      // ens, farcaster, erc20, address mentions
+      MentionExtension.configure({
+        searchSuggestions: searchAddressSuggestions,
+        suggestion: {
+          char: "@",
+          pluginKey: new PluginKey("address-mention"),
+        },
+      }),
+      // erc20 symbol or address mentions
+      MentionExtension.configure({
+        searchSuggestions: searchERC20TokenSuggestions,
+        suggestion: {
+          char: "$",
+          pluginKey: new PluginKey("erc20-mention"),
+        },
       }),
       UploadTracker,
     ],
