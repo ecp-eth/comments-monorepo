@@ -41,7 +41,7 @@
     "typescript": "^5.8.2",
     "use-debounce": "^10.0.4",
     "vite-tsconfig-paths": "^5.1.4",
-    "vocs": "https://gitpkg.vercel.app/davidfurlong/vocs/src?main",
+    "vocs": "github:davidfurlong/vocs#main&path:/src",
     "zod": "^3.24.2"
   },
   "devDependencies": {
