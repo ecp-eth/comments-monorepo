@@ -72,6 +72,10 @@ export const UploadTracker = Node.create({
     ];
   },
 
+  renderHTML() {
+    return ["div", { "data-type": "upload-tracker" }, 0];
+  },
+
   addNodeView() {
     return ReactNodeViewRenderer(UploadTrackerView);
   },
