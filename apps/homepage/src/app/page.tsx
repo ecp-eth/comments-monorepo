@@ -606,6 +606,7 @@ await fetchComments({
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <iframe
               src="https://paragraph.com/@df/embed?minimal=true&vertical=true"
+              className="w-full max-w-full"
               width="480"
               height="90"
               frameBorder="0"
