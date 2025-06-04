@@ -52,8 +52,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared
       '@privy-io/server-auth':
-        specifier: 1.21.1
-        version: 1.21.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))
+        specifier: 1.26.0
+        version: 1.26.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))
       '@radix-ui/react-avatar':
         specifier: ^1.1.3
         version: 1.1.10(@types/react-dom@19.1.5(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -80,7 +80,7 @@ importers:
         version: 1.2.7(@types/react-dom@19.1.5(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@rainbow-me/rainbowkit':
         specifier: ^2.2.4
-        version: 2.2.5(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(wagmi@2.15.5(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4))
+        version: 2.2.5(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(wagmi@2.15.5(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(@upstash/redis@1.35.0)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4))
       '@tanstack/react-query':
         specifier: ^5.75.6
         version: 5.80.2(react@19.1.0)
@@ -113,7 +113,7 @@ importers:
         version: 1.1.0
       next:
         specifier: ^15.3.0
-        version: 15.3.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.2(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-themes:
         specifier: ^0.4.4
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -195,7 +195,7 @@ importers:
         version: 11.4.1(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))
       '@reown/appkit-wagmi-react-native':
         specifier: ^1.2.3
-        version: 1.2.4(41d2a8e5544b5abce8ed33514505ca92)
+        version: 1.2.4(55fe701b7b810e9802a99240fd330957)
       '@tanstack/react-query':
         specifier: ^5.75.6
         version: 5.80.2(react@19.1.0)
@@ -316,10 +316,10 @@ importers:
         version: 1.2.7(@types/react-dom@19.1.5(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@rainbow-me/rainbowkit':
         specifier: ^2.2.4
-        version: 2.2.5(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(wagmi@2.15.5(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4))
+        version: 2.2.5(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(wagmi@2.15.5(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(@upstash/redis@1.35.0)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4))
       '@sentry/nextjs':
         specifier: ^9.3.0
-        version: 9.25.1(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.99.9)
+        version: 9.25.1(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.2(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.99.9)
       '@tanstack/react-query':
         specifier: ^5.75.6
         version: 5.80.2(react@19.1.0)
@@ -352,7 +352,7 @@ importers:
         version: 1.1.0
       next:
         specifier: ^15.3.0
-        version: 15.3.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.2(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-themes:
         specifier: ^0.4.4
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -410,7 +410,7 @@ importers:
         version: link:../../packages/sdk
       next:
         specifier: ^15.3.0
-        version: 15.3.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.2(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-mdx-remote:
         specifier: ^5.0.0
         version: 5.0.0(@types/react@19.1.6)(acorn@8.14.1)(react@19.1.0)
@@ -462,7 +462,7 @@ importers:
         version: 0.511.0(react@19.1.0)
       next:
         specifier: 15.3.2
-        version: 15.3.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.2(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ~19.1.0
         version: 19.1.0
@@ -883,7 +883,7 @@ importers:
         version: link:../typescript-config
       '@rainbow-me/rainbowkit':
         specifier: ^2.2.4
-        version: 2.2.5(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(wagmi@2.15.5(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4))
+        version: 2.2.5(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(wagmi@2.15.5(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(@upstash/redis@1.35.0)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4))
       '@tanstack/react-query':
         specifier: ^5.75.6
         version: 5.80.2(react@19.1.0)
@@ -898,7 +898,7 @@ importers:
         version: 9.28.0(jiti@2.4.2)
       next:
         specifier: ^15.3.0
-        version: 15.3.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.2(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ~19.1.0
         version: 19.1.0
@@ -2929,19 +2929,22 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.8
 
-  '@privy-io/api-base@1.4.6':
-    resolution: {integrity: sha512-HqCt3wTSx3I9tuZCu4J6w1AZSP8gcCoGEbJonFaCVIdWIq/7usp2PsXIP2utAG0jiXF+wwdhQpxCAkq46wW6ig==}
+  '@privy-io/api-base@1.5.1':
+    resolution: {integrity: sha512-UokueOxl2hoW+kfFTzwV8uqwCNajSaJJEGSWHpsuKvdDQ8ePwXe53Gr5ptnKznaZlMLivc25mrv92bVEJbclfQ==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
 
-  '@privy-io/public-api@2.23.0':
-    resolution: {integrity: sha512-t6Y8yRCF2qk2Fz2sg3iS2mDmuZduUBbybvp+qRx4fJ8BL244Sp/IR1j2rVzhDL3XIOcSTjveu58SSLIt5wSriw==}
+  '@privy-io/public-api@2.32.0':
+    resolution: {integrity: sha512-zbqU7+mWSFLyurr0JVrpoRsMEtFp4VLXcqesrh60ZfPbYuUN+ULoY/mNrHFrvtSQCB0wq+sU3b679kS36g88XA==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
 
-  '@privy-io/server-auth@1.21.1':
-    resolution: {integrity: sha512-5mwo4MkrJFT9l3y8QW78NXuoC8cTiYrbjlQoJ7dcPRD4L15qxahTgCOSdKQqLVY+J/8OvfSWIrfHewYZw86FwA==}
+  '@privy-io/server-auth@1.26.0':
+    resolution: {integrity: sha512-E6pbxgx01RfB4BQ4c1JhrAOSPXqR9/c/GEJBq5iF+/CKrRdRXUMH1Q7OEPnjHCIEcYNErLwkydaql/QH5NNz0A==}
     peerDependencies:
+      ethers: ^6
       viem: ~2.29.2
     peerDependenciesMeta:
+      ethers:
+        optional: true
       viem:
         optional: true
 
@@ -14661,13 +14664,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@privy-io/api-base@1.4.6':
+  '@privy-io/api-base@1.5.1':
     dependencies:
       zod: 3.24.4
 
-  '@privy-io/public-api@2.23.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)':
+  '@privy-io/public-api@2.32.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)':
     dependencies:
-      '@privy-io/api-base': 1.4.6
+      '@privy-io/api-base': 1.5.1
       bs58: 5.0.0
       libphonenumber-js: 1.12.8
       viem: 2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4)
@@ -14677,11 +14680,11 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@privy-io/server-auth@1.21.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))':
+  '@privy-io/server-auth@1.26.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))':
     dependencies:
       '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0
-      '@privy-io/public-api': 2.23.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
+      '@privy-io/public-api': 2.32.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@solana/web3.js': 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       canonicalize: 2.1.0
       dotenv: 16.5.0
@@ -15452,7 +15455,7 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
-  '@rainbow-me/rainbowkit@2.2.5(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(wagmi@2.15.5(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4))':
+  '@rainbow-me/rainbowkit@2.2.5(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(wagmi@2.15.5(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(@upstash/redis@1.35.0)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4))':
     dependencies:
       '@tanstack/react-query': 5.80.2(react@19.1.0)
       '@vanilla-extract/css': 1.15.5
@@ -15829,11 +15832,11 @@ snapshots:
     dependencies:
       buffer: 6.0.3
 
-  '@reown/appkit-scaffold-react-native@1.2.4(c8ec5fca2ac2bbabdb210e84aa5968dc)':
+  '@reown/appkit-scaffold-react-native@1.2.4(2fc53bb97d0b3283014ec9e173a0343a)':
     dependencies:
       '@reown/appkit-common-react-native': 1.2.4
       '@reown/appkit-core-react-native': 1.2.4(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@types/react@19.1.6)(@walletconnect/react-native-compat@2.21.1(991242cece1fcee02bafdd18898aa311))(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
-      '@reown/appkit-siwe-react-native': 1.2.4(185b1e8b9377e4e3a7c7293ecb3332c5)
+      '@reown/appkit-siwe-react-native': 1.2.4(219b38c4bc164292663b6f743ceba5b9)
       '@reown/appkit-ui-react-native': 1.2.4(react-native-svg@15.12.0(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0))(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
       react: 19.1.0
       react-native: 0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)
@@ -15881,10 +15884,10 @@ snapshots:
       - valtio
       - zod
 
-  '@reown/appkit-scaffold-utils-react-native@1.2.4(c8ec5fca2ac2bbabdb210e84aa5968dc)':
+  '@reown/appkit-scaffold-utils-react-native@1.2.4(2fc53bb97d0b3283014ec9e173a0343a)':
     dependencies:
       '@reown/appkit-common-react-native': 1.2.4
-      '@reown/appkit-scaffold-react-native': 1.2.4(c8ec5fca2ac2bbabdb210e84aa5968dc)
+      '@reown/appkit-scaffold-react-native': 1.2.4(2fc53bb97d0b3283014ec9e173a0343a)
     transitivePeerDependencies:
       - '@react-native-async-storage/async-storage'
       - '@types/react'
@@ -15895,7 +15898,7 @@ snapshots:
       - react-native-modal
       - react-native-svg
 
-  '@reown/appkit-siwe-react-native@1.2.4(185b1e8b9377e4e3a7c7293ecb3332c5)':
+  '@reown/appkit-siwe-react-native@1.2.4(219b38c4bc164292663b6f743ceba5b9)':
     dependencies:
       '@reown/appkit-common-react-native': 1.2.4
       '@reown/appkit-core-react-native': 1.2.4(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@types/react@19.1.6)(@walletconnect/react-native-compat@2.21.1(991242cece1fcee02bafdd18898aa311))(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
@@ -15989,14 +15992,14 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-wagmi-react-native@1.2.4(41d2a8e5544b5abce8ed33514505ca92)':
+  '@reown/appkit-wagmi-react-native@1.2.4(55fe701b7b810e9802a99240fd330957)':
     dependencies:
       '@react-native-async-storage/async-storage': 2.1.2(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))
       '@react-native-community/netinfo': 11.4.1(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))
       '@reown/appkit-common-react-native': 1.2.4
-      '@reown/appkit-scaffold-react-native': 1.2.4(c8ec5fca2ac2bbabdb210e84aa5968dc)
-      '@reown/appkit-scaffold-utils-react-native': 1.2.4(c8ec5fca2ac2bbabdb210e84aa5968dc)
-      '@reown/appkit-siwe-react-native': 1.2.4(185b1e8b9377e4e3a7c7293ecb3332c5)
+      '@reown/appkit-scaffold-react-native': 1.2.4(2fc53bb97d0b3283014ec9e173a0343a)
+      '@reown/appkit-scaffold-utils-react-native': 1.2.4(2fc53bb97d0b3283014ec9e173a0343a)
+      '@reown/appkit-siwe-react-native': 1.2.4(219b38c4bc164292663b6f743ceba5b9)
       '@walletconnect/react-native-compat': 2.21.1(991242cece1fcee02bafdd18898aa311)
       react: 19.1.0
       react-native: 0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)
@@ -16354,7 +16357,7 @@ snapshots:
 
   '@sentry/core@9.25.1': {}
 
-  '@sentry/nextjs@9.25.1(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.99.9)':
+  '@sentry/nextjs@9.25.1(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.2(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.99.9)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.34.0
@@ -16367,7 +16370,7 @@ snapshots:
       '@sentry/vercel-edge': 9.25.1
       '@sentry/webpack-plugin': 3.5.0(webpack@5.99.9)
       chalk: 3.0.0
-      next: 15.3.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.2(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       resolve: 1.22.8
       rollup: 4.35.0
       stacktrace-parser: 0.1.11
@@ -22974,7 +22977,7 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  next@15.3.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  next@15.3.2(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       '@next/env': 15.3.2
       '@swc/counter': 0.1.3
@@ -22984,7 +22987,7 @@ snapshots:
       postcss: 8.4.31
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-      styled-jsx: 5.1.6(@babel/core@7.26.10)(react@19.1.0)
+      styled-jsx: 5.1.6(react@19.1.0)
     optionalDependencies:
       '@next/swc-darwin-arm64': 15.3.2
       '@next/swc-darwin-x64': 15.3.2
@@ -25183,12 +25186,10 @@ snapshots:
     dependencies:
       inline-style-parser: 0.2.4
 
-  styled-jsx@5.1.6(@babel/core@7.26.10)(react@19.1.0):
+  styled-jsx@5.1.6(react@19.1.0):
     dependencies:
       client-only: 0.0.1
       react: 19.1.0
-    optionalDependencies:
-      '@babel/core': 7.26.10
 
   stylis@4.3.6: {}
 
