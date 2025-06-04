@@ -12,8 +12,8 @@
     "@ecp.eth/sdk": "workspace:*",
     "next": "^15.3.0",
     "next-mdx-remote": "^5.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "~19.0.0",
+    "react-dom": "~19.0.0",
     "sugar-high": "^0.6.0"
   },
   "devDependencies": {
