@@ -50,7 +50,7 @@ export default defineConfig({
           link: "/integration-options/react-component-library",
         },
         {
-          text: "Iframe Embed (no code)",
+          text: "Iframe Widget (no code)",
           link: "/integration-options/embed-comments",
         },
         {
@@ -60,27 +60,35 @@ export default defineConfig({
       ],
     },
     {
-      text: "How it works",
+      text: "Concepts",
       items: [
         {
           text: "Architecture Overview",
           link: "/architecture-overview",
         },
         {
-          text: "Dual-signature System",
+          text: "Signatures & Approvals",
           link: "/dual-signature-system",
         },
         {
-          text: "Comment Data",
+          text: "Comment",
           link: "/comment-data-props",
         },
         {
-          text: "Post comment flows",
+          text: "UX Flows",
           link: "/post-comment-flows",
         },
         {
-          text: "Channels & Hooks",
-          link: "/channels-and-hooks",
+          text: "Channels",
+          link: "/channels",
+        },
+        {
+          text: "Hooks",
+          link: "/hooks",
+        },
+        {
+          text: "Moderation & Spam",
+          link: "/moderation",
         },
       ],
     },
@@ -121,48 +129,19 @@ export default defineConfig({
       ],
     },
     {
-      text: "Demos & Examples",
+      text: "Boilerplates",
       items: [
         {
-          text: "React Custom Integration",
+          text: "Next.js",
           link: "/demos/custom-integration",
-          collapsed: true,
-          items: [
-            {
-              text: "Demo",
-              link: "https://demo.ethcomments.xyz/",
-            },
-            {
-              text: "Source Code",
-              link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo",
-            },
-          ],
         },
         {
           text: "React Native Integration",
           link: "/demos/react-native-integration",
-          collapsed: true,
-          items: [
-            {
-              text: "Source Code",
-              link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo-rn-expo",
-            },
-          ],
         },
         {
           text: "Blog with <CommentsEmbed />",
           link: "/demos/blog",
-          collapsed: true,
-          items: [
-            {
-              text: "Demo",
-              link: "https://demo-blog.ethcomments.xyz/blog/spaces-vs-tabs",
-            },
-            {
-              text: "Source Code",
-              link: "https://github.com/ecp-eth/comments-monorepo/tree/main/apps/embed-demo-blog",
-            },
-          ],
         },
       ],
     },

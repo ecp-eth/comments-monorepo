@@ -1,12 +1,13 @@
-# Comment Data
+# Comment
 
-`Comment Data` is a data structure that contains the essential information of a comment.
+The `Comment` is a data structure that contains the essential information of a comment.
 
 ## `content`
 
 The comment content stores the plain text content of the comment.
 
 - Please use `\n` for line breaks. (Most browsers will normalize the line breaks to `\n` regardless of the OS).
+- any media or links that should be displayed to users should be stored in the content property and rendered by clients based on the media type at the uri.
 
 ## `metadata`
 
@@ -60,18 +61,49 @@ If you are creating features just for yourself to post, such as a blog, you can 
 
 To see detailed explanation please refer to the [Dual-signature System](./dual-signature-system.mdx) page.
 
-## `nonce`
-
-An integer value that prevents replay attacks, this value is automatically incremented with each action per user per app.
-
-- It is used to prevent replay attacks.
-- It is used as part of the hashing process to generate a unique comment id.
-
-Note: `nonce` is no longer required for creating or deleting comments, but it is still necessary for editing comments.
-
 ## `deadline`
 
 The deadline is a timestamp in seconds since the epoch. Posting a comment with an expired deadline will result in the transaction being reverted.
 
 - It must be a future timestamp.
 - It provides a guarantee around the timestamp when the user or app countersigned the comment.
+
+## `commentType`
+
+The `commentType` property is used to categorize the type of comment being created.
+
+- Must be a string value that describes the nature of the comment.
+- Common examples include:
+  - `"comment"` - A standard comment or discussion
+  - `"like"` - A like or reaction to content
+- Applications can define their own comment types based on their specific use cases.
+- This field helps applications filter and display comments appropriately based on their type.
+
+## `channelId`
+
+The `channelId` property is used to organize comments into different channels or categories.
+
+- Must be a numeric identifier (`uint256`).
+- Allows applications to segment comments into different groups, communities, or topics.
+- Comments with the same `channelId` are logically grouped together.
+- Applications can use this to implement features like multiple comment sections, communities, or discussion boards.
+
+## `createdAt` (automatic)
+- Timestamp when the comment was first created (in seconds since epoch).
+- Set automatically when the comment is posted to the blockchain.
+- Cannot be modified after creation.
+
+## `updatedAt`  (automatic)
+- Timestamp when the comment was last modified (in seconds since epoch).
+- Updated automatically whenever the comment content or metadata is edited.
+- Initially equals `createdAt` for new comments.
+
+## `hookData`
+
+The `hookData` property stores additional data that can be added by hooks during comment processing.
+
+- Must be a valid string.
+- Used by the protocol's hook system to attach additional information to comments.
+- The specific format and content depend on the hooks implemented by the application.
+- Applications can use this for custom features like moderation flags, additional metadata, or integration data.
+
