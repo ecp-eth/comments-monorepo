@@ -1,34 +1,18 @@
-## Dual-signature System
+# Signatures & Approvals
 
-The protocol implements a dual-signature system that allows comment authors to delegate comment actions to app server. When an author approves an app signer, that app server can perform actions like posting comments on behalf of the author. This enables features like gasless transactions while maintaining security through cryptographic signatures.
+## Approvals
 
-### Author Signer
+The protocol implements an approvals system that allows comment authors to delegate the ability for an app to post comments on their behalf. 
+This enables a smooth UX by which a user signs a one time approval transaction, and the app can post comments on their behalf without the need for the user to sign each transaction.
+These approvals can be revoked by the user at any time.
 
-The author signer represents the party who creates and owns the comments, its responsibilities are:
+## Signatures
 
-- Create and own comments
-- Signs transactions to post comments directly
-- Can approve or revoke app signers
+Comments require different signatures depending on whether the author has granted approval to the app:
 
-### App Signer
+**With Approval:** When a user has granted approval to an app, comments only need to be signed by the app. The app can post comments on the user's behalf using the pre-existing approval.
 
-The app signer represents the party who owns the app or community, its responsibilities are:
+**Without Approval:** When no approval exists, comments must be signed by both the app and the comment author. 
 
-- Authorize comments to be associated with the application
-- Can be approved to post comments on behalf of an author
-- This app signer can be used as a filter to only show comments signed by your app, from a group of apps, or any app (in which case a spam mechanism is advisable).
-
-#### Single Player Mode
-
-If you're building an app just for yourself—like a personal blog where only you will post—you can simplify things by using your author signer as your app signer.
-
-In this setup, the same signer is responsible for generating both the author signature (proving authorship of content) and the app signature (authorizing the content to be posted to an app).
-This approach reduces setup complexity while maintaining full functionality for solo use.
-
-### Submitter
-
-The app server backend can use a separate submitter wallet to pay for the gas fee.
-
-- A backend wallet that pays for gas
-- Executes transactions on behalf of authors or apps
-- Enables gasless operations when combined with signatures
+This means that every comment is attributable to an app and author. This enables the app to impose offchain limitations and gating on which comments it wants to co-sign, as well as allowing the app to choose whether to index and display comments from other apps or not.
+If interacting with the protocol directly, the user can also choose to self sign the comment, signing with their address as the app and author.

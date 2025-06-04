@@ -1,0 +1,128 @@
+# Hooks
+
+**Hooks** are smart contracts that can be set on a [Channel](/channels). A **Hook** defines the rules for commenting on the specified **Channel**. They unlock flexible and powerful behaviors, such as:
+
+  1. Defining who can comment and how comments behave
+  1. Charging a small fee to post a comment
+  1. Integrating with other protocols, such as tokens or NFTs
+
+## Available Hook Functions
+
+[`onInitialize`](/protocol-reference/interfaces/IHook#onInitialize) - Called when a channel is initialized
+[`onCommentAdd`](/protocol-reference/interfaces/IHook#onCommentAdd) - Called when a comment is added
+[`onCommentEdit`](/protocol-reference/interfaces/IHook#onCommentEdit) - Called when a comment is edited
+[`onCommentDelete`](/protocol-reference/interfaces/IHook#onCommentDelete) - Called when a comment is deleted
+[`onChannelUpdate`](/protocol-reference/interfaces/IHook#onChannelUpdate) - Called when a channel is updated
+
+See [IHook](/protocol-reference/interfaces/IHook) or [BaseHook](/protocol-reference/hooks/BaseHook)
+
+### Discover Community created Hooks
+
+[Awesome Hooks](https://github.com/ecp-eth/awesome-hooks) is a collection of hooks that can be used to build on top of ECP.
+
+### Modifying the Hook on a Channel
+
+```solidity
+channelManager.setHook(channelId, hookAddress);
+```
+
+## Writing Your Own Hooks
+
+Hooks allow you to customize channel behavior. To create a custom hook:
+
+1. Inherit from [BaseHook](/protocol-reference/hooks/BaseHook)
+2. Override the desired hook functions
+3. Implement the required permissions
+
+
+### Basic Hook Example
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import { BaseHook } from "./BaseHook.sol";
+import { Hooks } from "../libraries/Hooks.sol";
+import { Comments } from "../libraries/Comments.sol";
+import { Channels } from "../libraries/Channels.sol";
+
+contract MyCustomHook is BaseHook {
+  function _getHookPermissions()
+    internal
+    pure
+    override
+    returns (Hooks.Permissions memory)
+  {
+    return
+      Hooks.Permissions({
+        onInitialize: true, // Enable channel initialization hook
+        onCommentAdd: true, // Enable comment addition hook
+        onCommentEdit: false, // Disable comment editing hook
+        onCommentDelete: false, // Disable comment deletion hook
+        onChannelUpdate: false // Disable channel update hook
+      });
+  }
+
+  function _onInitialize(
+    address channel,
+    Channels.Channel memory channelData,
+    uint256 channelId
+  ) internal override returns (bool) {
+    // Your initialization logic here
+    return true;
+  }
+
+  function _onCommentAdd(
+    Comments.Comment calldata commentData,
+    address msgSender,
+    bytes32 commentId
+  ) internal override returns (string memory) {
+    // Your comment addition logic here
+    return "";
+  }
+}
+```
+
+- For
+
+## Best Practices
+
+1. **Hook Implementation**
+
+   - Keep hook logic gas-efficient
+   - Handle errors gracefully
+   - Validate inputs thoroughly
+
+2. **Channel Management**
+
+   - Use meaningful channel names and descriptions
+   - Keep track of channel IDs
+
+3. **Security**
+
+   - Validate all inputs in hooks
+   - Be cautious with external calls
+   - Consider reentrancy risks
+   - Test hooks thoroughly
+
+## Troubleshooting
+
+1. **Hook Not Working**
+
+   - Check if hook permissions are set correctly
+   - Verify the hook implementation
+   - Ensure the hook is properly set on the channel
+   - Remember that hooks are called after modifying contract state, and any revert in a hook will revert the entire transaction
+
+2. **Channel Creation Fails**
+
+   - Ensure you have enough ETH for the creation fee
+   - Check if the channel name/description is valid
+   - Verify that metadata is valid JSON
+   - Verify the hook is approved by the ECP team
+
+3. **Hook Reverts**
+
+   - Check the hook implementation for errors
+   - Verify input validation
+   - Check gas limits
