@@ -278,17 +278,17 @@ const CommentManagerABI: readonly [{
         name: "author";
         type: "address";
       }, {
+        internalType: "uint96";
+        name: "createdAt";
+        type: "uint96";
+      }, {
         internalType: "address";
         name: "app";
         type: "address";
       }, {
-        internalType: "uint80";
-        name: "createdAt";
-        type: "uint80";
-      }, {
-        internalType: "uint80";
+        internalType: "uint96";
         name: "updatedAt";
-        type: "uint80";
+        type: "uint96";
       }, {
         internalType: "uint256";
         name: "channelId";
@@ -787,9 +787,9 @@ const CommentManagerABI: readonly [{
      type: "bytes32";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "createdAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
      internalType: "string";
@@ -867,14 +867,14 @@ const CommentManagerABI: readonly [{
      type: "bytes32";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "createdAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "updatedAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
      internalType: "string";

@@ -120,7 +120,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     Comments.Comment storage comment = comments[commentId];
 
-    uint80 timestampNow = uint80(block.timestamp);
+    uint96 timestampNow = uint96(block.timestamp);
 
     comment.author = author;
     comment.app = app;
@@ -220,7 +220,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     string calldata content = editData.content;
     string calldata metadata = editData.metadata;
-    uint80 timestampNow = uint80(block.timestamp);
+    uint96 timestampNow = uint96(block.timestamp);
 
     comment.content = content;
     comment.metadata = metadata;

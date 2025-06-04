@@ -357,19 +357,19 @@ export const CommentManagerABI = [
             internalType: "address",
           },
           {
+            name: "createdAt",
+            type: "uint96",
+            internalType: "uint96",
+          },
+          {
             name: "app",
             type: "address",
             internalType: "address",
           },
           {
-            name: "createdAt",
-            type: "uint80",
-            internalType: "uint80",
-          },
-          {
             name: "updatedAt",
-            type: "uint80",
-            internalType: "uint80",
+            type: "uint96",
+            internalType: "uint96",
           },
           {
             name: "channelId",
@@ -1008,9 +1008,9 @@ export const CommentManagerABI = [
       },
       {
         name: "createdAt",
-        type: "uint80",
+        type: "uint96",
         indexed: false,
-        internalType: "uint80",
+        internalType: "uint96",
       },
       {
         name: "content",
@@ -1106,15 +1106,15 @@ export const CommentManagerABI = [
       },
       {
         name: "createdAt",
-        type: "uint80",
+        type: "uint96",
         indexed: false,
-        internalType: "uint80",
+        internalType: "uint96",
       },
       {
         name: "updatedAt",
-        type: "uint80",
+        type: "uint96",
         indexed: false,
-        internalType: "uint80",
+        internalType: "uint96",
       },
       {
         name: "content",

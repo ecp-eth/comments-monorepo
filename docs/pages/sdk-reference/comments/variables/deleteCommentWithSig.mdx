@@ -278,17 +278,17 @@ const deleteCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResu
         name: "author";
         type: "address";
       }, {
+        internalType: "uint96";
+        name: "createdAt";
+        type: "uint96";
+      }, {
         internalType: "address";
         name: "app";
         type: "address";
       }, {
-        internalType: "uint80";
-        name: "createdAt";
-        type: "uint80";
-      }, {
-        internalType: "uint80";
+        internalType: "uint96";
         name: "updatedAt";
-        type: "uint80";
+        type: "uint96";
       }, {
         internalType: "uint256";
         name: "channelId";
@@ -787,9 +787,9 @@ const deleteCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResu
      type: "bytes32";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "createdAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
      internalType: "string";
@@ -867,14 +867,14 @@ const deleteCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResu
      type: "bytes32";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "createdAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
-     internalType: "uint80";
+     internalType: "uint96";
      name: "updatedAt";
-     type: "uint80";
+     type: "uint96";
    }, {
      indexed: false;
      internalType: "string";
@@ -1351,17 +1351,17 @@ Delete a comment with app signature verification
         `name`: `"author"`;
         `type`: `"address"`;
       \}, \{
+        `internalType`: `"uint96"`;
+        `name`: `"createdAt"`;
+        `type`: `"uint96"`;
+      \}, \{
         `internalType`: `"address"`;
         `name`: `"app"`;
         `type`: `"address"`;
       \}, \{
-        `internalType`: `"uint80"`;
-        `name`: `"createdAt"`;
-        `type`: `"uint80"`;
-      \}, \{
-        `internalType`: `"uint80"`;
+        `internalType`: `"uint96"`;
         `name`: `"updatedAt"`;
-        `type`: `"uint80"`;
+        `type`: `"uint96"`;
       \}, \{
         `internalType`: `"uint256"`;
         `name`: `"channelId"`;
@@ -1860,9 +1860,9 @@ Delete a comment with app signature verification
      `type`: `"bytes32"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"createdAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;
@@ -1940,14 +1940,14 @@ Delete a comment with app signature verification
      `type`: `"bytes32"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"createdAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"uint80"`;
+     `internalType`: `"uint96"`;
      `name`: `"updatedAt"`;
-     `type`: `"uint80"`;
+     `type`: `"uint96"`;
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;

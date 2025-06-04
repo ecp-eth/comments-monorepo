@@ -17,15 +17,15 @@
 
 
 
+- **createdAt:** (uint96) The timestamp when the comment was created
+
+
+
 - **app:** (address) The address of the application signer that authorized this comment
 
 
 
-- **createdAt:** (uint80) The timestamp when the comment was created
-
-
-
-- **updatedAt:** (uint80) The timestamp when the comment was last updated
+- **updatedAt:** (uint96) The timestamp when the comment was last updated
 
 
 

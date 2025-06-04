@@ -19,10 +19,10 @@ library Comments {
   /// @param hookData Additional data for the comment, added by a hook.
   struct Comment {
     // Pack these two addresses together (saves 1 storage slot)
-    address author; // 20 bytes
-    address app; // 20 bytes
-    uint80 createdAt;
-    uint80 updatedAt;
+    address author; // 20 bytes   --┬-- 32 bytes
+    uint96 createdAt; // 12 bytes --┘
+    address app; // 20 bytes      --┬-- 32 bytes
+    uint96 updatedAt; // 12 bytes --┘
     // 32-byte types
     uint256 channelId;
     bytes32 parentId;
