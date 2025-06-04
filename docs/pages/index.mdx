@@ -1,71 +1,115 @@
-# Quick Start
+# Ethereum Comments Protocol
 
-Get started with the Ethereum Comments Protocol in minutes.
+## Why Build on ECP?
 
-## Installation
+- **🌐 Permissionless & Available** - Comments become part of Ethereum's permanent record, accessible by any application
+- **🔧 Composable & Programmable** - Comments can be referenced by other smart contracts, enabling new use cases
+- **✅ Verifiable** - Cryptographically signed comments provide proof of authorship and timing
+- **🛡️ Censorship Resistant** - While apps can moderate interfaces, underlying data remains accessible onchain
+- **⚡ Cheap & Fast** - Gas optimized for L2s (~$0.001 per comment on L2s)
+- **🏷️ Attributable to Your App** - Comments are linked to both author and app, enabling composable rewards
 
-:::code-group
+## Choose how to integrate ECP into your app or website
 
-```bash [npm]
-npm install @ecp.eth/sdk
-# install peer dependencies
-npm install viem wagmi @tanstack/react-query @tanstack/query-core
-```
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
 
-```bash [yarn]
-yarn add @ecp.eth/sdk
-# install peer dependencies
-yarn add viem wagmi @tanstack/react-query @tanstack/query-core
-```
+<div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+  <h3 className="text-xl font-semibold mb-3 text-green-600">🌐 Iframe Embedding</h3>
+  <p className="text-gray-600 mb-4">Drop-in solution for any website. No JavaScript framework required - works everywhere.</p>
+  <div className="text-sm text-gray-500 mb-4">
+    <strong>Best for:</strong> Static sites, WordPress, any platform where you can add HTML
+  </div>
+  <a href="/integration-options/embed-comments" className="inline-flex items-center text-green-600 hover:text-green-800 font-medium">
+    Get Started →
+  </a>
+</div>
+<div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+  <h3 className="text-xl font-semibold mb-3 text-blue-600">🚀 React Components</h3>
+  <p className="text-gray-600 mb-4">Pre-built, customizable UI components for React applications. Perfect for modern web apps.</p>
+  <div className="text-sm text-gray-500 mb-4">
+    <strong>Best for:</strong> React/Next.js applications, modern web development
+  </div>
+  <a href="/integration-options/react-component-library" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+    Get Started →
+  </a>
+</div>
 
-```bash [pnpm]
-pnpm add @ecp.eth/sdk
-# install peer dependencies
-pnpm add viem wagmi @tanstack/react-query @tanstack/query-core
-```
 
-:::
+<div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+  <h3 className="text-xl font-semibold mb-3 text-purple-600">🔧 TypeScript SDK</h3>
+  <p className="text-gray-600 mb-4">Direct access to comments data and indexer APIs. Build custom interfaces and experiences.</p>
+  <div className="text-sm text-gray-500 mb-4">
+    <strong>Best for:</strong> Custom implementations, data analysis, headless applications, react-native mobile apps
+  </div>
+  <a href="/integration-options/typescript-sdk" className="inline-flex items-center text-purple-600 hover:text-purple-800 font-medium">
+    Get Started →
+  </a>
+</div>
 
-## Basic Usage
+<div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+  <h3 className="text-xl font-semibold mb-3 text-orange-600">⚡ Contract Interactions</h3>
+  <p className="text-gray-600 mb-4">Direct smart contract integration. Full control over transactions and gas optimization.</p>
+  <div className="text-sm text-gray-500 mb-4">
+    <strong>Best for:</strong> dApps, advanced developers, custom posting flows
+  </div>
+  <a href="/integration-options/contract-interactions" className="inline-flex items-center text-orange-600 hover:text-orange-800 font-medium">
+    Get Started →
+  </a>
+</div>
 
-::::steps
+</div>
 
-### Install dependencies
+## Fork a Boilerplate
 
-```bash
-npm install @ecp.eth/sdk wagmi
-```
+Get started immediately by forking one of our working demo applications.
 
-### Render the comment box
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
 
-Render `<CommentsEmbed />` component with a unique url for current page.
+<div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+  <h3 className="text-lg font-semibold mb-3 text-indigo-600">📱 React Native + Expo</h3>
+  <p className="text-gray-600 mb-4 text-sm">Mobile app with TypeScript SDK integration. Cross-platform iOS/Android support.</p>
+  <div className="text-xs text-gray-500 mb-4">
+    <strong>Path:</strong> <code>apps/demo-rn-expo</code>
+  </div>
+  <a href="https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo-rn-expo" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium text-sm">
+    Fork on GitHub →
+  </a>
+</div>
 
-```tsx
-import { CommentsEmbed } from "@ecp.eth/sdk/embed";
+<div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+  <h3 className="text-lg font-semibold mb-3 text-blue-600">🌐 Next.js + TypeScript SDK</h3>
+  <p className="text-gray-600 mb-4 text-sm">Full-featured web app with custom UI and direct SDK integration.</p>
+  <div className="text-xs text-gray-500 mb-4">
+    <strong>Path:</strong> <code>apps/demo</code>
+  </div>
+  <a href="https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm">
+    Fork on GitHub →
+  </a>
+</div>
 
-const baseOrigin = "https://blog.example.com";
+<div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+  <h3 className="text-lg font-semibold mb-3 text-emerald-600">⚡ Next.js + React Components</h3>
+  <p className="text-gray-600 mb-4 text-sm">Blog-style site using pre-built React components for rapid development.</p>
+  <div className="text-xs text-gray-500 mb-4">
+    <strong>Path:</strong> <code>apps/embed-demo-blog</code>
+  </div>
+  <a href="https://github.com/ecp-eth/comments-monorepo/tree/main/apps/embed-demo-blog" className="inline-flex items-center text-emerald-600 hover:text-emerald-800 font-medium text-sm">
+    Fork on GitHub →
+  </a>
+</div>
 
-export function Comments() {
-  return (
-    <div>
-      <h3>Comments</h3>
-      <CommentsEmbed
-        // the uri for commenting
-        uri={new URL(window.location.pathname, baseOrigin)}
-      />
-    </div>
-  );
-}
-```
+</div>
 
-For more details, see [integration options: react component library](/integration-options/react-component-library) and [`<CommentsEmbed />`](/sdk-reference/embed/functions/CommentsEmbed).
+## Write a Hook
 
-### Deploy and start interacting with your community!
+Hooks are smart contracts that define the rules for commenting on a channel. They enable powerful features like:
 
-::::
+- Custom access control
+- Comment fees
+- Integration with other protocols
 
-## Next Steps
+Learn how to create and deploy your own hook in our [Hooks Guide](/hooks).
 
-- Learn more about [architecture overview](/architecture-overview) and [post comment flows](/post-comment-flows)
-- Explore [integration options](/integration-options/)
-- Check out our [demo repository](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo)
+## Next step
+
+- Learn more about the [ECP Architecture](/architecture-overview)
