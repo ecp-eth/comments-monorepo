@@ -131,7 +131,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postComment(commentData, "");
   }
 
-  function test_PostComment() public {
+  function test_PostCommentWithSig_ValidSignatures() public {
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(author, app);
     commentData.app = app;
@@ -151,7 +151,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
 
-  function test_PostComment_InvalidAppSignature() public {
+  function test_PostCommentWithSig_InvalidAppSignature() public {
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(author, app);
     commentData.app = app;
@@ -168,7 +168,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postCommentWithSig(commentData, authorSignature, wrongSignature);
   }
 
-  function test_PostComment_WithSigs() public {
+  function test_PostCommentWithSigs_ValidAppSignature_AppApproved() public {
     // First add approval
     vm.prank(author);
     comments.addApproval(app);
@@ -187,7 +187,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postCommentWithSig(commentData, bytes(""), appSignature);
   }
 
-  function test_PostComment_WithoutApproval() public {
+  function test_PostCommentWithSigs_ValidAppSignature_AppNotApproved() public {
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(author, app);
     bytes32 commentId = comments.getCommentId(commentData);
@@ -208,7 +208,33 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postCommentWithSig(commentData, bytes(""), appSignature);
   }
 
-  function test_PostComment_WithFeeCollection() public {
+  function test_PostCommentWithSigs_ValidAppSignature_AppApproved_PostAsAnotherApp()
+    public
+  {
+    address anotherApp = address(0x999);
+    // First add approval
+    vm.prank(author);
+    comments.addApproval(app);
+    comments.addApproval(anotherApp);
+
+    // Create and post comment
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, anotherApp);
+
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    vm.expectRevert(
+      abi.encodeWithSelector(ICommentManager.InvalidAppSignature.selector)
+    );
+    comments.postCommentWithSig(commentData, bytes(""), appSignature);
+  }
+
+  function test_PostCommentWithSig_WithFeeCollection() public {
     uint256 channelId1 = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Test Description",
@@ -241,7 +267,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
   }
 
-  function test_PostComment_WithInvalidFee() public {
+  function test_PostCommentWithSig_WithInvalidFee() public {
     // Setup fee collector that requires 1 ether
     MaliciousFeeCollector maliciousCollector = new MaliciousFeeCollector();
 
@@ -277,7 +303,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
   }
 
-  function test_PostComment_WithThreading() public {
+  function test_PostCommentWithSig_WithThreading() public {
     // Post parent comment
     Comments.CreateComment memory parentComment = TestUtils
       .generateDummyCreateComment(author, app);
@@ -319,7 +345,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
   }
 
-  function test_PostComment_ExpiredDeadline() public {
+  function test_PostCommentWithSig_ExpiredDeadline() public {
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(author, app);
     commentData.deadline = block.timestamp - 1; // Expired deadline
@@ -346,7 +372,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
 
-  function test_PostComment_ReplyToDeletedComment() public {
+  function test_PostCommentWithSig_ReplyToDeletedComment() public {
     // Post parent comment
     Comments.CreateComment memory parentComment = TestUtils
       .generateDummyCreateComment(author, app);
@@ -393,7 +419,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
   }
 
-  function test_PostComment_CannotHaveBothParentIdAndTargetUri() public {
+  function test_PostCommentWithSig_CannotHaveBothParentIdAndTargetUri() public {
     // First create a parent comment
     Comments.CreateComment memory parentComment = TestUtils
       .generateDummyCreateComment(author, app);
@@ -438,7 +464,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
 
-  function test_PostComment_WithHookData() public {
+  function test_PostCommentWithSig_WithHookData() public {
     // Create a channel with the hook
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",

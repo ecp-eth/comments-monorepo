@@ -300,7 +300,7 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(editedComment.updatedAt, originalComment.updatedAt);
   }
 
-  function test_EditComment() public {
+  function test_EditCommentWithSig_AuthorSignature() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(author, app);
@@ -374,108 +374,7 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
   }
 
-  function test_EditComment_InvalidAppSignature() public {
-    // First create a comment
-    Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
-    bytes32 commentId = comments.getCommentId(commentData);
-    bytes memory appSignature = TestUtils.signEIP712(
-      vm,
-      appPrivateKey,
-      commentId
-    );
-
-    vm.prank(author);
-    comments.postComment(commentData, appSignature);
-
-    // Try to edit with wrong app signature
-    Comments.EditComment memory editData = TestUtils.generateDummyEditComment(
-      comments,
-      author,
-      app
-    );
-    bytes32 editHash = comments.getEditCommentHash(
-      commentId,
-      commentData.author,
-      editData
-    );
-    bytes memory editAuthorSignature = TestUtils.signEIP712(
-      vm,
-      authorPrivateKey,
-      editHash
-    );
-    bytes memory wrongAppSignature = TestUtils.signEIP712(
-      vm,
-      wrongPrivateKey,
-      editHash
-    );
-
-    vm.expectRevert(ICommentManager.InvalidAppSignature.selector);
-    comments.editCommentWithSig(
-      commentId,
-      editData,
-      editAuthorSignature,
-      wrongAppSignature
-    );
-  }
-
-  function test_EditComment_InvalidNonce() public {
-    // First create a comment
-    Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
-    bytes32 commentId = comments.getCommentId(commentData);
-    bytes memory appSignature = TestUtils.signEIP712(
-      vm,
-      appPrivateKey,
-      commentId
-    );
-
-    vm.prank(author);
-    comments.postComment(commentData, appSignature);
-
-    // Try to edit with wrong nonce
-    Comments.EditComment memory editData = TestUtils.generateDummyEditComment(
-      comments,
-      author,
-      app
-    );
-    uint256 goodNonce = editData.nonce;
-    editData.nonce = editData.nonce + 1; // Use wrong nonce
-
-    bytes32 editHash = comments.getEditCommentHash(
-      commentId,
-      commentData.author,
-      editData
-    );
-    bytes memory editAuthorSignature = TestUtils.signEIP712(
-      vm,
-      authorPrivateKey,
-      editHash
-    );
-    bytes memory editAppSignature = TestUtils.signEIP712(
-      vm,
-      appPrivateKey,
-      editHash
-    );
-
-    vm.expectRevert(
-      abi.encodeWithSelector(
-        ICommentManager.InvalidNonce.selector,
-        author,
-        app,
-        goodNonce,
-        editData.nonce
-      )
-    );
-    comments.editCommentWithSig(
-      commentId,
-      editData,
-      editAuthorSignature,
-      editAppSignature
-    );
-  }
-
-  function test_EditComment_WithSigs() public {
+  function test_EditCommentWithSig_AppSignature_AppApproved() public {
     // First add approval
     vm.prank(author);
     comments.addApproval(app);
@@ -548,7 +447,166 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
   }
 
-  function test_EditComment_ExpiredDeadline() public {
+  function test_EditCommentWithSig_SenderIsApp_NoAppSignature() public {
+    // First add approval
+    vm.prank(author);
+    comments.addApproval(app);
+
+    // Create and post a comment
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+    vm.prank(author);
+    comments.postComment(commentData, appSignature);
+
+    // Edit comment without app signature, but broadcaster is the app
+    Comments.EditComment memory editData = TestUtils.generateDummyEditComment(
+      comments,
+      author,
+      app
+    );
+
+    Comments.Comment memory expectedCommentData = comments.getComment(
+      commentId
+    );
+
+    expectedCommentData.content = editData.content;
+    expectedCommentData.metadata = editData.metadata;
+    expectedCommentData.updatedAt = uint96(block.timestamp);
+
+    vm.expectEmit(true, true, true, true);
+    emit CommentEdited(
+      commentId,
+      editData.app,
+      author,
+      app,
+      commentData.channelId,
+      commentData.parentId,
+      uint96(block.timestamp),
+      uint96(block.timestamp),
+      editData.content,
+      editData.metadata,
+      commentData.targetUri,
+      commentData.commentType,
+      ""
+    );
+    vm.prank(app);
+    comments.editCommentWithSig(commentId, editData, "", "");
+
+    // Verify the comment was edited
+    Comments.Comment memory editedComment = comments.getComment(commentId);
+    assertEq(editedComment.content, editData.content);
+    assertEq(editedComment.metadata, editData.metadata);
+    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+  }
+
+  function test_EditCommentWithSig_InvalidAppSignature() public {
+    // First create a comment
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    vm.prank(author);
+    comments.postComment(commentData, appSignature);
+
+    // Try to edit with wrong app signature
+    Comments.EditComment memory editData = TestUtils.generateDummyEditComment(
+      comments,
+      author,
+      app
+    );
+    bytes32 editHash = comments.getEditCommentHash(
+      commentId,
+      commentData.author,
+      editData
+    );
+    bytes memory editAuthorSignature = TestUtils.signEIP712(
+      vm,
+      authorPrivateKey,
+      editHash
+    );
+    bytes memory wrongAppSignature = TestUtils.signEIP712(
+      vm,
+      wrongPrivateKey,
+      editHash
+    );
+
+    vm.expectRevert(ICommentManager.InvalidAppSignature.selector);
+    comments.editCommentWithSig(
+      commentId,
+      editData,
+      editAuthorSignature,
+      wrongAppSignature
+    );
+  }
+
+  function test_EditCommentWithSig_InvalidNonce() public {
+    // First create a comment
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    vm.prank(author);
+    comments.postComment(commentData, appSignature);
+
+    // Try to edit with wrong nonce
+    Comments.EditComment memory editData = TestUtils.generateDummyEditComment(
+      comments,
+      author,
+      app
+    );
+    uint256 goodNonce = editData.nonce;
+    editData.nonce = editData.nonce + 1; // Use wrong nonce
+
+    bytes32 editHash = comments.getEditCommentHash(
+      commentId,
+      commentData.author,
+      editData
+    );
+    bytes memory editAuthorSignature = TestUtils.signEIP712(
+      vm,
+      authorPrivateKey,
+      editHash
+    );
+    bytes memory editAppSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      editHash
+    );
+
+    vm.expectRevert(
+      abi.encodeWithSelector(
+        ICommentManager.InvalidNonce.selector,
+        author,
+        app,
+        goodNonce,
+        editData.nonce
+      )
+    );
+    comments.editCommentWithSig(
+      commentId,
+      editData,
+      editAuthorSignature,
+      editAppSignature
+    );
+  }
+
+  function test_EditCommentWithSig_ExpiredDeadline() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(author, app);
@@ -633,7 +691,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
   }
 
-  function test_EditComment_InvalidAuthor() public {
+  function test_EditCommentWithSig_InvalidAuthor() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(author, app);
