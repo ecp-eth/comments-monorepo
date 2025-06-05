@@ -203,6 +203,7 @@ async function resolveEthAddress(
   if (farcasterData) {
     return {
       type: "farcaster",
+      address,
       displayName: farcasterData.displayName ?? null,
       fid: farcasterData.fid,
       pfpUrl: farcasterData.pfpUrl ?? null,

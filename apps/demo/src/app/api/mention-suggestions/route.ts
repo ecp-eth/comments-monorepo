@@ -41,9 +41,20 @@ const erc20TokenSuggestionSchema = z.object({
   address: HexSchema,
 });
 
+const farcasterSuggestionSchema = z.object({
+  type: z.literal("farcaster"),
+  address: HexSchema,
+  fid: z.number().int(),
+  displayName: z.string().nullable(),
+  username: z.string().nullable(),
+  pfpUrl: z.string().nullable(),
+  url: z.string(),
+});
+
 const suggestionSchema = z.union([
   ensSuggestionSchema,
   erc20TokenSuggestionSchema,
+  farcasterSuggestionSchema,
 ]);
 
 export type MentionSuggestionSchemaType = z.infer<typeof suggestionSchema>;

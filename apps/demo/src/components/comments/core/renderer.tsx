@@ -6,7 +6,7 @@ import type {
 
 const KEEP_ORIGINAL_TEXT = Symbol("KEEP_ORIGINAL_TEXT");
 
-const URL_REGEX = /https?:\/\/[^\s<>[\]{}|\\^]+/gu;
+const URL_REGEX = /^https?:\/\/[^\s<>[\]{}|\\^]+/u;
 
 type ReferenceRenderer<
   TReference extends IndexerAPICommentReferenceSchemaType,
@@ -77,9 +77,6 @@ export function renderToReact({
   }
 
   const elements: React.ReactNode[] = [];
-  // we don't need to do Array.from(content) for unicode support because positions of references are
-  // already computed as byte offsets respecting unicode
-  const chars = content;
   let currentParagraphText = "";
   let currentParagraph: React.ReactElement[] = [];
   let consecutiveNewLines = 0;
@@ -89,56 +86,7 @@ export function renderToReact({
       return;
     }
 
-    // Process any URLs in the text before flushing
-    let lastIndex = 0;
-    const textParts: React.ReactElement[] = [];
-    let text = "";
-
-    // Reset the regex lastIndex since we're using the 'g' flag
-    URL_REGEX.lastIndex = 0;
-
-    let match: RegExpExecArray | null;
-
-    while ((match = URL_REGEX.exec(currentParagraphText)) !== null) {
-      const matchStart = match.index;
-      const matchEnd = URL_REGEX.lastIndex;
-
-      if (matchStart > 0) {
-        text += currentParagraphText.slice(lastIndex, matchStart);
-      }
-
-      // Add the URL as a link
-      const url = match[0];
-
-      // flush if there is any text before the url
-      textParts.push(<Fragment>{text}</Fragment>);
-      text = "";
-
-      textParts.push(
-        <a
-          className="font-medium underline"
-          href={url}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          {url}
-        </a>,
-      );
-
-      lastIndex = matchEnd;
-    }
-
-    // Add any remaining text
-    if (lastIndex < currentParagraphText.length) {
-      textParts.push(
-        <Fragment>{currentParagraphText.slice(lastIndex)}</Fragment>,
-      );
-    }
-
-    if (textParts.length > 0) {
-      currentParagraph.push(...textParts);
-    }
-
+    currentParagraph.push(<Fragment>{currentParagraphText}</Fragment>);
     currentParagraphText = "";
   };
 
@@ -155,9 +103,17 @@ export function renderToReact({
     }
   };
 
-  for (let i = 0; i < chars.length; i++) {
-    const char = chars[i];
-    const reference = referencesByPosition.get(i);
+  let pos = 0;
+
+  while (pos < content.length) {
+    const codePoint = content.codePointAt(pos);
+
+    if (codePoint == null) {
+      throw new Error(`Invalid code point at position ${pos}`);
+    }
+
+    const char = String.fromCodePoint(codePoint);
+    const reference = referencesByPosition.get(pos);
 
     if (reference) {
       const renderer = referenceRenderers[reference.type] as
@@ -168,9 +124,9 @@ export function renderToReact({
         const result = renderer(reference);
 
         if (result !== KEEP_ORIGINAL_TEXT) {
-          i = reference.position.end - 1;
           flushParagraphText();
           currentParagraph.push(result);
+          pos = reference.position.end;
 
           continue;
         }
@@ -179,19 +135,51 @@ export function renderToReact({
 
     if (char === "\n" || char === "\r") {
       // skip the \r in \r\n
-      if (char === "\r" && chars[i + 1] === "\n") {
-        i++;
+      if (char === "\r" && content[pos + 1] === "\n") {
+        pos++;
       }
 
+      pos++;
       consecutiveNewLines++;
 
       if (consecutiveNewLines === 1) {
         flushParagraph();
       }
-    } else {
-      consecutiveNewLines = 0;
-      currentParagraphText += char;
+
+      continue;
     }
+
+    consecutiveNewLines = 0;
+
+    // check if there is an url
+    const restOfText = content.slice(pos);
+    const urlMatch = restOfText.match(URL_REGEX);
+
+    if (urlMatch) {
+      const url = urlMatch[0];
+
+      flushParagraphText();
+
+      currentParagraph.push(
+        <a
+          className="font-medium underline"
+          href={url}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          {url}
+        </a>,
+      );
+
+      pos += url.length;
+
+      continue;
+    }
+
+    currentParagraphText += char;
+
+    // Increment by proper code point length
+    pos += codePoint > 0xffff ? 2 : 1;
   }
 
   flushParagraph();

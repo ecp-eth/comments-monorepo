@@ -20,3 +20,10 @@ export type UploadTrackerFile =
 export type UploadTrackerAttributes = {
   uploads: UploadTrackerFile[];
 };
+
+export type LinkAttributes = {
+  class: "underline cursor-pointer";
+  href: string;
+  rel: "noopener noreferrer";
+  target: "_blank";
+};

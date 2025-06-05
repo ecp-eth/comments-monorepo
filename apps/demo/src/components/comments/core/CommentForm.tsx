@@ -17,8 +17,9 @@ import {
 } from "./queries";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { Editor, EditorRef } from "./CommentTextEditor/Editor";
-import type { Content } from "@tiptap/react";
 import { useUploadFiles } from "./CommentTextEditor/hooks/useUploadFiles";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import { isContentEqual } from "./CommentTextEditor/utils";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -34,7 +35,10 @@ type BaseCommentFormProps = {
   /**
    * Default comment content, will be parsed as markdown.
    */
-  defaultContent?: string;
+  defaultContent?: {
+    content: string;
+    references: IndexerAPICommentReferencesSchemaType;
+  };
   /**
    * Called when user pressed escape or left the form empty or unchanged (blurred with empty or unchanged content)
    */
@@ -73,7 +77,6 @@ function BaseCommentForm({
   const { address } = useAccount();
   const connectAccount = useConnectAccount();
   const editorRef = useRef<EditorRef>(null);
-  const [content, setContent] = useState<Content>(() => defaultContent);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const { uploadFiles } = useUploadFiles();
 
@@ -126,7 +129,6 @@ function BaseCommentForm({
       }
     },
     onSuccess() {
-      setContent("");
       editorRef.current?.clear();
       submitMutation.reset();
       onSubmitSuccessRef.current?.();
@@ -158,17 +160,19 @@ function BaseCommentForm({
             return;
           }
 
-          const editor = editorRef.current?.editor;
+          const editor = editorRef.current;
 
           if (!editor) {
             return;
           }
 
-          const content = editor.getText().trim();
+          const isEmpty = editor.editor?.isEmpty ?? true;
+          const defaultContent = editor.getDefaultContent();
+          const currentContent = editor.editor?.getJSON();
 
           if (
-            !content ||
-            (defaultContent != null && content === defaultContent)
+            isEmpty ||
+            isContentEqual(currentContent ?? {}, defaultContent ?? {})
           ) {
             onCancel?.();
           }
@@ -176,7 +180,7 @@ function BaseCommentForm({
         className="w-full p-2 border border-gray-300 rounded"
         disabled={isSubmitting || disabled}
         placeholder={placeholder}
-        defaultValue={content}
+        defaultValue={defaultContent}
         ref={editorRef}
         onEscapePress={() => {
           if (isSubmitting) {
@@ -321,7 +325,10 @@ export function CommentEditForm<TExtraEditData = unknown>({
   return (
     <BaseCommentForm
       {...props}
-      defaultContent={comment.content}
+      defaultContent={{
+        content: comment.content,
+        references: comment.references,
+      }}
       onSubmit={handleSubmit}
       submitIdleLabel={submitIdleLabel}
       submitPendingLabel={submitPendingLabel}

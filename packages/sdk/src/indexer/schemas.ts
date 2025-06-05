@@ -97,6 +97,7 @@ export type IndexerAPICommentReferenceENSSchemaType = z.infer<
 
 export const IndexerAPICommentReferenceFarcasterSchema = z.object({
   type: z.literal("farcaster"),
+  address: HexSchema,
   fid: z.number().int(),
   username: z.string().nullable(),
   displayName: z.string().nullable(),

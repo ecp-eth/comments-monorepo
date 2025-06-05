@@ -213,6 +213,7 @@ describe("resolveCommentReferences", () => {
       expect(result.references).toEqual([
         {
           type: "farcaster",
+          address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
           fid: 341794,
           url: "https://farcaster.xyz/mskr",
           username: "mskr",
@@ -461,6 +462,7 @@ describe("resolveCommentReferences", () => {
       },
       {
         type: "farcaster",
+        address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
         fid: 341794,
         url: "https://farcaster.xyz/mskr",
         username: "mskr",

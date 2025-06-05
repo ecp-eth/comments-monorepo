@@ -74,7 +74,13 @@ export const Suggestions = forwardRef(function Suggestions(
             onClick={() => selectItem(index)}
           >
             <span>
-              {item.type === "ens" ? item.name : item.symbol || item.name}
+              {item.type === "ens" ? item.name : null}
+              {item.type === "erc20"
+                ? item.symbol || item.name || item.address
+                : null}
+              {item.type === "farcaster"
+                ? item.username || item.displayName || item.address
+                : null}
             </span>
           </button>
         ))

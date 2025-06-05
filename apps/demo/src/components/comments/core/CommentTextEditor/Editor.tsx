@@ -1,7 +1,7 @@
 import {
   type Editor as TipTapEditor,
-  type Content,
   EditorContent,
+  type JSONContent,
   useEditor,
 } from "@tiptap/react";
 import { Document } from "@tiptap/extension-document";
@@ -23,6 +23,9 @@ import {
 import { ALLOWED_UPLOAD_MIME_TYPES } from "@/lib/constants";
 import { HardBreak } from "@tiptap/extension-hard-break";
 import { PluginKey } from "prosemirror-state";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import { useHandleDefaultEditorValue } from "./hooks/useHandleDefaultEditorValue";
+import { LinkAttributes } from "./extensions/types";
 
 export type EditorRef = {
   focus: () => void;
@@ -31,6 +34,7 @@ export type EditorRef = {
    */
   clear: () => void;
   editor: TipTapEditor | null;
+  getDefaultContent: () => JSONContent;
   getUploadedFiles: () => UploadTrackerUploadedFile[];
   getFilesForUpload: () => UploadTrackerFileToUpload[];
   setFileAsUploaded: (file: UploadTrackerUploadedFile) => void;
@@ -40,7 +44,10 @@ export type EditorRef = {
 type EditorProps = {
   className?: string;
   disabled?: boolean;
-  defaultValue?: Content;
+  defaultValue?: {
+    content: string;
+    references: IndexerAPICommentReferencesSchemaType;
+  };
   placeholder: string;
   /**
    * @default false
@@ -64,9 +71,13 @@ export function Editor({
   const [isDragging, setIsDragging] = useState(false);
   const searchAddressSuggestions = useMentionSuggestions("@");
   const searchERC20TokenSuggestions = useMentionSuggestions("$");
+  const content = useHandleDefaultEditorValue(
+    defaultValue?.content,
+    defaultValue?.references,
+  );
 
   const editor = useEditor({
-    content: defaultValue,
+    content,
     // fix ssr hydration error
     immediatelyRender: false,
     autofocus: autoFocus,
@@ -79,7 +90,7 @@ export function Editor({
       HardBreak,
       Link.configure({
         HTMLAttributes: {
-          class: "underline cursor-pointer",
+          class: "underline cursor-pointer" satisfies LinkAttributes["class"],
         },
       }),
       Placeholder.configure({
@@ -175,8 +186,11 @@ export function Editor({
 
         return [];
       },
+      getDefaultContent() {
+        return content;
+      },
     }),
-    [editor],
+    [editor, content],
   );
 
   const handleDragOver = (e: React.DragEvent) => {

@@ -1,5 +1,5 @@
 import { Mention, type MentionOptions } from "@tiptap/extension-mention";
-import { ReactRenderer } from "@tiptap/react";
+import { Attribute, ReactRenderer } from "@tiptap/react";
 import tippy, { type Instance } from "tippy.js";
 import type {
   MentionSuggestionsResponseSchemaType,
@@ -21,11 +21,24 @@ type MentionExtensionOptions = MentionOptions<SuggestionItem, MentionItem> & {
   ) => Promise<MentionSuggestionsResponseSchemaType>;
 };
 
+export type MentionItemKeys =
+  | keyof Extract<MentionItem, { type: "ens" }>
+  | keyof Extract<MentionItem, { type: "erc20" }>
+  | keyof Extract<MentionItem, { type: "farcaster" }>;
+
+type MentionAttributes = {
+  [K in MentionItemKeys]: Attribute;
+};
+
 export const MentionExtension = Mention.extend<MentionExtensionOptions>({
   addAttributes() {
+    /**
+     * Some properties use undefined as default value to indicate that the property is not present in the node.
+     * This is necessary so editor.getJSON() returns the correct value that equals to provided default value if JSON.stringify() is used.
+     */
     return {
       address: {
-        default: null,
+        default: undefined,
         parseHTML: (element) => element.getAttribute("data-address"),
         renderHTML: (attributes) => {
           return {
@@ -33,8 +46,35 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
           };
         },
       },
+      fid: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-fid"),
+        renderHTML: (attributes) => {
+          return {
+            "data-fid": attributes.fid,
+          };
+        },
+      },
+      username: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-username"),
+        renderHTML: (attributes) => {
+          return {
+            "data-username": attributes.username,
+          };
+        },
+      },
+      displayName: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-display-name"),
+        renderHTML: (attributes) => {
+          return {
+            "data-display-name": attributes.displayName,
+          };
+        },
+      },
       name: {
-        default: null,
+        default: undefined,
         parseHTML: (element) => element.getAttribute("data-name"),
         renderHTML: (attributes) => {
           return {
@@ -42,8 +82,26 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
           };
         },
       },
+      pfpUrl: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-pfp-url"),
+        renderHTML: (attributes) => {
+          return {
+            "data-pfp-url": attributes.pfpUrl,
+          };
+        },
+      },
+      url: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-url"),
+        renderHTML: (attributes) => {
+          return {
+            "data-url": attributes.url,
+          };
+        },
+      },
       symbol: {
-        default: null,
+        default: undefined,
         parseHTML: (element) => element.getAttribute("data-symbol"),
         renderHTML: (attributes) => {
           return {
@@ -52,7 +110,6 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         },
       },
       type: {
-        default: null,
         parseHTML: (element) => element.getAttribute("data-type"),
         renderHTML: (attributes) => {
           return {
@@ -60,7 +117,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
           };
         },
       },
-    };
+    } satisfies MentionAttributes;
   },
   renderText({ node }) {
     const attrs = node.attrs as MentionItem;
@@ -71,30 +128,43 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
   renderHTML({ node }) {
     const attrs = node.attrs as MentionItem;
 
-    if (attrs.type === "ens") {
-      return [
-        "span",
-        {
-          "data-type": attrs.type,
-          "data-name": attrs.name,
-          "data-address": attrs.address,
-          class: "mention font-medium",
-        },
-        `@${attrs.name}`,
-      ];
+    switch (attrs.type) {
+      case "ens": {
+        return [
+          "span",
+          {
+            "data-type": attrs.type,
+            "data-name": attrs.name,
+            "data-address": attrs.address,
+          },
+          `@${attrs.name}`,
+        ];
+      }
+      case "erc20": {
+        return [
+          "span",
+          {
+            "data-type": attrs.type,
+            "data-name": attrs.name,
+            "data-address": attrs.address,
+            "data-symbol": attrs.symbol,
+          },
+          `$${attrs.symbol}`,
+        ];
+      }
+      default: {
+        // farcaster
+        return [
+          "span",
+          {
+            "data-type": attrs.type,
+            "data-address": attrs.address,
+            "data-name": attrs.username || attrs.displayName || attrs.address,
+          },
+          `@${attrs.username || attrs.displayName || attrs.address}`,
+        ];
+      }
     }
-
-    return [
-      "span",
-      {
-        "data-type": attrs.type,
-        "data-name": attrs.name,
-        "data-address": attrs.address,
-        "data-symbol": attrs.symbol,
-        class: "mention font-medium",
-      },
-      `$${attrs.symbol || attrs.name || attrs.address}`,
-    ];
   },
   addOptions() {
     const parent = this.parent?.();
