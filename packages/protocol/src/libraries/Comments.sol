@@ -4,7 +4,6 @@ pragma solidity ^0.8.20;
 /// @title Comments - Library defining comment-related types
 library Comments {
   /// @notice Struct containing all comment data
-  /// @notice Struct containing all comment data
   /// @param author The address of the comment author
   /// @param app The address of the application signer that authorized this comment
   /// @param createdAt The timestamp when the comment was created
