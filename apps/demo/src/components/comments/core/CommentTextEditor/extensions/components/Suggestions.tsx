@@ -78,9 +78,7 @@ export const Suggestions = forwardRef(function Suggestions(
               {item.type === "erc20"
                 ? item.symbol || item.name || item.address
                 : null}
-              {item.type === "farcaster"
-                ? item.username || item.displayName || item.address
-                : null}
+              {item.type === "farcaster" ? item.username : null}
             </span>
           </button>
         ))

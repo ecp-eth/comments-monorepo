@@ -27,7 +27,7 @@ export const IndexerAPIFarcasterDataSchema = z.object({
   fid: z.number().int(),
   pfpUrl: z.string().optional(),
   displayName: z.string().optional(),
-  username: z.string().optional(),
+  username: z.string(),
 });
 
 export type IndexerAPIFarcasterDataSchemaType = z.infer<
@@ -99,7 +99,7 @@ export const IndexerAPICommentReferenceFarcasterSchema = z.object({
   type: z.literal("farcaster"),
   address: HexSchema,
   fid: z.number().int(),
-  username: z.string().nullable(),
+  username: z.string(),
   displayName: z.string().nullable(),
   pfpUrl: z.string().nullable(),
   position: IndexerAPICommentReferencePositionSchema,

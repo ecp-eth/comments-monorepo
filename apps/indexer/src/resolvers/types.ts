@@ -7,15 +7,6 @@ export type ResolvedENSData = {
   url: string;
 };
 
-export type ResolvedFarcasterData = {
-  fid: number;
-  address: Hex;
-  username?: string | null;
-  displayName?: string | null;
-  pfpUrl?: string | null;
-  url: string;
-};
-
 export type ResolvedERC20Data = {
   address: Hex;
   symbol: string;

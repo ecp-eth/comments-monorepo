@@ -62,6 +62,7 @@ const EnvSchema = z
       .transform((val) => val === "1"),
     PINATA_JWT: z.string().nonempty(),
     ENS_RPC_URL: z.string().url(),
+    NEYNAR_API_KEY: z.string().nonempty(),
   })
   .merge(publicEnvSchema)
   .merge(EthSubmitterEnvSchema.partial())

@@ -71,6 +71,9 @@ importers:
       '@hpke/core':
         specifier: ^1.7.2
         version: 1.7.2
+      '@neynar/nodejs-sdk':
+        specifier: ^2.13.1
+        version: 2.44.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4)
       '@privy-io/server-auth':
         specifier: 1.26.0
         version: 1.26.0(patch_hash=78088c76aea7ad10983f0789b33590118cecdd976346ac52e3b965b6bed7202a)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))
@@ -155,6 +158,12 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      dataloader:
+        specifier: ^2.2.3
+        version: 2.2.3
+      lru-cache:
+        specifier: ^11.0.2
+        version: 11.1.0
       lucide-react:
         specifier: ^0.474.0
         version: 0.474.0(react@19.1.0)
@@ -1019,6 +1028,9 @@ importers:
       '@ecp.eth/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@neynar/nodejs-sdk':
+        specifier: ^2.13.1
+        version: 2.44.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4)
       '@rainbow-me/rainbowkit':
         specifier: ^2.2.4
         version: 2.2.5(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(wagmi@2.15.5(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.2(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4))
@@ -1031,6 +1043,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      dataloader:
+        specifier: ^2.2.3
+        version: 2.2.3
       eslint:
         specifier: ^9.19.0
         version: 9.28.0(jiti@2.4.2)

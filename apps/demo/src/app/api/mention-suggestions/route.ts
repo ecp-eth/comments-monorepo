@@ -1,6 +1,11 @@
 import { env } from "@/env";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { JSONResponse } from "@ecp.eth/shared/helpers";
+import { LRUCache } from "lru-cache";
+import {
+  createFarcasterByAddressResolver,
+  type ResolvedFarcasterData,
+} from "@ecp.eth/shared/resolvers";
 import { tokenList } from "@ecp.eth/shared/token-list";
 import { NextRequest } from "next/server";
 import {
@@ -14,6 +19,19 @@ import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
 import { z } from "zod";
 import { supportedChains } from "@/lib/wagmi";
+
+const farcasterByAddressCache = new LRUCache<
+  Hex,
+  Promise<ResolvedFarcasterData | null>
+>({
+  max: 1000,
+  ttl: 1000 * 60 * 60 * 24,
+});
+
+const farcasterByAddressResolver = createFarcasterByAddressResolver({
+  cacheMap: farcasterByAddressCache,
+  neynarApiKey: env.NEYNAR_API_KEY,
+});
 
 const ensResolverClient = createPublicClient({
   chain: mainnet,
@@ -45,9 +63,9 @@ const farcasterSuggestionSchema = z.object({
   type: z.literal("farcaster"),
   address: HexSchema,
   fid: z.number().int(),
-  displayName: z.string().nullable(),
-  username: z.string().nullable(),
-  pfpUrl: z.string().nullable(),
+  displayName: z.string().nullish(),
+  username: z.string(),
+  pfpUrl: z.string().nullish(),
   url: z.string(),
 });
 
@@ -85,7 +103,7 @@ export async function GET(
 
   if (char === "@") {
     if (isEthAddress(query)) {
-      const ensName = await resolveENSNameByAddress(query as Hex);
+      const ensName = await resolveENSNameByAddress(query);
 
       if (ensName) {
         return new JSONResponse(responseSchema, {
@@ -95,7 +113,19 @@ export async function GET(
         });
       }
 
-      // @todo resolve farcaster
+      const farcaster = await farcasterByAddressResolver.load(query);
+
+      if (farcaster) {
+        return new JSONResponse(responseSchema, {
+          suggestions: [
+            {
+              type: "farcaster",
+              ...farcaster,
+            },
+          ],
+        });
+      }
+
       const token = await suggestERC20TokenByAddress(query as Hex, chainId);
 
       if (token) {

@@ -89,7 +89,7 @@ describe("content parser", () => {
         pfpUrl: null,
         displayName: null,
         url: "",
-        username: null,
+        username: "username",
         position: {
           start: 6,
           end: 49,
@@ -111,7 +111,7 @@ describe("content parser", () => {
                 address: "0x1234567890123456789012345678901234567890",
                 fid: 1234567890,
                 displayName: null,
-                username: null,
+                username: "username",
                 pfpUrl: null,
                 url: "",
               },

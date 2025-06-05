@@ -1,26 +1,16 @@
-import DataLoader from "dataloader";
-import { type Address, getAddress, type Hex } from "viem";
-import type { ResolvedFarcasterData } from "./types";
-import { LRUCache } from "lru-cache";
 import {
-  NeynarAPIClient,
-  Configuration as NeynarConfiguration,
-} from "@neynar/nodejs-sdk";
+  createFarcasterByAddressResolver,
+  type ResolvedFarcasterData,
+} from "@ecp.eth/shared/resolvers";
+import { type Hex } from "viem";
+import { LRUCache } from "lru-cache";
 
-import { User } from "@neynar/nodejs-sdk/build/api";
 import { env } from "../env";
-import { IndexerAPIFarcasterDataSchema } from "@ecp.eth/sdk/indexer";
 
-export type FarcasterByAddressResolver = DataLoader<
-  string,
-  ResolvedFarcasterData | null
->;
-
-const config = new NeynarConfiguration({
-  apiKey: env.NEYNAR_API_KEY,
-});
-
-const neynarClient = new NeynarAPIClient(config);
+export type {
+  ResolvedFarcasterData,
+  FarcasterByAddressResolver,
+} from "@ecp.eth/shared/resolvers";
 
 // could also use redis
 const cacheMap = new LRUCache<Hex, Promise<ResolvedFarcasterData | null>>({
@@ -29,56 +19,7 @@ const cacheMap = new LRUCache<Hex, Promise<ResolvedFarcasterData | null>>({
   allowStale: true,
 });
 
-export const farcasterByAddressResolver = new DataLoader<
-  Hex,
-  ResolvedFarcasterData | null
->(
-  async (addresses) => {
-    if (!addresses.length) {
-      return [];
-    }
-
-    try {
-      const response = await neynarClient.fetchBulkUsersByEthOrSolAddress({
-        addresses: addresses.slice(),
-      });
-
-      const normalizedResponse: Record<Address, User[]> = {};
-
-      for (const [key, value] of Object.entries(response)) {
-        normalizedResponse[getAddress(key)] = value;
-      }
-
-      return addresses.map((address) => {
-        const normalizedAddress = getAddress(address);
-        const [user] = normalizedResponse[normalizedAddress] ?? [];
-        const parseUserDataResult = IndexerAPIFarcasterDataSchema.safeParse({
-          fid: user?.fid,
-          username: user?.username,
-          displayName: user?.display_name,
-          pfpUrl: user?.pfp_url,
-        });
-
-        if (!parseUserDataResult.success) {
-          return null;
-        }
-
-        return {
-          address: normalizedAddress,
-          url: `https://farcaster.xyz/${parseUserDataResult.data.username || parseUserDataResult.data.fid}`,
-          ...parseUserDataResult.data,
-        };
-      });
-    } catch (e) {
-      console.error(e);
-
-      const err = e instanceof Error ? e : new Error(String(e));
-
-      throw err;
-    }
-  },
-  {
-    cacheMap,
-    maxBatchSize: 350, // this is limit coming from neynar api
-  },
-);
+export const farcasterByAddressResolver = createFarcasterByAddressResolver({
+  neynarApiKey: env.NEYNAR_API_KEY,
+  cacheMap,
+});
