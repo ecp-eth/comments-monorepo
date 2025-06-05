@@ -56,6 +56,12 @@ importers:
       '@ecp.eth/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@hpke/chacha20poly1305':
+        specifier: ^1.6.2
+        version: 1.6.2
+      '@hpke/core':
+        specifier: ^1.7.2
+        version: 1.7.2
       '@privy-io/server-auth':
         specifier: 1.26.0
         version: 1.26.0(patch_hash=78088c76aea7ad10983f0789b33590118cecdd976346ac52e3b965b6bed7202a)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))
@@ -2167,6 +2173,18 @@ packages:
     peerDependencies:
       hono: '>=3.9.0'
       zod: ~3.24.2
+
+  '@hpke/chacha20poly1305@1.6.2':
+    resolution: {integrity: sha512-LAzcHlX+GfrVqwjx+EqqHmEdkzE5YYIlzZz4Q1uN2Keq81iOB9IveJpufhsbyB1zw7W5/Y4gJ6dfAZq4gFO/sA==}
+    engines: {node: '>=16.0.0'}
+
+  '@hpke/common@1.7.3':
+    resolution: {integrity: sha512-6wbbjlOPWZb2MnBETFNJRMcnEcB8jXMnjepGUs8412xEQX2Prds1n1yibvaxwUmQiKsHvjkGX+vTlWjqiiSiKw==}
+    engines: {node: '>=16.0.0'}
+
+  '@hpke/core@1.7.2':
+    resolution: {integrity: sha512-WPsy/Wp1oF+47EVfQdXG55TGS+rOKAAZJ4W/4BFnTENGGq/EAJeX1h0ooCarkqWrJsREsrpa4EiIZkz1m8hMOA==}
+    engines: {node: '>=16.0.0'}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -13622,6 +13640,17 @@ snapshots:
     dependencies:
       hono: 4.7.11
       zod: 3.24.4
+
+  '@hpke/chacha20poly1305@1.6.2':
+    dependencies:
+      '@hpke/common': 1.7.3
+      '@noble/ciphers': 1.3.0
+
+  '@hpke/common@1.7.3': {}
+
+  '@hpke/core@1.7.2':
+    dependencies:
+      '@hpke/common': 1.7.3
 
   '@humanfs/core@0.19.1': {}
 
