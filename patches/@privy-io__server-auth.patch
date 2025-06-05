@@ -11,3 +11,16 @@ index 6ffed073a4ddcc69ce67648a69176e5550b7b456..42bea92d9a90aeea00fb06e4e939b590
  import '@solana/web3.js';
  import 'redaxios';
  import '@privy-io/public-api';
+diff --git a/package.json b/package.json
+index f07f9de48462d12c1584d029c09fb625b9c8708c..8538c355226f6fdb40ffd2eb24cf57b45cb93026 100644
+--- a/package.json
++++ b/package.json
+@@ -88,6 +88,8 @@
+     "@noble/hashes": "^1.5.0",
+     "@privy-io/public-api": "2.32.0",
+     "@solana/web3.js": "^1.95.8",
++    "@hpke/chacha20poly1305": "^1.6.2",
++    "@hpke/core": "^1.7.2",
+     "canonicalize": "^2.0.0",
+     "dotenv": "^16.0.3",
+     "jose": "^4.10.4",
