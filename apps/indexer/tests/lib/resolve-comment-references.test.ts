@@ -237,6 +237,7 @@ describe("resolveCommentReferences", () => {
         caip19: "eip155:1/erc20:0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
         decimals: 18,
         url: "https://etherscan.io/token/0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
+        chainId: 1,
       };
       resolveERC20ByAddress.mockResolvedValue(resolvedValue);
 
@@ -288,6 +289,7 @@ describe("resolveCommentReferences", () => {
         caip19: "eip155:1/erc20:0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
         decimals: 18,
         url: "https://etherscan.io/token/0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
+        chainId: 1,
       };
       resolveERC20ByTicker.mockResolvedValue(resolvedValue);
 
@@ -413,6 +415,7 @@ describe("resolveCommentReferences", () => {
         "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
       caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      chainId: 1,
     });
 
     resolveFarcasterByAddress.mockResolvedValue({
@@ -455,6 +458,7 @@ describe("resolveCommentReferences", () => {
           "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
         caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        chainId: 1,
         position: {
           start: 27,
           end: 32,
@@ -502,6 +506,7 @@ describe("resolveCommentReferences", () => {
         caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         decimals: 6,
+        chainId: 1,
       });
 
       const result = await resolveCommentReferences(
@@ -535,6 +540,7 @@ describe("resolveCommentReferences", () => {
         caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         decimals: 6,
+        chainId: 1,
       });
 
       const result = await resolveCommentReferences(
@@ -566,6 +572,92 @@ describe("resolveCommentReferences", () => {
       );
 
       expect(result.status).toBe("failed");
+    });
+  });
+
+  describe("erc20 caip url", () => {
+    it("resolves erc20 caip url prefixed with $", async () => {
+      resolveERC20ByAddress.mockResolvedValueOnce({
+        address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        name: "USD Coin",
+        symbol: "USDC",
+        logoURI:
+          "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
+        caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        decimals: 6,
+        chainId: 1,
+      });
+
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content: "$eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        },
+        options,
+      );
+
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          type: "erc20",
+          address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          name: "USD Coin",
+          symbol: "USDC",
+          logoURI:
+            "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
+          caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          chainId: 1,
+          decimals: 6,
+          position: {
+            start: 0,
+            end: 58,
+          },
+        },
+      ]);
+    });
+
+    it("resolves erc20 caip url without prefix", async () => {
+      resolveERC20ByAddress.mockResolvedValueOnce({
+        address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        name: "USD Coin",
+        symbol: "USDC",
+        logoURI:
+          "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
+        caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        decimals: 6,
+        chainId: 1,
+      });
+
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content: "$eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        },
+        options,
+      );
+
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          type: "erc20",
+          address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          name: "USD Coin",
+          symbol: "USDC",
+          logoURI:
+            "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
+          caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          chainId: 1,
+          decimals: 6,
+          position: {
+            start: 0,
+            end: 58,
+          },
+        },
+      ]);
     });
   });
 });

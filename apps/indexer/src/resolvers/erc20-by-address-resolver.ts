@@ -41,6 +41,7 @@ async function resolveErc20Data(
       name: token.name,
       symbol: token.symbol,
       caip19: token.caip19,
+      chainId: token.chainId,
       url: config.tokenAddressURL(address),
     };
   }
@@ -151,6 +152,7 @@ async function resolveERC20Token(
       decimals,
       logoURI: null,
       url: config.tokenAddressURL(address),
+      chainId: config.chainId,
       caip19: `eip155:${config.chainId}/erc20:${address}`,
     };
   } catch (e) {

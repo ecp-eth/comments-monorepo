@@ -57,6 +57,8 @@ const erc20TokenSuggestionSchema = z.object({
   name: z.string(),
   symbol: z.string(),
   address: HexSchema,
+  caip19: z.string(),
+  chainId: z.number().int(),
 });
 
 const farcasterSuggestionSchema = z.object({
@@ -136,6 +138,8 @@ export async function GET(
               symbol: token.symbol,
               name: token.name,
               address: query,
+              caip19: token.caip19,
+              chainId,
             },
           ],
         });
@@ -166,6 +170,8 @@ export async function GET(
       name: token.name,
       address: getAddress(token.address),
       symbol: token.symbol,
+      caip19: token.caip19,
+      chainId: token.chainId,
     })),
   });
 }
@@ -199,6 +205,7 @@ type ERC20Token = {
   name: string;
   symbol: string;
   decimals: number;
+  caip19: string;
 };
 
 async function resolveERC20Token(
@@ -237,7 +244,13 @@ async function resolveERC20Token(
       functionName: "decimals",
     });
 
-    return { address: getAddress(address), name, symbol, decimals };
+    return {
+      address: getAddress(address),
+      name,
+      symbol,
+      decimals,
+      caip19: `eip155:${chainId}/erc20:${address}`,
+    };
   } catch (e) {
     console.warn("Resolving ERC20 token from chain failed with", e);
     return null;
@@ -275,12 +288,14 @@ async function suggestERC20TokenByAddress(
   name: string;
   symbol: string;
   logoURI?: string | null;
+  caip19: string;
 }> {
   let token:
     | {
         name: string;
         symbol: string;
         logoURI?: string | null;
+        caip19: string;
       }
     | undefined
     | null = tokenList.find(

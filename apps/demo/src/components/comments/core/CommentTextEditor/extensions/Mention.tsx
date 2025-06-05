@@ -46,12 +46,30 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
           };
         },
       },
+      caip19: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-caip19"),
+        renderHTML: (attributes) => {
+          return {
+            "data-caip19": attributes.caip19,
+          };
+        },
+      },
       fid: {
         default: undefined,
         parseHTML: (element) => element.getAttribute("data-fid"),
         renderHTML: (attributes) => {
           return {
             "data-fid": attributes.fid,
+          };
+        },
+      },
+      chainId: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-chain-id"),
+        renderHTML: (attributes) => {
+          return {
+            "data-chain-id": attributes.chainId,
           };
         },
       },
@@ -122,8 +140,13 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
   renderText({ node }) {
     const attrs = node.attrs as MentionItem;
 
-    // render address so we can easily resolve it in indexer
-    return attrs.address;
+    // in case of erc20 token render caip19
+    if (attrs.type === "erc20") {
+      return attrs.caip19;
+    }
+
+    // for ens name, farcaster username or just address render address prefixed with mention
+    return `@${attrs.address}`;
   },
   renderHTML({ node }) {
     const attrs = node.attrs as MentionItem;

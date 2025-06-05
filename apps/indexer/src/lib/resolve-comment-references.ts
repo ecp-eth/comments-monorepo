@@ -97,6 +97,22 @@ export async function resolveCommentReferences(
       continue;
     }
 
+    match = restOfContent.match(ERC_20_CAIP_19_REGEX);
+
+    if (match) {
+      const position = { start: pos, end: pos + match[0].length };
+      const chainId = Number(match[1]);
+      const address = match[2] as Hex;
+
+      promises.push(
+        resolveERC20TokenEthAddress(address, chainId, position, options),
+      );
+
+      pos += [...match[0]].length;
+
+      continue;
+    }
+
     match = restOfContent.match(ERC20_TOKEN_TICKER_REGEX);
 
     if (match) {
@@ -167,11 +183,30 @@ type ResolverPosition = {
   end: number;
 };
 
+/**
+ * Can be any entity on a chain so make sure you resolve it properly
+ */
 const ETH_ADDRESS_REGEX = /^@?0x[a-fA-F0-9]{40}/u;
+/**
+ * This one is an address that should probably point only to erc20 token
+ */
 const ERC20_TOKEN_ETH_ADDRESS_REGEX = /^\$0x[a-fA-F0-9]{40}/u;
+/**
+ * Handles ens name or ens name mention
+ */
 const ENS_NAME_REGEX = /^@?[a-zA-Z0-9.-]+\.eth/u;
+/**
+ * Handles erc20 symbol
+ */
 const ERC20_TOKEN_TICKER_REGEX = /^\$[a-zA-Z0-9.-]+/u;
+/**
+ * Handles url
+ */
 const URL_REGEX = /^https?:\/\/[^\s<>[\]{}|\\^]+/u;
+/**
+ * Handles erc20 caip19 url
+ */
+const ERC_20_CAIP_19_REGEX = /^\$?eip155:([0-9]+)\/erc20:(0x[a-fA-F0-9]{40})/u;
 
 async function resolveEthAddress(
   address: Hex,
@@ -274,6 +309,7 @@ async function resolveERC20TokenTicker(
       logoURI: result.logoURI,
       url: result.url,
       caip19: result.caip19,
+      chainId: result.chainId,
     };
   }
 

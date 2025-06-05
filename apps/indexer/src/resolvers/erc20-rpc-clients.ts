@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { env } from "../env";
 import { createPublicClient, type Hex, http, type PublicClient } from "viem";
 import { getChainById } from "../utils/getChainById";
 
@@ -9,7 +8,7 @@ export type ChainClientConfig = {
 };
 
 // create clients based on ERC20_RPC_URL_{chainId} env variables
-export const erc20RpcClientsByChainId = Object.entries(env).reduce(
+export const erc20RpcClientsByChainId = Object.entries(process.env).reduce(
   (acc, [key, value]) => {
     if (key.startsWith("ERC20_RPC_URL_")) {
       const chainId = z.coerce
@@ -19,7 +18,10 @@ export const erc20RpcClientsByChainId = Object.entries(env).reduce(
         .parse(key.replace("ERC20_RPC_URL_", ""));
 
       const rpcUrl = z.string().url().parse(value);
-      const tokenUrl = z.string().url().parse(value);
+      const tokenUrl = z
+        .string()
+        .url()
+        .parse(process.env[`ERC20_TOKEN_URL_${chainId}`]);
 
       acc[chainId] = {
         client: createPublicClient({

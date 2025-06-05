@@ -129,13 +129,14 @@ describe("content parser", () => {
         address: "0x1234567890123456789012345678901234567890",
         name: "John Doe",
         symbol: "JDOE",
+        chainId: 1,
         position: {
           start: 6,
           end: 49,
         },
         url: "",
         logoURI: null,
-        caip19: "",
+        caip19: "eip155:1/erc20:0x1234567890123456789012345678901234567890",
       },
     ]);
 
@@ -153,6 +154,9 @@ describe("content parser", () => {
                 address: "0x1234567890123456789012345678901234567890",
                 name: "John Doe",
                 symbol: "JDOE",
+                chainId: 1,
+                caip19:
+                  "eip155:1/erc20:0x1234567890123456789012345678901234567890",
               },
             },
           ],
@@ -236,6 +240,7 @@ describe("content parser", () => {
             "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
           caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
           url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          chainId: 1,
           position: {
             start: 27,
             end: 32,
@@ -280,6 +285,9 @@ describe("content parser", () => {
                 address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 name: "USD Coin",
                 symbol: "USDC",
+                chainId: 1,
+                caip19:
+                  "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
               },
             },
             { type: "text", text: " 💻   " },

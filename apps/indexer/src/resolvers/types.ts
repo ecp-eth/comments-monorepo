@@ -15,4 +15,5 @@ export type ResolvedERC20Data = {
   logoURI: string | null;
   url: string;
   caip19: string;
+  chainId: number;
 };

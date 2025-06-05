@@ -112,6 +112,7 @@ export type IndexerAPICommentReferenceFarcasterSchemaType = z.infer<
 
 export const IndexerAPICommentReferenceERC20Schema = z.object({
   type: z.literal("erc20"),
+  chainId: z.number().int(),
   symbol: z.string(),
   logoURI: z.string().nullable(),
   name: z.string(),

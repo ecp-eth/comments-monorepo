@@ -41,6 +41,7 @@ async function resolveErc20Data(
     name: token.name,
     symbol: token.symbol,
     caip19: token.caip19,
+    chainId: token.chainId,
     url: config.tokenAddressURL(token.address as Hex),
   };
 }

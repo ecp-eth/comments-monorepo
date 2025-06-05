@@ -109,6 +109,8 @@ export function parse(
               address: reference.address,
               name: reference.name,
               symbol: reference.symbol,
+              caip19: reference.caip19,
+              chainId: reference.chainId,
             } satisfies MentionItem,
           });
 

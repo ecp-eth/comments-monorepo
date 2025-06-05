@@ -35,7 +35,7 @@ const referenceRenderers: Partial<ReferenceRendererKey> = {
         rel="noopener noreferrer"
         target="_blank"
       >
-        {reference.name}
+        @{reference.name}
       </a>
     );
   },
@@ -47,7 +47,7 @@ const referenceRenderers: Partial<ReferenceRendererKey> = {
         rel="noopener noreferrer"
         target="_blank"
       >
-        {reference.displayName}
+        @{reference.username}
       </a>
     );
   },
