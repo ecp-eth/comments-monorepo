@@ -72,29 +72,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @inheritdoc ICommentManager
   function postComment(
     Comments.CreateComment calldata commentData,
-    bytes calldata appSignature
-  ) external payable {
-    _postComment(commentData, bytes(""), appSignature);
-  }
-
-  /// @inheritdoc ICommentManager
-  function postCommentWithSig(
-    Comments.CreateComment calldata commentData,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) external payable {
-    _postComment(commentData, authorSignature, appSignature);
-  }
-
-  /// @notice Internal function to handle comment posting logic
-  /// @param commentData The comment data struct containing content and metadata
-  /// @param authorSignature Signature from the author (empty if called via postComment)
-  /// @param appSignature Signature from the app signer
-  function _postComment(
-    Comments.CreateComment calldata commentData,
-    bytes memory authorSignature,
-    bytes memory appSignature
-  ) internal {
+  ) external payable notStale(commentData.deadline) {
     address author = commentData.author;
     address app = commentData.app;
     uint256 channelId = commentData.channelId;
@@ -104,7 +84,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     string calldata targetUri = commentData.targetUri;
     string calldata commentType = commentData.commentType;
 
-    guardBlockTimestamp(commentData.deadline);
     guardParentCommentAndTargetUri(parentId, targetUri);
     guardChannelExists(channelId);
 
@@ -173,34 +152,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   function editComment(
     bytes32 commentId,
     Comments.EditComment calldata editData,
-    bytes calldata appSignature
-  ) external payable {
-    _editComment(commentId, editData, bytes(""), appSignature);
-  }
-
-  /// @inheritdoc ICommentManager
-  function editCommentWithSig(
-    bytes32 commentId,
-    Comments.EditComment calldata editData,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) external payable {
-    _editComment(commentId, editData, authorSignature, appSignature);
-  }
-
-  /// @notice Internal function to handle comment editing logic
-  /// @param commentId The unique identifier of the comment to edit
-  /// @param editData The comment data struct containing content and metadata
-  /// @param authorSignature Signature from the author (empty if called via editComment)
-  /// @param appSignature Signature from the app signer
-  function _editComment(
-    bytes32 commentId,
-    Comments.EditComment calldata editData,
-    bytes memory authorSignature,
-    bytes memory appSignature
-  ) internal {
-    guardBlockTimestamp(editData.deadline);
-
+  ) external payable notStale(editData.deadline) {
     Comments.Comment storage comment = comments[commentId];
     address author = comment.author;
     address editingApp = editData.app;
@@ -268,35 +222,27 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function deleteComment(bytes32 commentId) external {
-    Comments.Comment storage comment = comments[commentId];
-    address author = comment.author;
-
-    require(author != address(0), "Comment does not exist");
-    require(author == msg.sender, "Not comment author");
-
-    _deleteComment(commentId, msg.sender);
-  }
-
-  /// @inheritdoc ICommentManager
-  function deleteCommentWithSig(
+  function deleteComment(
     bytes32 commentId,
     address app,
     uint256 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) external {
-    guardBlockTimestamp(deadline);
-
+  ) external notStale(deadline) {
     Comments.Comment storage comment = comments[commentId];
     address author = comment.author;
 
     require(author != address(0), "Comment does not exist");
 
+    if (isBroadcastedByAuthorOrApp(author, app)) {
+      _deleteComment(commentId, msg.sender);
+      return;
+    }
+
     bytes32 deleteHash = getDeleteCommentHash(commentId, author, app, deadline);
 
     // for deleting comment, only single party (either author or app) is needed for authorization
-    guardAuthorizedByAuthorOrApp(
+    guardSignedByAuthorOrApp(
       author,
       app,
       deleteHash,
@@ -374,9 +320,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     uint256 nonce,
     uint256 deadline,
     bytes calldata signature
-  ) external {
-    guardBlockTimestamp(deadline);
-
+  ) external notStale(deadline) {
     guardNonceAndIncrement(author, app, nonce);
 
     bytes32 addApprovalHash = getAddApprovalHash(author, app, nonce, deadline);
@@ -393,9 +337,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     uint256 nonce,
     uint256 deadline,
     bytes calldata signature
-  ) external {
-    guardBlockTimestamp(deadline);
-
+  ) external notStale(deadline) {
     guardNonceAndIncrement(author, app, nonce);
 
     bytes32 removeApprovalHash = getRemoveApprovalHash(
@@ -539,14 +481,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     return deleted[commentId];
   }
 
-  /// @notice Internal function to guard against timestamp expiration
-  /// @param deadline The timestamp after which the operation is no longer valid
-  function guardBlockTimestamp(uint256 deadline) internal view {
-    if (block.timestamp > deadline) {
-      revert SignatureDeadlineReached(deadline, block.timestamp);
-    }
-  }
-
   /// @notice Internal function prevent replay attack by check nonce and increment it
   /// @param author The address of the comment author
   /// @param app The address of the app signer
@@ -627,27 +561,35 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     revert NotAuthorized(msg.sender, author);
   }
 
-  /// @notice Internal function to ensure either author or app is authorized to perform the action
+  /// @notice Internal function to check if the message is broadcasted by the author or an approved app
+  /// @param author The address of the comment author
+  /// @param app The address of the app signer
+  function isBroadcastedByAuthorOrApp(
+    address author,
+    address app
+  ) internal view returns (bool) {
+    return
+      msg.sender == author || (approvals[author][app] && msg.sender == app);
+  }
+
+  /// @notice Internal function to ensure either author or app is signed to perform the action
   /// @param author The address of the comment author
   /// @param app The address of the app signer
   /// @param sigHash The hash used to generate the signature
   /// @param authorSignature The signature of the author
   /// @param appSignature The signature of the app signer
-  function guardAuthorizedByAuthorOrApp(
+  function guardSignedByAuthorOrApp(
     address author,
     address app,
     bytes32 sigHash,
     bytes memory authorSignature,
     bytes memory appSignature
   ) internal view {
-    bool isAuthorizedByAuthor = (msg.sender == author ||
-      SignatureChecker.isValidSignatureNow(author, sigHash, authorSignature));
-
-    bool isAuthorizedByApprovedApp = approvals[author][app] &&
-      (msg.sender == app ||
-        SignatureChecker.isValidSignatureNow(app, sigHash, appSignature));
-
-    if (isAuthorizedByAuthor || isAuthorizedByApprovedApp) {
+    if (
+      SignatureChecker.isValidSignatureNow(author, sigHash, authorSignature) ||
+      (approvals[author][app] &&
+        SignatureChecker.isValidSignatureNow(app, sigHash, appSignature))
+    ) {
       return;
     }
 
@@ -671,5 +613,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     }
 
     revert InvalidAuthorSignature();
+  }
+
+  modifier notStale(uint256 deadline) {
+    if (block.timestamp > deadline) {
+      revert SignatureDeadlineReached(deadline, block.timestamp);
+    }
+    _;
   }
 }

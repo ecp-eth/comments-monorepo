@@ -29,6 +29,8 @@ contract DebugGasUsage is Test, IERC721Receiver {
   Comments.CreateComment createCommentData;
   bytes authorSignature;
   bytes appSignature;
+  bytes32 commentId;
+  Comments.EditComment editData;
 
   function setUp() public {
     owner = address(this);
@@ -50,9 +52,13 @@ contract DebugGasUsage is Test, IERC721Receiver {
     debugConstructChannelManager();
     debugCreateChannel();
     debugUpdateChannel();
-    debugPostComment();
-    debugPostCommentWithSigBroadcastedByAuthor();
-    debugPostCommentWithSigSignedByAuthor();
+    debugPostCommentBroadcastedByAuthor();
+    debugPostCommentSignedByAuthor();
+    debugEditCommentBroadcastedByAuthor();
+    debugEditCommentSignedByAuthor();
+    debugDeleteCommentBroadcastedByAuthor();
+    debugDeleteCommentSignedByAuthor();
+    debugDeleteCommentSignedByApp();
     debugParseCAIP19();
   }
 
@@ -102,7 +108,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     );
   }
 
-  function debugPostComment() public {
+  function debugPostCommentBroadcastedByAuthor() public {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 1",
@@ -116,20 +122,22 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
-    bytes32 commentId = comments.getCommentId(createCommentData);
-    authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, commentId);
+    commentId = comments.getCommentId(createCommentData);
     appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
 
-    // Post comment directly as author
+    // Post comment with sig directly as author
     vm.prank(user1);
-    measureGas("postComment", runPostComment);
+    measureGas(
+      "postComment broadcasted by author",
+      runPostCommentBroadcastedByAuthor
+    );
   }
 
-  function runPostComment() internal {
-    comments.postComment{ value: 0 }(createCommentData, appSignature);
+  function runPostCommentBroadcastedByAuthor() internal {
+    comments.postComment{ value: 0 }(createCommentData, "", appSignature);
   }
 
-  function debugPostCommentWithSigBroadcastedByAuthor() public {
+  function debugPostCommentSignedByAuthor() public {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 2",
@@ -143,26 +151,24 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
-    bytes32 commentId = comments.getCommentId(createCommentData);
+    commentId = comments.getCommentId(createCommentData);
+    authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, commentId);
     appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
 
-    // Post comment with sig directly as author
-    vm.prank(user1);
-    measureGas(
-      "postCommentWithSig broadcasted by author",
-      runPostCommentWithSigBroadcastedByAuthor
-    );
+    // Post comment directly as author
+    vm.prank(address(0xdead));
+    measureGas("postComment signed by author", runPostCommentSignedByAuthor);
   }
 
-  function runPostCommentWithSigBroadcastedByAuthor() internal {
-    comments.postCommentWithSig{ value: 0 }(
+  function runPostCommentSignedByAuthor() internal {
+    comments.postComment{ value: 0 }(
       createCommentData,
-      "",
+      authorSignature,
       appSignature
     );
   }
 
-  function debugPostCommentWithSigSignedByAuthor() public {
+  function debugEditCommentBroadcastedByAuthor() public {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 3",
@@ -176,22 +182,213 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
-    bytes32 commentId = comments.getCommentId(createCommentData);
-    authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, commentId);
+    commentId = comments.getCommentId(createCommentData);
     appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
 
-    // Post comment directly as author
-    vm.prank(address(0xdead));
+    // Post comment
+    vm.prank(user1);
+    comments.postComment{ value: 0 }(createCommentData, "", appSignature);
+
+    // Sign edit
+    editData = Comments.EditComment({
+      app: user2,
+      content: "Test comment 4",
+      metadata: "",
+      nonce: comments.getNonce(user1, user2),
+      deadline: block.timestamp + 1 days
+    });
+    bytes32 editHash = comments.getEditCommentHash(commentId, user1, editData);
+
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, editHash);
+
+    vm.prank(user1);
     measureGas(
-      "postCommentWithSig signed by author",
-      runPostCommentWithSigSignedByAuthor
+      "editComment broadcasted by author",
+      runEditCommentBroadcastedByAuthor
     );
   }
 
-  function runPostCommentWithSigSignedByAuthor() internal {
-    comments.postCommentWithSig{ value: 0 }(
-      createCommentData,
+  function runEditCommentBroadcastedByAuthor() internal {
+    comments.editComment{ value: 0 }(commentId, editData, "", appSignature);
+  }
+
+  function debugEditCommentSignedByAuthor() public {
+    // Create comment data using direct construction
+    createCommentData = Comments.CreateComment({
+      content: "Test comment 5",
+      metadata: "{}",
+      targetUri: "",
+      commentType: "comment",
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    commentId = comments.getCommentId(createCommentData);
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+
+    // Post comment
+    vm.prank(user1);
+    comments.postComment{ value: 0 }(createCommentData, "", appSignature);
+
+    // Sign edit
+    editData = Comments.EditComment({
+      app: user2,
+      content: "Test comment 6",
+      metadata: "",
+      nonce: comments.getNonce(user1, user2),
+      deadline: block.timestamp + 1 days
+    });
+    bytes32 editHash = comments.getEditCommentHash(commentId, user1, editData);
+
+    authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, editHash);
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, editHash);
+
+    vm.prank(address(0xdead));
+    measureGas("editComment signed by author", runEditCommentSignedByAuthor);
+  }
+
+  function runEditCommentSignedByAuthor() internal {
+    comments.editComment{ value: 0 }(
+      commentId,
+      editData,
       authorSignature,
+      appSignature
+    );
+  }
+
+  function debugDeleteCommentBroadcastedByAuthor() public {
+    // Create comment data using direct construction
+    createCommentData = Comments.CreateComment({
+      content: "Test comment 7",
+      metadata: "{}",
+      targetUri: "",
+      commentType: "comment",
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    commentId = comments.getCommentId(createCommentData);
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+
+    // Post comment
+    vm.prank(user1);
+    comments.postComment{ value: 0 }(createCommentData, "", appSignature);
+
+    vm.prank(user1);
+    measureGas(
+      "deleteComment broadcasted by author",
+      runDeleteCommentBroadcastedByAuthor
+    );
+  }
+
+  function runDeleteCommentBroadcastedByAuthor() internal {
+    comments.deleteComment(
+      commentId,
+      address(0x0),
+      block.timestamp + 1 days,
+      "",
+      ""
+    );
+  }
+
+  function debugDeleteCommentSignedByAuthor() public {
+    // Create comment data using direct construction
+    createCommentData = Comments.CreateComment({
+      content: "Test comment 8",
+      metadata: "{}",
+      targetUri: "",
+      commentType: "comment",
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    commentId = comments.getCommentId(createCommentData);
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+
+    // Post comment
+    vm.prank(user1);
+    comments.postComment{ value: 0 }(createCommentData, "", appSignature);
+
+    // Sign delete
+    bytes32 deleteHash = comments.getDeleteCommentHash(
+      commentId,
+      user1,
+      user2,
+      block.timestamp + 1 days
+    );
+
+    authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, deleteHash);
+
+    vm.prank(address(0xdead));
+    measureGas(
+      "deleteComment signed by author",
+      runDeleteCommentSignedByAuthor
+    );
+  }
+
+  function runDeleteCommentSignedByAuthor() internal {
+    comments.deleteComment(
+      commentId,
+      user2,
+      block.timestamp + 1 days,
+      authorSignature,
+      ""
+    );
+  }
+
+  function debugDeleteCommentSignedByApp() public {
+    vm.prank(user1);
+    comments.addApproval(user2);
+
+    // Create comment data using direct construction
+    createCommentData = Comments.CreateComment({
+      content: "Test comment 9",
+      metadata: "{}",
+      targetUri: "",
+      commentType: "comment",
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    commentId = comments.getCommentId(createCommentData);
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+
+    // Post comment
+    vm.prank(user1);
+    comments.postComment{ value: 0 }(createCommentData, "", appSignature);
+
+    // Sign delete
+    bytes32 deleteHash = comments.getDeleteCommentHash(
+      commentId,
+      user1,
+      user2,
+      block.timestamp + 1 days
+    );
+
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, deleteHash);
+
+    vm.prank(address(0xdead));
+    measureGas("deleteComment signed by app", runDeleteCommentSignedByApp);
+  }
+
+  function runDeleteCommentSignedByApp() internal {
+    comments.deleteComment(
+      commentId,
+      user2,
+      block.timestamp + 1 days,
+      "",
       appSignature
     );
   }
