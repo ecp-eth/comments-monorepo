@@ -152,11 +152,14 @@ export default function HomePage() {
               >
                 Community
               </Link>
+
               <Button
+                variant="default"
+                size="lg"
+                className="px-8 py-3 bg-indigo-600 text-white hover:bg-indigo-500 hidden md:flex"
                 asChild
-                className="px-8 py-3 bg-indigo-400 text-black hover:bg-indigo-500 hidden md:block"
               >
-                <Link href="https://docs.ethcomments.xyz">
+                <Link href="https://docs.ethcomments.xyz/">
                   <Zap className="w-5 h-5 mr-1" />
                   Quickstart
                 </Link>
@@ -190,7 +193,7 @@ export default function HomePage() {
               <Button
                 variant="default"
                 size="lg"
-                className="px-8 py-3 bg-indigo-400 text-black hover:bg-indigo-500"
+                className="px-8 py-3 bg-indigo-600 text-white hover:bg-indigo-500"
                 asChild
               >
                 <Link href="https://docs.ethcomments.xyz/">
@@ -582,7 +585,11 @@ await fetchComments({
                 Create a hook
               </Link>
             </Button>
-            <Button variant="default" asChild>
+            <Button
+              variant="default"
+              asChild
+              className="px-8 py-3 bg-indigo-600 text-white hover:bg-indigo-500"
+            >
               <Link href="https://github.com/ecp-eth/awesome-ecp-hooks">
                 <Search className="w-5 h-5 mr-2" />
                 Discover Hooks
@@ -645,7 +652,7 @@ await fetchComments({
             <Button
               variant="default"
               size="lg"
-              className="px-8 py-3 bg-indigo-400 text-black hover:bg-indigo-500"
+              className="px-8 py-3 bg-indigo-600 text-white hover:bg-indigo-500"
               asChild
             >
               <Link href="https://docs.ethcomments.xyz/">
