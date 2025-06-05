@@ -160,6 +160,10 @@ export default defineConfig({
           text: "Gas Costs",
           link: "/gas-costs",
         },
+        {
+          text: "FAQ",
+          link: "/faq",
+        },
       ],
     },
     {

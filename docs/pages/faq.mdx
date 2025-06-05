@@ -1,0 +1,17 @@
+# FAQ
+
+## Isn't putting content onchain expensive?
+
+See [Gas Costs](/gas-costs) for more information - blockspace is pretty cheap already, and only getting cheaper.
+
+## There's a protocol fee switch with no timelock on the governance contract. Isn't this a risk of frontrunning transactions with fee changes on short notice?
+
+This is a temporary tradeoff for the simplicity of the ECP contracts. We will publicly announce any fee increases at least 48 hours in advance. We plan to transfer the protocol ownership to a Governor contract that will have appropriate timelocks on protocol settings.
+
+## Is there a way to delete channel?
+
+No, but you can freeze the channel from receiving new comments by sending the channel NFT to the zero address, or setting a hook for the channel that reverts on every hook call.
+
+## Why is there a fee to create a channel?
+
+We want to initially prevent too many low quality channels from being created. We may remove this fee in the future.
