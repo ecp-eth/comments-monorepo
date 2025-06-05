@@ -1,5 +1,8 @@
 import { cloneElement, Fragment } from "react";
 import type {
+  IndexerAPICommentReferenceURLVideoSchemaType,
+  IndexerAPICommentReferenceURLImageSchemaType,
+  IndexerAPICommentReferenceURLFileSchemaType,
   IndexerAPICommentReferenceSchemaType,
   IndexerAPICommentReferencesSchemaType,
 } from "@ecp.eth/sdk/indexer";
@@ -7,6 +10,11 @@ import type {
 const KEEP_ORIGINAL_TEXT = Symbol("KEEP_ORIGINAL_TEXT");
 
 const URL_REGEX = /^https?:\/\/[^\s<>[\]{}|\\^]+/u;
+
+export type AllowedMediaReferences =
+  | IndexerAPICommentReferenceURLVideoSchemaType
+  | IndexerAPICommentReferenceURLImageSchemaType
+  | IndexerAPICommentReferenceURLFileSchemaType;
 
 type ReferenceRenderer<
   TReference extends IndexerAPICommentReferenceSchemaType,
@@ -63,10 +71,17 @@ type RenderToReactProps = {
   references: IndexerAPICommentReferencesSchemaType;
 };
 
+type RenderResult = {
+  element: React.ReactElement;
+  mediaReferences: AllowedMediaReferences[];
+};
+
 export function renderToReact({
   content,
   references,
-}: RenderToReactProps): React.ReactElement {
+}: RenderToReactProps): RenderResult {
+  const { mediaReferences, content: contentWithoutMediaReferences } =
+    processMediaReferences(content, references);
   const referencesByPosition: Map<
     number,
     IndexerAPICommentReferenceSchemaType
@@ -105,8 +120,8 @@ export function renderToReact({
 
   let pos = 0;
 
-  while (pos < content.length) {
-    const codePoint = content.codePointAt(pos);
+  while (pos < contentWithoutMediaReferences.length) {
+    const codePoint = contentWithoutMediaReferences.codePointAt(pos);
 
     if (codePoint == null) {
       throw new Error(`Invalid code point at position ${pos}`);
@@ -135,7 +150,7 @@ export function renderToReact({
 
     if (char === "\n" || char === "\r") {
       // skip the \r in \r\n
-      if (char === "\r" && content[pos + 1] === "\n") {
+      if (char === "\r" && contentWithoutMediaReferences[pos + 1] === "\n") {
         pos++;
       }
 
@@ -152,7 +167,7 @@ export function renderToReact({
     consecutiveNewLines = 0;
 
     // check if there is an url
-    const restOfText = content.slice(pos);
+    const restOfText = contentWithoutMediaReferences.slice(pos);
     const urlMatch = restOfText.match(URL_REGEX);
 
     if (urlMatch) {
@@ -184,5 +199,63 @@ export function renderToReact({
 
   flushParagraph();
 
-  return <Fragment>{elements}</Fragment>;
+  return {
+    element: <Fragment>{elements}</Fragment>,
+    mediaReferences,
+  };
+}
+
+type ProcessMediaReferencesResult = {
+  mediaReferences: AllowedMediaReferences[];
+  /**
+   * Content without media references
+   */
+  content: string;
+};
+
+function processMediaReferences(
+  content: string,
+  references: IndexerAPICommentReferenceSchemaType[],
+): ProcessMediaReferencesResult {
+  // First, let's identify which references are at the end
+  const mediaReferences: AllowedMediaReferences[] = [];
+
+  // Sort references by position
+  const sortedReferences = [...references].sort(
+    (a, b) => a.position.start - b.position.start,
+  );
+
+  let contentEndPos = content.length;
+
+  // Process references from end to start
+  for (let i = sortedReferences.length - 1; i >= 0; i--) {
+    const reference = sortedReferences[i];
+
+    if (
+      reference.type !== "image" &&
+      reference.type !== "video" &&
+      reference.type !== "file"
+    ) {
+      continue;
+    }
+
+    // Check if this reference is right at the end of remaining content
+    // and there's only whitespace after it
+    const isAtEnd =
+      reference.position.start <= contentEndPos &&
+      content.slice(reference.position.end, contentEndPos).trim() === "";
+
+    if (isAtEnd) {
+      mediaReferences.unshift(reference);
+      contentEndPos = reference.position.start;
+    }
+  }
+
+  // Trim content to remove the media references
+  const trimmedContent = content.slice(0, contentEndPos).trimEnd();
+
+  return {
+    content: trimmedContent,
+    mediaReferences,
+  };
 }
