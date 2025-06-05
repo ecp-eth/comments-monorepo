@@ -136,6 +136,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     Channels.Channel memory channel = channelManager.getChannel(channelId);
 
+    // emit event before calling the `onCommentAdd` hook to ensure the order of events is correct in the case of reentrancy
     emit CommentAdded(
       commentId,
       author,
@@ -230,6 +231,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       comment.channelId
     );
 
+    // emit event before calling the `onCommentEdit` hook to ensure the order of events is correct in the case of reentrancy
     emit CommentEdited(
       commentId,
       editingApp,
@@ -322,6 +324,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       commentToDelete.channelId
     );
 
+    // emit event before calling the `onCommentDelete` hook to ensure the order of events is correct in the case of reentrancy
     emit CommentDeleted(commentId, author);
 
     if (channel.hook != address(0) && channel.permissions.onCommentDelete) {
