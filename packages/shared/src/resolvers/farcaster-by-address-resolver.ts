@@ -15,8 +15,8 @@ export type ResolvedFarcasterData = {
   fid: number;
   address: Hex;
   username: string;
-  displayName?: string | null;
-  pfpUrl?: string | null;
+  displayName?: string;
+  pfpUrl?: string;
   url: string;
 };
 

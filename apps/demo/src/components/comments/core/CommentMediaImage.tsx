@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MediaDimensions } from "./types";
+import { getMediaOrientation } from "./utils";
 
 export function CommentMediaImage({
   fileOrUrl,
@@ -29,12 +30,7 @@ export function CommentMediaImage({
       setDimensions({
         width: img.naturalWidth,
         height: img.naturalHeight,
-        orientation:
-          img.naturalWidth > img.naturalHeight
-            ? "landscape"
-            : img.naturalWidth < img.naturalHeight
-              ? "portrait"
-              : "square",
+        orientation: getMediaOrientation(img.naturalWidth, img.naturalHeight),
       });
     };
 

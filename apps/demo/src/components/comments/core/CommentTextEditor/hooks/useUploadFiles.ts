@@ -1,11 +1,11 @@
-import type { GenerateUploadUrlResponseSchemaType } from "@/app/api/generate-upload-url/route";
 import { PinataSDK, type UploadResponse } from "pinata";
 import { publicEnv } from "@/publicEnv";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import type {
   UploadTrackerFileToUpload,
   UploadTrackerUploadedFile,
 } from "../extensions/UploadTracker";
+import { GenerateUploadUrlResponseSchema } from "@/lib/schemas";
 
 type UploadCallbacks = {
   onError?: (uploadedFileId: string, error: Error) => void;
@@ -31,8 +31,11 @@ type UseUploadFilesReturn = {
 };
 
 export function useUploadFiles(): UseUploadFilesReturn {
-  const uploadFile = useCallback(
-    async (file: UploadTrackerFileToUpload, callbacks?: UploadCallbacks) => {
+  return useMemo(() => {
+    const uploadFile = async (
+      file: UploadTrackerFileToUpload,
+      callbacks?: UploadCallbacks,
+    ) => {
       try {
         // first obtain upload url
         const uploadUrlResponse = await fetch("/api/generate-upload-url", {
@@ -44,8 +47,9 @@ export function useUploadFiles(): UseUploadFilesReturn {
           throw new Error("Failed to generate upload URL");
         }
 
-        const { url: uploadUrl } =
-          (await uploadUrlResponse.json()) as GenerateUploadUrlResponseSchemaType;
+        const { url: uploadUrl } = GenerateUploadUrlResponseSchema.parse(
+          await uploadUrlResponse.json(),
+        );
 
         const uploadResponse = await pinata.upload.public
           .file(file.file)
@@ -55,44 +59,37 @@ export function useUploadFiles(): UseUploadFilesReturn {
           uploadResponse.cid,
         );
 
-        if (callbacks?.onSuccess) {
-          callbacks.onSuccess(
-            {
-              id: file.id,
-              name: uploadResponse.name,
-              url: fileUrl,
-              mimeType: uploadResponse.mime_type,
-            },
-            uploadResponse,
-          );
-        }
+        callbacks?.onSuccess?.(
+          {
+            id: file.id,
+            name: uploadResponse.name,
+            url: fileUrl,
+            mimeType: uploadResponse.mime_type,
+          },
+          uploadResponse,
+        );
 
         return uploadResponse;
       } catch (e) {
-        if (callbacks?.onError) {
-          callbacks.onError(
-            file.id,
-            e instanceof Error ? e : new Error(String(e)),
-          );
-        }
+        callbacks?.onError?.(
+          file.id,
+          e instanceof Error ? e : new Error(String(e)),
+        );
 
         throw e;
       }
-    },
-    [],
-  );
+    };
 
-  const uploadFiles = useCallback(
-    async (files: UploadTrackerFileToUpload[], callbacks?: UploadCallbacks) => {
+    const uploadFiles = async (
+      files: UploadTrackerFileToUpload[],
+      callbacks?: UploadCallbacks,
+    ) => {
       return Promise.all(files.map((file) => uploadFile(file, callbacks)));
-    },
-    [uploadFile],
-  );
+    };
 
-  return useMemo(() => {
     return {
       uploadFile,
       uploadFiles,
     };
-  }, [uploadFile, uploadFiles]);
+  }, []);
 }

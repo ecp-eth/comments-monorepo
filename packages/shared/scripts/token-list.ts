@@ -3,9 +3,7 @@ import path from "path";
 import { writeFile, readFile } from "fs/promises";
 import { existsSync } from "fs";
 
-const tokenListResponse = await fetch(
-  "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokens.1inch.eth.link",
-);
+const tokenListResponse = await fetch("http://tokens.1inch.eth.link");
 
 if (!tokenListResponse.ok) {
   throw new Error("Failed to fetch token list");

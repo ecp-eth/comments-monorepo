@@ -3,12 +3,6 @@ import { CommentMediaImage } from "./CommentMediaImage";
 import { CommentMediaVideo } from "./CommentMediaVideo";
 import { CommentMediaFile } from "./CommentMediaFile";
 
-export type MediaDimensions = {
-  width: number;
-  height: number;
-  orientation: "landscape" | "portrait" | "square";
-};
-
 export function CommentMediaReference({
   reference,
 }: {

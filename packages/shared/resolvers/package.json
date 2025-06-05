@@ -1,5 +1,0 @@
-{
-  "type": "module",
-  "types": "../dist/esm/resolvers/index.d.ts",
-  "main": "../dist/cjs/resolvers/index.cjs"
-}

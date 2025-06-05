@@ -3,6 +3,7 @@ import { ALLOWED_UPLOAD_MIME_TYPES } from "@/lib/constants";
 import {
   BadRequestResponseSchema,
   InternalServerErrorResponseSchema,
+  GenerateUploadUrlResponseSchema,
 } from "@/lib/schemas";
 import { publicEnv } from "@/publicEnv";
 import { JSONResponse } from "@ecp.eth/shared/helpers";
@@ -17,14 +18,6 @@ const pinata = new PinataSDK({
 const payloadSchema = z.object({
   filename: z.string().trim().nonempty(),
 });
-
-const responseSchema = z.object({
-  url: z.string().url(),
-});
-
-export type GenerateUploadUrlResponseSchemaType = z.infer<
-  typeof responseSchema
->;
 
 export async function POST(request: Request) {
   try {
@@ -44,7 +37,7 @@ export async function POST(request: Request) {
       name: parsedBodyResult.data.filename,
     });
 
-    return new JSONResponse(responseSchema, {
+    return new JSONResponse(GenerateUploadUrlResponseSchema, {
       url,
     });
   } catch (e) {

@@ -1,0 +1,97 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentReferenceERC20SchemaType
+
+# Type Alias: IndexerAPICommentReferenceERC20SchemaType
+
+```ts
+type IndexerAPICommentReferenceERC20SchemaType = {
+  address: `0x${string}`;
+  caip19: string;
+  chainId: number;
+  logoURI: null | string;
+  name: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  symbol: string;
+  type: "erc20";
+  url: string;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:125](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L125)
+
+## Type declaration
+
+### address
+
+```ts
+address: `0x${string}` = HexSchema;
+```
+
+### caip19
+
+```ts
+caip19: string;
+```
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+### logoURI
+
+```ts
+logoURI: null | string;
+```
+
+### name
+
+```ts
+name: string;
+```
+
+### position
+
+```ts
+position: {
+  end: number;
+  start: number;
+} = IndexerAPICommentReferencePositionSchema;
+```
+
+#### position.end
+
+```ts
+end: number;
+```
+
+#### position.start
+
+```ts
+start: number;
+```
+
+### symbol
+
+```ts
+symbol: string;
+```
+
+### type
+
+```ts
+type: "erc20";
+```
+
+### url
+
+```ts
+url: string;
+```

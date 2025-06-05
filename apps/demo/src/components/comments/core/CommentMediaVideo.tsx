@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MediaDimensions } from "./types";
+import { getMediaOrientation } from "./utils";
 
 export function CommentMediaVideo({
   fileOrUrl: file,
@@ -27,12 +28,7 @@ export function CommentMediaVideo({
       setDimensions({
         width: video.videoWidth,
         height: video.videoHeight,
-        orientation:
-          video.videoWidth > video.videoHeight
-            ? "landscape"
-            : video.videoWidth < video.videoHeight
-              ? "portrait"
-              : "square",
+        orientation: getMediaOrientation(video.videoWidth, video.videoHeight),
       });
     };
 

@@ -14,7 +14,7 @@ const cacheMap = new LRUCache<Hex, Promise<ResolvedENSData | null>>({
   allowStale: true,
 });
 
-export type { ENSByAddressResolver };
+export type { ENSByAddressResolver, ResolvedENSData };
 
 export const ensByAddressResolver = createENSByAddressResolver({
   chainRpcUrl: env.ENS_RPC_URL,

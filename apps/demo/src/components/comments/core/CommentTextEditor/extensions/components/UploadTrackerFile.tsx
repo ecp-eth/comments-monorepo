@@ -4,12 +4,6 @@ import { CommentMediaVideo } from "../../../CommentMediaVideo";
 import { CommentMediaImage } from "../../../CommentMediaImage";
 import { CommentMediaFile } from "../../../CommentMediaFile";
 
-export type MediaDimensions = {
-  width: number;
-  height: number;
-  orientation: "landscape" | "portrait" | "square";
-};
-
 type UploadTrackerFileProps = {
   file: UploadTrackerFile;
   onDeleteClick: () => void;

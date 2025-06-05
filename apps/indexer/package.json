@@ -15,7 +15,8 @@
     "serve": "ponder serve",
     "lint": "eslint \"./src/**/*.ts\"",
     "check-types": "tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@0x/0x-parser": "^2.10.1",

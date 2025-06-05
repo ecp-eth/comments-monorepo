@@ -1,0 +1,90 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentReferenceFarcasterSchemaType
+
+# Type Alias: IndexerAPICommentReferenceFarcasterSchemaType
+
+```ts
+type IndexerAPICommentReferenceFarcasterSchemaType = {
+  address: `0x${string}`;
+  displayName: null | string;
+  fid: number;
+  pfpUrl: null | string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "farcaster";
+  url: string;
+  username: string;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:109](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L109)
+
+## Type declaration
+
+### address
+
+```ts
+address: `0x${string}` = HexSchema;
+```
+
+### displayName
+
+```ts
+displayName: null | string;
+```
+
+### fid
+
+```ts
+fid: number;
+```
+
+### pfpUrl
+
+```ts
+pfpUrl: null | string;
+```
+
+### position
+
+```ts
+position: {
+  end: number;
+  start: number;
+} = IndexerAPICommentReferencePositionSchema;
+```
+
+#### position.end
+
+```ts
+end: number;
+```
+
+#### position.start
+
+```ts
+start: number;
+```
+
+### type
+
+```ts
+type: "farcaster";
+```
+
+### url
+
+```ts
+url: string;
+```
+
+### username
+
+```ts
+username: string;
+```
