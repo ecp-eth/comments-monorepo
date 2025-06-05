@@ -251,7 +251,7 @@ contract PaymastersTest is Test, IERC721Receiver {
       initialPaymasterBalance
     );
 
-    assertEq(channelManager.getChannelOwner(channelId), address(user1Account));
+    assertEq(channelManager.ownerOf(channelId), address(user1Account));
   }
 
   function onERC721Received(

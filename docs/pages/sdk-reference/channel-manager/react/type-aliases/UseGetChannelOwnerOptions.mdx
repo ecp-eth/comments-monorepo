@@ -1,13 +1,16 @@
 [**@ecp.eth/sdk**](../../../index.mdx)
 
-***
+---
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager/react](/sdk-reference/channel-manager/react/index.mdx) / UseGetChannelOwnerOptions
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager/react](/sdk-reference/channel-manager/react/index.mdx) / UseOwnerOfOptions
 
-# Type Alias: UseGetChannelOwnerOptions
+# Type Alias: UseOwnerOfOptions
 
 ```ts
-type UseGetChannelOwnerOptions = Omit<UseQueryOptions<GetChannelOwnerResult, Error>, "queryKey" | "queryFn">;
+type UseOwnerOfOptions = Omit<
+  UseQueryOptions<OwnerOfResult, Error>,
+  "queryKey" | "queryFn"
+>;
 ```
 
 Defined in: [packages/sdk/src/channel-manager/react/channel.ts:192](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/react/channel.ts#L192)

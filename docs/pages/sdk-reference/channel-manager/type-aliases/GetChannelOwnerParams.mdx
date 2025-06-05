@@ -1,16 +1,16 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / GetChannelOwnerParams
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / OwnerOfParams
 
-# Type Alias: GetChannelOwnerParams
+# Type Alias: OwnerOfParams
 
 ```ts
-type GetChannelOwnerParams = {
+type OwnerOfParams = {
   channelId: bigint;
   channelManagerAddress?: Hex;
-  readContract: ContractReadFunctions["getChannelOwner"];
+  readContract: ContractReadFunctions["ownerOf"];
 };
 ```
 
@@ -28,7 +28,7 @@ Defined in: [packages/sdk/src/channel-manager/channel.ts:260](https://github.com
 
 The ID of the channel to get the owner of
 
-***
+---
 
 ### channelManagerAddress?
 
@@ -43,15 +43,15 @@ The address of the channel manager
 #### Default
 
 ```ts
-CHANNEL_MANAGER_ADDRESS
+CHANNEL_MANAGER_ADDRESS;
 ```
 
-***
+---
 
 ### readContract
 
 ```ts
-readContract: ContractReadFunctions["getChannelOwner"];
+readContract: ContractReadFunctions["ownerOf"];
 ```
 
 Defined in: [packages/sdk/src/channel-manager/channel.ts:267](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L267)

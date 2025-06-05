@@ -1592,25 +1592,6 @@ export const ChannelManagerABI = [
   },
   {
     type: "function",
-    name: "getChannelOwner",
-    inputs: [
-      {
-        name: "channelId",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
     name: "getHookTransactionFee",
     inputs: [],
     outputs: [

@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager/types](/sdk-reference/channel-manager/types/index.mdx) / ContractReadFunctions
 
@@ -8,12 +8,33 @@
 
 ```ts
 type ContractReadFunctions = {
-  channelExists: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "channelExists">>;
-  deductProtocolHookTransactionFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "deductProtocolHookTransactionFee">>;
-  getChannel: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
-  getChannelCreationFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelCreationFee">>;
-  getChannelOwner: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelOwner">>;
-  getHookTransactionFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getHookTransactionFee">>;
+  channelExists: (
+    args,
+  ) => Promise<ReadContractReturnType<ChannelManagerABIType, "channelExists">>;
+  deductProtocolHookTransactionFee: (
+    args,
+  ) => Promise<
+    ReadContractReturnType<
+      ChannelManagerABIType,
+      "deductProtocolHookTransactionFee"
+    >
+  >;
+  getChannel: (
+    args,
+  ) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
+  getChannelCreationFee: (
+    args,
+  ) => Promise<
+    ReadContractReturnType<ChannelManagerABIType, "getChannelCreationFee">
+  >;
+  ownerOf: (
+    args,
+  ) => Promise<ReadContractReturnType<ChannelManagerABIType, "ownerOf">>;
+  getHookTransactionFee: (
+    args,
+  ) => Promise<
+    ReadContractReturnType<ChannelManagerABIType, "getHookTransactionFee">
+  >;
 };
 ```
 
@@ -24,7 +45,8 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:89](https://github.com/ec
 ### channelExists()
 
 ```ts
-channelExists: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "channelExists">>;
+channelExists: (args) =>
+  Promise<ReadContractReturnType<ChannelManagerABIType, "channelExists">>;
 ```
 
 Defined in: [packages/sdk/src/channel-manager/types.ts:94](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L94)
@@ -39,12 +61,18 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:94](https://github.com/ec
 
 `Promise`\<`ReadContractReturnType`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"channelExists"`\>\>
 
-***
+---
 
 ### deductProtocolHookTransactionFee()
 
 ```ts
-deductProtocolHookTransactionFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "deductProtocolHookTransactionFee">>;
+deductProtocolHookTransactionFee: (args) =>
+  Promise<
+    ReadContractReturnType<
+      ChannelManagerABIType,
+      "deductProtocolHookTransactionFee"
+    >
+  >;
 ```
 
 Defined in: [packages/sdk/src/channel-manager/types.ts:122](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L122)
@@ -59,12 +87,13 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:122](https://github.com/e
 
 `Promise`\<`ReadContractReturnType`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"deductProtocolHookTransactionFee"`\>\>
 
-***
+---
 
 ### getChannel()
 
 ```ts
-getChannel: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
+getChannel: (args) =>
+  Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
 ```
 
 Defined in: [packages/sdk/src/channel-manager/types.ts:90](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L90)
@@ -79,12 +108,15 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:90](https://github.com/ec
 
 `Promise`\<`ReadContractReturnType`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"getChannel"`\>\>
 
-***
+---
 
 ### getChannelCreationFee()
 
 ```ts
-getChannelCreationFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelCreationFee">>;
+getChannelCreationFee: (args) =>
+  Promise<
+    ReadContractReturnType<ChannelManagerABIType, "getChannelCreationFee">
+  >;
 ```
 
 Defined in: [packages/sdk/src/channel-manager/types.ts:104](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L104)
@@ -99,12 +131,13 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:104](https://github.com/e
 
 `Promise`\<`ReadContractReturnType`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"getChannelCreationFee"`\>\>
 
-***
+---
 
-### getChannelOwner()
+### ownerOf()
 
 ```ts
-getChannelOwner: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelOwner">>;
+ownerOf: (args) =>
+  Promise<ReadContractReturnType<ChannelManagerABIType, "ownerOf">>;
 ```
 
 Defined in: [packages/sdk/src/channel-manager/types.ts:98](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L98)
@@ -113,18 +146,21 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:98](https://github.com/ec
 
 ##### args
 
-`ReadContractParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"getChannelOwner"`\>
+`ReadContractParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"ownerOf"`\>
 
 #### Returns
 
-`Promise`\<`ReadContractReturnType`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"getChannelOwner"`\>\>
+`Promise`\<`ReadContractReturnType`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"ownerOf"`\>\>
 
-***
+---
 
 ### getHookTransactionFee()
 
 ```ts
-getHookTransactionFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getHookTransactionFee">>;
+getHookTransactionFee: (args) =>
+  Promise<
+    ReadContractReturnType<ChannelManagerABIType, "getHookTransactionFee">
+  >;
 ```
 
 Defined in: [packages/sdk/src/channel-manager/types.ts:113](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L113)

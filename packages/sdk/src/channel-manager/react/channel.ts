@@ -17,9 +17,9 @@ import {
   type GetChannelParams,
   type GetChannelResult,
   getChannel,
-  type GetChannelOwnerParams,
-  type GetChannelOwnerResult,
-  getChannelOwner,
+  type OwnerOfParams,
+  type OwnerOfResult,
+  ownerOf,
   type GetChannelCreationFeeParams,
   type GetChannelCreationFeeResult,
   getChannelCreationFee,
@@ -185,18 +185,12 @@ export function useChannelExists(
   });
 }
 
-export type UseGetChannelOwnerParams = Omit<
-  GetChannelOwnerParams,
-  "readContract"
->;
-export type UseGetChannelOwnerOptions = Omit<
-  UseQueryOptions<GetChannelOwnerResult, Error>,
+export type UseOwnerOfParams = Omit<OwnerOfParams, "readContract">;
+export type UseOwnerOfOptions = Omit<
+  UseQueryOptions<OwnerOfResult, Error>,
   "queryKey" | "queryFn"
 >;
-export type UseGetChannelOwnerResult = UseQueryResult<
-  GetChannelOwnerResult,
-  Error
->;
+export type UseOwnerOfResult = UseQueryResult<OwnerOfResult, Error>;
 
 /**
  * Get the owner of a channel
@@ -205,10 +199,10 @@ export type UseGetChannelOwnerResult = UseQueryResult<
  * @param options - The options for the query
  * @returns The result of the query
  */
-export function useGetChannelOwner(
-  params: UseGetChannelOwnerParams,
-  options: UseGetChannelOwnerOptions = {},
-): UseGetChannelOwnerResult {
+export function useOwnerOf(
+  params: UseOwnerOfParams,
+  options: UseOwnerOfOptions = {},
+): UseOwnerOfResult {
   const client = usePublicClient();
 
   return useQuery({
@@ -216,7 +210,7 @@ export function useGetChannelOwner(
     enabled: options.enabled && !!client,
     queryKey: ["channelOwner", params.channelId, params.channelManagerAddress],
     queryFn: async () => {
-      const result = await getChannelOwner({
+      const result = await ownerOf({
         ...params,
         readContract: async (params) => {
           if (!client) {
