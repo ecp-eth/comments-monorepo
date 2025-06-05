@@ -21,17 +21,22 @@ contract DebugGasUsage is Test, IERC721Receiver {
   address public owner;
   address public user1;
   address public user2;
+  uint256 public user1PrivateKey;
   uint256 public user2PrivateKey;
 
   uint256 channelId;
   Comments.Comment commentData;
   Comments.CreateComment createCommentData;
-  bytes signature;
+  bytes authorSignature;
+  bytes appSignature;
 
   function setUp() public {
     owner = address(this);
-    user1 = makeAddr("user1");
+    (address _user1, uint256 _user1PrivateKey) = makeAddrAndKey("user1");
     (address _user2, uint256 _user2PrivateKey) = makeAddrAndKey("user2");
+
+    user1 = _user1;
+    user1PrivateKey = _user1PrivateKey;
     user2 = _user2;
     user2PrivateKey = _user2PrivateKey;
 
@@ -46,6 +51,8 @@ contract DebugGasUsage is Test, IERC721Receiver {
     debugCreateChannel();
     debugUpdateChannel();
     debugPostComment();
+    debugPostCommentWithSigBroadcastedByAuthor();
+    debugPostCommentWithSigSignedByAuthor();
     debugParseCAIP19();
   }
 
@@ -98,7 +105,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
   function debugPostComment() public {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
-      content: "Test comment",
+      content: "Test comment 1",
       metadata: "{}",
       targetUri: "",
       commentType: "comment",
@@ -110,7 +117,8 @@ contract DebugGasUsage is Test, IERC721Receiver {
     });
 
     bytes32 commentId = comments.getCommentId(createCommentData);
-    signature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+    authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, commentId);
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
 
     // Post comment directly as author
     vm.prank(user1);
@@ -118,7 +126,74 @@ contract DebugGasUsage is Test, IERC721Receiver {
   }
 
   function runPostComment() internal {
-    comments.postComment{ value: 0 }(createCommentData, signature);
+    comments.postComment{ value: 0 }(createCommentData, appSignature);
+  }
+
+  function debugPostCommentWithSigBroadcastedByAuthor() public {
+    // Create comment data using direct construction
+    createCommentData = Comments.CreateComment({
+      content: "Test comment 2",
+      metadata: "{}",
+      targetUri: "",
+      commentType: "comment",
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    bytes32 commentId = comments.getCommentId(createCommentData);
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+
+    // Post comment with sig directly as author
+    vm.prank(user1);
+    measureGas(
+      "postCommentWithSig broadcasted by author",
+      runPostCommentWithSigBroadcastedByAuthor
+    );
+  }
+
+  function runPostCommentWithSigBroadcastedByAuthor() internal {
+    comments.postCommentWithSig{ value: 0 }(
+      createCommentData,
+      "",
+      appSignature
+    );
+  }
+
+  function debugPostCommentWithSigSignedByAuthor() public {
+    // Create comment data using direct construction
+    createCommentData = Comments.CreateComment({
+      content: "Test comment 3",
+      metadata: "{}",
+      targetUri: "",
+      commentType: "comment",
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    bytes32 commentId = comments.getCommentId(createCommentData);
+    authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, commentId);
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+
+    // Post comment directly as author
+    vm.prank(address(0xdead));
+    measureGas(
+      "postCommentWithSig signed by author",
+      runPostCommentWithSigSignedByAuthor
+    );
+  }
+
+  function runPostCommentWithSigSignedByAuthor() internal {
+    comments.postCommentWithSig{ value: 0 }(
+      createCommentData,
+      authorSignature,
+      appSignature
+    );
   }
 
   function debugParseCAIP19() public {
