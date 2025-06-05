@@ -98,7 +98,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     string calldata metadata,
     address hook
   ) external payable returns (uint256 channelId) {
-    if (msg.sender == address(0)) revert ZeroAddress();
     collectChannelCreationFee();
 
     // Generate channel ID using the internal function
