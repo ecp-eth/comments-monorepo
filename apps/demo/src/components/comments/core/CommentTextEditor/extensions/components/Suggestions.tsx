@@ -1,7 +1,11 @@
 import type { MentionSuggestionSchemaType } from "@/app/api/mention-suggestions/route";
 import { cn } from "@/lib/utils";
+import { getChainById } from "@ecp.eth/shared/helpers";
 import type { SuggestionProps } from "@tiptap/suggestion";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import * as chains from "viem/chains";
+
+const allChains = Object.values(chains);
 
 export type SuggestionsProps = SuggestionProps<MentionSuggestionSchemaType>;
 
@@ -76,7 +80,7 @@ export const Suggestions = forwardRef(function Suggestions(
             <span>
               {item.type === "ens" ? item.name : null}
               {item.type === "erc20"
-                ? item.symbol || item.name || item.address
+                ? `${item.symbol || item.name || item.address} (${getChainById(item.chainId, Object.values(chains))?.name})`
                 : null}
               {item.type === "farcaster" ? item.username : null}
             </span>

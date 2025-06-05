@@ -1,24 +1,76 @@
 import { env } from "@/env";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
-import { JSONResponse } from "@ecp.eth/shared/helpers";
+import { getChainById, JSONResponse } from "@ecp.eth/shared/helpers";
 import { LRUCache } from "lru-cache";
+import * as chains from "viem/chains";
+import Dataloader from "dataloader";
 import {
   createFarcasterByAddressResolver,
+  createERC20ByAddressResolver,
+  type ERC20ByAddressResolverKey,
+  type ERC20ClientRegistry as ERC20ClientRegistryType,
+  createENSByAddressResolver,
+  createENSByNameResolver,
+  createERC20ByQueryResolver,
   type ResolvedFarcasterData,
+  type ResolvedENSData,
+  ResolvedERC20Data,
+  type ERC20ClientConfig,
 } from "@ecp.eth/shared/resolvers";
-import { tokenList } from "@ecp.eth/shared/token-list";
 import { NextRequest } from "next/server";
-import {
-  createPublicClient,
-  type Hex,
-  http,
-  getAddress,
-  isAddressEqual,
-} from "viem";
-import { mainnet } from "viem/chains";
-import { normalize } from "viem/ens";
+import { type Hex, createPublicClient, getAddress, http } from "viem";
 import { z } from "zod";
-import { supportedChains } from "@/lib/wagmi";
+
+const ERC_20_CAIP_19_REGEX = /^eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40})$/;
+
+const allChains = Object.values(chains);
+
+class ERC20ClientRegistry
+  extends Dataloader<number, ERC20ClientConfig | null>
+  implements ERC20ClientRegistryType
+{
+  constructor() {
+    super(async (chainIds) => {
+      return chainIds.map((chainId) => {
+        try {
+          const rpcUrl = z
+            .string()
+            .url()
+            .parse(process.env[`ERC20_RPC_URL_${chainId}`]);
+          const tokenUrl = z
+            .string()
+            .url()
+            .parse(process.env[`ERC20_TOKEN_URL_${chainId}`]);
+
+          return {
+            client: createPublicClient({
+              chain: getChainById(chainId, allChains) as chains.Chain,
+              transport: http(rpcUrl),
+            }),
+            tokenAddressURL: (address) =>
+              tokenUrl.replace("{tokenAddress}", address),
+          } satisfies ERC20ClientConfig;
+        } catch (e) {
+          if (e instanceof z.ZodError) {
+            console.error(
+              `validation error for chain ${chainId} client`,
+              e.flatten(),
+            );
+            return null;
+          }
+
+          throw e;
+        }
+      });
+    });
+  }
+
+  getClientByChainId(chainId: number): Promise<ERC20ClientConfig | null> {
+    return this.load(chainId);
+  }
+}
+
+const erc20ClientRegistry = new ERC20ClientRegistry();
 
 const farcasterByAddressCache = new LRUCache<
   Hex,
@@ -33,16 +85,47 @@ const farcasterByAddressResolver = createFarcasterByAddressResolver({
   neynarApiKey: env.NEYNAR_API_KEY,
 });
 
-const ensResolverClient = createPublicClient({
-  chain: mainnet,
-  transport: http(env.ENS_RPC_URL),
+const ensByAddressCache = new LRUCache<Hex, Promise<ResolvedENSData | null>>({
+  max: 1000,
+  ttl: 1000 * 60 * 60 * 24,
+});
+
+const ensByAddressResolver = createENSByAddressResolver({
+  chainRpcUrl: env.ENS_RPC_URL,
+  cacheMap: ensByAddressCache,
+});
+
+const ensByNameCache = new LRUCache<string, Promise<ResolvedENSData | null>>({
+  max: 1000,
+  ttl: 1000 * 60 * 60 * 24,
+});
+
+const ensByNameResolver = createENSByNameResolver({
+  chainRpcUrl: env.ENS_RPC_URL,
+  cacheMap: ensByNameCache,
+});
+
+const erc20ByAddressCache = new LRUCache<
+  ERC20ByAddressResolverKey,
+  Promise<ResolvedERC20Data | null>
+>({
+  max: 1000,
+  ttl: 1000 * 60 * 60 * 24,
+});
+
+const erc20ByAddressResolver = createERC20ByAddressResolver({
+  clientRegistry: erc20ClientRegistry,
+  cacheMap: erc20ByAddressCache,
+});
+
+const erc20ByQueryResolver = createERC20ByQueryResolver({
+  limit: 20,
+  clientRegistry: erc20ClientRegistry,
 });
 
 const requestParamSchema = z.object({
   query: z.string().trim().min(1).nonempty().toLowerCase(),
-  chainId: z
-    .enum(Object.keys(supportedChains) as [string, ...string[]])
-    .transform((value) => Number(value)),
+  chainId: z.coerce.number().int(),
   char: z.enum(["@", "$"]),
 });
 
@@ -105,12 +188,12 @@ export async function GET(
 
   if (char === "@") {
     if (isEthAddress(query)) {
-      const ensName = await resolveENSNameByAddress(query);
+      const ensName = await ensByAddressResolver.load(query);
 
       if (ensName) {
         return new JSONResponse(responseSchema, {
           suggestions: [
-            { type: "ens", name: ensName, address: getAddress(query) },
+            { type: "ens", name: ensName.name, address: ensName.address },
           ],
         });
       }
@@ -128,7 +211,7 @@ export async function GET(
         });
       }
 
-      const token = await suggestERC20TokenByAddress(query as Hex, chainId);
+      const token = await erc20ByAddressResolver.load([query, chainId]);
 
       if (token) {
         return new JSONResponse(responseSchema, {
@@ -149,7 +232,7 @@ export async function GET(
         suggestions: [],
       });
     } else if (query.endsWith(".eth")) {
-      const ensName = await resolveENSAddressByName(query);
+      const ensName = await ensByNameResolver.load(query);
 
       if (ensName) {
         return new JSONResponse(responseSchema, {
@@ -161,8 +244,34 @@ export async function GET(
     }
   }
 
+  // detect if user entered caip19 address of ERC20 token
+  const caip19Match = query.match(ERC_20_CAIP_19_REGEX);
+
+  if (caip19Match) {
+    const [, chainId, address] = caip19Match;
+    const token = await erc20ByAddressResolver.load([
+      address as Hex,
+      Number(chainId),
+    ]);
+
+    if (token) {
+      return new JSONResponse(responseSchema, {
+        suggestions: [
+          {
+            type: "erc20",
+            name: token.name,
+            address: token.address,
+            symbol: token.symbol,
+            caip19: token.caip19,
+            chainId: token.chainId,
+          },
+        ],
+      });
+    }
+  }
+
   // so we weren't able to resolve an address so now we don't care what the char actually is and we can just try to search for erc20 tokens
-  const tokens = await suggestERC20TokensBySymbol(query, chainId);
+  const tokens = await erc20ByQueryResolver.load(query);
 
   return new JSONResponse(responseSchema, {
     suggestions: tokens.map((token) => ({
@@ -174,152 +283,4 @@ export async function GET(
       chainId: token.chainId,
     })),
   });
-}
-
-const ERC20_ABI = [
-  {
-    name: "name",
-    type: "function",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ type: "string" }],
-  },
-  {
-    name: "symbol",
-    type: "function",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ type: "string" }],
-  },
-  {
-    name: "decimals",
-    type: "function",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ type: "uint8" }],
-  },
-] as const;
-
-type ERC20Token = {
-  address: Hex;
-  name: string;
-  symbol: string;
-  decimals: number;
-  caip19: string;
-};
-
-async function resolveERC20Token(
-  address: Hex,
-  chainId: number,
-): Promise<null | ERC20Token> {
-  const chainConfig = supportedChains[chainId as keyof typeof supportedChains];
-
-  if (!chainConfig) {
-    throw new Error(`Chain ${chainId} is not supported`);
-  }
-
-  const publicClient = createPublicClient(chainConfig);
-  const bytecode = await publicClient.getCode({ address });
-
-  if (!bytecode) {
-    return null;
-  }
-
-  try {
-    const name = await publicClient.readContract({
-      address,
-      abi: ERC20_ABI,
-      functionName: "name",
-    });
-
-    const symbol = await publicClient.readContract({
-      address,
-      abi: ERC20_ABI,
-      functionName: "symbol",
-    });
-
-    const decimals = await publicClient.readContract({
-      address,
-      abi: ERC20_ABI,
-      functionName: "decimals",
-    });
-
-    return {
-      address: getAddress(address),
-      name,
-      symbol,
-      decimals,
-      caip19: `eip155:${chainId}/erc20:${address}`,
-    };
-  } catch (e) {
-    console.warn("Resolving ERC20 token from chain failed with", e);
-    return null;
-  }
-}
-
-async function resolveENSNameByAddress(address: Hex) {
-  const ensName = await ensResolverClient.getEnsName({
-    address,
-  });
-
-  return ensName;
-}
-
-async function resolveENSAddressByName(name: string) {
-  const normalizedName = normalize(name);
-  const address = await ensResolverClient.getEnsAddress({
-    name: normalizedName,
-  });
-
-  if (address) {
-    return {
-      address,
-      name: normalizedName,
-    };
-  }
-
-  return null;
-}
-
-async function suggestERC20TokenByAddress(
-  address: Hex,
-  chainId: number,
-): Promise<null | {
-  name: string;
-  symbol: string;
-  logoURI?: string | null;
-  caip19: string;
-}> {
-  let token:
-    | {
-        name: string;
-        symbol: string;
-        logoURI?: string | null;
-        caip19: string;
-      }
-    | undefined
-    | null = tokenList.find(
-    (token) =>
-      isAddressEqual(token.address as Hex, address) &&
-      token.chainId === chainId,
-  );
-
-  if (!token) {
-    token = await resolveERC20Token(address, chainId);
-  }
-
-  return token ?? null;
-}
-
-async function suggestERC20TokensBySymbol(
-  lowerCasedSymbol: string,
-  chainId: number,
-) {
-  const tokens = tokenList.filter(
-    (token) =>
-      token.symbol.toLowerCase().includes(lowerCasedSymbol) &&
-      token.chainId === chainId,
-  );
-
-  return tokens;
 }

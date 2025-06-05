@@ -38,11 +38,6 @@
       "import": "./dist/esm/schemas.js",
       "default": "./dist/cjs/schemas.cjs"
     },
-    "./token-list": {
-      "types": "./dist/esm/token-list.d.ts",
-      "import": "./dist/esm/token-list.js",
-      "default": "./dist/cjs/token-list.cjs"
-    },
     "./types": {
       "types": "./dist/esm/types.d.ts",
       "import": "./dist/esm/types.js",
@@ -60,9 +55,9 @@
     "gen:token-list": "node --experimental-strip-types scripts/token-list.ts"
   },
   "devDependencies": {
-    "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/build-tools": "workspace:^",
     "@ecp.eth/eslint-config": "workspace:*",
+    "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/typescript-config": "workspace:*",
     "@neynar/nodejs-sdk": "^2.13.1",
     "@rainbow-me/rainbowkit": "^2.2.4",
