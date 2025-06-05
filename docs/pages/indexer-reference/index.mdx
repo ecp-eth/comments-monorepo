@@ -1,33 +1,37 @@
-# ECP Indexer
+{/*
+  !!DO NOT EDIT!!
+  Automatically generated doc.
+  run `pnpm run ref:gen:indexer:index` to update
+  !!DO NOT EDIT!!
+*/}
+# Open source Ponder based indexer
 
-The ECP (Ethereum Comments Protocol) Indexer is a [Ponder](https://ponder.sh/) based service that indexes and processes comments from the EVM-compatible blockchains. It provides REST API endpoints that allow clients to efficiently query and access the indexed comment data.
+We provide an open source [Ponder](https://ponder.sh/) Indexer service that indexes and processes comments from the EVM-compatible blockchains. It provides REST API endpoints that allow clients to efficiently query and access the indexed comment data.
 
 ## Overview
 
-The ECP Indexer utilise [Ponder](https://ponder.sh/) to monitor `CommentManager` contract events for comment-related activities and processes them into a queryable database. It supports the following features:
+The ECP Indexer monitors `CommentManager` contract events for comment-related activities and processes them into a queryable database. It supports the following features:
 
-- Indexes comments from ECP-compatible smart contracts
+- Indexes comments from ECP smart contracts
 - Processes comment metadata and content
 - Maintains relationships between comments (replies, threads)
 - Provides REST API endpoints for querying indexed comments
 
-### Authentication
+### Free Hosted Indexer
 
-The API is currently free to use and does not require authentication.
-
-### Rate Limiting
-
-If you are an enterprise user of the API please consider self hosting - we may throttle this API.
+We are running a free hosted version of this indexer at https://api.ethcomments.xyz. If you are an enterprise user of the API please consider self hosting - we may throttle this API.
 
 ### Links
 
-- The API endpoints: https://api.ethcomments.xyz/
+- [API endpoints](https://api.ethcomments.xyz/)
 - [Restful API reference and playground](https://docs.ethcomments.xyz/indexer-reference/restful)
-- OpenAPI spec: https://docs.ethcomments.xyz/indexer-openapi.yaml
-- GraphQL references and playground: https://api.ethcomments.xyz/graphql
-- Source code: https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer
+- [OpenAPI spec](https://docs.ethcomments.xyz/indexer-openapi.yaml)
+- [GraphQL references and playground](https://api.ethcomments.xyz/graphql)
+- [Source code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer)
 
-## Getting Started
+## Self hosting the Indexer
+
+Clone the repo from the [Source code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer)
 
 ### Prerequisites
 

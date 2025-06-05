@@ -1,4 +1,4 @@
-import { PrivyClient } from "@privy-io/server-auth";
+import * as PrivyServerAuth from "@privy-io/server-auth";
 import { createViemAccount } from "@privy-io/server-auth/viem";
 import { env, SubmitterEnvSchema } from "@/env";
 import { privateKeyToAccount } from "viem/accounts";
@@ -13,7 +13,7 @@ export async function resolveSubmitterAccount() {
     return privateKeyToAccount(submitterSettings.SUBMITTER_PRIVATE_KEY);
   }
 
-  const privy = new PrivyClient(
+  const privy = new PrivyServerAuth.PrivyClient(
     submitterSettings.PRIVY_APP_ID,
     submitterSettings.PRIVY_SECRET,
     {

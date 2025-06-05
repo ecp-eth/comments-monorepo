@@ -1,31 +1,15 @@
 # Comments Protocol Contract
 
-The Comments Protocol is a smart contract that enables users to post and manage comments with optional app-signer approval. It implements EIP-712 for typed structured data hashing and signing.
+The contracts are currently only deployed on the Monad testnet as we decide where to deploy the production contracts.
 
 ## Comment Manager Contract Details
 
 - **Contract Address:** `%COMMENT_MANAGER_ADDRESS`
 - **Networks:**
-  - [Ethereum](https://etherscan.io/address/%COMMENT_MANAGER_ADDRESS)
-  - [Ethereum Sepolia](https://sepolia.etherscan.io/address/%COMMENT_MANAGER_ADDRESS)
-  - [Base](https://basescan.org/address/%COMMENT_MANAGER_ADDRESS)
-  - [Base Sepolia](https://sepolia.basescan.org/address/%COMMENT_MANAGER_ADDRESS)
-  - [World chain](https://worldscan.worldchain.xyz/address/%COMMENT_MANAGER_ADDRESS)
-- **Contract Explorer:** [View on Basescan](https://basescan.org/address/%COMMENT_MANAGER_ADDRESS#code)
+  - [Monad testnet](https://monad-testnet.socialscan.io/address/%COMMENT_MANAGER_ADDRESS)
 - **Contract ABI:** [View ABI Documentation](/protocol-reference/CommentManager)
 
-### Features
-
-- Comments stored on-chain
-- Post comments with or without app-signer approval
-- Delete comments with signature verification
-- Manage app-signer approvals
-- EIP-712 compliant for secure signing
-- Support for comment metadata and parent-child relationships
-
-### Contract Functions
-
-The contract provides several key functions:
+### Comment Manager Contract Functions
 
 | Function                 | Description                                               | Note                                                           |
 | ------------------------ | --------------------------------------------------------- | -------------------------------------------------------------- |
@@ -42,26 +26,10 @@ For detailed information about all functions, events, and structs, please refer 
 
 - **Contract Address:** `%CHANNEL_MANAGER_ADDRESS`
 - **Networks:**
-  - [Ethereum](https://etherscan.io/address/%CHANNEL_MANAGER_ADDRESS)
-  - [Ethereum Sepolia](https://sepolia.etherscan.io/address/%CHANNEL_MANAGER_ADDRESS)
-  - [Base](https://basescan.org/address/%CHANNEL_MANAGER_ADDRESS)
-  - [Base Sepolia](https://sepolia.basescan.org/address/%CHANNEL_MANAGER_ADDRESS)
-  - [World chain](https://worldscan.worldchain.xyz/address/%CHANNEL_MANAGER_ADDRESS)
-- **Contract Explorer:** [View on Basescan](https://basescan.org/address/%CHANNEL_MANAGER_ADDRESS#code)
-- **Contract ABI:** [View ABI Documentation](/protocol-reference/CommentManager)
+  - [Monad testnet](https://monad-testnet.socialscan.io/address/%CHANNEL_MANAGER_ADDRESS)
+- **Contract ABI:** [View ABI Documentation](/protocol-reference/ChannelManager)
 
-### Features
-
-- Comments stored on-chain
-- Post comments with or without app-signer approval
-- Delete comments with signature verification
-- Manage app-signer approvals
-- EIP-712 compliant for secure signing
-- Support for comment metadata and parent-child relationships
-
-### Contract Functions
-
-The contract provides several key functions:
+### ChannelManager Contract Functions
 
 | Function                 | Description                                                                           | Note                                     |
 | ------------------------ | ------------------------------------------------------------------------------------- | ---------------------------------------- |
@@ -75,4 +43,4 @@ The contract provides several key functions:
 | `updateCommentsContract` | Updates the address of the Comments contract                                          | Only callable by contract owner          |
 | `setBaseURI`             | Sets the base URI for token metadata                                                  | Only callable by contract owner          |
 
-For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/CommentManager).
+For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/ChannelManager).

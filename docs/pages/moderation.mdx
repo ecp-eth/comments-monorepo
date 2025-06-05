@@ -1,0 +1,75 @@
+# Spam Prevention & Content Moderation
+
+> **Important Note**: The protocol itself does not perform any moderation. Each application (demo, embed, or custom implementations) is responsible for implementing their own moderation strategies using the tools provided below or through their own mechanisms. The ECP hosted indexer provides an opinionated moderation stack.
+
+## The Challenge of Content Moderation
+
+Content moderation is a notoriously difficult problem that remains broadly unsolved across the internet. The challenges include:
+
+- Balancing free speech with content quality
+- Scaling moderation across different languages and cultures  
+- Detecting sophisticated spam and abuse patterns
+- Managing the costs and complexity of human moderation
+
+Recognizing this complexity, specialized infrastructure providers exist to help solve moderation challenges and can index ECP data to provide advanced moderation services for applications that need them.
+
+## ECP's Multi-Layer Moderation Approach
+
+ECP makes moderation easier by providing multiple layers of protection that work together:
+
+### Layer A: Pre-Cosigning App Moderation
+
+Apps can moderate content **before** cosigning a comment with their app, enabling them to filter out unwanted content based on offchain rules before it ever makes it onchain. This includes:
+
+- **Rate Limiting**: Comments are rate-limited per author address. When rate limit is exceeded, requests return a 429 status code with a `Retry-After` header
+- **Content Filtering**: Basic profanity detection using the `obscenity` library, rejecting comments containing profane words
+- **CAPTCHA Systems**: Challenge-response systems to prevent automated spam
+- **Custom Validation**: Any application-specific rules or filters
+
+When combined with indexing only comments from your app, this approach can be highly effective at maintaining content quality.
+
+### Layer B: Onchain Gating with Hooks
+
+You can use Hooks that apply onchain gating mechanisms to limit who can comment:
+
+- **Token Gating**: Only token holders can comment, significantly limiting spam vectors
+- **NFT Requirements**: Require ownership of specific NFTs to participate
+- **Staking Mechanisms**: Require users to stake tokens to comment
+- **Reputation Systems**: Base commenting permissions on onchain reputation
+
+These onchain restrictions create economic and social barriers that make spam less profitable.
+
+### Layer C: Indexer-Level Moderation
+
+The indexer service implements additional spam prevention measures and tools:
+
+1. **Muted Address Detection**
+   - Maintains a list of known muted addresses that you can mark to hide them from your app
+   - Comments from addresses marked as muted are not indexed
+   - Muted accounts can be managed using the [Admin CLI](/indexer/admin-cli-muted-accounts)
+
+2. **Content Validation (Opt in)**
+   - Implements basic profanity detection
+   - Can be extended with more advanced content analysis
+
+3. **Comment Premoderation (Opt in)**
+   - Comments can be configured to require moderator approval before appearing in the feed
+   - When enabled, new comments are initially hidden and only become visible after explicit approval
+   - Moderators can approve or reject comments through the [Admin CLI](/indexer/admin-cli-comments-premoderation), directly through [Indexer API](/indexer-reference/restful) or through a Telegram bot
+   - This provides an additional layer of control over content quality and spam prevention
+
+### Layer D: Hosted Infrastructure Moderation
+
+The ECP team is currently responsible for moderation on the free hosted indexer and actively uses premoderation on comments to ensure quality standards are maintained for applications using the hosted service - at our discretion. You can self host your own indexer to run your own moderation.
+
+## Recommendations & Future improvements
+
+For production deployments, consider implementing or using service providers foradditional spam prevention measures:
+
+- Machine learning-based content analysis
+- IP-based rate limiting
+- Advanced pattern matching for spam detection
+- User reputation scoring
+- Integration with specialized moderation service providers
+- Community-based moderation systems
+- CAPTCHA or similar challenge-response systems

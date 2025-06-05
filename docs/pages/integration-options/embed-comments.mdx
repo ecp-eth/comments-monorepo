@@ -1,4 +1,5 @@
 import IframeConfigurator from "../../components/IframeConfigurator";
+import { ScrollToCommentButton } from "../../components/ScrollToCommentButton";
 
 # Integration Options
 
@@ -6,28 +7,13 @@ import IframeConfigurator from "../../components/IframeConfigurator";
 
 The iframe embedding option allows you to integrate comments into any website without requiring React or any other JavaScript framework. This is ideal for static websites or platforms where you can't modify the JavaScript code.
 
-### Using the Configurator
+## Demo
 
-The configurator below provides a visual interface to customize your comments section. You can:
+<ScrollToCommentButton />
 
-1. Enter your page URI
-2. Customize the appearance using the visual controls
-3. Copy the generated iframe code
-4. See a live preview of how your comments will look
+### Generate an iframe code for your website
 
 <IframeConfigurator />
-
-### Basic Implementation
-
-After configuring your comments section using the configurator above, you'll get a code snippet that looks like this:
-
-```html
-<iframe
-  src="https://embed.ethcomments.xyz?uri=YOUR_PAGE_URI&config=YOUR_CONFIG"
-  style="width: 100%; height: 600px; border: none;"
-  title="Comments"
-></iframe>
-```
 
 ### URI Guidelines
 
