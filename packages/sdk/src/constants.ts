@@ -31,9 +31,15 @@ export const ZERO_ADDRESS = toHex(0, { size: 20 });
 export const DEFAULT_CHANNEL_ID = 0n;
 
 /**
+ * Comment type constants
+ */
+export const COMMENT_TYPE_COMMENT = 0;
+export const COMMENT_TYPE_REACTION = 1;
+
+/**
  * The default comment type for the `CommentManager` contract.
  */
-export const DEFAULT_COMMENT_TYPE = "comment" as const;
+export const DEFAULT_COMMENT_TYPE = COMMENT_TYPE_COMMENT;
 
 /**
  * The default `embedUri` for the CommentsEmbed component.

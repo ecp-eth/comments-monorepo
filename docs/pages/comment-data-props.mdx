@@ -8,13 +8,57 @@ The comment content stores the plain text content of the comment.
 
 - Please use `\n` for line breaks. (Most browsers will normalize the line breaks to `\n` regardless of the OS).
 - any media or links that should be displayed to users should be stored in the content property and rendered by clients based on the media type at the uri.
+- For **reactions** (commentType = 1), the content field contains the reaction type as a string.
+
+### Reaction Content Types
+
+When `commentType = 1` (reaction), the `content` field should contain a string indicating the type of reaction:
+
+#### Standardized Reaction Types
+
+- `"like"` - General approval or appreciation
+- `"downvote"` - Disagreement or negative feedback
+- `"repost"` - Sharing or amplifying the content
+
+#### Custom Reaction Types
+
+Applications can define their own reaction types based on their specific use cases:
+
+- `"heart"` - Love or strong appreciation
+- `"laugh"` - Humorous response
+- `"angry"` - Strong disagreement
+- `"celebrate"` - Excitement or congratulations
+- `"insightful"` - Marking content as particularly valuable
+
+#### Implementation Notes
+
+- Reaction content should be a simple string identifier (lowercase recommended)
+- Applications should validate reaction types against their supported list
+- Unknown reaction types should be handled gracefully by displaying a generic reaction icon
+- Consider internationalization when displaying reaction labels to users
 
 ## `metadata`
 
-The `metadata` property stores additional data that shouldn't be shown to the user as it is.
+The `metadata` property stores additional data as key-value pairs that shouldn't be shown to the user as-is.
 
-- Must be a valid JSON string (RFC 8259)[https://datatracker.ietf.org/doc/html/rfc8259].
+- Stored as an array of `MetadataEntry` structures with `bytes32 key` and `bytes value` fields
+- Keys should be UTF-8 encoded strings with format "key type" (e.g., "category string", "priority uint256")
+- Values are stored as `bytes` and can contain any encoded data type
+- Significantly more gas-efficient than JSON strings, especially when metadata is empty
 - Please be mindful that storing large amounts of data on the chain will increase the cost of the transaction.
+
+### Metadata Access
+
+```solidity
+// Get all metadata for a comment
+Comments.MetadataEntry[] memory metadata = commentManager.getCommentMetadata(commentId);
+
+// Get specific metadata value
+bytes memory value = commentManager.getCommentMetadataValue(commentId, keccak256("category string"));
+
+// Get all metadata keys
+bytes32[] memory keys = commentManager.getCommentMetadataKeys(commentId);
+```
 
 ## `targetUri`
 
@@ -70,14 +114,92 @@ The deadline is a timestamp in seconds since the epoch. Posting a comment with a
 
 ## `commentType`
 
-The `commentType` property is used to categorize the type of comment being created.
+The `commentType` property uses a `uint8` value to efficiently categorize different types of comments.
 
-- Must be a string value that describes the nature of the comment.
-- Common examples include:
-  - `"comment"` - A standard comment or discussion
-  - `"like"` - A like or reaction to content
-- Applications can define their own comment types based on their specific use cases.
-- This field helps applications filter and display comments appropriately based on their type.
+### Comment Type Values
+
+| Value | Name                  | Description                | Usage                                       |
+| ----- | --------------------- | -------------------------- | ------------------------------------------- |
+| `0`   | **Comment** (Default) | Standard text comments     | Regular discussions, replies, conversations |
+| `1`   | **Reaction**          | Quick reactions to content | Likes, dislikes, hearts, thumbs up/down     |
+
+### Constants
+
+The `Comments` library provides constants for easy reference:
+
+```solidity
+Comments.COMMENT_TYPE_COMMENT = 0;   // Standard comment
+Comments.COMMENT_TYPE_REACTION = 1;  // Reaction
+```
+
+### Usage Examples
+
+#### Standard Comment (Type 0)
+
+```solidity
+Comments.CreateComment memory commentData = Comments.CreateComment({
+    author: userAddress,
+    app: appAddress,
+    channelId: 1,
+    deadline: block.timestamp + 3600,
+    parentId: bytes32(0),
+    commentType: 0, // or Comments.COMMENT_TYPE_COMMENT
+    content: "This is a thoughtful response to the discussion.",
+    metadata: new Comments.MetadataEntry[](0),
+    targetUri: "https://example.com/post/123"
+});
+```
+
+#### Reaction (Type 1)
+
+```solidity
+Comments.CreateComment memory reactionData = Comments.CreateComment({
+    author: userAddress,
+    app: appAddress,
+    channelId: 1,
+    deadline: block.timestamp + 3600,
+    parentId: bytes32(0),
+    commentType: 1, // or Comments.COMMENT_TYPE_REACTION
+    content: "like", // The reaction type goes in the content field
+    metadata: new Comments.MetadataEntry[](0),
+    targetUri: "https://example.com/post/123"
+});
+```
+
+### Implementation Notes
+
+- **Default Behavior**: If `commentType` is not explicitly set, it defaults to `0` (standard comment)
+- **Storage Efficiency**: Using `uint8` instead of `string` saves significant gas, especially for reactions
+- **Immutable**: Comment type cannot be changed after creation (not included in `EditComment` struct)
+- **Validation**: Applications should validate that reaction content contains valid reaction types
+- **Extensibility**: Additional comment types can be added in future versions
+
+### Gas Savings
+
+By using `uint8` instead of `string` for comment types:
+
+- **Reactions**: Save ~20,000+ gas per reaction (no string storage needed)
+- **Comments**: Save ~10,000+ gas per comment vs storing "comment" string
+- **Events**: More efficient event indexing and filtering
+
+### Frontend Integration
+
+Applications can easily filter and display different comment types:
+
+```typescript
+// Filter for reactions only
+const reactions = comments.filter((c) => c.commentType === 1);
+
+// Filter for standard comments only
+const textComments = comments.filter((c) => c.commentType === 0);
+
+// Handle reaction display
+if (comment.commentType === 1) {
+  displayReaction(comment.content); // "like", "heart", etc.
+} else {
+  displayComment(comment.content);
+}
+```
 
 ## `channelId`
 
@@ -89,21 +211,35 @@ The `channelId` property is used to organize comments into different channels or
 - Applications can use this to implement features like multiple comment sections, communities, or discussion boards.
 
 ## `createdAt` (automatic)
+
 - Timestamp when the comment was first created (in seconds since epoch).
 - Set automatically when the comment is posted to the blockchain.
 - Cannot be modified after creation.
 
-## `updatedAt`  (automatic)
+## `updatedAt` (automatic)
+
 - Timestamp when the comment was last modified (in seconds since epoch).
 - Updated automatically whenever the comment content or metadata is edited.
 - Initially equals `createdAt` for new comments.
 
-## `hookData`
+## Hook Metadata
 
-The `hookData` property stores additional data that can be added by hooks during comment processing.
+Hook metadata is additional data that can be added by hooks during comment processing, stored separately from regular metadata.
 
-- Must be a valid string.
-- Used by the protocol's hook system to attach additional information to comments.
-- The specific format and content depend on the hooks implemented by the application.
-- Applications can use this for custom features like moderation flags, additional metadata, or integration data.
+- Stored as key-value pairs similar to regular metadata
+- Used by the protocol's hook system to attach additional information to comments
+- The specific format and content depend on the hooks implemented by the application
+- Applications can use this for custom features like moderation flags, additional metadata, or integration data
 
+### Hook Metadata Access
+
+```solidity
+// Get all hook metadata for a comment
+Comments.MetadataEntry[] memory hookMetadata = commentManager.getCommentHookMetadata(commentId);
+
+// Get specific hook metadata value
+bytes memory value = commentManager.getCommentHookMetadataValue(commentId, keccak256("moderationStatus string"));
+
+// Get all hook metadata keys
+bytes32[] memory keys = commentManager.getCommentHookMetadataKeys(commentId);
+```

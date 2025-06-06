@@ -10,8 +10,7 @@ import type {
   CommentData,
   CreateReplyCommentDataParams,
   CreateRootCommentDataParams,
-  Json,
-  JsonObject,
+  MetadataEntry,
 } from "./types.js";
 
 export const JsonLiteralSchema = z.union([
@@ -21,57 +20,35 @@ export const JsonLiteralSchema = z.union([
   z.null(),
 ]);
 
-export const JsonSchema: z.ZodType<Json> = z.lazy(() =>
+export const JsonSchema: z.ZodType<any> = z.lazy(() =>
   z.union([JsonLiteralSchema, z.array(JsonSchema), z.record(JsonSchema)]),
 );
 
-export const JsonObjectSchema: z.ZodType<JsonObject> = z.record(
+export const JsonObjectSchema: z.ZodType<Record<string, any>> = z.record(
   z.string(),
   JsonSchema,
 );
 
-export const CommentMetadataSchema = z.string().refine(
-  (val) => {
-    if (!val) {
-      return true;
-    }
+export const MetadataEntrySchema = z.object({
+  key: HexSchema,
+  value: HexSchema,
+});
 
-    try {
-      const parsedValue = JSON.parse(val);
-
-      const parsedValueSchema = JsonObjectSchema.safeParse(parsedValue);
-
-      if (!parsedValueSchema.success) {
-        return false;
-      }
-
-      return true;
-    } catch {
-      return false;
-    }
-  },
-  {
-    message: "Invalid JSON, expecting object",
-  },
-);
+export const MetadataArraySchema = z.array(MetadataEntrySchema);
 
 export const CommentDataSchema = z.object({
   author: HexSchema,
   app: HexSchema,
 
   channelId: z.coerce.bigint(),
-  deadline: z.coerce.bigint(),
   parentId: HexSchema,
 
   content: z.string(),
-  metadata: CommentMetadataSchema,
   targetUri: z.string(),
-  commentType: z.string(),
+  commentType: z.number(),
 
   createdAt: z.coerce.bigint(),
   updatedAt: z.coerce.bigint(),
-
-  hookData: z.string(),
 });
 
 // this just tests if the shape is correct
@@ -80,6 +57,8 @@ export const CommentDataSchema = z.object({
 export const CreateCommentDataSchema = CommentDataSchema.omit({
   createdAt: true,
   updatedAt: true,
+}).extend({
+  deadline: z.coerce.bigint(),
 });
 
 export type CreateCommentData = z.infer<typeof CreateCommentDataSchema>;
@@ -93,11 +72,9 @@ const BaseCommentInputDataSchema = z.object({
   parentId: HexSchema,
 
   content: z.string(),
-  metadata: CommentMetadataSchema,
+  metadata: MetadataArraySchema.default([]),
   targetUri: z.string(),
-  commentType: z.string().default(DEFAULT_COMMENT_TYPE),
-
-  hookData: z.string().default(""),
+  commentType: z.number().default(DEFAULT_COMMENT_TYPE),
 });
 
 export const RootCommentInputDataSchema = BaseCommentInputDataSchema.omit({
@@ -112,7 +89,7 @@ export const RootCommentInputDataSchema = BaseCommentInputDataSchema.omit({
 ({}) as z.infer<typeof RootCommentInputDataSchema> satisfies Omit<
   CreateRootCommentDataParams,
   "metadata"
->;
+> & { metadata: MetadataEntry[] };
 
 export const ReplyCommentInputDataSchema = BaseCommentInputDataSchema.omit({
   targetUri: true,
@@ -124,7 +101,7 @@ export const ReplyCommentInputDataSchema = BaseCommentInputDataSchema.omit({
 ({}) as z.infer<typeof ReplyCommentInputDataSchema> satisfies Omit<
   CreateReplyCommentDataParams,
   "metadata"
->;
+> & { metadata: MetadataEntry[] };
 
 /**
  * Comment input data schema. This is used as input of the functions.
@@ -147,7 +124,7 @@ export type CommentInputData = z.infer<typeof CommentInputDataSchema>;
 export const EditCommentDataSchema = z.object({
   commentId: HexSchema,
   content: z.string(),
-  metadata: CommentMetadataSchema,
+  metadata: MetadataArraySchema.default([]),
   app: HexSchema,
   nonce: z.coerce.bigint(),
   deadline: z.coerce.bigint(),
@@ -168,14 +145,23 @@ export const AddCommentTypedDataSchema = z.object({
     AddComment: z.array(
       z.union([
         z.object({ name: z.literal("content"), type: z.literal("string") }),
-        z.object({ name: z.literal("metadata"), type: z.literal("string") }),
+        z.object({
+          name: z.literal("metadata"),
+          type: z.literal("MetadataEntry[]"),
+        }),
         z.object({ name: z.literal("targetUri"), type: z.literal("string") }),
-        z.object({ name: z.literal("commentType"), type: z.literal("string") }),
+        z.object({ name: z.literal("commentType"), type: z.literal("uint8") }),
         z.object({ name: z.literal("author"), type: z.literal("address") }),
         z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("channelId"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
         z.object({ name: z.literal("parentId"), type: z.literal("bytes32") }),
+      ]),
+    ),
+    MetadataEntry: z.array(
+      z.union([
+        z.object({ name: z.literal("key"), type: z.literal("bytes32") }),
+        z.object({ name: z.literal("value"), type: z.literal("bytes") }),
       ]),
     ),
   }),
@@ -226,7 +212,7 @@ export const EditCommentTypedDataSchema = z.object({
   message: z.object({
     commentId: HexSchema,
     content: z.string(),
-    metadata: CommentMetadataSchema,
+    metadata: MetadataArraySchema,
     author: HexSchema,
     app: HexSchema,
     nonce: z.coerce.bigint(),
@@ -237,11 +223,20 @@ export const EditCommentTypedDataSchema = z.object({
       z.union([
         z.object({ name: z.literal("commentId"), type: z.literal("bytes32") }),
         z.object({ name: z.literal("content"), type: z.literal("string") }),
-        z.object({ name: z.literal("metadata"), type: z.literal("string") }),
+        z.object({
+          name: z.literal("metadata"),
+          type: z.literal("MetadataEntry[]"),
+        }),
         z.object({ name: z.literal("author"), type: z.literal("address") }),
         z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
+      ]),
+    ),
+    MetadataEntry: z.array(
+      z.union([
+        z.object({ name: z.literal("key"), type: z.literal("bytes32") }),
+        z.object({ name: z.literal("value"), type: z.literal("bytes") }),
       ]),
     ),
   }),

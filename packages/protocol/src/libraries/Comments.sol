@@ -3,6 +3,21 @@ pragma solidity ^0.8.20;
 
 /// @title Comments - Library defining comment-related types
 library Comments {
+  /// @notice Comment type constants
+  /// @dev Type 0: Standard comment
+  /// @dev Type 1: Reaction (with reaction type in content field, e.g. "like", "dislike", "heart")
+  /// more types can be added in the future, please check the docs for more information.
+  uint8 public constant COMMENT_TYPE_COMMENT = 0;
+  uint8 public constant COMMENT_TYPE_REACTION = 1;
+
+  /// @notice Struct containing metadata key-value pair
+  /// @param key UTF-8 encoded string of format "key type"
+  /// @param value The metadata value as bytes
+  struct MetadataEntry {
+    bytes32 key;
+    bytes value;
+  }
+
   /// @notice Struct containing all comment data
   /// @param author The address of the comment author
   /// @param app The address of the application signer that authorized this comment
@@ -12,10 +27,8 @@ library Comments {
   /// @param deadline Timestamp after which the signatures for this comment become invalid
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param content The text content of the comment - may contain urls, images and mentions
-  /// @param metadata Additional JSON data that shouldn't be displayed to the user
   /// @param targetUri the URI about which the comment is being made
-  /// @param commentType The type of the comment (e.g. "comment", "like", etc.)
-  /// @param hookData Additional data for the comment, added by a hook.
+  /// @param commentType The type of the comment (0=comment, 1=reaction)
   struct Comment {
     // Pack these two addresses together (saves 1 storage slot)
     address author; // 20 bytes   --┬-- 32 bytes
@@ -25,12 +38,11 @@ library Comments {
     // 32-byte types
     uint256 channelId;
     bytes32 parentId;
+    // Smaller types
+    uint8 commentType; // 1 byte
     // Dynamic types last (conventional pattern)
     string content;
-    string metadata;
     string targetUri;
-    string commentType;
-    string hookData;
   }
 
   /// @notice Struct containing all comment data for creating a comment
@@ -39,21 +51,21 @@ library Comments {
   /// @param channelId The channel ID associated with the comment
   /// @param deadline Timestamp after which the signatures for this comment become invalid
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
-  /// @param content The actual text content of the comment
-  /// @param metadata Additional JSON data that shouldn't be shown to the user as it is
+  /// @param content The actual text content of the comment. If the commentType is COMMENT_TYPE_REACTION, the content should be the reaction type, such as "like", "downvote", "repost" etc.
+  /// @param metadata Array of key-value pairs for additional data
   /// @param targetUri the URI about which the comment is being made
-  /// @param commentType The type of the comment (e.g. "question", "answer", "feedback", etc.)
+  /// @param commentType The type of the comment (0=comment, 1=reaction)
   struct CreateComment {
     address author;
     address app;
     uint256 channelId;
     uint256 deadline;
     bytes32 parentId;
+    uint8 commentType;
     // Dynamic types last (conventional pattern)
     string content;
-    string metadata;
+    MetadataEntry[] metadata;
     string targetUri;
-    string commentType;
   }
 
   /// @notice Struct containing all comment data for editing a comment
@@ -61,12 +73,12 @@ library Comments {
   /// @param nonce The nonce for the comment
   /// @param deadline Timestamp after which the signatures for this comment become invalid
   /// @param content The actual text content of the comment
-  /// @param metadata Additional JSON data that shouldn't be shown to the user as it is
+  /// @param metadata Array of key-value pairs for additional data
   struct EditComment {
     address app;
     uint256 nonce;
     uint256 deadline;
     string content;
-    string metadata;
+    MetadataEntry[] metadata;
   }
 }

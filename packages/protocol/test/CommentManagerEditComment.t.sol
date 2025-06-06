@@ -25,12 +25,19 @@ contract CommentsTest is Test, IERC721Receiver {
     uint96 createdAt,
     uint96 updatedAt,
     string content,
-    string metadata,
     string targetUri,
-    string commentType,
-    string hookData
+    uint8 commentType
   );
-  event CommentHookDataUpdated(bytes32 indexed commentId, string hookData);
+  event CommentMetadataSet(
+    bytes32 indexed commentId,
+    bytes32 indexed key,
+    bytes value
+  );
+  event CommentHookMetadataSet(
+    bytes32 indexed commentId,
+    bytes32 indexed key,
+    bytes value
+  );
 
   CommentManager public comments;
   ChannelManager public channelManager;
@@ -96,7 +103,6 @@ contract CommentsTest is Test, IERC721Receiver {
     );
 
     expectedCommentData.content = editData.content;
-    expectedCommentData.metadata = editData.metadata;
     expectedCommentData.updatedAt = uint96(block.timestamp);
 
     vm.prank(author);
@@ -111,17 +117,14 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       uint96(block.timestamp),
       editData.content,
-      editData.metadata,
       commentData.targetUri,
-      commentData.commentType,
-      ""
+      commentData.commentType
     );
     comments.editComment(commentId, editData, editAppSignature);
 
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.metadata, editData.metadata);
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
   }
 
@@ -166,14 +169,6 @@ contract CommentsTest is Test, IERC721Receiver {
       editHash
     );
 
-    Comments.Comment memory expectedCommentData = comments.getComment(
-      commentId
-    );
-
-    expectedCommentData.content = editData.content;
-    expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint96(block.timestamp);
-
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
@@ -186,21 +181,28 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       uint96(block.timestamp),
       editData.content,
-      editData.metadata,
       commentData.targetUri,
-      commentData.commentType,
-      "hook data"
+      commentData.commentType
     );
     vm.expectEmit(true, true, true, true);
-    emit CommentHookDataUpdated(commentId, "hook data edited");
+    emit CommentHookMetadataSet(
+      commentId,
+      keccak256("status string"),
+      bytes("hook data edited")
+    );
     comments.editComment(commentId, editData, editAppSignature);
 
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.metadata, editData.metadata);
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
-    assertEq(editedComment.hookData, "hook data edited");
+
+    // Verify hook metadata was set
+    Comments.MetadataEntry[] memory hookMetadata = comments
+      .getCommentHookMetadata(commentId);
+    assertEq(hookMetadata.length, 1);
+    assertEq(hookMetadata[0].key, keccak256("status string"));
+    assertEq(string(hookMetadata[0].value), "hook data edited");
   }
 
   function test_EditComment_AsAuthor_RejectedByHook() public {
@@ -296,7 +298,6 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify comment did not change
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, originalComment.content);
-    assertEq(editedComment.metadata, originalComment.metadata);
     assertEq(editedComment.updatedAt, originalComment.updatedAt);
   }
 
@@ -336,14 +337,6 @@ contract CommentsTest is Test, IERC721Receiver {
       editHash
     );
 
-    Comments.Comment memory expectedCommentData = comments.getComment(
-      commentId
-    );
-
-    expectedCommentData.content = editData.content;
-    expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint96(block.timestamp);
-
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
@@ -355,10 +348,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       uint96(block.timestamp),
       editData.content,
-      editData.metadata,
       commentData.targetUri,
-      commentData.commentType,
-      ""
+      commentData.commentType
     );
     comments.editCommentWithSig(
       commentId,
@@ -370,7 +361,6 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.metadata, editData.metadata);
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
   }
 
@@ -409,14 +399,6 @@ contract CommentsTest is Test, IERC721Receiver {
       editHash
     );
 
-    Comments.Comment memory expectedCommentData = comments.getComment(
-      commentId
-    );
-
-    expectedCommentData.content = editData.content;
-    expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint96(block.timestamp);
-
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
@@ -428,10 +410,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       uint96(block.timestamp),
       editData.content,
-      editData.metadata,
       commentData.targetUri,
-      commentData.commentType,
-      ""
+      commentData.commentType
     );
     comments.editCommentWithSig(
       commentId,
@@ -443,7 +423,6 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.metadata, editData.metadata);
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
   }
 
@@ -471,14 +450,6 @@ contract CommentsTest is Test, IERC721Receiver {
       app
     );
 
-    Comments.Comment memory expectedCommentData = comments.getComment(
-      commentId
-    );
-
-    expectedCommentData.content = editData.content;
-    expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint96(block.timestamp);
-
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
@@ -490,10 +461,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       uint96(block.timestamp),
       editData.content,
-      editData.metadata,
       commentData.targetUri,
-      commentData.commentType,
-      ""
+      commentData.commentType
     );
     vm.prank(app);
     comments.editCommentWithSig(commentId, editData, "", "");
@@ -501,7 +470,6 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.metadata, editData.metadata);
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
   }
 
@@ -773,11 +741,12 @@ contract RejectEditHook is BaseHook {
       });
   }
 
-  function onCommentEdit(
+  function _onCommentEdit(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable override returns (string memory) {
+  ) internal pure override returns (Comments.MetadataEntry[] memory) {
     revert TestHookRejected();
   }
 }

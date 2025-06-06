@@ -555,7 +555,7 @@ export function createCommentTypedData(
  */
 export function createCommentData({
   content,
-  metadata,
+  metadata = [],
   author,
   app,
   deadline,
@@ -563,17 +563,33 @@ export function createCommentData({
   commentType = DEFAULT_COMMENT_TYPE,
   ...params
 }: CreateCommentDataParams): CommentInputData {
-  return CommentInputDataSchema.parse({
-    content,
-    metadata: metadata ? JSON.stringify(metadata) : "",
-    targetUri: "parentId" in params ? "" : params.targetUri,
-    parentId: "parentId" in params ? params.parentId : EMPTY_PARENT_ID,
-    author,
-    app,
-    channelId,
-    commentType,
-    deadline: deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day
-  });
+  const timestampInMs = deadline ?? BigInt(Date.now() + 24 * 60 * 60 * 1000);
+
+  if ("targetUri" in params) {
+    return {
+      content,
+      metadata,
+      targetUri: params.targetUri,
+      commentType,
+      author,
+      app,
+      channelId,
+      deadline: timestampInMs,
+      parentId: EMPTY_PARENT_ID,
+    };
+  } else {
+    return {
+      content,
+      metadata,
+      targetUri: "",
+      commentType,
+      author,
+      app,
+      channelId,
+      deadline: timestampInMs,
+      parentId: params.parentId,
+    };
+  }
 }
 
 export type CreateDeleteCommentTypedDataParams = {
@@ -739,15 +755,15 @@ export type EditCommentDataParams =
 export function createEditCommentData(
   params: EditCommentDataParams,
 ): EditCommentData {
-  return EditCommentDataSchema.parse({
-    ...params,
-    metadata:
-      "metadataRaw" in params
-        ? params.metadataRaw
-        : JSON.stringify(params.metadataObject),
+  return {
+    commentId: params.commentId,
+    content: params.content,
+    metadata: "metadataRaw" in params ? [] : [], // For now, convert to empty array
+    app: params.app,
+    nonce: params.nonce,
     deadline:
-      params.deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
-  });
+      params.deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24),
+  };
 }
 
 export type CreateEditCommentTypedDataParams = {

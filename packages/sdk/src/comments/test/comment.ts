@@ -32,6 +32,12 @@ import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
 import type { CreateCommentData } from "../schemas.js";
 import { privateKeyToAccount } from "viem/accounts";
+import {
+  COMMENT_MANAGER_ADDRESS,
+  DEFAULT_CHANNEL_ID,
+  EMPTY_PARENT_ID,
+} from "../../constants.js";
+import { createMetadataEntry } from "../metadata.js";
 
 describe("comment", () => {
   let commentsAddress: Hex;
@@ -78,6 +84,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
+        metadata: [],
         targetUri: "https://example.com",
       });
 
@@ -123,6 +130,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
+        metadata: [],
         targetUri: "https://example.com",
       });
 
@@ -171,6 +179,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
+        metadata: [],
         targetUri: "https://example.com",
       });
 
@@ -206,7 +215,7 @@ describe("comment", () => {
               app: appAccount.address,
               author: account.address,
               content: "Test comment content",
-              metadata: { test: true },
+              metadata: [],
               targetUri: "https://example.com",
             }),
             appSignature,
@@ -229,6 +238,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
+        metadata: [],
         targetUri: "https://example.com",
       });
 
@@ -280,8 +290,7 @@ describe("comment", () => {
           app: appAccount.address,
           author: account.address,
           content: "Test comment content",
-          metadata: { test: true },
-
+          metadata: [],
           targetUri: "https://example.com",
         },
         readContract: client.readContract,
@@ -301,7 +310,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
-        metadata: { test: true },
+        metadata: [],
         targetUri: "https://example.com",
       });
 
@@ -367,6 +376,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
+        metadata: [],
         targetUri: "https://example.com",
       });
 
@@ -491,7 +501,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
-        metadata: { test: true },
+        metadata: [],
         targetUri: "https://example.com",
       });
 
@@ -590,6 +600,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         content: "Test comment content",
+        metadata: [],
         targetUri: "https://example.com",
       });
 

@@ -17,6 +17,16 @@ export type Json = JsonLiteral | JsonArray | JsonObject;
 export type CommentManagerABIType = typeof CommentManagerABI;
 
 /**
+ * Metadata entry structure that matches the smart contract
+ */
+export type MetadataEntry = {
+  /** UTF-8 encoded string of format "key type" */
+  key: Hex;
+  /** The metadata value as bytes */
+  value: Hex;
+};
+
+/**
  * The shared parameters for creating a comment
  */
 export type CreateCommentDataParamsShared = {
@@ -32,14 +42,15 @@ export type CreateCommentDataParamsShared = {
   channelId?: bigint;
   /**
    * The type of the comment
+   * 0 = standard comment, 1 = reaction
    *
-   * If not provided, the default comment type (comment) will be used
+   * If not provided, the default comment type (0) will be used
    *
-   * @default "comment"
+   * @default 0
    */
-  commentType?: string;
-  /** Metadata about the comment */
-  metadata?: JsonObject;
+  commentType?: number;
+  /** Metadata about the comment as key-value pairs */
+  metadata?: MetadataEntry[];
   /** The address of the author of the comment */
   author: Hex;
   /** The address of the app signer */
@@ -77,17 +88,13 @@ export type CommentData = {
    */
   content: string;
   /**
-   * Metadata about the comment
-   */
-  metadata: string;
-  /**
    * Empty string for replies
    */
   targetUri: string;
   /**
-   * The type of the comment
+   * The type of the comment (0 = comment, 1 = reaction)
    */
-  commentType: string;
+  commentType: number;
   /**
    * The ID of the channel
    */
@@ -114,10 +121,6 @@ export type CommentData = {
    * The timestamp of the comment update in seconds since epoch
    */
   updatedAt: bigint;
-  /**
-   * Additional data for the comment, added by a hook.
-   */
-  hookData: string;
 };
 
 export type ContractWriteFunctions = {

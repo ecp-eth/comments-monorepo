@@ -255,12 +255,13 @@ library TestUtils {
     address author,
     address app
   ) internal view returns (Comments.CreateComment memory) {
+    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](0);
     return
       Comments.CreateComment({
         content: "Test comment",
-        metadata: "{}",
+        metadata: metadata,
         targetUri: "",
-        commentType: "comment",
+        commentType: 0, // COMMENT_TYPE_COMMENT
         author: author,
         app: app,
         channelId: 0,
@@ -274,10 +275,15 @@ library TestUtils {
     address author,
     address app
   ) internal view returns (Comments.EditComment memory) {
+    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](1);
+    metadata[0] = Comments.MetadataEntry({
+      key: keccak256("edited bool"),
+      value: abi.encode(true)
+    });
     return
       Comments.EditComment({
         content: "Edited content",
-        metadata: '{"edited":true}',
+        metadata: metadata,
         app: app,
         nonce: comments.getNonce(author, app),
         deadline: block.timestamp + 1 days
@@ -413,10 +419,18 @@ contract MockHook is BaseHook {
 
   function _onCommentAdd(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal virtual override returns (string memory) {
-    return returningHookData;
+  ) internal view override returns (Comments.MetadataEntry[] memory) {
+    Comments.MetadataEntry[] memory hookMetadata = new Comments.MetadataEntry[](
+      1
+    );
+    hookMetadata[0] = Comments.MetadataEntry({
+      key: keccak256("hookData string"),
+      value: bytes(returningHookData)
+    });
+    return hookMetadata;
   }
 }
 
@@ -439,17 +453,33 @@ contract AlwaysReturningDataHook is BaseHook {
 
   function onCommentEdit(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable override returns (string memory) {
-    return "hook data edited";
+  ) external payable override returns (Comments.MetadataEntry[] memory) {
+    Comments.MetadataEntry[] memory hookMetadata = new Comments.MetadataEntry[](
+      1
+    );
+    hookMetadata[0] = Comments.MetadataEntry({
+      key: keccak256("status string"),
+      value: bytes("hook data edited")
+    });
+    return hookMetadata;
   }
 
   function onCommentAdd(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable override returns (string memory) {
-    return "hook data";
+  ) external payable override returns (Comments.MetadataEntry[] memory) {
+    Comments.MetadataEntry[] memory hookMetadata = new Comments.MetadataEntry[](
+      1
+    );
+    hookMetadata[0] = Comments.MetadataEntry({
+      key: keccak256("status string"),
+      value: bytes("hook data")
+    });
+    return hookMetadata;
   }
 }
