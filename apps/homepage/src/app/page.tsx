@@ -241,6 +241,7 @@ export default function HomePage() {
               <CardContent className="">
                 <CardDescription className="text-gray-600 dark:text-gray-400">
                   Replace traditional comments with decentralized alternatives
+                  without sacrificing UX
                 </CardDescription>
               </CardContent>
             </Card>
