@@ -20,21 +20,11 @@ When `commentType = 1` (reaction), the `content` field should contain a string i
 - `"downvote"` - Disagreement or negative feedback
 - `"repost"` - Sharing or amplifying the content
 
-#### Custom Reaction Types
-
-Applications can define their own reaction types based on their specific use cases:
-
-- `"heart"` - Love or strong appreciation
-- `"laugh"` - Humorous response
-- `"angry"` - Strong disagreement
-- `"celebrate"` - Excitement or congratulations
-- `"insightful"` - Marking content as particularly valuable
-
 #### Implementation Notes
 
 - Reaction content should be a simple string identifier (lowercase recommended)
 - Applications should validate reaction types against their supported list
-- Unknown reaction types should be handled gracefully by displaying a generic reaction icon
+- Unknown reaction types should be handled gracefully by displaying a generic reaction icon or ignored
 - Consider internationalization when displaying reaction labels to users
 
 ## `metadata`
