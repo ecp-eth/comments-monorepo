@@ -192,7 +192,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   }
 
   /// @inheritdoc IChannelManager
-  function channelExists(uint256 channelId) public view returns (bool) {
+  function channelExists(uint256 channelId) external view returns (bool) {
     return _channelExists(channelId);
   }
 
