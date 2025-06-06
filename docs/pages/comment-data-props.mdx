@@ -8,7 +8,7 @@ The comment content stores the plain text content of the comment.
 
 - Please use `\n` for line breaks. (Most browsers will normalize the line breaks to `\n` regardless of the OS).
 - any media or links that should be displayed to users should be stored in the content property and rendered by clients based on the media type at the uri.
-- For **reactions** (commentType = 1), the content field contains the reaction type as a string.
+- For **reactions** (commentType = 1), the content field contains the reaction type as a lower case string, such as `"like"`, `"dislike"`, `"repost"`, or whichever custom reaction type your app wants to use.
 
 ### Reaction Content Types
 
@@ -32,10 +32,9 @@ When `commentType = 1` (reaction), the `content` field should contain a string i
 The `metadata` property stores additional data as key-value pairs that shouldn't be shown to the user as-is.
 
 - Stored as an array of `MetadataEntry` structures with `bytes32 key` and `bytes value` fields
-- Keys should be UTF-8 encoded strings with format "key type" (e.g., "category string", "priority uint256")
-- Values are stored as `bytes` and can contain any encoded data type
-- Significantly more gas-efficient than JSON strings, especially when metadata is empty
-- Please be mindful that storing large amounts of data on the chain will increase the cost of the transaction.
+- Keys should be UTF-8 encoded strings with format "type key" (e.g., "category string", "priority uint256")
+- Values are stored as `bytes` and can contain any encoded data type, encoded via `abi.encode`
+- Please be mindful that storing large amounts of metadata on the chain will increase the gas cost of the transaction.
 
 ### Metadata Access
 
@@ -67,7 +66,7 @@ Be careful when choosing the value for the `targetUri` property as an inconsiste
 
 ### App/Chain Agnostic URIs
 
-Whenver possible, it is recommended to use app or chain agnostic URIs, e.g. [CAIP-19](https://github.com/ChainAgnostic/namespaces/blob/main/eip155/caip19.md) specification for referencing onchain or offchain assets.
+Whenever possible, it is recommended to use app or chain agnostic URIs, e.g. [CAIP-19](https://github.com/ChainAgnostic/namespaces/blob/main/eip155/caip19.md) specification for referencing onchain or offchain assets.
 This ensures the reference is consistent and maximal compatibility across different applications and chains.
 
 Example (NFT and collection):
@@ -106,90 +105,19 @@ The deadline is a timestamp in seconds since the epoch. Posting a comment with a
 
 The `commentType` property uses a `uint8` value to efficiently categorize different types of comments.
 
-### Comment Type Values
+### Valid Comment Type Values
 
-| Value | Name                  | Description                | Usage                                       |
-| ----- | --------------------- | -------------------------- | ------------------------------------------- |
-| `0`   | **Comment** (Default) | Standard text comments     | Regular discussions, replies, conversations |
-| `1`   | **Reaction**          | Quick reactions to content | Likes, dislikes, hearts, thumbs up/down     |
-
-### Constants
-
-The `Comments` library provides constants for easy reference:
-
-```solidity
-Comments.COMMENT_TYPE_COMMENT = 0;   // Standard comment
-Comments.COMMENT_TYPE_REACTION = 1;  // Reaction
-```
-
-### Usage Examples
-
-#### Standard Comment (Type 0)
-
-```solidity
-Comments.CreateComment memory commentData = Comments.CreateComment({
-    author: userAddress,
-    app: appAddress,
-    channelId: 1,
-    deadline: block.timestamp + 3600,
-    parentId: bytes32(0),
-    commentType: 0, // or Comments.COMMENT_TYPE_COMMENT
-    content: "This is a thoughtful response to the discussion.",
-    metadata: new Comments.MetadataEntry[](0),
-    targetUri: "https://example.com/post/123"
-});
-```
-
-#### Reaction (Type 1)
-
-```solidity
-Comments.CreateComment memory reactionData = Comments.CreateComment({
-    author: userAddress,
-    app: appAddress,
-    channelId: 1,
-    deadline: block.timestamp + 3600,
-    parentId: bytes32(0),
-    commentType: 1, // or Comments.COMMENT_TYPE_REACTION
-    content: "like", // The reaction type goes in the content field
-    metadata: new Comments.MetadataEntry[](0),
-    targetUri: "https://example.com/post/123"
-});
-```
+| Value | Name                  | Description            | Usage                                       |
+| ----- | --------------------- | ---------------------- | ------------------------------------------- |
+| `0`   | **Comment** (Default) | Standard text comments | Regular discussions, replies, conversations |
+| `1`   | **Reaction**          | Reactions to content   | Likes, dislikes, hearts, thumbs up/down     |
 
 ### Implementation Notes
 
 - **Default Behavior**: If `commentType` is not explicitly set, it defaults to `0` (standard comment)
-- **Storage Efficiency**: Using `uint8` instead of `string` saves significant gas, especially for reactions
 - **Immutable**: Comment type cannot be changed after creation (not included in `EditComment` struct)
 - **Validation**: Applications should validate that reaction content contains valid reaction types
 - **Extensibility**: Additional comment types can be added in future versions
-
-### Gas Savings
-
-By using `uint8` instead of `string` for comment types:
-
-- **Reactions**: Save ~20,000+ gas per reaction (no string storage needed)
-- **Comments**: Save ~10,000+ gas per comment vs storing "comment" string
-- **Events**: More efficient event indexing and filtering
-
-### Frontend Integration
-
-Applications can easily filter and display different comment types:
-
-```typescript
-// Filter for reactions only
-const reactions = comments.filter((c) => c.commentType === 1);
-
-// Filter for standard comments only
-const textComments = comments.filter((c) => c.commentType === 0);
-
-// Handle reaction display
-if (comment.commentType === 1) {
-  displayReaction(comment.content); // "like", "heart", etc.
-} else {
-  displayComment(comment.content);
-}
-```
 
 ## `channelId`
 

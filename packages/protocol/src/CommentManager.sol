@@ -143,14 +143,22 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     comment.updatedAt = timestampNow;
 
     // Store metadata in mappings
-    for (uint i = 0; i < metadata.length; i++) {
-      bytes32 key = metadata[i].key;
-      bytes memory value = metadata[i].value;
+    if (metadata.length > 0) {
+      mapping(bytes32 => bytes) storage commentMetadataForId = commentMetadata[
+        commentId
+      ];
+      bytes32[] storage commentMetadataKeysForId = commentMetadataKeys[
+        commentId
+      ];
+      for (uint i = 0; i < metadata.length; i++) {
+        bytes32 key = metadata[i].key;
+        bytes memory value = metadata[i].value;
 
-      commentMetadata[commentId][key] = value;
-      commentMetadataKeys[commentId].push(key);
+        commentMetadataForId[key] = value;
+        commentMetadataKeysForId.push(key);
 
-      emit CommentMetadataSet(commentId, key, value);
+        emit CommentMetadataSet(commentId, key, value);
+      }
     }
 
     Channels.Channel memory channel = channelManager.getChannel(channelId);
@@ -179,14 +187,22 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       }(comment, metadata, msg.sender, commentId);
 
       // Store hook metadata
-      for (uint i = 0; i < hookMetadata.length; i++) {
-        bytes32 key = hookMetadata[i].key;
-        bytes memory value = hookMetadata[i].value;
+      if (hookMetadata.length > 0) {
+        mapping(bytes32 => bytes)
+          storage commentHookMetadataForId = commentHookMetadata[commentId];
+        bytes32[]
+          storage commentHookMetadataKeysForId = commentHookMetadataKeys[
+            commentId
+          ];
+        for (uint i = 0; i < hookMetadata.length; i++) {
+          bytes32 key = hookMetadata[i].key;
+          bytes memory value = hookMetadata[i].value;
 
-        commentHookMetadata[commentId][key] = value;
-        commentHookMetadataKeys[commentId].push(key);
+          commentHookMetadataForId[key] = value;
+          commentHookMetadataKeysForId.push(key);
 
-        emit CommentHookMetadataSet(commentId, key, value);
+          emit CommentHookMetadataSet(commentId, key, value);
+        }
       }
     }
   }

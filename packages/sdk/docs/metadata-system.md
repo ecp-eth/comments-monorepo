@@ -20,7 +20,7 @@ The new comment system uses a key-value metadata structure instead of JSON strin
 
 ```typescript
 type MetadataEntry = {
-  key: Hex; // keccak256 hash of "key type" string
+  key: Hex; // keccak256 hash of "type key" string
   value: Hex; // Encoded value as bytes
 };
 ```

@@ -3,11 +3,11 @@ import type { Hex } from "../core/schemas.js";
 import type { JsonObject, MetadataEntry } from "./types.js";
 
 /**
- * Creates a metadata key by encoding a string in the format "key type"
+ * Creates a metadata key by encoding a string in the format "type key"
  *
  * @param keyString - The key string (e.g., "status", "author", "url")
  * @param valueType - The type of the value (e.g., "string", "bool", "uint256")
- * @returns The keccak256 hash of the UTF-8 encoded "key type" string
+ * @returns The keccak256 hash of the UTF-8 encoded "type key" string
  */
 export function createMetadataKey(keyString: string, valueType: string): Hex {
   const keyTypeString = `${keyString} ${valueType}`;

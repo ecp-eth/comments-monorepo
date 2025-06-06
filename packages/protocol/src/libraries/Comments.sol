@@ -11,7 +11,7 @@ library Comments {
   uint8 public constant COMMENT_TYPE_REACTION = 1;
 
   /// @notice Struct containing metadata key-value pair
-  /// @param key UTF-8 encoded string of format "key type"
+  /// @param key UTF-8 encoded string of format "type key"
   /// @param value The metadata value as bytes
   struct MetadataEntry {
     bytes32 key;

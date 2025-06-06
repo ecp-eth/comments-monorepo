@@ -20,7 +20,7 @@ export type CommentManagerABIType = typeof CommentManagerABI;
  * Metadata entry structure that matches the smart contract
  */
 export type MetadataEntry = {
-  /** UTF-8 encoded string of format "key type" */
+  /** UTF-8 encoded string of format "type key" */
   key: Hex;
   /** The metadata value as bytes */
   value: Hex;
