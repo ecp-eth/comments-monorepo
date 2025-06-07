@@ -41,7 +41,8 @@ contract CommentsTest is Test, IERC721Receiver {
     uint96 createdAt,
     string content,
     string targetUri,
-    uint8 commentType
+    uint8 commentType,
+    Comments.MetadataEntry[] metadata
   );
   event CommentMetadataSet(
     bytes32 indexed commentId,
@@ -506,7 +507,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       commentData.content,
       commentData.targetUri,
-      commentData.commentType
+      commentData.commentType,
+      new Comments.MetadataEntry[](0)
     );
     vm.expectEmit(true, true, true, true);
     emit CommentHookMetadataSet(

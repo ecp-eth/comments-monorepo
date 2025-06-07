@@ -531,7 +531,7 @@ contract TokenHookTest is Test, IERC721Receiver {
       // Look for CommentAdded event (topic[0] is the event signature hash)
       if (
         logs[i].topics[0] ==
-        0x0d63547bf74519334a5daba25e8f13c5eed8de5747ac84eb4be55f9a7f525a5c
+        0x4a933191a06b638568464a44a81268e15664e57edfe69421af878312bee4c1e7
       ) {
         commentId = logs[i].topics[1];
         break;

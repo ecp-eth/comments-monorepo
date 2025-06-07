@@ -25,7 +25,8 @@ contract CommentsTest is Test, IERC721Receiver {
     uint96 createdAt,
     string content,
     string targetUri,
-    uint8 commentType
+    uint8 commentType,
+    Comments.MetadataEntry[] metadata
   );
 
   CommentManager public comments;
@@ -260,7 +261,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       commentData.content,
       commentData.targetUri,
-      commentData.commentType
+      commentData.commentType,
+      new Comments.MetadataEntry[](0)
     );
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
