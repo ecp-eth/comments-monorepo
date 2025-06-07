@@ -20,26 +20,24 @@ library Comments {
 
   /// @notice Struct containing all comment data
   /// @param author The address of the comment author
-  /// @param app The address of the application signer that authorized this comment
   /// @param createdAt The timestamp when the comment was created
+  /// @param app The address of the application signer that authorized this comment
   /// @param updatedAt The timestamp when the comment was last updated
+  /// @param commentType The type of the comment (0=comment, 1=reaction)
   /// @param channelId The channel ID associated with the comment
-  /// @param deadline Timestamp after which the signatures for this comment become invalid
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param content The text content of the comment - may contain urls, images and mentions
   /// @param targetUri the URI about which the comment is being made
-  /// @param commentType The type of the comment (0=comment, 1=reaction)
   struct Comment {
-    // Pack these two addresses together (saves 1 storage slot)
+    // Pack these fields together (saves 1 storage slot)
     address author; // 20 bytes   --┬-- 32 bytes
     uint96 createdAt; // 12 bytes --┘
     address app; // 20 bytes      --┬-- 32 bytes
-    uint96 updatedAt; // 12 bytes --┘
+    uint88 updatedAt; // 11 bytes --┘
+    uint8 commentType; // 1 byte --┘
     // 32-byte types
     uint256 channelId;
     bytes32 parentId;
-    // Smaller types
-    uint8 commentType; // 1 byte
     // Dynamic types last (conventional pattern)
     string content;
     string targetUri;
