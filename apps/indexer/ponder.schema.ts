@@ -1,5 +1,6 @@
 import { index, onchainTable, relations } from "ponder";
 import type { IndexerAPICommentZeroExSwapSchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import type { MetadataEntrySchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 export const comments = onchainTable(
   "comments",
@@ -9,9 +10,10 @@ export const comments = onchainTable(
     updatedAt: t.timestamp({ withTimezone: true }).notNull(),
     channelId: t.bigint().notNull(),
     content: t.text().notNull(),
-    metadata: t.text().notNull(),
+    metadata: t.jsonb().$type<MetadataEntrySchemaType[]>(),
+    hookMetadata: t.jsonb().$type<MetadataEntrySchemaType[]>(),
     targetUri: t.text().notNull(),
-    commentType: t.text().notNull(),
+    commentType: t.integer().notNull(),
     parentId: t.hex(),
     rootCommentId: t.hex(),
     author: t.hex().notNull(),

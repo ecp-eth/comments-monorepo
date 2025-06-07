@@ -1,6 +1,13 @@
 import { z } from "zod";
 import { HexSchema } from "../core/schemas.js";
 
+export const MetadataEntrySchema = z.object({
+  key: HexSchema,
+  value: HexSchema,
+});
+
+export type MetadataEntrySchemaType = z.infer<typeof MetadataEntrySchema>;
+
 export const IndexerAPIAuthorEnsDataSchema = z.object({
   name: z.string(),
   avatarUrl: z.string().nullable(),
@@ -69,12 +76,13 @@ export const IndexerAPICommentSchema = z.object({
   author: IndexerAPIAuthorDataSchema,
   id: HexSchema,
   channelId: z.coerce.bigint(),
-  commentType: z.string(),
+  commentType: z.number().int(),
   content: z.string(),
   chainId: z.number().int(),
   deletedAt: z.coerce.date().nullable(),
   logIndex: z.number().int().nullable(),
-  metadata: z.string(),
+  metadata: z.array(MetadataEntrySchema),
+  hookMetadata: z.array(MetadataEntrySchema),
   parentId: HexSchema.nullable(),
   targetUri: z.string(),
   txHash: HexSchema,

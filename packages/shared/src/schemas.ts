@@ -13,15 +13,14 @@ import {
   CommentInputData,
   CreateCommentDataSchema,
   EditCommentDataSchema,
+  MetadataEntrySchema,
 } from "@ecp.eth/sdk/comments/schemas";
 import { z } from "zod";
 
 export const CommentDataWithIdSchema = CreateCommentDataSchema.extend({
   id: HexSchema,
+  metadata: MetadataEntrySchema.array(),
 });
-
-// this is just for type checking
-({}) as z.infer<typeof CommentDataWithIdSchema> satisfies CommentInputData;
 
 /**
  * Parses response from API endpoint for usage in client
@@ -42,7 +41,9 @@ export type SignCommentResponseClientSchemaType = z.infer<
 export const SignEditCommentResponseClientSchema = z.object({
   signature: HexSchema,
   hash: HexSchema,
-  data: EditCommentDataSchema,
+  data: EditCommentDataSchema.extend({
+    metadata: MetadataEntrySchema.array(),
+  }),
 });
 
 export type SignEditCommentResponseClientSchemaType = z.infer<
