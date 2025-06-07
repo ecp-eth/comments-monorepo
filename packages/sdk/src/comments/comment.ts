@@ -39,6 +39,12 @@ import type {
   WriteContractHelperResult,
 } from "../core/types.js";
 import { createWaitableWriteContractHelper } from "../core/utils.js";
+import {
+  createAddCommentTypedDataWithMetadata,
+  createEditCommentTypedDataWithMetadata,
+} from "./metadata-signatures.js";
+import { createMetadataEntries } from "./metadata.js";
+import type { MetadataEntry } from "./types.js";
 
 export type PostCommentParams = {
   /**
@@ -731,7 +737,7 @@ export type BaseEditCommentDataParams = {
 
 export type EditCommentDataParamsWithMetadataRaw = BaseEditCommentDataParams & {
   /**
-   * The metadata of the comment as a raw string (already json serialized)
+   * The metadata of the comment as a raw JSON string (legacy format)
    */
   metadataRaw: string;
 };
@@ -739,14 +745,23 @@ export type EditCommentDataParamsWithMetadataRaw = BaseEditCommentDataParams & {
 export type EditCommentDataParamsWithMetadataObject =
   BaseEditCommentDataParams & {
     /**
-     * The metadata of the comment as an object
+     * The metadata of the comment as an object (legacy format)
      */
     metadataObject: object;
   };
 
+export type EditCommentDataParamsWithMetadataEntries =
+  BaseEditCommentDataParams & {
+    /**
+     * The metadata of the comment as MetadataEntry array (new format)
+     */
+    metadata: MetadataEntry[];
+  };
+
 export type EditCommentDataParams =
   | EditCommentDataParamsWithMetadataRaw
-  | EditCommentDataParamsWithMetadataObject;
+  | EditCommentDataParamsWithMetadataObject
+  | EditCommentDataParamsWithMetadataEntries;
 
 /**
  * Create the data structure of a comment for editing
@@ -755,10 +770,32 @@ export type EditCommentDataParams =
 export function createEditCommentData(
   params: EditCommentDataParams,
 ): EditCommentData {
+  let metadata: MetadataEntry[];
+
+  if ("metadata" in params) {
+    // New format: already MetadataEntry[]
+    metadata = params.metadata;
+  } else if ("metadataRaw" in params) {
+    // Legacy format: JSON string
+    try {
+      const parsedMetadata = JSON.parse(params.metadataRaw);
+      metadata = createMetadataEntries(parsedMetadata);
+    } catch {
+      metadata = [];
+    }
+  } else if ("metadataObject" in params) {
+    // Legacy format: object
+    metadata = createMetadataEntries(
+      params.metadataObject as Record<string, any>,
+    );
+  } else {
+    metadata = [];
+  }
+
   return {
     commentId: params.commentId,
     content: params.content,
-    metadata: "metadataRaw" in params ? [] : [], // For now, convert to empty array
+    metadata,
     app: params.app,
     nonce: params.nonce,
     deadline:

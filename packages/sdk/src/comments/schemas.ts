@@ -46,6 +46,7 @@ export const CommentDataSchema = z.object({
   content: z.string(),
   targetUri: z.string(),
   commentType: z.number(),
+  metadata: MetadataArraySchema.default([]),
 
   createdAt: z.coerce.bigint(),
   updatedAt: z.coerce.bigint(),
@@ -59,6 +60,7 @@ export const CreateCommentDataSchema = CommentDataSchema.omit({
   updatedAt: true,
 }).extend({
   deadline: z.coerce.bigint(),
+  metadata: MetadataArraySchema.default([]),
 });
 
 export type CreateCommentData = z.infer<typeof CreateCommentDataSchema>;
@@ -140,7 +142,7 @@ export const AddCommentTypedDataSchema = z.object({
     chainId: z.number(),
     verifyingContract: HexSchema,
   }),
-  message: CreateCommentDataSchema,
+  message: CommentInputDataSchema,
   types: z.object({
     AddComment: z.array(
       z.union([
