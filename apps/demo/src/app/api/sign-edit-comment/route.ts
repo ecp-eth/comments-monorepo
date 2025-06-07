@@ -88,7 +88,7 @@ export async function POST(
     app: app.address,
     nonce,
     commentId,
-    metadataRaw: metadata,
+    metadataRaw: JSON.stringify(metadata),
   });
 
   const typedCommentData = createEditCommentTypedData({

@@ -49,6 +49,49 @@ bytes memory value = commentManager.getCommentMetadataValue(commentId, keccak256
 bytes32[] memory keys = commentManager.getCommentMetadataKeys(commentId);
 ```
 
+### Metadata Format Conversion
+
+The SDK provides functions to convert between two metadata formats:
+
+**JS/SDK Format (easier to work with):**
+
+```typescript
+Record<string, { key: string; type: string; value: Hex }>;
+```
+
+**Contract Format (used by blockchain):**
+
+```solidity
+struct MetadataEntry {
+  bytes32 key;
+  bytes value;
+}
+```
+
+#### Converting Between Formats
+
+```typescript
+import {
+  convertRecordToContractFormat,
+  convertContractToRecordFormat,
+  createKeyTypeMap,
+} from "@ecp.eth/sdk/comments";
+
+// Before sending to contract
+const contractData = convertRecordToContractFormat(jsMetadata);
+
+// After receiving from contract (requires key mapping)
+const keyTypeMap = createKeyTypeMap([
+  { key: "status", type: "string" },
+  { key: "reputation", type: "uint256" },
+]);
+const jsMetadata = convertContractToRecordFormat(contractData, keyTypeMap);
+```
+
+**Supported types:** `string`, `bool`, `uint256`, `address`, `bytes32`, `bytes`, and other numeric types.
+
+**Best practice:** Maintain a mapping of your known metadata keys and types for proper conversion.
+
 ## `targetUri`
 
 It serves as a unique identifier for locating comments.

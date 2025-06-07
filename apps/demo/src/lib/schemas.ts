@@ -167,7 +167,7 @@ export const PrepareSignedGaslessEditCommentRequestBodySchema = z.object({
   commentId: HexSchema,
   content: z.string().trim().nonempty(),
   author: HexSchema,
-  metadata: z.string(),
+  metadata: MetadataArraySchema,
   submitIfApproved: z.boolean(),
 });
 
@@ -204,7 +204,7 @@ export const SignEditCommentPayloadRequestSchema = z.object({
   commentId: HexSchema,
   content: z.string().trim().nonempty(),
   author: HexSchema,
-  metadata: z.string(),
+  metadata: MetadataArraySchema,
 });
 
 export type SignEditCommentPayloadRequestSchemaType = z.infer<

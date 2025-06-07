@@ -144,3 +144,143 @@ export function convertJsonMetadataToEntries(
 
   return filteredEntries.map(([key, value]) => createMetadataEntry(key, value));
 }
+
+/**
+ * Type representing the supported on-chain serializable types
+ */
+export type MetadataType =
+  | "string"
+  | "bool"
+  | "uint256"
+  | "address"
+  | "bytes32"
+  | "bytes"
+  | "uint8"
+  | "uint16"
+  | "uint32"
+  | "uint64"
+  | "uint128"
+  | "int256"
+  | "int128";
+
+/**
+ * JS/SDK/Indexer format for metadata storage
+ */
+export type MetadataRecord = Record<
+  string,
+  {
+    key: string;
+    type: MetadataType;
+    value: Hex;
+  }
+>;
+
+/**
+ * Converts from JS/SDK Record format to contract MetadataEntry array format
+ *
+ * @param metadataRecord - The metadata in Record format
+ * @returns Array of MetadataEntry for contract use
+ */
+export function convertRecordToContractFormat(
+  metadataRecord: MetadataRecord,
+): MetadataEntry[] {
+  return Object.entries(metadataRecord).map(([, metadata]) => ({
+    key: createMetadataKey(metadata.key, metadata.type),
+    value: metadata.value,
+  }));
+}
+
+/**
+ * Converts from contract MetadataEntry array format to JS/SDK Record format
+ * Note: This requires knowledge of the original key string and type, which are lost
+ * in the contract format. This function attempts to reverse-engineer them from
+ * common patterns used in the codebase.
+ *
+ * @param metadataEntries - Array of MetadataEntry from contracts
+ * @param keyTypeMap - Optional mapping of known keys to their original string and type
+ * @returns The metadata in Record format
+ */
+export function convertContractToRecordFormat(
+  metadataEntries: MetadataEntry[],
+  keyTypeMap?: Record<Hex, { key: string; type: MetadataType }>,
+): MetadataRecord {
+  const result: MetadataRecord = {};
+
+  for (const entry of metadataEntries) {
+    const keyHex = entry.key;
+
+    // Try to find the original key and type from the provided map
+    const originalKeyType = keyTypeMap?.[keyHex];
+
+    if (originalKeyType) {
+      // Use the provided mapping
+      const recordKey = `${originalKeyType.type} ${originalKeyType.key}`;
+      result[recordKey] = {
+        key: originalKeyType.key,
+        type: originalKeyType.type,
+        value: entry.value,
+      };
+    } else {
+      // Fallback: create a generic key since we can't reverse the hash
+      // In practice, applications should maintain their own key mappings
+      const recordKey = `${keyHex}`;
+      result[recordKey] = {
+        key: keyHex, // Use the hash as the key
+        type: "bytes", // Default to bytes type
+        value: entry.value,
+      };
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Helper function to create a key-type mapping for known metadata keys
+ * This should be maintained by applications to properly convert from contract format
+ *
+ * @param knownKeys - Array of known key-type pairs
+ * @returns Mapping from hashed key to original key and type
+ */
+export function createKeyTypeMap(
+  knownKeys: Array<{ key: string; type: MetadataType }>,
+): Record<Hex, { key: string; type: MetadataType }> {
+  const map: Record<Hex, { key: string; type: MetadataType }> = {};
+
+  for (const keyType of knownKeys) {
+    const hashedKey = createMetadataKey(keyType.key, keyType.type);
+    map[hashedKey] = keyType;
+  }
+
+  return map;
+}
+
+/**
+ * Convenience function to convert metadata for sending to contracts
+ * Handles both Record format and direct MetadataEntry array
+ *
+ * @param metadata - Metadata in either Record or MetadataEntry array format
+ * @returns MetadataEntry array ready for contract calls
+ */
+export function prepareMetadataForContract(
+  metadata: MetadataRecord | MetadataEntry[],
+): MetadataEntry[] {
+  if (Array.isArray(metadata)) {
+    return metadata; // Already in contract format
+  }
+  return convertRecordToContractFormat(metadata);
+}
+
+/**
+ * Convenience function to convert metadata from contracts for JS/SDK use
+ *
+ * @param metadata - MetadataEntry array from contract
+ * @param keyTypeMap - Optional mapping of known keys
+ * @returns Metadata in Record format
+ */
+export function parseMetadataFromContract(
+  metadata: MetadataEntry[],
+  keyTypeMap?: Record<Hex, { key: string; type: MetadataType }>,
+): MetadataRecord {
+  return convertContractToRecordFormat(metadata, keyTypeMap);
+}
