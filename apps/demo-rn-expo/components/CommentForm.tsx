@@ -142,14 +142,14 @@ export function CommentForm({
                   content: text,
                   author: address,
                   parentId: replyingComment?.id,
-                  metadata: "",
+                  metadata: [],
                 }
               : {
                   content: text,
                   // in react native app we will have to specify a targetUri that is owned by us
                   targetUri: publicEnv.EXPO_PUBLIC_TARGET_URI,
                   author: address,
-                  metadata: "",
+                  metadata: [],
                 };
 
             console.log("posting comment: ", commentToPost);

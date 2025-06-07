@@ -133,43 +133,6 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     }
   });
 
-  // Handle metadata setting separately
-  ponder.on("CommentsV1:CommentMetadataSet", async ({ event, context }) => {
-    const comment = await context.db.find(schema.comments, {
-      id: event.args.commentId,
-    });
-
-    if (!comment) {
-      // Comment might not be indexed yet, skip for now
-      return;
-    }
-
-    // Add the metadata entry to the existing metadata array
-    const existingMetadata = comment.metadata || [];
-    const newMetadataEntry = {
-      key: event.args.key,
-      value: event.args.value,
-    };
-
-    // Check if this key already exists and update it, otherwise add new entry
-    const existingIndex = existingMetadata.findIndex(
-      (entry) => entry.key === event.args.key,
-    );
-    if (existingIndex !== -1) {
-      existingMetadata[existingIndex] = newMetadataEntry;
-    } else {
-      existingMetadata.push(newMetadataEntry);
-    }
-
-    await context.db
-      .update(schema.comments, {
-        id: event.args.commentId,
-      })
-      .set({
-        metadata: existingMetadata,
-      });
-  });
-
   // Handle hook metadata setting separately
   ponder.on("CommentsV1:CommentHookMetadataSet", async ({ event, context }) => {
     const comment = await context.db.find(schema.comments, {

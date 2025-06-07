@@ -56,7 +56,9 @@ export default (app: OpenAPIHono) => {
       targetUri ? eq(schema.comments.targetUri, targetUri) : undefined,
       app ? eq(schema.comments.app, app) : undefined,
       channelId != null ? eq(schema.comments.channelId, channelId) : undefined,
-      commentType ? eq(schema.comments.commentType, commentType) : undefined,
+      commentType
+        ? eq(schema.comments.commentType, parseInt(commentType, 10))
+        : undefined,
     ];
 
     const repliesConditions: (SQL<unknown> | undefined)[] = [];

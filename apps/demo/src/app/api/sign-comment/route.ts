@@ -85,7 +85,7 @@ export async function POST(
   const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
   const commentData = createCommentData({
     content,
-    metadata: metadata ? JSON.parse(metadata) : undefined,
+    metadata: metadata || [],
     author,
     app: app.address,
 

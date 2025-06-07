@@ -122,8 +122,8 @@ export function useGaslessCommentActions({
         content: comment.content,
         isApproved: comment.pendingOperation.type === "gasless-preapproved",
         targetUri: comment.targetUri,
-        parentId: comment.parentId ?? undefined,
-        metadata: comment.metadata,
+        parentId: comment.parentId || undefined,
+        metadata: JSON.stringify(comment.metadata),
       });
 
       try {
@@ -215,7 +215,7 @@ export function useGaslessCommentActions({
         isApproved: hasApproval,
         commentId: params.comment.id,
         content: params.edit.content,
-        metadata: params.edit.metadata,
+        metadata: JSON.stringify(params.edit.metadata),
       });
 
       try {
@@ -270,7 +270,7 @@ export function useGaslessCommentActions({
         isApproved: comment.pendingOperation.type === "gasless-preapproved",
         commentId: comment.id,
         content: comment.content,
-        metadata: comment.metadata,
+        metadata: JSON.stringify(comment.metadata),
       });
 
       try {

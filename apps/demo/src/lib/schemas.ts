@@ -5,7 +5,7 @@ import {
   DeleteCommentTypedDataSchema,
   EditCommentDataSchema,
   EditCommentTypedDataSchema,
-  CommentMetadataSchema,
+  MetadataArraySchema,
 } from "@ecp.eth/sdk/comments/schemas";
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
@@ -13,7 +13,7 @@ import { z } from "zod";
 const sharedCommentSchema = z.object({
   author: HexSchema,
   content: z.string().trim().nonempty(),
-  metadata: CommentMetadataSchema,
+  metadata: MetadataArraySchema,
 });
 
 export const PrepareSignedGaslessCommentRequestBodySchema = z.union([

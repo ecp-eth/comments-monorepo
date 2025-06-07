@@ -30,13 +30,13 @@ type SubmitGaslessCommentVariables =
       isApproved: boolean;
       content: string;
       targetUri: string;
-      metadata: string;
+      metadata: { value: Hex; key: Hex }[];
     }
   | {
       isApproved: boolean;
       content: string;
       parentId: Hex;
-      metadata: string;
+      metadata: { value: Hex; key: Hex }[];
     };
 
 type SubmitGaslessCommentVariablesInternal =
@@ -44,13 +44,13 @@ type SubmitGaslessCommentVariablesInternal =
       author: Hex;
       content: string;
       targetUri: string;
-      metadata: string;
+      metadata: { value: Hex; key: Hex }[];
     }
   | {
       author: Hex;
       content: string;
       parentId: Hex;
-      metadata: string;
+      metadata: { value: Hex; key: Hex }[];
     };
 
 type PostPriorNotApprovedResult = GaslessPostCommentResponseSchemaType &
@@ -202,14 +202,14 @@ type SubmitGaslessEditCommentVariables = {
   content: string;
   isApproved: boolean;
   commentId: Hex;
-  metadata: string;
+  metadata: { value: Hex; key: Hex }[];
 };
 
 type SubmitGaslessEditCommentVariablesInternal = {
   author: Hex;
   content: string;
   commentId: Hex;
-  metadata: string;
+  metadata: { value: Hex; key: Hex }[];
 };
 
 type EditPriorNotApprovedResult = GaslessEditResponseSchemaType &

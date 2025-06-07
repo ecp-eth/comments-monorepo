@@ -39,10 +39,6 @@ import type {
   WriteContractHelperResult,
 } from "../core/types.js";
 import { createWaitableWriteContractHelper } from "../core/utils.js";
-import {
-  createAddCommentTypedDataWithMetadata,
-  createEditCommentTypedDataWithMetadata,
-} from "./metadata-signatures.js";
 import { createMetadataEntries } from "./metadata.js";
 import type { MetadataEntry } from "./types.js";
 
