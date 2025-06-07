@@ -142,6 +142,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     comment.createdAt = timestampNow;
     comment.updatedAt = timestampNow;
 
+    // emit event before calling the `onCommentAdd` hook to ensure the order of events is correct in the case of reentrancy
+    emit CommentAdded(
+      commentId,
+      author,
+      app,
+      channelId,
+      parentId,
+      timestampNow,
+      content,
+      targetUri,
+      commentType,
+      metadata
+    );
+
     // Store metadata in mappings
     if (metadata.length > 0) {
       mapping(bytes32 => bytes) storage commentMetadataForId = commentMetadata[
@@ -162,19 +176,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     }
 
     Channels.Channel memory channel = channelManager.getChannel(channelId);
-
-    // emit event before calling the `onCommentAdd` hook to ensure the order of events is correct in the case of reentrancy
-    emit CommentAdded(
-      commentId,
-      author,
-      app,
-      channelId,
-      parentId,
-      timestampNow,
-      content,
-      targetUri,
-      commentType
-    );
 
     if (channel.hook != address(0) && channel.permissions.onCommentAdd) {
       IHook hook = IHook(channel.hook);

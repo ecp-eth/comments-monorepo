@@ -76,10 +76,22 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       event.args.commentId,
     );
 
+    // Transform metadata from event args to database format
+    // Note: metadata property may not be in types yet if ABI hasn't been regenerated
+    const eventArgs = event.args as any;
+    const metadata = eventArgs["metadata"]
+      ? eventArgs["metadata"].map((entry: { key: string; value: string }) => ({
+          key: entry.key,
+          value: entry.value,
+        }))
+      : [];
+
     await context.db.insert(schema.comments).values({
       id: event.args.commentId,
       content: event.args.content,
-      metadata: event.args.metadata,
+      // Use metadata directly from the event, or empty array if not available yet
+      metadata,
+      hookMetadata: [], // Hook metadata still comes from separate events
       targetUri,
       parentId,
       rootCommentId,
@@ -91,7 +103,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       app: event.args.app,
       logIndex: event.log.logIndex,
       channelId: event.args.channelId,
-      commentType: event.args.commentType,
+      // commentType is now a uint8, convert to integer
+      commentType: Number(event.args.commentType),
       ...(moderationStatus
         ? {
             moderationStatus: moderationStatus.status,
@@ -118,6 +131,80 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         targetUri,
       });
     }
+  });
+
+  // Handle metadata setting separately
+  ponder.on("CommentsV1:CommentMetadataSet", async ({ event, context }) => {
+    const comment = await context.db.find(schema.comments, {
+      id: event.args.commentId,
+    });
+
+    if (!comment) {
+      // Comment might not be indexed yet, skip for now
+      return;
+    }
+
+    // Add the metadata entry to the existing metadata array
+    const existingMetadata = comment.metadata || [];
+    const newMetadataEntry = {
+      key: event.args.key,
+      value: event.args.value,
+    };
+
+    // Check if this key already exists and update it, otherwise add new entry
+    const existingIndex = existingMetadata.findIndex(
+      (entry) => entry.key === event.args.key,
+    );
+    if (existingIndex !== -1) {
+      existingMetadata[existingIndex] = newMetadataEntry;
+    } else {
+      existingMetadata.push(newMetadataEntry);
+    }
+
+    await context.db
+      .update(schema.comments, {
+        id: event.args.commentId,
+      })
+      .set({
+        metadata: existingMetadata,
+      });
+  });
+
+  // Handle hook metadata setting separately
+  ponder.on("CommentsV1:CommentHookMetadataSet", async ({ event, context }) => {
+    const comment = await context.db.find(schema.comments, {
+      id: event.args.commentId,
+    });
+
+    if (!comment) {
+      // Comment might not be indexed yet, skip for now
+      return;
+    }
+
+    // Add the hook metadata entry to the existing hookMetadata array
+    const existingHookMetadata = comment.hookMetadata || [];
+    const newHookMetadataEntry = {
+      key: event.args.key,
+      value: event.args.value,
+    };
+
+    // Check if this key already exists and update it, otherwise add new entry
+    const existingIndex = existingHookMetadata.findIndex(
+      (entry) => entry.key === event.args.key,
+    );
+    if (existingIndex !== -1) {
+      existingHookMetadata[existingIndex] = newHookMetadataEntry;
+    } else {
+      existingHookMetadata.push(newHookMetadataEntry);
+    }
+
+    await context.db
+      .update(schema.comments, {
+        id: event.args.commentId,
+      })
+      .set({
+        hookMetadata: existingHookMetadata,
+      });
   });
 
   ponder.on("CommentsV1:CommentDeleted", async ({ event, context }) => {
@@ -157,7 +244,8 @@ ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
     })
     .set({
       content: event.args.content,
-      metadata: event.args.metadata,
+      // Note: metadata for CommentEdited is also handled via separate CommentMetadataSet events
+      // so we don't update metadata here directly
       revision: existingComment.revision + 1,
       updatedAt,
     });

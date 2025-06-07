@@ -18,6 +18,7 @@ interface ICommentManager {
   /// @param content The text content of the comment - may contain urls, images and mentions
   /// @param targetUri the URI about which the comment is being made
   /// @param commentType The type of the comment (0=comment, 1=reaction)
+  /// @param metadata Array of key-value pairs for additional data
   event CommentAdded(
     bytes32 indexed commentId,
     address indexed author,
@@ -27,7 +28,8 @@ interface ICommentManager {
     uint96 createdAt,
     string content,
     string targetUri,
-    uint8 commentType
+    uint8 commentType,
+    Comments.MetadataEntry[] metadata
   );
 
   /// @notice Emitted when metadata is set for a comment
