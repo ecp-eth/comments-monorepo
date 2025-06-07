@@ -140,7 +140,7 @@ The `channelId` property is used to organize comments into different channels or
 - Updated automatically whenever the comment content or metadata is edited.
 - Initially equals `createdAt` for new comments.
 
-## Hook Metadata
+## `hookData` (added by hooks)
 
 Hook metadata is additional data that can be added by hooks during comment processing, stored separately from regular metadata.
 
@@ -148,6 +148,7 @@ Hook metadata is additional data that can be added by hooks during comment proce
 - Used by the protocol's hook system to attach additional information to comments
 - The specific format and content depend on the hooks implemented by the application
 - Applications can use this for custom features like moderation flags, additional metadata, or integration data
+- Since `hookData` is added by hooks, it is not signed by the author nor the app.
 
 ### Hook Metadata Access
 
