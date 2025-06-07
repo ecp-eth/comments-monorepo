@@ -129,7 +129,7 @@ export const CommentManagerABI = [
         internalType: "uint256",
       },
       {
-        name: "signature",
+        name: "authorSignature",
         type: "bytes",
         internalType: "bytes",
       },
@@ -867,7 +867,7 @@ export const CommentManagerABI = [
         internalType: "uint256",
       },
       {
-        name: "signature",
+        name: "authorSignature",
         type: "bytes",
         internalType: "bytes",
       },

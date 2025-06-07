@@ -371,7 +371,7 @@ contract CommentsTest is Test, IERC721Receiver {
     bytes32 nonExistentId = bytes32(uint256(1));
 
     vm.prank(author);
-    vm.expectRevert("Comment does not exist");
+    vm.expectRevert(ICommentManager.CommentDoesNotExist.selector);
     comments.deleteComment(nonExistentId);
   }
 

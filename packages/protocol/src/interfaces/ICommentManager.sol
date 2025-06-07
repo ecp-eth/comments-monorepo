@@ -108,6 +108,8 @@ interface ICommentManager {
   error InvalidCommentReference(string message);
   /// @notice Error thrown when address is zero
   error ZeroAddress();
+  /// @notice Error thrown when comment does not exist
+  error CommentDoesNotExist();
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata

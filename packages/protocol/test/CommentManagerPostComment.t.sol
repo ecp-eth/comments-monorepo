@@ -107,13 +107,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Send transaction from wrong address
     address wrongAuthor = address(0x3);
     vm.prank(wrongAuthor);
-    vm.expectRevert(
-      abi.encodeWithSelector(
-        ICommentManager.NotAuthorized.selector,
-        wrongAuthor,
-        author
-      )
-    );
+    vm.expectRevert("Not comment author");
     comments.postComment(commentData, appSignature);
   }
 

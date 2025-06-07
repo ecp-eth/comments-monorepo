@@ -29,6 +29,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
   Comments.CreateComment createCommentData;
   bytes authorSignature;
   bytes appSignature;
+  bytes32 commentId;
 
   function setUp() public {
     owner = address(this);
@@ -51,7 +52,6 @@ contract DebugGasUsage is Test, IERC721Receiver {
     debugCreateChannel();
     debugUpdateChannel();
     debugPostComment();
-    debugPostCommentWithSigBroadcastedByAuthor();
     debugPostCommentWithSigSignedByAuthor();
     debugParseCAIP19();
   }
@@ -116,7 +116,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
-    bytes32 commentId = comments.getCommentId(createCommentData);
+    commentId = comments.getCommentId(createCommentData);
     authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, commentId);
     appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
 
@@ -127,39 +127,6 @@ contract DebugGasUsage is Test, IERC721Receiver {
 
   function runPostComment() internal {
     comments.postComment{ value: 0 }(createCommentData, appSignature);
-  }
-
-  function debugPostCommentWithSigBroadcastedByAuthor() public {
-    // Create comment data using direct construction
-    createCommentData = Comments.CreateComment({
-      content: "Test comment 2",
-      metadata: "{}",
-      targetUri: "",
-      commentType: "comment",
-      author: user1,
-      app: user2,
-      channelId: channelId,
-      deadline: block.timestamp + 1 days,
-      parentId: bytes32(0)
-    });
-
-    bytes32 commentId = comments.getCommentId(createCommentData);
-    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
-
-    // Post comment with sig directly as author
-    vm.prank(user1);
-    measureGas(
-      "postCommentWithSig broadcasted by author",
-      runPostCommentWithSigBroadcastedByAuthor
-    );
-  }
-
-  function runPostCommentWithSigBroadcastedByAuthor() internal {
-    comments.postCommentWithSig{ value: 0 }(
-      createCommentData,
-      "",
-      appSignature
-    );
   }
 
   function debugPostCommentWithSigSignedByAuthor() public {
@@ -176,7 +143,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
-    bytes32 commentId = comments.getCommentId(createCommentData);
+    commentId = comments.getCommentId(createCommentData);
     authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, commentId);
     appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
 

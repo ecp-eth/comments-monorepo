@@ -284,13 +284,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     address wrongAuthor = address(0x3);
     vm.prank(wrongAuthor);
-    vm.expectRevert(
-      abi.encodeWithSelector(
-        ICommentManager.NotAuthorized.selector,
-        wrongAuthor,
-        author
-      )
-    );
+    vm.expectRevert("Not comment author");
     comments.editComment(commentId, editData, editAppSignature);
 
     // Verify comment did not change
@@ -682,7 +676,7 @@ contract CommentsTest is Test, IERC721Receiver {
       editHash
     );
 
-    vm.expectRevert("Comment does not exist");
+    vm.expectRevert(ICommentManager.CommentDoesNotExist.selector);
     comments.editCommentWithSig(
       nonExistentId,
       editData,
