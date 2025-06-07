@@ -103,7 +103,7 @@ contract CommentsTest is Test, IERC721Receiver {
     );
 
     expectedCommentData.content = editData.content;
-    expectedCommentData.updatedAt = uint96(block.timestamp);
+    expectedCommentData.updatedAt = uint88(block.timestamp);
 
     vm.prank(author);
     vm.expectEmit(true, true, true, true);

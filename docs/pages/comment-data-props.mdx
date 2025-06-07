@@ -33,7 +33,7 @@ The `metadata` property stores additional data as key-value pairs that shouldn't
 
 - Stored as an array of `MetadataEntry` structures with `bytes32 key` and `bytes value` fields
 - Keys should be UTF-8 encoded strings with format "type key" (e.g., "category string", "priority uint256")
-- Values are stored as `bytes` and can contain any encoded data type, encoded via `abi.encode`
+- Values are stored as `bytes` and can contain any encoded data type, encoded via `abi.encodePacked`
 - Please be mindful that storing large amounts of metadata on the chain will increase the gas cost of the transaction.
 
 ### Metadata Access
