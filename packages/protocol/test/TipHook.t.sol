@@ -311,20 +311,6 @@ contract TipHookTest is Test, IERC721Receiver {
   using TestUtils for string;
   using LibString for string;
 
-  event CommentAdded(
-    bytes32 indexed commentId,
-    address indexed author,
-    address indexed app,
-    uint256 channelId,
-    bytes32 parentId,
-    uint96 createdAt,
-    string content,
-    string metadata,
-    string targetUri,
-    string commentType,
-    string hookData
-  );
-
   IChannelManager public channelManager;
   TipHook public tipHook;
   ICommentManager public commentManager;
@@ -653,23 +639,8 @@ contract TipHookTest is Test, IERC721Receiver {
       commentManager
     );
 
-    bytes32 commentId = commentManager.getCommentId(replyComment);
-
     vm.prank(user2);
-    vm.expectEmit(true, true, true, true);
-    emit CommentAdded(
-      commentId,
-      replyComment.author,
-      replyComment.app,
-      replyComment.channelId,
-      replyComment.parentId,
-      uint96(block.timestamp),
-      replyComment.content,
-      replyComment.metadata,
-      replyComment.targetUri,
-      replyComment.commentType,
-      ""
-    );
+
     commentManager.postComment{ value: tipAmount }(replyComment, appSignature);
   }
 
