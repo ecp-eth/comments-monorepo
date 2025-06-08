@@ -1,13 +1,15 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { http } from "wagmi";
-import { anvil, base } from "wagmi/chains";
+import { anvil, monadTestnet } from "wagmi/chains";
 import { publicEnv } from "@/publicEnv";
 
+const prodChain = monadTestnet;
+
 // swap works only with base, locally it doesn't work
-export const chain = publicEnv.NODE_ENV === "development" ? anvil : base;
+export const chain = publicEnv.NODE_ENV === "development" ? anvil : prodChain;
 
 export const transport =
-  chain.id === base.id
+  chain.id === prodChain.id
     ? http(publicEnv.NEXT_PUBLIC_RPC_URL)
     : http("http://localhost:8545");
 
