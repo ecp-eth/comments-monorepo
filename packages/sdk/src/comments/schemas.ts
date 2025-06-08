@@ -78,7 +78,7 @@ const BaseCommentInputDataSchema = z.object({
   content: z.string(),
   metadata: MetadataArraySchema.default([]),
   targetUri: z.string(),
-  commentType: z.number().default(DEFAULT_COMMENT_TYPE),
+  commentType: z.number().int().min(0).max(255).default(DEFAULT_COMMENT_TYPE),
 });
 
 export const RootCommentInputDataSchema = BaseCommentInputDataSchema.omit({
