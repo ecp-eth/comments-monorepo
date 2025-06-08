@@ -215,10 +215,7 @@ export function useGaslessCommentActions({
         isApproved: hasApproval,
         commentId: params.comment.id,
         content: params.edit.content,
-        metadata:
-          typeof params.edit.metadata === "string"
-            ? JSON.parse(params.edit.metadata)
-            : params.edit.metadata,
+        metadata: params.edit.metadata,
       });
 
       try {
@@ -273,10 +270,7 @@ export function useGaslessCommentActions({
         isApproved: comment.pendingOperation.type === "gasless-preapproved",
         commentId: comment.id,
         content: comment.content,
-        metadata:
-          typeof comment.metadata === "string"
-            ? JSON.parse(comment.metadata)
-            : (comment.metadata ?? []),
+        metadata: comment.metadata ?? [],
       });
 
       try {

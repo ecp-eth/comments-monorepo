@@ -80,7 +80,8 @@ interface ICommentManager {
     uint96 updatedAt,
     string content,
     string targetUri,
-    uint8 commentType
+    uint8 commentType,
+    Comments.MetadataEntry[] metadata
   );
 
   /// @notice Emitted when an author approves an app signer

@@ -1122,6 +1122,20 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      internalType: "uint8";
      name: "commentType";
      type: "uint8";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     indexed: false;
+     internalType: "struct Comments.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
   }];
   name: "CommentEdited";
   type: "event";
@@ -2442,6 +2456,20 @@ Edit a comment as an author
      `internalType`: `"uint8"`;
      `name`: `"commentType"`;
      `type`: `"uint8"`;
+   \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `indexed`: `false`;
+     `internalType`: `"struct Comments.MetadataEntry[]"`;
+     `name`: `"metadata"`;
+     `type`: `"tuple[]"`;
   \}\];
   `name`: `"CommentEdited"`;
   `type`: `"event"`;

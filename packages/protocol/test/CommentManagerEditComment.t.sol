@@ -26,7 +26,8 @@ contract CommentsTest is Test, IERC721Receiver {
     uint96 updatedAt,
     string content,
     string targetUri,
-    uint8 commentType
+    uint8 commentType,
+    Comments.MetadataEntry[] metadata
   );
   event CommentMetadataSet(
     bytes32 indexed commentId,
@@ -118,7 +119,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       editData.content,
       commentData.targetUri,
-      commentData.commentType
+      commentData.commentType,
+      editData.metadata
     );
     comments.editComment(commentId, editData, editAppSignature);
 
@@ -172,7 +174,6 @@ contract CommentsTest is Test, IERC721Receiver {
       keccak256("test key"),
       bytes("test value")
     );
-    vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
       editData.app,
@@ -184,7 +185,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
-      commentData.commentType
+      commentData.commentType,
+      editData.metadata
     );
     comments.editComment(commentId, editData, "");
 
@@ -255,7 +257,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       editData.content,
       commentData.targetUri,
-      commentData.commentType
+      commentData.commentType,
+      editData.metadata
     );
     vm.expectEmit(true, true, true, true);
     emit CommentHookMetadataSet(
@@ -416,7 +419,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       editData.content,
       commentData.targetUri,
-      commentData.commentType
+      commentData.commentType,
+      editData.metadata
     );
     comments.editCommentWithSig(
       commentId,
@@ -478,7 +482,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       editData.content,
       commentData.targetUri,
-      commentData.commentType
+      commentData.commentType,
+      editData.metadata
     );
     comments.editCommentWithSig(
       commentId,
@@ -529,7 +534,8 @@ contract CommentsTest is Test, IERC721Receiver {
       uint96(block.timestamp),
       editData.content,
       commentData.targetUri,
-      commentData.commentType
+      commentData.commentType,
+      editData.metadata
     );
     vm.prank(app);
     comments.editCommentWithSig(commentId, editData, "", "");

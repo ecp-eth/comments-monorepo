@@ -1446,6 +1446,24 @@ export const CommentManagerABI = [
         indexed: false,
         internalType: "uint8",
       },
+      {
+        name: "metadata",
+        type: "tuple[]",
+        indexed: false,
+        internalType: "struct Comments.MetadataEntry[]",
+        components: [
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
+      },
     ],
     anonymous: false,
   },

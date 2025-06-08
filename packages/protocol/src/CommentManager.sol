@@ -369,7 +369,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       timestampNow,
       content,
       comment.targetUri,
-      comment.commentType
+      comment.commentType,
+      metadata
     );
 
     if (channel.hook != address(0) && channel.permissions.onCommentEdit) {

@@ -42,7 +42,7 @@ Emitted when a comment is deleted
 
 
 
-### `CommentEdited(bytes32 commentId, address editedByApp, address author, address app, uint256 channelId, bytes32 parentId, uint96 createdAt, uint96 updatedAt, string content, string targetUri, uint8 commentType)`
+### `CommentEdited(bytes32 commentId, address editedByApp, address author, address app, uint256 channelId, bytes32 parentId, uint96 createdAt, uint96 updatedAt, string content, string targetUri, uint8 commentType, struct Comments.MetadataEntry[] metadata)`
 
 Emitted when a comment is edited
 
