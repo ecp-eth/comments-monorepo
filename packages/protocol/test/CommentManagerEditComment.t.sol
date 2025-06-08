@@ -155,7 +155,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Add metadata to the edit
     Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](1);
     metadata[0] = Comments.MetadataEntry({
-      key: keccak256("test key"),
+      key: bytes32("string key"),
       value: bytes("test value")
     });
     editData.metadata = metadata;
@@ -171,7 +171,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentMetadataSet(
       commentId,
-      keccak256("test key"),
+      bytes32("string key"),
       bytes("test value")
     );
     emit CommentEdited(
@@ -199,7 +199,7 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.MetadataEntry[] memory commentMetadata = comments
       .getCommentMetadata(commentId);
     assertEq(commentMetadata.length, 1);
-    assertEq(commentMetadata[0].key, keccak256("test key"));
+    assertEq(commentMetadata[0].key, bytes32("string key"));
     assertEq(string(commentMetadata[0].value), "test value");
   }
 
@@ -263,7 +263,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentHookMetadataSet(
       commentId,
-      keccak256("status string"),
+      bytes32("string status"),
       bytes("hook data edited")
     );
     comments.editComment(commentId, editData, editAppSignature);
@@ -277,7 +277,7 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.MetadataEntry[] memory hookMetadata = comments
       .getCommentHookMetadata(commentId);
     assertEq(hookMetadata.length, 1);
-    assertEq(hookMetadata[0].key, keccak256("status string"));
+    assertEq(hookMetadata[0].key, bytes32("string status"));
     assertEq(string(hookMetadata[0].value), "hook data edited");
   }
 

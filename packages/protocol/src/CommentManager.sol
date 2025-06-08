@@ -264,9 +264,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     bytes32 editHash = getEditCommentHash(commentId, author, editData);
 
     if (
-      // It would be sent by someone such as a contract, with `author == app == contract address`.
-      // In such case we don't want they providing an extra app signature since `msg.sender` already indicates the authorization
+      // In the case of direct contract calls, where `author == app == contract address`.
       msg.sender == app ||
+      // or the app signs the edit hash
       SignatureChecker.isValidSignatureNow(app, editHash, appSignature)
     ) {
       _editComment(commentId, editData);

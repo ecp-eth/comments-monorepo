@@ -585,7 +585,7 @@ export function createCommentData({
       app,
       channelId,
       deadline: timestampInMs,
-      parentId: params.parentId,
+      parentId: "parentId" in params ? params.parentId : EMPTY_PARENT_ID,
     };
   }
 }
@@ -727,21 +727,6 @@ export type BaseEditCommentDataParams = {
   deadline?: bigint;
 };
 
-export type EditCommentDataParamsWithMetadataRaw = BaseEditCommentDataParams & {
-  /**
-   * The metadata of the comment as a raw JSON string (legacy format)
-   */
-  metadataRaw: string;
-};
-
-export type EditCommentDataParamsWithMetadataObject =
-  BaseEditCommentDataParams & {
-    /**
-     * The metadata of the comment as an object (legacy format)
-     */
-    metadataObject: object;
-  };
-
 export type EditCommentDataParamsWithMetadataEntries =
   BaseEditCommentDataParams & {
     /**
@@ -750,10 +735,7 @@ export type EditCommentDataParamsWithMetadataEntries =
     metadata: MetadataEntry[];
   };
 
-export type EditCommentDataParams =
-  | EditCommentDataParamsWithMetadataRaw
-  | EditCommentDataParamsWithMetadataObject
-  | EditCommentDataParamsWithMetadataEntries;
+export type EditCommentDataParams = EditCommentDataParamsWithMetadataEntries;
 
 /**
  * Create the data structure of a comment for editing
@@ -765,40 +747,7 @@ export function createEditCommentData(
   let metadata: MetadataEntry[];
 
   if ("metadata" in params) {
-    // New format: already MetadataEntry[]
     metadata = params.metadata;
-  } else if ("metadataRaw" in params) {
-    // Legacy format: JSON string
-    try {
-      const parsedMetadata = JSON.parse(params.metadataRaw);
-      // Convert legacy format to proper format
-      const convertedMetadata: Record<
-        string,
-        { type: MetadataType; value: any }
-      > = {};
-      for (const [key, value] of Object.entries(parsedMetadata)) {
-        convertedMetadata[key] = {
-          type: inferMetadataType(value),
-          value: value,
-        };
-      }
-      metadata = createMetadataEntries(convertedMetadata);
-    } catch {
-      metadata = [];
-    }
-  } else if ("metadataObject" in params) {
-    // Legacy format: object - convert to proper format
-    const convertedMetadata: Record<
-      string,
-      { type: MetadataType; value: any }
-    > = {};
-    for (const [key, value] of Object.entries(params.metadataObject)) {
-      convertedMetadata[key] = {
-        type: inferMetadataType(value),
-        value: value,
-      };
-    }
-    metadata = createMetadataEntries(convertedMetadata);
   } else {
     metadata = [];
   }
@@ -812,24 +761,6 @@ export function createEditCommentData(
     deadline:
       params.deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24),
   };
-}
-
-/**
- * Helper function to infer the metadata type from a JavaScript value
- * Used for legacy metadata format conversion
- */
-function inferMetadataType(value: unknown): MetadataType {
-  if (typeof value === "boolean") {
-    return "bool";
-  } else if (typeof value === "number") {
-    return "uint256";
-  } else if (typeof value === "bigint") {
-    return "uint256";
-  } else if (typeof value === "object" && value !== null) {
-    return "string"; // JSON objects are stored as strings
-  } else {
-    return "string"; // Default to string for everything else
-  }
 }
 
 export type CreateEditCommentTypedDataParams = {

@@ -4,6 +4,7 @@ import { EmbedConfigSchema } from "@ecp.eth/sdk/embed/schemas";
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { MAX_COMMENT_LENGTH } from "./constants";
 import { decompressFromURI } from "lz-ts";
+import { MetadataEntrySchema } from "@ecp.eth/sdk/comments";
 
 const sharedCommentSchema = z.object({
   author: HexSchema,
@@ -40,7 +41,7 @@ export const SignEditCommentPayloadRequestSchema = z.object({
   commentId: HexSchema,
   content: z.string().trim().nonempty(),
   author: HexSchema,
-  metadata: z.string(),
+  metadata: z.array(MetadataEntrySchema),
   chainId: z.number(),
 });
 

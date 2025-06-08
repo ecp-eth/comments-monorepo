@@ -507,7 +507,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentHookMetadataSet(
       commentId,
-      keccak256("status string"),
+      bytes32("string status"),
       bytes("hook data")
     );
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
@@ -516,7 +516,7 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.MetadataEntry[] memory hookMetadata = comments
       .getCommentHookMetadata(commentId);
     assertEq(hookMetadata.length, 1);
-    assertEq(hookMetadata[0].key, keccak256("status string"));
+    assertEq(hookMetadata[0].key, bytes32("string status"));
     assertEq(string(hookMetadata[0].value), "hook data");
   }
 

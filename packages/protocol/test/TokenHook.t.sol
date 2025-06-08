@@ -166,7 +166,7 @@ contract TokenHook is BaseHook {
         Comments.MetadataEntry[]
           memory hookMetadata = new Comments.MetadataEntry[](1);
         hookMetadata[0] = Comments.MetadataEntry({
-          key: keccak256("address deployed_token_address"),
+          key: bytes32("address deployed_token_address"),
           value: abi.encodePacked(tokenAddress)
         });
         return hookMetadata;
@@ -196,17 +196,17 @@ contract TokenHook is BaseHook {
       bytes calldata value = metadata[i].value;
 
       // Compare against known key hashes
-      if (key == keccak256("symbol string")) {
+      if (key == bytes32("string symbol")) {
         params.symbol = string(value);
-      } else if (key == keccak256("name string")) {
+      } else if (key == bytes32("string name")) {
         params.name = string(value);
-      } else if (key == keccak256("image string")) {
+      } else if (key == bytes32("string image")) {
         params.image = string(value);
-      } else if (key == keccak256("metadata string")) {
+      } else if (key == bytes32("string metadata")) {
         params.metadata = string(value);
-      } else if (key == keccak256("context string")) {
+      } else if (key == bytes32("string context")) {
         params.context = string(value);
-      } else if (key == keccak256("recipient address")) {
+      } else if (key == bytes32("address recipient")) {
         require(value.length == 20, "Invalid address length");
         params.customRecipient = address(bytes20(value));
       }
@@ -493,11 +493,11 @@ contract TokenHookTest is Test, IERC721Receiver {
     // Create metadata for token deployment
     Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](2);
     metadata[0] = Comments.MetadataEntry({
-      key: keccak256("symbol string"),
+      key: bytes32("string symbol"),
       value: bytes("MYTOKEN")
     });
     metadata[1] = Comments.MetadataEntry({
-      key: keccak256("name string"),
+      key: bytes32("string name"),
       value: bytes("My Awesome Token")
     });
 
@@ -553,7 +553,7 @@ contract TokenHookTest is Test, IERC721Receiver {
     Comments.MetadataEntry[] memory hookMetadata = comments
       .getCommentHookMetadata(commentId);
     assertEq(hookMetadata.length, 1);
-    assertEq(hookMetadata[0].key, keccak256("address deployed_token_address"));
+    assertEq(hookMetadata[0].key, bytes32("address deployed_token_address"));
     assertEq(address(bytes20(hookMetadata[0].value)), call.deployedToken);
   }
 
@@ -569,27 +569,27 @@ contract TokenHookTest is Test, IERC721Receiver {
     // Create comprehensive metadata
     Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](6);
     metadata[0] = Comments.MetadataEntry({
-      key: keccak256("symbol string"),
+      key: bytes32("string symbol"),
       value: bytes("FULL")
     });
     metadata[1] = Comments.MetadataEntry({
-      key: keccak256("name string"),
+      key: bytes32("string name"),
       value: bytes("Full Feature Token")
     });
     metadata[2] = Comments.MetadataEntry({
-      key: keccak256("image string"),
+      key: bytes32("string image"),
       value: bytes("https://example.com/token.png")
     });
     metadata[3] = Comments.MetadataEntry({
-      key: keccak256("metadata string"),
+      key: bytes32("string metadata"),
       value: bytes("Additional metadata")
     });
     metadata[4] = Comments.MetadataEntry({
-      key: keccak256("context string"),
+      key: bytes32("string context"),
       value: bytes("A token for testing all features")
     });
     metadata[5] = Comments.MetadataEntry({
-      key: keccak256("recipient address"),
+      key: bytes32("address recipient"),
       value: abi.encodePacked(customRecipient)
     });
 
@@ -644,7 +644,7 @@ contract TokenHookTest is Test, IERC721Receiver {
     // Create metadata without required fields
     Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](1);
     metadata[0] = Comments.MetadataEntry({
-      key: keccak256("random string"),
+      key: bytes32("string random"),
       value: bytes("not relevant")
     });
 
@@ -686,11 +686,11 @@ contract TokenHookTest is Test, IERC721Receiver {
     // Create metadata for token deployment
     Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](2);
     metadata[0] = Comments.MetadataEntry({
-      key: keccak256("symbol string"),
+      key: bytes32("string symbol"),
       value: bytes("EVENT")
     });
     metadata[1] = Comments.MetadataEntry({
-      key: keccak256("name string"),
+      key: bytes32("string name"),
       value: bytes("Event Test Token")
     });
 
@@ -735,11 +735,11 @@ contract TokenHookTest is Test, IERC721Receiver {
     // Create metadata for token deployment
     Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](2);
     metadata[0] = Comments.MetadataEntry({
-      key: keccak256("symbol string"),
+      key: bytes32("string symbol"),
       value: bytes("FAIL")
     });
     metadata[1] = Comments.MetadataEntry({
-      key: keccak256("name string"),
+      key: bytes32("string name"),
       value: bytes("Fail Test Token")
     });
 
@@ -781,11 +781,11 @@ contract TokenHookTest is Test, IERC721Receiver {
     // Create metadata for token deployment
     Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](2);
     metadata[0] = Comments.MetadataEntry({
-      key: keccak256("symbol string"),
+      key: bytes32("string symbol"),
       value: bytes("CONFIG")
     });
     metadata[1] = Comments.MetadataEntry({
-      key: keccak256("name string"),
+      key: bytes32("string name"),
       value: bytes("Config Test Token")
     });
 

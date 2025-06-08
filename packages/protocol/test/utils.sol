@@ -277,7 +277,7 @@ library TestUtils {
   ) internal view returns (Comments.EditComment memory) {
     Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](1);
     metadata[0] = Comments.MetadataEntry({
-      key: keccak256("edited bool"),
+      key: bytes32("bool edited"),
       value: abi.encode(true)
     });
     return
@@ -427,7 +427,7 @@ contract MockHook is BaseHook {
       1
     );
     hookMetadata[0] = Comments.MetadataEntry({
-      key: keccak256("hookData string"),
+      key: bytes32("string hookData"),
       value: bytes(returningHookData)
     });
     return hookMetadata;
@@ -461,7 +461,7 @@ contract AlwaysReturningDataHook is BaseHook {
       1
     );
     hookMetadata[0] = Comments.MetadataEntry({
-      key: keccak256("status string"),
+      key: bytes32("string status"),
       value: bytes("hook data edited")
     });
     return hookMetadata;
@@ -477,7 +477,7 @@ contract AlwaysReturningDataHook is BaseHook {
       1
     );
     hookMetadata[0] = Comments.MetadataEntry({
-      key: keccak256("status string"),
+      key: bytes32("string status"),
       value: bytes("hook data")
     });
     return hookMetadata;

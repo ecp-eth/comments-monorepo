@@ -26,6 +26,7 @@ import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import type { QuoteViewState } from "../0x/QuoteView";
 import type { IndexerAPICommentZeroExSwapSchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import { createMetadataEntry } from "@ecp.eth/sdk/comments/metadata";
 
 export type SwapWithCommentExtra = {
   quoteViewState: QuoteViewState;
@@ -148,17 +149,15 @@ export function useCommentActions({
         commentRequest: {
           content: comment.content,
           metadata: [
-            {
-              key: "0x73776170" as Hex, // "swap" in hex
-              value: JSON.stringify(
-                {
-                  swap: true,
-                  provider: "0x",
-                  data: zeroExSwap,
-                },
-                bigintReplacer,
-              ) as Hex,
-            },
+            createMetadataEntry(
+              "swap",
+              "string",
+              JSON.stringify({
+                swap: true,
+                provider: "0x",
+                data: zeroExSwap,
+              }),
+            ),
           ],
           ...("parentId" in comment
             ? {
