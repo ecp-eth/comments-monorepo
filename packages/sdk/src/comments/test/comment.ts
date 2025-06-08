@@ -1347,6 +1347,11 @@ describe("comment", () => {
             const decodedValue = decodeMetadataValue(entry, decodedInfo.type);
             const originalKey = decodedInfo.key;
 
+            assert.ok(
+              typeof decodedValue === "string",
+              "decodedValue is a string",
+            );
+
             // Match the decoded value to the original using the decoded key
             if (originalKey === "contractAddress") {
               assert.equal(
@@ -1445,6 +1450,11 @@ describe("comment", () => {
             // Use the decoded type information from on-chain data (not prior knowledge)
             const decodedValue = decodeMetadataValue(entry, decodedInfo.type);
             const originalKey = decodedInfo.key;
+
+            assert.ok(
+              typeof decodedValue === "string",
+              "decodedValue is a string",
+            );
 
             // Match the decoded value to the original using the decoded key
             if (originalKey === "hash") {
@@ -1664,6 +1674,10 @@ describe("comment", () => {
                 typeof expectedValue === "string" &&
                 originalKey === "owner"
               ) {
+                assert.ok(
+                  typeof decodedValue === "string",
+                  "decodedValue is a string",
+                );
                 // Address comparison (normalize case)
                 assert.equal(
                   decodedValue.toLowerCase(),
@@ -1674,6 +1688,10 @@ describe("comment", () => {
                 typeof expectedValue === "string" &&
                 (originalKey === "hash" || originalKey === "data")
               ) {
+                assert.ok(
+                  typeof decodedValue === "string",
+                  "decodedValue is a string",
+                );
                 // Hex string comparison (normalize case)
                 assert.equal(
                   decodedValue.toLowerCase(),

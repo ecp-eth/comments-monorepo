@@ -1,6 +1,6 @@
 import { stringToHex, toHex, pad } from "viem";
 import type { Hex } from "../core/schemas.js";
-import type { JsonObject, MetadataEntry } from "./types.js";
+import type { Json, JsonObject, MetadataEntry } from "./types.js";
 
 /**
  * Creates a metadata key by encoding a string in the format "type key" using abi.encodePacked
@@ -411,7 +411,7 @@ export function decodeMetadataTypes(
  * @param encodedValue - The hex-encoded bytes
  * @returns The decoded string value
  */
-export function decodeStringValue(encodedValue: Hex): string {
+export function decodeStringValue(encodedValue: Hex): string | Json {
   // For strings, we need to handle both regular strings and JSON objects
   try {
     const decoded = new TextDecoder().decode(
@@ -507,7 +507,7 @@ export function decodeBytesValue(encodedValue: Hex): Hex {
 export function decodeMetadataValue(
   entry: MetadataEntry,
   type: MetadataType,
-): any {
+): string | boolean | bigint | Hex | Json {
   switch (type) {
     case "string":
       return decodeStringValue(entry.value);

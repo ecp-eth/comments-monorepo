@@ -7,7 +7,7 @@
 # Function: decodeMetadataValue()
 
 ```ts
-function decodeMetadataValue(entry, type): any;
+function decodeMetadataValue(entry, type): bigint | Json;
 ```
 
 Defined in: [packages/sdk/src/comments/metadata.ts:507](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L507)
@@ -30,6 +30,6 @@ The metadata type for proper decoding
 
 ## Returns
 
-`any`
+`bigint` \| [`Json`](/sdk-reference/comments/type-aliases/Json.mdx)
 
 The decoded value in its original JavaScript type

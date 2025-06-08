@@ -153,6 +153,8 @@ paths:
                           pattern: ^d+$
                         commentType:
                           type: integer
+                          minimum: 0
+                          maximum: 255
                         content:
                           type: string
                         chainId:
@@ -297,6 +299,8 @@ paths:
                                     pattern: ^d+$
                                   commentType:
                                     type: integer
+                                    minimum: 0
+                                    maximum: 255
                                   content:
                                     type: string
                                   chainId:
@@ -613,6 +617,8 @@ paths:
                           pattern: ^d+$
                         commentType:
                           type: integer
+                          minimum: 0
+                          maximum: 255
                         content:
                           type: string
                         chainId:
@@ -754,6 +760,8 @@ paths:
                                     pattern: ^d+$
                                   commentType:
                                     type: integer
+                                    minimum: 0
+                                    maximum: 255
                                   content:
                                     type: string
                                   chainId:
@@ -1336,6 +1344,8 @@ paths:
                           pattern: ^d+$
                         commentType:
                           type: integer
+                          minimum: 0
+                          maximum: 255
                         content:
                           type: string
                         chainId:
@@ -1557,6 +1567,8 @@ paths:
                     pattern: ^d+$
                   commentType:
                     type: integer
+                    minimum: 0
+                    maximum: 255
                   content:
                     type: string
                   chainId:
@@ -1759,6 +1771,8 @@ paths:
                     pattern: ^d+$
                   commentType:
                     type: integer
+                    minimum: 0
+                    maximum: 255
                   content:
                     type: string
                   chainId:
