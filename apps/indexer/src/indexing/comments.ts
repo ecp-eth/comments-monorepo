@@ -196,8 +196,6 @@ ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
     })
     .set({
       content: event.args.content,
-      // Note: metadata for CommentEdited is also handled via separate CommentMetadataSet events
-      // so we don't update metadata here directly
       revision: existingComment.revision + 1,
       updatedAt,
     });
