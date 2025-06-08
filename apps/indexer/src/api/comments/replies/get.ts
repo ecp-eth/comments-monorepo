@@ -50,8 +50,8 @@ export default (app: OpenAPIHono) => {
     const sharedConditions = [
       app ? eq(schema.comments.app, app) : undefined,
       channelId != null ? eq(schema.comments.channelId, channelId) : undefined,
-      commentType
-        ? eq(schema.comments.commentType, parseInt(commentType, 10))
+      commentType != null
+        ? eq(schema.comments.commentType, commentType)
         : undefined,
     ];
 
