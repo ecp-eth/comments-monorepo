@@ -168,10 +168,7 @@ export function useGaslessCommentActions({
       const pendingOperation = await submitComment({
         content: params.comment.content,
         isApproved: hasApproval,
-        metadata:
-          typeof params.comment.metadata === "string"
-            ? JSON.parse(params.comment.metadata)
-            : (params.comment.metadata ?? []),
+        metadata: params.comment.metadata ?? [],
         ...("targetUri" in params.comment
           ? {
               targetUri: params.comment.targetUri,
