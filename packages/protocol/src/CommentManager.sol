@@ -85,9 +85,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     address app = commentData.app;
 
     if (
-      // It would be sent by someone such as a contract, with `author == app == contract address`.
-      // In such case we don't want they providing an extra app signature since `msg.sender` already indicates the authorization
+      // for direct contract calls where msg.sender = app = comment.author
       msg.sender == app ||
+      // or comment.app signs the comment
       SignatureChecker.isValidSignatureNow(app, commentId, appSignature)
     ) {
       _postComment(commentId, commentData);
