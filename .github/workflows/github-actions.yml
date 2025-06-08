@@ -99,6 +99,7 @@ jobs:
       APP_URL: "http://localhost:3000"
       WEBHOOK_SECRET: "secret"
       TURBO_UI: "false"
+      ETHERSCAN_API_KEY: ""
       CONTRACT_OWNER_ADDRESS: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
       FUND_ADDRESS: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
     name: Build and Test on Node.js 22
