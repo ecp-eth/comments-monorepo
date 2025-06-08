@@ -104,7 +104,7 @@ const CommentManagerABI: readonly [{
      type: "uint256";
    }, {
      internalType: "bytes";
-     name: "signature";
+     name: "authorSignature";
      type: "bytes";
   }];
   name: "addApprovalWithSig";
@@ -903,7 +903,7 @@ const CommentManagerABI: readonly [{
      type: "uint256";
    }, {
      internalType: "bytes";
-     name: "signature";
+     name: "authorSignature";
      type: "bytes";
   }];
   name: "removeApprovalWithSig";
@@ -1203,6 +1203,10 @@ const CommentManagerABI: readonly [{
 }, {
   inputs: readonly [];
   name: "ChannelDoesNotExist";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "CommentDoesNotExist";
   type: "error";
 }, {
   inputs: readonly [];
