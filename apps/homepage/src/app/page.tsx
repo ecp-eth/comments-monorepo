@@ -212,9 +212,9 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-2 md:gap-6 max-w-7xl mx-auto py-4">
-            <Card className="p-2 px-2 border-none shadow-none hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+            <Card className="p-2 px-2 border-none shadow-none hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-black group border-gray-200 dark:border-gray-700">
               <CardHeader className="flex flex-row items-center gap-4">
-                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-gray-100 dark:bg-black rounded-lg flex items-center justify-center">
                   <ArrowLeftRight className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                 </div>
                 <CardTitle className="text-gray-900 dark:text-white">
@@ -229,9 +229,9 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="p-2 px-2 border-none shadow-none hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+            <Card className="p-2 px-2 border-none shadow-none hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-black group border-gray-200 dark:border-gray-700">
               <CardHeader className="flex flex-row items-center gap-4">
-                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-gray-100 dark:bg-black rounded-lg flex items-center justify-center">
                   <MessageSquare className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                 </div>
                 <CardTitle className="text-gray-900 dark:text-white">
@@ -246,9 +246,9 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="p-2 px-2 border-none shadow-none hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+            <Card className="p-2 px-2 border-none shadow-none hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-black group border-gray-200 dark:border-gray-700">
               <CardHeader className="flex flex-row items-center gap-4">
-                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-gray-100 dark:bg-black rounded-lg flex items-center justify-center">
                   <Coins className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                 </div>
                 <CardTitle className="text-gray-900 dark:text-white">
@@ -263,9 +263,9 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="p-2 border-none shadow-none hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-gray-800 group border-gray-200 dark:border-gray-700">
+            <Card className="p-2 border-none shadow-none hover:border-indigo-400 transition-colors h-full flex flex-col bg-white dark:bg-black group border-gray-200 dark:border-gray-700">
               <CardHeader className="flex flex-row items-center gap-4">
-                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-gray-100 dark:bg-black rounded-lg flex items-center justify-center">
                   <Users className="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                 </div>
                 <CardTitle className="text-gray-900 dark:text-white">
