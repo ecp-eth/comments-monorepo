@@ -841,13 +841,13 @@ describe("comment", () => {
         assert.equal(retrievedComment.metadata.length, 3);
 
         // Test decoding
-        const reverseEngineeredMap = decodeMetadataTypes(
+        const decodedEngineeredMap = decodeMetadataTypes(
           retrievedComment.metadata,
         );
 
         const parsedMetadata = convertContractToRecordFormat(
           retrievedComment.metadata,
-          reverseEngineeredMap,
+          decodedEngineeredMap,
         );
 
         assert.equal(Object.keys(parsedMetadata).length, 3);
@@ -860,7 +860,7 @@ describe("comment", () => {
 
         // **NEW: Validate that encoded values decode back to original values using ONLY derived on-chain data**
         for (const entry of retrievedComment.metadata) {
-          const decodedInfo = reverseEngineeredMap[entry.key];
+          const decodedInfo = decodedEngineeredMap[entry.key];
 
           if (decodedInfo) {
             // Use the decoded type information from on-chain data (not prior knowledge)
@@ -955,13 +955,13 @@ describe("comment", () => {
         const retrievedComment = await getCommentWithMetadata(commentId);
 
         // Test decoding
-        const reverseEngineeredMap = decodeMetadataTypes(
+        const decodedEngineeredMap = decodeMetadataTypes(
           retrievedComment.metadata,
         );
 
         const parsedMetadata = convertContractToRecordFormat(
           retrievedComment.metadata,
-          reverseEngineeredMap,
+          decodedEngineeredMap,
         );
 
         assert.equal(Object.keys(parsedMetadata).length, 3);
@@ -975,7 +975,7 @@ describe("comment", () => {
         // **NEW: Validate that encoded boolean values decode back to original values using ONLY derived on-chain data**
         // This simulates the real-world scenario where we don't have prior knowledge of the types
         for (const entry of retrievedComment.metadata) {
-          const decodedInfo = reverseEngineeredMap[entry.key];
+          const decodedInfo = decodedEngineeredMap[entry.key];
 
           if (decodedInfo) {
             // Use the decoded type information from on-chain data (not prior knowledge)
@@ -1072,13 +1072,13 @@ describe("comment", () => {
         assert.equal(retrievedComment.metadata.length, 3);
 
         // Test decoding
-        const reverseEngineeredMap = decodeMetadataTypes(
+        const decodedEngineeredMap = decodeMetadataTypes(
           retrievedComment.metadata,
         );
 
         const parsedMetadata = convertContractToRecordFormat(
           retrievedComment.metadata,
-          reverseEngineeredMap,
+          decodedEngineeredMap,
         );
 
         assert.equal(Object.keys(parsedMetadata).length, 3);
@@ -1090,7 +1090,7 @@ describe("comment", () => {
         // **NEW: Validate that encoded numeric values decode back to original values using ONLY derived on-chain data**
         // This simulates the real-world scenario where we don't have prior knowledge of the types
         for (const entry of retrievedComment.metadata) {
-          const decodedInfo = reverseEngineeredMap[entry.key];
+          const decodedInfo = decodedEngineeredMap[entry.key];
 
           if (decodedInfo) {
             // Use the decoded type information from on-chain data (not prior knowledge)
@@ -1189,13 +1189,13 @@ describe("comment", () => {
         assert.equal(retrievedComment.metadata.length, 5);
 
         // Test decoding
-        const reverseEngineeredMap = decodeMetadataTypes(
+        const decodedEngineeredMap = decodeMetadataTypes(
           retrievedComment.metadata,
         );
 
         const parsedMetadata = convertContractToRecordFormat(
           retrievedComment.metadata,
-          reverseEngineeredMap,
+          decodedEngineeredMap,
         );
 
         assert.equal(Object.keys(parsedMetadata).length, 5);
@@ -1259,13 +1259,13 @@ describe("comment", () => {
         assert.equal(retrievedComment.metadata.length, 2);
 
         // Test decoding
-        const reverseEngineeredMap = decodeMetadataTypes(
+        const decodedEngineeredMap = decodeMetadataTypes(
           retrievedComment.metadata,
         );
 
         const parsedMetadata = convertContractToRecordFormat(
           retrievedComment.metadata,
-          reverseEngineeredMap,
+          decodedEngineeredMap,
         );
 
         assert.equal(Object.keys(parsedMetadata).length, 2);
@@ -1333,13 +1333,13 @@ describe("comment", () => {
         assert.equal(retrievedComment.metadata.length, 2);
 
         // Test decoding
-        const reverseEngineeredMap = decodeMetadataTypes(
+        const decodedEngineeredMap = decodeMetadataTypes(
           retrievedComment.metadata,
         );
 
         const parsedMetadata = convertContractToRecordFormat(
           retrievedComment.metadata,
-          reverseEngineeredMap,
+          decodedEngineeredMap,
         );
 
         assert.equal(Object.keys(parsedMetadata).length, 2);
@@ -1352,7 +1352,7 @@ describe("comment", () => {
         // **NEW: Validate that encoded address values decode back to original values using ONLY derived on-chain data**
         // This simulates the real-world scenario where we don't have prior knowledge of the types
         for (const entry of retrievedComment.metadata) {
-          const decodedInfo = reverseEngineeredMap[entry.key];
+          const decodedInfo = decodedEngineeredMap[entry.key];
 
           if (decodedInfo) {
             // Use the decoded type information from on-chain data (not prior knowledge)
@@ -1435,13 +1435,13 @@ describe("comment", () => {
         assert.equal(retrievedComment.metadata.length, 2);
 
         // Test decoding
-        const reverseEngineeredMap = decodeMetadataTypes(
+        const decodedEngineeredMap = decodeMetadataTypes(
           retrievedComment.metadata,
         );
 
         const parsedMetadata = convertContractToRecordFormat(
           retrievedComment.metadata,
-          reverseEngineeredMap,
+          decodedEngineeredMap,
         );
 
         assert.equal(Object.keys(parsedMetadata).length, 2);
@@ -1451,7 +1451,7 @@ describe("comment", () => {
         // **NEW: Validate that encoded bytes values decode back to original values using ONLY derived on-chain data**
         // This simulates the real-world scenario where we don't have prior knowledge of the types
         for (const entry of retrievedComment.metadata) {
-          const decodedInfo = reverseEngineeredMap[entry.key];
+          const decodedInfo = decodedEngineeredMap[entry.key];
 
           if (decodedInfo) {
             // Use the decoded type information from on-chain data (not prior knowledge)
@@ -1591,13 +1591,13 @@ describe("comment", () => {
         assert.equal(retrievedComment.metadata.length, 14);
 
         // Test decoding
-        const reverseEngineeredMap = decodeMetadataTypes(
+        const decodedEngineeredMap = decodeMetadataTypes(
           retrievedComment.metadata,
         );
 
         const parsedMetadata = convertContractToRecordFormat(
           retrievedComment.metadata,
-          reverseEngineeredMap,
+          decodedEngineeredMap,
         );
 
         // Verify all types are correctly parsed from the key field
@@ -1660,7 +1660,7 @@ describe("comment", () => {
 
         let decodedCount = 0;
         for (const entry of retrievedComment.metadata) {
-          const decodedInfo = reverseEngineeredMap[entry.key];
+          const decodedInfo = decodedEngineeredMap[entry.key];
 
           if (decodedInfo) {
             // Use ONLY the type information derived from on-chain data
