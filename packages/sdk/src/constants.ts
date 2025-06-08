@@ -7,8 +7,8 @@ import type { Hex } from "./core/schemas.js";
  */
 export const COMMENT_MANAGER_ADDRESS = (
   __DEV__
-    ? "0xBD20b92ca626853D497246CB0792Ace694890D44"
-    : "0xB7aF05daE28b4C96db996Cd4ceefdF9d4431D54d"
+    ? "0xC191d9e95d940914851c4bC3d7E81b5816fAa612"
+    : "0xbD4F5D51484A91E37d9E6f0b53c35531B53e2c9f"
 ) as Hex;
 
 /**
@@ -16,8 +16,8 @@ export const COMMENT_MANAGER_ADDRESS = (
  */
 export const CHANNEL_MANAGER_ADDRESS = (
   __DEV__
-    ? "0x3eB7cfd2f537Ff2cE3e1a96dB16b83124c0543D0"
-    : "0x0c47bb07B152F698612A0CdC89D1510B0a8c6E30"
+    ? "0xd584cae1517a1525BB017d9ad7031c1B732Dd01D"
+    : "0xDA359Bc9A3748FDc7427D9A98a3deCad5a065aa9"
 ) as Hex;
 
 /**
