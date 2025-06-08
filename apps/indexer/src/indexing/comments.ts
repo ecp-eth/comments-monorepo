@@ -76,21 +76,10 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       event.args.commentId,
     );
 
-    // Transform metadata from event args to database format
-    // Note: metadata property may not be in types yet if ABI hasn't been regenerated
-    const eventArgs = event.args as any;
-    const metadata = eventArgs["metadata"]
-      ? eventArgs["metadata"].map((entry: { key: string; value: string }) => ({
-          key: entry.key,
-          value: entry.value,
-        }))
-      : [];
-
     await context.db.insert(schema.comments).values({
       id: event.args.commentId,
       content: event.args.content,
-      // Use metadata directly from the event, or empty array if not available yet
-      metadata,
+      metadata: event.args.metadata.slice(),
       hookMetadata: [], // Hook metadata still comes from separate events
       targetUri,
       parentId,
