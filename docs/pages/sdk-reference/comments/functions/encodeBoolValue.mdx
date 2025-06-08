@@ -1,0 +1,29 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / encodeBoolValue
+
+# Function: encodeBoolValue()
+
+```ts
+function encodeBoolValue(value): `0x${string}`;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:47](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L47)
+
+Encodes a boolean value as bytes for metadata
+
+## Parameters
+
+### value
+
+`boolean`
+
+The boolean value to encode
+
+## Returns
+
+`` `0x${string}` ``
+
+The hex-encoded bytes (32 bytes, 1 for true, 0 for false)

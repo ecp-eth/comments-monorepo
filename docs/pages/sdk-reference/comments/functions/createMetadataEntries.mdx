@@ -1,0 +1,36 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / createMetadataEntries
+
+# Function: createMetadataEntries()
+
+```ts
+function createMetadataEntries(metadata): MetadataEntry[];
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:162](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L162)
+
+Creates multiple metadata entries from an object with explicit types
+
+## Parameters
+
+### metadata
+
+`Record`\<`string`, \{
+  `type`: [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx);
+  `value`:   \| `string`
+     \| `boolean`
+     \| `number`
+     \| `bigint`
+     \| [`JsonObject`](/sdk-reference/comments/type-aliases/JsonObject.mdx);
+\}\>
+
+An object with key-value pairs and their types
+
+## Returns
+
+[`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)[]
+
+Array of MetadataEntry

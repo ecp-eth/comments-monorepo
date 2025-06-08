@@ -94,14 +94,8 @@ export function createZeroExSwapResolver(
         );
       }
 
-      const metadata = ZeroExCommentMetadataSchema.safeParse(
-        event.args.metadata,
-      );
-
-      if (!metadata.success) {
-        return null;
-      }
-
+      // Try to parse swap directly from transaction hash
+      // Note: metadata is not available in CommentAdded event, it comes from separate CommentMetadataSet events
       const swap = await parseSwap({
         publicClient,
         transactionHash: event.transaction.hash,

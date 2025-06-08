@@ -1,0 +1,35 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / decodeMetadataValue
+
+# Function: decodeMetadataValue()
+
+```ts
+function decodeMetadataValue(entry, type): bigint | Json;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:515](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L515)
+
+Decodes a metadata entry value based on its type
+
+## Parameters
+
+### entry
+
+[`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)
+
+The metadata entry to decode
+
+### type
+
+[`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx)
+
+The metadata type for proper decoding
+
+## Returns
+
+`bigint` \| [`Json`](/sdk-reference/comments/type-aliases/Json.mdx)
+
+The decoded value in its original JavaScript type

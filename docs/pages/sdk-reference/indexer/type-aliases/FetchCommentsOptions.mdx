@@ -12,7 +12,7 @@ type FetchCommentsOptions = {
   app?: Hex;
   author?: Hex;
   channelId?: bigint;
-  commentType?: string;
+  commentType?: number;
   cursor?: Hex;
   limit?: number;
   mode?: "nested" | "flat";
@@ -87,7 +87,7 @@ Filter comments by channel ID
 ### commentType?
 
 ```ts
-optional commentType: string;
+optional commentType: number;
 ```
 
 Defined in: [packages/sdk/src/indexer/api.ts:47](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L47)

@@ -106,9 +106,9 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 1",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,
@@ -133,9 +133,9 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 2",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,
@@ -166,9 +166,9 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 3",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,

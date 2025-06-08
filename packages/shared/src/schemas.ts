@@ -13,11 +13,13 @@ import {
   CommentInputData,
   CreateCommentDataSchema,
   EditCommentDataSchema,
+  MetadataEntrySchema,
 } from "@ecp.eth/sdk/comments/schemas";
 import { z } from "zod";
 
 export const CommentDataWithIdSchema = CreateCommentDataSchema.extend({
   id: HexSchema,
+  metadata: MetadataEntrySchema.array(),
 });
 
 // this is just for type checking
@@ -152,17 +154,29 @@ type CommentSchemaType = IndexerAPICommentSchemaType & {
   };
 };
 
-export const CommentSchema: z.ZodType<CommentSchemaType> =
-  IndexerAPICommentSchema.extend({
-    replies: z
-      .object({
-        extra: IndexerAPIExtraSchema,
-        results: z.lazy(() => CommentSchema.array()),
-        pagination: IndexerAPICursorPaginationSchema,
-      })
-      .optional(),
-    pendingOperation: PendingCommentOperationSchema.optional(),
-  });
+type CommentSchemaInputType = IndexerAPICommentSchemaType & {
+  pendingOperation?: z.input<typeof PendingCommentOperationSchema>;
+  replies?: {
+    extra: IndexerAPIExtraSchemaType;
+    results: CommentSchemaInputType[];
+    pagination: IndexerAPICursorPaginationSchemaType;
+  };
+};
+
+export const CommentSchema: z.ZodType<
+  CommentSchemaType,
+  z.ZodTypeDef,
+  CommentSchemaInputType
+> = IndexerAPICommentSchema.extend({
+  replies: z
+    .object({
+      extra: IndexerAPIExtraSchema,
+      results: z.lazy(() => CommentSchema.array()),
+      pagination: IndexerAPICursorPaginationSchema,
+    })
+    .optional(),
+  pendingOperation: PendingCommentOperationSchema.optional(),
+});
 
 export type Comment = z.infer<typeof CommentSchema>;
 

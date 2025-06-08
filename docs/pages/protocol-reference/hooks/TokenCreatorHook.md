@@ -93,7 +93,7 @@ Get all channels with their token information
 
 
 
-### `_onCommentAdd(struct Comments.Comment commentData, address, bytes32) → string` (internal)
+### `_onCommentAdd(struct Comments.Comment commentData, struct Comments.MetadataEntry[], address, bytes32) → struct Comments.MetadataEntry[]` (internal)
 
 
 

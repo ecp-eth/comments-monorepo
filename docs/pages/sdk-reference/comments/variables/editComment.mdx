@@ -124,6 +124,78 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
 }, {
   inputs: readonly [{
      internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+   }, {
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  name: "commentHookMetadata";
+  outputs: readonly [{
+     internalType: "bytes";
+     name: "";
+     type: "bytes";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+   }, {
+     internalType: "uint256";
+     name: "";
+     type: "uint256";
+  }];
+  name: "commentHookMetadataKeys";
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+   }, {
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  name: "commentMetadata";
+  outputs: readonly [{
+     internalType: "bytes";
+     name: "";
+     type: "bytes";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+   }, {
+     internalType: "uint256";
+     name: "";
+     type: "uint256";
+  }];
+  name: "commentMetadataKeys";
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
      name: "commentId";
      type: "bytes32";
   }];
@@ -180,9 +252,18 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: ...;
+           name: ...;
+           type: ...;
+         }, {
+           internalType: ...;
+           name: ...;
+           type: ...;
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
      }];
      internalType: "struct Comments.EditComment";
      name: "editData";
@@ -219,9 +300,18 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: ...;
+           name: ...;
+           type: ...;
+         }, {
+           internalType: ...;
+           name: ...;
+           type: ...;
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
      }];
      internalType: "struct Comments.EditComment";
      name: "editData";
@@ -286,9 +376,13 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         name: "app";
         type: "address";
       }, {
-        internalType: "uint96";
+        internalType: "uint88";
         name: "updatedAt";
-        type: "uint96";
+        type: "uint88";
+      }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
       }, {
         internalType: "uint256";
         name: "channelId";
@@ -303,24 +397,67 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         type: "string";
       }, {
         internalType: "string";
-        name: "metadata";
-        type: "string";
-      }, {
-        internalType: "string";
         name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "hookData";
         type: "string";
      }];
      internalType: "struct Comments.Comment";
      name: "";
      type: "tuple";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "getCommentHookMetadata";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Comments.MetadataEntry[]";
+     name: "";
+     type: "tuple[]";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "getCommentHookMetadataKeys";
+  outputs: readonly [{
+     internalType: "bytes32[]";
+     name: "";
+     type: "bytes32[]";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+   }, {
+     internalType: "bytes32";
+     name: "key";
+     type: "bytes32";
+  }];
+  name: "getCommentHookMetadataValue";
+  outputs: readonly [{
+     internalType: "bytes";
+     name: "";
+     type: "bytes";
   }];
   stateMutability: "view";
   type: "function";
@@ -347,20 +484,29 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         name: "parentId";
         type: "bytes32";
       }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
         internalType: "string";
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: ...;
+           name: ...;
+           type: ...;
+         }, {
+           internalType: ...;
+           name: ...;
+           type: ...;
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
       }, {
         internalType: "string";
         name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
         type: "string";
      }];
      internalType: "struct Comments.CreateComment";
@@ -372,6 +518,61 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      internalType: "bytes32";
      name: "";
      type: "bytes32";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "getCommentMetadata";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Comments.MetadataEntry[]";
+     name: "";
+     type: "tuple[]";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "getCommentMetadataKeys";
+  outputs: readonly [{
+     internalType: "bytes32[]";
+     name: "";
+     type: "bytes32[]";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+   }, {
+     internalType: "bytes32";
+     name: "key";
+     type: "bytes32";
+  }];
+  name: "getCommentMetadataValue";
+  outputs: readonly [{
+     internalType: "bytes";
+     name: "";
+     type: "bytes";
   }];
   stateMutability: "view";
   type: "function";
@@ -428,9 +629,18 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: ...;
+           name: ...;
+           type: ...;
+         }, {
+           internalType: ...;
+           name: ...;
+           type: ...;
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
      }];
      internalType: "struct Comments.EditComment";
      name: "editData";
@@ -573,20 +783,29 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         name: "parentId";
         type: "bytes32";
       }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
         internalType: "string";
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: ...;
+           name: ...;
+           type: ...;
+         }, {
+           internalType: ...;
+           name: ...;
+           type: ...;
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
       }, {
         internalType: "string";
         name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
         type: "string";
      }];
      internalType: "struct Comments.CreateComment";
@@ -624,20 +843,29 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
         name: "parentId";
         type: "bytes32";
       }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
         internalType: "string";
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: ...;
+           name: ...;
+           type: ...;
+         }, {
+           internalType: ...;
+           name: ...;
+           type: ...;
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
       }, {
         internalType: "string";
         name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
         type: "string";
      }];
      internalType: "struct Comments.CreateComment";
@@ -798,23 +1026,27 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
    }, {
      indexed: false;
      internalType: "string";
-     name: "metadata";
-     type: "string";
-   }, {
-     indexed: false;
-     internalType: "string";
      name: "targetUri";
      type: "string";
    }, {
      indexed: false;
-     internalType: "string";
+     internalType: "uint8";
      name: "commentType";
-     type: "string";
+     type: "uint8";
    }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
      indexed: false;
-     internalType: "string";
-     name: "hookData";
-     type: "string";
+     internalType: "struct Comments.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
   }];
   name: "CommentAdded";
   type: "event";
@@ -883,23 +1115,13 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
    }, {
      indexed: false;
      internalType: "string";
-     name: "metadata";
-     type: "string";
-   }, {
-     indexed: false;
-     internalType: "string";
      name: "targetUri";
      type: "string";
    }, {
      indexed: false;
-     internalType: "string";
+     internalType: "uint8";
      name: "commentType";
-     type: "string";
-   }, {
-     indexed: false;
-     internalType: "string";
-     name: "hookData";
-     type: "string";
+     type: "uint8";
   }];
   name: "CommentEdited";
   type: "event";
@@ -911,12 +1133,37 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
      name: "commentId";
      type: "bytes32";
    }, {
+     indexed: true;
+     internalType: "bytes32";
+     name: "key";
+     type: "bytes32";
+   }, {
      indexed: false;
-     internalType: "string";
-     name: "hookData";
-     type: "string";
+     internalType: "bytes";
+     name: "value";
+     type: "bytes";
   }];
-  name: "CommentHookDataUpdated";
+  name: "CommentHookMetadataSet";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+   }, {
+     indexed: true;
+     internalType: "bytes32";
+     name: "key";
+     type: "bytes32";
+   }, {
+     indexed: false;
+     internalType: "bytes";
+     name: "value";
+     type: "bytes";
+  }];
+  name: "CommentMetadataSet";
   type: "event";
 }, {
   anonymous: false;
@@ -1064,7 +1311,7 @@ const editComment: (...args) => Promise<WaitableWriteContractHelperResult<readon
 }], "CommentEdited">>;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:854](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L854)
+Defined in: [packages/sdk/src/comments/comment.ts:935](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L935)
 
 Edit a comment as an author
 
@@ -1076,7 +1323,7 @@ Edit a comment as an author
 
 ## Returns
 
-`Promise`\<`WaitableWriteContractHelperResult`\<readonly \[\{
+`Promise`\<[`WaitableWriteContractHelperResult`](/sdk-reference/core/type-aliases/WaitableWriteContractHelperResult.mdx)\<readonly \[\{
   `inputs`: readonly \[\{
      `internalType`: `"address"`;
      `name`: `"initialOwner"`;
@@ -1193,6 +1440,78 @@ Edit a comment as an author
 \}, \{
   `inputs`: readonly \[\{
      `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"commentHookMetadata"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes"`;
+     `name`: `""`;
+     `type`: `"bytes"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"commentHookMetadataKeys"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"commentMetadata"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes"`;
+     `name`: `""`;
+     `type`: `"bytes"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"commentMetadataKeys"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
      `name`: `"commentId"`;
      `type`: `"bytes32"`;
   \}\];
@@ -1249,9 +1568,18 @@ Edit a comment as an author
         `name`: `"content"`;
         `type`: `"string"`;
       \}, \{
-        `internalType`: `"string"`;
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Comments.MetadataEntry[]"`;
         `name`: `"metadata"`;
-        `type`: `"string"`;
+        `type`: `"tuple[]"`;
      \}\];
      `internalType`: `"struct Comments.EditComment"`;
      `name`: `"editData"`;
@@ -1288,9 +1616,18 @@ Edit a comment as an author
         `name`: `"content"`;
         `type`: `"string"`;
       \}, \{
-        `internalType`: `"string"`;
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Comments.MetadataEntry[]"`;
         `name`: `"metadata"`;
-        `type`: `"string"`;
+        `type`: `"tuple[]"`;
      \}\];
      `internalType`: `"struct Comments.EditComment"`;
      `name`: `"editData"`;
@@ -1355,9 +1692,13 @@ Edit a comment as an author
         `name`: `"app"`;
         `type`: `"address"`;
       \}, \{
-        `internalType`: `"uint96"`;
+        `internalType`: `"uint88"`;
         `name`: `"updatedAt"`;
-        `type`: `"uint96"`;
+        `type`: `"uint88"`;
+      \}, \{
+        `internalType`: `"uint8"`;
+        `name`: `"commentType"`;
+        `type`: `"uint8"`;
       \}, \{
         `internalType`: `"uint256"`;
         `name`: `"channelId"`;
@@ -1372,24 +1713,67 @@ Edit a comment as an author
         `type`: `"string"`;
       \}, \{
         `internalType`: `"string"`;
-        `name`: `"metadata"`;
-        `type`: `"string"`;
-      \}, \{
-        `internalType`: `"string"`;
         `name`: `"targetUri"`;
-        `type`: `"string"`;
-      \}, \{
-        `internalType`: `"string"`;
-        `name`: `"commentType"`;
-        `type`: `"string"`;
-      \}, \{
-        `internalType`: `"string"`;
-        `name`: `"hookData"`;
         `type`: `"string"`;
      \}\];
      `internalType`: `"struct Comments.Comment"`;
      `name`: `""`;
      `type`: `"tuple"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentHookMetadata"`;
+  `outputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `internalType`: `"struct Comments.MetadataEntry[]"`;
+     `name`: `""`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentHookMetadataKeys"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32[]"`;
+     `name`: `""`;
+     `type`: `"bytes32[]"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"bytes32"`;
+     `name`: `"key"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentHookMetadataValue"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes"`;
+     `name`: `""`;
+     `type`: `"bytes"`;
   \}\];
   `stateMutability`: `"view"`;
   `type`: `"function"`;
@@ -1416,20 +1800,29 @@ Edit a comment as an author
         `name`: `"parentId"`;
         `type`: `"bytes32"`;
       \}, \{
+        `internalType`: `"uint8"`;
+        `name`: `"commentType"`;
+        `type`: `"uint8"`;
+      \}, \{
         `internalType`: `"string"`;
         `name`: `"content"`;
         `type`: `"string"`;
       \}, \{
-        `internalType`: `"string"`;
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Comments.MetadataEntry[]"`;
         `name`: `"metadata"`;
-        `type`: `"string"`;
+        `type`: `"tuple[]"`;
       \}, \{
         `internalType`: `"string"`;
         `name`: `"targetUri"`;
-        `type`: `"string"`;
-      \}, \{
-        `internalType`: `"string"`;
-        `name`: `"commentType"`;
         `type`: `"string"`;
      \}\];
      `internalType`: `"struct Comments.CreateComment"`;
@@ -1441,6 +1834,61 @@ Edit a comment as an author
      `internalType`: `"bytes32"`;
      `name`: `""`;
      `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentMetadata"`;
+  `outputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `internalType`: `"struct Comments.MetadataEntry[]"`;
+     `name`: `""`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentMetadataKeys"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32[]"`;
+     `name`: `""`;
+     `type`: `"bytes32[]"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"bytes32"`;
+     `name`: `"key"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentMetadataValue"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes"`;
+     `name`: `""`;
+     `type`: `"bytes"`;
   \}\];
   `stateMutability`: `"view"`;
   `type`: `"function"`;
@@ -1497,9 +1945,18 @@ Edit a comment as an author
         `name`: `"content"`;
         `type`: `"string"`;
       \}, \{
-        `internalType`: `"string"`;
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Comments.MetadataEntry[]"`;
         `name`: `"metadata"`;
-        `type`: `"string"`;
+        `type`: `"tuple[]"`;
      \}\];
      `internalType`: `"struct Comments.EditComment"`;
      `name`: `"editData"`;
@@ -1642,20 +2099,29 @@ Edit a comment as an author
         `name`: `"parentId"`;
         `type`: `"bytes32"`;
       \}, \{
+        `internalType`: `"uint8"`;
+        `name`: `"commentType"`;
+        `type`: `"uint8"`;
+      \}, \{
         `internalType`: `"string"`;
         `name`: `"content"`;
         `type`: `"string"`;
       \}, \{
-        `internalType`: `"string"`;
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Comments.MetadataEntry[]"`;
         `name`: `"metadata"`;
-        `type`: `"string"`;
+        `type`: `"tuple[]"`;
       \}, \{
         `internalType`: `"string"`;
         `name`: `"targetUri"`;
-        `type`: `"string"`;
-      \}, \{
-        `internalType`: `"string"`;
-        `name`: `"commentType"`;
         `type`: `"string"`;
      \}\];
      `internalType`: `"struct Comments.CreateComment"`;
@@ -1693,20 +2159,29 @@ Edit a comment as an author
         `name`: `"parentId"`;
         `type`: `"bytes32"`;
       \}, \{
+        `internalType`: `"uint8"`;
+        `name`: `"commentType"`;
+        `type`: `"uint8"`;
+      \}, \{
         `internalType`: `"string"`;
         `name`: `"content"`;
         `type`: `"string"`;
       \}, \{
-        `internalType`: `"string"`;
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Comments.MetadataEntry[]"`;
         `name`: `"metadata"`;
-        `type`: `"string"`;
+        `type`: `"tuple[]"`;
       \}, \{
         `internalType`: `"string"`;
         `name`: `"targetUri"`;
-        `type`: `"string"`;
-      \}, \{
-        `internalType`: `"string"`;
-        `name`: `"commentType"`;
         `type`: `"string"`;
      \}\];
      `internalType`: `"struct Comments.CreateComment"`;
@@ -1867,23 +2342,27 @@ Edit a comment as an author
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;
-     `name`: `"metadata"`;
-     `type`: `"string"`;
-   \}, \{
-     `indexed`: `false`;
-     `internalType`: `"string"`;
      `name`: `"targetUri"`;
      `type`: `"string"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"string"`;
+     `internalType`: `"uint8"`;
      `name`: `"commentType"`;
-     `type`: `"string"`;
+     `type`: `"uint8"`;
    \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
      `indexed`: `false`;
-     `internalType`: `"string"`;
-     `name`: `"hookData"`;
-     `type`: `"string"`;
+     `internalType`: `"struct Comments.MetadataEntry[]"`;
+     `name`: `"metadata"`;
+     `type`: `"tuple[]"`;
   \}\];
   `name`: `"CommentAdded"`;
   `type`: `"event"`;
@@ -1952,23 +2431,13 @@ Edit a comment as an author
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;
-     `name`: `"metadata"`;
-     `type`: `"string"`;
-   \}, \{
-     `indexed`: `false`;
-     `internalType`: `"string"`;
      `name`: `"targetUri"`;
      `type`: `"string"`;
    \}, \{
      `indexed`: `false`;
-     `internalType`: `"string"`;
+     `internalType`: `"uint8"`;
      `name`: `"commentType"`;
-     `type`: `"string"`;
-   \}, \{
-     `indexed`: `false`;
-     `internalType`: `"string"`;
-     `name`: `"hookData"`;
-     `type`: `"string"`;
+     `type`: `"uint8"`;
   \}\];
   `name`: `"CommentEdited"`;
   `type`: `"event"`;
@@ -1980,12 +2449,37 @@ Edit a comment as an author
      `name`: `"commentId"`;
      `type`: `"bytes32"`;
    \}, \{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"key"`;
+     `type`: `"bytes32"`;
+   \}, \{
      `indexed`: `false`;
-     `internalType`: `"string"`;
-     `name`: `"hookData"`;
-     `type`: `"string"`;
+     `internalType`: `"bytes"`;
+     `name`: `"value"`;
+     `type`: `"bytes"`;
   \}\];
-  `name`: `"CommentHookDataUpdated"`;
+  `name`: `"CommentHookMetadataSet"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"key"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"bytes"`;
+     `name`: `"value"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"CommentMetadataSet"`;
   `type`: `"event"`;
 \}, \{
   `anonymous`: `false`;

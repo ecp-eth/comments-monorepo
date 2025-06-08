@@ -1,3 +1,4 @@
+import type { MetadataEntry } from "@ecp.eth/sdk/comments";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
@@ -35,13 +36,13 @@ export type OnPostCommentParams<TExtra = unknown> = {
         author: Hex;
         parentId: Hex;
         content: string;
-        metadata?: string;
+        metadata?: MetadataEntry[];
       }
     | {
         author: Hex;
         content: string;
         targetUri: string;
-        metadata?: string;
+        metadata?: MetadataEntry[];
       };
   /**
    * Query key to a query where comment is stored
@@ -71,7 +72,7 @@ export type OnEditCommentParams<TExtra = unknown> = {
     /**
      * Updated Comment metadata
      */
-    metadata: string;
+    metadata: MetadataEntry[];
   };
   /**
    * Query key to a query where comment is stored

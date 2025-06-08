@@ -24,36 +24,44 @@ interface IHook is IERC165 {
 
   /// @notice Execute after a comment is processed
   /// @param commentData The comment data that was processed
+  /// @param metadata The metadata entries for the comment
   /// @param msgSender The original msg.sender that initiated the transaction
   /// @param commentId The unique identifier of the processed comment
-  /// @return hookData The comment hook data that was generated
+  /// @return hookMetadata The hook metadata entries that were generated
   function onCommentAdd(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata metadata,
     address msgSender,
     bytes32 commentId
-  ) external payable returns (string memory hookData);
+  ) external payable returns (Comments.MetadataEntry[] memory hookMetadata);
 
   /// @notice Execute after a comment is deleted
   /// @param commentData The comment data that was deleted
+  /// @param metadata The metadata entries for the comment
+  /// @param hookMetadata The hook metadata entries for the comment
   /// @param msgSender The original msg.sender that initiated the transaction
   /// @param commentId The unique identifier of the deleted comment
   /// @return success Whether the hook execution was successful
   function onCommentDelete(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata metadata,
+    Comments.MetadataEntry[] calldata hookMetadata,
     address msgSender,
     bytes32 commentId
   ) external payable returns (bool success);
 
   /// @notice Execute after a comment is edited
   /// @param commentData The comment data that was edited
+  /// @param metadata The metadata entries for the comment
   /// @param msgSender The original msg.sender that initiated the transaction
   /// @param commentId The unique identifier of the edited comment
-  /// @return commentHookData The comment hook data that was generated
+  /// @return hookMetadata The hook metadata entries that were generated
   function onCommentEdit(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata metadata,
     address msgSender,
     bytes32 commentId
-  ) external payable returns (string memory commentHookData);
+  ) external payable returns (Comments.MetadataEntry[] memory hookMetadata);
 
   /// @notice Execute after a channel is updated
   /// @param channel The address of the channel that was updated

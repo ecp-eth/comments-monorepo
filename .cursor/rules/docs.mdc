@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: Where to add docs
+globs: 
+alwaysApply: true
+---
+
+- Whenever creating documentation, it should be in /docs/pages and in `.mdx` format. You should prefer adding to existing docs pages in that folder rather than making new ones. Keep docs succinct and to the point.

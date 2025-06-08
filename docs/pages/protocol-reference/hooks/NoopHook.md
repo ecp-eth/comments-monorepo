@@ -28,31 +28,31 @@
 
 
 
-### `onCommentAdd(struct Comments.Comment, address, bytes32) → string hookData` (external)
+### `onCommentAdd(struct Comments.Comment, struct Comments.MetadataEntry[], address, bytes32) → struct Comments.MetadataEntry[]` (external)
 
 
 
 
 
-### `onInitialize(address channel, struct Channels.Channel channelData, uint256 channelId) → bool success` (external)
+### `onInitialize(address, struct Channels.Channel, uint256) → bool` (external)
 
 
 
 
 
-### `onCommentDelete(struct Comments.Comment commentData, address msgSender, bytes32 commentId) → bool success` (external)
+### `onCommentDelete(struct Comments.Comment, struct Comments.MetadataEntry[], struct Comments.MetadataEntry[], address, bytes32) → bool` (external)
 
 
 
 
 
-### `onCommentEdit(struct Comments.Comment, address, bytes32) → string commentHookData` (external)
+### `onCommentEdit(struct Comments.Comment, struct Comments.MetadataEntry[], address, bytes32) → struct Comments.MetadataEntry[]` (external)
 
 
 
 
 
-### `onChannelUpdate(address channel, uint256 channelId, struct Channels.Channel channelData) → bool success` (external)
+### `onChannelUpdate(address, uint256, struct Channels.Channel) → bool` (external)
 
 
 

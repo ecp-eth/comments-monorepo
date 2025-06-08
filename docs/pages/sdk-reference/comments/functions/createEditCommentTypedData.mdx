@@ -20,7 +20,10 @@ function createEditCommentTypedData(params): {
      commentId: `0x${string}`;
      content: string;
      deadline: bigint;
-     metadata: string;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
      nonce: bigint;
   };
   primaryType: "EditComment";
@@ -36,7 +39,7 @@ function createEditCommentTypedData(params): {
       }
         | {
         name: "metadata";
-        type: "string";
+        type: "MetadataEntry[]";
       }
         | {
         name: "author";
@@ -54,11 +57,20 @@ function createEditCommentTypedData(params): {
         name: "deadline";
         type: "uint256";
      })[];
+     MetadataEntry: (
+        | {
+        name: "key";
+        type: "bytes32";
+      }
+        | {
+        name: "value";
+        type: "bytes";
+     })[];
   };
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:787](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L787)
+Defined in: [packages/sdk/src/comments/comment.ts:869](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L869)
 
 Create the EIP-712 typed data structure for editing comment
 
@@ -84,7 +96,10 @@ Create the EIP-712 typed data structure for editing comment
      commentId: `0x${string}`;
      content: string;
      deadline: bigint;
-     metadata: string;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
      nonce: bigint;
   };
   primaryType: "EditComment";
@@ -100,7 +115,7 @@ Create the EIP-712 typed data structure for editing comment
       }
         | {
         name: "metadata";
-        type: "string";
+        type: "MetadataEntry[]";
       }
         | {
         name: "author";
@@ -117,6 +132,15 @@ Create the EIP-712 typed data structure for editing comment
         | {
         name: "deadline";
         type: "uint256";
+     })[];
+     MetadataEntry: (
+        | {
+        name: "key";
+        type: "bytes32";
+      }
+        | {
+        name: "value";
+        type: "bytes";
      })[];
   };
 }
@@ -168,7 +192,10 @@ message: {
   commentId: `0x${string}`;
   content: string;
   deadline: bigint;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   nonce: bigint;
 };
 ```
@@ -206,7 +233,10 @@ deadline: bigint;
 #### message.metadata
 
 ```ts
-metadata: string = CommentMetadataSchema;
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = MetadataArraySchema;
 ```
 
 #### message.nonce
@@ -236,7 +266,7 @@ types: {
    }
      | {
      name: "metadata";
-     type: "string";
+     type: "MetadataEntry[]";
    }
      | {
      name: "author";
@@ -253,6 +283,15 @@ types: {
      | {
      name: "deadline";
      type: "uint256";
+  })[];
+  MetadataEntry: (
+     | {
+     name: "key";
+     type: "bytes32";
+   }
+     | {
+     name: "value";
+     type: "bytes";
   })[];
 };
 ```
@@ -271,7 +310,7 @@ EditComment: (
 }
   | {
   name: "metadata";
-  type: "string";
+  type: "MetadataEntry[]";
 }
   | {
   name: "author";
@@ -288,5 +327,19 @@ EditComment: (
   | {
   name: "deadline";
   type: "uint256";
+})[];
+```
+
+#### types.MetadataEntry
+
+```ts
+MetadataEntry: (
+  | {
+  name: "key";
+  type: "bytes32";
+}
+  | {
+  name: "value";
+  type: "bytes";
 })[];
 ```

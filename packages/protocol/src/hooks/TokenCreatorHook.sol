@@ -198,9 +198,10 @@ contract TokenCreatorHook is BaseHook {
 
   function _onCommentAdd(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata,
     address /* caller */,
     bytes32 /* commentId */
-  ) internal view override returns (string memory) {
+  ) internal view override returns (Comments.MetadataEntry[] memory) {
     // Get token info for this channel
     TokenInfo memory tokenInfo = _channelTokenInfo[commentData.channelId];
 
@@ -210,7 +211,7 @@ contract TokenCreatorHook is BaseHook {
 
     // Check if this is a top-level comment (no parent)
     if (commentData.parentId != bytes32(0)) {
-      return "";
+      return new Comments.MetadataEntry[](0);
     }
 
     // Only token creator can post top-level comments
@@ -229,7 +230,7 @@ contract TokenCreatorHook is BaseHook {
       revert InvalidTargetUri();
     }
 
-    return "";
+    return new Comments.MetadataEntry[](0);
   }
 
   /// @notice Convert bytes to uint256

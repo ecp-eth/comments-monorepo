@@ -80,7 +80,6 @@ async function waitContractWriteEventArgs<
  * This is due to EVM limitations, the return value of a contract write cannot be returned directly.
  * We had to use the events to expose certain useful values related to the write.
  *
- * @param param0
  * @returns
  */
 export function createWaitableWriteContractHelper<

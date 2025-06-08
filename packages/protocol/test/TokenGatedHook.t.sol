@@ -34,13 +34,14 @@ contract TokenGatedHook is BaseHook {
 
   function _onCommentAdd(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal view override returns (string memory hookData) {
+  ) internal view override returns (Comments.MetadataEntry[] memory) {
     // Check if the comment author has enough tokens
     uint256 balance = token.balanceOf(commentData.author);
     if (balance < requiredBalance) revert NotEnoughTokens();
-    return "";
+    return new Comments.MetadataEntry[](0);
   }
 
   function _getHookPermissions()
@@ -104,9 +105,9 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     // Create comment data
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,
@@ -139,9 +140,9 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     // Create comment data
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,
@@ -172,9 +173,9 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     // Create comment data
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,

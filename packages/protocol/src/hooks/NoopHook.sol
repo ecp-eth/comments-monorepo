@@ -10,9 +10,8 @@ import { IChannelManager } from "../interfaces/IChannelManager.sol";
 import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import { Channels } from "../libraries/Channels.sol";
 
-// Fee basic hook that does nothing
+// Basic hook that does nothing
 contract NoopHook is IHook {
   function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
     return interfaceId == type(IHook).interfaceId;
@@ -23,39 +22,58 @@ contract NoopHook is IHook {
     pure
     override
     returns (Hooks.Permissions memory)
-  {}
+  {
+    return
+      Hooks.Permissions({
+        onInitialize: false,
+        onCommentAdd: false,
+        onCommentDelete: false,
+        onCommentEdit: false,
+        onChannelUpdate: false
+      });
+  }
 
   function onCommentAdd(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable returns (string memory hookData) {
-    return "";
+  ) external payable returns (Comments.MetadataEntry[] memory) {
+    return new Comments.MetadataEntry[](0);
   }
 
   function onInitialize(
-    address channel,
-    Channels.Channel memory channelData,
-    uint256 channelId
-  ) external override returns (bool success) {}
+    address,
+    Channels.Channel memory,
+    uint256
+  ) external override returns (bool) {
+    return true;
+  }
 
   function onCommentDelete(
-    Comments.Comment calldata commentData,
-    address msgSender,
-    bytes32 commentId
-  ) external payable override returns (bool success) {}
+    Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
+    Comments.MetadataEntry[] calldata,
+    address,
+    bytes32
+  ) external payable override returns (bool) {
+    return true;
+  }
 
   function onCommentEdit(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable override returns (string memory commentHookData) {
-    return "";
+  ) external payable override returns (Comments.MetadataEntry[] memory) {
+    return new Comments.MetadataEntry[](0);
   }
 
   function onChannelUpdate(
-    address channel,
-    uint256 channelId,
-    Channels.Channel calldata channelData
-  ) external override returns (bool success) {}
+    address,
+    uint256,
+    Channels.Channel calldata
+  ) external override returns (bool) {
+    return true;
+  }
 }

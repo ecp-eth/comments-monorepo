@@ -49,9 +49,10 @@ contract FlatFeeHook is BaseHook {
 
   function _onCommentAdd(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal override returns (string memory hookData) {
+  ) internal override returns (Comments.MetadataEntry[] memory) {
     require(msg.value >= HOOK_FEE, "Insufficient fee");
 
     totalFeesCollected += HOOK_FEE;
@@ -66,7 +67,7 @@ contract FlatFeeHook is BaseHook {
         emit RefundIssued(commentData.author, refundAmount);
       }
     }
-    return "";
+    return new Comments.MetadataEntry[](0);
   }
 
   function withdrawFees() external {
@@ -143,9 +144,9 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
       app: user2,
       channelId: channelId,
@@ -182,9 +183,9 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
       app: user2,
       channelId: channelId,
@@ -224,9 +225,9 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
       app: user2,
       channelId: channelId,
@@ -251,9 +252,9 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
       app: user2,
       channelId: channelId,

@@ -152,6 +152,102 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
+    name: "commentHookMetadata",
+    inputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "commentHookMetadataKeys",
+    inputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "commentMetadata",
+    inputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "commentMetadataKeys",
+    inputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "deleteComment",
     inputs: [
       {
@@ -232,8 +328,20 @@ export const CommentManagerABI = [
           },
           {
             name: "metadata",
-            type: "string",
-            internalType: "string",
+            type: "tuple[]",
+            internalType: "struct Comments.MetadataEntry[]",
+            components: [
+              {
+                name: "key",
+                type: "bytes32",
+                internalType: "bytes32",
+              },
+              {
+                name: "value",
+                type: "bytes",
+                internalType: "bytes",
+              },
+            ],
           },
         ],
       },
@@ -282,8 +390,20 @@ export const CommentManagerABI = [
           },
           {
             name: "metadata",
-            type: "string",
-            internalType: "string",
+            type: "tuple[]",
+            internalType: "struct Comments.MetadataEntry[]",
+            components: [
+              {
+                name: "key",
+                type: "bytes32",
+                internalType: "bytes32",
+              },
+              {
+                name: "value",
+                type: "bytes",
+                internalType: "bytes",
+              },
+            ],
           },
         ],
       },
@@ -368,8 +488,13 @@ export const CommentManagerABI = [
           },
           {
             name: "updatedAt",
-            type: "uint96",
-            internalType: "uint96",
+            type: "uint88",
+            internalType: "uint88",
+          },
+          {
+            name: "commentType",
+            type: "uint8",
+            internalType: "uint8",
           },
           {
             name: "channelId",
@@ -387,26 +512,85 @@ export const CommentManagerABI = [
             internalType: "string",
           },
           {
-            name: "metadata",
-            type: "string",
-            internalType: "string",
-          },
-          {
             name: "targetUri",
             type: "string",
             internalType: "string",
           },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCommentHookMetadata",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "tuple[]",
+        internalType: "struct Comments.MetadataEntry[]",
+        components: [
           {
-            name: "commentType",
-            type: "string",
-            internalType: "string",
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
           },
           {
-            name: "hookData",
-            type: "string",
-            internalType: "string",
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
           },
         ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCommentHookMetadataKeys",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32[]",
+        internalType: "bytes32[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCommentHookMetadataValue",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "key",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes",
+        internalType: "bytes",
       },
     ],
     stateMutability: "view",
@@ -446,22 +630,34 @@ export const CommentManagerABI = [
             internalType: "bytes32",
           },
           {
+            name: "commentType",
+            type: "uint8",
+            internalType: "uint8",
+          },
+          {
             name: "content",
             type: "string",
             internalType: "string",
           },
           {
             name: "metadata",
-            type: "string",
-            internalType: "string",
+            type: "tuple[]",
+            internalType: "struct Comments.MetadataEntry[]",
+            components: [
+              {
+                name: "key",
+                type: "bytes32",
+                internalType: "bytes32",
+              },
+              {
+                name: "value",
+                type: "bytes",
+                internalType: "bytes",
+              },
+            ],
           },
           {
             name: "targetUri",
-            type: "string",
-            internalType: "string",
-          },
-          {
-            name: "commentType",
             type: "string",
             internalType: "string",
           },
@@ -473,6 +669,80 @@ export const CommentManagerABI = [
         name: "",
         type: "bytes32",
         internalType: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCommentMetadata",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "tuple[]",
+        internalType: "struct Comments.MetadataEntry[]",
+        components: [
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCommentMetadataKeys",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32[]",
+        internalType: "bytes32[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCommentMetadataValue",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "key",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes",
+        internalType: "bytes",
       },
     ],
     stateMutability: "view",
@@ -552,8 +822,20 @@ export const CommentManagerABI = [
           },
           {
             name: "metadata",
-            type: "string",
-            internalType: "string",
+            type: "tuple[]",
+            internalType: "struct Comments.MetadataEntry[]",
+            components: [
+              {
+                name: "key",
+                type: "bytes32",
+                internalType: "bytes32",
+              },
+              {
+                name: "value",
+                type: "bytes",
+                internalType: "bytes",
+              },
+            ],
           },
         ],
       },
@@ -742,22 +1024,34 @@ export const CommentManagerABI = [
             internalType: "bytes32",
           },
           {
+            name: "commentType",
+            type: "uint8",
+            internalType: "uint8",
+          },
+          {
             name: "content",
             type: "string",
             internalType: "string",
           },
           {
             name: "metadata",
-            type: "string",
-            internalType: "string",
+            type: "tuple[]",
+            internalType: "struct Comments.MetadataEntry[]",
+            components: [
+              {
+                name: "key",
+                type: "bytes32",
+                internalType: "bytes32",
+              },
+              {
+                name: "value",
+                type: "bytes",
+                internalType: "bytes",
+              },
+            ],
           },
           {
             name: "targetUri",
-            type: "string",
-            internalType: "string",
-          },
-          {
-            name: "commentType",
             type: "string",
             internalType: "string",
           },
@@ -807,22 +1101,34 @@ export const CommentManagerABI = [
             internalType: "bytes32",
           },
           {
+            name: "commentType",
+            type: "uint8",
+            internalType: "uint8",
+          },
+          {
             name: "content",
             type: "string",
             internalType: "string",
           },
           {
             name: "metadata",
-            type: "string",
-            internalType: "string",
+            type: "tuple[]",
+            internalType: "struct Comments.MetadataEntry[]",
+            components: [
+              {
+                name: "key",
+                type: "bytes32",
+                internalType: "bytes32",
+              },
+              {
+                name: "value",
+                type: "bytes",
+                internalType: "bytes",
+              },
+            ],
           },
           {
             name: "targetUri",
-            type: "string",
-            internalType: "string",
-          },
-          {
-            name: "commentType",
             type: "string",
             internalType: "string",
           },
@@ -1019,12 +1325,6 @@ export const CommentManagerABI = [
         internalType: "string",
       },
       {
-        name: "metadata",
-        type: "string",
-        indexed: false,
-        internalType: "string",
-      },
-      {
         name: "targetUri",
         type: "string",
         indexed: false,
@@ -1032,15 +1332,27 @@ export const CommentManagerABI = [
       },
       {
         name: "commentType",
-        type: "string",
+        type: "uint8",
         indexed: false,
-        internalType: "string",
+        internalType: "uint8",
       },
       {
-        name: "hookData",
-        type: "string",
+        name: "metadata",
+        type: "tuple[]",
         indexed: false,
-        internalType: "string",
+        internalType: "struct Comments.MetadataEntry[]",
+        components: [
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
       },
     ],
     anonymous: false,
@@ -1123,12 +1435,6 @@ export const CommentManagerABI = [
         internalType: "string",
       },
       {
-        name: "metadata",
-        type: "string",
-        indexed: false,
-        internalType: "string",
-      },
-      {
         name: "targetUri",
         type: "string",
         indexed: false,
@@ -1136,22 +1442,16 @@ export const CommentManagerABI = [
       },
       {
         name: "commentType",
-        type: "string",
+        type: "uint8",
         indexed: false,
-        internalType: "string",
-      },
-      {
-        name: "hookData",
-        type: "string",
-        indexed: false,
-        internalType: "string",
+        internalType: "uint8",
       },
     ],
     anonymous: false,
   },
   {
     type: "event",
-    name: "CommentHookDataUpdated",
+    name: "CommentHookMetadataSet",
     inputs: [
       {
         name: "commentId",
@@ -1160,10 +1460,41 @@ export const CommentManagerABI = [
         internalType: "bytes32",
       },
       {
-        name: "hookData",
-        type: "string",
+        name: "key",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+      {
+        name: "value",
+        type: "bytes",
         indexed: false,
-        internalType: "string",
+        internalType: "bytes",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "CommentMetadataSet",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+      {
+        name: "key",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+      {
+        name: "value",
+        type: "bytes",
+        indexed: false,
+        internalType: "bytes",
       },
     ],
     anonymous: false,

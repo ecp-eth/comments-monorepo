@@ -12,12 +12,15 @@ function createEditCommentData(params): {
   commentId: `0x${string}`;
   content: string;
   deadline: bigint;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   nonce: bigint;
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:739](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L739)
+Defined in: [packages/sdk/src/comments/comment.ts:762](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L762)
 
 Create the data structure of a comment for editing
 
@@ -35,7 +38,10 @@ Create the data structure of a comment for editing
   commentId: `0x${string}`;
   content: string;
   deadline: bigint;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   nonce: bigint;
 }
 ```
@@ -69,7 +75,10 @@ deadline: bigint;
 ### metadata
 
 ```ts
-metadata: string = CommentMetadataSchema;
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[];
 ```
 
 ### nonce
