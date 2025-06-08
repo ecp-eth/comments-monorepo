@@ -647,11 +647,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   function getComment(
     bytes32 commentId
   ) external view returns (Comments.Comment memory) {
-    Comments.Comment memory comment = comments[commentId];
-    if (comment.author == address(0)) {
-      revert CommentDoesNotExist();
-    }
-    return comment;
+    return comments[commentId];
   }
 
   /// @inheritdoc ICommentManager

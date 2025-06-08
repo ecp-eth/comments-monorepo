@@ -119,8 +119,6 @@ interface ICommentManager {
   error InvalidCommentReference(string message);
   /// @notice Error thrown when address is zero
   error ZeroAddress();
-  /// @notice Error thrown when comment does not exist
-  error CommentDoesNotExist();
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata
@@ -279,7 +277,7 @@ interface ICommentManager {
 
   /// @notice Get a comment by its ID
   /// @param commentId The ID of the comment to get
-  /// @return The comment data
+  /// @return The comment data (returns empty struct with zero address author if comment doesn't exist)
   function getComment(
     bytes32 commentId
   ) external view returns (Comments.Comment memory);

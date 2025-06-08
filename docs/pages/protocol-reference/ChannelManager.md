@@ -80,7 +80,7 @@ Internal function to set the hook for a channel
 
 
 
-### `channelExists(uint256 channelId) → bool` (public)
+### `channelExists(uint256 channelId) → bool` (external)
 
 Checks if a channel exists
 
