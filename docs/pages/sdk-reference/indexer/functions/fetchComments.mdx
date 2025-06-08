@@ -35,14 +35,21 @@ function fetchComments(options): Promise<{
      };
      chainId: number;
      channelId: bigint;
-     commentType: string;
+     commentType: number;
      content: string;
      createdAt: Date;
      cursor: `0x${string}`;
      deletedAt: null | Date;
+     hookMetadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
      id: `0x${string}`;
      logIndex: null | number;
-     metadata: string;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -74,14 +81,21 @@ function fetchComments(options): Promise<{
            };
            chainId: number;
            channelId: bigint;
-           commentType: string;
+           commentType: number;
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
            deletedAt: null | Date;
+           hookMetadata: {
+              key: `0x${string}`;
+              value: `0x${string}`;
+           }[];
            id: `0x${string}`;
            logIndex: null | number;
-           metadata: string;
+           metadata: {
+              key: `0x${string}`;
+              value: `0x${string}`;
+           }[];
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
@@ -165,14 +179,21 @@ Fetch comments from the Indexer API
      \};
      `chainId`: `number`;
      `channelId`: `bigint`;
-     `commentType`: `string`;
+     `commentType`: `number`;
      `content`: `string`;
      `createdAt`: `Date`;
      `cursor`: `` `0x${string}` ``;
      `deletedAt`: `null` \| `Date`;
+     `hookMetadata`: \{
+        `key`: `` `0x${string}` ``;
+        `value`: `` `0x${string}` ``;
+     \}[];
      `id`: `` `0x${string}` ``;
      `logIndex`: `null` \| `number`;
-     `metadata`: `string`;
+     `metadata`: \{
+        `key`: `` `0x${string}` ``;
+        `value`: `` `0x${string}` ``;
+     \}[];
      `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
      `moderationStatusChangedAt`: `Date`;
      `parentId`: `null` \| `` `0x${string}` ``;
@@ -204,14 +225,21 @@ Fetch comments from the Indexer API
            \};
            `chainId`: `number`;
            `channelId`: `bigint`;
-           `commentType`: `string`;
+           `commentType`: `number`;
            `content`: `string`;
            `createdAt`: `Date`;
            `cursor`: `` `0x${string}` ``;
            `deletedAt`: `null` \| `Date`;
+           `hookMetadata`: \{
+              `key`: `` `0x${string}` ``;
+              `value`: `` `0x${string}` ``;
+           \}[];
            `id`: `` `0x${string}` ``;
            `logIndex`: `null` \| `number`;
-           `metadata`: `string`;
+           `metadata`: \{
+              `key`: `` `0x${string}` ``;
+              `value`: `` `0x${string}` ``;
+           \}[];
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;

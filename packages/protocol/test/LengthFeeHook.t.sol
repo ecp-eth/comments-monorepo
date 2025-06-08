@@ -55,9 +55,10 @@ contract LengthFeeHook is BaseHook {
 
   function _onCommentAdd(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal override returns (string memory hookData) {
+  ) internal override returns (Comments.MetadataEntry[] memory) {
     // Calculate fee based on content length
     uint256 contentLength = bytes(commentData.content).length;
     uint256 totalFee = contentLength * tokensPerCharacter;
@@ -77,7 +78,7 @@ contract LengthFeeHook is BaseHook {
     totalFeesCollected += hookFee;
     emit FeeCollected(commentData.author, hookFee);
 
-    return "";
+    return new Comments.MetadataEntry[](0);
   }
 
   function withdrawFees() external {
@@ -310,9 +311,9 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: content,
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
       app: user2,
       channelId: channelId,
@@ -357,9 +358,9 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: content,
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
       app: user2,
       channelId: channelId,

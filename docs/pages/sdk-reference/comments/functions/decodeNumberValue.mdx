@@ -1,0 +1,35 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / decodeNumberValue
+
+# Function: decodeNumberValue()
+
+```ts
+function decodeNumberValue(encodedValue, isSigned): bigint;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:468](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L468)
+
+Decodes a number value from encoded metadata bytes
+
+## Parameters
+
+### encodedValue
+
+`` `0x${string}` ``
+
+The hex-encoded bytes (32 bytes big-endian)
+
+### isSigned
+
+`boolean` = `false`
+
+Whether the number is signed (for two's complement handling)
+
+## Returns
+
+`bigint`
+
+The decoded number value (as bigint for safety)

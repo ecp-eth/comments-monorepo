@@ -39,11 +39,11 @@ contract RejectChannelUpdateHook is BaseHook {
       });
   }
 
-  function onChannelUpdate(
+  function _onChannelUpdate(
     address,
     uint256,
     Channels.Channel calldata
-  ) external pure override returns (bool) {
+  ) internal pure override returns (bool) {
     revert("Rejected by hook");
   }
 }

@@ -54,8 +54,12 @@ paths:
           name: channelId
           in: query
         - schema:
-            type: string
-            description: The comment type (e.g. comment, question, answer, etc)
+            type:
+              - integer
+              - 'null'
+            minimum: 0
+            maximum: 255
+            description: The comment type (e.g. 0=comment, 1=reaction)
           required: false
           name: commentType
           in: query
@@ -149,6 +153,8 @@ paths:
                           pattern: ^d+$
                         commentType:
                           type: integer
+                          minimum: 0
+                          maximum: 255
                         content:
                           type: string
                         chainId:
@@ -293,6 +299,8 @@ paths:
                                     pattern: ^d+$
                                   commentType:
                                     type: integer
+                                    minimum: 0
+                                    maximum: 255
                                   content:
                                     type: string
                                   chainId:
@@ -521,8 +529,12 @@ paths:
           name: channelId
           in: query
         - schema:
-            type: string
-            description: The comment type (e.g. comment, question, answer, etc)
+            type:
+              - integer
+              - 'null'
+            minimum: 0
+            maximum: 255
+            description: The comment type (e.g. 0=comment, 1=reaction)
           required: false
           name: commentType
           in: query
@@ -605,6 +617,8 @@ paths:
                           pattern: ^d+$
                         commentType:
                           type: integer
+                          minimum: 0
+                          maximum: 255
                         content:
                           type: string
                         chainId:
@@ -746,6 +760,8 @@ paths:
                                     pattern: ^d+$
                                   commentType:
                                     type: integer
+                                    minimum: 0
+                                    maximum: 255
                                   content:
                                     type: string
                                   chainId:
@@ -1328,6 +1344,8 @@ paths:
                           pattern: ^d+$
                         commentType:
                           type: integer
+                          minimum: 0
+                          maximum: 255
                         content:
                           type: string
                         chainId:
@@ -1549,6 +1567,8 @@ paths:
                     pattern: ^d+$
                   commentType:
                     type: integer
+                    minimum: 0
+                    maximum: 255
                   content:
                     type: string
                   chainId:
@@ -1751,6 +1771,8 @@ paths:
                     pattern: ^d+$
                   commentType:
                     type: integer
+                    minimum: 0
+                    maximum: 255
                   content:
                     type: string
                   chainId:

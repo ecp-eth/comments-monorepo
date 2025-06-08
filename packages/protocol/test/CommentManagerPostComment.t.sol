@@ -40,12 +40,20 @@ contract CommentsTest is Test, IERC721Receiver {
     bytes32 parentId,
     uint96 createdAt,
     string content,
-    string metadata,
     string targetUri,
-    string commentType,
-    string hookData
+    uint8 commentType,
+    Comments.MetadataEntry[] metadata
   );
-  event CommentHookDataUpdated(bytes32 indexed commentId, string hookData);
+  event CommentMetadataSet(
+    bytes32 indexed commentId,
+    bytes32 indexed key,
+    bytes value
+  );
+  event CommentHookMetadataSet(
+    bytes32 indexed commentId,
+    bytes32 indexed key,
+    bytes value
+  );
 
   CommentManager public comments;
   ChannelManager public channelManager;
@@ -492,18 +500,24 @@ contract CommentsTest is Test, IERC721Receiver {
       commentData.parentId,
       uint96(block.timestamp),
       commentData.content,
-      commentData.metadata,
       commentData.targetUri,
       commentData.commentType,
-      ""
+      new Comments.MetadataEntry[](0)
     );
     vm.expectEmit(true, true, true, true);
-    emit CommentHookDataUpdated(commentId, "hook data");
+    emit CommentHookMetadataSet(
+      commentId,
+      keccak256("status string"),
+      bytes("hook data")
+    );
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
 
-    // Verify the comment was created with hook data
-    Comments.Comment memory createdComment = comments.getComment(commentId);
-    assertEq(createdComment.hookData, "hook data");
+    // Verify the comment was created with hook metadata
+    Comments.MetadataEntry[] memory hookMetadata = comments
+      .getCommentHookMetadata(commentId);
+    assertEq(hookMetadata.length, 1);
+    assertEq(hookMetadata[0].key, keccak256("status string"));
+    assertEq(string(hookMetadata[0].value), "hook data");
   }
 
   function onERC721Received(
@@ -520,9 +534,10 @@ contract CommentsTest is Test, IERC721Receiver {
 contract MaliciousFeeCollector is BaseHook {
   function _onCommentAdd(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal pure override returns (string memory) {
+  ) internal pure override returns (Comments.MetadataEntry[] memory) {
     revert("Malicious revert");
   }
 

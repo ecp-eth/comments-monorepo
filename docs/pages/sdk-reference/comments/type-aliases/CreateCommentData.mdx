@@ -11,17 +11,19 @@ type CreateCommentData = {
   app: `0x${string}`;
   author: `0x${string}`;
   channelId: bigint;
-  commentType: string;
+  commentType: number;
   content: string;
   deadline: bigint;
-  hookData: string;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   parentId: `0x${string}`;
   targetUri: string;
 };
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:85](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L85)
+Defined in: [packages/sdk/src/comments/schemas.ts:68](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L68)
 
 ## Type declaration
 
@@ -46,7 +48,7 @@ channelId: bigint;
 ### commentType
 
 ```ts
-commentType: string;
+commentType: number;
 ```
 
 ### content
@@ -61,16 +63,13 @@ content: string;
 deadline: bigint;
 ```
 
-### hookData
-
-```ts
-hookData: string;
-```
-
 ### metadata
 
 ```ts
-metadata: string = CommentMetadataSchema;
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[];
 ```
 
 ### parentId

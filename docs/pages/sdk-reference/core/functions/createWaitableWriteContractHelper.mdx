@@ -10,7 +10,7 @@
 function createWaitableWriteContractHelper<TArgs, TAbi, TEventName, TWriteContractHelperResult>(writeFunc, __namedParameters): (...args) => Promise<WaitableWriteContractHelperResult<TAbi, TEventName>>;
 ```
 
-Defined in: [packages/sdk/src/core/utils.ts:86](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L86)
+Defined in: [packages/sdk/src/core/utils.ts:85](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L85)
 
 This function wraps the write function to add a `wait()` method in the returned object.
 The `wait()` method waits the transaction receipt and
@@ -35,7 +35,7 @@ We had to use the events to expose certain useful values related to the write.
 
 ### TWriteContractHelperResult
 
-`TWriteContractHelperResult` *extends* `WriteContractHelperResult`
+`TWriteContractHelperResult` *extends* [`WriteContractHelperResult`](/sdk-reference/core/type-aliases/WriteContractHelperResult.mdx)
 
 ## Parameters
 
@@ -67,4 +67,4 @@ We had to use the events to expose certain useful values related to the write.
 
 ### Returns
 
-`Promise`\<`WaitableWriteContractHelperResult`\<`TAbi`, `TEventName`\>\>
+`Promise`\<[`WaitableWriteContractHelperResult`](/sdk-reference/core/type-aliases/WaitableWriteContractHelperResult.mdx)\<`TAbi`, `TEventName`\>\>

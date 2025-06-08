@@ -1,0 +1,44 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / createMetadataEntry
+
+# Function: createMetadataEntry()
+
+```ts
+function createMetadataEntry(
+   keyString, 
+   valueType, 
+   value): MetadataEntry;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:93](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L93)
+
+Creates a metadata entry from a key-value pair with explicit type specification
+
+## Parameters
+
+### keyString
+
+`string`
+
+The key string
+
+### valueType
+
+[`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx)
+
+The metadata type (string, bool, uint256, etc.)
+
+### value
+
+The value (string, boolean, number, bigint, or JsonObject)
+
+`string` | `number` | `bigint` | `boolean` | [`JsonObject`](/sdk-reference/comments/type-aliases/JsonObject.mdx)
+
+## Returns
+
+[`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)
+
+The MetadataEntry

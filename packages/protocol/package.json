@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "forge build --sizes --skip test",
     "build:abi": "node ./build-abi.js",
     "test": "forge test -vvv",
     "debug:gas": "forge script script/debug.s.sol:DebugGasUsage",

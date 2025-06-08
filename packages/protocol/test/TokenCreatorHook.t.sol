@@ -177,9 +177,9 @@ contract TokenCreatorHookTest is Test {
       channelId: channelId,
       parentId: bytes32(0),
       content: "Test comment",
-      metadata: "",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: validTargetUri,
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       deadline: block.timestamp + 1 hours
     });
 
@@ -203,9 +203,9 @@ contract TokenCreatorHookTest is Test {
       channelId: channelId,
       parentId: bytes32(0),
       content: "Parent comment",
-      metadata: "",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: validTargetUri,
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       deadline: block.timestamp + 1 hours
     });
 
@@ -220,9 +220,9 @@ contract TokenCreatorHookTest is Test {
       channelId: channelId,
       parentId: commentManager.getCommentId(parentComment),
       content: "Reply comment",
-      metadata: "",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "", // No target URI needed for replies
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       deadline: block.timestamp + 1 hours
     });
 
@@ -244,9 +244,9 @@ contract TokenCreatorHookTest is Test {
       channelId: channelId,
       parentId: bytes32(0),
       content: "Test comment",
-      metadata: "",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: invalidTargetUri,
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       deadline: block.timestamp + 1 hours
     });
 
@@ -272,9 +272,9 @@ contract TokenCreatorHookTest is Test {
       channelId: channelId,
       parentId: bytes32(0),
       content: "Test comment",
-      metadata: "",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: validTargetUri,
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       deadline: block.timestamp + 1 hours
     });
 

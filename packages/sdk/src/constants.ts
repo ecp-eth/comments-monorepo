@@ -7,8 +7,8 @@ import type { Hex } from "./core/schemas.js";
  */
 export const COMMENT_MANAGER_ADDRESS = (
   __DEV__
-    ? "0x4aA9DBb302b23c4609175C7b568d4eaF76E6110C"
-    : "0x75f0C4c4afa9c9eCeB47FE8ab7C9E8B7E79d2E27"
+    ? "0x443592C1139fB2cEA00Bd20609640F2A4b8F900b"
+    : "0x19f2e0A305A7DaABdBf228b33bb469fd1517AC59"
 ) as Hex;
 
 /**
@@ -16,8 +16,8 @@ export const COMMENT_MANAGER_ADDRESS = (
  */
 export const CHANNEL_MANAGER_ADDRESS = (
   __DEV__
-    ? "0x254871bdbAbefb106C7a1B43cCcc3231cE6aE721"
-    : "0xdB1c26e752551E0D00B5992bAE7F775010e402D9"
+    ? "0xd584cae1517a1525BB017d9ad7031c1B732Dd01D"
+    : "0xDA359Bc9A3748FDc7427D9A98a3deCad5a065aa9"
 ) as Hex;
 
 /**
@@ -31,9 +31,15 @@ export const ZERO_ADDRESS = toHex(0, { size: 20 });
 export const DEFAULT_CHANNEL_ID = 0n;
 
 /**
+ * Comment type constants
+ */
+export const COMMENT_TYPE_COMMENT = 0;
+export const COMMENT_TYPE_REACTION = 1;
+
+/**
  * The default comment type for the `CommentManager` contract.
  */
-export const DEFAULT_COMMENT_TYPE = "comment" as const;
+export const DEFAULT_COMMENT_TYPE = COMMENT_TYPE_COMMENT;
 
 /**
  * The default `embedUri` for the CommentsEmbed component.

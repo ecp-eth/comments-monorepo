@@ -56,16 +56,17 @@ contract TipHook is BaseHook {
 
   /// @notice Execute after a comment is processed to handle ETH tips
   /// @param commentData The comment data to process
-  /// @return hookData The comment hook data that was generated
+  /// @return hookMetadata The comment hook metadata that was generated
   function _onCommentAdd(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32 commentId
-  ) internal override returns (string memory hookData) {
+  ) internal override returns (Comments.MetadataEntry[] memory) {
     // Check if this is a reply comment
     if (commentData.parentId == bytes32(0) && msg.value == 0) {
       // No tip was sent, so ignore it.
-      return "";
+      return new Comments.MetadataEntry[](0);
     }
 
     // Get the parent comment's author
@@ -106,9 +107,9 @@ contract TipHook is BaseHook {
             LibString.toHexString(uint160(parentAuthor))
           )
         ),
-        metadata: "{}",
+        metadata: new Comments.MetadataEntry[](0),
         targetUri: "",
-        commentType: "comment",
+        commentType: 0, // COMMENT_TYPE_COMMENT
         author: address(this),
         app: address(this),
         channelId: commentData.channelId,
@@ -123,7 +124,7 @@ contract TipHook is BaseHook {
       console.log("No tip amount found");
     }
 
-    return "";
+    return new Comments.MetadataEntry[](0);
   }
 
   /// @notice Parse a tip mention from a comment's content
@@ -310,20 +311,6 @@ contract TipHookTest is Test, IERC721Receiver {
   using TestUtils for string;
   using LibString for string;
 
-  event CommentAdded(
-    bytes32 indexed commentId,
-    address indexed author,
-    address indexed app,
-    uint256 channelId,
-    bytes32 parentId,
-    uint96 createdAt,
-    string content,
-    string metadata,
-    string targetUri,
-    string commentType,
-    string hookData
-  );
-
   IChannelManager public channelManager;
   TipHook public tipHook;
   ICommentManager public commentManager;
@@ -369,9 +356,9 @@ contract TipHookTest is Test, IERC721Receiver {
     // --- Parent Comment Setup ---
     Comments.CreateComment memory parentComment = Comments.CreateComment({
       content: "Parent comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,
@@ -402,9 +389,9 @@ contract TipHookTest is Test, IERC721Receiver {
           " 0.1 ETH"
         )
       ),
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user2,
       app: user2,
       channelId: channelId,
@@ -438,9 +425,9 @@ contract TipHookTest is Test, IERC721Receiver {
   function testRevertWhenTipAmountMismatch() public {
     Comments.CreateComment memory parentComment = Comments.CreateComment({
       content: "Parent comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,
@@ -467,9 +454,9 @@ contract TipHookTest is Test, IERC721Receiver {
           " 0.1ETH"
         )
       ),
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user2,
       app: user2,
       channelId: channelId,
@@ -493,9 +480,9 @@ contract TipHookTest is Test, IERC721Receiver {
     // --- Parent Comment Setup ---
     Comments.CreateComment memory parentComment = Comments.CreateComment({
       content: "Parent comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,
@@ -522,9 +509,9 @@ contract TipHookTest is Test, IERC721Receiver {
           " invalid_amount"
         )
       ),
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user2,
       app: user2,
       channelId: channelId,
@@ -548,9 +535,9 @@ contract TipHookTest is Test, IERC721Receiver {
     // --- Parent Comment Setup ---
     Comments.CreateComment memory parentComment = Comments.CreateComment({
       content: "Parent comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,
@@ -573,9 +560,9 @@ contract TipHookTest is Test, IERC721Receiver {
     // --- Reply Comment Setup (No Tip Mention) ---
     Comments.CreateComment memory replyComment = Comments.CreateComment({
       content: "Regular reply without tip", // No tip mention
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user2,
       app: user2,
       channelId: channelId,
@@ -604,9 +591,9 @@ contract TipHookTest is Test, IERC721Receiver {
     // --- Parent Comment Setup ---
     Comments.CreateComment memory parentComment = Comments.CreateComment({
       content: "Parent comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,
@@ -635,9 +622,9 @@ contract TipHookTest is Test, IERC721Receiver {
           " 0.1 ETH"
         )
       ),
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user2,
       app: user2,
       channelId: channelId,
@@ -652,23 +639,8 @@ contract TipHookTest is Test, IERC721Receiver {
       commentManager
     );
 
-    bytes32 commentId = commentManager.getCommentId(replyComment);
-
     vm.prank(user2);
-    vm.expectEmit(true, true, true, true);
-    emit CommentAdded(
-      commentId,
-      replyComment.author,
-      replyComment.app,
-      replyComment.channelId,
-      replyComment.parentId,
-      uint96(block.timestamp),
-      replyComment.content,
-      replyComment.metadata,
-      replyComment.targetUri,
-      replyComment.commentType,
-      ""
-    );
+
     commentManager.postComment{ value: tipAmount }(replyComment, appSignature);
   }
 

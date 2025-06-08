@@ -20,7 +20,10 @@ type EditCommentTypedDataSchemaType = {
      commentId: `0x${string}`;
      content: string;
      deadline: bigint;
-     metadata: string;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
      nonce: bigint;
   };
   primaryType: "EditComment";
@@ -36,7 +39,7 @@ type EditCommentTypedDataSchemaType = {
       }
         | {
         name: "metadata";
-        type: "string";
+        type: "MetadataEntry[]";
       }
         | {
         name: "author";
@@ -54,11 +57,20 @@ type EditCommentTypedDataSchemaType = {
         name: "deadline";
         type: "uint256";
      })[];
+     MetadataEntry: (
+        | {
+        name: "key";
+        type: "bytes32";
+      }
+        | {
+        name: "value";
+        type: "bytes";
+     })[];
   };
 };
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:250](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L250)
+Defined in: [packages/sdk/src/comments/schemas.ts:249](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L249)
 
 ## Type declaration
 
@@ -106,7 +118,10 @@ message: {
   commentId: `0x${string}`;
   content: string;
   deadline: bigint;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   nonce: bigint;
 };
 ```
@@ -144,7 +159,10 @@ deadline: bigint;
 #### message.metadata
 
 ```ts
-metadata: string = CommentMetadataSchema;
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = MetadataArraySchema;
 ```
 
 #### message.nonce
@@ -174,7 +192,7 @@ types: {
    }
      | {
      name: "metadata";
-     type: "string";
+     type: "MetadataEntry[]";
    }
      | {
      name: "author";
@@ -191,6 +209,15 @@ types: {
      | {
      name: "deadline";
      type: "uint256";
+  })[];
+  MetadataEntry: (
+     | {
+     name: "key";
+     type: "bytes32";
+   }
+     | {
+     name: "value";
+     type: "bytes";
   })[];
 };
 ```
@@ -209,7 +236,7 @@ EditComment: (
 }
   | {
   name: "metadata";
-  type: "string";
+  type: "MetadataEntry[]";
 }
   | {
   name: "author";
@@ -226,5 +253,19 @@ EditComment: (
   | {
   name: "deadline";
   type: "uint256";
+})[];
+```
+
+#### types.MetadataEntry
+
+```ts
+MetadataEntry: (
+  | {
+  name: "key";
+  type: "bytes32";
+}
+  | {
+  name: "value";
+  type: "bytes";
 })[];
 ```

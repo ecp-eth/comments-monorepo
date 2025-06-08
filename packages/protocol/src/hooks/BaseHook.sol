@@ -78,31 +78,44 @@ abstract contract BaseHook is IHook, ERC165 {
   /// @inheritdoc IHook
   function onCommentAdd(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata metadata,
     address msgSender,
     bytes32 commentId
-  ) external payable virtual returns (string memory) {
-    return _onCommentAdd(commentData, msgSender, commentId);
+  ) external payable virtual returns (Comments.MetadataEntry[] memory) {
+    return _onCommentAdd(commentData, metadata, msgSender, commentId);
   }
 
   function _onCommentAdd(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal virtual returns (string memory) {
+  ) internal virtual returns (Comments.MetadataEntry[] memory) {
     revert HookNotImplemented();
   }
 
   /// @inheritdoc IHook
   function onCommentDelete(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata metadata,
+    Comments.MetadataEntry[] calldata hookMetadata,
     address msgSender,
     bytes32 commentId
   ) external payable virtual returns (bool) {
-    return _onCommentDelete(commentData, msgSender, commentId);
+    return
+      _onCommentDelete(
+        commentData,
+        metadata,
+        hookMetadata,
+        msgSender,
+        commentId
+      );
   }
 
   function _onCommentDelete(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
   ) internal virtual returns (bool) {
@@ -112,17 +125,19 @@ abstract contract BaseHook is IHook, ERC165 {
   /// @inheritdoc IHook
   function onCommentEdit(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata metadata,
     address msgSender,
     bytes32 commentId
-  ) external payable virtual returns (string memory) {
-    return _onCommentEdit(commentData, msgSender, commentId);
+  ) external payable virtual returns (Comments.MetadataEntry[] memory) {
+    return _onCommentEdit(commentData, metadata, msgSender, commentId);
   }
 
   function _onCommentEdit(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal virtual returns (string memory) {
+  ) internal virtual returns (Comments.MetadataEntry[] memory) {
     revert HookNotImplemented();
   }
 

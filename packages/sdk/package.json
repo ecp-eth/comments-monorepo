@@ -87,6 +87,7 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "check-contract-addresses": "node --experimental-strip-types --no-warnings ./scripts/check-contract-addresses.ts",
+    "check-contract-addresses:prod": "NODE_ENV=production node --experimental-strip-types --no-warnings ./scripts/check-contract-addresses.ts",
     "dev": "tsup --format esm --out-dir dist/esm --watch",
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",

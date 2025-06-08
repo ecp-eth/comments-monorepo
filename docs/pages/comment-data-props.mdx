@@ -8,13 +8,89 @@ The comment content stores the plain text content of the comment.
 
 - Please use `\n` for line breaks. (Most browsers will normalize the line breaks to `\n` regardless of the OS).
 - any media or links that should be displayed to users should be stored in the content property and rendered by clients based on the media type at the uri.
+- For **reactions** (commentType = 1), the content field contains the reaction type as a lower case string, such as `"like"`, `"dislike"`, `"repost"`, or whichever custom reaction type your app wants to use.
+
+### Reaction Content Types
+
+When `commentType = 1` (reaction), the `content` field should contain a string indicating the type of reaction:
+
+#### Standardized Reaction Types
+
+- `"like"` - General approval or appreciation
+- `"downvote"` - Disagreement or negative feedback
+- `"repost"` - Sharing or amplifying the content
+
+#### Implementation Notes
+
+- Reaction content should be a simple string identifier (lowercase recommended)
+- Applications should validate reaction types against their supported list
+- Unknown reaction types should be handled gracefully by displaying a generic reaction icon or ignored
+- Consider internationalization when displaying reaction labels to users
 
 ## `metadata`
 
-The `metadata` property stores additional data that shouldn't be shown to the user as it is.
+The `metadata` property stores additional data as key-value pairs that shouldn't be shown to the user as-is.
 
-- Must be a valid JSON string (RFC 8259)[https://datatracker.ietf.org/doc/html/rfc8259].
-- Please be mindful that storing large amounts of data on the chain will increase the cost of the transaction.
+- Stored as an array of `MetadataEntry` structures with `bytes32 key` and `bytes value` fields
+- Keys should be UTF-8 encoded strings with format "type key" (e.g., "category string", "priority uint256")
+- Values are stored as `bytes` and can contain any encoded data type, encoded via `abi.encodePacked`
+- Please be mindful that storing large amounts of metadata on the chain will increase the gas cost of the transaction.
+
+### Metadata Access
+
+```solidity
+// Get all metadata for a comment
+Comments.MetadataEntry[] memory metadata = commentManager.getCommentMetadata(commentId);
+
+// Get specific metadata value
+bytes memory value = commentManager.getCommentMetadataValue(commentId, keccak256("category string"));
+
+// Get all metadata keys
+bytes32[] memory keys = commentManager.getCommentMetadataKeys(commentId);
+```
+
+### Metadata Format Conversion
+
+The SDK provides functions to convert between two metadata formats:
+
+**JS/SDK Format (easier to work with):**
+
+```typescript
+Record<string, { key: string; type: string; value: Hex }>;
+```
+
+**Contract Format (used by blockchain):**
+
+```solidity
+struct MetadataEntry {
+  bytes32 key;
+  bytes value;
+}
+```
+
+#### Converting Between Formats
+
+```typescript
+import {
+  convertRecordToContractFormat,
+  convertContractToRecordFormat,
+  createKeyTypeMap,
+} from "@ecp.eth/sdk/comments";
+
+// Before sending to contract
+const contractData = convertRecordToContractFormat(jsMetadata);
+
+// After receiving from contract (requires key mapping)
+const keyTypeMap = createKeyTypeMap([
+  { key: "status", type: "string" },
+  { key: "reputation", type: "uint256" },
+]);
+const jsMetadata = convertContractToRecordFormat(contractData, keyTypeMap);
+```
+
+**Supported types:** `string`, `bool`, `uint256`, `address`, `bytes32`, `bytes`, and other numeric types.
+
+**Best practice:** Maintain a mapping of your known metadata keys and types for proper conversion.
 
 ## `targetUri`
 
@@ -33,7 +109,7 @@ Be careful when choosing the value for the `targetUri` property as an inconsiste
 
 ### App/Chain Agnostic URIs
 
-Whenver possible, it is recommended to use app or chain agnostic URIs, e.g. [CAIP-19](https://github.com/ChainAgnostic/namespaces/blob/main/eip155/caip19.md) specification for referencing onchain or offchain assets.
+Whenever possible, it is recommended to use app or chain agnostic URIs, e.g. [CAIP-19](https://github.com/ChainAgnostic/namespaces/blob/main/eip155/caip19.md) specification for referencing onchain or offchain assets.
 This ensures the reference is consistent and maximal compatibility across different applications and chains.
 
 Example (NFT and collection):
@@ -70,14 +146,21 @@ The deadline is a timestamp in seconds since the epoch. Posting a comment with a
 
 ## `commentType`
 
-The `commentType` property is used to categorize the type of comment being created.
+The `commentType` property uses a `uint8` value to efficiently categorize different types of comments.
 
-- Must be a string value that describes the nature of the comment.
-- Common examples include:
-  - `"comment"` - A standard comment or discussion
-  - `"like"` - A like or reaction to content
-- Applications can define their own comment types based on their specific use cases.
-- This field helps applications filter and display comments appropriately based on their type.
+### Valid Comment Type Values
+
+| Value | Name                  | Description            | Usage                                       |
+| ----- | --------------------- | ---------------------- | ------------------------------------------- |
+| `0`   | **Comment** (Default) | Standard text comments | Regular discussions, replies, conversations |
+| `1`   | **Reaction**          | Reactions to content   | Likes, dislikes, hearts, thumbs up/down     |
+
+### Implementation Notes
+
+- **Default Behavior**: If `commentType` is not explicitly set, it defaults to `0` (standard comment)
+- **Immutable**: Comment type cannot be changed after creation (not included in `EditComment` struct)
+- **Validation**: Applications should validate that reaction content contains valid reaction types
+- **Extensibility**: Additional comment types can be added in future versions
 
 ## `channelId`
 
@@ -89,21 +172,36 @@ The `channelId` property is used to organize comments into different channels or
 - Applications can use this to implement features like multiple comment sections, communities, or discussion boards.
 
 ## `createdAt` (automatic)
+
 - Timestamp when the comment was first created (in seconds since epoch).
 - Set automatically when the comment is posted to the blockchain.
 - Cannot be modified after creation.
 
-## `updatedAt`  (automatic)
+## `updatedAt` (automatic)
+
 - Timestamp when the comment was last modified (in seconds since epoch).
 - Updated automatically whenever the comment content or metadata is edited.
 - Initially equals `createdAt` for new comments.
 
-## `hookData`
+## `hookData` (added by hooks)
 
-The `hookData` property stores additional data that can be added by hooks during comment processing.
+Hook metadata is additional data that can be added by hooks during comment processing, stored separately from regular metadata.
 
-- Must be a valid string.
-- Used by the protocol's hook system to attach additional information to comments.
-- The specific format and content depend on the hooks implemented by the application.
-- Applications can use this for custom features like moderation flags, additional metadata, or integration data.
+- Stored as key-value pairs similar to regular metadata
+- Used by the protocol's hook system to attach additional information to comments
+- The specific format and content depend on the hooks implemented by the application
+- Applications can use this for custom features like moderation flags, additional metadata, or integration data
+- Since `hookData` is added by hooks, it is not signed by the author nor the app.
 
+### Hook Metadata Access
+
+```solidity
+// Get all hook metadata for a comment
+Comments.MetadataEntry[] memory hookMetadata = commentManager.getCommentHookMetadata(commentId);
+
+// Get specific hook metadata value
+bytes memory value = commentManager.getCommentHookMetadataValue(commentId, keccak256("moderationStatus string"));
+
+// Get all hook metadata keys
+bytes32[] memory keys = commentManager.getCommentHookMetadataKeys(commentId);
+```

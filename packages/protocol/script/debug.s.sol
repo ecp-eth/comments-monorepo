@@ -106,9 +106,9 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 1",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,
@@ -129,13 +129,46 @@ contract DebugGasUsage is Test, IERC721Receiver {
     comments.postComment{ value: 0 }(createCommentData, appSignature);
   }
 
+  function debugPostCommentWithSigBroadcastedByAuthor() public {
+    // Create comment data using direct construction
+    createCommentData = Comments.CreateComment({
+      content: "Test comment 2",
+      metadata: new Comments.MetadataEntry[](0),
+      targetUri: "",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    bytes32 commentId = comments.getCommentId(createCommentData);
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+
+    // Post comment with sig directly as author
+    vm.prank(user1);
+    measureGas(
+      "postCommentWithSig broadcasted by author",
+      runPostCommentWithSigBroadcastedByAuthor
+    );
+  }
+
+  function runPostCommentWithSigBroadcastedByAuthor() internal {
+    comments.postCommentWithSig{ value: 0 }(
+      createCommentData,
+      "",
+      appSignature
+    );
+  }
+
   function debugPostCommentWithSigSignedByAuthor() public {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 3",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
       app: user2,
       channelId: channelId,

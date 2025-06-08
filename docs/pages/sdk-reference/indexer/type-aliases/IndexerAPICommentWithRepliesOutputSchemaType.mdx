@@ -24,14 +24,21 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
   };
   chainId: number;
   channelId: string;
-  commentType: string;
+  commentType: number;
   content: string;
   createdAt: string;
   cursor: `0x${string}`;
   deletedAt: null | string;
+  hookMetadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   id: `0x${string}`;
   logIndex: null | number;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
@@ -63,14 +70,21 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
         };
         chainId: number;
         channelId: string;
-        commentType: string;
+        commentType: number;
         content: string;
         createdAt: string;
         cursor: `0x${string}`;
         deletedAt: null | string;
+        hookMetadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
         id: `0x${string}`;
         logIndex: null | number;
-        metadata: string;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: string;
         parentId: null | `0x${string}`;
@@ -113,7 +127,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:162](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L162)
+Defined in: [packages/sdk/src/indexer/schemas.ts:176](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L176)
 
 ## Type declaration
 
@@ -218,7 +232,7 @@ channelId: string = bigintToString;
 ### commentType
 
 ```ts
-commentType: string;
+commentType: number;
 ```
 
 ### content
@@ -245,6 +259,15 @@ cursor: `0x${string}` = HexSchema;
 deletedAt: null | string;
 ```
 
+### hookMetadata
+
+```ts
+hookMetadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[];
+```
+
 ### id
 
 ```ts
@@ -260,7 +283,10 @@ logIndex: null | number;
 ### metadata
 
 ```ts
-metadata: string;
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[];
 ```
 
 ### moderationStatus
@@ -312,14 +338,21 @@ replies: {
      };
      chainId: number;
      channelId: string;
-     commentType: string;
+     commentType: number;
      content: string;
      createdAt: string;
      cursor: `0x${string}`;
      deletedAt: null | string;
+     hookMetadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
      id: `0x${string}`;
      logIndex: null | number;
-     metadata: string;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
@@ -420,14 +453,21 @@ results: {
   };
   chainId: number;
   channelId: string;
-  commentType: string;
+  commentType: number;
   content: string;
   createdAt: string;
   cursor: `0x${string}`;
   deletedAt: null | string;
+  hookMetadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   id: `0x${string}`;
   logIndex: null | number;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;

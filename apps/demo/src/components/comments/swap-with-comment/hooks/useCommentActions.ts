@@ -147,14 +147,19 @@ export function useCommentActions({
         zeroExSwap,
         commentRequest: {
           content: comment.content,
-          metadata: JSON.stringify(
+          metadata: [
             {
-              swap: true,
-              provider: "0x",
-              data: zeroExSwap,
+              key: "0x73776170" as Hex, // "swap" in hex
+              value: JSON.stringify(
+                {
+                  swap: true,
+                  provider: "0x",
+                  data: zeroExSwap,
+                },
+                bigintReplacer,
+              ) as Hex,
             },
-            bigintReplacer,
-          ),
+          ],
           ...("parentId" in comment
             ? {
                 parentId: comment.parentId,

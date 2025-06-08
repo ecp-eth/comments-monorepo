@@ -1,0 +1,41 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / convertIndexerMetadataToRecord
+
+# Function: convertIndexerMetadataToRecord()
+
+```ts
+function convertIndexerMetadataToRecord(metadataEntries, keyTypeMap?): MetadataRecord;
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:275](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L275)
+
+Converts IndexerAPI MetadataEntry array to Record format for easier manipulation
+
+## Parameters
+
+### metadataEntries
+
+\{
+  `key`: `` `0x${string}` ``;
+  `value`: `` `0x${string}` ``;
+\}[]
+
+Array of MetadataEntry from indexer API
+
+### keyTypeMap?
+
+`Record`\<`` `0x${string}` ``, \{
+  `key`: `string`;
+  `type`: [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx);
+\}\>
+
+Optional mapping of known keys to their original string and type
+
+## Returns
+
+[`MetadataRecord`](/sdk-reference/comments/type-aliases/MetadataRecord.mdx)
+
+The metadata in Record format

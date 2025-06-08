@@ -62,7 +62,6 @@ const CreateChannelParamsSchema = z.object({
 /**
  * Create a new channel
  *
- * @param params - The parameters for creating a new channel
  * @returns The transaction hash of the created channel
  */
 export const createChannel = createWaitableWriteContractHelper(
@@ -187,7 +186,6 @@ const UpdateChannelParamsSchema = z.object({
 /**
  * Update a channel
  *
- * @param params - The parameters for updating a channel
  * @returns The transaction hash of the updated channel
  */
 export const updateChannel = createWaitableWriteContractHelper(

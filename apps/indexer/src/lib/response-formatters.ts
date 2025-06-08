@@ -179,6 +179,8 @@ function formatComment(comment: CommentSelectType) {
     ...comment,
     id: HexSchema.parse(comment.id),
     content: comment.deletedAt ? "[deleted]" : comment.content,
+    metadata: comment.metadata || [],
+    hookMetadata: comment.hookMetadata || [],
     cursor: getCommentCursor(comment.id as Hex, comment.createdAt),
   };
 }

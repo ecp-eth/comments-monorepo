@@ -1,0 +1,30 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / prepareMetadataForContract
+
+# Function: prepareMetadataForContract()
+
+```ts
+function prepareMetadataForContract(metadata): MetadataEntry[];
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:331](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L331)
+
+Convenience function to convert metadata for sending to contracts
+Handles both Record format and direct MetadataEntry array
+
+## Parameters
+
+### metadata
+
+Metadata in either Record or MetadataEntry array format
+
+[`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)[] | [`MetadataRecord`](/sdk-reference/comments/type-aliases/MetadataRecord.mdx)
+
+## Returns
+
+[`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)[]
+
+MetadataEntry array ready for contract calls

@@ -10,6 +10,16 @@
 
 ## Structs
 
+### `MetadataEntry`
+
+
+- **key:** (bytes32) UTF-8 encoded string of format "type key". Must fit in 32 bytes.
+
+
+
+- **value:** (bytes) The metadata value as bytes
+
+
 ### `Comment`
 
 
@@ -25,7 +35,11 @@
 
 
 
-- **updatedAt:** (uint96) The timestamp when the comment was last updated
+- **updatedAt:** (uint88) The timestamp when the comment was last updated
+
+
+
+- **commentType:** (uint8) The type of the comment (0=comment, 1=reaction)
 
 
 
@@ -41,19 +55,7 @@
 
 
 
-- **metadata:** (string) Additional JSON data that shouldn't be displayed to the user
-
-
-
 - **targetUri:** (string) the URI about which the comment is being made
-
-
-
-- **commentType:** (string) The type of the comment (e.g. "comment", "like", etc.)
-
-
-
-- **hookData:** (string) Additional data for the comment, added by a hook.
 
 
 ### `CreateComment`
@@ -79,19 +81,19 @@
 
 
 
-- **content:** (string) The actual text content of the comment
+- **commentType:** (uint8) The type of the comment (0=comment, 1=reaction)
+
+
+- **content:** (string) The actual text content of the comment. If the commentType is COMMENT_TYPE_REACTION, the content should be the reaction type, such as "like", "downvote", "repost" etc.
 
 
 
-- **metadata:** (string) Additional JSON data that shouldn't be shown to the user as it is
+- **metadata:** (struct Comments.MetadataEntry[]) Array of key-value pairs for additional data
 
 
 
 - **targetUri:** (string) the URI about which the comment is being made
 
-
-
-- **commentType:** (string) The type of the comment (e.g. "question", "answer", "feedback", etc.)
 
 
 ### `EditComment`
@@ -113,7 +115,7 @@
 
 
 
-- **metadata:** (string) Additional JSON data that shouldn't be shown to the user as it is
+- **metadata:** (struct Comments.MetadataEntry[]) Array of key-value pairs for additional data
 
 
 

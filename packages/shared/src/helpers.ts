@@ -226,6 +226,8 @@ export function insertPendingCommentToPage(
     createdAt: new Date(),
     updatedAt: new Date(),
     revision: 0,
+    metadata: [],
+    hookMetadata: [],
     moderationStatus: moderationEnabled ? "pending" : "approved",
     moderationStatusChangedAt: new Date(),
     zeroExSwap: zeroExSwap ?? null,

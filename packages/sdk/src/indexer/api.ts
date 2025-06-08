@@ -44,7 +44,7 @@ export type FetchCommentsOptions = {
   /**
    * Filter comments by comment type
    */
-  commentType?: string;
+  commentType?: number;
   /**
    * Number of times to retry the signing operation in case of failure.
    *
@@ -83,7 +83,7 @@ const FetchCommentsOptionsSchema = z.object({
   apiUrl: z.string().url().default(INDEXER_API_URL),
   app: HexSchema.optional(),
   channelId: z.coerce.bigint().optional(),
-  commentType: z.string().optional(),
+  commentType: z.number().int().min(0).max(255).optional(),
   retries: z.number().int().positive().default(3),
   sort: z.enum(["asc", "desc"]).default("desc"),
   cursor: HexSchema.optional(),
@@ -152,7 +152,7 @@ export async function fetchComments(
     }
 
     if (commentType) {
-      url.searchParams.set("commentType", commentType);
+      url.searchParams.set("commentType", commentType.toString());
     }
 
     const response = await fetch(url.toString(), {
@@ -226,7 +226,7 @@ export type FetchCommentRepliesOptions = {
   /**
    * Filter replies by comment type
    */
-  commentType?: string;
+  commentType?: number;
   /**
    * Filter replies by channel ID
    */
@@ -249,7 +249,7 @@ const FetchCommentRepliesOptionSchema = z.object({
   signal: z.instanceof(AbortSignal).optional(),
   sort: z.enum(["asc", "desc"]).default("desc"),
   mode: z.enum(["nested", "flat"]).optional(),
-  commentType: z.string().optional(),
+  commentType: z.number().int().min(0).max(255).optional(),
   channelId: z.coerce.bigint().optional(),
 });
 
@@ -303,7 +303,7 @@ export async function fetchCommentReplies(
     }
 
     if (commentType) {
-      url.searchParams.set("commentType", commentType);
+      url.searchParams.set("commentType", commentType.toString());
     }
 
     const response = await fetch(url.toString(), {
