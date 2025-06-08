@@ -136,7 +136,12 @@ jobs:
       - name: "Protocol: Build ABI"
         run: pnpm run build:abi
         working-directory: packages/protocol
-
+      - name: "Protocol: Log ABI diff"
+        run: |
+          git diff --name-only packages/protocol/abis.ts packages/sdk/src/abis.ts || true
+          echo "=== Full diff ==="
+          git diff packages/protocol/abis.ts packages/sdk/src/abis.ts || true
+        shell: bash
       - name: "Protocol: Ensure ABI is up to date"
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
