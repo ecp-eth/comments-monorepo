@@ -201,6 +201,7 @@ jobs:
       - name: "Docs: Warn if docs are not synced"
         id: docs-warn-out-of-sync
         run: |
+          git diff
           if [[ -n "$(git status --porcelain)" ]]; then
             echo "::warning ::Below files are out of sync"
             git status --porcelain | while read -r line; do
