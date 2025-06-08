@@ -116,7 +116,7 @@ export function useCommentActions({
         zeroExSwap: null,
         commentRequest: {
           content: comment.content,
-          metadata: Array.isArray(comment.metadata) ? comment.metadata : [],
+          metadata: comment.metadata,
           ...(comment.parentId
             ? {
                 parentId: comment.parentId,
