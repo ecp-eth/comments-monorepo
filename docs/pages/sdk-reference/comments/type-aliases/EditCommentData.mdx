@@ -12,12 +12,15 @@ type EditCommentData = {
   commentId: `0x${string}`;
   content: string;
   deadline: bigint;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   nonce: bigint;
 };
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:156](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L156)
+Defined in: [packages/sdk/src/comments/schemas.ts:135](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L135)
 
 Edit comment data schema. This is used as input of the functions.
 
@@ -50,7 +53,10 @@ deadline: bigint;
 ### metadata
 
 ```ts
-metadata: string = CommentMetadataSchema;
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[];
 ```
 
 ### nonce

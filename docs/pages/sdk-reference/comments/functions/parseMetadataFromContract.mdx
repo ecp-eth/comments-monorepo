@@ -1,0 +1,38 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / parseMetadataFromContract
+
+# Function: parseMetadataFromContract()
+
+```ts
+function parseMetadataFromContract(metadata, keyTypeMap?): MetadataRecord;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:339](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L339)
+
+Convenience function to convert metadata from contracts for JS/SDK use
+
+## Parameters
+
+### metadata
+
+[`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)[]
+
+MetadataEntry array from contract
+
+### keyTypeMap?
+
+`Record`\<`` `0x${string}` ``, \{
+  `key`: `string`;
+  `type`: [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx);
+\}\>
+
+Optional mapping of known keys
+
+## Returns
+
+[`MetadataRecord`](/sdk-reference/comments/type-aliases/MetadataRecord.mdx)
+
+Metadata in Record format

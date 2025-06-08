@@ -37,6 +37,7 @@ Functionality for indexing and querying comments data
 | [IndexerAPIModerationGetPendingCommentsSchemaType](/sdk-reference/indexer/type-aliases/IndexerAPIModerationGetPendingCommentsSchemaType.mdx) | - |
 | [IndexerAPIPaginationSchemaType](/sdk-reference/indexer/type-aliases/IndexerAPIPaginationSchemaType.mdx) | - |
 | [IsMutedOptions](/sdk-reference/indexer/type-aliases/IsMutedOptions.mdx) | The options for `isMuted()` |
+| [MetadataEntrySchemaType](/sdk-reference/indexer/type-aliases/MetadataEntrySchemaType.mdx) | - |
 
 ## Variables
 
@@ -63,13 +64,58 @@ Functionality for indexing and querying comments data
 | [IndexerAPIModerationGetPendingCommentsSchema](/sdk-reference/indexer/variables/IndexerAPIModerationGetPendingCommentsSchema.mdx) | - |
 | [IndexerAPIPaginationSchema](/sdk-reference/indexer/variables/IndexerAPIPaginationSchema.mdx) | - |
 | [IndexerAPIZeroExTokenAmountSchema](/sdk-reference/indexer/variables/IndexerAPIZeroExTokenAmountSchema.mdx) | - |
+| [MetadataEntrySchema](/sdk-reference/indexer/variables/MetadataEntrySchema.mdx) | - |
 
 ## Functions
 
 | Function | Description |
 | ------ | ------ |
+| [convertIndexerMetadataToRecord](/sdk-reference/indexer/functions/convertIndexerMetadataToRecord.mdx) | Converts IndexerAPI MetadataEntry array to Record format for easier manipulation |
+| [convertRecordToIndexerMetadata](/sdk-reference/indexer/functions/convertRecordToIndexerMetadata.mdx) | Converts Record format metadata to IndexerAPI MetadataEntry array format |
 | [fetchAuthorData](/sdk-reference/indexer/functions/fetchAuthorData.mdx) | Fetch author data from the Indexer API |
 | [fetchCommentReplies](/sdk-reference/indexer/functions/fetchCommentReplies.mdx) | Fetch replies for a comment from the Indexer API |
 | [fetchComments](/sdk-reference/indexer/functions/fetchComments.mdx) | Fetch comments from the Indexer API |
 | [getCommentCursor](/sdk-reference/indexer/functions/getCommentCursor.mdx) | Get the cursor for a comment |
 | [isMuted](/sdk-reference/indexer/functions/isMuted.mdx) | Checks if an address is marked as a muted on the indexer of your choice. |
+
+## References
+
+### convertContractToRecordFormat
+
+Re-exports [convertContractToRecordFormat](/sdk-reference/comments/functions/convertContractToRecordFormat.mdx)
+
+***
+
+### convertRecordToContractFormat
+
+Re-exports [convertRecordToContractFormat](/sdk-reference/comments/functions/convertRecordToContractFormat.mdx)
+
+***
+
+### createKeyTypeMap
+
+Re-exports [createKeyTypeMap](/sdk-reference/comments/functions/createKeyTypeMap.mdx)
+
+***
+
+### MetadataRecord
+
+Re-exports [MetadataRecord](/sdk-reference/comments/type-aliases/MetadataRecord.mdx)
+
+***
+
+### MetadataType
+
+Re-exports [MetadataType](/sdk-reference/comments/type-aliases/MetadataType.mdx)
+
+***
+
+### parseMetadataFromContract
+
+Re-exports [parseMetadataFromContract](/sdk-reference/comments/functions/parseMetadataFromContract.mdx)
+
+***
+
+### prepareMetadataForContract
+
+Re-exports [prepareMetadataForContract](/sdk-reference/comments/functions/prepareMetadataForContract.mdx)

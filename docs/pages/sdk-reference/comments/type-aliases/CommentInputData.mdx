@@ -12,11 +12,13 @@ type CommentInputData =
   app: `0x${string}`;
   author: `0x${string}`;
   channelId: bigint;
-  commentType: string;
+  commentType: number;
   content: string;
   deadline: bigint;
-  hookData: string;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   parentId: `0x${string}`;
   targetUri: string;
 }
@@ -24,17 +26,19 @@ type CommentInputData =
   app: `0x${string}`;
   author: `0x${string}`;
   channelId: bigint;
-  commentType: string;
+  commentType: number;
   content: string;
   deadline: bigint;
-  hookData: string;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   parentId: `0x${string}`;
   targetUri: "";
 };
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:139](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L139)
+Defined in: [packages/sdk/src/comments/schemas.ts:118](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L118)
 
 Comment input data schema. This is used as input of the functions.
 

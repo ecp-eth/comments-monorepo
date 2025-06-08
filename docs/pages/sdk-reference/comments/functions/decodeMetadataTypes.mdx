@@ -1,0 +1,37 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / decodeMetadataTypes
+
+# Function: decodeMetadataTypes()
+
+```ts
+function decodeMetadataTypes(metadataEntries): Record<Hex, {
+  key: string;
+  type: MetadataType;
+}>;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:354](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L354)
+
+Decodes metadata types from on-chain metadata entries by reverse-engineering
+the type information from the encoded key field. Works without requiring
+prior knowledge of the key-type mappings.
+
+## Parameters
+
+### metadataEntries
+
+[`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)[]
+
+Array of MetadataEntry from contracts
+
+## Returns
+
+`Record`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx), \{
+  `key`: `string`;
+  `type`: [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx);
+\}\>
+
+Mapping from hashed key to original key and type information

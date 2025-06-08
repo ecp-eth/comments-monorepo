@@ -148,7 +148,7 @@ paths:
                           type: string
                           pattern: ^d+$
                         commentType:
-                          type: string
+                          type: integer
                         content:
                           type: string
                         chainId:
@@ -162,7 +162,25 @@ paths:
                             - integer
                             - 'null'
                         metadata:
-                          type: string
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key: {}
+                              value: {}
+                            required:
+                              - key
+                              - value
+                        hookMetadata:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key: {}
+                              value: {}
+                            required:
+                              - key
+                              - value
                         parentId: {}
                         targetUri:
                           type: string
@@ -274,7 +292,7 @@ paths:
                                     type: string
                                     pattern: ^d+$
                                   commentType:
-                                    type: string
+                                    type: integer
                                   content:
                                     type: string
                                   chainId:
@@ -288,7 +306,25 @@ paths:
                                       - integer
                                       - 'null'
                                   metadata:
-                                    type: string
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        key: {}
+                                        value: {}
+                                      required:
+                                        - key
+                                        - value
+                                  hookMetadata:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        key: {}
+                                        value: {}
+                                      required:
+                                        - key
+                                        - value
                                   parentId: {}
                                   targetUri:
                                     type: string
@@ -356,6 +392,7 @@ paths:
                                   - deletedAt
                                   - logIndex
                                   - metadata
+                                  - hookMetadata
                                   - parentId
                                   - targetUri
                                   - txHash
@@ -396,6 +433,7 @@ paths:
                         - deletedAt
                         - logIndex
                         - metadata
+                        - hookMetadata
                         - parentId
                         - targetUri
                         - txHash
@@ -566,7 +604,7 @@ paths:
                           type: string
                           pattern: ^d+$
                         commentType:
-                          type: string
+                          type: integer
                         content:
                           type: string
                         chainId:
@@ -580,7 +618,25 @@ paths:
                             - integer
                             - 'null'
                         metadata:
-                          type: string
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key: {}
+                              value: {}
+                            required:
+                              - key
+                              - value
+                        hookMetadata:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key: {}
+                              value: {}
+                            required:
+                              - key
+                              - value
                         parentId: {}
                         targetUri:
                           type: string
@@ -689,7 +745,7 @@ paths:
                                     type: string
                                     pattern: ^d+$
                                   commentType:
-                                    type: string
+                                    type: integer
                                   content:
                                     type: string
                                   chainId:
@@ -703,7 +759,25 @@ paths:
                                       - integer
                                       - 'null'
                                   metadata:
-                                    type: string
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        key: {}
+                                        value: {}
+                                      required:
+                                        - key
+                                        - value
+                                  hookMetadata:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        key: {}
+                                        value: {}
+                                      required:
+                                        - key
+                                        - value
                                   parentId: {}
                                   targetUri:
                                     type: string
@@ -771,6 +845,7 @@ paths:
                                   - deletedAt
                                   - logIndex
                                   - metadata
+                                  - hookMetadata
                                   - parentId
                                   - targetUri
                                   - txHash
@@ -811,6 +886,7 @@ paths:
                         - deletedAt
                         - logIndex
                         - metadata
+                        - hookMetadata
                         - parentId
                         - targetUri
                         - txHash
@@ -1251,7 +1327,7 @@ paths:
                           type: string
                           pattern: ^d+$
                         commentType:
-                          type: string
+                          type: integer
                         content:
                           type: string
                         chainId:
@@ -1265,7 +1341,25 @@ paths:
                             - integer
                             - 'null'
                         metadata:
-                          type: string
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key: {}
+                              value: {}
+                            required:
+                              - key
+                              - value
+                        hookMetadata:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key: {}
+                              value: {}
+                            required:
+                              - key
+                              - value
                         parentId: {}
                         targetUri:
                           type: string
@@ -1333,6 +1427,7 @@ paths:
                         - deletedAt
                         - logIndex
                         - metadata
+                        - hookMetadata
                         - parentId
                         - targetUri
                         - txHash
@@ -1453,7 +1548,7 @@ paths:
                     type: string
                     pattern: ^d+$
                   commentType:
-                    type: string
+                    type: integer
                   content:
                     type: string
                   chainId:
@@ -1467,7 +1562,25 @@ paths:
                       - integer
                       - 'null'
                   metadata:
-                    type: string
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key: {}
+                        value: {}
+                      required:
+                        - key
+                        - value
+                  hookMetadata:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key: {}
+                        value: {}
+                      required:
+                        - key
+                        - value
                   parentId: {}
                   targetUri:
                     type: string
@@ -1535,6 +1648,7 @@ paths:
                   - deletedAt
                   - logIndex
                   - metadata
+                  - hookMetadata
                   - parentId
                   - targetUri
                   - txHash
@@ -1636,7 +1750,7 @@ paths:
                     type: string
                     pattern: ^d+$
                   commentType:
-                    type: string
+                    type: integer
                   content:
                     type: string
                   chainId:
@@ -1650,7 +1764,25 @@ paths:
                       - integer
                       - 'null'
                   metadata:
-                    type: string
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key: {}
+                        value: {}
+                      required:
+                        - key
+                        - value
+                  hookMetadata:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key: {}
+                        value: {}
+                      required:
+                        - key
+                        - value
                   parentId: {}
                   targetUri:
                     type: string
@@ -1718,6 +1850,7 @@ paths:
                   - deletedAt
                   - logIndex
                   - metadata
+                  - hookMetadata
                   - parentId
                   - targetUri
                   - txHash

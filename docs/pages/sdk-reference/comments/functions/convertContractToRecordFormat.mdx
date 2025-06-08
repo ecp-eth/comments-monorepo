@@ -1,0 +1,41 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / convertContractToRecordFormat
+
+# Function: convertContractToRecordFormat()
+
+```ts
+function convertContractToRecordFormat(metadataEntries, keyTypeMap?): MetadataRecord;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:261](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L261)
+
+Converts from contract MetadataEntry array format to JS/SDK Record format
+Note: This requires knowledge of the original key string and type, which are lost
+in the contract format. This function attempts to reverse-engineer them from
+common patterns used in the codebase.
+
+## Parameters
+
+### metadataEntries
+
+[`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)[]
+
+Array of MetadataEntry from contracts
+
+### keyTypeMap?
+
+`Record`\<`` `0x${string}` ``, \{
+  `key`: `string`;
+  `type`: [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx);
+\}\>
+
+Optional mapping of known keys to their original string and type
+
+## Returns
+
+[`MetadataRecord`](/sdk-reference/comments/type-aliases/MetadataRecord.mdx)
+
+The metadata in Record format

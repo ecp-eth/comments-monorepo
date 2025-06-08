@@ -1,0 +1,44 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / createCustomMetadataEntry
+
+# Function: createCustomMetadataEntry()
+
+```ts
+function createCustomMetadataEntry(
+   keyString, 
+   valueType, 
+   encodedValue): MetadataEntry;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:176](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L176)
+
+Creates a metadata entry with a custom type
+
+## Parameters
+
+### keyString
+
+`string`
+
+The key string
+
+### valueType
+
+[`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx)
+
+The type string MetadataType
+
+### encodedValue
+
+`` `0x${string}` ``
+
+The pre-encoded value as hex
+
+## Returns
+
+[`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)
+
+The MetadataEntry

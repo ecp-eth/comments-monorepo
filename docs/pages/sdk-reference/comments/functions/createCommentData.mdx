@@ -12,11 +12,13 @@ function createCommentData(__namedParameters):
   app: `0x${string}`;
   author: `0x${string}`;
   channelId: bigint;
-  commentType: string;
+  commentType: number;
   content: string;
   deadline: bigint;
-  hookData: string;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   parentId: `0x${string}`;
   targetUri: string;
 }
@@ -24,17 +26,19 @@ function createCommentData(__namedParameters):
   app: `0x${string}`;
   author: `0x${string}`;
   channelId: bigint;
-  commentType: string;
+  commentType: number;
   content: string;
   deadline: bigint;
-  hookData: string;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   parentId: `0x${string}`;
   targetUri: "";
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:556](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L556)
+Defined in: [packages/sdk/src/comments/comment.ts:558](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L558)
 
 Create the data structure of a comment
 
@@ -50,11 +54,13 @@ Create the data structure of a comment
   `app`: `` `0x${string}` ``;
   `author`: `` `0x${string}` ``;
   `channelId`: `bigint`;
-  `commentType`: `string`;
+  `commentType`: `number`;
   `content`: `string`;
   `deadline`: `bigint`;
-  `hookData`: `string`;
-  `metadata`: `string`;
+  `metadata`: \{
+     `key`: `` `0x${string}` ``;
+     `value`: `` `0x${string}` ``;
+  \}[];
   `parentId`: `` `0x${string}` ``;
   `targetUri`: `string`;
 \}
@@ -62,11 +68,13 @@ Create the data structure of a comment
   `app`: `` `0x${string}` ``;
   `author`: `` `0x${string}` ``;
   `channelId`: `bigint`;
-  `commentType`: `string`;
+  `commentType`: `number`;
   `content`: `string`;
   `deadline`: `bigint`;
-  `hookData`: `string`;
-  `metadata`: `string`;
+  `metadata`: \{
+     `key`: `` `0x${string}` ``;
+     `value`: `` `0x${string}` ``;
+  \}[];
   `parentId`: `` `0x${string}` ``;
   `targetUri`: `""`;
 \}

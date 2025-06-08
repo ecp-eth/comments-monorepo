@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / createChannel
 
@@ -174,20 +174,6 @@ const createChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      internalType: "uint96";
      name: "";
      type: "uint96";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [{
-     internalType: "uint256";
-     name: "channelId";
-     type: "uint256";
-  }];
-  name: "ownerOf";
-  outputs: readonly [{
-     internalType: "address";
-     name: "";
-     type: "address";
   }];
   stateMutability: "view";
   type: "function";
@@ -871,853 +857,839 @@ Create a new channel
 ## Returns
 
 `Promise`\<`WaitableWriteContractHelperResult`\<readonly \[\{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"initialOwner"`;
-`type`: `"address"`;
-\}\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"constructor"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"to"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"approve"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"owner"`;
-`type`: `"address"`;
-\}\];
-`name`: `"balanceOf"`;
-`outputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `""`;
-`type`: `"uint256"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"channelExists"`;
-`outputs`: readonly \[\{
-`internalType`: `"bool"`;
-`name`: `""`;
-`type`: `"bool"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"string"`;
-`name`: `"name"`;
-`type`: `"string"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"description"`;
-`type`: `"string"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"metadata"`;
-`type`: `"string"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"hook"`;
-`type`: `"address"`;
-\}\];
-`name`: `"createChannel"`;
-`outputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}\];
-`stateMutability`: `"payable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"value"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"deductProtocolHookTransactionFee"`;
-`outputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"hookValue"`;
-`type`: `"uint256"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"getApproved"`;
-`outputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `""`;
-`type`: `"address"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"getChannel"`;
-`outputs`: readonly \[\{
-`components`: readonly \[\{
-`internalType`: `"string"`;
-`name`: `"name"`;
-`type`: `"string"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"description"`;
-`type`: `"string"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"metadata"`;
-`type`: `"string"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"hook"`;
-`type`: `"address"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}, \{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}, \{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}, \{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}, \{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}\];
-`internalType`: `"struct Hooks.Permissions"`;
-`name`: `"permissions"`;
-`type`: `"tuple"`;
-\}\];
-`internalType`: `"struct Channels.Channel"`;
-`name`: `""`;
-`type`: `"tuple"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"getChannelCreationFee"`;
-`outputs`: readonly \[\{
-`internalType`: `"uint96"`;
-`name`: `""`;
-`type`: `"uint96"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"ownerOf"`;
-`outputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `""`;
-`type`: `"address"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"getHookTransactionFee"`;
-`outputs`: readonly \[\{
-`internalType`: `"uint16"`;
-`name`: `""`;
-`type`: `"uint16"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"owner"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"operator"`;
-`type`: `"address"`;
-\}\];
-`name`: `"isApprovedForAll"`;
-`outputs`: readonly \[\{
-`internalType`: `"bool"`;
-`name`: `""`;
-`type`: `"bool"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"name"`;
-`outputs`: readonly \[\{
-`internalType`: `"string"`;
-`name`: `""`;
-`type`: `"string"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"owner"`;
-`outputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `""`;
-`type`: `"address"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"ownerOf"`;
-`outputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `""`;
-`type`: `"address"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"renounceOwnership"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"from"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"to"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"safeTransferFrom"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"from"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"to"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"data"`;
-`type`: `"bytes"`;
-\}\];
-`name`: `"safeTransferFrom"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"operator"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"bool"`;
-`name`: `"approved"`;
-`type`: `"bool"`;
-\}\];
-`name`: `"setApprovalForAll"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"string"`;
-`name`: `"baseURI_"`;
-`type`: `"string"`;
-\}\];
-`name`: `"setBaseURI"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint96"`;
-`name`: `"fee"`;
-`type`: `"uint96"`;
-\}\];
-`name`: `"setChannelCreationFee"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"hook"`;
-`type`: `"address"`;
-\}\];
-`name`: `"setHook"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint16"`;
-`name`: `"feeBasisPoints"`;
-`type`: `"uint16"`;
-\}\];
-`name`: `"setHookTransactionFee"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes4"`;
-`name`: `"interfaceId"`;
-`type`: `"bytes4"`;
-\}\];
-`name`: `"supportsInterface"`;
-`outputs`: readonly \[\{
-`internalType`: `"bool"`;
-`name`: `""`;
-`type`: `"bool"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"symbol"`;
-`outputs`: readonly \[\{
-`internalType`: `"string"`;
-`name`: `""`;
-`type`: `"string"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"index"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"tokenByIndex"`;
-`outputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `""`;
-`type`: `"uint256"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"owner"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"index"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"tokenOfOwnerByIndex"`;
-`outputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `""`;
-`type`: `"uint256"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"tokenURI"`;
-`outputs`: readonly \[\{
-`internalType`: `"string"`;
-`name`: `""`;
-`type`: `"string"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"totalSupply"`;
-`outputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `""`;
-`type`: `"uint256"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"from"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"to"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"transferFrom"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"newOwner"`;
-`type`: `"address"`;
-\}\];
-`name`: `"transferOwnership"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"name"`;
-`type`: `"string"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"description"`;
-`type`: `"string"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"metadata"`;
-`type`: `"string"`;
-\}\];
-`name`: `"updateChannel"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"_commentsContract"`;
-`type`: `"address"`;
-\}\];
-`name`: `"updateCommentsContract"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"recipient"`;
-`type`: `"address"`;
-\}\];
-`name`: `"withdrawFees"`;
-`outputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"amount"`;
-`type`: `"uint256"`;
-\}\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"owner"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"approved"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"Approval"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"owner"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"operator"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"bool"`;
-`name`: `"approved"`;
-`type`: `"bool"`;
-\}\];
-`name`: `"ApprovalForAll"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `false`;
-`internalType`: `"string"`;
-`name`: `"baseURI"`;
-`type`: `"string"`;
-\}\];
-`name`: `"BaseURIUpdated"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"string"`;
-`name`: `"name"`;
-`type`: `"string"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"string"`;
-`name`: `"metadata"`;
-`type`: `"string"`;
-\}\];
-`name`: `"ChannelCreated"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `false`;
-`internalType`: `"uint96"`;
-`name`: `"newFee"`;
-`type`: `"uint96"`;
-\}\];
-`name`: `"ChannelCreationFeeUpdated"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"string"`;
-`name`: `"name"`;
-`type`: `"string"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"string"`;
-`name`: `"description"`;
-`type`: `"string"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"string"`;
-`name`: `"metadata"`;
-`type`: `"string"`;
-\}\];
-`name`: `"ChannelUpdated"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"recipient"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"uint256"`;
-`name`: `"amount"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"FeesWithdrawn"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"hook"`;
-`type`: `"address"`;
-\}\];
-`name`: `"HookSet"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"hook"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"bool"`;
-`name`: `"enabled"`;
-`type`: `"bool"`;
-\}\];
-`name`: `"HookStatusUpdated"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `false`;
-`internalType`: `"uint16"`;
-`name`: `"newBasisPoints"`;
-`type`: `"uint16"`;
-\}\];
-`name`: `"HookTransactionFeeUpdated"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"previousOwner"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"newOwner"`;
-`type`: `"address"`;
-\}\];
-`name`: `"OwnershipTransferred"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"from"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"to"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"Transfer"`;
-`type`: `"event"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ChannelAlreadyExists"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ChannelDoesNotExist"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ERC721EnumerableForbiddenBatchMint"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"sender"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"owner"`;
-`type`: `"address"`;
-\}\];
-`name`: `"ERC721IncorrectOwner"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"operator"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"ERC721InsufficientApproval"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"approver"`;
-`type`: `"address"`;
-\}\];
-`name`: `"ERC721InvalidApprover"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"operator"`;
-`type`: `"address"`;
-\}\];
-`name`: `"ERC721InvalidOperator"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"owner"`;
-`type`: `"address"`;
-\}\];
-`name`: `"ERC721InvalidOwner"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"receiver"`;
-`type`: `"address"`;
-\}\];
-`name`: `"ERC721InvalidReceiver"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"sender"`;
-`type`: `"address"`;
-\}\];
-`name`: `"ERC721InvalidSender"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"tokenId"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"ERC721NonexistentToken"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"owner"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"index"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"ERC721OutOfBoundsIndex"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"InsufficientFee"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"InvalidBaseURI"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"InvalidFee"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"InvalidHookInterface"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"owner"`;
-`type`: `"address"`;
-\}\];
-`name`: `"OwnableInvalidOwner"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"account"`;
-`type`: `"address"`;
-\}\];
-`name`: `"OwnableUnauthorizedAccount"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ReentrancyGuardReentrantCall"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"UnauthorizedCaller"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ZeroAddress"`;
-`type`: `"error"`;
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"initialOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"constructor"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"to"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"approve"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"balanceOf"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"channelExists"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bool"`;
+     `name`: `""`;
+     `type`: `"bool"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"string"`;
+     `name`: `"name"`;
+     `type`: `"string"`;
+   \}, \{
+     `internalType`: `"string"`;
+     `name`: `"description"`;
+     `type`: `"string"`;
+   \}, \{
+     `internalType`: `"string"`;
+     `name`: `"metadata"`;
+     `type`: `"string"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"hook"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"createChannel"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"value"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"deductProtocolHookTransactionFee"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"hookValue"`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"getApproved"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `""`;
+     `type`: `"address"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"getChannel"`;
+  `outputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"string"`;
+        `name`: `"name"`;
+        `type`: `"string"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"description"`;
+        `type`: `"string"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"metadata"`;
+        `type`: `"string"`;
+      \}, \{
+        `internalType`: `"address"`;
+        `name`: `"hook"`;
+        `type`: `"address"`;
+      \}, \{
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Hooks.Permissions"`;
+        `name`: `"permissions"`;
+        `type`: `"tuple"`;
+     \}\];
+     `internalType`: `"struct Channels.Channel"`;
+     `name`: `""`;
+     `type`: `"tuple"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"getChannelCreationFee"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint96"`;
+     `name`: `""`;
+     `type`: `"uint96"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"getHookTransactionFee"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint16"`;
+     `name`: `""`;
+     `type`: `"uint16"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"operator"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"isApprovedForAll"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bool"`;
+     `name`: `""`;
+     `type`: `"bool"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"name"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"string"`;
+     `name`: `""`;
+     `type`: `"string"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"owner"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `""`;
+     `type`: `"address"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"ownerOf"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `""`;
+     `type`: `"address"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"renounceOwnership"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"from"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"to"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"safeTransferFrom"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"from"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"to"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"data"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"safeTransferFrom"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"operator"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"bool"`;
+     `name`: `"approved"`;
+     `type`: `"bool"`;
+  \}\];
+  `name`: `"setApprovalForAll"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"string"`;
+     `name`: `"baseURI_"`;
+     `type`: `"string"`;
+  \}\];
+  `name`: `"setBaseURI"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint96"`;
+     `name`: `"fee"`;
+     `type`: `"uint96"`;
+  \}\];
+  `name`: `"setChannelCreationFee"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"hook"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"setHook"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint16"`;
+     `name`: `"feeBasisPoints"`;
+     `type`: `"uint16"`;
+  \}\];
+  `name`: `"setHookTransactionFee"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes4"`;
+     `name`: `"interfaceId"`;
+     `type`: `"bytes4"`;
+  \}\];
+  `name`: `"supportsInterface"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bool"`;
+     `name`: `""`;
+     `type`: `"bool"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"symbol"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"string"`;
+     `name`: `""`;
+     `type`: `"string"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"index"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"tokenByIndex"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"index"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"tokenOfOwnerByIndex"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"tokenURI"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"string"`;
+     `name`: `""`;
+     `type`: `"string"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"totalSupply"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"from"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"to"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"transferFrom"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"newOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"transferOwnership"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"string"`;
+     `name`: `"name"`;
+     `type`: `"string"`;
+   \}, \{
+     `internalType`: `"string"`;
+     `name`: `"description"`;
+     `type`: `"string"`;
+   \}, \{
+     `internalType`: `"string"`;
+     `name`: `"metadata"`;
+     `type`: `"string"`;
+  \}\];
+  `name`: `"updateChannel"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"_commentsContract"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"updateCommentsContract"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"recipient"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"withdrawFees"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"amount"`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"approved"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"Approval"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"operator"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"bool"`;
+     `name`: `"approved"`;
+     `type`: `"bool"`;
+  \}\];
+  `name`: `"ApprovalForAll"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `false`;
+     `internalType`: `"string"`;
+     `name`: `"baseURI"`;
+     `type`: `"string"`;
+  \}\];
+  `name`: `"BaseURIUpdated"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"string"`;
+     `name`: `"name"`;
+     `type`: `"string"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"string"`;
+     `name`: `"metadata"`;
+     `type`: `"string"`;
+  \}\];
+  `name`: `"ChannelCreated"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `false`;
+     `internalType`: `"uint96"`;
+     `name`: `"newFee"`;
+     `type`: `"uint96"`;
+  \}\];
+  `name`: `"ChannelCreationFeeUpdated"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"string"`;
+     `name`: `"name"`;
+     `type`: `"string"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"string"`;
+     `name`: `"description"`;
+     `type`: `"string"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"string"`;
+     `name`: `"metadata"`;
+     `type`: `"string"`;
+  \}\];
+  `name`: `"ChannelUpdated"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"recipient"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint256"`;
+     `name`: `"amount"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"FeesWithdrawn"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"hook"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"HookSet"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"hook"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"bool"`;
+     `name`: `"enabled"`;
+     `type`: `"bool"`;
+  \}\];
+  `name`: `"HookStatusUpdated"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `false`;
+     `internalType`: `"uint16"`;
+     `name`: `"newBasisPoints"`;
+     `type`: `"uint16"`;
+  \}\];
+  `name`: `"HookTransactionFeeUpdated"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"previousOwner"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"newOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"OwnershipTransferred"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"from"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"to"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"Transfer"`;
+  `type`: `"event"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ChannelAlreadyExists"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ChannelDoesNotExist"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ERC721EnumerableForbiddenBatchMint"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"sender"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ERC721IncorrectOwner"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"operator"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"ERC721InsufficientApproval"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"approver"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ERC721InvalidApprover"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"operator"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ERC721InvalidOperator"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ERC721InvalidOwner"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"receiver"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ERC721InvalidReceiver"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"sender"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ERC721InvalidSender"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"tokenId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"ERC721NonexistentToken"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"index"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"ERC721OutOfBoundsIndex"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InsufficientFee"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InvalidBaseURI"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InvalidFee"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InvalidHookInterface"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"OwnableInvalidOwner"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"account"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"OwnableUnauthorizedAccount"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ReentrancyGuardReentrantCall"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"UnauthorizedCaller"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ZeroAddress"`;
+  `type`: `"error"`;
 \}\], `"ChannelCreated"`\>\>
 
 The transaction hash of the created channel

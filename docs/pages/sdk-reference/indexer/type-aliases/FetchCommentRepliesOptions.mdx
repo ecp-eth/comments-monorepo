@@ -12,7 +12,7 @@ type FetchCommentRepliesOptions = {
   app?: Hex;
   channelId?: bigint;
   commentId: Hex;
-  commentType?: string;
+  commentType?: number;
   cursor?: Hex;
   limit?: number;
   mode?: "nested" | "flat";
@@ -86,7 +86,7 @@ The ID of the comment to fetch replies for
 ### commentType?
 
 ```ts
-optional commentType: string;
+optional commentType: number;
 ```
 
 Defined in: [packages/sdk/src/indexer/api.ts:229](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L229)
