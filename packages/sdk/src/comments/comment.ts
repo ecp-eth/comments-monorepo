@@ -84,7 +84,6 @@ const PostCommentParamsSchema = z.object({
 /**
  * Posts a comment as an author
  *
- * @param params - The parameters for posting a comment as an author
  * @returns The transaction hash
  */
 export const postComment = createWaitableWriteContractHelper(
@@ -157,7 +156,6 @@ const PostCommentWithSigParamsSchema = z.object({
 /**
  * Posts a comment with author signature verification
  *
- * @param params - The parameters for posting a comment
  * @returns The transaction hash
  */
 export const postCommentWithSig = createWaitableWriteContractHelper(
@@ -296,7 +294,6 @@ const DeleteCommentParamsSchema = z.object({
 /**
  * Delete a comment as an author
  *
- * @param params - The parameters for deleting a comment as an author
  * @returns The transaction hash
  */
 export const deleteComment = createWaitableWriteContractHelper(
@@ -370,7 +367,6 @@ const DeleteCommentWithSigParamsSchema = z.object({
 /**
  * Delete a comment with app signature verification
  *
- * @param params - The parameters for deleting a comment
  * @returns The transaction hash
  */
 export const deleteCommentWithSig = createWaitableWriteContractHelper(
@@ -822,7 +818,7 @@ export function createEditCommentData(
  * Helper function to infer the metadata type from a JavaScript value
  * Used for legacy metadata format conversion
  */
-function inferMetadataType(value: any): MetadataType {
+function inferMetadataType(value: unknown): MetadataType {
   if (typeof value === "boolean") {
     return "bool";
   } else if (typeof value === "number") {
@@ -934,7 +930,6 @@ export type EditCommentResult = WaitableWriteContractHelperResult<
 /**
  * Edit a comment as an author
  *
- * @param params - The parameters for editing a comment as an author
  * @returns The transaction hash
  */
 export const editComment = createWaitableWriteContractHelper(
@@ -1007,7 +1002,6 @@ export type EditCommentWithSigResult = WaitableWriteContractHelperResult<
 /**
  * Edit a comment
  *
- * @param params - The parameters for editing a comment
  * @returns The transaction hash
  */
 export const editCommentWithSig = createWaitableWriteContractHelper(

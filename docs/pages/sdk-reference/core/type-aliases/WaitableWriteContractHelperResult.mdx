@@ -1,0 +1,57 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [core](/sdk-reference/core/index.mdx) / WaitableWriteContractHelperResult
+
+# Type Alias: WaitableWriteContractHelperResult\<TAbi, TEventName\>
+
+```ts
+type WaitableWriteContractHelperResult<TAbi, TEventName> = WriteContractHelperResult & {
+  wait: (params) => Promise<
+     | GetContractEventsReturnType<TAbi, TEventName>[number]["args"]
+    | undefined>;
+};
+```
+
+Defined in: [packages/sdk/src/core/types.ts:22](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/types.ts#L22)
+
+## Type declaration
+
+### wait()
+
+```ts
+wait: (params) => Promise<
+  | GetContractEventsReturnType<TAbi, TEventName>[number]["args"]
+| undefined>;
+```
+
+Wait for the return value of the method call
+
+#### Parameters
+
+##### params
+
+###### getContractEvents
+
+`PublicActions`\[`"getContractEvents"`\]
+
+###### waitForTransactionReceipt
+
+`PublicActions`\[`"waitForTransactionReceipt"`\]
+
+#### Returns
+
+`Promise`\<
+  \| `GetContractEventsReturnType`\<`TAbi`, `TEventName`\>\[`number`\]\[`"args"`\]
+  \| `undefined`\>
+
+## Type Parameters
+
+### TAbi
+
+`TAbi` *extends* `Abi`
+
+### TEventName
+
+`TEventName` *extends* `ContractEventName`\<`TAbi`\>
