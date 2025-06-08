@@ -72,7 +72,7 @@ export type OnEditCommentParams<TExtra = unknown> = {
     /**
      * Updated Comment metadata
      */
-    metadata: string;
+    metadata: MetadataEntry[];
   };
   /**
    * Query key to a query where comment is stored

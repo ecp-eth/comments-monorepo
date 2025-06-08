@@ -263,7 +263,7 @@ export function CommentEditForm<TExtraEditData = unknown>({
       const result = await editComment({
         address: author,
         comment,
-        edit: { content, metadata: JSON.stringify(comment.metadata) },
+        edit: { content, metadata: comment.metadata },
         queryKey,
         extra,
         onStart: () => {
