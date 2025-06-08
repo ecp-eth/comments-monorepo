@@ -143,7 +143,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
-    bytes32 commentId = comments.getCommentId(createCommentData);
+    commentId = comments.getCommentId(createCommentData);
     appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
 
     // Post comment with sig directly as author

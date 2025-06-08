@@ -150,15 +150,28 @@ contract CommentsTest is Test, IERC721Receiver {
       author
     );
 
+    // Add metadata to the edit
+    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](1);
+    metadata[0] = Comments.MetadataEntry({
+      key: keccak256("test key"),
+      value: bytes("test value")
+    });
+    editData.metadata = metadata;
+
     Comments.Comment memory expectedCommentData = comments.getComment(
       commentId
     );
 
     expectedCommentData.content = editData.content;
-    expectedCommentData.metadata = editData.metadata;
-    expectedCommentData.updatedAt = uint96(block.timestamp);
+    expectedCommentData.updatedAt = uint88(block.timestamp);
 
     vm.prank(author);
+    vm.expectEmit(true, true, true, true);
+    emit CommentMetadataSet(
+      commentId,
+      keccak256("test key"),
+      bytes("test value")
+    );
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
@@ -168,20 +181,24 @@ contract CommentsTest is Test, IERC721Receiver {
       commentData.channelId,
       commentData.parentId,
       uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
-      editData.metadata,
       commentData.targetUri,
-      commentData.commentType,
-      ""
+      commentData.commentType
     );
     comments.editComment(commentId, editData, "");
 
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.metadata, editData.metadata);
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
+
+    // Verify metadata was set
+    Comments.MetadataEntry[] memory commentMetadata = comments
+      .getCommentMetadata(commentId);
+    assertEq(commentMetadata.length, 1);
+    assertEq(commentMetadata[0].key, keccak256("test key"));
+    assertEq(string(commentMetadata[0].value), "test value");
   }
 
   function test_EditComment_AsAuthor_UpdatedWithHookData() public {
