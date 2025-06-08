@@ -93,7 +93,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       logIndex: event.log.logIndex,
       channelId: event.args.channelId,
       // commentType is now a uint8, convert to integer
-      commentType: Number(event.args.commentType),
+      commentType: event.args.commentType,
       ...(moderationStatus
         ? {
             moderationStatus: moderationStatus.status,
