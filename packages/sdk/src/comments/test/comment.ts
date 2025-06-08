@@ -859,7 +859,6 @@ describe("comment", () => {
         assert.equal(parsedMetadata["string category"]?.type, "string");
 
         // **NEW: Validate that encoded values decode back to original values using ONLY derived on-chain data**
-        // This simulates the real-world scenario where we don't have prior knowledge of the types
         for (const entry of retrievedComment.metadata) {
           const decodedInfo = reverseEngineeredMap[entry.key];
 
@@ -1639,6 +1638,86 @@ describe("comment", () => {
           );
           assert.equal(fallbackParsed[entry.key]?.key, entry.key); // Uses hash as key
         }
+
+        // **NEW: Demonstrate TRUE zero-knowledge decoding - decode ALL values using ONLY on-chain derived information**
+        // This proves the system can reconstruct original data from on-chain metadata without any prior knowledge
+        const originalValues = {
+          title: "Complete Test",
+          isActive: true,
+          score: 42n,
+          level: 255n,
+          points: 65535n,
+          experience: 4294967295n,
+          timestamp: 18446744073709551615n,
+          balance: 340282366920938463463374607431768211455n,
+          delta: -42n,
+          offset: -123456789n,
+          owner: account.address.toLowerCase(),
+          hash: "0x1234567890123456789012345678901234567890123456789012345678901234",
+          data: "0x48656c6c6f",
+          config: { theme: "dark", version: 1 },
+        };
+
+        let decodedCount = 0;
+        for (const entry of retrievedComment.metadata) {
+          const decodedInfo = reverseEngineeredMap[entry.key];
+
+          if (decodedInfo) {
+            // Use ONLY the type information derived from on-chain data
+            const decodedValue = decodeMetadataValue(entry, decodedInfo.type);
+            const originalKey = decodedInfo.key;
+
+            // Validate against expected values based on the decoded key
+            if (originalKey in originalValues) {
+              const expectedValue =
+                originalValues[originalKey as keyof typeof originalValues];
+
+              if (
+                typeof expectedValue === "string" &&
+                originalKey === "owner"
+              ) {
+                // Address comparison (normalize case)
+                assert.equal(
+                  decodedValue.toLowerCase(),
+                  expectedValue,
+                  `Decoded ${originalKey} should match original (zero-knowledge decoding)`,
+                );
+              } else if (
+                typeof expectedValue === "string" &&
+                (originalKey === "hash" || originalKey === "data")
+              ) {
+                // Hex string comparison (normalize case)
+                assert.equal(
+                  decodedValue.toLowerCase(),
+                  expectedValue.toLowerCase(),
+                  `Decoded ${originalKey} should match original (zero-knowledge decoding)`,
+                );
+              } else if (typeof expectedValue === "object") {
+                // JSON object comparison
+                assert.deepEqual(
+                  decodedValue,
+                  expectedValue,
+                  `Decoded ${originalKey} should match original (zero-knowledge decoding)`,
+                );
+              } else {
+                // Direct comparison for primitives and bigints
+                assert.equal(
+                  decodedValue,
+                  expectedValue,
+                  `Decoded ${originalKey} should match original (zero-knowledge decoding)`,
+                );
+              }
+              decodedCount++;
+            }
+          }
+        }
+
+        // Ensure we successfully decoded all 14 metadata entries
+        assert.equal(
+          decodedCount,
+          14,
+          "Should have successfully decoded all metadata entries using only on-chain derived information",
+        );
       });
     });
   });
