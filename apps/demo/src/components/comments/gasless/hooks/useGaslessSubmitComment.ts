@@ -203,14 +203,14 @@ type SubmitGaslessEditCommentVariables = {
   content: string;
   isApproved: boolean;
   commentId: Hex;
-  metadata: { value: Hex; key: Hex }[];
+  metadata: MetadataEntry[];
 };
 
 type SubmitGaslessEditCommentVariablesInternal = {
   author: Hex;
   content: string;
   commentId: Hex;
-  metadata: { value: Hex; key: Hex }[];
+  metadata: MetadataEntry[];
 };
 
 type EditPriorNotApprovedResult = GaslessEditResponseSchemaType &
