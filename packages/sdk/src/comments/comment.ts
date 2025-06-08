@@ -561,33 +561,27 @@ export function createCommentData({
   commentType = DEFAULT_COMMENT_TYPE,
   ...params
 }: CreateCommentDataParams): CommentInputData {
-  const timestampInMs = deadline ?? BigInt(Date.now() + 24 * 60 * 60 * 1000);
+  const parentIdOrTargetUri =
+    "targetUri" in params
+      ? {
+          targetUri: params.targetUri,
+          parentId: EMPTY_PARENT_ID,
+        }
+      : {
+          targetUri: "",
+          parentId: params.parentId,
+        };
 
-  if ("targetUri" in params) {
-    return {
-      content,
-      metadata,
-      targetUri: params.targetUri,
-      commentType,
-      author,
-      app,
-      channelId,
-      deadline: timestampInMs,
-      parentId: EMPTY_PARENT_ID,
-    };
-  } else {
-    return {
-      content,
-      metadata,
-      targetUri: "",
-      commentType,
-      author,
-      app,
-      channelId,
-      deadline: timestampInMs,
-      parentId: "parentId" in params ? params.parentId : EMPTY_PARENT_ID,
-    };
-  }
+  return {
+    content,
+    metadata,
+    commentType,
+    author,
+    app,
+    channelId,
+    deadline: deadline ?? BigInt(Date.now() + 24 * 60 * 60 * 1000),
+    ...parentIdOrTargetUri,
+  };
 }
 
 export type CreateDeleteCommentTypedDataParams = {
