@@ -86,7 +86,7 @@ contract DeployScript is Script {
     // Deploy ChannelManager with CommentManager address
     channelManager = new ChannelManager{ salt: bytes32(salt) }(deployerAddress);
 
-    if (!isSimulation) {
+    if (!isSimulation && env == Env.Prod) {
       // Update contract addresses
       channelManager.updateCommentsContract(address(comments));
       comments.updateChannelContract(address(channelManager));
@@ -137,6 +137,12 @@ contract DeployScript is Script {
 
       vm.ffi(commentManagerCmd);
       console.log("CommentManager verified successfully");
+    } else {
+      // For non-production environments, just update contract addresses and ownership
+      channelManager.updateCommentsContract(address(comments));
+      comments.updateChannelContract(address(channelManager));
+      channelManager.transferOwnership(ownerAddress);
+      comments.transferOwnership(ownerAddress);
     }
 
     console.log("ChannelManager deployed at", address(channelManager));
