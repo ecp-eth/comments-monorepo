@@ -29,6 +29,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
   Comments.CreateComment createCommentData;
   bytes authorSignature;
   bytes appSignature;
+  bytes32 commentId;
 
   function setUp() public {
     owner = address(this);
@@ -51,7 +52,6 @@ contract DebugGasUsage is Test, IERC721Receiver {
     debugCreateChannel();
     debugUpdateChannel();
     debugPostComment();
-    debugPostCommentWithSigBroadcastedByAuthor();
     debugPostCommentWithSigSignedByAuthor();
     debugParseCAIP19();
   }
@@ -116,7 +116,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
-    bytes32 commentId = comments.getCommentId(createCommentData);
+    commentId = comments.getCommentId(createCommentData);
     authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, commentId);
     appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
 
@@ -143,7 +143,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
-    bytes32 commentId = comments.getCommentId(createCommentData);
+    commentId = comments.getCommentId(createCommentData);
     appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
 
     // Post comment with sig directly as author
@@ -176,7 +176,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       parentId: bytes32(0)
     });
 
-    bytes32 commentId = comments.getCommentId(createCommentData);
+    commentId = comments.getCommentId(createCommentData);
     authorSignature = TestUtils.signEIP712(vm, user1PrivateKey, commentId);
     appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
 
