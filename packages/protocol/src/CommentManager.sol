@@ -85,13 +85,16 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     address app = commentData.app;
 
     if (
-      msg.sender != app &&
-      !SignatureChecker.isValidSignatureNow(app, commentId, appSignature)
+      // It would be sent by someone such as a contract, with `author == app == contract address`.
+      // In such case we don't want they providing an extra app signature since `msg.sender` already indicates the authorization
+      msg.sender == app ||
+      SignatureChecker.isValidSignatureNow(app, commentId, appSignature)
     ) {
-      revert InvalidAppSignature();
+      _postComment(commentId, commentData);
+      return;
     }
 
-    _postComment(commentId, commentData);
+    revert InvalidAppSignature();
   }
 
   /// @inheritdoc ICommentManager
@@ -207,7 +210,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     onlyAuthor(comments[commentId].author)
     notStale(editData.deadline)
     commentExists(commentId)
-    bumpNonce(
+    validateNonce(
       comments[commentId].author,
       comments[commentId].app,
       editData.nonce
@@ -217,13 +220,21 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     address author = comment.author;
     address app = editData.app;
 
+    nonces[author][app]++;
+
     bytes32 editHash = getEditCommentHash(commentId, author, editData);
 
-    if (!SignatureChecker.isValidSignatureNow(app, editHash, appSignature)) {
-      revert InvalidAppSignature();
+    if (
+      // It would be sent by someone such as a contract, with `author == app == contract address`.
+      // In such case we don't want they providing an extra app signature since `msg.sender` already indicates the authorization
+      msg.sender == app ||
+      SignatureChecker.isValidSignatureNow(app, editHash, appSignature)
+    ) {
+      _editComment(commentId, editData);
+      return;
     }
 
-    _editComment(commentId, editData);
+    revert InvalidAppSignature();
   }
 
   /// @inheritdoc ICommentManager
@@ -237,7 +248,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     payable
     notStale(editData.deadline)
     commentExists(commentId)
-    bumpNonce(
+    validateNonce(
       comments[commentId].author,
       comments[commentId].app,
       editData.nonce
@@ -246,6 +257,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Comments.Comment storage comment = comments[commentId];
     address author = comment.author;
     address app = editData.app;
+
+    nonces[author][app]++;
 
     require(author != address(0), "Comment does not exist");
 
@@ -414,7 +427,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     uint256 nonce,
     uint256 deadline,
     bytes calldata authorSignature
-  ) external notStale(deadline) bumpNonce(author, app, nonce) {
+  ) external notStale(deadline) validateNonce(author, app, nonce) {
+    nonces[author][app]++;
+
     bytes32 addApprovalHash = getAddApprovalHash(author, app, nonce, deadline);
 
     if (
@@ -450,7 +465,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     uint256 nonce,
     uint256 deadline,
     bytes calldata authorSignature
-  ) external notStale(deadline) bumpNonce(author, app, nonce) {
+  ) external notStale(deadline) validateNonce(author, app, nonce) {
+    nonces[author][app]++;
+
     bytes32 removeApprovalHash = getRemoveApprovalHash(
       author,
       app,
@@ -644,12 +661,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     _;
   }
 
-  modifier bumpNonce(address author, address app, uint256 nonce) {
+  modifier validateNonce(address author, address app, uint256 nonce) {
     if (nonces[author][app] != nonce) {
       revert InvalidNonce(author, app, nonces[author][app], nonce);
     }
-
-    nonces[author][app]++;
 
     _;
   }

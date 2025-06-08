@@ -125,6 +125,62 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
   }
 
+  function test_EditComment_AsAuthorAndApp_AppSignatureNotRequired() public {
+    // First create a comment
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    vm.prank(author);
+    comments.postComment(commentData, appSignature);
+
+    // Now edit the comment
+    Comments.EditComment memory editData = TestUtils.generateDummyEditComment(
+      comments,
+      author,
+      // set app to author address so we can avoid app signature
+      author
+    );
+
+    Comments.Comment memory expectedCommentData = comments.getComment(
+      commentId
+    );
+
+    expectedCommentData.content = editData.content;
+    expectedCommentData.metadata = editData.metadata;
+    expectedCommentData.updatedAt = uint96(block.timestamp);
+
+    vm.prank(author);
+    vm.expectEmit(true, true, true, true);
+    emit CommentEdited(
+      commentId,
+      editData.app,
+      author,
+      app,
+      commentData.channelId,
+      commentData.parentId,
+      uint96(block.timestamp),
+      uint96(block.timestamp),
+      editData.content,
+      editData.metadata,
+      commentData.targetUri,
+      commentData.commentType,
+      ""
+    );
+    comments.editComment(commentId, editData, "");
+
+    // Verify the comment was edited
+    Comments.Comment memory editedComment = comments.getComment(commentId);
+    assertEq(editedComment.content, editData.content);
+    assertEq(editedComment.metadata, editData.metadata);
+    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+  }
+
   function test_EditComment_AsAuthor_UpdatedWithHookData() public {
     // Create a channel with the reject hook
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
