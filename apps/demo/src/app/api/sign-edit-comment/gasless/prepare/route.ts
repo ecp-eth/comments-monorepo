@@ -95,7 +95,7 @@ export async function POST(
     content,
     app: app.address,
     nonce,
-    metadataRaw: JSON.stringify(metadata),
+    metadata,
   });
 
   const chainId = chain.id;
