@@ -22,6 +22,9 @@ export const CommentDataWithIdSchema = CreateCommentDataSchema.extend({
   metadata: MetadataEntrySchema.array(),
 });
 
+// this is just for type checking
+({}) as z.infer<typeof CommentDataWithIdSchema> satisfies CommentInputData;
+
 /**
  * Parses response from API endpoint for usage in client
  */
@@ -41,9 +44,7 @@ export type SignCommentResponseClientSchemaType = z.infer<
 export const SignEditCommentResponseClientSchema = z.object({
   signature: HexSchema,
   hash: HexSchema,
-  data: EditCommentDataSchema.extend({
-    metadata: MetadataEntrySchema.array(),
-  }),
+  data: EditCommentDataSchema,
 });
 
 export type SignEditCommentResponseClientSchemaType = z.infer<
@@ -153,17 +154,29 @@ type CommentSchemaType = IndexerAPICommentSchemaType & {
   };
 };
 
-export const CommentSchema: z.ZodType<CommentSchemaType> =
-  IndexerAPICommentSchema.extend({
-    replies: z
-      .object({
-        extra: IndexerAPIExtraSchema,
-        results: z.lazy(() => CommentSchema.array()),
-        pagination: IndexerAPICursorPaginationSchema,
-      })
-      .optional(),
-    pendingOperation: PendingCommentOperationSchema.optional(),
-  });
+type CommentSchemaInputType = IndexerAPICommentSchemaType & {
+  pendingOperation?: z.input<typeof PendingCommentOperationSchema>;
+  replies?: {
+    extra: IndexerAPIExtraSchemaType;
+    results: CommentSchemaInputType[];
+    pagination: IndexerAPICursorPaginationSchemaType;
+  };
+};
+
+export const CommentSchema: z.ZodType<
+  CommentSchemaType,
+  z.ZodTypeDef,
+  CommentSchemaInputType
+> = IndexerAPICommentSchema.extend({
+  replies: z
+    .object({
+      extra: IndexerAPIExtraSchema,
+      results: z.lazy(() => CommentSchema.array()),
+      pagination: IndexerAPICursorPaginationSchema,
+    })
+    .optional(),
+  pendingOperation: PendingCommentOperationSchema.optional(),
+});
 
 export type Comment = z.infer<typeof CommentSchema>;
 
