@@ -32,12 +32,6 @@ import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
 import type { CreateCommentData } from "../schemas.js";
 import { privateKeyToAccount } from "viem/accounts";
-import {
-  COMMENT_MANAGER_ADDRESS,
-  DEFAULT_CHANNEL_ID,
-  EMPTY_PARENT_ID,
-} from "../../constants.js";
-import { createMetadataEntry } from "../metadata.js";
 
 describe("comment", () => {
   let commentsAddress: Hex;

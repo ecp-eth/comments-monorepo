@@ -488,8 +488,13 @@ export const CommentManagerABI = [
           },
           {
             name: "updatedAt",
-            type: "uint96",
-            internalType: "uint96",
+            type: "uint88",
+            internalType: "uint88",
+          },
+          {
+            name: "commentType",
+            type: "uint8",
+            internalType: "uint8",
           },
           {
             name: "channelId",
@@ -500,11 +505,6 @@ export const CommentManagerABI = [
             name: "parentId",
             type: "bytes32",
             internalType: "bytes32",
-          },
-          {
-            name: "commentType",
-            type: "uint8",
-            internalType: "uint8",
           },
           {
             name: "content",
@@ -1335,6 +1335,24 @@ export const CommentManagerABI = [
         type: "uint8",
         indexed: false,
         internalType: "uint8",
+      },
+      {
+        name: "metadata",
+        type: "tuple[]",
+        indexed: false,
+        internalType: "struct Comments.MetadataEntry[]",
+        components: [
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
       },
     ],
     anonymous: false,
