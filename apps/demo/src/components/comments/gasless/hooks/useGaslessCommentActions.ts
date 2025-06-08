@@ -123,10 +123,7 @@ export function useGaslessCommentActions({
         isApproved: comment.pendingOperation.type === "gasless-preapproved",
         targetUri: comment.targetUri,
         ...(comment.parentId && { parentId: comment.parentId }),
-        metadata:
-          typeof comment.metadata === "string"
-            ? JSON.parse(comment.metadata)
-            : (comment.metadata ?? []),
+        metadata: comment.metadata,
       });
 
       try {
