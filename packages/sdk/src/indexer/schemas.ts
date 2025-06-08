@@ -82,7 +82,7 @@ export const IndexerAPICommentSchema = z.object({
   author: IndexerAPIAuthorDataSchema,
   id: HexSchema,
   channelId: z.coerce.bigint(),
-  commentType: z.number().int(),
+  commentType: z.number().int().min(0).max(255),
   content: z.string(),
   chainId: z.number().int(),
   deletedAt: z.coerce.date().nullable(),

@@ -83,7 +83,7 @@ const FetchCommentsOptionsSchema = z.object({
   apiUrl: z.string().url().default(INDEXER_API_URL),
   app: HexSchema.optional(),
   channelId: z.coerce.bigint().optional(),
-  commentType: z.number().int().optional(),
+  commentType: z.number().int().min(0).max(255).optional(),
   retries: z.number().int().positive().default(3),
   sort: z.enum(["asc", "desc"]).default("desc"),
   cursor: HexSchema.optional(),
@@ -249,7 +249,7 @@ const FetchCommentRepliesOptionSchema = z.object({
   signal: z.instanceof(AbortSignal).optional(),
   sort: z.enum(["asc", "desc"]).default("desc"),
   mode: z.enum(["nested", "flat"]).optional(),
-  commentType: z.number().int().optional(),
+  commentType: z.number().int().min(0).max(255).optional(),
   channelId: z.coerce.bigint().optional(),
 });
 
