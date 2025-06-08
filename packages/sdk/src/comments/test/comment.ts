@@ -36,25 +36,13 @@ import {
   createMetadataEntry,
   createMetadataEntries,
   createCustomMetadataEntry,
-  createMetadataKey,
-  encodeStringValue,
-  encodeBoolValue,
   encodeNumberValue,
-  encodeJsonValue,
   convertContractToRecordFormat,
-  createKeyTypeMap,
   decodeMetadataTypes,
   decodeMetadataValue,
-  decodeStringValue,
-  decodeBoolValue,
-  decodeNumberValue,
-  decodeAddressValue,
-  decodeBytesValue,
-  type MetadataType,
   MetadataTypeValues,
 } from "../metadata.js";
 import type { MetadataEntry } from "../types.js";
-import { hexToString } from "viem";
 
 describe("comment", () => {
   let commentsAddress: Hex;
