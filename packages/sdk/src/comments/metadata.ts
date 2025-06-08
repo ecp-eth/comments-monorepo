@@ -101,27 +101,34 @@ export function createMetadataEntry(
         key: createMetadataKey(keyString, valueType),
         value: encodeStringValue(value),
       };
-    } else if (typeof value === "object" && value !== null) {
+    }
+
+    if (typeof value === "object" && value !== null) {
       return {
         key: createMetadataKey(keyString, valueType),
         value: encodeJsonValue(value),
       };
-    } else {
-      throw new Error(
-        `Value must be string or object for string type, got ${typeof value}`,
-      );
     }
-  } else if (valueType === "bool") {
+
+    throw new Error(
+      `Value must be string or object for string type, got ${typeof value}`,
+    );
+  }
+
+  if (valueType === "bool") {
     if (typeof value !== "boolean") {
       throw new Error(
         `Value must be boolean for bool type, got ${typeof value}`,
       );
     }
+
     return {
       key: createMetadataKey(keyString, valueType),
       value: encodeBoolValue(value),
     };
-  } else if (
+  }
+
+  if (
     valueType === "uint256" ||
     valueType === "uint8" ||
     valueType === "uint16" ||
@@ -136,13 +143,14 @@ export function createMetadataEntry(
         `Value must be number or bigint for ${valueType} type, got ${typeof value}`,
       );
     }
+
     return {
       key: createMetadataKey(keyString, valueType),
       value: encodeNumberValue(value),
     };
-  } else {
-    throw new Error(`Unsupported metadata type: ${valueType}`);
   }
+
+  throw new Error(`Unsupported metadata type: ${valueType}`);
 }
 
 /**
