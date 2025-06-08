@@ -11,6 +11,8 @@ import type {
   CreateReplyCommentDataParams,
   CreateRootCommentDataParams,
   MetadataEntry,
+  Json,
+  JsonObject,
 } from "./types.js";
 
 export const JsonLiteralSchema = z.union([
@@ -20,11 +22,11 @@ export const JsonLiteralSchema = z.union([
   z.null(),
 ]);
 
-export const JsonSchema: z.ZodType<any> = z.lazy(() =>
+export const JsonSchema: z.ZodType<Json> = z.lazy(() =>
   z.union([JsonLiteralSchema, z.array(JsonSchema), z.record(JsonSchema)]),
 );
 
-export const JsonObjectSchema: z.ZodType<Record<string, any>> = z.record(
+export const JsonObjectSchema: z.ZodType<JsonObject> = z.record(
   z.string(),
   JsonSchema,
 );
