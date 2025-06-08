@@ -1551,6 +1551,11 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
+    name: "CommentDoesNotExist",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "EnforcedPause",
     inputs: [],
   },
