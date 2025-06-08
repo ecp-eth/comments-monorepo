@@ -133,7 +133,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     }
 
     // Add the hook metadata entry to the existing hookMetadata array
-    const existingHookMetadata = comment.hookMetadata || [];
+    const existingHookMetadata = comment.hookMetadata ?? [];
     const newHookMetadataEntry = {
       key: event.args.key,
       value: event.args.value,
