@@ -189,7 +189,7 @@ export function useCommentActions({
         zeroExSwap: null,
         commentRequest: {
           content: comment.content,
-          metadata: Array.isArray(comment.metadata) ? comment.metadata : [],
+          metadata: comment.metadata ?? [],
           ...("parentId" in comment
             ? {
                 parentId: comment.parentId,
