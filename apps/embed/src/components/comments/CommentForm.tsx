@@ -131,7 +131,15 @@ function BaseCommentForm({
 
   return (
     <form
-      action={submitMutation.mutateAsync}
+      action={async (formData) => {
+        try {
+          await submitMutation.mutateAsync(formData);
+        } catch (e) {
+          console.error(e);
+
+          // do not rethrow the error, we already handle it in the mutations
+        }
+      }}
       className="flex flex-col gap-2 mb-2"
     >
       <Textarea
