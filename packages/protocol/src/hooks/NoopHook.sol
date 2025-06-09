@@ -46,7 +46,7 @@ contract NoopHook is IHook {
     address,
     Channels.Channel memory,
     uint256
-  ) external override returns (bool) {
+  ) external pure override returns (bool) {
     return true;
   }
 
@@ -73,7 +73,7 @@ contract NoopHook is IHook {
     address,
     uint256,
     Channels.Channel calldata
-  ) external override returns (bool) {
+  ) external pure override returns (bool) {
     return true;
   }
 }
