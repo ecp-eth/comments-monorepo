@@ -1,22 +1,36 @@
 # Ethereum Comments Protocol
 
-A protocol for commenting built on Ethereum.
+A protocol for commenting, built on Ethereum.
+[ethcomments.xyz](https://ethcomments.xyz) | [docs](https://docs.ethcomments.xyz)
 
-## Deployments
+## Monorepo
 
-| Network          | Contract Address                           |
-| ---------------- | ------------------------------------------ |
-| Ethereum Mainnet | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
-| Ethereum Sepolia | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
-| Base             | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
-| Base Sepolia     | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
-| World Chain      | 0xabD9cE1952992211dEe051Df6ed337fa6efC995d |
+This monorepo contains all the auxilliary tools and libraries of the Ethereum Comments Protocol.
 
-## Packages
+### Apps (`/apps`)
 
-- `@ecp.eth/sdk`: SDK for integrating ECP into your project.
-- `@ecp.eth/indexer`: Indexer and API for ECP across all chains.
-- `@ecp.eth/protocol`: Smart contracts for ECP.
+- `indexer/` - Ponder.sh based blockchain indexer service for ECP
+- `demo/` - Main demo application showcasing ECP integration
+- `embed/` - Embeddable components for ECP
+- `homepage/` - Project homepage and documentation
+- `embed-demo-blog/` - Demo blog with embedded ECP comments
+- `demo-rn-expo/` - React Native demo application
+
+### Packages (`/packages`)
+
+- `protocol/` - Smart contracts and core protocol implementation
+- `sdk/` - TypeScript/JavaScript SDK for ECP integration
+- `shared/` - Shared utilities and types
+- `build-tools/` - Build and development tooling
+- `test-protocol/` - Protocol testing utilities
+- `eslint-config/` - Shared ESLint configuration
+- `typescript-config/` - Shared TypeScript configuration
+
+### Documentation (`/docs`)
+
+- Protocol documentation
+- Integration guides
+- API references
 
 ## Development
 
