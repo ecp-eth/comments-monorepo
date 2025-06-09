@@ -113,7 +113,15 @@ function BaseCommentForm({
 
   return (
     <form
-      action={submitMutation.mutateAsync}
+      action={(formData) => {
+        try {
+          submitMutation.mutateAsync(formData);
+        } catch (e) {
+          // do not rethrow because we already handle the error in the mutation and also effect
+          // we don't need to also propagate the error to React
+          console.error(e);
+        }
+      }}
       className="mb-4 flex flex-col gap-2"
     >
       <Textarea

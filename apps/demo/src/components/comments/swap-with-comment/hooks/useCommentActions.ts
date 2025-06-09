@@ -12,7 +12,12 @@ import {
   useConfig,
   useSendCalls,
 } from "wagmi";
-import { waitForCallsStatus, waitForTransactionReceipt } from "@wagmi/core";
+import {
+  getCapabilities,
+  getChainId,
+  waitForCallsStatus,
+  waitForTransactionReceipt,
+} from "@wagmi/core";
 import {
   useCommentDeletion,
   useCommentSubmission,
@@ -110,7 +115,21 @@ export function useCommentActions({
       const { comment } = params;
 
       if (!params.extra) {
-        throw new Error("Missing extra data");
+        throw new Error(
+          "Missing swap information. Make sure to first finalize the swap.",
+        );
+      }
+
+      const chainId = await getChainId(wagmiConfig);
+      const capabilities = await getCapabilities(wagmiConfig);
+
+      if (
+        capabilities[chainId]?.atomic?.status !== "supported" &&
+        capabilities[chainId]?.atomic?.status !== "ready"
+      ) {
+        throw new Error(
+          "Atomic transactions are not supported by your wallet on this chain.",
+        );
       }
 
       const { quoteViewState } = params.extra;
