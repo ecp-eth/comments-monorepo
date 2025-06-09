@@ -8,6 +8,10 @@ export const publicEnvSchema = z.object({
   NEXT_PUBLIC_WC_PROJECT_ID: z.string().nonempty(),
   NEXT_PUBLIC_COMMENTS_INDEXER_URL: z.string().url(),
   NEXT_PUBLIC_COMMENT_AUTHOR_URL: z.string().url().optional(),
+  NEXT_PUBLIC_ENABLE_SWAPPING: z
+    .enum(["1", "0"])
+    .default("0")
+    .transform((val) => val === "1"),
 });
 
 export const publicEnv = publicEnvSchema.parse({
@@ -18,4 +22,5 @@ export const publicEnv = publicEnvSchema.parse({
   NEXT_PUBLIC_COMMENTS_INDEXER_URL:
     process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   NEXT_PUBLIC_COMMENT_AUTHOR_URL: process.env.NEXT_PUBLIC_COMMENT_AUTHOR_URL,
+  NEXT_PUBLIC_ENABLE_SWAPPING: process.env.NEXT_PUBLIC_ENABLE_SWAPPING,
 });

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CommentSection as CommentSectionSwapWithComment } from "@/components/comments/swap-with-comment/CommentSection";
 import { PoweredBy } from "@ecp.eth/shared/components";
+import { publicEnv } from "@/publicEnv";
 
 type Tab = "default" | "gasless" | "swap";
 
@@ -48,17 +49,17 @@ export default function Home() {
             <TabsTrigger value="gasless">
               Gas Sponsored Transactions
             </TabsTrigger>
-            <TabsTrigger value="swap">Swap with comment</TabsTrigger>
+            {publicEnv.NEXT_PUBLIC_ENABLE_SWAPPING && (
+              <TabsTrigger value="swap">Swap with comment</TabsTrigger>
+            )}
           </TabsList>
         </Tabs>
         <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
-          {activeTab === "gasless" ? (
-            <CommentSectionGasless />
-          ) : activeTab === "swap" ? (
+          {activeTab === "gasless" && <CommentSectionGasless />}
+          {activeTab === "swap" && publicEnv.NEXT_PUBLIC_ENABLE_SWAPPING && (
             <CommentSectionSwapWithComment />
-          ) : (
-            <CommentSection />
           )}
+          {activeTab === "default" && <CommentSection />}
           <PoweredBy />
         </div>
       </div>

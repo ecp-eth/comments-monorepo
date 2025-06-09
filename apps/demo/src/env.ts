@@ -35,6 +35,20 @@ export const SubmitterEnvSchema = z.union([
   EthSubmitterEnvSchema,
 ]);
 
+const EnableSwappingSchema = z.discriminatedUnion(
+  "NEXT_PUBLIC_ENABLE_SWAPPING",
+  [
+    z.object({
+      NEXT_PUBLIC_ENABLE_SWAPPING: z.literal(true),
+      ZEROEX_API_KEY: z.string().nonempty(),
+    }),
+    z.object({
+      NEXT_PUBLIC_ENABLE_SWAPPING: z.literal(false),
+      ZEROEX_API_KEY: z.string().optional(),
+    }),
+  ],
+);
+
 const EnvSchema = z
   .object({
     APP_URL: z.string().url(),
@@ -42,18 +56,28 @@ const EnvSchema = z
     KV_REST_API_URL: z.string().url().optional(),
     KV_REST_API_TOKEN: z.string().optional(),
     ZEROEX_API_KEY: z.string().optional(),
+    NEXT_PUBLIC_ENABLE_SWAPPING: z
+      .enum(["1", "0"])
+      .default("0")
+      .transform((val) => val === "1"),
   })
   .merge(publicEnvSchema)
   .merge(EthSubmitterEnvSchema.partial())
   .merge(PrivySubmitterEnvSchema.partial())
   .refine((data) => {
-    const result = SubmitterEnvSchema.safeParse(data);
+    const submitterResult = SubmitterEnvSchema.safeParse(data);
 
-    if (result.success) {
-      return true;
+    if (!submitterResult.success) {
+      throw submitterResult.error;
     }
 
-    return result.error;
+    const swapResult = EnableSwappingSchema.safeParse(data);
+
+    if (!swapResult.success) {
+      throw swapResult.error;
+    }
+
+    return true;
   });
 
 declare global {
