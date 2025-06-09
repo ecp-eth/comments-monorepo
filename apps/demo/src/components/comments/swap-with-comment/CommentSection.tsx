@@ -114,7 +114,10 @@ export function CommentSection() {
             Your wallet doesn&apos;t support atomic transactions
           </div>
         )}
-        <CommentForm disabled={!isEIP7702Supported} />
+        <CommentForm
+          disabled={!isEIP7702Supported}
+          placeholder="Add a comment to your swap"
+        />
         {error && <div>Error loading comments: {(error as Error).message}</div>}
         {isSuccess && (
           <>
