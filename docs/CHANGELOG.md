@@ -1,5 +1,17 @@
 # @ecp.eth/docs
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [df82ffe]
+- Updated dependencies [3cd058f]
+- Updated dependencies [42ae8ef]
+- Updated dependencies [aba0192]
+- Updated dependencies [4cfae7d]
+- Updated dependencies [1684dfd]
+  - @ecp.eth/sdk@0.0.15
+
 ## 0.0.9
 
 ### Patch Changes

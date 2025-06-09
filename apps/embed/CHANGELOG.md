@@ -1,5 +1,21 @@
 # @ecp.eth/embed
 
+## 0.0.14
+
+### Patch Changes
+
+- 42ae8ef: feat: add channel, hook and key-value based metadata
+- Updated dependencies [df82ffe]
+- Updated dependencies [3cd058f]
+- Updated dependencies [a7ba513]
+- Updated dependencies [42ae8ef]
+- Updated dependencies [aba0192]
+- Updated dependencies [4cfae7d]
+- Updated dependencies [1684dfd]
+- Updated dependencies [a8e67a4]
+  - @ecp.eth/sdk@0.0.15
+  - @ecp.eth/shared@0.0.8
+
 ## 0.0.13
 
 ### Patch Changes
