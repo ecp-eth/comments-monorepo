@@ -8,7 +8,7 @@ import { PriceView, type PriceViewState } from "./0x/PriceView";
 import { QuoteView, type QuoteViewState } from "./0x/QuoteView";
 import { SwapWithCommentExtra } from "./hooks/useCommentActions";
 
-export function CommentForm({ disabled, ...props }: CommentFormProps) {
+export function CommentForm(props: CommentFormProps) {
   const [finalizedPriceState, setFinalize] = useState<PriceViewState | null>(
     null,
   );
@@ -30,10 +30,10 @@ export function CommentForm({ disabled, ...props }: CommentFormProps) {
       )}
       <BaseCommentForm<SwapWithCommentExtra>
         {...props}
-        disabled={!finalizedPriceState || !quoteViewState || disabled}
         submitIdleLabel="Swap"
         submitPendingLabel="Posting..."
         extra={quoteViewState ? { quoteViewState: quoteViewState } : undefined}
+        placeholder="Add a comment to your swap"
         onSubmitSuccess={() => {
           setQuote(null);
           setFinalize(null);

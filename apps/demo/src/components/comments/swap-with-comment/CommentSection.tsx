@@ -16,7 +16,7 @@ import {
 import type { Hex } from "viem";
 import { CommentForm } from "./CommentForm";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
-import { useAccount, useCapabilities, useChainId } from "wagmi";
+import { useAccount } from "wagmi";
 import { CommentItem } from "../core/CommentItem";
 import { createRootCommentsQueryKey } from "../core/queries";
 import { useCommentActions } from "./hooks/useCommentActions";
@@ -24,8 +24,6 @@ import { CommentActionsProvider } from "./context";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
-  const chainId = useChainId();
-  const { data: capabilities } = useCapabilities();
   const isAccountStatusResolved = useIsAccountStatusResolved();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
@@ -99,25 +97,11 @@ export function CommentSection() {
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
-  const isWalletConnected = !!viewer;
-  const isEIP7702Supported =
-    !!capabilities &&
-    (capabilities[chainId]?.atomic?.status === "supported" ||
-      capabilities[chainId]?.atomic?.status === "ready");
-
   return (
     <CommentActionsProvider value={commentActions}>
       <CommentSectionWrapper>
         <h2 className="text-lg font-semibold mb-4">Comments</h2>
-        {isWalletConnected && !isEIP7702Supported && (
-          <div className="text-red-500">
-            Your wallet doesn&apos;t support atomic transactions
-          </div>
-        )}
-        <CommentForm
-          disabled={!isEIP7702Supported}
-          placeholder="Add a comment to your swap"
-        />
+        <CommentForm />
         {error && <div>Error loading comments: {(error as Error).message}</div>}
         {isSuccess && (
           <>

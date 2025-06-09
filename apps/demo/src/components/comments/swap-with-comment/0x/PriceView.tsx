@@ -1,4 +1,3 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   useReadContract,
@@ -371,8 +370,6 @@ export function PriceView({
       </div>
 
       <div className="flex justify-end">
-        {!taker && <ConnectButton />}
-
         {!!taker && !!price && price.liquidityAvailable && (
           <ApproveOrReviewButton
             taker={taker}
