@@ -9,7 +9,7 @@ DRY_RUN=false
 # ensure we are in the root of the repo
 cd $(git rev-parse --show-toplevel)
 # ensure we are on the main branch
-git checkout $(git rev-parse --abbrev-ref HEAD)
+git checkout main
 
 # ensure git workspace is clean
 if [[ -n $(git status -s) ]]; then
