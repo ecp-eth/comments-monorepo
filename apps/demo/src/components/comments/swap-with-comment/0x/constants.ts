@@ -4,8 +4,16 @@ import type { Token } from "./types";
 
 export const PERMIT2_ADDRESS = "0x000000000022D473030F116dDEE9F6B43aC78BA3";
 
-export const AFFILIATE_FEE = 100; // 1% affiliate fee. Denoted in Bps.
-export const FEE_RECIPIENT = "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d"; // The ETH address that should receive affiliate fees
+/**
+ * Affiliate fee. Denoted in Bps.
+ * @see https://0x.org/docs/api#tag/Swap/operation/swap::permit2::getPrice
+ */
+export const SWAP_FEE_BPS = 0;
+/**
+ * The ETH address that should receive affiliate fees in selected buy token
+ * @see https://0x.org/docs/api#tag/Swap/operation/swap::permit2::getPrice
+ */
+export const SWAP_FEE_RECIPIENT = "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d";
 
 const BASE_CHAIN_TOKENS = {
   weth: {

@@ -1,8 +1,8 @@
 import { type Address, formatUnits } from "viem";
 import {
   BASE_TOKENS_BY_ADDRESS,
-  AFFILIATE_FEE,
-  FEE_RECIPIENT,
+  SWAP_FEE_BPS,
+  SWAP_FEE_RECIPIENT,
 } from "./constants";
 import Image from "next/image";
 import {
@@ -65,10 +65,10 @@ export function QuoteView({
         buyToken: price.buyToken.toString(),
         sellAmount: price.sellAmount.toString(),
         ...(taker && { taker: taker.toString() }),
-        swapFeeRecipient: FEE_RECIPIENT,
-        swapFeeBps: AFFILIATE_FEE.toString(),
+        swapFeeRecipient: SWAP_FEE_RECIPIENT,
+        swapFeeBps: SWAP_FEE_BPS.toString(),
         swapFeeToken: price.buyToken,
-        tradeSurplusRecipient: FEE_RECIPIENT,
+        tradeSurplusRecipient: SWAP_FEE_RECIPIENT,
       };
 
       const response = await fetch(
@@ -167,34 +167,31 @@ export function QuoteView({
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 p-4 border border-gray-300 rounded mb-4">
-          <div className="text-muted-foreground text-sm">
-            {quote.fees &&
-            quote.fees.integratorFee &&
-            quote.fees.integratorFee.amount
-              ? "Affiliate Fee: " +
+        {!!quote.fees.integratorFee?.amount && (
+          <div className="flex flex-col gap-2 p-4 border border-gray-300 rounded mb-4">
+            <div className="text-muted-foreground text-sm">
+              {"Affiliate Fee: " +
                 formatUnits(
                   quote.fees.integratorFee.amount,
                   buyTokenInfo.decimals,
                 ) +
                 " " +
-                buyTokenInfo.symbol
-              : null}
+                buyTokenInfo.symbol}
+            </div>
           </div>
-          {((!!quote.tokenMetadata.buyToken &&
-            quote.tokenMetadata.buyToken.buyTaxBps !== 0) ||
-            (!!quote.tokenMetadata.sellToken &&
-              quote.tokenMetadata.sellToken.sellTaxBps !== 0)) && (
-            <div className="text-muted-foreground text-sm mt-4">
-              {quote.tokenMetadata.buyToken.buyTaxBps != null &&
-                quote.tokenMetadata.buyToken.buyTaxBps !== 0 && (
+        )}
+
+        {!!quote.tokenMetadata.buyToken.buyTaxBps ||
+          (!!quote.tokenMetadata.sellToken.sellTaxBps && (
+            <div className="flex flex-col gap-2 p-4 border border-gray-300 rounded mb-4">
+              <div className="text-muted-foreground text-sm">
+                {!!quote.tokenMetadata.buyToken.buyTaxBps && (
                   <p>
                     {buyTokenInfo.symbol +
                       ` Buy Tax: ${formatTax(quote.tokenMetadata.buyToken.buyTaxBps)}%`}
                   </p>
                 )}
-              {quote.tokenMetadata.sellToken.sellTaxBps != null &&
-                quote.tokenMetadata.sellToken.sellTaxBps !== 0 && (
+                {!!quote.tokenMetadata.sellToken.sellTaxBps && (
                   <p>
                     {sellTokenInfo.symbol +
                       ` Sell Tax: ${formatTax(
@@ -202,9 +199,9 @@ export function QuoteView({
                       )}%`}
                   </p>
                 )}
+              </div>
             </div>
-          )}
-        </div>
+          ))}
       </form>
     </div>
   );

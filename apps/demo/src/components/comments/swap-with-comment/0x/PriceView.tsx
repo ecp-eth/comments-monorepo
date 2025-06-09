@@ -10,8 +10,8 @@ import { Address, formatUnits, parseUnits, maxUint256 } from "viem";
 import {
   getTokensByChain,
   getTokenBySymbolAndChain,
-  AFFILIATE_FEE,
-  FEE_RECIPIENT,
+  SWAP_FEE_BPS,
+  SWAP_FEE_RECIPIENT,
 } from "./constants";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
@@ -135,10 +135,10 @@ export function PriceView({
         buyToken: parsedParams.data.buyToken,
         ...(parsedSellAmount && { sellAmount: parsedSellAmount.toString() }),
         ...(taker && { taker: taker.toString() }),
-        swapFeeRecipient: FEE_RECIPIENT,
-        swapFeeBps: AFFILIATE_FEE.toString(),
+        swapFeeRecipient: SWAP_FEE_RECIPIENT,
+        swapFeeBps: SWAP_FEE_BPS.toString(),
         swapFeeToken: parsedParams.data.buyToken,
-        tradeSurplusRecipient: FEE_RECIPIENT,
+        tradeSurplusRecipient: SWAP_FEE_RECIPIENT,
       };
 
       const response = await fetch(
