@@ -178,20 +178,6 @@ const createChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   stateMutability: "view";
   type: "function";
 }, {
-  inputs: readonly [{
-     internalType: "uint256";
-     name: "channelId";
-     type: "uint256";
-  }];
-  name: "getChannelOwner";
-  outputs: readonly [{
-     internalType: "address";
-     name: "";
-     type: "address";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
   inputs: readonly [];
   name: "getHookTransactionFee";
   outputs: readonly [{
@@ -858,7 +844,7 @@ const createChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
 }], "ChannelCreated">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:68](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L68)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:67](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L67)
 
 Create a new channel
 
@@ -870,7 +856,7 @@ Create a new channel
 
 ## Returns
 
-`Promise`\<`WaitableWriteContractHelperResult`\<readonly \[\{
+`Promise`\<[`WaitableWriteContractHelperResult`](/sdk-reference/core/type-aliases/WaitableWriteContractHelperResult.mdx)\<readonly \[\{
   `inputs`: readonly \[\{
      `internalType`: `"address"`;
      `name`: `"initialOwner"`;
@@ -1037,20 +1023,6 @@ Create a new channel
      `internalType`: `"uint96"`;
      `name`: `""`;
      `type`: `"uint96"`;
-  \}\];
-  `stateMutability`: `"view"`;
-  `type`: `"function"`;
-\}, \{
-  `inputs`: readonly \[\{
-     `internalType`: `"uint256"`;
-     `name`: `"channelId"`;
-     `type`: `"uint256"`;
-  \}\];
-  `name`: `"getChannelOwner"`;
-  `outputs`: readonly \[\{
-     `internalType`: `"address"`;
-     `name`: `""`;
-     `type`: `"address"`;
   \}\];
   `stateMutability`: `"view"`;
   `type`: `"function"`;

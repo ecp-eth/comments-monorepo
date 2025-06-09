@@ -109,9 +109,4 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   /// @param channelId Unique identifier of the channel
   /// @return exists Whether the channel exists
   function channelExists(uint256 channelId) external view returns (bool);
-
-  /// @notice Gets the owner of a channel
-  /// @param channelId The unique identifier of the channel
-  /// @return owner The address of the channel owner
-  function getChannelOwner(uint256 channelId) external view returns (address);
 }

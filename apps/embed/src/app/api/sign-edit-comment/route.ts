@@ -92,7 +92,7 @@ export async function POST(req: Request) {
     app: app.address,
     nonce,
     commentId,
-    metadataRaw: metadata,
+    metadata: metadata,
   });
 
   const typedCommentData = createEditCommentTypedData({

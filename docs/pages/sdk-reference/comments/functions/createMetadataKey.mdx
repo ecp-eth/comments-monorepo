@@ -1,0 +1,35 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / createMetadataKey
+
+# Function: createMetadataKey()
+
+```ts
+function createMetadataKey(keyString, valueType): `0x${string}`;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:12](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L12)
+
+Creates a metadata key by encoding a string in the format "type key" using abi.encodePacked
+
+## Parameters
+
+### keyString
+
+`string`
+
+The key string (e.g., "status", "author", "url")
+
+### valueType
+
+[`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx)
+
+The type of the value MetadataType
+
+## Returns
+
+`` `0x${string}` ``
+
+The keccak256 hash of the abi.encodePacked "type key" string

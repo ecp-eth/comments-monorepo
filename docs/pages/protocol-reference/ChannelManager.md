@@ -80,16 +80,9 @@ Internal function to set the hook for a channel
 
 
 
-### `channelExists(uint256 channelId) → bool` (public)
+### `channelExists(uint256 channelId) → bool` (external)
 
 Checks if a channel exists
-
-
-
-
-### `getChannelOwner(uint256 channelId) → address` (external)
-
-Gets the owner of a channel
 
 
 

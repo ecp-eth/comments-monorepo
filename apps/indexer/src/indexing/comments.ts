@@ -79,7 +79,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     await context.db.insert(schema.comments).values({
       id: event.args.commentId,
       content: event.args.content,
-      metadata: event.args.metadata,
+      metadata: event.args.metadata.slice(),
+      hookMetadata: [], // Hook metadata still comes from separate events
       targetUri,
       parentId,
       rootCommentId,
@@ -120,6 +121,43 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     }
   });
 
+  // Handle hook metadata setting separately
+  ponder.on("CommentsV1:CommentHookMetadataSet", async ({ event, context }) => {
+    const comment = await context.db.find(schema.comments, {
+      id: event.args.commentId,
+    });
+
+    if (!comment) {
+      // Comment might not be indexed yet, skip for now
+      return;
+    }
+
+    // Add the hook metadata entry to the existing hookMetadata array
+    const existingHookMetadata = comment.hookMetadata ?? [];
+    const newHookMetadataEntry = {
+      key: event.args.key,
+      value: event.args.value,
+    };
+
+    // Check if this key already exists and update it, otherwise add new entry
+    const existingIndex = existingHookMetadata.findIndex(
+      (entry) => entry.key === event.args.key,
+    );
+    if (existingIndex !== -1) {
+      existingHookMetadata[existingIndex] = newHookMetadataEntry;
+    } else {
+      existingHookMetadata.push(newHookMetadataEntry);
+    }
+
+    await context.db
+      .update(schema.comments, {
+        id: event.args.commentId,
+      })
+      .set({
+        hookMetadata: existingHookMetadata,
+      });
+  });
+
   ponder.on("CommentsV1:CommentDeleted", async ({ event, context }) => {
     const existingComment = await context.db.find(schema.comments, {
       id: event.args.commentId,
@@ -157,7 +195,6 @@ ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
     })
     .set({
       content: event.args.content,
-      metadata: event.args.metadata,
       revision: existingComment.revision + 1,
       updatedAt,
     });

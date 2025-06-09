@@ -7,25 +7,6 @@ import { type Hex } from "@ecp.eth/sdk/core";
 import { IndexerAPICommentZeroExSwapSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { z } from "zod";
 
-const ZeroExCommentMetadataSchema = z.preprocess(
-  (data) => {
-    try {
-      if (typeof data !== "string") {
-        return null;
-      }
-
-      return JSON.parse(data);
-    } catch {
-      return null;
-    }
-  },
-  z.object({
-    swap: z.literal(true),
-    provider: z.literal("0x"),
-    data: IndexerAPICommentZeroExSwapSchema,
-  }),
-);
-
 type ZeroExSwap = {
   from: {
     symbol: string;
@@ -94,14 +75,8 @@ export function createZeroExSwapResolver(
         );
       }
 
-      const metadata = ZeroExCommentMetadataSchema.safeParse(
-        event.args.metadata,
-      );
-
-      if (!metadata.success) {
-        return null;
-      }
-
+      // Try to parse swap directly from transaction hash
+      // Note: metadata is not available in CommentAdded event, it comes from separate CommentMetadataSet events
       const swap = await parseSwap({
         publicClient,
         transactionHash: event.transaction.hash,

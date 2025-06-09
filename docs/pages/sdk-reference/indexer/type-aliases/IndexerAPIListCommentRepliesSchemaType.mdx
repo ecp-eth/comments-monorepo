@@ -35,14 +35,21 @@ type IndexerAPIListCommentRepliesSchemaType = {
      };
      chainId: number;
      channelId: bigint;
-     commentType: string;
+     commentType: number;
      content: string;
      createdAt: Date;
      cursor: `0x${string}`;
      deletedAt: null | Date;
+     hookMetadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
      id: `0x${string}`;
      logIndex: null | number;
-     metadata: string;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -67,7 +74,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:193](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L193)
+Defined in: [packages/sdk/src/indexer/schemas.ts:207](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L207)
 
 ## Type declaration
 
@@ -147,14 +154,21 @@ results: {
   };
   chainId: number;
   channelId: bigint;
-  commentType: string;
+  commentType: number;
   content: string;
   createdAt: Date;
   cursor: `0x${string}`;
   deletedAt: null | Date;
+  hookMetadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   id: `0x${string}`;
   logIndex: null | number;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;

@@ -1,5 +1,18 @@
 import { z } from "zod";
 import { HexSchema } from "../core/schemas.js";
+import type { MetadataType, MetadataRecord } from "../comments/metadata.js";
+import {
+  convertRecordToContractFormat,
+  convertContractToRecordFormat,
+} from "../comments/metadata.js";
+import type { Hex } from "../core/schemas.js";
+
+export const MetadataEntrySchema = z.object({
+  key: HexSchema,
+  value: HexSchema,
+});
+
+export type MetadataEntrySchemaType = z.infer<typeof MetadataEntrySchema>;
 
 export const IndexerAPIAuthorEnsDataSchema = z.object({
   name: z.string(),
@@ -69,12 +82,13 @@ export const IndexerAPICommentSchema = z.object({
   author: IndexerAPIAuthorDataSchema,
   id: HexSchema,
   channelId: z.coerce.bigint(),
-  commentType: z.string(),
+  commentType: z.number().int().min(0).max(255),
   content: z.string(),
   chainId: z.number().int(),
   deletedAt: z.coerce.date().nullable(),
   logIndex: z.number().int().nullable(),
-  metadata: z.string(),
+  metadata: z.array(MetadataEntrySchema),
+  hookMetadata: z.array(MetadataEntrySchema),
   parentId: HexSchema.nullable(),
   targetUri: z.string(),
   txHash: HexSchema,
@@ -239,3 +253,40 @@ export type IndexerAPIModerationChangeModerationStatusOnCommentOutputSchemaType 
   z.infer<
     typeof IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema
   >;
+
+// Re-export metadata conversion functions for indexer use
+export {
+  type MetadataType,
+  type MetadataRecord,
+  convertRecordToContractFormat,
+  convertContractToRecordFormat,
+  createKeyTypeMap,
+  prepareMetadataForContract,
+  parseMetadataFromContract,
+} from "../comments/metadata.js";
+
+/**
+ * Converts IndexerAPI MetadataEntry array to Record format for easier manipulation
+ *
+ * @param metadataEntries - Array of MetadataEntry from indexer API
+ * @param keyTypeMap - Optional mapping of known keys to their original string and type
+ * @returns The metadata in Record format
+ */
+export function convertIndexerMetadataToRecord(
+  metadataEntries: MetadataEntrySchemaType[],
+  keyTypeMap?: Record<Hex, { key: string; type: MetadataType }>,
+): MetadataRecord {
+  return convertContractToRecordFormat(metadataEntries, keyTypeMap);
+}
+
+/**
+ * Converts Record format metadata to IndexerAPI MetadataEntry array format
+ *
+ * @param metadataRecord - The metadata in Record format
+ * @returns Array of MetadataEntry for indexer API use
+ */
+export function convertRecordToIndexerMetadata(
+  metadataRecord: MetadataRecord,
+): MetadataEntrySchemaType[] {
+  return convertRecordToContractFormat(metadataRecord);
+}

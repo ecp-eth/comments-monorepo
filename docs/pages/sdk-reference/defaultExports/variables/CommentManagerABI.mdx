@@ -104,7 +104,7 @@ const CommentManagerABI: readonly [{
      type: "uint256";
    }, {
      internalType: "bytes";
-     name: "signature";
+     name: "authorSignature";
      type: "bytes";
   }];
   name: "addApprovalWithSig";
@@ -118,6 +118,78 @@ const CommentManagerABI: readonly [{
      internalType: "contract IChannelManager";
      name: "";
      type: "address";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+   }, {
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  name: "commentHookMetadata";
+  outputs: readonly [{
+     internalType: "bytes";
+     name: "";
+     type: "bytes";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+   }, {
+     internalType: "uint256";
+     name: "";
+     type: "uint256";
+  }];
+  name: "commentHookMetadataKeys";
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+   }, {
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  name: "commentMetadata";
+  outputs: readonly [{
+     internalType: "bytes";
+     name: "";
+     type: "bytes";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+   }, {
+     internalType: "uint256";
+     name: "";
+     type: "uint256";
+  }];
+  name: "commentMetadataKeys";
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
   }];
   stateMutability: "view";
   type: "function";
@@ -180,9 +252,18 @@ const CommentManagerABI: readonly [{
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: "bytes32";
+           name: "key";
+           type: "bytes32";
+         }, {
+           internalType: "bytes";
+           name: "value";
+           type: "bytes";
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
      }];
      internalType: "struct Comments.EditComment";
      name: "editData";
@@ -219,9 +300,18 @@ const CommentManagerABI: readonly [{
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: "bytes32";
+           name: "key";
+           type: "bytes32";
+         }, {
+           internalType: "bytes";
+           name: "value";
+           type: "bytes";
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
      }];
      internalType: "struct Comments.EditComment";
      name: "editData";
@@ -286,9 +376,13 @@ const CommentManagerABI: readonly [{
         name: "app";
         type: "address";
       }, {
-        internalType: "uint96";
+        internalType: "uint88";
         name: "updatedAt";
-        type: "uint96";
+        type: "uint88";
+      }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
       }, {
         internalType: "uint256";
         name: "channelId";
@@ -303,24 +397,67 @@ const CommentManagerABI: readonly [{
         type: "string";
       }, {
         internalType: "string";
-        name: "metadata";
-        type: "string";
-      }, {
-        internalType: "string";
         name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "hookData";
         type: "string";
      }];
      internalType: "struct Comments.Comment";
      name: "";
      type: "tuple";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "getCommentHookMetadata";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Comments.MetadataEntry[]";
+     name: "";
+     type: "tuple[]";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "getCommentHookMetadataKeys";
+  outputs: readonly [{
+     internalType: "bytes32[]";
+     name: "";
+     type: "bytes32[]";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+   }, {
+     internalType: "bytes32";
+     name: "key";
+     type: "bytes32";
+  }];
+  name: "getCommentHookMetadataValue";
+  outputs: readonly [{
+     internalType: "bytes";
+     name: "";
+     type: "bytes";
   }];
   stateMutability: "view";
   type: "function";
@@ -347,20 +484,29 @@ const CommentManagerABI: readonly [{
         name: "parentId";
         type: "bytes32";
       }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
         internalType: "string";
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: "bytes32";
+           name: "key";
+           type: "bytes32";
+         }, {
+           internalType: "bytes";
+           name: "value";
+           type: "bytes";
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
       }, {
         internalType: "string";
         name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
         type: "string";
      }];
      internalType: "struct Comments.CreateComment";
@@ -372,6 +518,61 @@ const CommentManagerABI: readonly [{
      internalType: "bytes32";
      name: "";
      type: "bytes32";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "getCommentMetadata";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Comments.MetadataEntry[]";
+     name: "";
+     type: "tuple[]";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "getCommentMetadataKeys";
+  outputs: readonly [{
+     internalType: "bytes32[]";
+     name: "";
+     type: "bytes32[]";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+   }, {
+     internalType: "bytes32";
+     name: "key";
+     type: "bytes32";
+  }];
+  name: "getCommentMetadataValue";
+  outputs: readonly [{
+     internalType: "bytes";
+     name: "";
+     type: "bytes";
   }];
   stateMutability: "view";
   type: "function";
@@ -428,9 +629,18 @@ const CommentManagerABI: readonly [{
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: "bytes32";
+           name: "key";
+           type: "bytes32";
+         }, {
+           internalType: "bytes";
+           name: "value";
+           type: "bytes";
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
      }];
      internalType: "struct Comments.EditComment";
      name: "editData";
@@ -573,20 +783,29 @@ const CommentManagerABI: readonly [{
         name: "parentId";
         type: "bytes32";
       }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
         internalType: "string";
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: "bytes32";
+           name: "key";
+           type: "bytes32";
+         }, {
+           internalType: "bytes";
+           name: "value";
+           type: "bytes";
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
       }, {
         internalType: "string";
         name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
         type: "string";
      }];
      internalType: "struct Comments.CreateComment";
@@ -624,20 +843,29 @@ const CommentManagerABI: readonly [{
         name: "parentId";
         type: "bytes32";
       }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
         internalType: "string";
         name: "content";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: "bytes32";
+           name: "key";
+           type: "bytes32";
+         }, {
+           internalType: "bytes";
+           name: "value";
+           type: "bytes";
+        }];
+        internalType: "struct Comments.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
       }, {
         internalType: "string";
         name: "targetUri";
-        type: "string";
-      }, {
-        internalType: "string";
-        name: "commentType";
         type: "string";
      }];
      internalType: "struct Comments.CreateComment";
@@ -675,7 +903,7 @@ const CommentManagerABI: readonly [{
      type: "uint256";
    }, {
      internalType: "bytes";
-     name: "signature";
+     name: "authorSignature";
      type: "bytes";
   }];
   name: "removeApprovalWithSig";
@@ -798,23 +1026,27 @@ const CommentManagerABI: readonly [{
    }, {
      indexed: false;
      internalType: "string";
-     name: "metadata";
-     type: "string";
-   }, {
-     indexed: false;
-     internalType: "string";
      name: "targetUri";
      type: "string";
    }, {
      indexed: false;
-     internalType: "string";
+     internalType: "uint8";
      name: "commentType";
-     type: "string";
+     type: "uint8";
    }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
      indexed: false;
-     internalType: "string";
-     name: "hookData";
-     type: "string";
+     internalType: "struct Comments.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
   }];
   name: "CommentAdded";
   type: "event";
@@ -883,23 +1115,27 @@ const CommentManagerABI: readonly [{
    }, {
      indexed: false;
      internalType: "string";
-     name: "metadata";
-     type: "string";
-   }, {
-     indexed: false;
-     internalType: "string";
      name: "targetUri";
      type: "string";
    }, {
      indexed: false;
-     internalType: "string";
+     internalType: "uint8";
      name: "commentType";
-     type: "string";
+     type: "uint8";
    }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
      indexed: false;
-     internalType: "string";
-     name: "hookData";
-     type: "string";
+     internalType: "struct Comments.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
   }];
   name: "CommentEdited";
   type: "event";
@@ -911,12 +1147,37 @@ const CommentManagerABI: readonly [{
      name: "commentId";
      type: "bytes32";
    }, {
+     indexed: true;
+     internalType: "bytes32";
+     name: "key";
+     type: "bytes32";
+   }, {
      indexed: false;
-     internalType: "string";
-     name: "hookData";
-     type: "string";
+     internalType: "bytes";
+     name: "value";
+     type: "bytes";
   }];
-  name: "CommentHookDataUpdated";
+  name: "CommentHookMetadataSet";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+   }, {
+     indexed: true;
+     internalType: "bytes32";
+     name: "key";
+     type: "bytes32";
+   }, {
+     indexed: false;
+     internalType: "bytes";
+     name: "value";
+     type: "bytes";
+  }];
+  name: "CommentMetadataSet";
   type: "event";
 }, {
   anonymous: false;

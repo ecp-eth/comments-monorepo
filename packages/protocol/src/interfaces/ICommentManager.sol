@@ -16,10 +16,9 @@ interface ICommentManager {
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param createdAt The timestamp when the comment was created
   /// @param content The text content of the comment - may contain urls, images and mentions
-  /// @param metadata Additional JSON data that shouldn't be displayed to the user
   /// @param targetUri the URI about which the comment is being made
-  /// @param commentType The type of the comment (e.g. "comment", "like", etc.)
-  /// @param hookData Additional data for the comment, added by a hook.
+  /// @param commentType The type of the comment (0=comment, 1=reaction)
+  /// @param metadata Array of key-value pairs for additional data
   event CommentAdded(
     bytes32 indexed commentId,
     address indexed author,
@@ -28,10 +27,29 @@ interface ICommentManager {
     bytes32 parentId,
     uint96 createdAt,
     string content,
-    string metadata,
     string targetUri,
-    string commentType,
-    string hookData
+    uint8 commentType,
+    Comments.MetadataEntry[] metadata
+  );
+
+  /// @notice Emitted when metadata is set for a comment
+  /// @param commentId Unique identifier of the comment
+  /// @param key The metadata key
+  /// @param value The metadata value
+  event CommentMetadataSet(
+    bytes32 indexed commentId,
+    bytes32 indexed key,
+    bytes value
+  );
+
+  /// @notice Emitted when hook metadata is set for a comment
+  /// @param commentId Unique identifier of the comment
+  /// @param key The hook metadata key
+  /// @param value The hook metadata value
+  event CommentHookMetadataSet(
+    bytes32 indexed commentId,
+    bytes32 indexed key,
+    bytes value
   );
 
   /// @notice Emitted when a comment is deleted
@@ -49,8 +67,8 @@ interface ICommentManager {
   /// @param createdAt The timestamp when the comment was created
   /// @param updatedAt The timestamp when the comment was last updated
   /// @param content The text content of the comment - may contain urls, images and mentions
-  /// @param metadata Additional JSON data that shouldn't be displayed to the user
   /// @param targetUri the URI about which the comment is being made
+  /// @param commentType The type of the comment (0=comment, 1=reaction)
   event CommentEdited(
     bytes32 indexed commentId,
     address indexed editedByApp,
@@ -61,16 +79,10 @@ interface ICommentManager {
     uint96 createdAt,
     uint96 updatedAt,
     string content,
-    string metadata,
     string targetUri,
-    string commentType,
-    string hookData
+    uint8 commentType,
+    Comments.MetadataEntry[] metadata
   );
-
-  /// @notice Emitted when a comment's hook data is updated
-  /// @param commentId Unique identifier of the comment
-  /// @param hookData The new hook data
-  event CommentHookDataUpdated(bytes32 indexed commentId, string hookData);
 
   /// @notice Emitted when an author approves an app signer
   /// @param author Address of the author giving approval
@@ -268,10 +280,56 @@ interface ICommentManager {
 
   /// @notice Get a comment by its ID
   /// @param commentId The ID of the comment to get
-  /// @return The comment data
+  /// @return The comment data (returns empty struct with zero address author if comment doesn't exist)
   function getComment(
     bytes32 commentId
   ) external view returns (Comments.Comment memory);
+
+  /// @notice Get metadata for a comment
+  /// @param commentId The ID of the comment
+  /// @return The metadata entries for the comment
+  function getCommentMetadata(
+    bytes32 commentId
+  ) external view returns (Comments.MetadataEntry[] memory);
+
+  /// @notice Get hook metadata for a comment
+  /// @param commentId The ID of the comment
+  /// @return The hook metadata entries for the comment
+  function getCommentHookMetadata(
+    bytes32 commentId
+  ) external view returns (Comments.MetadataEntry[] memory);
+
+  /// @notice Get a specific metadata value for a comment
+  /// @param commentId The ID of the comment
+  /// @param key The metadata key
+  /// @return The metadata value
+  function getCommentMetadataValue(
+    bytes32 commentId,
+    bytes32 key
+  ) external view returns (bytes memory);
+
+  /// @notice Get a specific hook metadata value for a comment
+  /// @param commentId The ID of the comment
+  /// @param key The hook metadata key
+  /// @return The hook metadata value
+  function getCommentHookMetadataValue(
+    bytes32 commentId,
+    bytes32 key
+  ) external view returns (bytes memory);
+
+  /// @notice Get all metadata keys for a comment
+  /// @param commentId The ID of the comment
+  /// @return The metadata keys for the comment
+  function getCommentMetadataKeys(
+    bytes32 commentId
+  ) external view returns (bytes32[] memory);
+
+  /// @notice Get all hook metadata keys for a comment
+  /// @param commentId The ID of the comment
+  /// @return The hook metadata keys for the comment
+  function getCommentHookMetadataKeys(
+    bytes32 commentId
+  ) external view returns (bytes32[] memory);
 
   /// @notice Get the approval status for an author and app
   /// @param author The address of the author

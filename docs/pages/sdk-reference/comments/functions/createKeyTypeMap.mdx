@@ -1,0 +1,39 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / createKeyTypeMap
+
+# Function: createKeyTypeMap()
+
+```ts
+function createKeyTypeMap(knownKeys): Record<Hex, {
+  key: string;
+  type: MetadataType;
+}>;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:311](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L311)
+
+Helper function to create a key-type mapping for known metadata keys
+This should be maintained by applications to properly convert from contract format
+
+## Parameters
+
+### knownKeys
+
+\{
+  `key`: `string`;
+  `type`: [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx);
+\}[]
+
+Array of known key-type pairs
+
+## Returns
+
+`Record`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx), \{
+  `key`: `string`;
+  `type`: [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx);
+\}\>
+
+Mapping from hashed key to original key and type

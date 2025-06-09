@@ -101,12 +101,5 @@ Checks if a channel exists
 
 
 
-### `getChannelOwner(uint256 channelId) → address` (external)
-
-Gets the owner of a channel
-
-
-
-
 
 

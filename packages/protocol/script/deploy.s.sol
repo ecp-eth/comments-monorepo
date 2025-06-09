@@ -94,6 +94,54 @@ contract DeployScript is Script {
       // Set contract owners
       channelManager.transferOwnership(ownerAddress);
       comments.transferOwnership(ownerAddress);
+
+      if (env == Env.Prod) {
+        string memory chainId = vm.envOr("CHAIN_ID", string("1"));
+        string memory etherscanApiKey = vm.envOr(
+          "ETHERSCAN_API_KEY",
+          string("")
+        );
+        string memory verifierUrl = vm.envOr("VERIFIER_URL", string(""));
+
+        // Verify contracts
+        string[] memory channelManagerCmd = new string[](3);
+        channelManagerCmd[0] = "forge";
+        channelManagerCmd[1] = "verify-contract";
+        channelManagerCmd[2] = string.concat(
+          vm.toString(address(channelManager)),
+          " src/ChannelManager.sol:ChannelManager --chain-id ",
+          chainId,
+          " --etherscan-api-key ",
+          etherscanApiKey,
+          " --verifier-url ",
+          verifierUrl,
+          ' --constructor-args $(cast abi-encode "constructor(address)" ',
+          vm.toString(deployerAddress),
+          ")"
+        );
+
+        string[] memory commentManagerCmd = new string[](3);
+        commentManagerCmd[0] = "forge";
+        commentManagerCmd[1] = "verify-contract";
+        commentManagerCmd[2] = string.concat(
+          vm.toString(address(comments)),
+          " src/CommentManager.sol:CommentManager --chain-id ",
+          chainId,
+          " --etherscan-api-key ",
+          etherscanApiKey,
+          " --verifier-url ",
+          verifierUrl,
+          ' --constructor-args $(cast abi-encode "constructor(address)" ',
+          vm.toString(deployerAddress),
+          ")"
+        );
+
+        vm.ffi(channelManagerCmd);
+        console.log("ChannelManager verified successfully");
+
+        vm.ffi(commentManagerCmd);
+        console.log("CommentManager verified successfully");
+      }
     }
 
     console.log("ChannelManager deployed at", address(channelManager));

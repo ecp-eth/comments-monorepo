@@ -59,8 +59,8 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.deleteComment(commentId);
 
     // Verify comment is deleted
-    vm.expectRevert(ICommentManager.CommentDoesNotExist.selector);
-    comments.getComment(commentId);
+    Comments.Comment memory deletedComment = comments.getComment(commentId);
+    assertEq(deletedComment.author, address(0));
   }
 
   function test_DeleteComment_AsNonAuthor() public {
@@ -371,7 +371,7 @@ contract CommentsTest is Test, IERC721Receiver {
     bytes32 nonExistentId = bytes32(uint256(1));
 
     vm.prank(author);
-    vm.expectRevert("Comment does not exist");
+    vm.expectRevert(ICommentManager.CommentDoesNotExist.selector);
     comments.deleteComment(nonExistentId);
   }
 

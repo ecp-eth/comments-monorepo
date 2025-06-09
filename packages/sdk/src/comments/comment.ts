@@ -39,6 +39,8 @@ import type {
   WriteContractHelperResult,
 } from "../core/types.js";
 import { createWaitableWriteContractHelper } from "../core/utils.js";
+import { createMetadataEntries, type MetadataType } from "./metadata.js";
+import type { MetadataEntry } from "./types.js";
 
 export type PostCommentParams = {
   /**
@@ -82,7 +84,6 @@ const PostCommentParamsSchema = z.object({
 /**
  * Posts a comment as an author
  *
- * @param params - The parameters for posting a comment as an author
  * @returns The transaction hash
  */
 export const postComment = createWaitableWriteContractHelper(
@@ -155,7 +156,6 @@ const PostCommentWithSigParamsSchema = z.object({
 /**
  * Posts a comment with author signature verification
  *
- * @param params - The parameters for posting a comment
  * @returns The transaction hash
  */
 export const postCommentWithSig = createWaitableWriteContractHelper(
@@ -294,7 +294,6 @@ const DeleteCommentParamsSchema = z.object({
 /**
  * Delete a comment as an author
  *
- * @param params - The parameters for deleting a comment as an author
  * @returns The transaction hash
  */
 export const deleteComment = createWaitableWriteContractHelper(
@@ -368,7 +367,6 @@ const DeleteCommentWithSigParamsSchema = z.object({
 /**
  * Delete a comment with app signature verification
  *
- * @param params - The parameters for deleting a comment
  * @returns The transaction hash
  */
 export const deleteCommentWithSig = createWaitableWriteContractHelper(
@@ -555,7 +553,7 @@ export function createCommentTypedData(
  */
 export function createCommentData({
   content,
-  metadata,
+  metadata = [],
   author,
   app,
   deadline,
@@ -563,17 +561,27 @@ export function createCommentData({
   commentType = DEFAULT_COMMENT_TYPE,
   ...params
 }: CreateCommentDataParams): CommentInputData {
-  return CommentInputDataSchema.parse({
+  const parentIdOrTargetUri =
+    "targetUri" in params
+      ? {
+          targetUri: params.targetUri,
+          parentId: EMPTY_PARENT_ID,
+        }
+      : {
+          targetUri: "",
+          parentId: params.parentId,
+        };
+
+  return {
     content,
-    metadata: metadata ? JSON.stringify(metadata) : "",
-    targetUri: "parentId" in params ? "" : params.targetUri,
-    parentId: "parentId" in params ? params.parentId : EMPTY_PARENT_ID,
+    metadata,
+    commentType,
     author,
     app,
     channelId,
-    commentType,
-    deadline: deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day
-  });
+    deadline: deadline ?? BigInt(Date.now() + 24 * 60 * 60 * 1000),
+    ...parentIdOrTargetUri,
+  };
 }
 
 export type CreateDeleteCommentTypedDataParams = {
@@ -713,24 +721,15 @@ export type BaseEditCommentDataParams = {
   deadline?: bigint;
 };
 
-export type EditCommentDataParamsWithMetadataRaw = BaseEditCommentDataParams & {
-  /**
-   * The metadata of the comment as a raw string (already json serialized)
-   */
-  metadataRaw: string;
-};
-
-export type EditCommentDataParamsWithMetadataObject =
+export type EditCommentDataParamsWithMetadataEntries =
   BaseEditCommentDataParams & {
     /**
-     * The metadata of the comment as an object
+     * The metadata of the comment as MetadataEntry array (new format)
      */
-    metadataObject: object;
+    metadata: MetadataEntry[];
   };
 
-export type EditCommentDataParams =
-  | EditCommentDataParamsWithMetadataRaw
-  | EditCommentDataParamsWithMetadataObject;
+export type EditCommentDataParams = EditCommentDataParamsWithMetadataEntries;
 
 /**
  * Create the data structure of a comment for editing
@@ -739,15 +738,23 @@ export type EditCommentDataParams =
 export function createEditCommentData(
   params: EditCommentDataParams,
 ): EditCommentData {
-  return EditCommentDataSchema.parse({
-    ...params,
-    metadata:
-      "metadataRaw" in params
-        ? params.metadataRaw
-        : JSON.stringify(params.metadataObject),
+  let metadata: MetadataEntry[];
+
+  if ("metadata" in params) {
+    metadata = params.metadata;
+  } else {
+    metadata = [];
+  }
+
+  return {
+    commentId: params.commentId,
+    content: params.content,
+    metadata,
+    app: params.app,
+    nonce: params.nonce,
     deadline:
-      params.deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
-  });
+      params.deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24),
+  };
 }
 
 export type CreateEditCommentTypedDataParams = {
@@ -848,7 +855,6 @@ export type EditCommentResult = WaitableWriteContractHelperResult<
 /**
  * Edit a comment as an author
  *
- * @param params - The parameters for editing a comment as an author
  * @returns The transaction hash
  */
 export const editComment = createWaitableWriteContractHelper(
@@ -921,7 +927,6 @@ export type EditCommentWithSigResult = WaitableWriteContractHelperResult<
 /**
  * Edit a comment
  *
- * @param params - The parameters for editing a comment
  * @returns The transaction hash
  */
 export const editCommentWithSig = createWaitableWriteContractHelper(

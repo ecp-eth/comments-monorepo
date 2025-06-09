@@ -24,10 +24,9 @@ contract CommentsTest is Test, IERC721Receiver {
     bytes32 parentId,
     uint96 createdAt,
     string content,
-    string metadata,
     string targetUri,
-    string commentType,
-    string hookData
+    uint8 commentType,
+    Comments.MetadataEntry[] metadata
   );
 
   CommentManager public comments;
@@ -261,10 +260,9 @@ contract CommentsTest is Test, IERC721Receiver {
       commentData.parentId,
       uint96(block.timestamp),
       commentData.content,
-      commentData.metadata,
       commentData.targetUri,
       commentData.commentType,
-      ""
+      new Comments.MetadataEntry[](0)
     );
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
@@ -283,9 +281,10 @@ contract CommentsTest is Test, IERC721Receiver {
 contract MaliciousFeeCollector is BaseHook {
   function _onCommentAdd(
     Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal pure override returns (string memory) {
+  ) internal pure override returns (Comments.MetadataEntry[] memory) {
     revert("Malicious revert");
   }
 

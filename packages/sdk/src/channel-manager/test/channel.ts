@@ -15,7 +15,7 @@ import {
   getChannel,
   channelExists,
   getChannelCreationFee,
-  getChannelOwner,
+  ownerOf,
   updateChannel,
   setChannelCreationFee,
   withdrawFees,
@@ -203,7 +203,7 @@ describe("channel", () => {
     });
   });
 
-  describe("getChannelOwner()", () => {
+  describe("ownerOf()", () => {
     let channelId: bigint;
 
     beforeEach(async () => {
@@ -232,7 +232,7 @@ describe("channel", () => {
     });
 
     it("default channel", async () => {
-      const owner = await getChannelOwner({
+      const owner = await ownerOf({
         channelId,
         readContract: client.readContract,
         channelManagerAddress,

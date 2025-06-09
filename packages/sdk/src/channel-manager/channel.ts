@@ -62,7 +62,6 @@ const CreateChannelParamsSchema = z.object({
 /**
  * Create a new channel
  *
- * @param params - The parameters for creating a new channel
  * @returns The transaction hash of the created channel
  */
 export const createChannel = createWaitableWriteContractHelper(
@@ -187,7 +186,6 @@ const UpdateChannelParamsSchema = z.object({
 /**
  * Update a channel
  *
- * @param params - The parameters for updating a channel
  * @returns The transaction hash of the updated channel
  */
 export const updateChannel = createWaitableWriteContractHelper(
@@ -253,7 +251,7 @@ export async function channelExists(
   return exists;
 }
 
-export type GetChannelOwnerParams = {
+export type OwnerOfParams = {
   /**
    * The ID of the channel to get the owner of
    */
@@ -264,14 +262,14 @@ export type GetChannelOwnerParams = {
    * @default CHANNEL_MANAGER_ADDRESS
    */
   channelManagerAddress?: Hex;
-  readContract: ContractReadFunctions["getChannelOwner"];
+  readContract: ContractReadFunctions["ownerOf"];
 };
 
-export type GetChannelOwnerResult = {
+export type OwnerOfResult = {
   owner: Hex;
 };
 
-const GetChannelOwnerParamsSchema = z.object({
+const OwnerOfParamsSchema = z.object({
   channelId: z.bigint(),
   channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
 });
@@ -282,16 +280,14 @@ const GetChannelOwnerParamsSchema = z.object({
  * @param params - The parameters for getting the owner of a channel
  * @returns The owner of the channel
  */
-export async function getChannelOwner(
-  params: GetChannelOwnerParams,
-): Promise<GetChannelOwnerResult> {
+export async function ownerOf(params: OwnerOfParams): Promise<OwnerOfResult> {
   const { channelId, channelManagerAddress } =
-    GetChannelOwnerParamsSchema.parse(params);
+    OwnerOfParamsSchema.parse(params);
 
   const owner = await params.readContract({
     address: channelManagerAddress,
     abi: ChannelManagerABI,
-    functionName: "getChannelOwner",
+    functionName: "ownerOf",
     args: [channelId],
   });
 

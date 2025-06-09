@@ -6,7 +6,7 @@ The contracts are currently only deployed on the Monad testnet as we decide wher
 
 - **Contract Address:** `%COMMENT_MANAGER_ADDRESS`
 - **Networks:**
-  - [Monad testnet](https://monad-testnet.socialscan.io/address/%COMMENT_MANAGER_ADDRESS)
+  - [Base Sepolia](https://sepolia.basescan.org/address/%COMMENT_MANAGER_ADDRESS)
 - **Contract ABI:** [View ABI Documentation](/protocol-reference/CommentManager)
 
 ### Comment Manager Contract Functions
@@ -39,7 +39,7 @@ For detailed information about all functions, events, and structs, please refer 
 | `getChannel`             | Retrieves channel information including name, description, metadata, and hook address |                                          |
 | `executeHook`            | Executes channel hooks for comment operations                                         | Normally called by the Comments contract |
 | `channelExists`          | Checks if a channel ID exists                                                         |                                          |
-| `getChannelOwner`        | Gets the owner address of a channel                                                   |                                          |
+| `ownerOf`                | Gets the owner address of a channel                                                   |                                          |
 | `updateCommentsContract` | Updates the address of the Comments contract                                          | Only callable by contract owner          |
 | `setBaseURI`             | Sets the base URI for token metadata                                                  | Only callable by contract owner          |
 

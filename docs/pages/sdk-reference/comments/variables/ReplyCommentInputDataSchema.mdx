@@ -11,11 +11,19 @@ const ReplyCommentInputDataSchema: ZodObject<Omit<{
   app: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
   author: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
   channelId: ZodDefault<ZodBigInt>;
-  commentType: ZodDefault<ZodString>;
+  commentType: ZodDefault<ZodNumber>;
   content: ZodString;
   deadline: ZodBigInt;
-  hookData: ZodDefault<ZodString>;
-  metadata: ZodEffects<ZodString, string, string>;
+  metadata: ZodDefault<ZodArray<ZodObject<{
+     key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     value: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+   }, "strip", ZodTypeAny, {
+     key: `0x${string}`;
+     value: `0x${string}`;
+   }, {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }>, "many">>;
   parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
   targetUri: ZodString;
 }, "targetUri"> & {
@@ -24,25 +32,29 @@ const ReplyCommentInputDataSchema: ZodObject<Omit<{
   app: `0x${string}`;
   author: `0x${string}`;
   channelId: bigint;
-  commentType: string;
+  commentType: number;
   content: string;
   deadline: bigint;
-  hookData: string;
-  metadata: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   parentId: `0x${string}`;
   targetUri: "";
 }, {
   app: `0x${string}`;
   author: `0x${string}`;
   channelId?: bigint;
-  commentType?: string;
+  commentType?: number;
   content: string;
   deadline: bigint;
-  hookData?: string;
-  metadata: string;
+  metadata?: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
   parentId: `0x${string}`;
   targetUri: "";
 }>;
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:117](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L117)
+Defined in: [packages/sdk/src/comments/schemas.ts:98](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L98)

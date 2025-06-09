@@ -98,7 +98,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     string calldata metadata,
     address hook
   ) external payable returns (uint256 channelId) {
-    if (msg.sender == address(0)) revert ZeroAddress();
     collectChannelCreationFee();
 
     // Generate channel ID using the internal function
@@ -164,6 +163,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   /// @param channelId The unique identifier of the channel
   /// @param hook The address of the hook contract
   function _setHook(uint256 channelId, address hook) internal {
+    // Emit events before calling the`onInitialize` hook to ensure the order of events is correct in the case of reentrancy
     emit HookSet(channelId, hook);
     emit HookStatusUpdated(channelId, hook, hook != address(0));
 
@@ -192,17 +192,8 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   }
 
   /// @inheritdoc IChannelManager
-  function channelExists(uint256 channelId) public view returns (bool) {
-    try this.ownerOf(channelId) returns (address) {
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  /// @inheritdoc IChannelManager
-  function getChannelOwner(uint256 channelId) external view returns (address) {
-    return ownerOf(channelId);
+  function channelExists(uint256 channelId) external view returns (bool) {
+    return _channelExists(channelId);
   }
 
   /// @inheritdoc IChannelManager

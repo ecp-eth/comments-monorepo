@@ -24,19 +24,20 @@ import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { InvalidCommentError, RateLimitedError } from "../../core/errors";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { publicEnv } from "@/publicEnv";
+import type { MetadataEntry } from "@ecp.eth/sdk/comments";
 
 type SubmitGaslessCommentVariables =
   | {
       isApproved: boolean;
       content: string;
       targetUri: string;
-      metadata: string;
+      metadata: MetadataEntry[];
     }
   | {
       isApproved: boolean;
       content: string;
       parentId: Hex;
-      metadata: string;
+      metadata: MetadataEntry[];
     };
 
 type SubmitGaslessCommentVariablesInternal =
@@ -44,13 +45,13 @@ type SubmitGaslessCommentVariablesInternal =
       author: Hex;
       content: string;
       targetUri: string;
-      metadata: string;
+      metadata: MetadataEntry[];
     }
   | {
       author: Hex;
       content: string;
       parentId: Hex;
-      metadata: string;
+      metadata: MetadataEntry[];
     };
 
 type PostPriorNotApprovedResult = GaslessPostCommentResponseSchemaType &
@@ -202,14 +203,14 @@ type SubmitGaslessEditCommentVariables = {
   content: string;
   isApproved: boolean;
   commentId: Hex;
-  metadata: string;
+  metadata: MetadataEntry[];
 };
 
 type SubmitGaslessEditCommentVariablesInternal = {
   author: Hex;
   content: string;
   commentId: Hex;
-  metadata: string;
+  metadata: MetadataEntry[];
 };
 
 type EditPriorNotApprovedResult = GaslessEditResponseSchemaType &

@@ -78,9 +78,10 @@ contract SharedFeeHook is BaseHook {
 
   function _onCommentAdd(
     Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal override returns (string memory hookData) {
+  ) internal override returns (Comments.MetadataEntry[] memory) {
     // Calculate protocol fee
     uint256 protocolFee = (feeAmount * PROTOCOL_FEE_PERCENTAGE) / 10000;
     uint256 hookFee = feeAmount - protocolFee;
@@ -99,7 +100,7 @@ contract SharedFeeHook is BaseHook {
     // Distribute fees to recipients
     _distributeFees(hookFee);
 
-    return "";
+    return new Comments.MetadataEntry[](0);
   }
 
   function addRecipient(address _recipient, uint256 _share) external {
@@ -367,9 +368,9 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: "{}",
+      metadata: new Comments.MetadataEntry[](0),
       targetUri: "",
-      commentType: "comment",
+      commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
       app: user2,
       channelId: channelId,

@@ -1,0 +1,33 @@
+# FAQ
+
+## Isn't putting content onchain expensive?
+
+See [Gas Costs](/gas-costs) for more information - blockspace is pretty cheap already, and only getting cheaper.
+
+## There's a protocol fee switch with no timelock on the governance contract. Isn't this a risk of frontrunning transactions with fee changes on short notice?
+
+This is a temporary tradeoff for the simplicity of the ECP contracts. We will publicly announce any fee increases at least 48 hours in advance. We plan to transfer the protocol ownership to a Governor contract that will have appropriate timelocks on protocol settings.
+
+## Is there a way to delete channel?
+
+No, but you can freeze the channel from receiving new comments by sending the channel NFT to the zero address, or setting a hook for the channel that reverts on every hook call.
+
+## Why is there a fee to create a channel?
+
+We want to initially prevent too many low quality channels from being created. We may remove this fee in the future.
+
+## Are your contracts upgradeable?
+
+No, we want to minimize the need for developers to maintain the infrastructure to keep their apps and integrations running.
+
+## Are there ECP profiles? What about other social primitives like follows?
+
+No, that's the role of another protocol. We don't want apps to have to choose between the user experience costs of onboarding users to a new profile and getting the benefits of onchain composability. We recommend using [ENS](https://ens.domains) for profiles, and [EFP](https://efp.app) for follows
+
+## Will ECP be available on my favorite EVM chain?
+
+If there's enough interest from developers we are open to adding support for new chains, please reach out to us.
+
+## Will ECP build an App to compete with my App built on ECP?
+
+We want to avoid misalignment and competition between the ECP protocol team and potential integrators. We may build apps in the future to try to help drive the growth of ECP, but our current approach is to focused on aligning other builders to build on ECP, and avoiding building a traditional social super app.
