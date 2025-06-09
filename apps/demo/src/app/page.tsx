@@ -43,7 +43,7 @@ export default function Home() {
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as Tab)}
         >
-          <TabsList className="mx-auto">
+          <TabsList className="overflow-x-auto justify-start">
             <TabsTrigger value="default">Default</TabsTrigger>
             <TabsTrigger value="gasless">
               Gas Sponsored Transactions
