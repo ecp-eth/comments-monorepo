@@ -55,6 +55,7 @@ echo "${GREEN}🔔🔔🔔 Preparation Completed 🔔🔔🔔${NC}"
 echo ""
 echo "Now please ${YELLOW}👀 review the changes${NC}, then come back here to continue."
 read -p "Reviewed? (y/N)" -n 1 -r
+echo ""
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "${RED}❌ Aborting publish${NC}"
