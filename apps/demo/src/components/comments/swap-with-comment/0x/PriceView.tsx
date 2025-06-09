@@ -197,7 +197,7 @@ export function PriceView({
   return (
     <form>
       <div className="p-4 border border-gray-300 rounded mb-4">
-        <h2 className="font-semibold mb-2">Swap tokens powered by 0x</h2>
+        <h2 className="font-semibold mb-2">Swap tokens</h2>
 
         <Label htmlFor="sell">Sell</Label>
         <section className="mt-4 flex items-start justify-center">
