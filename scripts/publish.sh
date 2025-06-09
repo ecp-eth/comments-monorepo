@@ -1,3 +1,6 @@
+#!/bin/bash
+
+set -e
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -19,6 +22,8 @@ fi
 
 # ensure we are up to date
 git pull
+
+# TODO: ensure main is not ahead of origin/main
 
 COMMIT_HASH=$(git rev-parse --short HEAD)
 RELEASE_BRANCH_NAME="release-${COMMIT_HASH}"
