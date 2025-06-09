@@ -35,12 +35,16 @@
     "overrides": {
       "@hono/zod-openapi>@asteasolutions/zod-to-openapi": "^7.3.0",
       "@react-native-async-storage/async-storage": "^2.1.2",
+      "@walletconnect/core": "~2.21.1",
+      "@walletconnect/sign-client": "~2.21.1",
+      "@walletconnect/universal-provider": "~2.21.1",
       "zod": "~3.24.2",
       "viem": "~2.29.2",
       "use-sync-external-store": "^1.5.0"
     },
     "patchedDependencies": {
-      "@privy-io/server-auth": "patches/@privy-io__server-auth.patch"
+      "@privy-io/server-auth": "patches/@privy-io__server-auth.patch",
+      "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch"
     }
   },
   "lint-staged": {
