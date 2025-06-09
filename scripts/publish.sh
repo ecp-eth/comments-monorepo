@@ -1,3 +1,6 @@
+#!/bin/bash
+
+set -e
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -9,7 +12,7 @@ DRY_RUN=false
 # ensure we are in the root of the repo
 cd $(git rev-parse --show-toplevel)
 # ensure we are on the main branch
-git checkout $(git rev-parse --abbrev-ref HEAD)
+git checkout main
 
 # ensure git workspace is clean
 if [[ -n $(git status -s) ]]; then
@@ -19,6 +22,8 @@ fi
 
 # ensure we are up to date
 git pull
+
+# TODO: ensure main is not ahead of origin/main
 
 COMMIT_HASH=$(git rev-parse --short HEAD)
 RELEASE_BRANCH_NAME="release-${COMMIT_HASH}"
@@ -55,6 +60,7 @@ echo "${GREEN}🔔🔔🔔 Preparation Completed 🔔🔔🔔${NC}"
 echo ""
 echo "Now please ${YELLOW}👀 review the changes${NC}, then come back here to continue."
 read -p "Reviewed? (y/N)" -n 1 -r
+echo
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "${RED}❌ Aborting publish${NC}"
