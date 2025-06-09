@@ -40,7 +40,8 @@
       "use-sync-external-store": "^1.5.0"
     },
     "patchedDependencies": {
-      "@privy-io/server-auth": "patches/@privy-io__server-auth.patch"
+      "@privy-io/server-auth": "patches/@privy-io__server-auth.patch",
+      "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch"
     }
   },
   "lint-staged": {
