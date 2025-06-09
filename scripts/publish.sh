@@ -9,14 +9,11 @@ NC='\033[0m' # No Color
 GIT_REMOTE="origin"
 DRY_RUN=false
 
-# ensure we are in the root of the repo
-cd $(git rev-parse --show-toplevel)
-# ensure we are on the main branch
-git checkout main
+printf "${RED}❌ Git workspace is not clean. Please commit or stash your changes.${NC}"
 
 # ensure git workspace is clean
 if [[ -n $(git status -s) ]]; then
-    echo "${RED}❌ Git workspace is not clean. Please commit or stash your changes.${NC}"
+    printf "${RED}❌ Git workspace is not clean. Please commit or stash your changes.${NC}"
     exit 1
 fi
 
@@ -45,7 +42,7 @@ git add -A && git commit --amend --no-edit
 read -p "Ready to push release branch to ${GIT_REMOTE}? (y/N) " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "${RED}❌ Aborting release branch push${NC}"
+    printf "${RED}❌ Aborting release branch push${NC}"
     exit 1
 fi
 
@@ -56,26 +53,26 @@ fi
 
 
 # publish
-echo "${GREEN}🔔🔔🔔 Preparation Completed 🔔🔔🔔${NC}"
-echo ""
-echo "Now please ${YELLOW}👀 review the changes${NC}, then come back here to continue."
+printf "${GREEN}🔔🔔🔔 Preparation Completed 🔔🔔🔔${NC}"
+printf ""
+printf "Now please ${YELLOW}👀 review the changes${NC}, then come back here to continue."
 read -p "Reviewed? (y/N)" -n 1 -r
 echo
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "${RED}❌ Aborting publish${NC}"
-    echo ""
-    echo "You may want to run the following step manually:"
-    echo ""
-    echo "  1. review the PR changes"
-    echo "  2. run 'pnpm changeset publish' to publish the changes"
-    echo "  3. run 'git push --tags' to push tags"
-    echo ""
-    echo "Or otherwise delete the release branch manually:"
-    echo ""
-    echo "  1. run 'git push ${GIT_REMOTE} :${RELEASE_BRANCH_NAME}' to delete the branch"
-    echo "  2. run 'git branch -D ${RELEASE_BRANCH_NAME}' to delete the branch"
-    echo ""
+    printf "${RED}❌ Aborting publish${NC}"
+    printf ""
+    printf "You may want to run the following step manually:"
+    printf ""
+    printf "  1. review the PR changes"
+    printf "  2. run 'pnpm changeset publish' to publish the changes"
+    printf "  3. run 'git push --tags' to push tags"
+    printf ""
+    printf "Or otherwise delete the release branch manually:"
+    printf ""
+    printf "  1. run 'git push ${GIT_REMOTE} :${RELEASE_BRANCH_NAME}' to delete the branch"
+    printf "  2. run 'git branch -D ${RELEASE_BRANCH_NAME}' to delete the branch"
+    printf ""
     exit 1
 fi
 
@@ -92,4 +89,4 @@ if [[ ! $DRY_RUN == "true" ]]; then
     git push --tags
 fi
 
-echo "${GREEN}🥳🥳🥳 All done! 🥳🥳🥳${NC}"
+printf "${GREEN}🥳🥳🥳 All done! 🥳🥳🥳${NC}"
