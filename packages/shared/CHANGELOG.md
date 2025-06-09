@@ -1,5 +1,19 @@
 # @ecp.eth/shared
 
+## 0.0.8
+
+### Patch Changes
+
+- a7ba513: feat: add truncate text helper
+- a8e67a4: feat: add JSONResponse for typed reponse
+- Updated dependencies [df82ffe]
+- Updated dependencies [3cd058f]
+- Updated dependencies [42ae8ef]
+- Updated dependencies [aba0192]
+- Updated dependencies [4cfae7d]
+- Updated dependencies [1684dfd]
+  - @ecp.eth/sdk@0.0.15
+
 ## 0.0.7
 
 ### Patch Changes
