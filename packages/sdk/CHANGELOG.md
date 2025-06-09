@@ -1,5 +1,16 @@
 # @ecp.eth/sdk
 
+## 0.0.15
+
+### Patch Changes
+
+- df82ffe: feat: support URI() as targetUri
+- 3cd058f: chore: revert back to use nonce for add comment
+- 42ae8ef: feat: add channel, hook and key-value based metadata
+- aba0192: feat: add flat replies mode to comments list api
+- 4cfae7d: feat: support for ecp promotion toggling
+- 1684dfd: feat: add chain id config to embeds
+
 ## 0.0.13
 
 ### Patch Changes
