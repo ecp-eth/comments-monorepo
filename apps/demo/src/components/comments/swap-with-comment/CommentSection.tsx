@@ -99,6 +99,7 @@ export function CommentSection() {
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
+  const isWalletConnected = !!viewer;
   const isEIP7702Supported =
     !!capabilities &&
     (capabilities[chainId]?.atomic?.status === "supported" ||
@@ -108,7 +109,7 @@ export function CommentSection() {
     <CommentActionsProvider value={commentActions}>
       <CommentSectionWrapper>
         <h2 className="text-lg font-semibold mb-4">Comments</h2>
-        {!isEIP7702Supported && (
+        {isWalletConnected && !isEIP7702Supported && (
           <div className="text-red-500">
             Your wallet doesn&apos;t support atomic transactions
           </div>
