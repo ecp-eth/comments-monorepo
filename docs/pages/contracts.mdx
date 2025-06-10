@@ -11,14 +11,18 @@ The contracts are currently only deployed on the Monad testnet as we decide wher
 
 ### Comment Manager Contract Functions
 
-| Function                 | Description                                               | Note                                                           |
-| ------------------------ | --------------------------------------------------------- | -------------------------------------------------------------- |
-| `postCommentAsAuthor`    | Post a comment directly from the author's address         |                                                                |
-| `postComment`            | Post a comment with both author and app signer signatures |                                                                |
-| `deleteCommentAsAuthor`  | Delete a comment when called by the author                | ⚠️ Deleted data may still be traceable or recoverable on-chain |
-| `deleteComment`          | Delete a comment with signature verification              | ⚠️ Deleted data may still be traceable or recoverable on-chain |
-| `addApprovalAsAuthor`    | Approve an app signer directly                            |                                                                |
-| `revokeApprovalAsAuthor` | Remove an app signer approval directly                    |                                                                |
+| Function                | Description                                        | Note                                                           |
+| ----------------------- | -------------------------------------------------- | -------------------------------------------------------------- |
+| `postComment`           | Post a comment with app signature verification     | Requires author to be msg.sender                               |
+| `postCommentWithSig`    | Post a comment with both author and app signatures | Allows posting on behalf of author with signatures             |
+| `editComment`           | Edit a comment with app signature verification     | Requires author to be msg.sender                               |
+| `editCommentWithSig`    | Edit a comment with both author and app signatures | Allows editing on behalf of author with signatures             |
+| `deleteComment`         | Delete a comment when called by the author         | ⚠️ Deleted data may still be traceable or recoverable on-chain |
+| `deleteCommentWithSig`  | Delete a comment with signature verification       | ⚠️ Deleted data may still be traceable or recoverable on-chain |
+| `addApproval`           | Approve an app signer directly                     | Called by the author                                           |
+| `addApprovalWithSig`    | Approve an app signer with signature               | Allows approving on behalf of author with signature            |
+| `revokeApproval`        | Remove an app signer approval directly             | Called by the author                                           |
+| `removeApprovalWithSig` | Remove an app signer approval with signature       | Allows revoking on behalf of author with signature             |
 
 For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/CommentManager).
 
@@ -31,16 +35,15 @@ For detailed information about all functions, events, and structs, please refer 
 
 ### ChannelManager Contract Functions
 
-| Function                 | Description                                                                           | Note                                     |
-| ------------------------ | ------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `createChannel`          | Creates a new channel with specified name, description, metadata, and optional hook   | Requires channel creation fee            |
-| `updateChannel`          | Updates an existing channel's name, description, and metadata                         | Only callable by channel owner           |
-| `setHook`                | Sets or updates a hook contract for a channel                                         | Only callable by channel owner           |
-| `getChannel`             | Retrieves channel information including name, description, metadata, and hook address |                                          |
-| `executeHook`            | Executes channel hooks for comment operations                                         | Normally called by the Comments contract |
-| `channelExists`          | Checks if a channel ID exists                                                         |                                          |
-| `ownerOf`                | Gets the owner address of a channel                                                   |                                          |
-| `updateCommentsContract` | Updates the address of the Comments contract                                          | Only callable by contract owner          |
-| `setBaseURI`             | Sets the base URI for token metadata                                                  | Only callable by contract owner          |
+| Function                 | Description                                                                           | Note                            |
+| ------------------------ | ------------------------------------------------------------------------------------- | ------------------------------- |
+| `createChannel`          | Creates a new channel with specified name, description, metadata, and optional hook   | Requires channel creation fee   |
+| `updateChannel`          | Updates an existing channel's name, description, and metadata                         | Only callable by channel owner  |
+| `setHook`                | Sets or updates a hook contract for a channel                                         | Only callable by channel owner  |
+| `getChannel`             | Retrieves channel information including name, description, metadata, and hook address |                                 |
+| `channelExists`          | Checks if a channel ID exists                                                         |                                 |
+| `updateCommentsContract` | Updates the address of the Comments contract                                          | Only callable by contract owner |
+| `setBaseURI`             | Sets the base URI for token metadata                                                  | Only callable by contract owner |
+| `ownerOf`                | Gets the owner address of a channel                                                   |                                 |
 
 For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/ChannelManager).
