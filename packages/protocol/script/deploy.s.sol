@@ -163,7 +163,7 @@ contract DeployScript is Script {
         );
       } else {
         // Set base uri to the nft-base-uri-server
-        string memory baseUri = "http://localhost:3000/chain/31337/";
+        string memory baseUri = "http://localhost:3007/chain/31337/";
 
         channelManager.setBaseURI(baseUri);
         console.log("ChannelManager baseURI set to", baseUri);
