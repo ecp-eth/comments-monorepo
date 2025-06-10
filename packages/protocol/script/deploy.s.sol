@@ -141,6 +141,11 @@ contract DeployScript is Script {
 
         vm.ffi(commentManagerCmd);
         console.log("CommentManager verified successfully");
+
+        console.log(
+          "\x1b[33m%s\x1b[0m",
+          "Remember to update `packages/sdk/src/embed/schemas/index.ts` to include new chain into SDK."
+        );
       }
     }
 

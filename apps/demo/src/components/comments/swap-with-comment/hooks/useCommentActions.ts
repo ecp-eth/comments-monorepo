@@ -28,7 +28,6 @@ import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { useDeleteComment } from "@ecp.eth/sdk/comments/react";
 import { useCommentActions as useStandardCommentActions } from "../../standard/hooks/useCommentActions";
 import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
-import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import type { QuoteViewState } from "../0x/QuoteView";
 import type { IndexerAPICommentZeroExSwapSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { createMetadataEntry } from "@ecp.eth/sdk/comments/metadata";
