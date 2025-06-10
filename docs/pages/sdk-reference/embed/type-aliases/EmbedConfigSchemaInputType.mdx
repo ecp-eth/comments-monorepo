@@ -8,7 +8,7 @@
 
 ```ts
 type EmbedConfigSchemaInputType = {
-  chainId?: 1 | 31337 | 8453 | 11155111;
+  chainId?: 31337 | 84532;
   disablePromotion?: boolean;
   restrictMaximumContainerWidth?: boolean;
   theme?: {
@@ -1826,7 +1826,7 @@ type EmbedConfigSchemaInputType = {
 };
 ```
 
-Defined in: [packages/sdk/src/embed/schemas/index.ts:244](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L244)
+Defined in: [packages/sdk/src/embed/schemas/index.ts:246](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L246)
 
 Custom configuration for `<CommentEmbed />` component.
 
@@ -1835,7 +1835,7 @@ Custom configuration for `<CommentEmbed />` component.
 ### chainId?
 
 ```ts
-optional chainId: 1 | 31337 | 8453 | 11155111 = EmbedConfigSupportedChainIdsSchema;
+optional chainId: 31337 | 84532 = EmbedConfigSupportedChainIdsSchema;
 ```
 
 The id of the chain to post the comments to.
@@ -1844,7 +1844,7 @@ We don't filter chain id when fetching comments.
 #### Default
 
 ```ts
-8453
+84532
 ```
 
 ### disablePromotion?

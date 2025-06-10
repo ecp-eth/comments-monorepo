@@ -15,7 +15,9 @@ export async function getApprovalStatusAndNonce<
   connectedAddress: Address,
 ): Promise<[{ result: boolean }, { result: bigint }]> {
   return (
-    chain.contracts?.multicall3
+    chain.contracts &&
+    "multicall3" in chain.contracts &&
+    chain.contracts.multicall3
       ? await publicClient.multicall({
           contracts: [
             {

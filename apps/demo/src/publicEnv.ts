@@ -12,6 +12,7 @@ export const publicEnvSchema = z.object({
     .enum(["1", "0"])
     .default("0")
     .transform((val) => val === "1"),
+  NEXT_PUBLIC_PROD_CHAIN_ID: z.coerce.number(),
 });
 
 export const publicEnv = publicEnvSchema.parse({
@@ -23,4 +24,5 @@ export const publicEnv = publicEnvSchema.parse({
     process.env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   NEXT_PUBLIC_COMMENT_AUTHOR_URL: process.env.NEXT_PUBLIC_COMMENT_AUTHOR_URL,
   NEXT_PUBLIC_ENABLE_SWAPPING: process.env.NEXT_PUBLIC_ENABLE_SWAPPING,
+  NEXT_PUBLIC_PROD_CHAIN_ID: process.env.NEXT_PUBLIC_PROD_CHAIN_ID,
 });
