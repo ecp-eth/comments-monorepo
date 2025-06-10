@@ -30,7 +30,8 @@
     "PRIVY_WALLET_ADDRESS",
     "PRIVY_WALLET_ID",
     "RPC_URL_*",
-    "WEBHOOK_SECRET"
+    "WEBHOOK_SECRET",
+    "ALLOWED_CHAIN_IDS"
   ],
   "tasks": {
     "build": {
