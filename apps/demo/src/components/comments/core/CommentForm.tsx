@@ -160,7 +160,7 @@ function BaseCommentForm({
             value="post"
             type="submit"
             className="px-4 py-2 rounded"
-            disabled={isSubmitting || !isContentValid}
+            disabled={isSubmitting}
           >
             {formState === "post" ? submitPendingLabel : submitIdleLabel}
           </Button>

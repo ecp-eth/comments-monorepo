@@ -173,7 +173,7 @@ function BaseCommentForm({
         <Button
           className="ml-auto"
           type="submit"
-          disabled={isSubmitting || !isContentValid}
+          disabled={isSubmitting}
           size="sm"
         >
           {isSubmitting ? submitPendingLabel : submitIdleLabel}
