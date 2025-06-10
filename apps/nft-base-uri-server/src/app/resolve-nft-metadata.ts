@@ -64,7 +64,7 @@ export async function resolveNFTMetadata(
         "This NFT represents ownership of an Ethereum Comments Protocol Channel. Channel owners can customize comment rules, set hooks for gating access, charge fees, and integrate with other protocols. Use this channel to build your on-chain community!",
       image: imageUrl.toString(),
       attributes: [],
-    });
+    } satisfies NFTMetadata);
   } catch (error) {
     console.error("Error resolving NFT metadata:", error);
 
