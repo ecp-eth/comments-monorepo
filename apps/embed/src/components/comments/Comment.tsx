@@ -83,7 +83,7 @@ export function Comment({
                   <MoreVertical className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="apply-theme">
                 <DropdownMenuItem
                   className="cursor-pointer"
                   onClick={onEditClick}
