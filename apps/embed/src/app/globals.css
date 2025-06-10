@@ -79,16 +79,20 @@ body {
   }
 
   .theme-root,
-  .theme-root.light {
+  .theme-root.light,
+  .apply-theme,
+  .apply-theme.light {
     @apply light-theme-values;
   }
 
-  .theme-root.dark {
+  .theme-root.dark,
+  .apply-theme.dark {
     @apply dark-theme-values;
   }
 
   @media (prefers-color-scheme: dark) {
-    .theme-root:not(.light) {
+    .theme-root:not(.light),
+    .apply-theme:not(.light) {
       @apply dark-theme-values;
     }
   }
