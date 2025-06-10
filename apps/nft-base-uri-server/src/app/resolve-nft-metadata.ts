@@ -16,6 +16,8 @@ export const NFTAttributeSchema = z.object({
   max_value: z.number().optional(),
 });
 
+export type NFTAttribute = z.infer<typeof NFTAttributeSchema>;
+
 export const NFTMetadataSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
@@ -58,12 +60,21 @@ export async function resolveNFTMetadata(
 
     const imageUrl = new URL("/nft.png", requestUrl);
 
+    const attributes: NFTAttribute[] = [];
+
+    if (channel.metadata) {
+      attributes.push({
+        trait_type: "Channel Metadata",
+        value: channel.metadata,
+      });
+    }
+
     return Response.json({
       name: "Ethereum Comments Protocol Channel #" + channelId,
       description:
         "This NFT represents ownership of an Ethereum Comments Protocol Channel. Channel owners can customize comment rules, set hooks for gating access, charge fees, and integrate with other protocols. Use this channel to build your on-chain community!",
       image: imageUrl.toString(),
-      attributes: [],
+      attributes,
     } satisfies NFTMetadata);
   } catch (error) {
     console.error("Error resolving NFT metadata:", error);
