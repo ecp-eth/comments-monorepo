@@ -8,6 +8,7 @@
     "build:indexer": "turbo build --filter=./apps/indexer...",
     "dev": "turbo dev --filter=./apps/demo... --filter=./apps/indexer --filter=./packages/protocol --filter=./packages/test-protocol",
     "dev:indexer": "turbo dev --filter=./apps/indexer... --filter=./packages/protocol",
+    "dev:nft-base-uri-server": "turbo dev --filter=./apps/nft-base-uri-server... --filter=./packages/protocol",
     "dev:embed": "turbo dev --filter=./apps/embed... --filter=./apps/embed-demo-blog --filter=./apps/indexer --filter=./packages/protocol",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{js,ts,tsx,sol}\"",
