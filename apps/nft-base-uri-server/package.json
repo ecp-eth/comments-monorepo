@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "check-types": "tsc --noEmit",
-    "dev": "next dev",
+    "dev": "PORT=3007 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
