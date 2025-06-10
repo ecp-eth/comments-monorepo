@@ -15,6 +15,7 @@
     "NEXT_PUBLIC_SENTRY_DSN"
   ],
   "globalPassThroughEnv": [
+    "ALLOWED_CHAIN_IDS",
     "APP_URL",
     "APP_SIGNER_PRIVATE_KEY",
     "CONTRACT_OWNER_ADDRESS",
@@ -28,6 +29,7 @@
     "PRIVY_AUTHORIZATION_KEY",
     "PRIVY_WALLET_ADDRESS",
     "PRIVY_WALLET_ID",
+    "RPC_URL_*",
     "WEBHOOK_SECRET"
   ],
   "tasks": {
