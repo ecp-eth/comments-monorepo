@@ -191,16 +191,18 @@ export type EmbedConfigThemeSchemaType = z.infer<typeof EmbedConfigThemeSchema>;
 export const EmbedConfigSupportedChainIdsSchema = z
   .union([
     // ethereum mainnet
-    z.literal(1),
+    // z.literal(1),
     // base
-    z.literal(8453),
+    // z.literal(8453),
+    // base sepolia
+    z.literal(84532),
     // ethereum sepolia
-    z.literal(11155111),
+    // z.literal(11155111),
     // anvil
     z.literal(31337),
   ])
   .optional()
-  .default(isNodeEnvDev() ? 31337 : 8453);
+  .default(isNodeEnvDev() ? 31337 : 84532);
 
 /**
  * The type for supported chain ids
@@ -221,7 +223,7 @@ export const EmbedConfigSchema = z.object({
    * The id of the chain to post the comments to.
    * We don't filter chain id when fetching comments.
    *
-   * @default 8453
+   * @default 84532
    */
   chainId: EmbedConfigSupportedChainIdsSchema,
   /**
