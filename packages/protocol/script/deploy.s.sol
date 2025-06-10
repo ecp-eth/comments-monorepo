@@ -103,6 +103,21 @@ contract DeployScript is Script {
         );
         string memory verifierUrl = vm.envOr("VERIFIER_URL", string(""));
 
+        // Set base uri to the nft-base-uri-server
+        string memory baseUri = vm.envOr(
+          "NFT_BASE_URI",
+          string("https://nft.ethcomments.xyz")
+        );
+        string memory baseUriWithChainId = string.concat(
+          baseUri,
+          "/chain/",
+          chainId,
+          "/"
+        );
+
+        channelManager.setBaseURI(baseUriWithChainId);
+        console.log("ChannelManager baseURI set to", baseUriWithChainId);
+
         // Verify contracts
         string[] memory channelManagerCmd = new string[](3);
         channelManagerCmd[0] = "forge";
@@ -146,6 +161,12 @@ contract DeployScript is Script {
           "\x1b[33m%s\x1b[0m",
           "Remember to update `packages/sdk/src/embed/schemas/index.ts` to include new chain into SDK."
         );
+      } else {
+        // Set base uri to the nft-base-uri-server
+        string memory baseUri = "http://localhost:3000/chain/31337/";
+
+        channelManager.setBaseURI(baseUri);
+        console.log("ChannelManager baseURI set to", baseUri);
       }
     }
 
