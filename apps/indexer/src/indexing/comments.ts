@@ -153,7 +153,13 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     });
 
     if (!comment) {
-      // Comment might not be indexed yet, skip for now
+      // Ponder should respect the event order, so this should never happen
+      Sentry.captureMessage(
+        `Comment not found while setting hook metadata for commentId: ${event.args.commentId}`,
+        {
+          level: "warning",
+        },
+      );
       return;
     }
 

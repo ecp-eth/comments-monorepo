@@ -39,7 +39,6 @@ import type {
   WriteContractHelperResult,
 } from "../core/types.js";
 import { createWaitableWriteContractHelper } from "../core/utils.js";
-import { createMetadataEntries, type MetadataType } from "./metadata.js";
 import type { MetadataEntry } from "./types.js";
 
 export type PostCommentParams = {
