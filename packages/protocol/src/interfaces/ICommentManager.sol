@@ -181,6 +181,11 @@ interface ICommentManager {
     bytes calldata appSignature
   ) external payable;
 
+  /// @notice Updates hook metadata for an existing comment using merge mode (gas-efficient)
+  /// @dev Only updates provided metadata fields without clearing existing ones
+  /// @param commentId The unique identifier of the comment to update
+  function updateCommentHookData(bytes32 commentId) external;
+
   /// @notice Approves an app signer when called directly by the author
   /// @param app The address to approve
   function addApproval(address app) external;

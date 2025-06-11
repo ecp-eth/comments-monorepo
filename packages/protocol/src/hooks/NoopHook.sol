@@ -29,7 +29,8 @@ contract NoopHook is IHook {
         onCommentAdd: false,
         onCommentDelete: false,
         onCommentEdit: false,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 
@@ -75,5 +76,15 @@ contract NoopHook is IHook {
     Channels.Channel calldata
   ) external pure override returns (bool) {
     return true;
+  }
+
+  function onCommentHookDataUpdate(
+    Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
+    Comments.MetadataEntry[] calldata,
+    address,
+    bytes32
+  ) external pure override returns (Comments.HookMetadataUpdate[] memory) {
+    return new Comments.HookMetadataUpdate[](0);
   }
 }

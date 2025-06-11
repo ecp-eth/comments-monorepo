@@ -73,4 +73,19 @@ interface IHook is IERC165 {
     uint256 channelId,
     Channels.Channel calldata channelData
   ) external returns (bool success);
+
+  /// @notice Execute to update hook data for an existing comment
+  /// @param commentData The comment data to update
+  /// @param metadata The current metadata entries for the comment
+  /// @param hookMetadata The current hook metadata entries for the comment
+  /// @param msgSender The original msg.sender that initiated the transaction
+  /// @param commentId The unique identifier of the comment to update
+  /// @return operations The explicit metadata operations to perform (SET or DELETE)
+  function onCommentHookDataUpdate(
+    Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata metadata,
+    Comments.MetadataEntry[] calldata hookMetadata,
+    address msgSender,
+    bytes32 commentId
+  ) external returns (Comments.HookMetadataUpdate[] memory operations);
 }

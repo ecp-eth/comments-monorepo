@@ -54,7 +54,8 @@ abstract contract BaseHook is IHook, ERC165 {
         onCommentAdd: false,
         onCommentDelete: false,
         onCommentEdit: false,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 
@@ -155,6 +156,34 @@ abstract contract BaseHook is IHook, ERC165 {
     uint256,
     Channels.Channel calldata
   ) internal virtual returns (bool) {
+    revert HookNotImplemented();
+  }
+
+  /// @inheritdoc IHook
+  function onCommentHookDataUpdate(
+    Comments.Comment calldata commentData,
+    Comments.MetadataEntry[] calldata metadata,
+    Comments.MetadataEntry[] calldata hookMetadata,
+    address msgSender,
+    bytes32 commentId
+  ) external virtual returns (Comments.HookMetadataUpdate[] memory) {
+    return
+      _onCommentHookDataUpdate(
+        commentData,
+        metadata,
+        hookMetadata,
+        msgSender,
+        commentId
+      );
+  }
+
+  function _onCommentHookDataUpdate(
+    Comments.Comment calldata,
+    Comments.MetadataEntry[] calldata,
+    Comments.MetadataEntry[] calldata,
+    address,
+    bytes32
+  ) internal virtual returns (Comments.HookMetadataUpdate[] memory) {
     revert HookNotImplemented();
   }
 }

@@ -13,6 +13,7 @@
 [`onCommentEdit`](/protocol-reference/interfaces/IHook#onCommentEdit) - Called when a comment is edited
 [`onCommentDelete`](/protocol-reference/interfaces/IHook#onCommentDelete) - Called when a comment is deleted
 [`onChannelUpdate`](/protocol-reference/interfaces/IHook#onChannelUpdate) - Called when a channel is updated
+[`onCommentHookDataUpdate`](/protocol-reference/interfaces/IHook#onCommentHookDataUpdate) - Called when hook metadata is updated for an existing comment
 
 See [IHook](/protocol-reference/interfaces/IHook) or [BaseHook](/protocol-reference/hooks/BaseHook)
 
@@ -24,6 +25,53 @@ See [IHook](/protocol-reference/interfaces/IHook) or [BaseHook](/protocol-refere
 
 ```solidity
 channelManager.setHook(channelId, hookAddress);
+```
+
+### Updating Hook Metadata
+
+The `updateCommentHookData` function allows you to trigger a hook to update its metadata for an existing comment. This is useful for scenarios where hook metadata needs to be refreshed based on external conditions or time-based changes.
+
+```solidity
+// Trigger hook metadata update for a specific comment
+commentManager.updateCommentHookData(commentId);
+```
+
+**Key Features:**
+
+- **Gas Efficient**: Only updates specified metadata fields using SET and DELETE operations
+- **Explicit Operations**: Hooks return precise operations instead of replacing all metadata
+- **Non-Payable**: No ETH required for metadata updates
+- **Permission-Based**: Only works if the channel's hook has `onCommentHookDataUpdate: true`
+
+**Hook Implementation Example:**
+
+```solidity
+function _onCommentHookDataUpdate(
+  Comments.Comment calldata commentData,
+  Comments.MetadataEntry[] calldata metadata,
+  Comments.MetadataEntry[] calldata hookMetadata,
+  address msgSender,
+  bytes32 commentId
+) internal override returns (Comments.HookMetadataUpdate[] memory) {
+  Comments.HookMetadataUpdate[]
+    memory operations = new Comments.HookMetadataUpdate[](2);
+
+  // Update an existing field
+  operations[0] = Comments.HookMetadataUpdate({
+    operation: Comments.MetadataOperation.SET,
+    key: keccak256("score"),
+    value: abi.encode(calculateNewScore(commentData))
+  });
+
+  // Delete a field
+  operations[1] = Comments.HookMetadataUpdate({
+    operation: Comments.MetadataOperation.DELETE,
+    key: keccak256("temp_data"),
+    value: "" // Ignored for DELETE operations
+  });
+
+  return operations;
+}
 ```
 
 ## Writing Your Own Hooks
@@ -58,7 +106,8 @@ contract MyCustomHook is BaseHook {
         onCommentAdd: true, // Enable comment addition hook
         onCommentEdit: false, // Disable comment editing hook
         onCommentDelete: false, // Disable comment deletion hook
-        onChannelUpdate: false // Disable channel update hook
+        onChannelUpdate: false, // Disable channel update hook
+        onCommentHookDataUpdate: false // Disable comment hook update hook
       });
   }
 

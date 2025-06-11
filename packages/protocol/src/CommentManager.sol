@@ -880,6 +880,120 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     _;
   }
 
+  /// @inheritdoc ICommentManager
+  function updateCommentHookData(
+    bytes32 commentId
+  ) external commentExists(commentId) {
+    _updateCommentHookData(commentId);
+  }
+
+  /// @notice Internal function to update hook metadata using merge mode for gas efficiency
+  /// @param commentId The unique identifier of the comment to update
+  function _updateCommentHookData(bytes32 commentId) internal {
+    Comments.Comment storage comment = comments[commentId];
+
+    Channels.Channel memory channel = channelManager.getChannel(
+      comment.channelId
+    );
+    if (
+      channel.hook == address(0) || !channel.permissions.onCommentHookDataUpdate
+    ) {
+      revert HookNotEnabled();
+    }
+
+    // Get current metadata for hook
+    Comments.MetadataEntry[] memory metadata = _getCommentMetadataInternal(
+      commentId
+    );
+    Comments.MetadataEntry[]
+      memory hookMetadata = _getCommentHookMetadataInternal(commentId);
+
+    IHook hook = IHook(channel.hook);
+
+    Comments.HookMetadataUpdate[] memory operations = hook
+      .onCommentHookDataUpdate(
+        comment,
+        metadata,
+        hookMetadata,
+        msg.sender,
+        commentId
+      );
+
+    // Apply hook metadata operations using merge mode (gas-efficient)
+    _applyHookMetadataOperations(commentId, operations);
+  }
+
+  /// @notice Internal function to apply hook metadata operations efficiently
+  /// @param commentId The unique identifier of the comment
+  /// @param operations The metadata operations to apply
+  function _applyHookMetadataOperations(
+    bytes32 commentId,
+    Comments.HookMetadataUpdate[] memory operations
+  ) internal {
+    for (uint i = 0; i < operations.length; i++) {
+      Comments.HookMetadataUpdate memory op = operations[i];
+
+      if (op.operation == Comments.MetadataOperation.DELETE) {
+        _deleteCommentHookMetadataKey(commentId, op.key);
+        emit CommentHookMetadataSet(commentId, op.key, ""); // Emit empty value for deletion
+      } else if (op.operation == Comments.MetadataOperation.SET) {
+        // Check if this is a new key for gas optimization
+        bool isNewKey = !_hookMetadataKeyExists(commentId, op.key);
+
+        commentHookMetadata[commentId][op.key] = op.value;
+
+        // Only add to keys array if it's a new key
+        if (isNewKey) {
+          commentHookMetadataKeys[commentId].push(op.key);
+        }
+
+        emit CommentHookMetadataSet(commentId, op.key, op.value);
+      }
+    }
+  }
+
+  /// @notice Internal function to delete a specific hook metadata key
+  /// @param commentId The unique identifier of the comment
+  /// @param keyToDelete The key to delete
+  function _deleteCommentHookMetadataKey(
+    bytes32 commentId,
+    bytes32 keyToDelete
+  ) internal {
+    // Delete the value
+    delete commentHookMetadata[commentId][keyToDelete];
+
+    // Remove from keys array
+    bytes32[] storage keys = commentHookMetadataKeys[commentId];
+    for (uint i = 0; i < keys.length; i++) {
+      if (keys[i] == keyToDelete) {
+        // Move last element to current position and pop
+        keys[i] = keys[keys.length - 1];
+        keys.pop();
+        break;
+      }
+    }
+  }
+
+  /// @notice Internal function to check if a hook metadata key exists
+  /// @param commentId The unique identifier of the comment
+  /// @param targetKey The key to check for existence
+  /// @return exists Whether the key exists in the metadata
+  function _hookMetadataKeyExists(
+    bytes32 commentId,
+    bytes32 targetKey
+  ) internal view returns (bool exists) {
+    bytes32[] storage keys = commentHookMetadataKeys[commentId];
+    for (uint i = 0; i < keys.length; i++) {
+      if (keys[i] == targetKey) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// @notice Error thrown when hook is not enabled for the operation
+  error HookNotEnabled();
+
   /// @notice Internal function to add an app signer approval
   /// @param author The address granting approval
   /// @param app The address being approved

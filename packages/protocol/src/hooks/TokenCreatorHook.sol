@@ -118,9 +118,10 @@ contract TokenCreatorHook is BaseHook {
       Hooks.Permissions({
         onInitialize: true,
         onCommentAdd: true,
-        onCommentEdit: false,
         onCommentDelete: false,
-        onChannelUpdate: false
+        onCommentEdit: false,
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 

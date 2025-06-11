@@ -26,7 +26,8 @@ contract NoHook is BaseHook {
         onCommentAdd: false,
         onCommentDelete: false,
         onCommentEdit: false,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 }
@@ -549,11 +550,12 @@ contract MaliciousFeeCollector is BaseHook {
   {
     return
       Hooks.Permissions({
+        onInitialize: false,
         onCommentAdd: true,
         onCommentDelete: false,
-        onInitialize: false,
         onCommentEdit: false,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 }

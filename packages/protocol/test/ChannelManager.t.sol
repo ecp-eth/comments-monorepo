@@ -35,7 +35,8 @@ contract RejectChannelUpdateHook is BaseHook {
         onCommentAdd: false,
         onCommentDelete: false,
         onCommentEdit: false,
-        onChannelUpdate: true
+        onChannelUpdate: true,
+        onCommentHookDataUpdate: false
       });
   }
 

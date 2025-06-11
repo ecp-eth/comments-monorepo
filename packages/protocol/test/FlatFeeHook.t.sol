@@ -43,7 +43,8 @@ contract FlatFeeHook is BaseHook {
         onCommentAdd: true,
         onCommentDelete: false,
         onCommentEdit: false,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 

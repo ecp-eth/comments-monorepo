@@ -413,7 +413,8 @@ contract MockHook is BaseHook {
         onCommentAdd: true,
         onCommentDelete: false,
         onCommentEdit: false,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 
@@ -447,7 +448,8 @@ contract AlwaysReturningDataHook is BaseHook {
         onCommentAdd: true,
         onCommentDelete: false,
         onCommentEdit: true,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 

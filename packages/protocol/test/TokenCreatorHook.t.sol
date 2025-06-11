@@ -299,7 +299,8 @@ contract TokenCreatorHookTest is Test {
           onCommentAdd: false,
           onCommentEdit: false,
           onCommentDelete: false,
-          onChannelUpdate: false
+          onChannelUpdate: false,
+          onCommentHookDataUpdate: false
         })
       });
   }

@@ -810,7 +810,8 @@ contract RejectEditHook is BaseHook {
         onCommentAdd: false,
         onCommentDelete: false,
         onCommentEdit: true,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 

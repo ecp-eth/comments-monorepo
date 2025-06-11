@@ -72,7 +72,8 @@ contract SharedFeeHook is BaseHook {
         onCommentDelete: false,
         onCommentEdit: false,
         onInitialize: false,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 

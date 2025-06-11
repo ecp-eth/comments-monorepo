@@ -18,6 +18,22 @@ library Comments {
     bytes value;
   }
 
+  /// @notice Enum for metadata operations in hook updates
+  enum MetadataOperation {
+    SET, // Set or update the metadata value
+    DELETE // Delete the metadata key
+  }
+
+  /// @notice Struct for hook metadata operations with explicit operation type
+  /// @param operation The operation to perform (SET or DELETE)
+  /// @param key The metadata key
+  /// @param value The metadata value (ignored for DELETE operations)
+  struct HookMetadataUpdate {
+    MetadataOperation operation;
+    bytes32 key;
+    bytes value;
+  }
+
   /// @notice Struct containing all comment data
   /// @param author The address of the comment author
   /// @param createdAt The timestamp when the comment was created
