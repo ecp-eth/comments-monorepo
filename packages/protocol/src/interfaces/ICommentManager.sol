@@ -126,20 +126,22 @@ interface ICommentManager {
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata
   /// @param appSignature Signature from the app signer authorizing the comment
+  /// @return commentId The unique identifier of the created comment
   function postComment(
     Comments.CreateComment calldata commentData,
     bytes calldata appSignature
-  ) external payable;
+  ) external payable returns (bytes32 commentId);
 
   /// @notice Posts a comment with both author and app signer signatures
   /// @param commentData The comment data struct containing content and metadata
   /// @param authorSignature Signature from the author authorizing the comment
   /// @param appSignature Signature from the app signer authorizing the comment
+  /// @return commentId The unique identifier of the created comment
   function postCommentWithSig(
     Comments.CreateComment calldata commentData,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) external payable;
+  ) external payable returns (bytes32 commentId);
 
   /// @notice Deletes a comment when called by the author directly
   /// @param commentId The unique identifier of the comment to delete

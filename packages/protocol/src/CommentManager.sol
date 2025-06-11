@@ -90,6 +90,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     notStale(commentData.deadline)
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
+    returns (bytes32)
   {
     bytes32 commentId = getCommentId(commentData);
     address app = commentData.app;
@@ -101,7 +102,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       SignatureChecker.isValidSignatureNow(app, commentId, appSignature)
     ) {
       _postComment(commentId, commentData);
-      return;
+      return commentId;
     }
 
     revert InvalidAppSignature();
@@ -118,6 +119,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     notStale(commentData.deadline)
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
+    returns (bytes32)
   {
     bytes32 commentId = getCommentId(commentData);
     address app = commentData.app;
@@ -140,7 +142,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       )
     ) {
       _postComment(commentId, commentData);
-      return;
+      return commentId;
     }
 
     revert NotAuthorized(msg.sender, commentData.author);
