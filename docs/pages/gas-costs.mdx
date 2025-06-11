@@ -13,11 +13,11 @@ Base is an Ethereum L2 that offers significantly lower gas costs compared to Eth
 <GasEstimationTable
   operations={[
     {
-      name: "postCommentAsAuthor",
+      name: "postComment",
       gasUnits: 74000,
     },
     {
-      name: "postComment",
+      name: "postCommentWithSig",
       gasUnits: 60000,
     },
     {
@@ -34,11 +34,11 @@ Base is an Ethereum L2 that offers significantly lower gas costs compared to Eth
 <GasEstimationTable
   operations={[
     {
-      name: "postCommentAsAuthor",
+      name: "postComment",
       gasUnits: 74000,
     },
     {
-      name: "postComment",
+      name: "postCommentWithSig",
       gasUnits: 60000,
     },
     {
@@ -52,7 +52,7 @@ Base is an Ethereum L2 that offers significantly lower gas costs compared to Eth
 
 # Example transactions:
 
-For example a [`postCommentAsAuthor`](/protocol-reference/CommentManager#postcommentasauthorstruct-commentscommentdata-commentdata-bytes-appsignature-external) that replies to a comment,
+For example a [`postComment`](/protocol-reference/CommentManager#postcommentstruct-commentscommentdata-commentdata-bytes-appsignature-external) that replies to a comment,
 the [transaction](https://basescan.org/tx/0x189c08c3b6bda7f098a649574e27d203aa1e760848197f447e9adfdbc8a3a465) is initiated and paid by the author,
 it costs around `73,657` gas units, with a limit of `74,532` gas units on Base L2; `4,324` gas units on L1:
 
