@@ -1,4 +1,6 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import Decimal from "decimal.js";
+import { useEffect, useState } from "react";
 
 type GasEstimationTableProps = {
   operations: {
@@ -6,14 +8,18 @@ type GasEstimationTableProps = {
     gasUnits: string;
   }[];
   gweiPerGases: string[];
-  usdPerEth: string;
 };
 
 export function GasEstimationTable({
   operations,
   gweiPerGases,
-  usdPerEth,
 }: GasEstimationTableProps) {
+  const [usdPerEth, setUsdPerEth] = useState(undefined);
+
+  useEffect(() => {
+    getETHPrice().then(setUsdPerEth);
+  }, []);
+
   return (
     <table className="vocs_Table">
       <thead>
@@ -36,12 +42,16 @@ export function GasEstimationTable({
               const gweiPerGas = new Decimal(gweiPerGasString);
               return (
                 <td key={index} className="vocs_TableCell">
-                  $
-                  {gweiPerGas
-                    .mul(operation.gasUnits)
-                    .div(1000000000)
-                    .mul(usdPerEth)
-                    .toString()}
+                  {usdPerEth == null ? (
+                    <Skeleton className="w-full h-[20px] rounded-full" />
+                  ) : (
+                    `${gweiPerGas
+                      .mul(operation.gasUnits)
+                      .div(1000000000)
+                      .mul(usdPerEth)
+                      .toSignificantDigits(2)
+                      .toString()}`
+                  )}
                 </td>
               );
             })}
@@ -50,4 +60,17 @@ export function GasEstimationTable({
       </tbody>
     </table>
   );
+}
+
+async function getETHPrice() {
+  const response = await fetch(
+    "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.ethereum.usd;
 }

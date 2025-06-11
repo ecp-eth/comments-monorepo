@@ -4,6 +4,7 @@ import { remarkMermaid } from "@theguild/remark-mermaid";
 import { CHANNEL_MANAGER_ADDRESS, COMMENT_MANAGER_ADDRESS } from "@ecp.eth/sdk";
 import remarkFindAndReplace from "./plugins/remark-find-replace";
 import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
   title: "Ethereum Comments Protocol",
@@ -262,6 +263,11 @@ export default defineConfig({
   vite: {
     envPrefix: "VITE_",
     plugins: [react()],
+    resolve: {
+      alias: {
+        "@": path.resolve("./"),
+      },
+    },
     define: {
       "import.meta.env.COMMENT_MANAGER_ADDRESS": JSON.stringify(
         COMMENT_MANAGER_ADDRESS,
