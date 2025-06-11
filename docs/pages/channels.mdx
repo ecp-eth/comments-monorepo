@@ -12,6 +12,8 @@ To prevent spam and ensure quality channels, creating a new channel requires pay
 
 Together with [Hooks](/hooks), Channels create a flexible system for building on-chain communities and apps with customizable rules.
 
+Creating a channel currently requires paying a fee, currently set to 0.02 ETH, to deter initial spam, while we figure out how to combat it. If you are building an app that will create channels, feel free to reach out to us and we may be able to sponsor the channel fee.
+
 ## Getting Started
 
 You can create channels and hooks using our [TypeScript SDK](/sdk-reference) or by interacting with our [smart contracts](/contracts).
@@ -39,7 +41,7 @@ Initialize the account using `viem`. Ensure the account has enough balance to co
 const account = privateKeyToAccount(privateKey);
 ```
 
-Creating a channel requires paying a fee. The code below retrieves the channel creation fee and
+The code below retrieves the channel creation fee and
 calls the `createChannel` function from the SDK to create a new channel:
 
 ```typescript
