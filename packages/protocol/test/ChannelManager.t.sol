@@ -14,6 +14,7 @@ import { Hooks } from "../src/libraries/Hooks.sol";
 import { Channels } from "../src/libraries/Channels.sol";
 import { IHook } from "../src/interfaces/IHook.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 
 // Invalid hook that doesn't support the interface
 contract InvalidHook {
@@ -61,12 +62,17 @@ contract ChannelManagerTest is Test, IERC721Receiver {
   address public user1;
   address public user2;
 
-  event ChannelCreated(uint256 indexed channelId, string name, string metadata);
+  event ChannelCreated(
+    uint256 indexed channelId,
+    string name,
+    string description,
+    Metadata.MetadataEntry[] metadata
+  );
   event ChannelUpdated(
     uint256 indexed channelId,
     string name,
     string description,
-    string metadata
+    Metadata.MetadataEntry[] metadata
   );
   event HookSet(uint256 indexed channelId, address indexed hook);
   event HookStatusUpdated(
@@ -94,7 +100,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
   function test_CreateChannel() public {
     string memory name = "Test Channel";
     string memory description = "Test Description";
-    string memory metadata = "{}";
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](0);
 
     uint256 initialBalance = address(channelManager).balance;
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
@@ -108,7 +114,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
     assertEq(channel.name, name);
     assertEq(channel.description, description);
-    assertEq(channel.metadata, metadata);
+    assertEq(channel.metadata.length, metadata.length);
     assertEq(address(channel.hook), address(0));
     assertEq(address(channelManager).balance - initialBalance, 0.02 ether);
   }
@@ -116,7 +122,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
   function test_CreateChannelWithHook() public {
     string memory name = "Test Channel";
     string memory description = "Test Description";
-    string memory metadata = "{}";
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](0);
 
     uint256 initialBalance = address(channelManager).balance;
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
@@ -136,14 +142,20 @@ contract ChannelManagerTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Initial Name",
       "Initial Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(0)
     );
 
     // Update the channel
     string memory newName = "Updated Name";
     string memory newDescription = "Updated Description";
-    string memory newMetadata = '{"updated": true}';
+    Metadata.MetadataEntry[] memory newMetadata = new Metadata.MetadataEntry[](
+      1
+    );
+    newMetadata[0] = Metadata.MetadataEntry({
+      key: "string updated",
+      value: abi.encode(true)
+    });
 
     channelManager.updateChannel(
       channelId,
@@ -156,7 +168,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
     assertEq(channel.name, newName);
     assertEq(channel.description, newDescription);
-    assertEq(channel.metadata, newMetadata);
+    assertEq(channel.metadata.length, newMetadata.length);
   }
 
   function test_SetHook() public {
@@ -164,7 +176,7 @@ contract ChannelManagerTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(0)
     );
 

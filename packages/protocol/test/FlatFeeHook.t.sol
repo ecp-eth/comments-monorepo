@@ -13,6 +13,7 @@ import { TestUtils } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
 import { Comments } from "../src/libraries/Comments.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 
 // Fee charging hook contract
 contract FlatFeeHook is BaseHook {
@@ -50,10 +51,10 @@ contract FlatFeeHook is BaseHook {
 
   function _onCommentAdd(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal override returns (Comments.MetadataEntry[] memory) {
+  ) internal override returns (Metadata.MetadataEntry[] memory) {
     require(msg.value >= HOOK_FEE, "Insufficient fee");
 
     totalFeesCollected += HOOK_FEE;
@@ -68,7 +69,7 @@ contract FlatFeeHook is BaseHook {
         emit RefundIssued(commentData.author, refundAmount);
       }
     }
-    return new Comments.MetadataEntry[](0);
+    return new Metadata.MetadataEntry[](0);
   }
 
   function withdrawFees() external {
@@ -141,11 +142,16 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
-    }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
+    }(
+      "Fee Channel",
+      "Pay 0.001 ETH to comment",
+      new Metadata.MetadataEntry[](0),
+      address(feeHook)
+    );
 
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
@@ -179,12 +185,17 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
-    }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
+    }(
+      "Fee Channel",
+      "Pay 0.001 ETH to comment",
+      new Metadata.MetadataEntry[](0),
+      address(feeHook)
+    );
 
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
@@ -221,12 +232,17 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
-    }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
+    }(
+      "Fee Channel",
+      "Pay 0.001 ETH to comment",
+      new Metadata.MetadataEntry[](0),
+      address(feeHook)
+    );
 
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
@@ -248,12 +264,17 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
-    }("Fee Channel", "Pay 0.001 ETH to comment", "{}", address(feeHook));
+    }(
+      "Fee Channel",
+      "Pay 0.001 ETH to comment",
+      new Metadata.MetadataEntry[](0),
+      address(feeHook)
+    );
 
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,

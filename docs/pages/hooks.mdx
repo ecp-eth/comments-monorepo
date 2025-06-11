@@ -48,8 +48,8 @@ commentManager.updateCommentHookData(commentId);
 ```solidity
 function _onCommentHookDataUpdate(
   Comments.Comment calldata commentData,
-  Comments.MetadataEntry[] calldata metadata,
-  Comments.MetadataEntry[] calldata hookMetadata,
+  Metadata.MetadataEntry[] calldata metadata,
+  Metadata.MetadataEntry[] calldata hookMetadata,
   address msgSender,
   bytes32 commentId
 ) internal override returns (Comments.HookMetadataUpdate[] memory) {
@@ -59,14 +59,14 @@ function _onCommentHookDataUpdate(
   // Update an existing field
   operations[0] = Comments.HookMetadataUpdate({
     operation: Comments.MetadataOperation.SET,
-    key: keccak256("score"),
+    key: "string score",
     value: abi.encode(calculateNewScore(commentData))
   });
 
   // Delete a field
   operations[1] = Comments.HookMetadataUpdate({
     operation: Comments.MetadataOperation.DELETE,
-    key: keccak256("temp_data"),
+    key: "string temp_data",
     value: "" // Ignored for DELETE operations
   });
 

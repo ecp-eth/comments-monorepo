@@ -10,6 +10,7 @@ import { CommentManager } from "../src/CommentManager.sol";
 import { TestUtils, MockHook } from "../test/utils.sol";
 import { Comments } from "../src/libraries/Comments.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 
 /// @notice This script is used to debug the gas usage of the ChannelManager and CommentManager contracts.
 /// @dev This script is not used in the protocol and should not be used in production.
@@ -63,7 +64,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(mockHook)
     );
   }
@@ -84,7 +85,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel 2",
       "Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(0)
     );
   }
@@ -98,7 +99,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       channelId,
       "Test Channel 3",
       "Description",
-      "{}"
+      new Metadata.MetadataEntry[](0)
     );
   }
 
@@ -106,7 +107,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 1",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
@@ -133,7 +134,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 2",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
@@ -166,7 +167,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 3",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,

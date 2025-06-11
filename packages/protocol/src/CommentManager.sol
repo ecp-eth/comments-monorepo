@@ -157,7 +157,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     uint256 channelId = commentData.channelId;
     bytes32 parentId = commentData.parentId;
     string calldata content = commentData.content;
-    Comments.MetadataEntry[] calldata metadata = commentData.metadata;
+    Metadata.MetadataEntry[] calldata metadata = commentData.metadata;
     string calldata targetUri = commentData.targetUri;
     uint8 commentType = commentData.commentType;
     uint88 timestampNow = uint88(block.timestamp);
@@ -215,7 +215,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      Comments.MetadataEntry[] memory hookMetadata = hook.onCommentAdd{
+      Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentAdd{
         value: msgValueAfterFee
       }(comment, metadata, msg.sender, commentId);
 
@@ -335,7 +335,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Comments.Comment storage comment = comments[commentId];
 
     string calldata content = editData.content;
-    Comments.MetadataEntry[] calldata metadata = editData.metadata;
+    Metadata.MetadataEntry[] calldata metadata = editData.metadata;
     uint88 timestampNow = uint88(block.timestamp);
 
     comment.content = content;
@@ -382,7 +382,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
 
-      Comments.MetadataEntry[] memory hookMetadata = hook.onCommentEdit{
+      Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentEdit{
         value: msgValueAfterFee
       }(comment, metadata, msg.sender, commentId);
 
@@ -452,10 +452,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Comments.Comment memory commentToDelete = comment;
 
     // Get metadata for hook
-    Comments.MetadataEntry[] memory metadata = _getCommentMetadataInternal(
+    Metadata.MetadataEntry[] memory metadata = _getCommentMetadataInternal(
       commentId
     );
-    Comments.MetadataEntry[]
+    Metadata.MetadataEntry[]
       memory hookMetadata = _getCommentHookMetadataInternal(commentId);
 
     // Delete the comment and metadata
@@ -492,14 +492,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @return The metadata entries for the comment
   function _getCommentMetadataInternal(
     bytes32 commentId
-  ) internal view returns (Comments.MetadataEntry[] memory) {
+  ) internal view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentMetadataKeys[commentId];
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](
       keys.length
     );
 
     for (uint i = 0; i < keys.length; i++) {
-      metadata[i] = Comments.MetadataEntry({
+      metadata[i] = Metadata.MetadataEntry({
         key: keys[i],
         value: commentMetadata[commentId][keys[i]]
       });
@@ -513,14 +513,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @return The hook metadata entries for the comment
   function _getCommentHookMetadataInternal(
     bytes32 commentId
-  ) internal view returns (Comments.MetadataEntry[] memory) {
+  ) internal view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentHookMetadataKeys[commentId];
-    Comments.MetadataEntry[] memory hookMetadata = new Comments.MetadataEntry[](
+    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
       keys.length
     );
 
     for (uint i = 0; i < keys.length; i++) {
-      hookMetadata[i] = Comments.MetadataEntry({
+      hookMetadata[i] = Metadata.MetadataEntry({
         key: keys[i],
         value: commentHookMetadata[commentId][keys[i]]
       });
@@ -709,7 +709,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @param metadata The metadata array to hash
   /// @return The hash of the metadata array
   function _hashMetadataArray(
-    Comments.MetadataEntry[] memory metadata
+    Metadata.MetadataEntry[] memory metadata
   ) internal pure returns (bytes32) {
     bytes32[] memory hashedEntries = new bytes32[](metadata.length);
 
@@ -742,14 +742,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @inheritdoc ICommentManager
   function getCommentMetadata(
     bytes32 commentId
-  ) external view returns (Comments.MetadataEntry[] memory) {
+  ) external view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentMetadataKeys[commentId];
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](
       keys.length
     );
 
     for (uint i = 0; i < keys.length; i++) {
-      metadata[i] = Comments.MetadataEntry({
+      metadata[i] = Metadata.MetadataEntry({
         key: keys[i],
         value: commentMetadata[commentId][keys[i]]
       });
@@ -761,14 +761,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @inheritdoc ICommentManager
   function getCommentHookMetadata(
     bytes32 commentId
-  ) external view returns (Comments.MetadataEntry[] memory) {
+  ) external view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentHookMetadataKeys[commentId];
-    Comments.MetadataEntry[] memory hookMetadata = new Comments.MetadataEntry[](
+    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
       keys.length
     );
 
     for (uint i = 0; i < keys.length; i++) {
-      hookMetadata[i] = Comments.MetadataEntry({
+      hookMetadata[i] = Metadata.MetadataEntry({
         key: keys[i],
         value: commentHookMetadata[commentId][keys[i]]
       });
@@ -904,15 +904,15 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     }
 
     // Get current metadata for hook
-    Comments.MetadataEntry[] memory metadata = _getCommentMetadataInternal(
+    Metadata.MetadataEntry[] memory metadata = _getCommentMetadataInternal(
       commentId
     );
-    Comments.MetadataEntry[]
+    Metadata.MetadataEntry[]
       memory hookMetadata = _getCommentHookMetadataInternal(commentId);
 
     IHook hook = IHook(channel.hook);
 
-    Comments.HookMetadataUpdate[] memory operations = hook
+    Metadata.HookMetadataUpdate[] memory operations = hook
       .onCommentHookDataUpdate(
         comment,
         metadata,
@@ -930,15 +930,15 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @param operations The metadata operations to apply
   function _applyHookMetadataOperations(
     bytes32 commentId,
-    Comments.HookMetadataUpdate[] memory operations
+    Metadata.HookMetadataUpdate[] memory operations
   ) internal {
     for (uint i = 0; i < operations.length; i++) {
-      Comments.HookMetadataUpdate memory op = operations[i];
+      Metadata.HookMetadataUpdate memory op = operations[i];
 
-      if (op.operation == Comments.MetadataOperation.DELETE) {
+      if (op.operation == Metadata.MetadataOperation.DELETE) {
         _deleteCommentHookMetadataKey(commentId, op.key);
         emit CommentHookMetadataSet(commentId, op.key, ""); // Emit empty value for deletion
-      } else if (op.operation == Comments.MetadataOperation.SET) {
+      } else if (op.operation == Metadata.MetadataOperation.SET) {
         // Check if this is a new key for gas optimization
         bool isNewKey = !_hookMetadataKeyExists(commentId, op.key);
 

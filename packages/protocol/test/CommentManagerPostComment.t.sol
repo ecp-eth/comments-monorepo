@@ -12,6 +12,7 @@ import {
 import { TestUtils, AlwaysReturningDataHook } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 
 contract NoHook is BaseHook {
   function getHookPermissions()
@@ -43,7 +44,7 @@ contract CommentsTest is Test, IERC721Receiver {
     string content,
     string targetUri,
     uint8 commentType,
-    Comments.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata
   );
   event CommentMetadataSet(
     bytes32 indexed commentId,
@@ -241,7 +242,7 @@ contract CommentsTest is Test, IERC721Receiver {
     uint256 channelId1 = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Test Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(noHook)
     );
 
@@ -277,7 +278,7 @@ contract CommentsTest is Test, IERC721Receiver {
     uint256 channelId2 = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Test Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(maliciousCollector)
     );
 
@@ -472,7 +473,7 @@ contract CommentsTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Test Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(alwaysReturningDataHook)
     );
 
@@ -503,7 +504,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentData.content,
       commentData.targetUri,
       commentData.commentType,
-      new Comments.MetadataEntry[](0)
+      new Metadata.MetadataEntry[](0)
     );
     vm.expectEmit(true, true, true, true);
     emit CommentHookMetadataSet(
@@ -514,7 +515,7 @@ contract CommentsTest is Test, IERC721Receiver {
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
 
     // Verify the comment was created with hook metadata
-    Comments.MetadataEntry[] memory hookMetadata = comments
+    Metadata.MetadataEntry[] memory hookMetadata = comments
       .getCommentHookMetadata(commentId);
     assertEq(hookMetadata.length, 1);
     assertEq(hookMetadata[0].key, bytes32("string status"));
@@ -535,10 +536,10 @@ contract CommentsTest is Test, IERC721Receiver {
 contract MaliciousFeeCollector is BaseHook {
   function _onCommentAdd(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal pure override returns (Comments.MetadataEntry[] memory) {
+  ) internal pure override returns (Metadata.MetadataEntry[] memory) {
     revert("Malicious revert");
   }
 

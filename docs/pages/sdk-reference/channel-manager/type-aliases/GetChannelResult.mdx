@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / GetChannelResult
 
@@ -10,7 +10,7 @@
 type GetChannelResult = {
   description: string | undefined;
   hook: Hex | undefined;
-  metadata: string | undefined;
+  metadata: MetadataEntry[] | undefined;
   name: string;
   permissions: ChannelPermissions;
 };
@@ -28,7 +28,7 @@ description: string | undefined;
 
 Defined in: [packages/sdk/src/channel-manager/channel.ts:106](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L106)
 
-***
+---
 
 ### hook
 
@@ -38,17 +38,17 @@ hook: Hex | undefined;
 
 Defined in: [packages/sdk/src/channel-manager/channel.ts:108](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L108)
 
-***
+---
 
 ### metadata
 
 ```ts
-metadata: string | undefined;
+metadata: MetadataEntry[] | undefined;
 ```
 
 Defined in: [packages/sdk/src/channel-manager/channel.ts:107](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L107)
 
-***
+---
 
 ### name
 
@@ -58,7 +58,7 @@ name: string;
 
 Defined in: [packages/sdk/src/channel-manager/channel.ts:105](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L105)
 
-***
+---
 
 ### permissions
 

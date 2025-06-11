@@ -16,6 +16,7 @@ import { TestUtils } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
 import { Comments } from "../src/libraries/Comments.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 /// @title SharedFeeHook - A hook that splits comment fees between channel owners and parent comment authors
 /// @notice This hook charges 0.001 ETH per comment and splits it between channel owners and parent comment authors
 contract SharedFeeHook is BaseHook {
@@ -79,10 +80,10 @@ contract SharedFeeHook is BaseHook {
 
   function _onCommentAdd(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal override returns (Comments.MetadataEntry[] memory) {
+  ) internal override returns (Metadata.MetadataEntry[] memory) {
     // Calculate protocol fee
     uint256 protocolFee = (feeAmount * PROTOCOL_FEE_PERCENTAGE) / 10000;
     uint256 hookFee = feeAmount - protocolFee;
@@ -101,7 +102,7 @@ contract SharedFeeHook is BaseHook {
     // Distribute fees to recipients
     _distributeFees(hookFee);
 
-    return new Comments.MetadataEntry[](0);
+    return new Metadata.MetadataEntry[](0);
   }
 
   function addRecipient(address _recipient, uint256 _share) external {
@@ -362,14 +363,14 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Fee Channel",
       "Pay tokens to comment",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(feeHook)
     );
 
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,

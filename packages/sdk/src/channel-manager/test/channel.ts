@@ -275,7 +275,7 @@ describe("channel", () => {
         channelId,
         name: "Updated channel",
         description: "New description",
-        metadata: "New metadata",
+        metadata: [],
         writeContract: client.writeContract,
         channelManagerAddress,
       });
@@ -296,7 +296,7 @@ describe("channel", () => {
       assert.deepEqual(channel, {
         name: "Updated channel",
         description: "New description",
-        metadata: "New metadata",
+        metadata: [],
         hook: undefined,
         permissions: {
           onCommentAdd: false,

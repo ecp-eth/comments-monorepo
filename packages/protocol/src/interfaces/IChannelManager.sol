@@ -30,19 +30,24 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   /// @notice Emitted when a new channel is created
   /// @param channelId The unique identifier of the channel
   /// @param name The name of the channel
-  /// @param metadata The channel metadata
-  event ChannelCreated(uint256 indexed channelId, string name, string metadata);
+  /// @param metadata The channel metadata entries
+  event ChannelCreated(
+    uint256 indexed channelId,
+    string name,
+    string description,
+    Metadata.MetadataEntry[] metadata
+  );
 
   /// @notice Emitted when a channel's configuration is updated
   /// @param channelId The unique identifier of the channel
   /// @param name The new name of the channel
   /// @param description The new description of the channel
-  /// @param metadata The new metadata
+  /// @param metadata The new metadata entries
   event ChannelUpdated(
     uint256 indexed channelId,
     string name,
     string description,
-    string metadata
+    Metadata.MetadataEntry[] metadata
   );
 
   /// @notice Emitted when a hook is set for a channel
@@ -60,16 +65,22 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
     bool enabled
   );
 
+  /// @notice Emitted when channel metadata is set
+  /// @param channelId The unique identifier of the channel
+  /// @param key The metadata key
+  /// @param value The metadata value
+  event ChannelMetadataSet(uint256 indexed channelId, bytes32 key, bytes value);
+
   /// @notice Creates a new channel
   /// @param name The name of the channel
   /// @param description The description of the channel
-  /// @param metadata The channel metadata (arbitrary JSON)
+  /// @param metadata The channel metadata entries
   /// @param hook Address of the hook to add to the channel
   /// @return channelId The unique identifier of the created channel
   function createChannel(
     string calldata name,
     string calldata description,
-    string calldata metadata,
+    Metadata.MetadataEntry[] calldata metadata,
     address hook
   ) external payable returns (uint256 channelId);
 
@@ -80,16 +91,29 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
     uint256 channelId
   ) external view returns (Channels.Channel memory);
 
+  /// @notice Calculates a unique hash for a channel
+  /// @param creator The address of the channel creator
+  /// @param name The name of the channel
+  /// @param description The description of the channel
+  /// @param metadata The channel metadata entries
+  /// @return bytes32 The computed hash
+  function getChannelId(
+    address creator,
+    string calldata name,
+    string calldata description,
+    Metadata.MetadataEntry[] calldata metadata
+  ) external view returns (uint256);
+
   /// @notice Updates an existing channel's configuration
   /// @param channelId The unique identifier of the channel
   /// @param name The new name of the channel
   /// @param description The new description of the channel
-  /// @param metadata The new metadata
+  /// @param metadata The new metadata entries
   function updateChannel(
     uint256 channelId,
     string calldata name,
     string calldata description,
-    string calldata metadata
+    Metadata.MetadataEntry[] calldata metadata
   ) external;
 
   /// @notice Sets the hook for a channel
@@ -109,4 +133,35 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   /// @param channelId Unique identifier of the channel
   /// @return exists Whether the channel exists
   function channelExists(uint256 channelId) external view returns (bool);
+
+  /// @notice Set metadata for a channel
+  /// @param channelId The unique identifier of the channel
+  /// @param metadata The metadata entries to set
+  function setChannelMetadata(
+    uint256 channelId,
+    Metadata.MetadataEntry[] calldata metadata
+  ) external;
+
+  /// @notice Get all metadata for a channel
+  /// @param channelId The unique identifier of the channel
+  /// @return The metadata entries for the channel
+  function getChannelMetadata(
+    uint256 channelId
+  ) external view returns (Metadata.MetadataEntry[] memory);
+
+  /// @notice Get metadata value for a specific key
+  /// @param channelId The unique identifier of the channel
+  /// @param key The metadata key
+  /// @return The metadata value
+  function getChannelMetadataValue(
+    uint256 channelId,
+    bytes32 key
+  ) external view returns (bytes memory);
+
+  /// @notice Get all metadata keys for a channel
+  /// @param channelId The unique identifier of the channel
+  /// @return The metadata keys for the channel
+  function getChannelMetadataKeys(
+    uint256 channelId
+  ) external view returns (bytes32[] memory);
 }

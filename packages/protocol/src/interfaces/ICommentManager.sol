@@ -29,7 +29,7 @@ interface ICommentManager {
     string content,
     string targetUri,
     uint8 commentType,
-    Comments.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata
   );
 
   /// @notice Emitted when metadata is set for a comment
@@ -81,7 +81,7 @@ interface ICommentManager {
     string content,
     string targetUri,
     uint8 commentType,
-    Comments.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata
   );
 
   /// @notice Emitted when an author approves an app signer
@@ -297,14 +297,14 @@ interface ICommentManager {
   /// @return The metadata entries for the comment
   function getCommentMetadata(
     bytes32 commentId
-  ) external view returns (Comments.MetadataEntry[] memory);
+  ) external view returns (Metadata.MetadataEntry[] memory);
 
   /// @notice Get hook metadata for a comment
   /// @param commentId The ID of the comment
   /// @return The hook metadata entries for the comment
   function getCommentHookMetadata(
     bytes32 commentId
-  ) external view returns (Comments.MetadataEntry[] memory);
+  ) external view returns (Metadata.MetadataEntry[] memory);
 
   /// @notice Get a specific metadata value for a comment
   /// @param commentId The ID of the comment

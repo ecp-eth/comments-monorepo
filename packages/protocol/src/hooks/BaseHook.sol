@@ -9,6 +9,7 @@ import { ERC165 } from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import { Hooks } from "../libraries/Hooks.sol";
 import { Comments } from "../libraries/Comments.sol";
 import { Channels } from "../libraries/Channels.sol";
+import { Metadata } from "../libraries/Metadata.sol";
 
 /**
  * @title BaseHook
@@ -79,27 +80,27 @@ abstract contract BaseHook is IHook, ERC165 {
   /// @inheritdoc IHook
   function onCommentAdd(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata metadata,
     address msgSender,
     bytes32 commentId
-  ) external payable virtual returns (Comments.MetadataEntry[] memory) {
+  ) external payable virtual returns (Metadata.MetadataEntry[] memory) {
     return _onCommentAdd(commentData, metadata, msgSender, commentId);
   }
 
   function _onCommentAdd(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal virtual returns (Comments.MetadataEntry[] memory) {
+  ) internal virtual returns (Metadata.MetadataEntry[] memory) {
     revert HookNotImplemented();
   }
 
   /// @inheritdoc IHook
   function onCommentDelete(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata metadata,
-    Comments.MetadataEntry[] calldata hookMetadata,
+    Metadata.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata hookMetadata,
     address msgSender,
     bytes32 commentId
   ) external payable virtual returns (bool) {
@@ -115,8 +116,8 @@ abstract contract BaseHook is IHook, ERC165 {
 
   function _onCommentDelete(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
   ) internal virtual returns (bool) {
@@ -126,19 +127,19 @@ abstract contract BaseHook is IHook, ERC165 {
   /// @inheritdoc IHook
   function onCommentEdit(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata metadata,
     address msgSender,
     bytes32 commentId
-  ) external payable virtual returns (Comments.MetadataEntry[] memory) {
+  ) external payable virtual returns (Metadata.MetadataEntry[] memory) {
     return _onCommentEdit(commentData, metadata, msgSender, commentId);
   }
 
   function _onCommentEdit(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal virtual returns (Comments.MetadataEntry[] memory) {
+  ) internal virtual returns (Metadata.MetadataEntry[] memory) {
     revert HookNotImplemented();
   }
 
@@ -162,11 +163,11 @@ abstract contract BaseHook is IHook, ERC165 {
   /// @inheritdoc IHook
   function onCommentHookDataUpdate(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata metadata,
-    Comments.MetadataEntry[] calldata hookMetadata,
+    Metadata.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata hookMetadata,
     address msgSender,
     bytes32 commentId
-  ) external virtual returns (Comments.HookMetadataUpdate[] memory) {
+  ) external virtual returns (Metadata.HookMetadataUpdate[] memory) {
     return
       _onCommentHookDataUpdate(
         commentData,
@@ -179,11 +180,11 @@ abstract contract BaseHook is IHook, ERC165 {
 
   function _onCommentHookDataUpdate(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal virtual returns (Comments.HookMetadataUpdate[] memory) {
+  ) internal virtual returns (Metadata.HookMetadataUpdate[] memory) {
     revert HookNotImplemented();
   }
 }

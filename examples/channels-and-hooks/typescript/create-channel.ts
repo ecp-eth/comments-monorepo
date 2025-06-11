@@ -7,6 +7,11 @@ import { ChannelManagerABI } from "@ecp.eth/sdk/abis";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { parseEnv } from "./util";
+import {
+  createMetadataEntry,
+  MetadataTypeValues,
+} from "@ecp.eth/sdk/comments/metadata";
+import { sepolia } from "viem/chains";
 
 const { privateKey, rpcUrl, chain } = parseEnv();
 
@@ -40,10 +45,12 @@ async function main() {
       name: "Ethereum Comments Protocol Updates",
       description:
         "Latest updates and announcements from the Ethereum Comments Protocol",
-      metadata: JSON.stringify({
-        category: "blog",
-        rules: ["Be respectful", "No spam"],
-      }),
+      metadata: [
+        createMetadataEntry("category", MetadataTypeValues.STRING, "blog"),
+        createMetadataEntry("rules", MetadataTypeValues.STRING, {
+          list: ["Be respectful", "No spam"],
+        }),
+      ],
       hook: "0x0000000000000000000000000000000000000000", // No hook initially
       fee: fee,
       writeContract: walletClient.writeContract,

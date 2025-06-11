@@ -13,7 +13,10 @@ import type {
   ContractReadFunctions,
   ChannelPermissions,
   ChannelManagerABIType,
+  Channel,
 } from "./types.js";
+import type { MetadataEntry } from "../comments/types.js";
+import { MetadataEntrySchema } from "../comments/schemas.js";
 
 export type CreateChannelParams = {
   /**
@@ -27,7 +30,7 @@ export type CreateChannelParams = {
   /**
    * The metadata of the channel
    */
-  metadata?: string;
+  metadata?: MetadataEntry[];
   /**
    * The hook of the channel
    */
@@ -53,7 +56,7 @@ export type CreateChannelResult = WaitableWriteContractHelperResult<
 const CreateChannelParamsSchema = z.object({
   name: z.string().trim().min(1),
   description: z.string().trim().default(""),
-  metadata: z.string().default(""),
+  metadata: z.array(MetadataEntrySchema).default([]),
   hook: HexSchema.default(ZERO_ADDRESS),
   channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
   fee: z.bigint().min(0n).optional(),
@@ -101,13 +104,7 @@ export type GetChannelParams = {
   readContract: ContractReadFunctions["getChannel"];
 };
 
-export type GetChannelResult = {
-  name: string;
-  description: string | undefined;
-  metadata: string | undefined;
-  hook: Hex | undefined;
-  permissions: ChannelPermissions;
-};
+export type GetChannelResult = Channel;
 
 const GetChannelParamsSchema = z.object({
   channelId: z.bigint(),
@@ -138,7 +135,7 @@ export async function getChannel(
   return {
     name,
     description: !description ? undefined : description,
-    metadata: !metadata ? undefined : metadata,
+    metadata: !metadata || metadata.length === 0 ? undefined : [...metadata],
     hook: isZeroHex(hook) ? undefined : hook,
     permissions,
   };
@@ -160,7 +157,7 @@ export type UpdateChannelParams = {
   /**
    * The metadata of the channel
    */
-  metadata?: string;
+  metadata?: MetadataEntry[];
   /**
    * The address of the channel manager
    *
@@ -179,7 +176,7 @@ const UpdateChannelParamsSchema = z.object({
   channelId: z.bigint(),
   name: z.string().trim().min(1),
   description: z.string().trim().default(""),
-  metadata: z.string().default(""),
+  metadata: z.array(MetadataEntrySchema).default([]),
   channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
 });
 

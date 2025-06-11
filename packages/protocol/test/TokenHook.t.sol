@@ -139,10 +139,10 @@ contract TokenHook is BaseHook {
   /// @inheritdoc BaseHook
   function _onCommentAdd(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata metadata,
     address /* msgSender */,
     bytes32 commentId
-  ) internal override returns (Comments.MetadataEntry[] memory) {
+  ) internal override returns (Metadata.MetadataEntry[] memory) {
     // Parse metadata for token deployment parameters
     TokenDeploymentParams memory params = _parseTokenMetadata(metadata);
 
@@ -164,11 +164,11 @@ contract TokenHook is BaseHook {
         );
 
         // Return metadata with deployed token address
-        Comments.MetadataEntry[]
-          memory hookMetadata = new Comments.MetadataEntry[](1);
-        hookMetadata[0] = Comments.MetadataEntry({
+        Metadata.MetadataEntry[]
+          memory hookMetadata = new Metadata.MetadataEntry[](1);
+        hookMetadata[0] = Metadata.MetadataEntry({
           key: bytes32("address deployed_token_address"),
-          value: abi.encodePacked(tokenAddress)
+          value: abi.encode(tokenAddress)
         });
         return hookMetadata;
       } catch Error(string memory reason) {
@@ -183,14 +183,14 @@ contract TokenHook is BaseHook {
     }
 
     // Return empty metadata array if no deployment occurred
-    return new Comments.MetadataEntry[](0);
+    return new Metadata.MetadataEntry[](0);
   }
 
   /// @notice Parse metadata entries for token deployment parameters
   /// @param metadata The metadata entries to parse
   /// @return params The parsed token deployment parameters
   function _parseTokenMetadata(
-    Comments.MetadataEntry[] calldata metadata
+    Metadata.MetadataEntry[] calldata metadata
   ) internal pure returns (TokenDeploymentParams memory params) {
     for (uint256 i = 0; i < metadata.length; i++) {
       bytes32 key = metadata[i].key;
@@ -487,17 +487,17 @@ contract TokenHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Token Creation Channel",
       "Create tokens by commenting with metadata",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(tokenHook)
     );
 
     // Create metadata for token deployment
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](2);
-    metadata[0] = Comments.MetadataEntry({
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](2);
+    metadata[0] = Metadata.MetadataEntry({
       key: bytes32("string symbol"),
       value: bytes("MYTOKEN")
     });
-    metadata[1] = Comments.MetadataEntry({
+    metadata[1] = Metadata.MetadataEntry({
       key: bytes32("string name"),
       value: bytes("My Awesome Token")
     });
@@ -523,21 +523,10 @@ contract TokenHookTest is Test, IERC721Receiver {
     );
     vm.prank(user1);
     vm.recordLogs();
-    comments.postComment{ value: 0.01 ether }(commentData, appSignature);
-
-    // Get comment ID from logs
-    Vm.Log[] memory logs = vm.getRecordedLogs();
-    bytes32 commentId;
-    for (uint i = 0; i < logs.length; i++) {
-      // Look for CommentAdded event (topic[0] is the event signature hash)
-      if (
-        logs[i].topics[0] ==
-        0x4a933191a06b638568464a44a81268e15664e57edfe69421af878312bee4c1e7
-      ) {
-        commentId = logs[i].topics[1];
-        break;
-      }
-    }
+    bytes32 commentId = comments.postComment{ value: 0.01 ether }(
+      commentData,
+      appSignature
+    );
 
     // Verify Clanker was called
     assertEq(mockClanker.getDeploymentCallsCount(), 1);
@@ -551,11 +540,11 @@ contract TokenHookTest is Test, IERC721Receiver {
     assertFalse(call.isCustom);
 
     // Verify hook metadata contains deployed token address
-    Comments.MetadataEntry[] memory hookMetadata = comments
+    Metadata.MetadataEntry[] memory hookMetadata = comments
       .getCommentHookMetadata(commentId);
     assertEq(hookMetadata.length, 1);
     assertEq(hookMetadata[0].key, bytes32("address deployed_token_address"));
-    assertEq(address(bytes20(hookMetadata[0].value)), call.deployedToken);
+    assertEq(abi.decode(hookMetadata[0].value, (address)), call.deployedToken);
   }
 
   function test_TokenHookWithAllMetadata() public {
@@ -563,33 +552,33 @@ contract TokenHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Token Creation Channel",
       "Create tokens by commenting with metadata",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(tokenHook)
     );
 
     // Create comprehensive metadata
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](6);
-    metadata[0] = Comments.MetadataEntry({
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](6);
+    metadata[0] = Metadata.MetadataEntry({
       key: bytes32("string symbol"),
       value: bytes("FULL")
     });
-    metadata[1] = Comments.MetadataEntry({
+    metadata[1] = Metadata.MetadataEntry({
       key: bytes32("string name"),
       value: bytes("Full Feature Token")
     });
-    metadata[2] = Comments.MetadataEntry({
+    metadata[2] = Metadata.MetadataEntry({
       key: bytes32("string image"),
       value: bytes("https://example.com/token.png")
     });
-    metadata[3] = Comments.MetadataEntry({
+    metadata[3] = Metadata.MetadataEntry({
       key: bytes32("string metadata"),
       value: bytes("Additional metadata")
     });
-    metadata[4] = Comments.MetadataEntry({
+    metadata[4] = Metadata.MetadataEntry({
       key: bytes32("string context"),
       value: bytes("A token for testing all features")
     });
-    metadata[5] = Comments.MetadataEntry({
+    metadata[5] = Metadata.MetadataEntry({
       key: bytes32("address recipient"),
       value: abi.encodePacked(customRecipient)
     });
@@ -638,13 +627,13 @@ contract TokenHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Token Creation Channel",
       "Create tokens by commenting with metadata",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(tokenHook)
     );
 
     // Create metadata without required fields
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](1);
-    metadata[0] = Comments.MetadataEntry({
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](1);
+    metadata[0] = Metadata.MetadataEntry({
       key: bytes32("string random"),
       value: bytes("not relevant")
     });
@@ -680,17 +669,17 @@ contract TokenHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Token Creation Channel",
       "Create tokens by commenting with metadata",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(tokenHook)
     );
 
     // Create metadata for token deployment
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](2);
-    metadata[0] = Comments.MetadataEntry({
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](2);
+    metadata[0] = Metadata.MetadataEntry({
       key: bytes32("string symbol"),
       value: bytes("EVENT")
     });
-    metadata[1] = Comments.MetadataEntry({
+    metadata[1] = Metadata.MetadataEntry({
       key: bytes32("string name"),
       value: bytes("Event Test Token")
     });
@@ -729,17 +718,17 @@ contract TokenHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Token Creation Channel",
       "Create tokens by commenting with metadata",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(tokenHook)
     );
 
     // Create metadata for token deployment
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](2);
-    metadata[0] = Comments.MetadataEntry({
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](2);
+    metadata[0] = Metadata.MetadataEntry({
       key: bytes32("string symbol"),
       value: bytes("FAIL")
     });
-    metadata[1] = Comments.MetadataEntry({
+    metadata[1] = Metadata.MetadataEntry({
       key: bytes32("string name"),
       value: bytes("Fail Test Token")
     });
@@ -775,17 +764,17 @@ contract TokenHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Token Creation Channel",
       "Create tokens by commenting with metadata",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(tokenHook)
     );
 
     // Create metadata for token deployment
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](2);
-    metadata[0] = Comments.MetadataEntry({
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](2);
+    metadata[0] = Metadata.MetadataEntry({
       key: bytes32("string symbol"),
       value: bytes("CONFIG")
     });
-    metadata[1] = Comments.MetadataEntry({
+    metadata[1] = Metadata.MetadataEntry({
       key: bytes32("string name"),
       value: bytes("Config Test Token")
     });

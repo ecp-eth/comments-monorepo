@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
-***
+---
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / CreateChannelParams
 
@@ -35,10 +35,10 @@ The address of the channel manager
 #### Default
 
 ```ts
-CHANNEL_MANAGER_ADDRESS
+CHANNEL_MANAGER_ADDRESS;
 ```
 
-***
+---
 
 ### description?
 
@@ -50,7 +50,7 @@ Defined in: [packages/sdk/src/channel-manager/channel.ts:26](https://github.com/
 
 The description of the channel
 
-***
+---
 
 ### fee?
 
@@ -62,7 +62,7 @@ Defined in: [packages/sdk/src/channel-manager/channel.ts:38](https://github.com/
 
 The fee for creating the channel this will be paid in the ETH by the caller.
 
-***
+---
 
 ### hook?
 
@@ -74,19 +74,19 @@ Defined in: [packages/sdk/src/channel-manager/channel.ts:34](https://github.com/
 
 The hook of the channel
 
-***
+---
 
 ### metadata?
 
 ```ts
-optional metadata: string;
+optional metadata: MetadataEntry[];
 ```
 
 Defined in: [packages/sdk/src/channel-manager/channel.ts:30](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L30)
 
 The metadata of the channel
 
-***
+---
 
 ### name
 
@@ -98,7 +98,7 @@ Defined in: [packages/sdk/src/channel-manager/channel.ts:22](https://github.com/
 
 The name of the channel
 
-***
+---
 
 ### writeContract
 

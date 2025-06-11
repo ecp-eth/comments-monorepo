@@ -6,6 +6,7 @@ import { IHook } from "../interfaces/IHook.sol";
 import { Hooks } from "../libraries/Hooks.sol";
 import { Comments } from "../libraries/Comments.sol";
 import { Channels } from "../libraries/Channels.sol";
+import { Metadata } from "../libraries/Metadata.sol";
 import { IChannelManager } from "../interfaces/IChannelManager.sol";
 import {
   IERC721Receiver
@@ -36,11 +37,11 @@ contract NoopHook is IHook {
 
   function onCommentAdd(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable returns (Comments.MetadataEntry[] memory) {
-    return new Comments.MetadataEntry[](0);
+  ) external payable returns (Metadata.MetadataEntry[] memory) {
+    return new Metadata.MetadataEntry[](0);
   }
 
   function onInitialize(
@@ -53,8 +54,8 @@ contract NoopHook is IHook {
 
   function onCommentDelete(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
   ) external payable override returns (bool) {
@@ -63,11 +64,11 @@ contract NoopHook is IHook {
 
   function onCommentEdit(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable override returns (Comments.MetadataEntry[] memory) {
-    return new Comments.MetadataEntry[](0);
+  ) external payable override returns (Metadata.MetadataEntry[] memory) {
+    return new Metadata.MetadataEntry[](0);
   }
 
   function onChannelUpdate(
@@ -80,11 +81,11 @@ contract NoopHook is IHook {
 
   function onCommentHookDataUpdate(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external pure override returns (Comments.HookMetadataUpdate[] memory) {
-    return new Comments.HookMetadataUpdate[](0);
+  ) external pure override returns (Metadata.HookMetadataUpdate[] memory) {
+    return new Metadata.HookMetadataUpdate[](0);
   }
 }

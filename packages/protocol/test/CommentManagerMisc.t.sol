@@ -12,6 +12,7 @@ import {
 import { TestUtils } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 
 contract CommentsTest is Test, IERC721Receiver {
   event ApprovalAdded(address indexed approver, address indexed approved);
@@ -26,7 +27,7 @@ contract CommentsTest is Test, IERC721Receiver {
     string content,
     string targetUri,
     uint8 commentType,
-    Comments.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata
   );
   event CommentHookMetadataSet(
     bytes32 indexed commentId,
@@ -267,7 +268,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentData.content,
       commentData.targetUri,
       commentData.commentType,
-      new Comments.MetadataEntry[](0)
+      new Metadata.MetadataEntry[](0)
     );
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
   }
@@ -277,7 +278,7 @@ contract CommentsTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Channel for testing hook updates",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(0)
     );
 
@@ -309,33 +310,30 @@ contract CommentsTest is Test, IERC721Receiver {
     bytes32[] memory keys = comments.getCommentHookMetadataKeys(commentId);
     assertEq(keys.length, 2);
     assertEq(
-      comments.getCommentHookMetadataValue(
-        commentId,
-        keccak256("initial_score")
-      ),
+      comments.getCommentHookMetadataValue(commentId, "uint256 initial_score"),
       abi.encode(uint256(100))
     );
     assertEq(
-      comments.getCommentHookMetadataValue(commentId, keccak256("status")),
+      comments.getCommentHookMetadataValue(commentId, "string status"),
       abi.encode("active")
     );
 
     // Now test updateCommentHookData
     // Expect events for the operations the hook will perform
     vm.expectEmit(true, true, true, true);
-    emit CommentHookMetadataSet(commentId, keccak256("status"), ""); // DELETE operation
+    emit CommentHookMetadataSet(commentId, "string status", ""); // DELETE operation
 
     vm.expectEmit(true, true, true, true);
     emit CommentHookMetadataSet(
       commentId,
-      keccak256("initial_score"),
+      "uint256 initial_score",
       abi.encode(uint256(150))
     ); // UPDATE operation
 
     vm.expectEmit(true, true, true, true);
     emit CommentHookMetadataSet(
       commentId,
-      keccak256("last_updated"),
+      "uint96 last_updated",
       abi.encode(block.timestamp)
     ); // NEW operation
 
@@ -348,27 +346,19 @@ contract CommentsTest is Test, IERC721Receiver {
 
     // Check that "status" was deleted
     assertEq(
-      comments
-        .getCommentHookMetadataValue(commentId, keccak256("status"))
-        .length,
+      comments.getCommentHookMetadataValue(commentId, "string status").length,
       0
     );
 
     // Check that "initial_score" was updated
     assertEq(
-      comments.getCommentHookMetadataValue(
-        commentId,
-        keccak256("initial_score")
-      ),
+      comments.getCommentHookMetadataValue(commentId, "uint256 initial_score"),
       abi.encode(uint256(150))
     );
 
     // Check that "last_updated" was added
     assertEq(
-      comments.getCommentHookMetadataValue(
-        commentId,
-        keccak256("last_updated")
-      ),
+      comments.getCommentHookMetadataValue(commentId, "uint96 last_updated"),
       abi.encode(block.timestamp)
     );
 
@@ -378,9 +368,9 @@ contract CommentsTest is Test, IERC721Receiver {
     bool foundStatus = false;
 
     for (uint i = 0; i < keys.length; i++) {
-      if (keys[i] == keccak256("initial_score")) foundScore = true;
-      if (keys[i] == keccak256("last_updated")) foundLastUpdated = true;
-      if (keys[i] == keccak256("status")) foundStatus = true;
+      if (keys[i] == "uint256 initial_score") foundScore = true;
+      if (keys[i] == "uint96 last_updated") foundLastUpdated = true;
+      if (keys[i] == "string status") foundStatus = true;
     }
 
     assertTrue(foundScore);
@@ -432,10 +422,10 @@ contract CommentsTest is Test, IERC721Receiver {
 contract MaliciousFeeCollector is BaseHook {
   function _onCommentAdd(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal pure override returns (Comments.MetadataEntry[] memory) {
+  ) internal pure override returns (Metadata.MetadataEntry[] memory) {
     revert("Malicious revert");
   }
 
@@ -461,18 +451,18 @@ contract MaliciousFeeCollector is BaseHook {
 contract TestHookUpdater is BaseHook {
   function _onCommentAdd(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal pure override returns (Comments.MetadataEntry[] memory) {
+  ) internal pure override returns (Metadata.MetadataEntry[] memory) {
     // Set initial metadata when comment is added
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](2);
-    metadata[0] = Comments.MetadataEntry({
-      key: keccak256("initial_score"),
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](2);
+    metadata[0] = Metadata.MetadataEntry({
+      key: "uint256 initial_score",
       value: abi.encode(uint256(100))
     });
-    metadata[1] = Comments.MetadataEntry({
-      key: keccak256("status"),
+    metadata[1] = Metadata.MetadataEntry({
+      key: "string status",
       value: abi.encode("active")
     });
     return metadata;
@@ -480,33 +470,33 @@ contract TestHookUpdater is BaseHook {
 
   function _onCommentHookDataUpdate(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal view override returns (Comments.HookMetadataUpdate[] memory) {
+  ) internal view override returns (Metadata.HookMetadataUpdate[] memory) {
     // Demonstrate SET and DELETE operations
-    Comments.HookMetadataUpdate[]
-      memory operations = new Comments.HookMetadataUpdate[](3);
+    Metadata.HookMetadataUpdate[]
+      memory operations = new Metadata.HookMetadataUpdate[](3);
 
     // DELETE operation - remove the status field
-    operations[0] = Comments.HookMetadataUpdate({
-      operation: Comments.MetadataOperation.DELETE,
-      key: keccak256("status"),
+    operations[0] = Metadata.HookMetadataUpdate({
+      operation: Metadata.MetadataOperation.DELETE,
+      key: "string status",
       value: "" // Ignored for DELETE
     });
 
     // SET operation - update existing score
-    operations[1] = Comments.HookMetadataUpdate({
-      operation: Comments.MetadataOperation.SET,
-      key: keccak256("initial_score"),
+    operations[1] = Metadata.HookMetadataUpdate({
+      operation: Metadata.MetadataOperation.SET,
+      key: "uint256 initial_score",
       value: abi.encode(uint256(150))
     });
 
     // SET operation - add new field
-    operations[2] = Comments.HookMetadataUpdate({
-      operation: Comments.MetadataOperation.SET,
-      key: keccak256("last_updated"),
+    operations[2] = Metadata.HookMetadataUpdate({
+      operation: Metadata.MetadataOperation.SET,
+      key: "uint96 last_updated",
       value: abi.encode(block.timestamp)
     });
 

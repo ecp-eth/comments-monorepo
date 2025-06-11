@@ -16,6 +16,7 @@ import { TestUtils } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
 import { Comments } from "../src/libraries/Comments.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 
 // Fee charging hook contract based on comment length
 contract LengthFeeHook is BaseHook {
@@ -55,10 +56,10 @@ contract LengthFeeHook is BaseHook {
 
   function _onCommentAdd(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal override returns (Comments.MetadataEntry[] memory) {
+  ) internal override returns (Metadata.MetadataEntry[] memory) {
     // Calculate fee based on content length
     uint256 contentLength = bytes(commentData.content).length;
     uint256 totalFee = contentLength * tokensPerCharacter;
@@ -78,7 +79,7 @@ contract LengthFeeHook is BaseHook {
     totalFeesCollected += hookFee;
     emit FeeCollected(commentData.author, hookFee);
 
-    return new Comments.MetadataEntry[](0);
+    return new Metadata.MetadataEntry[](0);
   }
 
   function withdrawFees() external {
@@ -299,7 +300,7 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Fee Channel",
       "Pay tokens per character",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(feeHook)
     );
 
@@ -312,7 +313,7 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: content,
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
@@ -350,7 +351,7 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Fee Channel",
       "Pay tokens per character",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(feeHook)
     );
 
@@ -359,7 +360,7 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
     // Create comment data using direct construction
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: content,
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT
       author: user1,
