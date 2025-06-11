@@ -45,7 +45,8 @@
     },
     "patchedDependencies": {
       "@privy-io/server-auth": "patches/@privy-io__server-auth.patch",
-      "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch"
+      "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch",
+      "@wagmi/connectors": "patches/@wagmi__connectors.patch"
     }
   },
   "lint-staged": {

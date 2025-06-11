@@ -1,0 +1,17 @@
+diff --git a/dist/esm/walletConnect.js b/dist/esm/walletConnect.js
+index 9fd3bc8c5774a9e5cb413f973255a91cc18f614d..5cdc15c9d5812442ee84c9910ceb5fe53475d188 100644
+--- a/dist/esm/walletConnect.js
++++ b/dist/esm/walletConnect.js
+@@ -1,10 +1,10 @@
+ import { ChainNotConfiguredError, ProviderNotFoundError, createConnector, extractRpcUrls, } from '@wagmi/core';
+ import { SwitchChainError, UserRejectedRequestError, getAddress, numberToHex, } from 'viem';
+ walletConnect.type = 'walletConnect';
++let provider_;
++let providerPromise;
+ export function walletConnect(parameters) {
+     const isNewChainsStale = parameters.isNewChainsStale ?? true;
+-    let provider_;
+-    let providerPromise;
+     const NAMESPACE = 'eip155';
+     let accountsChanged;
+     let chainChanged;

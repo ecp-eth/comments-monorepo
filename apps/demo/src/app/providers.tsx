@@ -9,7 +9,8 @@ import { useState, useMemo } from "react";
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  // force config to be retrieved from client side
+  // load config only once on client side
+  // (in dev strict mode it's called multiple times)
   const [config] = useState(() => getConfig());
   /**
    * This is a workaround to fix the issue when using ssr but not having cookies so the wagmi state
