@@ -45,7 +45,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     let rootCommentId: Hex | null = null;
 
     if (parentId) {
-      const parentComment = await context.db.find(schema.comments, {
+      const parentComment = await context.db.find(schema.comment, {
         id: parentId,
       });
 
@@ -98,7 +98,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       },
     );
 
-    await context.db.insert(schema.comments).values({
+    await context.db.insert(schema.comment).values({
       id: event.args.commentId,
       content: event.args.content,
       metadata: event.args.metadata.slice(),
@@ -148,7 +148,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
   // Handle hook metadata setting separately
   ponder.on("CommentsV1:CommentHookMetadataSet", async ({ event, context }) => {
-    const comment = await context.db.find(schema.comments, {
+    const comment = await context.db.find(schema.comment, {
       id: event.args.commentId,
     });
 
@@ -175,7 +175,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     }
 
     await context.db
-      .update(schema.comments, {
+      .update(schema.comment, {
         id: event.args.commentId,
       })
       .set({
@@ -184,7 +184,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   });
 
   ponder.on("CommentsV1:CommentDeleted", async ({ event, context }) => {
-    const existingComment = await context.db.find(schema.comments, {
+    const existingComment = await context.db.find(schema.comment, {
       id: event.args.commentId,
     });
 
@@ -193,7 +193,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       getAddress(existingComment.author) === getAddress(event.args.author)
     ) {
       await context.db
-        .update(schema.comments, {
+        .update(schema.comment, {
           id: event.args.commentId,
         })
         .set({
@@ -203,7 +203,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   });
 
   ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
-    const existingComment = await context.db.find(schema.comments, {
+    const existingComment = await context.db.find(schema.comment, {
       id: event.args.commentId,
     });
 
@@ -229,7 +229,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     );
 
     await context.db
-      .update(schema.comments, {
+      .update(schema.comment, {
         id: event.args.commentId,
       })
       .set({

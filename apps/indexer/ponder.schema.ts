@@ -5,8 +5,8 @@ import type {
 } from "@ecp.eth/sdk/indexer/schemas";
 import type { MetadataEntrySchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
-export const comments = onchainTable(
-  "comments",
+export const comment = onchainTable(
+  "comment",
   (t) => ({
     id: t.hex().primaryKey(),
     createdAt: t.timestamp({ withTimezone: true }).notNull(),
@@ -66,11 +66,11 @@ export const comments = onchainTable(
   }),
 );
 
-export type CommentSelectType = typeof comments.$inferSelect;
-export type CommentInsertType = typeof comments.$inferInsert;
+export type CommentSelectType = typeof comment.$inferSelect;
+export type CommentInsertType = typeof comment.$inferInsert;
 
-export const approvals = onchainTable(
-  "approvals",
+export const approval = onchainTable(
+  "approval",
   (t) => ({
     id: t.text().primaryKey(),
     author: t.hex().notNull(),
@@ -88,25 +88,25 @@ export const approvals = onchainTable(
   }),
 );
 
-export const commentRelations = relations(comments, ({ one, many }) => ({
+export const commentRelations = relations(comment, ({ one, many }) => ({
   // Each comment may have many response comments (children) that reference it.
-  replies: many(comments, {
+  replies: many(comment, {
     relationName: "comment_replies",
   }),
   // Each comment may have one parent comment, referenced by parentId.
-  parent: one(comments, {
+  parent: one(comment, {
     relationName: "comment_replies",
-    fields: [comments.parentId],
-    references: [comments.id],
+    fields: [comment.parentId],
+    references: [comment.id],
   }),
   // Each comment may have one root comment, referenced by rootCommentId.
-  root: one(comments, {
+  root: one(comment, {
     relationName: "comment_flat_replies",
-    fields: [comments.rootCommentId],
-    references: [comments.id],
+    fields: [comment.rootCommentId],
+    references: [comment.id],
   }),
   // Each root comment may have many replies (children) that reference it.
-  flatReplies: many(comments, {
+  flatReplies: many(comment, {
     relationName: "comment_flat_replies",
   }),
 }));
