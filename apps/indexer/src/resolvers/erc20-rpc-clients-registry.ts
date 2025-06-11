@@ -4,7 +4,10 @@ import type {
 } from "@ecp.eth/shared/resolvers";
 import { z } from "zod";
 import { createPublicClient, http } from "viem";
-import { getChainById } from "../utils/getChainById";
+import * as chains from "viem/chains";
+import { getChainById } from "@ecp.eth/shared/helpers";
+
+const allChains = Object.values(chains);
 
 class ERC20RpcClientsRegistry implements ERC20ClientRegistry {
   private clientsByChainId: Record<number, ERC20ClientConfig>;
@@ -26,9 +29,15 @@ class ERC20RpcClientsRegistry implements ERC20ClientRegistry {
             .url()
             .parse(process.env[`ERC20_TOKEN_URL_${chainId}`]);
 
+          const chain = getChainById<chains.Chain>(chainId, allChains);
+
+          if (!chain) {
+            throw new Error(`Chain ${chainId} not found`);
+          }
+
           acc[chainId] = {
             client: createPublicClient({
-              chain: getChainById(chainId),
+              chain,
               transport: http(rpcUrl),
             }),
             tokenAddressURL: (address) =>

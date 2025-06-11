@@ -31,12 +31,12 @@ export default (app: OpenAPIHono) => {
   app.openapi(getApprovalsRoute, async (c) => {
     const { author, app, limit, offset } = c.req.valid("query");
 
-    const query = db.query.approvals.findMany({
+    const query = db.query.approval.findMany({
       where: and(
-        eq(schema.approvals.author, author),
-        eq(schema.approvals.app, app),
+        eq(schema.approval.author, author),
+        eq(schema.approval.app, app),
       ),
-      orderBy: desc(schema.approvals.deletedAt),
+      orderBy: desc(schema.approval.deletedAt),
       limit: limit + 1,
       offset,
     });

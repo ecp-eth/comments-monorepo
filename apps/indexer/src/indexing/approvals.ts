@@ -6,7 +6,7 @@ export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
     const id = `${event.args.author}-${event.args.app}-${context.network.chainId}`;
 
     await context.db
-      .insert(schema.approvals)
+      .insert(schema.approval)
       .values({
         id,
         author: event.args.author,
@@ -26,7 +26,7 @@ export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
     const id = `${event.args.author}-${event.args.app}-${context.network.chainId}`;
 
     await context.db
-      .update(schema.approvals, {
+      .update(schema.approval, {
         id,
       })
       .set({
