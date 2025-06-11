@@ -27,7 +27,7 @@ export const IndexerAPIFarcasterDataSchema = z.object({
   fid: z.number().int(),
   pfpUrl: z.string().optional(),
   displayName: z.string().optional(),
-  username: z.string().optional(),
+  username: z.string(),
 });
 
 export type IndexerAPIFarcasterDataSchemaType = z.infer<
@@ -77,6 +77,131 @@ export type IndexerAPICommentZeroExSwapSchemaType = z.infer<
   typeof IndexerAPICommentZeroExSwapSchema
 >;
 
+export const IndexerAPICommentReferencePositionSchema = z.object({
+  start: z.number().int(),
+  end: z.number().int(),
+});
+
+export const IndexerAPICommentReferenceENSSchema = z.object({
+  type: z.literal("ens"),
+  avatarUrl: z.string().nullable(),
+  name: z.string(),
+  address: HexSchema,
+  position: IndexerAPICommentReferencePositionSchema,
+  url: z.string().url(),
+});
+
+export type IndexerAPICommentReferenceENSSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceENSSchema
+>;
+
+export const IndexerAPICommentReferenceFarcasterSchema = z.object({
+  type: z.literal("farcaster"),
+  address: HexSchema,
+  fid: z.number().int(),
+  username: z.string(),
+  displayName: z.string().nullable(),
+  pfpUrl: z.string().nullable(),
+  position: IndexerAPICommentReferencePositionSchema,
+  url: z.string().url(),
+});
+
+export type IndexerAPICommentReferenceFarcasterSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceFarcasterSchema
+>;
+
+export const IndexerAPICommentReferenceERC20Schema = z.object({
+  type: z.literal("erc20"),
+  chainId: z.number().int(),
+  symbol: z.string(),
+  logoURI: z.string().nullable(),
+  name: z.string(),
+  address: HexSchema,
+  caip19: z.string(),
+  url: z.string().url(),
+  position: IndexerAPICommentReferencePositionSchema,
+});
+
+export type IndexerAPICommentReferenceERC20SchemaType = z.infer<
+  typeof IndexerAPICommentReferenceERC20Schema
+>;
+
+export const IndexerAPICommentReferenceURLWebPageSchema = z.object({
+  type: z.literal("webpage"),
+  url: z.string().url(),
+  position: IndexerAPICommentReferencePositionSchema,
+  title: z.string(),
+  description: z.string().nullable(),
+  favicon: z.string().url().nullable(),
+  opengraph: z
+    .object({
+      title: z.string(),
+      description: z.string().nullable(),
+      image: z.string().url(),
+      url: z.string().url(),
+    })
+    .nullable(),
+});
+
+export type IndexerAPICommentReferenceURLWebPageSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceURLWebPageSchema
+>;
+
+export const IndexerAPICommentReferenceURLFileSchema = z.object({
+  type: z.literal("file"),
+  url: z.string().url(),
+  position: IndexerAPICommentReferencePositionSchema,
+  mediaType: z.string(),
+});
+
+export type IndexerAPICommentReferenceURLFileSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceURLFileSchema
+>;
+
+export const IndexerAPICommentReferenceURLImageSchema = z.object({
+  type: z.literal("image"),
+  url: z.string().url(),
+  position: IndexerAPICommentReferencePositionSchema,
+  mediaType: z.string(),
+});
+
+export type IndexerAPICommentReferenceURLImageSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceURLImageSchema
+>;
+
+export const IndexerAPICommentReferenceURLVideoSchema = z.object({
+  type: z.literal("video"),
+  url: z.string().url(),
+  position: IndexerAPICommentReferencePositionSchema,
+  mediaType: z.string(),
+});
+
+export type IndexerAPICommentReferenceURLVideoSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceURLVideoSchema
+>;
+
+export const IndexerAPICommentReferenceSchema = z.union([
+  IndexerAPICommentReferenceENSSchema,
+  IndexerAPICommentReferenceERC20Schema,
+  IndexerAPICommentReferenceFarcasterSchema,
+  IndexerAPICommentReferenceURLWebPageSchema,
+  IndexerAPICommentReferenceURLFileSchema,
+  IndexerAPICommentReferenceURLImageSchema,
+  IndexerAPICommentReferenceURLVideoSchema,
+]);
+
+export type IndexerAPICommentReferenceSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceSchema
+>;
+
+export const IndexerAPICommentReferencesSchema = z.array(
+  IndexerAPICommentReferenceSchema,
+);
+
+export type IndexerAPICommentReferencesSchemaType = z.infer<
+  typeof IndexerAPICommentReferencesSchema
+>;
+
 export const IndexerAPICommentSchema = z.object({
   app: HexSchema,
   author: IndexerAPIAuthorDataSchema,
@@ -99,6 +224,7 @@ export const IndexerAPICommentSchema = z.object({
   updatedAt: z.coerce.date(),
   revision: z.number().int(),
   zeroExSwap: IndexerAPICommentZeroExSwapSchema.nullable(),
+  references: IndexerAPICommentReferencesSchema,
 });
 
 export type IndexerAPICommentSchemaType = z.infer<

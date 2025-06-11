@@ -145,6 +145,7 @@ paths:
                                   type: string
                               required:
                                 - fid
+                                - username
                           required:
                             - address
                         id: {}
@@ -246,6 +247,264 @@ paths:
                           required:
                             - from
                             - to
+                        references:
+                          type: array
+                          items:
+                            anyOf:
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - ens
+                                  avatarUrl:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  name:
+                                    type: string
+                                  address: {}
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  url:
+                                    type: string
+                                    format: uri
+                                required:
+                                  - type
+                                  - avatarUrl
+                                  - name
+                                  - address
+                                  - position
+                                  - url
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - erc20
+                                  chainId:
+                                    type: integer
+                                  symbol:
+                                    type: string
+                                  logoURI:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  name:
+                                    type: string
+                                  address: {}
+                                  caip19:
+                                    type: string
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                required:
+                                  - type
+                                  - chainId
+                                  - symbol
+                                  - logoURI
+                                  - name
+                                  - address
+                                  - caip19
+                                  - url
+                                  - position
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - farcaster
+                                  address: {}
+                                  fid:
+                                    type: integer
+                                  username:
+                                    type: string
+                                  displayName:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  pfpUrl:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  url:
+                                    type: string
+                                    format: uri
+                                required:
+                                  - type
+                                  - address
+                                  - fid
+                                  - username
+                                  - displayName
+                                  - pfpUrl
+                                  - position
+                                  - url
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - webpage
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  title:
+                                    type: string
+                                  description:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  favicon:
+                                    type:
+                                      - string
+                                      - 'null'
+                                    format: uri
+                                  opengraph:
+                                    type:
+                                      - object
+                                      - 'null'
+                                    properties:
+                                      title:
+                                        type: string
+                                      description:
+                                        type:
+                                          - string
+                                          - 'null'
+                                      image:
+                                        type: string
+                                        format: uri
+                                      url:
+                                        type: string
+                                        format: uri
+                                    required:
+                                      - title
+                                      - description
+                                      - image
+                                      - url
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - title
+                                  - description
+                                  - favicon
+                                  - opengraph
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - file
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  mediaType:
+                                    type: string
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - mediaType
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - image
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  mediaType:
+                                    type: string
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - mediaType
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - video
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  mediaType:
+                                    type: string
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - mediaType
                         replies:
                           type: object
                           properties:
@@ -291,6 +550,7 @@ paths:
                                             type: string
                                         required:
                                           - fid
+                                          - username
                                     required:
                                       - address
                                   id: {}
@@ -389,6 +649,264 @@ paths:
                                     required:
                                       - from
                                       - to
+                                  references:
+                                    type: array
+                                    items:
+                                      anyOf:
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - ens
+                                            avatarUrl:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            name:
+                                              type: string
+                                            address: {}
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            url:
+                                              type: string
+                                              format: uri
+                                          required:
+                                            - type
+                                            - avatarUrl
+                                            - name
+                                            - address
+                                            - position
+                                            - url
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - erc20
+                                            chainId:
+                                              type: integer
+                                            symbol:
+                                              type: string
+                                            logoURI:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            name:
+                                              type: string
+                                            address: {}
+                                            caip19:
+                                              type: string
+                                            url:
+                                              type: string
+                                              format: uri
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                          required:
+                                            - type
+                                            - chainId
+                                            - symbol
+                                            - logoURI
+                                            - name
+                                            - address
+                                            - caip19
+                                            - url
+                                            - position
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - farcaster
+                                            address: {}
+                                            fid:
+                                              type: integer
+                                            username:
+                                              type: string
+                                            displayName:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            pfpUrl:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            url:
+                                              type: string
+                                              format: uri
+                                          required:
+                                            - type
+                                            - address
+                                            - fid
+                                            - username
+                                            - displayName
+                                            - pfpUrl
+                                            - position
+                                            - url
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - webpage
+                                            url:
+                                              type: string
+                                              format: uri
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            title:
+                                              type: string
+                                            description:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            favicon:
+                                              type:
+                                                - string
+                                                - 'null'
+                                              format: uri
+                                            opengraph:
+                                              type:
+                                                - object
+                                                - 'null'
+                                              properties:
+                                                title:
+                                                  type: string
+                                                description:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                image:
+                                                  type: string
+                                                  format: uri
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                              required:
+                                                - title
+                                                - description
+                                                - image
+                                                - url
+                                          required:
+                                            - type
+                                            - url
+                                            - position
+                                            - title
+                                            - description
+                                            - favicon
+                                            - opengraph
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - file
+                                            url:
+                                              type: string
+                                              format: uri
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            mediaType:
+                                              type: string
+                                          required:
+                                            - type
+                                            - url
+                                            - position
+                                            - mediaType
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - image
+                                            url:
+                                              type: string
+                                              format: uri
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            mediaType:
+                                              type: string
+                                          required:
+                                            - type
+                                            - url
+                                            - position
+                                            - mediaType
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - video
+                                            url:
+                                              type: string
+                                              format: uri
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            mediaType:
+                                              type: string
+                                          required:
+                                            - type
+                                            - url
+                                            - position
+                                            - mediaType
                                 required:
                                   - app
                                   - author
@@ -411,6 +929,7 @@ paths:
                                   - updatedAt
                                   - revision
                                   - zeroExSwap
+                                  - references
                             pagination:
                               type: object
                               properties:
@@ -452,6 +971,7 @@ paths:
                         - updatedAt
                         - revision
                         - zeroExSwap
+                        - references
                         - replies
                   pagination:
                     type: object
@@ -609,6 +1129,7 @@ paths:
                                   type: string
                               required:
                                 - fid
+                                - username
                           required:
                             - address
                         id: {}
@@ -707,6 +1228,264 @@ paths:
                           required:
                             - from
                             - to
+                        references:
+                          type: array
+                          items:
+                            anyOf:
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - ens
+                                  avatarUrl:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  name:
+                                    type: string
+                                  address: {}
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  url:
+                                    type: string
+                                    format: uri
+                                required:
+                                  - type
+                                  - avatarUrl
+                                  - name
+                                  - address
+                                  - position
+                                  - url
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - erc20
+                                  chainId:
+                                    type: integer
+                                  symbol:
+                                    type: string
+                                  logoURI:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  name:
+                                    type: string
+                                  address: {}
+                                  caip19:
+                                    type: string
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                required:
+                                  - type
+                                  - chainId
+                                  - symbol
+                                  - logoURI
+                                  - name
+                                  - address
+                                  - caip19
+                                  - url
+                                  - position
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - farcaster
+                                  address: {}
+                                  fid:
+                                    type: integer
+                                  username:
+                                    type: string
+                                  displayName:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  pfpUrl:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  url:
+                                    type: string
+                                    format: uri
+                                required:
+                                  - type
+                                  - address
+                                  - fid
+                                  - username
+                                  - displayName
+                                  - pfpUrl
+                                  - position
+                                  - url
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - webpage
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  title:
+                                    type: string
+                                  description:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  favicon:
+                                    type:
+                                      - string
+                                      - 'null'
+                                    format: uri
+                                  opengraph:
+                                    type:
+                                      - object
+                                      - 'null'
+                                    properties:
+                                      title:
+                                        type: string
+                                      description:
+                                        type:
+                                          - string
+                                          - 'null'
+                                      image:
+                                        type: string
+                                        format: uri
+                                      url:
+                                        type: string
+                                        format: uri
+                                    required:
+                                      - title
+                                      - description
+                                      - image
+                                      - url
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - title
+                                  - description
+                                  - favicon
+                                  - opengraph
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - file
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  mediaType:
+                                    type: string
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - mediaType
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - image
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  mediaType:
+                                    type: string
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - mediaType
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - video
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  mediaType:
+                                    type: string
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - mediaType
                         replies:
                           type: object
                           properties:
@@ -752,6 +1531,7 @@ paths:
                                             type: string
                                         required:
                                           - fid
+                                          - username
                                     required:
                                       - address
                                   id: {}
@@ -850,6 +1630,264 @@ paths:
                                     required:
                                       - from
                                       - to
+                                  references:
+                                    type: array
+                                    items:
+                                      anyOf:
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - ens
+                                            avatarUrl:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            name:
+                                              type: string
+                                            address: {}
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            url:
+                                              type: string
+                                              format: uri
+                                          required:
+                                            - type
+                                            - avatarUrl
+                                            - name
+                                            - address
+                                            - position
+                                            - url
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - erc20
+                                            chainId:
+                                              type: integer
+                                            symbol:
+                                              type: string
+                                            logoURI:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            name:
+                                              type: string
+                                            address: {}
+                                            caip19:
+                                              type: string
+                                            url:
+                                              type: string
+                                              format: uri
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                          required:
+                                            - type
+                                            - chainId
+                                            - symbol
+                                            - logoURI
+                                            - name
+                                            - address
+                                            - caip19
+                                            - url
+                                            - position
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - farcaster
+                                            address: {}
+                                            fid:
+                                              type: integer
+                                            username:
+                                              type: string
+                                            displayName:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            pfpUrl:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            url:
+                                              type: string
+                                              format: uri
+                                          required:
+                                            - type
+                                            - address
+                                            - fid
+                                            - username
+                                            - displayName
+                                            - pfpUrl
+                                            - position
+                                            - url
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - webpage
+                                            url:
+                                              type: string
+                                              format: uri
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            title:
+                                              type: string
+                                            description:
+                                              type:
+                                                - string
+                                                - 'null'
+                                            favicon:
+                                              type:
+                                                - string
+                                                - 'null'
+                                              format: uri
+                                            opengraph:
+                                              type:
+                                                - object
+                                                - 'null'
+                                              properties:
+                                                title:
+                                                  type: string
+                                                description:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                image:
+                                                  type: string
+                                                  format: uri
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                              required:
+                                                - title
+                                                - description
+                                                - image
+                                                - url
+                                          required:
+                                            - type
+                                            - url
+                                            - position
+                                            - title
+                                            - description
+                                            - favicon
+                                            - opengraph
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - file
+                                            url:
+                                              type: string
+                                              format: uri
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            mediaType:
+                                              type: string
+                                          required:
+                                            - type
+                                            - url
+                                            - position
+                                            - mediaType
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - image
+                                            url:
+                                              type: string
+                                              format: uri
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            mediaType:
+                                              type: string
+                                          required:
+                                            - type
+                                            - url
+                                            - position
+                                            - mediaType
+                                        - type: object
+                                          properties:
+                                            type:
+                                              type: string
+                                              enum:
+                                                - video
+                                            url:
+                                              type: string
+                                              format: uri
+                                            position:
+                                              type: object
+                                              properties:
+                                                start:
+                                                  type: integer
+                                                end:
+                                                  type: integer
+                                              required:
+                                                - start
+                                                - end
+                                            mediaType:
+                                              type: string
+                                          required:
+                                            - type
+                                            - url
+                                            - position
+                                            - mediaType
                                 required:
                                   - app
                                   - author
@@ -872,6 +1910,7 @@ paths:
                                   - updatedAt
                                   - revision
                                   - zeroExSwap
+                                  - references
                             pagination:
                               type: object
                               properties:
@@ -913,6 +1952,7 @@ paths:
                         - updatedAt
                         - revision
                         - zeroExSwap
+                        - references
                         - replies
                   pagination:
                     type: object
@@ -1077,6 +2117,7 @@ paths:
                         type: string
                     required:
                       - fid
+                      - username
                 required:
                   - address
   /api/muted-accounts/{address}:
@@ -1336,6 +2377,7 @@ paths:
                                   type: string
                               required:
                                 - fid
+                                - username
                           required:
                             - address
                         id: {}
@@ -1434,6 +2476,264 @@ paths:
                           required:
                             - from
                             - to
+                        references:
+                          type: array
+                          items:
+                            anyOf:
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - ens
+                                  avatarUrl:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  name:
+                                    type: string
+                                  address: {}
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  url:
+                                    type: string
+                                    format: uri
+                                required:
+                                  - type
+                                  - avatarUrl
+                                  - name
+                                  - address
+                                  - position
+                                  - url
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - erc20
+                                  chainId:
+                                    type: integer
+                                  symbol:
+                                    type: string
+                                  logoURI:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  name:
+                                    type: string
+                                  address: {}
+                                  caip19:
+                                    type: string
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                required:
+                                  - type
+                                  - chainId
+                                  - symbol
+                                  - logoURI
+                                  - name
+                                  - address
+                                  - caip19
+                                  - url
+                                  - position
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - farcaster
+                                  address: {}
+                                  fid:
+                                    type: integer
+                                  username:
+                                    type: string
+                                  displayName:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  pfpUrl:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  url:
+                                    type: string
+                                    format: uri
+                                required:
+                                  - type
+                                  - address
+                                  - fid
+                                  - username
+                                  - displayName
+                                  - pfpUrl
+                                  - position
+                                  - url
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - webpage
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  title:
+                                    type: string
+                                  description:
+                                    type:
+                                      - string
+                                      - 'null'
+                                  favicon:
+                                    type:
+                                      - string
+                                      - 'null'
+                                    format: uri
+                                  opengraph:
+                                    type:
+                                      - object
+                                      - 'null'
+                                    properties:
+                                      title:
+                                        type: string
+                                      description:
+                                        type:
+                                          - string
+                                          - 'null'
+                                      image:
+                                        type: string
+                                        format: uri
+                                      url:
+                                        type: string
+                                        format: uri
+                                    required:
+                                      - title
+                                      - description
+                                      - image
+                                      - url
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - title
+                                  - description
+                                  - favicon
+                                  - opengraph
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - file
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  mediaType:
+                                    type: string
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - mediaType
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - image
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  mediaType:
+                                    type: string
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - mediaType
+                              - type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    enum:
+                                      - video
+                                  url:
+                                    type: string
+                                    format: uri
+                                  position:
+                                    type: object
+                                    properties:
+                                      start:
+                                        type: integer
+                                      end:
+                                        type: integer
+                                    required:
+                                      - start
+                                      - end
+                                  mediaType:
+                                    type: string
+                                required:
+                                  - type
+                                  - url
+                                  - position
+                                  - mediaType
                       required:
                         - app
                         - author
@@ -1456,6 +2756,7 @@ paths:
                         - updatedAt
                         - revision
                         - zeroExSwap
+                        - references
                   pagination:
                     type: object
                     properties:
@@ -1559,6 +2860,7 @@ paths:
                             type: string
                         required:
                           - fid
+                          - username
                     required:
                       - address
                   id: {}
@@ -1657,6 +2959,264 @@ paths:
                     required:
                       - from
                       - to
+                  references:
+                    type: array
+                    items:
+                      anyOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - ens
+                            avatarUrl:
+                              type:
+                                - string
+                                - 'null'
+                            name:
+                              type: string
+                            address: {}
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            url:
+                              type: string
+                              format: uri
+                          required:
+                            - type
+                            - avatarUrl
+                            - name
+                            - address
+                            - position
+                            - url
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - erc20
+                            chainId:
+                              type: integer
+                            symbol:
+                              type: string
+                            logoURI:
+                              type:
+                                - string
+                                - 'null'
+                            name:
+                              type: string
+                            address: {}
+                            caip19:
+                              type: string
+                            url:
+                              type: string
+                              format: uri
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                          required:
+                            - type
+                            - chainId
+                            - symbol
+                            - logoURI
+                            - name
+                            - address
+                            - caip19
+                            - url
+                            - position
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - farcaster
+                            address: {}
+                            fid:
+                              type: integer
+                            username:
+                              type: string
+                            displayName:
+                              type:
+                                - string
+                                - 'null'
+                            pfpUrl:
+                              type:
+                                - string
+                                - 'null'
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            url:
+                              type: string
+                              format: uri
+                          required:
+                            - type
+                            - address
+                            - fid
+                            - username
+                            - displayName
+                            - pfpUrl
+                            - position
+                            - url
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - webpage
+                            url:
+                              type: string
+                              format: uri
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            title:
+                              type: string
+                            description:
+                              type:
+                                - string
+                                - 'null'
+                            favicon:
+                              type:
+                                - string
+                                - 'null'
+                              format: uri
+                            opengraph:
+                              type:
+                                - object
+                                - 'null'
+                              properties:
+                                title:
+                                  type: string
+                                description:
+                                  type:
+                                    - string
+                                    - 'null'
+                                image:
+                                  type: string
+                                  format: uri
+                                url:
+                                  type: string
+                                  format: uri
+                              required:
+                                - title
+                                - description
+                                - image
+                                - url
+                          required:
+                            - type
+                            - url
+                            - position
+                            - title
+                            - description
+                            - favicon
+                            - opengraph
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - file
+                            url:
+                              type: string
+                              format: uri
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            mediaType:
+                              type: string
+                          required:
+                            - type
+                            - url
+                            - position
+                            - mediaType
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - image
+                            url:
+                              type: string
+                              format: uri
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            mediaType:
+                              type: string
+                          required:
+                            - type
+                            - url
+                            - position
+                            - mediaType
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - video
+                            url:
+                              type: string
+                              format: uri
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            mediaType:
+                              type: string
+                          required:
+                            - type
+                            - url
+                            - position
+                            - mediaType
                 required:
                   - app
                   - author
@@ -1679,6 +3239,7 @@ paths:
                   - updatedAt
                   - revision
                   - zeroExSwap
+                  - references
         '400':
           description: When request is not valid
           content:
@@ -1763,6 +3324,7 @@ paths:
                             type: string
                         required:
                           - fid
+                          - username
                     required:
                       - address
                   id: {}
@@ -1861,6 +3423,264 @@ paths:
                     required:
                       - from
                       - to
+                  references:
+                    type: array
+                    items:
+                      anyOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - ens
+                            avatarUrl:
+                              type:
+                                - string
+                                - 'null'
+                            name:
+                              type: string
+                            address: {}
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            url:
+                              type: string
+                              format: uri
+                          required:
+                            - type
+                            - avatarUrl
+                            - name
+                            - address
+                            - position
+                            - url
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - erc20
+                            chainId:
+                              type: integer
+                            symbol:
+                              type: string
+                            logoURI:
+                              type:
+                                - string
+                                - 'null'
+                            name:
+                              type: string
+                            address: {}
+                            caip19:
+                              type: string
+                            url:
+                              type: string
+                              format: uri
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                          required:
+                            - type
+                            - chainId
+                            - symbol
+                            - logoURI
+                            - name
+                            - address
+                            - caip19
+                            - url
+                            - position
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - farcaster
+                            address: {}
+                            fid:
+                              type: integer
+                            username:
+                              type: string
+                            displayName:
+                              type:
+                                - string
+                                - 'null'
+                            pfpUrl:
+                              type:
+                                - string
+                                - 'null'
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            url:
+                              type: string
+                              format: uri
+                          required:
+                            - type
+                            - address
+                            - fid
+                            - username
+                            - displayName
+                            - pfpUrl
+                            - position
+                            - url
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - webpage
+                            url:
+                              type: string
+                              format: uri
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            title:
+                              type: string
+                            description:
+                              type:
+                                - string
+                                - 'null'
+                            favicon:
+                              type:
+                                - string
+                                - 'null'
+                              format: uri
+                            opengraph:
+                              type:
+                                - object
+                                - 'null'
+                              properties:
+                                title:
+                                  type: string
+                                description:
+                                  type:
+                                    - string
+                                    - 'null'
+                                image:
+                                  type: string
+                                  format: uri
+                                url:
+                                  type: string
+                                  format: uri
+                              required:
+                                - title
+                                - description
+                                - image
+                                - url
+                          required:
+                            - type
+                            - url
+                            - position
+                            - title
+                            - description
+                            - favicon
+                            - opengraph
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - file
+                            url:
+                              type: string
+                              format: uri
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            mediaType:
+                              type: string
+                          required:
+                            - type
+                            - url
+                            - position
+                            - mediaType
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - image
+                            url:
+                              type: string
+                              format: uri
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            mediaType:
+                              type: string
+                          required:
+                            - type
+                            - url
+                            - position
+                            - mediaType
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - video
+                            url:
+                              type: string
+                              format: uri
+                            position:
+                              type: object
+                              properties:
+                                start:
+                                  type: integer
+                                end:
+                                  type: integer
+                              required:
+                                - start
+                                - end
+                            mediaType:
+                              type: string
+                          required:
+                            - type
+                            - url
+                            - position
+                            - mediaType
                 required:
                   - app
                   - author
@@ -1883,6 +3703,7 @@ paths:
                   - updatedAt
                   - revision
                   - zeroExSwap
+                  - references
         '401':
           description: When user is not authenticated
           content:

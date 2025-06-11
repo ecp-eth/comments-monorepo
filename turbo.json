@@ -12,7 +12,11 @@
     "SENTRY_DSN",
     "SENTRY_ORG",
     "SENTRY_PROJECT",
-    "NEXT_PUBLIC_SENTRY_DSN"
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "NEXT_PUBLIC_PINATA_GATEWAY_URL",
+    "ENS_RPC_URL",
+    "NEYNAR_API_KEY",
+    "PINATA_JWT"
   ],
   "globalPassThroughEnv": [
     "ALLOWED_CHAIN_IDS",

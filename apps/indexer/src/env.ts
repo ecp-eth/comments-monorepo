@@ -31,6 +31,7 @@ const EnvSchema = z
     MODERATION_INDEXER_URL: z.string().url().optional(),
     PONDER_RPC_URL_8453: z.string().url().optional(),
     PONDER_START_BLOCK_8453: z.coerce.number().optional(),
+    ENS_RPC_URL: z.string().url(),
   })
   .superRefine((vars, ctx) => {
     if (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) {

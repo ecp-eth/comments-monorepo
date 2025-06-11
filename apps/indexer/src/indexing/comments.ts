@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { ponder, ponder as Ponder } from "ponder:registry";
+import { ponder as Ponder } from "ponder:registry";
 import {
   transformCommentParentId,
   transformCommentTargetUri,
@@ -15,6 +15,13 @@ import {
 import { notifyCommentPendingModeration } from "../lib/telegram-notifications";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
+import { resolveCommentReferences } from "../lib/resolve-comment-references";
+import { ensByAddressResolver } from "../resolvers/ens-by-address-resolver";
+import { ensByNameResolver } from "../resolvers/ens-by-name-resolver";
+import { erc20ByAddressResolver } from "../resolvers/erc20-by-address-resolver";
+import { erc20ByTickerResolver } from "../resolvers/erc20-by-ticker-resolver";
+import { farcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
+import { urlResolver } from "../resolvers/url-resolver";
 
 const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
 
@@ -76,6 +83,21 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       event.args.commentId,
     );
 
+    const referencesResolutionResult = await resolveCommentReferences(
+      {
+        chainId: context.network.chainId,
+        content: event.args.content,
+      },
+      {
+        ensByAddressResolver,
+        ensByNameResolver,
+        erc20ByAddressResolver,
+        erc20ByTickerResolver,
+        farcasterByAddressResolver,
+        urlResolver,
+      },
+    );
+
     await context.db.insert(schema.comments).values({
       id: event.args.commentId,
       content: event.args.content,
@@ -103,6 +125,9 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
             moderationStatusChangedAt: createdAt,
           }),
       zeroExSwap,
+      references: referencesResolutionResult.references,
+      referencesResolutionStatus: referencesResolutionResult.status,
+      referencesResolutionStatusChangedAt: new Date(),
     });
 
     // this is new comment so ensure we use correct default moderation status
@@ -176,26 +201,44 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         });
     }
   });
-}
 
-ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
-  const existingComment = await context.db.find(schema.comments, {
-    id: event.args.commentId,
-  });
-
-  if (!existingComment) {
-    return;
-  }
-
-  const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
-
-  await context.db
-    .update(schema.comments, {
+  ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
+    const existingComment = await context.db.find(schema.comments, {
       id: event.args.commentId,
-    })
-    .set({
-      content: event.args.content,
-      revision: existingComment.revision + 1,
-      updatedAt,
     });
-});
+
+    if (!existingComment) {
+      return;
+    }
+
+    const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
+
+    const referencesResolutionResult = await resolveCommentReferences(
+      {
+        chainId: context.network.chainId,
+        content: event.args.content,
+      },
+      {
+        ensByAddressResolver,
+        ensByNameResolver,
+        erc20ByAddressResolver,
+        erc20ByTickerResolver,
+        farcasterByAddressResolver,
+        urlResolver,
+      },
+    );
+
+    await context.db
+      .update(schema.comments, {
+        id: event.args.commentId,
+      })
+      .set({
+        content: event.args.content,
+        revision: existingComment.revision + 1,
+        updatedAt,
+        references: referencesResolutionResult.references,
+        referencesResolutionStatus: referencesResolutionResult.status,
+        referencesResolutionStatusChangedAt: new Date(),
+      });
+  });
+}

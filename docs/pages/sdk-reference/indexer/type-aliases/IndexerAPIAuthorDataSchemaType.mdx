@@ -17,7 +17,7 @@ type IndexerAPIAuthorDataSchemaType = {
      displayName?: string;
      fid: number;
      pfpUrl?: string;
-     username?: string;
+     username: string;
   };
 };
 ```
@@ -60,7 +60,7 @@ optional farcaster: {
   displayName?: string;
   fid: number;
   pfpUrl?: string;
-  username?: string;
+  username: string;
 };
 ```
 
@@ -82,8 +82,8 @@ fid: number;
 optional pfpUrl: string;
 ```
 
-#### farcaster.username?
+#### farcaster.username
 
 ```ts
-optional username: string;
+username: string;
 ```

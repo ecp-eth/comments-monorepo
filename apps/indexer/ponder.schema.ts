@@ -1,5 +1,8 @@
 import { index, onchainTable, relations } from "ponder";
-import type { IndexerAPICommentZeroExSwapSchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import type {
+  IndexerAPICommentReferencesSchemaType,
+  IndexerAPICommentZeroExSwapSchemaType,
+} from "@ecp.eth/sdk/indexer/schemas";
 import type { MetadataEntrySchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 export const comments = onchainTable(
@@ -32,6 +35,18 @@ export const comments = onchainTable(
     revision: t.integer().notNull().default(0),
     // find a way to define the column value as object or null
     zeroExSwap: t.jsonb().$type<IndexerAPICommentZeroExSwapSchemaType | null>(),
+    references: t
+      .jsonb()
+      .notNull()
+      .$type<IndexerAPICommentReferencesSchemaType>()
+      .default([]),
+    referencesResolutionStatus: t
+      .text({ enum: ["success", "pending", "partial", "failed"] })
+      .notNull()
+      .default("pending"),
+    referencesResolutionStatusChangedAt: t
+      .timestamp({ withTimezone: true })
+      .notNull(),
   }),
   (table) => ({
     targetUriIdx: index().on(table.targetUri),
@@ -44,6 +59,10 @@ export const comments = onchainTable(
     rootCommentIdIdx: index().on(table.rootCommentId),
     channelIdIdx: index().on(table.channelId),
     commentTypeIdx: index().on(table.commentType),
+    referencesResolutionStatusIdx: index().on(table.referencesResolutionStatus),
+    referencesResolutionStatusChangedAtIdx: index().on(
+      table.referencesResolutionStatusChangedAt,
+    ),
   }),
 );
 

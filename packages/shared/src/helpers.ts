@@ -231,6 +231,7 @@ export function insertPendingCommentToPage(
     moderationStatus: moderationEnabled ? "pending" : "approved",
     moderationStatusChangedAt: new Date(),
     zeroExSwap: zeroExSwap ?? null,
+    references: [],
     replies: {
       extra: queryData.pages[0].extra,
       results: [],

@@ -52,8 +52,6 @@ export function useCommentEdition(): CommentEditionAPI {
       client.setQueryData<ListCommentsQueryDataSchemaType | undefined>(
         params.queryKey,
         (data) => {
-          console.log("start", params);
-          console.log("data", data);
           if (!data) {
             return data;
           }
