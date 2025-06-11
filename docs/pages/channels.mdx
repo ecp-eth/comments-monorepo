@@ -3,9 +3,12 @@
 Each Comment in ECP is associated with a **Channel**. If not specified, the comment is associated with the default channel with id 0.
 Channels are [ERC721 NFTs](https://eips.ethereum.org/EIPS/eip-721) that can be owned, transferred, or traded.
 The Channel owner can set the **Hooks** for their channel that enable flexible and powerful behaviors for comments in the channel, such as:
+
 - Gating who can comment - by onchain primitives like NFTs or tokens
 - Charging a small fee to post a comment
 - Integrating with other protocols, such as tokens or NFTs
+
+To prevent spam and ensure quality channels, creating a new channel requires paying a small fee. The current channel creation fee can be retrieved by calling `getChannelCreationFee` from the SDK. This fee helps maintain the quality of channels in the protocol while still keeping channel creation accessible.
 
 Together with [Hooks](/hooks), Channels create a flexible system for building on-chain communities and apps with customizable rules.
 
@@ -103,7 +106,6 @@ uint256 channelId = channelManager.createChannel{value: fee}(
 ```
 
 - See the full example [here](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/channels-and-hooks/solidity/CreateChannel.s.sol).
-
 
 ## Links
 
