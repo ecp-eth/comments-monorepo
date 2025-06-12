@@ -14,19 +14,34 @@ Base is an Ethereum L2 that offers significantly lower gas costs compared to Eth
   operations={[
     {
       name: "postComment",
-      gasUnits: 74000,
+      gasUnits: 184150,
     },
     {
       name: "postCommentWithSig",
-      gasUnits: 60000,
+      gasUnits: 187407,
     },
     {
-      name: "Delete Comment",
-      gasUnits: 25000,
+      name: "editComment",
+      gasUnits: 49229,
+    },
+    {
+      name: "editCommentWithSig",
+      gasUnits: 34420,
+    },
+    {
+      name: "deleteComment",
+      gasUnits: 42588,
+    },
+    {
+      name: "deleteCommentWithSig",
+      gasUnits: 46980,
+    },
+    {
+      name: "createChannel",
+      gasUnits: 196535,
     },
   ]}
   gweiPerGases={[0.001, 0.005, 0.01]}
-  usdPerEth={2000}
 />
 
 ## Ethereum Mainnet
@@ -42,12 +57,27 @@ Base is an Ethereum L2 that offers significantly lower gas costs compared to Eth
       gasUnits: 60000,
     },
     {
-      name: "Delete Comment",
-      gasUnits: 25000,
+      name: "editComment",
+      gasUnits: 49229,
+    },
+    {
+      name: "editCommentWithSig",
+      gasUnits: 34420,
+    },
+    {
+      name: "deleteComment",
+      gasUnits: 42588,
+    },
+    {
+      name: "deleteCommentWithSig",
+      gasUnits: 46980,
+    },
+    {
+      name: "createChannel",
+      gasUnits: 196535,
     },
   ]}
   gweiPerGases={[0.1, 0.5, 1]}
-  usdPerEth={2000}
 />
 
 # Example transactions:
