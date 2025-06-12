@@ -236,7 +236,6 @@ function createIndexerAPICommentDataFromPendingCommentOperation(
     },
     deletedAt: null,
     zeroExSwap: null,
-    references: [],
     cursor: pendingCommentOperation.response.hash,
     hookMetadata: [],
     replies: {

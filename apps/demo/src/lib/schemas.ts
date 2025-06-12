@@ -10,14 +10,6 @@ import {
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 
-export const GenerateUploadUrlResponseSchema = z.object({
-  url: z.string().url(),
-});
-
-export type GenerateUploadUrlResponseSchemaType = z.infer<
-  typeof GenerateUploadUrlResponseSchema
->;
-
 const sharedCommentSchema = z.object({
   author: HexSchema,
   content: z.string().trim().nonempty(),
