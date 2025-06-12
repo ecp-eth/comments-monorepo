@@ -16,48 +16,48 @@
 
 ## Functions
 
-### `getHookPermissions() → struct Hooks.Permissions` (external)
+### getHookPermissions() → [struct Hooks.Permissions](/protocol-reference/libraries/Hooks#permissions) (external)
 
 
 
 
 
-### `onInitialize(address channel, struct Channels.Channel channelData, uint256 channelId) → bool success` (external)
+### onInitialize(address channel, [struct Channels.Channel](/protocol-reference/libraries/Channels#channel) channelData, uint256 channelId) → bool success (external)
 
 Execute after a hook is initialized on a channel
 
 
 
 
-### `onCommentAdd(struct Comments.Comment commentData, struct Metadata.MetadataEntry[] metadata, address msgSender, bytes32 commentId) → struct Metadata.MetadataEntry[] hookMetadata` (external)
+### onCommentAdd([struct Comments.Comment](/protocol-reference/libraries/Comments#comment) commentData, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata, address msgSender, bytes32 commentId) → [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) hookMetadata (external)
 
 Execute after a comment is processed
 
 
 
 
-### `onCommentDelete(struct Comments.Comment commentData, struct Metadata.MetadataEntry[] metadata, struct Metadata.MetadataEntry[] hookMetadata, address msgSender, bytes32 commentId) → bool success` (external)
+### onCommentDelete([struct Comments.Comment](/protocol-reference/libraries/Comments#comment) commentData, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) hookMetadata, address msgSender, bytes32 commentId) → bool success (external)
 
 Execute after a comment is deleted
 
 
 
 
-### `onCommentEdit(struct Comments.Comment commentData, struct Metadata.MetadataEntry[] metadata, address msgSender, bytes32 commentId) → struct Metadata.MetadataEntry[] hookMetadata` (external)
+### onCommentEdit([struct Comments.Comment](/protocol-reference/libraries/Comments#comment) commentData, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata, address msgSender, bytes32 commentId) → [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) hookMetadata (external)
 
 Execute after a comment is edited
 
 
 
 
-### `onChannelUpdate(address channel, uint256 channelId, struct Channels.Channel channelData, struct Metadata.MetadataEntry[] metadata) → bool success` (external)
+### onChannelUpdate(address channel, uint256 channelId, [struct Channels.Channel](/protocol-reference/libraries/Channels#channel) channelData, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata) → bool success (external)
 
 Execute after a channel is updated
 
 
 
 
-### `onCommentHookDataUpdate(struct Comments.Comment commentData, struct Metadata.MetadataEntry[] metadata, struct Metadata.MetadataEntry[] hookMetadata, address msgSender, bytes32 commentId) → struct Metadata.MetadataEntryOp[] operations` (external)
+### onCommentHookDataUpdate([struct Comments.Comment](/protocol-reference/libraries/Comments#comment) commentData, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) hookMetadata, address msgSender, bytes32 commentId) → [struct Metadata.MetadataEntryOp[]](/protocol-reference/libraries/Metadata#metadataentryop) operations (external)
 
 Execute to update hook data for an existing comment
 

@@ -15,6 +15,10 @@
 {{#each ownStructs}}
 ### `{{name}}`
 
+{{{natspec.userdoc}}}
+
+{{{natspec.devdoc}}}
+
 {{#each members}}
 
 - **{{name}}:** ({{type}}) {{natspec.devdoc}}
@@ -54,7 +58,7 @@
 {{/if}}
 
 {{#each ownFunctions}}
-### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
+### {{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}} ({{visibility}})
 
 {{{natspec.userdoc}}}
 

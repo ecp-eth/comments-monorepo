@@ -12,6 +12,11 @@
 
 ### `Comment`
 
+Struct containing all comment data
+
+
+
+
 
 - **author:** (address) The address of the comment author
 
@@ -50,6 +55,11 @@
 
 ### `CreateComment`
 
+Struct containing all comment data for creating a comment
+
+
+
+
 
 - **author:** (address) The address of the comment author
 
@@ -87,6 +97,11 @@
 
 
 ### `EditComment`
+
+Struct containing all comment data for editing a comment
+
+
+
 
 
 - **app:** (address) The address of the application signer that authorized this comment

@@ -12,6 +12,11 @@
 
 ### `MetadataEntry`
 
+Struct containing metadata key-value pair
+
+
+
+
 
 - **key:** (bytes32) UTF-8 encoded string of format "type key". Must fit in 32 bytes.
 
@@ -21,6 +26,11 @@
 
 
 ### `MetadataEntryOp`
+
+Struct for hook metadata operations with explicit operation type
+
+
+
 
 
 - **operation:** (enum Metadata.MetadataOperation) The operation to perform (SET or DELETE)
@@ -46,9 +56,9 @@
 ### `MetadataOperation`
 
 
+SET
 
 
-
-
+DELETE
 
 
