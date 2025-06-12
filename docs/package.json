@@ -15,7 +15,7 @@
     "ref:gen:sdk": "typedoc --publicPath /sdk-reference/ && add-mdx-autogen-warning pages/sdk-reference/index.mdx",
     "ref:gen:protocol": "solidity-docgen -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen",
     "ref:gen:indexer:index": "cp ../apps/indexer/README.md pages/indexer-reference/index.mdx && add-mdx-autogen-warning pages/indexer-reference/index.mdx",
-    "ref:gen:indexer": "npm run ref:gen:indexer:index && NEYNAR_API_KEY=123 SKIP_DRIZZLE_SCHEMA_DETECTION=1 WEBHOOK_SECRET=secret ENS_RPC_URL=https://some.rpc.url DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres tsx --import ./scripts/ponder-module-register.mjs scripts/generate-indexer-openapi-spec.ts",
+    "ref:gen:indexer": "npm run ref:gen:indexer:index && NEYNAR_API_KEY=123 SKIP_DRIZZLE_SCHEMA_DETECTION=1 WEBHOOK_SECRET=secret DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres tsx --import ./scripts/ponder-module-register.mjs scripts/generate-indexer-openapi-spec.ts",
     "ref:gen:all": "pnpm run ref:gen:protocol && pnpm run ref:gen:sdk && pnpm run ref:gen:indexer && pnpm run ref:gen:demo"
   },
   "dependencies": {

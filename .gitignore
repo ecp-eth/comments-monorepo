@@ -75,5 +75,3 @@ packages/shared/helpers
 packages/shared/hooks
 packages/shared/schemas
 packages/shared/types
-packages/shared/token-list
-packages/shared/resolvers
