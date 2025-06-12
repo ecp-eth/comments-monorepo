@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@ecp.eth/sdk": "workspace:*",
-    "@radix-ui/react-select": "^2.1.6",
+    "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-slot": "^1.1.1",
     "@theguild/remark-mermaid": "^0.3.0",
     "@vitejs/plugin-react": "^4.5.1",
