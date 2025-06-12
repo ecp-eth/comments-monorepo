@@ -3,6 +3,7 @@ import { type Address, getAddress, type Hex } from "viem";
 import {
   NeynarAPIClient,
   Configuration as NeynarConfiguration,
+  isApiErrorResponse,
 } from "@neynar/nodejs-sdk";
 
 import type { User } from "@neynar/nodejs-sdk/build/api";
@@ -86,10 +87,15 @@ export function createFarcasterByAddressResolver({
           };
         });
       } catch (e) {
+        if (isApiErrorResponse(e) && e.response.status === 404) {
+          // this is expected edge case in neynar api when you pass only one address and that address does not exist
+          // in this case we return null for all addresses
+          return addresses.map(() => null);
+        }
+
         console.error(e);
 
         const err = e instanceof Error ? e : new Error(String(e));
-
         throw err;
       }
     },
