@@ -13,6 +13,7 @@ import { TestUtils, AlwaysReturningDataHook } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
 import { Metadata } from "../src/libraries/Metadata.sol";
+import { IProtocolFees } from "../src/interfaces/IProtocolFees.sol";
 
 contract NoHook is BaseHook {
   function getHookPermissions()
@@ -30,6 +31,43 @@ contract NoHook is BaseHook {
         onChannelUpdate: false,
         onCommentHookDataUpdate: false
       });
+  }
+}
+
+contract FeeRequiringHook is BaseHook {
+  uint256 public constant REQUIRED_FEE = 0.001 ether;
+
+  function _getHookPermissions()
+    internal
+    pure
+    override
+    returns (Hooks.Permissions memory)
+  {
+    return
+      Hooks.Permissions({
+        onInitialize: false,
+        onCommentAdd: true,
+        onCommentDelete: false,
+        onCommentEdit: false,
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
+      });
+  }
+
+  function getRequiredFee() public pure returns (uint256) {
+    return REQUIRED_FEE;
+  }
+
+  function _onCommentAdd(
+    Comments.Comment calldata,
+    Metadata.MetadataEntry[] calldata,
+    address,
+    bytes32
+  ) internal override returns (Metadata.MetadataEntry[] memory) {
+    if (msg.value < REQUIRED_FEE) {
+      revert("Insufficient hook fee");
+    }
+    return new Metadata.MetadataEntry[](0);
   }
 }
 
@@ -62,6 +100,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
   NoHook public noHook;
   AlwaysReturningDataHook public alwaysReturningDataHook;
+  FeeRequiringHook public feeRequiringHook;
 
   // Test accounts
   address public owner;
@@ -77,6 +116,7 @@ contract CommentsTest is Test, IERC721Receiver {
     app = vm.addr(appPrivateKey);
     noHook = new NoHook();
     alwaysReturningDataHook = new AlwaysReturningDataHook();
+    feeRequiringHook = new FeeRequiringHook();
     (comments, channelManager) = TestUtils.createContracts(owner);
 
     // Setup private keys for signing
@@ -520,6 +560,153 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(hookMetadata.length, 1);
     assertEq(hookMetadata[0].key, bytes32("string status"));
     assertEq(string(hookMetadata[0].value), "hook data");
+  }
+
+  function test_PostCommentWithSig_WithProtocolAndHookFees() public {
+    // Set protocol comment creation fee
+    uint96 commentsProtocolFee = 0.01 ether;
+    uint96 channelCreationFee = 0.02 ether;
+    channelManager.setCommentCreationFee(commentsProtocolFee);
+
+    uint256 hookFee = feeRequiringHook.getRequiredFee();
+
+    // Calculate the total amount needed to send to get hookFee after protocol fee
+    uint256 hookProtocolFee = channelManager.calculateMsgValueWithHookFee(
+      hookFee
+    ) - hookFee;
+
+    // Create channel with fee hook that requires 0.001 ETH
+    uint256 channelId = channelManager.createChannel{
+      value: channelCreationFee
+    }(
+      "Test Channel",
+      "Test Description",
+      new Metadata.MetadataEntry[](0),
+      address(feeRequiringHook)
+    );
+
+    // Verify channel creation fee was collected
+    assertEq(address(channelManager).balance, channelCreationFee);
+
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.channelId = channelId;
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory authorSignature = TestUtils.signEIP712(
+      vm,
+      authorPrivateKey,
+      commentId
+    );
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    assertEq(address(feeRequiringHook).balance, 0);
+
+    // Post comment with both protocol fee (0.01 ETH) and hook fee (0.001 ETH)
+    vm.prank(author);
+    vm.deal(author, 1 ether);
+    comments.postCommentWithSig{
+      value: commentsProtocolFee + hookFee + hookProtocolFee
+    }(commentData, authorSignature, appSignature);
+
+    assertEq(address(feeRequiringHook).balance, hookFee);
+    assertEq(
+      address(feeRequiringHook).balance,
+      feeRequiringHook.getRequiredFee()
+    );
+    assertEq(address(comments).balance, 0);
+    // Verify protocol fee was collected
+    assertEq(
+      address(channelManager).balance,
+      channelCreationFee + commentsProtocolFee + hookProtocolFee
+    ); // 0.02 (channel creation) + 0.01 (comment fee) + hook protocol fee
+    // Verify hook fee was collected
+  }
+
+  function test_PostCommentWithSig_WithProtocolAndHookFees_InsufficientFee()
+    public
+  {
+    // Set protocol comment creation fee
+    channelManager.setCommentCreationFee(0.01 ether);
+
+    // Create channel with fee hook that requires 0.001 ETH
+    uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
+      "Test Channel",
+      "Test Description",
+      new Metadata.MetadataEntry[](0),
+      address(feeRequiringHook)
+    );
+
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.channelId = channelId;
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory authorSignature = TestUtils.signEIP712(
+      vm,
+      authorPrivateKey,
+      commentId
+    );
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    // Try to post comment with insufficient fee (only 0.005 ETH when 0.011 ETH is required)
+    vm.prank(author);
+    vm.deal(author, 1 ether);
+    vm.expectRevert(IProtocolFees.InsufficientFee.selector);
+    comments.postCommentWithSig{ value: 0.005 ether }(
+      commentData,
+      authorSignature,
+      appSignature
+    );
+  }
+
+  function test_PostCommentWithSig_WithProtocolAndHookFees_ExcessFee() public {
+    // Set protocol comment creation fee
+    channelManager.setCommentCreationFee(0.01 ether);
+
+    // Create channel with fee hook that requires 0.001 ETH
+    uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
+      "Test Channel",
+      "Test Description",
+      new Metadata.MetadataEntry[](0),
+      address(0)
+    );
+
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.channelId = channelId;
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory authorSignature = TestUtils.signEIP712(
+      vm,
+      authorPrivateKey,
+      commentId
+    );
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    // Post comment with excess fee (0.02 ETH when 0.01 ETH is required)
+    vm.prank(author);
+    vm.deal(author, 1 ether);
+    uint256 authorBalanceBefore = author.balance;
+
+    comments.postCommentWithSig{ value: 0.02 ether }(
+      commentData,
+      authorSignature,
+      appSignature
+    );
+
+    // Verify excess fee was refunded
+    assertEq(author.balance, authorBalanceBefore - 0.01 ether);
+    assertEq(address(channelManager).balance, 0.03 ether); // 0.02 (channel creation) + 0.01 (comment fee)
   }
 
   function onERC721Received(

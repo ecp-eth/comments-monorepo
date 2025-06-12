@@ -152,6 +152,15 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     bytes32 commentId,
     Comments.CreateComment calldata commentData
   ) internal {
+    // Collect protocol comment fee, if any.
+    uint96 commentCreationFee = channelManager.getCommentCreationFee();
+    if (commentCreationFee > 0) {
+      if (msg.value < commentCreationFee) {
+        revert IProtocolFees.InsufficientFee();
+      }
+      channelManager.collectCommentCreationFee{ value: commentCreationFee }();
+    }
+
     address author = commentData.author;
     address app = commentData.app;
     uint256 channelId = commentData.channelId;
@@ -213,9 +222,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       IHook hook = IHook(channel.hook);
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
-        .deductProtocolHookTransactionFee(msg.value);
+        .deductProtocolHookTransactionFee(msg.value - commentCreationFee);
+      payable(address(channelManager)).transfer(
+        msg.value - commentCreationFee - msgValueAfterFee
+      );
 
-      Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentAdd{
+      Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentAdd{ // forward the remaining sent value to the hook.
         value: msgValueAfterFee
       }(comment, metadata, msg.sender, commentId);
 
@@ -237,6 +249,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
           emit CommentHookMetadataSet(commentId, key, value);
         }
       }
+    }
+    // refund excess payment if any
+    else if (msg.value > commentCreationFee) {
+      payable(msg.sender).transfer(msg.value - commentCreationFee);
     }
   }
 
@@ -381,6 +397,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       // Calculate hook value after protocol fee
       uint256 msgValueAfterFee = channelManager
         .deductProtocolHookTransactionFee(msg.value);
+      payable(address(channelManager)).transfer(msg.value - msgValueAfterFee);
 
       Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentEdit{
         value: msgValueAfterFee
@@ -399,6 +416,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         emit CommentHookMetadataSet(commentId, key, value);
       }
+    } else if (msg.value > 0) {
+      // refund excess payment if any
+      payable(msg.sender).transfer(msg.value);
     }
   }
 

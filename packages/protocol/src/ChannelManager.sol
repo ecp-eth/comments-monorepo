@@ -118,7 +118,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     Metadata.MetadataEntry[] calldata metadata,
     address hook
   ) external payable returns (uint256 channelId) {
-    collectChannelCreationFee();
+    _collectChannelCreationFee();
 
     // Generate channel ID using the internal function
     channelId = getChannelId(msg.sender, name, description, metadata);
