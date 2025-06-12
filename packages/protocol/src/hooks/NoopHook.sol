@@ -85,7 +85,7 @@ contract NoopHook is IHook {
     Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external pure override returns (Metadata.HookMetadataUpdate[] memory) {
-    return new Metadata.HookMetadataUpdate[](0);
+  ) external pure override returns (Metadata.MetadataEntryOp[] memory) {
+    return new Metadata.MetadataEntryOp[](0);
   }
 }

@@ -474,27 +474,27 @@ contract TestHookUpdater is BaseHook {
     Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal view override returns (Metadata.HookMetadataUpdate[] memory) {
+  ) internal view override returns (Metadata.MetadataEntryOp[] memory) {
     // Demonstrate SET and DELETE operations
-    Metadata.HookMetadataUpdate[]
-      memory operations = new Metadata.HookMetadataUpdate[](3);
+    Metadata.MetadataEntryOp[]
+      memory operations = new Metadata.MetadataEntryOp[](3);
 
     // DELETE operation - remove the status field
-    operations[0] = Metadata.HookMetadataUpdate({
+    operations[0] = Metadata.MetadataEntryOp({
       operation: Metadata.MetadataOperation.DELETE,
       key: "string status",
       value: "" // Ignored for DELETE
     });
 
     // SET operation - update existing score
-    operations[1] = Metadata.HookMetadataUpdate({
+    operations[1] = Metadata.MetadataEntryOp({
       operation: Metadata.MetadataOperation.SET,
       key: "uint256 initial_score",
       value: abi.encode(uint256(150))
     });
 
     // SET operation - add new field
-    operations[2] = Metadata.HookMetadataUpdate({
+    operations[2] = Metadata.MetadataEntryOp({
       operation: Metadata.MetadataOperation.SET,
       key: "uint96 last_updated",
       value: abi.encode(block.timestamp)

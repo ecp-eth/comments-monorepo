@@ -134,12 +134,12 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   /// @return exists Whether the channel exists
   function channelExists(uint256 channelId) external view returns (bool);
 
-  /// @notice Set metadata for a channel
+  /// @notice Sets metadata for a channel
   /// @param channelId The unique identifier of the channel
-  /// @param metadata The metadata entries to set
+  /// @param operations Array of metadata operations to perform
   function setChannelMetadata(
     uint256 channelId,
-    Metadata.MetadataEntry[] calldata metadata
+    Metadata.MetadataEntryOp[] calldata operations
   ) external;
 
   /// @notice Get all metadata for a channel

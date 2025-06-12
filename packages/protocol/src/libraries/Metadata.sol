@@ -21,7 +21,7 @@ library Metadata {
   /// @param operation The operation to perform (SET or DELETE)
   /// @param key The metadata key
   /// @param value The metadata value (ignored for DELETE operations)
-  struct HookMetadataUpdate {
+  struct MetadataEntryOp {
     MetadataOperation operation;
     bytes32 key;
     bytes value;

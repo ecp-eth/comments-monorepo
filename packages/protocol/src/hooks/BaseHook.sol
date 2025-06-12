@@ -167,7 +167,7 @@ abstract contract BaseHook is IHook, ERC165 {
     Metadata.MetadataEntry[] calldata hookMetadata,
     address msgSender,
     bytes32 commentId
-  ) external virtual returns (Metadata.HookMetadataUpdate[] memory) {
+  ) external virtual returns (Metadata.MetadataEntryOp[] memory) {
     return
       _onCommentHookDataUpdate(
         commentData,
@@ -184,7 +184,7 @@ abstract contract BaseHook is IHook, ERC165 {
     Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal virtual returns (Metadata.HookMetadataUpdate[] memory) {
+  ) internal virtual returns (Metadata.MetadataEntryOp[] memory) {
     revert HookNotImplemented();
   }
 }

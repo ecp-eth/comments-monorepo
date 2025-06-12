@@ -241,23 +241,31 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   /// @inheritdoc IChannelManager
   function setChannelMetadata(
     uint256 channelId,
-    Metadata.MetadataEntry[] calldata metadata
+    Metadata.MetadataEntryOp[] calldata operations
   ) external {
     if (!_channelExists(channelId)) revert ChannelDoesNotExist();
     if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
 
-    // Clear existing metadata to prevent orphaned entries
-    _clearChannelMetadata(channelId);
+    // Apply metadata operations
+    for (uint i = 0; i < operations.length; i++) {
+      Metadata.MetadataEntryOp memory op = operations[i];
 
-    // Store new metadata entries in mappings
-    for (uint i = 0; i < metadata.length; i++) {
-      bytes32 key = metadata[i].key;
-      bytes memory value = metadata[i].value;
+      if (op.operation == Metadata.MetadataOperation.DELETE) {
+        _deleteChannelMetadataKey(channelId, op.key);
+        emit ChannelMetadataSet(channelId, op.key, ""); // Emit empty value for deletion
+      } else if (op.operation == Metadata.MetadataOperation.SET) {
+        // Check if this is a new key for gas optimization
+        bool isNewKey = !_channelMetadataKeyExists(channelId, op.key);
 
-      channelMetadata[channelId][key] = value;
-      channelMetadataKeys[channelId].push(key);
+        channelMetadata[channelId][op.key] = op.value;
 
-      emit ChannelMetadataSet(channelId, key, value);
+        // Only add to keys array if it's a new key
+        if (isNewKey) {
+          channelMetadataKeys[channelId].push(op.key);
+        }
+
+        emit ChannelMetadataSet(channelId, op.key, op.value);
+      }
     }
 
     // Notify hook of channel update if configured
@@ -270,6 +278,45 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         hook.onChannelUpdate(address(this), channelId, channel);
       }
     }
+  }
+
+  /// @notice Internal function to delete a specific channel metadata key
+  /// @param channelId The unique identifier of the channel
+  /// @param keyToDelete The key to delete
+  function _deleteChannelMetadataKey(
+    uint256 channelId,
+    bytes32 keyToDelete
+  ) internal {
+    // Delete the value
+    delete channelMetadata[channelId][keyToDelete];
+
+    // Remove from keys array
+    bytes32[] storage keys = channelMetadataKeys[channelId];
+    for (uint i = 0; i < keys.length; i++) {
+      if (keys[i] == keyToDelete) {
+        // Move last element to current position and pop
+        keys[i] = keys[keys.length - 1];
+        keys.pop();
+        break;
+      }
+    }
+  }
+
+  /// @notice Internal function to check if a channel metadata key exists
+  /// @param channelId The unique identifier of the channel
+  /// @param targetKey The key to check for existence
+  /// @return exists Whether the key exists in the metadata
+  function _channelMetadataKeyExists(
+    uint256 channelId,
+    bytes32 targetKey
+  ) internal view returns (bool) {
+    bytes32[] storage keys = channelMetadataKeys[channelId];
+    for (uint i = 0; i < keys.length; i++) {
+      if (keys[i] == targetKey) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// @inheritdoc IChannelManager
@@ -304,18 +351,5 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     uint256 channelId
   ) external view returns (bytes32[] memory) {
     return channelMetadataKeys[channelId];
-  }
-
-  /// @notice Internal function to clear all metadata for a channel
-  /// @dev Removes all key-value pairs and clears the keys array to prevent orphaned data
-  /// @param channelId The unique identifier of the channel
-  function _clearChannelMetadata(uint256 channelId) internal {
-    bytes32[] storage keys = channelMetadataKeys[channelId];
-    // Delete all metadata values by iterating through keys
-    for (uint i = 0; i < keys.length; i++) {
-      delete channelMetadata[channelId][keys[i]];
-    }
-    // Clear the keys array
-    delete channelMetadataKeys[channelId];
   }
 }

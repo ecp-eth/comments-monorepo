@@ -88,5 +88,5 @@ interface IHook is IERC165 {
     Metadata.MetadataEntry[] calldata hookMetadata,
     address msgSender,
     bytes32 commentId
-  ) external returns (Metadata.HookMetadataUpdate[] memory operations);
+  ) external returns (Metadata.MetadataEntryOp[] memory operations);
 }

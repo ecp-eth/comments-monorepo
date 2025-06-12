@@ -155,9 +155,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     // Collect protocol comment fee, if any.
     uint96 commentCreationFee = channelManager.getCommentCreationFee();
     if (commentCreationFee > 0) {
-      if (msg.value < commentCreationFee) {
-        revert IProtocolFees.InsufficientFee();
-      }
       channelManager.collectCommentCreationFee{ value: commentCreationFee }();
     }
 
@@ -932,14 +929,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     IHook hook = IHook(channel.hook);
 
-    Metadata.HookMetadataUpdate[] memory operations = hook
-      .onCommentHookDataUpdate(
-        comment,
-        metadata,
-        hookMetadata,
-        msg.sender,
-        commentId
-      );
+    Metadata.MetadataEntryOp[] memory operations = hook.onCommentHookDataUpdate(
+      comment,
+      metadata,
+      hookMetadata,
+      msg.sender,
+      commentId
+    );
 
     // Apply hook metadata operations using merge mode (gas-efficient)
     _applyHookMetadataOperations(commentId, operations);
@@ -950,10 +946,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @param operations The metadata operations to apply
   function _applyHookMetadataOperations(
     bytes32 commentId,
-    Metadata.HookMetadataUpdate[] memory operations
+    Metadata.MetadataEntryOp[] memory operations
   ) internal {
     for (uint i = 0; i < operations.length; i++) {
-      Metadata.HookMetadataUpdate memory op = operations[i];
+      Metadata.MetadataEntryOp memory op = operations[i];
 
       if (op.operation == Metadata.MetadataOperation.DELETE) {
         _deleteCommentHookMetadataKey(commentId, op.key);

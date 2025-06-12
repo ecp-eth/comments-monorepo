@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import { Test } from "forge-std/Test.sol";
+import { console } from "forge-std/console.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
@@ -185,6 +186,160 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
     Channels.Channel memory channel = channelManager.getChannel(channelId);
     assertEq(address(channel.hook), address(mockHook));
+  }
+
+  function test_SetChannelMetadata_GasComparison() public {
+    // Create a channel first
+    uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
+      "Test Channel",
+      "Test Description",
+      new Metadata.MetadataEntry[](0),
+      address(0)
+    );
+
+    // Test data for both implementations
+    bytes32 key1 = "string key1";
+    bytes32 key2 = "string key2";
+    bytes32 key3 = "string key3";
+    bytes memory value1 = abi.encode("value1");
+    bytes memory value2 = abi.encode("value2");
+    bytes memory value3 = abi.encode("value3");
+
+    // Test old implementation (full replacement)
+    Metadata.MetadataEntryOp[]
+      memory oldOperations = new Metadata.MetadataEntryOp[](3);
+    oldOperations[0] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: key1,
+      value: value1
+    });
+    oldOperations[1] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: key2,
+      value: value2
+    });
+    oldOperations[2] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: key3,
+      value: value3
+    });
+
+    // Test new implementation (incremental updates)
+    Metadata.MetadataEntryOp[]
+      memory newOperations = new Metadata.MetadataEntryOp[](3);
+    newOperations[0] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: key1,
+      value: value1
+    });
+    newOperations[1] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: key2,
+      value: value2
+    });
+    newOperations[2] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: key3,
+      value: value3
+    });
+
+    // Measure gas for old implementation
+    uint256 oldGasStart = gasleft();
+    channelManager.setChannelMetadata(channelId, oldOperations);
+    uint256 oldGasUsed = oldGasStart - gasleft();
+
+    // Measure gas for new implementation
+    uint256 newGasStart = gasleft();
+    channelManager.setChannelMetadata(channelId, newOperations);
+    uint256 newGasUsed = newGasStart - gasleft();
+
+    // Test partial updates
+    Metadata.MetadataEntryOp[]
+      memory partialOperations = new Metadata.MetadataEntryOp[](2);
+    partialOperations[0] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.DELETE,
+      key: key1,
+      value: ""
+    });
+    partialOperations[1] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: key2,
+      value: abi.encode("updated value2")
+    });
+
+    // Measure gas for partial update
+    uint256 partialGasStart = gasleft();
+    channelManager.setChannelMetadata(channelId, partialOperations);
+    uint256 partialGasUsed = partialGasStart - gasleft();
+
+    // Log gas costs for comparison
+    console.log("Gas used for full replacement (old):", oldGasUsed);
+    console.log("Gas used for full replacement (new):", newGasUsed);
+    console.log("Gas used for partial update (new):", partialGasUsed);
+    console.log("Gas savings for full replacement:", oldGasUsed - newGasUsed);
+    console.log(
+      "Gas savings percentage:",
+      ((oldGasUsed - newGasUsed) * 100) / oldGasUsed
+    );
+  }
+
+  function test_SetChannelMetadata_DeleteAndUpdate() public {
+    // Create a channel first
+    uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
+      "Test Channel",
+      "Test Description",
+      new Metadata.MetadataEntry[](0),
+      address(0)
+    );
+
+    // First set some metadata
+    Metadata.MetadataEntryOp[]
+      memory setOperations = new Metadata.MetadataEntryOp[](2);
+    setOperations[0] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: "string key1",
+      value: abi.encode("value1")
+    });
+    setOperations[1] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: "string key2",
+      value: abi.encode("value2")
+    });
+
+    channelManager.setChannelMetadata(channelId, setOperations);
+
+    // Now delete one and update the other
+    Metadata.MetadataEntryOp[]
+      memory updateOperations = new Metadata.MetadataEntryOp[](2);
+    updateOperations[0] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.DELETE,
+      key: "string key1",
+      value: ""
+    });
+    updateOperations[1] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: "string key2",
+      value: abi.encode("updated value2")
+    });
+
+    channelManager.setChannelMetadata(channelId, updateOperations);
+
+    // Verify the results
+    bytes memory value1 = channelManager.getChannelMetadataValue(
+      channelId,
+      "string key1"
+    );
+    bytes memory value2 = channelManager.getChannelMetadataValue(
+      channelId,
+      "string key2"
+    );
+
+    assertEq(value1.length, 0, "Key1 should be deleted");
+    assertEq(
+      string(abi.decode(value2, (string))),
+      "updated value2",
+      "Key2 should be updated"
+    );
   }
 
   function onERC721Received(

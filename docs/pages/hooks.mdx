@@ -52,19 +52,20 @@ function _onCommentHookDataUpdate(
   Metadata.MetadataEntry[] calldata hookMetadata,
   address msgSender,
   bytes32 commentId
-) internal override returns (Comments.HookMetadataUpdate[] memory) {
-  Comments.HookMetadataUpdate[]
-    memory operations = new Comments.HookMetadataUpdate[](2);
+) internal override returns (Comments.MetadataEntryOp[] memory) {
+  Comments.MetadataEntryOp[] memory operations = new Comments.MetadataEntryOp[](
+    2
+  );
 
   // Update an existing field
-  operations[0] = Comments.HookMetadataUpdate({
+  operations[0] = Comments.MetadataEntryOp({
     operation: Comments.MetadataOperation.SET,
     key: "string score",
     value: abi.encode(calculateNewScore(commentData))
   });
 
   // Delete a field
-  operations[1] = Comments.HookMetadataUpdate({
+  operations[1] = Comments.MetadataEntryOp({
     operation: Comments.MetadataOperation.DELETE,
     key: "string temp_data",
     value: "" // Ignored for DELETE operations
