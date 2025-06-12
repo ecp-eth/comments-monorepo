@@ -72,9 +72,7 @@ export function useConnectAccount() {
     if (openConnectModal) {
       openConnectModal();
     } else {
-      deferred.reject(
-        new Error("openConnectModal from rainbowkit is not available"),
-      );
+      console.warn("openConnectModal from rainbowkit is not available");
     }
 
     return deferred.promise.finally(() => {

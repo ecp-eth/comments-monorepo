@@ -6,15 +6,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { type Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { getAddress } from "viem";
+import { CommentText } from "@ecp.eth/shared/components";
 import { CommentActionOrStatus } from "./CommentActionOrStatus";
 import { MoreVerticalIcon } from "lucide-react";
 import { CommentAuthor } from "./CommentAuthor";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import { CommentSwapInfo } from "./CommentSwapInfo";
-import { useMemo } from "react";
-import { renderToReact } from "./renderer";
-import { CommentMediaReference } from "./CommentMediaReference";
 
 type CommentProps = {
   comment: CommentType;
@@ -36,9 +34,6 @@ export function Comment({
   onRetryEditClick,
 }: CommentProps) {
   const { address: connectedAddress } = useAccount();
-  const { element: textElement, mediaReferences } = useMemo(() => {
-    return renderToReact(comment);
-  }, [comment]);
 
   const isAuthor =
     connectedAddress && comment.author
@@ -99,20 +94,8 @@ export function Comment({
           comment.deletedAt && "text-muted-foreground",
         )}
       >
-        <div>{textElement}</div>
+        <CommentText text={comment.content} />
       </div>
-      {mediaReferences.length > 0 && (
-        <div className="flex gap-2 flex-wrap">
-          {mediaReferences.map((reference, referenceIndex) => {
-            return (
-              <CommentMediaReference
-                reference={reference}
-                key={referenceIndex}
-              />
-            );
-          })}
-        </div>
-      )}
       <div className="mb-2">
         <CommentActionOrStatus
           comment={comment}

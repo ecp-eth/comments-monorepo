@@ -13,7 +13,6 @@ export const publicEnvSchema = z.object({
     .default("0")
     .transform((val) => val === "1"),
   NEXT_PUBLIC_PROD_CHAIN_ID: z.coerce.number(),
-  NEXT_PUBLIC_PINATA_GATEWAY_URL: z.string().nonempty(),
 });
 
 export const publicEnv = publicEnvSchema.parse({
@@ -26,5 +25,4 @@ export const publicEnv = publicEnvSchema.parse({
   NEXT_PUBLIC_COMMENT_AUTHOR_URL: process.env.NEXT_PUBLIC_COMMENT_AUTHOR_URL,
   NEXT_PUBLIC_ENABLE_SWAPPING: process.env.NEXT_PUBLIC_ENABLE_SWAPPING,
   NEXT_PUBLIC_PROD_CHAIN_ID: process.env.NEXT_PUBLIC_PROD_CHAIN_ID,
-  NEXT_PUBLIC_PINATA_GATEWAY_URL: process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL,
 });
