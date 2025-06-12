@@ -3,6 +3,7 @@ import { type Address, getAddress, type Hex } from "viem";
 import {
   NeynarAPIClient,
   Configuration as NeynarConfiguration,
+  isApiErrorResponse,
 } from "@neynar/nodejs-sdk";
 
 import type { User } from "@neynar/nodejs-sdk/build/api";
@@ -86,6 +87,14 @@ export function createFarcasterByAddressResolver({
           };
         });
       } catch (e) {
+        if (isApiErrorResponse(e)) {
+          if (e.response.status === 404) {
+            // this is weird case when if you pass only on address to API and it doesn't exist on farcaster
+            // it returns 404 error
+            return addresses.map(() => null);
+          }
+        }
+
         console.error(e);
 
         const err = e instanceof Error ? e : new Error(String(e));
