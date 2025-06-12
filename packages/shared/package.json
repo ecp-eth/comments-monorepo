@@ -50,9 +50,10 @@
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
     "build": "rm -rf dist && npm run gen:token-list && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
-    "test": "echo 'Add test script here'",
     "lint": "eslint \"./src/**/*.ts\"",
-    "gen:token-list": "node --experimental-strip-types scripts/token-list.ts"
+    "gen:token-list": "node --experimental-strip-types scripts/token-list.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@ecp.eth/build-tools": "workspace:^",
@@ -67,10 +68,12 @@
     "dataloader": "^2.2.3",
     "eslint": "^9.19.0",
     "next": "^15.3.0",
+    "nock": "^14.0.5",
     "react": "~19.1.0",
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.0.1",
     "viem": "^2.29.2",
+    "vitest": "^3.1.4",
     "wagmi": "^2.15.2",
     "zod": "^3.24.2"
   },
