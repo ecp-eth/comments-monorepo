@@ -119,11 +119,12 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
   function deductProtocolHookTransactionFee(
     uint256 value
   ) external view returns (uint256 hookValue) {
-    if (value <= 0 || hookTransactionFeeBasisPoints <= 0) {
+    // Cache storage variable
+    uint16 fee = hookTransactionFeeBasisPoints;
+    if (value <= 0 || fee <= 0) {
       return value;
     }
-
-    uint256 protocolFee = (value * hookTransactionFeeBasisPoints) / 10000;
+    uint256 protocolFee = (value * fee) / 10000;
     return value - protocolFee;
   }
 

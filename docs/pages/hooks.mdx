@@ -148,8 +148,13 @@ contract MyCustomHook is BaseHook {
 
    - Validate all inputs in hooks
    - Be cautious with external calls
-   - Consider reentrancy risks
    - Test hooks thoroughly
+   - Consider implementing a ReentrancyGuard in your hook if you want to prevent reentrancy attacks
+
+4. **Fees**
+
+   - Consider refunding any excess fees to the user
+   - use `channelManager.calculateMsgValueWithHookFee` to calculate the correct amount of ETH to send to your hook
 
 ## Troubleshooting
 
