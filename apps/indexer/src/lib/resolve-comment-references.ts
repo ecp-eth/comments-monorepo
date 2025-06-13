@@ -206,7 +206,8 @@ const URL_REGEX = /^https?:\/\/[^\s<>[\]{}|\\^]+/u;
 /**
  * Handles erc20 caip19 url
  */
-const ERC_20_CAIP_19_REGEX = /^\$?eip155:([0-9]+)\/erc20:(0x[a-fA-F0-9]{40})/u;
+const ERC_20_CAIP_19_REGEX =
+  /^(?:\$|@)?eip155:([0-9]+)\/erc20:(0x[a-fA-F0-9]{40})/u;
 
 async function resolveEthAddress(
   address: Hex,
