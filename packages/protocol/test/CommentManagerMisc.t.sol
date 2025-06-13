@@ -404,7 +404,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
 
-    vm.expectRevert(CommentManager.HookNotEnabled.selector);
+    vm.expectRevert(ICommentManager.HookNotEnabled.selector);
     comments.updateCommentHookData(commentId);
   }
 

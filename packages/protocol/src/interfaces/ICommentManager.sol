@@ -122,6 +122,10 @@ interface ICommentManager {
   error ZeroAddress();
   /// @notice Error thrown when comment does not exist
   error CommentDoesNotExist();
+  /// @notice Error thrown when hook is not enabled for the operation
+  error HookNotEnabled();
+  /// @notice Error thrown when parent comment is not in the same channel
+  error ParentCommentNotInSameChannel();
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata

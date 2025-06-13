@@ -90,6 +90,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     notStale(commentData.deadline)
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
+    replyInSameChannel(commentData.parentId, commentData.channelId)
     returns (bytes32)
   {
     bytes32 commentId = getCommentId(commentData);
@@ -119,6 +120,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     notStale(commentData.deadline)
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
+    replyInSameChannel(commentData.parentId, commentData.channelId)
     returns (bytes32)
   {
     bytes32 commentId = getCommentId(commentData);
@@ -866,6 +868,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     _;
   }
 
+  modifier replyInSameChannel(bytes32 parentId, uint256 channelId) {
+    if (parentId != bytes32(0) && comments[parentId].channelId != channelId) {
+      revert ParentCommentNotInSameChannel();
+    }
+    _;
+  }
+
   modifier onlyParentIdOrTargetUri(
     bytes32 parentId,
     string calldata targetUri
@@ -1008,9 +1017,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     }
     return false;
   }
-
-  /// @notice Error thrown when hook is not enabled for the operation
-  error HookNotEnabled();
 
   /// @notice Internal function to add an app signer approval
   /// @param author The address granting approval

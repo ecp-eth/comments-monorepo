@@ -463,6 +463,62 @@ contract CommentsTest is Test, IERC721Receiver {
     );
   }
 
+  function test_PostCommentWithSig_ReplyWithDifferentChannelId() public {
+    // Create two different channels
+    uint256 channelId1 = channelManager.createChannel{ value: 0.02 ether }(
+      "Channel 1",
+      "Description 1",
+      new Metadata.MetadataEntry[](0),
+      address(0)
+    );
+    uint256 channelId2 = channelManager.createChannel{ value: 0.02 ether }(
+      "Channel 2",
+      "Description 2",
+      new Metadata.MetadataEntry[](0),
+      address(0)
+    );
+
+    // Post parent comment in channel 1
+    Comments.CreateComment memory parentComment = TestUtils
+      .generateDummyCreateComment(author, app);
+    parentComment.channelId = channelId1;
+    bytes32 parentId = comments.getCommentId(parentComment);
+    bytes memory parentAuthorSig = TestUtils.signEIP712(
+      vm,
+      authorPrivateKey,
+      parentId
+    );
+    bytes memory parentAppSig = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      parentId
+    );
+
+    comments.postCommentWithSig(parentComment, parentAuthorSig, parentAppSig);
+
+    // Try to post reply in channel 2
+    Comments.CreateComment memory replyComment = TestUtils
+      .generateDummyCreateComment(author, app);
+    replyComment.parentId = parentId;
+    replyComment.channelId = channelId2; // Set different channel ID
+
+    bytes32 replyId = comments.getCommentId(replyComment);
+    bytes memory replyAuthorSig = TestUtils.signEIP712(
+      vm,
+      authorPrivateKey,
+      replyId
+    );
+    bytes memory replyAppSig = TestUtils.signEIP712(vm, appPrivateKey, replyId);
+
+    // This should fail because reply is in different channel than parent
+    vm.expectRevert(
+      abi.encodeWithSelector(
+        ICommentManager.ParentCommentNotInSameChannel.selector
+      )
+    );
+    comments.postCommentWithSig(replyComment, replyAuthorSig, replyAppSig);
+  }
+
   function test_PostCommentWithSig_CannotHaveBothParentIdAndTargetUri() public {
     // First create a parent comment
     Comments.CreateComment memory parentComment = TestUtils
