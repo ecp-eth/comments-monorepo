@@ -234,10 +234,13 @@ describe("resolveCommentReferences", () => {
         symbol: "XEN",
         logoURI:
           "https://tokens.1inch.io/0x06450dee7fd2fb8e39061434babcfc05599a6fb8.png",
-        caip19: "eip155:1/erc20:0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
         decimals: 18,
-        url: "https://etherscan.io/token/0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
-        chainId: 1,
+        chains: [
+          {
+            chainId: 1,
+            caip: "eip155:1/erc20:0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
+          },
+        ],
       };
       resolveERC20ByAddress.mockResolvedValue(resolvedValue);
 
@@ -256,6 +259,7 @@ describe("resolveCommentReferences", () => {
         {
           type: "erc20",
           ...resolvedValue,
+          chainId: null,
           position: {
             start: 5,
             end: 47,
@@ -286,10 +290,13 @@ describe("resolveCommentReferences", () => {
         symbol: "XEN",
         logoURI:
           "https://tokens.1inch.io/0x06450dee7fd2fb8e39061434babcfc05599a6fb8.png",
-        caip19: "eip155:1/erc20:0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
         decimals: 18,
-        url: "https://etherscan.io/token/0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
-        chainId: 1,
+        chains: [
+          {
+            chainId: 1,
+            caip: "eip155:1/erc20:0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
+          },
+        ],
       };
       resolveERC20ByTicker.mockResolvedValue(resolvedValue);
 
@@ -305,13 +312,11 @@ describe("resolveCommentReferences", () => {
 
       expect(result.status).toBe("success");
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { decimals, ...expected } = resolvedValue;
-
       expect(result.references).toEqual([
         {
           type: "erc20",
-          ...expected,
+          ...resolvedValue,
+          chainId: 1,
           position: {
             start: 5,
             end: 9,
@@ -413,9 +418,12 @@ describe("resolveCommentReferences", () => {
       symbol: "USDC",
       logoURI:
         "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-      caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      chainId: 1,
+      chains: [
+        {
+          chainId: 1,
+          caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        },
+      ],
     });
 
     resolveFarcasterByAddress.mockResolvedValue({
@@ -456,13 +464,18 @@ describe("resolveCommentReferences", () => {
         symbol: "USDC",
         logoURI:
           "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-        caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        decimals: 6,
         chainId: 1,
         position: {
           start: 27,
           end: 32,
         },
+        chains: [
+          {
+            chainId: 1,
+            caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          },
+        ],
       },
       {
         type: "farcaster",
@@ -503,10 +516,13 @@ describe("resolveCommentReferences", () => {
         symbol: "USDC",
         logoURI:
           "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-        caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         decimals: 6,
-        chainId: 1,
+        chains: [
+          {
+            chainId: 1,
+            caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          },
+        ],
       });
 
       const result = await resolveCommentReferences(
@@ -537,10 +553,13 @@ describe("resolveCommentReferences", () => {
         symbol: "USDC",
         logoURI:
           "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-        caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         decimals: 6,
-        chainId: 1,
+        chains: [
+          {
+            chainId: 1,
+            caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          },
+        ],
       });
 
       const result = await resolveCommentReferences(
@@ -583,10 +602,13 @@ describe("resolveCommentReferences", () => {
         symbol: "USDC",
         logoURI:
           "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-        caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         decimals: 6,
-        chainId: 1,
+        chains: [
+          {
+            chainId: 1,
+            caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          },
+        ],
       });
 
       const result = await resolveCommentReferences(
@@ -597,10 +619,9 @@ describe("resolveCommentReferences", () => {
         options,
       );
 
-      expect(resolveERC20ByAddress).toHaveBeenCalledWith([
+      expect(resolveERC20ByAddress).toHaveBeenCalledWith(
         "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        1,
-      ]);
+      );
 
       expect(result.status).toBe("success");
       expect(result.references).toEqual([
@@ -611,14 +632,18 @@ describe("resolveCommentReferences", () => {
           symbol: "USDC",
           logoURI:
             "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-          caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          chainId: 1,
           decimals: 6,
+          chainId: 1,
           position: {
             start: 0,
             end: 58,
           },
+          chains: [
+            {
+              chainId: 1,
+              caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            },
+          ],
         },
       ]);
     });
@@ -630,10 +655,13 @@ describe("resolveCommentReferences", () => {
         symbol: "USDC",
         logoURI:
           "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-        caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         decimals: 6,
-        chainId: 1,
+        chains: [
+          {
+            chainId: 1,
+            caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          },
+        ],
       });
 
       const result = await resolveCommentReferences(
@@ -644,10 +672,9 @@ describe("resolveCommentReferences", () => {
         options,
       );
 
-      expect(resolveERC20ByAddress).toHaveBeenCalledWith([
+      expect(resolveERC20ByAddress).toHaveBeenCalledWith(
         "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        1,
-      ]);
+      );
 
       expect(result.status).toBe("success");
       expect(result.references).toEqual([
@@ -658,14 +685,18 @@ describe("resolveCommentReferences", () => {
           symbol: "USDC",
           logoURI:
             "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-          caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          chainId: 1,
           decimals: 6,
+          chainId: 1,
           position: {
             start: 0,
             end: 58,
           },
+          chains: [
+            {
+              chainId: 1,
+              caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            },
+          ],
         },
       ]);
     });
@@ -677,10 +708,13 @@ describe("resolveCommentReferences", () => {
         symbol: "USDC",
         logoURI:
           "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-        caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         decimals: 6,
-        chainId: 1,
+        chains: [
+          {
+            chainId: 1,
+            caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          },
+        ],
       });
 
       const result = await resolveCommentReferences(
@@ -700,14 +734,18 @@ describe("resolveCommentReferences", () => {
           symbol: "USDC",
           logoURI:
             "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-          caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          chainId: 1,
           decimals: 6,
+          chainId: 1,
           position: {
             start: 0,
             end: 58,
           },
+          chains: [
+            {
+              chainId: 1,
+              caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            },
+          ],
         },
       ]);
     });

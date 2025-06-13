@@ -109,7 +109,7 @@ async function searchEns(query: string): Promise<Result | null> {
   return null;
 }
 
-// const ERC_20_CAIP_19_REGEX = /^eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40})$/;
+const ERC_20_CAIP_19_REGEX = /^eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40})$/;
 
 const allChains = Object.values(chains);
 
@@ -202,7 +202,7 @@ const erc20ByAddressCache = new LRUCache<
 });
 
 const erc20ByAddressResolver = createERC20ByAddressResolver({
-  clientRegistry: erc20ClientRegistry,
+  simApiKey: env.SIM_API_KEY,
   cacheMap: erc20ByAddressCache,
 });
 
@@ -270,7 +270,7 @@ function isEthAddress(address: string): address is Hex {
 export async function GET(
   request: NextRequest,
 ): Promise<JSONResponse<typeof responseSchema>> {
-  const { query, chainId, char } = requestParamSchema.parse(
+  const { query, char } = requestParamSchema.parse(
     Object.fromEntries(request.nextUrl.searchParams),
   );
 
@@ -299,20 +299,18 @@ export async function GET(
         });
       }
 
-      const token = await erc20ByAddressResolver.load([query, chainId]);
+      const token = await erc20ByAddressResolver.load(query);
 
       if (token) {
         return new JSONResponse(responseSchema, {
-          suggestions: [
-            {
-              type: "erc20",
-              symbol: token.symbol,
-              name: token.name,
-              address: query,
-              caip19: token.caip19,
-              chainId,
-            },
-          ],
+          suggestions: token.chains.map((chain) => ({
+            type: "erc20",
+            symbol: token.symbol,
+            name: token.name,
+            address: query,
+            caip19: chain.caip,
+            chainId: chain.chainId,
+          })),
         });
       }
 
@@ -344,40 +342,34 @@ export async function GET(
     }
   }
 
-  return new JSONResponse(responseSchema, {
-    suggestions: [],
-  });
-
-  // for now we don't support erc20 mentions until we find some API to properly look for them
-
   // detect if user entered caip19 address of ERC20 token
-  /* const caip19Match = query.match(ERC_20_CAIP_19_REGEX);
+  const caip19Match = query.match(ERC_20_CAIP_19_REGEX);
 
   if (caip19Match) {
-    const [, chainId, address] = caip19Match;
-    const token = await erc20ByAddressResolver.load([
-      address as Hex,
-      Number(chainId),
-    ]);
+    const [, , address] = caip19Match;
+    const token = await erc20ByAddressResolver.load(address as Hex);
 
     if (token) {
       return new JSONResponse(responseSchema, {
-        suggestions: [
-          {
-            type: "erc20",
-            name: token.name,
-            address: token.address,
-            symbol: token.symbol,
-            caip19: token.caip19,
-            chainId: token.chainId,
-          },
-        ],
+        suggestions: token.chains.map((chain) => ({
+          type: "erc20",
+          name: token.name,
+          address: token.address,
+          symbol: token.symbol,
+          caip19: chain.caip,
+          chainId: chain.chainId,
+        })),
       });
     }
   }
 
+  // for now we don't support erc20 mentions until we find some API to properly look for them
+  return new JSONResponse(responseSchema, {
+    suggestions: [],
+  });
+
   // so we weren't able to resolve an address so now we don't care what the char actually is and we can just try to search for erc20 tokens
-  const tokens = await erc20ByQueryResolver.load(query);
+  /* const tokens = await erc20ByQueryResolver.load(query);
 
   return new JSONResponse(responseSchema, {
     suggestions: tokens.map((token) => ({

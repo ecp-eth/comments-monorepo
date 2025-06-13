@@ -65,6 +65,7 @@ const EnvSchema = z
     NEYNAR_API_KEY: z.string().nonempty(),
     GRAPH_API_KEY: z.string().optional(),
     GRAPH_ENS_SUBGRAPH_URL: z.string().url().optional(),
+    SIM_API_KEY: z.string().nonempty(),
   })
   .merge(publicEnvSchema)
   .merge(EthSubmitterEnvSchema.partial())

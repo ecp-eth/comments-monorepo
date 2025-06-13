@@ -58,9 +58,7 @@ export async function resolveCommentReferences(
       const position = { start: pos, end: pos + match[0].length };
       const address = match[0].startsWith("@") ? match[0].slice(1) : match[0];
 
-      promises.push(
-        resolveEthAddress(address as Hex, comment.chainId, position, options),
-      );
+      promises.push(resolveEthAddress(address as Hex, position, options));
       pos += [...match[0]].length;
 
       continue;
@@ -75,7 +73,7 @@ export async function resolveCommentReferences(
       promises.push(
         resolveERC20TokenEthAddress(
           address as Hex,
-          comment.chainId,
+          undefined,
           position,
           options,
         ),
@@ -101,8 +99,8 @@ export async function resolveCommentReferences(
 
     if (match) {
       const position = { start: pos, end: pos + match[0].length };
-      const chainId = Number(match[1]);
       const address = match[2] as Hex;
+      const chainId = Number(match[1]);
 
       promises.push(
         resolveERC20TokenEthAddress(address, chainId, position, options),
@@ -211,7 +209,6 @@ const ERC_20_CAIP_19_REGEX =
 
 async function resolveEthAddress(
   address: Hex,
-  chainId: number,
   position: ResolverPosition,
   options: Options,
 ): Promise<
@@ -249,21 +246,26 @@ async function resolveEthAddress(
     };
   }
 
-  return resolveERC20TokenEthAddress(address, chainId, position, options);
+  return resolveERC20TokenEthAddress(address, undefined, position, options);
 }
 
 async function resolveERC20TokenEthAddress(
   address: Hex,
-  chainId: number,
+  /**
+   * If passed this means that user selected specific token on specific chain
+   * or we parsed caip19.
+   */
+  chainId: number | undefined,
   position: ResolverPosition,
   { erc20ByAddressResolver }: Options,
 ): Promise<IndexerAPICommentReferenceERC20SchemaType | null> {
-  const result = await erc20ByAddressResolver.load([address, chainId]);
+  const result = await erc20ByAddressResolver.load(address);
 
   if (result) {
     return {
       type: "erc20",
       ...result,
+      chainId: chainId ?? null,
       position,
     };
   }
@@ -303,14 +305,14 @@ async function resolveERC20TokenTicker(
   if (result) {
     return {
       type: "erc20",
+      chainId,
       symbol: result.symbol,
       address: result.address,
       name: result.name,
       position,
       logoURI: result.logoURI,
-      url: result.url,
-      caip19: result.caip19,
-      chainId: result.chainId,
+      decimals: result.decimals,
+      chains: result.chains,
     };
   }
 

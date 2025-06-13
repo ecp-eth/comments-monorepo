@@ -102,6 +102,13 @@ export function parse(
         case "erc20": {
           flushText();
 
+          // if reference has chainId, we need to find it in the chains array and use that as reference
+          // otherwise use just first available reference
+          let chain = reference.chainId
+            ? reference.chains.find((c) => c.chainId === reference.chainId)
+            : undefined;
+          chain = chain ?? reference.chains[0]!;
+
           currentParagraph.content.push({
             type: "mention",
             attrs: {
@@ -109,8 +116,8 @@ export function parse(
               address: reference.address,
               name: reference.name,
               symbol: reference.symbol,
-              caip19: reference.caip19,
-              chainId: reference.chainId,
+              caip19: chain.caip,
+              chainId: chain.chainId,
             } satisfies MentionItem,
           });
 

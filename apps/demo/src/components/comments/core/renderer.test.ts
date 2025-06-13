@@ -98,9 +98,14 @@ describe("renderToReact", () => {
           symbol: "USDC",
           logoURI:
             "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-          caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          chainId: 1,
+          decimals: 6,
+          chainId: null,
+          chains: [
+            {
+              caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              chainId: 1,
+            },
+          ],
           position: {
             start: 27,
             end: 32,
@@ -124,7 +129,7 @@ describe("renderToReact", () => {
 
     expect(result.mediaReferences).toEqual([]);
     expect(renderToStaticMarkup(result.element)).toBe(
-      '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <a class="text-blue-500" href="https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" rel="noopener noreferrer" target="_blank" title="USD Coin">$USDC</a> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p>',
+      '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <span class="text-blue-500" title="USD Coin">$USDC</span> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p>',
     );
   });
 
@@ -177,9 +182,14 @@ describe("renderToReact", () => {
           symbol: "USDC",
           logoURI:
             "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-          caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          chainId: 1,
+          decimals: 6,
+          chainId: null,
+          chains: [
+            {
+              caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              chainId: 1,
+            },
+          ],
           position: {
             start: 27,
             end: 32,
@@ -235,7 +245,7 @@ describe("renderToReact", () => {
     ]);
 
     expect(renderToStaticMarkup(result.element)).toBe(
-      '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <a class="text-blue-500" href="https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" rel="noopener noreferrer" target="_blank" title="USD Coin">$USDC</a> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p><p><a class="underline" href="http://donthavereference.tld" rel="noopener noreferrer" target="_blank">http://donthavereference.tld</a></p>',
+      '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <span class="text-blue-500" title="USD Coin">$USDC</span> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p><p><a class="underline" href="http://donthavereference.tld" rel="noopener noreferrer" target="_blank">http://donthavereference.tld</a></p>',
     );
   });
 });

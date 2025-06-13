@@ -42,9 +42,12 @@ async function resolveErc20Data(
     logoURI: token.logoURI,
     name: token.name,
     symbol: token.symbol,
-    caip19: token.caip19,
-    chainId: token.chainId,
-    url: config.tokenAddressURL(token.address as Hex),
+    chains: [
+      {
+        caip: `eip155:${token.chainId}/erc20:${token.address}`,
+        chainId,
+      },
+    ],
   };
 }
 

@@ -2,8 +2,8 @@ import {
   createERC20ByTickerResolver,
   type ERC20ByTickerResolver,
   type ERC20ByTickerResolverKey,
+  type ResolvedERC20Data,
 } from "@ecp.eth/shared/resolvers";
-import type { ResolvedERC20Data } from "./types";
 import { LRUCache } from "lru-cache";
 import { erc20RpcClientsRegistry } from "./erc20-rpc-clients-registry";
 

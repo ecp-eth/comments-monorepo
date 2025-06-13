@@ -44,7 +44,12 @@ export function createERC20ByQueryResolver({
               results.push({
                 ...token,
                 address: token.address as Hex,
-                url: client.tokenAddressURL(token.address as Hex),
+                chains: [
+                  {
+                    caip: token.caip19,
+                    chainId: token.chainId,
+                  },
+                ],
               });
             }
 

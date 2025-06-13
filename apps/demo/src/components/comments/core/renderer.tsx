@@ -53,15 +53,12 @@ const referenceRenderers: Partial<ReferenceRendererKey> = {
   },
   erc20(reference) {
     return (
-      <a
+      <span
         className="text-blue-500"
-        href={reference.url}
-        rel="noopener noreferrer"
-        target="_blank"
         title={reference.name || reference.address}
       >
         ${reference.symbol}
-      </a>
+      </span>
     );
   },
 };

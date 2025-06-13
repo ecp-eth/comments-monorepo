@@ -8,9 +8,13 @@ export type ResolvedERC20Data = {
   name: string;
   decimals: number;
   logoURI: string | null;
-  url: string;
-  caip19: string;
-  chainId: number;
+  chains: {
+    /**
+     * CAIP-19 format
+     */
+    caip: string;
+    chainId: ChainID;
+  }[];
 };
 
 export type ERC20ClientConfig = {

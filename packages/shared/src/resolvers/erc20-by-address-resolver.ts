@@ -1,14 +1,42 @@
 import DataLoader from "dataloader";
-import { getAddress, isAddressEqual, type Hex } from "viem";
-import type {
-  ResolvedERC20Data,
-  ChainID,
-  ERC20ClientRegistry,
-  ERC20ClientConfig,
-} from "./erc20.types";
-import { tokenList } from "../token-list";
+import type { Hex } from "viem";
+import type { ChainID, ResolvedERC20Data } from "./erc20.types";
+import { z } from "zod";
+import { HexSchema } from "@ecp.eth/sdk/core";
 
-export type ERC20ByAddressResolverKey = [Hex, ChainID];
+export type ERC20ByAddressResolverKey = Hex;
+
+const TokenInfoSchema = z.object({
+  chain_id: z.number().int().positive(),
+  chain: z.string(),
+  price_usd: z.number().nullish(),
+  pool_size: z.number(),
+  total_supply: z.coerce.bigint().nullish(),
+  fully_diluted_value: z.number().nullish(),
+  symbol: z.string(),
+  name: z.string().nullable(),
+  decimals: z.number().int().positive(),
+  logo: z.string().url().nullable(),
+});
+
+type TokenInfo = z.infer<typeof TokenInfoSchema>;
+
+const SimResponseSchema = z.object({
+  contract_address: HexSchema,
+  tokens: z.array(z.record(z.string(), z.unknown())),
+});
+
+const SIM_TOKEN_INFO_URL = "https://api.sim.dune.com/v1/evm/token-info/";
+
+export class SimApiError extends Error {
+  constructor(
+    message: string,
+    readonly response: Response,
+  ) {
+    super(message);
+    this.name = "SimApiError";
+  }
+}
 
 export type ERC20ByAddressResolver = DataLoader<
   ERC20ByAddressResolverKey,
@@ -16,142 +44,81 @@ export type ERC20ByAddressResolver = DataLoader<
 >;
 
 export type ERC20ByAddressResolverOptions = {
-  clientRegistry: ERC20ClientRegistry;
-} & DataLoader.Options<ERC20ByAddressResolverKey, ResolvedERC20Data | null>;
+  simApiKey: string;
+} & Omit<
+  DataLoader.Options<ERC20ByAddressResolverKey, ResolvedERC20Data | null>,
+  "batchLoadFn" | "maxBatchSize"
+>;
 
 export function createERC20ByAddressResolver({
-  clientRegistry,
+  simApiKey,
   ...dataLoaderOptions
 }: ERC20ByAddressResolverOptions): ERC20ByAddressResolver {
   return new DataLoader<ERC20ByAddressResolverKey, ResolvedERC20Data | null>(
-    async (keys) => {
+    async (addresses) => {
+      if (!addresses.length) {
+        return [];
+      }
+
       return Promise.all(
-        keys.map(([address, chainId]) =>
-          resolveErc20Data(address, chainId, clientRegistry),
-        ),
+        addresses.map(async (address): Promise<ResolvedERC20Data | null> => {
+          const url = new URL(`${address}`, SIM_TOKEN_INFO_URL);
+
+          url.searchParams.set("chain_ids", "all");
+
+          const response = await fetch(url, {
+            headers: {
+              "X-Sim-Api-Key": simApiKey,
+            },
+          });
+
+          if (!response.ok) {
+            throw new SimApiError(
+              `Failed to fetch token info for ${address}`,
+              response,
+            );
+          }
+
+          const parseResult = SimResponseSchema.safeParse(
+            await response.json(),
+          );
+
+          if (!parseResult.success) {
+            return null;
+          }
+
+          const chainIds = new Set<ChainID>();
+          const tokens: TokenInfo[] = [];
+
+          for (const token of parseResult.data.tokens) {
+            const tokenInfoResult = TokenInfoSchema.safeParse(token);
+
+            if (!tokenInfoResult.success) {
+              continue;
+            }
+
+            chainIds.add(tokenInfoResult.data.chain_id);
+            tokens.push(tokenInfoResult.data);
+          }
+
+          if (tokens.length === 0) {
+            return null;
+          }
+
+          return {
+            address: parseResult.data.contract_address,
+            logoURI: tokens[0]!.logo,
+            symbol: tokens[0]!.symbol,
+            name: tokens[0]!.name || tokens[0]!.symbol,
+            decimals: tokens[0]!.decimals,
+            chains: Array.from(chainIds).map((chainId) => ({
+              caip: `eip155:${chainId}/erc20:${parseResult.data.contract_address}`,
+              chainId,
+            })),
+          };
+        }),
       );
     },
     dataLoaderOptions,
   );
-}
-
-async function resolveErc20Data(
-  address: Hex,
-  chainId: ChainID,
-  clientRegistry: ERC20ClientRegistry,
-): Promise<ResolvedERC20Data | null> {
-  const config = await clientRegistry.getClientByChainId(chainId);
-
-  if (!config) {
-    console.warn(`No client found for chainId ${chainId}`);
-    return null;
-  }
-
-  const token = tokenList.find(
-    (token) =>
-      isAddressEqual(token.address as Hex, address) &&
-      token.chainId === chainId,
-  );
-
-  if (token) {
-    return {
-      address: token.address as Hex,
-      decimals: token.decimals,
-      logoURI: token.logoURI,
-      name: token.name,
-      symbol: token.symbol,
-      caip19: token.caip19,
-      chainId: token.chainId,
-      url: config.tokenAddressURL(address),
-    };
-  }
-
-  const code = await config.client.getCode({
-    address,
-  });
-
-  if (code !== "0x") {
-    return null;
-  }
-
-  return resolveERC20Token(address, {
-    ...config,
-    chainId,
-  });
-}
-
-const ERC20_ABI = [
-  {
-    name: "name",
-    type: "function",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ type: "string" }],
-  },
-  {
-    name: "symbol",
-    type: "function",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ type: "string" }],
-  },
-  {
-    name: "decimals",
-    type: "function",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ type: "uint8" }],
-  },
-  {
-    name: "logoURI",
-    type: "function",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ type: "string" }],
-  },
-] as const;
-
-async function resolveERC20Token(
-  address: Hex,
-  config: ERC20ClientConfig & { chainId: number },
-): Promise<null | ResolvedERC20Data> {
-  const bytecode = await config.client.getCode({ address });
-
-  if (!bytecode) {
-    return null;
-  }
-
-  try {
-    const name = await config.client.readContract({
-      address,
-      abi: ERC20_ABI,
-      functionName: "name",
-    });
-
-    const symbol = await config.client.readContract({
-      address,
-      abi: ERC20_ABI,
-      functionName: "symbol",
-    });
-
-    const decimals = await config.client.readContract({
-      address,
-      abi: ERC20_ABI,
-      functionName: "decimals",
-    });
-
-    return {
-      address: getAddress(address),
-      name,
-      symbol,
-      decimals,
-      logoURI: null,
-      url: config.tokenAddressURL(address),
-      chainId: config.chainId,
-      caip19: `eip155:${config.chainId}/erc20:${address}`,
-    };
-  } catch (e) {
-    console.warn("Resolving ERC20 token from chain failed with", e);
-    return null;
-  }
 }

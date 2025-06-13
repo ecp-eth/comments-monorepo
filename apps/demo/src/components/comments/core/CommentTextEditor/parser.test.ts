@@ -134,9 +134,14 @@ describe("content parser", () => {
           start: 6,
           end: 49,
         },
-        url: "",
         logoURI: null,
-        caip19: "eip155:1/erc20:0x1234567890123456789012345678901234567890",
+        decimals: 18,
+        chains: [
+          {
+            chainId: 1,
+            caip: "eip155:1/erc20:0x1234567890123456789012345678901234567890",
+          },
+        ],
       },
     ]);
 
@@ -238,9 +243,14 @@ describe("content parser", () => {
           symbol: "USDC",
           logoURI:
             "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
-          caip19: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          url: "https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          decimals: 18,
           chainId: 1,
+          chains: [
+            {
+              chainId: 1,
+              caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            },
+          ],
           position: {
             start: 27,
             end: 32,

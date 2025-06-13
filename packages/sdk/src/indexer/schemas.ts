@@ -191,14 +191,23 @@ export type IndexerAPICommentReferenceFarcasterSchemaType = z.infer<
 
 export const IndexerAPICommentReferenceERC20Schema = z.object({
   type: z.literal("erc20"),
-  chainId: z.number().int(),
   symbol: z.string(),
   logoURI: z.string().nullable(),
   name: z.string(),
   address: HexSchema,
-  caip19: z.string(),
-  url: z.string().url(),
+  decimals: z.number().int(),
   position: IndexerAPICommentReferencePositionSchema,
+  // if filled this means that user either selected specific token with a chain
+  // which resulted in caip19 being used
+  // chain id is null for example if comment text contained just an address of contract
+  // in which case we don't know what should be the chain id
+  chainId: z.number().int().positive().nullable(),
+  chains: z.array(
+    z.object({
+      caip: z.string(),
+      chainId: z.number().int().positive(),
+    }),
+  ),
 });
 
 export type IndexerAPICommentReferenceERC20SchemaType = z.infer<

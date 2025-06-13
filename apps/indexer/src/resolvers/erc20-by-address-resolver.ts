@@ -2,10 +2,10 @@ import {
   createERC20ByAddressResolver,
   type ERC20ByAddressResolver,
   type ERC20ByAddressResolverKey,
+  type ResolvedERC20Data,
 } from "@ecp.eth/shared/resolvers";
-import type { ResolvedERC20Data } from "./types";
 import { LRUCache } from "lru-cache";
-import { erc20RpcClientsRegistry } from "./erc20-rpc-clients-registry";
+import { env } from "../env";
 
 export type { ERC20ByAddressResolver };
 
@@ -19,6 +19,6 @@ const cacheMap = new LRUCache<
   allowStale: true,
 });
 export const erc20ByAddressResolver = createERC20ByAddressResolver({
-  clientRegistry: erc20RpcClientsRegistry,
+  simApiKey: env.SIM_API_KEY,
   cacheMap,
 });

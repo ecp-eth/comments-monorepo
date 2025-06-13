@@ -33,6 +33,7 @@ const EnvSchema = z
     PONDER_RPC_URL_8453: z.string().url().optional(),
     PONDER_START_BLOCK_8453: z.coerce.number().optional(),
     ENS_RPC_URL: z.string().url(),
+    SIM_API_KEY: z.string().nonempty(),
   })
   .superRefine((vars, ctx) => {
     if (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) {
