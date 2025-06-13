@@ -35,7 +35,9 @@
     "PRIVY_WALLET_ADDRESS",
     "PRIVY_WALLET_ID",
     "RPC_URL_*",
-    "WEBHOOK_SECRET"
+    "WEBHOOK_SECRET",
+    "GRAPH_API_KEY",
+    "GRAPH_ENS_SUBGRAPH_URL"
   ],
   "tasks": {
     "build": {
