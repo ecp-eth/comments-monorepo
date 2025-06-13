@@ -158,7 +158,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         return [
           "span",
           {
-            class: "font-semibold text-blue-500",
+            class: "text-blue-500",
             "data-type": attrs.type,
             "data-name": attrs.name,
             "data-address": attrs.address,
@@ -170,7 +170,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         return [
           "span",
           {
-            class: "font-semibold text-blue-500",
+            class: "text-blue-500",
             "data-type": attrs.type,
             "data-name": attrs.name,
             "data-address": attrs.address,
@@ -184,7 +184,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         return [
           "span",
           {
-            class: "font-semibold text-blue-500",
+            class: "text-blue-500",
             "data-type": attrs.type,
             "data-address": attrs.address,
             "data-name": attrs.username || attrs.displayName || attrs.address,

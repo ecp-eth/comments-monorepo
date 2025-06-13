@@ -11,17 +11,17 @@ import {
   type ERC20ClientRegistry as ERC20ClientRegistryType,
   createENSByAddressResolver,
   createENSByNameResolver,
-  createERC20ByQueryResolver,
+  // createERC20ByQueryResolver,
   type ResolvedFarcasterData,
   type ResolvedENSData,
   ResolvedERC20Data,
   type ERC20ClientConfig,
 } from "@ecp.eth/shared/resolvers";
 import { NextRequest } from "next/server";
-import { type Hex, createPublicClient, getAddress, http } from "viem";
+import { type Hex, createPublicClient, http } from "viem";
 import { z } from "zod";
 
-const ERC_20_CAIP_19_REGEX = /^eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40})$/;
+// const ERC_20_CAIP_19_REGEX = /^eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40})$/;
 
 const allChains = Object.values(chains);
 
@@ -118,10 +118,10 @@ const erc20ByAddressResolver = createERC20ByAddressResolver({
   cacheMap: erc20ByAddressCache,
 });
 
-const erc20ByQueryResolver = createERC20ByQueryResolver({
+/* const erc20ByQueryResolver = createERC20ByQueryResolver({
   limit: 20,
   clientRegistry: erc20ClientRegistry,
-});
+});*/
 
 const requestParamSchema = z.object({
   query: z.string().trim().min(1).nonempty().toLowerCase(),
@@ -244,8 +244,14 @@ export async function GET(
     }
   }
 
+  return new JSONResponse(responseSchema, {
+    suggestions: [],
+  });
+
+  // for now we don't support erc20 mentions until we find some API to properly look for them
+
   // detect if user entered caip19 address of ERC20 token
-  const caip19Match = query.match(ERC_20_CAIP_19_REGEX);
+  /* const caip19Match = query.match(ERC_20_CAIP_19_REGEX);
 
   if (caip19Match) {
     const [, chainId, address] = caip19Match;
@@ -282,5 +288,5 @@ export async function GET(
       caip19: token.caip19,
       chainId: token.chainId,
     })),
-  });
+  });*/
 }

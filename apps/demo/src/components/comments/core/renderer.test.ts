@@ -70,7 +70,7 @@ describe("renderToReact", () => {
 
     expect(result.mediaReferences).toEqual([]);
     expect(renderToStaticMarkup(result.element)).toBe(
-      '<p>Test <a class="font-semibold text-blue-500" href="https://app.ens.domains/0x225f137127d9067788314bc7fcc1f36746a3c3B5" rel="noopener noreferrer" target="_blank">@luc.eth</a> <a class="font-semibold text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a> $USDC</p>',
+      '<p>Test <a class="text-blue-500" href="https://app.ens.domains/0x225f137127d9067788314bc7fcc1f36746a3c3B5" rel="noopener noreferrer" target="_blank">@luc.eth</a> <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a> $USDC</p>',
     );
   });
 
@@ -124,7 +124,7 @@ describe("renderToReact", () => {
 
     expect(result.mediaReferences).toEqual([]);
     expect(renderToStaticMarkup(result.element)).toBe(
-      '<p>👀 what is 🎶 <a class="font-semibold text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <a class="font-semibold text-blue-500" href="https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" rel="noopener noreferrer" target="_blank" title="USD Coin">$USDC</a> 💻   <a class="font-semibold text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p>',
+      '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <a class="text-blue-500" href="https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" rel="noopener noreferrer" target="_blank" title="USD Coin">$USDC</a> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p>',
     );
   });
 
@@ -149,7 +149,7 @@ describe("renderToReact", () => {
 
     expect(result.mediaReferences).toEqual([]);
     expect(renderToStaticMarkup(result.element)).toBe(
-      '<p>🌎 <a class="underline" href="https://example.com/test" rel="noopener noreferrer" target="_blank">https://example.com/test</a> 💻 <a class="font-semibold text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> <a class="underline" href="http://localhost:3000" rel="noopener noreferrer" target="_blank">http://localhost:3000</a></p>',
+      '<p>🌎 <a class="underline" href="https://example.com/test" rel="noopener noreferrer" target="_blank">https://example.com/test</a> 💻 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> <a class="underline" href="http://localhost:3000" rel="noopener noreferrer" target="_blank">http://localhost:3000</a></p>',
     );
   });
 
@@ -235,7 +235,7 @@ describe("renderToReact", () => {
     ]);
 
     expect(renderToStaticMarkup(result.element)).toBe(
-      '<p>👀 what is 🎶 <a class="font-semibold text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <a class="font-semibold text-blue-500" href="https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" rel="noopener noreferrer" target="_blank" title="USD Coin">$USDC</a> 💻   <a class="font-semibold text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p><p><a class="underline" href="http://donthavereference.tld" rel="noopener noreferrer" target="_blank">http://donthavereference.tld</a></p>',
+      '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <a class="text-blue-500" href="https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" rel="noopener noreferrer" target="_blank" title="USD Coin">$USDC</a> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p><p><a class="underline" href="http://donthavereference.tld" rel="noopener noreferrer" target="_blank">http://donthavereference.tld</a></p>',
     );
   });
 });

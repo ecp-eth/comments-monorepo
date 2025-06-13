@@ -30,7 +30,7 @@ const referenceRenderers: Partial<ReferenceRendererKey> = {
   ens(reference) {
     return (
       <a
-        className="font-semibold text-blue-500"
+        className="text-blue-500"
         href={reference.url}
         rel="noopener noreferrer"
         target="_blank"
@@ -42,7 +42,7 @@ const referenceRenderers: Partial<ReferenceRendererKey> = {
   farcaster(reference) {
     return (
       <a
-        className="font-semibold text-blue-500"
+        className="text-blue-500"
         href={reference.url}
         rel="noopener noreferrer"
         target="_blank"
@@ -54,7 +54,7 @@ const referenceRenderers: Partial<ReferenceRendererKey> = {
   erc20(reference) {
     return (
       <a
-        className="font-semibold text-blue-500"
+        className="text-blue-500"
         href={reference.url}
         rel="noopener noreferrer"
         target="_blank"

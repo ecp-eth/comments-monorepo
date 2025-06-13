@@ -71,7 +71,7 @@ export function Editor({
 }: EditorProps) {
   const [isDragging, setIsDragging] = useState(false);
   const searchAddressSuggestions = useMentionSuggestions("@");
-  const searchERC20TokenSuggestions = useMentionSuggestions("$");
+  // const searchERC20TokenSuggestions = useMentionSuggestions("$");
   const content = useHandleDefaultEditorValue(
     defaultValue?.content,
     defaultValue?.references,
@@ -108,13 +108,13 @@ export function Editor({
         },
       }),
       // erc20 symbol or address mentions
-      MentionExtension.configure({
+      /* MentionExtension.configure({
         searchSuggestions: searchERC20TokenSuggestions,
         suggestion: {
           char: "$",
           pluginKey: new PluginKey("erc20-mention"),
         },
-      }),
+      }),*/
       UploadTracker,
     ],
     editorProps: {
