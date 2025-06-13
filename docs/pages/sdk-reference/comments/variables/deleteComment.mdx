@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / deleteComment
 
@@ -817,7 +817,11 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "bytes";
   }];
   name: "postComment";
-  outputs: readonly [];
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
   stateMutability: "payable";
   type: "function";
 }, {
@@ -881,7 +885,11 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "bytes";
   }];
   name: "postCommentWithSig";
-  outputs: readonly [];
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
   stateMutability: "payable";
   type: "function";
 }, {
@@ -943,6 +951,16 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "address";
   }];
   name: "updateChannelContract";
+  outputs: readonly [];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "updateCommentHookData";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -1232,6 +1250,10 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "error";
 }, {
   inputs: readonly [];
+  name: "HookNotEnabled";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "InvalidAppSignature";
   type: "error";
 }, {
@@ -1308,6 +1330,10 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "error";
 }, {
   inputs: readonly [];
+  name: "ParentCommentNotInSameChannel";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "ReentrancyGuardReentrantCall";
   type: "error";
 }, {
@@ -1342,1324 +1368,1350 @@ Delete a comment as an author
 ## Returns
 
 `Promise`\<[`WaitableWriteContractHelperResult`](/sdk-reference/core/type-aliases/WaitableWriteContractHelperResult.mdx)\<readonly \[\{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"initialOwner"`;
-`type`: `"address"`;
-\}\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"constructor"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ADD_APPROVAL_TYPEHASH"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ADD_COMMENT_TYPEHASH"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"DELETE_COMMENT_TYPEHASH"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"DOMAIN_SEPARATOR"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"EDIT_COMMENT_TYPEHASH"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"REMOVE_APPROVAL_TYPEHASH"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}\];
-`name`: `"addApproval"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"nonce"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"authorSignature"`;
-`type`: `"bytes"`;
-\}\];
-`name`: `"addApprovalWithSig"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"channelManager"`;
-`outputs`: readonly \[\{
-`internalType`: `"contract IChannelManager"`;
-`name`: `""`;
-`type`: `"address"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"commentHookMetadata"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes"`;
-`name`: `""`;
-`type`: `"bytes"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `""`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"commentHookMetadataKeys"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"commentMetadata"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes"`;
-`name`: `""`;
-`type`: `"bytes"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `""`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"commentMetadataKeys"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"deleteComment"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"authorSignature"`;
-`type`: `"bytes"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"appSignature"`;
-`type`: `"bytes"`;
-\}\];
-`name`: `"deleteCommentWithSig"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"nonce"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"content"`;
-`type`: `"string"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}, \{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}\];
-`internalType`: `"struct Metadata.MetadataEntry[]"`;
-`name`: `"metadata"`;
-`type`: `"tuple[]"`;
-\}\];
-`internalType`: `"struct Comments.EditComment"`;
-`name`: `"editData"`;
-`type`: `"tuple"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"appSignature"`;
-`type`: `"bytes"`;
-\}\];
-`name`: `"editComment"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"payable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"nonce"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"content"`;
-`type`: `"string"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}, \{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}\];
-`internalType`: `"struct Metadata.MetadataEntry[]"`;
-`name`: `"metadata"`;
-`type`: `"tuple[]"`;
-\}\];
-`internalType`: `"struct Comments.EditComment"`;
-`name`: `"editData"`;
-`type`: `"tuple"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"authorSignature"`;
-`type`: `"bytes"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"appSignature"`;
-`type`: `"bytes"`;
-\}\];
-`name`: `"editCommentWithSig"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"payable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"nonce"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"getAddApprovalHash"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"getComment"`;
-`outputs`: readonly \[\{
-`components`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint96"`;
-`name`: `"createdAt"`;
-`type`: `"uint96"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint88"`;
-`name`: `"updatedAt"`;
-`type`: `"uint88"`;
-\}, \{
-`internalType`: `"uint8"`;
-`name`: `"commentType"`;
-`type`: `"uint8"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"bytes32"`;
-`name`: `"parentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"content"`;
-`type`: `"string"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"targetUri"`;
-`type`: `"string"`;
-\}\];
-`internalType`: `"struct Comments.Comment"`;
-`name`: `""`;
-`type`: `"tuple"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"getCommentHookMetadata"`;
-`outputs`: readonly \[\{
-`components`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"key"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"value"`;
-`type`: `"bytes"`;
-\}\];
-`internalType`: `"struct Metadata.MetadataEntry[]"`;
-`name`: `""`;
-`type`: `"tuple[]"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"getCommentHookMetadataKeys"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32[]"`;
-`name`: `""`;
-`type`: `"bytes32[]"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"bytes32"`;
-`name`: `"key"`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"getCommentHookMetadataValue"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes"`;
-`name`: `""`;
-`type`: `"bytes"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`components`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"bytes32"`;
-`name`: `"parentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"uint8"`;
-`name`: `"commentType"`;
-`type`: `"uint8"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"content"`;
-`type`: `"string"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}, \{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}\];
-`internalType`: `"struct Metadata.MetadataEntry[]"`;
-`name`: `"metadata"`;
-`type`: `"tuple[]"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"targetUri"`;
-`type`: `"string"`;
-\}\];
-`internalType`: `"struct Comments.CreateComment"`;
-`name`: `"commentData"`;
-`type`: `"tuple"`;
-\}\];
-`name`: `"getCommentId"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"getCommentMetadata"`;
-`outputs`: readonly \[\{
-`components`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"key"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"value"`;
-`type`: `"bytes"`;
-\}\];
-`internalType`: `"struct Metadata.MetadataEntry[]"`;
-`name`: `""`;
-`type`: `"tuple[]"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"getCommentMetadataKeys"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32[]"`;
-`name`: `""`;
-`type`: `"bytes32[]"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"bytes32"`;
-`name`: `"key"`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"getCommentMetadataValue"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes"`;
-`name`: `""`;
-`type`: `"bytes"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"getDeleteCommentHash"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"nonce"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"content"`;
-`type`: `"string"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}, \{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}\];
-`internalType`: `"struct Metadata.MetadataEntry[]"`;
-`name`: `"metadata"`;
-`type`: `"tuple[]"`;
-\}\];
-`internalType`: `"struct Comments.EditComment"`;
-`name`: `"editData"`;
-`type`: `"tuple"`;
-\}\];
-`name`: `"getEditCommentHash"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}\];
-`name`: `"getNonce"`;
-`outputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `""`;
-`type`: `"uint256"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"nonce"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"getRemoveApprovalHash"`;
-`outputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `""`;
-`type`: `"bytes32"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}\];
-`name`: `"isApproved"`;
-`outputs`: readonly \[\{
-`internalType`: `"bool"`;
-`name`: `""`;
-`type`: `"bool"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}\];
-`name`: `"isDeleted"`;
-`outputs`: readonly \[\{
-`internalType`: `"bool"`;
-`name`: `""`;
-`type`: `"bool"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"name"`;
-`outputs`: readonly \[\{
-`internalType`: `"string"`;
-`name`: `""`;
-`type`: `"string"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"owner"`;
-`outputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `""`;
-`type`: `"address"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"paused"`;
-`outputs`: readonly \[\{
-`internalType`: `"bool"`;
-`name`: `""`;
-`type`: `"bool"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`components`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"bytes32"`;
-`name`: `"parentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"uint8"`;
-`name`: `"commentType"`;
-`type`: `"uint8"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"content"`;
-`type`: `"string"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}, \{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}\];
-`internalType`: `"struct Metadata.MetadataEntry[]"`;
-`name`: `"metadata"`;
-`type`: `"tuple[]"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"targetUri"`;
-`type`: `"string"`;
-\}\];
-`internalType`: `"struct Comments.CreateComment"`;
-`name`: `"commentData"`;
-`type`: `"tuple"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"appSignature"`;
-`type`: `"bytes"`;
-\}\];
-`name`: `"postComment"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"payable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`components`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"bytes32"`;
-`name`: `"parentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"uint8"`;
-`name`: `"commentType"`;
-`type`: `"uint8"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"content"`;
-`type`: `"string"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}, \{
-`internalType`: ...;
-`name`: ...;
-`type`: ...;
-\}\];
-`internalType`: `"struct Metadata.MetadataEntry[]"`;
-`name`: `"metadata"`;
-`type`: `"tuple[]"`;
-\}, \{
-`internalType`: `"string"`;
-`name`: `"targetUri"`;
-`type`: `"string"`;
-\}\];
-`internalType`: `"struct Comments.CreateComment"`;
-`name`: `"commentData"`;
-`type`: `"tuple"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"authorSignature"`;
-`type`: `"bytes"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"appSignature"`;
-`type`: `"bytes"`;
-\}\];
-`name`: `"postCommentWithSig"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"payable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"nonce"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"authorSignature"`;
-`type`: `"bytes"`;
-\}\];
-`name`: `"removeApprovalWithSig"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"renounceOwnership"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}\];
-`name`: `"revokeApproval"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"newOwner"`;
-`type`: `"address"`;
-\}\];
-`name`: `"transferOwnership"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"_channelContract"`;
-`type`: `"address"`;
-\}\];
-`name`: `"updateChannelContract"`;
-`outputs`: readonly \[\];
-`stateMutability`: `"nonpayable"`;
-`type`: `"function"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"version"`;
-`outputs`: readonly \[\{
-`internalType`: `"string"`;
-`name`: `""`;
-`type`: `"string"`;
-\}\];
-`stateMutability`: `"view"`;
-`type`: `"function"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}\];
-`name`: `"ApprovalAdded"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}\];
-`name`: `"ApprovalRemoved"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"bytes32"`;
-`name`: `"parentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"uint96"`;
-`name`: `"createdAt"`;
-`type`: `"uint96"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"string"`;
-`name`: `"content"`;
-`type`: `"string"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"string"`;
-`name`: `"targetUri"`;
-`type`: `"string"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"uint8"`;
-`name`: `"commentType"`;
-`type`: `"uint8"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"key"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"value"`;
-`type`: `"bytes"`;
-\}\];
-`indexed`: `false`;
-`internalType`: `"struct Metadata.MetadataEntry[]"`;
-`name`: `"metadata"`;
-`type`: `"tuple[]"`;
-\}\];
-`name`: `"CommentAdded"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}\];
-`name`: `"CommentDeleted"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"editedByApp"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"uint256"`;
-`name`: `"channelId"`;
-`type`: `"uint256"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"bytes32"`;
-`name`: `"parentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"uint96"`;
-`name`: `"createdAt"`;
-`type`: `"uint96"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"uint96"`;
-`name`: `"updatedAt"`;
-`type`: `"uint96"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"string"`;
-`name`: `"content"`;
-`type`: `"string"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"string"`;
-`name`: `"targetUri"`;
-`type`: `"string"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"uint8"`;
-`name`: `"commentType"`;
-`type`: `"uint8"`;
-\}, \{
-`components`: readonly \[\{
-`internalType`: `"bytes32"`;
-`name`: `"key"`;
-`type`: `"bytes32"`;
-\}, \{
-`internalType`: `"bytes"`;
-`name`: `"value"`;
-`type`: `"bytes"`;
-\}\];
-`indexed`: `false`;
-`internalType`: `"struct Metadata.MetadataEntry[]"`;
-`name`: `"metadata"`;
-`type`: `"tuple[]"`;
-\}\];
-`name`: `"CommentEdited"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"bytes32"`;
-`name`: `"key"`;
-`type`: `"bytes32"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"bytes"`;
-`name`: `"value"`;
-`type`: `"bytes"`;
-\}\];
-`name`: `"CommentHookMetadataSet"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"bytes32"`;
-`name`: `"commentId"`;
-`type`: `"bytes32"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"bytes32"`;
-`name`: `"key"`;
-`type`: `"bytes32"`;
-\}, \{
-`indexed`: `false`;
-`internalType`: `"bytes"`;
-`name`: `"value"`;
-`type`: `"bytes"`;
-\}\];
-`name`: `"CommentMetadataSet"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"previousOwner"`;
-`type`: `"address"`;
-\}, \{
-`indexed`: `true`;
-`internalType`: `"address"`;
-`name`: `"newOwner"`;
-`type`: `"address"`;
-\}\];
-`name`: `"OwnershipTransferred"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `false`;
-`internalType`: `"address"`;
-`name`: `"account"`;
-`type`: `"address"`;
-\}\];
-`name`: `"Paused"`;
-`type`: `"event"`;
-\}, \{
-`anonymous`: `false`;
-`inputs`: readonly \[\{
-`indexed`: `false`;
-`internalType`: `"address"`;
-`name`: `"account"`;
-`type`: `"address"`;
-\}\];
-`name`: `"Unpaused"`;
-`type`: `"event"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ChannelDoesNotExist"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"CommentDoesNotExist"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"EnforcedPause"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ExpectedPause"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"InvalidAppSignature"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"InvalidAuthorSignature"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"string"`;
-`name`: `"message"`;
-`type`: `"string"`;
-\}\];
-`name`: `"InvalidCommentReference"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"author"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"app"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"expected"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"provided"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"InvalidNonce"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"InvalidSignatureLength"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"InvalidSignatureS"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"caller"`;
-`type`: `"address"`;
-\}, \{
-`internalType`: `"address"`;
-`name`: `"requiredCaller"`;
-`type`: `"address"`;
-\}\];
-`name`: `"NotAuthorized"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"owner"`;
-`type`: `"address"`;
-\}\];
-`name`: `"OwnableInvalidOwner"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"address"`;
-`name`: `"account"`;
-`type`: `"address"`;
-\}\];
-`name`: `"OwnableUnauthorizedAccount"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ParentCommentHasNeverExisted"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ReentrancyGuardReentrantCall"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\{
-`internalType`: `"uint256"`;
-`name`: `"deadline"`;
-`type`: `"uint256"`;
-\}, \{
-`internalType`: `"uint256"`;
-`name`: `"currentTime"`;
-`type`: `"uint256"`;
-\}\];
-`name`: `"SignatureDeadlineReached"`;
-`type`: `"error"`;
-\}, \{
-`inputs`: readonly \[\];
-`name`: `"ZeroAddress"`;
-`type`: `"error"`;
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"initialOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"constructor"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ADD_APPROVAL_TYPEHASH"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ADD_COMMENT_TYPEHASH"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"DELETE_COMMENT_TYPEHASH"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"DOMAIN_SEPARATOR"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"EDIT_COMMENT_TYPEHASH"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"REMOVE_APPROVAL_TYPEHASH"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"addApproval"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"nonce"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"deadline"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"authorSignature"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"addApprovalWithSig"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"channelManager"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"contract IChannelManager"`;
+     `name`: `""`;
+     `type`: `"address"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"commentHookMetadata"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes"`;
+     `name`: `""`;
+     `type`: `"bytes"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"commentHookMetadataKeys"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"commentMetadata"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes"`;
+     `name`: `""`;
+     `type`: `"bytes"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"commentMetadataKeys"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"deleteComment"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"deadline"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"authorSignature"`;
+     `type`: `"bytes"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"appSignature"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"deleteCommentWithSig"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"address"`;
+        `name`: `"app"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"nonce"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"deadline"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"content"`;
+        `type`: `"string"`;
+      \}, \{
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
+        `name`: `"metadata"`;
+        `type`: `"tuple[]"`;
+     \}\];
+     `internalType`: `"struct Comments.EditComment"`;
+     `name`: `"editData"`;
+     `type`: `"tuple"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"appSignature"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"editComment"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"address"`;
+        `name`: `"app"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"nonce"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"deadline"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"content"`;
+        `type`: `"string"`;
+      \}, \{
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
+        `name`: `"metadata"`;
+        `type`: `"tuple[]"`;
+     \}\];
+     `internalType`: `"struct Comments.EditComment"`;
+     `name`: `"editData"`;
+     `type`: `"tuple"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"authorSignature"`;
+     `type`: `"bytes"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"appSignature"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"editCommentWithSig"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"nonce"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"deadline"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"getAddApprovalHash"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getComment"`;
+  `outputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"address"`;
+        `name`: `"author"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"uint96"`;
+        `name`: `"createdAt"`;
+        `type`: `"uint96"`;
+      \}, \{
+        `internalType`: `"address"`;
+        `name`: `"app"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"uint88"`;
+        `name`: `"updatedAt"`;
+        `type`: `"uint88"`;
+      \}, \{
+        `internalType`: `"uint8"`;
+        `name`: `"commentType"`;
+        `type`: `"uint8"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"channelId"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"bytes32"`;
+        `name`: `"parentId"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"content"`;
+        `type`: `"string"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"targetUri"`;
+        `type`: `"string"`;
+     \}\];
+     `internalType`: `"struct Comments.Comment"`;
+     `name`: `""`;
+     `type`: `"tuple"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentHookMetadata"`;
+  `outputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
+     `name`: `""`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentHookMetadataKeys"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32[]"`;
+     `name`: `""`;
+     `type`: `"bytes32[]"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"bytes32"`;
+     `name`: `"key"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentHookMetadataValue"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes"`;
+     `name`: `""`;
+     `type`: `"bytes"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"address"`;
+        `name`: `"author"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"address"`;
+        `name`: `"app"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"channelId"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"deadline"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"bytes32"`;
+        `name`: `"parentId"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"uint8"`;
+        `name`: `"commentType"`;
+        `type`: `"uint8"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"content"`;
+        `type`: `"string"`;
+      \}, \{
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
+        `name`: `"metadata"`;
+        `type`: `"tuple[]"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"targetUri"`;
+        `type`: `"string"`;
+     \}\];
+     `internalType`: `"struct Comments.CreateComment"`;
+     `name`: `"commentData"`;
+     `type`: `"tuple"`;
+  \}\];
+  `name`: `"getCommentId"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentMetadata"`;
+  `outputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
+     `name`: `""`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentMetadataKeys"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32[]"`;
+     `name`: `""`;
+     `type`: `"bytes32[]"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"bytes32"`;
+     `name`: `"key"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getCommentMetadataValue"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes"`;
+     `name`: `""`;
+     `type`: `"bytes"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"deadline"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"getDeleteCommentHash"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"address"`;
+        `name`: `"app"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"nonce"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"deadline"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"content"`;
+        `type`: `"string"`;
+      \}, \{
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
+        `name`: `"metadata"`;
+        `type`: `"tuple[]"`;
+     \}\];
+     `internalType`: `"struct Comments.EditComment"`;
+     `name`: `"editData"`;
+     `type`: `"tuple"`;
+  \}\];
+  `name`: `"getEditCommentHash"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"getNonce"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"nonce"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"deadline"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"getRemoveApprovalHash"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"isApproved"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bool"`;
+     `name`: `""`;
+     `type`: `"bool"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"isDeleted"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bool"`;
+     `name`: `""`;
+     `type`: `"bool"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"name"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"string"`;
+     `name`: `""`;
+     `type`: `"string"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"owner"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `""`;
+     `type`: `"address"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"paused"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bool"`;
+     `name`: `""`;
+     `type`: `"bool"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"address"`;
+        `name`: `"author"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"address"`;
+        `name`: `"app"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"channelId"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"deadline"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"bytes32"`;
+        `name`: `"parentId"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"uint8"`;
+        `name`: `"commentType"`;
+        `type`: `"uint8"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"content"`;
+        `type`: `"string"`;
+      \}, \{
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
+        `name`: `"metadata"`;
+        `type`: `"tuple[]"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"targetUri"`;
+        `type`: `"string"`;
+     \}\];
+     `internalType`: `"struct Comments.CreateComment"`;
+     `name`: `"commentData"`;
+     `type`: `"tuple"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"appSignature"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"postComment"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"address"`;
+        `name`: `"author"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"address"`;
+        `name`: `"app"`;
+        `type`: `"address"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"channelId"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"deadline"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"bytes32"`;
+        `name`: `"parentId"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"uint8"`;
+        `name`: `"commentType"`;
+        `type`: `"uint8"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"content"`;
+        `type`: `"string"`;
+      \}, \{
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
+        `name`: `"metadata"`;
+        `type`: `"tuple[]"`;
+      \}, \{
+        `internalType`: `"string"`;
+        `name`: `"targetUri"`;
+        `type`: `"string"`;
+     \}\];
+     `internalType`: `"struct Comments.CreateComment"`;
+     `name`: `"commentData"`;
+     `type`: `"tuple"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"authorSignature"`;
+     `type`: `"bytes"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"appSignature"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"postCommentWithSig"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"nonce"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"deadline"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"authorSignature"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"removeApprovalWithSig"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"renounceOwnership"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"revokeApproval"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"newOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"transferOwnership"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"_channelContract"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"updateChannelContract"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"updateCommentHookData"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"version"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"string"`;
+     `name`: `""`;
+     `type`: `"string"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ApprovalAdded"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ApprovalRemoved"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"bytes32"`;
+     `name`: `"parentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint96"`;
+     `name`: `"createdAt"`;
+     `type`: `"uint96"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"string"`;
+     `name`: `"content"`;
+     `type`: `"string"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"string"`;
+     `name`: `"targetUri"`;
+     `type`: `"string"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint8"`;
+     `name`: `"commentType"`;
+     `type`: `"uint8"`;
+   \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `indexed`: `false`;
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
+     `name`: `"metadata"`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `name`: `"CommentAdded"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"CommentDeleted"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"editedByApp"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"bytes32"`;
+     `name`: `"parentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint96"`;
+     `name`: `"createdAt"`;
+     `type`: `"uint96"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint96"`;
+     `name`: `"updatedAt"`;
+     `type`: `"uint96"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"string"`;
+     `name`: `"content"`;
+     `type`: `"string"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"string"`;
+     `name`: `"targetUri"`;
+     `type`: `"string"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint8"`;
+     `name`: `"commentType"`;
+     `type`: `"uint8"`;
+   \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `indexed`: `false`;
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
+     `name`: `"metadata"`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `name`: `"CommentEdited"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"key"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"bytes"`;
+     `name`: `"value"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"CommentHookMetadataSet"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"key"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"bytes"`;
+     `name`: `"value"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"CommentMetadataSet"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"previousOwner"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"newOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"OwnershipTransferred"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `false`;
+     `internalType`: `"address"`;
+     `name`: `"account"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"Paused"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `false`;
+     `internalType`: `"address"`;
+     `name`: `"account"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"Unpaused"`;
+  `type`: `"event"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ChannelDoesNotExist"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"CommentDoesNotExist"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"EnforcedPause"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ExpectedPause"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"HookNotEnabled"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InvalidAppSignature"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InvalidAuthorSignature"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"string"`;
+     `name`: `"message"`;
+     `type`: `"string"`;
+  \}\];
+  `name`: `"InvalidCommentReference"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"expected"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"provided"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"InvalidNonce"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InvalidSignatureLength"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InvalidSignatureS"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"caller"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"requiredCaller"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"NotAuthorized"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"OwnableInvalidOwner"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"account"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"OwnableUnauthorizedAccount"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ParentCommentHasNeverExisted"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ParentCommentNotInSameChannel"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ReentrancyGuardReentrantCall"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"deadline"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"currentTime"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"SignatureDeadlineReached"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ZeroAddress"`;
+  `type`: `"error"`;
 \}\], `"CommentDeleted"`\>\>
 
 The transaction hash

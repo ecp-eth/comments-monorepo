@@ -1714,6 +1714,11 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
+    name: "ParentCommentNotInSameChannel",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "ReentrancyGuardReentrantCall",
     inputs: [],
   },
@@ -1756,6 +1761,10 @@ export const ChannelManagerABI = [
     stateMutability: "nonpayable",
   },
   {
+    type: "receive",
+    stateMutability: "payable",
+  },
+  {
     type: "function",
     name: "approve",
     inputs: [
@@ -1781,6 +1790,25 @@ export const ChannelManagerABI = [
         name: "owner",
         type: "address",
         internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "calculateMsgValueWithHookFee",
+    inputs: [
+      {
+        name: "postFeeAmountForwardedToHook",
+        type: "uint256",
+        internalType: "uint256",
       },
     ],
     outputs: [
@@ -1858,6 +1886,19 @@ export const ChannelManagerABI = [
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "collectCommentCreationFee",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint96",
+        internalType: "uint96",
+      },
+    ],
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -2168,6 +2209,19 @@ export const ChannelManagerABI = [
   },
   {
     type: "function",
+    name: "getCommentCreationFee",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint96",
+        internalType: "uint96",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "getHookTransactionFee",
     inputs: [],
     outputs: [
@@ -2360,10 +2414,15 @@ export const ChannelManagerABI = [
         internalType: "uint256",
       },
       {
-        name: "metadata",
+        name: "operations",
         type: "tuple[]",
-        internalType: "struct Metadata.MetadataEntry[]",
+        internalType: "struct Metadata.MetadataEntryOp[]",
         components: [
+          {
+            name: "operation",
+            type: "uint8",
+            internalType: "enum Metadata.MetadataOperation",
+          },
           {
             name: "key",
             type: "bytes32",
@@ -2375,6 +2434,19 @@ export const ChannelManagerABI = [
             internalType: "bytes",
           },
         ],
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setCommentCreationFee",
+    inputs: [
+      {
+        name: "fee",
+        type: "uint96",
+        internalType: "uint96",
       },
     ],
     outputs: [],
@@ -2809,6 +2881,19 @@ export const ChannelManagerABI = [
             internalType: "bytes",
           },
         ],
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "CommentCreationFeeUpdated",
+    inputs: [
+      {
+        name: "newFee",
+        type: "uint96",
+        indexed: false,
+        internalType: "uint96",
       },
     ],
     anonymous: false,

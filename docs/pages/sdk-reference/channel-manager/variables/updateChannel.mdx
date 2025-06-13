@@ -16,6 +16,9 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   stateMutability: "nonpayable";
   type: "constructor";
 }, {
+  stateMutability: "payable";
+  type: "receive";
+}, {
   inputs: readonly [{
      internalType: "address";
      name: "to";
@@ -46,6 +49,20 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
 }, {
   inputs: readonly [{
      internalType: "uint256";
+     name: "postFeeAmountForwardedToHook";
+     type: "uint256";
+  }];
+  name: "calculateMsgValueWithHookFee";
+  outputs: readonly [{
+     internalType: "uint256";
+     name: "";
+     type: "uint256";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
      name: "channelId";
      type: "uint256";
   }];
@@ -59,6 +76,52 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "function";
 }, {
   inputs: readonly [{
+     internalType: "uint256";
+     name: "";
+     type: "uint256";
+   }, {
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  name: "channelMetadata";
+  outputs: readonly [{
+     internalType: "bytes";
+     name: "";
+     type: "bytes";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
+     name: "";
+     type: "uint256";
+   }, {
+     internalType: "uint256";
+     name: "";
+     type: "uint256";
+  }];
+  name: "channelMetadataKeys";
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [];
+  name: "collectCommentCreationFee";
+  outputs: readonly [{
+     internalType: "uint96";
+     name: "";
+     type: "uint96";
+  }];
+  stateMutability: "payable";
+  type: "function";
+}, {
+  inputs: readonly [{
      internalType: "string";
      name: "name";
      type: "string";
@@ -67,9 +130,18 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      name: "description";
      type: "string";
    }, {
-     internalType: "string";
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "metadata";
-     type: "string";
+     type: "tuple[]";
    }, {
      internalType: "address";
      name: "hook";
@@ -128,15 +200,28 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
         name: "description";
         type: "string";
       }, {
-        internalType: "string";
+        components: readonly [{
+           internalType: ...;
+           name: ...;
+           type: ...;
+         }, {
+           internalType: ...;
+           name: ...;
+           type: ...;
+        }];
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
-        type: "string";
+        type: "tuple[]";
       }, {
         internalType: "address";
         name: "hook";
         type: "address";
       }, {
         components: readonly [{
+           internalType: ...;
+           name: ...;
+           type: ...;
+         }, {
            internalType: ...;
            name: ...;
            type: ...;
@@ -170,6 +255,106 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
 }, {
   inputs: readonly [];
   name: "getChannelCreationFee";
+  outputs: readonly [{
+     internalType: "uint96";
+     name: "";
+     type: "uint96";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "creator";
+     type: "address";
+   }, {
+     internalType: "string";
+     name: "name";
+     type: "string";
+   }, {
+     internalType: "string";
+     name: "description";
+     type: "string";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
+  }];
+  name: "getChannelId";
+  outputs: readonly [{
+     internalType: "uint256";
+     name: "";
+     type: "uint256";
+  }];
+  stateMutability: "pure";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+  }];
+  name: "getChannelMetadata";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "";
+     type: "tuple[]";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+  }];
+  name: "getChannelMetadataKeys";
+  outputs: readonly [{
+     internalType: "bytes32[]";
+     name: "";
+     type: "bytes32[]";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+   }, {
+     internalType: "bytes32";
+     name: "key";
+     type: "bytes32";
+  }];
+  name: "getChannelMetadataValue";
+  outputs: readonly [{
+     internalType: "bytes";
+     name: "";
+     type: "bytes";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [];
+  name: "getCommentCreationFee";
   outputs: readonly [{
      internalType: "uint96";
      name: "";
@@ -325,6 +510,43 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      name: "channelId";
      type: "uint256";
    }, {
+     components: readonly [{
+        internalType: "enum Metadata.MetadataOperation";
+        name: "operation";
+        type: "uint8";
+      }, {
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntryOp[]";
+     name: "operations";
+     type: "tuple[]";
+  }];
+  name: "setChannelMetadata";
+  outputs: readonly [];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "uint96";
+     name: "fee";
+     type: "uint96";
+  }];
+  name: "setCommentCreationFee";
+  outputs: readonly [];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+   }, {
      internalType: "address";
      name: "hook";
      type: "address";
@@ -465,9 +687,18 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      name: "description";
      type: "string";
    }, {
-     internalType: "string";
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "metadata";
-     type: "string";
+     type: "tuple[]";
   }];
   name: "updateChannel";
   outputs: readonly [];
@@ -562,8 +793,22 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
    }, {
      indexed: false;
      internalType: "string";
-     name: "metadata";
+     name: "description";
      type: "string";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     indexed: false;
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
   }];
   name: "ChannelCreated";
   type: "event";
@@ -586,6 +831,26 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "uint256";
    }, {
      indexed: false;
+     internalType: "bytes32";
+     name: "key";
+     type: "bytes32";
+   }, {
+     indexed: false;
+     internalType: "bytes";
+     name: "value";
+     type: "bytes";
+  }];
+  name: "ChannelMetadataSet";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+   }, {
+     indexed: false;
      internalType: "string";
      name: "name";
      type: "string";
@@ -595,12 +860,31 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      name: "description";
      type: "string";
    }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
      indexed: false;
-     internalType: "string";
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "metadata";
-     type: "string";
+     type: "tuple[]";
   }];
   name: "ChannelUpdated";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: false;
+     internalType: "uint96";
+     name: "newFee";
+     type: "uint96";
+  }];
+  name: "CommentCreationFeeUpdated";
   type: "event";
 }, {
   anonymous: false;
@@ -844,7 +1128,7 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
 }], "ChannelUpdated">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:191](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L191)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:188](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L188)
 
 Update a channel
 
@@ -864,6 +1148,9 @@ Update a channel
   \}\];
   `stateMutability`: `"nonpayable"`;
   `type`: `"constructor"`;
+\}, \{
+  `stateMutability`: `"payable"`;
+  `type`: `"receive"`;
 \}, \{
   `inputs`: readonly \[\{
      `internalType`: `"address"`;
@@ -895,6 +1182,20 @@ Update a channel
 \}, \{
   `inputs`: readonly \[\{
      `internalType`: `"uint256"`;
+     `name`: `"postFeeAmountForwardedToHook"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"calculateMsgValueWithHookFee"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
      `name`: `"channelId"`;
      `type`: `"uint256"`;
   \}\];
@@ -908,6 +1209,52 @@ Update a channel
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"channelMetadata"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes"`;
+     `name`: `""`;
+     `type`: `"bytes"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"channelMetadataKeys"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"collectCommentCreationFee"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint96"`;
+     `name`: `""`;
+     `type`: `"uint96"`;
+  \}\];
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
      `internalType`: `"string"`;
      `name`: `"name"`;
      `type`: `"string"`;
@@ -916,9 +1263,18 @@ Update a channel
      `name`: `"description"`;
      `type`: `"string"`;
    \}, \{
-     `internalType`: `"string"`;
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
      `name`: `"metadata"`;
-     `type`: `"string"`;
+     `type`: `"tuple[]"`;
    \}, \{
      `internalType`: `"address"`;
      `name`: `"hook"`;
@@ -977,15 +1333,28 @@ Update a channel
         `name`: `"description"`;
         `type`: `"string"`;
       \}, \{
-        `internalType`: `"string"`;
+        `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+        \}\];
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
         `name`: `"metadata"`;
-        `type`: `"string"`;
+        `type`: `"tuple[]"`;
       \}, \{
         `internalType`: `"address"`;
         `name`: `"hook"`;
         `type`: `"address"`;
       \}, \{
         `components`: readonly \[\{
+           `internalType`: ...;
+           `name`: ...;
+           `type`: ...;
+         \}, \{
            `internalType`: ...;
            `name`: ...;
            `type`: ...;
@@ -1019,6 +1388,106 @@ Update a channel
 \}, \{
   `inputs`: readonly \[\];
   `name`: `"getChannelCreationFee"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint96"`;
+     `name`: `""`;
+     `type`: `"uint96"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"creator"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"string"`;
+     `name`: `"name"`;
+     `type`: `"string"`;
+   \}, \{
+     `internalType`: `"string"`;
+     `name`: `"description"`;
+     `type`: `"string"`;
+   \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
+     `name`: `"metadata"`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `name`: `"getChannelId"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"pure"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"getChannelMetadata"`;
+  `outputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
+     `name`: `""`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"getChannelMetadataKeys"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32[]"`;
+     `name`: `""`;
+     `type`: `"bytes32[]"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"bytes32"`;
+     `name`: `"key"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"getChannelMetadataValue"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes"`;
+     `name`: `""`;
+     `type`: `"bytes"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"getCommentCreationFee"`;
   `outputs`: readonly \[\{
      `internalType`: `"uint96"`;
      `name`: `""`;
@@ -1174,6 +1643,43 @@ Update a channel
      `name`: `"channelId"`;
      `type`: `"uint256"`;
    \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"enum Metadata.MetadataOperation"`;
+        `name`: `"operation"`;
+        `type`: `"uint8"`;
+      \}, \{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `internalType`: `"struct Metadata.MetadataEntryOp[]"`;
+     `name`: `"operations"`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `name`: `"setChannelMetadata"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint96"`;
+     `name`: `"fee"`;
+     `type`: `"uint96"`;
+  \}\];
+  `name`: `"setCommentCreationFee"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
      `internalType`: `"address"`;
      `name`: `"hook"`;
      `type`: `"address"`;
@@ -1314,9 +1820,18 @@ Update a channel
      `name`: `"description"`;
      `type`: `"string"`;
    \}, \{
-     `internalType`: `"string"`;
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
      `name`: `"metadata"`;
-     `type`: `"string"`;
+     `type`: `"tuple[]"`;
   \}\];
   `name`: `"updateChannel"`;
   `outputs`: readonly \[\];
@@ -1411,8 +1926,22 @@ Update a channel
    \}, \{
      `indexed`: `false`;
      `internalType`: `"string"`;
-     `name`: `"metadata"`;
+     `name`: `"description"`;
      `type`: `"string"`;
+   \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `indexed`: `false`;
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
+     `name`: `"metadata"`;
+     `type`: `"tuple[]"`;
   \}\];
   `name`: `"ChannelCreated"`;
   `type`: `"event"`;
@@ -1435,6 +1964,26 @@ Update a channel
      `type`: `"uint256"`;
    \}, \{
      `indexed`: `false`;
+     `internalType`: `"bytes32"`;
+     `name`: `"key"`;
+     `type`: `"bytes32"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"bytes"`;
+     `name`: `"value"`;
+     `type`: `"bytes"`;
+  \}\];
+  `name`: `"ChannelMetadataSet"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `indexed`: `false`;
      `internalType`: `"string"`;
      `name`: `"name"`;
      `type`: `"string"`;
@@ -1444,12 +1993,31 @@ Update a channel
      `name`: `"description"`;
      `type`: `"string"`;
    \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
      `indexed`: `false`;
-     `internalType`: `"string"`;
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
      `name`: `"metadata"`;
-     `type`: `"string"`;
+     `type`: `"tuple[]"`;
   \}\];
   `name`: `"ChannelUpdated"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `false`;
+     `internalType`: `"uint96"`;
+     `name`: `"newFee"`;
+     `type`: `"uint96"`;
+  \}\];
+  `name`: `"CommentCreationFeeUpdated"`;
   `type`: `"event"`;
 \}, \{
   `anonymous`: `false`;

@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / CreateChannelParams
 
@@ -12,13 +12,13 @@ type CreateChannelParams = {
   description?: string;
   fee?: bigint;
   hook?: Hex;
-  metadata?: string;
+  metadata?: MetadataEntry[];
   name: string;
   writeContract: ContractWriteFunctions["createChannel"];
 };
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:18](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L18)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:21](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L21)
 
 ## Properties
 
@@ -28,17 +28,17 @@ Defined in: [packages/sdk/src/channel-manager/channel.ts:18](https://github.com/
 optional channelManagerAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:44](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L44)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:47](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L47)
 
 The address of the channel manager
 
 #### Default
 
 ```ts
-CHANNEL_MANAGER_ADDRESS;
+CHANNEL_MANAGER_ADDRESS
 ```
 
----
+***
 
 ### description?
 
@@ -46,11 +46,11 @@ CHANNEL_MANAGER_ADDRESS;
 optional description: string;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:26](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L26)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:29](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L29)
 
 The description of the channel
 
----
+***
 
 ### fee?
 
@@ -58,11 +58,11 @@ The description of the channel
 optional fee: bigint;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:38](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L38)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:41](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L41)
 
 The fee for creating the channel this will be paid in the ETH by the caller.
 
----
+***
 
 ### hook?
 
@@ -70,11 +70,11 @@ The fee for creating the channel this will be paid in the ETH by the caller.
 optional hook: Hex;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:34](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L34)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:37](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L37)
 
 The hook of the channel
 
----
+***
 
 ### metadata?
 
@@ -82,11 +82,11 @@ The hook of the channel
 optional metadata: MetadataEntry[];
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:30](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L30)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:33](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L33)
 
 The metadata of the channel
 
----
+***
 
 ### name
 
@@ -94,11 +94,11 @@ The metadata of the channel
 name: string;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:22](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L22)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:25](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L25)
 
 The name of the channel
 
----
+***
 
 ### writeContract
 
@@ -106,4 +106,4 @@ The name of the channel
 writeContract: ContractWriteFunctions["createChannel"];
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:45](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L45)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:48](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L48)

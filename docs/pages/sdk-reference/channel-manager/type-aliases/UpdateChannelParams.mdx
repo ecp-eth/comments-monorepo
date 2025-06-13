@@ -1,6 +1,6 @@
 [**@ecp.eth/sdk**](../../index.mdx)
 
----
+***
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / UpdateChannelParams
 
@@ -11,13 +11,13 @@ type UpdateChannelParams = {
   channelId: bigint;
   channelManagerAddress?: Hex;
   description?: string;
-  metadata?: string;
+  metadata?: MetadataEntry[];
   name: string;
   writeContract: ContractWriteFunctions["updateChannel"];
 };
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:147](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L147)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:144](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L144)
 
 ## Properties
 
@@ -27,11 +27,11 @@ Defined in: [packages/sdk/src/channel-manager/channel.ts:147](https://github.com
 channelId: bigint;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:151](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L151)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:148](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L148)
 
 The ID of the channel to update
 
----
+***
 
 ### channelManagerAddress?
 
@@ -39,17 +39,17 @@ The ID of the channel to update
 optional channelManagerAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:169](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L169)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:166](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L166)
 
 The address of the channel manager
 
 #### Default
 
 ```ts
-CHANNEL_MANAGER_ADDRESS;
+CHANNEL_MANAGER_ADDRESS
 ```
 
----
+***
 
 ### description?
 
@@ -57,11 +57,11 @@ CHANNEL_MANAGER_ADDRESS;
 optional description: string;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:159](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L159)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:156](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L156)
 
 The description of the channel
 
----
+***
 
 ### metadata?
 
@@ -69,11 +69,11 @@ The description of the channel
 optional metadata: MetadataEntry[];
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:163](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L163)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:160](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L160)
 
 The metadata of the channel
 
----
+***
 
 ### name
 
@@ -81,11 +81,11 @@ The metadata of the channel
 name: string;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:155](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L155)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:152](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L152)
 
 The name of the channel
 
----
+***
 
 ### writeContract
 
@@ -93,4 +93,4 @@ The name of the channel
 writeContract: ContractWriteFunctions["updateChannel"];
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:170](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L170)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:167](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L167)
