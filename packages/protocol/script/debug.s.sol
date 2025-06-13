@@ -253,7 +253,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 5",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
@@ -276,7 +276,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       nonce: comments.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       content: "Test comment 6",
-      metadata: new Comments.MetadataEntry[](0)
+      metadata: new Metadata.MetadataEntry[](0)
     });
     bytes32 editHash = comments.getEditCommentHash(
       commentId,
@@ -308,7 +308,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create a comment to be deleted
     createCommentData = Comments.CreateComment({
       content: "Test comment for deletion",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0,
       author: user1,
@@ -338,7 +338,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create a comment to be deleted
     createCommentData = Comments.CreateComment({
       content: "Test comment for deletion with sigs",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0,
       author: user1,
