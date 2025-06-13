@@ -39,6 +39,7 @@ export type EditorRef = {
   getFilesForUpload: () => UploadTrackerFileToUpload[];
   setFileAsUploaded: (file: UploadTrackerUploadedFile) => void;
   setFileUploadAsFailed: (fileId: string) => void;
+  addFiles: (files: File[]) => void;
 };
 
 type EditorProps = {
@@ -150,6 +151,16 @@ export function Editor({
         editor?.commands.focus();
       },
       editor,
+      addFiles: (files) => {
+        for (const file of files) {
+          editor?.commands.addFile({
+            id: crypto.randomUUID(),
+            name: file.name,
+            file,
+            mimeType: file.type,
+          });
+        }
+      },
       setFileAsUploaded: (file) => {
         editor?.commands.updateFile(file);
       },

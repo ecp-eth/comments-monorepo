@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
 import { useAccount } from "wagmi";
+import { PlusIcon } from "lucide-react";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { z } from "zod";
 import { InvalidCommentError } from "./errors";
@@ -9,6 +10,7 @@ import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import { useCommentActions } from "./CommentActionsContext";
 import type { QueryKey } from "@tanstack/react-query";
 import type { Hex } from "viem";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import {
@@ -20,6 +22,16 @@ import { Editor, EditorRef } from "./CommentTextEditor/Editor";
 import { useUploadFiles } from "./CommentTextEditor/hooks/useUploadFiles";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { isContentEqual } from "./CommentTextEditor/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  ALLOWED_UPLOAD_MIME_TYPES,
+  MAX_UPLOAD_FILE_SIZE,
+} from "@/lib/constants";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -77,6 +89,7 @@ function BaseCommentForm({
   const { address } = useAccount();
   const connectAccount = useConnectAccount();
   const editorRef = useRef<EditorRef>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const { uploadFiles } = useUploadFiles();
 
@@ -142,6 +155,55 @@ function BaseCommentForm({
 
   const isSubmitting = submitMutation.isPending;
 
+  const handleFileSelect = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      let files = Array.from(event.target.files || []);
+
+      if (files.length === 0) {
+        return;
+      }
+
+      let removedDueToMimeType = 0;
+      let removedDueToSize = 0;
+
+      files = files.filter((file) => {
+        if (!ALLOWED_UPLOAD_MIME_TYPES.includes(file.type)) {
+          removedDueToMimeType++;
+
+          return false;
+        }
+
+        if (file.size > MAX_UPLOAD_FILE_SIZE) {
+          removedDueToSize++;
+
+          return false;
+        }
+
+        return true;
+      });
+
+      if (removedDueToMimeType > 0 || removedDueToSize) {
+        toast.error("Some files were removed", {
+          description: "Some files were removed due to file type or size",
+        });
+      }
+
+      if (files.length === 0) {
+        return;
+      }
+
+      editorRef.current?.addFiles(files);
+
+      // Reset the input so the same file can be selected again
+      event.target.value = "";
+    },
+    [],
+  );
+
+  const handleAddFileClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
   return (
     <form
       action={async (formData: FormData) => {
@@ -153,6 +215,14 @@ function BaseCommentForm({
       }}
       className="mb-4 flex flex-col gap-2"
     >
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept={ALLOWED_UPLOAD_MIME_TYPES.join(",")}
+        onChange={handleFileSelect}
+        className="hidden"
+      />
       <Editor
         autoFocus={autoFocus}
         onBlur={() => {
@@ -193,6 +263,25 @@ function BaseCommentForm({
       <div className="flex gap-2 justify-between">
         {address && <CommentBoxAuthor address={address} />}
         <div className="flex gap-2 items-center ml-auto">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  aria-label="Add a file"
+                  variant="outline"
+                  size="icon"
+                  type="button"
+                  onClick={handleAddFileClick}
+                  disabled={isSubmitting || disabled}
+                >
+                  <PlusIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Add a file</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <Button
             name="action"
             value="post"
