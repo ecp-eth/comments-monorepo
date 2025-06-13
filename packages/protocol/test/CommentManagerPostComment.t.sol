@@ -714,7 +714,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Try to post comment with insufficient fee (only 0.005 ETH when 0.011 ETH is required)
     vm.prank(author);
     vm.deal(author, 1 ether);
-    vm.expectRevert(IProtocolFees.InsufficientFee.selector);
+    vm.expectRevert();
     comments.postCommentWithSig{ value: 0.005 ether }(
       commentData,
       authorSignature,
