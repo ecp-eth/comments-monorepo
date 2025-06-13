@@ -282,7 +282,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
 
   onBeforeCreate() {
     this.options.suggestion.items = async ({ query }) => {
-      if (query.trim().length < 3) {
+      if (query.trim().length < 2) {
         return [];
       }
 
