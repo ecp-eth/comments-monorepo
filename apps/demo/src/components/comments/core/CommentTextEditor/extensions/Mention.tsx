@@ -11,6 +11,8 @@ import {
   type SuggestionsProps,
 } from "./components/Suggestions";
 
+const MINIMUM_QUERY_LENGTH = 2;
+
 export type MentionItem = MentionSuggestionSchemaType;
 
 type SuggestionItem = MentionSuggestionSchemaType;
@@ -156,6 +158,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         return [
           "span",
           {
+            class: "font-semibold text-blue-500",
             "data-type": attrs.type,
             "data-name": attrs.name,
             "data-address": attrs.address,
@@ -167,6 +170,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         return [
           "span",
           {
+            class: "font-semibold text-blue-500",
             "data-type": attrs.type,
             "data-name": attrs.name,
             "data-address": attrs.address,
@@ -180,6 +184,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         return [
           "span",
           {
+            class: "font-semibold text-blue-500",
             "data-type": attrs.type,
             "data-address": attrs.address,
             "data-name": attrs.username || attrs.displayName || attrs.address,
@@ -231,7 +236,10 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
               }
 
               reactRenderer = new ReactRenderer(Suggestions, {
-                props,
+                props: {
+                  ...props,
+                  minimumQueryLength: MINIMUM_QUERY_LENGTH,
+                },
                 editor: props.editor,
               });
 
@@ -282,7 +290,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
 
   onBeforeCreate() {
     this.options.suggestion.items = async ({ query }) => {
-      if (query.trim().length < 2) {
+      if (query.trim().length < MINIMUM_QUERY_LENGTH) {
         return [];
       }
 

@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
 import { useAccount } from "wagmi";
-import { PlusIcon } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { z } from "zod";
 import { InvalidCommentError } from "./errors";
@@ -267,18 +267,18 @@ function BaseCommentForm({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  aria-label="Add a file"
+                  aria-label="Add media"
                   variant="outline"
                   size="icon"
                   type="button"
                   onClick={handleAddFileClick}
                   disabled={isSubmitting || disabled}
                 >
-                  <PlusIcon />
+                  <ImageIcon />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Add a file</p>
+                <p>Add media</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
