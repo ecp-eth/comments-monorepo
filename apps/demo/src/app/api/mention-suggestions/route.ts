@@ -20,6 +20,94 @@ import {
 import { NextRequest } from "next/server";
 import { type Hex, createPublicClient, http } from "viem";
 import { z } from "zod";
+import { gql, request as graphqlRequest } from "graphql-request";
+
+type Result = {
+  domains: {
+    id: Hex;
+    name: string;
+    resolvedAddress:
+      | {
+          id: Hex;
+        }
+      | undefined;
+    owner: {
+      id: Hex;
+    };
+  }[];
+};
+
+const searchByNameQuery = gql`
+  query SearchByName($name: String!) {
+    domains(where: { name_contains: $name }, first: 10) {
+      id
+      name
+      resolvedAddress {
+        id
+      }
+      owner {
+        id
+      }
+    }
+  }
+`;
+
+const searchByAddressQuery = gql`
+  query SearchByAddress($address: String!) {
+    domains(where: { resolvedAddress_starts_with: $address }, first: 10) {
+      id
+      name
+      resolvedAddress {
+        id
+      }
+      owner {
+        id
+      }
+    }
+  }
+`;
+
+async function searchEns(query: string): Promise<Result | null> {
+  if (!env.GRAPH_API_KEY || !env.GRAPH_ENS_SUBGRAPH_URL) {
+    return null;
+  }
+
+  if (query.startsWith("0x")) {
+    const results = await graphqlRequest<Result>(
+      env.GRAPH_ENS_SUBGRAPH_URL,
+      searchByAddressQuery,
+      {
+        address: query,
+      },
+      {
+        Authorization: `Bearer ${env.GRAPH_API_KEY}`,
+      },
+    );
+
+    if (results.domains.length > 0) {
+      return results;
+    }
+
+    return null;
+  }
+
+  const results = await graphqlRequest<Result>(
+    env.GRAPH_ENS_SUBGRAPH_URL,
+    searchByNameQuery,
+    {
+      name: query,
+    },
+    {
+      Authorization: `Bearer ${env.GRAPH_API_KEY}`,
+    },
+  );
+
+  if (results.domains.length > 0) {
+    return results;
+  }
+
+  return null;
+}
 
 // const ERC_20_CAIP_19_REGEX = /^eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40})$/;
 
@@ -241,6 +329,18 @@ export async function GET(
           ],
         });
       }
+    }
+
+    const results = await searchEns(query);
+
+    if (results) {
+      return new JSONResponse(responseSchema, {
+        suggestions: results.domains.map((domain) => ({
+          type: "ens" as const,
+          name: domain.name,
+          address: domain.resolvedAddress?.id ?? domain.owner.id,
+        })),
+      });
     }
   }
 
