@@ -158,6 +158,11 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
           onRetryDeleteClick={onDeleteClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
+          optimisticReferences={
+            comment.pendingOperation?.action === "post"
+              ? comment.pendingOperation.references
+              : undefined
+          }
         />
       )}
       {isReplying && (

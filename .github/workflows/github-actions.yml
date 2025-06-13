@@ -106,6 +106,7 @@ jobs:
       NEXT_PUBLIC_PINATA_GATEWAY_URL: "https://some.gateway.url"
       ENS_RPC_URL: "https://some.rpc.url"
       NEYNAR_API_KEY: "NEYNAR_API_KEY"
+      SIM_API_KEY: "SIM_API_KEY"
 
     name: Build and Test on Node.js 22
     steps:

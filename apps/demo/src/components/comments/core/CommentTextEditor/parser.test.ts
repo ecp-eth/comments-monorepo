@@ -72,6 +72,7 @@ describe("content parser", () => {
                 type: "ens",
                 address: "0x1234567890123456789012345678901234567890",
                 name: "John Doe",
+                url: "",
               },
             },
           ],
@@ -162,6 +163,8 @@ describe("content parser", () => {
                 chainId: 1,
                 caip19:
                   "eip155:1/erc20:0x1234567890123456789012345678901234567890",
+                decimals: 18,
+                logoURI: null,
               },
             },
           ],
@@ -285,6 +288,7 @@ describe("content parser", () => {
                 type: "ens",
                 address: "0x225f137127d9067788314bc7fcc1f36746a3c3B5",
                 name: "luc.eth",
+                url: "https://app.ens.domains/luc.eth",
               },
             },
             { type: "text", text: " this " },
@@ -296,6 +300,9 @@ describe("content parser", () => {
                 name: "USD Coin",
                 symbol: "USDC",
                 chainId: 1,
+                decimals: 18,
+                logoURI:
+                  "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
                 caip19:
                   "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
               },
@@ -364,6 +371,7 @@ describe("content parser", () => {
                 type: "ens",
                 address: "0x1234567890123456789012345678901234567890",
                 name: "John Doe",
+                url: "",
               },
             },
             { type: "text", text: " 💻" },

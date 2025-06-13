@@ -59,7 +59,7 @@ export async function resolveCommentReferences(
       const address = match[0].startsWith("@") ? match[0].slice(1) : match[0];
 
       promises.push(resolveEthAddress(address as Hex, position, options));
-      pos += [...match[0]].length;
+      pos += match[0].length;
 
       continue;
     }
@@ -78,7 +78,7 @@ export async function resolveCommentReferences(
           options,
         ),
       );
-      pos += [...match[0]].length;
+      pos += match[0].length;
 
       continue;
     }
@@ -90,7 +90,7 @@ export async function resolveCommentReferences(
       const ensName = match[0].startsWith("@") ? match[0].slice(1) : match[0];
 
       promises.push(resolveEnsName(ensName, position, options));
-      pos += [...match[0]].length;
+      pos += match[0].length;
 
       continue;
     }
@@ -106,7 +106,7 @@ export async function resolveCommentReferences(
         resolveERC20TokenEthAddress(address, chainId, position, options),
       );
 
-      pos += [...match[0]].length;
+      pos += match[0].length;
 
       continue;
     }
@@ -124,7 +124,7 @@ export async function resolveCommentReferences(
           options,
         ),
       );
-      pos += [...match[0]].length;
+      pos += match[0].length;
 
       continue;
     }
@@ -135,7 +135,7 @@ export async function resolveCommentReferences(
       const position = { start: pos, end: pos + match[0].length };
 
       promises.push(resolveURL(match[0], position, options));
-      pos += [...match[0]].length;
+      pos += match[0].length;
 
       continue;
     }

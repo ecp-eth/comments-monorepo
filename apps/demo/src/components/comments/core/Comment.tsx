@@ -15,6 +15,7 @@ import { CommentSwapInfo } from "./CommentSwapInfo";
 import { useMemo } from "react";
 import { renderToReact } from "./renderer";
 import { CommentMediaReference } from "./CommentMediaReference";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 type CommentProps = {
   comment: CommentType;
@@ -24,6 +25,7 @@ type CommentProps = {
   onRetryPostClick: () => void;
   onEditClick: () => void;
   onRetryEditClick: () => void;
+  optimisticReferences: IndexerAPICommentReferencesSchemaType | undefined;
 };
 
 export function Comment({
@@ -34,11 +36,25 @@ export function Comment({
   onReplyClick,
   onEditClick,
   onRetryEditClick,
+  optimisticReferences,
 }: CommentProps) {
   const { address: connectedAddress } = useAccount();
   const { element: textElement, mediaReferences } = useMemo(() => {
-    return renderToReact(comment);
-  }, [comment]);
+    let commentWithReferences = comment;
+
+    if (
+      comment.references.length === 0 &&
+      optimisticReferences &&
+      optimisticReferences.length > 0
+    ) {
+      commentWithReferences = {
+        ...comment,
+        references: optimisticReferences,
+      };
+    }
+
+    return renderToReact(commentWithReferences);
+  }, [comment, optimisticReferences]);
 
   const isAuthor =
     connectedAddress && comment.author

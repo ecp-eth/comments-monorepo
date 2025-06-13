@@ -248,4 +248,32 @@ describe("renderToReact", () => {
       '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <span class="text-blue-500" title="USD Coin">$USDC</span> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p><p><a class="underline" href="http://donthavereference.tld" rel="noopener noreferrer" target="_blank">http://donthavereference.tld</a></p>',
     );
   });
+
+  it("works correctly just with text and uploaded file", () => {
+    const result = renderToReact({
+      content:
+        "Test\nhttps://amber-electoral-takin-876.mypinata.cloud/ipfs/bafybeihnltvyg5fgrvvqdszx6skfpkmg4hjtumj4gdn7wdwjba2uxnzsgu",
+      references: [
+        {
+          type: "image",
+          mediaType: "image/png",
+          position: {
+            start: 5,
+            end: 118,
+          },
+          url: "https://amber-electoral-takin-876.mypinata.cloud/ipfs/bafybeihnltvyg5fgrvvqdszx6skfpkmg4hjtumj4gdn7wdwjba2uxnzsgu",
+        },
+      ],
+    });
+
+    expect(result.mediaReferences).toEqual([
+      {
+        type: "image",
+        mediaType: "image/png",
+        position: { start: 5, end: 118 },
+        url: "https://amber-electoral-takin-876.mypinata.cloud/ipfs/bafybeihnltvyg5fgrvvqdszx6skfpkmg4hjtumj4gdn7wdwjba2uxnzsgu",
+      },
+    ]);
+    expect(renderToStaticMarkup(result.element)).toBe("<p>Test</p>");
+  });
 });

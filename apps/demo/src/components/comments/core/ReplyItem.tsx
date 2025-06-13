@@ -58,6 +58,11 @@ export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
           onRetryDeleteClick={onDeleteClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
+          optimisticReferences={
+            comment.pendingOperation?.action === "post"
+              ? comment.pendingOperation.references
+              : undefined
+          }
         />
       )}
       {isReplying && (

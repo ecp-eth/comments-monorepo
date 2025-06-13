@@ -124,6 +124,7 @@ export function useGaslessCommentActions({
         targetUri: comment.targetUri,
         ...(comment.parentId && { parentId: comment.parentId }),
         metadata: comment.metadata,
+        references: comment.references,
       });
 
       try {
@@ -164,6 +165,7 @@ export function useGaslessCommentActions({
     async (params) => {
       const pendingOperation = await submitComment({
         content: params.comment.content,
+        references: params.comment.references,
         isApproved: hasApproval,
         metadata: params.comment.metadata ?? [],
         ...("targetUri" in params.comment

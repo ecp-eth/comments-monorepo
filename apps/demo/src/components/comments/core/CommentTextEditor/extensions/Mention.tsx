@@ -137,6 +137,24 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
           };
         },
       },
+      decimals: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-decimals"),
+        renderHTML: (attributes) => {
+          return {
+            "data-decimals": attributes.decimals,
+          };
+        },
+      },
+      logoURI: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-logo-uri"),
+        renderHTML: (attributes) => {
+          return {
+            "data-logo-uri": attributes.logoURI,
+          };
+        },
+      },
     } satisfies MentionAttributes;
   },
   renderText({ node }) {

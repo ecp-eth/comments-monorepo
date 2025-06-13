@@ -1,5 +1,6 @@
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { JSONContent } from "@tiptap/core";
+import { getUnicodeLength } from "@ecp.eth/shared/helpers";
 import type { MentionItem } from "./extensions/Mention";
 import type { LinkAttributes } from "./extensions/types";
 
@@ -92,6 +93,7 @@ export function parse(
               type: "ens",
               address: reference.address,
               name: reference.name,
+              url: reference.url,
             } satisfies MentionItem,
           });
 
@@ -118,6 +120,8 @@ export function parse(
               symbol: reference.symbol,
               caip19: chain.caip,
               chainId: chain.chainId,
+              decimals: reference.decimals,
+              logoURI: reference.logoURI,
             } satisfies MentionItem,
           });
 

@@ -32,10 +32,12 @@ import {
   ALLOWED_UPLOAD_MIME_TYPES,
   MAX_UPLOAD_FILE_SIZE,
 } from "@/lib/constants";
+import { extractReferences } from "./CommentTextEditor/extract-references";
 
 type OnSubmitFunction = (params: {
   author: Hex;
   content: string;
+  references: IndexerAPICommentReferencesSchemaType;
 }) => Promise<void>;
 
 type BaseCommentFormProps = {
@@ -116,6 +118,10 @@ function BaseCommentForm({
           },
         });
 
+        const references = extractReferences(
+          editorRef.current.editor.getJSON(),
+        );
+
         // validate content
         const content = z
           .string()
@@ -126,7 +132,7 @@ function BaseCommentForm({
             }),
           );
 
-        const result = await onSubmit({ author, content });
+        const result = await onSubmit({ author, content, references });
 
         return result;
       } catch (e) {
@@ -325,7 +331,7 @@ export function CommentForm<TExtraSubmitData = unknown>({
   const onSubmitStartRef = useFreshRef(onSubmitStart);
 
   const handleSubmit = useCallback<OnSubmitFunction>(
-    async ({ author, content }) => {
+    async ({ author, content, references }) => {
       let queryKey: QueryKey;
 
       if (parentId) {
@@ -341,11 +347,13 @@ export function CommentForm<TExtraSubmitData = unknown>({
               author,
               content,
               parentId,
+              references,
             }
           : {
               author,
               content,
               targetUri: window.location.href,
+              references,
             },
         queryKey,
         extra,

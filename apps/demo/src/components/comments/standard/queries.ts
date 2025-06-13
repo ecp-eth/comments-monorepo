@@ -12,6 +12,7 @@ import {
 import { publicEnv } from "@/publicEnv";
 import {
   fetchAuthorData,
+  type IndexerAPICommentReferencesSchemaType,
   type IndexerAPICommentZeroExSwapSchemaType,
 } from "@ecp.eth/sdk/indexer";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
@@ -40,6 +41,7 @@ type SubmitCommentParams = {
     signCommentResponse: SignCommentResponseClientSchemaType;
     chainId: number;
   }) => Promise<Hex>;
+  references: IndexerAPICommentReferencesSchemaType;
 };
 
 export async function submitCommentMutationFunction({
@@ -48,6 +50,7 @@ export async function submitCommentMutationFunction({
   switchChainAsync,
   writeContractAsync,
   zeroExSwap,
+  references,
 }: SubmitCommentParams): Promise<PendingPostCommentOperationSchemaType> {
   if (!address) {
     throw new SubmitCommentMutationError("Wallet not connected.");
@@ -126,6 +129,7 @@ export async function submitCommentMutationFunction({
       state: { status: "pending" },
       chainId: chain.id,
       zeroExSwap: zeroExSwap ?? undefined,
+      references,
     };
   } catch (e) {
     if (

@@ -221,6 +221,7 @@ const ensSuggestionSchema = z.object({
   type: z.literal("ens"),
   address: HexSchema,
   name: z.string(),
+  url: z.string(),
 });
 
 const erc20TokenSuggestionSchema = z.object({
@@ -230,6 +231,8 @@ const erc20TokenSuggestionSchema = z.object({
   address: HexSchema,
   caip19: z.string(),
   chainId: z.number().int(),
+  decimals: z.number().int(),
+  logoURI: z.string().nullable(),
 });
 
 const farcasterSuggestionSchema = z.object({
@@ -281,7 +284,12 @@ export async function GET(
       if (ensName) {
         return new JSONResponse(responseSchema, {
           suggestions: [
-            { type: "ens", name: ensName.name, address: ensName.address },
+            {
+              type: "ens",
+              name: ensName.name,
+              address: ensName.address,
+              url: ensName.url,
+            },
           ],
         });
       }
@@ -310,6 +318,8 @@ export async function GET(
             address: query,
             caip19: chain.caip,
             chainId: chain.chainId,
+            decimals: token.decimals,
+            logoURI: token.logoURI,
           })),
         });
       }
@@ -323,7 +333,12 @@ export async function GET(
       if (ensName) {
         return new JSONResponse(responseSchema, {
           suggestions: [
-            { type: "ens", name: ensName.name, address: ensName.address },
+            {
+              type: "ens",
+              name: ensName.name,
+              address: ensName.address,
+              url: ensName.url,
+            },
           ],
         });
       }
@@ -337,6 +352,7 @@ export async function GET(
           type: "ens" as const,
           name: domain.name,
           address: domain.resolvedAddress?.id ?? domain.owner.id,
+          url: `https://app.ens.domains/${domain.resolvedAddress?.id ?? domain.owner.id}`,
         })),
       });
     }
@@ -358,6 +374,8 @@ export async function GET(
           symbol: token.symbol,
           caip19: chain.caip,
           chainId: chain.chainId,
+          decimals: token.decimals,
+          logoURI: token.logoURI,
         })),
       });
     }
