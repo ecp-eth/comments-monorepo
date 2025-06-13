@@ -18,7 +18,7 @@ You may want to read more about the [post comment flows](/post-comment-flows) fo
 #### The Contract
 
 - For latest contract address, see [COMMENT_MANAGER_ADDRESS](/sdk-reference/defaultExports/variables/COMMENT_MANAGER_ADDRESS).
-- We will call [`postCommentAsAuthor()`](/protocol-reference/CommentManager#postcommentasauthorstruct-commentscommentdata-commentdata-bytes-appsignature-external) method to post the comment.
+- We will call [`postComment()`](/protocol-reference/CommentManager#postcommentstruct-commentscommentdata-commentdata-bytes-appsignature-external) method to post the comment.
 
 #### Demo Dependencies
 
@@ -130,7 +130,7 @@ Now with the wagmi ready to go, and the comment data and app signature returned 
 await writeContractAsync({
   abi: CommentManagerABI,
   address: COMMENT_MANAGER_ADDRESS,
-  functionName: "postCommentAsAuthor",
+  functionName: "postComment",
   args: [commentData, appSignature],
 });
 ```

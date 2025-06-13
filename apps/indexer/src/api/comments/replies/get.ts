@@ -48,18 +48,18 @@ export default (app: OpenAPIHono) => {
     const { commentId } = c.req.valid("param");
 
     const sharedConditions = [
-      app ? eq(schema.comments.app, app) : undefined,
-      channelId != null ? eq(schema.comments.channelId, channelId) : undefined,
+      app ? eq(schema.comment.app, app) : undefined,
+      channelId != null ? eq(schema.comment.channelId, channelId) : undefined,
       commentType != null
-        ? eq(schema.comments.commentType, commentType)
+        ? eq(schema.comment.commentType, commentType)
         : undefined,
     ];
 
     if (mode === "flat") {
-      const rootComment = await db.query.comments.findFirst({
+      const rootComment = await db.query.comment.findFirst({
         where: and(
-          eq(schema.comments.id, commentId),
-          isNull(schema.comments.rootCommentId),
+          eq(schema.comment.id, commentId),
+          isNull(schema.comment.rootCommentId),
         ),
       });
 
@@ -72,17 +72,17 @@ export default (app: OpenAPIHono) => {
         );
       }
 
-      sharedConditions.push(eq(schema.comments.rootCommentId, rootComment.id));
+      sharedConditions.push(eq(schema.comment.rootCommentId, rootComment.id));
     } else {
-      sharedConditions.push(eq(schema.comments.parentId, commentId));
+      sharedConditions.push(eq(schema.comment.parentId, commentId));
     }
 
     if (env.MODERATION_ENABLED) {
-      const onlyApproved = eq(schema.comments.moderationStatus, "approved");
+      const onlyApproved = eq(schema.comment.moderationStatus, "approved");
 
       if (viewer) {
         sharedConditions.push(
-          or(onlyApproved, eq(schema.comments.author, viewer)),
+          or(onlyApproved, eq(schema.comment.author, viewer)),
         );
       } else {
         sharedConditions.push(onlyApproved);
@@ -91,7 +91,7 @@ export default (app: OpenAPIHono) => {
 
     // use reverse order to find previous reply
     const previousReplyQuery = cursor
-      ? db.query.comments
+      ? db.query.comment
           .findFirst({
             where: and(
               ...sharedConditions,
@@ -99,10 +99,10 @@ export default (app: OpenAPIHono) => {
                 ? [
                     or(
                       and(
-                        eq(schema.comments.createdAt, cursor.createdAt),
-                        lt(schema.comments.id, cursor.id),
+                        eq(schema.comment.createdAt, cursor.createdAt),
+                        lt(schema.comment.id, cursor.id),
                       ),
-                      lt(schema.comments.createdAt, cursor.createdAt),
+                      lt(schema.comment.createdAt, cursor.createdAt),
                     ),
                   ]
                 : []),
@@ -110,33 +110,33 @@ export default (app: OpenAPIHono) => {
                 ? [
                     or(
                       and(
-                        eq(schema.comments.createdAt, cursor.createdAt),
-                        gt(schema.comments.id, cursor.id),
+                        eq(schema.comment.createdAt, cursor.createdAt),
+                        gt(schema.comment.id, cursor.id),
                       ),
-                      gt(schema.comments.createdAt, cursor.createdAt),
+                      gt(schema.comment.createdAt, cursor.createdAt),
                     ),
                   ]
                 : []),
             ),
             orderBy:
               sort === "desc"
-                ? [asc(schema.comments.createdAt), asc(schema.comments.id)]
-                : [desc(schema.comments.createdAt), desc(schema.comments.id)],
+                ? [asc(schema.comment.createdAt), asc(schema.comment.id)]
+                : [desc(schema.comment.createdAt), desc(schema.comment.id)],
           })
           .execute()
       : undefined;
 
-    const repliesQuery = db.query.comments.findMany({
+    const repliesQuery = db.query.comment.findMany({
       where: and(
         ...sharedConditions,
         ...(sort === "desc" && !!cursor
           ? [
               or(
                 and(
-                  eq(schema.comments.createdAt, cursor.createdAt),
-                  lt(schema.comments.id, cursor.id),
+                  eq(schema.comment.createdAt, cursor.createdAt),
+                  lt(schema.comment.id, cursor.id),
                 ),
-                lt(schema.comments.createdAt, cursor.createdAt),
+                lt(schema.comment.createdAt, cursor.createdAt),
               ),
             ]
           : []),
@@ -144,18 +144,18 @@ export default (app: OpenAPIHono) => {
           ? [
               or(
                 and(
-                  eq(schema.comments.createdAt, cursor.createdAt),
-                  gt(schema.comments.id, cursor.id),
+                  eq(schema.comment.createdAt, cursor.createdAt),
+                  gt(schema.comment.id, cursor.id),
                 ),
-                gt(schema.comments.createdAt, cursor.createdAt),
+                gt(schema.comment.createdAt, cursor.createdAt),
               ),
             ]
           : []),
       ),
       orderBy:
         sort === "desc"
-          ? [desc(schema.comments.createdAt), desc(schema.comments.id)]
-          : [asc(schema.comments.createdAt), asc(schema.comments.id)],
+          ? [desc(schema.comment.createdAt), desc(schema.comment.id)]
+          : [asc(schema.comment.createdAt), asc(schema.comment.id)],
       limit: limit + 1,
     });
 

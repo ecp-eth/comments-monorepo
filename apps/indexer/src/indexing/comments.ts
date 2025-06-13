@@ -15,13 +15,6 @@ import {
 import { notifyCommentPendingModeration } from "../lib/telegram-notifications";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
-import { resolveCommentReferences } from "../lib/resolve-comment-references";
-import { ensByAddressResolver } from "../resolvers/ens-by-address-resolver";
-import { ensByNameResolver } from "../resolvers/ens-by-name-resolver";
-import { erc20ByAddressResolver } from "../resolvers/erc20-by-address-resolver";
-import { erc20ByTickerResolver } from "../resolvers/erc20-by-ticker-resolver";
-import { farcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
-import { urlResolver } from "../resolvers/url-resolver";
 
 const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
 
@@ -45,7 +38,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     let rootCommentId: Hex | null = null;
 
     if (parentId) {
-      const parentComment = await context.db.find(schema.comments, {
+      const parentComment = await context.db.find(schema.comment, {
         id: parentId,
       });
 
@@ -83,22 +76,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       event.args.commentId,
     );
 
-    const referencesResolutionResult = await resolveCommentReferences(
-      {
-        chainId: context.network.chainId,
-        content: event.args.content,
-      },
-      {
-        ensByAddressResolver,
-        ensByNameResolver,
-        erc20ByAddressResolver,
-        erc20ByTickerResolver,
-        farcasterByAddressResolver,
-        urlResolver,
-      },
-    );
-
-    await context.db.insert(schema.comments).values({
+    await context.db.insert(schema.comment).values({
       id: event.args.commentId,
       content: event.args.content,
       metadata: event.args.metadata.slice(),
@@ -125,9 +103,6 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
             moderationStatusChangedAt: createdAt,
           }),
       zeroExSwap,
-      references: referencesResolutionResult.references,
-      referencesResolutionStatus: referencesResolutionResult.status,
-      referencesResolutionStatusChangedAt: new Date(),
     });
 
     // this is new comment so ensure we use correct default moderation status
@@ -148,12 +123,18 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
   // Handle hook metadata setting separately
   ponder.on("CommentsV1:CommentHookMetadataSet", async ({ event, context }) => {
-    const comment = await context.db.find(schema.comments, {
+    const comment = await context.db.find(schema.comment, {
       id: event.args.commentId,
     });
 
     if (!comment) {
-      // Comment might not be indexed yet, skip for now
+      // Ponder should respect the event order, so this should never happen
+      Sentry.captureMessage(
+        `Comment not found while setting hook metadata for commentId: ${event.args.commentId}`,
+        {
+          level: "warning",
+        },
+      );
       return;
     }
 
@@ -175,7 +156,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
     }
 
     await context.db
-      .update(schema.comments, {
+      .update(schema.comment, {
         id: event.args.commentId,
       })
       .set({
@@ -184,7 +165,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   });
 
   ponder.on("CommentsV1:CommentDeleted", async ({ event, context }) => {
-    const existingComment = await context.db.find(schema.comments, {
+    const existingComment = await context.db.find(schema.comment, {
       id: event.args.commentId,
     });
 
@@ -193,7 +174,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       getAddress(existingComment.author) === getAddress(event.args.author)
     ) {
       await context.db
-        .update(schema.comments, {
+        .update(schema.comment, {
           id: event.args.commentId,
         })
         .set({
@@ -203,7 +184,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   });
 
   ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
-    const existingComment = await context.db.find(schema.comments, {
+    const existingComment = await context.db.find(schema.comment, {
       id: event.args.commentId,
     });
 
@@ -213,32 +194,14 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
     const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
 
-    const referencesResolutionResult = await resolveCommentReferences(
-      {
-        chainId: context.network.chainId,
-        content: event.args.content,
-      },
-      {
-        ensByAddressResolver,
-        ensByNameResolver,
-        erc20ByAddressResolver,
-        erc20ByTickerResolver,
-        farcasterByAddressResolver,
-        urlResolver,
-      },
-    );
-
     await context.db
-      .update(schema.comments, {
+      .update(schema.comment, {
         id: event.args.commentId,
       })
       .set({
         content: event.args.content,
         revision: existingComment.revision + 1,
         updatedAt,
-        references: referencesResolutionResult.references,
-        referencesResolutionStatus: referencesResolutionResult.status,
-        referencesResolutionStatusChangedAt: new Date(),
       });
   });
 }

@@ -4,8 +4,6 @@ import { base } from "viem/chains";
 import { Chain, createPublicClient, http, PublicClient } from "viem";
 import { parseSwap } from "@0x/0x-parser";
 import { type Hex } from "@ecp.eth/sdk/core";
-import { IndexerAPICommentZeroExSwapSchema } from "@ecp.eth/sdk/indexer/schemas";
-import { z } from "zod";
 
 type ZeroExSwap = {
   from: {
