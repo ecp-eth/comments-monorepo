@@ -1,5 +1,8 @@
 import { env } from "@/env";
-import { ALLOWED_UPLOAD_MIME_TYPES } from "@/lib/constants";
+import {
+  ALLOWED_UPLOAD_MIME_TYPES,
+  MAX_UPLOAD_FILE_SIZE,
+} from "@/lib/constants";
 import {
   BadRequestResponseSchema,
   InternalServerErrorResponseSchema,
@@ -35,6 +38,7 @@ export async function POST(request: Request) {
       mimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
       expires: 60,
       name: parsedBodyResult.data.filename,
+      maxFileSize: MAX_UPLOAD_FILE_SIZE,
     });
 
     return new JSONResponse(GenerateUploadUrlResponseSchema, {
