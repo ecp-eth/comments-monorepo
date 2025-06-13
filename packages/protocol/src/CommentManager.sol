@@ -159,6 +159,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     if (commentCreationFee > 0) {
       channelManager.collectCommentCreationFee{ value: commentCreationFee }();
     }
+    uint256 remainingValue = msg.value - commentCreationFee;
 
     address author = commentData.author;
     address app = commentData.app;
@@ -220,14 +221,17 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     if (channel.hook != address(0) && channel.permissions.onCommentAdd) {
       IHook hook = IHook(channel.hook);
       // Calculate hook value after protocol fee
-      uint256 msgValueAfterFee = channelManager
-        .deductProtocolHookTransactionFee(msg.value - commentCreationFee);
-      payable(address(channelManager)).transfer(
-        msg.value - commentCreationFee - msgValueAfterFee
-      );
+      uint256 valueToPassToTheHook = channelManager
+        .deductProtocolHookTransactionFee(remainingValue);
+      if (remainingValue > valueToPassToTheHook) {
+        // send the hook transaction fee to the channel manager
+        payable(address(channelManager)).transfer(
+          remainingValue - valueToPassToTheHook
+        );
+      }
 
       Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentAdd{ // forward the remaining sent value to the hook.
-        value: msgValueAfterFee
+        value: valueToPassToTheHook
       }(comment, metadata, msg.sender, commentId);
 
       // Store hook metadata
@@ -250,8 +254,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       }
     }
     // refund excess payment if any
-    else if (msg.value > commentCreationFee) {
-      payable(msg.sender).transfer(msg.value - commentCreationFee);
+    else if (remainingValue > 0) {
+      payable(msg.sender).transfer(remainingValue);
     }
   }
 
@@ -394,12 +398,16 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       IHook hook = IHook(channel.hook);
 
       // Calculate hook value after protocol fee
-      uint256 msgValueAfterFee = channelManager
+      uint256 valueToPassToHook = channelManager
         .deductProtocolHookTransactionFee(msg.value);
-      payable(address(channelManager)).transfer(msg.value - msgValueAfterFee);
+      if (msg.value > valueToPassToHook) {
+        payable(address(channelManager)).transfer(
+          msg.value - valueToPassToHook
+        );
+      }
 
       Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentEdit{
-        value: msgValueAfterFee
+        value: valueToPassToHook
       }(comment, metadata, msg.sender, commentId);
 
       // Clear existing hook metadata
