@@ -329,7 +329,7 @@ export const CommentManagerABI = [
           {
             name: "metadata",
             type: "tuple[]",
-            internalType: "struct Comments.MetadataEntry[]",
+            internalType: "struct Metadata.MetadataEntry[]",
             components: [
               {
                 name: "key",
@@ -391,7 +391,7 @@ export const CommentManagerABI = [
           {
             name: "metadata",
             type: "tuple[]",
-            internalType: "struct Comments.MetadataEntry[]",
+            internalType: "struct Metadata.MetadataEntry[]",
             components: [
               {
                 name: "key",
@@ -535,7 +535,7 @@ export const CommentManagerABI = [
       {
         name: "",
         type: "tuple[]",
-        internalType: "struct Comments.MetadataEntry[]",
+        internalType: "struct Metadata.MetadataEntry[]",
         components: [
           {
             name: "key",
@@ -642,7 +642,7 @@ export const CommentManagerABI = [
           {
             name: "metadata",
             type: "tuple[]",
-            internalType: "struct Comments.MetadataEntry[]",
+            internalType: "struct Metadata.MetadataEntry[]",
             components: [
               {
                 name: "key",
@@ -687,7 +687,7 @@ export const CommentManagerABI = [
       {
         name: "",
         type: "tuple[]",
-        internalType: "struct Comments.MetadataEntry[]",
+        internalType: "struct Metadata.MetadataEntry[]",
         components: [
           {
             name: "key",
@@ -823,7 +823,7 @@ export const CommentManagerABI = [
           {
             name: "metadata",
             type: "tuple[]",
-            internalType: "struct Comments.MetadataEntry[]",
+            internalType: "struct Metadata.MetadataEntry[]",
             components: [
               {
                 name: "key",
@@ -1036,7 +1036,7 @@ export const CommentManagerABI = [
           {
             name: "metadata",
             type: "tuple[]",
-            internalType: "struct Comments.MetadataEntry[]",
+            internalType: "struct Metadata.MetadataEntry[]",
             components: [
               {
                 name: "key",
@@ -1063,7 +1063,13 @@ export const CommentManagerABI = [
         internalType: "bytes",
       },
     ],
-    outputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "payable",
   },
   {
@@ -1113,7 +1119,7 @@ export const CommentManagerABI = [
           {
             name: "metadata",
             type: "tuple[]",
-            internalType: "struct Comments.MetadataEntry[]",
+            internalType: "struct Metadata.MetadataEntry[]",
             components: [
               {
                 name: "key",
@@ -1145,7 +1151,13 @@ export const CommentManagerABI = [
         internalType: "bytes",
       },
     ],
-    outputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
     stateMutability: "payable",
   },
   {
@@ -1222,6 +1234,19 @@ export const CommentManagerABI = [
         name: "_channelContract",
         type: "address",
         internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "updateCommentHookData",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        internalType: "bytes32",
       },
     ],
     outputs: [],
@@ -1340,7 +1365,7 @@ export const CommentManagerABI = [
         name: "metadata",
         type: "tuple[]",
         indexed: false,
-        internalType: "struct Comments.MetadataEntry[]",
+        internalType: "struct Metadata.MetadataEntry[]",
         components: [
           {
             name: "key",
@@ -1450,7 +1475,7 @@ export const CommentManagerABI = [
         name: "metadata",
         type: "tuple[]",
         indexed: false,
-        internalType: "struct Comments.MetadataEntry[]",
+        internalType: "struct Metadata.MetadataEntry[]",
         components: [
           {
             name: "key",
@@ -1584,6 +1609,11 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
+    name: "HookNotEnabled",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "InvalidAppSignature",
     inputs: [],
   },
@@ -1684,6 +1714,11 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
+    name: "ParentCommentNotInSameChannel",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "ReentrancyGuardReentrantCall",
     inputs: [],
   },
@@ -1726,6 +1761,10 @@ export const ChannelManagerABI = [
     stateMutability: "nonpayable",
   },
   {
+    type: "receive",
+    stateMutability: "payable",
+  },
+  {
     type: "function",
     name: "approve",
     inputs: [
@@ -1764,6 +1803,25 @@ export const ChannelManagerABI = [
   },
   {
     type: "function",
+    name: "calculateMsgValueWithHookFee",
+    inputs: [
+      {
+        name: "postFeeAmountForwardedToHook",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "channelExists",
     inputs: [
       {
@@ -1783,6 +1841,67 @@ export const ChannelManagerABI = [
   },
   {
     type: "function",
+    name: "channelMetadata",
+    inputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "channelMetadataKeys",
+    inputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "collectCommentCreationFee",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint96",
+        internalType: "uint96",
+      },
+    ],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
     name: "createChannel",
     inputs: [
       {
@@ -1797,8 +1916,20 @@ export const ChannelManagerABI = [
       },
       {
         name: "metadata",
-        type: "string",
-        internalType: "string",
+        type: "tuple[]",
+        internalType: "struct Metadata.MetadataEntry[]",
+        components: [
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
       },
       {
         name: "hook",
@@ -1881,8 +2012,20 @@ export const ChannelManagerABI = [
           },
           {
             name: "metadata",
-            type: "string",
-            internalType: "string",
+            type: "tuple[]",
+            internalType: "struct Metadata.MetadataEntry[]",
+            components: [
+              {
+                name: "key",
+                type: "bytes32",
+                internalType: "bytes32",
+              },
+              {
+                name: "value",
+                type: "bytes",
+                internalType: "bytes",
+              },
+            ],
           },
           {
             name: "hook",
@@ -1919,6 +2062,11 @@ export const ChannelManagerABI = [
                 type: "bool",
                 internalType: "bool",
               },
+              {
+                name: "onCommentHookDataUpdate",
+                type: "bool",
+                internalType: "bool",
+              },
             ],
           },
         ],
@@ -1929,6 +2077,93 @@ export const ChannelManagerABI = [
   {
     type: "function",
     name: "getChannelCreationFee",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint96",
+        internalType: "uint96",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getChannelMetadata",
+    inputs: [
+      {
+        name: "channelId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "tuple[]",
+        internalType: "struct Metadata.MetadataEntry[]",
+        components: [
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getChannelMetadataKeys",
+    inputs: [
+      {
+        name: "channelId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32[]",
+        internalType: "bytes32[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getChannelMetadataValue",
+    inputs: [
+      {
+        name: "channelId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "key",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCommentCreationFee",
     inputs: [],
     outputs: [
       {
@@ -2113,6 +2348,54 @@ export const ChannelManagerABI = [
   {
     type: "function",
     name: "setChannelCreationFee",
+    inputs: [
+      {
+        name: "fee",
+        type: "uint96",
+        internalType: "uint96",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setChannelMetadata",
+    inputs: [
+      {
+        name: "channelId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "operations",
+        type: "tuple[]",
+        internalType: "struct Metadata.MetadataEntryOp[]",
+        components: [
+          {
+            name: "operation",
+            type: "uint8",
+            internalType: "enum Metadata.MetadataOperation",
+          },
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setCommentCreationFee",
     inputs: [
       {
         name: "fee",
@@ -2318,8 +2601,20 @@ export const ChannelManagerABI = [
       },
       {
         name: "metadata",
-        type: "string",
-        internalType: "string",
+        type: "tuple[]",
+        internalType: "struct Metadata.MetadataEntry[]",
+        components: [
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
       },
     ],
     outputs: [],
@@ -2437,10 +2732,34 @@ export const ChannelManagerABI = [
         internalType: "string",
       },
       {
-        name: "metadata",
+        name: "description",
         type: "string",
         indexed: false,
         internalType: "string",
+      },
+      {
+        name: "metadata",
+        type: "tuple[]",
+        indexed: false,
+        internalType: "struct Metadata.MetadataEntry[]",
+        components: [
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
+      },
+      {
+        name: "hook",
+        type: "address",
+        indexed: false,
+        internalType: "address",
       },
     ],
     anonymous: false,
@@ -2454,6 +2773,31 @@ export const ChannelManagerABI = [
         type: "uint96",
         indexed: false,
         internalType: "uint96",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "ChannelMetadataSet",
+    inputs: [
+      {
+        name: "channelId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
+      {
+        name: "key",
+        type: "bytes32",
+        indexed: false,
+        internalType: "bytes32",
+      },
+      {
+        name: "value",
+        type: "bytes",
+        indexed: false,
+        internalType: "bytes",
       },
     ],
     anonymous: false,
@@ -2482,9 +2826,34 @@ export const ChannelManagerABI = [
       },
       {
         name: "metadata",
-        type: "string",
+        type: "tuple[]",
         indexed: false,
-        internalType: "string",
+        internalType: "struct Metadata.MetadataEntry[]",
+        components: [
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "CommentCreationFeeUpdated",
+    inputs: [
+      {
+        name: "newFee",
+        type: "uint96",
+        indexed: false,
+        internalType: "uint96",
       },
     ],
     anonymous: false,

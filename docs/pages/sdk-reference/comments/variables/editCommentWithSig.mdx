@@ -261,7 +261,7 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
            name: ...;
            type: ...;
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
      }];
@@ -309,7 +309,7 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
            name: ...;
            type: ...;
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
      }];
@@ -423,7 +423,7 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
         name: "value";
         type: "bytes";
      }];
-     internalType: "struct Comments.MetadataEntry[]";
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "";
      type: "tuple[]";
   }];
@@ -501,7 +501,7 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
            name: ...;
            type: ...;
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
       }, {
@@ -538,7 +538,7 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
         name: "value";
         type: "bytes";
      }];
-     internalType: "struct Comments.MetadataEntry[]";
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "";
      type: "tuple[]";
   }];
@@ -638,7 +638,7 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
            name: ...;
            type: ...;
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
      }];
@@ -800,7 +800,7 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
            name: ...;
            type: ...;
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
       }, {
@@ -817,7 +817,11 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
      type: "bytes";
   }];
   name: "postComment";
-  outputs: readonly [];
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
   stateMutability: "payable";
   type: "function";
 }, {
@@ -860,7 +864,7 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
            name: ...;
            type: ...;
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
       }, {
@@ -881,7 +885,11 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
      type: "bytes";
   }];
   name: "postCommentWithSig";
-  outputs: readonly [];
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
   stateMutability: "payable";
   type: "function";
 }, {
@@ -943,6 +951,16 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
      type: "address";
   }];
   name: "updateChannelContract";
+  outputs: readonly [];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "updateCommentHookData";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -1044,7 +1062,7 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
         type: "bytes";
      }];
      indexed: false;
-     internalType: "struct Comments.MetadataEntry[]";
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "metadata";
      type: "tuple[]";
   }];
@@ -1133,7 +1151,7 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
         type: "bytes";
      }];
      indexed: false;
-     internalType: "struct Comments.MetadataEntry[]";
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "metadata";
      type: "tuple[]";
   }];
@@ -1232,6 +1250,10 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
   type: "error";
 }, {
   inputs: readonly [];
+  name: "HookNotEnabled";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "InvalidAppSignature";
   type: "error";
 }, {
@@ -1305,6 +1327,10 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
 }, {
   inputs: readonly [];
   name: "ParentCommentHasNeverExisted";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "ParentCommentNotInSameChannel";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1595,7 +1621,7 @@ Edit a comment
            `name`: ...;
            `type`: ...;
         \}\];
-        `internalType`: `"struct Comments.MetadataEntry[]"`;
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
         `name`: `"metadata"`;
         `type`: `"tuple[]"`;
      \}\];
@@ -1643,7 +1669,7 @@ Edit a comment
            `name`: ...;
            `type`: ...;
         \}\];
-        `internalType`: `"struct Comments.MetadataEntry[]"`;
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
         `name`: `"metadata"`;
         `type`: `"tuple[]"`;
      \}\];
@@ -1757,7 +1783,7 @@ Edit a comment
         `name`: `"value"`;
         `type`: `"bytes"`;
      \}\];
-     `internalType`: `"struct Comments.MetadataEntry[]"`;
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
      `name`: `""`;
      `type`: `"tuple[]"`;
   \}\];
@@ -1835,7 +1861,7 @@ Edit a comment
            `name`: ...;
            `type`: ...;
         \}\];
-        `internalType`: `"struct Comments.MetadataEntry[]"`;
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
         `name`: `"metadata"`;
         `type`: `"tuple[]"`;
       \}, \{
@@ -1872,7 +1898,7 @@ Edit a comment
         `name`: `"value"`;
         `type`: `"bytes"`;
      \}\];
-     `internalType`: `"struct Comments.MetadataEntry[]"`;
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
      `name`: `""`;
      `type`: `"tuple[]"`;
   \}\];
@@ -1972,7 +1998,7 @@ Edit a comment
            `name`: ...;
            `type`: ...;
         \}\];
-        `internalType`: `"struct Comments.MetadataEntry[]"`;
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
         `name`: `"metadata"`;
         `type`: `"tuple[]"`;
      \}\];
@@ -2134,7 +2160,7 @@ Edit a comment
            `name`: ...;
            `type`: ...;
         \}\];
-        `internalType`: `"struct Comments.MetadataEntry[]"`;
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
         `name`: `"metadata"`;
         `type`: `"tuple[]"`;
       \}, \{
@@ -2151,7 +2177,11 @@ Edit a comment
      `type`: `"bytes"`;
   \}\];
   `name`: `"postComment"`;
-  `outputs`: readonly \[\];
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
   `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
@@ -2194,7 +2224,7 @@ Edit a comment
            `name`: ...;
            `type`: ...;
         \}\];
-        `internalType`: `"struct Comments.MetadataEntry[]"`;
+        `internalType`: `"struct Metadata.MetadataEntry[]"`;
         `name`: `"metadata"`;
         `type`: `"tuple[]"`;
       \}, \{
@@ -2215,7 +2245,11 @@ Edit a comment
      `type`: `"bytes"`;
   \}\];
   `name`: `"postCommentWithSig"`;
-  `outputs`: readonly \[\];
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `""`;
+     `type`: `"bytes32"`;
+  \}\];
   `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
@@ -2277,6 +2311,16 @@ Edit a comment
      `type`: `"address"`;
   \}\];
   `name`: `"updateChannelContract"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+  \}\];
+  `name`: `"updateCommentHookData"`;
   `outputs`: readonly \[\];
   `stateMutability`: `"nonpayable"`;
   `type`: `"function"`;
@@ -2378,7 +2422,7 @@ Edit a comment
         `type`: `"bytes"`;
      \}\];
      `indexed`: `false`;
-     `internalType`: `"struct Comments.MetadataEntry[]"`;
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
      `name`: `"metadata"`;
      `type`: `"tuple[]"`;
   \}\];
@@ -2467,7 +2511,7 @@ Edit a comment
         `type`: `"bytes"`;
      \}\];
      `indexed`: `false`;
-     `internalType`: `"struct Comments.MetadataEntry[]"`;
+     `internalType`: `"struct Metadata.MetadataEntry[]"`;
      `name`: `"metadata"`;
      `type`: `"tuple[]"`;
   \}\];
@@ -2566,6 +2610,10 @@ Edit a comment
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
+  `name`: `"HookNotEnabled"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
   `name`: `"InvalidAppSignature"`;
   `type`: `"error"`;
 \}, \{
@@ -2639,6 +2687,10 @@ Edit a comment
 \}, \{
   `inputs`: readonly \[\];
   `name`: `"ParentCommentHasNeverExisted"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ParentCommentNotInSameChannel"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];

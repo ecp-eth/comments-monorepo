@@ -261,7 +261,7 @@ const CommentManagerABI: readonly [{
            name: "value";
            type: "bytes";
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
      }];
@@ -309,7 +309,7 @@ const CommentManagerABI: readonly [{
            name: "value";
            type: "bytes";
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
      }];
@@ -423,7 +423,7 @@ const CommentManagerABI: readonly [{
         name: "value";
         type: "bytes";
      }];
-     internalType: "struct Comments.MetadataEntry[]";
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "";
      type: "tuple[]";
   }];
@@ -501,7 +501,7 @@ const CommentManagerABI: readonly [{
            name: "value";
            type: "bytes";
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
       }, {
@@ -538,7 +538,7 @@ const CommentManagerABI: readonly [{
         name: "value";
         type: "bytes";
      }];
-     internalType: "struct Comments.MetadataEntry[]";
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "";
      type: "tuple[]";
   }];
@@ -638,7 +638,7 @@ const CommentManagerABI: readonly [{
            name: "value";
            type: "bytes";
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
      }];
@@ -800,7 +800,7 @@ const CommentManagerABI: readonly [{
            name: "value";
            type: "bytes";
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
       }, {
@@ -817,7 +817,11 @@ const CommentManagerABI: readonly [{
      type: "bytes";
   }];
   name: "postComment";
-  outputs: readonly [];
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
   stateMutability: "payable";
   type: "function";
 }, {
@@ -860,7 +864,7 @@ const CommentManagerABI: readonly [{
            name: "value";
            type: "bytes";
         }];
-        internalType: "struct Comments.MetadataEntry[]";
+        internalType: "struct Metadata.MetadataEntry[]";
         name: "metadata";
         type: "tuple[]";
       }, {
@@ -881,7 +885,11 @@ const CommentManagerABI: readonly [{
      type: "bytes";
   }];
   name: "postCommentWithSig";
-  outputs: readonly [];
+  outputs: readonly [{
+     internalType: "bytes32";
+     name: "";
+     type: "bytes32";
+  }];
   stateMutability: "payable";
   type: "function";
 }, {
@@ -943,6 +951,16 @@ const CommentManagerABI: readonly [{
      type: "address";
   }];
   name: "updateChannelContract";
+  outputs: readonly [];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "updateCommentHookData";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -1044,7 +1062,7 @@ const CommentManagerABI: readonly [{
         type: "bytes";
      }];
      indexed: false;
-     internalType: "struct Comments.MetadataEntry[]";
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "metadata";
      type: "tuple[]";
   }];
@@ -1133,7 +1151,7 @@ const CommentManagerABI: readonly [{
         type: "bytes";
      }];
      indexed: false;
-     internalType: "struct Comments.MetadataEntry[]";
+     internalType: "struct Metadata.MetadataEntry[]";
      name: "metadata";
      type: "tuple[]";
   }];
@@ -1232,6 +1250,10 @@ const CommentManagerABI: readonly [{
   type: "error";
 }, {
   inputs: readonly [];
+  name: "HookNotEnabled";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "InvalidAppSignature";
   type: "error";
 }, {
@@ -1305,6 +1327,10 @@ const CommentManagerABI: readonly [{
 }, {
   inputs: readonly [];
   name: "ParentCommentHasNeverExisted";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "ParentCommentNotInSameChannel";
   type: "error";
 }, {
   inputs: readonly [];

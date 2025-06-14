@@ -28,6 +28,9 @@ Library containing hook-related types and utilities
 - **onChannelUpdate:** (bool) 
 
 
+- **onCommentHookDataUpdate:** (bool) 
+
+
 
 
 

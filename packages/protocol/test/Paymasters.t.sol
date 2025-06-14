@@ -32,33 +32,7 @@ import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { TestUtils, MockHook } from "./utils.sol";
-
-/// @notice Generates a unique channel ID based on input parameters
-/// @param creator The address creating the channel
-/// @param name The name of the channel
-/// @param description The description of the channel
-/// @param metadata The channel metadata
-/// @return channelId The generated channel ID
-function generateChannelId(
-  address creator,
-  string memory name,
-  string memory description,
-  string memory metadata
-) view returns (uint256) {
-  return
-    uint256(
-      keccak256(
-        abi.encodePacked(
-          creator,
-          name,
-          description,
-          metadata,
-          block.timestamp,
-          block.chainid
-        )
-      )
-    );
-}
+import { Metadata } from "../src/libraries/Metadata.sol";
 
 /**
  * test paymaster, that pays for everything, without any check.
@@ -155,18 +129,17 @@ contract PaymastersTest is Test, IERC721Receiver {
   function test_CreateChannelThroughPaymaster() public {
     string memory name = "Test Channel";
     string memory description = "Test Description";
-    string memory metadata = "{}";
-
-    uint256 initialPaymasterBalance = entryPointContract.balanceOf(
-      address(paymaster)
-    );
-
-    bytes memory innerCallData = abi.encodeWithSelector(
-      ChannelManager.createChannel.selector,
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](0);
+    bytes memory innerCallData = abi.encodeWithSignature(
+      "createChannel(string,string,(bytes32,bytes)[],address)",
       name,
       description,
       metadata,
       address(0)
+    );
+
+    uint256 initialPaymasterBalance = entryPointContract.balanceOf(
+      address(paymaster)
     );
 
     vm.deal(address(user1Account), 0.02 ether);
@@ -211,13 +184,6 @@ contract PaymastersTest is Test, IERC721Receiver {
     (uint8 v, bytes32 r, bytes32 s) = vm.sign(user1PrivateKey, userOpHash);
     userOp.signature = abi.encodePacked(r, s, v);
 
-    uint256 channelId = generateChannelId(
-      address(user1Account),
-      name,
-      description,
-      metadata
-    );
-
     vm.recordLogs();
 
     // Pack the user operation into an array
@@ -239,19 +205,30 @@ contract PaymastersTest is Test, IERC721Receiver {
       }
 
       if (
-        logEntry.topics[0] == keccak256("ChannelCreated(uint256,string,string)")
+        logEntry.topics[0] ==
+        keccak256(
+          "ChannelCreated(uint256,string,string,(bytes32,bytes)[],address)"
+        )
       ) {
+        // The channel ID is in the first topic after the event signature
         foundCreatedChannelId = uint256(logEntry.topics[1]);
+        break;
       }
     }
 
-    assertEq(foundCreatedChannelId, channelId, "Channel creation failed");
+    assertTrue(
+      foundCreatedChannelId != 0,
+      "Channel creation failed - no channel ID found"
+    );
     assertLt(
       entryPointContract.balanceOf(address(paymaster)),
       initialPaymasterBalance
     );
 
-    assertEq(channelManager.ownerOf(channelId), address(user1Account));
+    assertEq(
+      channelManager.ownerOf(foundCreatedChannelId),
+      address(user1Account)
+    );
   }
 
   function onERC721Received(

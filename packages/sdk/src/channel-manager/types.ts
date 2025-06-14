@@ -5,6 +5,7 @@ import type {
 } from "viem";
 import type { Hex } from "../core/schemas.js";
 import type { ChannelManagerABI } from "../abis.js";
+import type { MetadataEntry } from "../comments/types.js";
 
 export type ChannelManagerABIType = typeof ChannelManagerABI;
 
@@ -14,6 +15,14 @@ export type ChannelPermissions = {
   onCommentDelete: boolean;
   onCommentEdit: boolean;
   onChannelUpdate: boolean;
+};
+
+export type Channel = {
+  name: string;
+  description: string | undefined;
+  metadata: MetadataEntry[] | undefined;
+  hook: Hex | undefined;
+  permissions: ChannelPermissions;
 };
 
 // we can't use generics and mapped type because the API would be lazy resolved

@@ -21,14 +21,14 @@ Emitted when the base URI for NFT metadata is updated
 
 
 
-### `ChannelCreated(uint256 channelId, string name, string metadata)`
+### `ChannelCreated(uint256 channelId, string name, string description, struct Metadata.MetadataEntry[] metadata, address hook)`
 
 Emitted when a new channel is created
 
 
 
 
-### `ChannelUpdated(uint256 channelId, string name, string description, string metadata)`
+### `ChannelUpdated(uint256 channelId, string name, string description, struct Metadata.MetadataEntry[] metadata)`
 
 Emitted when a channel's configuration is updated
 
@@ -49,10 +49,17 @@ Emitted when a hook's enabled status is updated
 
 
 
+### `ChannelMetadataSet(uint256 channelId, bytes32 key, bytes value)`
+
+Emitted when channel metadata is set
+
+
+
+
 
 ## Functions
 
-### `createChannel(string name, string description, string metadata, address hook) → uint256 channelId` (external)
+### `createChannel(string name, string description, struct Metadata.MetadataEntry[] metadata, address hook) → uint256 channelId` (external)
 
 Creates a new channel
 
@@ -66,7 +73,7 @@ Get a channel by its ID
 
 
 
-### `updateChannel(uint256 channelId, string name, string description, string metadata)` (external)
+### `updateChannel(uint256 channelId, string name, string description, struct Metadata.MetadataEntry[] metadata)` (external)
 
 Updates an existing channel's configuration
 
@@ -97,6 +104,34 @@ Sets the base URI for NFT metadata
 ### `channelExists(uint256 channelId) → bool` (external)
 
 Checks if a channel exists
+
+
+
+
+### `setChannelMetadata(uint256 channelId, struct Metadata.MetadataEntryOp[] operations)` (external)
+
+Sets metadata for a channel
+
+
+
+
+### `getChannelMetadata(uint256 channelId) → struct Metadata.MetadataEntry[]` (external)
+
+Get all metadata for a channel
+
+
+
+
+### `getChannelMetadataValue(uint256 channelId, bytes32 key) → bytes` (external)
+
+Get metadata value for a specific key
+
+
+
+
+### `getChannelMetadataKeys(uint256 channelId) → bytes32[]` (external)
+
+Get all metadata keys for a channel
 
 
 

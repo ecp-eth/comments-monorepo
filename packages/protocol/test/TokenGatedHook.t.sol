@@ -13,6 +13,7 @@ import { TestUtils } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
 import { Comments } from "../src/libraries/Comments.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 
 // Token contract for testing
 contract TestToken is ERC20 {
@@ -34,14 +35,14 @@ contract TokenGatedHook is BaseHook {
 
   function _onCommentAdd(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal view override returns (Comments.MetadataEntry[] memory) {
+  ) internal view override returns (Metadata.MetadataEntry[] memory) {
     // Check if the comment author has enough tokens
     uint256 balance = token.balanceOf(commentData.author);
     if (balance < requiredBalance) revert NotEnoughTokens();
-    return new Comments.MetadataEntry[](0);
+    return new Metadata.MetadataEntry[](0);
   }
 
   function _getHookPermissions()
@@ -56,7 +57,8 @@ contract TokenGatedHook is BaseHook {
         onCommentAdd: true,
         onCommentDelete: false,
         onCommentEdit: false,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 }
@@ -95,7 +97,7 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Token Gated Channel",
       "Must hold 1000 TEST tokens to comment",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(tokenGatedHook)
     );
 
@@ -105,7 +107,7 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     // Create comment data
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
@@ -130,7 +132,7 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Token Gated Channel",
       "Must hold 1000 TEST tokens to comment",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(tokenGatedHook)
     );
 
@@ -140,7 +142,7 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     // Create comment data
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
@@ -166,14 +168,14 @@ contract TokenGatedHookTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Token Gated Channel",
       "Must hold 1000 TEST tokens to comment",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(tokenGatedHook)
     );
 
     // Create comment data
     Comments.CreateComment memory commentData = Comments.CreateComment({
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,

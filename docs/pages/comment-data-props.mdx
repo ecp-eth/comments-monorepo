@@ -40,7 +40,7 @@ The `metadata` property stores additional data as key-value pairs that shouldn't
 
 ```solidity
 // Get all metadata for a comment
-Comments.MetadataEntry[] memory metadata = commentManager.getCommentMetadata(commentId);
+Metadata.MetadataEntry[] memory metadata = commentManager.getCommentMetadata(commentId);
 
 // Get specific metadata value
 bytes memory value = commentManager.getCommentMetadataValue(commentId, keccak256("category string"));
@@ -197,7 +197,7 @@ Hook metadata is additional data that can be added by hooks during comment proce
 
 ```solidity
 // Get all hook metadata for a comment
-Comments.MetadataEntry[] memory hookMetadata = commentManager.getCommentHookMetadata(commentId);
+Metadata.MetadataEntry[] memory hookMetadata = commentManager.getCommentHookMetadata(commentId);
 
 // Get specific hook metadata value
 bytes memory value = commentManager.getCommentHookMetadataValue(commentId, keccak256("moderationStatus string"));
