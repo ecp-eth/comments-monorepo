@@ -10,7 +10,7 @@
 
 When sending ETH value to a hook, a protocol fee is automatically deducted from the value. This fee is used to support the protocol's development and maintenance. The remaining value is passed to the hook. The current protocol fee is set to 2%, but this value is subject to change in the future. Any fee changes will be announced at least 48 hours in advance.
 
-## Available Hook Functions
+## Available hook Functions
 
 [`onInitialize`](/protocol-reference/interfaces/IHook#onInitialize) - Called when a channel is initialized
 [`onCommentAdd`](/protocol-reference/interfaces/IHook#onCommentAdd) - Called when a comment is added
@@ -21,17 +21,17 @@ When sending ETH value to a hook, a protocol fee is automatically deducted from 
 
 See [IHook](/protocol-reference/interfaces/IHook) or [BaseHook](/protocol-reference/hooks/BaseHook)
 
-### Discover Community created Hooks
+### Discover community created hooks
 
-[Awesome Hooks](https://github.com/ecp-eth/awesome-hooks) is a collection of hooks that can be used to build on top of ECP.
+[Awesome hooks](https://github.com/ecp-eth/awesome-hooks) is a collection of hooks that can be used to build on top of ECP.
 
-### Modifying the Hook on a Channel
+### Modifying the hook on a channel
 
 ```solidity
 channelManager.setHook(channelId, hookAddress);
 ```
 
-### Updating Hook Metadata
+### Updating hook metadata
 
 The `updateCommentHookData` function allows you to trigger a hook to update its metadata for an existing comment. This is useful for scenarios where hook metadata needs to be refreshed based on external conditions or time-based changes.
 
@@ -79,7 +79,7 @@ function _onCommentHookDataUpdate(
 }
 ```
 
-## Writing Your Own Hooks
+## Writing Your Own hooks
 
 Hooks allow you to customize channel behavior. To create a custom hook:
 
@@ -87,7 +87,7 @@ Hooks allow you to customize channel behavior. To create a custom hook:
 2. Override the desired hook functions
 3. Implement the required permissions
 
-### Basic Hook Example
+### Basic hook example
 
 ```solidity
 // SPDX-License-Identifier: MIT
