@@ -22,6 +22,7 @@ import "./interfaces/IChannelManager.sol";
 abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
   // Fee configuration
   uint96 internal channelCreationFee;
+  uint96 internal commentCreationFee;
   uint16 internal hookTransactionFeeBasisPoints; // (1 basis point = 0.01%)
 
   /// @notice Constructor sets the contract owner and initializes fees
@@ -30,8 +31,11 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
     if (initialOwner == address(0)) revert IChannelManager.ZeroAddress();
 
     // Initialize fees with safe defaults
+    // Initialize channel creation fees to reduce initial spammy channels
     channelCreationFee = 0.02 ether;
-    // 2% fee on hook revenue
+    // Make a future implementation of comment creation fees at subcent levels to be enabled, in the case of hooks monetizing via ERC20s that bypass hookTransactionFeeBasisPoints
+    commentCreationFee = 0;
+    // 2% fee on hook ETH revenue
     hookTransactionFeeBasisPoints = 200;
   }
 
@@ -39,6 +43,12 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
   function setChannelCreationFee(uint96 fee) external onlyOwner {
     channelCreationFee = fee;
     emit IProtocolFees.ChannelCreationFeeUpdated(fee);
+  }
+
+  /// @inheritdoc IProtocolFees
+  function setCommentCreationFee(uint96 fee) external onlyOwner {
+    commentCreationFee = fee;
+    emit IProtocolFees.CommentCreationFeeUpdated(fee);
   }
 
   /// @inheritdoc IProtocolFees
@@ -51,6 +61,11 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
   /// @inheritdoc IProtocolFees
   function getChannelCreationFee() external view returns (uint96) {
     return channelCreationFee;
+  }
+
+  /// @inheritdoc IProtocolFees
+  function getCommentCreationFee() external view returns (uint96) {
+    return commentCreationFee;
   }
 
   /// @inheritdoc IProtocolFees
@@ -73,30 +88,23 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
     return amount;
   }
 
-  /// @notice Guard against insufficient channel creation fee
+  /// @notice Collects the protocol fee for channel creation
   /// @return The amount of fees collected
-  function collectChannelCreationFee() internal returns (uint96) {
-    return _collectFee(channelCreationFee);
+  function _collectChannelCreationFee() internal returns (uint96) {
+    return _collectFeeWithRefund(channelCreationFee);
   }
 
-  /// @notice Calculates the hook transaction fee by deducting the protocol fee
-  /// @param value The total value sent with the transaction
-  /// @return hookValue The amount that should be passed to the hook
-  function deductProtocolHookTransactionFee(
-    uint256 value
-  ) external view returns (uint256 hookValue) {
-    if (value <= 0 || hookTransactionFeeBasisPoints <= 0) {
-      return value;
-    }
-
-    uint256 protocolFee = (value * hookTransactionFeeBasisPoints) / 10000;
-    return value - protocolFee;
+  /// @inheritdoc IProtocolFees
+  function collectCommentCreationFee() external payable returns (uint96) {
+    return _collectFeeWithRefund(commentCreationFee);
   }
 
-  /// @notice Internal function to guard against insufficient fee
+  /// @notice Internal function to guard against insufficient fee with refund of excess
   /// @param requiredFee The fee amount required for the operation
   /// @return The amount of fees collected
-  function _collectFee(uint96 requiredFee) internal virtual returns (uint96) {
+  function _collectFeeWithRefund(
+    uint96 requiredFee
+  ) internal virtual returns (uint96) {
     if (msg.value < requiredFee) revert InsufficientFee();
 
     if (msg.value > requiredFee) {
@@ -106,4 +114,35 @@ abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
 
     return requiredFee;
   }
+
+  /// @inheritdoc IProtocolFees
+  function deductProtocolHookTransactionFee(
+    uint256 value
+  ) external view returns (uint256 hookValue) {
+    // Cache storage variable
+    uint16 fee = hookTransactionFeeBasisPoints;
+    if (value <= 0 || fee <= 0) {
+      return value;
+    }
+    uint256 protocolFee = (value * fee) / 10000;
+    return value - protocolFee;
+  }
+
+  /// @inheritdoc IProtocolFees
+  function calculateMsgValueWithHookFee(
+    uint256 postFeeAmountForwardedToHook
+  ) external view returns (uint256) {
+    if (hookTransactionFeeBasisPoints == 0) return postFeeAmountForwardedToHook;
+    // invalid fee basis points
+    if (hookTransactionFeeBasisPoints >= 10000) return 0;
+
+    // Formula: postFeeAmountForwardedToHook = input - (input * feeBasisPoints / 10000)
+    // Solving for input: input = postFeeAmountForwardedToHook / (1 - feeBasisPoints/10000)
+    return
+      (postFeeAmountForwardedToHook * 10000) /
+      (10000 - hookTransactionFeeBasisPoints);
+  }
+
+  /// @notice Allows the contract to receive ETH
+  receive() external payable {}
 }

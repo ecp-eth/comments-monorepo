@@ -9,8 +9,17 @@ import { CommentManager } from "../src/CommentManager.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { IHook } from "../src/interfaces/IHook.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 import { console } from "forge-std/console.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+// Token contract for testing
+contract TestToken is ERC20 {
+  constructor() ERC20("Test Token", "TEST") {
+    _mint(msg.sender, 1000000 * 10 ** 18);
+  }
+}
 
 contract TokenCreatorHookTest is Test {
   TokenCreatorHook public hook;
@@ -20,7 +29,8 @@ contract TokenCreatorHookTest is Test {
   address public tokenCreator;
   uint256 public tokenChainId;
   uint256 public channelId;
-  string public validMetadata;
+  Metadata.MetadataEntry[] public validMetadata;
+  ERC20 public testToken;
 
   function setUp() public {
     // Deploy contracts
@@ -39,22 +49,25 @@ contract TokenCreatorHookTest is Test {
 
     // Deploy and set up hook
     hook = new TokenCreatorHook();
-    tokenAddress = makeAddr("token");
+    testToken = new TestToken();
+    tokenAddress = address(testToken);
     tokenCreator = makeAddr("creator");
     tokenChainId = 1; // Ethereum mainnet
 
     // Create valid metadata JSON
-    validMetadata = string.concat(
-      '{"tokenAddress":"',
-      _addressToString(tokenAddress),
-      '","tokenCreator":"',
-      _addressToString(tokenCreator),
-      '","tokenChainId":"',
-      vm.toString(tokenChainId),
-      '"}'
-    );
-
-    console.log("validMetadata", validMetadata);
+    validMetadata = new Metadata.MetadataEntry[](3);
+    validMetadata[0] = Metadata.MetadataEntry({
+      key: "string tokenAddress",
+      value: abi.encode(tokenAddress)
+    });
+    validMetadata[1] = Metadata.MetadataEntry({
+      key: "string tokenCreator",
+      value: abi.encode(tokenCreator)
+    });
+    validMetadata[2] = Metadata.MetadataEntry({
+      key: "string tokenChainId",
+      value: abi.encode(tokenChainId)
+    });
 
     // Create a channel with the hook
     // First create the channel
@@ -76,13 +89,16 @@ contract TokenCreatorHookTest is Test {
   }
 
   function test_InitializeWithMissingTokenAddress() public {
-    string memory invalidMetadata = string.concat(
-      '{"tokenCreator":"',
-      _addressToString(tokenCreator),
-      '","tokenChainId":"',
-      vm.toString(tokenChainId),
-      '"}'
-    );
+    Metadata.MetadataEntry[]
+      memory invalidMetadata = new Metadata.MetadataEntry[](2);
+    invalidMetadata[0] = Metadata.MetadataEntry({
+      key: "string tokenCreator",
+      value: abi.encode(tokenCreator)
+    });
+    invalidMetadata[1] = Metadata.MetadataEntry({
+      key: "string tokenChainId",
+      value: abi.encode(tokenChainId)
+    });
 
     vm.startPrank(channelManager.owner());
     channelManager.updateChannel(
@@ -91,20 +107,23 @@ contract TokenCreatorHookTest is Test {
       "Test Description",
       invalidMetadata
     );
-    vm.expectRevert(TokenCreatorHook.InvalidMetadata.selector);
+    vm.expectRevert(TokenCreatorHook.InvalidTokenAddress.selector);
 
     channelManager.setHook(channelId, address(hook));
     vm.stopPrank();
   }
 
   function test_InitializeWithMissingTokenCreator() public {
-    string memory invalidMetadata = string.concat(
-      '{"tokenAddress":"',
-      _addressToString(tokenAddress),
-      '","tokenChainId":"',
-      vm.toString(tokenChainId),
-      '"}'
-    );
+    Metadata.MetadataEntry[]
+      memory invalidMetadata = new Metadata.MetadataEntry[](2);
+    invalidMetadata[0] = Metadata.MetadataEntry({
+      key: "string tokenAddress",
+      value: abi.encode(tokenAddress)
+    });
+    invalidMetadata[1] = Metadata.MetadataEntry({
+      key: "string tokenChainId",
+      value: abi.encode(tokenChainId)
+    });
 
     vm.startPrank(channelManager.owner());
     channelManager.updateChannel(
@@ -113,20 +132,23 @@ contract TokenCreatorHookTest is Test {
       "Test Description",
       invalidMetadata
     );
-    vm.expectRevert(TokenCreatorHook.InvalidMetadata.selector);
+    vm.expectRevert(TokenCreatorHook.InvalidTokenCreator.selector);
 
     channelManager.setHook(channelId, address(hook));
     vm.stopPrank();
   }
 
   function test_InitializeWithMissingTokenChainId() public {
-    string memory invalidMetadata = string.concat(
-      '{"tokenAddress":"',
-      _addressToString(tokenAddress),
-      '","tokenCreator":"',
-      _addressToString(tokenCreator),
-      '"}'
-    );
+    Metadata.MetadataEntry[]
+      memory invalidMetadata = new Metadata.MetadataEntry[](2);
+    invalidMetadata[0] = Metadata.MetadataEntry({
+      key: "string tokenAddress",
+      value: abi.encode(tokenAddress)
+    });
+    invalidMetadata[1] = Metadata.MetadataEntry({
+      key: "string tokenCreator",
+      value: abi.encode(tokenCreator)
+    });
 
     vm.startPrank(channelManager.owner());
     channelManager.updateChannel(
@@ -135,7 +157,7 @@ contract TokenCreatorHookTest is Test {
       "Test Description",
       invalidMetadata
     );
-    vm.expectRevert(TokenCreatorHook.InvalidMetadata.selector);
+    vm.expectRevert(TokenCreatorHook.InvalidTokenChainId.selector);
 
     channelManager.setHook(channelId, address(hook));
     vm.stopPrank();
@@ -177,7 +199,7 @@ contract TokenCreatorHookTest is Test {
       channelId: channelId,
       parentId: bytes32(0),
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: validTargetUri,
       commentType: 0, // COMMENT_TYPE_COMMENT,
       deadline: block.timestamp + 1 hours
@@ -203,7 +225,7 @@ contract TokenCreatorHookTest is Test {
       channelId: channelId,
       parentId: bytes32(0),
       content: "Parent comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: validTargetUri,
       commentType: 0, // COMMENT_TYPE_COMMENT,
       deadline: block.timestamp + 1 hours
@@ -220,7 +242,7 @@ contract TokenCreatorHookTest is Test {
       channelId: channelId,
       parentId: commentManager.getCommentId(parentComment),
       content: "Reply comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "", // No target URI needed for replies
       commentType: 0, // COMMENT_TYPE_COMMENT,
       deadline: block.timestamp + 1 hours
@@ -244,7 +266,7 @@ contract TokenCreatorHookTest is Test {
       channelId: channelId,
       parentId: bytes32(0),
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: invalidTargetUri,
       commentType: 0, // COMMENT_TYPE_COMMENT,
       deadline: block.timestamp + 1 hours
@@ -272,7 +294,7 @@ contract TokenCreatorHookTest is Test {
       channelId: channelId,
       parentId: bytes32(0),
       content: "Test comment",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: validTargetUri,
       commentType: 0, // COMMENT_TYPE_COMMENT,
       deadline: block.timestamp + 1 hours
@@ -286,7 +308,7 @@ contract TokenCreatorHookTest is Test {
 
   // Helper functions
   function _createChannelData(
-    string memory metadata
+    Metadata.MetadataEntry[] memory metadata
   ) internal pure returns (Channels.Channel memory) {
     return
       Channels.Channel({
@@ -299,7 +321,8 @@ contract TokenCreatorHookTest is Test {
           onCommentAdd: false,
           onCommentEdit: false,
           onCommentDelete: false,
-          onChannelUpdate: false
+          onChannelUpdate: false,
+          onCommentHookDataUpdate: false
         })
       });
   }

@@ -16,6 +16,7 @@ import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
 import { Comments } from "../src/libraries/Comments.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 
 /**
  * @title TestUtils
@@ -255,7 +256,7 @@ library TestUtils {
     address author,
     address app
   ) internal view returns (Comments.CreateComment memory) {
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](0);
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](0);
     return
       Comments.CreateComment({
         content: "Test comment",
@@ -275,8 +276,8 @@ library TestUtils {
     address author,
     address app
   ) internal view returns (Comments.EditComment memory) {
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](1);
-    metadata[0] = Comments.MetadataEntry({
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](1);
+    metadata[0] = Metadata.MetadataEntry({
       key: bytes32("bool edited"),
       value: abi.encode(true)
     });
@@ -413,20 +414,21 @@ contract MockHook is BaseHook {
         onCommentAdd: true,
         onCommentDelete: false,
         onCommentEdit: false,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 
   function _onCommentAdd(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal view override returns (Comments.MetadataEntry[] memory) {
-    Comments.MetadataEntry[] memory hookMetadata = new Comments.MetadataEntry[](
+  ) internal view override returns (Metadata.MetadataEntry[] memory) {
+    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
       1
     );
-    hookMetadata[0] = Comments.MetadataEntry({
+    hookMetadata[0] = Metadata.MetadataEntry({
       key: bytes32("string hookData"),
       value: bytes(returningHookData)
     });
@@ -447,20 +449,21 @@ contract AlwaysReturningDataHook is BaseHook {
         onCommentAdd: true,
         onCommentDelete: false,
         onCommentEdit: true,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 
   function onCommentEdit(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable override returns (Comments.MetadataEntry[] memory) {
-    Comments.MetadataEntry[] memory hookMetadata = new Comments.MetadataEntry[](
+  ) external payable override returns (Metadata.MetadataEntry[] memory) {
+    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
       1
     );
-    hookMetadata[0] = Comments.MetadataEntry({
+    hookMetadata[0] = Metadata.MetadataEntry({
       key: bytes32("string status"),
       value: bytes("hook data edited")
     });
@@ -469,14 +472,14 @@ contract AlwaysReturningDataHook is BaseHook {
 
   function onCommentAdd(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable override returns (Comments.MetadataEntry[] memory) {
-    Comments.MetadataEntry[] memory hookMetadata = new Comments.MetadataEntry[](
+  ) external payable override returns (Metadata.MetadataEntry[] memory) {
+    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
       1
     );
-    hookMetadata[0] = Comments.MetadataEntry({
+    hookMetadata[0] = Metadata.MetadataEntry({
       key: bytes32("string status"),
       value: bytes("hook data")
     });

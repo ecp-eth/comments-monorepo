@@ -57,7 +57,7 @@ describe("hook", () => {
 
     beforeEach(async () => {
       const result = await createChannel({
-        name: "Test channel",
+        name: `Test channel hook ${Date.now()}`,
         fee: parseEther("0.02"),
         writeContract: client.writeContract,
         channelManagerAddress,

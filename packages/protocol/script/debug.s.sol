@@ -10,6 +10,7 @@ import { CommentManager } from "../src/CommentManager.sol";
 import { TestUtils, MockHook } from "../test/utils.sol";
 import { Comments } from "../src/libraries/Comments.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 
 /// @notice This script is used to debug the gas usage of the ChannelManager and CommentManager contracts.
 /// @dev This script is not used in the protocol and should not be used in production.
@@ -70,7 +71,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(mockHook)
     );
   }
@@ -91,7 +92,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel 2",
       "Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(0)
     );
   }
@@ -105,7 +106,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       channelId,
       "Test Channel 3",
       "Description",
-      "{}"
+      new Metadata.MetadataEntry[](0)
     );
   }
 
@@ -113,7 +114,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 1",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
@@ -135,11 +136,44 @@ contract DebugGasUsage is Test, IERC721Receiver {
     comments.postComment{ value: 0 }(createCommentData, appSignature);
   }
 
-  function debugPostCommentWithSigSignedByAuthor() public {
+  function debugPostCommentWithSigBroadcastedByAuthor() public {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 2",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
+      targetUri: "",
+      commentType: 0, // COMMENT_TYPE_COMMENT,
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    commentId = comments.getCommentId(createCommentData);
+    appSignature = TestUtils.signEIP712(vm, user2PrivateKey, commentId);
+
+    // Post comment with sig directly as author
+    vm.prank(user1);
+    measureGas(
+      "postCommentWithSig broadcasted by author",
+      runPostCommentWithSigBroadcastedByAuthor
+    );
+  }
+
+  function runPostCommentWithSigBroadcastedByAuthor() internal {
+    comments.postCommentWithSig{ value: 0 }(
+      createCommentData,
+      "",
+      appSignature
+    );
+  }
+
+  function debugPostCommentWithSigSignedByAuthor() public {
+    // Create comment data using direct construction
+    createCommentData = Comments.CreateComment({
+      content: "Test comment 3",
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
@@ -173,7 +207,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 3",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
@@ -196,7 +230,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       nonce: comments.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       content: "Test comment 4",
-      metadata: new Comments.MetadataEntry[](0)
+      metadata: new Metadata.MetadataEntry[](0)
     });
     bytes32 editHash = comments.getEditCommentHash(
       commentId,
@@ -219,7 +253,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
       content: "Test comment 5",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
       author: user1,
@@ -242,7 +276,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       nonce: comments.getNonce(user1, user2),
       deadline: block.timestamp + 1 days,
       content: "Test comment 6",
-      metadata: new Comments.MetadataEntry[](0)
+      metadata: new Metadata.MetadataEntry[](0)
     });
     bytes32 editHash = comments.getEditCommentHash(
       commentId,
@@ -274,7 +308,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create a comment to be deleted
     createCommentData = Comments.CreateComment({
       content: "Test comment for deletion",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0,
       author: user1,
@@ -304,7 +338,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     // Create a comment to be deleted
     createCommentData = Comments.CreateComment({
       content: "Test comment for deletion with sigs",
-      metadata: new Comments.MetadataEntry[](0),
+      metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0,
       author: user1,

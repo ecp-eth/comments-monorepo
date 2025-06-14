@@ -14,7 +14,7 @@ This interface defines the functions and events for the Comments contract
 
 ## Events
 
-### `CommentAdded(bytes32 commentId, address author, address app, uint256 channelId, bytes32 parentId, uint96 createdAt, string content, string targetUri, uint8 commentType, struct Comments.MetadataEntry[] metadata)`
+### `CommentAdded(bytes32 commentId, address author, address app, uint256 channelId, bytes32 parentId, uint96 createdAt, string content, string targetUri, uint8 commentType, struct Metadata.MetadataEntry[] metadata)`
 
 Emitted when a new comment is added
 
@@ -42,7 +42,7 @@ Emitted when a comment is deleted
 
 
 
-### `CommentEdited(bytes32 commentId, address editedByApp, address author, address app, uint256 channelId, bytes32 parentId, uint96 createdAt, uint96 updatedAt, string content, string targetUri, uint8 commentType, struct Comments.MetadataEntry[] metadata)`
+### `CommentEdited(bytes32 commentId, address editedByApp, address author, address app, uint256 channelId, bytes32 parentId, uint96 createdAt, uint96 updatedAt, string content, string targetUri, uint8 commentType, struct Metadata.MetadataEntry[] metadata)`
 
 Emitted when a comment is edited
 
@@ -66,14 +66,14 @@ Emitted when an author removes an app signer's approval
 
 ## Functions
 
-### `postComment(struct Comments.CreateComment commentData, bytes appSignature)` (external)
+### `postComment(struct Comments.CreateComment commentData, bytes appSignature) → bytes32 commentId` (external)
 
 Posts a comment directly from the author's address
 
 
 
 
-### `postCommentWithSig(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature)` (external)
+### `postCommentWithSig(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature) → bytes32 commentId` (external)
 
 Posts a comment with both author and app signer signatures
 
@@ -106,6 +106,14 @@ Edits a comment when called by the author directly
 Edits a comment with both author and app signer signatures
 
 
+
+
+### `updateCommentHookData(bytes32 commentId)` (external)
+
+Updates hook metadata for an existing comment using merge mode (gas-efficient). Anyone can call this function.
+
+
+Only updates provided metadata fields without clearing existing ones
 
 
 ### `addApproval(address app)` (external)
@@ -185,14 +193,14 @@ Get a comment by its ID
 
 
 
-### `getCommentMetadata(bytes32 commentId) → struct Comments.MetadataEntry[]` (external)
+### `getCommentMetadata(bytes32 commentId) → struct Metadata.MetadataEntry[]` (external)
 
 Get metadata for a comment
 
 
 
 
-### `getCommentHookMetadata(bytes32 commentId) → struct Comments.MetadataEntry[]` (external)
+### `getCommentHookMetadata(bytes32 commentId) → struct Metadata.MetadataEntry[]` (external)
 
 Get hook metadata for a comment
 

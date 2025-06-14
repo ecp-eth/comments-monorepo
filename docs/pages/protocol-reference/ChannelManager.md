@@ -38,9 +38,9 @@ Get a channel by its ID
 
 
 
-### `_generateChannelId(address creator, string name, string description, string metadata) → uint256` (internal)
+### `_getChannelId(address creator, string name, string description, struct Metadata.MetadataEntry[] metadata) → uint256` (internal)
 
-Generates a unique channel ID based on input parameters
+Calculates a unique hash for a channel
 
 
 
@@ -52,14 +52,21 @@ Internal function to check if a channel exists
 
 
 
-### `createChannel(string name, string description, string metadata, address hook) → uint256 channelId` (external)
+### `_hashMetadataArray(struct Metadata.MetadataEntry[] metadata) → bytes32` (internal)
+
+Internal function to hash metadata array for deterministic channel ID generation
+
+
+
+
+### `createChannel(string name, string description, struct Metadata.MetadataEntry[] metadata, address hook) → uint256 channelId` (external)
 
 Creates a new channel
 
 
 
 
-### `updateChannel(uint256 channelId, string name, string description, string metadata)` (external)
+### `updateChannel(uint256 channelId, string name, string description, struct Metadata.MetadataEntry[] metadata)` (external)
 
 Updates an existing channel's configuration
 
@@ -107,6 +114,48 @@ Returns the base URI for token metadata
 
 
 Internal function that overrides ERC721's _baseURI()
+
+### `setChannelMetadata(uint256 channelId, struct Metadata.MetadataEntryOp[] operations)` (external)
+
+Sets metadata for a channel
+
+
+
+
+### `_deleteChannelMetadataKey(uint256 channelId, bytes32 keyToDelete)` (internal)
+
+Internal function to delete a specific channel metadata key
+
+
+
+
+### `_channelMetadataKeyExists(uint256 channelId, bytes32 targetKey) → bool` (internal)
+
+Internal function to check if a channel metadata key exists
+
+
+
+
+### `getChannelMetadata(uint256 channelId) → struct Metadata.MetadataEntry[]` (public)
+
+Get all metadata for a channel
+
+
+
+
+### `getChannelMetadataValue(uint256 channelId, bytes32 key) → bytes` (external)
+
+Get metadata value for a specific key
+
+
+
+
+### `getChannelMetadataKeys(uint256 channelId) → bytes32[]` (external)
+
+Get all metadata keys for a channel
+
+
+
 
 
 

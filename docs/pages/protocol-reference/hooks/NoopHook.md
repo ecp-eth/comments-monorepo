@@ -28,7 +28,7 @@
 
 
 
-### `onCommentAdd(struct Comments.Comment, struct Comments.MetadataEntry[], address, bytes32) → struct Comments.MetadataEntry[]` (external)
+### `onCommentAdd(struct Comments.Comment, struct Metadata.MetadataEntry[], address, bytes32) → struct Metadata.MetadataEntry[]` (external)
 
 
 
@@ -40,19 +40,25 @@
 
 
 
-### `onCommentDelete(struct Comments.Comment, struct Comments.MetadataEntry[], struct Comments.MetadataEntry[], address, bytes32) → bool` (external)
+### `onCommentDelete(struct Comments.Comment, struct Metadata.MetadataEntry[], struct Metadata.MetadataEntry[], address, bytes32) → bool` (external)
 
 
 
 
 
-### `onCommentEdit(struct Comments.Comment, struct Comments.MetadataEntry[], address, bytes32) → struct Comments.MetadataEntry[]` (external)
+### `onCommentEdit(struct Comments.Comment, struct Metadata.MetadataEntry[], address, bytes32) → struct Metadata.MetadataEntry[]` (external)
 
 
 
 
 
-### `onChannelUpdate(address, uint256, struct Channels.Channel) → bool` (external)
+### `onChannelUpdate(address, uint256, struct Channels.Channel, struct Metadata.MetadataEntry[]) → bool` (external)
+
+
+
+
+
+### `onCommentHookDataUpdate(struct Comments.Comment, struct Metadata.MetadataEntry[], struct Metadata.MetadataEntry[], address, bytes32) → struct Metadata.MetadataEntryOp[]` (external)
 
 
 

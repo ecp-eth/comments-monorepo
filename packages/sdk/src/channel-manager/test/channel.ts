@@ -118,7 +118,7 @@ describe("channel", () => {
 
     beforeEach(async () => {
       const result = await createChannel({
-        name: "Test channel",
+        name: "Test channel getChannel",
         fee: parseEther("0.02"),
         writeContract: client.writeContract,
         channelManagerAddress,
@@ -149,7 +149,7 @@ describe("channel", () => {
       });
 
       assert.deepEqual(channel, {
-        name: "Test channel",
+        name: "Test channel getChannel",
         description: undefined,
         metadata: undefined,
         hook: undefined,
@@ -159,6 +159,7 @@ describe("channel", () => {
           onCommentEdit: false,
           onInitialize: false,
           onChannelUpdate: false,
+          onCommentHookDataUpdate: false,
         },
       });
     });
@@ -208,7 +209,7 @@ describe("channel", () => {
 
     beforeEach(async () => {
       const result = await createChannel({
-        name: "Test channel",
+        name: "Test channel ownerOf",
         fee: parseEther("0.02"),
         writeContract: client.writeContract,
         channelManagerAddress,
@@ -247,7 +248,7 @@ describe("channel", () => {
 
     beforeEach(async () => {
       const result = await createChannel({
-        name: "Test channel",
+        name: "Test channel updateChannel",
         fee: parseEther("0.02"),
         writeContract: client.writeContract,
         channelManagerAddress,
@@ -275,7 +276,7 @@ describe("channel", () => {
         channelId,
         name: "Updated channel",
         description: "New description",
-        metadata: "New metadata",
+        metadata: [],
         writeContract: client.writeContract,
         channelManagerAddress,
       });
@@ -296,7 +297,7 @@ describe("channel", () => {
       assert.deepEqual(channel, {
         name: "Updated channel",
         description: "New description",
-        metadata: "New metadata",
+        metadata: undefined,
         hook: undefined,
         permissions: {
           onCommentAdd: false,
@@ -304,6 +305,7 @@ describe("channel", () => {
           onCommentEdit: false,
           onInitialize: false,
           onChannelUpdate: false,
+          onCommentHookDataUpdate: false,
         },
       });
     });

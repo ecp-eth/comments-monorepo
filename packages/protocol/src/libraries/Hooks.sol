@@ -16,5 +16,6 @@ library Hooks {
     bool onCommentDelete;
     bool onCommentEdit;
     bool onChannelUpdate;
+    bool onCommentHookDataUpdate;
   }
 }

@@ -41,6 +41,13 @@ Sets the fee for creating a new channel
 
 
 
+### `setCommentCreationFee(uint96 fee)` (external)
+
+Sets the fee for creating a new comment
+
+
+
+
 ### `setHookTransactionFee(uint16 feeBasisPoints)` (external)
 
 Sets the fee percentage taken from hook transactions
@@ -51,6 +58,13 @@ Sets the fee percentage taken from hook transactions
 ### `getChannelCreationFee() → uint96` (external)
 
 Gets the current channel creation fee
+
+
+
+
+### `getCommentCreationFee() → uint96` (external)
+
+Gets the current comment creation fee
 
 
 
@@ -69,9 +83,23 @@ Withdraws accumulated fees to a specified address
 
 
 
-### `collectChannelCreationFee() → uint96` (internal)
+### `_collectChannelCreationFee() → uint96` (internal)
 
-Guard against insufficient channel creation fee
+Collects the protocol fee for channel creation
+
+
+
+
+### `collectCommentCreationFee() → uint96` (external)
+
+Collects the protocol fee for comment creation
+
+
+
+
+### `_collectFeeWithRefund(uint96 requiredFee) → uint96` (internal)
+
+Internal function to guard against insufficient fee with refund of excess
 
 
 
@@ -83,10 +111,16 @@ Calculates the hook transaction fee by deducting the protocol fee
 
 
 
-### `_collectFee(uint96 requiredFee) → uint96` (internal)
+### `calculateMsgValueWithHookFee(uint256 postFeeAmountForwardedToHook) → uint256` (external)
 
-Internal function to guard against insufficient fee
+Calculates the required input value to achieve a desired output after protocol fee deduction
 
+
+
+
+### `receive()` (external)
+
+Allows the contract to receive ETH
 
 
 

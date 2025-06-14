@@ -2,6 +2,13 @@ import { z } from "zod";
 import { ChainConfig } from "./config";
 import { createPublicClient, http } from "viem";
 import { ChannelManagerABI, CHANNEL_MANAGER_ADDRESS } from "@ecp.eth/sdk";
+import {
+  parseMetadataFromContract,
+  decodeMetadataValue,
+  decodeMetadataTypes,
+} from "@ecp.eth/sdk/comments/metadata";
+import type { MetadataEntry } from "@ecp.eth/sdk/comments/types";
+import type { Hex } from "@ecp.eth/sdk/core/schemas";
 
 export const ChannelIDParser = z.coerce.bigint();
 
@@ -63,10 +70,35 @@ export async function resolveNFTMetadata(
     const attributes: NFTAttribute[] = [];
 
     if (channel.metadata) {
-      attributes.push({
-        trait_type: "Channel Metadata",
-        value: channel.metadata,
-      });
+      // Convert readonly array to mutable array
+      const metadataEntries = [...channel.metadata] as MetadataEntry[];
+
+      // Decode the metadata types from the entries
+      const keyTypeMap = decodeMetadataTypes(metadataEntries);
+
+      // Parse the metadata into a record format
+      const metadataRecord = parseMetadataFromContract(
+        metadataEntries,
+        keyTypeMap,
+      );
+
+      // Convert each metadata entry into an NFT attribute
+      for (const [key, metadata] of Object.entries(metadataRecord)) {
+        const decodedValue = decodeMetadataValue(
+          { key: metadata.key as Hex, value: metadata.value as Hex },
+          metadata.type,
+        );
+
+        // Convert the decoded value to a string for the NFT attribute
+        const stringValue =
+          typeof decodedValue === "object"
+            ? JSON.stringify(decodedValue)
+            : String(decodedValue);
+        attributes.push({
+          trait_type: `${metadata.type} ${key}`,
+          value: stringValue,
+        });
+      }
     }
 
     return Response.json({

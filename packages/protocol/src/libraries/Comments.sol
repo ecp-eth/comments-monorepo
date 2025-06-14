@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import { Metadata } from "./Metadata.sol";
+
 /// @title Comments - Library defining comment-related types
 library Comments {
   /// @notice Comment type constants
@@ -9,14 +11,6 @@ library Comments {
   /// more types can be added in the future, please check the docs for more information.
   uint8 public constant COMMENT_TYPE_COMMENT = 0;
   uint8 public constant COMMENT_TYPE_REACTION = 1;
-
-  /// @notice Struct containing metadata key-value pair
-  /// @param key UTF-8 encoded string of format "type key". Must fit in 32 bytes.
-  /// @param value The metadata value as bytes
-  struct MetadataEntry {
-    bytes32 key;
-    bytes value;
-  }
 
   /// @notice Struct containing all comment data
   /// @param author The address of the comment author
@@ -62,7 +56,7 @@ library Comments {
     uint8 commentType;
     // Dynamic types last (conventional pattern)
     string content;
-    MetadataEntry[] metadata;
+    Metadata.MetadataEntry[] metadata;
     string targetUri;
   }
 
@@ -77,6 +71,6 @@ library Comments {
     uint256 nonce;
     uint256 deadline;
     string content;
-    MetadataEntry[] metadata;
+    Metadata.MetadataEntry[] metadata;
   }
 }

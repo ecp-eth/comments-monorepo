@@ -17,6 +17,7 @@ When sending ETH value to a hook, a protocol fee is automatically deducted from 
 [`onCommentEdit`](/protocol-reference/interfaces/IHook#onCommentEdit) - Called when a comment is edited
 [`onCommentDelete`](/protocol-reference/interfaces/IHook#onCommentDelete) - Called when a comment is deleted
 [`onChannelUpdate`](/protocol-reference/interfaces/IHook#onChannelUpdate) - Called when a channel is updated
+[`onCommentHookDataUpdate`](/protocol-reference/interfaces/IHook#onCommentHookDataUpdate) - Called when hook metadata is updated for an existing comment
 
 See [IHook](/protocol-reference/interfaces/IHook) or [BaseHook](/protocol-reference/hooks/BaseHook)
 
@@ -28,6 +29,54 @@ See [IHook](/protocol-reference/interfaces/IHook) or [BaseHook](/protocol-refere
 
 ```solidity
 channelManager.setHook(channelId, hookAddress);
+```
+
+### Updating Hook Metadata
+
+The `updateCommentHookData` function allows you to trigger a hook to update its metadata for an existing comment. This is useful for scenarios where hook metadata needs to be refreshed based on external conditions or time-based changes.
+
+```solidity
+// Trigger hook metadata update for a specific comment
+commentManager.updateCommentHookData(commentId);
+```
+
+**Key Features:**
+
+- **Gas Efficient**: Only updates specified metadata fields using SET and DELETE operations
+- **Explicit Operations**: Hooks return precise operations instead of replacing all metadata
+- **Non-Payable**: No ETH required for metadata updates
+- **Permission-Based**: Only works if the channel's hook has `onCommentHookDataUpdate: true`
+
+**Hook Implementation Example:**
+
+```solidity
+function _onCommentHookDataUpdate(
+  Comments.Comment calldata commentData,
+  Metadata.MetadataEntry[] calldata metadata,
+  Metadata.MetadataEntry[] calldata hookMetadata,
+  address msgSender,
+  bytes32 commentId
+) internal override returns (Comments.MetadataEntryOp[] memory) {
+  Comments.MetadataEntryOp[] memory operations = new Comments.MetadataEntryOp[](
+    2
+  );
+
+  // Update an existing field
+  operations[0] = Comments.MetadataEntryOp({
+    operation: Comments.MetadataOperation.SET,
+    key: "string score",
+    value: abi.encode(calculateNewScore(commentData))
+  });
+
+  // Delete a field
+  operations[1] = Comments.MetadataEntryOp({
+    operation: Comments.MetadataOperation.DELETE,
+    key: "string temp_data",
+    value: "" // Ignored for DELETE operations
+  });
+
+  return operations;
+}
 ```
 
 ## Writing Your Own Hooks
@@ -62,7 +111,8 @@ contract MyCustomHook is BaseHook {
         onCommentAdd: true, // Enable comment addition hook
         onCommentEdit: false, // Disable comment editing hook
         onCommentDelete: false, // Disable comment deletion hook
-        onChannelUpdate: false // Disable channel update hook
+        onChannelUpdate: false, // Disable channel update hook
+        onCommentHookDataUpdate: false // Disable comment hook update hook
       });
   }
 
@@ -103,8 +153,13 @@ contract MyCustomHook is BaseHook {
 
    - Validate all inputs in hooks
    - Be cautious with external calls
-   - Consider reentrancy risks
    - Test hooks thoroughly
+   - Consider implementing a ReentrancyGuard in your hook if you want to prevent reentrancy attacks
+
+4. **Fees**
+
+   - Consider refunding any excess fees to the user
+   - use `channelManager.calculateMsgValueWithHookFee` to calculate the correct amount of ETH to send to your hook
 
 ## Troubleshooting
 
