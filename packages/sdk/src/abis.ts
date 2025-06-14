@@ -2089,52 +2089,6 @@ export const ChannelManagerABI = [
   },
   {
     type: "function",
-    name: "getChannelId",
-    inputs: [
-      {
-        name: "creator",
-        type: "address",
-        internalType: "address",
-      },
-      {
-        name: "name",
-        type: "string",
-        internalType: "string",
-      },
-      {
-        name: "description",
-        type: "string",
-        internalType: "string",
-      },
-      {
-        name: "metadata",
-        type: "tuple[]",
-        internalType: "struct Metadata.MetadataEntry[]",
-        components: [
-          {
-            name: "key",
-            type: "bytes32",
-            internalType: "bytes32",
-          },
-          {
-            name: "value",
-            type: "bytes",
-            internalType: "bytes",
-          },
-        ],
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "pure",
-  },
-  {
-    type: "function",
     name: "getChannelMetadata",
     inputs: [
       {
@@ -2800,6 +2754,12 @@ export const ChannelManagerABI = [
             internalType: "bytes",
           },
         ],
+      },
+      {
+        name: "hook",
+        type: "address",
+        indexed: false,
+        internalType: "address",
       },
     ],
     anonymous: false,

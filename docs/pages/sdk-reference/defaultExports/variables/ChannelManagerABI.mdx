@@ -264,41 +264,6 @@ const ChannelManagerABI: readonly [{
   type: "function";
 }, {
   inputs: readonly [{
-     internalType: "address";
-     name: "creator";
-     type: "address";
-   }, {
-     internalType: "string";
-     name: "name";
-     type: "string";
-   }, {
-     internalType: "string";
-     name: "description";
-     type: "string";
-   }, {
-     components: readonly [{
-        internalType: "bytes32";
-        name: "key";
-        type: "bytes32";
-      }, {
-        internalType: "bytes";
-        name: "value";
-        type: "bytes";
-     }];
-     internalType: "struct Metadata.MetadataEntry[]";
-     name: "metadata";
-     type: "tuple[]";
-  }];
-  name: "getChannelId";
-  outputs: readonly [{
-     internalType: "uint256";
-     name: "";
-     type: "uint256";
-  }];
-  stateMutability: "pure";
-  type: "function";
-}, {
-  inputs: readonly [{
      internalType: "uint256";
      name: "channelId";
      type: "uint256";
@@ -809,6 +774,11 @@ const ChannelManagerABI: readonly [{
      internalType: "struct Metadata.MetadataEntry[]";
      name: "metadata";
      type: "tuple[]";
+   }, {
+     indexed: false;
+     internalType: "address";
+     name: "hook";
+     type: "address";
   }];
   name: "ChannelCreated";
   type: "event";

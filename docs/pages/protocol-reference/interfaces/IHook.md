@@ -50,7 +50,7 @@ Execute after a comment is edited
 
 
 
-### `onChannelUpdate(address channel, uint256 channelId, struct Channels.Channel channelData) → bool success` (external)
+### `onChannelUpdate(address channel, uint256 channelId, struct Channels.Channel channelData, struct Metadata.MetadataEntry[] metadata) → bool success` (external)
 
 Execute after a channel is updated
 

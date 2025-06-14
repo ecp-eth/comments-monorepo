@@ -307,7 +307,7 @@ Get the deleted status for a comment
 
 ### `updateCommentHookData(bytes32 commentId)` (external)
 
-Updates hook metadata for an existing comment using merge mode (gas-efficient)
+Updates hook metadata for an existing comment using merge mode (gas-efficient). Anyone can call this function.
 
 
 Only updates provided metadata fields without clearing existing ones

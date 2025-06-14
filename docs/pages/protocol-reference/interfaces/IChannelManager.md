@@ -21,7 +21,7 @@ Emitted when the base URI for NFT metadata is updated
 
 
 
-### `ChannelCreated(uint256 channelId, string name, string description, struct Metadata.MetadataEntry[] metadata)`
+### `ChannelCreated(uint256 channelId, string name, string description, struct Metadata.MetadataEntry[] metadata, address hook)`
 
 Emitted when a new channel is created
 
@@ -69,13 +69,6 @@ Creates a new channel
 ### `getChannel(uint256 channelId) → struct Channels.Channel` (external)
 
 Get a channel by its ID
-
-
-
-
-### `getChannelId(address creator, string name, string description, struct Metadata.MetadataEntry[] metadata) → uint256` (external)
-
-Calculates a unique hash for a channel
 
 
 

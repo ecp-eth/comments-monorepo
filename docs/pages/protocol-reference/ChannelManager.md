@@ -38,7 +38,7 @@ Get a channel by its ID
 
 
 
-### `getChannelId(address creator, string name, string description, struct Metadata.MetadataEntry[] metadata) → uint256` (public)
+### `_getChannelId(address creator, string name, string description, struct Metadata.MetadataEntry[] metadata) → uint256` (internal)
 
 Calculates a unique hash for a channel
 
@@ -136,7 +136,7 @@ Internal function to check if a channel metadata key exists
 
 
 
-### `getChannelMetadata(uint256 channelId) → struct Metadata.MetadataEntry[]` (external)
+### `getChannelMetadata(uint256 channelId) → struct Metadata.MetadataEntry[]` (public)
 
 Get all metadata for a channel
 
