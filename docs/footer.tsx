@@ -20,7 +20,7 @@ export default function Footer() {
     <div id="ecp-embed-footer" style={{ width: "100%" }}>
       <CommentsEmbed
         embedUri={publicEnv.VITE_ECP_ETH_EMBED_URL}
-        uri={`${window.location.origin}/${window.location.pathname}`}
+        uri={`${window.location.origin}${window.location.pathname}`}
         containerProps={{
           style: {
             borderRadius: "var(--vocs-borderRadius_8)",

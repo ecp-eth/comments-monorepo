@@ -10,16 +10,6 @@
 
 ## Structs
 
-### `MetadataEntry`
-
-
-- **key:** (bytes32) UTF-8 encoded string of format "type key". Must fit in 32 bytes.
-
-
-
-- **value:** (bytes) The metadata value as bytes
-
-
 ### `Comment`
 
 
@@ -88,7 +78,7 @@
 
 
 
-- **metadata:** (struct Comments.MetadataEntry[]) Array of key-value pairs for additional data
+- **metadata:** (struct Metadata.MetadataEntry[]) Array of key-value pairs for additional data
 
 
 
@@ -115,7 +105,7 @@
 
 
 
-- **metadata:** (struct Comments.MetadataEntry[]) Array of key-value pairs for additional data
+- **metadata:** (struct Metadata.MetadataEntry[]) Array of key-value pairs for additional data
 
 
 

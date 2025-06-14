@@ -177,7 +177,7 @@ export default function HomePage() {
               A new, programmable social content primitive on Ethereum.
             </h1>
             <h2 className="text-xl max-w-3xl mx-auto md:text-xl text-gray-900 dark:text-white mb-6 leading-tight bg-clip-text bg-gradient-to-b from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
-              Add ECP to your ethereum app in 5 minutes
+              Add ECP to your Ethereum app in 5 minutes
             </h2>
 
             {/* <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed">
@@ -305,7 +305,7 @@ export default function HomePage() {
               Integration Options
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-4xl mx-auto">
-              We made it simple to put comments on ethereum without having to
+              We made it simple to put comments on Ethereum without having to
               get your users to sign up to yet another profile.
             </p>
           </div>
@@ -674,7 +674,7 @@ await fetchComments({
               asChild
               className="hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
             >
-              <Link href="https://docs.ethcomments.xyz/channels-and-hooks">
+              <Link href="https://docs.ethcomments.xyz/hooks">
                 <Code className="w-5 h-5 mr-2" />
                 Create a hook
               </Link>
@@ -686,7 +686,7 @@ await fetchComments({
             >
               <Link href="https://github.com/ecp-eth/awesome-ecp-hooks">
                 <Search className="w-5 h-5 mr-2" />
-                Discover Hooks
+                Discover hooks
               </Link>
             </Button>
           </div>

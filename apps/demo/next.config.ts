@@ -7,9 +7,6 @@ const nextConfig: NextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
-  experimental: {
-    esmExternals: "loose",
-  },
 };
 
 export default nextConfig;

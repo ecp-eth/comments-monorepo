@@ -7,6 +7,7 @@ import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/libraries/Hooks.sol";
+import { Metadata } from "../src/libraries/Metadata.sol";
 import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -27,7 +28,7 @@ contract CommentsTest is Test, IERC721Receiver {
     string content,
     string targetUri,
     uint8 commentType,
-    Comments.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata
   );
   event CommentMetadataSet(
     bytes32 indexed commentId,
@@ -153,8 +154,8 @@ contract CommentsTest is Test, IERC721Receiver {
     );
 
     // Add metadata to the edit
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](1);
-    metadata[0] = Comments.MetadataEntry({
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](1);
+    metadata[0] = Metadata.MetadataEntry({
       key: bytes32("string key"),
       value: bytes("test value")
     });
@@ -196,7 +197,7 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
 
     // Verify metadata was set
-    Comments.MetadataEntry[] memory commentMetadata = comments
+    Metadata.MetadataEntry[] memory commentMetadata = comments
       .getCommentMetadata(commentId);
     assertEq(commentMetadata.length, 1);
     assertEq(commentMetadata[0].key, bytes32("string key"));
@@ -208,7 +209,7 @@ contract CommentsTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Test Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(alwaysReturningDataHook)
     );
 
@@ -274,7 +275,7 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(editedComment.updatedAt, uint96(block.timestamp));
 
     // Verify hook metadata was set
-    Comments.MetadataEntry[] memory hookMetadata = comments
+    Metadata.MetadataEntry[] memory hookMetadata = comments
       .getCommentHookMetadata(commentId);
     assertEq(hookMetadata.length, 1);
     assertEq(hookMetadata[0].key, bytes32("string status"));
@@ -286,7 +287,7 @@ contract CommentsTest is Test, IERC721Receiver {
     uint256 channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Test Description",
-      "{}",
+      new Metadata.MetadataEntry[](0),
       address(rejectEditHook)
     );
 
@@ -810,16 +811,17 @@ contract RejectEditHook is BaseHook {
         onCommentAdd: false,
         onCommentDelete: false,
         onCommentEdit: true,
-        onChannelUpdate: false
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
       });
   }
 
   function _onCommentEdit(
     Comments.Comment calldata,
-    Comments.MetadataEntry[] calldata,
+    Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) internal pure override returns (Comments.MetadataEntry[] memory) {
+  ) internal pure override returns (Metadata.MetadataEntry[] memory) {
     revert TestHookRejected();
   }
 }

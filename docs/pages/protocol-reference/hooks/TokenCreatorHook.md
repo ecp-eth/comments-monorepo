@@ -93,36 +93,8 @@ Get all channels with their token information
 
 
 
-### `_onCommentAdd(struct Comments.Comment commentData, struct Comments.MetadataEntry[], address, bytes32) → struct Comments.MetadataEntry[]` (internal)
+### `_onCommentAdd(struct Comments.Comment commentData, struct Metadata.MetadataEntry[], address, bytes32) → struct Metadata.MetadataEntry[]` (internal)
 
-
-
-
-
-### `_bytesToUint(bytes b) → uint256` (internal)
-
-Convert bytes to uint256
-
-
-
-
-### `_bytesToAddress(bytes b) → address` (internal)
-
-Convert bytes to address
-
-
-
-
-### `_bytesToAddressAlternative(bytes b) → address` (internal)
-
-Alternative implementation of bytes to address conversion
-
-
-
-
-### `_extractJsonValue(string json, string key) → bytes` (internal)
-
-Extract a value from a JSON string
 
 
 

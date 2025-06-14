@@ -7,7 +7,7 @@
 Content moderation is a notoriously difficult problem that remains broadly unsolved across the internet. The challenges include:
 
 - Balancing free speech with content quality
-- Scaling moderation across different languages and cultures  
+- Scaling moderation across different languages and cultures
 - Detecting sophisticated spam and abuse patterns
 - Managing the costs and complexity of human moderation
 
@@ -28,14 +28,14 @@ Apps can moderate content **before** cosigning a comment with their app, enablin
 
 When combined with indexing only comments from your app, this approach can be highly effective at maintaining content quality.
 
-### Layer B: Onchain Gating with Hooks
+### Layer B: Onchain Gating with hooks
 
-You can use Hooks that apply onchain gating mechanisms to limit who can comment:
+You can use hooks that apply onchain gating mechanisms to limit who can comment:
 
-- **Token Gating**: Only token holders can comment, significantly limiting spam vectors
-- **NFT Requirements**: Require ownership of specific NFTs to participate
-- **Staking Mechanisms**: Require users to stake tokens to comment
-- **Reputation Systems**: Base commenting permissions on onchain reputation
+- **Token gating**: Only token holders can comment, significantly limiting spam vectors
+- **NFT requirements**: Require ownership of specific NFTs to participate
+- **Staking mechanisms**: Require users to stake tokens to comment
+- **Reputation systems**: Base commenting permissions on onchain reputation
 
 These onchain restrictions create economic and social barriers that make spam less profitable.
 
@@ -44,11 +44,13 @@ These onchain restrictions create economic and social barriers that make spam le
 The indexer service implements additional spam prevention measures and tools:
 
 1. **Muted Address Detection**
+
    - Maintains a list of known muted addresses that you can mark to hide them from your app
    - Comments from addresses marked as muted are not indexed
    - Muted accounts can be managed using the [Admin CLI](/indexer/admin-cli-muted-accounts)
 
 2. **Content Validation (Opt in)**
+
    - Implements basic profanity detection
    - Can be extended with more advanced content analysis
 

@@ -49,53 +49,66 @@ Execute after a hook is initialized on a channel
 
 
 
-### `onCommentAdd(struct Comments.Comment commentData, struct Comments.MetadataEntry[] metadata, address msgSender, bytes32 commentId) → struct Comments.MetadataEntry[]` (external)
+### `onCommentAdd(struct Comments.Comment commentData, struct Metadata.MetadataEntry[] metadata, address msgSender, bytes32 commentId) → struct Metadata.MetadataEntry[]` (external)
 
 Execute after a comment is processed
 
 
 
 
-### `_onCommentAdd(struct Comments.Comment, struct Comments.MetadataEntry[], address, bytes32) → struct Comments.MetadataEntry[]` (internal)
+### `_onCommentAdd(struct Comments.Comment, struct Metadata.MetadataEntry[], address, bytes32) → struct Metadata.MetadataEntry[]` (internal)
 
 
 
 
 
-### `onCommentDelete(struct Comments.Comment commentData, struct Comments.MetadataEntry[] metadata, struct Comments.MetadataEntry[] hookMetadata, address msgSender, bytes32 commentId) → bool` (external)
+### `onCommentDelete(struct Comments.Comment commentData, struct Metadata.MetadataEntry[] metadata, struct Metadata.MetadataEntry[] hookMetadata, address msgSender, bytes32 commentId) → bool` (external)
 
 Execute after a comment is deleted
 
 
 
 
-### `_onCommentDelete(struct Comments.Comment, struct Comments.MetadataEntry[], struct Comments.MetadataEntry[], address, bytes32) → bool` (internal)
+### `_onCommentDelete(struct Comments.Comment, struct Metadata.MetadataEntry[], struct Metadata.MetadataEntry[], address, bytes32) → bool` (internal)
 
 
 
 
 
-### `onCommentEdit(struct Comments.Comment commentData, struct Comments.MetadataEntry[] metadata, address msgSender, bytes32 commentId) → struct Comments.MetadataEntry[]` (external)
+### `onCommentEdit(struct Comments.Comment commentData, struct Metadata.MetadataEntry[] metadata, address msgSender, bytes32 commentId) → struct Metadata.MetadataEntry[]` (external)
 
 Execute after a comment is edited
 
 
 
 
-### `_onCommentEdit(struct Comments.Comment, struct Comments.MetadataEntry[], address, bytes32) → struct Comments.MetadataEntry[]` (internal)
+### `_onCommentEdit(struct Comments.Comment, struct Metadata.MetadataEntry[], address, bytes32) → struct Metadata.MetadataEntry[]` (internal)
 
 
 
 
 
-### `onChannelUpdate(address channel, uint256 channelId, struct Channels.Channel channelData) → bool` (external)
+### `onChannelUpdate(address channel, uint256 channelId, struct Channels.Channel channelData, struct Metadata.MetadataEntry[] metadata) → bool` (external)
 
 Execute after a channel is updated
 
 
 
 
-### `_onChannelUpdate(address, uint256, struct Channels.Channel) → bool` (internal)
+### `_onChannelUpdate(address, uint256, struct Channels.Channel, struct Metadata.MetadataEntry[]) → bool` (internal)
+
+
+
+
+
+### `onCommentHookDataUpdate(struct Comments.Comment commentData, struct Metadata.MetadataEntry[] metadata, struct Metadata.MetadataEntry[] hookMetadata, address msgSender, bytes32 commentId) → struct Metadata.MetadataEntryOp[]` (external)
+
+Execute to update hook data for an existing comment
+
+
+
+
+### `_onCommentHookDataUpdate(struct Comments.Comment, struct Metadata.MetadataEntry[], struct Metadata.MetadataEntry[], address, bytes32) → struct Metadata.MetadataEntryOp[]` (internal)
 
 
 

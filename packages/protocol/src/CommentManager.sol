@@ -90,6 +90,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     notStale(commentData.deadline)
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
+    replyInSameChannel(commentData.parentId, commentData.channelId)
+    returns (bytes32)
   {
     bytes32 commentId = getCommentId(commentData);
     address app = commentData.app;
@@ -101,7 +103,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       SignatureChecker.isValidSignatureNow(app, commentId, appSignature)
     ) {
       _postComment(commentId, commentData);
-      return;
+      return commentId;
     }
 
     revert InvalidAppSignature();
@@ -118,6 +120,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     notStale(commentData.deadline)
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
+    replyInSameChannel(commentData.parentId, commentData.channelId)
+    returns (bytes32)
   {
     bytes32 commentId = getCommentId(commentData);
     address app = commentData.app;
@@ -140,7 +144,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       )
     ) {
       _postComment(commentId, commentData);
-      return;
+      return commentId;
     }
 
     revert NotAuthorized(msg.sender, commentData.author);
@@ -150,12 +154,19 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     bytes32 commentId,
     Comments.CreateComment calldata commentData
   ) internal {
+    // Collect protocol comment fee, if any.
+    uint96 commentCreationFee = channelManager.getCommentCreationFee();
+    if (commentCreationFee > 0) {
+      channelManager.collectCommentCreationFee{ value: commentCreationFee }();
+    }
+    uint256 remainingValue = msg.value - commentCreationFee;
+
     address author = commentData.author;
     address app = commentData.app;
     uint256 channelId = commentData.channelId;
     bytes32 parentId = commentData.parentId;
     string calldata content = commentData.content;
-    Comments.MetadataEntry[] calldata metadata = commentData.metadata;
+    Metadata.MetadataEntry[] calldata metadata = commentData.metadata;
     string calldata targetUri = commentData.targetUri;
     uint8 commentType = commentData.commentType;
     uint88 timestampNow = uint88(block.timestamp);
@@ -210,11 +221,17 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     if (channel.hook != address(0) && channel.permissions.onCommentAdd) {
       IHook hook = IHook(channel.hook);
       // Calculate hook value after protocol fee
-      uint256 msgValueAfterFee = channelManager
-        .deductProtocolHookTransactionFee(msg.value);
+      uint256 valueToPassToTheHook = channelManager
+        .deductProtocolHookTransactionFee(remainingValue);
+      if (remainingValue > valueToPassToTheHook) {
+        // send the hook transaction fee to the channel manager
+        payable(address(channelManager)).transfer(
+          remainingValue - valueToPassToTheHook
+        );
+      }
 
-      Comments.MetadataEntry[] memory hookMetadata = hook.onCommentAdd{
-        value: msgValueAfterFee
+      Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentAdd{ // forward the remaining sent value to the hook.
+        value: valueToPassToTheHook
       }(comment, metadata, msg.sender, commentId);
 
       // Store hook metadata
@@ -235,6 +252,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
           emit CommentHookMetadataSet(commentId, key, value);
         }
       }
+    }
+    // refund excess payment if any
+    else if (remainingValue > 0) {
+      payable(msg.sender).transfer(remainingValue);
     }
   }
 
@@ -333,7 +354,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Comments.Comment storage comment = comments[commentId];
 
     string calldata content = editData.content;
-    Comments.MetadataEntry[] calldata metadata = editData.metadata;
+    Metadata.MetadataEntry[] calldata metadata = editData.metadata;
     uint88 timestampNow = uint88(block.timestamp);
 
     comment.content = content;
@@ -377,11 +398,16 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       IHook hook = IHook(channel.hook);
 
       // Calculate hook value after protocol fee
-      uint256 msgValueAfterFee = channelManager
+      uint256 valueToPassToHook = channelManager
         .deductProtocolHookTransactionFee(msg.value);
+      if (msg.value > valueToPassToHook) {
+        payable(address(channelManager)).transfer(
+          msg.value - valueToPassToHook
+        );
+      }
 
-      Comments.MetadataEntry[] memory hookMetadata = hook.onCommentEdit{
-        value: msgValueAfterFee
+      Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentEdit{
+        value: valueToPassToHook
       }(comment, metadata, msg.sender, commentId);
 
       // Clear existing hook metadata
@@ -397,6 +423,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
         emit CommentHookMetadataSet(commentId, key, value);
       }
+    } else if (msg.value > 0) {
+      // refund excess payment if any
+      payable(msg.sender).transfer(msg.value);
     }
   }
 
@@ -450,10 +479,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Comments.Comment memory commentToDelete = comment;
 
     // Get metadata for hook
-    Comments.MetadataEntry[] memory metadata = _getCommentMetadataInternal(
+    Metadata.MetadataEntry[] memory metadata = _getCommentMetadataInternal(
       commentId
     );
-    Comments.MetadataEntry[]
+    Metadata.MetadataEntry[]
       memory hookMetadata = _getCommentHookMetadataInternal(commentId);
 
     // Delete the comment and metadata
@@ -490,14 +519,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @return The metadata entries for the comment
   function _getCommentMetadataInternal(
     bytes32 commentId
-  ) internal view returns (Comments.MetadataEntry[] memory) {
+  ) internal view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentMetadataKeys[commentId];
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](
       keys.length
     );
 
     for (uint i = 0; i < keys.length; i++) {
-      metadata[i] = Comments.MetadataEntry({
+      metadata[i] = Metadata.MetadataEntry({
         key: keys[i],
         value: commentMetadata[commentId][keys[i]]
       });
@@ -511,14 +540,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @return The hook metadata entries for the comment
   function _getCommentHookMetadataInternal(
     bytes32 commentId
-  ) internal view returns (Comments.MetadataEntry[] memory) {
+  ) internal view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentHookMetadataKeys[commentId];
-    Comments.MetadataEntry[] memory hookMetadata = new Comments.MetadataEntry[](
+    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
       keys.length
     );
 
     for (uint i = 0; i < keys.length; i++) {
-      hookMetadata[i] = Comments.MetadataEntry({
+      hookMetadata[i] = Metadata.MetadataEntry({
         key: keys[i],
         value: commentHookMetadata[commentId][keys[i]]
       });
@@ -707,7 +736,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @param metadata The metadata array to hash
   /// @return The hash of the metadata array
   function _hashMetadataArray(
-    Comments.MetadataEntry[] memory metadata
+    Metadata.MetadataEntry[] memory metadata
   ) internal pure returns (bytes32) {
     bytes32[] memory hashedEntries = new bytes32[](metadata.length);
 
@@ -740,14 +769,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @inheritdoc ICommentManager
   function getCommentMetadata(
     bytes32 commentId
-  ) external view returns (Comments.MetadataEntry[] memory) {
+  ) external view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentMetadataKeys[commentId];
-    Comments.MetadataEntry[] memory metadata = new Comments.MetadataEntry[](
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](
       keys.length
     );
 
     for (uint i = 0; i < keys.length; i++) {
-      metadata[i] = Comments.MetadataEntry({
+      metadata[i] = Metadata.MetadataEntry({
         key: keys[i],
         value: commentMetadata[commentId][keys[i]]
       });
@@ -759,14 +788,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @inheritdoc ICommentManager
   function getCommentHookMetadata(
     bytes32 commentId
-  ) external view returns (Comments.MetadataEntry[] memory) {
+  ) external view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentHookMetadataKeys[commentId];
-    Comments.MetadataEntry[] memory hookMetadata = new Comments.MetadataEntry[](
+    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
       keys.length
     );
 
     for (uint i = 0; i < keys.length; i++) {
-      hookMetadata[i] = Comments.MetadataEntry({
+      hookMetadata[i] = Metadata.MetadataEntry({
         key: keys[i],
         value: commentHookMetadata[commentId][keys[i]]
       });
@@ -847,6 +876,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     _;
   }
 
+  modifier replyInSameChannel(bytes32 parentId, uint256 channelId) {
+    if (parentId != bytes32(0) && comments[parentId].channelId != channelId) {
+      revert ParentCommentNotInSameChannel();
+    }
+    _;
+  }
+
   modifier onlyParentIdOrTargetUri(
     bytes32 parentId,
     string calldata targetUri
@@ -878,6 +914,116 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     require(msg.sender == author, "Not comment author");
 
     _;
+  }
+
+  /// @inheritdoc ICommentManager
+  function updateCommentHookData(
+    bytes32 commentId
+  ) external commentExists(commentId) {
+    _updateCommentHookData(commentId);
+  }
+
+  /// @notice Internal function to update hook metadata using merge mode for gas efficiency
+  /// @param commentId The unique identifier of the comment to update
+  function _updateCommentHookData(bytes32 commentId) internal {
+    Comments.Comment storage comment = comments[commentId];
+
+    Channels.Channel memory channel = channelManager.getChannel(
+      comment.channelId
+    );
+    if (
+      channel.hook == address(0) || !channel.permissions.onCommentHookDataUpdate
+    ) {
+      revert HookNotEnabled();
+    }
+
+    // Get current metadata for hook
+    Metadata.MetadataEntry[] memory metadata = _getCommentMetadataInternal(
+      commentId
+    );
+    Metadata.MetadataEntry[]
+      memory hookMetadata = _getCommentHookMetadataInternal(commentId);
+
+    IHook hook = IHook(channel.hook);
+
+    Metadata.MetadataEntryOp[] memory operations = hook.onCommentHookDataUpdate(
+      comment,
+      metadata,
+      hookMetadata,
+      msg.sender,
+      commentId
+    );
+
+    // Apply hook metadata operations using merge mode (gas-efficient)
+    _applyHookMetadataOperations(commentId, operations);
+  }
+
+  /// @notice Internal function to apply hook metadata operations efficiently
+  /// @param commentId The unique identifier of the comment
+  /// @param operations The metadata operations to apply
+  function _applyHookMetadataOperations(
+    bytes32 commentId,
+    Metadata.MetadataEntryOp[] memory operations
+  ) internal {
+    for (uint i = 0; i < operations.length; i++) {
+      Metadata.MetadataEntryOp memory op = operations[i];
+
+      if (op.operation == Metadata.MetadataOperation.DELETE) {
+        _deleteCommentHookMetadataKey(commentId, op.key);
+        emit CommentHookMetadataSet(commentId, op.key, ""); // Emit empty value for deletion
+      } else if (op.operation == Metadata.MetadataOperation.SET) {
+        // Check if this is a new key for gas optimization
+        bool isNewKey = !_hookMetadataKeyExists(commentId, op.key);
+
+        commentHookMetadata[commentId][op.key] = op.value;
+
+        // Only add to keys array if it's a new key
+        if (isNewKey) {
+          commentHookMetadataKeys[commentId].push(op.key);
+        }
+
+        emit CommentHookMetadataSet(commentId, op.key, op.value);
+      }
+    }
+  }
+
+  /// @notice Internal function to delete a specific hook metadata key
+  /// @param commentId The unique identifier of the comment
+  /// @param keyToDelete The key to delete
+  function _deleteCommentHookMetadataKey(
+    bytes32 commentId,
+    bytes32 keyToDelete
+  ) internal {
+    // Delete the value
+    delete commentHookMetadata[commentId][keyToDelete];
+
+    // Remove from keys array
+    bytes32[] storage keys = commentHookMetadataKeys[commentId];
+    for (uint i = 0; i < keys.length; i++) {
+      if (keys[i] == keyToDelete) {
+        // Move last element to current position and pop
+        keys[i] = keys[keys.length - 1];
+        keys.pop();
+        break;
+      }
+    }
+  }
+
+  /// @notice Internal function to check if a hook metadata key exists
+  /// @param commentId The unique identifier of the comment
+  /// @param targetKey The key to check for existence
+  /// @return exists Whether the key exists in the metadata
+  function _hookMetadataKeyExists(
+    bytes32 commentId,
+    bytes32 targetKey
+  ) internal view returns (bool exists) {
+    bytes32[] storage keys = commentHookMetadataKeys[commentId];
+    for (uint i = 0; i < keys.length; i++) {
+      if (keys[i] == targetKey) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// @notice Internal function to add an app signer approval

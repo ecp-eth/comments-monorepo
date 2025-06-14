@@ -29,7 +29,7 @@ interface ICommentManager {
     string content,
     string targetUri,
     uint8 commentType,
-    Comments.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata
   );
 
   /// @notice Emitted when metadata is set for a comment
@@ -81,7 +81,7 @@ interface ICommentManager {
     string content,
     string targetUri,
     uint8 commentType,
-    Comments.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata
   );
 
   /// @notice Emitted when an author approves an app signer
@@ -122,24 +122,30 @@ interface ICommentManager {
   error ZeroAddress();
   /// @notice Error thrown when comment does not exist
   error CommentDoesNotExist();
+  /// @notice Error thrown when hook is not enabled for the operation
+  error HookNotEnabled();
+  /// @notice Error thrown when parent comment is not in the same channel
+  error ParentCommentNotInSameChannel();
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata
   /// @param appSignature Signature from the app signer authorizing the comment
+  /// @return commentId The unique identifier of the created comment
   function postComment(
     Comments.CreateComment calldata commentData,
     bytes calldata appSignature
-  ) external payable;
+  ) external payable returns (bytes32 commentId);
 
   /// @notice Posts a comment with both author and app signer signatures
   /// @param commentData The comment data struct containing content and metadata
   /// @param authorSignature Signature from the author authorizing the comment
   /// @param appSignature Signature from the app signer authorizing the comment
+  /// @return commentId The unique identifier of the created comment
   function postCommentWithSig(
     Comments.CreateComment calldata commentData,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) external payable;
+  ) external payable returns (bytes32 commentId);
 
   /// @notice Deletes a comment when called by the author directly
   /// @param commentId The unique identifier of the comment to delete
@@ -180,6 +186,11 @@ interface ICommentManager {
     bytes calldata authorSignature,
     bytes calldata appSignature
   ) external payable;
+
+  /// @notice Updates hook metadata for an existing comment using merge mode (gas-efficient). Anyone can call this function.
+  /// @dev Only updates provided metadata fields without clearing existing ones
+  /// @param commentId The unique identifier of the comment to update
+  function updateCommentHookData(bytes32 commentId) external;
 
   /// @notice Approves an app signer when called directly by the author
   /// @param app The address to approve
@@ -290,14 +301,14 @@ interface ICommentManager {
   /// @return The metadata entries for the comment
   function getCommentMetadata(
     bytes32 commentId
-  ) external view returns (Comments.MetadataEntry[] memory);
+  ) external view returns (Metadata.MetadataEntry[] memory);
 
   /// @notice Get hook metadata for a comment
   /// @param commentId The ID of the comment
   /// @return The hook metadata entries for the comment
   function getCommentHookMetadata(
     bytes32 commentId
-  ) external view returns (Comments.MetadataEntry[] memory);
+  ) external view returns (Metadata.MetadataEntry[] memory);
 
   /// @notice Get a specific metadata value for a comment
   /// @param commentId The ID of the comment

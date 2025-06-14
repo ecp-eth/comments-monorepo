@@ -21,7 +21,7 @@
 
 
 
-- **metadata:** (string) The metadata of the channel. Should be a normalized JSON object, stringified.
+- **metadata:** (struct Metadata.MetadataEntry[]) The metadata of the channel as an array of key-value pairs
 
 
 

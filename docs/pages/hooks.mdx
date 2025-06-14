@@ -6,27 +6,80 @@
 1. Charging a small fee to post a comment
 1. Integrating with other protocols, such as tokens or NFTs
 
-## Available Hook Functions
+## Protocol Fee
+
+When sending ETH value to a hook, a protocol fee is automatically deducted from the value. This fee is used to support the protocol's development and maintenance. The remaining value is passed to the hook. The current protocol fee is set to 2%, but this value is subject to change in the future. Any fee changes will be announced at least 48 hours in advance.
+
+## Available hook Functions
 
 [`onInitialize`](/protocol-reference/interfaces/IHook#onInitialize) - Called when a channel is initialized
 [`onCommentAdd`](/protocol-reference/interfaces/IHook#onCommentAdd) - Called when a comment is added
 [`onCommentEdit`](/protocol-reference/interfaces/IHook#onCommentEdit) - Called when a comment is edited
 [`onCommentDelete`](/protocol-reference/interfaces/IHook#onCommentDelete) - Called when a comment is deleted
 [`onChannelUpdate`](/protocol-reference/interfaces/IHook#onChannelUpdate) - Called when a channel is updated
+[`onCommentHookDataUpdate`](/protocol-reference/interfaces/IHook#onCommentHookDataUpdate) - Called when hook metadata is updated for an existing comment
 
 See [IHook](/protocol-reference/interfaces/IHook) or [BaseHook](/protocol-reference/hooks/BaseHook)
 
-### Discover Community created Hooks
+### Discover community created hooks
 
-[Awesome Hooks](https://github.com/ecp-eth/awesome-hooks) is a collection of hooks that can be used to build on top of ECP.
+[Awesome hooks](https://github.com/ecp-eth/awesome-hooks) is a collection of hooks that can be used to build on top of ECP.
 
-### Modifying the Hook on a Channel
+### Modifying the hook on a channel
 
 ```solidity
 channelManager.setHook(channelId, hookAddress);
 ```
 
-## Writing Your Own Hooks
+### Updating hook metadata
+
+The `updateCommentHookData` function allows you to trigger a hook to update its metadata for an existing comment. This is useful for scenarios where hook metadata needs to be refreshed based on external conditions or time-based changes.
+
+```solidity
+// Trigger hook metadata update for a specific comment
+commentManager.updateCommentHookData(commentId);
+```
+
+**Key Features:**
+
+- **Gas Efficient**: Only updates specified metadata fields using SET and DELETE operations
+- **Explicit Operations**: Hooks return precise operations instead of replacing all metadata
+- **Non-Payable**: No ETH required for metadata updates
+- **Permission-Based**: Only works if the channel's hook has `onCommentHookDataUpdate: true`
+
+**Hook Implementation Example:**
+
+```solidity
+function _onCommentHookDataUpdate(
+  Comments.Comment calldata commentData,
+  Metadata.MetadataEntry[] calldata metadata,
+  Metadata.MetadataEntry[] calldata hookMetadata,
+  address msgSender,
+  bytes32 commentId
+) internal override returns (Comments.MetadataEntryOp[] memory) {
+  Comments.MetadataEntryOp[] memory operations = new Comments.MetadataEntryOp[](
+    2
+  );
+
+  // Update an existing field
+  operations[0] = Comments.MetadataEntryOp({
+    operation: Comments.MetadataOperation.SET,
+    key: "string score",
+    value: abi.encode(calculateNewScore(commentData))
+  });
+
+  // Delete a field
+  operations[1] = Comments.MetadataEntryOp({
+    operation: Comments.MetadataOperation.DELETE,
+    key: "string temp_data",
+    value: "" // Ignored for DELETE operations
+  });
+
+  return operations;
+}
+```
+
+## Writing Your Own hooks
 
 Hooks allow you to customize channel behavior. To create a custom hook:
 
@@ -34,7 +87,7 @@ Hooks allow you to customize channel behavior. To create a custom hook:
 2. Override the desired hook functions
 3. Implement the required permissions
 
-### Basic Hook Example
+### Basic hook example
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -58,7 +111,8 @@ contract MyCustomHook is BaseHook {
         onCommentAdd: true, // Enable comment addition hook
         onCommentEdit: false, // Disable comment editing hook
         onCommentDelete: false, // Disable comment deletion hook
-        onChannelUpdate: false // Disable channel update hook
+        onChannelUpdate: false, // Disable channel update hook
+        onCommentHookDataUpdate: false // Disable comment hook update hook
       });
   }
 
@@ -99,8 +153,13 @@ contract MyCustomHook is BaseHook {
 
    - Validate all inputs in hooks
    - Be cautious with external calls
-   - Consider reentrancy risks
    - Test hooks thoroughly
+   - Consider implementing a ReentrancyGuard in your hook if you want to prevent reentrancy attacks
+
+4. **Fees**
+
+   - Consider refunding any excess fees to the user
+   - use `channelManager.calculateMsgValueWithHookFee` to calculate the correct amount of ETH to send to your hook
 
 ## Troubleshooting
 

@@ -3,11 +3,12 @@
   "private": true,
   "scripts": {
     "check-types": "turbo run check-types",
-    "build": "turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./apps/embed-demo-blog --filter=!./docs --filter=!./packages/protocol --filter=!./examples/channels-and-hooks",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./apps/embed-demo-blog --filter=!./docs --filter=!./packages/protocol --filter=!./examples/channels-and-hooks --filter=!./apps/nft-base-uri-server",
     "build:dev": "turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./apps/embed-demo-blog --filter=!./docs",
     "build:indexer": "turbo build --filter=./apps/indexer...",
     "dev": "turbo dev --filter=./apps/demo... --filter=./apps/indexer --filter=./packages/protocol --filter=./packages/test-protocol",
     "dev:indexer": "turbo dev --filter=./apps/indexer... --filter=./packages/protocol",
+    "dev:nft-base-uri-server": "turbo dev --filter=./apps/nft-base-uri-server... --filter=./packages/protocol",
     "dev:embed": "turbo dev --filter=./apps/embed... --filter=./apps/embed-demo-blog --filter=./apps/indexer --filter=./packages/protocol",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{js,ts,tsx,sol}\"",
@@ -44,7 +45,8 @@
     },
     "patchedDependencies": {
       "@privy-io/server-auth": "patches/@privy-io__server-auth.patch",
-      "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch"
+      "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch",
+      "@wagmi/connectors": "patches/@wagmi__connectors.patch"
     }
   },
   "lint-staged": {

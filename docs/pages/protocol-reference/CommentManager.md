@@ -31,6 +31,12 @@ Implements EIP-712 for typed structured data hashing and signing
 
 
 
+### `replyInSameChannel(bytes32 parentId, uint256 channelId)`
+
+
+
+
+
 ### `onlyParentIdOrTargetUri(bytes32 parentId, string targetUri)`
 
 
@@ -62,14 +68,14 @@ Constructor initializes the contract with the deployer as owner and channel mana
 Sets up EIP-712 domain separator
 
 
-### `postComment(struct Comments.CreateComment commentData, bytes appSignature)` (external)
+### `postComment(struct Comments.CreateComment commentData, bytes appSignature) → bytes32` (external)
 
 Posts a comment directly from the author's address
 
 
 
 
-### `postCommentWithSig(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature)` (external)
+### `postCommentWithSig(struct Comments.CreateComment commentData, bytes authorSignature, bytes appSignature) → bytes32` (external)
 
 Posts a comment with both author and app signer signatures
 
@@ -124,14 +130,14 @@ Internal function to handle comment deletion logic
 
 
 
-### `_getCommentMetadataInternal(bytes32 commentId) → struct Comments.MetadataEntry[]` (internal)
+### `_getCommentMetadataInternal(bytes32 commentId) → struct Metadata.MetadataEntry[]` (internal)
 
 Internal function to get metadata for a comment
 
 
 
 
-### `_getCommentHookMetadataInternal(bytes32 commentId) → struct Comments.MetadataEntry[]` (internal)
+### `_getCommentHookMetadataInternal(bytes32 commentId) → struct Metadata.MetadataEntry[]` (internal)
 
 Internal function to get hook metadata for a comment
 
@@ -215,7 +221,7 @@ Calculates the EIP-712 hash for a comment
 
 
 
-### `_hashMetadataArray(struct Comments.MetadataEntry[] metadata) → bytes32` (internal)
+### `_hashMetadataArray(struct Metadata.MetadataEntry[] metadata) → bytes32` (internal)
 
 Internal function to hash metadata array for EIP-712
 
@@ -236,14 +242,14 @@ Get a comment by its ID
 
 
 
-### `getCommentMetadata(bytes32 commentId) → struct Comments.MetadataEntry[]` (external)
+### `getCommentMetadata(bytes32 commentId) → struct Metadata.MetadataEntry[]` (external)
 
 Get metadata for a comment
 
 
 
 
-### `getCommentHookMetadata(bytes32 commentId) → struct Comments.MetadataEntry[]` (external)
+### `getCommentHookMetadata(bytes32 commentId) → struct Metadata.MetadataEntry[]` (external)
 
 Get hook metadata for a comment
 
@@ -295,6 +301,42 @@ Get the nonce for an author and app
 ### `isDeleted(bytes32 commentId) → bool` (external)
 
 Get the deleted status for a comment
+
+
+
+
+### `updateCommentHookData(bytes32 commentId)` (external)
+
+Updates hook metadata for an existing comment using merge mode (gas-efficient). Anyone can call this function.
+
+
+Only updates provided metadata fields without clearing existing ones
+
+
+### `_updateCommentHookData(bytes32 commentId)` (internal)
+
+Internal function to update hook metadata using merge mode for gas efficiency
+
+
+
+
+### `_applyHookMetadataOperations(bytes32 commentId, struct Metadata.MetadataEntryOp[] operations)` (internal)
+
+Internal function to apply hook metadata operations efficiently
+
+
+
+
+### `_deleteCommentHookMetadataKey(bytes32 commentId, bytes32 keyToDelete)` (internal)
+
+Internal function to delete a specific hook metadata key
+
+
+
+
+### `_hookMetadataKeyExists(bytes32 commentId, bytes32 targetKey) → bool exists` (internal)
+
+Internal function to check if a hook metadata key exists
 
 
 

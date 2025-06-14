@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../libraries/Hooks.sol";
 import "../libraries/Comments.sol";
 import "../libraries/Channels.sol";
+import "../libraries/Metadata.sol";
 
 interface IHook is IERC165 {
   function getHookPermissions()
@@ -30,10 +31,10 @@ interface IHook is IERC165 {
   /// @return hookMetadata The hook metadata entries that were generated
   function onCommentAdd(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata metadata,
     address msgSender,
     bytes32 commentId
-  ) external payable returns (Comments.MetadataEntry[] memory hookMetadata);
+  ) external payable returns (Metadata.MetadataEntry[] memory hookMetadata);
 
   /// @notice Execute after a comment is deleted
   /// @param commentData The comment data that was deleted
@@ -44,8 +45,8 @@ interface IHook is IERC165 {
   /// @return success Whether the hook execution was successful
   function onCommentDelete(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata metadata,
-    Comments.MetadataEntry[] calldata hookMetadata,
+    Metadata.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata hookMetadata,
     address msgSender,
     bytes32 commentId
   ) external payable returns (bool success);
@@ -58,10 +59,10 @@ interface IHook is IERC165 {
   /// @return hookMetadata The hook metadata entries that were generated
   function onCommentEdit(
     Comments.Comment calldata commentData,
-    Comments.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata metadata,
     address msgSender,
     bytes32 commentId
-  ) external payable returns (Comments.MetadataEntry[] memory hookMetadata);
+  ) external payable returns (Metadata.MetadataEntry[] memory hookMetadata);
 
   /// @notice Execute after a channel is updated
   /// @param channel The address of the channel that was updated
@@ -71,6 +72,22 @@ interface IHook is IERC165 {
   function onChannelUpdate(
     address channel,
     uint256 channelId,
-    Channels.Channel calldata channelData
+    Channels.Channel calldata channelData,
+    Metadata.MetadataEntry[] calldata metadata
   ) external returns (bool success);
+
+  /// @notice Execute to update hook data for an existing comment
+  /// @param commentData The comment data to update
+  /// @param metadata The current metadata entries for the comment
+  /// @param hookMetadata The current hook metadata entries for the comment
+  /// @param msgSender The original msg.sender that initiated the transaction
+  /// @param commentId The unique identifier of the comment to update
+  /// @return operations The explicit metadata operations to perform (SET or DELETE)
+  function onCommentHookDataUpdate(
+    Comments.Comment calldata commentData,
+    Metadata.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata hookMetadata,
+    address msgSender,
+    bytes32 commentId
+  ) external returns (Metadata.MetadataEntryOp[] memory operations);
 }
