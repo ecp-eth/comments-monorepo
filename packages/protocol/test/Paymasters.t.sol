@@ -184,13 +184,6 @@ contract PaymastersTest is Test, IERC721Receiver {
     (uint8 v, bytes32 r, bytes32 s) = vm.sign(user1PrivateKey, userOpHash);
     userOp.signature = abi.encodePacked(r, s, v);
 
-    channelManager.getChannelId(
-      address(user1Account),
-      name,
-      description,
-      metadata
-    );
-
     vm.recordLogs();
 
     // Pack the user operation into an array
@@ -213,9 +206,13 @@ contract PaymastersTest is Test, IERC721Receiver {
 
       if (
         logEntry.topics[0] ==
-        keccak256("ChannelCreated(uint256,string,string,(bytes32,bytes)[])")
+        keccak256(
+          "ChannelCreated(uint256,string,string,(bytes32,bytes)[],address)"
+        )
       ) {
+        // The channel ID is in the first topic after the event signature
         foundCreatedChannelId = uint256(logEntry.topics[1]);
+        break;
       }
     }
 

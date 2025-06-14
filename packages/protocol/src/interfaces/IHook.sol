@@ -72,7 +72,8 @@ interface IHook is IERC165 {
   function onChannelUpdate(
     address channel,
     uint256 channelId,
-    Channels.Channel calldata channelData
+    Channels.Channel calldata channelData,
+    Metadata.MetadataEntry[] calldata metadata
   ) external returns (bool success);
 
   /// @notice Execute to update hook data for an existing comment

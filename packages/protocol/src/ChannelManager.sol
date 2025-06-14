@@ -61,13 +61,18 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     return channels[channelId];
   }
 
-  /// @inheritdoc IChannelManager
-  function getChannelId(
+  /// @notice Calculates a unique hash for a channel
+  /// @param creator The address of the channel creator
+  /// @param name The name of the channel
+  /// @param description The description of the channel
+  /// @param metadata The channel metadata entries
+  /// @return bytes32 The computed hash
+  function _getChannelId(
     address creator,
     string memory name,
     string memory description,
     Metadata.MetadataEntry[] memory metadata
-  ) public pure returns (uint256) {
+  ) internal view returns (uint256) {
     return
       uint256(
         keccak256(
@@ -75,7 +80,9 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
             creator,
             keccak256(bytes(name)),
             keccak256(bytes(description)),
-            _hashMetadataArray(metadata)
+            _hashMetadataArray(metadata),
+            block.timestamp,
+            block.chainid
           )
         )
       );
@@ -121,7 +128,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     _collectChannelCreationFee();
 
     // Generate channel ID using the internal function
-    channelId = getChannelId(msg.sender, name, description, metadata);
+    channelId = _getChannelId(msg.sender, name, description, metadata);
 
     // Ensure channel ID doesn't already exist
     if (_channelExists(channelId)) revert ChannelAlreadyExists();
@@ -134,7 +141,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     channel.description = description;
     channel.metadata = metadata;
 
-    emit ChannelCreated(channelId, name, description, metadata);
+    emit ChannelCreated(channelId, name, description, metadata, hook);
 
     // Add hook if provided
     if (hook != address(0)) {
@@ -167,7 +174,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
       Hooks.Permissions memory permissions = hook.getHookPermissions();
 
       if (permissions.onChannelUpdate) {
-        hook.onChannelUpdate(address(this), channelId, channel);
+        hook.onChannelUpdate(address(this), channelId, channel, metadata);
       }
     }
   }
@@ -275,7 +282,12 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
       Hooks.Permissions memory permissions = hook.getHookPermissions();
 
       if (permissions.onChannelUpdate) {
-        hook.onChannelUpdate(address(this), channelId, channel);
+        hook.onChannelUpdate(
+          address(this),
+          channelId,
+          channel,
+          getChannelMetadata(channelId)
+        );
       }
     }
   }
@@ -322,7 +334,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   /// @inheritdoc IChannelManager
   function getChannelMetadata(
     uint256 channelId
-  ) external view returns (Metadata.MetadataEntry[] memory) {
+  ) public view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = channelMetadataKeys[channelId];
     Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](
       keys.length

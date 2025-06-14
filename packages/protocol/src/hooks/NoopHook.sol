@@ -74,7 +74,8 @@ contract NoopHook is IHook {
   function onChannelUpdate(
     address,
     uint256,
-    Channels.Channel calldata
+    Channels.Channel calldata,
+    Metadata.MetadataEntry[] calldata
   ) external pure override returns (bool) {
     return true;
   }

@@ -35,7 +35,8 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
     uint256 indexed channelId,
     string name,
     string description,
-    Metadata.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata,
+    address hook
   );
 
   /// @notice Emitted when a channel's configuration is updated
@@ -90,19 +91,6 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   function getChannel(
     uint256 channelId
   ) external view returns (Channels.Channel memory);
-
-  /// @notice Calculates a unique hash for a channel
-  /// @param creator The address of the channel creator
-  /// @param name The name of the channel
-  /// @param description The description of the channel
-  /// @param metadata The channel metadata entries
-  /// @return bytes32 The computed hash
-  function getChannelId(
-    address creator,
-    string calldata name,
-    string calldata description,
-    Metadata.MetadataEntry[] calldata metadata
-  ) external view returns (uint256);
 
   /// @notice Updates an existing channel's configuration
   /// @param channelId The unique identifier of the channel

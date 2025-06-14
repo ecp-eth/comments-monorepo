@@ -147,15 +147,17 @@ abstract contract BaseHook is IHook, ERC165 {
   function onChannelUpdate(
     address channel,
     uint256 channelId,
-    Channels.Channel calldata channelData
+    Channels.Channel calldata channelData,
+    Metadata.MetadataEntry[] calldata metadata
   ) external virtual returns (bool) {
-    return _onChannelUpdate(channel, channelId, channelData);
+    return _onChannelUpdate(channel, channelId, channelData, metadata);
   }
 
   function _onChannelUpdate(
     address,
     uint256,
-    Channels.Channel calldata
+    Channels.Channel calldata,
+    Metadata.MetadataEntry[] calldata
   ) internal virtual returns (bool) {
     revert HookNotImplemented();
   }
