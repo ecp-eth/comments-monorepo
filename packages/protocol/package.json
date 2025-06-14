@@ -14,7 +14,7 @@
     "deploy:dev": "forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"dev\" --rpc-url http://localhost:8545 --broadcast --force",
     "deploy:dev:simulation": "SIM=true forge script script/deploy.s.sol --sig \"run(string)\" \"dev\" --rpc-url http://localhost:8545 --force",
     "//": "To deploy on prod, update PROD_RPC_URL in `.env`  to https://<CHAIN>.g.alchemy.com/v2/<APIKEY>",
-    "deploy:prod": "dotenv -c .local -- bash -c 'forge script script/deploy.s.sol:DeployScript --sig \"run(string)\" \"prod\" --rpc-url $PROD_RPC_URL --broadcast'",
+    "deploy:prod": "dotenv -c .local -- bash -c 'forge script script/deploy.s.sol:DeployScript --ffi --sig \"run(string)\" \"prod\" --rpc-url $PROD_RPC_URL --broadcast'",
     "deploy:prod:simulation": "SIM=true PROD_DEPLOYER_ADDRESS=0xD1177f978A5535eBa843bDd817E730DF1c42c476 forge script script/deploy.s.sol --sig \"run(string)\" \"prod\" --rpc-url http://localhost:8545 --force"
   },
   "dependencies": {
