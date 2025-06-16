@@ -47,7 +47,7 @@
   "devDependencies": {
     "@ecp.eth/build-tools": "workspace:^",
     "@ecp.eth/indexer": "workspace:*",
-    "@ecp.eth/solidity-docgen": "~0.5.19",
+    "@ecp.eth/solidity-docgen": "~0.5.20",
     "@hono/zod-openapi": "^0.18.4",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

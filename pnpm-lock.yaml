@@ -734,8 +734,8 @@ importers:
         specifier: workspace:*
         version: link:../apps/indexer
       '@ecp.eth/solidity-docgen':
-        specifier: ~0.5.19
-        version: 0.5.19(@types/node@22.15.29)(typescript@5.8.3)
+        specifier: ~0.5.20
+        version: 0.5.20(@types/node@22.15.29)(typescript@5.8.3)
       '@hono/zod-openapi':
         specifier: ^0.18.4
         version: 0.18.4(hono@4.7.11)(zod@3.24.4)
@@ -1644,8 +1644,8 @@ packages:
     peerDependencies:
       '@noble/ciphers': ^1.0.0
 
-  '@ecp.eth/solidity-docgen@0.5.19':
-    resolution: {integrity: sha512-6jfhI0cHNQ/PALgnN3snO0VMOBMmiIWsxnU0QaLc62U8u+e7hLyEe0b3sLA9UqX+tFxF/JVR+TGpTY+Ljds34w==}
+  '@ecp.eth/solidity-docgen@0.5.20':
+    resolution: {integrity: sha512-/tEnekZclTg2Ffw48JMJNmD3CTmGNwsSyCB4EmbLyC08ST7BvdfQu58ZE+DiO2BgwljonJGvcQwz8P+eKPrg+A==}
     hasBin: true
 
   '@egjs/hammerjs@2.0.17':
@@ -10943,6 +10943,9 @@ packages:
     engines: {node: '>=12.0.0'}
     hasBin: true
 
+  solidity-ast@0.4.60:
+    resolution: {integrity: sha512-UwhasmQ37ji1ul8cIp0XlrQ/+SVQhy09gGqJH4jnwdo2TgI6YIByzi0PI5QvIGcIdFOs1pbSmJW1pnWB7AVh2w==}
+
   sonic-boom@2.8.0:
     resolution: {integrity: sha512-kuonw1YOYYNOve5iHdSahXPOK49GqwA+LZhI6Wz/l0rP57iKyXXIHaRagOBHAPmGwJC6od2Z9zgvZ5loSgMlVg==}
 
@@ -13255,7 +13258,7 @@ snapshots:
     dependencies:
       '@noble/ciphers': 1.3.0
 
-  '@ecp.eth/solidity-docgen@0.5.19(@types/node@22.15.29)(typescript@5.8.3)':
+  '@ecp.eth/solidity-docgen@0.5.20(@types/node@22.15.29)(typescript@5.8.3)':
     dependencies:
       '@oclif/command': 1.8.36(@oclif/config@1.18.17)
       '@oclif/config': 1.18.17
@@ -13270,6 +13273,7 @@ snapshots:
       never: 1.1.0
       semver: 7.7.2
       solc: 0.6.12
+      solidity-ast: 0.4.60
     transitivePeerDependencies:
       - '@swc/core'
       - '@swc/wasm'
@@ -25340,6 +25344,8 @@ snapshots:
       tmp: 0.0.33
     transitivePeerDependencies:
       - debug
+
+  solidity-ast@0.4.60: {}
 
   sonic-boom@2.8.0:
     dependencies:
