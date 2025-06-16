@@ -54,6 +54,18 @@ export type IndexerAPICommentModerationStatusSchemaType = z.infer<
   typeof IndexerAPICommentModerationStatusSchema
 >;
 
+export const IndexerAPICommentListModeSchema = z.enum(["nested", "flat"]);
+
+export type IndexerAPICommentListModeSchemaType = z.infer<
+  typeof IndexerAPICommentListModeSchema
+>;
+
+export const IndexerAPICommentListSortSchema = z.enum(["asc", "desc"]);
+
+export type IndexerAPICommentListSortSchemaType = z.infer<
+  typeof IndexerAPICommentListSortSchema
+>;
+
 export const IndexerAPIZeroExTokenAmountSchema = z.coerce
   .string()
   .regex(/^\d+(\.\d+)?$/, {

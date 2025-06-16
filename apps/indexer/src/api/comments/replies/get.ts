@@ -1,6 +1,6 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { and, asc, desc, eq, gt, lt, or, isNull } from "ponder";
+import { and, asc, desc, eq, gt, lt, or, isNull, inArray } from "ponder";
 import { IndexerAPIListCommentRepliesOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../../lib/response-formatters";
@@ -11,6 +11,7 @@ import {
 } from "../../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../../lib/constants";
 import { env } from "../../../env";
+import { normalizeModerationStatusFilter } from "../helpers";
 
 const getCommentsRoute = createRoute({
   method: "get",
@@ -43,8 +44,17 @@ const getCommentsRoute = createRoute({
 });
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
-    const { app, sort, limit, cursor, mode, viewer, channelId, commentType } =
-      c.req.valid("query");
+    const {
+      app,
+      sort,
+      limit,
+      cursor,
+      mode,
+      viewer,
+      channelId,
+      commentType,
+      moderationStatus,
+    } = c.req.valid("query");
     const { commentId } = c.req.valid("param");
 
     const sharedConditions = [
@@ -77,7 +87,14 @@ export default (app: OpenAPIHono) => {
       sharedConditions.push(eq(schema.comment.parentId, commentId));
     }
 
-    if (env.MODERATION_ENABLED) {
+    const moderationStatusFilter =
+      normalizeModerationStatusFilter(moderationStatus);
+
+    if (moderationStatusFilter.length > 0) {
+      sharedConditions.push(
+        inArray(schema.comment.moderationStatus, moderationStatusFilter),
+      );
+    } else if (env.MODERATION_ENABLED) {
       const onlyApproved = eq(schema.comment.moderationStatus, "approved");
 
       if (viewer) {

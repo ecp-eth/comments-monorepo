@@ -64,6 +64,24 @@ paths:
           name: commentType
           in: query
         - schema:
+            anyOf:
+              - type: string
+                enum: &ref_0
+                  - approved
+                  - rejected
+                  - pending
+              - type: array
+                items:
+                  type: string
+                  enum: *ref_0
+            description: >-
+              The moderation status of the comments to return. If omitted it
+              will return comments based on moderation settings (approved if
+              moderation is enabled).
+          required: false
+          name: moderationStatus
+          in: query
+        - schema:
             type: integer
             minimum: 1
             maximum: 100
@@ -194,10 +212,7 @@ paths:
                         cursor: {}
                         moderationStatus:
                           type: string
-                          enum: &ref_0
-                            - approved
-                            - rejected
-                            - pending
+                          enum: *ref_0
                         moderationStatusChangedAt:
                           type:
                             - string
@@ -537,6 +552,21 @@ paths:
             description: The comment type (e.g. 0=comment, 1=reaction)
           required: false
           name: commentType
+          in: query
+        - schema:
+            anyOf:
+              - type: string
+                enum: *ref_0
+              - type: array
+                items:
+                  type: string
+                  enum: *ref_0
+            description: >-
+              The moderation status of the comments to return. If omitted it
+              will return comments based on moderation settings (approved if
+              moderation is enabled).
+          required: false
+          name: moderationStatus
           in: query
         - schema:
             type: integer

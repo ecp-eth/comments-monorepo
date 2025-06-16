@@ -1,6 +1,6 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { and, asc, desc, eq, gt, isNull, lt, or } from "ponder";
+import { and, asc, desc, eq, gt, inArray, isNull, lt, or } from "ponder";
 import { IndexerAPIListCommentsOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response-formatters";
@@ -8,6 +8,7 @@ import { GetCommentsQuerySchema } from "../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../lib/constants";
 import { env } from "../../env";
 import type { SQL } from "drizzle-orm";
+import { normalizeModerationStatusFilter } from "./helpers";
 
 const getCommentsRoute = createRoute({
   method: "get",
@@ -48,6 +49,7 @@ export default (app: OpenAPIHono) => {
       mode,
       channelId,
       commentType,
+      moderationStatus,
     } = c.req.valid("query");
 
     const sharedConditions = [
@@ -62,8 +64,18 @@ export default (app: OpenAPIHono) => {
     ];
 
     const repliesConditions: (SQL<unknown> | undefined)[] = [];
+    const moderationStatusFilter =
+      normalizeModerationStatusFilter(moderationStatus);
 
-    if (env.MODERATION_ENABLED) {
+    // if we want to filter by moderation status then it doesn't matter who the viewer is
+    if (moderationStatusFilter.length > 0) {
+      sharedConditions.push(
+        inArray(schema.comment.moderationStatus, moderationStatusFilter),
+      );
+      repliesConditions.push(
+        inArray(schema.comment.moderationStatus, moderationStatusFilter),
+      );
+    } else if (env.MODERATION_ENABLED) {
       const approvedComments = eq(schema.comment.moderationStatus, "approved");
 
       if (viewer) {

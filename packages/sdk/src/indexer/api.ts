@@ -7,6 +7,12 @@ import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
   IndexerAPIAuthorDataSchema,
+  IndexerAPICommentModerationStatusSchema,
+  type IndexerAPICommentModerationStatusSchemaType,
+  type IndexerAPICommentListModeSchemaType,
+  IndexerAPICommentListModeSchema,
+  type IndexerAPICommentListSortSchemaType,
+  IndexerAPICommentListSortSchema,
 } from "./schemas.js";
 import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
@@ -46,6 +52,17 @@ export type FetchCommentsOptions = {
    */
   commentType?: number;
   /**
+   * Filter comments by moderation status.
+   *
+   * By default API returns only approved comments if moderation is enabled for all comments except
+   * when the viewer is provided, for viewer it returns all comments regardless of status.
+   *
+   * If moderation is disabled, this parameter is ignored.
+   */
+  moderationStatus?:
+    | IndexerAPICommentModerationStatusSchemaType
+    | IndexerAPICommentModerationStatusSchemaType[];
+  /**
    * Number of times to retry the signing operation in case of failure.
    *
    * @default 3
@@ -60,14 +77,14 @@ export type FetchCommentsOptions = {
    *
    * @default "desc"
    */
-  sort?: "asc" | "desc";
+  sort?: IndexerAPICommentListSortSchemaType;
   /**
    * The mode to fetch comments in by default it returns only the first level of comments.
    * If flat is used it will return all comments sorted by timestamp in descending order.
    *
    * @default "nested"
    */
-  mode?: "nested" | "flat";
+  mode?: IndexerAPICommentListModeSchemaType;
   /**
    * The number of comments to fetch
    *
@@ -84,12 +101,15 @@ const FetchCommentsOptionsSchema = z.object({
   app: HexSchema.optional(),
   channelId: z.coerce.bigint().optional(),
   commentType: z.number().int().min(0).max(255).optional(),
+  moderationStatus: IndexerAPICommentModerationStatusSchema.or(
+    z.array(IndexerAPICommentModerationStatusSchema),
+  ).optional(),
   retries: z.number().int().positive().default(3),
-  sort: z.enum(["asc", "desc"]).default("desc"),
+  sort: IndexerAPICommentListSortSchema.default("desc"),
   cursor: HexSchema.optional(),
   limit: z.number().int().positive().default(50),
   signal: z.instanceof(AbortSignal).optional(),
-  mode: z.enum(["nested", "flat"]).optional(),
+  mode: IndexerAPICommentListModeSchema.optional(),
   viewer: HexSchema.optional(),
 });
 
@@ -115,6 +135,7 @@ export async function fetchComments(
     mode,
     channelId,
     commentType,
+    moderationStatus,
   } = FetchCommentsOptionsSchema.parse(options);
 
   const fetchCommentsTask = Effect.tryPromise(async (signal) => {
@@ -153,6 +174,12 @@ export async function fetchComments(
 
     if (commentType) {
       url.searchParams.set("commentType", commentType.toString());
+    }
+
+    if (typeof moderationStatus === "string") {
+      url.searchParams.set("moderationStatus", moderationStatus);
+    } else if (Array.isArray(moderationStatus) && moderationStatus.length > 0) {
+      url.searchParams.set("moderationStatus", moderationStatus.join(","));
     }
 
     const response = await fetch(url.toString(), {
@@ -215,18 +242,29 @@ export type FetchCommentRepliesOptions = {
   /**
    * @default "desc"
    */
-  sort?: "asc" | "desc";
+  sort?: IndexerAPICommentListSortSchemaType;
   /**
    * The mode to fetch replies in by default it returns only the first level of replies.
    * If flat is used it will return all replies sorted by timestamp in descending order.
    *
    * @default "nested"
    */
-  mode?: "nested" | "flat";
+  mode?: IndexerAPICommentListModeSchemaType;
   /**
    * Filter replies by comment type
    */
   commentType?: number;
+  /**
+   * Filter replies by moderation status.
+   *
+   * By default API returns only approved comments if moderation is enabled for all comments except
+   * when the viewer is provided, for viewer it returns all comments regardless of status.
+   *
+   * If moderation is disabled, this parameter is ignored.
+   */
+  moderationStatus?:
+    | IndexerAPICommentModerationStatusSchemaType
+    | IndexerAPICommentModerationStatusSchemaType[];
   /**
    * Filter replies by channel ID
    */
@@ -247,10 +285,13 @@ const FetchCommentRepliesOptionSchema = z.object({
   viewer: HexSchema.optional(),
   limit: z.number().int().positive().default(50),
   signal: z.instanceof(AbortSignal).optional(),
-  sort: z.enum(["asc", "desc"]).default("desc"),
-  mode: z.enum(["nested", "flat"]).optional(),
+  sort: IndexerAPICommentListSortSchema.default("desc"),
+  mode: IndexerAPICommentListModeSchema.optional(),
   commentType: z.number().int().min(0).max(255).optional(),
   channelId: z.coerce.bigint().optional(),
+  moderationStatus: IndexerAPICommentModerationStatusSchema.or(
+    z.array(IndexerAPICommentModerationStatusSchema),
+  ).optional(),
 });
 
 /**
@@ -274,6 +315,7 @@ export async function fetchCommentReplies(
     mode,
     commentType,
     channelId,
+    moderationStatus,
   } = FetchCommentRepliesOptionSchema.parse(options);
 
   const fetchRepliesTask = Effect.tryPromise(async (signal) => {
@@ -304,6 +346,12 @@ export async function fetchCommentReplies(
 
     if (commentType) {
       url.searchParams.set("commentType", commentType.toString());
+    }
+
+    if (typeof moderationStatus === "string") {
+      url.searchParams.set("moderationStatus", moderationStatus);
+    } else if (Array.isArray(moderationStatus) && moderationStatus.length > 0) {
+      url.searchParams.set("moderationStatus", moderationStatus.join(","));
     }
 
     const response = await fetch(url.toString(), {
