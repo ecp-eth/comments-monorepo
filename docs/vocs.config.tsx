@@ -138,6 +138,15 @@ export default defineConfig({
       ],
     },
     {
+      text: "Guides",
+      items: [
+        {
+          text: "Next.js Demo",
+          link: "/guides/nextjs-demo",
+        },
+      ],
+    },
+    {
       text: "Boilerplates",
       items: [
         {

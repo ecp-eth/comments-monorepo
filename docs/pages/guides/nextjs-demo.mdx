@@ -1,0 +1,160 @@
+# Guides
+
+## Next.js Demo
+
+### Post the comment as the author
+
+In this section, we will walk through the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of posting a comment as the author.
+
+The ECP supports 4 types of comment posting flows, each with its pros and cons.
+
+Here we will discuss [the simplest flow](/post-comment-flows#1-author-pays-gas):
+
+- The author posts and pays for gas, see ["author pays for the gas"](/post-comment-flows#1-author-pays-gas).
+- The app server authorizes the post by signing the comment data.
+
+You may want to read more about the [post comment flows](/post-comment-flows) for more details.
+
+#### The Contract
+
+- For the latest contract address, see [COMMENT_MANAGER_ADDRESS](/sdk-reference/defaultExports/variables/COMMENT_MANAGER_ADDRESS).
+- We will call [`postComment()`](/protocol-reference/CommentManager#postcommentstruct-commentscommentdata-commentdata-bytes-appsignature-external) method to post the comment.
+
+#### Demo Dependencies
+
+Here is a quick run-down of some of the dependencies used in the demo app:
+
+1. `@ecp.eth/sdk` - for comment data creation, retrieving, and interaction with the indexer.
+1. `wagmi` - for react based wallet connection
+1. `viem` - for contract interaction
+1. `@rainbow-me/rainbowkit` - for wallet connection UI
+1. `@tanstack/react-query` - for data fetching and caching
+
+#### Test environment
+
+- We use [Anvil](https://book.getfoundry.sh/anvil/) for local testing and development, follow the steps in [Test with Anvil](/test-with-anvil) to set up the environment.
+- You may want to set up an indexer locally as well, see [Indexer](/indexer-reference/) for more details.
+
+Now let's go through the steps to post a comment!
+
+::::steps
+
+##### Collect the comment data and send it to the server for signing
+
+We will start by collecting the [comment data](/comment-data-props) and send it to the server for signing:
+
+The comment data is sent to the server for signing:
+
+```typescript
+const response = await fetch("/api/sign-comment", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    content,
+    targetUri: window.location.href,
+    parentId,
+    author: address,
+    chainId,
+  }),
+});
+```
+
+🧑‍💻 _[/apps/demo/src/components/comments/CommentBox.tsx#L62](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/CommentBox.tsx#L62)_
+
+##### The App Server signs the comment data
+
+Once the data reaches the app server, it creates a `CommentData` using `createCommentData` from `@ecp.eth/sdk`:
+
+```typescript
+const commentData = createCommentData({
+  content,
+  targetUri,
+  parentId,
+  author,
+  app: app.address,
+});
+```
+
+See [`Comment Data`](/comment-data-props) for more details on the properties of the comment data.
+
+Create a typed data structure from `commentData` according to EIP-712:
+
+```typescript
+const typedCommentData = createCommentTypedData({
+  commentData,
+  chainId: chain.id,
+});
+```
+
+Finally, sign the typed data using the app signer's private key and return both `signature` and `commentData`:
+
+```typescript
+const signature = await app.signTypedData(typedCommentData);
+
+return {
+  signature,
+  commentData,
+};
+```
+
+🧑‍💻 _[/apps/demo/src/app/api/sign-comment/route.ts#L48-L61](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/route.ts#L48-L61)_
+
+**Note**:
+
+- Do not expose the app signer's private key on the client side.
+  In the demo, we store the private key in the environment variable `APP_SIGNER_PRIVATE_KEY`.
+  Next.js ensures that the environment variable without `NEXT_PUBLIC_` prefix is only available on the server side.
+
+Now that we have finished server-side signing, let's move on to the client side.
+
+#### The Author signs and sends the transaction
+
+In the demo, we use a combination of `wagmi` and `rainbowkit` to connect the user wallet and send the transaction to the contract.
+You can find out how it was set up in the `providers` component:
+
+```tsx
+<QueryClientProvider client={queryClient}>
+  <WagmiProvider config={config}>
+    <RainbowKitProvider>{children}</RainbowKitProvider>
+  </WagmiProvider>
+</QueryClientProvider>
+```
+
+🧑‍💻 _[/apps/demo/src/app/providers.tsx#L16-L20](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/providers.tsx#L16-L20)_
+
+Now with the wagmi ready to go, and the comment data and app signature returned from the server, we can now post the comment to the contract:
+
+```typescript
+await writeContractAsync({
+  abi: CommentManagerABI,
+  address: COMMENT_MANAGER_ADDRESS,
+  functionName: "postComment",
+  args: [commentData, appSignature],
+});
+```
+
+🧑‍💻 _[/apps/demo/src/lib/contract.ts#L40-L45](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/lib/contract.ts#L40-L45)_
+
+##### Congratulations! You've completed the tutorial!
+
+::::
+
+### Best Practices
+
+1. Implement proper error handling
+1. Monitor gas costs and adjust gas limits accordingly
+1. Consider implementing retry mechanisms for failed transactions
+1. Keep private keys secure and never expose them in client-side code
+1. While the contract doesn't impose rate limits, consider implementing application-level rate limiting to prevent spam and manage gas costs effectively.
+1. Consider anti-spam measures
+
+### Additional Resources
+
+- Check out **gasless** [post comment flows](/post-comment-flows)
+- See [Protocol API Reference](/protocol-reference/CommentManager) for more functions and details.
+- See [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) for implementations of:
+  1. The other post comment flows.
+  2. Request permission from the user for gasless posting.
+  3. Deleting comments.

@@ -2,159 +2,201 @@
 
 ## Contract Interaction
 
-### Post the comment as the author
+### Protocol Integration Guide
 
-In this section, we will walk through the code from the [demo app](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) to illustrate the process of posting a comment as the author.
+This guide explains how to integrate the ECP protocol into your own smart contracts. The protocol consists of two main contracts:
 
-The ECP supports 4 types of comment posting flows, each with its pros and cons.
+1. `CommentManager` - Handles comment creation, editing, and deletion
+2. `ChannelManager` - Manages comment channels and their associated hooks
 
-Here we will discuss [the simplest flow](/post-comment-flows#1-author-pays-gas):
+### Core Concepts
 
-- The author posts and pays for gas, see ["author pays for the gas"](/post-comment-flows#1-author-pays-gas).
-- The app server authorizes the post by signing the comment data.
+#### Channels
 
-You may want to read more about the [post comment flows](/post-comment-flows) for more details.
+Channels are the primary organizational unit in the ECP protocol. Each channel:
 
-#### The Contract
+- Is represented as an NFT (ERC721)
+- Can have one custom hook attached to it
+- Has its own metadata
+- Can enforce specific rules for comments
 
-- For latest contract address, see [COMMENT_MANAGER_ADDRESS](/sdk-reference/defaultExports/variables/COMMENT_MANAGER_ADDRESS).
-- We will call [`postComment()`](/protocol-reference/CommentManager#postcommentstruct-commentscommentdata-commentdata-bytes-appsignature-external) method to post the comment.
+#### Hooks
 
-#### Demo Dependencies
+A hook is a smart contract that can be attached to a channel (one hook per channel) to:
 
-Here is a quick run-down of some of the dependencies used in the demo app:
+- Validate comments before they're posted
+- Add custom metadata to comments
+- Implement custom business logic
+- Monetize channels through various mechanisms
 
-1. `@ecp.eth/sdk` - for comment data creation, retrieving, and interaction with the indexer.
-1. `wagmi` - for react based wallet connection
-1. `viem` - for contract interaction
-1. `@rainbow-me/rainbowkit` - for wallet connection UI
-1. `@tanstack/react-query` - for data fetching and caching
+The hook is set during channel creation or can be updated later using the `setHook` function in the `ChannelManager` contract. When a hook is set, it can define which operations it wants to participate in through its permissions.
 
-#### Test environment
+### Integration Methods
 
-- We use [Anvil](https://book.getfoundry.sh/anvil/) for local testing and development, follow the steps in [Test with Anvil](/test-with-anvil) to set up the environment.
-- You may want to set up an indexer locally as well, see [Indexer](/indexer-reference/) for more details.
+#### 1. Direct Contract Calls
 
-Now let's go through the steps to post a comment!
+The simplest way to integrate is by directly calling the protocol contracts:
 
-::::steps
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-##### Collect the comment data and send it to the server for signing
+import "@ecp.eth/protocol/src/interfaces/ICommentManager.sol";
+import "@ecp.eth/protocol/src/interfaces/IChannelManager.sol";
+import "@ecp.eth/protocol/src/types/Comments.sol";
+import "@ecp.eth/protocol/src/types/Metadata.sol";
 
-We will start by collecting the [comment data](/comment-data-props) and send it to the server for signing:
+contract MyProtocol {
+  ICommentManager public commentManager;
+  IChannelManager public channelManager;
 
-The comment data is sent to the server for signing:
+  constructor(address _commentManager, address _channelManager) {
+    commentManager = ICommentManager(_commentManager);
+    channelManager = IChannelManager(_channelManager);
+  }
 
-```typescript
-const response = await fetch("/api/sign-comment", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    content,
-    targetUri: window.location.href,
-    parentId,
-    author: address,
-    chainId,
-  }),
-});
+  /// @notice Posts a comment through the protocol
+  /// @param commentData The comment data including content, metadata, and other parameters
+  /// @return The ID of the created comment
+  function postComment(
+    Comments.CreateComment memory commentData
+  ) external payable returns (bytes32) {
+    require(address(this) == commentData.app, "Only the app can post comments");
+
+    // When msg.sender equals app (address(this)), the protocol skips app signature verification
+    // This is why we can pass an empty string as appSignature
+    return commentManager.postComment{ value: msg.value }(commentData, "");
+  }
+}
 ```
 
-🧑‍💻 _[/apps/demo/src/components/comments/CommentBox.tsx#L62](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/components/comments/CommentBox.tsx#L62)_
+#### 2. Custom Hook Implementation
 
-##### The App Server signs the comment data
+For more advanced integration, you can implement a custom hook:
 
-Once the data reaches the app server, it creates a `CommentData` using `createCommentData` from `@ecp.eth/sdk`:
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-```typescript
-const commentData = createCommentData({
-  content,
-  targetUri,
-  parentId,
-  author,
-  app: app.address,
-});
+import "@ecp.eth/protocol/src/interfaces/IHook.sol";
+import "@ecp.eth/protocol/src/types/Hooks.sol";
+import "@ecp.eth/protocol/src/types/Comments.sol";
+import "@ecp.eth/protocol/src/types/Metadata.sol";
+
+contract MyCustomHook is IHook {
+  function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+    return interfaceId == type(IHook).interfaceId;
+  }
+
+  function getHookPermissions()
+    external
+    pure
+    returns (Hooks.Permissions memory)
+  {
+    return
+      Hooks.Permissions({
+        onInitialize: true,
+        onCommentAdd: true,
+        onCommentDelete: false,
+        onCommentEdit: false,
+        onChannelUpdate: false,
+        onCommentHookDataUpdate: false
+      });
+  }
+
+  function onCommentAdd(
+    Comments.Comment calldata comment,
+    Metadata.MetadataEntry[] calldata metadata,
+    address caller,
+    bytes32 commentId
+  ) external payable returns (Metadata.MetadataEntry[] memory) {
+    // Your custom logic here
+    // For example, validate comments, add metadata, etc.
+
+    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
+      1
+    );
+    hookMetadata[0] = Metadata.MetadataEntry({
+      key: "string custom_data",
+      value: abi.encode("my custom data")
+    });
+
+    return hookMetadata;
+  }
+
+  // Implement other required hook functions...
+}
 ```
 
-See [`Comment Data`](/comment-data-props) for more details on the properties of the comment data.
+**Note:** Metadata keys should be UTF-8 encoded strings in the format `"type key"` (e.g., `"string custom_data"`, `"uint256 count"`, `"bool verified"`). In Solidity, you can use string literals directly for `bytes32` fields - no explicit conversion is needed.
 
-Create a typed data structure from `commentData` according to EIP-712:
+### Protocol Fees
 
-```typescript
-const typedCommentData = createCommentTypedData({
-  commentData,
-  chainId: chain.id,
-});
-```
+The protocol implements several fee mechanisms:
 
-Finally, sign the typed data using the app signer's private key and return both `signature` and `commentData`:
+1. Channel Creation Fee (default: 0.02 ETH)
 
-```typescript
-const signature = await app.signTypedData(typedCommentData);
+   - Paid when creating a new channel
+   - Can be adjusted by protocol owner
 
-return {
-  signature,
-  commentData,
-};
-```
+2. Comment Creation Fee (default: 0)
 
-🧑‍💻 _[/apps/demo/src/app/api/sign-comment/route.ts#L48-L61](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/api/sign-comment/route.ts#L48-L61)_
+   - Can be enabled for spam prevention
+   - Set by protocol owner
 
-**Note**:
-
-- Do not expose the app signer's private key on the client side.
-  In the demo, we store the private key in the environment variable `APP_SIGNER_PRIVATE_KEY`.
-  Next.JS ensures that the environment variable without `NEXT_PUBLIC_` prefix is only available on the server side.
-
-Now that we have finished server-side signing, let's move on to the client side.
-
-#### The Author signs and sends the transaction
-
-In the demo, we use a combination of `wagmi` and `rainbowkit` to connect the user wallet and send the transaction to the contract.
-You can find out how it was set up in the `providers` component:
-
-```tsx
-<QueryClientProvider client={queryClient}>
-  <WagmiProvider config={config}>
-    <RainbowKitProvider>{children}</RainbowKitProvider>
-  </WagmiProvider>
-</QueryClientProvider>
-```
-
-🧑‍💻 _[/apps/demo/src/app/providers.tsx#L16-L20](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/app/providers.tsx#L16-L20)_
-
-Now with the wagmi ready to go, and the comment data and app signature returned from the server, we can now post the comment to the contract:
-
-```typescript
-await writeContractAsync({
-  abi: CommentManagerABI,
-  address: COMMENT_MANAGER_ADDRESS,
-  functionName: "postComment",
-  args: [commentData, appSignature],
-});
-```
-
-🧑‍💻 _[/apps/demo/src/lib/contract.ts#L40-L45](https://github.com/ecp-eth/comments-monorepo/blob/094bcde2bca079bd7451c6571f26c5687b2ad128/apps/demo/src/lib/contract.ts#L40-L45)_
-
-##### Congratulations! You've completed the tutorial!
-
-::::
+3. Hook Transaction Fee (default: 2%)
+   - Applied to ETH sent to hooks
+   - Basis points (1 bp = 0.01%)
+   - Maximum 100%
 
 ### Best Practices
 
-1. Implement proper error handling
-1. Monitor gas costs and adjust gas limits accordingly
-1. Consider implementing retry mechanisms for failed transactions
-1. Keep private keys secure and never expose them in client-side code
-1. While the contract doesn't impose rate limits, consider implementing application-level rate limiting to prevent spam and manage gas costs effectively.
-1. Consider anti-spam measures
+1. **Security**
+
+   - Always verify channel existence before posting comments
+   - Implement proper access control in your hooks
+   - Handle protocol fees correctly
+   - Use reentrancy guards when necessary
+
+2. **Gas Optimization**
+
+   - Batch metadata operations when possible
+   - Use efficient data structures for hook storage
+   - Consider gas costs when implementing hook logic
+
+3. **Error Handling**
+
+   - Implement proper error handling for all protocol interactions
+   - Handle failed transactions gracefully
+   - Consider implementing retry mechanisms
+
+4. **Testing**
+   - Test your integration with the protocol thoroughly
+   - Use the provided test hooks (NoopHook) for development
+   - Test with different fee configurations
+
+### Example Use Cases
+
+1. **Token-Gated Comments**
+
+   - Create a channel for a specific token
+   - Implement a hook that verifies token ownership
+   - Allow only token holders to comment
+
+2. **Monetized Channels**
+
+   - Create a channel with a custom hook
+   - Implement payment logic in the hook
+   - Share revenue with channel owners
+
+3. **Moderated Comments**
+   - Create a channel with moderation rules
+   - Implement a hook that enforces moderation
+   - Allow only approved addresses to comment
 
 ### Additional Resources
 
-- Check out **gasless** [post comment flows](/post-comment-flows)
-- See [Protocol API Reference](/protocol-reference/CommentManager) for more functions and details.
-- See [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) for implementations of:
-  1. The other post comment flows.
-  2. Request permission from the user for gasless posting.
-  3. Deleting comments.
+- [Protocol API Reference](/protocol-reference/CommentManager)
+- [Hook Interface Reference](/protocol-reference/interfaces/IHook)
+- [Channel Manager Reference](/protocol-reference/ChannelManager)
+- [Example Hooks](https://github.com/ecp-eth/comments-monorepo/tree/main/packages/protocol/src/hooks)
