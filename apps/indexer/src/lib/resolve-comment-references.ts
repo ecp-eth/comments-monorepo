@@ -239,6 +239,7 @@ async function resolveEthAddress(
       address,
       displayName: farcasterData.displayName ?? null,
       fid: farcasterData.fid,
+      fname: farcasterData.fname,
       pfpUrl: farcasterData.pfpUrl ?? null,
       username: farcasterData.username ?? null,
       url: farcasterData.url,

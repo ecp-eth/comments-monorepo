@@ -133,6 +133,7 @@ export async function submitCommentMutationFunction({
       action: "post",
       state: { status: "pending" },
       chainId: commentData.chainId,
+      references: [],
     };
   } catch (e) {
     if (

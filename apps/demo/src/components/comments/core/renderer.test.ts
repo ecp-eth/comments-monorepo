@@ -56,6 +56,7 @@ describe("renderToReact", () => {
           type: "farcaster",
           address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
           fid: 341794,
+          fname: "mskr.fcast.id",
           url: "https://farcaster.xyz/mskr",
           username: "mskr",
           displayName: "mskr",
@@ -70,7 +71,7 @@ describe("renderToReact", () => {
 
     expect(result.mediaReferences).toEqual([]);
     expect(renderToStaticMarkup(result.element)).toBe(
-      '<p>Test <a class="text-blue-500" href="https://app.ens.domains/0x225f137127d9067788314bc7fcc1f36746a3c3B5" rel="noopener noreferrer" target="_blank">@luc.eth</a> <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a> $USDC</p>',
+      '<p>Test <a class="text-blue-500" href="https://app.ens.domains/0x225f137127d9067788314bc7fcc1f36746a3c3B5" rel="noopener noreferrer" target="_blank">@luc.eth</a> <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a> $USDC</p>',
     );
   });
 
@@ -114,6 +115,7 @@ describe("renderToReact", () => {
         {
           type: "farcaster",
           fid: 341794,
+          fname: "mskr.fcast.id",
           address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
           url: "https://farcaster.xyz/mskr",
           username: "mskr",
@@ -129,7 +131,7 @@ describe("renderToReact", () => {
 
     expect(result.mediaReferences).toEqual([]);
     expect(renderToStaticMarkup(result.element)).toBe(
-      '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <span class="text-blue-500" title="USD Coin">$USDC</span> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p>',
+      '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <span class="text-blue-500" title="USD Coin">$USDC</span> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a>.</p>',
     );
   });
 
@@ -198,6 +200,7 @@ describe("renderToReact", () => {
         {
           type: "farcaster",
           fid: 341794,
+          fname: "mskr.fcast.id",
           address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
           url: "https://farcaster.xyz/mskr",
           username: "mskr",
@@ -245,7 +248,7 @@ describe("renderToReact", () => {
     ]);
 
     expect(renderToStaticMarkup(result.element)).toBe(
-      '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <span class="text-blue-500" title="USD Coin">$USDC</span> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>.</p><p><a class="underline" href="http://donthavereference.tld" rel="noopener noreferrer" target="_blank">http://donthavereference.tld</a></p>',
+      '<p>👀 what is 🎶 <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a> this <span class="text-blue-500" title="USD Coin">$USDC</span> 💻   <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a>.</p><p><a class="underline" href="http://donthavereference.tld" rel="noopener noreferrer" target="_blank">http://donthavereference.tld</a></p>',
     );
   });
 

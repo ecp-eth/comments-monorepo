@@ -36,6 +36,7 @@ export function extractReferences(
 
               references.push({
                 type: "farcaster",
+                fname: mention.fname,
                 displayName: mention.displayName ?? null,
                 address: mention.address,
                 fid: mention.fid,

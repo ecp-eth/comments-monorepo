@@ -178,6 +178,7 @@ export const IndexerAPICommentReferenceFarcasterSchema = z.object({
   type: z.literal("farcaster"),
   address: HexSchema,
   fid: z.number().int(),
+  fname: z.string(),
   username: z.string(),
   displayName: z.string().nullable(),
   pfpUrl: z.string().nullable(),

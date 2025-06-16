@@ -1,6 +1,5 @@
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { JSONContent } from "@tiptap/core";
-import { getUnicodeLength } from "@ecp.eth/shared/helpers";
 import type { MentionItem } from "./extensions/Mention";
 import type { LinkAttributes } from "./extensions/types";
 
@@ -136,6 +135,7 @@ export function parse(
             type: "mention",
             attrs: {
               type: "farcaster",
+              fname: reference.fname,
               address: reference.address,
               displayName: reference.displayName,
               username: reference.username,

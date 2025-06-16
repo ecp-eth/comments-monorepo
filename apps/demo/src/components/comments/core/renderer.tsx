@@ -47,7 +47,7 @@ const referenceRenderers: Partial<ReferenceRendererKey> = {
         rel="noopener noreferrer"
         target="_blank"
       >
-        @{reference.username}
+        @{reference.fname}
       </a>
     );
   },

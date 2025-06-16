@@ -14,6 +14,7 @@ import {
 
 export type ResolvedFarcasterData = {
   fid: number;
+  fname: string;
   address: Hex;
   username: string;
   displayName?: string;
@@ -83,6 +84,7 @@ export function createFarcasterByAddressResolver({
           return {
             address: normalizedAddress,
             url: generateProfileUrl(parseUserDataResult.data),
+            fname: `${parseUserDataResult.data.username}.fcast.id`,
             ...parseUserDataResult.data,
           };
         });

@@ -239,6 +239,7 @@ const farcasterSuggestionSchema = z.object({
   type: z.literal("farcaster"),
   address: HexSchema,
   fid: z.number().int(),
+  fname: z.string(),
   displayName: z.string().nullish(),
   username: z.string(),
   pfpUrl: z.string().nullish(),

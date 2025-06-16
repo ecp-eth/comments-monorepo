@@ -20,6 +20,7 @@ describe("extractReferences", () => {
               attrs: {
                 address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
                 fid: 341794,
+                fname: "mskr.fcast.id",
                 username: "mskr",
                 displayName: "mskr",
                 pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
@@ -134,6 +135,7 @@ describe("extractReferences", () => {
         username: "mskr",
         address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
         fid: 341794,
+        fname: "mskr.fcast.id",
         pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
         url: "https://farcaster.xyz/mskr",
         position: {
@@ -198,7 +200,7 @@ describe("extractReferences", () => {
     });
 
     expect(renderToStaticMarkup(result.element)).toEqual(
-      '<p>Test 💻 🌎 <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a> <a class="text-blue-500" href="https://app.ens.domains/0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5" rel="noopener noreferrer" target="_blank">@nick.eth</a> </p><p><span class="text-blue-500" title="USD Coin">$USDC</span> <a class="underline" href="http://localhost:3000/" rel="noopener noreferrer" target="_blank">http://localhost:3000/</a></p><p>new paragraph</p>',
+      '<p>Test 💻 🌎 <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a> <a class="text-blue-500" href="https://app.ens.domains/0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5" rel="noopener noreferrer" target="_blank">@nick.eth</a> </p><p><span class="text-blue-500" title="USD Coin">$USDC</span> <a class="underline" href="http://localhost:3000/" rel="noopener noreferrer" target="_blank">http://localhost:3000/</a></p><p>new paragraph</p>',
     );
   });
 
@@ -226,6 +228,7 @@ describe("extractReferences", () => {
               attrs: {
                 address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
                 fid: 341794,
+                fname: "mskr.fcast.id",
                 username: "mskr",
                 displayName: "mskr",
                 pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
@@ -258,6 +261,7 @@ describe("extractReferences", () => {
               attrs: {
                 address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
                 fid: 341794,
+                fname: "mskr.fcast.id",
                 username: "mskr",
                 displayName: "mskr",
                 pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
@@ -274,6 +278,7 @@ describe("extractReferences", () => {
               attrs: {
                 address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
                 fid: 341794,
+                fname: "mskr.fcast.id",
                 username: "mskr",
                 displayName: "mskr",
                 pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
@@ -320,6 +325,7 @@ describe("extractReferences", () => {
         type: "farcaster",
         address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
         fid: 341794,
+        fname: "mskr.fcast.id",
         username: "mskr",
         displayName: "mskr",
         pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
@@ -333,6 +339,7 @@ describe("extractReferences", () => {
         type: "farcaster",
         address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
         fid: 341794,
+        fname: "mskr.fcast.id",
         username: "mskr",
         displayName: "mskr",
         pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
@@ -346,6 +353,7 @@ describe("extractReferences", () => {
         type: "farcaster",
         address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
         fid: 341794,
+        fname: "mskr.fcast.id",
         username: "mskr",
         displayName: "mskr",
         pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
@@ -376,7 +384,7 @@ describe("extractReferences", () => {
     ]);
 
     expect(renderToStaticMarkup(rendered.element)).toEqual(
-      '<p>test</p><p><a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a>this shit </p><p><a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a> <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr</a></p>',
+      '<p>test</p><p><a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a>this shit </p><p><a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a> <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a></p>',
     );
   });
 

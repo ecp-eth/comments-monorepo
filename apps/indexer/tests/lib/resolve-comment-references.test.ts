@@ -191,6 +191,7 @@ describe("resolveCommentReferences", () => {
       const resolvedValue = {
         fid: 341794,
         url: "https://farcaster.xyz/mskr",
+        fname: "mskr.fcast.id",
         username: "mskr",
         displayName: "mskr",
         pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
@@ -215,6 +216,7 @@ describe("resolveCommentReferences", () => {
           type: "farcaster",
           address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
           fid: 341794,
+          fname: "mskr.fcast.id",
           url: "https://farcaster.xyz/mskr",
           username: "mskr",
           displayName: "mskr",
@@ -429,6 +431,7 @@ describe("resolveCommentReferences", () => {
     resolveFarcasterByAddress.mockResolvedValue({
       fid: 341794,
       url: "https://farcaster.xyz/mskr",
+      fname: "mskr.fcast.id",
       username: "mskr",
       displayName: "mskr",
       pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
@@ -481,6 +484,7 @@ describe("resolveCommentReferences", () => {
         type: "farcaster",
         address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
         fid: 341794,
+        fname: "mskr.fcast.id",
         url: "https://farcaster.xyz/mskr",
         username: "mskr",
         displayName: "mskr",

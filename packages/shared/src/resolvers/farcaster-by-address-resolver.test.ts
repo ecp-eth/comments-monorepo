@@ -61,6 +61,17 @@ describe("farcaster-by-address-resolver", () => {
         "0xc8fff6bbfc93e912b0012716cf4573c2f7a9b974",
         "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
       ]),
-    ).resolves.toEqual([null, expect.toSatisfy((v) => v != null)]);
+    ).resolves.toEqual([
+      null,
+      {
+        address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
+        fid: 341794,
+        username: "mskr",
+        fname: "mskr.fcast.id",
+        pfpUrl: "https://i.imgur.com/DyoLsDd.jpg",
+        displayName: "mskr",
+        url: "https://farcaster.xyz/mskr",
+      },
+    ]);
   });
 });

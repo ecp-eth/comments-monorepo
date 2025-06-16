@@ -66,6 +66,15 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
           };
         },
       },
+      fname: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-fname"),
+        renderHTML: (attributes) => {
+          return {
+            "data-fname": attributes.fname,
+          };
+        },
+      },
       chainId: {
         default: undefined,
         parseHTML: (element) => element.getAttribute("data-chain-id"),
@@ -207,7 +216,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
             "data-address": attrs.address,
             "data-name": attrs.username || attrs.displayName || attrs.address,
           },
-          `@${attrs.username || attrs.displayName || attrs.address}`,
+          `@${attrs.fname}`,
         ];
       }
     }
