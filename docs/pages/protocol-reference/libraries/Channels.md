@@ -12,6 +12,11 @@
 
 ### `Channel`
 
+Struct containing channel configuration
+
+
+
+
 
 - **name:** (string) The name of the channel
 

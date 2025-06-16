@@ -12,6 +12,11 @@ Library containing hook-related types and utilities
 
 ### `Permissions`
 
+Struct defining which hook functions are enabled
+
+
+Each boolean indicates whether the corresponding hook function is enabled
+
 
 - **onInitialize:** (bool) 
 

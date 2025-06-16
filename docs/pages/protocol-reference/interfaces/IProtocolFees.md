@@ -45,70 +45,70 @@ Emitted when fees are withdrawn
 
 ## Functions
 
-### `setChannelCreationFee(uint96 fee)` (external)
+### setChannelCreationFee(uint96 fee) (external)
 
 Sets the fee for creating a new channel
 
 
 
 
-### `getChannelCreationFee() → uint96 fee` (external)
+### getChannelCreationFee() → uint96 fee (external)
 
 Gets the current channel creation fee
 
 
 
 
-### `setCommentCreationFee(uint96 fee)` (external)
+### setCommentCreationFee(uint96 fee) (external)
 
 Sets the fee for creating a new comment
 
 
 
 
-### `getCommentCreationFee() → uint96 fee` (external)
+### getCommentCreationFee() → uint96 fee (external)
 
 Gets the current comment creation fee
 
 
 
 
-### `setHookTransactionFee(uint16 feeBasisPoints)` (external)
+### setHookTransactionFee(uint16 feeBasisPoints) (external)
 
 Sets the fee percentage taken from hook transactions
 
 
 
 
-### `getHookTransactionFee() → uint16 feeBasisPoints` (external)
+### getHookTransactionFee() → uint16 feeBasisPoints (external)
 
 Gets the current hook transaction fee percentage
 
 
 
 
-### `withdrawFees(address recipient) → uint256 amount` (external)
+### withdrawFees(address recipient) → uint256 amount (external)
 
 Withdraws accumulated fees to a specified address
 
 
 
 
-### `collectCommentCreationFee() → uint96` (external)
+### collectCommentCreationFee() → uint96 (external)
 
 Collects the protocol fee for comment creation
 
 
 
 
-### `deductProtocolHookTransactionFee(uint256 value) → uint256 hookValue` (external)
+### deductProtocolHookTransactionFee(uint256 value) → uint256 hookValue (external)
 
 Calculates the hook transaction fee by deducting the protocol fee
 
 
 
 
-### `calculateMsgValueWithHookFee(uint256 postFeeAmountForwardedToHook) → uint256` (external)
+### calculateMsgValueWithHookFee(uint256 postFeeAmountForwardedToHook) → uint256 (external)
 
 Calculates the required input value to achieve a desired output after protocol fee deduction
 

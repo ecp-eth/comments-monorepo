@@ -13,7 +13,7 @@
     "ref:gen:demo:react-native": "generate-readme-as-index-mdx ../apps/demo-rn-expo pages/demos/react-native-integration",
     "ref:gen:demo": "pnpm run ref:gen:demo:blog && pnpm run ref:gen:demo:demo && pnpm run ref:gen:demo:react-native",
     "ref:gen:sdk": "typedoc --publicPath /sdk-reference/ && add-mdx-autogen-warning pages/sdk-reference/index.mdx",
-    "ref:gen:protocol": "solidity-docgen -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen",
+    "ref:gen:protocol": "solidity-docgen -s pages -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen",
     "ref:gen:indexer:index": "cp ../apps/indexer/README.md pages/indexer-reference/index.mdx && add-mdx-autogen-warning pages/indexer-reference/index.mdx",
     "ref:gen:indexer": "npm run ref:gen:indexer:index && NEYNAR_API_KEY=123 SKIP_DRIZZLE_SCHEMA_DETECTION=1 WEBHOOK_SECRET=secret DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres tsx --import ./scripts/ponder-module-register.mjs scripts/generate-indexer-openapi-spec.ts",
     "ref:gen:all": "pnpm run ref:gen:protocol && pnpm run ref:gen:sdk && pnpm run ref:gen:indexer && pnpm run ref:gen:demo"
@@ -41,13 +41,13 @@
     "typescript": "^5.8.2",
     "use-debounce": "^10.0.4",
     "vite-tsconfig-paths": "^5.1.4",
-    "vocs": "github:davidfurlong/vocs#main&path:/src",
+    "vocs": "github:ecp-eth/vocs#main&path:/src",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@ecp.eth/build-tools": "workspace:^",
     "@ecp.eth/indexer": "workspace:*",
-    "@ecp.eth/solidity-docgen": "~0.5.19",
+    "@ecp.eth/solidity-docgen": "~0.5.21",
     "@hono/zod-openapi": "^0.18.4",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

@@ -21,14 +21,14 @@ Emitted when the base URI for NFT metadata is updated
 
 
 
-### `ChannelCreated(uint256 channelId, string name, string description, struct Metadata.MetadataEntry[] metadata, address hook)`
+### `ChannelCreated(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata, address hook)`
 
 Emitted when a new channel is created
 
 
 
 
-### `ChannelUpdated(uint256 channelId, string name, string description, struct Metadata.MetadataEntry[] metadata)`
+### `ChannelUpdated(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata)`
 
 Emitted when a channel's configuration is updated
 
@@ -59,77 +59,77 @@ Emitted when channel metadata is set
 
 ## Functions
 
-### `createChannel(string name, string description, struct Metadata.MetadataEntry[] metadata, address hook) → uint256 channelId` (external)
+### createChannel(string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata, address hook) → uint256 channelId (external)
 
 Creates a new channel
 
 
 
 
-### `getChannel(uint256 channelId) → struct Channels.Channel` (external)
+### getChannel(uint256 channelId) → [struct Channels.Channel](/protocol-reference/libraries/Channels#channel) (external)
 
 Get a channel by its ID
 
 
 
 
-### `updateChannel(uint256 channelId, string name, string description, struct Metadata.MetadataEntry[] metadata)` (external)
+### updateChannel(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata) (external)
 
 Updates an existing channel's configuration
 
 
 
 
-### `setHook(uint256 channelId, address hook)` (external)
+### setHook(uint256 channelId, address hook) (external)
 
 Sets the hook for a channel
 
 
 
 
-### `updateCommentsContract(address _commentsContract)` (external)
+### updateCommentsContract(address _commentsContract) (external)
 
 Updates the comments contract address (only owner)
 
 
 
 
-### `setBaseURI(string baseURI_)` (external)
+### setBaseURI(string baseURI_) (external)
 
 Sets the base URI for NFT metadata
 
 
 
 
-### `channelExists(uint256 channelId) → bool` (external)
+### channelExists(uint256 channelId) → bool (external)
 
 Checks if a channel exists
 
 
 
 
-### `setChannelMetadata(uint256 channelId, struct Metadata.MetadataEntryOp[] operations)` (external)
+### setChannelMetadata(uint256 channelId, [struct Metadata.MetadataEntryOp[]](/protocol-reference/libraries/Metadata#metadataentryop) operations) (external)
 
 Sets metadata for a channel
 
 
 
 
-### `getChannelMetadata(uint256 channelId) → struct Metadata.MetadataEntry[]` (external)
+### getChannelMetadata(uint256 channelId) → [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) (external)
 
 Get all metadata for a channel
 
 
 
 
-### `getChannelMetadataValue(uint256 channelId, bytes32 key) → bytes` (external)
+### getChannelMetadataValue(uint256 channelId, bytes32 key) → bytes (external)
 
 Get metadata value for a specific key
 
 
 
 
-### `getChannelMetadataKeys(uint256 channelId) → bytes32[]` (external)
+### getChannelMetadataKeys(uint256 channelId) → bytes32[] (external)
 
 Get all metadata keys for a channel
 
