@@ -69,6 +69,7 @@ function fetchCommentReplies(options): Promise<{
         address: `0x${string}`;
         displayName: null | string;
         fid: number;
+        fname: string;
         pfpUrl: null | string;
         position: {
            end: number;
@@ -80,8 +81,12 @@ function fetchCommentReplies(options): Promise<{
       }
         | {
         address: `0x${string}`;
-        caip19: string;
-        chainId: number;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
         logoURI: null | string;
         name: string;
         position: {
@@ -90,7 +95,6 @@ function fetchCommentReplies(options): Promise<{
         };
         symbol: string;
         type: "erc20";
-        url: string;
       }
         | {
         description: null | string;
@@ -232,6 +236,7 @@ Fetch replies for a comment from the Indexer API
         `address`: `` `0x${string}` ``;
         `displayName`: `null` \| `string`;
         `fid`: `number`;
+        `fname`: `string`;
         `pfpUrl`: `null` \| `string`;
         `position`: \{
            `end`: `number`;
@@ -243,8 +248,12 @@ Fetch replies for a comment from the Indexer API
       \}
         \| \{
         `address`: `` `0x${string}` ``;
-        `caip19`: `string`;
-        `chainId`: `number`;
+        `chainId`: `null` \| `number`;
+        `chains`: \{
+           `caip`: `string`;
+           `chainId`: `number`;
+        \}[];
+        `decimals`: `number`;
         `logoURI`: `null` \| `string`;
         `name`: `string`;
         `position`: \{
@@ -253,7 +262,6 @@ Fetch replies for a comment from the Indexer API
         \};
         `symbol`: `string`;
         `type`: `"erc20"`;
-        `url`: `string`;
       \}
         \| \{
         `description`: `null` \| `string`;

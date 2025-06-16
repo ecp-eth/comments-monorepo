@@ -69,6 +69,7 @@ function fetchComments(options): Promise<{
         address: `0x${string}`;
         displayName: null | string;
         fid: number;
+        fname: string;
         pfpUrl: null | string;
         position: {
            end: number;
@@ -80,8 +81,12 @@ function fetchComments(options): Promise<{
       }
         | {
         address: `0x${string}`;
-        caip19: string;
-        chainId: number;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
         logoURI: null | string;
         name: string;
         position: {
@@ -90,7 +95,6 @@ function fetchComments(options): Promise<{
         };
         symbol: string;
         type: "erc20";
-        url: string;
       }
         | {
         description: null | string;
@@ -199,6 +203,7 @@ function fetchComments(options): Promise<{
               address: `0x${(...)}`;
               displayName: ... | ...;
               fid: number;
+              fname: string;
               pfpUrl: ... | ...;
               position: {
                  end: ...;
@@ -210,8 +215,9 @@ function fetchComments(options): Promise<{
             }
               | {
               address: `0x${(...)}`;
-              caip19: string;
-              chainId: number;
+              chainId: ... | ...;
+              chains: ...[];
+              decimals: number;
               logoURI: ... | ...;
               name: string;
               position: {
@@ -220,7 +226,6 @@ function fetchComments(options): Promise<{
               };
               symbol: string;
               type: "erc20";
-              url: string;
             }
               | {
               description: ... | ...;
@@ -375,6 +380,7 @@ Fetch comments from the Indexer API
         `address`: `` `0x${string}` ``;
         `displayName`: `null` \| `string`;
         `fid`: `number`;
+        `fname`: `string`;
         `pfpUrl`: `null` \| `string`;
         `position`: \{
            `end`: `number`;
@@ -386,8 +392,12 @@ Fetch comments from the Indexer API
       \}
         \| \{
         `address`: `` `0x${string}` ``;
-        `caip19`: `string`;
-        `chainId`: `number`;
+        `chainId`: `null` \| `number`;
+        `chains`: \{
+           `caip`: `string`;
+           `chainId`: `number`;
+        \}[];
+        `decimals`: `number`;
         `logoURI`: `null` \| `string`;
         `name`: `string`;
         `position`: \{
@@ -396,7 +406,6 @@ Fetch comments from the Indexer API
         \};
         `symbol`: `string`;
         `type`: `"erc20"`;
-        `url`: `string`;
       \}
         \| \{
         `description`: `null` \| `string`;
@@ -505,6 +514,7 @@ Fetch comments from the Indexer API
               `address`: `` `0x${(...)}` ``;
               `displayName`: ... \| ...;
               `fid`: `number`;
+              `fname`: `string`;
               `pfpUrl`: ... \| ...;
               `position`: \{
                  `end`: ...;
@@ -516,8 +526,9 @@ Fetch comments from the Indexer API
             \}
               \| \{
               `address`: `` `0x${(...)}` ``;
-              `caip19`: `string`;
-              `chainId`: `number`;
+              `chainId`: ... \| ...;
+              `chains`: ...[];
+              `decimals`: `number`;
               `logoURI`: ... \| ...;
               `name`: `string`;
               `position`: \{
@@ -526,7 +537,6 @@ Fetch comments from the Indexer API
               \};
               `symbol`: `string`;
               `type`: `"erc20"`;
-              `url`: `string`;
             \}
               \| \{
               `description`: ... \| ...;

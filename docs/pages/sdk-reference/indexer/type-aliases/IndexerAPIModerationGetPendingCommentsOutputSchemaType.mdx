@@ -66,6 +66,7 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
         address: `0x${string}`;
         displayName: null | string;
         fid: number;
+        fname: string;
         pfpUrl: null | string;
         position: {
            end: number;
@@ -77,8 +78,12 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
       }
         | {
         address: `0x${string}`;
-        caip19: string;
-        chainId: number;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
         logoURI: null | string;
         name: string;
         position: {
@@ -87,7 +92,6 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
         };
         symbol: string;
         type: "erc20";
-        url: string;
       }
         | {
         description: null | string;
@@ -155,7 +159,7 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:424](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L424)
+Defined in: [packages/sdk/src/indexer/schemas.ts:434](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L434)
 
 ## Type declaration
 
@@ -255,6 +259,7 @@ results: {
      address: `0x${string}`;
      displayName: null | string;
      fid: number;
+     fname: string;
      pfpUrl: null | string;
      position: {
         end: number;
@@ -266,8 +271,12 @@ results: {
    }
      | {
      address: `0x${string}`;
-     caip19: string;
-     chainId: number;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
      logoURI: null | string;
      name: string;
      position: {
@@ -276,7 +285,6 @@ results: {
      };
      symbol: string;
      type: "erc20";
-     url: string;
    }
      | {
      description: null | string;

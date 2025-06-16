@@ -69,6 +69,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
         address: `0x${string}`;
         displayName: null | string;
         fid: number;
+        fname: string;
         pfpUrl: null | string;
         position: {
            end: number;
@@ -80,8 +81,12 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
       }
         | {
         address: `0x${string}`;
-        caip19: string;
-        chainId: number;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
         logoURI: null | string;
         name: string;
         position: {
@@ -90,7 +95,6 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
         };
         symbol: string;
         type: "erc20";
-        url: string;
       }
         | {
         description: null | string;
@@ -199,6 +203,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
               address: `0x${string}`;
               displayName: null | string;
               fid: number;
+              fname: string;
               pfpUrl: null | string;
               position: {
                  end: number;
@@ -210,8 +215,12 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
             }
               | {
               address: `0x${string}`;
-              caip19: string;
-              chainId: number;
+              chainId: null | number;
+              chains: {
+                 caip: ...;
+                 chainId: ...;
+              }[];
+              decimals: number;
               logoURI: null | string;
               name: string;
               position: {
@@ -220,7 +229,6 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
               };
               symbol: string;
               type: "erc20";
-              url: string;
             }
               | {
               description: null | string;
@@ -307,7 +315,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:405](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L405)
+Defined in: [packages/sdk/src/indexer/schemas.ts:415](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L415)
 
 ## Type declaration
 
@@ -421,6 +429,7 @@ results: {
      address: `0x${string}`;
      displayName: null | string;
      fid: number;
+     fname: string;
      pfpUrl: null | string;
      position: {
         end: number;
@@ -432,8 +441,12 @@ results: {
    }
      | {
      address: `0x${string}`;
-     caip19: string;
-     chainId: number;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
      logoURI: null | string;
      name: string;
      position: {
@@ -442,7 +455,6 @@ results: {
      };
      symbol: string;
      type: "erc20";
-     url: string;
    }
      | {
      description: null | string;
@@ -551,6 +563,7 @@ results: {
            address: `0x${string}`;
            displayName: null | string;
            fid: number;
+           fname: string;
            pfpUrl: null | string;
            position: {
               end: number;
@@ -562,8 +575,12 @@ results: {
          }
            | {
            address: `0x${string}`;
-           caip19: string;
-           chainId: number;
+           chainId: null | number;
+           chains: {
+              caip: ...;
+              chainId: ...;
+           }[];
+           decimals: number;
            logoURI: null | string;
            name: string;
            position: {
@@ -572,7 +589,6 @@ results: {
            };
            symbol: string;
            type: "erc20";
-           url: string;
          }
            | {
            description: null | string;

@@ -23,6 +23,7 @@ type IndexerAPICommentReferencesSchemaType = (
   address: `0x${string}`;
   displayName: null | string;
   fid: number;
+  fname: string;
   pfpUrl: null | string;
   position: {
      end: number;
@@ -34,8 +35,12 @@ type IndexerAPICommentReferencesSchemaType = (
 }
   | {
   address: `0x${string}`;
-  caip19: string;
-  chainId: number;
+  chainId: null | number;
+  chains: {
+     caip: string;
+     chainId: number;
+  }[];
+  decimals: number;
   logoURI: null | string;
   name: string;
   position: {
@@ -44,7 +49,6 @@ type IndexerAPICommentReferencesSchemaType = (
   };
   symbol: string;
   type: "erc20";
-  url: string;
 }
   | {
   description: null | string;
@@ -93,4 +97,4 @@ type IndexerAPICommentReferencesSchemaType = (
 })[];
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:280](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L280)
+Defined in: [packages/sdk/src/indexer/schemas.ts:290](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L290)

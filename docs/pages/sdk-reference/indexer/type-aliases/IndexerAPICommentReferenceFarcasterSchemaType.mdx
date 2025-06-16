@@ -11,6 +11,7 @@ type IndexerAPICommentReferenceFarcasterSchemaType = {
   address: `0x${string}`;
   displayName: null | string;
   fid: number;
+  fname: string;
   pfpUrl: null | string;
   position: {
      end: number;
@@ -22,7 +23,7 @@ type IndexerAPICommentReferenceFarcasterSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:188](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L188)
+Defined in: [packages/sdk/src/indexer/schemas.ts:189](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L189)
 
 ## Type declaration
 
@@ -42,6 +43,12 @@ displayName: null | string;
 
 ```ts
 fid: number;
+```
+
+### fname
+
+```ts
+fname: string;
 ```
 
 ### pfpUrl

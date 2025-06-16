@@ -9,8 +9,12 @@
 ```ts
 type IndexerAPICommentReferenceERC20SchemaType = {
   address: `0x${string}`;
-  caip19: string;
-  chainId: number;
+  chainId: null | number;
+  chains: {
+     caip: string;
+     chainId: number;
+  }[];
+  decimals: number;
   logoURI: null | string;
   name: string;
   position: {
@@ -19,11 +23,10 @@ type IndexerAPICommentReferenceERC20SchemaType = {
   };
   symbol: string;
   type: "erc20";
-  url: string;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:204](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L204)
+Defined in: [packages/sdk/src/indexer/schemas.ts:214](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L214)
 
 ## Type declaration
 
@@ -33,16 +36,25 @@ Defined in: [packages/sdk/src/indexer/schemas.ts:204](https://github.com/ecp-eth
 address: `0x${string}` = HexSchema;
 ```
 
-### caip19
-
-```ts
-caip19: string;
-```
-
 ### chainId
 
 ```ts
-chainId: number;
+chainId: null | number;
+```
+
+### chains
+
+```ts
+chains: {
+  caip: string;
+  chainId: number;
+}[];
+```
+
+### decimals
+
+```ts
+decimals: number;
 ```
 
 ### logoURI
@@ -88,10 +100,4 @@ symbol: string;
 
 ```ts
 type: "erc20";
-```
-
-### url
-
-```ts
-url: string;
 ```
