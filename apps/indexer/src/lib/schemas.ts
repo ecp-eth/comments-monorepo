@@ -139,6 +139,23 @@ export const GetCommentsQuerySchema = z.object({
   commentType: z.coerce.number().int().min(0).max(255).optional().openapi({
     description: "The comment type (e.g. 0=comment, 1=reaction)",
   }),
+  moderationStatus: z
+    .preprocess(
+      (val) => {
+        if (typeof val === "string" && val.includes(",")) {
+          return val.split(",");
+        }
+
+        return val;
+      },
+      IndexerAPICommentModerationStatusSchema.or(
+        z.array(IndexerAPICommentModerationStatusSchema),
+      ).optional(),
+    )
+    .openapi({
+      description:
+        "The moderation status of the comments to return. If omitted it will return comments based on moderation settings (approved if moderation is enabled).",
+    }),
   // zod-openapi plugin doesn't automatically infer the minimum value from `int().positive()`
   // so use min(1) for better compatibility
   limit: z.coerce.number().int().min(1).max(100).default(50).openapi({
