@@ -5,7 +5,10 @@
   "keywords": [
     "ethereum",
     "protocol",
-    "comments"
+    "comments",
+    "smart",
+    "contracts",
+    "solidity"
   ],
   "author": "ecp.eth",
   "license": "MIT",
