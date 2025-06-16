@@ -10,7 +10,6 @@ import type {
   CommentData,
   CreateReplyCommentDataParams,
   CreateRootCommentDataParams,
-  MetadataEntry,
   Json,
   JsonObject,
 } from "./types.js";
@@ -90,10 +89,9 @@ export const RootCommentInputDataSchema = BaseCommentInputDataSchema.omit({
 });
 
 // this just tests if the shape is correct
-({}) as z.infer<typeof RootCommentInputDataSchema> satisfies Omit<
-  CreateRootCommentDataParams,
-  "metadata"
-> & { metadata: MetadataEntry[] };
+({}) as z.infer<
+  typeof RootCommentInputDataSchema
+> satisfies CreateRootCommentDataParams;
 
 export const ReplyCommentInputDataSchema = BaseCommentInputDataSchema.omit({
   targetUri: true,
@@ -102,10 +100,9 @@ export const ReplyCommentInputDataSchema = BaseCommentInputDataSchema.omit({
 });
 
 // this just tests if the shape is correct
-({}) as z.infer<typeof ReplyCommentInputDataSchema> satisfies Omit<
-  CreateReplyCommentDataParams,
-  "metadata"
-> & { metadata: MetadataEntry[] };
+({}) as z.infer<
+  typeof ReplyCommentInputDataSchema
+> satisfies CreateReplyCommentDataParams;
 
 /**
  * Comment input data schema. This is used as input of the functions.

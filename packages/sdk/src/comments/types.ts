@@ -50,7 +50,7 @@ export type CreateCommentDataParamsShared = {
    */
   commentType?: number;
   /** Metadata about the comment as key-value pairs */
-  metadata?: MetadataEntry[];
+  metadata: MetadataEntry[];
   /** The address of the author of the comment */
   author: Hex;
   /** The address of the app signer */
