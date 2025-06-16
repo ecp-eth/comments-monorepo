@@ -93,10 +93,10 @@ Hooks allow you to customize channel behavior. To create a custom hook:
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import { BaseHook } from "./BaseHook.sol";
-import { Hooks } from "../libraries/Hooks.sol";
-import { Comments } from "../libraries/Comments.sol";
-import { Channels } from "../libraries/Channels.sol";
+import { BaseHook } from "@ecp.eth/protocol/src/hooks/BaseHook.sol";
+import { Hooks } from "@ecp.eth/protocol/src/libraries/Hooks.sol";
+import { Comments } from "@ecp.eth/protocol/src/libraries/Comments.sol";
+import { Channels } from "@ecp.eth/protocol/src/libraries/Channels.sol";
 
 contract MyCustomHook is BaseHook {
   function _getHookPermissions()

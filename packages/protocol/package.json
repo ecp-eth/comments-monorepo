@@ -1,8 +1,22 @@
 {
   "name": "@ecp.eth/protocol",
   "version": "1.0.1",
-  "private": true,
   "type": "module",
+  "keywords": [
+    "ethereum",
+    "protocol",
+    "comments"
+  ],
+  "author": "ecp.eth",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecp-eth/ecp.eth"
+  },
+  "files": [
+    "src/**/*.sol",
+    "!test/**/*"
+  ],
   "scripts": {
     "build": "forge build --sizes --skip test",
     "build:abi": "node ./build-abi.js",
@@ -23,9 +37,6 @@
     "forge-std": "github:foundry-rs/forge-std#v1.9.6",
     "solady": "^0.1.14"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "dotenv-cli": "^8.0.0"
   }
