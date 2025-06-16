@@ -108,8 +108,6 @@ function BaseCommentForm({
   }, [submitMutation.error]);
 
   const isSubmitting = submitMutation.isPending;
-  const trimmedContent = content.trim();
-  const isContentValid = trimmedContent.length > 0;
 
   return (
     <form

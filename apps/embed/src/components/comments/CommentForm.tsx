@@ -125,9 +125,6 @@ function BaseCommentForm({
   }, [submitMutation.error]);
 
   const isSubmitting = submitMutation.isPending;
-  const trimmedContent = content.trim();
-  const isContentValid =
-    trimmedContent.length > 0 && trimmedContent.length <= MAX_COMMENT_LENGTH;
 
   return (
     <form
