@@ -6,14 +6,25 @@ import {
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { Transport } from "wagmi";
 import * as allChains from "wagmi/chains";
+import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 
 const networks = getNetworkFromProcessEnv("NEXT_PUBLIC_", publicEnv);
 
 export const supportedChains = Object.values(networks)
   .map((network) => {
-    return getChainById(network.chainId, Object.values(allChains));
+    const chain = getChainById(network.chainId, Object.values(allChains));
+
+    if (!chain || !(chain.id in SUPPORTED_CHAINS)) {
+      return null;
+    }
+
+    return chain;
   })
   .filter((chain) => chain != null);
+
+if (supportedChains.length === 0) {
+  throw new Error("No supported chains found");
+}
 
 export const transports = Object.entries(networks).reduce(
   (acc, [chainId, network]) => {
