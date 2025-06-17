@@ -262,6 +262,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         render: () => {
           let reactRenderer: ReactRenderer<SuggestionsRef, SuggestionsProps>;
           let popup: Instance;
+          let scrollListener: () => void;
 
           return {
             onStart: (props) => {
@@ -288,6 +289,12 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
                 trigger: "manual",
                 placement: "bottom-start",
               });
+
+              scrollListener = () => {
+                popup?.hide();
+              };
+
+              window.addEventListener("scroll", scrollListener);
             },
 
             onUpdate(props) {
@@ -317,6 +324,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
             onExit() {
               popup?.destroy();
               reactRenderer?.destroy();
+              window.removeEventListener("scroll", scrollListener);
             },
           };
         },
