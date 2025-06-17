@@ -62,7 +62,7 @@ type IndexerAPIModerationChangeModerationStatusOnCommentSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:256](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L256)
+Defined in: [packages/sdk/src/indexer/schemas.ts:305](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L305)
 
 ## Type declaration
 
@@ -200,7 +200,7 @@ deletedAt: null | Date;
 hookMetadata: {
   key: `0x${string}`;
   value: `0x${string}`;
-}[];
+}[] = IndexerAPIMetadataSchema;
 ```
 
 ### id
@@ -221,7 +221,7 @@ logIndex: null | number;
 metadata: {
   key: `0x${string}`;
   value: `0x${string}`;
-}[];
+}[] = IndexerAPIMetadataSchema;
 ```
 
 ### moderationStatus

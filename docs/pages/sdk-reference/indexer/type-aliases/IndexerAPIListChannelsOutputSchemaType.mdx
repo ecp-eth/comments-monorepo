@@ -1,0 +1,94 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPIListChannelsOutputSchemaType
+
+# Type Alias: IndexerAPIListChannelsOutputSchemaType
+
+```ts
+type IndexerAPIListChannelsOutputSchemaType = {
+  pagination: {
+     endCursor?: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor?: `0x${string}`;
+  };
+  results: {
+     createdAt: string;
+     description: string;
+     hook: null | `0x${string}`;
+     id: string;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     name: string;
+     updatedAt: string;
+  }[];
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:82](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L82)
+
+## Type declaration
+
+### pagination
+
+```ts
+pagination: {
+  endCursor?: `0x${string}`;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  limit: number;
+  startCursor?: `0x${string}`;
+} = IndexerAPICursorPaginationSchema;
+```
+
+#### pagination.endCursor?
+
+```ts
+optional endCursor: `0x${string}`;
+```
+
+#### pagination.hasNext
+
+```ts
+hasNext: boolean;
+```
+
+#### pagination.hasPrevious
+
+```ts
+hasPrevious: boolean;
+```
+
+#### pagination.limit
+
+```ts
+limit: number;
+```
+
+#### pagination.startCursor?
+
+```ts
+optional startCursor: `0x${string}`;
+```
+
+### results
+
+```ts
+results: {
+  createdAt: string;
+  description: string;
+  hook: null | `0x${string}`;
+  id: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  name: string;
+  updatedAt: string;
+}[];
+```

@@ -27,6 +27,10 @@ app.use("*", async (c, next) => {
 });
 
 app.onError((err, c) => {
+  if (process.env.NODE_ENV !== "production") {
+    console.error(err);
+  }
+
   if (err instanceof HTTPException) {
     // Get the custom response
     return err.getResponse();

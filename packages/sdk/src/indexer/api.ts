@@ -11,8 +11,10 @@ import {
   type IndexerAPICommentModerationStatusSchemaType,
   type IndexerAPICommentListModeSchemaType,
   IndexerAPICommentListModeSchema,
-  type IndexerAPICommentListSortSchemaType,
-  IndexerAPICommentListSortSchema,
+  IndexerAPISortSchema,
+  type IndexerAPISortSchemaType,
+  IndexerAPIListChannelsSchema,
+  type IndexerAPIListChannelsSchemaType,
 } from "./schemas.js";
 import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
@@ -77,7 +79,7 @@ export type FetchCommentsOptions = {
    *
    * @default "desc"
    */
-  sort?: IndexerAPICommentListSortSchemaType;
+  sort?: IndexerAPISortSchemaType;
   /**
    * The mode to fetch comments in by default it returns only the first level of comments.
    * If flat is used it will return all comments sorted by timestamp in descending order.
@@ -105,7 +107,7 @@ const FetchCommentsOptionsSchema = z.object({
     z.array(IndexerAPICommentModerationStatusSchema),
   ).optional(),
   retries: z.number().int().positive().default(3),
-  sort: IndexerAPICommentListSortSchema.default("desc"),
+  sort: IndexerAPISortSchema.default("desc"),
   cursor: HexSchema.optional(),
   limit: z.number().int().positive().default(50),
   signal: z.instanceof(AbortSignal).optional(),
@@ -242,7 +244,7 @@ export type FetchCommentRepliesOptions = {
   /**
    * @default "desc"
    */
-  sort?: IndexerAPICommentListSortSchemaType;
+  sort?: IndexerAPISortSchemaType;
   /**
    * The mode to fetch replies in by default it returns only the first level of replies.
    * If flat is used it will return all replies sorted by timestamp in descending order.
@@ -285,7 +287,7 @@ const FetchCommentRepliesOptionSchema = z.object({
   viewer: HexSchema.optional(),
   limit: z.number().int().positive().default(50),
   signal: z.instanceof(AbortSignal).optional(),
-  sort: IndexerAPICommentListSortSchema.default("desc"),
+  sort: IndexerAPISortSchema.default("desc"),
   mode: IndexerAPICommentListModeSchema.optional(),
   commentType: z.number().int().min(0).max(255).optional(),
   channelId: z.coerce.bigint().optional(),
@@ -517,4 +519,94 @@ export async function isMuted(options: IsMutedOptions): Promise<boolean> {
   );
 
   return Effect.runPromise(isMutedTask, { signal });
+}
+
+/**
+ * The options for `fetchChannels()`
+ */
+export type FetchChannelsOptions = {
+  /**
+   * URL on which /api/channels endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+  /**
+   * The cursor to fetch channels from
+   */
+  cursor?: Hex;
+  /**
+   * The sort order, either `asc` or `desc`
+   *
+   * @default "desc"
+   */
+  sort?: IndexerAPISortSchemaType;
+  /**
+   * The number of channels to fetch
+   *
+   * @default 50
+   */
+  limit?: number;
+  signal?: AbortSignal;
+};
+
+const FetchChannelsOptionsSchema = z.object({
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  retries: z.number().int().positive().default(3),
+  cursor: HexSchema.optional(),
+  sort: IndexerAPISortSchema.default("desc"),
+  limit: z.number().int().positive().default(50),
+  signal: z.instanceof(AbortSignal).optional(),
+});
+
+/**
+ * Fetch channels from the Indexer API
+ *
+ * @returns A promise that resolves channels fetched from the Indexer API
+ */
+export async function fetchChannels(
+  options: FetchChannelsOptions,
+): Promise<IndexerAPIListChannelsSchemaType> {
+  const { apiUrl, limit, cursor, retries, sort, signal } =
+    FetchChannelsOptionsSchema.parse(options);
+
+  const fetchChannelsTask = Effect.tryPromise(async (signal) => {
+    const url = new URL("/api/channels", apiUrl);
+
+    url.searchParams.set("sort", sort);
+    url.searchParams.set("limit", limit.toString());
+
+    if (cursor) {
+      url.searchParams.set("cursor", cursor);
+    }
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-cache",
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch channels: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+
+    return IndexerAPIListChannelsSchema.parse(responseData);
+  });
+
+  const repeatableTask = Effect.retry(fetchChannelsTask, {
+    times: retries,
+  });
+
+  return Effect.runPromise(repeatableTask, { signal });
 }

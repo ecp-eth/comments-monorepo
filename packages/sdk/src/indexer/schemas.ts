@@ -7,12 +7,81 @@ import {
 } from "../comments/metadata.js";
 import type { Hex } from "../core/schemas.js";
 
-export const MetadataEntrySchema = z.object({
+/**
+ * Transforms bigint to string to avoid json output issues
+ */
+const bigintToString = z.coerce.bigint().transform((val) => val.toString());
+const dateToString = z.coerce.date().transform((val) => val.toISOString());
+
+export const IndexerAPICursorPaginationSchema = z.object({
+  limit: z.number().int(),
+  hasNext: z.boolean(),
+  hasPrevious: z.boolean(),
+  startCursor: HexSchema.optional(),
+  endCursor: HexSchema.optional(),
+});
+
+export type IndexerAPICursorPaginationSchemaType = z.infer<
+  typeof IndexerAPICursorPaginationSchema
+>;
+
+export const IndexerAPIMetadataEntrySchema = z.object({
   key: HexSchema,
   value: HexSchema,
 });
 
-export type MetadataEntrySchemaType = z.infer<typeof MetadataEntrySchema>;
+export type IndexerAPIMetadataEntrySchemaType = z.infer<
+  typeof IndexerAPIMetadataEntrySchema
+>;
+
+export const IndexerAPIMetadataSchema = z.array(IndexerAPIMetadataEntrySchema);
+
+export type IndexerAPIMetadataSchemaType = z.infer<
+  typeof IndexerAPIMetadataSchema
+>;
+
+export const IndexerAPIChannelSchema = z.object({
+  id: z.coerce.bigint(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  name: z.string(),
+  description: z.string(),
+  metadata: IndexerAPIMetadataSchema,
+  hook: HexSchema.nullable(),
+});
+
+export type IndexerAPIChannelSchemaType = z.infer<
+  typeof IndexerAPIChannelSchema
+>;
+
+export const IndexerAPIChannelOutputSchema = IndexerAPIChannelSchema.extend({
+  id: bigintToString,
+  createdAt: dateToString,
+  updatedAt: dateToString,
+});
+
+export type IndexerAPIChannelOutputSchemaType = z.infer<
+  typeof IndexerAPIChannelOutputSchema
+>;
+
+export const IndexerAPIListChannelsSchema = z.object({
+  results: z.array(IndexerAPIChannelSchema),
+  pagination: IndexerAPICursorPaginationSchema,
+});
+
+export type IndexerAPIListChannelsSchemaType = z.infer<
+  typeof IndexerAPIListChannelsSchema
+>;
+
+export const IndexerAPIListChannelsOutputSchema =
+  IndexerAPIListChannelsSchema.extend({
+    results: z.array(IndexerAPIChannelOutputSchema),
+    pagination: IndexerAPICursorPaginationSchema,
+  });
+
+export type IndexerAPIListChannelsOutputSchemaType = z.infer<
+  typeof IndexerAPIListChannelsOutputSchema
+>;
 
 export const IndexerAPIAuthorEnsDataSchema = z.object({
   name: z.string(),
@@ -60,11 +129,9 @@ export type IndexerAPICommentListModeSchemaType = z.infer<
   typeof IndexerAPICommentListModeSchema
 >;
 
-export const IndexerAPICommentListSortSchema = z.enum(["asc", "desc"]);
+export const IndexerAPISortSchema = z.enum(["asc", "desc"]);
 
-export type IndexerAPICommentListSortSchemaType = z.infer<
-  typeof IndexerAPICommentListSortSchema
->;
+export type IndexerAPISortSchemaType = z.infer<typeof IndexerAPISortSchema>;
 
 export const IndexerAPIZeroExTokenAmountSchema = z.coerce
   .string()
@@ -99,8 +166,8 @@ export const IndexerAPICommentSchema = z.object({
   chainId: z.number().int(),
   deletedAt: z.coerce.date().nullable(),
   logIndex: z.number().int().nullable(),
-  metadata: z.array(MetadataEntrySchema),
-  hookMetadata: z.array(MetadataEntrySchema),
+  metadata: IndexerAPIMetadataSchema,
+  hookMetadata: IndexerAPIMetadataSchema,
   parentId: HexSchema.nullable(),
   targetUri: z.string(),
   txHash: HexSchema,
@@ -116,12 +183,6 @@ export const IndexerAPICommentSchema = z.object({
 export type IndexerAPICommentSchemaType = z.infer<
   typeof IndexerAPICommentSchema
 >;
-
-/**
- * Transforms bigint to string to avoid json output issues
- */
-const bigintToString = z.coerce.bigint().transform((val) => val.toString());
-const dateToString = z.coerce.date().transform((val) => val.toISOString());
 
 export const IndexerAPICommentOutputSchema = IndexerAPICommentSchema.extend({
   channelId: bigintToString,
@@ -143,18 +204,6 @@ export const IndexerAPIPaginationSchema = z.object({
 
 export type IndexerAPIPaginationSchemaType = z.infer<
   typeof IndexerAPIPaginationSchema
->;
-
-export const IndexerAPICursorPaginationSchema = z.object({
-  limit: z.number().int(),
-  hasNext: z.boolean(),
-  hasPrevious: z.boolean(),
-  startCursor: HexSchema.optional(),
-  endCursor: HexSchema.optional(),
-});
-
-export type IndexerAPICursorPaginationSchemaType = z.infer<
-  typeof IndexerAPICursorPaginationSchema
 >;
 
 export const IndexerAPIExtraSchema = z.object({
@@ -285,7 +334,7 @@ export {
  * @returns The metadata in Record format
  */
 export function convertIndexerMetadataToRecord(
-  metadataEntries: MetadataEntrySchemaType[],
+  metadataEntries: IndexerAPIMetadataEntrySchemaType[],
   keyTypeMap?: Record<Hex, { key: string; type: MetadataType }>,
 ): MetadataRecord {
   return convertContractToRecordFormat(metadataEntries, keyTypeMap);
@@ -299,6 +348,6 @@ export function convertIndexerMetadataToRecord(
  */
 export function convertRecordToIndexerMetadata(
   metadataRecord: MetadataRecord,
-): MetadataEntrySchemaType[] {
+): IndexerAPIMetadataEntrySchemaType[] {
   return convertRecordToContractFormat(metadataRecord);
 }

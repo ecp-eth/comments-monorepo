@@ -1,6 +1,6 @@
 import { index, onchainTable, relations } from "ponder";
 import type { IndexerAPICommentZeroExSwapSchemaType } from "@ecp.eth/sdk/indexer/schemas";
-import type { MetadataEntrySchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import type { IndexerAPIMetadataSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 export const comment = onchainTable(
   "comment",
@@ -10,8 +10,8 @@ export const comment = onchainTable(
     updatedAt: t.timestamp({ withTimezone: true }).notNull(),
     channelId: t.bigint().notNull(),
     content: t.text().notNull(),
-    metadata: t.jsonb().$type<MetadataEntrySchemaType[]>(),
-    hookMetadata: t.jsonb().$type<MetadataEntrySchemaType[]>(),
+    metadata: t.jsonb().$type<IndexerAPIMetadataSchemaType>(),
+    hookMetadata: t.jsonb().$type<IndexerAPIMetadataSchemaType>(),
     targetUri: t.text().notNull(),
     commentType: t.integer().notNull(),
     parentId: t.hex(),
@@ -50,10 +50,32 @@ export const comment = onchainTable(
 export type CommentSelectType = typeof comment.$inferSelect;
 export type CommentInsertType = typeof comment.$inferInsert;
 
+export const channel = onchainTable(
+  "channel",
+  (t) => ({
+    id: t.bigint().primaryKey(),
+    createdAt: t.timestamp({ withTimezone: true }).notNull(),
+    updatedAt: t.timestamp({ withTimezone: true }).notNull(),
+    name: t.text().notNull(),
+    description: t.text().notNull(),
+    metadata: t.jsonb().$type<IndexerAPIMetadataSchemaType>().notNull(),
+    hook: t.hex(),
+  }),
+  (table) => ({
+    createdAtIdx: index().on(table.createdAt),
+    updatedAtIdx: index().on(table.updatedAt),
+  }),
+);
+
+export type ChannelSelectType = typeof channel.$inferSelect;
+export type ChannelInsertType = typeof channel.$inferInsert;
+
 export const approval = onchainTable(
   "approval",
   (t) => ({
     id: t.text().primaryKey(),
+    createdAt: t.timestamp({ withTimezone: true }).notNull(),
+    updatedAt: t.timestamp({ withTimezone: true }).notNull(),
     author: t.hex().notNull(),
     app: t.hex().notNull(),
     chainId: t.integer().notNull(),

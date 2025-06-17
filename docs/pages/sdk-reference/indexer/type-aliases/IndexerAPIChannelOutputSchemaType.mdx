@@ -1,0 +1,71 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPIChannelOutputSchemaType
+
+# Type Alias: IndexerAPIChannelOutputSchemaType
+
+```ts
+type IndexerAPIChannelOutputSchemaType = {
+  createdAt: string;
+  description: string;
+  hook: null | `0x${string}`;
+  id: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  name: string;
+  updatedAt: string;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L63)
+
+## Type declaration
+
+### createdAt
+
+```ts
+createdAt: string = dateToString;
+```
+
+### description
+
+```ts
+description: string;
+```
+
+### hook
+
+```ts
+hook: null | `0x${string}`;
+```
+
+### id
+
+```ts
+id: string = bigintToString;
+```
+
+### metadata
+
+```ts
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = IndexerAPIMetadataSchema;
+```
+
+### name
+
+```ts
+name: string;
+```
+
+### updatedAt
+
+```ts
+updatedAt: string = dateToString;
+```

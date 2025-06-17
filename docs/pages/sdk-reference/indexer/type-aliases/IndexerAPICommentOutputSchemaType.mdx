@@ -62,7 +62,7 @@ type IndexerAPICommentOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:134](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L134)
+Defined in: [packages/sdk/src/indexer/schemas.ts:195](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L195)
 
 ## Type declaration
 
@@ -200,7 +200,7 @@ deletedAt: null | string;
 hookMetadata: {
   key: `0x${string}`;
   value: `0x${string}`;
-}[];
+}[] = IndexerAPIMetadataSchema;
 ```
 
 ### id
@@ -221,7 +221,7 @@ logIndex: null | number;
 metadata: {
   key: `0x${string}`;
   value: `0x${string}`;
-}[];
+}[] = IndexerAPIMetadataSchema;
 ```
 
 ### moderationStatus

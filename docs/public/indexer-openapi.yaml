@@ -9,6 +9,182 @@ components:
   schemas: {}
   parameters: {}
 paths:
+  /api/channels/{channelId}:
+    get:
+      tags:
+        - channels
+      description: Retrieve a channel by ID
+      parameters:
+        - schema:
+            type: string
+            pattern: ^d+$
+            description: The ID of the channel
+          required: true
+          name: channelId
+          in: path
+      responses:
+        '200':
+          description: Retrieve a list of channels
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    pattern: ^d+$
+                  createdAt:
+                    type:
+                      - string
+                      - 'null'
+                  updatedAt:
+                    type:
+                      - string
+                      - 'null'
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  metadata:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key: {}
+                        value: {}
+                      required:
+                        - key
+                        - value
+                  hook: {}
+                required:
+                  - id
+                  - createdAt
+                  - updatedAt
+                  - name
+                  - description
+                  - metadata
+                  - hook
+        '404':
+          description: Channel not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/channels:
+    get:
+      tags:
+        - channels
+      description: Retrieve a list of channels based on the criteria
+      parameters:
+        - schema:
+            type: object
+            properties:
+              createdAt:
+                type:
+                  - string
+                  - 'null'
+              id:
+                type: string
+                pattern: ^d+$
+            required:
+              - createdAt
+              - id
+            description: >-
+              Non inclusive cursor from which to fetch the channels based on
+              sort
+          required: false
+          name: cursor
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+            description: The number of channels to return
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+            description: The sort order of the channels
+          required: false
+          name: sort
+          in: query
+      responses:
+        '200':
+          description: Retrieve a list of channels
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          pattern: ^d+$
+                        createdAt:
+                          type:
+                            - string
+                            - 'null'
+                        updatedAt:
+                          type:
+                            - string
+                            - 'null'
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        metadata:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key: {}
+                              value: {}
+                            required:
+                              - key
+                              - value
+                        hook: {}
+                      required:
+                        - id
+                        - createdAt
+                        - updatedAt
+                        - name
+                        - description
+                        - metadata
+                        - hook
+                  pagination:
+                    type: object
+                    properties:
+                      limit:
+                        type: integer
+                      hasNext:
+                        type: boolean
+                      hasPrevious:
+                        type: boolean
+                      startCursor: {}
+                      endCursor: {}
+                    required:
+                      - limit
+                      - hasNext
+                      - hasPrevious
+                required:
+                  - results
+                  - pagination
   /api/comments:
     get:
       tags:

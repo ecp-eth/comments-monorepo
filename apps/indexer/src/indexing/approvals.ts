@@ -9,6 +9,8 @@ export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
       .insert(schema.approval)
       .values({
         id,
+        createdAt: new Date(Number(event.block.timestamp) * 1000),
+        updatedAt: new Date(Number(event.block.timestamp) * 1000),
         author: event.args.author,
         app: event.args.app,
         chainId: context.network.chainId,
@@ -31,6 +33,7 @@ export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
       })
       .set({
         deletedAt: new Date(Number(event.block.timestamp) * 1000),
+        updatedAt: new Date(Number(event.block.timestamp) * 1000),
       });
   });
 }
