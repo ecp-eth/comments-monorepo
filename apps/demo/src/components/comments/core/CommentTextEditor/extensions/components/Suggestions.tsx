@@ -127,7 +127,7 @@ function AccountSuggestion({
   return (
     <div className="flex flex-row items-center gap-2">
       <div
-        className="rounded-full bg-cover bg-center size-12"
+        className="rounded-full bg-cover bg-center size-12 bg-muted border border-border"
         style={{ backgroundImage: avatarUrl ? `url(${avatarUrl})` : undefined }}
       ></div>
       <div className="flex flex-col gap-1 items-start">
@@ -146,7 +146,7 @@ function ERC20TokenSuggestion({ suggestion }: ERC20TokenSuggestionProps) {
   return (
     <div className="flex flex-row items-center gap-2">
       <div
-        className="rounded-full bg-cover bg-center size-12"
+        className="rounded-full bg-cover bg-center size-12 bg-muted border border-border"
         style={{
           backgroundImage: suggestion.logoURI
             ? `url(${suggestion.logoURI})`
