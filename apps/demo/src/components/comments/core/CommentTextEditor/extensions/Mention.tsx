@@ -48,6 +48,15 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
           };
         },
       },
+      avatarUrl: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-avatar-url"),
+        renderHTML: (attributes) => {
+          return {
+            "data-avatar-url": attributes.avatarUrl,
+          };
+        },
+      },
       caip19: {
         default: undefined,
         parseHTML: (element) => element.getAttribute("data-caip19"),

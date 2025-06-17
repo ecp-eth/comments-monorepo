@@ -1,24 +1,20 @@
 import { env } from "@/env";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
-import { getChainById, JSONResponse } from "@ecp.eth/shared/helpers";
+import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { LRUCache } from "lru-cache";
-import * as chains from "viem/chains";
-import Dataloader from "dataloader";
 import {
   createFarcasterByAddressResolver,
   createERC20ByAddressResolver,
   type ERC20ByAddressResolverKey,
-  type ERC20ClientRegistry as ERC20ClientRegistryType,
   createENSByAddressResolver,
   createENSByNameResolver,
   // createERC20ByQueryResolver,
   type ResolvedFarcasterData,
   type ResolvedENSData,
   ResolvedERC20Data,
-  type ERC20ClientConfig,
 } from "@ecp.eth/shared/resolvers";
 import { NextRequest } from "next/server";
-import { type Hex, createPublicClient, http } from "viem";
+import { type Hex } from "viem";
 import { z } from "zod";
 import { gql, request as graphqlRequest } from "graphql-request";
 
@@ -111,7 +107,7 @@ async function searchEns(query: string): Promise<Result | null> {
 
 const ERC_20_CAIP_19_REGEX = /^eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40})$/;
 
-const allChains = Object.values(chains);
+/* const allChains = Object.values(chains);
 
 class ERC20ClientRegistry
   extends Dataloader<number, ERC20ClientConfig | null>
@@ -159,6 +155,7 @@ class ERC20ClientRegistry
 }
 
 const erc20ClientRegistry = new ERC20ClientRegistry();
+*/
 
 const farcasterByAddressCache = new LRUCache<
   Hex,
@@ -221,6 +218,7 @@ const ensSuggestionSchema = z.object({
   type: z.literal("ens"),
   address: HexSchema,
   name: z.string(),
+  avatarUrl: z.string().nullable(),
   url: z.string(),
 });
 
@@ -290,6 +288,7 @@ export async function GET(
               name: ensName.name,
               address: ensName.address,
               url: ensName.url,
+              avatarUrl: ensName.avatarUrl,
             },
           ],
         });
@@ -339,6 +338,7 @@ export async function GET(
               name: ensName.name,
               address: ensName.address,
               url: ensName.url,
+              avatarUrl: ensName.avatarUrl,
             },
           ],
         });
@@ -354,6 +354,8 @@ export async function GET(
           name: domain.name,
           address: domain.resolvedAddress?.id ?? domain.owner.id,
           url: `https://app.ens.domains/${domain.resolvedAddress?.id ?? domain.owner.id}`,
+          // @todo we need an avatar url here, subgraph somehow doesn't have it
+          avatarUrl: null,
         })),
       });
     }
