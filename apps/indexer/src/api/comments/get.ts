@@ -1,6 +1,18 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { and, asc, desc, eq, gt, inArray, isNull, lt, or } from "ponder";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  gt,
+  gte,
+  inArray,
+  isNull,
+  lt,
+  lte,
+  or,
+} from "ponder";
 import { IndexerAPIListCommentsOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response-formatters";
@@ -103,7 +115,7 @@ export default (app: OpenAPIHono) => {
                     or(
                       and(
                         eq(schema.comment.createdAt, cursor.createdAt),
-                        lt(schema.comment.id, cursor.id),
+                        lte(schema.comment.id, cursor.id),
                       ),
                       lt(schema.comment.createdAt, cursor.createdAt),
                     ),
@@ -114,7 +126,7 @@ export default (app: OpenAPIHono) => {
                     or(
                       and(
                         eq(schema.comment.createdAt, cursor.createdAt),
-                        gt(schema.comment.id, cursor.id),
+                        gte(schema.comment.id, cursor.id),
                       ),
                       gt(schema.comment.createdAt, cursor.createdAt),
                     ),

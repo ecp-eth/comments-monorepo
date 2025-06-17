@@ -1,3 +1,5 @@
+import { setupGetChannel } from "./channels/[id]/get";
+import { setupGetChannels } from "./channels/get";
 import setupGetComments from "./comments/get";
 import setupGetCommentReplies from "./comments/replies/get";
 import setupGetApprovals from "./approvals/get";
@@ -12,6 +14,8 @@ import { setupGetComment } from "./moderate-comments/[commentId]/get";
 import { setupWebhook } from "./webhook/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
+  setupGetChannel(app);
+  setupGetChannels(app);
   setupGetComments(app);
   setupGetCommentReplies(app);
   setupGetApprovals(app);

@@ -1,6 +1,12 @@
 import { createConfig } from "ponder";
 import { http, Transport } from "viem";
-import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
+import {
+  ChannelManagerABI,
+  CommentManagerABI,
+  SUPPORTED_CHAINS,
+  type SupportedChainConfig,
+} from "@ecp.eth/sdk";
+import type { Hex } from "@ecp.eth/sdk/core";
 
 const networks = Object.entries(process.env).reduce(
   (acc, [key, value]) => {
@@ -10,11 +16,20 @@ const networks = Object.entries(process.env).reduce(
         process.env[`PONDER_START_BLOCK_${chainId}`] || "0",
       );
 
+      const supportedChain: SupportedChainConfig | undefined =
+        SUPPORTED_CHAINS[chainId as keyof typeof SUPPORTED_CHAINS];
+
+      if (!supportedChain) {
+        throw new Error(`Chain ${chainId} not supported by ECP`);
+      }
+
       acc[chainId] = {
         chainId,
         transport: http(value),
         disableCache: chainId === 31337,
         startBlock,
+        channelManagerAddress: supportedChain.channelManagerAddress,
+        commentManagerAddress: supportedChain.commentManagerAddress,
       };
     }
     return acc;
@@ -26,6 +41,8 @@ const networks = Object.entries(process.env).reduce(
       transport: Transport;
       disableCache?: boolean;
       startBlock?: number;
+      channelManagerAddress: Hex;
+      commentManagerAddress: Hex;
     }
   >,
 );
@@ -40,7 +57,7 @@ export default createConfig({
       network: Object.entries(networks).reduce(
         (acc, [chainId, network]) => {
           acc[chainId] = {
-            address: COMMENT_MANAGER_ADDRESS,
+            address: network.commentManagerAddress,
             startBlock: network.startBlock,
           };
           return acc;
@@ -48,19 +65,18 @@ export default createConfig({
         {} as Record<string, { address: `0x${string}`; startBlock?: number }>,
       ),
     },
-  },
-  blocks: {
-    Transactions: {
+    CommentsV1ChannelManager: {
+      abi: ChannelManagerABI,
       network: Object.entries(networks).reduce(
         (acc, [chainId, network]) => {
           acc[chainId] = {
+            address: network.channelManagerAddress,
             startBlock: network.startBlock,
           };
           return acc;
         },
-        {} as Record<string, { startBlock?: number }>,
+        {} as Record<string, { address: `0x${string}`; startBlock?: number }>,
       ),
-      interval: 1,
     },
   },
 });

@@ -247,6 +247,61 @@ export const GetCommentsPendingModerationQuerySchema = z.object({
   }),
 });
 
+const ChannelCursorSchema = z.object({
+  createdAt: z.coerce.date(),
+  id: z.coerce.bigint(),
+});
+
+export type ChannelCursorSchemaType = z.infer<typeof ChannelCursorSchema>;
+
+/**
+ * Schema for parsing a comment cursor from input.
+ */
+export const InputChannelCursorSchema = z.preprocess((value, ctx) => {
+  try {
+    const parsed = HexSchema.parse(value);
+    const hex = hexToString(parsed);
+    const [createdAt, id] = z
+      .tuple([z.coerce.number().positive(), z.coerce.bigint()])
+      .parse(hex.split(":"));
+
+    return {
+      createdAt,
+      id,
+    };
+  } catch {
+    ctx.addIssue({
+      code: "custom",
+      message: "Invalid channel cursor",
+      path: ["cursor"],
+    });
+
+    return z.NEVER;
+  }
+}, ChannelCursorSchema);
+
+/**
+ * Query string schema for getting a list of channels.
+ */
+export const GetChannelsQuerySchema = z.object({
+  cursor: InputChannelCursorSchema.optional().openapi({
+    description:
+      "Non inclusive cursor from which to fetch the channels based on sort",
+  }),
+  limit: z.coerce.number().int().min(1).max(100).default(50).openapi({
+    description: "The number of channels to return",
+  }),
+  sort: z.enum(["asc", "desc"]).default("desc").openapi({
+    description: "The sort order of the channels",
+  }),
+});
+
+export const GetChannelParamsSchema = z.object({
+  channelId: z.coerce.bigint().openapi({
+    description: "The ID of the channel",
+  }),
+});
+
 /**
  * Path params schema for moderating a comment.
  */

@@ -1,0 +1,67 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / fetchChannels
+
+# Function: fetchChannels()
+
+```ts
+function fetchChannels(options): Promise<{
+  pagination: {
+     endCursor?: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor?: `0x${string}`;
+  };
+  results: {
+     createdAt: Date;
+     description: string;
+     hook: null | `0x${string}`;
+     id: bigint;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     name: string;
+     updatedAt: Date;
+  }[];
+}>;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:575](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L575)
+
+Fetch channels from the Indexer API
+
+## Parameters
+
+### options
+
+[`FetchChannelsOptions`](/sdk-reference/indexer/type-aliases/FetchChannelsOptions.mdx)
+
+## Returns
+
+`Promise`\<\{
+  `pagination`: \{
+     `endCursor?`: `` `0x${string}` ``;
+     `hasNext`: `boolean`;
+     `hasPrevious`: `boolean`;
+     `limit`: `number`;
+     `startCursor?`: `` `0x${string}` ``;
+  \};
+  `results`: \{
+     `createdAt`: `Date`;
+     `description`: `string`;
+     `hook`: `null` \| `` `0x${string}` ``;
+     `id`: `bigint`;
+     `metadata`: \{
+        `key`: `` `0x${string}` ``;
+        `value`: `` `0x${string}` ``;
+     \}[];
+     `name`: `string`;
+     `updatedAt`: `Date`;
+  \}[];
+\}\>
+
+A promise that resolves channels fetched from the Indexer API

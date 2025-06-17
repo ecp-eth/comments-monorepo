@@ -1,0 +1,116 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / FetchChannelsOptions
+
+# Type Alias: FetchChannelsOptions
+
+```ts
+type FetchChannelsOptions = {
+  apiUrl?: string;
+  cursor?: Hex;
+  limit?: number;
+  retries?: number;
+  signal?: AbortSignal;
+  sort?: IndexerAPISortSchemaType;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:529](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L529)
+
+The options for `fetchChannels()`
+
+## Properties
+
+### apiUrl?
+
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:535](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L535)
+
+URL on which /api/channels endpoint will be called
+
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+***
+
+### cursor?
+
+```ts
+optional cursor: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:545](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L545)
+
+The cursor to fetch channels from
+
+***
+
+### limit?
+
+```ts
+optional limit: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:557](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L557)
+
+The number of channels to fetch
+
+#### Default
+
+```ts
+50
+```
+
+***
+
+### retries?
+
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:541](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L541)
+
+Number of times to retry the signing operation in case of failure.
+
+#### Default
+
+```ts
+3
+```
+
+***
+
+### signal?
+
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:558](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L558)
+
+***
+
+### sort?
+
+```ts
+optional sort: IndexerAPISortSchemaType;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:551](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L551)
+
+The sort order, either `asc` or `desc`
+
+#### Default
+
+```ts
+"desc"
+```
