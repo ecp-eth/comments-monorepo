@@ -35,7 +35,10 @@ type Result = {
 
 const searchByNameQuery = gql`
   query SearchByName($name: String!) {
-    domains(where: { name_contains: $name }, first: 10) {
+    domains(
+      where: { name_contains: $name, resolvedAddress_not: "" }
+      first: 10
+    ) {
       id
       name
       resolvedAddress {
