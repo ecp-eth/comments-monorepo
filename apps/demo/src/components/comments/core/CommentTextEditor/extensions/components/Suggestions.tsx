@@ -64,11 +64,7 @@ export const Suggestions = forwardRef(function Suggestions(
   let children = null;
 
   if (query.trim().length < minimumQueryLength) {
-    children = (
-      <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
-        Type at least {minimumQueryLength} characters to see suggestions
-      </div>
-    );
+    return null;
   } else if (items.length === 0) {
     children = (
       <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
@@ -87,13 +83,23 @@ export const Suggestions = forwardRef(function Suggestions(
             key={`${query}-${index}`}
             onClick={() => selectItem(index)}
           >
-            <span>
-              {item.type === "ens" ? item.name : null}
-              {item.type === "erc20"
-                ? `${item.symbol || item.name || item.address} (${getChainById(item.chainId, Object.values(chains))?.name})`
-                : null}
-              {item.type === "farcaster" ? item.fname : null}
-            </span>
+            {item.type === "ens" ? (
+              <AccountSuggestion
+                name={item.name}
+                avatarUrl={item.avatarUrl}
+                handle={item.name}
+              />
+            ) : null}
+            {item.type === "farcaster" ? (
+              <AccountSuggestion
+                avatarUrl={item.pfpUrl}
+                name={item.displayName || item.username}
+                handle={item.fname}
+              />
+            ) : null}
+            {item.type === "erc20" ? (
+              <ERC20TokenSuggestion suggestion={item} />
+            ) : null}
           </button>
         ))}
       </>
@@ -106,3 +112,53 @@ export const Suggestions = forwardRef(function Suggestions(
     </div>
   );
 });
+
+type AccountSuggestionProps = {
+  avatarUrl: string | null | undefined;
+  name: string;
+  handle: string;
+};
+
+function AccountSuggestion({
+  avatarUrl,
+  name,
+  handle,
+}: AccountSuggestionProps) {
+  return (
+    <div className="flex flex-row items-center gap-2">
+      <div
+        className="rounded-full bg-cover bg-center size-12"
+        style={{ backgroundImage: avatarUrl ? `url(${avatarUrl})` : undefined }}
+      ></div>
+      <div className="flex flex-col gap-1 items-start">
+        <span className="text-sm">{name}</span>
+        <span className="text-sm text-muted-foreground">{handle}</span>
+      </div>
+    </div>
+  );
+}
+
+type ERC20TokenSuggestionProps = {
+  suggestion: Extract<MentionSuggestionSchemaType, { type: "erc20" }>;
+};
+
+function ERC20TokenSuggestion({ suggestion }: ERC20TokenSuggestionProps) {
+  return (
+    <div className="flex flex-row items-center gap-2">
+      <div
+        className="rounded-full bg-cover bg-center size-12"
+        style={{
+          backgroundImage: suggestion.logoURI
+            ? `url(${suggestion.logoURI})`
+            : undefined,
+        }}
+      ></div>
+      <div className="flex flex-col gap-1 items-start">
+        <span className="text-sm">${suggestion.symbol}</span>
+        <span className="text-sm text-muted-foreground">
+          {getChainById(suggestion.chainId, Object.values(chains))?.name}
+        </span>
+      </div>
+    </div>
+  );
+}
