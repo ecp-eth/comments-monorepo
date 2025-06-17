@@ -41,7 +41,7 @@ export const Suggestions = forwardRef(function Suggestions(
         return true;
       }
 
-      if (event.key === "Enter" || event.key === " ") {
+      if (event.key === "Enter") {
         const selectedItem = items[selectedIndex];
 
         if (!selectedItem) {
@@ -51,10 +51,7 @@ export const Suggestions = forwardRef(function Suggestions(
 
         selectItem(selectedIndex);
 
-        // prevent default only if enter is pressed
-        // so if user presses space, we choose an item and also add space after it
-        // in case of enter we just select the item and keep the cursor after it
-        return event.key === "Enter";
+        return true;
       }
 
       return false;
