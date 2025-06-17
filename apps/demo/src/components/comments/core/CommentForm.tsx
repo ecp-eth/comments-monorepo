@@ -21,7 +21,6 @@ import type { Comment } from "@ecp.eth/shared/schemas";
 import { Editor, EditorRef } from "./CommentTextEditor/Editor";
 import { useUploadFiles } from "./CommentTextEditor/hooks/useUploadFiles";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
-import { isContentEqual } from "./CommentTextEditor/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -54,10 +53,6 @@ type BaseCommentFormProps = {
     references: IndexerAPICommentReferencesSchemaType;
   };
   /**
-   * Called when user pressed escape or left the form empty or unchanged (blurred with empty or unchanged content)
-   */
-  onCancel?: () => void;
-  /**
    * Called when transaction was created and also successfully processed.
    */
   onSubmitSuccess?: OnSubmitSuccessFunction;
@@ -74,6 +69,17 @@ type BaseCommentFormProps = {
    * @default "Posting..."
    */
   submitPendingLabel?: string;
+  /**
+   * Called when user pressed cancel button.
+   *
+   * If this is not provided, the cancel button will not be shown.
+   */
+  onCancel?: () => void;
+  /**
+   * Label for the cancel button.
+   * @default "Cancel"
+   */
+  cancelLabel?: string;
 };
 
 function BaseCommentForm({
@@ -86,6 +92,7 @@ function BaseCommentForm({
   submitIdleLabel = "Post",
   submitPendingLabel = "Posting...",
   onSubmitSuccess,
+  cancelLabel = "Cancel",
 }: BaseCommentFormProps) {
   const [formState, setFormState] = useState<"idle" | "post">("idle");
   const { address } = useAccount();
@@ -231,28 +238,6 @@ function BaseCommentForm({
       />
       <Editor
         autoFocus={autoFocus}
-        onBlur={() => {
-          if (isSubmitting) {
-            return;
-          }
-
-          const editor = editorRef.current;
-
-          if (!editor) {
-            return;
-          }
-
-          const isEmpty = editor.editor?.isEmpty ?? true;
-          const defaultContent = editor.getDefaultContent();
-          const currentContent = editor.editor?.getJSON();
-
-          if (
-            isEmpty ||
-            isContentEqual(currentContent ?? {}, defaultContent ?? {})
-          ) {
-            onCancel?.();
-          }
-        }}
         className="w-full p-2 border border-gray-300 rounded"
         disabled={isSubmitting || disabled}
         placeholder={placeholder}
@@ -297,6 +282,17 @@ function BaseCommentForm({
           >
             {formState === "post" ? submitPendingLabel : submitIdleLabel}
           </Button>
+          {onCancel && (
+            <Button
+              className="px-4 py-2 rounded"
+              disabled={isSubmitting}
+              onClick={onCancel}
+              type="button"
+              variant="outline"
+            >
+              {cancelLabel}
+            </Button>
+          )}
         </div>
       </div>
       {submitMutation.error && (
