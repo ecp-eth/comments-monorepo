@@ -3,6 +3,7 @@ import { http } from "wagmi";
 import * as allChains from "wagmi/chains";
 import { publicEnv } from "@/publicEnv";
 import { getChainById } from "@ecp.eth/shared/helpers";
+import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 
 const anvil = allChains.anvil;
 
@@ -17,6 +18,10 @@ if (!prodChain) {
 
 // swap works only with base, locally it doesn't work
 export const chain = publicEnv.NODE_ENV === "development" ? anvil : prodChain;
+
+if (!(chain.id in SUPPORTED_CHAINS)) {
+  throw new Error(`Chain ${chain.id} not supported`);
+}
 
 export const transport =
   chain.id === prodChain.id

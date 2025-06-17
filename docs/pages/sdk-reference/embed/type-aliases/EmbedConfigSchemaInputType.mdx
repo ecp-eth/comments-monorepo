@@ -8,7 +8,7 @@
 
 ```ts
 type EmbedConfigSchemaInputType = {
-  chainId?: 31337 | 84532;
+  chainId?: 84532 | 31337;
   disablePromotion?: boolean;
   restrictMaximumContainerWidth?: boolean;
   theme?: {
@@ -1835,7 +1835,7 @@ Custom configuration for `<CommentEmbed />` component.
 ### chainId?
 
 ```ts
-optional chainId: 31337 | 84532 = EmbedConfigSupportedChainIdsSchema;
+optional chainId: 84532 | 31337 = EmbedConfigSupportedChainIdsSchema;
 ```
 
 The id of the chain to post the comments to.
