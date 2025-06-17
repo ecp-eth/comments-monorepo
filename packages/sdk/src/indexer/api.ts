@@ -15,6 +15,8 @@ import {
   type IndexerAPISortSchemaType,
   IndexerAPIListChannelsSchema,
   type IndexerAPIListChannelsSchemaType,
+  IndexerAPIChannelOutputSchema,
+  type IndexerAPIChannelOutputSchemaType,
 } from "./schemas.js";
 import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
@@ -605,6 +607,75 @@ export async function fetchChannels(
   });
 
   const repeatableTask = Effect.retry(fetchChannelsTask, {
+    times: retries,
+  });
+
+  return Effect.runPromise(repeatableTask, { signal });
+}
+
+/**
+ * The options for `fetchChannel()`
+ */
+export type FetchChannelOptions = {
+  /**
+   * The ID of the channel to fetch
+   */
+  channelId: bigint;
+  /**
+   * URL on which /api/channels/$channelId endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+  signal?: AbortSignal;
+};
+
+const FetchChannelOptionsSchema = z.object({
+  channelId: z.coerce.bigint(),
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  retries: z.number().int().positive().default(3),
+  signal: z.instanceof(AbortSignal).optional(),
+});
+
+/**
+ * Fetch a single channel by ID from the Indexer API
+ *
+ * @returns A promise that resolves to the channel data fetched from the Indexer API
+ */
+export async function fetchChannel(
+  options: FetchChannelOptions,
+): Promise<IndexerAPIChannelOutputSchemaType> {
+  const { channelId, apiUrl, retries, signal } =
+    FetchChannelOptionsSchema.parse(options);
+
+  const fetchChannelTask = Effect.tryPromise(async (signal) => {
+    const url = new URL(`/api/channels/${channelId}`, apiUrl);
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-cache",
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch channel: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+
+    return IndexerAPIChannelOutputSchema.parse(responseData);
+  });
+
+  const repeatableTask = Effect.retry(fetchChannelTask, {
     times: retries,
   });
 

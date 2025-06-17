@@ -1,0 +1,78 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / FetchChannelOptions
+
+# Type Alias: FetchChannelOptions
+
+```ts
+type FetchChannelOptions = {
+  apiUrl?: string;
+  channelId: bigint;
+  retries?: number;
+  signal?: AbortSignal;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:619](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L619)
+
+The options for `fetchChannel()`
+
+## Properties
+
+### apiUrl?
+
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:629](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L629)
+
+URL on which /api/channels/$channelId endpoint will be called
+
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+***
+
+### channelId
+
+```ts
+channelId: bigint;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:623](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L623)
+
+The ID of the channel to fetch
+
+***
+
+### retries?
+
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:635](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L635)
+
+Number of times to retry the signing operation in case of failure.
+
+#### Default
+
+```ts
+3
+```
+
+***
+
+### signal?
+
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:636](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L636)

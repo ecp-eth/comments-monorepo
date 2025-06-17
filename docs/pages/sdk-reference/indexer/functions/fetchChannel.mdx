@@ -1,0 +1,49 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / fetchChannel
+
+# Function: fetchChannel()
+
+```ts
+function fetchChannel(options): Promise<{
+  createdAt: string;
+  description: string;
+  hook: null | `0x${string}`;
+  id: string;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  name: string;
+  updatedAt: string;
+}>;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:651](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L651)
+
+Fetch a single channel by ID from the Indexer API
+
+## Parameters
+
+### options
+
+[`FetchChannelOptions`](/sdk-reference/indexer/type-aliases/FetchChannelOptions.mdx)
+
+## Returns
+
+`Promise`\<\{
+  `createdAt`: `string`;
+  `description`: `string`;
+  `hook`: `null` \| `` `0x${string}` ``;
+  `id`: `string`;
+  `metadata`: \{
+     `key`: `` `0x${string}` ``;
+     `value`: `` `0x${string}` ``;
+  \}[];
+  `name`: `string`;
+  `updatedAt`: `string`;
+\}\>
+
+A promise that resolves to the channel data fetched from the Indexer API
