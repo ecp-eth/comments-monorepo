@@ -6,26 +6,6 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import setupRestAPI from "./setupRestAPI";
 import { HTTPException } from "hono/http-exception";
 import * as Sentry from "@sentry/node";
-import { nodeProfilingIntegration } from "@sentry/profiling-node";
-import { env } from "../env";
-
-// Initialize Sentry
-Sentry.init({
-  dsn: env.SENTRY_DSN,
-  debug: !env.SENTRY_DSN,
-  integrations: [
-    // Enable profiling integration
-    nodeProfilingIntegration(),
-  ],
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
-  // Set profilesSampleRate to 1.0 to profile 100%
-  // of sampled transactions.
-  // We recommend adjusting this value in production
-  profilesSampleRate: 1.0,
-});
 
 const app = new OpenAPIHono();
 
