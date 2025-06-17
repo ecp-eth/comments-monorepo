@@ -12,12 +12,14 @@ type ReplyItemProps = {
   connectedAddress: Hex | undefined;
   comment: CommentType;
   queryKey: QueryKey;
+  parentCommentId: Hex;
 };
 
 export function ReplyItem({
   connectedAddress,
   comment,
   queryKey,
+  parentCommentId,
 }: ReplyItemProps) {
   const deleteComment = useDeleteComment();
   const retryPostComment = useRetryPostComment({ connectedAddress });
@@ -78,7 +80,8 @@ export function ReplyItem({
           onSubmitStart={() => {
             setIsReplying(false);
           }}
-          parentId={comment.id}
+          // make sure to update replies on top level comment because we are using flat replies mode
+          parentId={parentCommentId}
         />
       )}
     </div>

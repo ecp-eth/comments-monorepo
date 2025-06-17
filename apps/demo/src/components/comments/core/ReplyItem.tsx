@@ -4,13 +4,22 @@ import { useCallback, useState } from "react";
 import type { QueryKey } from "@tanstack/react-query";
 import { CommentEditForm, CommentForm } from "./CommentForm";
 import { useCommentActions } from "./CommentActionsContext";
+import type { Hex } from "viem";
 
 type ReplyItemProps = {
   comment: CommentType;
   queryKey: QueryKey;
+  /**
+   * The id of the parent comment to update.
+   */
+  parentCommentId: Hex;
 };
 
-export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
+export function ReplyItem({
+  comment,
+  queryKey,
+  parentCommentId,
+}: ReplyItemProps) {
   const { deleteComment, retryPostComment, retryEditComment } =
     useCommentActions();
   const [isReplying, setIsReplying] = useState(false);
@@ -74,7 +83,7 @@ export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
           onSubmitStart={() => {
             setIsReplying(false);
           }}
-          parentId={comment.id}
+          parentId={parentCommentId}
         />
       )}
     </div>

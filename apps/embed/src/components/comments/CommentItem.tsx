@@ -194,6 +194,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
           comment={reply}
           queryKey={queryKey}
           connectedAddress={connectedAddress}
+          parentCommentId={comment.id}
         />
       ))}
       {repliesQuery.hasNextPage && (
