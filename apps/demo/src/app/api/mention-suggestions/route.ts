@@ -63,7 +63,7 @@ const searchByAddressQuery = gql`
   }
 `;
 
-const VALID_ENS_NAME = /^[a-z0-9]+([-_][a-z0-9]+)*\.[a-z]{2,}$/;
+const VALID_ENS_NAME = /^[a-z0-9]+([-_][a-z0-9]+)*(\.[a-z]{2,})?$/;
 
 async function searchEns(query: string): Promise<Result | null> {
   if (!env.GRAPH_API_KEY || !env.GRAPH_ENS_SUBGRAPH_URL) {
