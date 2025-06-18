@@ -318,6 +318,15 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
               }
 
               if (!popup?.state.isShown) {
+                if (
+                  props.event.key === "ArrowUp" ||
+                  props.event.key === "ArrowDown"
+                ) {
+                  popup?.show();
+
+                  return true;
+                }
+
                 // make sure that we won't select a last selected suggestion if popup is not shown
                 return false;
               }
