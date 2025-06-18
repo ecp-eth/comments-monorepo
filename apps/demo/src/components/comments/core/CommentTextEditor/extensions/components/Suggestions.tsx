@@ -104,7 +104,7 @@ export const Suggestions = forwardRef(function Suggestions(
   }
 
   return (
-    <div className="flex flex-col z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
+    <div className="flex flex-col z-50 min-w-[8rem] max-h-[250px] overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md suggestions-scrollbar">
       {children}
     </div>
   );

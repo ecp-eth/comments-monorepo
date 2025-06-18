@@ -288,6 +288,35 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
                 interactive: true,
                 trigger: "manual",
                 placement: "bottom-start",
+                popperOptions: {
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, 8],
+                      },
+                    },
+                    {
+                      name: "preventOverflow",
+                      options: {
+                        boundary: "viewport",
+                        padding: 16,
+                        altBoundary: false,
+                      },
+                    },
+                    {
+                      name: "flip",
+                      options: {
+                        fallbackPlacements: [
+                          "top-start",
+                          "bottom-end",
+                          "top-end",
+                        ],
+                        padding: 16,
+                      },
+                    },
+                  ],
+                },
               });
 
               scrollListener = () => {
