@@ -91,6 +91,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
     replyInSameChannel(commentData.parentId, commentData.channelId)
+    reactionHasTargetOrParent(
+      commentData.commentType,
+      commentData.parentId,
+      commentData.targetUri
+    )
     returns (bytes32)
   {
     bytes32 commentId = getCommentId(commentData);
@@ -122,6 +127,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
     replyInSameChannel(commentData.parentId, commentData.channelId)
+    reactionHasTargetOrParent(
+      commentData.commentType,
+      commentData.parentId,
+      commentData.targetUri
+    )
     returns (bytes32)
   {
     bytes32 commentId = getCommentId(commentData);
@@ -1087,4 +1097,23 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     approvals[author][app] = 0;
     emit ApprovalRemoved(author, app);
   }
+
+  modifier reactionHasTargetOrParent(
+    uint8 commentType,
+    bytes32 parentId,
+    string calldata targetUri
+  ) {
+    if (commentType == Comments.COMMENT_TYPE_REACTION) {
+      bool hasParent = parentId != bytes32(0);
+      bool hasTarget = bytes(targetUri).length > 0;
+      if (!hasParent && !hasTarget) {
+        revert InvalidReactionReference(
+          "Reactions must have either a parentId or targetUri"
+        );
+      }
+    }
+    _;
+  }
+
+  error InvalidReactionReference(string reason);
 }
