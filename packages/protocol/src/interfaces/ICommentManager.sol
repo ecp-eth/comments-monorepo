@@ -153,6 +153,8 @@ interface ICommentManager {
   error InvalidValueDistribution(uint256 providedValue, uint256 requiredValue);
   /// @notice Error thrown when batch operation fails
   error BatchOperationFailed(uint256 operationIndex, bytes reason);
+  /// @notice Error thrown when reaction has no parentId or targetUri
+  error InvalidReactionReference(string reason);
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata

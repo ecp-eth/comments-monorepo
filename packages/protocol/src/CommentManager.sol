@@ -1157,8 +1157,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     _;
   }
 
-  error InvalidReactionReference(string reason);
-
   // ============ BATCH OPERATIONS ============
 
   /// @inheritdoc ICommentManager
