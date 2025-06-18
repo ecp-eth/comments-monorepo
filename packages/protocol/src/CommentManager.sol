@@ -1,20 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
+import "solady/auth/Ownable.sol";
+import "solady/utils/ReentrancyGuard.sol";
 import "./libraries/Comments.sol";
 import "./libraries/CommentSigning.sol";
 import "./interfaces/ICommentManager.sol";
 import "./interfaces/IHook.sol";
 import "./ChannelManager.sol";
 import "./libraries/Channels.sol";
-
 /// @title CommentManager - A decentralized comments system
 /// @notice This contract allows users to post and manage comments with optional app-signer approval and channel-specific hooks
 /// @dev Implements EIP-712 for typed structured data hashing and signing
-contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
+contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   string public constant name = "ECP";
   string public constant version = "1";
   bytes32 public immutable DOMAIN_SEPARATOR;
@@ -44,8 +42,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @notice Constructor initializes the contract with the deployer as owner and channel manager
   /// @dev Sets up EIP-712 domain separator
   /// @param initialOwner The address that will own the contract
-  constructor(address initialOwner) Ownable(initialOwner) {
+  constructor(address initialOwner) {
     if (initialOwner == address(0)) revert ZeroAddress();
+
+    _initializeOwner(initialOwner);
 
     DOMAIN_SEPARATOR = CommentSigning.generateDomainSeparator(
       name,

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+import "solady/utils/SignatureCheckerLib.sol";
 import "./Comments.sol";
 import "./Metadata.sol";
 
@@ -210,7 +210,7 @@ library CommentSigning {
   ) internal view returns (bool) {
     return
       msgSender == app ||
-      SignatureChecker.isValidSignatureNow(app, hash, signature);
+      SignatureCheckerLib.isValidSignatureNow(app, hash, signature);
   }
 
   /// @notice Verify author signature
@@ -223,7 +223,7 @@ library CommentSigning {
     bytes32 hash,
     bytes memory signature
   ) internal view returns (bool) {
-    return SignatureChecker.isValidSignatureNow(author, hash, signature);
+    return SignatureCheckerLib.isValidSignatureNow(author, hash, signature);
   }
 
   /// @notice Check if author is approved by app

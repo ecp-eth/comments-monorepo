@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "solady/auth/Ownable.sol";
+import "solady/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./interfaces/IChannelManager.sol";
@@ -38,6 +38,8 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     address initialOwner
   ) ProtocolFees(initialOwner) ERC721("ECP Channel", "ECPC") {
     if (initialOwner == address(0)) revert ZeroAddress();
+
+    _initializeOwner(initialOwner);
 
     // Create default channel with ID 0
     _safeMint(initialOwner, 0);
