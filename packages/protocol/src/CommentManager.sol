@@ -14,7 +14,7 @@ import "./libraries/Channels.sol";
 /// @notice This contract allows users to post and manage comments with optional app-signer approval and channel-specific hooks
 /// @dev Implements EIP-712 for typed structured data hashing and signing
 contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
-  string public constant name = "Comments";
+  string public constant name = "ECP";
   string public constant version = "1";
   bytes32 public immutable DOMAIN_SEPARATOR;
   bytes32 public constant ADD_COMMENT_TYPEHASH =
@@ -31,7 +31,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     );
   bytes32 public constant ADD_APPROVAL_TYPEHASH =
     keccak256(
-      "AddApproval(address author,address app,uint256 nonce,uint256 deadline)"
+      "AddApproval(address author,address app,uint256 expiry,uint256 nonce,uint256 deadline)"
     );
   bytes32 public constant REMOVE_APPROVAL_TYPEHASH =
     keccak256(
@@ -40,8 +40,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
   // On-chain storage mappings
   mapping(bytes32 => Comments.Comment) internal comments;
-  /// @notice Mapping of author to app to approval status
-  mapping(address => mapping(address => bool)) internal approvals;
+  /// @notice Mapping of author to app to approval expiry timestamp (0 means no approval)
+  mapping(address => mapping(address => uint256)) internal approvals;
   /// @notice Mapping of author to app to nonce
   mapping(address => mapping(address => uint256)) internal nonces;
   /// @notice Mapping of comment ID to deleted status, if missing in mapping, the comment is not deleted
@@ -150,7 +150,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         Comments.AuthorAuthMethod.AUTHOR_SIGNATURE
       );
       return commentId;
-    } else if (approvals[commentData.author][app]) {
+    } else if (approvals[commentData.author][app] > block.timestamp) {
       _postComment(
         commentId,
         commentData,
@@ -360,7 +360,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         Comments.AuthorAuthMethod.AUTHOR_SIGNATURE
       );
       return;
-    } else if (approvals[author][app]) {
+    } else if (approvals[author][app] > block.timestamp) {
       _editComment(commentId, editData, Comments.AuthorAuthMethod.APP_APPROVAL);
       return;
     }
@@ -485,7 +485,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         authorSignature
       ));
 
-    bool isAuthorizedByApprovedApp = approvals[author][app] &&
+    bool isAuthorizedByApprovedApp = approvals[author][app] > block.timestamp &&
       (msg.sender == app ||
         SignatureChecker.isValidSignatureNow(app, deleteHash, appSignature));
 
@@ -605,21 +605,28 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function addApproval(address app) external {
-    _addApproval(msg.sender, app);
+  function addApproval(address app, uint256 expiry) external {
+    _addApproval(msg.sender, app, expiry);
   }
 
   /// @inheritdoc ICommentManager
   function addApprovalWithSig(
     address author,
     address app,
+    uint256 expiry,
     uint256 nonce,
     uint256 deadline,
     bytes calldata authorSignature
   ) external notStale(deadline) validateNonce(author, app, nonce) {
     nonces[author][app]++;
 
-    bytes32 addApprovalHash = getAddApprovalHash(author, app, nonce, deadline);
+    bytes32 addApprovalHash = getAddApprovalHash(
+      author,
+      app,
+      expiry,
+      nonce,
+      deadline
+    );
 
     if (
       !SignatureChecker.isValidSignatureNow(
@@ -631,7 +638,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       revert InvalidAuthorSignature();
     }
 
-    _addApproval(author, app);
+    _addApproval(author, app, expiry);
   }
 
   /// @inheritdoc ICommentManager
@@ -673,11 +680,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   function getAddApprovalHash(
     address author,
     address app,
+    uint256 expiry,
     uint256 nonce,
     uint256 deadline
   ) public view returns (bytes32) {
     bytes32 structHash = keccak256(
-      abi.encode(ADD_APPROVAL_TYPEHASH, author, app, nonce, deadline)
+      abi.encode(ADD_APPROVAL_TYPEHASH, author, app, expiry, nonce, deadline)
     );
 
     return
@@ -867,6 +875,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     address author,
     address app
   ) external view returns (bool) {
+    return approvals[author][app] > block.timestamp;
+  }
+
+  /// @inheritdoc ICommentManager
+  function getApprovalExpiry(
+    address author,
+    address app
+  ) external view returns (uint256) {
     return approvals[author][app];
   }
 
@@ -1057,16 +1073,18 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @notice Internal function to add an app signer approval
   /// @param author The address granting approval
   /// @param app The address being approved
-  function _addApproval(address author, address app) internal {
-    approvals[author][app] = true;
-    emit ApprovalAdded(author, app);
+  /// @param expiry The timestamp when the approval expires
+  function _addApproval(address author, address app, uint256 expiry) internal {
+    if (expiry <= block.timestamp) revert InvalidApprovalExpiry();
+    approvals[author][app] = expiry;
+    emit ApprovalAdded(author, app, expiry);
   }
 
   /// @notice Internal function to remove an app signer approval
   /// @param author The address removing approval
   /// @param app The address being unapproved
   function _revokeApproval(address author, address app) internal {
-    approvals[author][app] = false;
+    approvals[author][app] = 0;
     emit ApprovalRemoved(author, app);
   }
 }

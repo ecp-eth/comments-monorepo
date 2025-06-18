@@ -91,7 +91,12 @@ interface ICommentManager {
   /// @notice Emitted when an author approves an app signer
   /// @param author Address of the author giving approval
   /// @param app Address being approved
-  event ApprovalAdded(address indexed author, address indexed app);
+  /// @param expiry The timestamp when the approval expires
+  event ApprovalAdded(
+    address indexed author,
+    address indexed app,
+    uint256 expiry
+  );
 
   /// @notice Emitted when an author removes an app signer's approval
   /// @param author Address of the author removing approval
@@ -130,6 +135,8 @@ interface ICommentManager {
   error HookNotEnabled();
   /// @notice Error thrown when parent comment is not in the same channel
   error ParentCommentNotInSameChannel();
+  /// @notice Error thrown when approval expiry is invalid (in the past)
+  error InvalidApprovalExpiry();
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata
@@ -198,7 +205,8 @@ interface ICommentManager {
 
   /// @notice Approves an app signer when called directly by the author
   /// @param app The address to approve
-  function addApproval(address app) external;
+  /// @param expiry The timestamp when the approval expires
+  function addApproval(address app, uint256 expiry) external;
 
   /// @notice Removes an app signer approval when called directly by the author
   /// @param app The address to remove approval from
@@ -207,12 +215,14 @@ interface ICommentManager {
   /// @notice Approves an app signer with signature verification
   /// @param author The address granting approval
   /// @param app The address being approved
+  /// @param expiry The timestamp when the approval expires
   /// @param nonce The current nonce for the author
   /// @param deadline Timestamp after which the signature becomes invalid
   /// @param signature The author's signature authorizing the approval
   function addApprovalWithSig(
     address author,
     address app,
+    uint256 expiry,
     uint256 nonce,
     uint256 deadline,
     bytes calldata signature
@@ -235,12 +245,14 @@ interface ICommentManager {
   /// @notice Calculates the EIP-712 hash for a permit
   /// @param author Address of the author
   /// @param app Address of the app signer
+  /// @param expiry The timestamp when the approval expires
   /// @param nonce Current nonce for the author
   /// @param deadline Timestamp after which the signature is invalid
   /// @return bytes32 The computed hash
   function getAddApprovalHash(
     address author,
     address app,
+    uint256 expiry,
     uint256 nonce,
     uint256 deadline
   ) external view returns (bytes32);
@@ -351,6 +363,15 @@ interface ICommentManager {
   /// @param app The address of the app
   /// @return The approval status
   function isApproved(address author, address app) external view returns (bool);
+
+  /// @notice Get the approval expiry timestamp for an author and app
+  /// @param author The address of the author
+  /// @param app The address of the app
+  /// @return The approval expiry timestamp (0 if not approved)
+  function getApprovalExpiry(
+    address author,
+    address app
+  ) external view returns (uint256);
 
   /// @notice Get the nonce for an author and app
   /// @param author The address of the author

@@ -168,7 +168,7 @@ contract CommentsTest is Test, IERC721Receiver {
     commentData.app = app;
 
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Send transaction as author
     vm.prank(author);
@@ -216,7 +216,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_PostCommentWithSigs_ValidAppSignature_AppApproved() public {
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Create and post comment
     Comments.CreateComment memory commentData = TestUtils
@@ -259,8 +259,8 @@ contract CommentsTest is Test, IERC721Receiver {
     address anotherApp = address(0x999);
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
-    comments.addApproval(anotherApp);
+    comments.addApproval(app, block.timestamp + 30 days);
+    comments.addApproval(anotherApp, block.timestamp + 30 days);
 
     // Create and post comment
     Comments.CreateComment memory commentData = TestUtils
@@ -847,7 +847,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_PostCommentWithSig_StoresAppApprovalAuthMethod() public {
     // First add approval for the app
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     Comments.CreateComment memory commentData = TestUtils
       .generateDummyCreateComment(author, app);
@@ -878,6 +878,37 @@ contract CommentsTest is Test, IERC721Receiver {
     );
     assertEq(storedComment.author, author, "Author should match");
     assertEq(storedComment.app, app, "App should match");
+  }
+
+  function test_PostCommentWithSig_ExpiredApproval_Reverts() public {
+    // Add approval with expiry in the near future
+    uint256 expiry = block.timestamp + 1;
+    vm.prank(author);
+    comments.addApproval(app, expiry);
+
+    // Advance time past expiry
+    vm.warp(expiry + 1);
+
+    // Prepare comment data
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.app = app;
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    // Try to post comment with only app signature (should revert due to expired approval)
+    vm.expectRevert(
+      abi.encodeWithSelector(
+        ICommentManager.NotAuthorized.selector,
+        address(this),
+        author
+      )
+    );
+    comments.postCommentWithSig(commentData, bytes(""), appSignature);
   }
 }
 

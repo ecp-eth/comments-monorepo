@@ -15,7 +15,11 @@ import { Hooks } from "../src/libraries/Hooks.sol";
 import { Metadata } from "../src/libraries/Metadata.sol";
 
 contract CommentsTest is Test, IERC721Receiver {
-  event ApprovalAdded(address indexed approver, address indexed approved);
+  event ApprovalAdded(
+    address indexed approver,
+    address indexed approved,
+    uint256 expiry
+  );
   event ApprovalRemoved(address indexed approver, address indexed approved);
   event CommentAdded(
     bytes32 indexed commentId,
@@ -60,10 +64,11 @@ contract CommentsTest is Test, IERC721Receiver {
   }
 
   function test_AddApproval() public {
+    uint256 expiry = block.timestamp + 30 days;
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
-    emit ApprovalAdded(author, app);
-    comments.addApproval(app);
+    emit ApprovalAdded(author, app, expiry);
+    comments.addApproval(app, expiry);
 
     assertTrue(comments.isApproved(author, app));
   }
@@ -71,7 +76,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_revokeApproval() public {
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Then remove it
     vm.prank(author);
@@ -83,12 +88,14 @@ contract CommentsTest is Test, IERC721Receiver {
   }
 
   function test_AddApproval_WithSignature() public {
+    uint256 expiry = block.timestamp + 30 days;
     uint256 nonce = 0;
     uint256 deadline = block.timestamp + 1 days;
 
     bytes32 addApprovalHash = comments.getAddApprovalHash(
       author,
       app,
+      expiry,
       nonce,
       deadline
     );
@@ -100,8 +107,15 @@ contract CommentsTest is Test, IERC721Receiver {
 
     vm.prank(author);
     vm.expectEmit(true, true, true, true);
-    emit ApprovalAdded(author, app);
-    comments.addApprovalWithSig(author, app, nonce, deadline, signature);
+    emit ApprovalAdded(author, app, expiry);
+    comments.addApprovalWithSig(
+      author,
+      app,
+      expiry,
+      nonce,
+      deadline,
+      signature
+    );
 
     assertTrue(comments.isApproved(author, app));
   }
@@ -109,7 +123,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_revokeApproval_WithSignature() public {
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     uint256 nonce = 0;
     uint256 deadline = block.timestamp + 1 days;
@@ -135,12 +149,14 @@ contract CommentsTest is Test, IERC721Receiver {
   }
 
   function test_AddApproval_InvalidNonce() public {
+    uint256 expiry = block.timestamp + 30 days;
     uint256 wrongNonce = 1;
     uint256 deadline = block.timestamp + 1 days;
 
     bytes32 addApprovalHash = comments.getAddApprovalHash(
       author,
       app,
+      expiry,
       wrongNonce,
       deadline
     );
@@ -159,12 +175,19 @@ contract CommentsTest is Test, IERC721Receiver {
         1
       )
     );
-    comments.addApprovalWithSig(author, app, wrongNonce, deadline, signature);
+    comments.addApprovalWithSig(
+      author,
+      app,
+      expiry,
+      wrongNonce,
+      deadline,
+      signature
+    );
   }
 
   function test_revokeApproval_InvalidNonce() public {
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     uint256 wrongNonce = 1;
     uint256 deadline = block.timestamp + 1 days;
@@ -202,7 +225,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_ApprovalLifecycle() public {
     // Add approval
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
     assertTrue(comments.isApproved(author, app));
 
     // Post comment without author signature (using approval)

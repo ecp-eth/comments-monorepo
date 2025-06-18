@@ -444,7 +444,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_EditCommentWithSig_AppSignature_AppApproved() public {
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Create and post a comment
     Comments.CreateComment memory commentData = TestUtils
@@ -508,7 +508,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_EditCommentWithSig_SenderIsApp_NoAppSignature() public {
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Create and post a comment
     Comments.CreateComment memory commentData = TestUtils

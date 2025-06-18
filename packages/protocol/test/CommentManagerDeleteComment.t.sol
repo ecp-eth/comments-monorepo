@@ -180,7 +180,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.prank(author);
     comments.postComment(commentData, appSignature);
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Delete the comment with signature
     bytes32 deleteHash = comments.getDeleteCommentHash(
@@ -264,7 +264,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.prank(author);
     comments.postComment(commentData, appSignature);
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Try to delete with wrong signature
     uint256 deadline = block.timestamp + 1 days;
@@ -308,7 +308,7 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.prank(author);
     comments.postComment(commentData, appSignature);
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Delete the comment without signature if the sender is the app itself
     vm.prank(app);
@@ -403,7 +403,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_WithApprovedSigner() public {
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Create and post a comment
     Comments.CreateComment memory commentData = TestUtils
