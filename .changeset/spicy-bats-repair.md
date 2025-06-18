@@ -1,6 +1,6 @@
 ---
-"@ecp.eth/indexer": minor
-"@ecp.eth/sdk": minor
+"@ecp.eth/indexer": patch
+"@ecp.eth/sdk": patch
 ---
 
 feat: channels indexing + api
