@@ -280,8 +280,9 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
               });
 
               popup = tippy(document.body, {
-                getReferenceClientRect: () => clientRect,
-                appendTo: () => document.body,
+                getReferenceClientRect: () =>
+                  props.clientRect?.() ?? clientRect,
+                appendTo: document.body,
                 content: reactRenderer.element,
                 showOnCreate: true,
                 interactive: true,

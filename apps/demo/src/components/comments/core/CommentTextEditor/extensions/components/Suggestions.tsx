@@ -122,14 +122,18 @@ function AccountSuggestion({
   handle,
 }: AccountSuggestionProps) {
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="flex flex-row items-center gap-2 w-full min-w-0">
       <div
-        className="rounded-full bg-cover bg-center size-12 bg-muted border border-border"
-        style={{ backgroundImage: avatarUrl ? `url(${avatarUrl})` : undefined }}
+        className="rounded-full bg-cover bg-center size-10 bg-muted border border-border flex-shrink-0"
+        style={{
+          backgroundImage: `url(${avatarUrl || "data:image/svg+xml;base64,CiAgPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMTAgMTEwIj4KICAgIDxkZWZzPgogICAgICA8bGluZWFyR3JhZGllbnQgaWQ9Imd6ciIgeDE9IjEwNi45NzUiIHkxPSIxMzYuMTU2IiB4Mj0iLTEyLjk4MTUiIHkyPSIxMy41MzQ3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgICAgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxMzEuNjM4IDEyOS44MzUpIHJvdGF0ZSgtMTQxLjE5NCkgc2NhbGUoMTg1LjU4MikiPgogICAgICAgIDxzdG9wIG9mZnNldD0iMC4xNTYyIiBzdG9wLWNvbG9yPSJoc2woMTQxLCA4NiUsIDkwJSkiIC8+CiAgICAgICAgPHN0b3Agb2Zmc2V0PSIwLjM5NTgiIHN0b3AtY29sb3I9ImhzbCgxNDEsIDg3JSwgNjglKSIgLz4KICAgICAgICA8c3RvcCBvZmZzZXQ9IjAuNzI5MiIgc3RvcC1jb2xvcj0iaHNsKDIyMSwgODklLCA0NSUpIiAvPgogICAgICAgIDxzdG9wIG9mZnNldD0iMC45MDYzIiBzdG9wLWNvbG9yPSJoc2woMjMxLCA5NCUsIDM2JSkiIC8+CiAgICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSJoc2woMjMxLCA5NiUsIDM2JSkiIC8+CiAgICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8L2RlZnM+CiAgICA8cGF0aAogICAgICBkPSJNMTEwIDU1QzExMCAyNC42MjQ0IDg1LjM3NTYgMCA1NSAwQzI0LjYyNDQgMCAwIDI0LjYyNDQgMCA1NUMwIDg1LjM3NTYgMjQuNjI0NCAxMTAgNTUgMTEwQzg1LjM3NTYgMTEwIDExMCA4NS4zNzU2IDExMCA1NVoiCiAgICAgIGZpbGw9InVybCgjZ3pyKSIgLz4KICA8L3N2Zz4KICAgIA=="}`,
+        }}
       ></div>
-      <div className="flex flex-col gap-1 items-start">
-        <span className="text-sm">{name}</span>
-        <span className="text-sm text-muted-foreground">{handle}</span>
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className="text-sm truncate w-full text-left">{name}</span>
+        <span className="text-sm text-muted-foreground truncate w-full text-left">
+          {handle}
+        </span>
       </div>
     </div>
   );
@@ -141,18 +145,20 @@ type ERC20TokenSuggestionProps = {
 
 function ERC20TokenSuggestion({ suggestion }: ERC20TokenSuggestionProps) {
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="flex flex-row items-center gap-2 w-full min-w-0">
       <div
-        className="rounded-full bg-cover bg-center size-12 bg-muted border border-border"
+        className="rounded-full bg-cover bg-center size-10 bg-muted border border-border flex-shrink-0"
         style={{
           backgroundImage: suggestion.logoURI
             ? `url(${suggestion.logoURI})`
             : undefined,
         }}
       ></div>
-      <div className="flex flex-col gap-1 items-start">
-        <span className="text-sm">${suggestion.symbol}</span>
-        <span className="text-sm text-muted-foreground">
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className="text-sm truncate w-full text-left">
+          ${suggestion.symbol}
+        </span>
+        <span className="text-sm text-muted-foreground truncate w-full text-left">
           {getChainById(suggestion.chainId, Object.values(chains))?.name}
         </span>
       </div>
