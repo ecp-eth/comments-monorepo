@@ -262,7 +262,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         render: () => {
           let reactRenderer: ReactRenderer<SuggestionsRef, SuggestionsProps>;
           let popup: Instance;
-          let scrollListener: () => void;
+          let scrollListener: (() => void) | undefined;
 
           return {
             onStart: (props) => {
@@ -318,13 +318,27 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
                 return true;
               }
 
+              if (!popup?.state.isShown) {
+                // make sure that we won't select a last selected suggestion if popup is not shown
+                return false;
+              }
+
               return reactRenderer?.ref?.onKeyDown(props) || false;
             },
 
             onExit() {
-              popup?.destroy();
-              reactRenderer?.destroy();
-              window.removeEventListener("scroll", scrollListener);
+              // avoid warnings
+              if (popup) {
+                popup.destroy();
+              }
+
+              if (reactRenderer) {
+                reactRenderer.destroy();
+              }
+
+              if (scrollListener) {
+                window.removeEventListener("scroll", scrollListener);
+              }
             },
           };
         },
