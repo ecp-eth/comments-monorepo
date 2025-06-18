@@ -481,8 +481,6 @@ paths:
                                     type: string
                                     enum:
                                       - erc20
-                                  chainId:
-                                    type: integer
                                   symbol:
                                     type: string
                                   logoURI:
@@ -492,11 +490,8 @@ paths:
                                   name:
                                     type: string
                                   address: {}
-                                  caip19:
-                                    type: string
-                                  url:
-                                    type: string
-                                    format: uri
+                                  decimals:
+                                    type: integer
                                   position:
                                     type: object
                                     properties:
@@ -507,16 +502,34 @@ paths:
                                     required:
                                       - start
                                       - end
+                                  chainId:
+                                    type:
+                                      - integer
+                                      - 'null'
+                                    exclusiveMinimum: 0
+                                  chains:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        caip:
+                                          type: string
+                                        chainId:
+                                          type: integer
+                                          exclusiveMinimum: 0
+                                      required:
+                                        - caip
+                                        - chainId
                                 required:
                                   - type
-                                  - chainId
                                   - symbol
                                   - logoURI
                                   - name
                                   - address
-                                  - caip19
-                                  - url
+                                  - decimals
                                   - position
+                                  - chainId
+                                  - chains
                               - type: object
                                 properties:
                                   type:
@@ -526,6 +539,8 @@ paths:
                                   address: {}
                                   fid:
                                     type: integer
+                                  fname:
+                                    type: string
                                   username:
                                     type: string
                                   displayName:
@@ -553,6 +568,7 @@ paths:
                                   - type
                                   - address
                                   - fid
+                                  - fname
                                   - username
                                   - displayName
                                   - pfpUrl
@@ -883,8 +899,6 @@ paths:
                                               type: string
                                               enum:
                                                 - erc20
-                                            chainId:
-                                              type: integer
                                             symbol:
                                               type: string
                                             logoURI:
@@ -894,11 +908,8 @@ paths:
                                             name:
                                               type: string
                                             address: {}
-                                            caip19:
-                                              type: string
-                                            url:
-                                              type: string
-                                              format: uri
+                                            decimals:
+                                              type: integer
                                             position:
                                               type: object
                                               properties:
@@ -909,16 +920,34 @@ paths:
                                               required:
                                                 - start
                                                 - end
+                                            chainId:
+                                              type:
+                                                - integer
+                                                - 'null'
+                                              exclusiveMinimum: 0
+                                            chains:
+                                              type: array
+                                              items:
+                                                type: object
+                                                properties:
+                                                  caip:
+                                                    type: string
+                                                  chainId:
+                                                    type: integer
+                                                    exclusiveMinimum: 0
+                                                required:
+                                                  - caip
+                                                  - chainId
                                           required:
                                             - type
-                                            - chainId
                                             - symbol
                                             - logoURI
                                             - name
                                             - address
-                                            - caip19
-                                            - url
+                                            - decimals
                                             - position
+                                            - chainId
+                                            - chains
                                         - type: object
                                           properties:
                                             type:
@@ -928,6 +957,8 @@ paths:
                                             address: {}
                                             fid:
                                               type: integer
+                                            fname:
+                                              type: string
                                             username:
                                               type: string
                                             displayName:
@@ -955,6 +986,7 @@ paths:
                                             - type
                                             - address
                                             - fid
+                                            - fname
                                             - username
                                             - displayName
                                             - pfpUrl
@@ -1477,8 +1509,6 @@ paths:
                                     type: string
                                     enum:
                                       - erc20
-                                  chainId:
-                                    type: integer
                                   symbol:
                                     type: string
                                   logoURI:
@@ -1488,11 +1518,8 @@ paths:
                                   name:
                                     type: string
                                   address: {}
-                                  caip19:
-                                    type: string
-                                  url:
-                                    type: string
-                                    format: uri
+                                  decimals:
+                                    type: integer
                                   position:
                                     type: object
                                     properties:
@@ -1503,16 +1530,34 @@ paths:
                                     required:
                                       - start
                                       - end
+                                  chainId:
+                                    type:
+                                      - integer
+                                      - 'null'
+                                    exclusiveMinimum: 0
+                                  chains:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        caip:
+                                          type: string
+                                        chainId:
+                                          type: integer
+                                          exclusiveMinimum: 0
+                                      required:
+                                        - caip
+                                        - chainId
                                 required:
                                   - type
-                                  - chainId
                                   - symbol
                                   - logoURI
                                   - name
                                   - address
-                                  - caip19
-                                  - url
+                                  - decimals
                                   - position
+                                  - chainId
+                                  - chains
                               - type: object
                                 properties:
                                   type:
@@ -1522,6 +1567,8 @@ paths:
                                   address: {}
                                   fid:
                                     type: integer
+                                  fname:
+                                    type: string
                                   username:
                                     type: string
                                   displayName:
@@ -1549,6 +1596,7 @@ paths:
                                   - type
                                   - address
                                   - fid
+                                  - fname
                                   - username
                                   - displayName
                                   - pfpUrl
@@ -1879,8 +1927,6 @@ paths:
                                               type: string
                                               enum:
                                                 - erc20
-                                            chainId:
-                                              type: integer
                                             symbol:
                                               type: string
                                             logoURI:
@@ -1890,11 +1936,8 @@ paths:
                                             name:
                                               type: string
                                             address: {}
-                                            caip19:
-                                              type: string
-                                            url:
-                                              type: string
-                                              format: uri
+                                            decimals:
+                                              type: integer
                                             position:
                                               type: object
                                               properties:
@@ -1905,16 +1948,34 @@ paths:
                                               required:
                                                 - start
                                                 - end
+                                            chainId:
+                                              type:
+                                                - integer
+                                                - 'null'
+                                              exclusiveMinimum: 0
+                                            chains:
+                                              type: array
+                                              items:
+                                                type: object
+                                                properties:
+                                                  caip:
+                                                    type: string
+                                                  chainId:
+                                                    type: integer
+                                                    exclusiveMinimum: 0
+                                                required:
+                                                  - caip
+                                                  - chainId
                                           required:
                                             - type
-                                            - chainId
                                             - symbol
                                             - logoURI
                                             - name
                                             - address
-                                            - caip19
-                                            - url
+                                            - decimals
                                             - position
+                                            - chainId
+                                            - chains
                                         - type: object
                                           properties:
                                             type:
@@ -1924,6 +1985,8 @@ paths:
                                             address: {}
                                             fid:
                                               type: integer
+                                            fname:
+                                              type: string
                                             username:
                                               type: string
                                             displayName:
@@ -1951,6 +2014,7 @@ paths:
                                             - type
                                             - address
                                             - fid
+                                            - fname
                                             - username
                                             - displayName
                                             - pfpUrl
@@ -2725,8 +2789,6 @@ paths:
                                     type: string
                                     enum:
                                       - erc20
-                                  chainId:
-                                    type: integer
                                   symbol:
                                     type: string
                                   logoURI:
@@ -2736,11 +2798,8 @@ paths:
                                   name:
                                     type: string
                                   address: {}
-                                  caip19:
-                                    type: string
-                                  url:
-                                    type: string
-                                    format: uri
+                                  decimals:
+                                    type: integer
                                   position:
                                     type: object
                                     properties:
@@ -2751,16 +2810,34 @@ paths:
                                     required:
                                       - start
                                       - end
+                                  chainId:
+                                    type:
+                                      - integer
+                                      - 'null'
+                                    exclusiveMinimum: 0
+                                  chains:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        caip:
+                                          type: string
+                                        chainId:
+                                          type: integer
+                                          exclusiveMinimum: 0
+                                      required:
+                                        - caip
+                                        - chainId
                                 required:
                                   - type
-                                  - chainId
                                   - symbol
                                   - logoURI
                                   - name
                                   - address
-                                  - caip19
-                                  - url
+                                  - decimals
                                   - position
+                                  - chainId
+                                  - chains
                               - type: object
                                 properties:
                                   type:
@@ -2770,6 +2847,8 @@ paths:
                                   address: {}
                                   fid:
                                     type: integer
+                                  fname:
+                                    type: string
                                   username:
                                     type: string
                                   displayName:
@@ -2797,6 +2876,7 @@ paths:
                                   - type
                                   - address
                                   - fid
+                                  - fname
                                   - username
                                   - displayName
                                   - pfpUrl
@@ -3208,8 +3288,6 @@ paths:
                               type: string
                               enum:
                                 - erc20
-                            chainId:
-                              type: integer
                             symbol:
                               type: string
                             logoURI:
@@ -3219,11 +3297,8 @@ paths:
                             name:
                               type: string
                             address: {}
-                            caip19:
-                              type: string
-                            url:
-                              type: string
-                              format: uri
+                            decimals:
+                              type: integer
                             position:
                               type: object
                               properties:
@@ -3234,16 +3309,34 @@ paths:
                               required:
                                 - start
                                 - end
+                            chainId:
+                              type:
+                                - integer
+                                - 'null'
+                              exclusiveMinimum: 0
+                            chains:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  caip:
+                                    type: string
+                                  chainId:
+                                    type: integer
+                                    exclusiveMinimum: 0
+                                required:
+                                  - caip
+                                  - chainId
                           required:
                             - type
-                            - chainId
                             - symbol
                             - logoURI
                             - name
                             - address
-                            - caip19
-                            - url
+                            - decimals
                             - position
+                            - chainId
+                            - chains
                         - type: object
                           properties:
                             type:
@@ -3253,6 +3346,8 @@ paths:
                             address: {}
                             fid:
                               type: integer
+                            fname:
+                              type: string
                             username:
                               type: string
                             displayName:
@@ -3280,6 +3375,7 @@ paths:
                             - type
                             - address
                             - fid
+                            - fname
                             - username
                             - displayName
                             - pfpUrl
@@ -3672,8 +3768,6 @@ paths:
                               type: string
                               enum:
                                 - erc20
-                            chainId:
-                              type: integer
                             symbol:
                               type: string
                             logoURI:
@@ -3683,11 +3777,8 @@ paths:
                             name:
                               type: string
                             address: {}
-                            caip19:
-                              type: string
-                            url:
-                              type: string
-                              format: uri
+                            decimals:
+                              type: integer
                             position:
                               type: object
                               properties:
@@ -3698,16 +3789,34 @@ paths:
                               required:
                                 - start
                                 - end
+                            chainId:
+                              type:
+                                - integer
+                                - 'null'
+                              exclusiveMinimum: 0
+                            chains:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  caip:
+                                    type: string
+                                  chainId:
+                                    type: integer
+                                    exclusiveMinimum: 0
+                                required:
+                                  - caip
+                                  - chainId
                           required:
                             - type
-                            - chainId
                             - symbol
                             - logoURI
                             - name
                             - address
-                            - caip19
-                            - url
+                            - decimals
                             - position
+                            - chainId
+                            - chains
                         - type: object
                           properties:
                             type:
@@ -3717,6 +3826,8 @@ paths:
                             address: {}
                             fid:
                               type: integer
+                            fname:
+                              type: string
                             username:
                               type: string
                             displayName:
@@ -3744,6 +3855,7 @@ paths:
                             - type
                             - address
                             - fid
+                            - fname
                             - username
                             - displayName
                             - pfpUrl

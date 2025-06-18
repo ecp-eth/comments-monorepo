@@ -93,6 +93,7 @@ export function parse(
               address: reference.address,
               name: reference.name,
               url: reference.url,
+              avatarUrl: reference.avatarUrl,
             } satisfies MentionItem,
           });
 
