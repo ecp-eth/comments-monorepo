@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "./libraries/Comments.sol";
+import "./libraries/CommentSigning.sol";
 import "./interfaces/ICommentManager.sol";
 import "./interfaces/IHook.sol";
 import "./ChannelManager.sol";
@@ -18,26 +18,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   string public constant name = "ECP";
   string public constant version = "1";
   bytes32 public immutable DOMAIN_SEPARATOR;
-  bytes32 public constant ADD_COMMENT_TYPEHASH =
-    keccak256(
-      "AddComment(string content,MetadataEntry[] metadata,string targetUri,uint8 commentType,address author,address app,uint256 channelId,uint256 deadline,bytes32 parentId)MetadataEntry(bytes32 key,bytes value)"
-    );
-  bytes32 public constant DELETE_COMMENT_TYPEHASH =
-    keccak256(
-      "DeleteComment(bytes32 commentId,address author,address app,uint256 deadline)"
-    );
-  bytes32 public constant EDIT_COMMENT_TYPEHASH =
-    keccak256(
-      "EditComment(bytes32 commentId,string content,MetadataEntry[] metadata,address author,address app,uint256 nonce,uint256 deadline)MetadataEntry(bytes32 key,bytes value)"
-    );
-  bytes32 public constant ADD_APPROVAL_TYPEHASH =
-    keccak256(
-      "AddApproval(address author,address app,uint256 expiry,uint256 nonce,uint256 deadline)"
-    );
-  bytes32 public constant REMOVE_APPROVAL_TYPEHASH =
-    keccak256(
-      "RemoveApproval(address author,address app,uint256 nonce,uint256 deadline)"
-    );
 
   // On-chain storage mappings
   mapping(bytes32 => Comments.Comment) internal comments;
@@ -67,16 +47,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   constructor(address initialOwner) Ownable(initialOwner) {
     if (initialOwner == address(0)) revert ZeroAddress();
 
-    DOMAIN_SEPARATOR = keccak256(
-      abi.encode(
-        keccak256(
-          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        ),
-        keccak256(bytes(name)),
-        keccak256(bytes(version)),
-        block.chainid,
-        address(this)
-      )
+    DOMAIN_SEPARATOR = CommentSigning.generateDomainSeparator(
+      name,
+      version,
+      block.chainid,
+      address(this)
     );
   }
 
@@ -107,15 +82,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     )
     returns (bytes32)
   {
-    bytes32 commentId = getCommentId(commentData);
+    bytes32 commentId = CommentSigning.getCommentId(
+      commentData,
+      DOMAIN_SEPARATOR
+    );
     address app = commentData.app;
 
     // Verify the App signature.
     if (
-      // for direct contract calls where msg.sender = app = comment.author
-      msg.sender == app ||
-      // or comment.app signs the comment
-      SignatureChecker.isValidSignatureNow(app, commentId, appSignature)
+      CommentSigning.verifyAppSignature(
+        app,
+        commentId,
+        appSignature,
+        msg.sender
+      )
     ) {
       _createComment(
         commentId,
@@ -163,21 +143,26 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     )
     returns (bytes32)
   {
-    bytes32 commentId = getCommentId(commentData);
+    bytes32 commentId = CommentSigning.getCommentId(
+      commentData,
+      DOMAIN_SEPARATOR
+    );
     address app = commentData.app;
 
     if (
-      // skip app signature check if msg.sender is the app itself
-      msg.sender != app &&
-      !SignatureChecker.isValidSignatureNow(app, commentId, appSignature)
+      !CommentSigning.verifyAppSignature(
+        app,
+        commentId,
+        appSignature,
+        msg.sender
+      )
     ) {
       revert InvalidAppSignature();
     }
 
     // Verify the author signature.
     if (
-      // consider authorized if the author has signed the comment hash
-      SignatureChecker.isValidSignatureNow(
+      CommentSigning.verifyAuthorSignature(
         commentData.author,
         commentId,
         authorSignature
@@ -190,7 +175,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         value
       );
       return commentId;
-    } else if (approvals[commentData.author][app] > block.timestamp) {
+    } else if (
+      CommentSigning.isApprovalValid(
+        commentData.author,
+        app,
+        approvals[commentData.author][app]
+      )
+    ) {
       _createComment(
         commentId,
         commentData,
@@ -348,14 +339,16 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     nonces[author][app]++;
 
-    bytes32 editHash = _getEditCommentHash(commentId, author, editData);
+    bytes32 editHash = CommentSigning.getEditCommentHash(
+      commentId,
+      author,
+      editData,
+      DOMAIN_SEPARATOR
+    );
 
     // Verify the app signature.
     if (
-      // In the case of direct contract calls, where `author == app == contract address`.
-      msg.sender == app ||
-      // or the app signs the edit hash
-      SignatureChecker.isValidSignatureNow(app, editHash, appSignature)
+      CommentSigning.verifyAppSignature(app, editHash, appSignature, msg.sender)
     ) {
       _editComment(
         commentId,
@@ -410,21 +403,28 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     require(author != address(0), "Comment does not exist");
 
-    bytes32 editHash = _getEditCommentHash(commentId, author, editData);
+    bytes32 editHash = CommentSigning.getEditCommentHash(
+      commentId,
+      author,
+      editData,
+      DOMAIN_SEPARATOR
+    );
 
     // Verify the app signature.
     if (
-      // skip app signature check if msg.sender is the app itself
-      msg.sender != app &&
-      !SignatureChecker.isValidSignatureNow(app, editHash, appSignature)
+      !CommentSigning.verifyAppSignature(
+        app,
+        editHash,
+        appSignature,
+        msg.sender
+      )
     ) {
       revert InvalidAppSignature();
     }
 
     // Verify the author signature.
     if (
-      // consider authorized if the author has signed the comment hash
-      SignatureChecker.isValidSignatureNow(author, editHash, authorSignature)
+      CommentSigning.verifyAuthorSignature(author, editHash, authorSignature)
     ) {
       _editComment(
         commentId,
@@ -433,7 +433,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         value
       );
       return;
-    } else if (approvals[author][app] > block.timestamp) {
+    } else if (
+      CommentSigning.isApprovalValid(author, app, approvals[author][app])
+    ) {
       _editComment(
         commentId,
         editData,
@@ -552,19 +554,33 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Comments.Comment storage comment = comments[commentId];
     address author = comment.author;
 
-    bytes32 deleteHash = getDeleteCommentHash(commentId, author, app, deadline);
+    bytes32 deleteHash = CommentSigning.getDeleteCommentHash(
+      commentId,
+      author,
+      app,
+      deadline,
+      DOMAIN_SEPARATOR
+    );
 
     // for deleting comment, only single party (either author or app) is needed for authorization
     bool isAuthorizedByAuthor = (msg.sender == author ||
-      SignatureChecker.isValidSignatureNow(
+      CommentSigning.verifyAuthorSignature(
         author,
         deleteHash,
         authorSignature
       ));
 
-    bool isAuthorizedByApprovedApp = approvals[author][app] > block.timestamp &&
-      (msg.sender == app ||
-        SignatureChecker.isValidSignatureNow(app, deleteHash, appSignature));
+    bool isAuthorizedByApprovedApp = CommentSigning.isApprovalValid(
+      author,
+      app,
+      approvals[author][app]
+    ) &&
+      CommentSigning.verifyAppSignature(
+        app,
+        deleteHash,
+        appSignature,
+        msg.sender
+      );
 
     if (isAuthorizedByAuthor || isAuthorizedByApprovedApp) {
       _deleteComment(commentId, author);
@@ -696,16 +712,17 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   ) external notStale(deadline) validateNonce(author, app, nonce) {
     nonces[author][app]++;
 
-    bytes32 addApprovalHash = getAddApprovalHash(
+    bytes32 addApprovalHash = CommentSigning.getAddApprovalHash(
       author,
       app,
       expiry,
       nonce,
-      deadline
+      deadline,
+      DOMAIN_SEPARATOR
     );
 
     if (
-      !SignatureChecker.isValidSignatureNow(
+      !CommentSigning.verifyAuthorSignature(
         author,
         addApprovalHash,
         authorSignature
@@ -732,15 +749,16 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   ) external notStale(deadline) validateNonce(author, app, nonce) {
     nonces[author][app]++;
 
-    bytes32 removeApprovalHash = getRemoveApprovalHash(
+    bytes32 removeApprovalHash = CommentSigning.getRemoveApprovalHash(
       author,
       app,
       nonce,
-      deadline
+      deadline,
+      DOMAIN_SEPARATOR
     );
 
     if (
-      !SignatureChecker.isValidSignatureNow(
+      !CommentSigning.verifyAuthorSignature(
         author,
         removeApprovalHash,
         authorSignature
@@ -760,12 +778,15 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     uint256 nonce,
     uint256 deadline
   ) public view returns (bytes32) {
-    bytes32 structHash = keccak256(
-      abi.encode(ADD_APPROVAL_TYPEHASH, author, app, expiry, nonce, deadline)
-    );
-
     return
-      keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+      CommentSigning.getAddApprovalHash(
+        author,
+        app,
+        expiry,
+        nonce,
+        deadline,
+        DOMAIN_SEPARATOR
+      );
   }
 
   /// @inheritdoc ICommentManager
@@ -775,12 +796,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     uint256 nonce,
     uint256 deadline
   ) public view returns (bytes32) {
-    bytes32 structHash = keccak256(
-      abi.encode(REMOVE_APPROVAL_TYPEHASH, author, app, nonce, deadline)
-    );
-
     return
-      keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+      CommentSigning.getRemoveApprovalHash(
+        author,
+        app,
+        nonce,
+        deadline,
+        DOMAIN_SEPARATOR
+      );
   }
 
   /// @inheritdoc ICommentManager
@@ -790,12 +813,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     address app,
     uint256 deadline
   ) public view returns (bytes32) {
-    bytes32 structHash = keccak256(
-      abi.encode(DELETE_COMMENT_TYPEHASH, commentId, author, app, deadline)
-    );
-
     return
-      keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+      CommentSigning.getDeleteCommentHash(
+        commentId,
+        author,
+        app,
+        deadline,
+        DOMAIN_SEPARATOR
+      );
   }
 
   /// @inheritdoc ICommentManager
@@ -804,92 +829,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     address author,
     Comments.EditComment calldata editData
   ) public view returns (bytes32) {
-    bytes32 structHash = keccak256(
-      abi.encode(
-        EDIT_COMMENT_TYPEHASH,
-        commentId,
-        keccak256(bytes(editData.content)),
-        _hashMetadataArray(editData.metadata),
-        author,
-        editData.app,
-        editData.nonce,
-        editData.deadline
-      )
-    );
-
     return
-      keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+      CommentSigning.getEditCommentHash(
+        commentId,
+        author,
+        editData,
+        DOMAIN_SEPARATOR
+      );
   }
 
   /// @inheritdoc ICommentManager
   function getCommentId(
     Comments.CreateComment memory commentData
   ) public view returns (bytes32) {
-    bytes32 structHash = keccak256(
-      abi.encode(
-        ADD_COMMENT_TYPEHASH,
-        keccak256(bytes(commentData.content)),
-        _hashMetadataArray(commentData.metadata),
-        keccak256(bytes(commentData.targetUri)),
-        commentData.commentType,
-        commentData.author,
-        commentData.app,
-        commentData.channelId,
-        commentData.deadline,
-        commentData.parentId
-      )
-    );
-
-    return
-      keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
-  }
-
-  /// @notice Internal function to hash metadata array for EIP-712
-  /// @param metadata The metadata array to hash
-  /// @return The hash of the metadata array
-  function _hashMetadataArray(
-    Metadata.MetadataEntry[] memory metadata
-  ) internal pure returns (bytes32) {
-    bytes32[] memory hashedEntries = new bytes32[](metadata.length);
-
-    for (uint i = 0; i < metadata.length; i++) {
-      hashedEntries[i] = keccak256(
-        abi.encode(
-          keccak256("MetadataEntry(bytes32 key,bytes value)"),
-          metadata[i].key,
-          keccak256(metadata[i].value)
-        )
-      );
-    }
-
-    return keccak256(abi.encodePacked(hashedEntries));
-  }
-
-  /// @notice Helper function to compute edit comment hash from memory struct
-  /// @param commentId The unique identifier of the comment to edit
-  /// @param author The address of the comment author
-  /// @param editData The comment data struct containing content and metadata
-  /// @return The computed hash
-  function _getEditCommentHash(
-    bytes32 commentId,
-    address author,
-    Comments.EditComment memory editData
-  ) internal view returns (bytes32) {
-    bytes32 structHash = keccak256(
-      abi.encode(
-        EDIT_COMMENT_TYPEHASH,
-        commentId,
-        keccak256(bytes(editData.content)),
-        _hashMetadataArray(editData.metadata),
-        author,
-        editData.app,
-        editData.nonce,
-        editData.deadline
-      )
-    );
-
-    return
-      keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+    return CommentSigning.getCommentId(commentData, DOMAIN_SEPARATOR);
   }
 
   /// @inheritdoc ICommentManager
