@@ -11,16 +11,7 @@ import {
   IndexerAPIFarcasterDataSchema,
   type IndexerAPIFarcasterDataSchemaType,
 } from "@ecp.eth/sdk/indexer";
-
-export type ResolvedFarcasterData = {
-  fid: number;
-  fname: string;
-  address: Hex;
-  username: string;
-  displayName?: string;
-  pfpUrl?: string;
-  url: string;
-};
+import type { ResolvedFarcasterData } from "./farcaster.types";
 
 export type FarcasterByAddressResolver = DataLoader<
   Hex,

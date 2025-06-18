@@ -8,10 +8,13 @@ import {
   type ERC20ByAddressResolverKey,
   createENSByAddressResolver,
   createENSByNameResolver,
+  createFarcasterByNameResolver,
   // createERC20ByQueryResolver,
   type ResolvedFarcasterData,
   type ResolvedENSData,
-  ResolvedERC20Data,
+  type ResolvedERC20Data,
+  isFarcasterFname,
+  FarcasterName,
 } from "@ecp.eth/shared/resolvers";
 import { NextRequest } from "next/server";
 import { type Hex } from "viem";
@@ -179,6 +182,19 @@ const farcasterByAddressResolver = createFarcasterByAddressResolver({
   neynarApiKey: env.NEYNAR_API_KEY,
 });
 
+const farcasterByNameCache = new LRUCache<
+  FarcasterName,
+  Promise<ResolvedFarcasterData | null>
+>({
+  max: 1000,
+  ttl: 1000 * 60 * 60 * 24,
+});
+
+const farcasterByNameResolver = createFarcasterByNameResolver({
+  cacheMap: farcasterByNameCache,
+  neynarApiKey: env.NEYNAR_API_KEY,
+});
+
 const ensByAddressCache = new LRUCache<Hex, Promise<ResolvedENSData | null>>({
   max: 1000,
   ttl: 1000 * 60 * 60 * 24,
@@ -275,6 +291,10 @@ function isEthAddress(address: string): address is Hex {
   return ETH_ADDRESS_REGEX.test(address);
 }
 
+function isEthName(name: string): name is `${string}.eth` {
+  return name.match(/\.eth$/i) !== null;
+}
+
 /**
  * Resolves possible mentions based on given query
  */
@@ -336,7 +356,7 @@ export async function GET(
       return new JSONResponse(responseSchema, {
         suggestions: [],
       });
-    } else if (query.endsWith(".eth")) {
+    } else if (isEthName(query)) {
       const ensName = await ensByNameResolver.load(query);
 
       if (ensName) {
@@ -348,6 +368,19 @@ export async function GET(
               address: ensName.address,
               url: ensName.url,
               avatarUrl: ensName.avatarUrl,
+            },
+          ],
+        });
+      }
+    } else if (isFarcasterFname(query)) {
+      const farcaster = await farcasterByNameResolver.load(query);
+
+      if (farcaster) {
+        return new JSONResponse(responseSchema, {
+          suggestions: [
+            {
+              type: "farcaster",
+              ...farcaster,
             },
           ],
         });

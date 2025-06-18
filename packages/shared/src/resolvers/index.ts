@@ -1,4 +1,3 @@
-export * from "./farcaster-by-address-resolver";
 export * from "./ens-by-address-resolver";
 export * from "./ens.types";
 export * from "./ens-by-name-resolver";
@@ -6,3 +5,7 @@ export * from "./erc20-by-address-resolver";
 export * from "./erc20-by-ticker-resolver";
 export * from "./erc20.types";
 export * from "./erc20-by-query-resolver";
+export * from "./farcaster-by-address-resolver";
+export * from "./farcaster-by-name-resolver";
+export * from "./farcaster.types";
+export * from "./farcaster.utils";
