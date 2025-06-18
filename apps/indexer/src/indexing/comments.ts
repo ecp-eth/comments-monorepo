@@ -14,16 +14,30 @@ import {
 } from "../management/services/moderation";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
-import { resolveCommentReferences } from "../lib/resolve-comment-references";
+import {
+  resolveCommentReferences,
+  type ResolveCommentReferencesOptions,
+} from "../lib/resolve-comment-references";
 import { ensByAddressResolver } from "../resolvers/ens-by-address-resolver";
 import { ensByNameResolver } from "../resolvers/ens-by-name-resolver";
 import { erc20ByAddressResolver } from "../resolvers/erc20-by-address-resolver";
 import { erc20ByTickerResolver } from "../resolvers/erc20-by-ticker-resolver";
 import { farcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
+import { farcasterByNameResolver } from "../resolvers/farcaster-by-name-resolver";
 import { urlResolver } from "../resolvers/url-resolver";
 import { moderationNotificationsService } from "../services";
 
 const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
+
+const resolverCommentReferences: ResolveCommentReferencesOptions = {
+  ensByAddressResolver,
+  ensByNameResolver,
+  erc20ByAddressResolver,
+  erc20ByTickerResolver,
+  farcasterByAddressResolver,
+  farcasterByNameResolver,
+  urlResolver,
+};
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
@@ -88,14 +102,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         chainId: context.chain.id,
         content: event.args.content,
       },
-      {
-        ensByAddressResolver,
-        ensByNameResolver,
-        erc20ByAddressResolver,
-        erc20ByTickerResolver,
-        farcasterByAddressResolver,
-        urlResolver,
-      },
+      resolverCommentReferences,
     );
 
     await context.db.insert(schema.comment).values({
@@ -243,14 +250,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         chainId: context.chain.id,
         content: event.args.content,
       },
-      {
-        ensByAddressResolver,
-        ensByNameResolver,
-        erc20ByAddressResolver,
-        erc20ByTickerResolver,
-        farcasterByAddressResolver,
-        urlResolver,
-      },
+      resolverCommentReferences,
     );
 
     await context.db

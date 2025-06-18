@@ -17,11 +17,16 @@ import type { FarcasterByAddressResolver } from "../resolvers/farcaster-by-addre
 import type { ERC20ByTickerResolver } from "../resolvers/erc20-by-ticker-resolver";
 import type { ERC20ByAddressResolver } from "../resolvers/erc20-by-address-resolver";
 import type { URLResolver } from "../resolvers/url-resolver";
+import type {
+  FarcasterByNameResolver,
+  FarcasterName,
+} from "@ecp.eth/shared/resolvers";
 
-type Options = {
+export type ResolveCommentReferencesOptions = {
   ensByAddressResolver: ENSByAddressResolver;
   ensByNameResolver: ENSByNameResolver;
   farcasterByAddressResolver: FarcasterByAddressResolver;
+  farcasterByNameResolver: FarcasterByNameResolver;
   erc20ByTickerResolver: ERC20ByTickerResolver;
   erc20ByAddressResolver: ERC20ByAddressResolver;
   urlResolver: URLResolver;
@@ -38,7 +43,7 @@ type Options = {
  */
 export async function resolveCommentReferences(
   comment: Pick<CommentSelectType, "content" | "chainId">,
-  options: Options,
+  options: ResolveCommentReferencesOptions,
 ): Promise<{
   references: IndexerAPICommentReferencesSchemaType;
   status: CommentSelectType["referencesResolutionStatus"];
@@ -93,6 +98,18 @@ export async function resolveCommentReferences(
       pos += match[0].length;
 
       continue;
+    }
+
+    match = restOfContent.match(FARCASTER_FNAME_REGEX);
+
+    if (match) {
+      const position = { start: pos, end: pos + match[0].length };
+      const fname = match[0].startsWith("@") ? match[0].slice(1) : match[0];
+
+      promises.push(
+        resolveFarcasterFname(fname as FarcasterName, position, options),
+      );
+      pos += match[0].length;
     }
 
     match = restOfContent.match(ERC_20_CAIP_19_REGEX);
@@ -192,7 +209,11 @@ const ERC20_TOKEN_ETH_ADDRESS_REGEX = /^\$0x[a-fA-F0-9]{40}/u;
 /**
  * Handles ens name or ens name mention
  */
-const ENS_NAME_REGEX = /^@?[a-zA-Z0-9.-]+\.eth/u;
+const ENS_NAME_REGEX = /^@?[a-zA-Z0-9.-]+\.eth/iu;
+/**
+ * Handles farcaster fname
+ */
+const FARCASTER_FNAME_REGEX = /^@?[a-zA-Z0-9.-]+\.fcast\.id/iu;
 /**
  * Handles erc20 symbol
  */
@@ -210,7 +231,7 @@ const ERC_20_CAIP_19_REGEX =
 async function resolveEthAddress(
   address: Hex,
   position: ResolverPosition,
-  options: Options,
+  options: ResolveCommentReferencesOptions,
 ): Promise<
   | IndexerAPICommentReferenceENSSchemaType
   | IndexerAPICommentReferenceERC20SchemaType
@@ -241,7 +262,7 @@ async function resolveEthAddress(
       fid: farcasterData.fid,
       fname: farcasterData.fname,
       pfpUrl: farcasterData.pfpUrl ?? null,
-      username: farcasterData.username ?? null,
+      username: farcasterData.username,
       url: farcasterData.url,
       position,
     };
@@ -258,7 +279,7 @@ async function resolveERC20TokenEthAddress(
    */
   chainId: number | undefined,
   position: ResolverPosition,
-  { erc20ByAddressResolver }: Options,
+  { erc20ByAddressResolver }: ResolveCommentReferencesOptions,
 ): Promise<IndexerAPICommentReferenceERC20SchemaType | null> {
   const result = await erc20ByAddressResolver.load(address);
 
@@ -277,7 +298,7 @@ async function resolveERC20TokenEthAddress(
 async function resolveEnsName(
   name: string,
   position: ResolverPosition,
-  { ensByNameResolver }: Options,
+  { ensByNameResolver }: ResolveCommentReferencesOptions,
 ): Promise<IndexerAPICommentReferenceENSSchemaType | null> {
   const result = await ensByNameResolver.load(name);
 
@@ -295,11 +316,35 @@ async function resolveEnsName(
   return null;
 }
 
+async function resolveFarcasterFname(
+  fname: FarcasterName,
+  position: ResolverPosition,
+  { farcasterByNameResolver }: ResolveCommentReferencesOptions,
+): Promise<IndexerAPICommentReferenceFarcasterSchemaType | null> {
+  const result = await farcasterByNameResolver.load(fname);
+
+  if (result) {
+    return {
+      type: "farcaster",
+      address: result.address,
+      displayName: result.displayName ?? null,
+      fid: result.fid,
+      fname: result.fname,
+      pfpUrl: result.pfpUrl ?? null,
+      username: result.username,
+      url: result.url,
+      position,
+    };
+  }
+
+  return null;
+}
+
 async function resolveERC20TokenTicker(
   ticker: string,
   chainId: number,
   position: ResolverPosition,
-  { erc20ByTickerResolver }: Options,
+  { erc20ByTickerResolver }: ResolveCommentReferencesOptions,
 ): Promise<IndexerAPICommentReferenceERC20SchemaType | null> {
   const result = await erc20ByTickerResolver.load([ticker, chainId]);
 
@@ -323,7 +368,7 @@ async function resolveERC20TokenTicker(
 async function resolveURL(
   url: string,
   position: ResolverPosition,
-  { urlResolver }: Options,
+  { urlResolver }: ResolveCommentReferencesOptions,
 ): Promise<
   | IndexerAPICommentReferenceURLFileSchemaType
   | IndexerAPICommentReferenceURLImageSchemaType

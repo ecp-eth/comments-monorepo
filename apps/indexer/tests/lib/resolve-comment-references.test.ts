@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { resolveCommentReferences } from "../../src/lib/resolve-comment-references";
+import {
+  resolveCommentReferences,
+  type ResolveCommentReferencesOptions,
+} from "../../src/lib/resolve-comment-references";
 import DataLoader from "dataloader";
 import type { ENSByNameResolver } from "../../src/resolvers/ens-by-name-resolver";
 import type { ENSByAddressResolver } from "../../src/resolvers/ens-by-address-resolver";
@@ -7,6 +10,7 @@ import type { ERC20ByTickerResolver } from "../../src/resolvers/erc20-by-ticker-
 import type { FarcasterByAddressResolver } from "../../src/resolvers/farcaster-by-address-resolver";
 import type { ERC20ByAddressResolver } from "../../src/resolvers/erc20-by-address-resolver";
 import type { URLResolver } from "../../src/resolvers/url-resolver";
+import type { FarcasterByNameResolver } from "@ecp.eth/shared/resolvers";
 
 const ensByNameResolver: ENSByNameResolver = new DataLoader(async (keys) =>
   keys.map(() => null),
@@ -17,6 +21,9 @@ const ensByAddressResolver: ENSByAddressResolver = new DataLoader(
 const farcasterByAddressResolver: FarcasterByAddressResolver = new DataLoader(
   async (keys) => keys.map(() => null),
 ) as unknown as FarcasterByAddressResolver;
+const farcasterByNameResolver: FarcasterByNameResolver = new DataLoader(
+  async (keys) => keys.map(() => null),
+) as unknown as FarcasterByNameResolver;
 const erc20ByTickerResolver: ERC20ByTickerResolver = new DataLoader(
   async (keys) => keys.map(() => null),
 ) as unknown as ERC20ByTickerResolver;
@@ -32,14 +39,16 @@ const fetchMock = vi.spyOn(global, "fetch");
 const resolveEnsByName = vi.spyOn(ensByNameResolver, "load");
 const resolveEnsByAddress = vi.spyOn(ensByAddressResolver, "load");
 const resolveFarcasterByAddress = vi.spyOn(farcasterByAddressResolver, "load");
+const resolveFarcasterByName = vi.spyOn(farcasterByNameResolver, "load");
 const resolveERC20ByTicker = vi.spyOn(erc20ByTickerResolver, "load");
 const resolveERC20ByAddress = vi.spyOn(erc20ByAddressResolver, "load");
 const resolveUrl = vi.spyOn(urlResolver, "load");
 
-const options = {
+const options: ResolveCommentReferencesOptions = {
   ensByAddressResolver,
   ensByNameResolver,
   farcasterByAddressResolver,
+  farcasterByNameResolver,
   erc20ByTickerResolver,
   erc20ByAddressResolver,
   urlResolver,
@@ -148,6 +157,59 @@ describe("resolveCommentReferences", () => {
             end: 17,
           },
           url: "https://app.ens.domains/luc.eth",
+        },
+      ]);
+    });
+  });
+
+  describe("farcaster fname", () => {
+    it("resolves farcaster fname without @ prefix", async () => {
+      resolveFarcasterByName.mockResolvedValue({
+        fid: 341794,
+        fname: "mskr.fcast.id",
+        address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
+        username: "mskr",
+        url: "https://farcaster.xyz/mskr",
+        displayName: "mskr",
+      });
+
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content: "❤️ mskr.fcast.id ❤️ @mskr.fcast.id",
+        },
+        options,
+      );
+
+      expect(resolveFarcasterByName).toHaveBeenCalledTimes(2);
+
+      const expectedReference = {
+        fid: 341794,
+        fname: "mskr.fcast.id",
+        address: "0x78397D9D185D3a57D01213CBe3Ec1EbAC3EEc77d",
+        username: "mskr",
+        url: "https://farcaster.xyz/mskr",
+        displayName: "mskr",
+        pfpUrl: null,
+      };
+
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          type: "farcaster",
+          ...expectedReference,
+          position: {
+            start: 3,
+            end: 16,
+          },
+        },
+        {
+          type: "farcaster",
+          ...expectedReference,
+          position: {
+            start: 20,
+            end: 34,
+          },
         },
       ]);
     });
