@@ -5,6 +5,8 @@ import "solady/auth/Ownable.sol";
 import "solady/utils/ReentrancyGuard.sol";
 import "./libraries/Comments.sol";
 import "./libraries/CommentSigning.sol";
+import "./libraries/Batching.sol";
+import "./libraries/Approvals.sol";
 import "./interfaces/ICommentManager.sol";
 import "./interfaces/IHook.sol";
 import "./ChannelManager.sol";
@@ -205,106 +207,21 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     if (commentCreationFee > 0) {
       channelManager.collectCommentCreationFee{ value: commentCreationFee }();
     }
-    uint256 remainingValue = value - commentCreationFee;
 
-    address author = commentData.author;
-    address app = commentData.app;
-    uint256 channelId = commentData.channelId;
-    bytes32 parentId = commentData.parentId;
-    string memory content = commentData.content;
-    Metadata.MetadataEntry[] memory metadata = commentData.metadata;
-    string memory targetUri = commentData.targetUri;
-    uint8 commentType = commentData.commentType;
-    uint88 timestampNow = uint88(block.timestamp);
-
-    Comments.Comment storage comment = comments[commentId];
-
-    comment.author = author;
-    comment.app = app;
-    comment.channelId = channelId;
-    comment.parentId = parentId;
-    comment.content = content;
-    comment.targetUri = targetUri;
-    comment.commentType = commentType;
-    comment.authMethod = uint8(authMethod);
-    comment.createdAt = timestampNow;
-    comment.updatedAt = timestampNow;
-
-    // emit event before calling the `onCommentAdd` hook to ensure the order of events is correct in the case of reentrancy
-    emit CommentAdded(
+    Comments.createComment(
       commentId,
-      author,
-      app,
-      channelId,
-      parentId,
-      timestampNow,
-      content,
-      targetUri,
-      commentType,
-      comment.authMethod,
-      metadata
+      commentData,
+      authMethod,
+      value,
+      commentCreationFee,
+      channelManager,
+      comments,
+      commentMetadata,
+      commentMetadataKeys,
+      commentHookMetadata,
+      commentHookMetadataKeys,
+      msg.sender
     );
-
-    // Store metadata in mappings
-    if (metadata.length > 0) {
-      mapping(bytes32 => bytes) storage commentMetadataForId = commentMetadata[
-        commentId
-      ];
-      bytes32[] storage commentMetadataKeysForId = commentMetadataKeys[
-        commentId
-      ];
-      for (uint i = 0; i < metadata.length; i++) {
-        bytes32 key = metadata[i].key;
-        bytes memory val = metadata[i].value;
-
-        commentMetadataForId[key] = val;
-        commentMetadataKeysForId.push(key);
-
-        emit CommentMetadataSet(commentId, key, val);
-      }
-    }
-
-    Channels.Channel memory channel = channelManager.getChannel(channelId);
-
-    if (channel.hook != address(0) && channel.permissions.onCommentAdd) {
-      IHook hook = IHook(channel.hook);
-      // Calculate hook value after protocol fee
-      uint256 valueToPassToTheHook = channelManager
-        .deductProtocolHookTransactionFee(remainingValue);
-      if (remainingValue > valueToPassToTheHook) {
-        // send the hook transaction fee to the channel manager
-        payable(address(channelManager)).transfer(
-          remainingValue - valueToPassToTheHook
-        );
-      }
-
-      Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentAdd{ // forward the remaining sent value to the hook.
-        value: valueToPassToTheHook
-      }(comment, metadata, msg.sender, commentId);
-
-      // Store hook metadata
-      if (hookMetadata.length > 0) {
-        mapping(bytes32 => bytes)
-          storage commentHookMetadataForId = commentHookMetadata[commentId];
-        bytes32[]
-          storage commentHookMetadataKeysForId = commentHookMetadataKeys[
-            commentId
-          ];
-        for (uint i = 0; i < hookMetadata.length; i++) {
-          bytes32 key = hookMetadata[i].key;
-          bytes memory val = hookMetadata[i].value;
-
-          commentHookMetadataForId[key] = val;
-          commentHookMetadataKeysForId.push(key);
-
-          emit CommentHookMetadataSet(commentId, key, val);
-        }
-      }
-    }
-    // refund excess payment if any
-    else if (remainingValue > 0) {
-      payable(msg.sender).transfer(remainingValue);
-    }
   }
 
   /// @inheritdoc ICommentManager
@@ -337,7 +254,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     address author = comment.author;
     address app = editData.app;
 
-    nonces[author][app]++;
+    Approvals.incrementNonce(author, app, nonces);
 
     bytes32 editHash = CommentSigning.getEditCommentHash(
       commentId,
@@ -399,7 +316,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     address author = comment.author;
     address app = editData.app;
 
-    nonces[author][app]++;
+    Approvals.incrementNonce(author, app, nonces);
 
     require(author != address(0), "Comment does not exist");
 
@@ -458,82 +375,19 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     Comments.AuthorAuthMethod authMethod,
     uint256 value
   ) internal {
-    Comments.Comment storage comment = comments[commentId];
-
-    string memory content = editData.content;
-    Metadata.MetadataEntry[] memory metadata = editData.metadata;
-    uint88 timestampNow = uint88(block.timestamp);
-
-    comment.content = content;
-    comment.updatedAt = timestampNow;
-    comment.authMethod = uint8(authMethod);
-
-    // Clear existing metadata
-    _clearCommentMetadata(commentId);
-
-    // Store new metadata
-    for (uint i = 0; i < metadata.length; i++) {
-      bytes32 key = metadata[i].key;
-      bytes memory val = metadata[i].value;
-
-      commentMetadata[commentId][key] = val;
-      commentMetadataKeys[commentId].push(key);
-
-      emit CommentMetadataSet(commentId, key, val);
-    }
-
-    Channels.Channel memory channel = channelManager.getChannel(
-      comment.channelId
-    );
-
-    // emit event before calling the `onCommentEdit` hook to ensure the order of events is correct in the case of reentrancy
-    emit CommentEdited(
+    Comments.editComment(
       commentId,
-      editData.app,
-      comment.author,
-      comment.app,
-      comment.channelId,
-      comment.parentId,
-      comment.createdAt,
-      timestampNow,
-      content,
-      comment.targetUri,
-      comment.commentType,
-      comment.authMethod,
-      metadata
+      editData,
+      authMethod,
+      value,
+      channelManager,
+      comments,
+      commentMetadata,
+      commentMetadataKeys,
+      commentHookMetadata,
+      commentHookMetadataKeys,
+      msg.sender
     );
-
-    if (channel.hook != address(0) && channel.permissions.onCommentEdit) {
-      IHook hook = IHook(channel.hook);
-
-      // Calculate hook value after protocol fee
-      uint256 valueToPassToHook = channelManager
-        .deductProtocolHookTransactionFee(value);
-      if (value > valueToPassToHook) {
-        payable(address(channelManager)).transfer(value - valueToPassToHook);
-      }
-
-      Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentEdit{
-        value: valueToPassToHook
-      }(comment, metadata, msg.sender, commentId);
-
-      // Clear existing hook metadata
-      _clearCommentHookMetadata(commentId);
-
-      // Store new hook metadata
-      for (uint i = 0; i < hookMetadata.length; i++) {
-        bytes32 key = hookMetadata[i].key;
-        bytes memory val = hookMetadata[i].value;
-
-        commentHookMetadata[commentId][key] = val;
-        commentHookMetadataKeys[commentId].push(key);
-
-        emit CommentHookMetadataSet(commentId, key, val);
-      }
-    } else if (value > 0) {
-      // refund excess payment if any
-      payable(msg.sender).transfer(value);
-    }
   }
 
   /// @inheritdoc ICommentManager
@@ -594,111 +448,28 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   /// @param commentId The unique identifier of the comment to delete
   /// @param author The address of the comment author
   function _deleteComment(bytes32 commentId, address author) internal {
-    Comments.Comment storage comment = comments[commentId];
-
-    // Store comment data for hook
-    Comments.Comment memory commentToDelete = comment;
-
-    // Get metadata for hook
-    Metadata.MetadataEntry[] memory metadata = _getCommentMetadata(commentId);
-    Metadata.MetadataEntry[] memory hookMetadata = _getCommentHookMetadata(
-      commentId
+    Comments.deleteComment(
+      commentId,
+      author,
+      channelManager,
+      comments,
+      deleted,
+      commentMetadata,
+      commentMetadataKeys,
+      commentHookMetadata,
+      commentHookMetadataKeys,
+      msg.sender,
+      msg.value
     );
-
-    // Delete the comment and metadata
-    delete comments[commentId];
-    deleted[commentId] = true;
-    _clearCommentMetadata(commentId);
-    _clearCommentHookMetadata(commentId);
-
-    Channels.Channel memory channel = channelManager.getChannel(
-      commentToDelete.channelId
-    );
-
-    // emit event before calling the `onCommentDelete` hook to ensure the order of events is correct in the case of reentrancy
-    emit CommentDeleted(commentId, author);
-
-    if (channel.hook != address(0) && channel.permissions.onCommentDelete) {
-      IHook hook = IHook(channel.hook);
-      // Calculate hook value after protocol fee
-      uint256 msgValueAfterFee = channelManager
-        .deductProtocolHookTransactionFee(msg.value);
-
-      hook.onCommentDelete{ value: msgValueAfterFee }(
-        commentToDelete,
-        metadata,
-        hookMetadata,
-        msg.sender,
-        commentId
-      );
-    }
   }
 
   /// @notice Internal function to get metadata for a comment
   /// @param commentId The unique identifier of the comment
   /// @return The metadata entries for the comment
-  function _getCommentMetadata(
-    bytes32 commentId
-  ) internal view returns (Metadata.MetadataEntry[] memory) {
-    bytes32[] memory keys = commentMetadataKeys[commentId];
-    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](
-      keys.length
-    );
-
-    for (uint i = 0; i < keys.length; i++) {
-      metadata[i] = Metadata.MetadataEntry({
-        key: keys[i],
-        value: commentMetadata[commentId][keys[i]]
-      });
-    }
-
-    return metadata;
-  }
-
-  /// @notice Internal function to get hook metadata for a comment
-  /// @param commentId The unique identifier of the comment
-  /// @return The hook metadata entries for the comment
-  function _getCommentHookMetadata(
-    bytes32 commentId
-  ) internal view returns (Metadata.MetadataEntry[] memory) {
-    bytes32[] memory keys = commentHookMetadataKeys[commentId];
-    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
-      keys.length
-    );
-
-    for (uint i = 0; i < keys.length; i++) {
-      hookMetadata[i] = Metadata.MetadataEntry({
-        key: keys[i],
-        value: commentHookMetadata[commentId][keys[i]]
-      });
-    }
-
-    return hookMetadata;
-  }
-
-  /// @notice Internal function to clear all metadata for a comment
-  /// @param commentId The unique identifier of the comment
-  function _clearCommentMetadata(bytes32 commentId) internal {
-    bytes32[] storage keys = commentMetadataKeys[commentId];
-    for (uint i = 0; i < keys.length; i++) {
-      delete commentMetadata[commentId][keys[i]];
-    }
-    delete commentMetadataKeys[commentId];
-  }
-
-  /// @notice Internal function to clear all hook metadata for a comment
-  /// @param commentId The unique identifier of the comment
-  function _clearCommentHookMetadata(bytes32 commentId) internal {
-    bytes32[] storage keys = commentHookMetadataKeys[commentId];
-    for (uint i = 0; i < keys.length; i++) {
-      delete commentHookMetadata[commentId][keys[i]];
-    }
-    delete commentHookMetadataKeys[commentId];
-  }
 
   /// @inheritdoc ICommentManager
   function addApproval(address app, uint256 expiry) external {
-    _addApproval(msg.sender, app, expiry);
+    Approvals.addApproval(msg.sender, app, expiry, approvals);
   }
 
   /// @inheritdoc ICommentManager
@@ -710,7 +481,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     uint256 deadline,
     bytes calldata authorSignature
   ) external notStale(deadline) validateNonce(author, app, nonce) {
-    nonces[author][app]++;
+    Approvals.incrementNonce(author, app, nonces);
 
     bytes32 addApprovalHash = CommentSigning.getAddApprovalHash(
       author,
@@ -731,12 +502,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       revert InvalidAuthorSignature();
     }
 
-    _addApproval(author, app, expiry);
+    Approvals.addApproval(author, app, expiry, approvals);
   }
 
   /// @inheritdoc ICommentManager
   function revokeApproval(address app) external {
-    _revokeApproval(msg.sender, app);
+    Approvals.revokeApproval(msg.sender, app, approvals);
   }
 
   /// @inheritdoc ICommentManager
@@ -747,7 +518,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     uint256 deadline,
     bytes calldata authorSignature
   ) external notStale(deadline) validateNonce(author, app, nonce) {
-    nonces[author][app]++;
+    Approvals.incrementNonce(author, app, nonces);
 
     bytes32 removeApprovalHash = CommentSigning.getRemoveApprovalHash(
       author,
@@ -767,7 +538,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       revert InvalidAuthorSignature();
     }
 
-    _revokeApproval(author, app);
+    Approvals.revokeApproval(author, app, approvals);
   }
 
   /// @inheritdoc ICommentManager
@@ -862,38 +633,24 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   function getCommentMetadata(
     bytes32 commentId
   ) external view returns (Metadata.MetadataEntry[] memory) {
-    bytes32[] memory keys = commentMetadataKeys[commentId];
-    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](
-      keys.length
-    );
-
-    for (uint i = 0; i < keys.length; i++) {
-      metadata[i] = Metadata.MetadataEntry({
-        key: keys[i],
-        value: commentMetadata[commentId][keys[i]]
-      });
-    }
-
-    return metadata;
+    return
+      Metadata.getCommentMetadata(
+        commentId,
+        commentMetadata,
+        commentMetadataKeys
+      );
   }
 
   /// @inheritdoc ICommentManager
   function getCommentHookMetadata(
     bytes32 commentId
   ) external view returns (Metadata.MetadataEntry[] memory) {
-    bytes32[] memory keys = commentHookMetadataKeys[commentId];
-    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
-      keys.length
-    );
-
-    for (uint i = 0; i < keys.length; i++) {
-      hookMetadata[i] = Metadata.MetadataEntry({
-        key: keys[i],
-        value: commentHookMetadata[commentId][keys[i]]
-      });
-    }
-
-    return hookMetadata;
+    return
+      Metadata.getCommentHookMetadata(
+        commentId,
+        commentHookMetadata,
+        commentHookMetadataKeys
+      );
   }
 
   /// @inheritdoc ICommentManager
@@ -931,7 +688,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     address author,
     address app
   ) external view returns (bool) {
-    return approvals[author][app] > block.timestamp;
+    return Approvals.isApproved(author, app, approvals);
   }
 
   /// @inheritdoc ICommentManager
@@ -939,7 +696,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     address author,
     address app
   ) external view returns (uint256) {
-    return approvals[author][app];
+    return Approvals.getApprovalExpiry(author, app, approvals);
   }
 
   /// @inheritdoc ICommentManager
@@ -947,7 +704,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     address author,
     address app
   ) external view returns (uint256) {
-    return nonces[author][app];
+    return Approvals.getNonce(author, app, nonces);
   }
 
   /// @inheritdoc ICommentManager
@@ -1000,10 +757,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   modifier validateNonce(address author, address app, uint256 nonce) {
-    if (nonces[author][app] != nonce) {
-      revert InvalidNonce(author, app, nonces[author][app], nonce);
-    }
-
+    Approvals.validateNonce(author, app, nonce, nonces);
     _;
   }
 
@@ -1017,127 +771,16 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   function updateCommentHookData(
     bytes32 commentId
   ) external commentExists(commentId) {
-    _updateCommentHookData(commentId);
-  }
-
-  /// @notice Internal function to update hook metadata using merge mode for gas efficiency
-  /// @param commentId The unique identifier of the comment to update
-  function _updateCommentHookData(bytes32 commentId) internal {
-    Comments.Comment storage comment = comments[commentId];
-
-    Channels.Channel memory channel = channelManager.getChannel(
-      comment.channelId
+    Comments.updateCommentHookData(
+      commentId,
+      channelManager,
+      comments,
+      commentMetadata,
+      commentMetadataKeys,
+      commentHookMetadata,
+      commentHookMetadataKeys,
+      msg.sender
     );
-    if (
-      channel.hook == address(0) || !channel.permissions.onCommentHookDataUpdate
-    ) {
-      revert HookNotEnabled();
-    }
-
-    // Get current metadata for hook
-    Metadata.MetadataEntry[] memory metadata = _getCommentMetadata(commentId);
-    Metadata.MetadataEntry[] memory hookMetadata = _getCommentHookMetadata(
-      commentId
-    );
-
-    IHook hook = IHook(channel.hook);
-
-    Metadata.MetadataEntryOp[] memory operations = hook.onCommentHookDataUpdate(
-      comment,
-      metadata,
-      hookMetadata,
-      msg.sender,
-      commentId
-    );
-
-    // Apply hook metadata operations using merge mode (gas-efficient)
-    _applyHookMetadataOperations(commentId, operations);
-  }
-
-  /// @notice Internal function to apply hook metadata operations efficiently
-  /// @param commentId The unique identifier of the comment
-  /// @param operations The metadata operations to apply
-  function _applyHookMetadataOperations(
-    bytes32 commentId,
-    Metadata.MetadataEntryOp[] memory operations
-  ) internal {
-    for (uint i = 0; i < operations.length; i++) {
-      Metadata.MetadataEntryOp memory op = operations[i];
-
-      if (op.operation == Metadata.MetadataOperation.DELETE) {
-        _deleteCommentHookMetadataKey(commentId, op.key);
-        emit CommentHookMetadataSet(commentId, op.key, ""); // Emit empty value for deletion
-      } else if (op.operation == Metadata.MetadataOperation.SET) {
-        // Check if this is a new key for gas optimization
-        bool isNewKey = !_hookMetadataKeyExists(commentId, op.key);
-
-        commentHookMetadata[commentId][op.key] = op.value;
-
-        // Only add to keys array if it's a new key
-        if (isNewKey) {
-          commentHookMetadataKeys[commentId].push(op.key);
-        }
-
-        emit CommentHookMetadataSet(commentId, op.key, op.value);
-      }
-    }
-  }
-
-  /// @notice Internal function to delete a specific hook metadata key
-  /// @param commentId The unique identifier of the comment
-  /// @param keyToDelete The key to delete
-  function _deleteCommentHookMetadataKey(
-    bytes32 commentId,
-    bytes32 keyToDelete
-  ) internal {
-    // Delete the value
-    delete commentHookMetadata[commentId][keyToDelete];
-
-    // Remove from keys array
-    bytes32[] storage keys = commentHookMetadataKeys[commentId];
-    for (uint i = 0; i < keys.length; i++) {
-      if (keys[i] == keyToDelete) {
-        // Move last element to current position and pop
-        keys[i] = keys[keys.length - 1];
-        keys.pop();
-        break;
-      }
-    }
-  }
-
-  /// @notice Internal function to check if a hook metadata key exists
-  /// @param commentId The unique identifier of the comment
-  /// @param targetKey The key to check for existence
-  /// @return exists Whether the key exists in the metadata
-  function _hookMetadataKeyExists(
-    bytes32 commentId,
-    bytes32 targetKey
-  ) internal view returns (bool exists) {
-    bytes32[] storage keys = commentHookMetadataKeys[commentId];
-    for (uint i = 0; i < keys.length; i++) {
-      if (keys[i] == targetKey) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /// @notice Internal function to add an app signer approval
-  /// @param author The address granting approval
-  /// @param app The address being approved
-  /// @param expiry The timestamp when the approval expires
-  function _addApproval(address author, address app, uint256 expiry) internal {
-    if (expiry <= block.timestamp) revert InvalidApprovalExpiry();
-    approvals[author][app] = expiry;
-    emit ApprovalAdded(author, app, expiry);
-  }
-
-  /// @notice Internal function to remove an app signer approval
-  /// @param author The address removing approval
-  /// @param app The address being unapproved
-  function _revokeApproval(address author, address app) internal {
-    approvals[author][app] = 0;
-    emit ApprovalRemoved(author, app);
   }
 
   modifier reactionHasTargetOrParent(
@@ -1163,28 +806,22 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   function batchOperations(
     Comments.BatchOperation[] calldata operations
   ) external payable nonReentrant returns (bytes[] memory results) {
-    if (operations.length == 0) {
-      revert InvalidBatchOperation(0, "Empty operations array");
-    }
-
-    // Validate total value distribution
-    uint256 totalRequiredValue = 0;
-    for (uint i = 0; i < operations.length; i++) {
-      totalRequiredValue += operations[i].value;
-    }
-
-    if (msg.value != totalRequiredValue) {
-      revert InvalidValueDistribution(msg.value, totalRequiredValue);
-    }
+    // Validate batch operations
+    Batching.validateBatchOperations(operations, msg.value);
 
     results = new bytes[](operations.length);
 
     // Execute operations in order
     for (uint i = 0; i < operations.length; i++) {
+      Batching.validateBatchOperationSignatures(operations[i], i);
       results[i] = _executeBatchOperation(operations[i], i);
     }
 
-    emit BatchOperationExecuted(msg.sender, operations.length, msg.value);
+    Batching.emitBatchOperationExecuted(
+      msg.sender,
+      operations.length,
+      msg.value
+    );
 
     return results;
   }
@@ -1231,17 +868,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     Comments.BatchOperation calldata operation,
     uint256 operationIndex
   ) internal returns (bytes memory) {
-    Comments.CreateComment memory commentData = abi.decode(
-      operation.data,
-      (Comments.CreateComment)
+    Comments.CreateComment memory commentData = Batching.decodePostCommentData(
+      operation
     );
-
-    if (operation.signatures.length != 1) {
-      revert InvalidBatchOperation(
-        operationIndex,
-        "POST_COMMENT requires exactly 1 signature"
-      );
-    }
 
     // Call internal postComment function with allocated value
     bytes32 commentId = _postComment(
@@ -1250,24 +879,16 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       operation.value
     );
 
-    return abi.encode(commentId);
+    return Batching.encodeCommentIdResult(commentId);
   }
 
   function _executePostCommentWithSigBatch(
     Comments.BatchOperation calldata operation,
     uint256 operationIndex
   ) internal returns (bytes memory) {
-    Comments.CreateComment memory commentData = abi.decode(
-      operation.data,
-      (Comments.CreateComment)
+    Comments.CreateComment memory commentData = Batching.decodePostCommentData(
+      operation
     );
-
-    if (operation.signatures.length != 2) {
-      revert InvalidBatchOperation(
-        operationIndex,
-        "POST_COMMENT_WITH_SIG requires exactly 2 signatures"
-      );
-    }
 
     // Call postCommentWithSig function directly
     bytes32 commentId = _postCommentWithSig(
@@ -1277,24 +898,15 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       operation.value
     );
 
-    return abi.encode(commentId);
+    return Batching.encodeCommentIdResult(commentId);
   }
 
   function _executeEditCommentBatch(
     Comments.BatchOperation calldata operation,
     uint256 operationIndex
   ) internal returns (bytes memory) {
-    (bytes32 commentId, Comments.EditComment memory editData) = abi.decode(
-      operation.data,
-      (bytes32, Comments.EditComment)
-    );
-
-    if (operation.signatures.length != 1) {
-      revert InvalidBatchOperation(
-        operationIndex,
-        "EDIT_COMMENT requires exactly 1 signature"
-      );
-    }
+    (bytes32 commentId, Comments.EditComment memory editData) = Batching
+      .decodeEditCommentData(operation);
 
     // Call internal editComment function with allocated value
     _editCommentDirect(
@@ -1304,24 +916,15 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       operation.value
     );
 
-    return "";
+    return Batching.getEmptyResult();
   }
 
   function _executeEditCommentWithSigBatch(
     Comments.BatchOperation calldata operation,
     uint256 operationIndex
   ) internal returns (bytes memory) {
-    (bytes32 commentId, Comments.EditComment memory editData) = abi.decode(
-      operation.data,
-      (bytes32, Comments.EditComment)
-    );
-
-    if (operation.signatures.length != 2) {
-      revert InvalidBatchOperation(
-        operationIndex,
-        "EDIT_COMMENT_WITH_SIG requires exactly 2 signatures"
-      );
-    }
+    (bytes32 commentId, Comments.EditComment memory editData) = Batching
+      .decodeEditCommentData(operation);
 
     // Call editCommentWithSig internal function with allocated value
     _editCommentWithSig(
@@ -1332,43 +935,27 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       operation.value
     );
 
-    return "";
+    return Batching.getEmptyResult();
   }
 
   function _executeDeleteCommentBatch(
     Comments.BatchOperation calldata operation,
     uint256 operationIndex
   ) internal returns (bytes memory) {
-    bytes32 commentId = abi.decode(operation.data, (bytes32));
-
-    if (operation.signatures.length != 0) {
-      revert InvalidBatchOperation(
-        operationIndex,
-        "DELETE_COMMENT requires no signatures"
-      );
-    }
+    bytes32 commentId = Batching.decodeDeleteCommentData(operation);
 
     // Call deleteComment function directly (preserves msg.sender)
     deleteComment(commentId);
 
-    return "";
+    return Batching.getEmptyResult();
   }
 
   function _executeDeleteCommentWithSigBatch(
     Comments.BatchOperation calldata operation,
     uint256 operationIndex
   ) internal returns (bytes memory) {
-    Comments.BatchDeleteData memory deleteData = abi.decode(
-      operation.data,
-      (Comments.BatchDeleteData)
-    );
-
-    if (operation.signatures.length != 2) {
-      revert InvalidBatchOperation(
-        operationIndex,
-        "DELETE_COMMENT_WITH_SIG requires exactly 2 signatures"
-      );
-    }
+    Comments.BatchDeleteData memory deleteData = Batching
+      .decodeDeleteCommentWithSigData(operation);
 
     // Call deleteCommentWithSig function directly
     deleteCommentWithSig(
@@ -1379,6 +966,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       operation.signatures[1] // app signature
     );
 
-    return "";
+    return Batching.getEmptyResult();
   }
 }

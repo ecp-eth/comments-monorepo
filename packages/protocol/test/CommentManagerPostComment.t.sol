@@ -597,7 +597,7 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       channelId,
       commentData.parentId,
-      uint96(block.timestamp),
+      uint88(block.timestamp),
       commentData.content,
       commentData.targetUri,
       commentData.commentType,

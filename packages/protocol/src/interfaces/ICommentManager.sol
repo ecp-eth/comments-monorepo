@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "../libraries/Comments.sol";
 import "../libraries/Hooks.sol";
 import "./IChannelManager.sol";
+import "../libraries/Metadata.sol";
 
 /// @title ICommentManager - Interface for the Comments contract
 /// @notice This interface defines the functions and events for the Comments contract
@@ -61,9 +62,8 @@ interface ICommentManager {
 
   /// @notice Emitted when a comment is edited
   /// @param commentId Unique identifier of the edited comment
-  /// @param editedByApp Address of the app signer that changed the comment
   /// @param author Address of the comment author
-  /// @param app Address of the app signer that created the comment
+  /// @param editedByApp Address of the app signer that changed the comment
   /// @param channelId The channel ID associated with the comment
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param createdAt The timestamp when the comment was created
@@ -74,9 +74,8 @@ interface ICommentManager {
   /// @param authMethod The author authentication method used to create this comment (from original creation)
   event CommentEdited(
     bytes32 indexed commentId,
-    address indexed editedByApp,
     address indexed author,
-    address app,
+    address indexed editedByApp,
     uint256 channelId,
     bytes32 parentId,
     uint96 createdAt,

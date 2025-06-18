@@ -2,9 +2,14 @@
 pragma solidity ^0.8.20;
 
 import { Metadata } from "./Metadata.sol";
+import "../interfaces/IHook.sol";
+import "../interfaces/IChannelManager.sol";
+import "../interfaces/ICommentManager.sol";
+import "../libraries/Channels.sol";
 
-/// @title Comments - Library defining comment-related types
+/// @title Comments - Library defining comment-related types and operations
 library Comments {
+  using Metadata for *;
   /// @notice Comment type constants
   /// @dev Type 0: Standard comment
   /// @dev Type 1: Reaction (with reaction type in content field, e.g. "like", "dislike", "heart")
@@ -118,5 +123,406 @@ library Comments {
     uint256 value;
     bytes data;
     bytes[] signatures;
+  }
+
+  /// @notice Create a new comment
+  /// @param commentId The unique identifier for the comment
+  /// @param commentData The comment creation data
+  /// @param authMethod The authentication method used
+  /// @param value The ETH value sent with the transaction
+  /// @param commentCreationFee The protocol fee for comment creation
+  /// @param channelManager The channel manager contract
+  /// @param comments Storage mapping for comments
+  /// @param commentMetadata Storage mapping for comment metadata
+  /// @param commentMetadataKeys Storage mapping for comment metadata keys
+  /// @param commentHookMetadata Storage mapping for comment hook metadata
+  /// @param commentHookMetadataKeys Storage mapping for comment hook metadata keys
+  /// @param msgSender The sender of the transaction
+  function createComment(
+    bytes32 commentId,
+    CreateComment memory commentData,
+    AuthorAuthMethod authMethod,
+    uint256 value,
+    uint96 commentCreationFee,
+    IChannelManager channelManager,
+    mapping(bytes32 => Comment) storage comments,
+    mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
+    mapping(bytes32 => bytes32[]) storage commentMetadataKeys,
+    mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
+    mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys,
+    address msgSender
+  ) external {
+    uint256 remainingValue = value - commentCreationFee;
+
+    address author = commentData.author;
+    address app = commentData.app;
+    uint256 channelId = commentData.channelId;
+    bytes32 parentId = commentData.parentId;
+    string memory content = commentData.content;
+    Metadata.MetadataEntry[] memory metadata = commentData.metadata;
+    string memory targetUri = commentData.targetUri;
+    uint8 commentType = commentData.commentType;
+    uint88 timestampNow = uint88(block.timestamp);
+
+    Comment storage comment = comments[commentId];
+
+    comment.author = author;
+    comment.app = app;
+    comment.channelId = channelId;
+    comment.parentId = parentId;
+    comment.content = content;
+    comment.targetUri = targetUri;
+    comment.commentType = commentType;
+    comment.authMethod = uint8(authMethod);
+    comment.createdAt = timestampNow;
+    comment.updatedAt = timestampNow;
+
+    // emit event before calling the `onCommentAdd` hook to ensure the order of events is correct in the case of reentrancy
+    emit ICommentManager.CommentAdded(
+      commentId,
+      author,
+      app,
+      channelId,
+      parentId,
+      uint96(timestampNow),
+      content,
+      targetUri,
+      commentType,
+      comment.authMethod,
+      metadata
+    );
+
+    // Store metadata in mappings
+    if (metadata.length > 0) {
+      for (uint i = 0; i < metadata.length; i++) {
+        bytes32 key = metadata[i].key;
+        bytes memory val = metadata[i].value;
+
+        commentMetadata[commentId][key] = val;
+        commentMetadataKeys[commentId].push(key);
+
+        emit ICommentManager.CommentMetadataSet(commentId, key, val);
+      }
+    }
+
+    Channels.Channel memory channel = channelManager.getChannel(channelId);
+
+    if (channel.hook != address(0) && channel.permissions.onCommentAdd) {
+      IHook hook = IHook(channel.hook);
+      // Calculate hook value after protocol fee
+      uint256 valueToPassToTheHook = channelManager
+        .deductProtocolHookTransactionFee(remainingValue);
+      if (remainingValue > valueToPassToTheHook) {
+        // send the hook transaction fee to the channel manager
+        payable(address(channelManager)).transfer(
+          remainingValue - valueToPassToTheHook
+        );
+      }
+
+      Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentAdd{
+        value: valueToPassToTheHook
+      }(comment, metadata, msgSender, commentId);
+
+      // Store hook metadata
+      if (hookMetadata.length > 0) {
+        Metadata.storeCommentHookMetadata(
+          commentId,
+          hookMetadata,
+          commentHookMetadata,
+          commentHookMetadataKeys
+        );
+
+        for (uint i = 0; i < hookMetadata.length; i++) {
+          emit ICommentManager.CommentHookMetadataSet(
+            commentId,
+            hookMetadata[i].key,
+            hookMetadata[i].value
+          );
+        }
+      }
+    }
+    // refund excess payment if any
+    else if (remainingValue > 0) {
+      payable(msgSender).transfer(remainingValue);
+    }
+  }
+
+  /// @notice Edit an existing comment
+  /// @param commentId The unique identifier of the comment to edit
+  /// @param editData The comment edit data
+  /// @param authMethod The authentication method used
+  /// @param value The ETH value sent with the transaction
+  /// @param channelManager The channel manager contract
+  /// @param comments Storage mapping for comments
+  /// @param commentMetadata Storage mapping for comment metadata
+  /// @param commentMetadataKeys Storage mapping for comment metadata keys
+  /// @param commentHookMetadata Storage mapping for comment hook metadata
+  /// @param commentHookMetadataKeys Storage mapping for comment hook metadata keys
+  /// @param msgSender The sender of the transaction
+  function editComment(
+    bytes32 commentId,
+    EditComment memory editData,
+    AuthorAuthMethod authMethod,
+    uint256 value,
+    IChannelManager channelManager,
+    mapping(bytes32 => Comment) storage comments,
+    mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
+    mapping(bytes32 => bytes32[]) storage commentMetadataKeys,
+    mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
+    mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys,
+    address msgSender
+  ) external {
+    Comment storage comment = comments[commentId];
+
+    string memory content = editData.content;
+    Metadata.MetadataEntry[] memory metadata = editData.metadata;
+    uint88 timestampNow = uint88(block.timestamp);
+
+    comment.content = content;
+    comment.updatedAt = timestampNow;
+    comment.authMethod = uint8(authMethod);
+
+    // Clear existing metadata
+    Metadata.clearCommentMetadata(
+      commentId,
+      commentMetadata,
+      commentMetadataKeys
+    );
+
+    // Store new metadata
+    for (uint i = 0; i < metadata.length; i++) {
+      bytes32 key = metadata[i].key;
+      bytes memory val = metadata[i].value;
+
+      commentMetadata[commentId][key] = val;
+      commentMetadataKeys[commentId].push(key);
+
+      emit ICommentManager.CommentMetadataSet(commentId, key, val);
+    }
+
+    Channels.Channel memory channel = channelManager.getChannel(
+      comment.channelId
+    );
+
+    // emit event before calling the `onCommentEdit` hook to ensure the order of events is correct in the case of reentrancy
+    emit ICommentManager.CommentEdited(
+      commentId,
+      comment.author,
+      editData.app,
+      comment.channelId,
+      comment.parentId,
+      uint96(comment.createdAt),
+      uint96(timestampNow),
+      content,
+      comment.targetUri,
+      comment.commentType,
+      comment.authMethod,
+      metadata
+    );
+
+    if (channel.hook != address(0) && channel.permissions.onCommentEdit) {
+      IHook hook = IHook(channel.hook);
+
+      // Calculate hook value after protocol fee
+      uint256 valueToPassToHook = channelManager
+        .deductProtocolHookTransactionFee(value);
+      if (value > valueToPassToHook) {
+        payable(address(channelManager)).transfer(value - valueToPassToHook);
+      }
+
+      Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentEdit{
+        value: valueToPassToHook
+      }(comment, metadata, msgSender, commentId);
+
+      // Clear existing hook metadata
+      Metadata.clearCommentHookMetadata(
+        commentId,
+        commentHookMetadata,
+        commentHookMetadataKeys
+      );
+
+      // Store new hook metadata
+      for (uint i = 0; i < hookMetadata.length; i++) {
+        bytes32 key = hookMetadata[i].key;
+        bytes memory val = hookMetadata[i].value;
+
+        commentHookMetadata[commentId][key] = val;
+        commentHookMetadataKeys[commentId].push(key);
+
+        emit ICommentManager.CommentHookMetadataSet(commentId, key, val);
+      }
+    } else if (value > 0) {
+      // refund excess payment if any
+      payable(msgSender).transfer(value);
+    }
+  }
+
+  /// @notice Delete a comment
+  /// @param commentId The unique identifier of the comment to delete
+  /// @param author The address of the comment author
+  /// @param channelManager The channel manager contract
+  /// @param comments Storage mapping for comments
+  /// @param deleted Storage mapping for deleted comments
+  /// @param commentMetadata Storage mapping for comment metadata
+  /// @param commentMetadataKeys Storage mapping for comment metadata keys
+  /// @param commentHookMetadata Storage mapping for comment hook metadata
+  /// @param commentHookMetadataKeys Storage mapping for comment hook metadata keys
+  /// @param msgSender The sender of the transaction
+  /// @param msgValue The ETH value sent with the transaction
+  function deleteComment(
+    bytes32 commentId,
+    address author,
+    IChannelManager channelManager,
+    mapping(bytes32 => Comment) storage comments,
+    mapping(bytes32 => bool) storage deleted,
+    mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
+    mapping(bytes32 => bytes32[]) storage commentMetadataKeys,
+    mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
+    mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys,
+    address msgSender,
+    uint256 msgValue
+  ) external {
+    Comment storage comment = comments[commentId];
+
+    // Store comment data for hook
+    Comment memory commentToDelete = comment;
+
+    // Get metadata for hook
+    Metadata.MetadataEntry[] memory metadata = Metadata.getCommentMetadata(
+      commentId,
+      commentMetadata,
+      commentMetadataKeys
+    );
+    Metadata.MetadataEntry[] memory hookMetadata = Metadata
+      .getCommentHookMetadata(
+        commentId,
+        commentHookMetadata,
+        commentHookMetadataKeys
+      );
+
+    // Delete the comment and metadata
+    delete comments[commentId];
+    deleted[commentId] = true;
+    Metadata.clearCommentMetadata(
+      commentId,
+      commentMetadata,
+      commentMetadataKeys
+    );
+    Metadata.clearCommentHookMetadata(
+      commentId,
+      commentHookMetadata,
+      commentHookMetadataKeys
+    );
+
+    Channels.Channel memory channel = channelManager.getChannel(
+      commentToDelete.channelId
+    );
+
+    // emit event before calling the `onCommentDelete` hook to ensure the order of events is correct in the case of reentrancy
+    emit ICommentManager.CommentDeleted(commentId, author);
+
+    if (channel.hook != address(0) && channel.permissions.onCommentDelete) {
+      IHook hook = IHook(channel.hook);
+      // Calculate hook value after protocol fee
+      uint256 msgValueAfterFee = channelManager
+        .deductProtocolHookTransactionFee(msgValue);
+
+      hook.onCommentDelete{ value: msgValueAfterFee }(
+        commentToDelete,
+        metadata,
+        hookMetadata,
+        msgSender,
+        commentId
+      );
+    }
+  }
+
+  /// @notice Update hook metadata for a comment
+  /// @param commentId The unique identifier of the comment
+  /// @param channelManager The channel manager contract
+  /// @param comments Storage mapping for comments
+  /// @param commentMetadata Storage mapping for comment metadata
+  /// @param commentMetadataKeys Storage mapping for comment metadata keys
+  /// @param commentHookMetadata Storage mapping for comment hook metadata
+  /// @param commentHookMetadataKeys Storage mapping for comment hook metadata keys
+  /// @param msgSender The sender of the transaction
+  function updateCommentHookData(
+    bytes32 commentId,
+    IChannelManager channelManager,
+    mapping(bytes32 => Comment) storage comments,
+    mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
+    mapping(bytes32 => bytes32[]) storage commentMetadataKeys,
+    mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
+    mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys,
+    address msgSender
+  ) external {
+    Comment storage comment = comments[commentId];
+
+    Channels.Channel memory channel = channelManager.getChannel(
+      comment.channelId
+    );
+    if (
+      channel.hook == address(0) || !channel.permissions.onCommentHookDataUpdate
+    ) {
+      revert ICommentManager.HookNotEnabled();
+    }
+
+    // Get current metadata for hook
+    Metadata.MetadataEntry[] memory metadata = Metadata.getCommentMetadata(
+      commentId,
+      commentMetadata,
+      commentMetadataKeys
+    );
+    Metadata.MetadataEntry[] memory hookMetadata = Metadata
+      .getCommentHookMetadata(
+        commentId,
+        commentHookMetadata,
+        commentHookMetadataKeys
+      );
+
+    IHook hook = IHook(channel.hook);
+
+    Metadata.MetadataEntryOp[] memory operations = hook.onCommentHookDataUpdate(
+      comment,
+      metadata,
+      hookMetadata,
+      msgSender,
+      commentId
+    );
+
+    // Apply hook metadata operations using merge mode (gas-efficient)
+    for (uint i = 0; i < operations.length; i++) {
+      Metadata.MetadataEntryOp memory op = operations[i];
+
+      if (op.operation == Metadata.MetadataOperation.DELETE) {
+        Metadata.deleteCommentHookMetadataKey(
+          commentId,
+          op.key,
+          commentHookMetadata,
+          commentHookMetadataKeys
+        );
+        emit ICommentManager.CommentHookMetadataSet(commentId, op.key, "");
+      } else if (op.operation == Metadata.MetadataOperation.SET) {
+        // Check if this is a new key for gas optimization
+        bool isNewKey = !Metadata.hookMetadataKeyExists(
+          commentId,
+          op.key,
+          commentHookMetadataKeys
+        );
+
+        commentHookMetadata[commentId][op.key] = op.value;
+
+        // Only add to keys array if it's a new key
+        if (isNewKey) {
+          commentHookMetadataKeys[commentId].push(op.key);
+        }
+
+        emit ICommentManager.CommentHookMetadataSet(
+          commentId,
+          op.key,
+          op.value
+        );
+      }
+    }
   }
 }

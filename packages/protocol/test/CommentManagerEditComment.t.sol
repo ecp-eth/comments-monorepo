@@ -18,9 +18,8 @@ error TestHookRejected();
 contract CommentsTest is Test, IERC721Receiver {
   event CommentEdited(
     bytes32 indexed commentId,
-    address indexed editedByApp,
     address indexed author,
-    address app,
+    address indexed editedByApp,
     uint256 channelId,
     bytes32 parentId,
     uint96 createdAt,
@@ -112,13 +111,12 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
@@ -130,7 +128,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
   }
 
   function test_EditComment_AsAuthorAndApp_AppSignatureNotRequired() public {
@@ -179,12 +177,11 @@ contract CommentsTest is Test, IERC721Receiver {
     );
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
+      uint88(block.timestamp),
       uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
@@ -197,7 +194,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
 
     // Verify metadata was set
     Metadata.MetadataEntry[] memory commentMetadata = comments
@@ -252,13 +249,12 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
@@ -276,7 +272,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
 
     // Verify hook metadata was set
     Metadata.MetadataEntry[] memory hookMetadata = comments
@@ -415,13 +411,12 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
@@ -438,7 +433,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
   }
 
   function test_EditCommentWithSig_AppSignature_AppApproved() public {
@@ -479,13 +474,12 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
@@ -502,7 +496,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
   }
 
   function test_EditCommentWithSig_SenderIsApp_NoAppSignature() public {
@@ -532,13 +526,12 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
@@ -551,7 +544,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
   }
 
   function test_EditCommentWithSig_InvalidAppSignature() public {
