@@ -96,6 +96,11 @@ export type CommentData = {
    */
   commentType: number;
   /**
+   * The authentication method used to create this comment
+   * 0 = DIRECT_TX, 1 = APP_APPROVAL, 2 = AUTHOR_SIGNATURE
+   */
+  authMethod: number;
+  /**
    * The ID of the channel
    */
   channelId: bigint;

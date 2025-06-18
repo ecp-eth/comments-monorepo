@@ -82,6 +82,7 @@ contract CommentsTest is Test, IERC721Receiver {
     string content,
     string targetUri,
     uint8 commentType,
+    uint8 authMethod,
     Metadata.MetadataEntry[] metadata
   );
   event CommentMetadataSet(
@@ -600,6 +601,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.AUTHOR_SIGNATURE),
       new Metadata.MetadataEntry[](0)
     );
     vm.expectEmit(true, true, true, true);
@@ -772,6 +774,110 @@ contract CommentsTest is Test, IERC721Receiver {
     bytes calldata
   ) external pure returns (bytes4) {
     return IERC721Receiver.onERC721Received.selector;
+  }
+
+  // Tests for AuthorAuthMethod tracking
+  function test_PostComment_StoresDirectTxAuthMethod() public {
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.app = app;
+
+    // Generate app signature
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    // Send transaction as author (direct transaction)
+    vm.prank(author);
+    bytes32 actualCommentId = comments.postComment(commentData, appSignature);
+
+    // Verify the comment was stored with DIRECT_TX auth method (0)
+    Comments.Comment memory storedComment = comments.getComment(
+      actualCommentId
+    );
+    assertEq(
+      storedComment.authMethod,
+      0,
+      "Auth method should be DIRECT_TX (0)"
+    );
+    assertEq(storedComment.author, author, "Author should match");
+    assertEq(storedComment.app, app, "App should match");
+  }
+
+  function test_PostCommentWithSig_StoresAuthorSignatureAuthMethod() public {
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.app = app;
+
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory authorSignature = TestUtils.signEIP712(
+      vm,
+      authorPrivateKey,
+      commentId
+    );
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    // Post comment with author signature (no pre-approval)
+    bytes32 actualCommentId = comments.postCommentWithSig(
+      commentData,
+      authorSignature,
+      appSignature
+    );
+
+    // Verify the comment was stored with AUTHOR_SIGNATURE auth method (2)
+    Comments.Comment memory storedComment = comments.getComment(
+      actualCommentId
+    );
+    assertEq(
+      storedComment.authMethod,
+      2,
+      "Auth method should be AUTHOR_SIGNATURE (2)"
+    );
+    assertEq(storedComment.author, author, "Author should match");
+    assertEq(storedComment.app, app, "App should match");
+  }
+
+  function test_PostCommentWithSig_StoresAppApprovalAuthMethod() public {
+    // First add approval for the app
+    vm.prank(author);
+    comments.addApproval(app);
+
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.app = app;
+
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    // Post comment with app approval (empty author signature)
+    bytes32 actualCommentId = comments.postCommentWithSig(
+      commentData,
+      bytes(""), // empty author signature
+      appSignature
+    );
+
+    // Verify the comment was stored with APP_APPROVAL auth method (1)
+    Comments.Comment memory storedComment = comments.getComment(
+      actualCommentId
+    );
+    assertEq(
+      storedComment.authMethod,
+      1,
+      "Auth method should be APP_APPROVAL (1)"
+    );
+    assertEq(storedComment.author, author, "Author should match");
+    assertEq(storedComment.app, app, "App should match");
   }
 }
 

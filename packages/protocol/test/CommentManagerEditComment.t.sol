@@ -28,6 +28,7 @@ contract CommentsTest is Test, IERC721Receiver {
     string content,
     string targetUri,
     uint8 commentType,
+    uint8 authMethod,
     Metadata.MetadataEntry[] metadata
   );
   event CommentMetadataSet(
@@ -121,6 +122,7 @@ contract CommentsTest is Test, IERC721Receiver {
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.DIRECT_TX),
       editData.metadata
     );
     comments.editComment(commentId, editData, editAppSignature);
@@ -187,6 +189,7 @@ contract CommentsTest is Test, IERC721Receiver {
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.DIRECT_TX),
       editData.metadata
     );
     comments.editComment(commentId, editData, "");
@@ -259,6 +262,7 @@ contract CommentsTest is Test, IERC721Receiver {
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.DIRECT_TX),
       editData.metadata
     );
     vm.expectEmit(true, true, true, true);
@@ -421,6 +425,7 @@ contract CommentsTest is Test, IERC721Receiver {
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.AUTHOR_SIGNATURE),
       editData.metadata
     );
     comments.editCommentWithSig(
@@ -484,6 +489,7 @@ contract CommentsTest is Test, IERC721Receiver {
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.APP_APPROVAL),
       editData.metadata
     );
     comments.editCommentWithSig(
@@ -536,6 +542,7 @@ contract CommentsTest is Test, IERC721Receiver {
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.APP_APPROVAL),
       editData.metadata
     );
     vm.prank(app);

@@ -18,6 +18,7 @@ interface ICommentManager {
   /// @param content The text content of the comment - may contain urls, images and mentions
   /// @param targetUri the URI about which the comment is being made
   /// @param commentType The type of the comment (0=comment, 1=reaction)
+  /// @param authMethod The author authentication method used to create this comment
   /// @param metadata Array of key-value pairs for additional data
   event CommentAdded(
     bytes32 indexed commentId,
@@ -29,6 +30,7 @@ interface ICommentManager {
     string content,
     string targetUri,
     uint8 commentType,
+    uint8 authMethod,
     Metadata.MetadataEntry[] metadata
   );
 
@@ -69,6 +71,7 @@ interface ICommentManager {
   /// @param content The text content of the comment - may contain urls, images and mentions
   /// @param targetUri the URI about which the comment is being made
   /// @param commentType The type of the comment (0=comment, 1=reaction)
+  /// @param authMethod The author authentication method used to create this comment (from original creation)
   event CommentEdited(
     bytes32 indexed commentId,
     address indexed editedByApp,
@@ -81,6 +84,7 @@ interface ICommentManager {
     string content,
     string targetUri,
     uint8 commentType,
+    uint8 authMethod,
     Metadata.MetadataEntry[] metadata
   );
 

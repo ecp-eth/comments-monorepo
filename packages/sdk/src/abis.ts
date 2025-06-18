@@ -478,8 +478,13 @@ export const CommentManagerABI = [
           },
           {
             name: "createdAt",
-            type: "uint96",
-            internalType: "uint96",
+            type: "uint88",
+            internalType: "uint88",
+          },
+          {
+            name: "authMethod",
+            type: "uint8",
+            internalType: "uint8",
           },
           {
             name: "app",
@@ -1362,6 +1367,12 @@ export const CommentManagerABI = [
         internalType: "uint8",
       },
       {
+        name: "authMethod",
+        type: "uint8",
+        indexed: false,
+        internalType: "uint8",
+      },
+      {
         name: "metadata",
         type: "tuple[]",
         indexed: false,
@@ -1467,6 +1478,12 @@ export const CommentManagerABI = [
       },
       {
         name: "commentType",
+        type: "uint8",
+        indexed: false,
+        internalType: "uint8",
+      },
+      {
+        name: "authMethod",
         type: "uint8",
         indexed: false,
         internalType: "uint8",

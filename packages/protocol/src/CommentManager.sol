@@ -96,13 +96,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     bytes32 commentId = getCommentId(commentData);
     address app = commentData.app;
 
+    // Verify the App signature.
     if (
       // for direct contract calls where msg.sender = app = comment.author
       msg.sender == app ||
       // or comment.app signs the comment
       SignatureChecker.isValidSignatureNow(app, commentId, appSignature)
     ) {
-      _postComment(commentId, commentData);
+      _postComment(commentId, commentData, Comments.AuthorAuthMethod.DIRECT_TX);
       return commentId;
     }
 
@@ -134,8 +135,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       revert InvalidAppSignature();
     }
 
+    // Verify the author signature.
     if (
-      approvals[commentData.author][app] ||
       // consider authorized if the author has signed the comment hash
       SignatureChecker.isValidSignatureNow(
         commentData.author,
@@ -143,7 +144,18 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         authorSignature
       )
     ) {
-      _postComment(commentId, commentData);
+      _postComment(
+        commentId,
+        commentData,
+        Comments.AuthorAuthMethod.AUTHOR_SIGNATURE
+      );
+      return commentId;
+    } else if (approvals[commentData.author][app]) {
+      _postComment(
+        commentId,
+        commentData,
+        Comments.AuthorAuthMethod.APP_APPROVAL
+      );
       return commentId;
     }
 
@@ -152,7 +164,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
   function _postComment(
     bytes32 commentId,
-    Comments.CreateComment calldata commentData
+    Comments.CreateComment calldata commentData,
+    Comments.AuthorAuthMethod authMethod
   ) internal {
     // Collect protocol comment fee, if any.
     uint96 commentCreationFee = channelManager.getCommentCreationFee();
@@ -180,6 +193,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     comment.content = content;
     comment.targetUri = targetUri;
     comment.commentType = commentType;
+    comment.authMethod = uint8(authMethod);
     comment.createdAt = timestampNow;
     comment.updatedAt = timestampNow;
 
@@ -194,6 +208,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       content,
       targetUri,
       commentType,
+      comment.authMethod,
       metadata
     );
 
@@ -284,13 +299,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     bytes32 editHash = getEditCommentHash(commentId, author, editData);
 
+    // Verify the app signature.
     if (
       // In the case of direct contract calls, where `author == app == contract address`.
       msg.sender == app ||
       // or the app signs the edit hash
       SignatureChecker.isValidSignatureNow(app, editHash, appSignature)
     ) {
-      _editComment(commentId, editData);
+      _editComment(commentId, editData, Comments.AuthorAuthMethod.DIRECT_TX);
       return;
     }
 
@@ -324,6 +340,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     bytes32 editHash = getEditCommentHash(commentId, author, editData);
 
+    // Verify the app signature.
     if (
       // skip app signature check if msg.sender is the app itself
       msg.sender != app &&
@@ -332,12 +349,19 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       revert InvalidAppSignature();
     }
 
+    // Verify the author signature.
     if (
-      approvals[author][app] ||
       // consider authorized if the author has signed the comment hash
       SignatureChecker.isValidSignatureNow(author, editHash, authorSignature)
     ) {
-      _editComment(commentId, editData);
+      _editComment(
+        commentId,
+        editData,
+        Comments.AuthorAuthMethod.AUTHOR_SIGNATURE
+      );
+      return;
+    } else if (approvals[author][app]) {
+      _editComment(commentId, editData, Comments.AuthorAuthMethod.APP_APPROVAL);
       return;
     }
 
@@ -347,9 +371,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @notice Internal function to handle comment editing logic
   /// @param commentId The unique identifier of the comment to edit
   /// @param editData The comment data struct containing content and metadata
+  /// @param authMethod The authentication method used for this edit
   function _editComment(
     bytes32 commentId,
-    Comments.EditComment calldata editData
+    Comments.EditComment calldata editData,
+    Comments.AuthorAuthMethod authMethod
   ) internal {
     Comments.Comment storage comment = comments[commentId];
 
@@ -359,6 +385,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     comment.content = content;
     comment.updatedAt = timestampNow;
+    comment.authMethod = uint8(authMethod);
 
     // Clear existing metadata
     _clearCommentMetadata(commentId);
@@ -391,6 +418,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       content,
       comment.targetUri,
       comment.commentType,
+      comment.authMethod,
       metadata
     );
 

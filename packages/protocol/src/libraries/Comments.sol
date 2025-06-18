@@ -12,12 +12,23 @@ library Comments {
   uint8 public constant COMMENT_TYPE_COMMENT = 0;
   uint8 public constant COMMENT_TYPE_REACTION = 1;
 
+  /// @notice Author Authentication method used to create the comment
+  /// @dev DIRECT_TX: User signed transaction directly (msg.sender == author).
+  /// @dev APP_APPROVAL: User has pre-approved the app that signed the comment (approvals[author][app] == true)
+  /// @dev AUTHOR_SIGNATURE: User signed the comment hash, the app submitted the comment on their behalf (gas-sponsored)
+  enum AuthorAuthMethod {
+    DIRECT_TX, // 0
+    APP_APPROVAL, // 1
+    AUTHOR_SIGNATURE // 2
+  }
+
   /// @notice Struct containing all comment data
   /// @param author The address of the comment author
   /// @param createdAt The timestamp when the comment was created
   /// @param app The address of the application signer that authorized this comment
   /// @param updatedAt The timestamp when the comment was last updated
   /// @param commentType The type of the comment (0=comment, 1=reaction)
+  /// @param authMethod The authentication method used to create this comment
   /// @param channelId The channel ID associated with the comment
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param content The text content of the comment - may contain urls, images and mentions
@@ -25,7 +36,8 @@ library Comments {
   struct Comment {
     // Pack these fields together (saves 1 storage slot)
     address author; // 20 bytes   --┬-- 32 bytes
-    uint96 createdAt; // 12 bytes --┘
+    uint88 createdAt; // 11 bytes --┘
+    uint8 authMethod; // 1 byte --┘
     address app; // 20 bytes      --┬-- 32 bytes
     uint88 updatedAt; // 11 bytes --┘
     uint8 commentType; // 1 byte --┘

@@ -27,6 +27,7 @@ contract CommentsTest is Test, IERC721Receiver {
     string content,
     string targetUri,
     uint8 commentType,
+    uint8 authMethod,
     Metadata.MetadataEntry[] metadata
   );
   event CommentHookMetadataSet(
@@ -268,6 +269,7 @@ contract CommentsTest is Test, IERC721Receiver {
       commentData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.AUTHOR_SIGNATURE),
       new Metadata.MetadataEntry[](0)
     );
     comments.postCommentWithSig(commentData, authorSignature, appSignature);
