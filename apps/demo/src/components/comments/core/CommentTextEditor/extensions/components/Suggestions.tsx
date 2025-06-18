@@ -2,7 +2,13 @@ import type { MentionSuggestionSchemaType } from "@/app/api/mention-suggestions/
 import { cn } from "@/lib/utils";
 import { getChainById } from "@ecp.eth/shared/helpers";
 import type { SuggestionProps } from "@tiptap/suggestion";
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import * as chains from "viem/chains";
 
 export type SuggestionsProps = SuggestionProps<MentionSuggestionSchemaType> & {
@@ -18,6 +24,7 @@ export const Suggestions = forwardRef(function Suggestions(
   ref: React.Ref<SuggestionsRef>,
 ) {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const selectedItemRef = useRef<HTMLButtonElement>(null);
 
   const selectItem = (index: number) => {
     const item = items[index];
@@ -28,6 +35,16 @@ export const Suggestions = forwardRef(function Suggestions(
   };
 
   useEffect(() => setSelectedIndex(0), [items]);
+
+  // Scroll selected item into view when selectedIndex changes
+  useEffect(() => {
+    if (selectedItemRef.current) {
+      selectedItemRef.current.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
+    }
+  }, [selectedIndex]);
 
   useImperativeHandle(ref, () => ({
     onKeyDown: ({ event }) => {
@@ -73,6 +90,7 @@ export const Suggestions = forwardRef(function Suggestions(
       <>
         {items.map((item, index) => (
           <button
+            ref={index === selectedIndex ? selectedItemRef : null}
             className={cn(
               "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
               index === selectedIndex ? "bg-accent text-accent-foreground" : "",
