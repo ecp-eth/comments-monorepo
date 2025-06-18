@@ -103,6 +103,16 @@ interface ICommentManager {
   /// @param app Address being unapproved
   event ApprovalRemoved(address indexed author, address indexed app);
 
+  /// @notice Emitted when a batch operation is executed
+  /// @param sender Address of the transaction sender
+  /// @param operationsCount Number of operations in the batch
+  /// @param totalValue Total ETH value sent with the batch
+  event BatchOperationExecuted(
+    address indexed sender,
+    uint256 operationsCount,
+    uint256 totalValue
+  );
+
   /// @notice Error thrown when app signature verification fails
   error InvalidAppSignature();
   /// @notice Error thrown when author signature verification fails
@@ -137,6 +147,12 @@ interface ICommentManager {
   error ParentCommentNotInSameChannel();
   /// @notice Error thrown when approval expiry is invalid (in the past)
   error InvalidApprovalExpiry();
+  /// @notice Error thrown when batch operation is invalid
+  error InvalidBatchOperation(uint256 operationIndex, string reason);
+  /// @notice Error thrown when batch operation value distribution is invalid
+  error InvalidValueDistribution(uint256 providedValue, uint256 requiredValue);
+  /// @notice Error thrown when batch operation fails
+  error BatchOperationFailed(uint256 operationIndex, bytes reason);
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata
@@ -386,4 +402,13 @@ interface ICommentManager {
   /// @param commentId The ID of the comment
   /// @return The deleted status
   function isDeleted(bytes32 commentId) external view returns (bool);
+
+  // Batch Operation Functions
+
+  /// @notice Executes multiple operations (post, edit, delete) in a single transaction preserving order
+  /// @param operations Array of batch operations to execute
+  /// @return results Array of results from each operation (comment IDs for post operations, empty for others)
+  function batchOperations(
+    Comments.BatchOperation[] calldata operations
+  ) external payable returns (bytes[] memory results);
 }

@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "./libraries/Comments.sol";
 import "./interfaces/ICommentManager.sol";
+import "./interfaces/IHook.sol";
 import "./ChannelManager.sol";
 import "./libraries/Channels.sol";
 
@@ -83,9 +84,17 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   function postComment(
     Comments.CreateComment calldata commentData,
     bytes calldata appSignature
+  ) external payable returns (bytes32) {
+    return _postComment(commentData, appSignature, msg.value);
+  }
+
+  /// @notice Internal function to handle comment posting with explicit value
+  function _postComment(
+    Comments.CreateComment memory commentData,
+    bytes memory appSignature,
+    uint256 value
   )
-    external
-    payable
+    internal
     onlyAuthor(commentData.author)
     notStale(commentData.deadline)
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
@@ -108,7 +117,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       // or comment.app signs the comment
       SignatureChecker.isValidSignatureNow(app, commentId, appSignature)
     ) {
-      _postComment(commentId, commentData, Comments.AuthorAuthMethod.DIRECT_TX);
+      _createComment(
+        commentId,
+        commentData,
+        Comments.AuthorAuthMethod.DIRECT_TX,
+        value
+      );
       return commentId;
     }
 
@@ -120,9 +134,24 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Comments.CreateComment calldata commentData,
     bytes calldata authorSignature,
     bytes calldata appSignature
+  ) external payable returns (bytes32) {
+    return
+      _postCommentWithSig(
+        commentData,
+        authorSignature,
+        appSignature,
+        msg.value
+      );
+  }
+
+  /// @notice Internal function to handle comment posting with signature and explicit value
+  function _postCommentWithSig(
+    Comments.CreateComment memory commentData,
+    bytes memory authorSignature,
+    bytes memory appSignature,
+    uint256 value
   )
-    external
-    payable
+    internal
     notStale(commentData.deadline)
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
@@ -154,17 +183,19 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
         authorSignature
       )
     ) {
-      _postComment(
+      _createComment(
         commentId,
         commentData,
-        Comments.AuthorAuthMethod.AUTHOR_SIGNATURE
+        Comments.AuthorAuthMethod.AUTHOR_SIGNATURE,
+        value
       );
       return commentId;
     } else if (approvals[commentData.author][app] > block.timestamp) {
-      _postComment(
+      _createComment(
         commentId,
         commentData,
-        Comments.AuthorAuthMethod.APP_APPROVAL
+        Comments.AuthorAuthMethod.APP_APPROVAL,
+        value
       );
       return commentId;
     }
@@ -172,25 +203,26 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     revert NotAuthorized(msg.sender, commentData.author);
   }
 
-  function _postComment(
+  function _createComment(
     bytes32 commentId,
-    Comments.CreateComment calldata commentData,
-    Comments.AuthorAuthMethod authMethod
+    Comments.CreateComment memory commentData,
+    Comments.AuthorAuthMethod authMethod,
+    uint256 value
   ) internal {
     // Collect protocol comment fee, if any.
     uint96 commentCreationFee = channelManager.getCommentCreationFee();
     if (commentCreationFee > 0) {
       channelManager.collectCommentCreationFee{ value: commentCreationFee }();
     }
-    uint256 remainingValue = msg.value - commentCreationFee;
+    uint256 remainingValue = value - commentCreationFee;
 
     address author = commentData.author;
     address app = commentData.app;
     uint256 channelId = commentData.channelId;
     bytes32 parentId = commentData.parentId;
-    string calldata content = commentData.content;
-    Metadata.MetadataEntry[] calldata metadata = commentData.metadata;
-    string calldata targetUri = commentData.targetUri;
+    string memory content = commentData.content;
+    Metadata.MetadataEntry[] memory metadata = commentData.metadata;
+    string memory targetUri = commentData.targetUri;
     uint8 commentType = commentData.commentType;
     uint88 timestampNow = uint88(block.timestamp);
 
@@ -232,12 +264,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       ];
       for (uint i = 0; i < metadata.length; i++) {
         bytes32 key = metadata[i].key;
-        bytes memory value = metadata[i].value;
+        bytes memory val = metadata[i].value;
 
-        commentMetadataForId[key] = value;
+        commentMetadataForId[key] = val;
         commentMetadataKeysForId.push(key);
 
-        emit CommentMetadataSet(commentId, key, value);
+        emit CommentMetadataSet(commentId, key, val);
       }
     }
 
@@ -269,12 +301,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
           ];
         for (uint i = 0; i < hookMetadata.length; i++) {
           bytes32 key = hookMetadata[i].key;
-          bytes memory value = hookMetadata[i].value;
+          bytes memory val = hookMetadata[i].value;
 
-          commentHookMetadataForId[key] = value;
+          commentHookMetadataForId[key] = val;
           commentHookMetadataKeysForId.push(key);
 
-          emit CommentHookMetadataSet(commentId, key, value);
+          emit CommentHookMetadataSet(commentId, key, val);
         }
       }
     }
@@ -289,9 +321,18 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     bytes32 commentId,
     Comments.EditComment calldata editData,
     bytes calldata appSignature
+  ) external payable {
+    _editCommentDirect(commentId, editData, appSignature, msg.value);
+  }
+
+  /// @notice Internal function to handle comment editing with explicit value
+  function _editCommentDirect(
+    bytes32 commentId,
+    Comments.EditComment memory editData,
+    bytes memory appSignature,
+    uint256 value
   )
-    external
-    payable
+    internal
     onlyAuthor(comments[commentId].author)
     notStale(editData.deadline)
     commentExists(commentId)
@@ -307,7 +348,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     nonces[author][app]++;
 
-    bytes32 editHash = getEditCommentHash(commentId, author, editData);
+    bytes32 editHash = _getEditCommentHash(commentId, author, editData);
 
     // Verify the app signature.
     if (
@@ -316,7 +357,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       // or the app signs the edit hash
       SignatureChecker.isValidSignatureNow(app, editHash, appSignature)
     ) {
-      _editComment(commentId, editData, Comments.AuthorAuthMethod.DIRECT_TX);
+      _editComment(
+        commentId,
+        editData,
+        Comments.AuthorAuthMethod.DIRECT_TX,
+        value
+      );
       return;
     }
 
@@ -329,9 +375,25 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Comments.EditComment calldata editData,
     bytes calldata authorSignature,
     bytes calldata appSignature
+  ) external payable {
+    _editCommentWithSig(
+      commentId,
+      editData,
+      authorSignature,
+      appSignature,
+      msg.value
+    );
+  }
+
+  /// @notice Internal function to handle comment editing with signature and explicit value
+  function _editCommentWithSig(
+    bytes32 commentId,
+    Comments.EditComment memory editData,
+    bytes memory authorSignature,
+    bytes memory appSignature,
+    uint256 value
   )
-    external
-    payable
+    internal
     notStale(editData.deadline)
     commentExists(commentId)
     validateNonce(
@@ -348,7 +410,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
     require(author != address(0), "Comment does not exist");
 
-    bytes32 editHash = getEditCommentHash(commentId, author, editData);
+    bytes32 editHash = _getEditCommentHash(commentId, author, editData);
 
     // Verify the app signature.
     if (
@@ -367,11 +429,17 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       _editComment(
         commentId,
         editData,
-        Comments.AuthorAuthMethod.AUTHOR_SIGNATURE
+        Comments.AuthorAuthMethod.AUTHOR_SIGNATURE,
+        value
       );
       return;
     } else if (approvals[author][app] > block.timestamp) {
-      _editComment(commentId, editData, Comments.AuthorAuthMethod.APP_APPROVAL);
+      _editComment(
+        commentId,
+        editData,
+        Comments.AuthorAuthMethod.APP_APPROVAL,
+        value
+      );
       return;
     }
 
@@ -384,13 +452,14 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @param authMethod The authentication method used for this edit
   function _editComment(
     bytes32 commentId,
-    Comments.EditComment calldata editData,
-    Comments.AuthorAuthMethod authMethod
+    Comments.EditComment memory editData,
+    Comments.AuthorAuthMethod authMethod,
+    uint256 value
   ) internal {
     Comments.Comment storage comment = comments[commentId];
 
-    string calldata content = editData.content;
-    Metadata.MetadataEntry[] calldata metadata = editData.metadata;
+    string memory content = editData.content;
+    Metadata.MetadataEntry[] memory metadata = editData.metadata;
     uint88 timestampNow = uint88(block.timestamp);
 
     comment.content = content;
@@ -403,12 +472,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     // Store new metadata
     for (uint i = 0; i < metadata.length; i++) {
       bytes32 key = metadata[i].key;
-      bytes memory value = metadata[i].value;
+      bytes memory val = metadata[i].value;
 
-      commentMetadata[commentId][key] = value;
+      commentMetadata[commentId][key] = val;
       commentMetadataKeys[commentId].push(key);
 
-      emit CommentMetadataSet(commentId, key, value);
+      emit CommentMetadataSet(commentId, key, val);
     }
 
     Channels.Channel memory channel = channelManager.getChannel(
@@ -437,11 +506,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
 
       // Calculate hook value after protocol fee
       uint256 valueToPassToHook = channelManager
-        .deductProtocolHookTransactionFee(msg.value);
-      if (msg.value > valueToPassToHook) {
-        payable(address(channelManager)).transfer(
-          msg.value - valueToPassToHook
-        );
+        .deductProtocolHookTransactionFee(value);
+      if (value > valueToPassToHook) {
+        payable(address(channelManager)).transfer(value - valueToPassToHook);
       }
 
       Metadata.MetadataEntry[] memory hookMetadata = hook.onCommentEdit{
@@ -454,23 +521,23 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
       // Store new hook metadata
       for (uint i = 0; i < hookMetadata.length; i++) {
         bytes32 key = hookMetadata[i].key;
-        bytes memory value = hookMetadata[i].value;
+        bytes memory val = hookMetadata[i].value;
 
-        commentHookMetadata[commentId][key] = value;
+        commentHookMetadata[commentId][key] = val;
         commentHookMetadataKeys[commentId].push(key);
 
-        emit CommentHookMetadataSet(commentId, key, value);
+        emit CommentHookMetadataSet(commentId, key, val);
       }
-    } else if (msg.value > 0) {
+    } else if (value > 0) {
       // refund excess payment if any
-      payable(msg.sender).transfer(msg.value);
+      payable(msg.sender).transfer(value);
     }
   }
 
   /// @inheritdoc ICommentManager
   function deleteComment(
     bytes32 commentId
-  ) external commentExists(commentId) onlyAuthor(comments[commentId].author) {
+  ) public commentExists(commentId) onlyAuthor(comments[commentId].author) {
     _deleteComment(commentId, msg.sender);
   }
 
@@ -481,7 +548,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     uint256 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) external notStale(deadline) commentExists(commentId) {
+  ) public notStale(deadline) commentExists(commentId) {
     Comments.Comment storage comment = comments[commentId];
     address author = comment.author;
 
@@ -517,11 +584,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     Comments.Comment memory commentToDelete = comment;
 
     // Get metadata for hook
-    Metadata.MetadataEntry[] memory metadata = _getCommentMetadataInternal(
+    Metadata.MetadataEntry[] memory metadata = _getCommentMetadata(commentId);
+    Metadata.MetadataEntry[] memory hookMetadata = _getCommentHookMetadata(
       commentId
     );
-    Metadata.MetadataEntry[]
-      memory hookMetadata = _getCommentHookMetadataInternal(commentId);
 
     // Delete the comment and metadata
     delete comments[commentId];
@@ -555,7 +621,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @notice Internal function to get metadata for a comment
   /// @param commentId The unique identifier of the comment
   /// @return The metadata entries for the comment
-  function _getCommentMetadataInternal(
+  function _getCommentMetadata(
     bytes32 commentId
   ) internal view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentMetadataKeys[commentId];
@@ -576,7 +642,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   /// @notice Internal function to get hook metadata for a comment
   /// @param commentId The unique identifier of the comment
   /// @return The hook metadata entries for the comment
-  function _getCommentHookMetadataInternal(
+  function _getCommentHookMetadata(
     bytes32 commentId
   ) internal view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentHookMetadataKeys[commentId];
@@ -799,6 +865,33 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     return keccak256(abi.encodePacked(hashedEntries));
   }
 
+  /// @notice Helper function to compute edit comment hash from memory struct
+  /// @param commentId The unique identifier of the comment to edit
+  /// @param author The address of the comment author
+  /// @param editData The comment data struct containing content and metadata
+  /// @return The computed hash
+  function _getEditCommentHash(
+    bytes32 commentId,
+    address author,
+    Comments.EditComment memory editData
+  ) internal view returns (bytes32) {
+    bytes32 structHash = keccak256(
+      abi.encode(
+        EDIT_COMMENT_TYPEHASH,
+        commentId,
+        keccak256(bytes(editData.content)),
+        _hashMetadataArray(editData.metadata),
+        author,
+        editData.app,
+        editData.nonce,
+        editData.deadline
+      )
+    );
+
+    return
+      keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+  }
+
   /// @inheritdoc ICommentManager
   function updateChannelContract(address _channelContract) external onlyOwner {
     if (_channelContract == address(0)) revert ZeroAddress();
@@ -937,10 +1030,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     _;
   }
 
-  modifier onlyParentIdOrTargetUri(
-    bytes32 parentId,
-    string calldata targetUri
-  ) {
+  modifier onlyParentIdOrTargetUri(bytes32 parentId, string memory targetUri) {
     if (parentId != bytes32(0)) {
       if (comments[parentId].author == address(0) && !deleted[parentId]) {
         revert ParentCommentHasNeverExisted();
@@ -992,11 +1082,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
     }
 
     // Get current metadata for hook
-    Metadata.MetadataEntry[] memory metadata = _getCommentMetadataInternal(
+    Metadata.MetadataEntry[] memory metadata = _getCommentMetadata(commentId);
+    Metadata.MetadataEntry[] memory hookMetadata = _getCommentHookMetadata(
       commentId
     );
-    Metadata.MetadataEntry[]
-      memory hookMetadata = _getCommentHookMetadataInternal(commentId);
 
     IHook hook = IHook(channel.hook);
 
@@ -1101,7 +1190,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   modifier reactionHasTargetOrParent(
     uint8 commentType,
     bytes32 parentId,
-    string calldata targetUri
+    string memory targetUri
   ) {
     if (commentType == Comments.COMMENT_TYPE_REACTION) {
       bool hasParent = parentId != bytes32(0);
@@ -1116,4 +1205,229 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Pausable, Ownable {
   }
 
   error InvalidReactionReference(string reason);
+
+  // ============ BATCH OPERATIONS ============
+
+  /// @inheritdoc ICommentManager
+  function batchOperations(
+    Comments.BatchOperation[] calldata operations
+  ) external payable nonReentrant returns (bytes[] memory results) {
+    if (operations.length == 0) {
+      revert InvalidBatchOperation(0, "Empty operations array");
+    }
+
+    // Validate total value distribution
+    uint256 totalRequiredValue = 0;
+    for (uint i = 0; i < operations.length; i++) {
+      totalRequiredValue += operations[i].value;
+    }
+
+    if (msg.value != totalRequiredValue) {
+      revert InvalidValueDistribution(msg.value, totalRequiredValue);
+    }
+
+    results = new bytes[](operations.length);
+
+    // Execute operations in order
+    for (uint i = 0; i < operations.length; i++) {
+      results[i] = _executeBatchOperation(operations[i], i);
+    }
+
+    emit BatchOperationExecuted(msg.sender, operations.length, msg.value);
+
+    return results;
+  }
+
+  /// @notice Internal function to execute a single batch operation
+  /// @param operation The batch operation to execute
+  /// @param operationIndex The index of the operation for error reporting
+  /// @return result The result of the operation
+  function _executeBatchOperation(
+    Comments.BatchOperation calldata operation,
+    uint256 operationIndex
+  ) internal returns (bytes memory result) {
+    if (operation.operationType == Comments.BatchOperationType.POST_COMMENT) {
+      return _executePostCommentBatch(operation, operationIndex);
+    } else if (
+      operation.operationType ==
+      Comments.BatchOperationType.POST_COMMENT_WITH_SIG
+    ) {
+      return _executePostCommentWithSigBatch(operation, operationIndex);
+    } else if (
+      operation.operationType == Comments.BatchOperationType.EDIT_COMMENT
+    ) {
+      return _executeEditCommentBatch(operation, operationIndex);
+    } else if (
+      operation.operationType ==
+      Comments.BatchOperationType.EDIT_COMMENT_WITH_SIG
+    ) {
+      return _executeEditCommentWithSigBatch(operation, operationIndex);
+    } else if (
+      operation.operationType == Comments.BatchOperationType.DELETE_COMMENT
+    ) {
+      return _executeDeleteCommentBatch(operation, operationIndex);
+    } else if (
+      operation.operationType ==
+      Comments.BatchOperationType.DELETE_COMMENT_WITH_SIG
+    ) {
+      return _executeDeleteCommentWithSigBatch(operation, operationIndex);
+    } else {
+      revert InvalidBatchOperation(operationIndex, "Invalid operation type");
+    }
+  }
+
+  function _executePostCommentBatch(
+    Comments.BatchOperation calldata operation,
+    uint256 operationIndex
+  ) internal returns (bytes memory) {
+    Comments.CreateComment memory commentData = abi.decode(
+      operation.data,
+      (Comments.CreateComment)
+    );
+
+    if (operation.signatures.length != 1) {
+      revert InvalidBatchOperation(
+        operationIndex,
+        "POST_COMMENT requires exactly 1 signature"
+      );
+    }
+
+    // Call internal postComment function with allocated value
+    bytes32 commentId = _postComment(
+      commentData,
+      operation.signatures[0], // app signature
+      operation.value
+    );
+
+    return abi.encode(commentId);
+  }
+
+  function _executePostCommentWithSigBatch(
+    Comments.BatchOperation calldata operation,
+    uint256 operationIndex
+  ) internal returns (bytes memory) {
+    Comments.CreateComment memory commentData = abi.decode(
+      operation.data,
+      (Comments.CreateComment)
+    );
+
+    if (operation.signatures.length != 2) {
+      revert InvalidBatchOperation(
+        operationIndex,
+        "POST_COMMENT_WITH_SIG requires exactly 2 signatures"
+      );
+    }
+
+    // Call postCommentWithSig function directly
+    bytes32 commentId = _postCommentWithSig(
+      commentData,
+      operation.signatures[0], // author signature
+      operation.signatures[1], // app signature
+      operation.value
+    );
+
+    return abi.encode(commentId);
+  }
+
+  function _executeEditCommentBatch(
+    Comments.BatchOperation calldata operation,
+    uint256 operationIndex
+  ) internal returns (bytes memory) {
+    (bytes32 commentId, Comments.EditComment memory editData) = abi.decode(
+      operation.data,
+      (bytes32, Comments.EditComment)
+    );
+
+    if (operation.signatures.length != 1) {
+      revert InvalidBatchOperation(
+        operationIndex,
+        "EDIT_COMMENT requires exactly 1 signature"
+      );
+    }
+
+    // Call internal editComment function with allocated value
+    _editCommentDirect(
+      commentId,
+      editData,
+      operation.signatures[0], // app signature
+      operation.value
+    );
+
+    return "";
+  }
+
+  function _executeEditCommentWithSigBatch(
+    Comments.BatchOperation calldata operation,
+    uint256 operationIndex
+  ) internal returns (bytes memory) {
+    (bytes32 commentId, Comments.EditComment memory editData) = abi.decode(
+      operation.data,
+      (bytes32, Comments.EditComment)
+    );
+
+    if (operation.signatures.length != 2) {
+      revert InvalidBatchOperation(
+        operationIndex,
+        "EDIT_COMMENT_WITH_SIG requires exactly 2 signatures"
+      );
+    }
+
+    // Call editCommentWithSig internal function with allocated value
+    _editCommentWithSig(
+      commentId,
+      editData,
+      operation.signatures[0], // author signature
+      operation.signatures[1], // app signature
+      operation.value
+    );
+
+    return "";
+  }
+
+  function _executeDeleteCommentBatch(
+    Comments.BatchOperation calldata operation,
+    uint256 operationIndex
+  ) internal returns (bytes memory) {
+    bytes32 commentId = abi.decode(operation.data, (bytes32));
+
+    if (operation.signatures.length != 0) {
+      revert InvalidBatchOperation(
+        operationIndex,
+        "DELETE_COMMENT requires no signatures"
+      );
+    }
+
+    // Call deleteComment function directly (preserves msg.sender)
+    deleteComment(commentId);
+
+    return "";
+  }
+
+  function _executeDeleteCommentWithSigBatch(
+    Comments.BatchOperation calldata operation,
+    uint256 operationIndex
+  ) internal returns (bytes memory) {
+    Comments.BatchDeleteData memory deleteData = abi.decode(
+      operation.data,
+      (Comments.BatchDeleteData)
+    );
+
+    if (operation.signatures.length != 2) {
+      revert InvalidBatchOperation(
+        operationIndex,
+        "DELETE_COMMENT_WITH_SIG requires exactly 2 signatures"
+      );
+    }
+
+    // Call deleteCommentWithSig function directly
+    deleteCommentWithSig(
+      deleteData.commentId,
+      deleteData.app,
+      deleteData.deadline,
+      operation.signatures[0], // author signature
+      operation.signatures[1] // app signature
+    );
+
+    return "";
+  }
 }

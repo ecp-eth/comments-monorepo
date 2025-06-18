@@ -85,4 +85,38 @@ library Comments {
     string content;
     Metadata.MetadataEntry[] metadata;
   }
+
+  // Batch operation structures
+
+  /// @notice Enum for different operation types in batch calls
+  enum BatchOperationType {
+    POST_COMMENT, // 0
+    POST_COMMENT_WITH_SIG, // 1
+    EDIT_COMMENT, // 2
+    EDIT_COMMENT_WITH_SIG, // 3
+    DELETE_COMMENT, // 4
+    DELETE_COMMENT_WITH_SIG // 5
+  }
+
+  /// @notice Struct for batch delete operation data
+  /// @param commentId The unique identifier of the comment to delete
+  /// @param app The address of the app signer (only for deleteCommentWithSig)
+  /// @param deadline Timestamp after which the signature becomes invalid (only for deleteCommentWithSig)
+  struct BatchDeleteData {
+    bytes32 commentId;
+    address app;
+    uint256 deadline;
+  }
+
+  /// @notice Struct containing a single batch operation
+  /// @param operationType The type of operation to perform
+  /// @param value The amount of ETH to send with this operation
+  /// @param data Encoded operation-specific data
+  /// @param signatures Array of signatures required for this operation
+  struct BatchOperation {
+    BatchOperationType operationType;
+    uint256 value;
+    bytes data;
+    bytes[] signatures;
+  }
 }
