@@ -320,7 +320,12 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
               });
 
               scrollListener = () => {
-                popup?.hide();
+                if (popup) {
+                  popup.setProps({
+                    getReferenceClientRect: () =>
+                      props.clientRect?.() ?? clientRect,
+                  });
+                }
               };
 
               window.addEventListener("scroll", scrollListener);
