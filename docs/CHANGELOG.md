@@ -1,5 +1,12 @@
 # @ecp.eth/docs
 
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies [ea722dd]
+  - @ecp.eth/sdk@0.0.16
+
 ## 0.0.10
 
 ### Patch Changes
