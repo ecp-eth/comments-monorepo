@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.1.0
+
+### Minor Changes
+
+- ea722dd: feat: channels indexing + api
+
 ## 0.0.15
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @ecp.eth/indexer
 
+## 0.1.0
+
+### Minor Changes
+
+- ea722dd: feat: channels indexing + api
+
+### Patch Changes
+
+- Updated dependencies [ea722dd]
+  - @ecp.eth/sdk@0.1.0
+
 ## 0.0.9
 
 ### Patch Changes
