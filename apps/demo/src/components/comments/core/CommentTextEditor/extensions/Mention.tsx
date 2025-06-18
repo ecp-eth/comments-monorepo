@@ -1,5 +1,5 @@
 import { Mention, type MentionOptions } from "@tiptap/extension-mention";
-import { Attribute, ReactRenderer } from "@tiptap/react";
+import { Attribute, mergeAttributes, ReactRenderer } from "@tiptap/react";
 import tippy, { type Instance } from "tippy.js";
 import type {
   MentionSuggestionsResponseSchemaType,
@@ -186,32 +186,31 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
     // for ens name, farcaster username or just address render address prefixed with mention
     return `@${attrs.address}`;
   },
-  renderHTML({ node }) {
+  renderHTML({ node, HTMLAttributes }) {
     const attrs = node.attrs as MentionItem;
 
     switch (attrs.type) {
       case "ens": {
         return [
           "span",
-          {
-            class: "text-blue-500",
-            "data-type": attrs.type,
-            "data-name": attrs.name,
-            "data-address": attrs.address,
-          },
+          mergeAttributes(
+            {
+              class: "text-blue-500",
+            },
+            HTMLAttributes,
+          ),
           `@${attrs.name}`,
         ];
       }
       case "erc20": {
         return [
           "span",
-          {
-            class: "text-blue-500",
-            "data-type": attrs.type,
-            "data-name": attrs.name,
-            "data-address": attrs.address,
-            "data-symbol": attrs.symbol,
-          },
+          mergeAttributes(
+            {
+              class: "text-blue-500",
+            },
+            HTMLAttributes,
+          ),
           `$${attrs.symbol}`,
         ];
       }
@@ -219,12 +218,12 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         // farcaster
         return [
           "span",
-          {
-            class: "text-blue-500",
-            "data-type": attrs.type,
-            "data-address": attrs.address,
-            "data-name": attrs.username || attrs.displayName || attrs.address,
-          },
+          mergeAttributes(
+            {
+              class: "text-blue-500",
+            },
+            HTMLAttributes,
+          ),
           `@${attrs.fname}`,
         ];
       }
