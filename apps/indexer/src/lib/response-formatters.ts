@@ -42,6 +42,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
       },
       extra: {
         moderationEnabled: env.MODERATION_ENABLED,
+        moderationKnownReactions: Array.from(env.MODERATION_KNOWN_REACTIONS),
       },
     };
   }
@@ -98,6 +99,9 @@ export async function resolveUserDataAndFormatListCommentsResponse({
           replies: {
             extra: {
               moderationEnabled: env.MODERATION_ENABLED,
+              moderationKnownReactions: Array.from(
+                env.MODERATION_KNOWN_REACTIONS,
+              ),
             },
             results: slicedReplies.map((reply) => {
               const resolvedAuthorEnsData = resolveUserData(
@@ -155,6 +159,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
     },
     extra: {
       moderationEnabled: env.MODERATION_ENABLED,
+      moderationKnownReactions: Array.from(env.MODERATION_KNOWN_REACTIONS),
     },
   };
 }

@@ -208,6 +208,7 @@ export type IndexerAPIPaginationSchemaType = z.infer<
 
 export const IndexerAPIExtraSchema = z.object({
   moderationEnabled: z.boolean(),
+  moderationKnownReactions: z.array(z.string()),
 });
 
 export type IndexerAPIExtraSchemaType = z.infer<typeof IndexerAPIExtraSchema>;

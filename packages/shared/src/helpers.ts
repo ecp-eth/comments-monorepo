@@ -1,11 +1,12 @@
 import type {
   Comment,
-  CommentPageSchemaType,
-  ListCommentsQueryPageParamsSchemaType,
+  type CommentDataWithIdSchemaType,
+  type CommentPageSchemaType,
+  type ListCommentsQueryPageParamsSchemaType,
   PendingComment,
-  PendingDeleteCommentOperationSchemaType,
-  PendingEditCommentOperationSchemaType,
-  PendingPostCommentOperationSchemaType,
+  type PendingDeleteCommentOperationSchemaType,
+  type PendingEditCommentOperationSchemaType,
+  type PendingPostCommentOperationSchemaType,
 } from "./schemas.js";
 import type { InfiniteData } from "@tanstack/react-query";
 import { clsx, type ClassValue } from "clsx";
@@ -15,7 +16,10 @@ import * as allChains from "wagmi/chains";
 import type { AuthorType, ProcessEnvNetwork } from "./types.js";
 import { z } from "zod";
 import { twMerge } from "tailwind-merge";
-import { getCommentCursor } from "@ecp.eth/sdk/indexer";
+import {
+  getCommentCursor,
+  type IndexerAPIExtraSchemaType,
+} from "@ecp.eth/sdk/indexer";
 
 function parseURL(url: string) {
   // use zod instead, `URL.canParse` does not work in RN 🤷‍♂️
@@ -211,8 +215,6 @@ export function insertPendingCommentToPage(
 
   const { response, txHash, chainId, zeroExSwap } = pendingOperation;
 
-  const moderationEnabled = queryData.pages[0].extra.moderationEnabled;
-
   queryData.pages[0].results.unshift({
     ...response.data,
     author: pendingOperation.resolvedAuthor ?? {
@@ -228,7 +230,10 @@ export function insertPendingCommentToPage(
     revision: 0,
     metadata: [],
     hookMetadata: [],
-    moderationStatus: moderationEnabled ? "pending" : "approved",
+    moderationStatus: getModerationStatus(
+      queryData.pages[0].extra,
+      response.data,
+    ),
     moderationStatusChangedAt: new Date(),
     zeroExSwap: zeroExSwap ?? null,
     replies: {
@@ -244,6 +249,24 @@ export function insertPendingCommentToPage(
   });
 
   return queryData;
+}
+
+function getModerationStatus(
+  extra: IndexerAPIExtraSchemaType,
+  comment: CommentDataWithIdSchemaType,
+): "pending" | "approved" {
+  if (!extra.moderationEnabled) {
+    return "approved";
+  }
+
+  if (
+    comment.commentType === 1 &&
+    extra.moderationKnownReactions.includes(comment.content)
+  ) {
+    return "approved";
+  }
+
+  return "pending";
 }
 
 /**

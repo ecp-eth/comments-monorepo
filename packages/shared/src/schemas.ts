@@ -22,8 +22,12 @@ export const CommentDataWithIdSchema = CreateCommentDataSchema.extend({
   metadata: MetadataEntrySchema.array(),
 });
 
+export type CommentDataWithIdSchemaType = z.infer<
+  typeof CommentDataWithIdSchema
+>;
+
 // this is just for type checking
-({}) as z.infer<typeof CommentDataWithIdSchema> satisfies CommentInputData;
+({}) as CommentDataWithIdSchemaType satisfies CommentInputData;
 
 /**
  * Parses response from API endpoint for usage in client

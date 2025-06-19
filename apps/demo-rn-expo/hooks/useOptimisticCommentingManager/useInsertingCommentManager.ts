@@ -245,7 +245,7 @@ function createIndexerAPICommentDataFromPendingCommentOperation(
         hasNext: false,
         hasPrevious: false,
       },
-      extra: { moderationEnabled: false },
+      extra: { moderationEnabled: false, moderationKnownReactions: [] },
     },
     pendingType,
     moderationStatus: "approved",
