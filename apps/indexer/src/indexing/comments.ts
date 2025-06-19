@@ -6,17 +6,10 @@ import {
 } from "../lib/utils";
 import { getMutedAccount } from "../management/services/muted-accounts";
 import schema from "ponder:schema";
-import { env } from "../env";
 import { getAddress } from "viem";
-import {
-  getCommentModerationStatus,
-  insertCommentModerationStatus,
-} from "../management/services/moderation";
-import { notifyCommentPendingModeration } from "../lib/telegram-notifications";
+import { commentModerationService } from "../management/services";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
-
-const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
@@ -72,18 +65,9 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
     // We need to check if the comment already has a moderation status
     // this is useful during the reindex process
-    const moderationStatus:
-      | {
-          status: "pending" | "approved" | "rejected";
-          changedAt: Date;
-        }
-      | undefined =
-      event.args.commentType === 1
-        ? await getCommentModerationStatus(event.args.commentId)
-        : {
-            status: "approved",
-            changedAt: createdAt,
-          };
+    const moderationResult = await commentModerationService.moderate(
+      event.args,
+    );
 
     await context.db.insert(schema.comment).values({
       id: event.args.commentId,
@@ -102,32 +86,12 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       logIndex: event.log.logIndex,
       channelId: event.args.channelId,
       commentType: event.args.commentType,
-      ...(moderationStatus
-        ? {
-            moderationStatus: moderationStatus.status,
-            moderationStatusChangedAt: moderationStatus.changedAt,
-          }
-        : {
-            moderationStatus: defaultModerationStatus,
-            moderationStatusChangedAt: createdAt,
-          }),
+      moderationStatus: moderationResult.result.status,
+      moderationStatusChangedAt: moderationResult.result.changedAt,
       zeroExSwap,
     });
 
-    // this is new comment so ensure we use correct default moderation status
-    if (!moderationStatus) {
-      await insertCommentModerationStatus(
-        event.args.commentId,
-        defaultModerationStatus,
-      );
-
-      await notifyCommentPendingModeration({
-        id: event.args.commentId,
-        authorAddress: event.args.author,
-        content: event.args.content,
-        targetUri,
-      });
-    }
+    await moderationResult.saveAndNotify();
   });
 
   // Handle hook metadata setting separately

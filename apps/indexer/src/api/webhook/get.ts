@@ -6,7 +6,7 @@ import {
 import { hmacMiddleware } from "../../middleware/hmac";
 import { env } from "../../env";
 import { MAX_WEBHOOK_REQUEST_AGE_SECONDS } from "../../lib/constants";
-import { updateCommentModerationStatus } from "../../management/services/moderation";
+import { commentModerationService } from "../../management/services";
 
 const webhookRoute = createRoute({
   method: "get",
@@ -50,10 +50,16 @@ export function setupWebhook(app: OpenAPIHono) {
 
     switch (command.type) {
       case "approve":
-        await updateCommentModerationStatus(command.commentId, "approved");
+        await commentModerationService.updateModerationStatus(
+          command.commentId,
+          "approved",
+        );
         break;
       case "reject":
-        await updateCommentModerationStatus(command.commentId, "rejected");
+        await commentModerationService.updateModerationStatus(
+          command.commentId,
+          "rejected",
+        );
         break;
     }
 

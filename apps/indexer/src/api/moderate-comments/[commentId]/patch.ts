@@ -7,7 +7,7 @@ import {
 import { authMiddleware } from "../../../middleware/auth";
 import { IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { resolveAuthorDataAndFormatCommentChangeModerationStatusResponse } from "../../../lib/response-formatters";
-import { updateCommentModerationStatus } from "../../../management/services/moderation";
+import { commentModerationService } from "../../../management/services";
 
 const changeCommentModerationStatusRoute = createRoute({
   method: "patch",
@@ -67,10 +67,11 @@ export function setupChangeCommentModerationStatus(app: OpenAPIHono) {
     const { commentId } = c.req.valid("param");
     const { moderationStatus } = c.req.valid("json");
 
-    const updatedComment = await updateCommentModerationStatus(
-      commentId,
-      moderationStatus,
-    );
+    const updatedComment =
+      await commentModerationService.updateModerationStatus(
+        commentId,
+        moderationStatus,
+      );
 
     if (!updatedComment) {
       return c.json(
