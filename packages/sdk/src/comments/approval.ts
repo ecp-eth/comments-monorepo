@@ -64,6 +64,11 @@ export type AddApprovalParams = {
    */
   app: Hex;
   /**
+   * Timestamp when the approval expires
+   * @default 1 year from now
+   */
+  expiry?: bigint;
+  /**
    * The address of the comments contract
    *
    * @default COMMENT_MANAGER_ADDRESS
@@ -78,6 +83,7 @@ export type AddApprovalResult = {
 
 const AddApprovalParamsSchema = z.object({
   app: HexSchema,
+  expiry: z.bigint().optional(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
   writeContract: z.custom<ContractWriteFunctions["addApproval"]>(() => true),
 });
@@ -93,13 +99,16 @@ export async function addApproval(
 ): Promise<AddApprovalResult> {
   const validatedParams = AddApprovalParamsSchema.parse(params);
 
-  const { app, commentsAddress, writeContract } = validatedParams;
+  const { app, expiry, commentsAddress, writeContract } = validatedParams;
+
+  const computedExpiry =
+    expiry ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365); // 1 year from now
 
   const txHash = await writeContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "addApproval",
-    args: [app],
+    args: [app, computedExpiry],
   });
 
   return {
@@ -159,6 +168,7 @@ export async function addApprovalWithSig(
     args: [
       typedData.message.author,
       typedData.message.app,
+      typedData.message.expiry,
       typedData.message.nonce,
       typedData.message.deadline,
       signature,
@@ -304,6 +314,11 @@ export type GetAddApprovalHashParams = {
    */
   deadline?: bigint;
   /**
+   * Timestamp when the approval expires
+   * @default 1 year from now
+   */
+  expiry?: bigint;
+  /**
    * The address of the comments contract
    *
    * @default COMMENT_MANAGER_ADDRESS
@@ -329,6 +344,7 @@ const GetAddApprovalHashParamsSchema = z.object({
   app: HexSchema,
   nonce: z.bigint(),
   deadline: z.bigint().optional(),
+  expiry: z.bigint().optional(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });
 
@@ -341,20 +357,25 @@ const GetAddApprovalHashParamsSchema = z.object({
 export async function getAddApprovalHash(
   params: GetAddApprovalHashParams,
 ): Promise<GetAddApprovalHashResult> {
-  const { author, app, nonce, deadline, commentsAddress } =
+  const { author, app, nonce, deadline, expiry, commentsAddress } =
     GetAddApprovalHashParamsSchema.parse(params);
 
   let computedDeadline = deadline;
+  let computedExpiry = expiry;
 
   if (!computedDeadline) {
     computedDeadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24); // 1 day from now
+  }
+
+  if (!computedExpiry) {
+    computedExpiry = BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365); // 1 year from now
   }
 
   const hash = await params.readContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "getAddApprovalHash",
-    args: [author, app, nonce, computedDeadline],
+    args: [author, app, nonce, computedDeadline, computedExpiry],
   });
 
   return {
@@ -474,6 +495,12 @@ export function createApprovalTypedData(
   const { author, app, chainId, nonce, deadline, commentsAddress } =
     validatedParams;
 
+  const computedDeadline =
+    deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24); // 1 day from now
+  const computedExpiry = BigInt(
+    Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365,
+  ); // 1 year from now
+
   return AddApprovalTypedDataSchema.parse({
     domain: {
       name: DOMAIN_NAME,
@@ -486,9 +513,9 @@ export function createApprovalTypedData(
     message: {
       author,
       app,
+      expiry: computedExpiry,
       nonce,
-      deadline:
-        deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
+      deadline: computedDeadline,
     },
   });
 }

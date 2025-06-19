@@ -49,7 +49,11 @@ export const CommentDataSchema = z.object({
   content: z.string(),
   targetUri: z.string(),
   commentType: z.number(),
-  authMethod: z.nativeEnum(AuthorAuthMethod),
+  authMethod: z.union([
+    z.literal(AuthorAuthMethod.DIRECT_TX),
+    z.literal(AuthorAuthMethod.APP_APPROVAL),
+    z.literal(AuthorAuthMethod.AUTHOR_SIGNATURE),
+  ]),
   metadata: MetadataArraySchema.default([]),
 
   createdAt: z.coerce.bigint(),
@@ -266,6 +270,7 @@ export const AddApprovalTypedDataSchema = z.object({
     app: HexSchema,
     nonce: z.coerce.bigint(),
     deadline: z.coerce.bigint(),
+    expiry: z.coerce.bigint(),
   }),
   types: z.object({
     AddApproval: z.array(
@@ -274,6 +279,7 @@ export const AddApprovalTypedDataSchema = z.object({
         z.object({ name: z.literal("app"), type: z.literal("address") }),
         z.object({ name: z.literal("nonce"), type: z.literal("uint256") }),
         z.object({ name: z.literal("deadline"), type: z.literal("uint256") }),
+        z.object({ name: z.literal("expiry"), type: z.literal("uint256") }),
       ]),
     ),
   }),

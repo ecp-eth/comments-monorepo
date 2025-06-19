@@ -15,72 +15,7 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
-    name: "ADD_APPROVAL_TYPEHASH",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "ADD_COMMENT_TYPEHASH",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "DELETE_COMMENT_TYPEHASH",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
     name: "DOMAIN_SEPARATOR",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "EDIT_COMMENT_TYPEHASH",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "REMOVE_APPROVAL_TYPEHASH",
     inputs: [],
     outputs: [
       {
@@ -99,6 +34,11 @@ export const CommentManagerABI = [
         name: "app",
         type: "address",
         internalType: "address",
+      },
+      {
+        name: "expiry",
+        type: "uint256",
+        internalType: "uint256",
       },
     ],
     outputs: [],
@@ -119,6 +59,11 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
+        name: "expiry",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
         name: "nonce",
         type: "uint256",
         internalType: "uint256",
@@ -136,6 +81,54 @@ export const CommentManagerABI = [
     ],
     outputs: [],
     stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "batchOperations",
+    inputs: [
+      {
+        name: "operations",
+        type: "tuple[]",
+        internalType: "struct Comments.BatchOperation[]",
+        components: [
+          {
+            name: "operationType",
+            type: "uint8",
+            internalType: "enum Comments.BatchOperationType",
+          },
+          {
+            name: "value",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "data",
+            type: "bytes",
+            internalType: "bytes",
+          },
+          {
+            name: "signatures",
+            type: "bytes[]",
+            internalType: "bytes[]",
+          },
+        ],
+      },
+    ],
+    outputs: [
+      {
+        name: "results",
+        type: "bytes[]",
+        internalType: "bytes[]",
+      },
+    ],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "cancelOwnershipHandover",
+    inputs: [],
+    outputs: [],
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -245,6 +238,19 @@ export const CommentManagerABI = [
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "completeOwnershipHandover",
+    inputs: [
+      {
+        name: "pendingOwner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -436,6 +442,11 @@ export const CommentManagerABI = [
         internalType: "address",
       },
       {
+        name: "expiry",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
         name: "nonce",
         type: "uint256",
         internalType: "uint256",
@@ -451,6 +462,30 @@ export const CommentManagerABI = [
         name: "",
         type: "bytes32",
         internalType: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getApprovalExpiry",
+    inputs: [
+      {
+        name: "author",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "app",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
@@ -484,7 +519,7 @@ export const CommentManagerABI = [
           {
             name: "authMethod",
             type: "uint8",
-            internalType: "uint8",
+            internalType: "enum Comments.AuthorAuthMethod",
           },
           {
             name: "app",
@@ -974,7 +1009,7 @@ export const CommentManagerABI = [
     inputs: [],
     outputs: [
       {
-        name: "",
+        name: "result",
         type: "address",
         internalType: "address",
       },
@@ -983,13 +1018,19 @@ export const CommentManagerABI = [
   },
   {
     type: "function",
-    name: "paused",
-    inputs: [],
+    name: "ownershipHandoverExpiresAt",
+    inputs: [
+      {
+        name: "pendingOwner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
     outputs: [
       {
-        name: "",
-        type: "bool",
-        internalType: "bool",
+        name: "result",
+        type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
@@ -1203,7 +1244,14 @@ export const CommentManagerABI = [
     name: "renounceOwnership",
     inputs: [],
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "requestOwnershipHandover",
+    inputs: [],
+    outputs: [],
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -1229,7 +1277,7 @@ export const CommentManagerABI = [
       },
     ],
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -1286,6 +1334,12 @@ export const CommentManagerABI = [
         indexed: true,
         internalType: "address",
       },
+      {
+        name: "expiry",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
     ],
     anonymous: false,
   },
@@ -1304,6 +1358,31 @@ export const CommentManagerABI = [
         type: "address",
         indexed: true,
         internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "BatchOperationExecuted",
+    inputs: [
+      {
+        name: "sender",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "operationsCount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "totalValue",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
       },
     ],
     anonymous: false,
@@ -1423,21 +1502,15 @@ export const CommentManagerABI = [
         internalType: "bytes32",
       },
       {
-        name: "editedByApp",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
         name: "author",
         type: "address",
         indexed: true,
         internalType: "address",
       },
       {
-        name: "app",
+        name: "editedByApp",
         type: "address",
-        indexed: false,
+        indexed: true,
         internalType: "address",
       },
       {
@@ -1561,10 +1634,36 @@ export const CommentManagerABI = [
   },
   {
     type: "event",
+    name: "OwnershipHandoverCanceled",
+    inputs: [
+      {
+        name: "pendingOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "OwnershipHandoverRequested",
+    inputs: [
+      {
+        name: "pendingOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "OwnershipTransferred",
     inputs: [
       {
-        name: "previousOwner",
+        name: "oldOwner",
         type: "address",
         indexed: true,
         internalType: "address",
@@ -1579,30 +1678,25 @@ export const CommentManagerABI = [
     anonymous: false,
   },
   {
-    type: "event",
-    name: "Paused",
-    inputs: [
-      {
-        name: "account",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-    ],
-    anonymous: false,
+    type: "error",
+    name: "AlreadyInitialized",
+    inputs: [],
   },
   {
-    type: "event",
-    name: "Unpaused",
+    type: "error",
+    name: "BatchOperationFailed",
     inputs: [
       {
-        name: "account",
-        type: "address",
-        indexed: false,
-        internalType: "address",
+        name: "operationIndex",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "reason",
+        type: "bytes",
+        internalType: "bytes",
       },
     ],
-    anonymous: false,
   },
   {
     type: "error",
@@ -1612,16 +1706,6 @@ export const CommentManagerABI = [
   {
     type: "error",
     name: "CommentDoesNotExist",
-    inputs: [],
-  },
-  {
-    type: "error",
-    name: "EnforcedPause",
-    inputs: [],
-  },
-  {
-    type: "error",
-    name: "ExpectedPause",
     inputs: [],
   },
   {
@@ -1636,8 +1720,29 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
+    name: "InvalidApprovalExpiry",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "InvalidAuthorSignature",
     inputs: [],
+  },
+  {
+    type: "error",
+    name: "InvalidBatchOperation",
+    inputs: [
+      {
+        name: "operationIndex",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "reason",
+        type: "string",
+        internalType: "string",
+      },
+    ],
   },
   {
     type: "error",
@@ -1678,12 +1783,49 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
+    name: "InvalidReactionReference",
+    inputs: [
+      {
+        name: "reason",
+        type: "string",
+        internalType: "string",
+      },
+    ],
+  },
+  {
+    type: "error",
     name: "InvalidSignatureLength",
     inputs: [],
   },
   {
     type: "error",
     name: "InvalidSignatureS",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "InvalidValueDistribution",
+    inputs: [
+      {
+        name: "providedValue",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "requiredValue",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "NewOwnerIsZeroAddress",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "NoHandoverRequest",
     inputs: [],
   },
   {
@@ -1704,28 +1846,6 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
-    name: "OwnableInvalidOwner",
-    inputs: [
-      {
-        name: "owner",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-  },
-  {
-    type: "error",
-    name: "OwnableUnauthorizedAccount",
-    inputs: [
-      {
-        name: "account",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-  },
-  {
-    type: "error",
     name: "ParentCommentHasNeverExisted",
     inputs: [],
   },
@@ -1736,7 +1856,7 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
-    name: "ReentrancyGuardReentrantCall",
+    name: "Reentrancy",
     inputs: [],
   },
   {
@@ -1754,6 +1874,11 @@ export const CommentManagerABI = [
         internalType: "uint256",
       },
     ],
+  },
+  {
+    type: "error",
+    name: "Unauthorized",
+    inputs: [],
   },
   {
     type: "error",
@@ -1839,6 +1964,13 @@ export const ChannelManagerABI = [
   },
   {
     type: "function",
+    name: "cancelOwnershipHandover",
+    inputs: [],
+    outputs: [],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
     name: "channelExists",
     inputs: [
       {
@@ -1915,6 +2047,19 @@ export const ChannelManagerABI = [
         internalType: "uint96",
       },
     ],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "completeOwnershipHandover",
+    inputs: [
+      {
+        name: "pendingOwner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
     stateMutability: "payable",
   },
   {
@@ -2247,7 +2392,7 @@ export const ChannelManagerABI = [
     inputs: [],
     outputs: [
       {
-        name: "",
+        name: "result",
         type: "address",
         internalType: "address",
       },
@@ -2275,10 +2420,36 @@ export const ChannelManagerABI = [
   },
   {
     type: "function",
+    name: "ownershipHandoverExpiresAt",
+    inputs: [
+      {
+        name: "pendingOwner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "result",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "renounceOwnership",
     inputs: [],
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "requestOwnershipHandover",
+    inputs: [],
+    outputs: [],
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -2595,7 +2766,7 @@ export const ChannelManagerABI = [
       },
     ],
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -2953,10 +3124,36 @@ export const ChannelManagerABI = [
   },
   {
     type: "event",
+    name: "OwnershipHandoverCanceled",
+    inputs: [
+      {
+        name: "pendingOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "OwnershipHandoverRequested",
+    inputs: [
+      {
+        name: "pendingOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "OwnershipTransferred",
     inputs: [
       {
-        name: "previousOwner",
+        name: "oldOwner",
         type: "address",
         indexed: true,
         internalType: "address",
@@ -2994,6 +3191,11 @@ export const ChannelManagerABI = [
       },
     ],
     anonymous: false,
+  },
+  {
+    type: "error",
+    name: "AlreadyInitialized",
+    inputs: [],
   },
   {
     type: "error",
@@ -3151,29 +3353,22 @@ export const ChannelManagerABI = [
   },
   {
     type: "error",
-    name: "OwnableInvalidOwner",
-    inputs: [
-      {
-        name: "owner",
-        type: "address",
-        internalType: "address",
-      },
-    ],
+    name: "NewOwnerIsZeroAddress",
+    inputs: [],
   },
   {
     type: "error",
-    name: "OwnableUnauthorizedAccount",
-    inputs: [
-      {
-        name: "account",
-        type: "address",
-        internalType: "address",
-      },
-    ],
+    name: "NoHandoverRequest",
+    inputs: [],
   },
   {
     type: "error",
-    name: "ReentrancyGuardReentrantCall",
+    name: "Reentrancy",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "Unauthorized",
     inputs: [],
   },
   {

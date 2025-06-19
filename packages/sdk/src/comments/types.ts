@@ -16,11 +16,14 @@ export type Json = JsonLiteral | JsonArray | JsonObject;
 
 export type CommentManagerABIType = typeof CommentManagerABI;
 
-export enum AuthorAuthMethod {
-  DIRECT_TX = 0,
-  APP_APPROVAL = 1,
-  AUTHOR_SIGNATURE = 2,
-}
+export const AuthorAuthMethod = {
+  DIRECT_TX: 0,
+  APP_APPROVAL: 1,
+  AUTHOR_SIGNATURE: 2,
+} as const;
+
+export type AuthorAuthMethod =
+  (typeof AuthorAuthMethod)[keyof typeof AuthorAuthMethod];
 
 /**
  * Metadata entry structure that matches the smart contract
@@ -220,22 +223,6 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "revokeApproval"
-    >,
-  ) => Promise<Hex>;
-
-  renounceOwnership: (
-    args: ContractFunctionParameters<
-      CommentManagerABIType,
-      "nonpayable",
-      "renounceOwnership"
-    >,
-  ) => Promise<Hex>;
-
-  transferOwnership: (
-    args: ContractFunctionParameters<
-      CommentManagerABIType,
-      "nonpayable",
-      "transferOwnership"
     >,
   ) => Promise<Hex>;
 
