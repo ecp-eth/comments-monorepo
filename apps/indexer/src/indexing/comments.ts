@@ -184,11 +184,30 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   });
 
   ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
+    // Check if the author is muted
+    if (await getMutedAccount(event.args.author)) {
+      return;
+    }
+
     const existingComment = await context.db.find(schema.comment, {
       id: event.args.commentId,
     });
 
     if (!existingComment) {
+      Sentry.captureMessage(
+        `Comment not found while editing commentId: ${event.args.commentId}`,
+        {
+          level: "warning",
+          extra: {
+            commentId: event.args.commentId,
+            author: event.args.author,
+            editedByApp: event.args.editedByApp,
+            chainId: context.network.chainId,
+            txHash: event.transaction.hash,
+            logIndex: event.log.logIndex,
+          },
+        },
+      );
       return;
     }
 
