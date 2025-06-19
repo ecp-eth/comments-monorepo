@@ -156,8 +156,8 @@ async function searchEns(query: string): Promise<ENSResultType | null> {
     return null;
   }
 
-  // do not allow a string that is completely non-alphanumeric or starts with non-alphanumeric
-  if (/^[^a-zA-Z0-9]/.test(query) || /^[^a-zA-Z0-9]+$/.test(query)) {
+  // do not allow the query to start with a dot
+  if (query.startsWith(".")) {
     return null;
   }
 
@@ -368,7 +368,7 @@ function isEthAddress(address: string): address is Hex {
 }
 
 function isEthName(name: string): name is `${string}.eth` {
-  return name.match(/\.eth$/i) !== null;
+  return name.match(/.+\.eth$/i) !== null;
 }
 
 /**

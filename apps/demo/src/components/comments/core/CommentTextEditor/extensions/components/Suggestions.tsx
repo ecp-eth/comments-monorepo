@@ -1,4 +1,5 @@
 import type { MentionSuggestionSchemaType } from "@/app/api/mention-suggestions/route";
+import { isValidQuery } from "../helpers";
 import { cn } from "@/lib/utils";
 import { getChainById } from "@ecp.eth/shared/helpers";
 import type { SuggestionProps } from "@tiptap/suggestion";
@@ -77,7 +78,7 @@ export const Suggestions = forwardRef(function Suggestions(
 
   let children = null;
 
-  if (query.trim().length < minimumQueryLength) {
+  if (!isValidQuery(query, minimumQueryLength)) {
     return null;
   } else if (items.length === 0) {
     children = (

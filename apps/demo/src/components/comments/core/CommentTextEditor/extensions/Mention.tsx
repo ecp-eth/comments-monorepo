@@ -10,6 +10,7 @@ import {
   type SuggestionsRef,
   type SuggestionsProps,
 } from "./components/Suggestions";
+import { isValidQuery } from "./helpers";
 
 const MINIMUM_QUERY_LENGTH = 2;
 
@@ -391,7 +392,7 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
 
   onBeforeCreate() {
     this.options.suggestion.items = async ({ query }) => {
-      if (query.trim().length < MINIMUM_QUERY_LENGTH) {
+      if (!isValidQuery(query, MINIMUM_QUERY_LENGTH)) {
         return [];
       }
 
