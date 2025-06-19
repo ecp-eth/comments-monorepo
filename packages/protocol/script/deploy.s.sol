@@ -22,6 +22,7 @@ contract DeployScript is Script {
   function run(string calldata envInput) public {
     uint256 fallbackPrivateKey = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
     Env env = getEnv(envInput);
+
     uint256 salt = uint256(0);
 
     bool isSimulation = vm.envOr("SIM", false);
@@ -40,9 +41,23 @@ contract DeployScript is Script {
       string.concat(isSimulation ? "Simulation " : "", "Deployer Address:"),
       deployerAddress
     );
+    console.log(
+      "Expected deployer from private key:",
+      deployerAddressFromPrivateKey
+    );
+
+    // Verify sender configuration
+    if (!isSimulation && deployerAddress != deployerAddressFromPrivateKey) {
+      console.log(
+        "WARNING: PROD_DEPLOYER_ADDRESS doesn't match private key address"
+      );
+      console.log("Using address from private key for broadcast");
+      deployerAddress = deployerAddressFromPrivateKey;
+    }
 
     if (isSimulation) {
       vm.startBroadcast(deployerAddress);
+      console.log("Is Simulation");
     } else {
       vm.startBroadcast(deployerPrivateKey);
     }
@@ -81,20 +96,58 @@ contract DeployScript is Script {
     // (although this can be changed by setting --private-key or --sender)
     // that means `msg.sender` with this in `run()` script function is not the same as the deployer address
     // we need to set the contract owners to the deployer address initially so we can call `ownerOnly` functions
-    comments = new CommentManager{ salt: bytes32(salt) }(deployerAddress);
-
+    try new CommentManager{ salt: bytes32(salt) }(deployerAddress) returns (
+      CommentManager _comments
+    ) {
+      comments = _comments;
+      console.log("CommentManager deployed at", address(comments));
+    } catch Error(string memory reason) {
+      console.log("CommentManager deployment failed:", reason);
+      revert("CommentManager deployment failed");
+    }
     // Deploy ChannelManager with CommentManager address
-    channelManager = new ChannelManager{ salt: bytes32(salt) }(deployerAddress);
-
+    try new ChannelManager{ salt: bytes32(salt) }(deployerAddress) returns (
+      ChannelManager _channelManager
+    ) {
+      channelManager = _channelManager;
+      console.log("ChannelManager deployed at", address(channelManager));
+    } catch Error(string memory reason) {
+      console.log("ChannelManager deployment failed:", reason);
+      revert("ChannelManager deployment failed");
+    }
     if (!isSimulation) {
       // Update contract addresses
-      channelManager.updateCommentsContract(address(comments));
-      comments.updateChannelContract(address(channelManager));
-
+      try channelManager.updateCommentsContract(address(comments)) {
+        console.log("ChannelManager comments contract updated successfully");
+      } catch Error(string memory reason) {
+        console.log(
+          "Failed to update ChannelManager comments contract:",
+          reason
+        );
+        revert("Contract configuration failed");
+      }
+      try comments.updateChannelContract(address(channelManager)) {
+        console.log("CommentManager channel contract updated successfully");
+      } catch Error(string memory reason) {
+        console.log(
+          "Failed to update CommentManager channel contract:",
+          reason
+        );
+        revert("Contract configuration failed");
+      }
       // Set contract owners
-      channelManager.transferOwnership(ownerAddress);
-      comments.transferOwnership(ownerAddress);
-
+      try channelManager.transferOwnership(ownerAddress) {
+        console.log("ChannelManager ownership transferred successfully");
+      } catch Error(string memory reason) {
+        console.log("Failed to transfer ChannelManager ownership:", reason);
+        revert("Ownership transfer failed");
+      }
+      try comments.transferOwnership(ownerAddress) {
+        console.log("CommentManager ownership transferred successfully");
+      } catch Error(string memory reason) {
+        console.log("Failed to transfer CommentManager ownership:", reason);
+        revert("Ownership transfer failed");
+      }
       if (env == Env.Prod) {
         string memory chainId = vm.envOr("CHAIN_ID", string("1"));
         string memory etherscanApiKey = vm.envOr(
@@ -115,48 +168,63 @@ contract DeployScript is Script {
           "/"
         );
 
-        channelManager.setBaseURI(baseUriWithChainId);
-        console.log("ChannelManager baseURI set to", baseUriWithChainId);
+        try channelManager.setBaseURI(baseUriWithChainId) {
+          console.log("ChannelManager baseURI set to", baseUriWithChainId);
+        } catch Error(string memory reason) {
+          console.log("Failed to set ChannelManager baseURI:", reason);
+          revert("BaseURI configuration failed");
+        }
+        // ABI-encode the constructor arguments using Solidity's built-in function
+        bytes memory encodedArgs = abi.encode(deployerAddress);
+        string memory encodedArgsStr = vm.toString(encodedArgs);
 
         // Verify contracts
-        string[] memory channelManagerCmd = new string[](3);
+        string[] memory channelManagerCmd = new string[](12);
         channelManagerCmd[0] = "forge";
         channelManagerCmd[1] = "verify-contract";
-        channelManagerCmd[2] = string.concat(
-          vm.toString(address(channelManager)),
-          " src/ChannelManager.sol:ChannelManager --chain-id ",
-          chainId,
-          " --etherscan-api-key ",
-          etherscanApiKey,
-          " --verifier-url ",
-          verifierUrl,
-          ' --constructor-args $(cast abi-encode "constructor(address)" ',
-          vm.toString(deployerAddress),
-          ")"
-        );
+        channelManagerCmd[2] = vm.toString(address(channelManager));
+        channelManagerCmd[3] = "src/ChannelManager.sol:ChannelManager";
+        channelManagerCmd[4] = "--chain-id";
+        channelManagerCmd[5] = chainId;
+        channelManagerCmd[6] = "--etherscan-api-key";
+        channelManagerCmd[7] = etherscanApiKey;
+        channelManagerCmd[8] = "--verifier-url";
+        channelManagerCmd[9] = verifierUrl;
+        channelManagerCmd[10] = "--constructor-args";
+        channelManagerCmd[11] = encodedArgsStr;
 
-        string[] memory commentManagerCmd = new string[](3);
+        string[] memory commentManagerCmd = new string[](12);
         commentManagerCmd[0] = "forge";
         commentManagerCmd[1] = "verify-contract";
-        commentManagerCmd[2] = string.concat(
-          vm.toString(address(comments)),
-          " src/CommentManager.sol:CommentManager --chain-id ",
-          chainId,
-          " --etherscan-api-key ",
-          etherscanApiKey,
-          " --verifier-url ",
-          verifierUrl,
-          ' --constructor-args $(cast abi-encode "constructor(address)" ',
-          vm.toString(deployerAddress),
-          ")"
-        );
+        commentManagerCmd[2] = vm.toString(address(comments));
+        commentManagerCmd[3] = "src/CommentManager.sol:CommentManager";
+        commentManagerCmd[4] = "--chain-id";
+        commentManagerCmd[5] = chainId;
+        commentManagerCmd[6] = "--etherscan-api-key";
+        commentManagerCmd[7] = etherscanApiKey;
+        commentManagerCmd[8] = "--verifier-url";
+        commentManagerCmd[9] = verifierUrl;
+        commentManagerCmd[10] = "--constructor-args";
+        commentManagerCmd[11] = encodedArgsStr;
 
-        vm.ffi(channelManagerCmd);
-        console.log("ChannelManager verified successfully");
-
-        vm.ffi(commentManagerCmd);
-        console.log("CommentManager verified successfully");
-
+        // Verify ChannelManager
+        try vm.ffi(channelManagerCmd) returns (bytes memory result) {
+          console.log("ChannelManager verified successfully");
+          console.log("Verification result:", string(result));
+        } catch Error(string memory reason) {
+          console.log("ChannelManager verification failed:", reason);
+        } catch {
+          console.log("ChannelManager verification failed with unknown error");
+        }
+        // Verify CommentManager
+        try vm.ffi(commentManagerCmd) returns (bytes memory result) {
+          console.log("CommentManager verified successfully");
+          console.log("Verification result:", string(result));
+        } catch Error(string memory reason) {
+          console.log("CommentManager verification failed:", reason);
+        } catch {
+          console.log("CommentManager verification failed with unknown error");
+        }
         console.log(
           "\x1b[33m%s\x1b[0m",
           "Remember to update `packages/sdk/src/embed/schemas/index.ts` to include new chain into SDK."
@@ -165,13 +233,18 @@ contract DeployScript is Script {
         // Set base uri to the nft-base-uri-server
         string memory baseUri = "http://localhost:3007/chain/31337/";
 
-        channelManager.setBaseURI(baseUri);
-        console.log("ChannelManager baseURI set to", baseUri);
+        try channelManager.setBaseURI(baseUri) {
+          console.log("ChannelManager baseURI set to", baseUri);
+        } catch Error(string memory reason) {
+          console.log("Failed to set ChannelManager baseURI:", reason);
+          revert("BaseURI configuration failed");
+        }
       }
     }
 
-    console.log("ChannelManager deployed at", address(channelManager));
-    console.log("CommentManager deployed at", address(comments));
+    console.log("Deployment completed successfully");
+    console.log("ChannelManager address:", address(channelManager));
+    console.log("CommentManager address:", address(comments));
 
     vm.stopBroadcast();
   }
@@ -185,16 +258,19 @@ contract DeployScript is Script {
       keccak256(abi.encodePacked("dev"))
     ) {
       env = Env.Dev;
+      console.log("Running with env dev");
     } else if (
       keccak256(abi.encodePacked(envInput)) ==
       keccak256(abi.encodePacked("prod"))
     ) {
       env = Env.Prod;
+      console.log("Running with env prod");
     } else if (
       keccak256(abi.encodePacked(envInput)) ==
       keccak256(abi.encodePacked("test"))
     ) {
       env = Env.Test;
+      console.log("Running with env test");
     } else {
       revert("Invalid env. Use 'dev' or 'prod' or 'test'");
     }
