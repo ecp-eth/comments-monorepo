@@ -230,8 +230,6 @@ library CommentSigning {
   /// @param approvalExpiry The approval expiry timestamp
   /// @return True if approval is still valid
   function isApprovalValid(
-    address /* author */,
-    address /* app */,
     uint256 approvalExpiry
   ) internal view returns (bool) {
     return approvalExpiry > block.timestamp;

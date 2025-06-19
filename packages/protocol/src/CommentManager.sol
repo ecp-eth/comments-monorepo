@@ -127,6 +127,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   /// @notice Internal function to handle comment posting with signature and explicit value
+  /// @dev This function is used to post a comment with a signature and explicit value
+  /// @param commentData The comment data struct containing content and metadata
+  /// @param authorSignature The author signature
+  /// @param appSignature The app signature
+  /// @param value The value to be paid for the comment
+  /// @return The comment ID
   function _postCommentWithSig(
     Comments.CreateComment memory commentData,
     bytes memory authorSignature,
@@ -178,11 +184,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       );
       return commentId;
     } else if (
-      CommentSigning.isApprovalValid(
-        commentData.author,
-        app,
-        approvals[commentData.author][app]
-      )
+      CommentSigning.isApprovalValid(approvals[commentData.author][app])
     ) {
       _createComment(
         commentId,
@@ -234,6 +236,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   /// @notice Internal function to handle comment editing with explicit value
+  /// @dev This function is used to edit a comment with an explicit value
+  /// @param commentId The unique identifier of the comment to edit
+  /// @param editData The comment data struct containing content and metadata
+  /// @param appSignature The app signature
+  /// @param value The value to be paid for the comment
   function _editCommentDirect(
     bytes32 commentId,
     Comments.EditComment memory editData,
@@ -296,6 +303,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   /// @notice Internal function to handle comment editing with signature and explicit value
+  /// @dev This function is used to edit a comment with a signature and explicit value
+  /// @param commentId The unique identifier of the comment to edit
+  /// @param editData The comment data struct containing content and metadata
+  /// @param authorSignature The author signature
+  /// @param appSignature The app signature
+  /// @param value The value to be paid for the comment
   function _editCommentWithSig(
     bytes32 commentId,
     Comments.EditComment memory editData,
@@ -350,9 +363,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
         value
       );
       return;
-    } else if (
-      CommentSigning.isApprovalValid(author, app, approvals[author][app])
-    ) {
+    } else if (CommentSigning.isApprovalValid(approvals[author][app])) {
       _editComment(
         commentId,
         editData,
@@ -425,8 +436,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       ));
 
     bool isAuthorizedByApprovedApp = CommentSigning.isApprovalValid(
-      author,
-      app,
       approvals[author][app]
     ) &&
       CommentSigning.verifyAppSignature(

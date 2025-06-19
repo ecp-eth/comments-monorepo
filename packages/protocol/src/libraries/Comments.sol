@@ -194,12 +194,18 @@ library Comments {
 
     // Store metadata in mappings
     if (metadata.length > 0) {
+      mapping(bytes32 => bytes) storage commentMetadataForId = commentMetadata[
+        commentId
+      ];
+      bytes32[] storage commentMetadataKeysForId = commentMetadataKeys[
+        commentId
+      ];
       for (uint i = 0; i < metadata.length; i++) {
         bytes32 key = metadata[i].key;
         bytes memory val = metadata[i].value;
 
-        commentMetadata[commentId][key] = val;
-        commentMetadataKeys[commentId].push(key);
+        commentMetadataForId[key] = val;
+        commentMetadataKeysForId.push(key);
 
         emit ICommentManager.CommentMetadataSet(commentId, key, val);
       }
@@ -231,14 +237,6 @@ library Comments {
           commentHookMetadata,
           commentHookMetadataKeys
         );
-
-        for (uint i = 0; i < hookMetadata.length; i++) {
-          emit ICommentManager.CommentHookMetadataSet(
-            commentId,
-            hookMetadata[i].key,
-            hookMetadata[i].value
-          );
-        }
       }
     }
     // refund excess payment if any
@@ -290,12 +288,16 @@ library Comments {
     );
 
     // Store new metadata
+    mapping(bytes32 => bytes) storage commentMetadataForId = commentMetadata[
+      commentId
+    ];
+    bytes32[] storage commentMetadataKeysForId = commentMetadataKeys[commentId];
     for (uint i = 0; i < metadata.length; i++) {
       bytes32 key = metadata[i].key;
       bytes memory val = metadata[i].value;
 
-      commentMetadata[commentId][key] = val;
-      commentMetadataKeys[commentId].push(key);
+      commentMetadataForId[key] = val;
+      commentMetadataKeysForId.push(key);
 
       emit ICommentManager.CommentMetadataSet(commentId, key, val);
     }
@@ -342,12 +344,17 @@ library Comments {
       );
 
       // Store new hook metadata
+      mapping(bytes32 => bytes)
+        storage commentHookMetadataForId = commentHookMetadata[commentId];
+      bytes32[] storage commentHookMetadataKeysForId = commentHookMetadataKeys[
+        commentId
+      ];
       for (uint i = 0; i < hookMetadata.length; i++) {
         bytes32 key = hookMetadata[i].key;
         bytes memory val = hookMetadata[i].value;
 
-        commentHookMetadata[commentId][key] = val;
-        commentHookMetadataKeys[commentId].push(key);
+        commentHookMetadataForId[key] = val;
+        commentHookMetadataKeysForId.push(key);
 
         emit ICommentManager.CommentHookMetadataSet(commentId, key, val);
       }

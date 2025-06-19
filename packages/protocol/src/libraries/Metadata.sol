@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "../interfaces/ICommentManager.sol";
+
 /// @title Metadata - Library defining shared metadata types and operations for comments and channels
 library Metadata {
   /// @notice Struct containing metadata key-value pair
@@ -253,12 +255,19 @@ library Metadata {
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
     mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys
   ) external {
+    mapping(bytes32 => bytes)
+      storage commentHookMetadataForId = commentHookMetadata[commentId];
+    bytes32[] storage commentHookMetadataKeysForId = commentHookMetadataKeys[
+      commentId
+    ];
     for (uint i = 0; i < hookMetadata.length; i++) {
       bytes32 key = hookMetadata[i].key;
       bytes memory val = hookMetadata[i].value;
 
-      commentHookMetadata[commentId][key] = val;
-      commentHookMetadataKeys[commentId].push(key);
+      commentHookMetadataForId[key] = val;
+      commentHookMetadataKeysForId.push(key);
+
+      emit ICommentManager.CommentHookMetadataSet(commentId, key, val);
     }
   }
 }
