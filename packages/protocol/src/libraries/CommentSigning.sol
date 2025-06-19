@@ -225,13 +225,4 @@ library CommentSigning {
   ) internal view returns (bool) {
     return SignatureCheckerLib.isValidSignatureNow(author, hash, signature);
   }
-
-  /// @notice Check if author is approved by app
-  /// @param approvalExpiry The approval expiry timestamp
-  /// @return True if approval is still valid
-  function isApprovalValid(
-    uint256 approvalExpiry
-  ) internal view returns (bool) {
-    return approvalExpiry > block.timestamp;
-  }
 }

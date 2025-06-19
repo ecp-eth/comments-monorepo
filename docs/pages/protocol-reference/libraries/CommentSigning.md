@@ -79,12 +79,5 @@ Verify author signature
 
 
 
-### isApprovalValid(uint256 approvalExpiry) → bool (internal)
-
-Check if author is approved by app
-
-
-
-
 
 

@@ -22,7 +22,7 @@ import "./ChannelManager.sol";
 /// @notice This contract allows users to post and manage comments with optional app-signer approval and channel-specific hooks
 /// @dev Implements EIP-712 for typed structured data hashing and signing
 contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
-  string public constant name = "ECP";
+  string public constant name = "Ethereum Comments Protocol";
   string public constant version = "1";
   bytes32 public immutable DOMAIN_SEPARATOR;
 
@@ -190,9 +190,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
         value
       );
       return commentId;
-    } else if (
-      CommentSigning.isApprovalValid(approvals[commentData.author][app])
-    ) {
+    }
+    if (Approvals.isApproved(commentData.author, app, approvals)) {
       _createComment(
         commentId,
         commentData,
@@ -370,7 +369,8 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
         value
       );
       return;
-    } else if (CommentSigning.isApprovalValid(approvals[author][app])) {
+    }
+    if (Approvals.isApproved(author, app, approvals)) {
       _editComment(
         commentId,
         editData,
@@ -442,8 +442,10 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
         authorSignature
       ));
 
-    bool isAuthorizedByApprovedApp = CommentSigning.isApprovalValid(
-      approvals[author][app]
+    bool isAuthorizedByApprovedApp = Approvals.isApproved(
+      author,
+      app,
+      approvals
     ) &&
       CommentSigning.verifyAppSignature(
         app,
@@ -555,6 +557,22 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     }
 
     Approvals.revokeApproval(author, app, approvals);
+  }
+
+  /// @inheritdoc ICommentManager
+  function updateCommentHookData(
+    bytes32 commentId
+  ) external commentExists(commentId) {
+    CommentOps.updateCommentHookData(
+      commentId,
+      channelManager,
+      comments,
+      commentMetadata,
+      commentMetadataKeys,
+      commentHookMetadata,
+      commentHookMetadataKeys,
+      msg.sender
+    );
   }
 
   /// @inheritdoc ICommentManager
@@ -781,22 +799,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     require(msg.sender == author, "Not comment author");
 
     _;
-  }
-
-  /// @inheritdoc ICommentManager
-  function updateCommentHookData(
-    bytes32 commentId
-  ) external commentExists(commentId) {
-    CommentOps.updateCommentHookData(
-      commentId,
-      channelManager,
-      comments,
-      commentMetadata,
-      commentMetadataKeys,
-      commentHookMetadata,
-      commentHookMetadataKeys,
-      msg.sender
-    );
   }
 
   modifier reactionHasTargetOrParent(

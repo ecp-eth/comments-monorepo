@@ -42,8 +42,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   ) ProtocolFees(initialOwner) ERC721("ECP Channel", "ECPC") {
     if (initialOwner == address(0)) revert ZeroAddress();
 
-    _initializeOwner(initialOwner);
-
     // Create default channel with ID 0
     _safeMint(initialOwner, 0);
 

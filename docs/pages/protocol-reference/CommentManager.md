@@ -194,6 +194,14 @@ Removes an app signer approval with signature verification
 
 
 
+### updateCommentHookData(bytes32 commentId) (external)
+
+Updates hook metadata for an existing comment using merge mode (gas-efficient). Anyone can call this function.
+
+
+Only updates provided metadata fields without clearing existing ones
+
+
 ### getAddApprovalHash(address author, address app, uint256 expiry, uint256 nonce, uint256 deadline) → bytes32 (public)
 
 Calculates the EIP-712 hash for a permit
@@ -311,14 +319,6 @@ Get the nonce for an author and app
 Get the deleted status for a comment
 
 
-
-
-### updateCommentHookData(bytes32 commentId) (external)
-
-Updates hook metadata for an existing comment using merge mode (gas-efficient). Anyone can call this function.
-
-
-Only updates provided metadata fields without clearing existing ones
 
 
 ### batchOperations([struct Comments.BatchOperation[]](/protocol-reference/types/Comments#batchoperation) operations) → bytes[] results (external)
