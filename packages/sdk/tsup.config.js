@@ -1,33 +1,31 @@
 import { defineConfig } from "tsup";
 import process from "node:process";
+import path from "node:path";
+import fs from "node:fs/promises";
 
-// Explicit entry points that match package.json exports
-// This prevents building unnecessary files and reduces memory usage
-const entry = [
-  // Main exports
-  "src/index.ts",
-  "src/abis.ts",
-  "src/constants.ts",
+const cwd = import.meta.dirname;
+const srcDir = path.join(cwd, "src");
 
-  // Channel manager
-  "src/channel-manager/index.ts",
-  "src/channel-manager/react/index.ts",
-  "src/channel-manager/types.ts",
+const files = await fs.readdir(srcDir, {
+  recursive: true,
+  withFileTypes: true,
+});
 
-  // Comments
-  "src/comments/index.ts",
-  "src/comments/react/index.ts",
+const entry = files
+  .map((file) => {
+    const filePath = path.join(file.parentPath, file.name);
 
-  // Core
-  "src/core/index.ts",
+    if (file.isDirectory()) {
+      return;
+    }
 
-  // Embed
-  "src/embed/index.ts",
-  "src/embed/schemas/index.ts",
+    if (filePath.match(/(\/test\/|\.test\.tsx?)/)) {
+      return;
+    }
 
-  // Indexer
-  "src/indexer/index.ts",
-];
+    return filePath;
+  })
+  .filter(Boolean);
 
 export default defineConfig({
   entry: entry,
