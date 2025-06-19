@@ -21,105 +21,173 @@ import { type Hex } from "viem";
 import { z } from "zod";
 import { gql, request as graphqlRequest } from "graphql-request";
 
-type Result = {
+type ENSResult = {
   domains: {
     id: Hex;
     name: string;
-    resolvedAddress:
-      | {
-          id: Hex;
-        }
-      | undefined;
-    owner: {
+    resolvedAddress: {
       id: Hex;
+    };
+    resolver: {
+      textChangeds: {
+        key: "avatar" | string;
+        value: string | null;
+      }[];
     };
   }[];
 };
 
+const domainFragment = gql`
+  fragment DomainFragment on Domain {
+    id
+    name
+    resolvedAddress {
+      id
+    }
+    resolver {
+      textChangeds(
+        where: { key: "avatar" }
+        first: 1
+        orderBy: blockNumber
+        orderDirection: desc
+      ) {
+        key
+        value
+      }
+    }
+  }
+`;
+
 const searchByNameQuery = gql`
-  query SearchByName($name: String!) {
+  ${domainFragment}
+  query SearchByName($name: String!, $currentTimestamp: BigInt!) {
     domains(
       where: {
-        name_contains_nocase: $name
-        name_not_starts_with: "["
+        name_contains: $name
+        # make sure to exclude reverse records
+        name_not_ends_with: ".addr.reverse"
+        # make sure to exclude empty labels
+        labelName_not: ""
+        # make sure to exclude expired domains
+        expiryDate_gte: $currentTimestamp
         resolvedAddress_not: ""
       }
-      first: 10
+      first: 20
     ) {
-      id
-      name
-      resolvedAddress {
-        id
-      }
-      owner {
-        id
-      }
+      ...DomainFragment
     }
   }
 `;
 
 const searchByAddressQuery = gql`
-  query SearchByAddress($address: String!) {
-    domains(where: { resolvedAddress_starts_with: $address }, first: 10) {
-      id
-      name
-      resolvedAddress {
-        id
+  ${domainFragment}
+  query SearchByAddress($address: String!, $currentTimestamp: BigInt!) {
+    domains(
+      where: {
+        resolvedAddressId_starts_with: $address
+        expiryDate_gte: $currentTimestamp
+        labelName_not: ""
       }
-      owner {
-        id
-      }
+      first: 20
+    ) {
+      ...DomainFragment
     }
   }
 `;
 
-const VALID_ENS_NAME = /^[a-z0-9]+([-_][a-z0-9]+)*(\.[a-z]{2,})?$/;
+const ensResultSchema = z
+  .object({
+    domains: z.array(
+      z.object({
+        id: HexSchema,
+        name: z.string(),
+        resolvedAddress: z.object({
+          id: HexSchema,
+        }),
+        resolver: z.object({
+          textChangeds: z.array(
+            z.object({
+              key: z.string().or(z.literal("avatar")),
+              value: z.string().nullable(),
+            }),
+          ),
+        }),
+      }),
+    ),
+  })
+  .transform((val) => {
+    return {
+      domains: val.domains.map((domain) => {
+        const avatarUrl = domain.resolver.textChangeds.find(
+          (t) => t.key === "avatar" && !!t.value,
+        )?.value;
 
-async function searchEns(query: string): Promise<Result | null> {
-  if (!env.GRAPH_API_KEY || !env.GRAPH_ENS_SUBGRAPH_URL) {
+        return {
+          ...domain,
+          avatarUrl: avatarUrl ? normalizeAvatarUrl(avatarUrl) : null,
+        };
+      }),
+    };
+  });
+
+type ENSResultType = z.infer<typeof ensResultSchema>;
+
+async function searchEns(query: string): Promise<ENSResultType | null> {
+  if (!env.ENSNODE_SUBGRAPH_URL) {
     return null;
   }
 
-  if (/^[^a-zA-Z0-9]/.test(query)) {
-    return null;
-  }
+  const currentTimestamp = Math.floor(Date.now() / 1000);
 
   if (query.startsWith("0x")) {
-    const results = await graphqlRequest<Result>(
-      env.GRAPH_ENS_SUBGRAPH_URL,
+    const results = await graphqlRequest<ENSResult>(
+      env.ENSNODE_SUBGRAPH_URL,
       searchByAddressQuery,
       {
         address: query,
-      },
-      {
-        Authorization: `Bearer ${env.GRAPH_API_KEY}`,
+        currentTimestamp,
       },
     );
 
     if (results.domains.length > 0) {
-      return results;
+      return ensResultSchema.parse(results);
     }
 
     return null;
   }
 
-  if (!VALID_ENS_NAME.test(query)) {
+  // do not allow a string that is completely non-alphanumeric or starts with non-alphanumeric
+  if (/^[^a-zA-Z0-9]/.test(query) || /^[^a-zA-Z0-9]+$/.test(query)) {
     return null;
   }
 
-  const results = await graphqlRequest<Result>(
-    env.GRAPH_ENS_SUBGRAPH_URL,
+  const results = await graphqlRequest<ENSResult>(
+    env.ENSNODE_SUBGRAPH_URL,
     searchByNameQuery,
     {
       name: query,
-    },
-    {
-      Authorization: `Bearer ${env.GRAPH_API_KEY}`,
+      currentTimestamp,
     },
   );
 
   if (results.domains.length > 0) {
-    return results;
+    return ensResultSchema.parse(results);
+  }
+
+  return null;
+}
+
+function normalizeAvatarUrl(url: string): string | null {
+  if (URL.canParse(url)) {
+    const { protocol } = new URL(url);
+
+    if (protocol === "ipfs:") {
+      return `https://ipfs.io/ipfs/${url.slice(7)}`;
+    }
+
+    if (protocol === "http:" || protocol === "https:") {
+      return url;
+    }
   }
 
   return null;
@@ -402,10 +470,9 @@ export async function GET(
         suggestions: results.domains.map((domain) => ({
           type: "ens" as const,
           name: domain.name,
-          address: domain.resolvedAddress?.id ?? domain.owner.id,
-          url: `https://app.ens.domains/${domain.resolvedAddress?.id ?? domain.owner.id}`,
-          // @todo we need an avatar url here, subgraph somehow doesn't have it
-          avatarUrl: null,
+          address: domain.resolvedAddress.id,
+          url: `https://app.ens.domains/${domain.resolvedAddress.id}`,
+          avatarUrl: domain.avatarUrl ?? null,
         })),
       });
     }
