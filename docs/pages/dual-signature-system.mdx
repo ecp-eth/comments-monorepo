@@ -79,3 +79,22 @@ Comments require different signatures depending on whether the author has grante
 
 This means that every comment is attributable to an app and author. This enables the app to impose offchain limitations and gating on which comments it wants to co-sign, as well as allowing the app to choose whether to index and display comments from other apps or not.
 If interacting with the protocol directly, the user can also choose to self sign the comment, signing with their address as the app and author.
+
+## Authentication Methods
+
+Each comment stores how it was authenticated on-chain via an `authMethod` field.
+
+- **`0` (DIRECT_TX)** - User signed transaction directly
+- **`1` (APP_APPROVAL)** - User pre-approved the app
+- **`2` (AUTHOR_SIGNATURE)** - User signed comment hash
+
+## Paymaster and Proxy Contract Attribution
+
+When using paymasters, or other proxy contract systems that relay transactions, be aware that comments may appear to originate from these proxy contracts rather than the intended app.
+
+**Key points:**
+
+- **Paymasters can be tricked:** A malicious actor could craft a transaction with the paymaster's address as the `app` field, causing the comment to appear as if it came from the paymaster
+- **Paymaster attribution should not be trusted:** Comments showing a paymaster or proxy contract as the app should not be considered as actually originating from that service
+
+This is an inherent limitation of any system that accepts `msg.sender` as a form of authentication when used with transaction relay services.
