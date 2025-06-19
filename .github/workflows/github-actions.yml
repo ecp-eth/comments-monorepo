@@ -104,7 +104,7 @@ jobs:
       NEXT_PUBLIC_PROD_CHAIN_ID: "84532"
       PINATA_JWT: "jwt"
       NEXT_PUBLIC_PINATA_GATEWAY_URL: "https://some.gateway.url"
-      ENS_RPC_URL: "https://some.rpc.url"
+      ENS_RPC_URL: "https://ethereum-rpc.publicnode.com"
       NEYNAR_API_KEY: "NEYNAR_API_KEY"
       SIM_API_KEY: "SIM_API_KEY"
 
