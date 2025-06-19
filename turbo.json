@@ -36,8 +36,7 @@
     "PRIVY_WALLET_ID",
     "RPC_URL_*",
     "WEBHOOK_SECRET",
-    "GRAPH_API_KEY",
-    "GRAPH_ENS_SUBGRAPH_URL",
+    "ENSNODE_SUBGRAPH_URL",
     "SIM_API_KEY"
   ],
   "tasks": {
