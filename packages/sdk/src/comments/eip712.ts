@@ -1,4 +1,4 @@
-export const DOMAIN_NAME = "ECP";
+export const DOMAIN_NAME = "Ethereum Comments Protocol";
 export const DOMAIN_VERSION = "1";
 
 export const METADATA_ENTRY_TYPE = {

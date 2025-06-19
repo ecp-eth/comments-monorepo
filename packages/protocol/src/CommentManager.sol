@@ -22,6 +22,7 @@ import "./ChannelManager.sol";
 /// @notice This contract allows users to post and manage comments with optional app-signer approval and channel-specific hooks
 /// @dev Implements EIP-712 for typed structured data hashing and signing
 contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
+  // go to ethcomments.xyz to learn more about ECP and building on ECP
   string public constant name = "Ethereum Comments Protocol";
   string public constant version = "1";
   bytes32 public immutable DOMAIN_SEPARATOR;
