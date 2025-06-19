@@ -320,9 +320,10 @@ describe("channel", () => {
             writeContract: client2.writeContract,
             channelManagerAddress,
           }),
-        (err) => {
+        (err: unknown) => {
+          const error = err as ContractFunctionExecutionError;
           assert.ok(err instanceof ContractFunctionExecutionError);
-          assert.ok(err.message.includes("Error: OwnableUnauthorizedAccount("));
+          assert.ok(error.message.includes("Error: Unauthorized()"));
           return true;
         },
       );
