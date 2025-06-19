@@ -3,13 +3,13 @@ pragma solidity ^0.8.20;
 
 import { Test } from "forge-std/Test.sol";
 import { TokenCreatorHook } from "../src/hooks/TokenCreatorHook.sol";
-import { Channels } from "../src/libraries/Channels.sol";
-import { Comments } from "../src/libraries/Comments.sol";
+import { Channels } from "../src/types/Channels.sol";
+import { Comments } from "../src/types/Comments.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { IHook } from "../src/interfaces/IHook.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 import { console } from "forge-std/console.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";

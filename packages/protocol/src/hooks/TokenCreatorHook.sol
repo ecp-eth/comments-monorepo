@@ -2,11 +2,11 @@
 pragma solidity ^0.8.20;
 
 import { BaseHook } from "./BaseHook.sol";
-import { Hooks } from "../libraries/Hooks.sol";
-import { Comments } from "../libraries/Comments.sol";
-import { Channels } from "../libraries/Channels.sol";
-import { Metadata } from "../libraries/Metadata.sol";
-import "solady/utils/LibString.sol";
+import { Hooks } from "../types/Hooks.sol";
+import { Comments } from "../types/Comments.sol";
+import { Channels } from "../types/Channels.sol";
+import { Metadata } from "../types/Metadata.sol";
+import "solady/src/utils/LibString.sol";
 import {
   EnumerableMap
 } from "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";

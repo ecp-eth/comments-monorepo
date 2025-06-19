@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import { Test } from "forge-std/Test.sol";
 import { CommentManager } from "../src/CommentManager.sol";
-import { Comments } from "../src/libraries/Comments.sol";
+import { Comments } from "../src/types/Comments.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import {
@@ -11,8 +11,8 @@ import {
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { TestUtils, AlwaysReturningDataHook } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 import { IProtocolFees } from "../src/interfaces/IProtocolFees.sol";
 
 contract NoHook is BaseHook {

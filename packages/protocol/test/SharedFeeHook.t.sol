@@ -14,9 +14,9 @@ import {
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { TestUtils } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Comments } from "../src/libraries/Comments.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Comments } from "../src/types/Comments.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 /// @title SharedFeeHook - A hook that splits comment fees between channel owners and parent comment authors
 /// @notice This hook charges 0.001 ETH per comment and splits it between channel owners and parent comment authors
 contract SharedFeeHook is BaseHook {

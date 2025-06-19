@@ -10,6 +10,7 @@
 type AddApprovalParams = {
   app: Hex;
   commentsAddress?: Hex;
+  expiry?: bigint;
   writeContract: ContractWriteFunctions["addApproval"];
 };
 ```
@@ -36,7 +37,7 @@ The address of the app signer being approved
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:71](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L71)
+Defined in: [packages/sdk/src/comments/approval.ts:76](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L76)
 
 The address of the comments contract
 
@@ -48,10 +49,28 @@ COMMENT_MANAGER_ADDRESS
 
 ***
 
+### expiry?
+
+```ts
+optional expiry: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:70](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L70)
+
+Timestamp when the approval expires
+
+#### Default
+
+```ts
+1 year from now
+```
+
+***
+
 ### writeContract
 
 ```ts
 writeContract: ContractWriteFunctions["addApproval"];
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:72](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L72)
+Defined in: [packages/sdk/src/comments/approval.ts:77](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L77)

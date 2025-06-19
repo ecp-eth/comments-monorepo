@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 import "../src/ProtocolFees.sol";
 import "../src/interfaces/IProtocolFees.sol";
-import "solady/auth/Ownable.sol";
+import "solady/src/auth/Ownable.sol";
 
 // Concrete implementation of ProtocolFees for testing
 contract TestProtocolFees is ProtocolFees {

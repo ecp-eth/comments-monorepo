@@ -2,33 +2,10 @@
 pragma solidity ^0.8.20;
 
 import "../interfaces/ICommentManager.sol";
+import "../types/Metadata.sol";
 
-/// @title Metadata - Library defining shared metadata types and operations for comments and channels
-library Metadata {
-  /// @notice Struct containing metadata key-value pair
-  /// @param key UTF-8 encoded string of format "type key". Must fit in 32 bytes.
-  /// @param value The metadata value as bytes
-  struct MetadataEntry {
-    bytes32 key;
-    bytes value;
-  }
-
-  /// @notice Enum for metadata operations in hook updates
-  enum MetadataOperation {
-    SET, // Set or update the metadata value
-    DELETE // Delete the metadata key
-  }
-
-  /// @notice Struct for hook metadata operations with explicit operation type
-  /// @param operation The operation to perform (SET or DELETE)
-  /// @param key The metadata key
-  /// @param value The metadata value (ignored for DELETE operations)
-  struct MetadataEntryOp {
-    MetadataOperation operation;
-    bytes32 key;
-    bytes value;
-  }
-
+/// @title MetadataOps - Library for metadata operations for comments and channels
+library MetadataOps {
   /// @notice Get metadata for a comment
   /// @param commentId The unique identifier of the comment
   /// @param commentMetadata Mapping of comment ID to metadata key to metadata value
@@ -38,12 +15,14 @@ library Metadata {
     bytes32 commentId,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
     mapping(bytes32 => bytes32[]) storage commentMetadataKeys
-  ) external view returns (MetadataEntry[] memory) {
+  ) external view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentMetadataKeys[commentId];
-    MetadataEntry[] memory metadata = new MetadataEntry[](keys.length);
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](
+      keys.length
+    );
 
     for (uint i = 0; i < keys.length; i++) {
-      metadata[i] = MetadataEntry({
+      metadata[i] = Metadata.MetadataEntry({
         key: keys[i],
         value: commentMetadata[commentId][keys[i]]
       });
@@ -61,12 +40,14 @@ library Metadata {
     bytes32 commentId,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
     mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys
-  ) external view returns (MetadataEntry[] memory) {
+  ) external view returns (Metadata.MetadataEntry[] memory) {
     bytes32[] memory keys = commentHookMetadataKeys[commentId];
-    MetadataEntry[] memory hookMetadata = new MetadataEntry[](keys.length);
+    Metadata.MetadataEntry[] memory hookMetadata = new Metadata.MetadataEntry[](
+      keys.length
+    );
 
     for (uint i = 0; i < keys.length; i++) {
-      hookMetadata[i] = MetadataEntry({
+      hookMetadata[i] = Metadata.MetadataEntry({
         key: keys[i],
         value: commentHookMetadata[commentId][keys[i]]
       });
@@ -114,21 +95,21 @@ library Metadata {
   /// @param commentHookMetadataKeys Mapping of comment ID to array of hook metadata keys
   function applyHookMetadataOperations(
     bytes32 commentId,
-    MetadataEntryOp[] memory operations,
+    Metadata.MetadataEntryOp[] memory operations,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
     mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys
   ) external {
     for (uint i = 0; i < operations.length; i++) {
-      MetadataEntryOp memory op = operations[i];
+      Metadata.MetadataEntryOp memory op = operations[i];
 
-      if (op.operation == MetadataOperation.DELETE) {
+      if (op.operation == Metadata.MetadataOperation.DELETE) {
         _deleteCommentHookMetadataKey(
           commentId,
           op.key,
           commentHookMetadata,
           commentHookMetadataKeys
         );
-      } else if (op.operation == MetadataOperation.SET) {
+      } else if (op.operation == Metadata.MetadataOperation.SET) {
         // Check if this is a new key for gas optimization
         bool isNewKey = !_hookMetadataKeyExists(
           commentId,
@@ -231,7 +212,7 @@ library Metadata {
   /// @param commentMetadataKeys Mapping of comment ID to array of metadata keys
   function storeCommentMetadata(
     bytes32 commentId,
-    MetadataEntry[] memory metadata,
+    Metadata.MetadataEntry[] memory metadata,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
     mapping(bytes32 => bytes32[]) storage commentMetadataKeys
   ) external {
@@ -251,7 +232,7 @@ library Metadata {
   /// @param commentHookMetadataKeys Mapping of comment ID to array of hook metadata keys
   function storeCommentHookMetadata(
     bytes32 commentId,
-    MetadataEntry[] memory hookMetadata,
+    Metadata.MetadataEntry[] memory hookMetadata,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
     mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys
   ) external {

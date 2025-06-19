@@ -8,9 +8,9 @@ import {
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { TestUtils, MockHook } from "../test/utils.sol";
-import { Comments } from "../src/libraries/Comments.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Comments } from "../src/types/Comments.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 
 /// @notice This script is used to debug the gas usage of the ChannelManager and CommentManager contracts.
 /// @dev This script is not used in the protocol and should not be used in production.

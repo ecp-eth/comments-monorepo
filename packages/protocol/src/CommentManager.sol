@@ -1,16 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "solady/auth/Ownable.sol";
-import "solady/utils/ReentrancyGuard.sol";
-import "./libraries/Comments.sol";
+import "solady/src/auth/Ownable.sol";
+import "solady/src/utils/ReentrancyGuard.sol";
+import "./types/Comments.sol";
+import "./types/Channels.sol";
+import "./types/Metadata.sol";
 import "./libraries/CommentSigning.sol";
 import "./libraries/Batching.sol";
 import "./libraries/Approvals.sol";
+import "./libraries/CommentOps.sol";
+import "./libraries/MetadataOps.sol";
 import "./interfaces/ICommentManager.sol";
+
+import "./interfaces/IChannelManager.sol";
 import "./interfaces/IHook.sol";
+import "./types/Hooks.sol";
+import "./ProtocolFees.sol";
 import "./ChannelManager.sol";
-import "./libraries/Channels.sol";
 /// @title CommentManager - A decentralized comments system
 /// @notice This contract allows users to post and manage comments with optional app-signer approval and channel-specific hooks
 /// @dev Implements EIP-712 for typed structured data hashing and signing
@@ -210,7 +217,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       channelManager.collectCommentCreationFee{ value: commentCreationFee }();
     }
 
-    Comments.createComment(
+    CommentOps.createComment(
       commentId,
       commentData,
       authMethod,
@@ -386,7 +393,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     Comments.AuthorAuthMethod authMethod,
     uint256 value
   ) internal {
-    Comments.editComment(
+    CommentOps.editComment(
       commentId,
       editData,
       authMethod,
@@ -457,7 +464,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   /// @param commentId The unique identifier of the comment to delete
   /// @param author The address of the comment author
   function _deleteComment(bytes32 commentId, address author) internal {
-    Comments.deleteComment(
+    CommentOps.deleteComment(
       commentId,
       author,
       channelManager,
@@ -643,7 +650,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     bytes32 commentId
   ) external view returns (Metadata.MetadataEntry[] memory) {
     return
-      Metadata.getCommentMetadata(
+      MetadataOps.getCommentMetadata(
         commentId,
         commentMetadata,
         commentMetadataKeys
@@ -655,7 +662,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     bytes32 commentId
   ) external view returns (Metadata.MetadataEntry[] memory) {
     return
-      Metadata.getCommentHookMetadata(
+      MetadataOps.getCommentHookMetadata(
         commentId,
         commentHookMetadata,
         commentHookMetadataKeys
@@ -780,7 +787,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   function updateCommentHookData(
     bytes32 commentId
   ) external commentExists(commentId) {
-    Comments.updateCommentHookData(
+    CommentOps.updateCommentHookData(
       commentId,
       channelManager,
       comments,

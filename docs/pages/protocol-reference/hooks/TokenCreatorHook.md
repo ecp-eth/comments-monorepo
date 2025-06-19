@@ -80,13 +80,13 @@ Get all channels with their token information
 
 
 
-### _getHookPermissions() → [struct Hooks.Permissions](/protocol-reference/libraries/Hooks#permissions) (internal)
+### _getHookPermissions() → [struct Hooks.Permissions](/protocol-reference/types/Hooks#permissions) (internal)
 
 
 
 
 
-### _onInitialize(address, [struct Channels.Channel](/protocol-reference/libraries/Channels#channel) channel, uint256 channelId) → bool (internal)
+### _onInitialize(address, [struct Channels.Channel](/protocol-reference/types/Channels#channel) channel, uint256 channelId) → bool (internal)
 
 
 
@@ -98,7 +98,7 @@ Get all channels with their token information
 
 
 
-### _onCommentAdd([struct Comments.Comment](/protocol-reference/libraries/Comments#comment) commentData, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry), address, bytes32) → [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) (internal)
+### _onCommentAdd([struct Comments.Comment](/protocol-reference/types/Comments#comment) commentData, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry), address, bytes32) → [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) (internal)
 
 
 

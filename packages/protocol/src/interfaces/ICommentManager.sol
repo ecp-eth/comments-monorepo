@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "../libraries/Comments.sol";
-import "../libraries/Hooks.sol";
+import "../types/Comments.sol";
+import "../types/Hooks.sol";
 import "./IChannelManager.sol";
-import "../libraries/Metadata.sol";
+import "../types/Metadata.sol";
 
 /// @title ICommentManager - Interface for the Comments contract
 /// @notice This interface defines the functions and events for the Comments contract

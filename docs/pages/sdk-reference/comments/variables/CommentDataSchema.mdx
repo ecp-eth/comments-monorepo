@@ -9,6 +9,7 @@
 ```ts
 const CommentDataSchema: ZodObject<{
   app: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  authMethod: ZodUnion<[ZodLiteral<0>, ZodLiteral<1>, ZodLiteral<2>]>;
   author: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
   channelId: ZodBigInt;
   commentType: ZodNumber;
@@ -29,6 +30,7 @@ const CommentDataSchema: ZodObject<{
   updatedAt: ZodBigInt;
 }, "strip", ZodTypeAny, {
   app: `0x${string}`;
+  authMethod: 0 | 1 | 2;
   author: `0x${string}`;
   channelId: bigint;
   commentType: number;
@@ -43,6 +45,7 @@ const CommentDataSchema: ZodObject<{
   updatedAt: bigint;
 }, {
   app: `0x${string}`;
+  authMethod: 0 | 1 | 2;
   author: `0x${string}`;
   channelId: bigint;
   commentType: number;
@@ -58,4 +61,4 @@ const CommentDataSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/comments/schemas.ts:41](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L41)
+Defined in: [packages/sdk/src/comments/schemas.ts:42](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L42)

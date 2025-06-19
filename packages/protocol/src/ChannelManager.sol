@@ -1,17 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "solady/auth/Ownable.sol";
-import "solady/utils/ReentrancyGuard.sol";
+import "solady/src/auth/Ownable.sol";
+import "solady/src/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./interfaces/IChannelManager.sol";
 import "./interfaces/IProtocolFees.sol";
 import "./ProtocolFees.sol";
-import "./libraries/Comments.sol";
-import "./libraries/Channels.sol";
-import "./libraries/Metadata.sol";
+import "./types/Comments.sol";
+import "./types/Channels.sol";
+import "./types/Metadata.sol";
 import "./interfaces/IHook.sol";
+import "./types/Comments.sol";
+import "./types/Channels.sol";
+import "./types/Metadata.sol";
 
 /// @title ChannelManager - A contract for managing comment channels and their hooks as NFTs
 /// @notice This contract allows creation and management of channels with configurable hooks, where each channel is an NFT

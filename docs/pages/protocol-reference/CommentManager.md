@@ -31,7 +31,7 @@ Implements EIP-712 for typed structured data hashing and signing
 
 
 
-### `replyInSameChannel(bytes32 parentId, uint256 channelId)`
+### `onlyReplyInSameChannel(bytes32 parentId, uint256 channelId)`
 
 
 
@@ -55,6 +55,12 @@ Implements EIP-712 for typed structured data hashing and signing
 
 
 
+### `reactionHasTargetOrParent(uint8 commentType, bytes32 parentId, string targetUri)`
+
+
+
+
+
 
 
 
@@ -68,55 +74,85 @@ Constructor initializes the contract with the deployer as owner and channel mana
 Sets up EIP-712 domain separator
 
 
-### postComment([struct Comments.CreateComment](/protocol-reference/libraries/Comments#createcomment) commentData, bytes appSignature) → bytes32 (external)
+### postComment([struct Comments.CreateComment](/protocol-reference/types/Comments#createcomment) commentData, bytes appSignature) → bytes32 (external)
 
 Posts a comment directly from the author's address
 
 
 
 
-### postCommentWithSig([struct Comments.CreateComment](/protocol-reference/libraries/Comments#createcomment) commentData, bytes authorSignature, bytes appSignature) → bytes32 (external)
+### _postComment([struct Comments.CreateComment](/protocol-reference/types/Comments#createcomment) commentData, bytes appSignature, uint256 value) → bytes32 (internal)
+
+Internal function to handle comment posting with explicit value
+
+
+
+### postCommentWithSig([struct Comments.CreateComment](/protocol-reference/types/Comments#createcomment) commentData, bytes authorSignature, bytes appSignature) → bytes32 (external)
 
 Posts a comment with both author and app signer signatures
 
 
 
 
-### _postComment(bytes32 commentId, [struct Comments.CreateComment](/protocol-reference/libraries/Comments#createcomment) commentData) (internal)
+### _postCommentWithSig([struct Comments.CreateComment](/protocol-reference/types/Comments#createcomment) commentData, bytes authorSignature, bytes appSignature, uint256 value) → bytes32 (internal)
+
+Internal function to handle comment posting with signature and explicit value
+
+
+This function is used to post a comment with a signature and explicit value
+
+
+### _createComment(bytes32 commentId, [struct Comments.CreateComment](/protocol-reference/types/Comments#createcomment) commentData, [enum Comments.AuthorAuthMethod](/protocol-reference/types/Comments#authorauthmethod) authMethod, uint256 value) (internal)
 
 
 
 
 
-### editComment(bytes32 commentId, [struct Comments.EditComment](/protocol-reference/libraries/Comments#editcomment) editData, bytes appSignature) (external)
+### editComment(bytes32 commentId, [struct Comments.EditComment](/protocol-reference/types/Comments#editcomment) editData, bytes appSignature) (external)
 
 Edits a comment when called by the author directly
 
 
 
 
-### editCommentWithSig(bytes32 commentId, [struct Comments.EditComment](/protocol-reference/libraries/Comments#editcomment) editData, bytes authorSignature, bytes appSignature) (external)
+### _editCommentDirect(bytes32 commentId, [struct Comments.EditComment](/protocol-reference/types/Comments#editcomment) editData, bytes appSignature, uint256 value) (internal)
+
+Internal function to handle comment editing with explicit value
+
+
+This function is used to edit a comment with an explicit value
+
+
+### editCommentWithSig(bytes32 commentId, [struct Comments.EditComment](/protocol-reference/types/Comments#editcomment) editData, bytes authorSignature, bytes appSignature) (external)
 
 Edits a comment with both author and app signer signatures
 
 
 
 
-### _editComment(bytes32 commentId, [struct Comments.EditComment](/protocol-reference/libraries/Comments#editcomment) editData) (internal)
+### _editCommentWithSig(bytes32 commentId, [struct Comments.EditComment](/protocol-reference/types/Comments#editcomment) editData, bytes authorSignature, bytes appSignature, uint256 value) (internal)
+
+Internal function to handle comment editing with signature and explicit value
+
+
+This function is used to edit a comment with a signature and explicit value
+
+
+### _editComment(bytes32 commentId, [struct Comments.EditComment](/protocol-reference/types/Comments#editcomment) editData, [enum Comments.AuthorAuthMethod](/protocol-reference/types/Comments#authorauthmethod) authMethod, uint256 value) (internal)
 
 Internal function to handle comment editing logic
 
 
 
 
-### deleteComment(bytes32 commentId) (external)
+### deleteComment(bytes32 commentId) (public)
 
 Deletes a comment when called by the author directly
 
 
 
 
-### deleteCommentWithSig(bytes32 commentId, address app, uint256 deadline, bytes authorSignature, bytes appSignature) (external)
+### deleteCommentWithSig(bytes32 commentId, address app, uint256 deadline, bytes authorSignature, bytes appSignature) (public)
 
 Deletes a comment with author signature verification
 
@@ -130,42 +166,14 @@ Internal function to handle comment deletion logic
 
 
 
-### _getCommentMetadataInternal(bytes32 commentId) → [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) (internal)
-
-Internal function to get metadata for a comment
-
-
-
-
-### _getCommentHookMetadataInternal(bytes32 commentId) → [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) (internal)
-
-Internal function to get hook metadata for a comment
-
-
-
-
-### _clearCommentMetadata(bytes32 commentId) (internal)
-
-Internal function to clear all metadata for a comment
-
-
-
-
-### _clearCommentHookMetadata(bytes32 commentId) (internal)
-
-Internal function to clear all hook metadata for a comment
-
-
-
-
-### addApproval(address app) (external)
+### addApproval(address app, uint256 expiry) (external)
 
 Approves an app signer when called directly by the author
 
 
 
 
-### addApprovalWithSig(address author, address app, uint256 nonce, uint256 deadline, bytes authorSignature) (external)
+### addApprovalWithSig(address author, address app, uint256 expiry, uint256 nonce, uint256 deadline, bytes authorSignature) (external)
 
 Approves an app signer with signature verification
 
@@ -186,7 +194,7 @@ Removes an app signer approval with signature verification
 
 
 
-### getAddApprovalHash(address author, address app, uint256 nonce, uint256 deadline) → bytes32 (public)
+### getAddApprovalHash(address author, address app, uint256 expiry, uint256 nonce, uint256 deadline) → bytes32 (public)
 
 Calculates the EIP-712 hash for a permit
 
@@ -207,23 +215,16 @@ Calculates the EIP-712 hash for deleting a comment
 
 
 
-### getEditCommentHash(bytes32 commentId, address author, [struct Comments.EditComment](/protocol-reference/libraries/Comments#editcomment) editData) → bytes32 (public)
+### getEditCommentHash(bytes32 commentId, address author, [struct Comments.EditComment](/protocol-reference/types/Comments#editcomment) editData) → bytes32 (public)
 
 Calculates the EIP-712 hash for editing a comment
 
 
 
 
-### getCommentId([struct Comments.CreateComment](/protocol-reference/libraries/Comments#createcomment) commentData) → bytes32 (public)
+### getCommentId([struct Comments.CreateComment](/protocol-reference/types/Comments#createcomment) commentData) → bytes32 (public)
 
 Calculates the EIP-712 hash for a comment
-
-
-
-
-### _hashMetadataArray([struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata) → bytes32 (internal)
-
-Internal function to hash metadata array for EIP-712
 
 
 
@@ -235,21 +236,21 @@ Updates the channel manager contract address (only owner)
 
 
 
-### getComment(bytes32 commentId) → [struct Comments.Comment](/protocol-reference/libraries/Comments#comment) (external)
+### getComment(bytes32 commentId) → [struct Comments.Comment](/protocol-reference/types/Comments#comment) (external)
 
 Get a comment by its ID
 
 
 
 
-### getCommentMetadata(bytes32 commentId) → [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) (external)
+### getCommentMetadata(bytes32 commentId) → [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) (external)
 
 Get metadata for a comment
 
 
 
 
-### getCommentHookMetadata(bytes32 commentId) → [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) (external)
+### getCommentHookMetadata(bytes32 commentId) → [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) (external)
 
 Get hook metadata for a comment
 
@@ -291,6 +292,13 @@ Get the approval status for an author and app
 
 
 
+### getApprovalExpiry(address author, address app) → uint256 (external)
+
+Get the approval expiry timestamp for an author and app
+
+
+
+
 ### getNonce(address author, address app) → uint256 (external)
 
 Get the nonce for an author and app
@@ -313,44 +321,52 @@ Updates hook metadata for an existing comment using merge mode (gas-efficient). 
 Only updates provided metadata fields without clearing existing ones
 
 
-### _updateCommentHookData(bytes32 commentId) (internal)
+### batchOperations([struct Comments.BatchOperation[]](/protocol-reference/types/Comments#batchoperation) operations) → bytes[] results (external)
 
-Internal function to update hook metadata using merge mode for gas efficiency
-
-
-
-
-### _applyHookMetadataOperations(bytes32 commentId, [struct Metadata.MetadataEntryOp[]](/protocol-reference/libraries/Metadata#metadataentryop) operations) (internal)
-
-Internal function to apply hook metadata operations efficiently
+Executes multiple operations (post, edit, delete) in a single transaction preserving order
 
 
 
 
-### _deleteCommentHookMetadataKey(bytes32 commentId, bytes32 keyToDelete) (internal)
+### _executeBatchOperation([struct Comments.BatchOperation](/protocol-reference/types/Comments#batchoperation) operation, uint256 operationIndex) → bytes result (internal)
 
-Internal function to delete a specific hook metadata key
-
-
-
-
-### _hookMetadataKeyExists(bytes32 commentId, bytes32 targetKey) → bool exists (internal)
-
-Internal function to check if a hook metadata key exists
+Internal function to execute a single batch operation
 
 
 
 
-### _addApproval(address author, address app) (internal)
-
-Internal function to add an app signer approval
+### _executePostCommentBatch([struct Comments.BatchOperation](/protocol-reference/types/Comments#batchoperation) operation) → bytes (internal)
 
 
 
 
-### _revokeApproval(address author, address app) (internal)
 
-Internal function to remove an app signer approval
+### _executePostCommentWithSigBatch([struct Comments.BatchOperation](/protocol-reference/types/Comments#batchoperation) operation) → bytes (internal)
+
+
+
+
+
+### _executeEditCommentBatch([struct Comments.BatchOperation](/protocol-reference/types/Comments#batchoperation) operation) → bytes (internal)
+
+
+
+
+
+### _executeEditCommentWithSigBatch([struct Comments.BatchOperation](/protocol-reference/types/Comments#batchoperation) operation) → bytes (internal)
+
+
+
+
+
+### _executeDeleteCommentBatch([struct Comments.BatchOperation](/protocol-reference/types/Comments#batchoperation) operation) → bytes (internal)
+
+
+
+
+
+### _executeDeleteCommentWithSigBatch([struct Comments.BatchOperation](/protocol-reference/types/Comments#batchoperation) operation) → bytes (internal)
+
 
 
 

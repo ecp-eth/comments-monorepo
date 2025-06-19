@@ -2,10 +2,10 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "../libraries/Hooks.sol";
-import "../libraries/Comments.sol";
-import "../libraries/Channels.sol";
-import "../libraries/Metadata.sol";
+import "../types/Hooks.sol";
+import "../types/Comments.sol";
+import "../types/Channels.sol";
+import "../types/Metadata.sol";
 
 interface IHook is IERC165 {
   function getHookPermissions()

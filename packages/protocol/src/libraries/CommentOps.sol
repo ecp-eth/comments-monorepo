@@ -1,130 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import { Metadata } from "./Metadata.sol";
+import "../types/Metadata.sol";
+import "../types/Comments.sol";
+import "../types/Channels.sol";
 import "../interfaces/IHook.sol";
 import "../interfaces/IChannelManager.sol";
 import "../interfaces/ICommentManager.sol";
-import "../libraries/Channels.sol";
+import "./MetadataOps.sol";
 
-/// @title Comments - Library defining comment-related types and operations
-library Comments {
-  using Metadata for *;
-  /// @notice Comment type constants
-  /// @dev Type 0: Standard comment
-  /// @dev Type 1: Reaction (with reaction type in content field, e.g. "like", "dislike", "heart")
-  /// more types can be added in the future, please check the docs for more information.
-  uint8 public constant COMMENT_TYPE_COMMENT = 0;
-  uint8 public constant COMMENT_TYPE_REACTION = 1;
-
-  /// @notice Author Authentication method used to create the comment
-  /// @dev DIRECT_TX: User signed transaction directly (msg.sender == author).
-  /// @dev APP_APPROVAL: User has pre-approved the app that signed the comment (approvals[author][app] == true)
-  /// @dev AUTHOR_SIGNATURE: User signed the comment hash, the app submitted the comment on their behalf (gas-sponsored)
-  enum AuthorAuthMethod {
-    DIRECT_TX, // 0
-    APP_APPROVAL, // 1
-    AUTHOR_SIGNATURE // 2
-  }
-
-  /// @notice Struct containing all comment data
-  /// @param author The address of the comment author
-  /// @param createdAt The timestamp when the comment was created
-  /// @param app The address of the application signer that authorized this comment
-  /// @param updatedAt The timestamp when the comment was last updated
-  /// @param commentType The type of the comment (0=comment, 1=reaction)
-  /// @param authMethod The authentication method used to create this comment
-  /// @param channelId The channel ID associated with the comment
-  /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
-  /// @param content The text content of the comment - may contain urls, images and mentions
-  /// @param targetUri the URI about which the comment is being made
-  struct Comment {
-    // Pack these fields together (saves 1 storage slot)
-    address author; // 20 bytes   --┬-- 32 bytes
-    uint88 createdAt; // 11 bytes --┘
-    AuthorAuthMethod authMethod; // 1 byte --┘
-    address app; // 20 bytes      --┬-- 32 bytes
-    uint88 updatedAt; // 11 bytes --┘
-    uint8 commentType; // 1 byte --┘
-    // 32-byte types
-    uint256 channelId;
-    bytes32 parentId;
-    // Dynamic types last (conventional pattern)
-    string content;
-    string targetUri;
-  }
-
-  /// @notice Struct containing all comment data for creating a comment
-  /// @param author The address of the comment author
-  /// @param app The address of the application signer that authorized this comment
-  /// @param channelId The channel ID associated with the comment
-  /// @param deadline Timestamp after which the signatures for this comment become invalid
-  /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
-  /// @param content The actual text content of the comment. If the commentType is COMMENT_TYPE_REACTION, the content should be the reaction type, such as "like", "downvote", "repost" etc.
-  /// @param metadata Array of key-value pairs for additional data
-  /// @param targetUri the URI about which the comment is being made
-  /// @param commentType The type of the comment (0=comment, 1=reaction)
-  struct CreateComment {
-    address author;
-    address app;
-    uint256 channelId;
-    uint256 deadline;
-    bytes32 parentId;
-    uint8 commentType;
-    // Dynamic types last (conventional pattern)
-    string content;
-    Metadata.MetadataEntry[] metadata;
-    string targetUri;
-  }
-
-  /// @notice Struct containing all comment data for editing a comment
-  /// @param app The address of the application signer that authorized this comment
-  /// @param nonce The nonce for the comment
-  /// @param deadline Timestamp after which the signatures for this comment become invalid
-  /// @param content The actual text content of the comment
-  /// @param metadata Array of key-value pairs for additional data
-  struct EditComment {
-    address app;
-    uint256 nonce;
-    uint256 deadline;
-    string content;
-    Metadata.MetadataEntry[] metadata;
-  }
-
-  // Batch operation structures
-
-  /// @notice Enum for different operation types in batch calls
-  enum BatchOperationType {
-    POST_COMMENT, // 0
-    POST_COMMENT_WITH_SIG, // 1
-    EDIT_COMMENT, // 2
-    EDIT_COMMENT_WITH_SIG, // 3
-    DELETE_COMMENT, // 4
-    DELETE_COMMENT_WITH_SIG // 5
-  }
-
-  /// @notice Struct for batch delete operation data
-  /// @param commentId The unique identifier of the comment to delete
-  /// @param app The address of the app signer (only for deleteCommentWithSig)
-  /// @param deadline Timestamp after which the signature becomes invalid (only for deleteCommentWithSig)
-  struct BatchDeleteData {
-    bytes32 commentId;
-    address app;
-    uint256 deadline;
-  }
-
-  /// @notice Struct containing a single batch operation
-  /// @param operationType The type of operation to perform
-  /// @param value The amount of ETH to send with this operation
-  /// @param data Encoded operation-specific data
-  /// @param signatures Array of signatures required for this operation
-  struct BatchOperation {
-    BatchOperationType operationType;
-    uint256 value;
-    bytes data;
-    bytes[] signatures;
-  }
-
+/// @title CommentOps - Library for comment-related operations
+library CommentOps {
   /// @notice Create a new comment
   /// @param commentId The unique identifier for the comment
   /// @param commentData The comment creation data
@@ -140,12 +26,12 @@ library Comments {
   /// @param msgSender The sender of the transaction
   function createComment(
     bytes32 commentId,
-    CreateComment memory commentData,
-    AuthorAuthMethod authMethod,
+    Comments.CreateComment memory commentData,
+    Comments.AuthorAuthMethod authMethod,
     uint256 value,
     uint96 commentCreationFee,
     IChannelManager channelManager,
-    mapping(bytes32 => Comment) storage comments,
+    mapping(bytes32 => Comments.Comment) storage comments,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
     mapping(bytes32 => bytes32[]) storage commentMetadataKeys,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
@@ -164,7 +50,7 @@ library Comments {
     uint8 commentType = commentData.commentType;
     uint88 timestampNow = uint88(block.timestamp);
 
-    Comment storage comment = comments[commentId];
+    Comments.Comment storage comment = comments[commentId];
 
     comment.author = author;
     comment.app = app;
@@ -231,7 +117,7 @@ library Comments {
 
       // Store hook metadata
       if (hookMetadata.length > 0) {
-        Metadata.storeCommentHookMetadata(
+        MetadataOps.storeCommentHookMetadata(
           commentId,
           hookMetadata,
           commentHookMetadata,
@@ -259,18 +145,18 @@ library Comments {
   /// @param msgSender The sender of the transaction
   function editComment(
     bytes32 commentId,
-    EditComment memory editData,
-    AuthorAuthMethod authMethod,
+    Comments.EditComment memory editData,
+    Comments.AuthorAuthMethod authMethod,
     uint256 value,
     IChannelManager channelManager,
-    mapping(bytes32 => Comment) storage comments,
+    mapping(bytes32 => Comments.Comment) storage comments,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
     mapping(bytes32 => bytes32[]) storage commentMetadataKeys,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
     mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys,
     address msgSender
   ) external {
-    Comment storage comment = comments[commentId];
+    Comments.Comment storage comment = comments[commentId];
 
     string memory content = editData.content;
     Metadata.MetadataEntry[] memory metadata = editData.metadata;
@@ -281,7 +167,7 @@ library Comments {
     comment.authMethod = authMethod;
 
     // Clear existing metadata
-    Metadata.clearCommentMetadata(
+    MetadataOps.clearCommentMetadata(
       commentId,
       commentMetadata,
       commentMetadataKeys
@@ -337,7 +223,7 @@ library Comments {
       }(comment, metadata, msgSender, commentId);
 
       // Clear existing hook metadata
-      Metadata.clearCommentHookMetadata(
+      MetadataOps.clearCommentHookMetadata(
         commentId,
         commentHookMetadata,
         commentHookMetadataKeys
@@ -380,7 +266,7 @@ library Comments {
     bytes32 commentId,
     address author,
     IChannelManager channelManager,
-    mapping(bytes32 => Comment) storage comments,
+    mapping(bytes32 => Comments.Comment) storage comments,
     mapping(bytes32 => bool) storage deleted,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
     mapping(bytes32 => bytes32[]) storage commentMetadataKeys,
@@ -389,18 +275,18 @@ library Comments {
     address msgSender,
     uint256 msgValue
   ) external {
-    Comment storage comment = comments[commentId];
+    Comments.Comment storage comment = comments[commentId];
 
     // Store comment data for hook
-    Comment memory commentToDelete = comment;
+    Comments.Comment memory commentToDelete = comment;
 
     // Get metadata for hook
-    Metadata.MetadataEntry[] memory metadata = Metadata.getCommentMetadata(
+    Metadata.MetadataEntry[] memory metadata = MetadataOps.getCommentMetadata(
       commentId,
       commentMetadata,
       commentMetadataKeys
     );
-    Metadata.MetadataEntry[] memory hookMetadata = Metadata
+    Metadata.MetadataEntry[] memory hookMetadata = MetadataOps
       .getCommentHookMetadata(
         commentId,
         commentHookMetadata,
@@ -410,12 +296,12 @@ library Comments {
     // Delete the comment and metadata
     delete comments[commentId];
     deleted[commentId] = true;
-    Metadata.clearCommentMetadata(
+    MetadataOps.clearCommentMetadata(
       commentId,
       commentMetadata,
       commentMetadataKeys
     );
-    Metadata.clearCommentHookMetadata(
+    MetadataOps.clearCommentHookMetadata(
       commentId,
       commentHookMetadata,
       commentHookMetadataKeys
@@ -456,14 +342,14 @@ library Comments {
   function updateCommentHookData(
     bytes32 commentId,
     IChannelManager channelManager,
-    mapping(bytes32 => Comment) storage comments,
+    mapping(bytes32 => Comments.Comment) storage comments,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
     mapping(bytes32 => bytes32[]) storage commentMetadataKeys,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
     mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys,
     address msgSender
   ) external {
-    Comment storage comment = comments[commentId];
+    Comments.Comment storage comment = comments[commentId];
 
     Channels.Channel memory channel = channelManager.getChannel(
       comment.channelId
@@ -475,12 +361,12 @@ library Comments {
     }
 
     // Get current metadata for hook
-    Metadata.MetadataEntry[] memory metadata = Metadata.getCommentMetadata(
+    Metadata.MetadataEntry[] memory metadata = MetadataOps.getCommentMetadata(
       commentId,
       commentMetadata,
       commentMetadataKeys
     );
-    Metadata.MetadataEntry[] memory hookMetadata = Metadata
+    Metadata.MetadataEntry[] memory hookMetadata = MetadataOps
       .getCommentHookMetadata(
         commentId,
         commentHookMetadata,
@@ -502,7 +388,7 @@ library Comments {
       Metadata.MetadataEntryOp memory op = operations[i];
 
       if (op.operation == Metadata.MetadataOperation.DELETE) {
-        Metadata.deleteCommentHookMetadataKey(
+        MetadataOps.deleteCommentHookMetadataKey(
           commentId,
           op.key,
           commentHookMetadata,
@@ -511,7 +397,7 @@ library Comments {
         emit ICommentManager.CommentHookMetadataSet(commentId, op.key, "");
       } else if (op.operation == Metadata.MetadataOperation.SET) {
         // Check if this is a new key for gas optimization
-        bool isNewKey = !Metadata.hookMetadataKeyExists(
+        bool isNewKey = !MetadataOps.hookMetadataKeyExists(
           commentId,
           op.key,
           commentHookMetadataKeys

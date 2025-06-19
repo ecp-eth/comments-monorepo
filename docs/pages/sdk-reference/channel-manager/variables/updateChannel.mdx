@@ -61,6 +61,12 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   stateMutability: "view";
   type: "function";
 }, {
+  inputs: readonly [];
+  name: "cancelOwnershipHandover";
+  outputs: readonly [];
+  stateMutability: "payable";
+  type: "function";
+}, {
   inputs: readonly [{
      internalType: "uint256";
      name: "channelId";
@@ -118,6 +124,16 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      name: "";
      type: "uint96";
   }];
+  stateMutability: "payable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "pendingOwner";
+     type: "address";
+  }];
+  name: "completeOwnershipHandover";
+  outputs: readonly [];
   stateMutability: "payable";
   type: "function";
 }, {
@@ -370,7 +386,7 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   name: "owner";
   outputs: readonly [{
      internalType: "address";
-     name: "";
+     name: "result";
      type: "address";
   }];
   stateMutability: "view";
@@ -390,10 +406,30 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   stateMutability: "view";
   type: "function";
 }, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "pendingOwner";
+     type: "address";
+  }];
+  name: "ownershipHandoverExpiresAt";
+  outputs: readonly [{
+     internalType: "uint256";
+     name: "result";
+     type: "uint256";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
   inputs: readonly [];
   name: "renounceOwnership";
   outputs: readonly [];
-  stateMutability: "nonpayable";
+  stateMutability: "payable";
+  type: "function";
+}, {
+  inputs: readonly [];
+  name: "requestOwnershipHandover";
+  outputs: readonly [];
+  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -636,7 +672,7 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   }];
   name: "transferOwnership";
   outputs: readonly [];
-  stateMutability: "nonpayable";
+  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -921,7 +957,27 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   inputs: readonly [{
      indexed: true;
      internalType: "address";
-     name: "previousOwner";
+     name: "pendingOwner";
+     type: "address";
+  }];
+  name: "OwnershipHandoverCanceled";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "address";
+     name: "pendingOwner";
+     type: "address";
+  }];
+  name: "OwnershipHandoverRequested";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "address";
+     name: "oldOwner";
      type: "address";
    }, {
      indexed: true;
@@ -951,6 +1007,10 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   }];
   name: "Transfer";
   type: "event";
+}, {
+  inputs: readonly [];
+  name: "AlreadyInitialized";
+  type: "error";
 }, {
   inputs: readonly [];
   name: "ChannelAlreadyExists";
@@ -1068,24 +1128,20 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   name: "InvalidHookInterface";
   type: "error";
 }, {
-  inputs: readonly [{
-     internalType: "address";
-     name: "owner";
-     type: "address";
-  }];
-  name: "OwnableInvalidOwner";
-  type: "error";
-}, {
-  inputs: readonly [{
-     internalType: "address";
-     name: "account";
-     type: "address";
-  }];
-  name: "OwnableUnauthorizedAccount";
+  inputs: readonly [];
+  name: "NewOwnerIsZeroAddress";
   type: "error";
 }, {
   inputs: readonly [];
-  name: "ReentrancyGuardReentrantCall";
+  name: "NoHandoverRequest";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "Reentrancy";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "Unauthorized";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1164,6 +1220,12 @@ Update a channel
   `stateMutability`: `"view"`;
   `type`: `"function"`;
 \}, \{
+  `inputs`: readonly \[\];
+  `name`: `"cancelOwnershipHandover"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
   `inputs`: readonly \[\{
      `internalType`: `"uint256"`;
      `name`: `"channelId"`;
@@ -1221,6 +1283,16 @@ Update a channel
      `name`: `""`;
      `type`: `"uint96"`;
   \}\];
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"pendingOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"completeOwnershipHandover"`;
+  `outputs`: readonly \[\];
   `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
@@ -1473,7 +1545,7 @@ Update a channel
   `name`: `"owner"`;
   `outputs`: readonly \[\{
      `internalType`: `"address"`;
-     `name`: `""`;
+     `name`: `"result"`;
      `type`: `"address"`;
   \}\];
   `stateMutability`: `"view"`;
@@ -1493,10 +1565,30 @@ Update a channel
   `stateMutability`: `"view"`;
   `type`: `"function"`;
 \}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"pendingOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ownershipHandoverExpiresAt"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"result"`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
   `inputs`: readonly \[\];
   `name`: `"renounceOwnership"`;
   `outputs`: readonly \[\];
-  `stateMutability`: `"nonpayable"`;
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"requestOwnershipHandover"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -1739,7 +1831,7 @@ Update a channel
   \}\];
   `name`: `"transferOwnership"`;
   `outputs`: readonly \[\];
-  `stateMutability`: `"nonpayable"`;
+  `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -2024,7 +2116,27 @@ Update a channel
   `inputs`: readonly \[\{
      `indexed`: `true`;
      `internalType`: `"address"`;
-     `name`: `"previousOwner"`;
+     `name`: `"pendingOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"OwnershipHandoverCanceled"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"pendingOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"OwnershipHandoverRequested"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"oldOwner"`;
      `type`: `"address"`;
    \}, \{
      `indexed`: `true`;
@@ -2054,6 +2166,10 @@ Update a channel
   \}\];
   `name`: `"Transfer"`;
   `type`: `"event"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"AlreadyInitialized"`;
+  `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
   `name`: `"ChannelAlreadyExists"`;
@@ -2171,24 +2287,20 @@ Update a channel
   `name`: `"InvalidHookInterface"`;
   `type`: `"error"`;
 \}, \{
-  `inputs`: readonly \[\{
-     `internalType`: `"address"`;
-     `name`: `"owner"`;
-     `type`: `"address"`;
-  \}\];
-  `name`: `"OwnableInvalidOwner"`;
-  `type`: `"error"`;
-\}, \{
-  `inputs`: readonly \[\{
-     `internalType`: `"address"`;
-     `name`: `"account"`;
-     `type`: `"address"`;
-  \}\];
-  `name`: `"OwnableUnauthorizedAccount"`;
+  `inputs`: readonly \[\];
+  `name`: `"NewOwnerIsZeroAddress"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
-  `name`: `"ReentrancyGuardReentrantCall"`;
+  `name`: `"NoHandoverRequest"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"Reentrancy"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"Unauthorized"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];

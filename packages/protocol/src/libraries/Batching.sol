@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "./Comments.sol";
-import "./Metadata.sol";
+import "../types/Comments.sol";
+import "../types/Metadata.sol";
 import "../interfaces/ICommentManager.sol";
 
 /// @title Batching - Library for handling batch comment operations

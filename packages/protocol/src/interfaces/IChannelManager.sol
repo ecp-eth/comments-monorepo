@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
+import "../types/Channels.sol";
+import "../types/Metadata.sol";
 import "./IHook.sol";
 import "./IProtocolFees.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
-import "../libraries/Comments.sol";
-import "../libraries/Channels.sol";
 
 /// @title IChannelManager - Interface for managing comment channels and their hooks
 /// @notice This interface defines the core functionality for managing channels and their associated hooks

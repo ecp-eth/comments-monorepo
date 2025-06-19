@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "solady/utils/SignatureCheckerLib.sol";
-import "./Comments.sol";
-import "./Metadata.sol";
+import "solady/src/utils/SignatureCheckerLib.sol";
+import "../types/Comments.sol";
+import "../types/Metadata.sol";
 
 /// @title CommentSigning - Library for comment signing operations
 /// @notice Handles EIP-712 signing, hash generation, and signature verification for comments
@@ -80,7 +80,7 @@ library CommentSigning {
   /// @notice Generate comment ID hash
   /// @param commentData The comment data to hash
   /// @param domainSeparator The EIP-712 domain separator
-  /// @return The comment ID hash
+  /// @return The c∑omment ID hash
   function getCommentId(
     Comments.CreateComment memory commentData,
     bytes32 domainSeparator

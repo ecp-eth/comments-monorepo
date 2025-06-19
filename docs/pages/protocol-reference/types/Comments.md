@@ -22,7 +22,11 @@ Struct containing all comment data
 
 
 
-- **createdAt:** (uint96) The timestamp when the comment was created
+- **createdAt:** (uint88) The timestamp when the comment was created
+
+
+
+- **authMethod:** (enum Comments.AuthorAuthMethod) The authentication method used to create this comment
 
 
 
@@ -123,11 +127,87 @@ Struct containing all comment data for editing a comment
 - **metadata:** (struct Metadata.MetadataEntry[]) Array of key-value pairs for additional data
 
 
+### `BatchDeleteData`
+
+Struct for batch delete operation data
+
+
+
+
+
+- **commentId:** (bytes32) The unique identifier of the comment to delete
+
+
+
+- **app:** (address) The address of the app signer (only for deleteCommentWithSig)
+
+
+
+- **deadline:** (uint256) Timestamp after which the signature becomes invalid (only for deleteCommentWithSig)
+
+
+### `BatchOperation`
+
+Struct containing a single batch operation
+
+
+
+
+
+- **operationType:** (enum Comments.BatchOperationType) The type of operation to perform
+
+
+
+- **value:** (uint256) The amount of ETH to send with this operation
+
+
+
+- **data:** (bytes) Encoded operation-specific data
+
+
+
+- **signatures:** (bytes[]) Array of signatures required for this operation
 
 
 
 
 
 
+
+
+
+## Enums
+
+### `AuthorAuthMethod`
+
+
+DIRECT_TX
+
+
+APP_APPROVAL
+
+
+AUTHOR_SIGNATURE
+
+
+### `BatchOperationType`
+
+
+POST_COMMENT
+
+
+POST_COMMENT_WITH_SIG
+
+
+EDIT_COMMENT
+
+
+EDIT_COMMENT_WITH_SIG
+
+
+DELETE_COMMENT
+
+
+DELETE_COMMENT_WITH_SIG
 
 

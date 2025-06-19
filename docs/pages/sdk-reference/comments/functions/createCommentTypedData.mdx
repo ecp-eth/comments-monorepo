@@ -10,7 +10,7 @@
 function createCommentTypedData(params): {
   domain: {
      chainId: number;
-     name: "Comments";
+     name: "ECP";
      verifyingContract: `0x${string}`;
      version: "1";
   };
@@ -94,7 +94,7 @@ function createCommentTypedData(params): {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:528](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L528)
+Defined in: [packages/sdk/src/comments/comment.ts:531](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L531)
 
 Create the EIP-712 typed data structure for adding comment
 
@@ -110,7 +110,7 @@ Create the EIP-712 typed data structure for adding comment
 {
   domain: {
      chainId: number;
-     name: "Comments";
+     name: "ECP";
      verifyingContract: `0x${string}`;
      version: "1";
   };
@@ -201,7 +201,7 @@ The typed data
 ```ts
 domain: {
   chainId: number;
-  name: "Comments";
+  name: "ECP";
   verifyingContract: `0x${string}`;
   version: "1";
 };
@@ -216,7 +216,7 @@ chainId: number;
 #### domain.name
 
 ```ts
-name: "Comments";
+name: "ECP";
 ```
 
 #### domain.verifyingContract

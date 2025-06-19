@@ -29,7 +29,7 @@ Implements fee management with the following features:
 
 ### constructor(address initialOwner) (internal)
 
-Constructor sets the contract owner and initializes fees
+Constructor sets the initial owner
 
 
 

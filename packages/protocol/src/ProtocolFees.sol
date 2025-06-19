@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "solady/auth/Ownable.sol";
-import "solady/utils/ReentrancyGuard.sol";
+import "solady/src/auth/Ownable.sol";
+import "solady/src/utils/ReentrancyGuard.sol";
 import "./interfaces/IProtocolFees.sol";
 import "./interfaces/IChannelManager.sol";
 

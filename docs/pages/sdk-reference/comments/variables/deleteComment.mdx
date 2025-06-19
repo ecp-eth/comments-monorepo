@@ -17,57 +17,7 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "constructor";
 }, {
   inputs: readonly [];
-  name: "ADD_APPROVAL_TYPEHASH";
-  outputs: readonly [{
-     internalType: "bytes32";
-     name: "";
-     type: "bytes32";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [];
-  name: "ADD_COMMENT_TYPEHASH";
-  outputs: readonly [{
-     internalType: "bytes32";
-     name: "";
-     type: "bytes32";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [];
-  name: "DELETE_COMMENT_TYPEHASH";
-  outputs: readonly [{
-     internalType: "bytes32";
-     name: "";
-     type: "bytes32";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [];
   name: "DOMAIN_SEPARATOR";
-  outputs: readonly [{
-     internalType: "bytes32";
-     name: "";
-     type: "bytes32";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [];
-  name: "EDIT_COMMENT_TYPEHASH";
-  outputs: readonly [{
-     internalType: "bytes32";
-     name: "";
-     type: "bytes32";
-  }];
-  stateMutability: "view";
-  type: "function";
-}, {
-  inputs: readonly [];
-  name: "REMOVE_APPROVAL_TYPEHASH";
   outputs: readonly [{
      internalType: "bytes32";
      name: "";
@@ -80,6 +30,10 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      internalType: "address";
      name: "app";
      type: "address";
+   }, {
+     internalType: "uint256";
+     name: "expiry";
+     type: "uint256";
   }];
   name: "addApproval";
   outputs: readonly [];
@@ -96,6 +50,10 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "address";
    }, {
      internalType: "uint256";
+     name: "expiry";
+     type: "uint256";
+   }, {
+     internalType: "uint256";
      name: "nonce";
      type: "uint256";
    }, {
@@ -110,6 +68,43 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   name: "addApprovalWithSig";
   outputs: readonly [];
   stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     components: readonly [{
+        internalType: "enum Comments.BatchOperationType";
+        name: "operationType";
+        type: "uint8";
+      }, {
+        internalType: "uint256";
+        name: "value";
+        type: "uint256";
+      }, {
+        internalType: "bytes";
+        name: "data";
+        type: "bytes";
+      }, {
+        internalType: "bytes[]";
+        name: "signatures";
+        type: "bytes[]";
+     }];
+     internalType: "struct Comments.BatchOperation[]";
+     name: "operations";
+     type: "tuple[]";
+  }];
+  name: "batchOperations";
+  outputs: readonly [{
+     internalType: "bytes[]";
+     name: "results";
+     type: "bytes[]";
+  }];
+  stateMutability: "payable";
+  type: "function";
+}, {
+  inputs: readonly [];
+  name: "cancelOwnershipHandover";
+  outputs: readonly [];
+  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [];
@@ -192,6 +187,16 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "bytes32";
   }];
   stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "pendingOwner";
+     type: "address";
+  }];
+  name: "completeOwnershipHandover";
+  outputs: readonly [];
+  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -340,6 +345,10 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "address";
    }, {
      internalType: "uint256";
+     name: "expiry";
+     type: "uint256";
+   }, {
+     internalType: "uint256";
      name: "nonce";
      type: "uint256";
    }, {
@@ -357,6 +366,24 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "function";
 }, {
   inputs: readonly [{
+     internalType: "address";
+     name: "author";
+     type: "address";
+   }, {
+     internalType: "address";
+     name: "app";
+     type: "address";
+  }];
+  name: "getApprovalExpiry";
+  outputs: readonly [{
+     internalType: "uint256";
+     name: "";
+     type: "uint256";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
      internalType: "bytes32";
      name: "commentId";
      type: "bytes32";
@@ -368,9 +395,13 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
         name: "author";
         type: "address";
       }, {
-        internalType: "uint96";
+        internalType: "uint88";
         name: "createdAt";
-        type: "uint96";
+        type: "uint88";
+      }, {
+        internalType: "enum Comments.AuthorAuthMethod";
+        name: "authMethod";
+        type: "uint8";
       }, {
         internalType: "address";
         name: "app";
@@ -745,18 +776,22 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   name: "owner";
   outputs: readonly [{
      internalType: "address";
-     name: "";
+     name: "result";
      type: "address";
   }];
   stateMutability: "view";
   type: "function";
 }, {
-  inputs: readonly [];
-  name: "paused";
+  inputs: readonly [{
+     internalType: "address";
+     name: "pendingOwner";
+     type: "address";
+  }];
+  name: "ownershipHandoverExpiresAt";
   outputs: readonly [{
-     internalType: "bool";
-     name: "";
-     type: "bool";
+     internalType: "uint256";
+     name: "result";
+     type: "uint256";
   }];
   stateMutability: "view";
   type: "function";
@@ -922,7 +957,13 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   inputs: readonly [];
   name: "renounceOwnership";
   outputs: readonly [];
-  stateMutability: "nonpayable";
+  stateMutability: "payable";
+  type: "function";
+}, {
+  inputs: readonly [];
+  name: "requestOwnershipHandover";
+  outputs: readonly [];
+  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -942,7 +983,7 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   }];
   name: "transferOwnership";
   outputs: readonly [];
-  stateMutability: "nonpayable";
+  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -986,6 +1027,11 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      internalType: "address";
      name: "app";
      type: "address";
+   }, {
+     indexed: false;
+     internalType: "uint256";
+     name: "expiry";
+     type: "uint256";
   }];
   name: "ApprovalAdded";
   type: "event";
@@ -1003,6 +1049,26 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "address";
   }];
   name: "ApprovalRemoved";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "address";
+     name: "sender";
+     type: "address";
+   }, {
+     indexed: false;
+     internalType: "uint256";
+     name: "operationsCount";
+     type: "uint256";
+   }, {
+     indexed: false;
+     internalType: "uint256";
+     name: "totalValue";
+     type: "uint256";
+  }];
+  name: "BatchOperationExecuted";
   type: "event";
 }, {
   anonymous: false;
@@ -1052,6 +1118,11 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      name: "commentType";
      type: "uint8";
    }, {
+     indexed: false;
+     internalType: "uint8";
+     name: "authMethod";
+     type: "uint8";
+   }, {
      components: readonly [{
         internalType: "bytes32";
         name: "key";
@@ -1093,17 +1164,12 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
    }, {
      indexed: true;
      internalType: "address";
-     name: "editedByApp";
+     name: "author";
      type: "address";
    }, {
      indexed: true;
      internalType: "address";
-     name: "author";
-     type: "address";
-   }, {
-     indexed: false;
-     internalType: "address";
-     name: "app";
+     name: "editedByApp";
      type: "address";
    }, {
      indexed: false;
@@ -1139,6 +1205,11 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
      indexed: false;
      internalType: "uint8";
      name: "commentType";
+     type: "uint8";
+   }, {
+     indexed: false;
+     internalType: "uint8";
+     name: "authMethod";
      type: "uint8";
    }, {
      components: readonly [{
@@ -1202,7 +1273,27 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   inputs: readonly [{
      indexed: true;
      internalType: "address";
-     name: "previousOwner";
+     name: "pendingOwner";
+     type: "address";
+  }];
+  name: "OwnershipHandoverCanceled";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "address";
+     name: "pendingOwner";
+     type: "address";
+  }];
+  name: "OwnershipHandoverRequested";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "address";
+     name: "oldOwner";
      type: "address";
    }, {
      indexed: true;
@@ -1213,25 +1304,21 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   name: "OwnershipTransferred";
   type: "event";
 }, {
-  anonymous: false;
-  inputs: readonly [{
-     indexed: false;
-     internalType: "address";
-     name: "account";
-     type: "address";
-  }];
-  name: "Paused";
-  type: "event";
+  inputs: readonly [];
+  name: "AlreadyInitialized";
+  type: "error";
 }, {
-  anonymous: false;
   inputs: readonly [{
-     indexed: false;
-     internalType: "address";
-     name: "account";
-     type: "address";
+     internalType: "uint256";
+     name: "operationIndex";
+     type: "uint256";
+   }, {
+     internalType: "bytes";
+     name: "reason";
+     type: "bytes";
   }];
-  name: "Unpaused";
-  type: "event";
+  name: "BatchOperationFailed";
+  type: "error";
 }, {
   inputs: readonly [];
   name: "ChannelDoesNotExist";
@@ -1239,14 +1326,6 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
 }, {
   inputs: readonly [];
   name: "CommentDoesNotExist";
-  type: "error";
-}, {
-  inputs: readonly [];
-  name: "EnforcedPause";
-  type: "error";
-}, {
-  inputs: readonly [];
-  name: "ExpectedPause";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1258,7 +1337,23 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "error";
 }, {
   inputs: readonly [];
+  name: "InvalidApprovalExpiry";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "InvalidAuthorSignature";
+  type: "error";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
+     name: "operationIndex";
+     type: "uint256";
+   }, {
+     internalType: "string";
+     name: "reason";
+     type: "string";
+  }];
+  name: "InvalidBatchOperation";
   type: "error";
 }, {
   inputs: readonly [{
@@ -1289,12 +1384,40 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   name: "InvalidNonce";
   type: "error";
 }, {
+  inputs: readonly [{
+     internalType: "string";
+     name: "reason";
+     type: "string";
+  }];
+  name: "InvalidReactionReference";
+  type: "error";
+}, {
   inputs: readonly [];
   name: "InvalidSignatureLength";
   type: "error";
 }, {
   inputs: readonly [];
   name: "InvalidSignatureS";
+  type: "error";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
+     name: "providedValue";
+     type: "uint256";
+   }, {
+     internalType: "uint256";
+     name: "requiredValue";
+     type: "uint256";
+  }];
+  name: "InvalidValueDistribution";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "NewOwnerIsZeroAddress";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "NoHandoverRequest";
   type: "error";
 }, {
   inputs: readonly [{
@@ -1309,22 +1432,6 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   name: "NotAuthorized";
   type: "error";
 }, {
-  inputs: readonly [{
-     internalType: "address";
-     name: "owner";
-     type: "address";
-  }];
-  name: "OwnableInvalidOwner";
-  type: "error";
-}, {
-  inputs: readonly [{
-     internalType: "address";
-     name: "account";
-     type: "address";
-  }];
-  name: "OwnableUnauthorizedAccount";
-  type: "error";
-}, {
   inputs: readonly [];
   name: "ParentCommentHasNeverExisted";
   type: "error";
@@ -1334,7 +1441,7 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "error";
 }, {
   inputs: readonly [];
-  name: "ReentrancyGuardReentrantCall";
+  name: "Reentrancy";
   type: "error";
 }, {
   inputs: readonly [{
@@ -1350,12 +1457,16 @@ const deleteComment: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "error";
 }, {
   inputs: readonly [];
+  name: "Unauthorized";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "ZeroAddress";
   type: "error";
 }], "CommentDeleted">>;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:298](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L298)
+Defined in: [packages/sdk/src/comments/comment.ts:301](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L301)
 
 Delete a comment as an author
 
@@ -1377,57 +1488,7 @@ Delete a comment as an author
   `type`: `"constructor"`;
 \}, \{
   `inputs`: readonly \[\];
-  `name`: `"ADD_APPROVAL_TYPEHASH"`;
-  `outputs`: readonly \[\{
-     `internalType`: `"bytes32"`;
-     `name`: `""`;
-     `type`: `"bytes32"`;
-  \}\];
-  `stateMutability`: `"view"`;
-  `type`: `"function"`;
-\}, \{
-  `inputs`: readonly \[\];
-  `name`: `"ADD_COMMENT_TYPEHASH"`;
-  `outputs`: readonly \[\{
-     `internalType`: `"bytes32"`;
-     `name`: `""`;
-     `type`: `"bytes32"`;
-  \}\];
-  `stateMutability`: `"view"`;
-  `type`: `"function"`;
-\}, \{
-  `inputs`: readonly \[\];
-  `name`: `"DELETE_COMMENT_TYPEHASH"`;
-  `outputs`: readonly \[\{
-     `internalType`: `"bytes32"`;
-     `name`: `""`;
-     `type`: `"bytes32"`;
-  \}\];
-  `stateMutability`: `"view"`;
-  `type`: `"function"`;
-\}, \{
-  `inputs`: readonly \[\];
   `name`: `"DOMAIN_SEPARATOR"`;
-  `outputs`: readonly \[\{
-     `internalType`: `"bytes32"`;
-     `name`: `""`;
-     `type`: `"bytes32"`;
-  \}\];
-  `stateMutability`: `"view"`;
-  `type`: `"function"`;
-\}, \{
-  `inputs`: readonly \[\];
-  `name`: `"EDIT_COMMENT_TYPEHASH"`;
-  `outputs`: readonly \[\{
-     `internalType`: `"bytes32"`;
-     `name`: `""`;
-     `type`: `"bytes32"`;
-  \}\];
-  `stateMutability`: `"view"`;
-  `type`: `"function"`;
-\}, \{
-  `inputs`: readonly \[\];
-  `name`: `"REMOVE_APPROVAL_TYPEHASH"`;
   `outputs`: readonly \[\{
      `internalType`: `"bytes32"`;
      `name`: `""`;
@@ -1440,6 +1501,10 @@ Delete a comment as an author
      `internalType`: `"address"`;
      `name`: `"app"`;
      `type`: `"address"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"expiry"`;
+     `type`: `"uint256"`;
   \}\];
   `name`: `"addApproval"`;
   `outputs`: readonly \[\];
@@ -1456,6 +1521,10 @@ Delete a comment as an author
      `type`: `"address"`;
    \}, \{
      `internalType`: `"uint256"`;
+     `name`: `"expiry"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
      `name`: `"nonce"`;
      `type`: `"uint256"`;
    \}, \{
@@ -1470,6 +1539,43 @@ Delete a comment as an author
   `name`: `"addApprovalWithSig"`;
   `outputs`: readonly \[\];
   `stateMutability`: `"nonpayable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `components`: readonly \[\{
+        `internalType`: `"enum Comments.BatchOperationType"`;
+        `name`: `"operationType"`;
+        `type`: `"uint8"`;
+      \}, \{
+        `internalType`: `"uint256"`;
+        `name`: `"value"`;
+        `type`: `"uint256"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"data"`;
+        `type`: `"bytes"`;
+      \}, \{
+        `internalType`: `"bytes[]"`;
+        `name`: `"signatures"`;
+        `type`: `"bytes[]"`;
+     \}\];
+     `internalType`: `"struct Comments.BatchOperation[]"`;
+     `name`: `"operations"`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `name`: `"batchOperations"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"bytes[]"`;
+     `name`: `"results"`;
+     `type`: `"bytes[]"`;
+  \}\];
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"cancelOwnershipHandover"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\];
@@ -1552,6 +1658,16 @@ Delete a comment as an author
      `type`: `"bytes32"`;
   \}\];
   `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"pendingOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"completeOwnershipHandover"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -1700,6 +1816,10 @@ Delete a comment as an author
      `type`: `"address"`;
    \}, \{
      `internalType`: `"uint256"`;
+     `name`: `"expiry"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
      `name`: `"nonce"`;
      `type`: `"uint256"`;
    \}, \{
@@ -1717,6 +1837,24 @@ Delete a comment as an author
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"author"`;
+     `type`: `"address"`;
+   \}, \{
+     `internalType`: `"address"`;
+     `name`: `"app"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"getApprovalExpiry"`;
+  `outputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `""`;
+     `type`: `"uint256"`;
+  \}\];
+  `stateMutability`: `"view"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\{
      `internalType`: `"bytes32"`;
      `name`: `"commentId"`;
      `type`: `"bytes32"`;
@@ -1728,9 +1866,13 @@ Delete a comment as an author
         `name`: `"author"`;
         `type`: `"address"`;
       \}, \{
-        `internalType`: `"uint96"`;
+        `internalType`: `"uint88"`;
         `name`: `"createdAt"`;
-        `type`: `"uint96"`;
+        `type`: `"uint88"`;
+      \}, \{
+        `internalType`: `"enum Comments.AuthorAuthMethod"`;
+        `name`: `"authMethod"`;
+        `type`: `"uint8"`;
       \}, \{
         `internalType`: `"address"`;
         `name`: `"app"`;
@@ -2105,18 +2247,22 @@ Delete a comment as an author
   `name`: `"owner"`;
   `outputs`: readonly \[\{
      `internalType`: `"address"`;
-     `name`: `""`;
+     `name`: `"result"`;
      `type`: `"address"`;
   \}\];
   `stateMutability`: `"view"`;
   `type`: `"function"`;
 \}, \{
-  `inputs`: readonly \[\];
-  `name`: `"paused"`;
+  `inputs`: readonly \[\{
+     `internalType`: `"address"`;
+     `name`: `"pendingOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ownershipHandoverExpiresAt"`;
   `outputs`: readonly \[\{
-     `internalType`: `"bool"`;
-     `name`: `""`;
-     `type`: `"bool"`;
+     `internalType`: `"uint256"`;
+     `name`: `"result"`;
+     `type`: `"uint256"`;
   \}\];
   `stateMutability`: `"view"`;
   `type`: `"function"`;
@@ -2282,7 +2428,13 @@ Delete a comment as an author
   `inputs`: readonly \[\];
   `name`: `"renounceOwnership"`;
   `outputs`: readonly \[\];
-  `stateMutability`: `"nonpayable"`;
+  `stateMutability`: `"payable"`;
+  `type`: `"function"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"requestOwnershipHandover"`;
+  `outputs`: readonly \[\];
+  `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -2302,7 +2454,7 @@ Delete a comment as an author
   \}\];
   `name`: `"transferOwnership"`;
   `outputs`: readonly \[\];
-  `stateMutability`: `"nonpayable"`;
+  `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -2346,6 +2498,11 @@ Delete a comment as an author
      `internalType`: `"address"`;
      `name`: `"app"`;
      `type`: `"address"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint256"`;
+     `name`: `"expiry"`;
+     `type`: `"uint256"`;
   \}\];
   `name`: `"ApprovalAdded"`;
   `type`: `"event"`;
@@ -2363,6 +2520,26 @@ Delete a comment as an author
      `type`: `"address"`;
   \}\];
   `name`: `"ApprovalRemoved"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"sender"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint256"`;
+     `name`: `"operationsCount"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint256"`;
+     `name`: `"totalValue"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"BatchOperationExecuted"`;
   `type`: `"event"`;
 \}, \{
   `anonymous`: `false`;
@@ -2412,6 +2589,11 @@ Delete a comment as an author
      `name`: `"commentType"`;
      `type`: `"uint8"`;
    \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint8"`;
+     `name`: `"authMethod"`;
+     `type`: `"uint8"`;
+   \}, \{
      `components`: readonly \[\{
         `internalType`: `"bytes32"`;
         `name`: `"key"`;
@@ -2453,17 +2635,12 @@ Delete a comment as an author
    \}, \{
      `indexed`: `true`;
      `internalType`: `"address"`;
-     `name`: `"editedByApp"`;
+     `name`: `"author"`;
      `type`: `"address"`;
    \}, \{
      `indexed`: `true`;
      `internalType`: `"address"`;
-     `name`: `"author"`;
-     `type`: `"address"`;
-   \}, \{
-     `indexed`: `false`;
-     `internalType`: `"address"`;
-     `name`: `"app"`;
+     `name`: `"editedByApp"`;
      `type`: `"address"`;
    \}, \{
      `indexed`: `false`;
@@ -2499,6 +2676,11 @@ Delete a comment as an author
      `indexed`: `false`;
      `internalType`: `"uint8"`;
      `name`: `"commentType"`;
+     `type`: `"uint8"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"uint8"`;
+     `name`: `"authMethod"`;
      `type`: `"uint8"`;
    \}, \{
      `components`: readonly \[\{
@@ -2562,7 +2744,27 @@ Delete a comment as an author
   `inputs`: readonly \[\{
      `indexed`: `true`;
      `internalType`: `"address"`;
-     `name`: `"previousOwner"`;
+     `name`: `"pendingOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"OwnershipHandoverCanceled"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"pendingOwner"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"OwnershipHandoverRequested"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"oldOwner"`;
      `type`: `"address"`;
    \}, \{
      `indexed`: `true`;
@@ -2573,25 +2775,21 @@ Delete a comment as an author
   `name`: `"OwnershipTransferred"`;
   `type`: `"event"`;
 \}, \{
-  `anonymous`: `false`;
-  `inputs`: readonly \[\{
-     `indexed`: `false`;
-     `internalType`: `"address"`;
-     `name`: `"account"`;
-     `type`: `"address"`;
-  \}\];
-  `name`: `"Paused"`;
-  `type`: `"event"`;
+  `inputs`: readonly \[\];
+  `name`: `"AlreadyInitialized"`;
+  `type`: `"error"`;
 \}, \{
-  `anonymous`: `false`;
   `inputs`: readonly \[\{
-     `indexed`: `false`;
-     `internalType`: `"address"`;
-     `name`: `"account"`;
-     `type`: `"address"`;
+     `internalType`: `"uint256"`;
+     `name`: `"operationIndex"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"bytes"`;
+     `name`: `"reason"`;
+     `type`: `"bytes"`;
   \}\];
-  `name`: `"Unpaused"`;
-  `type`: `"event"`;
+  `name`: `"BatchOperationFailed"`;
+  `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
   `name`: `"ChannelDoesNotExist"`;
@@ -2599,14 +2797,6 @@ Delete a comment as an author
 \}, \{
   `inputs`: readonly \[\];
   `name`: `"CommentDoesNotExist"`;
-  `type`: `"error"`;
-\}, \{
-  `inputs`: readonly \[\];
-  `name`: `"EnforcedPause"`;
-  `type`: `"error"`;
-\}, \{
-  `inputs`: readonly \[\];
-  `name`: `"ExpectedPause"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
@@ -2618,7 +2808,23 @@ Delete a comment as an author
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
+  `name`: `"InvalidApprovalExpiry"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
   `name`: `"InvalidAuthorSignature"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"operationIndex"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"string"`;
+     `name`: `"reason"`;
+     `type`: `"string"`;
+  \}\];
+  `name`: `"InvalidBatchOperation"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -2649,12 +2855,40 @@ Delete a comment as an author
   `name`: `"InvalidNonce"`;
   `type`: `"error"`;
 \}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"string"`;
+     `name`: `"reason"`;
+     `type`: `"string"`;
+  \}\];
+  `name`: `"InvalidReactionReference"`;
+  `type`: `"error"`;
+\}, \{
   `inputs`: readonly \[\];
   `name`: `"InvalidSignatureLength"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
   `name`: `"InvalidSignatureS"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"providedValue"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"requiredValue"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"InvalidValueDistribution"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"NewOwnerIsZeroAddress"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"NoHandoverRequest"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -2669,22 +2903,6 @@ Delete a comment as an author
   `name`: `"NotAuthorized"`;
   `type`: `"error"`;
 \}, \{
-  `inputs`: readonly \[\{
-     `internalType`: `"address"`;
-     `name`: `"owner"`;
-     `type`: `"address"`;
-  \}\];
-  `name`: `"OwnableInvalidOwner"`;
-  `type`: `"error"`;
-\}, \{
-  `inputs`: readonly \[\{
-     `internalType`: `"address"`;
-     `name`: `"account"`;
-     `type`: `"address"`;
-  \}\];
-  `name`: `"OwnableUnauthorizedAccount"`;
-  `type`: `"error"`;
-\}, \{
   `inputs`: readonly \[\];
   `name`: `"ParentCommentHasNeverExisted"`;
   `type`: `"error"`;
@@ -2694,7 +2912,7 @@ Delete a comment as an author
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
-  `name`: `"ReentrancyGuardReentrantCall"`;
+  `name`: `"Reentrancy"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -2707,6 +2925,10 @@ Delete a comment as an author
      `type`: `"uint256"`;
   \}\];
   `name`: `"SignatureDeadlineReached"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"Unauthorized"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];

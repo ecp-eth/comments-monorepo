@@ -11,9 +11,9 @@ import {
 import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 import { TestUtils } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Comments } from "../src/libraries/Comments.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Comments } from "../src/types/Comments.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 
 // Fee charging hook contract
 contract FlatFeeHook is BaseHook {

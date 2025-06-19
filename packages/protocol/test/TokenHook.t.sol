@@ -3,8 +3,8 @@ pragma solidity ^0.8.20;
 
 import "../src/hooks/BaseHook.sol";
 import "../src/interfaces/IHook.sol";
-import "../src/libraries/Comments.sol";
-import "../src/libraries/Hooks.sol";
+import "../src/types/Comments.sol";
+import "../src/types/Hooks.sol";
 import { Test } from "forge-std/Test.sol";
 import { Vm } from "forge-std/Vm.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
