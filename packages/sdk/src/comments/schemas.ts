@@ -6,6 +6,7 @@ import {
   DEFAULT_COMMENT_TYPE,
   EMPTY_PARENT_ID,
 } from "../constants.js";
+import { AuthorAuthMethod } from "./types.js";
 import type {
   CommentData,
   CreateReplyCommentDataParams,
@@ -48,7 +49,7 @@ export const CommentDataSchema = z.object({
   content: z.string(),
   targetUri: z.string(),
   commentType: z.number(),
-  authMethod: z.number().int().min(0).max(2),
+  authMethod: z.nativeEnum(AuthorAuthMethod),
   metadata: MetadataArraySchema.default([]),
 
   createdAt: z.coerce.bigint(),
@@ -121,8 +122,8 @@ export const CommentInputDataSchema = z.union([
 
 export type CommentInputData = z.infer<typeof CommentInputDataSchema>;
 
-// this is just for type checking - temporarily disabled due to authMethod field addition
-// ({}) as CommentInputData satisfies CreateCommentData;
+// this is just for type checking
+({}) as CommentInputData satisfies CreateCommentData;
 
 /**
  * Edit comment data schema. This is used as input of the functions.

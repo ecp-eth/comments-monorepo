@@ -16,6 +16,12 @@ export type Json = JsonLiteral | JsonArray | JsonObject;
 
 export type CommentManagerABIType = typeof CommentManagerABI;
 
+export enum AuthorAuthMethod {
+  DIRECT_TX = 0,
+  APP_APPROVAL = 1,
+  AUTHOR_SIGNATURE = 2,
+}
+
 /**
  * Metadata entry structure that matches the smart contract
  */
@@ -99,7 +105,7 @@ export type CommentData = {
    * The authentication method used to create this comment
    * 0 = DIRECT_TX, 1 = APP_APPROVAL, 2 = AUTHOR_SIGNATURE
    */
-  authMethod: number;
+  authMethod: AuthorAuthMethod;
   /**
    * The ID of the channel
    */

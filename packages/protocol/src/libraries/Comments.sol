@@ -42,7 +42,7 @@ library Comments {
     // Pack these fields together (saves 1 storage slot)
     address author; // 20 bytes   --┬-- 32 bytes
     uint88 createdAt; // 11 bytes --┘
-    uint8 authMethod; // 1 byte --┘
+    AuthorAuthMethod authMethod; // 1 byte --┘
     address app; // 20 bytes      --┬-- 32 bytes
     uint88 updatedAt; // 11 bytes --┘
     uint8 commentType; // 1 byte --┘
@@ -173,7 +173,7 @@ library Comments {
     comment.content = content;
     comment.targetUri = targetUri;
     comment.commentType = commentType;
-    comment.authMethod = uint8(authMethod);
+    comment.authMethod = authMethod;
     comment.createdAt = timestampNow;
     comment.updatedAt = timestampNow;
 
@@ -188,7 +188,7 @@ library Comments {
       content,
       targetUri,
       commentType,
-      comment.authMethod,
+      uint8(comment.authMethod),
       metadata
     );
 
@@ -280,7 +280,7 @@ library Comments {
 
     comment.content = content;
     comment.updatedAt = timestampNow;
-    comment.authMethod = uint8(authMethod);
+    comment.authMethod = authMethod;
 
     // Clear existing metadata
     Metadata.clearCommentMetadata(
@@ -316,7 +316,7 @@ library Comments {
       content,
       comment.targetUri,
       comment.commentType,
-      comment.authMethod,
+      uint8(comment.authMethod),
       metadata
     );
 

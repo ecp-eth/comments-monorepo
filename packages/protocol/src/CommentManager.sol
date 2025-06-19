@@ -76,7 +76,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     notStale(commentData.deadline)
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
-    replyInSameChannel(commentData.parentId, commentData.channelId)
+    onlyReplyInSameChannel(commentData.parentId, commentData.channelId)
     reactionHasTargetOrParent(
       commentData.commentType,
       commentData.parentId,
@@ -137,7 +137,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     notStale(commentData.deadline)
     onlyParentIdOrTargetUri(commentData.parentId, commentData.targetUri)
     channelExists(commentData.channelId)
-    replyInSameChannel(commentData.parentId, commentData.channelId)
+    onlyReplyInSameChannel(commentData.parentId, commentData.channelId)
     reactionHasTargetOrParent(
       commentData.commentType,
       commentData.parentId,
@@ -733,7 +733,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     _;
   }
 
-  modifier replyInSameChannel(bytes32 parentId, uint256 channelId) {
+  modifier onlyReplyInSameChannel(bytes32 parentId, uint256 channelId) {
     if (parentId != bytes32(0) && comments[parentId].channelId != channelId) {
       revert ParentCommentNotInSameChannel();
     }
@@ -835,38 +835,37 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     uint256 operationIndex
   ) internal returns (bytes memory result) {
     if (operation.operationType == Comments.BatchOperationType.POST_COMMENT) {
-      return _executePostCommentBatch(operation, operationIndex);
+      return _executePostCommentBatch(operation);
     } else if (
       operation.operationType ==
       Comments.BatchOperationType.POST_COMMENT_WITH_SIG
     ) {
-      return _executePostCommentWithSigBatch(operation, operationIndex);
+      return _executePostCommentWithSigBatch(operation);
     } else if (
       operation.operationType == Comments.BatchOperationType.EDIT_COMMENT
     ) {
-      return _executeEditCommentBatch(operation, operationIndex);
+      return _executeEditCommentBatch(operation);
     } else if (
       operation.operationType ==
       Comments.BatchOperationType.EDIT_COMMENT_WITH_SIG
     ) {
-      return _executeEditCommentWithSigBatch(operation, operationIndex);
+      return _executeEditCommentWithSigBatch(operation);
     } else if (
       operation.operationType == Comments.BatchOperationType.DELETE_COMMENT
     ) {
-      return _executeDeleteCommentBatch(operation, operationIndex);
+      return _executeDeleteCommentBatch(operation);
     } else if (
       operation.operationType ==
       Comments.BatchOperationType.DELETE_COMMENT_WITH_SIG
     ) {
-      return _executeDeleteCommentWithSigBatch(operation, operationIndex);
+      return _executeDeleteCommentWithSigBatch(operation);
     } else {
       revert InvalidBatchOperation(operationIndex, "Invalid operation type");
     }
   }
 
   function _executePostCommentBatch(
-    Comments.BatchOperation calldata operation,
-    uint256 operationIndex
+    Comments.BatchOperation calldata operation
   ) internal returns (bytes memory) {
     Comments.CreateComment memory commentData = Batching.decodePostCommentData(
       operation
@@ -883,8 +882,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   function _executePostCommentWithSigBatch(
-    Comments.BatchOperation calldata operation,
-    uint256 operationIndex
+    Comments.BatchOperation calldata operation
   ) internal returns (bytes memory) {
     Comments.CreateComment memory commentData = Batching.decodePostCommentData(
       operation
@@ -902,8 +900,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   function _executeEditCommentBatch(
-    Comments.BatchOperation calldata operation,
-    uint256 operationIndex
+    Comments.BatchOperation calldata operation
   ) internal returns (bytes memory) {
     (bytes32 commentId, Comments.EditComment memory editData) = Batching
       .decodeEditCommentData(operation);
@@ -920,8 +917,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   function _executeEditCommentWithSigBatch(
-    Comments.BatchOperation calldata operation,
-    uint256 operationIndex
+    Comments.BatchOperation calldata operation
   ) internal returns (bytes memory) {
     (bytes32 commentId, Comments.EditComment memory editData) = Batching
       .decodeEditCommentData(operation);
@@ -939,8 +935,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   function _executeDeleteCommentBatch(
-    Comments.BatchOperation calldata operation,
-    uint256 operationIndex
+    Comments.BatchOperation calldata operation
   ) internal returns (bytes memory) {
     bytes32 commentId = Batching.decodeDeleteCommentData(operation);
 
@@ -951,8 +946,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   function _executeDeleteCommentWithSigBatch(
-    Comments.BatchOperation calldata operation,
-    uint256 operationIndex
+    Comments.BatchOperation calldata operation
   ) internal returns (bytes memory) {
     Comments.BatchDeleteData memory deleteData = Batching
       .decodeDeleteCommentWithSigData(operation);

@@ -798,9 +798,8 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory storedComment = comments.getComment(
       actualCommentId
     );
-    assertEq(
-      storedComment.authMethod,
-      0,
+    assertTrue(
+      storedComment.authMethod == Comments.AuthorAuthMethod.DIRECT_TX,
       "Auth method should be DIRECT_TX (0)"
     );
     assertEq(storedComment.author, author, "Author should match");
@@ -835,9 +834,8 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory storedComment = comments.getComment(
       actualCommentId
     );
-    assertEq(
-      storedComment.authMethod,
-      2,
+    assertTrue(
+      storedComment.authMethod == Comments.AuthorAuthMethod.AUTHOR_SIGNATURE,
       "Auth method should be AUTHOR_SIGNATURE (2)"
     );
     assertEq(storedComment.author, author, "Author should match");
@@ -871,9 +869,8 @@ contract CommentsTest is Test, IERC721Receiver {
     Comments.Comment memory storedComment = comments.getComment(
       actualCommentId
     );
-    assertEq(
-      storedComment.authMethod,
-      1,
+    assertTrue(
+      storedComment.authMethod == Comments.AuthorAuthMethod.APP_APPROVAL,
       "Auth method should be APP_APPROVAL (1)"
     );
     assertEq(storedComment.author, author, "Author should match");
