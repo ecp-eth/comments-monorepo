@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  version: 0.0.9
+  version: 0.0.10
   title: Indexer Restful API
 servers:
   - url: https://api.ethcomments.xyz
@@ -23,7 +23,7 @@ paths:
           name: channelId
           in: path
       responses:
-        '200':
+        "200":
           description: Retrieve a list of channels
           content:
             application/json:
@@ -36,11 +36,11 @@ paths:
                   createdAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                   updatedAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                   name:
                     type: string
                   description:
@@ -64,7 +64,7 @@ paths:
                   - description
                   - metadata
                   - hook
-        '404':
+        "404":
           description: Channel not found
           content:
             application/json:
@@ -88,7 +88,7 @@ paths:
               createdAt:
                 type:
                   - string
-                  - 'null'
+                  - "null"
               id:
                 type: string
                 pattern: ^d+$
@@ -121,7 +121,7 @@ paths:
           name: sort
           in: query
       responses:
-        '200':
+        "200":
           description: Retrieve a list of channels
           content:
             application/json:
@@ -139,11 +139,11 @@ paths:
                         createdAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         updatedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         name:
                           type: string
                         description:
@@ -211,7 +211,7 @@ paths:
               createdAt:
                 type:
                   - string
-                  - 'null'
+                  - "null"
               id: {}
             required:
               - createdAt
@@ -232,7 +232,7 @@ paths:
         - schema:
             type:
               - integer
-              - 'null'
+              - "null"
             minimum: 0
             maximum: 255
             description: The comment type (e.g. 0=comment, 1=reaction)
@@ -297,7 +297,7 @@ paths:
           name: mode
           in: query
       responses:
-        '200':
+        "200":
           description: Retrieve a list of comments
           content:
             application/json:
@@ -322,7 +322,7 @@ paths:
                                 avatarUrl:
                                   type:
                                     - string
-                                    - 'null'
+                                    - "null"
                               required:
                                 - name
                                 - avatarUrl
@@ -356,11 +356,11 @@ paths:
                         deletedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         logIndex:
                           type:
                             - integer
-                            - 'null'
+                            - "null"
                         metadata:
                           type: array
                           items:
@@ -392,21 +392,21 @@ paths:
                         moderationStatusChangedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         createdAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         updatedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         revision:
                           type: integer
                         zeroExSwap:
                           type:
                             - object
-                            - 'null'
+                            - "null"
                           properties:
                             from:
                               type: object
@@ -465,7 +465,7 @@ paths:
                                           avatarUrl:
                                             type:
                                               - string
-                                              - 'null'
+                                              - "null"
                                         required:
                                           - name
                                           - avatarUrl
@@ -499,11 +499,11 @@ paths:
                                   deletedAt:
                                     type:
                                       - string
-                                      - 'null'
+                                      - "null"
                                   logIndex:
                                     type:
                                       - integer
-                                      - 'null'
+                                      - "null"
                                   metadata:
                                     type: array
                                     items:
@@ -535,21 +535,21 @@ paths:
                                   moderationStatusChangedAt:
                                     type:
                                       - string
-                                      - 'null'
+                                      - "null"
                                   createdAt:
                                     type:
                                       - string
-                                      - 'null'
+                                      - "null"
                                   updatedAt:
                                     type:
                                       - string
-                                      - 'null'
+                                      - "null"
                                   revision:
                                     type: integer
                                   zeroExSwap:
                                     type:
                                       - object
-                                      - 'null'
+                                      - "null"
                                     properties:
                                       from:
                                         type: object
@@ -701,7 +701,7 @@ paths:
               createdAt:
                 type:
                   - string
-                  - 'null'
+                  - "null"
               id: {}
             required:
               - createdAt
@@ -722,7 +722,7 @@ paths:
         - schema:
             type:
               - integer
-              - 'null'
+              - "null"
             minimum: 0
             maximum: 255
             description: The comment type (e.g. 0=comment, 1=reaction)
@@ -773,7 +773,7 @@ paths:
           name: mode
           in: query
       responses:
-        '200':
+        "200":
           description: Retrieve specific comment with its replies
           content:
             application/json:
@@ -798,7 +798,7 @@ paths:
                                 avatarUrl:
                                   type:
                                     - string
-                                    - 'null'
+                                    - "null"
                               required:
                                 - name
                                 - avatarUrl
@@ -832,11 +832,11 @@ paths:
                         deletedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         logIndex:
                           type:
                             - integer
-                            - 'null'
+                            - "null"
                         metadata:
                           type: array
                           items:
@@ -868,21 +868,21 @@ paths:
                         moderationStatusChangedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         createdAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         updatedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         revision:
                           type: integer
                         zeroExSwap:
                           type:
                             - object
-                            - 'null'
+                            - "null"
                           properties:
                             from:
                               type: object
@@ -941,7 +941,7 @@ paths:
                                           avatarUrl:
                                             type:
                                               - string
-                                              - 'null'
+                                              - "null"
                                         required:
                                           - name
                                           - avatarUrl
@@ -975,11 +975,11 @@ paths:
                                   deletedAt:
                                     type:
                                       - string
-                                      - 'null'
+                                      - "null"
                                   logIndex:
                                     type:
                                       - integer
-                                      - 'null'
+                                      - "null"
                                   metadata:
                                     type: array
                                     items:
@@ -1011,21 +1011,21 @@ paths:
                                   moderationStatusChangedAt:
                                     type:
                                       - string
-                                      - 'null'
+                                      - "null"
                                   createdAt:
                                     type:
                                       - string
-                                      - 'null'
+                                      - "null"
                                   updatedAt:
                                     type:
                                       - string
-                                      - 'null'
+                                      - "null"
                                   revision:
                                     type: integer
                                   zeroExSwap:
                                     type:
                                       - object
-                                      - 'null'
+                                      - "null"
                                     properties:
                                       from:
                                         type: object
@@ -1146,7 +1146,7 @@ paths:
                   - results
                   - pagination
                   - extra
-        '400':
+        "400":
           description: When request is not valid
           content:
             application/json:
@@ -1186,7 +1186,7 @@ paths:
         - schema:
             type:
               - integer
-              - 'null'
+              - "null"
             minimum: 0
             default: 0
             description: The offset of the comments to return
@@ -1194,7 +1194,7 @@ paths:
           name: offset
           in: query
       responses:
-        '200':
+        "200":
           description: Retrieve a list of approvals according to the criteria
           content:
             application/json:
@@ -1212,7 +1212,7 @@ paths:
                         deletedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         chainId:
                           type: integer
                         txHash: {}
@@ -1250,7 +1250,7 @@ paths:
           name: authorAddress
           in: path
       responses:
-        '200':
+        "200":
           description: An object with author address and ENS and Farcaster data
           content:
             application/json:
@@ -1266,7 +1266,7 @@ paths:
                       avatarUrl:
                         type:
                           - string
-                          - 'null'
+                          - "null"
                     required:
                       - name
                       - avatarUrl
@@ -1297,7 +1297,7 @@ paths:
           name: address
           in: path
       responses:
-        '200':
+        "200":
           description: When address is marked as muted
           content:
             application/json:
@@ -1309,12 +1309,12 @@ paths:
                   createdAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                     description: The date the account was muted
                 required:
                   - address
                   - createdAt
-        '400':
+        "400":
           description: When request is not valid
           content:
             application/json:
@@ -1326,7 +1326,7 @@ paths:
                     description: The error message
                 required:
                   - message
-        '404':
+        "404":
           description: When address is not marked as muted
           content:
             application/json:
@@ -1351,9 +1351,9 @@ paths:
           name: address
           in: path
       responses:
-        '204':
+        "204":
           description: When muted account was unmuted
-        '400':
+        "400":
           description: When request is not valid
           content:
             application/json:
@@ -1365,7 +1365,7 @@ paths:
                     description: The error message
                 required:
                   - message
-        '401':
+        "401":
           description: When request is not authenticated
           content:
             application/json:
@@ -1377,7 +1377,7 @@ paths:
                     description: The error message
                 required:
                   - message
-        '404':
+        "404":
           description: When muted account was not found in the list
           content:
             application/json:
@@ -1410,7 +1410,7 @@ paths:
               required:
                 - address
       responses:
-        '200':
+        "200":
           description: An object with muted account address
           content:
             application/json:
@@ -1421,7 +1421,7 @@ paths:
                     description: The address of the muted account
                 required:
                   - address
-        '400':
+        "400":
           description: When request data is not valid
           content:
             application/json:
@@ -1433,7 +1433,7 @@ paths:
                     description: The error message
                 required:
                   - message
-        '401':
+        "401":
           description: When request is not authenticated
           content:
             application/json:
@@ -1445,7 +1445,7 @@ paths:
                     description: The error message
                 required:
                   - message
-        '409':
+        "409":
           description: When account is already marked as muted
           content:
             application/json:
@@ -1469,7 +1469,7 @@ paths:
               createdAt:
                 type:
                   - string
-                  - 'null'
+                  - "null"
               id: {}
             required:
               - createdAt
@@ -1500,7 +1500,7 @@ paths:
           name: sort
           in: query
       responses:
-        '200':
+        "200":
           description: List of pending comments
           content:
             application/json:
@@ -1525,7 +1525,7 @@ paths:
                                 avatarUrl:
                                   type:
                                     - string
-                                    - 'null'
+                                    - "null"
                               required:
                                 - name
                                 - avatarUrl
@@ -1559,11 +1559,11 @@ paths:
                         deletedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         logIndex:
                           type:
                             - integer
-                            - 'null'
+                            - "null"
                         metadata:
                           type: array
                           items:
@@ -1595,21 +1595,21 @@ paths:
                         moderationStatusChangedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         createdAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         updatedAt:
                           type:
                             - string
-                            - 'null'
+                            - "null"
                         revision:
                           type: integer
                         zeroExSwap:
                           type:
                             - object
-                            - 'null'
+                            - "null"
                           properties:
                             from:
                               type: object
@@ -1680,7 +1680,7 @@ paths:
                 required:
                   - results
                   - pagination
-        '400':
+        "400":
           description: When request is not valid
           content:
             application/json:
@@ -1692,7 +1692,7 @@ paths:
                     description: The error message
                 required:
                   - message
-        '401':
+        "401":
           description: When user is not authenticated
           content:
             application/json:
@@ -1728,7 +1728,7 @@ paths:
               required:
                 - moderationStatus
       responses:
-        '200':
+        "200":
           description: Comment with moderation status changed
           content:
             application/json:
@@ -1748,7 +1748,7 @@ paths:
                           avatarUrl:
                             type:
                               - string
-                              - 'null'
+                              - "null"
                         required:
                           - name
                           - avatarUrl
@@ -1782,11 +1782,11 @@ paths:
                   deletedAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                   logIndex:
                     type:
                       - integer
-                      - 'null'
+                      - "null"
                   metadata:
                     type: array
                     items:
@@ -1818,21 +1818,21 @@ paths:
                   moderationStatusChangedAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                   createdAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                   updatedAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                   revision:
                     type: integer
                   zeroExSwap:
                     type:
                       - object
-                      - 'null'
+                      - "null"
                     properties:
                       from:
                         type: object
@@ -1885,7 +1885,7 @@ paths:
                   - updatedAt
                   - revision
                   - zeroExSwap
-        '400':
+        "400":
           description: When request is not valid
           content:
             application/json:
@@ -1897,7 +1897,7 @@ paths:
                     description: The error message
                 required:
                   - message
-        '401':
+        "401":
           description: When user is not authenticated
           content:
             application/json:
@@ -1909,7 +1909,7 @@ paths:
                     description: The error message
                 required:
                   - message
-        '404':
+        "404":
           description: When comment is not found
           content:
             application/json:
@@ -1932,7 +1932,7 @@ paths:
           name: commentId
           in: path
       responses:
-        '200':
+        "200":
           description: Comment found
           content:
             application/json:
@@ -1952,7 +1952,7 @@ paths:
                           avatarUrl:
                             type:
                               - string
-                              - 'null'
+                              - "null"
                         required:
                           - name
                           - avatarUrl
@@ -1986,11 +1986,11 @@ paths:
                   deletedAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                   logIndex:
                     type:
                       - integer
-                      - 'null'
+                      - "null"
                   metadata:
                     type: array
                     items:
@@ -2022,21 +2022,21 @@ paths:
                   moderationStatusChangedAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                   createdAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                   updatedAt:
                     type:
                       - string
-                      - 'null'
+                      - "null"
                   revision:
                     type: integer
                   zeroExSwap:
                     type:
                       - object
-                      - 'null'
+                      - "null"
                     properties:
                       from:
                         type: object
@@ -2089,7 +2089,7 @@ paths:
                   - updatedAt
                   - revision
                   - zeroExSwap
-        '401':
+        "401":
           description: When user is not authenticated
           content:
             application/json:
@@ -2101,7 +2101,7 @@ paths:
                     description: The error message
                 required:
                   - message
-        '404':
+        "404":
           description: When comment is not found
           content:
             application/json:
@@ -2143,9 +2143,9 @@ paths:
           name: c
           in: query
       responses:
-        '204':
+        "204":
           description: When webhook request is valid
-        '400':
+        "400":
           description: When request is not valid
           content:
             application/json:
@@ -2157,7 +2157,7 @@ paths:
                     description: The error message
                 required:
                   - message
-        '401':
+        "401":
           description: When request signature is not valid
           content:
             application/json:
