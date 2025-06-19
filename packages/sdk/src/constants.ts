@@ -2,8 +2,8 @@ import { toHex } from "viem/utils";
 import { baseSepolia, anvil, type Chain } from "viem/chains";
 import type { Hex } from "./core/schemas.js";
 
-const localCommentAddressManager = "0xcdc125ae7655530622f7f5615223fe5aCe052a4a";
-const localChannelAddressManager = "0x6C54f7606361c4ac9d1366679560c1F668980d45";
+const localCommentAddressManager = "0xDFB154eF3F50704d8E9C0500F07f0c79373CAd58";
+const localChannelAddressManager = "0xBB3437F9Fbc5595E58710C9a44518506D3aA888f";
 
 /**
  * The address of the `CommentManager` contract.
@@ -12,7 +12,7 @@ const localChannelAddressManager = "0x6C54f7606361c4ac9d1366679560c1F668980d45";
 export const COMMENT_MANAGER_ADDRESS = (
   __DEV__
     ? localCommentAddressManager
-    : "0x519D00E2C60BD598a8c234785216A3037b09F0CF"
+    : "0x5700Dcc5a555708623C910720f9583f682782280"
 ) as Hex;
 
 /**
@@ -21,7 +21,7 @@ export const COMMENT_MANAGER_ADDRESS = (
 export const CHANNEL_MANAGER_ADDRESS = (
   __DEV__
     ? localChannelAddressManager
-    : "0x17a91bdd48C40482982dC0ce8D999aD25b3e6E20"
+    : "0x33A5F5c53bc36e0251b47145Af87Ab27a6749Dd0"
 ) as Hex;
 
 export type SupportedChainConfig = {
