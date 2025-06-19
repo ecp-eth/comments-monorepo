@@ -133,7 +133,10 @@ export class CommentModerationService {
             comment.commentId,
             moderationStatus.status,
           );
-          await this.notifyTelegram(comment);
+
+          if (moderationStatus.status === "pending") {
+            await this.notifyTelegram(comment);
+          }
         }
       },
     };
