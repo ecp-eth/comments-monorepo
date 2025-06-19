@@ -72,9 +72,18 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
     // We need to check if the comment already has a moderation status
     // this is useful during the reindex process
-    const moderationStatus = await getCommentModerationStatus(
-      event.args.commentId,
-    );
+    const moderationStatus:
+      | {
+          status: "pending" | "approved" | "rejected";
+          changedAt: Date;
+        }
+      | undefined =
+      event.args.commentType === 1
+        ? await getCommentModerationStatus(event.args.commentId)
+        : {
+            status: "approved",
+            changedAt: createdAt,
+          };
 
     await context.db.insert(schema.comment).values({
       id: event.args.commentId,
