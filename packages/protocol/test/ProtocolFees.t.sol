@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 import "../src/ProtocolFees.sol";
 import "../src/interfaces/IProtocolFees.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "solady/src/auth/Ownable.sol";
 
 // Concrete implementation of ProtocolFees for testing
 contract TestProtocolFees is ProtocolFees {
@@ -35,12 +35,7 @@ contract ProtocolFeesTest is Test {
 
     // Try to withdraw as non-owner (should fail)
     vm.startPrank(nonOwner);
-    vm.expectRevert(
-      abi.encodeWithSelector(
-        Ownable.OwnableUnauthorizedAccount.selector,
-        nonOwner
-      )
-    );
+    vm.expectRevert(abi.encodeWithSelector(Ownable.Unauthorized.selector));
     protocolFees.withdrawFees(recipient);
     vm.stopPrank();
 

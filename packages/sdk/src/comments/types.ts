@@ -16,6 +16,15 @@ export type Json = JsonLiteral | JsonArray | JsonObject;
 
 export type CommentManagerABIType = typeof CommentManagerABI;
 
+export const AuthorAuthMethod = {
+  DIRECT_TX: 0,
+  APP_APPROVAL: 1,
+  AUTHOR_SIGNATURE: 2,
+} as const;
+
+export type AuthorAuthMethod =
+  (typeof AuthorAuthMethod)[keyof typeof AuthorAuthMethod];
+
 /**
  * Metadata entry structure that matches the smart contract
  */
@@ -95,6 +104,11 @@ export type CommentData = {
    * The type of the comment (0 = comment, 1 = reaction)
    */
   commentType: number;
+  /**
+   * The authentication method used to create this comment
+   * 0 = DIRECT_TX, 1 = APP_APPROVAL, 2 = AUTHOR_SIGNATURE
+   */
+  authMethod: AuthorAuthMethod;
   /**
    * The ID of the channel
    */
@@ -209,22 +223,6 @@ export type ContractWriteFunctions = {
       CommentManagerABIType,
       "nonpayable",
       "revokeApproval"
-    >,
-  ) => Promise<Hex>;
-
-  renounceOwnership: (
-    args: ContractFunctionParameters<
-      CommentManagerABIType,
-      "nonpayable",
-      "renounceOwnership"
-    >,
-  ) => Promise<Hex>;
-
-  transferOwnership: (
-    args: ContractFunctionParameters<
-      CommentManagerABIType,
-      "nonpayable",
-      "transferOwnership"
     >,
   ) => Promise<Hex>;
 

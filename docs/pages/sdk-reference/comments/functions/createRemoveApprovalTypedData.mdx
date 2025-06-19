@@ -10,7 +10,7 @@
 function createRemoveApprovalTypedData(params): {
   domain: {
      chainId: number;
-     name: "Comments";
+     name: "Ethereum Comments Protocol";
      verifyingContract: `0x${string}`;
      version: "1";
   };
@@ -43,7 +43,7 @@ function createRemoveApprovalTypedData(params): {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:539](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L539)
+Defined in: [packages/sdk/src/comments/approval.ts:566](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L566)
 
 Create the EIP-712 typed data structure for removing approval
 
@@ -59,7 +59,7 @@ Create the EIP-712 typed data structure for removing approval
 {
   domain: {
      chainId: number;
-     name: "Comments";
+     name: "Ethereum Comments Protocol";
      verifyingContract: `0x${string}`;
      version: "1";
   };
@@ -99,7 +99,7 @@ The typed data
 ```ts
 domain: {
   chainId: number;
-  name: "Comments";
+  name: "Ethereum Comments Protocol";
   verifyingContract: `0x${string}`;
   version: "1";
 };
@@ -114,7 +114,7 @@ chainId: number;
 #### domain.name
 
 ```ts
-name: "Comments";
+name: "Ethereum Comments Protocol";
 ```
 
 #### domain.verifyingContract

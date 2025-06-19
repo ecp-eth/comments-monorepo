@@ -1,4 +1,4 @@
-export const DOMAIN_NAME = "Comments";
+export const DOMAIN_NAME = "Ethereum Comments Protocol";
 export const DOMAIN_VERSION = "1";
 
 export const METADATA_ENTRY_TYPE = {
@@ -49,6 +49,7 @@ export const ADD_APPROVAL_TYPE = {
   AddApproval: [
     { name: "author", type: "address" },
     { name: "app", type: "address" },
+    { name: "expiry", type: "uint256" },
     { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
   ],

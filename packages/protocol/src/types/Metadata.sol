@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-/// @title Metadata - Library defining shared metadata types for comments and channels
+/// @title Metadata - Type definitions for metadata-related structs and enums
 library Metadata {
   /// @notice Struct containing metadata key-value pair
   /// @param key UTF-8 encoded string of format "type key". Must fit in 32 bytes.

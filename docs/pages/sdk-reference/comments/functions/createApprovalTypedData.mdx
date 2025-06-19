@@ -10,7 +10,7 @@
 function createApprovalTypedData(params): {
   domain: {
      chainId: number;
-     name: "Comments";
+     name: "Ethereum Comments Protocol";
      verifyingContract: `0x${string}`;
      version: "1";
   };
@@ -18,6 +18,7 @@ function createApprovalTypedData(params): {
      app: `0x${string}`;
      author: `0x${string}`;
      deadline: bigint;
+     expiry: bigint;
      nonce: bigint;
   };
   primaryType: "AddApproval";
@@ -38,12 +39,16 @@ function createApprovalTypedData(params): {
         | {
         name: "deadline";
         type: "uint256";
+      }
+        | {
+        name: "expiry";
+        type: "uint256";
      })[];
   };
 };
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:469](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L469)
+Defined in: [packages/sdk/src/comments/approval.ts:490](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L490)
 
 Create the EIP-712 typed data structure for approving comment
 
@@ -59,7 +64,7 @@ Create the EIP-712 typed data structure for approving comment
 {
   domain: {
      chainId: number;
-     name: "Comments";
+     name: "Ethereum Comments Protocol";
      verifyingContract: `0x${string}`;
      version: "1";
   };
@@ -67,6 +72,7 @@ Create the EIP-712 typed data structure for approving comment
      app: `0x${string}`;
      author: `0x${string}`;
      deadline: bigint;
+     expiry: bigint;
      nonce: bigint;
   };
   primaryType: "AddApproval";
@@ -87,6 +93,10 @@ Create the EIP-712 typed data structure for approving comment
         | {
         name: "deadline";
         type: "uint256";
+      }
+        | {
+        name: "expiry";
+        type: "uint256";
      })[];
   };
 }
@@ -99,7 +109,7 @@ The typed data
 ```ts
 domain: {
   chainId: number;
-  name: "Comments";
+  name: "Ethereum Comments Protocol";
   verifyingContract: `0x${string}`;
   version: "1";
 };
@@ -114,7 +124,7 @@ chainId: number;
 #### domain.name
 
 ```ts
-name: "Comments";
+name: "Ethereum Comments Protocol";
 ```
 
 #### domain.verifyingContract
@@ -136,6 +146,7 @@ message: {
   app: `0x${string}`;
   author: `0x${string}`;
   deadline: bigint;
+  expiry: bigint;
   nonce: bigint;
 };
 ```
@@ -156,6 +167,12 @@ author: `0x${string}` = HexSchema;
 
 ```ts
 deadline: bigint;
+```
+
+#### message.expiry
+
+```ts
+expiry: bigint;
 ```
 
 #### message.nonce
@@ -190,6 +207,10 @@ types: {
      | {
      name: "deadline";
      type: "uint256";
+   }
+     | {
+     name: "expiry";
+     type: "uint256";
   })[];
 };
 ```
@@ -212,6 +233,10 @@ AddApproval: (
 }
   | {
   name: "deadline";
+  type: "uint256";
+}
+  | {
+  name: "expiry";
   type: "uint256";
 })[];
 ```

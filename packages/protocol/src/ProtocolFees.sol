@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "solady/src/auth/Ownable.sol";
+import "solady/src/utils/ReentrancyGuard.sol";
 import "./interfaces/IProtocolFees.sol";
 import "./interfaces/IChannelManager.sol";
 
@@ -19,16 +19,18 @@ import "./interfaces/IChannelManager.sol";
 /// 3. Fee Updates:
 ///    - Only owner can update fee amounts
 ///    - Fee percentage capped at 100%
-abstract contract ProtocolFees is IProtocolFees, Ownable, ReentrancyGuard {
+abstract contract ProtocolFees is IProtocolFees, ReentrancyGuard, Ownable {
   // Fee configuration
   uint96 internal channelCreationFee;
   uint96 internal commentCreationFee;
   uint16 internal hookTransactionFeeBasisPoints; // (1 basis point = 0.01%)
 
-  /// @notice Constructor sets the contract owner and initializes fees
+  /// @notice Constructor sets the initial owner
   /// @param initialOwner The address that will own the contract
-  constructor(address initialOwner) Ownable(initialOwner) {
+  constructor(address initialOwner) {
     if (initialOwner == address(0)) revert IChannelManager.ZeroAddress();
+
+    _initializeOwner(initialOwner);
 
     // Initialize fees with safe defaults
     // Initialize channel creation fees to reduce initial spammy channels

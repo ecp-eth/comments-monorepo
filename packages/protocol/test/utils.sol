@@ -7,16 +7,16 @@ import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { LibString } from "solady/utils/LibString.sol";
+import { LibString } from "solady/src/utils/LibString.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { IHook } from "../src/interfaces/IHook.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Comments } from "../src/libraries/Comments.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Comments } from "../src/types/Comments.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 
 /**
  * @title TestUtils

@@ -21,14 +21,14 @@ Emitted when the base URI for NFT metadata is updated
 
 
 
-### `ChannelCreated(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata, address hook)`
+### `ChannelCreated(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata, address hook)`
 
 Emitted when a new channel is created
 
 
 
 
-### `ChannelUpdated(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata)`
+### `ChannelUpdated(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata)`
 
 Emitted when a channel's configuration is updated
 
@@ -59,21 +59,21 @@ Emitted when channel metadata is set
 
 ## Functions
 
-### createChannel(string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata, address hook) → uint256 channelId (external)
+### createChannel(string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata, address hook) → uint256 channelId (external)
 
 Creates a new channel
 
 
 
 
-### getChannel(uint256 channelId) → [struct Channels.Channel](/protocol-reference/libraries/Channels#channel) (external)
+### getChannel(uint256 channelId) → [struct Channels.Channel](/protocol-reference/types/Channels#channel) (external)
 
 Get a channel by its ID
 
 
 
 
-### updateChannel(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) metadata) (external)
+### updateChannel(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata) (external)
 
 Updates an existing channel's configuration
 
@@ -108,14 +108,14 @@ Checks if a channel exists
 
 
 
-### setChannelMetadata(uint256 channelId, [struct Metadata.MetadataEntryOp[]](/protocol-reference/libraries/Metadata#metadataentryop) operations) (external)
+### setChannelMetadata(uint256 channelId, [struct Metadata.MetadataEntryOp[]](/protocol-reference/types/Metadata#metadataentryop) operations) (external)
 
 Sets metadata for a channel
 
 
 
 
-### getChannelMetadata(uint256 channelId) → [struct Metadata.MetadataEntry[]](/protocol-reference/libraries/Metadata#metadataentry) (external)
+### getChannelMetadata(uint256 channelId) → [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) (external)
 
 Get all metadata for a channel
 

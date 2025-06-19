@@ -10,13 +10,13 @@ import {
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { TestUtils } from "./utils.sol";
-import { LibString } from "solady/utils/LibString.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Comments } from "../src/libraries/Comments.sol";
+import { LibString } from "solady/src/utils/LibString.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Comments } from "../src/types/Comments.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
 import { TestUtils } from "./utils.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 
 struct TipInfo {
   bool found;

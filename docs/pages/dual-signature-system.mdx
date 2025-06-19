@@ -2,9 +2,72 @@
 
 ## Approvals
 
-The protocol implements an approvals system that allows comment authors to delegate the ability for an app to post comments on their behalf. 
+The protocol implements an approvals system that allows comment authors to delegate the ability for an app to post comments on their behalf.
 This enables a smooth UX by which a user signs a one time approval transaction, and the app can post comments on their behalf without the need for the user to sign each transaction.
 These approvals can be revoked by the user at any time.
+
+### Approval Expiry
+
+Approvals include expiry functionality for enhanced security. When granting approval to an app, users must specify an expiry timestamp. This provides several benefits:
+
+- **Automatic Expiration:** Compromised approvals will automatically expire without user intervention
+- **User Control:** Users explicitly choose how long to grant approval (e.g., 30 days, 1 year)
+
+#### Granting Approval with Expiry
+
+```typescript
+import { addApproval } from "@ecp.eth/sdk";
+
+// Grant approval for 30 days
+const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days from now
+await addApproval({
+  app: appAddress,
+  expiry: Math.floor(expiry / 1000), // Convert to seconds
+  writeContract,
+});
+```
+
+#### Checking Approval Status
+
+```typescript
+import { isApproved, getApprovalExpiry } from "@ecp.eth/sdk";
+
+// Check if currently approved
+const approved = await isApproved({ author, app, readContract });
+
+// Get expiry timestamp
+const expiry = await getApprovalExpiry({ author, app, readContract });
+if (expiry > 0 && expiry > Math.floor(Date.now() / 1000)) {
+  console.log("Approval is valid until:", new Date(expiry * 1000));
+} else {
+  console.log("No valid approval exists");
+}
+```
+
+#### Smart Contract Interface
+
+The approval functions now require an expiry parameter:
+
+```solidity
+// Add approval with expiry
+function addApproval(address app, uint256 expiry) external;
+
+// Add approval with signature and expiry
+function addApprovalWithSig(
+  address author,
+  address app,
+  uint256 expiry,
+  uint256 nonce,
+  uint256 deadline,
+  bytes calldata signature
+) external;
+
+// Get approval expiry timestamp
+function getApprovalExpiry(
+  address author,
+  address app
+) external view returns (uint256);
+```
 
 ## Signatures
 
@@ -12,7 +75,26 @@ Comments require different signatures depending on whether the author has grante
 
 **With Approval:** When a user has granted approval to an app, comments only need to be signed by the app. The app can post comments on the user's behalf using the pre-existing approval.
 
-**Without Approval:** When no approval exists, comments must be signed by both the app and the comment author. 
+**Without Approval:** When no approval exists, comments must be signed by both the app and the comment author.
 
 This means that every comment is attributable to an app and author. This enables the app to impose offchain limitations and gating on which comments it wants to co-sign, as well as allowing the app to choose whether to index and display comments from other apps or not.
 If interacting with the protocol directly, the user can also choose to self sign the comment, signing with their address as the app and author.
+
+## Authentication Methods
+
+Each comment stores how it was authenticated on-chain via an `authMethod` field.
+
+- **`0` (DIRECT_TX)** - User signed transaction directly
+- **`1` (APP_APPROVAL)** - User pre-approved the app
+- **`2` (AUTHOR_SIGNATURE)** - User signed comment hash
+
+## Paymaster and Proxy Contract Attribution
+
+When using paymasters, or other proxy contract systems that relay transactions, be aware that comments may appear to originate from these proxy contracts rather than the intended app.
+
+**Key points:**
+
+- **Paymasters can be tricked:** A malicious actor could craft a transaction with the paymaster's address as the `app` field, causing the comment to appear as if it came from the paymaster
+- **Paymaster attribution should not be trusted:** Comments showing a paymaster or proxy contract as the app should not be considered as actually originating from that service
+
+This is an inherent limitation of any system that accepts `msg.sender` as a form of authentication when used with transaction relay services.

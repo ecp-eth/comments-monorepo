@@ -10,7 +10,7 @@
 function createEditCommentTypedData(params): {
   domain: {
      chainId: number;
-     name: "Comments";
+     name: "Ethereum Comments Protocol";
      verifyingContract: `0x${string}`;
      version: "1";
   };
@@ -70,7 +70,7 @@ function createEditCommentTypedData(params): {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:793](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L793)
+Defined in: [packages/sdk/src/comments/comment.ts:796](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L796)
 
 Create the EIP-712 typed data structure for editing comment
 
@@ -86,7 +86,7 @@ Create the EIP-712 typed data structure for editing comment
 {
   domain: {
      chainId: number;
-     name: "Comments";
+     name: "Ethereum Comments Protocol";
      verifyingContract: `0x${string}`;
      version: "1";
   };
@@ -153,7 +153,7 @@ The typed data
 ```ts
 domain: {
   chainId: number;
-  name: "Comments";
+  name: "Ethereum Comments Protocol";
   verifyingContract: `0x${string}`;
   version: "1";
 };
@@ -168,7 +168,7 @@ chainId: number;
 #### domain.name
 
 ```ts
-name: "Comments";
+name: "Ethereum Comments Protocol";
 ```
 
 #### domain.verifyingContract

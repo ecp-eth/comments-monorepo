@@ -12,12 +12,13 @@ type GetAddApprovalHashParams = {
   author: Hex;
   commentsAddress?: Hex;
   deadline?: bigint;
+  expiry?: bigint;
   nonce: bigint;
   readContract: ContractReadFunctions["getAddApprovalHash"];
 };
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:287](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L287)
+Defined in: [packages/sdk/src/comments/approval.ts:297](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L297)
 
 ## Properties
 
@@ -27,7 +28,7 @@ Defined in: [packages/sdk/src/comments/approval.ts:287](https://github.com/ecp-e
 app: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:295](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L295)
+Defined in: [packages/sdk/src/comments/approval.ts:305](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L305)
 
 The address of the app signer
 
@@ -39,7 +40,7 @@ The address of the app signer
 author: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:291](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L291)
+Defined in: [packages/sdk/src/comments/approval.ts:301](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L301)
 
 The address of the author
 
@@ -51,7 +52,7 @@ The address of the author
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:311](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L311)
+Defined in: [packages/sdk/src/comments/approval.ts:326](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L326)
 
 The address of the comments contract
 
@@ -69,7 +70,7 @@ COMMENT_MANAGER_ADDRESS
 optional deadline: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:305](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L305)
+Defined in: [packages/sdk/src/comments/approval.ts:315](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L315)
 
 Timestamp after which the signature becomes invalid
 
@@ -81,13 +82,31 @@ Timestamp after which the signature becomes invalid
 
 ***
 
+### expiry?
+
+```ts
+optional expiry: bigint;
+```
+
+Defined in: [packages/sdk/src/comments/approval.ts:320](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L320)
+
+Timestamp when the approval expires
+
+#### Default
+
+```ts
+1 year from now
+```
+
+***
+
 ### nonce
 
 ```ts
 nonce: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:299](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L299)
+Defined in: [packages/sdk/src/comments/approval.ts:309](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L309)
 
 The current nonce for the author
 
@@ -99,4 +118,4 @@ The current nonce for the author
 readContract: ContractReadFunctions["getAddApprovalHash"];
 ```
 
-Defined in: [packages/sdk/src/comments/approval.ts:312](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L312)
+Defined in: [packages/sdk/src/comments/approval.ts:327](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/approval.ts#L327)

@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 /**
  * @title Hooks
- * @notice Library containing hook-related types and utilities
+ * @notice Type definitions for hook-related structs
  */
 library Hooks {
   /**

@@ -4,7 +4,7 @@
 
 # `Hooks`
 
-Library containing hook-related types and utilities
+Type definitions for hook-related structs
 
 
 

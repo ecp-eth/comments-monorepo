@@ -9,6 +9,7 @@
 ```ts
 type CommentData = {
   app: Hex;
+  authMethod: AuthorAuthMethod;
   author: Hex;
   channelId: bigint;
   commentType: number;
@@ -20,7 +21,7 @@ type CommentData = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:85](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L85)
+Defined in: [packages/sdk/src/comments/types.ts:94](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L94)
 
 The data structure of a comment returned by the contract
 
@@ -32,9 +33,22 @@ The data structure of a comment returned by the contract
 app: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:115](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L115)
+Defined in: [packages/sdk/src/comments/types.ts:129](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L129)
 
 The address of the app signer
+
+***
+
+### authMethod
+
+```ts
+authMethod: AuthorAuthMethod;
+```
+
+Defined in: [packages/sdk/src/comments/types.ts:111](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L111)
+
+The authentication method used to create this comment
+0 = DIRECT_TX, 1 = APP_APPROVAL, 2 = AUTHOR_SIGNATURE
 
 ***
 
@@ -44,7 +58,7 @@ The address of the app signer
 author: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:111](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L111)
+Defined in: [packages/sdk/src/comments/types.ts:125](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L125)
 
 The address of the author of the comment
 
@@ -56,7 +70,7 @@ The address of the author of the comment
 channelId: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:101](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L101)
+Defined in: [packages/sdk/src/comments/types.ts:115](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L115)
 
 The ID of the channel
 
@@ -68,7 +82,7 @@ The ID of the channel
 commentType: number;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:97](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L97)
+Defined in: [packages/sdk/src/comments/types.ts:106](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L106)
 
 The type of the comment (0 = comment, 1 = reaction)
 
@@ -80,7 +94,7 @@ The type of the comment (0 = comment, 1 = reaction)
 content: string;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:89](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L89)
+Defined in: [packages/sdk/src/comments/types.ts:98](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L98)
 
 The content of the comment
 
@@ -92,7 +106,7 @@ The content of the comment
 createdAt: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:119](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L119)
+Defined in: [packages/sdk/src/comments/types.ts:133](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L133)
 
 The timestamp of the comment creation in seconds since epoch
 
@@ -104,7 +118,7 @@ The timestamp of the comment creation in seconds since epoch
 parentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:107](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L107)
+Defined in: [packages/sdk/src/comments/types.ts:121](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L121)
 
 id of parent comments if it has one, 0x for no parent comment
 
@@ -120,7 +134,7 @@ This zero address (32 bytes of zeros) indicates the comment has no parent and is
 targetUri: string;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:93](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L93)
+Defined in: [packages/sdk/src/comments/types.ts:102](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L102)
 
 Empty string for replies
 
@@ -132,6 +146,6 @@ Empty string for replies
 updatedAt: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:123](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L123)
+Defined in: [packages/sdk/src/comments/types.ts:137](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L137)
 
 The timestamp of the comment update in seconds since epoch

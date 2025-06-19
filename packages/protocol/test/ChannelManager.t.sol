@@ -10,12 +10,12 @@ import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { TestUtils, MockHook } from "./utils.sol";
-import { Comments } from "../src/libraries/Comments.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Channels } from "../src/libraries/Channels.sol";
+import { Comments } from "../src/types/Comments.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Channels } from "../src/types/Channels.sol";
 import { IHook } from "../src/interfaces/IHook.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 
 // Invalid hook that doesn't support the interface
 contract InvalidHook {

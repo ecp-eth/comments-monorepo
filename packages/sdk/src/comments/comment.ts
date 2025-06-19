@@ -20,6 +20,7 @@ import {
   type AddCommentTypedDataSchemaType,
   type CommentInputData,
   CommentInputDataSchema,
+  CommentDataSchema,
   DeleteCommentTypedDataSchema,
   type DeleteCommentTypedDataSchemaType,
   type EditCommentData,
@@ -217,12 +218,14 @@ export async function getComment(
 ): Promise<GetCommentResult> {
   const { commentId, commentsAddress } = GetCommentParamsSchema.parse(params);
 
-  const comment = await params.readContract({
+  const rawComment = await params.readContract({
     address: commentsAddress,
     abi: CommentManagerABI,
     functionName: "getComment",
     args: [commentId],
   });
+
+  const comment = CommentDataSchema.parse(rawComment);
 
   return {
     comment,

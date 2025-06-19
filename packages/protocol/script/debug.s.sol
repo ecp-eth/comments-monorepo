@@ -8,9 +8,9 @@ import {
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { TestUtils, MockHook } from "../test/utils.sol";
-import { Comments } from "../src/libraries/Comments.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Comments } from "../src/types/Comments.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 
 /// @notice This script is used to debug the gas usage of the ChannelManager and CommentManager contracts.
 /// @dev This script is not used in the protocol and should not be used in production.
@@ -20,6 +20,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
   MockHook public mockHook;
 
   address public owner;
+  address public runner;
   address public user1;
   address public user2;
   uint256 public user1PrivateKey;
@@ -34,7 +35,8 @@ contract DebugGasUsage is Test, IERC721Receiver {
   bytes32 commentId;
 
   function setUp() public {
-    owner = address(this);
+    owner = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    runner = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
     (address _user1, uint256 _user1PrivateKey) = makeAddrAndKey("user1");
     (address _user2, uint256 _user2PrivateKey) = makeAddrAndKey("user2");
 
@@ -43,9 +45,11 @@ contract DebugGasUsage is Test, IERC721Receiver {
     user2 = _user2;
     user2PrivateKey = _user2PrivateKey;
 
+    vm.startPrank(owner);
     (comments, channelManager) = TestUtils.createContracts(owner);
+    vm.stopPrank();
 
-    vm.deal(address(this), 10 ether);
+    vm.deal(runner, 10 ether);
   }
 
   function run() public {
@@ -68,6 +72,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
     mockHook = new MockHook();
 
     // Create channel with hook
+    vm.prank(runner);
     channelId = channelManager.createChannel{ value: 0.02 ether }(
       "Test Channel",
       "Description",
@@ -77,14 +82,16 @@ contract DebugGasUsage is Test, IERC721Receiver {
   }
 
   function debugConstructChannelManager() public {
+    vm.prank(runner);
     measureGas("constructChannelManager", runConstructChannelManager);
   }
 
   function runConstructChannelManager() internal {
-    new ChannelManager(address(this));
+    new ChannelManager(owner);
   }
 
   function debugCreateChannel() public {
+    vm.prank(runner);
     measureGas("createChannel", runCreateChannel);
   }
 
@@ -98,6 +105,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
   }
 
   function debugUpdateChannel() public {
+    vm.prank(runner);
     measureGas("updateChannel", runUpdateChannel);
   }
 

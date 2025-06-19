@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "../libraries/Comments.sol";
-import "../libraries/Hooks.sol";
+import "../types/Comments.sol";
+import "../types/Hooks.sol";
 import "./IChannelManager.sol";
+import "../types/Metadata.sol";
 
 /// @title ICommentManager - Interface for the Comments contract
 /// @notice This interface defines the functions and events for the Comments contract
@@ -18,6 +19,7 @@ interface ICommentManager {
   /// @param content The text content of the comment - may contain urls, images and mentions
   /// @param targetUri the URI about which the comment is being made
   /// @param commentType The type of the comment (0=comment, 1=reaction)
+  /// @param authMethod The author authentication method used to create this comment
   /// @param metadata Array of key-value pairs for additional data
   event CommentAdded(
     bytes32 indexed commentId,
@@ -29,6 +31,7 @@ interface ICommentManager {
     string content,
     string targetUri,
     uint8 commentType,
+    uint8 authMethod,
     Metadata.MetadataEntry[] metadata
   );
 
@@ -59,9 +62,8 @@ interface ICommentManager {
 
   /// @notice Emitted when a comment is edited
   /// @param commentId Unique identifier of the edited comment
-  /// @param editedByApp Address of the app signer that changed the comment
   /// @param author Address of the comment author
-  /// @param app Address of the app signer that created the comment
+  /// @param editedByApp Address of the app signer that changed the comment
   /// @param channelId The channel ID associated with the comment
   /// @param parentId The ID of the parent comment if this is a reply, otherwise bytes32(0)
   /// @param createdAt The timestamp when the comment was created
@@ -69,11 +71,11 @@ interface ICommentManager {
   /// @param content The text content of the comment - may contain urls, images and mentions
   /// @param targetUri the URI about which the comment is being made
   /// @param commentType The type of the comment (0=comment, 1=reaction)
+  /// @param authMethod The author authentication method used to create this comment (from original creation)
   event CommentEdited(
     bytes32 indexed commentId,
-    address indexed editedByApp,
     address indexed author,
-    address app,
+    address indexed editedByApp,
     uint256 channelId,
     bytes32 parentId,
     uint96 createdAt,
@@ -81,18 +83,34 @@ interface ICommentManager {
     string content,
     string targetUri,
     uint8 commentType,
+    uint8 authMethod,
     Metadata.MetadataEntry[] metadata
   );
 
   /// @notice Emitted when an author approves an app signer
   /// @param author Address of the author giving approval
   /// @param app Address being approved
-  event ApprovalAdded(address indexed author, address indexed app);
+  /// @param expiry The timestamp when the approval expires
+  event ApprovalAdded(
+    address indexed author,
+    address indexed app,
+    uint256 expiry
+  );
 
   /// @notice Emitted when an author removes an app signer's approval
   /// @param author Address of the author removing approval
   /// @param app Address being unapproved
   event ApprovalRemoved(address indexed author, address indexed app);
+
+  /// @notice Emitted when a batch operation is executed
+  /// @param sender Address of the transaction sender
+  /// @param operationsCount Number of operations in the batch
+  /// @param totalValue Total ETH value sent with the batch
+  event BatchOperationExecuted(
+    address indexed sender,
+    uint256 operationsCount,
+    uint256 totalValue
+  );
 
   /// @notice Error thrown when app signature verification fails
   error InvalidAppSignature();
@@ -126,6 +144,16 @@ interface ICommentManager {
   error HookNotEnabled();
   /// @notice Error thrown when parent comment is not in the same channel
   error ParentCommentNotInSameChannel();
+  /// @notice Error thrown when approval expiry is invalid (in the past)
+  error InvalidApprovalExpiry();
+  /// @notice Error thrown when batch operation is invalid
+  error InvalidBatchOperation(uint256 operationIndex, string reason);
+  /// @notice Error thrown when batch operation value distribution is invalid
+  error InvalidValueDistribution(uint256 providedValue, uint256 requiredValue);
+  /// @notice Error thrown when batch operation fails
+  error BatchOperationFailed(uint256 operationIndex, bytes reason);
+  /// @notice Error thrown when reaction has no parentId or targetUri
+  error InvalidReactionReference(string reason);
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata
@@ -194,7 +222,8 @@ interface ICommentManager {
 
   /// @notice Approves an app signer when called directly by the author
   /// @param app The address to approve
-  function addApproval(address app) external;
+  /// @param expiry The timestamp when the approval expires
+  function addApproval(address app, uint256 expiry) external;
 
   /// @notice Removes an app signer approval when called directly by the author
   /// @param app The address to remove approval from
@@ -203,12 +232,14 @@ interface ICommentManager {
   /// @notice Approves an app signer with signature verification
   /// @param author The address granting approval
   /// @param app The address being approved
+  /// @param expiry The timestamp when the approval expires
   /// @param nonce The current nonce for the author
   /// @param deadline Timestamp after which the signature becomes invalid
   /// @param signature The author's signature authorizing the approval
   function addApprovalWithSig(
     address author,
     address app,
+    uint256 expiry,
     uint256 nonce,
     uint256 deadline,
     bytes calldata signature
@@ -231,12 +262,14 @@ interface ICommentManager {
   /// @notice Calculates the EIP-712 hash for a permit
   /// @param author Address of the author
   /// @param app Address of the app signer
+  /// @param expiry The timestamp when the approval expires
   /// @param nonce Current nonce for the author
   /// @param deadline Timestamp after which the signature is invalid
   /// @return bytes32 The computed hash
   function getAddApprovalHash(
     address author,
     address app,
+    uint256 expiry,
     uint256 nonce,
     uint256 deadline
   ) external view returns (bytes32);
@@ -348,6 +381,15 @@ interface ICommentManager {
   /// @return The approval status
   function isApproved(address author, address app) external view returns (bool);
 
+  /// @notice Get the approval expiry timestamp for an author and app
+  /// @param author The address of the author
+  /// @param app The address of the app
+  /// @return The approval expiry timestamp (0 if not approved)
+  function getApprovalExpiry(
+    address author,
+    address app
+  ) external view returns (uint256);
+
   /// @notice Get the nonce for an author and app
   /// @param author The address of the author
   /// @param app The address of the app
@@ -361,4 +403,13 @@ interface ICommentManager {
   /// @param commentId The ID of the comment
   /// @return The deleted status
   function isDeleted(bytes32 commentId) external view returns (bool);
+
+  // Batch Operation Functions
+
+  /// @notice Executes multiple operations (post, edit, delete) in a single transaction preserving order
+  /// @param operations Array of batch operations to execute
+  /// @return results Array of results from each operation (comment IDs for post operations, empty for others)
+  function batchOperations(
+    Comments.BatchOperation[] calldata operations
+  ) external payable returns (bytes[] memory results);
 }

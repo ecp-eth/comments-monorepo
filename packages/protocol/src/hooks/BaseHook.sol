@@ -6,10 +6,10 @@ import {
   IERC165
 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { ERC165 } from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import { Hooks } from "../libraries/Hooks.sol";
-import { Comments } from "../libraries/Comments.sol";
-import { Channels } from "../libraries/Channels.sol";
-import { Metadata } from "../libraries/Metadata.sol";
+import { Hooks } from "../types/Hooks.sol";
+import { Comments } from "../types/Comments.sol";
+import { Channels } from "../types/Channels.sol";
+import { Metadata } from "../types/Metadata.sol";
 
 /**
  * @title BaseHook

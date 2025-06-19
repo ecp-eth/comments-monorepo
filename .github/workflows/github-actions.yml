@@ -167,6 +167,7 @@ jobs:
         working-directory: packages/sdk
         env:
           NODE_ENV: "development"
+          NODE_OPTIONS: "--max-old-space-size=8192"
 
   build-docs:
     timeout-minutes: 15

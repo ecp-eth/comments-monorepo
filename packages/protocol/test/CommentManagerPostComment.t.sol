@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import { Test } from "forge-std/Test.sol";
 import { CommentManager } from "../src/CommentManager.sol";
-import { Comments } from "../src/libraries/Comments.sol";
+import { Comments } from "../src/types/Comments.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import {
@@ -11,8 +11,8 @@ import {
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { TestUtils, AlwaysReturningDataHook } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 import { IProtocolFees } from "../src/interfaces/IProtocolFees.sol";
 
 contract NoHook is BaseHook {
@@ -82,6 +82,7 @@ contract CommentsTest is Test, IERC721Receiver {
     string content,
     string targetUri,
     uint8 commentType,
+    uint8 authMethod,
     Metadata.MetadataEntry[] metadata
   );
   event CommentMetadataSet(
@@ -167,7 +168,7 @@ contract CommentsTest is Test, IERC721Receiver {
     commentData.app = app;
 
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Send transaction as author
     vm.prank(author);
@@ -215,7 +216,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_PostCommentWithSigs_ValidAppSignature_AppApproved() public {
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Create and post comment
     Comments.CreateComment memory commentData = TestUtils
@@ -258,8 +259,8 @@ contract CommentsTest is Test, IERC721Receiver {
     address anotherApp = address(0x999);
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
-    comments.addApproval(anotherApp);
+    comments.addApproval(app, block.timestamp + 30 days);
+    comments.addApproval(anotherApp, block.timestamp + 30 days);
 
     // Create and post comment
     Comments.CreateComment memory commentData = TestUtils
@@ -596,10 +597,11 @@ contract CommentsTest is Test, IERC721Receiver {
       app,
       channelId,
       commentData.parentId,
-      uint96(block.timestamp),
+      uint88(block.timestamp),
       commentData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.AUTHOR_SIGNATURE),
       new Metadata.MetadataEntry[](0)
     );
     vm.expectEmit(true, true, true, true);
@@ -772,6 +774,138 @@ contract CommentsTest is Test, IERC721Receiver {
     bytes calldata
   ) external pure returns (bytes4) {
     return IERC721Receiver.onERC721Received.selector;
+  }
+
+  // Tests for AuthorAuthMethod tracking
+  function test_PostComment_StoresDirectTxAuthMethod() public {
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.app = app;
+
+    // Generate app signature
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    // Send transaction as author (direct transaction)
+    vm.prank(author);
+    bytes32 actualCommentId = comments.postComment(commentData, appSignature);
+
+    // Verify the comment was stored with DIRECT_TX auth method (0)
+    Comments.Comment memory storedComment = comments.getComment(
+      actualCommentId
+    );
+    assertTrue(
+      storedComment.authMethod == Comments.AuthorAuthMethod.DIRECT_TX,
+      "Auth method should be DIRECT_TX (0)"
+    );
+    assertEq(storedComment.author, author, "Author should match");
+    assertEq(storedComment.app, app, "App should match");
+  }
+
+  function test_PostCommentWithSig_StoresAuthorSignatureAuthMethod() public {
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.app = app;
+
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory authorSignature = TestUtils.signEIP712(
+      vm,
+      authorPrivateKey,
+      commentId
+    );
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    // Post comment with author signature (no pre-approval)
+    bytes32 actualCommentId = comments.postCommentWithSig(
+      commentData,
+      authorSignature,
+      appSignature
+    );
+
+    // Verify the comment was stored with AUTHOR_SIGNATURE auth method (2)
+    Comments.Comment memory storedComment = comments.getComment(
+      actualCommentId
+    );
+    assertTrue(
+      storedComment.authMethod == Comments.AuthorAuthMethod.AUTHOR_SIGNATURE,
+      "Auth method should be AUTHOR_SIGNATURE (2)"
+    );
+    assertEq(storedComment.author, author, "Author should match");
+    assertEq(storedComment.app, app, "App should match");
+  }
+
+  function test_PostCommentWithSig_StoresAppApprovalAuthMethod() public {
+    // First add approval for the app
+    vm.prank(author);
+    comments.addApproval(app, block.timestamp + 30 days);
+
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.app = app;
+
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    // Post comment with app approval (empty author signature)
+    bytes32 actualCommentId = comments.postCommentWithSig(
+      commentData,
+      bytes(""), // empty author signature
+      appSignature
+    );
+
+    // Verify the comment was stored with APP_APPROVAL auth method (1)
+    Comments.Comment memory storedComment = comments.getComment(
+      actualCommentId
+    );
+    assertTrue(
+      storedComment.authMethod == Comments.AuthorAuthMethod.APP_APPROVAL,
+      "Auth method should be APP_APPROVAL (1)"
+    );
+    assertEq(storedComment.author, author, "Author should match");
+    assertEq(storedComment.app, app, "App should match");
+  }
+
+  function test_PostCommentWithSig_ExpiredApproval_Reverts() public {
+    // Add approval with expiry in the near future
+    uint256 expiry = block.timestamp + 1;
+    vm.prank(author);
+    comments.addApproval(app, expiry);
+
+    // Advance time past expiry
+    vm.warp(expiry + 1);
+
+    // Prepare comment data
+    Comments.CreateComment memory commentData = TestUtils
+      .generateDummyCreateComment(author, app);
+    commentData.app = app;
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId
+    );
+
+    // Try to post comment with only app signature (should revert due to expired approval)
+    vm.expectRevert(
+      abi.encodeWithSelector(
+        ICommentManager.NotAuthorized.selector,
+        address(this),
+        author
+      )
+    );
+    comments.postCommentWithSig(commentData, bytes(""), appSignature);
   }
 }
 

@@ -11,9 +11,9 @@ import {
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { TestUtils } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Comments } from "../src/libraries/Comments.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Comments } from "../src/types/Comments.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 
 // Token contract for testing
 contract TestToken is ERC20 {

@@ -27,6 +27,17 @@ When `commentType = 1` (reaction), the `content` field should contain a string i
 - Unknown reaction types should be handled gracefully by displaying a generic reaction icon or ignored
 - Consider internationalization when displaying reaction labels to users
 
+## `authMethod`
+
+The `authMethod` field indicates how the comment was authenticated when it was created. This provides transparency about the trust model used for each comment.
+[Read more about the authentication methods](./dual-signature-system.mdx)
+
+### Authentication Methods
+
+- **`0` (DIRECT_TX)** - The user signed the transaction directly (msg.sender == author)
+- **`1` (APP_APPROVAL)** - The user has pre-approved the app to post on their behalf
+- **`2` (AUTHOR_SIGNATURE)** - The user signed the comment hash offline (meta-transaction)
+
 ## `metadata`
 
 The `metadata` property stores additional data as key-value pairs that shouldn't be shown to the user as-is.

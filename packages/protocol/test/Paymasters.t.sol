@@ -32,7 +32,7 @@ import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { TestUtils, MockHook } from "./utils.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 
 /**
  * test paymaster, that pays for everything, without any check.

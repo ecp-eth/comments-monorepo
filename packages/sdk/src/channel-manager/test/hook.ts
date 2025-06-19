@@ -176,7 +176,11 @@ describe("hook", () => {
           }),
         (err) => {
           assert.ok(err instanceof ContractFunctionExecutionError);
-          assert.ok(err.message.includes("Error: OwnableUnauthorizedAccount("));
+          assert.ok(
+            (err as ContractFunctionExecutionError).message.includes(
+              "Error: Unauthorized()",
+            ),
+          );
           return true;
         },
       );

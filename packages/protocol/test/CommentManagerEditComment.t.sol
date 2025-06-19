@@ -2,12 +2,12 @@
 pragma solidity ^0.8.20;
 import { Test } from "forge-std/Test.sol";
 import { CommentManager } from "../src/CommentManager.sol";
-import { Comments } from "../src/libraries/Comments.sol";
+import { Comments } from "../src/types/Comments.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
-import { Hooks } from "../src/libraries/Hooks.sol";
-import { Metadata } from "../src/libraries/Metadata.sol";
+import { Hooks } from "../src/types/Hooks.sol";
+import { Metadata } from "../src/types/Metadata.sol";
 import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -18,9 +18,8 @@ error TestHookRejected();
 contract CommentsTest is Test, IERC721Receiver {
   event CommentEdited(
     bytes32 indexed commentId,
-    address indexed editedByApp,
     address indexed author,
-    address app,
+    address indexed editedByApp,
     uint256 channelId,
     bytes32 parentId,
     uint96 createdAt,
@@ -28,6 +27,7 @@ contract CommentsTest is Test, IERC721Receiver {
     string content,
     string targetUri,
     uint8 commentType,
+    uint8 authMethod,
     Metadata.MetadataEntry[] metadata
   );
   event CommentMetadataSet(
@@ -111,16 +111,16 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.DIRECT_TX),
       editData.metadata
     );
     comments.editComment(commentId, editData, editAppSignature);
@@ -128,7 +128,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
   }
 
   function test_EditComment_AsAuthorAndApp_AppSignatureNotRequired() public {
@@ -177,16 +177,16 @@ contract CommentsTest is Test, IERC721Receiver {
     );
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
+      uint88(block.timestamp),
       uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.DIRECT_TX),
       editData.metadata
     );
     comments.editComment(commentId, editData, "");
@@ -194,7 +194,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
 
     // Verify metadata was set
     Metadata.MetadataEntry[] memory commentMetadata = comments
@@ -249,16 +249,16 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.DIRECT_TX),
       editData.metadata
     );
     vm.expectEmit(true, true, true, true);
@@ -272,7 +272,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
 
     // Verify hook metadata was set
     Metadata.MetadataEntry[] memory hookMetadata = comments
@@ -411,16 +411,16 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.AUTHOR_SIGNATURE),
       editData.metadata
     );
     comments.editCommentWithSig(
@@ -433,13 +433,13 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
   }
 
   function test_EditCommentWithSig_AppSignature_AppApproved() public {
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Create and post a comment
     Comments.CreateComment memory commentData = TestUtils
@@ -474,16 +474,16 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.APP_APPROVAL),
       editData.metadata
     );
     comments.editCommentWithSig(
@@ -496,13 +496,13 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
   }
 
   function test_EditCommentWithSig_SenderIsApp_NoAppSignature() public {
     // First add approval
     vm.prank(author);
-    comments.addApproval(app);
+    comments.addApproval(app, block.timestamp + 30 days);
 
     // Create and post a comment
     Comments.CreateComment memory commentData = TestUtils
@@ -526,16 +526,16 @@ contract CommentsTest is Test, IERC721Receiver {
     vm.expectEmit(true, true, true, true);
     emit CommentEdited(
       commentId,
-      editData.app,
       author,
-      app,
+      editData.app,
       commentData.channelId,
       commentData.parentId,
-      uint96(block.timestamp),
-      uint96(block.timestamp),
+      uint88(block.timestamp),
+      uint88(block.timestamp),
       editData.content,
       commentData.targetUri,
       commentData.commentType,
+      uint8(Comments.AuthorAuthMethod.APP_APPROVAL),
       editData.metadata
     );
     vm.prank(app);
@@ -544,7 +544,7 @@ contract CommentsTest is Test, IERC721Receiver {
     // Verify the comment was edited
     Comments.Comment memory editedComment = comments.getComment(commentId);
     assertEq(editedComment.content, editData.content);
-    assertEq(editedComment.updatedAt, uint96(block.timestamp));
+    assertEq(editedComment.updatedAt, uint88(block.timestamp));
   }
 
   function test_EditCommentWithSig_InvalidAppSignature() public {

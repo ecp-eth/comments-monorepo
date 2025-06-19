@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import { Metadata } from "./Metadata.sol";
+import "./Metadata.sol";
 import "./Hooks.sol";
 
-/// @title Channels - Library defining channel-related types
+/// @title Channels - Type definitions for channel-related structs
 library Channels {
   /// @notice Struct containing channel configuration
   /// @param name The name of the channel

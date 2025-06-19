@@ -10,7 +10,7 @@
 function createDeleteCommentTypedData(params): {
   domain: {
      chainId: number;
-     name: "Comments";
+     name: "Ethereum Comments Protocol";
      verifyingContract: `0x${string}`;
      version: "1";
   };
@@ -43,7 +43,7 @@ function createDeleteCommentTypedData(params): {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:627](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L627)
+Defined in: [packages/sdk/src/comments/comment.ts:630](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L630)
 
 Create the EIP-712 typed data structure for deleting comment
 
@@ -62,7 +62,7 @@ The purpose of this is to mark comment as deleted so indexers can do their logic
 {
   domain: {
      chainId: number;
-     name: "Comments";
+     name: "Ethereum Comments Protocol";
      verifyingContract: `0x${string}`;
      version: "1";
   };
@@ -102,7 +102,7 @@ The typed data
 ```ts
 domain: {
   chainId: number;
-  name: "Comments";
+  name: "Ethereum Comments Protocol";
   verifyingContract: `0x${string}`;
   version: "1";
 };
@@ -117,7 +117,7 @@ chainId: number;
 #### domain.name
 
 ```ts
-name: "Comments";
+name: "Ethereum Comments Protocol";
 ```
 
 #### domain.verifyingContract

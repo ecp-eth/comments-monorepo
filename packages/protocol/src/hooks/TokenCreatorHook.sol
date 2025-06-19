@@ -2,11 +2,11 @@
 pragma solidity ^0.8.20;
 
 import { BaseHook } from "./BaseHook.sol";
-import { Hooks } from "../libraries/Hooks.sol";
-import { Comments } from "../libraries/Comments.sol";
-import { Channels } from "../libraries/Channels.sol";
-import { Metadata } from "../libraries/Metadata.sol";
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+import { Hooks } from "../types/Hooks.sol";
+import { Comments } from "../types/Comments.sol";
+import { Channels } from "../types/Channels.sol";
+import { Metadata } from "../types/Metadata.sol";
+import "solady/src/utils/LibString.sol";
 import {
   EnumerableMap
 } from "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
@@ -15,8 +15,8 @@ import {
 /// @notice Hook that gates channels to only allow token creators to post top-level comments. Similar to telegram channels.
 /// @dev Requires channel metadata to contain tokenAddress and tokenCreator fields
 contract TokenCreatorHook is BaseHook {
-  using Strings for string;
-  using Strings for uint256;
+  using LibString for string;
+  using LibString for uint256;
   using EnumerableMap for EnumerableMap.UintToAddressMap;
 
   /// @notice Error thrown when token address is invalid
@@ -177,9 +177,9 @@ contract TokenCreatorHook is BaseHook {
     // Construct expected CAIP-19 URI for ERC20 token
     string memory expectedUri = string.concat(
       "eip155:",
-      Strings.toString(tokenChainId),
+      LibString.toString(tokenChainId),
       "/erc20:",
-      Strings.toHexString(uint160(tokenAddress), 20)
+      LibString.toHexString(uint160(tokenAddress), 20)
     );
 
     // Compare the URIs
