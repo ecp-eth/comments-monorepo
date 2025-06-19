@@ -80,6 +80,10 @@ async function searchEns(query: string): Promise<Result | null> {
     return null;
   }
 
+  if (/^[^a-zA-Z0-9]/.test(query)) {
+    return null;
+  }
+
   if (query.startsWith("0x")) {
     const results = await graphqlRequest<Result>(
       env.GRAPH_ENS_SUBGRAPH_URL,
