@@ -259,6 +259,7 @@ function getModerationStatus(
     return "approved";
   }
 
+  // commentType 1 represents reactions
   if (
     comment.commentType === 1 &&
     extra.moderationKnownReactions.includes(comment.content)

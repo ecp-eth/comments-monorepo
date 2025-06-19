@@ -103,6 +103,7 @@ export class CommentModerationService {
       };
     }
 
+    // commentType 1 represents reactions
     if (comment.commentType === 1 && this.knownReactions.has(comment.content)) {
       return {
         result: {
