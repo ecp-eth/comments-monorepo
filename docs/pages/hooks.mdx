@@ -94,9 +94,9 @@ Hooks allow you to customize channel behavior. To create a custom hook:
 pragma solidity ^0.8.20;
 
 import { BaseHook } from "@ecp.eth/protocol/src/hooks/BaseHook.sol";
-import { Hooks } from "@ecp.eth/protocol/src/libraries/Hooks.sol";
-import { Comments } from "@ecp.eth/protocol/src/libraries/Comments.sol";
-import { Channels } from "@ecp.eth/protocol/src/libraries/Channels.sol";
+import { Hooks } from "@ecp.eth/protocol/src/types/Hooks.sol";
+import { Comments } from "@ecp.eth/protocol/src/types/Comments.sol";
+import { Channels } from "@ecp.eth/protocol/src/types/Channels.sol";
 
 contract MyCustomHook is BaseHook {
   function _getHookPermissions()
