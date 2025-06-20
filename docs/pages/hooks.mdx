@@ -117,9 +117,10 @@ contract MyCustomHook is BaseHook {
   }
 
   function _onInitialize(
-    address channel,
+    address channelManager,
     Channels.Channel memory channelData,
-    uint256 channelId
+    uint256 channelId,
+    Metadata.MetadataEntry[] calldata metadata
   ) internal override returns (bool) {
     // Your initialization logic here
     return true;

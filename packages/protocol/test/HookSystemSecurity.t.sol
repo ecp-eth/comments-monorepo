@@ -58,7 +58,8 @@ contract MaliciousRevertHook is BaseHook {
   function _onInitialize(
     address,
     Channels.Channel memory,
-    uint256
+    uint256,
+    Metadata.MetadataEntry[] calldata
   ) internal view override returns (bool) {
     if (shouldRevertOnInit) {
       revert MaliciousHookError();
@@ -551,7 +552,6 @@ contract HookSystemSecurityTest is Test, IERC721Receiver {
     );
 
     // Try to call hook functions directly (should fail or be meaningless)
-    Comments.Comment memory dummyComment;
     Metadata.MetadataEntry[]
       memory dummyMetadata = new Metadata.MetadataEntry[](0);
 
@@ -573,7 +573,8 @@ contract HookSystemSecurityTest is Test, IERC721Receiver {
             onCommentHookDataUpdate: false
           })
         }),
-        channelId
+        channelId,
+        dummyMetadata
       )
     {
       // Direct call succeeded but shouldn't affect system

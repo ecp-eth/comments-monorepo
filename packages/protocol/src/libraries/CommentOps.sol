@@ -322,16 +322,23 @@ library CommentOps {
     if (channel.hook != address(0) && channel.permissions.onCommentDelete) {
       IHook hook = IHook(channel.hook);
       // Calculate hook value after protocol fee
-      uint256 msgValueAfterFee = channelManager
+      // Calculate hook value after protocol fee
+      uint256 valueToPassToHook = channelManager
         .deductProtocolHookTransactionFee(msgValue);
+      if (msgValue > valueToPassToHook) {
+        payable(address(channelManager)).transfer(msgValue - valueToPassToHook);
+      }
 
-      hook.onCommentDelete{ value: msgValueAfterFee }(
+      hook.onCommentDelete{ value: valueToPassToHook }(
         commentToDelete,
         metadata,
         hookMetadata,
         msgSender,
         commentId
       );
+    } else if (msgValue > 0) {
+      // refund excess payment if any
+      payable(msgSender).transfer(msgValue);
     }
   }
 
@@ -387,6 +394,8 @@ library CommentOps {
       msgSender,
       commentId
     );
+
+    emit ICommentManager.CommentHookDataUpdate(commentId, operations);
 
     // Apply hook metadata operations using merge mode (gas-efficient)
     for (uint i = 0; i < operations.length; i++) {

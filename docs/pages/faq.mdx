@@ -51,3 +51,4 @@ Yes. We have made the following tradeoffs with the contract design:
 1. Long deadlines can be exploited to delay sharing a comment
 1. Deduplication of identical comments by the same author should be done via using a different deadline for each comment.
 1. Metadata is limited to 1000 items to prevent gas-DOS attacks.
+1. An approval gives the app the permission to delete comments, including comments posted by another app for this user.

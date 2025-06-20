@@ -14,13 +14,16 @@ interface IHook is IERC165 {
     returns (Hooks.Permissions memory);
 
   /// @notice Execute after a hook is initialized on a channel
-  /// @param channel The address of the channel the hook was added to
+  /// @param channelManager The address of the channel the hook was added to
   /// @param channelData The channel data that was used to initialize the hook
+  /// @param channelId The unique identifier of the channel that was initialized
+  /// @param metadata The metadata entries for the channel that was initialized
   /// @return success Whether the hook initialization was successful
   function onInitialize(
-    address channel,
+    address channelManager,
     Channels.Channel memory channelData,
-    uint256 channelId
+    uint256 channelId,
+    Metadata.MetadataEntry[] calldata metadata
   ) external returns (bool success);
 
   /// @notice Execute after a comment is processed

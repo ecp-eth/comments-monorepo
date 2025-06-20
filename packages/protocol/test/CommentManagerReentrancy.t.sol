@@ -71,7 +71,8 @@ contract ReentrantHook is BaseHook {
   function onInitialize(
     address,
     Channels.Channel memory,
-    uint256
+    uint256,
+    Metadata.MetadataEntry[] calldata
   ) external pure override returns (bool) {
     return true;
   }

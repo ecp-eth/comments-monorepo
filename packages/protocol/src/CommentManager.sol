@@ -214,6 +214,9 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     // Collect protocol comment fee, if any.
     uint96 commentCreationFee = channelManager.getCommentCreationFee();
     if (commentCreationFee > 0) {
+      if (msg.value < commentCreationFee) {
+        revert InsufficientValue(msg.value, commentCreationFee);
+      }
       channelManager.collectCommentCreationFee{ value: commentCreationFee }();
     }
 
@@ -402,15 +405,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function deleteComment(
-    bytes32 commentId
-  )
-    public
-    payable
-    commentExists(commentId)
-    onlyAuthor(comments[commentId].author)
-  {
-    _deleteComment(commentId, msg.sender);
+  function deleteComment(bytes32 commentId) public payable {
+    _deleteComment(commentId, msg.sender, msg.value);
+  }
+
+  /// @notice Internal function to handle comment deletion logic
+  /// @param commentId The unique identifier of the comment to delete
+  /// @param author The address of the comment author
+  /// @param value The value to be paid for the comment
+  function _deleteComment(
+    bytes32 commentId,
+    address author,
+    uint256 value
+  ) internal commentExists(commentId) onlyAuthor(comments[commentId].author) {
+    _removeComment(commentId, author, value);
   }
 
   /// @inheritdoc ICommentManager
@@ -420,7 +428,32 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     uint256 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) public payable notStale(deadline) commentExists(commentId) {
+  ) public payable {
+    _deleteCommentWithSig(
+      commentId,
+      app,
+      deadline,
+      authorSignature,
+      appSignature,
+      msg.value
+    );
+  }
+
+  /// @notice Internal function to handle comment deletion with signature logic
+  /// @param commentId The unique identifier of the comment to delete
+  /// @param app The address of the app
+  /// @param deadline The deadline for the signature
+  /// @param authorSignature The author signature
+  /// @param appSignature The app signature
+  /// @param value The value to be paid for the comment
+  function _deleteCommentWithSig(
+    bytes32 commentId,
+    address app,
+    uint256 deadline,
+    bytes calldata authorSignature,
+    bytes calldata appSignature,
+    uint256 value
+  ) internal notStale(deadline) commentExists(commentId) {
     Comments.Comment storage comment = comments[commentId];
     address author = comment.author;
 
@@ -453,7 +486,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       );
 
     if (isAuthorizedByAuthor || isAuthorizedByApprovedApp) {
-      _deleteComment(commentId, author);
+      _removeComment(commentId, author, value);
       return;
     }
 
@@ -463,7 +496,11 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   /// @notice Internal function to handle comment deletion logic
   /// @param commentId The unique identifier of the comment to delete
   /// @param author The address of the comment author
-  function _deleteComment(bytes32 commentId, address author) internal {
+  function _removeComment(
+    bytes32 commentId,
+    address author,
+    uint256 value
+  ) internal {
     CommentOps.deleteComment(
       commentId,
       author,
@@ -475,7 +512,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       commentHookMetadata,
       commentHookMetadataKeys,
       msg.sender,
-      msg.value
+      value
     );
   }
 
@@ -968,7 +1005,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     bytes32 commentId = Batching.decodeDeleteCommentData(operation);
 
     // Call deleteComment function directly (preserves msg.sender)
-    deleteComment(commentId);
+    _deleteComment(commentId, msg.sender, operation.value);
 
     return Batching.getEmptyResult();
   }
@@ -980,12 +1017,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       .decodeDeleteCommentWithSigData(operation);
 
     // Call deleteCommentWithSig function directly
-    deleteCommentWithSig(
+    _deleteCommentWithSig(
       deleteData.commentId,
       deleteData.app,
       deleteData.deadline,
       operation.signatures[0], // author signature
-      operation.signatures[1] // app signature
+      operation.signatures[1], // app signature
+      operation.value
     );
 
     return Batching.getEmptyResult();

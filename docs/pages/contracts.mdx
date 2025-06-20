@@ -35,15 +35,14 @@ For detailed information about all functions, events, and structs, please refer 
 
 ### ChannelManager Contract Functions
 
-| Function                 | Description                                                                           | Note                            |
-| ------------------------ | ------------------------------------------------------------------------------------- | ------------------------------- |
-| `createChannel`          | Creates a new channel with specified name, description, metadata, and optional hook   | Requires channel creation fee   |
-| `updateChannel`          | Updates an existing channel's name, description, and metadata                         | Only callable by channel owner  |
-| `setHook`                | Sets or updates a hook contract for a channel                                         | Only callable by channel owner  |
-| `getChannel`             | Retrieves channel information including name, description, metadata, and hook address |                                 |
-| `channelExists`          | Checks if a channel ID exists                                                         |                                 |
-| `updateCommentsContract` | Updates the address of the Comments contract                                          | Only callable by contract owner |
-| `setBaseURI`             | Sets the base URI for token metadata                                                  | Only callable by contract owner |
-| `ownerOf`                | Gets the owner address of a channel                                                   |                                 |
+| Function        | Description                                                                           | Note                            |
+| --------------- | ------------------------------------------------------------------------------------- | ------------------------------- |
+| `createChannel` | Creates a new channel with specified name, description, metadata, and optional hook   | Requires channel creation fee   |
+| `updateChannel` | Updates an existing channel's name, description, and metadata                         | Only callable by channel owner  |
+| `setHook`       | Sets or updates a hook contract for a channel                                         | Only callable by channel owner  |
+| `getChannel`    | Retrieves channel information including name, description, metadata, and hook address |                                 |
+| `channelExists` | Checks if a channel ID exists                                                         |                                 |
+| `setBaseURI`    | Sets the base URI for token metadata                                                  | Only callable by contract owner |
+| `ownerOf`       | Gets the owner address of a channel                                                   |                                 |
 
 For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/ChannelManager).

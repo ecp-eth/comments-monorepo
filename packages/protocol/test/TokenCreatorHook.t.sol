@@ -30,6 +30,7 @@ contract TokenCreatorHookTest is Test {
   uint256 public tokenChainId;
   uint256 public channelId;
   Metadata.MetadataEntry[] public validMetadata;
+  Metadata.MetadataEntryOp[] public validMetadataOps;
   ERC20 public testToken;
 
   function setUp() public {
@@ -44,7 +45,6 @@ contract TokenCreatorHookTest is Test {
     commentManager = new CommentManager(initialOwner);
 
     // Set up cross-contract references
-    channelManager.updateCommentsContract(address(commentManager));
     commentManager.updateChannelContract(address(channelManager));
 
     // Deploy and set up hook
@@ -68,6 +68,22 @@ contract TokenCreatorHookTest is Test {
       key: "string tokenChainId",
       value: abi.encode(tokenChainId)
     });
+    validMetadataOps = new Metadata.MetadataEntryOp[](3);
+    validMetadataOps[0] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: "string tokenAddress",
+      value: abi.encode(tokenAddress)
+    });
+    validMetadataOps[1] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: "string tokenCreator",
+      value: abi.encode(tokenCreator)
+    });
+    validMetadataOps[2] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
+      key: "string tokenChainId",
+      value: abi.encode(tokenChainId)
+    });
 
     // Create a channel with the hook
     // First create the channel
@@ -77,27 +93,28 @@ contract TokenCreatorHookTest is Test {
       validMetadata,
       address(0) // Initially no hook
     );
-    // Then set the hook
-    channelManager.updateChannel(
-      channelId,
-      "Test Channel",
-      "Test Description",
-      validMetadata
-    );
+
     channelManager.setHook(channelId, address(hook));
     vm.stopPrank();
   }
 
   function test_InitializeWithMissingTokenAddress() public {
-    Metadata.MetadataEntry[]
-      memory invalidMetadata = new Metadata.MetadataEntry[](2);
-    invalidMetadata[0] = Metadata.MetadataEntry({
+    Metadata.MetadataEntryOp[]
+      memory invalidMetadata = new Metadata.MetadataEntryOp[](3);
+    invalidMetadata[0] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
       key: "string tokenCreator",
       value: abi.encode(tokenCreator)
     });
-    invalidMetadata[1] = Metadata.MetadataEntry({
+    invalidMetadata[1] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
       key: "string tokenChainId",
       value: abi.encode(tokenChainId)
+    });
+    invalidMetadata[2] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.DELETE,
+      key: "string tokenAddress",
+      value: abi.encode(tokenAddress)
     });
 
     vm.startPrank(channelManager.owner());
@@ -114,15 +131,22 @@ contract TokenCreatorHookTest is Test {
   }
 
   function test_InitializeWithMissingTokenCreator() public {
-    Metadata.MetadataEntry[]
-      memory invalidMetadata = new Metadata.MetadataEntry[](2);
-    invalidMetadata[0] = Metadata.MetadataEntry({
+    Metadata.MetadataEntryOp[]
+      memory invalidMetadata = new Metadata.MetadataEntryOp[](3);
+    invalidMetadata[0] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
       key: "string tokenAddress",
       value: abi.encode(tokenAddress)
     });
-    invalidMetadata[1] = Metadata.MetadataEntry({
+    invalidMetadata[1] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
       key: "string tokenChainId",
       value: abi.encode(tokenChainId)
+    });
+    invalidMetadata[2] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.DELETE,
+      key: "string tokenCreator",
+      value: abi.encode(tokenCreator)
     });
 
     vm.startPrank(channelManager.owner());
@@ -139,15 +163,22 @@ contract TokenCreatorHookTest is Test {
   }
 
   function test_InitializeWithMissingTokenChainId() public {
-    Metadata.MetadataEntry[]
-      memory invalidMetadata = new Metadata.MetadataEntry[](2);
-    invalidMetadata[0] = Metadata.MetadataEntry({
+    Metadata.MetadataEntryOp[]
+      memory invalidMetadata = new Metadata.MetadataEntryOp[](3);
+    invalidMetadata[0] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
       key: "string tokenAddress",
       value: abi.encode(tokenAddress)
     });
-    invalidMetadata[1] = Metadata.MetadataEntry({
+    invalidMetadata[1] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
       key: "string tokenCreator",
       value: abi.encode(tokenCreator)
+    });
+    invalidMetadata[2] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.DELETE,
+      key: "string tokenChainId",
+      value: abi.encode(tokenChainId)
     });
 
     vm.startPrank(channelManager.owner());
@@ -169,7 +200,7 @@ contract TokenCreatorHookTest is Test {
       channelId,
       "Test Channel",
       "Test Description",
-      validMetadata
+      validMetadataOps
     );
     channelManager.setHook(channelId, address(hook));
     vm.stopPrank();

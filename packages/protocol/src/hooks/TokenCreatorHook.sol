@@ -128,11 +128,11 @@ contract TokenCreatorHook is BaseHook {
 
   function _onInitialize(
     address,
-    Channels.Channel memory channel,
-    uint256 channelId
+    Channels.Channel memory,
+    uint256 channelId,
+    Metadata.MetadataEntry[] calldata metadata
   ) internal override returns (bool) {
     // Parse metadata to get token address and creator
-    Metadata.MetadataEntry[] memory metadata = channel.metadata;
     if (metadata.length == 0) revert InvalidMetadata();
 
     // Find token address and creator in metadata

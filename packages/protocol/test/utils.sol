@@ -221,7 +221,6 @@ library TestUtils {
     channelManager = new ChannelManager(owner);
 
     // update contract addresses
-    channelManager.updateCommentsContract(address(comments));
     comments.updateChannelContract(address(channelManager));
 
     return (comments, channelManager);

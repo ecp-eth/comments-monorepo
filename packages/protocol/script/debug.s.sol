@@ -114,7 +114,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
       channelId,
       "Test Channel 3",
       "Description",
-      new Metadata.MetadataEntry[](0)
+      new Metadata.MetadataEntryOp[](0)
     );
   }
 

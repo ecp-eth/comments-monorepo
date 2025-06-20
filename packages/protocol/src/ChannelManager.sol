@@ -22,9 +22,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   /// @notice Base URI for NFT metadata
   string internal baseURIValue;
 
-  /// @notice Address of the comments contract
-  address internal commentsContract;
-
   // Mapping from channel ID to channel configuration
   mapping(uint256 => Channels.Channel) internal channels;
 
@@ -56,11 +53,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
       channelZero.metadata,
       channelZero.hook
     );
-  }
-
-  modifier onlyCommentsContract() {
-    if (msg.sender != commentsContract) revert UnauthorizedCaller();
-    _;
   }
 
   /// @inheritdoc IChannelManager
@@ -137,13 +129,13 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   ) external payable returns (uint256 channelId) {
     if (bytes(name).length == 0) revert EmptyChannelName();
 
-    _collectChannelCreationFee();
-
     // Generate channel ID using the internal function
     channelId = _getChannelId(msg.sender, name, description, metadata);
 
     // Ensure channel ID doesn't already exist
     if (_channelExists(channelId)) revert ChannelAlreadyExists();
+
+    _collectChannelCreationFee();
 
     _safeMint(msg.sender, channelId);
 
@@ -151,7 +143,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
     channel.name = name;
     channel.description = description;
-    channel.metadata = metadata;
+    _createChannelMetadata(channelId, metadata);
 
     emit ChannelCreated(channelId, name, description, metadata, hook);
 
@@ -168,7 +160,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     uint256 channelId,
     string calldata name,
     string calldata description,
-    Metadata.MetadataEntry[] calldata metadata
+    Metadata.MetadataEntryOp[] calldata metadataOperations
   ) external {
     if (bytes(name).length == 0) revert EmptyChannelName();
     if (!_channelExists(channelId)) revert ChannelDoesNotExist();
@@ -178,7 +170,9 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
     channel.name = name;
     channel.description = description;
-    channel.metadata = metadata;
+    _setChannelMetadata(channelId, metadataOperations);
+
+    Metadata.MetadataEntry[] memory metadata = getChannelMetadata(channelId);
 
     emit ChannelUpdated(channelId, name, description, metadata);
 
@@ -225,7 +219,12 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
       // Call afterInitialize hook if permitted
       if (permissions.onInitialize) {
-        IHook(hook).onInitialize(address(this), channels[channelId], channelId);
+        IHook(hook).onInitialize(
+          address(this),
+          channels[channelId],
+          channelId,
+          getChannelMetadata(channelId)
+        );
       }
     } else {
       delete channels[channelId].hook; // Properly reset to default value
@@ -236,14 +235,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   /// @inheritdoc IChannelManager
   function channelExists(uint256 channelId) external view returns (bool) {
     return _channelExists(channelId);
-  }
-
-  /// @inheritdoc IChannelManager
-  function updateCommentsContract(
-    address _commentsContract
-  ) external onlyOwner {
-    if (_commentsContract == address(0)) revert ZeroAddress();
-    commentsContract = _commentsContract;
   }
 
   /// @inheritdoc IChannelManager
@@ -259,11 +250,29 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     return baseURIValue;
   }
 
-  /// @inheritdoc IChannelManager
-  function setChannelMetadata(
+  function _createChannelMetadata(
+    uint256 channelId,
+    Metadata.MetadataEntry[] calldata metadata
+  ) internal {
+    mapping(bytes32 => bytes) storage channelMetadataForId = channelMetadata[
+      channelId
+    ];
+    bytes32[] storage channelMetadataKeysForId = channelMetadataKeys[channelId];
+    for (uint i = 0; i < metadata.length; i++) {
+      bytes32 key = metadata[i].key;
+      bytes memory val = metadata[i].value;
+      channelMetadataForId[key] = val;
+      channelMetadataKeysForId.push(key);
+    }
+  }
+
+  /// @notice Sets metadata for a channel
+  /// @param channelId The unique identifier of the channel
+  /// @param operations Array of metadata operations to perform
+  function _setChannelMetadata(
     uint256 channelId,
     Metadata.MetadataEntryOp[] calldata operations
-  ) external {
+  ) internal {
     if (!_channelExists(channelId)) revert ChannelDoesNotExist();
     if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
 
@@ -282,7 +291,9 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         bool isNewKey = !_channelMetadataKeyExists(channelId, op.key);
 
         channelMetadata[channelId][op.key] = op.value;
-
+        if (op.key == bytes32(0)) {
+          revert InvalidKey();
+        }
         // Only add to keys array if it's a new key
         if (isNewKey) {
           channelMetadataKeys[channelId].push(op.key);

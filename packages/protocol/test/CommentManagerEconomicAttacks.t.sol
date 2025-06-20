@@ -232,6 +232,11 @@ contract CommentManagerEconomicAttacksTest is Test, IERC721Receiver {
     // Used for testing fee-related attacks and value transfers
   }
 
+  receive() external payable {
+    // This function allows the contract to receive ETH
+    // Used for testing fee-related attacks and value transfers
+  }
+
   function setUp() public {
     owner = address(this);
     author = vm.addr(authorPrivateKey);
