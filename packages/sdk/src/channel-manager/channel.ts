@@ -11,7 +11,6 @@ import { createWaitableWriteContractHelper, isZeroHex } from "../core/utils.js";
 import type {
   ContractWriteFunctions,
   ContractReadFunctions,
-  ChannelPermissions,
   ChannelManagerABIType,
   Channel,
 } from "./types.js";
