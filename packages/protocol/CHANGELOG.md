@@ -1,5 +1,11 @@
 # @ecp.eth/protocol
 
+## 1.1.0
+
+### Minor Changes
+
+- 4952dc9: feat(protocol): support batch operations, store author auth method
+
 ## 1.0.1
 
 ### Patch Changes
