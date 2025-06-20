@@ -54,22 +54,22 @@ export function createZeroExSwapResolver(
 
   return {
     resolveFromCommentAddedEvent: async ({ event, context }) => {
-      if (!options.chains[context.network.chainId]) {
-        if (!hasWarned[context.network.chainId]) {
-          hasWarned[context.network.chainId] = true;
+      if (!options.chains[context.chain.id]) {
+        if (!hasWarned[context.chain.id]) {
+          hasWarned[context.chain.id] = true;
           console.warn(
-            `ZeroExSwapResolver: Chain ${context.network.chainId} is not supported, skipping...`,
+            `ZeroExSwapResolver: Chain ${context.chain.id} is not supported, skipping...`,
           );
         }
 
         return null;
       }
 
-      const publicClient = clients[context.network.chainId];
+      const publicClient = clients[context.chain.id];
 
       if (!publicClient) {
         throw new Error(
-          `ZeroExSwapResolver: Public client for chain ${context.network.chainId} not found`,
+          `ZeroExSwapResolver: Public client for chain ${context.chain.id} not found`,
         );
       }
 

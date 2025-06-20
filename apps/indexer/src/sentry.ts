@@ -78,6 +78,8 @@ if (env.SENTRY_DSN) {
         console.error("Failed to flush Sentry", e);
       }
     });
+  } else {
+    console.warn("PONDER_COMMON is not available on globalThis");
   }
 } else {
   console.log("Sentry DSN not set");
