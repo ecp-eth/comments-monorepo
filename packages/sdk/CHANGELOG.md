@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.17
+
+### Patch Changes
+
+- e49a6dd: feat(sdk): updated contract
+
 ## 0.0.16
 
 ### Patch Changes
