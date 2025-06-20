@@ -9,8 +9,6 @@ NC='\033[0m' # No Color
 GIT_REMOTE="origin"
 DRY_RUN=false
 
-printf "${RED}❌ Git workspace is not clean. Please commit or stash your changes.${NC}"
-
 # ensure git workspace is clean
 if [[ -n $(git status -s) ]]; then
     printf "${RED}❌ Git workspace is not clean. Please commit or stash your changes.${NC}"
@@ -27,6 +25,12 @@ RELEASE_BRANCH_NAME="release-${COMMIT_HASH}"
 
 # ensure sdk and shared were built
 turbo run build lint test --filter=./packages/sdk... --filter=./packages/shared...
+
+# check if release branch already exists
+if git show-ref --verify --quiet refs/heads/$RELEASE_BRANCH_NAME; then
+    printf "${RED}❌ Release branch '${RELEASE_BRANCH_NAME}' already exists. Please delete it first or use a different commit.${NC}\n"
+    exit 1
+fi
 
 # we need to create a new branch for the release
 git checkout -b $RELEASE_BRANCH_NAME
