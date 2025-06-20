@@ -10,7 +10,7 @@ GIT_REMOTE="origin"
 DRY_RUN=false
 
 # ensure we are in the root of the repo
-cd $(git rev-parse --show-toplevel)
+cd "$(git rev-parse --show-toplevel)"
 
 # ensure we are on the main branch
 git checkout main
