@@ -250,6 +250,9 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     return baseURIValue;
   }
 
+  /// @notice Internal function to create channel metadata
+  /// @param channelId The unique identifier of the channel
+  /// @param metadata The metadata entries to create
   function _createChannelMetadata(
     uint256 channelId,
     Metadata.MetadataEntry[] calldata metadata
