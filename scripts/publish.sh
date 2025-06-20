@@ -9,6 +9,12 @@ NC='\033[0m' # No Color
 GIT_REMOTE="origin"
 DRY_RUN=false
 
+# ensure we are in the root of the repo
+cd $(git rev-parse --show-toplevel)
+
+# ensure we are on the main branch
+git checkout main
+
 # ensure git workspace is clean
 if [[ -n $(git status -s) ]]; then
     printf "${RED}❌ Git workspace is not clean. Please commit or stash your changes.${NC}"
