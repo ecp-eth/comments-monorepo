@@ -8,7 +8,7 @@ import {
 } from "@ecp.eth/sdk";
 import type { Hex } from "@ecp.eth/sdk/core";
 
-const networks = Object.entries(process.env).reduce(
+const chains = Object.entries(process.env).reduce(
   (acc, [key, value]) => {
     if (key.startsWith("PONDER_RPC_URL_")) {
       const chainId = parseInt(key.replace("PONDER_RPC_URL_", ""));
@@ -24,7 +24,7 @@ const networks = Object.entries(process.env).reduce(
       }
 
       acc[chainId] = {
-        chainId,
+        id: chainId,
         transport: http(value),
         disableCache: chainId === 31337,
         startBlock,
@@ -37,7 +37,7 @@ const networks = Object.entries(process.env).reduce(
   {} as Record<
     string,
     {
-      chainId: number;
+      id: number;
       transport: Transport;
       disableCache?: boolean;
       startBlock?: number;
@@ -47,14 +47,14 @@ const networks = Object.entries(process.env).reduce(
   >,
 );
 
-console.log(`Detected networks:`, networks);
+console.log(`Detected chains:`, chains);
 
 export default createConfig({
-  networks,
+  chains,
   contracts: {
     CommentsV1: {
       abi: CommentManagerABI,
-      network: Object.entries(networks).reduce(
+      chain: Object.entries(chains).reduce(
         (acc, [chainId, network]) => {
           acc[chainId] = {
             address: network.commentManagerAddress,
@@ -67,7 +67,7 @@ export default createConfig({
     },
     CommentsV1ChannelManager: {
       abi: ChannelManagerABI,
-      network: Object.entries(networks).reduce(
+      chain: Object.entries(chains).reduce(
         (acc, [chainId, network]) => {
           acc[chainId] = {
             address: network.channelManagerAddress,
