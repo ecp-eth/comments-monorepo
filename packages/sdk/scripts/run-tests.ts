@@ -66,7 +66,7 @@ process.on("beforeExit", () => {
 run({
   watch: wantsWatchMode,
   execArgv: [
-    "--experimental-strip-types",
+    "--experimental-transform-types",
     "--import",
     "./scripts/test-globals.js",
     "--import",

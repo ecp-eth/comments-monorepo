@@ -16,14 +16,11 @@ export type Json = JsonLiteral | JsonArray | JsonObject;
 
 export type CommentManagerABIType = typeof CommentManagerABI;
 
-export const AuthorAuthMethod = {
-  DIRECT_TX: 0,
-  APP_APPROVAL: 1,
-  AUTHOR_SIGNATURE: 2,
-} as const;
-
-export type AuthorAuthMethod =
-  (typeof AuthorAuthMethod)[keyof typeof AuthorAuthMethod];
+export enum AuthorAuthMethod {
+  DIRECT_TX = 0,
+  APP_APPROVAL = 1,
+  AUTHOR_SIGNATURE = 2,
+}
 
 /**
  * Metadata entry structure that matches the smart contract
