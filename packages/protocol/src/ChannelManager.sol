@@ -294,9 +294,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         bool isNewKey = !_channelMetadataKeyExists(channelId, op.key);
 
         channelMetadata[channelId][op.key] = op.value;
-        if (op.key == bytes32(0)) {
-          revert InvalidKey();
-        }
+
         // Only add to keys array if it's a new key
         if (isNewKey) {
           channelMetadataKeys[channelId].push(op.key);
