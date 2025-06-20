@@ -49,11 +49,7 @@ export const CommentDataSchema = z.object({
   content: z.string(),
   targetUri: z.string(),
   commentType: z.number(),
-  authMethod: z.union([
-    z.literal(AuthorAuthMethod.DIRECT_TX),
-    z.literal(AuthorAuthMethod.APP_APPROVAL),
-    z.literal(AuthorAuthMethod.AUTHOR_SIGNATURE),
-  ]),
+  authMethod: z.nativeEnum(AuthorAuthMethod),
   metadata: MetadataArraySchema.default([]),
 
   createdAt: z.coerce.bigint(),

@@ -86,14 +86,14 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "check-contract-addresses": "node --experimental-strip-types --no-warnings ./scripts/check-contract-addresses.ts",
-    "check-contract-addresses:prod": "NODE_ENV=production node --experimental-strip-types --no-warnings ./scripts/check-contract-addresses.ts",
+    "check-contract-addresses": "node --experimental-transform-types --no-warnings ./scripts/check-contract-addresses.ts",
+    "check-contract-addresses:prod": "NODE_ENV=production node --experimental-transform-types --no-warnings ./scripts/check-contract-addresses.ts",
     "dev": "tsup --format esm --out-dir dist/esm --watch",
     "build:cjs": "NODE_OPTIONS='--max-old-space-size=8192' tsup --format cjs --out-dir dist/cjs",
     "build:esm": "NODE_OPTIONS='--max-old-space-size=8192' tsup --format esm --out-dir dist/esm",
     "build": "rm -rf dist && NODE_ENV=production npm run build:cjs && NODE_ENV=production npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
     "build:dev": "rm -rf dist && NODE_ENV=development npm run build:cjs && NODE_ENV=development npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
-    "test": "node --experimental-strip-types --no-warnings ./scripts/run-tests.ts",
+    "test": "node --experimental-transform-types --no-warnings ./scripts/run-tests.ts",
     "test:watch": "pnpm run test --watch",
     "lint": "eslint \"./src/**/*.ts\""
   },
