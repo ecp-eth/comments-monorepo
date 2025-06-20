@@ -49,6 +49,14 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
 
     channelZero.name = "Home";
     channelZero.description = "Any kind of content";
+
+    emit ChannelCreated(
+      0,
+      channelZero.name,
+      channelZero.description,
+      channelZero.metadata,
+      channelZero.hook
+    );
   }
 
   modifier onlyCommentsContract() {
