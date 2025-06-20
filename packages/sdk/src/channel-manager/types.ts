@@ -78,14 +78,6 @@ export type ContractWriteFunctions = {
     >,
   ) => Promise<Hex>;
 
-  updateCommentsContract: (
-    args: ContractFunctionParameters<
-      ChannelManagerABIType,
-      "nonpayable",
-      "updateCommentsContract"
-    >,
-  ) => Promise<Hex>;
-
   withdrawFees: (
     args: ContractFunctionParameters<
       ChannelManagerABIType,

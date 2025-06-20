@@ -507,33 +507,6 @@ const ChannelManagerABI: readonly [{
   type: "function";
 }, {
   inputs: readonly [{
-     internalType: "uint256";
-     name: "channelId";
-     type: "uint256";
-   }, {
-     components: readonly [{
-        internalType: "enum Metadata.MetadataOperation";
-        name: "operation";
-        type: "uint8";
-      }, {
-        internalType: "bytes32";
-        name: "key";
-        type: "bytes32";
-      }, {
-        internalType: "bytes";
-        name: "value";
-        type: "bytes";
-     }];
-     internalType: "struct Metadata.MetadataEntryOp[]";
-     name: "operations";
-     type: "tuple[]";
-  }];
-  name: "setChannelMetadata";
-  outputs: readonly [];
-  stateMutability: "nonpayable";
-  type: "function";
-}, {
-  inputs: readonly [{
      internalType: "uint96";
      name: "fee";
      type: "uint96";
@@ -689,6 +662,10 @@ const ChannelManagerABI: readonly [{
      type: "string";
    }, {
      components: readonly [{
+        internalType: "enum Metadata.MetadataOperation";
+        name: "operation";
+        type: "uint8";
+      }, {
         internalType: "bytes32";
         name: "key";
         type: "bytes32";
@@ -697,21 +674,11 @@ const ChannelManagerABI: readonly [{
         name: "value";
         type: "bytes";
      }];
-     internalType: "struct Metadata.MetadataEntry[]";
-     name: "metadata";
+     internalType: "struct Metadata.MetadataEntryOp[]";
+     name: "metadataOperations";
      type: "tuple[]";
   }];
   name: "updateChannel";
-  outputs: readonly [];
-  stateMutability: "nonpayable";
-  type: "function";
-}, {
-  inputs: readonly [{
-     internalType: "address";
-     name: "_commentsContract";
-     type: "address";
-  }];
-  name: "updateCommentsContract";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -1113,6 +1080,10 @@ const ChannelManagerABI: readonly [{
   type: "error";
 }, {
   inputs: readonly [];
+  name: "EmptyChannelName";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "InsufficientFee";
   type: "error";
 }, {
@@ -1126,6 +1097,10 @@ const ChannelManagerABI: readonly [{
 }, {
   inputs: readonly [];
   name: "InvalidHookInterface";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "InvalidKey";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1154,6 +1129,6 @@ const ChannelManagerABI: readonly [{
 }];
 ```
 
-Defined in: [packages/sdk/src/abis.ts:1893](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L1893)
+Defined in: [packages/sdk/src/abis.ts:1970](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L1970)
 
 ABI of the ChannelManager contract.

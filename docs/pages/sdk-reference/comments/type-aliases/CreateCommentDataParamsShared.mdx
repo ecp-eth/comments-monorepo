@@ -18,7 +18,7 @@ type CreateCommentDataParamsShared = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:38](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L38)
+Defined in: [packages/sdk/src/comments/types.ts:49](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L49)
 
 The shared parameters for creating a comment
 
@@ -30,7 +30,7 @@ The shared parameters for creating a comment
 app: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L63)
+Defined in: [packages/sdk/src/comments/types.ts:74](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L74)
 
 The address of the app signer
 
@@ -42,7 +42,7 @@ The address of the app signer
 author: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:61](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L61)
+Defined in: [packages/sdk/src/comments/types.ts:72](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L72)
 
 The address of the author of the comment
 
@@ -54,7 +54,7 @@ The address of the author of the comment
 optional channelId: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:48](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L48)
+Defined in: [packages/sdk/src/comments/types.ts:59](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L59)
 
 The ID of the channel the comment is being made in
 
@@ -74,7 +74,7 @@ If not provided, the default channel ID (0) will be used
 optional commentType: number;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:57](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L57)
+Defined in: [packages/sdk/src/comments/types.ts:68](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L68)
 
 The type of the comment
 0 = standard comment, 1 = reaction
@@ -95,7 +95,7 @@ If not provided, the default comment type (0) will be used
 content: string;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:40](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L40)
+Defined in: [packages/sdk/src/comments/types.ts:51](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L51)
 
 The content of the comment
 
@@ -107,7 +107,7 @@ The content of the comment
 optional deadline: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:65](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L65)
+Defined in: [packages/sdk/src/comments/types.ts:76](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L76)
 
 The deadline of the comment submission in seconds since epoch
 
@@ -119,6 +119,6 @@ The deadline of the comment submission in seconds since epoch
 optional metadata: MetadataEntry[];
 ```
 
-Defined in: [packages/sdk/src/comments/types.ts:59](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L59)
+Defined in: [packages/sdk/src/comments/types.ts:70](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/types.ts#L70)
 
 Metadata about the comment as key-value pairs

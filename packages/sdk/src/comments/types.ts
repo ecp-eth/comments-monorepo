@@ -32,6 +32,17 @@ export type MetadataEntry = {
   value: Hex;
 };
 
+export enum MetadataOperation {
+  SET = 0,
+  DELETE = 1,
+}
+
+export type MetadataEntryOp = {
+  operation: MetadataOperation;
+  key: Hex;
+  value: Hex;
+};
+
 /**
  * The shared parameters for creating a comment
  */
@@ -174,7 +185,7 @@ export type ContractWriteFunctions = {
   deleteCommentWithSig: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
-      "nonpayable",
+      "payable",
       "deleteCommentWithSig"
     >,
   ) => Promise<Hex>;
@@ -182,7 +193,7 @@ export type ContractWriteFunctions = {
   deleteComment: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
-      "nonpayable",
+      "payable",
       "deleteComment"
     >,
   ) => Promise<Hex>;

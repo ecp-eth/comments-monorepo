@@ -263,7 +263,7 @@ export const CommentManagerABI = [
       },
     ],
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -296,7 +296,7 @@ export const CommentManagerABI = [
       },
     ],
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -1584,6 +1584,42 @@ export const CommentManagerABI = [
   },
   {
     type: "event",
+    name: "CommentHookDataUpdate",
+    inputs: [
+      {
+        name: "commentId",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
+      {
+        name: "operations",
+        type: "tuple[]",
+        indexed: false,
+        internalType: "struct Metadata.MetadataEntryOp[]",
+        components: [
+          {
+            name: "operation",
+            type: "uint8",
+            internalType: "enum Metadata.MetadataOperation",
+          },
+          {
+            name: "key",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "value",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "CommentHookMetadataSet",
     inputs: [
       {
@@ -1705,13 +1741,44 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
+    name: "CommentAlreadyDeleted",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "CommentAlreadyExists",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "CommentDoesNotExist",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "HookMetadataTooLong",
     inputs: [],
   },
   {
     type: "error",
     name: "HookNotEnabled",
     inputs: [],
+  },
+  {
+    type: "error",
+    name: "InsufficientValue",
+    inputs: [
+      {
+        name: "providedValue",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "requiredValue",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
   },
   {
     type: "error",
@@ -1754,6 +1821,11 @@ export const CommentManagerABI = [
         internalType: "string",
       },
     ],
+  },
+  {
+    type: "error",
+    name: "InvalidKey",
+    inputs: [],
   },
   {
     type: "error",
@@ -1817,6 +1889,11 @@ export const CommentManagerABI = [
         internalType: "uint256",
       },
     ],
+  },
+  {
+    type: "error",
+    name: "MetadataTooLong",
+    inputs: [],
   },
   {
     type: "error",
@@ -2548,41 +2625,6 @@ export const ChannelManagerABI = [
   },
   {
     type: "function",
-    name: "setChannelMetadata",
-    inputs: [
-      {
-        name: "channelId",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "operations",
-        type: "tuple[]",
-        internalType: "struct Metadata.MetadataEntryOp[]",
-        components: [
-          {
-            name: "operation",
-            type: "uint8",
-            internalType: "enum Metadata.MetadataOperation",
-          },
-          {
-            name: "key",
-            type: "bytes32",
-            internalType: "bytes32",
-          },
-          {
-            name: "value",
-            type: "bytes",
-            internalType: "bytes",
-          },
-        ],
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
     name: "setCommentCreationFee",
     inputs: [
       {
@@ -2788,10 +2830,15 @@ export const ChannelManagerABI = [
         internalType: "string",
       },
       {
-        name: "metadata",
+        name: "metadataOperations",
         type: "tuple[]",
-        internalType: "struct Metadata.MetadataEntry[]",
+        internalType: "struct Metadata.MetadataEntryOp[]",
         components: [
+          {
+            name: "operation",
+            type: "uint8",
+            internalType: "enum Metadata.MetadataOperation",
+          },
           {
             name: "key",
             type: "bytes32",
@@ -2803,19 +2850,6 @@ export const ChannelManagerABI = [
             internalType: "bytes",
           },
         ],
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "updateCommentsContract",
-    inputs: [
-      {
-        name: "_commentsContract",
-        type: "address",
-        internalType: "address",
       },
     ],
     outputs: [],
@@ -3333,6 +3367,11 @@ export const ChannelManagerABI = [
   },
   {
     type: "error",
+    name: "EmptyChannelName",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "InsufficientFee",
     inputs: [],
   },
@@ -3349,6 +3388,11 @@ export const ChannelManagerABI = [
   {
     type: "error",
     name: "InvalidHookInterface",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "InvalidKey",
     inputs: [],
   },
   {

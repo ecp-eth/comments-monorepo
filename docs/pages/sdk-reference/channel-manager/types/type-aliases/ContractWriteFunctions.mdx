@@ -14,7 +14,6 @@ type ContractWriteFunctions = {
   setHook: (args) => Promise<Hex>;
   setHookTransactionFee: (args) => Promise<Hex>;
   updateChannel: (args) => Promise<Hex>;
-  updateCommentsContract: (args) => Promise<Hex>;
   withdrawFees: (args) => Promise<Hex>;
 };
 ```
@@ -145,33 +144,13 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:73](https://github.com/ec
 
 ***
 
-### updateCommentsContract()
-
-```ts
-updateCommentsContract: (args) => Promise<Hex>;
-```
-
-Defined in: [packages/sdk/src/channel-manager/types.ts:81](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L81)
-
-#### Parameters
-
-##### args
-
-`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"nonpayable"`, `"updateCommentsContract"`\>
-
-#### Returns
-
-`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
-
-***
-
 ### withdrawFees()
 
 ```ts
 withdrawFees: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:89](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L89)
+Defined in: [packages/sdk/src/channel-manager/types.ts:81](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L81)
 
 #### Parameters
 

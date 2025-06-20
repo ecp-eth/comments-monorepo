@@ -1,0 +1,25 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / MetadataEntryOpSchema
+
+# Variable: MetadataEntryOpSchema
+
+```ts
+const MetadataEntryOpSchema: ZodObject<{
+  key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  operation: ZodNativeEnum<typeof MetadataOperation>;
+  value: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+}, "strip", ZodTypeAny, {
+  key: `0x${string}`;
+  operation: MetadataOperation;
+  value: `0x${string}`;
+}, {
+  key: `0x${string}`;
+  operation: MetadataOperation;
+  value: `0x${string}`;
+}>;
+```
+
+Defined in: [packages/sdk/src/comments/schemas.ts:42](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L42)

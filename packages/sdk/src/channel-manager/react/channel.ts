@@ -29,9 +29,6 @@ import {
   type WithdrawFeesParams,
   type WithdrawFeesResult,
   withdrawFees,
-  type UpdateCommentsContractParams,
-  type UpdateCommentsContractResult,
-  updateCommentsContract,
   type SetBaseURIParams,
   type SetBaseURIResult,
   setBaseURI,
@@ -337,46 +334,6 @@ export function useWithdrawFees(
     ...options,
     mutationFn: (params) => {
       return withdrawFees({
-        ...params,
-        writeContract: writeContractAsync,
-      });
-    },
-  });
-}
-
-export type UseUpdateCommentsContractParams = Omit<
-  UpdateCommentsContractParams,
-  "writeContract"
->;
-export type UseUpdateCommentsContractOptions = Omit<
-  UseMutationOptions<
-    UpdateCommentsContractResult,
-    Error,
-    UseUpdateCommentsContractParams
-  >,
-  "mutationFn"
->;
-export type UseUpdateCommentsContractResult = UseMutationResult<
-  UpdateCommentsContractResult,
-  Error,
-  UseUpdateCommentsContractParams
->;
-
-/**
- * Updates the comments contract address
- *
- * @param options - The options for the mutation
- * @returns The result of the mutation
- */
-export function useUpdateCommentsContract(
-  options: UseUpdateCommentsContractOptions = {},
-): UseUpdateCommentsContractResult {
-  const { writeContractAsync } = useWriteContract();
-
-  return useMutation({
-    ...options,
-    mutationFn: (params) => {
-      return updateCommentsContract({
         ...params,
         writeContract: writeContractAsync,
       });

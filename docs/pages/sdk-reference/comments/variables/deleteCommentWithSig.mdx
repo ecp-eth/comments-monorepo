@@ -206,7 +206,7 @@ const deleteCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResu
   }];
   name: "deleteComment";
   outputs: readonly [];
-  stateMutability: "nonpayable";
+  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -232,7 +232,7 @@ const deleteCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResu
   }];
   name: "deleteCommentWithSig";
   outputs: readonly [];
-  stateMutability: "nonpayable";
+  stateMutability: "payable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -1236,6 +1236,34 @@ const deleteCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResu
      name: "commentId";
      type: "bytes32";
    }, {
+     components: readonly [{
+        internalType: "enum Metadata.MetadataOperation";
+        name: "operation";
+        type: "uint8";
+      }, {
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     indexed: false;
+     internalType: "struct Metadata.MetadataEntryOp[]";
+     name: "operations";
+     type: "tuple[]";
+  }];
+  name: "CommentHookDataUpdate";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+   }, {
      indexed: true;
      internalType: "bytes32";
      name: "key";
@@ -1325,11 +1353,35 @@ const deleteCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResu
   type: "error";
 }, {
   inputs: readonly [];
+  name: "CommentAlreadyDeleted";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "CommentAlreadyExists";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "CommentDoesNotExist";
   type: "error";
 }, {
   inputs: readonly [];
+  name: "HookMetadataTooLong";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "HookNotEnabled";
+  type: "error";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
+     name: "providedValue";
+     type: "uint256";
+   }, {
+     internalType: "uint256";
+     name: "requiredValue";
+     type: "uint256";
+  }];
+  name: "InsufficientValue";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1362,6 +1414,10 @@ const deleteCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResu
      type: "string";
   }];
   name: "InvalidCommentReference";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "InvalidKey";
   type: "error";
 }, {
   inputs: readonly [{
@@ -1410,6 +1466,10 @@ const deleteCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResu
      type: "uint256";
   }];
   name: "InvalidValueDistribution";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "MetadataTooLong";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1677,7 +1737,7 @@ Delete a comment with app signature verification
   \}\];
   `name`: `"deleteComment"`;
   `outputs`: readonly \[\];
-  `stateMutability`: `"nonpayable"`;
+  `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -1703,7 +1763,7 @@ Delete a comment with app signature verification
   \}\];
   `name`: `"deleteCommentWithSig"`;
   `outputs`: readonly \[\];
-  `stateMutability`: `"nonpayable"`;
+  `stateMutability`: `"payable"`;
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -2707,6 +2767,34 @@ Delete a comment with app signature verification
      `name`: `"commentId"`;
      `type`: `"bytes32"`;
    \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"enum Metadata.MetadataOperation"`;
+        `name`: `"operation"`;
+        `type`: `"uint8"`;
+      \}, \{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `indexed`: `false`;
+     `internalType`: `"struct Metadata.MetadataEntryOp[]"`;
+     `name`: `"operations"`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `name`: `"CommentHookDataUpdate"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
      `indexed`: `true`;
      `internalType`: `"bytes32"`;
      `name`: `"key"`;
@@ -2796,11 +2884,35 @@ Delete a comment with app signature verification
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
+  `name`: `"CommentAlreadyDeleted"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"CommentAlreadyExists"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
   `name`: `"CommentDoesNotExist"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
+  `name`: `"HookMetadataTooLong"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
   `name`: `"HookNotEnabled"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"providedValue"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"requiredValue"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"InsufficientValue"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
@@ -2833,6 +2945,10 @@ Delete a comment with app signature verification
      `type`: `"string"`;
   \}\];
   `name`: `"InvalidCommentReference"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InvalidKey"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -2881,6 +2997,10 @@ Delete a comment with app signature verification
      `type`: `"uint256"`;
   \}\];
   `name`: `"InvalidValueDistribution"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"MetadataTooLong"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];

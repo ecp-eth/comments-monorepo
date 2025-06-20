@@ -6,7 +6,7 @@ import {
   DEFAULT_COMMENT_TYPE,
   EMPTY_PARENT_ID,
 } from "../constants.js";
-import { AuthorAuthMethod } from "./types.js";
+import { AuthorAuthMethod, MetadataOperation } from "./types.js";
 import type {
   CommentData,
   CreateReplyCommentDataParams,
@@ -38,6 +38,14 @@ export const MetadataEntrySchema = z.object({
 });
 
 export const MetadataArraySchema = z.array(MetadataEntrySchema);
+
+export const MetadataEntryOpSchema = z.object({
+  operation: z.nativeEnum(MetadataOperation),
+  key: HexSchema,
+  value: HexSchema,
+});
+
+export const MetadataArrayOpSchema = z.array(MetadataEntryOpSchema);
 
 export const CommentDataSchema = z.object({
   author: HexSchema,

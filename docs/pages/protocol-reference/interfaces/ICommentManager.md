@@ -49,6 +49,13 @@ Emitted when a comment is edited
 
 
 
+### `CommentHookDataUpdate(bytes32 commentId, [struct Metadata.MetadataEntryOp[]](/protocol-reference/types/Metadata#metadataentryop) operations)`
+
+Emitted when hook metadata is updated
+
+
+
+
 ### `ApprovalAdded(address author, address app, uint256 expiry)`
 
 Emitted when an author approves an app signer
