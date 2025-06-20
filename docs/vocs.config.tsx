@@ -97,6 +97,10 @@ export default defineConfig({
       text: "Indexing",
       items: [
         {
+          text: "Free hosted API",
+          link: "/indexer-reference/#free-hosted-indexer",
+        },
+        {
           text: "Ponder Indexer",
           link: "/indexer-reference/",
           collapsed: true,
