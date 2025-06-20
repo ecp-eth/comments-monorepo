@@ -210,7 +210,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     Comments.CreateComment memory commentData,
     Comments.AuthorAuthMethod authMethod,
     uint256 value
-  ) internal {
+  ) internal commentDoesNotExist(commentId) {
     // Collect protocol comment fee, if any.
     uint96 commentCreationFee = channelManager.getCommentCreationFee();
     if (commentCreationFee > 0) {
@@ -258,11 +258,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     onlyAuthor(comments[commentId].author)
     notStale(editData.deadline)
     commentExists(commentId)
-    validateNonce(
-      comments[commentId].author,
-      comments[commentId].app,
-      editData.nonce
-    )
+    validateNonce(comments[commentId].author, editData.app, editData.nonce)
   {
     Comments.Comment storage comment = comments[commentId];
     address author = comment.author;
@@ -326,11 +322,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     internal
     notStale(editData.deadline)
     commentExists(commentId)
-    validateNonce(
-      comments[commentId].author,
-      comments[commentId].app,
-      editData.nonce
-    )
+    validateNonce(comments[commentId].author, editData.app, editData.nonce)
   {
     Comments.Comment storage comment = comments[commentId];
     address author = comment.author;
@@ -412,7 +404,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   /// @inheritdoc ICommentManager
   function deleteComment(
     bytes32 commentId
-  ) public commentExists(commentId) onlyAuthor(comments[commentId].author) {
+  )
+    public
+    payable
+    commentExists(commentId)
+    onlyAuthor(comments[commentId].author)
+  {
     _deleteComment(commentId, msg.sender);
   }
 
@@ -423,7 +420,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     uint256 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) public notStale(deadline) commentExists(commentId) {
+  ) public payable notStale(deadline) commentExists(commentId) {
     Comments.Comment storage comment = comments[commentId];
     address author = comment.author;
 
@@ -754,8 +751,20 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     _;
   }
 
+  modifier commentDoesNotExist(bytes32 commentId) {
+    if (comments[commentId].author != address(0)) {
+      revert CommentAlreadyExists();
+    }
+    if (deleted[commentId]) {
+      revert CommentAlreadyDeleted();
+    }
+    _;
+  }
+
   modifier commentExists(bytes32 commentId) {
-    if (comments[commentId].author == address(0)) {
+    if (
+      comments[commentId].author == address(0) || deleted[commentId] == true
+    ) {
       revert CommentDoesNotExist();
     }
     _;

@@ -369,13 +369,39 @@ contract LengthFeeHookTest is Test, IERC721Receiver {
       deadline: block.timestamp + 1 days,
       parentId: bytes32(0)
     });
+    Comments.CreateComment memory commentData1 = Comments.CreateComment({
+      content: content,
+      metadata: new Metadata.MetadataEntry[](0),
+      targetUri: "",
+      commentType: 0, // COMMENT_TYPE_COMMENT
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 2 days,
+      parentId: bytes32(0)
+    });
+    Comments.CreateComment memory commentData2 = Comments.CreateComment({
+      content: content,
+      metadata: new Metadata.MetadataEntry[](0),
+      targetUri: "",
+      commentType: 0, // COMMENT_TYPE_COMMENT
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 3 days,
+      parentId: bytes32(0)
+    });
 
     // Make a few comments to collect fees
-    for (uint i = 0; i < 3; i++) {
-      bytes memory appSignature = _signAppSignature(commentData);
-      vm.prank(user1);
-      comments.postComment(commentData, appSignature);
-    }
+    bytes memory appSignature = _signAppSignature(commentData);
+    vm.prank(user1);
+    comments.postComment(commentData, appSignature);
+    bytes memory appSignature1 = _signAppSignature(commentData1);
+    vm.prank(user1);
+    comments.postComment(commentData1, appSignature1);
+    bytes memory appSignature2 = _signAppSignature(commentData2);
+    vm.prank(user1);
+    comments.postComment(commentData2, appSignature2);
 
     uint256 feeCollectorBalanceBefore = paymentToken.balanceOf(feeCollector);
     uint256 expectedFeePerComment = ((bytes(content).length *

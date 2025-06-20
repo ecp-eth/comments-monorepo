@@ -22,6 +22,10 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   error ZeroAddress();
   /// @notice Error thrown when unauthorized caller tries to access function
   error UnauthorizedCaller();
+  /// @notice Error thrown when metadata key is empty
+  error InvalidKey();
+  /// @notice Error thrown when channel name is empty
+  error EmptyChannelName();
 
   /// @notice Emitted when the base URI for NFT metadata is updated
   /// @param baseURI The new base URI

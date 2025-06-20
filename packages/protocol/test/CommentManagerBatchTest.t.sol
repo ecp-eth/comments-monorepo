@@ -139,7 +139,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
 
   function test_BatchOperations_SimplePostComment() public {
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
 
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
@@ -174,7 +174,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
 
   function test_BatchOperations_PostCommentWithSig() public {
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
 
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSignature = TestUtils.signEIP712(
@@ -212,7 +212,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
 
     // Parent comment
     Comments.CreateComment memory parentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     parentData.content = "Parent comment";
 
     bytes32 parentId = comments.getCommentId(parentData);
@@ -229,7 +229,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
 
     // Reply 1 to parent
     Comments.CreateComment memory reply1Data = TestUtils
-      .generateDummyCreateComment(author2, app);
+      .generateDummyCreateComment(author2, app, "Test comment");
     reply1Data.content = "First reply";
     reply1Data.parentId = parentId;
     reply1Data.targetUri = ""; // Clear target URI for reply
@@ -248,7 +248,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
 
     // Reply 2 to reply 1
     Comments.CreateComment memory reply2Data = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     reply2Data.content = "Reply to first reply";
     reply2Data.parentId = reply1Id;
     reply2Data.targetUri = ""; // Clear target URI for reply
@@ -331,12 +331,12 @@ contract CommentsBatchTest is Test, IERC721Receiver {
 
     // Create two comments with fees
     Comments.CreateComment memory comment1Data = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     comment1Data.channelId = channelId;
     comment1Data.content = "Comment 1";
 
     Comments.CreateComment memory comment2Data = TestUtils
-      .generateDummyCreateComment(author2, app);
+      .generateDummyCreateComment(author2, app, "Test comment");
     comment2Data.channelId = channelId;
     comment2Data.content = "Comment 2";
 
@@ -415,7 +415,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
 
   function test_BatchOperations_FailsWithIncorrectValueDistribution() public {
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSig = TestUtils.signEIP712(
       vm,
@@ -464,7 +464,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
     // Create, edit, then delete a comment in one batch
 
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     commentData.content = "Original content";
 
     bytes32 commentId = comments.getCommentId(commentData);
@@ -526,7 +526,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
   function test_BatchOperations_MixedOperationTypes() public {
     // First create a comment individually to edit/delete later
     Comments.CreateComment memory initialComment = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 initialId = comments.getCommentId(initialComment);
     bytes memory initialAuthorSig = TestUtils.signEIP712(
       vm,
@@ -552,7 +552,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
     // 3. Delete the existing comment
 
     Comments.CreateComment memory newComment = TestUtils
-      .generateDummyCreateComment(author2, app);
+      .generateDummyCreateComment(author2, app, "Test comment");
     newComment.content = "New comment in batch";
     bytes32 newId = comments.getCommentId(newComment);
     bytes memory newAuthorSig = TestUtils.signEIP712(
@@ -622,7 +622,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
   function test_BatchOperations_EditCommentWithSig() public {
     // Create a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSig = TestUtils.signEIP712(
       vm,
@@ -677,7 +677,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
   function test_BatchOperations_DeleteWithSig() public {
     // Create a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSig = TestUtils.signEIP712(
       vm,
@@ -732,7 +732,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
 
   function test_BatchOperations_FailsWithInvalidSignatureCount() public {
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
 
     // Test POST_COMMENT_WITH_SIG with wrong signature count
     Comments.BatchOperation[] memory operations = new Comments.BatchOperation[](
@@ -791,7 +791,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
 
   function test_BatchOperations_EventsEmittedCorrectly() public {
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSig = TestUtils.signEIP712(
       vm,
@@ -839,9 +839,9 @@ contract CommentsBatchTest is Test, IERC721Receiver {
     // User 1 original post
     Comments.CreateComment memory post1 = TestUtils.generateDummyCreateComment(
       author,
-      app
+      app,
+      "Original post by user 1"
     );
-    post1.content = "Original post by user 1";
     bytes32 post1Id = comments.getCommentId(post1);
     bytes memory post1AuthorSig = TestUtils.signEIP712(
       vm,
@@ -853,9 +853,9 @@ contract CommentsBatchTest is Test, IERC721Receiver {
     // User 2 reply
     Comments.CreateComment memory reply2 = TestUtils.generateDummyCreateComment(
       author2,
-      app
+      app,
+      "Reply by user 2"
     );
-    reply2.content = "Reply by user 2";
     reply2.parentId = post1Id;
     reply2.targetUri = "";
     bytes32 reply2Id = comments.getCommentId(reply2);
@@ -947,13 +947,13 @@ contract CommentsBatchTest is Test, IERC721Receiver {
   function test_BatchOperations_GasSavingsVsIndividual() public {
     // Create batch operations for comparison
     Comments.CreateComment memory comment1 = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     comment1.content = "Comment 1";
     Comments.CreateComment memory comment2 = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     comment2.content = "Comment 2";
     Comments.CreateComment memory comment3 = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     comment3.content = "Comment 3";
 
     bytes32 comment1Id = comments.getCommentId(comment1);

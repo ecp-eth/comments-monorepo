@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 import "solady/src/auth/Ownable.sol";
-import "solady/src/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./interfaces/IChannelManager.sol";
@@ -136,6 +135,8 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     Metadata.MetadataEntry[] calldata metadata,
     address hook
   ) external payable returns (uint256 channelId) {
+    if (bytes(name).length == 0) revert EmptyChannelName();
+
     _collectChannelCreationFee();
 
     // Generate channel ID using the internal function
@@ -169,6 +170,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     string calldata description,
     Metadata.MetadataEntry[] calldata metadata
   ) external {
+    if (bytes(name).length == 0) revert EmptyChannelName();
     if (!_channelExists(channelId)) revert ChannelDoesNotExist();
     if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
 
@@ -201,7 +203,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   /// @notice Internal function to set the hook for a channel
   /// @param channelId The unique identifier of the channel
   /// @param hook The address of the hook contract
-  function _setHook(uint256 channelId, address hook) internal {
+  function _setHook(uint256 channelId, address hook) internal nonReentrant {
     // Emit events before calling the`onInitialize` hook to ensure the order of events is correct in the case of reentrancy
     emit HookSet(channelId, hook);
     emit HookStatusUpdated(channelId, hook, hook != address(0));
@@ -227,6 +229,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
       }
     } else {
       delete channels[channelId].hook; // Properly reset to default value
+      delete channels[channelId].permissions;
     }
   }
 
@@ -267,6 +270,9 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     // Apply metadata operations
     for (uint i = 0; i < operations.length; i++) {
       Metadata.MetadataEntryOp memory op = operations[i];
+
+      // Ensure the key is not empty
+      if (op.key == bytes32(0)) revert InvalidKey();
 
       if (op.operation == Metadata.MetadataOperation.DELETE) {
         _deleteChannelMetadataKey(channelId, op.key);

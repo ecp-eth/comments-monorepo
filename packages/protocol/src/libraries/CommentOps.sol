@@ -79,22 +79,19 @@ library CommentOps {
     );
 
     // Store metadata in mappings
-    if (metadata.length > 0) {
-      mapping(bytes32 => bytes) storage commentMetadataForId = commentMetadata[
-        commentId
-      ];
-      bytes32[] storage commentMetadataKeysForId = commentMetadataKeys[
-        commentId
-      ];
-      for (uint i = 0; i < metadata.length; i++) {
-        bytes32 key = metadata[i].key;
-        bytes memory val = metadata[i].value;
-
-        commentMetadataForId[key] = val;
-        commentMetadataKeysForId.push(key);
-
-        emit ICommentManager.CommentMetadataSet(commentId, key, val);
+    if (
+      metadata.length > 0 && // don't store hook metadata if the hook re-entered to delete the comment
+      comments[commentId].author != address(0)
+    ) {
+      if (metadata.length > 1000) {
+        revert ICommentManager.MetadataTooLong();
       }
+      MetadataOps.storeCommentMetadata(
+        commentId,
+        metadata,
+        commentMetadata,
+        commentMetadataKeys
+      );
     }
 
     Channels.Channel memory channel = channelManager.getChannel(channelId);
@@ -116,7 +113,14 @@ library CommentOps {
       }(comment, metadata, msgSender, commentId);
 
       // Store hook metadata
-      if (hookMetadata.length > 0) {
+      if (
+        hookMetadata.length > 0 &&
+        // don't store hook metadata if the hook re-entered to delete the comment
+        comments[commentId].author != address(0)
+      ) {
+        if (hookMetadata.length > 1000) {
+          revert ICommentManager.HookMetadataTooLong();
+        }
         MetadataOps.storeCommentHookMetadata(
           commentId,
           hookMetadata,
@@ -173,19 +177,20 @@ library CommentOps {
       commentMetadataKeys
     );
 
-    // Store new metadata
-    mapping(bytes32 => bytes) storage commentMetadataForId = commentMetadata[
-      commentId
-    ];
-    bytes32[] storage commentMetadataKeysForId = commentMetadataKeys[commentId];
-    for (uint i = 0; i < metadata.length; i++) {
-      bytes32 key = metadata[i].key;
-      bytes memory val = metadata[i].value;
-
-      commentMetadataForId[key] = val;
-      commentMetadataKeysForId.push(key);
-
-      emit ICommentManager.CommentMetadataSet(commentId, key, val);
+    // Store metadata in mappings
+    if (
+      metadata.length > 0 && // don't store hook metadata if the hook re-entered to delete the comment
+      comments[commentId].author != address(0)
+    ) {
+      if (metadata.length > 1000) {
+        revert ICommentManager.MetadataTooLong();
+      }
+      MetadataOps.storeCommentMetadata(
+        commentId,
+        metadata,
+        commentMetadata,
+        commentMetadataKeys
+      );
     }
 
     Channels.Channel memory channel = channelManager.getChannel(
@@ -228,21 +233,21 @@ library CommentOps {
         commentHookMetadata,
         commentHookMetadataKeys
       );
-
-      // Store new hook metadata
-      mapping(bytes32 => bytes)
-        storage commentHookMetadataForId = commentHookMetadata[commentId];
-      bytes32[] storage commentHookMetadataKeysForId = commentHookMetadataKeys[
-        commentId
-      ];
-      for (uint i = 0; i < hookMetadata.length; i++) {
-        bytes32 key = hookMetadata[i].key;
-        bytes memory val = hookMetadata[i].value;
-
-        commentHookMetadataForId[key] = val;
-        commentHookMetadataKeysForId.push(key);
-
-        emit ICommentManager.CommentHookMetadataSet(commentId, key, val);
+      // Store hook metadata
+      if (
+        hookMetadata.length > 0 &&
+        // don't store hook metadata if the hook re-entered to delete the comment
+        comments[commentId].author != address(0)
+      ) {
+        if (hookMetadata.length > 1000) {
+          revert ICommentManager.HookMetadataTooLong();
+        }
+        MetadataOps.storeCommentHookMetadata(
+          commentId,
+          hookMetadata,
+          commentHookMetadata,
+          commentHookMetadataKeys
+        );
       }
     } else if (value > 0) {
       // refund excess payment if any

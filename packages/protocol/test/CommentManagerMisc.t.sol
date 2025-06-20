@@ -230,7 +230,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     // Post comment without author signature (using approval)
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -264,7 +264,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     // Post comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSignature = TestUtils.signEIP712(
       vm,
@@ -282,20 +282,36 @@ contract CommentsTest is Test, IERC721Receiver {
     assertEq(comments.getNonce(author, app), initialNonce);
 
     vm.expectEmit(true, true, true, true);
+    Comments.CreateComment memory commentData2 = TestUtils
+      .generateDummyCreateComment(author, app, "Test comment 2");
+    bytes32 commentId2 = comments.getCommentId(commentData2);
+
     emit CommentAdded(
-      commentId,
+      commentId2,
       author,
       app,
       0,
-      commentData.parentId,
+      commentData2.parentId,
       uint88(block.timestamp),
-      commentData.content,
-      commentData.targetUri,
-      commentData.commentType,
+      commentData2.content,
+      commentData2.targetUri,
+      commentData2.commentType,
       uint8(Comments.AuthorAuthMethod.AUTHOR_SIGNATURE),
       new Metadata.MetadataEntry[](0)
     );
-    comments.postCommentWithSig(commentData, authorSignature, appSignature);
+
+    bytes memory authorSignature2 = TestUtils.signEIP712(
+      vm,
+      authorPrivateKey,
+      commentId2
+    );
+    bytes memory appSignature2 = TestUtils.signEIP712(
+      vm,
+      appPrivateKey,
+      commentId2
+    );
+
+    comments.postCommentWithSig(commentData2, authorSignature2, appSignature2);
   }
 
   function test_UpdateCommentHookData() public {
@@ -313,7 +329,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     // Create a comment in this channel
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     commentData.channelId = channelId;
 
     bytes32 commentId = comments.getCommentId(commentData);
@@ -413,7 +429,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_UpdateCommentHookData_NoHook() public {
     // Create comment without hook
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
 
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSignature = TestUtils.signEIP712(

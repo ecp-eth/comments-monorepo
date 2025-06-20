@@ -41,7 +41,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_AsAuthor() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -66,7 +66,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_AsNonAuthor() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -89,7 +89,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteCommentWithSig_ValidAuthorSig() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -127,7 +127,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteCommentWithSig_InvalidAuthorSig() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -169,7 +169,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteCommentWithSig_ValidAppSig_AppApproved() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -209,7 +209,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteCommentWithSig_ValidAppSig_AppNotApproved() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -253,7 +253,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteCommentWithSig_InvalidAppSig_AppApproved() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -297,7 +297,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_SenderIsApp_AppApproved() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -326,7 +326,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_SenderIsApp_AppNotApproved() public {
     // Create and post a comment first
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,
@@ -378,7 +378,7 @@ contract CommentsTest is Test, IERC721Receiver {
   function test_DeleteComment_NotAuthor() public {
     // First create a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory authorSignature = TestUtils.signEIP712(
       vm,
@@ -407,7 +407,7 @@ contract CommentsTest is Test, IERC721Receiver {
 
     // Create and post a comment
     Comments.CreateComment memory commentData = TestUtils
-      .generateDummyCreateComment(author, app);
+      .generateDummyCreateComment(author, app, "Test comment");
     bytes32 commentId = comments.getCommentId(commentData);
     bytes memory appSignature = TestUtils.signEIP712(
       vm,

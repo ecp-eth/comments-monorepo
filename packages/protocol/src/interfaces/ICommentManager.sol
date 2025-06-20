@@ -154,6 +154,16 @@ interface ICommentManager {
   error BatchOperationFailed(uint256 operationIndex, bytes reason);
   /// @notice Error thrown when reaction has no parentId or targetUri
   error InvalidReactionReference(string reason);
+  /// @notice Error thrown when comment already exists
+  error CommentAlreadyExists();
+  /// @notice Error thrown when comment is already deleted
+  error CommentAlreadyDeleted();
+  /// @notice Error thrown when metadata key is empty
+  error InvalidKey();
+  /// @notice Error thrown when hook metadata is too long, this can be used to gas-DOS comment edits/deletes
+  error HookMetadataTooLong();
+  /// @notice Error thrown when metadata is too long, this can be used to gas-DOS comment edits/deletes
+  error MetadataTooLong();
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata
@@ -177,7 +187,7 @@ interface ICommentManager {
 
   /// @notice Deletes a comment when called by the author directly
   /// @param commentId The unique identifier of the comment to delete
-  function deleteComment(bytes32 commentId) external;
+  function deleteComment(bytes32 commentId) external payable;
 
   /// @notice Deletes a comment with author signature verification
   /// @param commentId The unique identifier of the comment to delete
@@ -191,7 +201,7 @@ interface ICommentManager {
     uint256 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) external;
+  ) external payable;
 
   /// @notice Edits a comment when called by the author directly
   /// @param commentId The unique identifier of the comment to edit
