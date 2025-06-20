@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.18
+
+### Patch Changes
+
+- c264d23: chore(sdk): export AuthorAuthMethod as enum
+
 ## 0.0.17
 
 ### Patch Changes
