@@ -803,7 +803,7 @@ const createChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      name: "channelId";
      type: "uint256";
    }, {
-     indexed: false;
+     indexed: true;
      internalType: "bytes32";
      name: "key";
      type: "bytes32";
@@ -1937,7 +1937,7 @@ Create a new channel
      `name`: `"channelId"`;
      `type`: `"uint256"`;
    \}, \{
-     `indexed`: `false`;
+     `indexed`: `true`;
      `internalType`: `"bytes32"`;
      `name`: `"key"`;
      `type`: `"bytes32"`;

@@ -3012,7 +3012,7 @@ export const ChannelManagerABI = [
       {
         name: "key",
         type: "bytes32",
-        indexed: false,
+        indexed: true,
         internalType: "bytes32",
       },
       {

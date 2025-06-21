@@ -74,7 +74,11 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   /// @param channelId The unique identifier of the channel
   /// @param key The metadata key
   /// @param value The metadata value
-  event ChannelMetadataSet(uint256 indexed channelId, bytes32 key, bytes value);
+  event ChannelMetadataSet(
+    uint256 indexed channelId,
+    bytes32 indexed key,
+    bytes value
+  );
 
   /// @notice Creates a new channel
   /// @param name The name of the channel

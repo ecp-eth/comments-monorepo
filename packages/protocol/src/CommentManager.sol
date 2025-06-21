@@ -882,11 +882,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       results[i] = _executeBatchOperation(operations[i], i);
     }
 
-    Batching.emitBatchOperationExecuted(
-      msg.sender,
-      operations.length,
-      msg.value
-    );
+    emit BatchOperationExecuted(msg.sender, operations.length, msg.value);
 
     return results;
   }
@@ -978,7 +974,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       operation.value
     );
 
-    return Batching.getEmptyResult();
+    return "";
   }
 
   function _executeEditCommentWithSigBatch(
@@ -996,7 +992,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       operation.value
     );
 
-    return Batching.getEmptyResult();
+    return "";
   }
 
   function _executeDeleteCommentBatch(
@@ -1007,7 +1003,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     // Call deleteComment function directly (preserves msg.sender)
     _deleteComment(commentId, msg.sender, operation.value);
 
-    return Batching.getEmptyResult();
+    return "";
   }
 
   function _executeDeleteCommentWithSigBatch(
@@ -1026,6 +1022,6 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       operation.value
     );
 
-    return Batching.getEmptyResult();
+    return "";
   }
 }

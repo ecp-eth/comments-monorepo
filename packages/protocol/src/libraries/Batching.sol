@@ -7,13 +7,6 @@ import "../interfaces/ICommentManager.sol";
 
 /// @title Batching - Library for handling batch comment operations
 library Batching {
-  /// @notice Event emitted when a batch operation is executed
-  event BatchOperationExecuted(
-    address indexed sender,
-    uint256 operationsCount,
-    uint256 totalValue
-  );
-
   /// @notice Validate batch operations structure and value distribution
   /// @param operations Array of batch operations to validate
   /// @param msgValue The total value sent with the transaction
@@ -167,23 +160,5 @@ library Batching {
     bytes32 commentId
   ) external pure returns (bytes memory result) {
     return abi.encode(commentId);
-  }
-
-  /// @notice Get empty result for operations that don't return data
-  /// @return result Empty bytes
-  function getEmptyResult() external pure returns (bytes memory result) {
-    return "";
-  }
-
-  /// @notice Emit batch operation executed event
-  /// @param sender The sender of the batch transaction
-  /// @param operationsCount The number of operations executed
-  /// @param totalValue The total value sent
-  function emitBatchOperationExecuted(
-    address sender,
-    uint256 operationsCount,
-    uint256 totalValue
-  ) external {
-    emit BatchOperationExecuted(sender, operationsCount, totalValue);
   }
 }

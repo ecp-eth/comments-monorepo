@@ -264,6 +264,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     for (uint i = 0; i < metadata.length; i++) {
       bytes32 key = metadata[i].key;
       bytes memory val = metadata[i].value;
+      if (key == bytes32(0)) revert InvalidKey();
       channelMetadataForId[key] = val;
       channelMetadataKeysForId.push(key);
     }
@@ -301,22 +302,6 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         }
 
         emit ChannelMetadataSet(channelId, op.key, op.value);
-      }
-    }
-
-    // Notify hook of channel update if configured
-    Channels.Channel memory channel = channels[channelId];
-    if (channel.hook != address(0)) {
-      IHook hook = IHook(channel.hook);
-      Hooks.Permissions memory permissions = hook.getHookPermissions();
-
-      if (permissions.onChannelUpdate) {
-        hook.onChannelUpdate(
-          address(this),
-          channelId,
-          channel,
-          getChannelMetadata(channelId)
-        );
       }
     }
   }
