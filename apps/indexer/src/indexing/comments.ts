@@ -12,9 +12,9 @@ import {
   getCommentModerationStatus,
   insertCommentModerationStatus,
 } from "../management/services/moderation";
-import { notifyCommentPendingModeration } from "../lib/telegram-notifications";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
+import { moderationNotificationsService } from "../services";
 
 const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
 
@@ -112,9 +112,9 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         defaultModerationStatus,
       );
 
-      await notifyCommentPendingModeration({
+      await moderationNotificationsService.notifyPendingModeration({
         id: event.args.commentId,
-        authorAddress: event.args.author,
+        author: event.args.author,
         content: event.args.content,
         targetUri,
       });

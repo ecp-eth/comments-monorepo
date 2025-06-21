@@ -11,7 +11,7 @@ import { setupGetMutedAccount } from "./muted-accounts/get";
 import { setupGetPendingModerationComments } from "./moderate-comments/get";
 import { setupChangeCommentModerationStatus } from "./moderate-comments/[commentId]/patch";
 import { setupGetComment } from "./moderate-comments/[commentId]/get";
-import { setupWebhook } from "./webhook/get";
+import { setupWebhook } from "./webhook/post";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
