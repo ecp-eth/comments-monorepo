@@ -150,7 +150,6 @@ describe("channel", () => {
       assert.deepEqual(channel, {
         name: "Test channel getChannel",
         description: undefined,
-        metadata: undefined,
         hook: undefined,
         permissions: {
           onCommentAdd: false,
@@ -296,7 +295,6 @@ describe("channel", () => {
       assert.deepEqual(channel, {
         name: "Updated channel",
         description: "New description",
-        metadata: undefined,
         hook: undefined,
         permissions: {
           onCommentAdd: false,
