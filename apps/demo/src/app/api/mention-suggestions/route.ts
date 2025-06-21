@@ -182,7 +182,7 @@ function normalizeAvatarUrl(url: string): string | null {
     const { protocol } = new URL(url);
 
     if (protocol === "ipfs:") {
-      return `https://ipfs.io/ipfs/${url.slice(7)}`;
+      return `https://gateway.pinata.cloud/ipfs/${url.slice(7)}`;
     }
 
     if (protocol === "http:" || protocol === "https:") {
