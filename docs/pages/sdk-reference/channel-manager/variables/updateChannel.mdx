@@ -1096,6 +1096,10 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "error";
 }, {
   inputs: readonly [];
+  name: "HookAlreadySet";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "InsufficientFee";
   type: "error";
 }, {
@@ -2239,6 +2243,10 @@ Update a channel
 \}, \{
   `inputs`: readonly \[\];
   `name`: `"EmptyChannelName"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"HookAlreadySet"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];

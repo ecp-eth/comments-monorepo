@@ -3391,6 +3391,11 @@ export const ChannelManagerABI = [
   },
   {
     type: "error",
+    name: "HookAlreadySet",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "InsufficientFee",
     inputs: [],
   },

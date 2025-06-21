@@ -26,6 +26,8 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   error InvalidKey();
   /// @notice Error thrown when channel name is empty
   error EmptyChannelName();
+  /// @notice Error thrown when hook is already set
+  error HookAlreadySet();
 
   /// @notice Emitted when the base URI for NFT metadata is updated
   /// @param baseURI The new base URI

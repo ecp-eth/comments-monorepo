@@ -378,6 +378,10 @@ library CommentOps {
 
     emit ICommentManager.CommentHookDataUpdate(commentId, operations);
 
+    if (operations.length > 1000) {
+      revert ICommentManager.HookMetadataTooLong();
+    }
+
     // Apply hook metadata operations using merge mode (gas-efficient)
     for (uint i = 0; i < operations.length; i++) {
       Metadata.MetadataEntryOp memory op = operations[i];

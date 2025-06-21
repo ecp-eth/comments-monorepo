@@ -195,6 +195,7 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
   function setHook(uint256 channelId, address hook) external {
     if (!_channelExists(channelId)) revert ChannelDoesNotExist();
     if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
+    if (hook == channels[channelId].hook) revert HookAlreadySet();
 
     return _setHook(channelId, hook);
   }
