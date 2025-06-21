@@ -11,7 +11,7 @@ export type { ENSByNameResolver };
 
 const cacheMap = new LRUCache<Hex, Promise<ResolvedENSData | null>>({
   max: 10000,
-  ttl: 14 * 24 * 60 * 60 * 1000, // 14 days
+  ttl: 24 * 60 * 60 * 1000, // 1 day
   allowStale: true,
 });
 
