@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import * as chains from "viem/chains";
+import type { Hex } from "viem";
 
 export type SuggestionsProps = SuggestionProps<MentionSuggestionSchemaType> & {
   minimumQueryLength: number;
@@ -101,6 +102,7 @@ export const Suggestions = forwardRef(function Suggestions(
           >
             {item.type === "ens" ? (
               <AccountSuggestion
+                address={item.address}
                 name={item.name}
                 avatarUrl={item.avatarUrl}
                 handle={item.name}
@@ -108,6 +110,7 @@ export const Suggestions = forwardRef(function Suggestions(
             ) : null}
             {item.type === "farcaster" ? (
               <AccountSuggestion
+                address={item.address}
                 avatarUrl={item.pfpUrl}
                 name={item.displayName || item.username}
                 handle={item.fname}
@@ -130,12 +133,14 @@ export const Suggestions = forwardRef(function Suggestions(
 });
 
 type AccountSuggestionProps = {
+  address: Hex;
   avatarUrl: string | null | undefined;
   name: string;
   handle: string;
 };
 
 function AccountSuggestion({
+  address,
   avatarUrl,
   name,
   handle,
@@ -145,7 +150,7 @@ function AccountSuggestion({
       <div
         className="rounded-full bg-cover bg-center size-10 bg-muted border border-border flex-shrink-0"
         style={{
-          backgroundImage: `url(${avatarUrl || "data:image/svg+xml;base64,CiAgPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMTAgMTEwIj4KICAgIDxkZWZzPgogICAgICA8bGluZWFyR3JhZGllbnQgaWQ9Imd6ciIgeDE9IjEwNi45NzUiIHkxPSIxMzYuMTU2IiB4Mj0iLTEyLjk4MTUiIHkyPSIxMy41MzQ3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgICAgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxMzEuNjM4IDEyOS44MzUpIHJvdGF0ZSgtMTQxLjE5NCkgc2NhbGUoMTg1LjU4MikiPgogICAgICAgIDxzdG9wIG9mZnNldD0iMC4xNTYyIiBzdG9wLWNvbG9yPSJoc2woMTQxLCA4NiUsIDkwJSkiIC8+CiAgICAgICAgPHN0b3Agb2Zmc2V0PSIwLjM5NTgiIHN0b3AtY29sb3I9ImhzbCgxNDEsIDg3JSwgNjglKSIgLz4KICAgICAgICA8c3RvcCBvZmZzZXQ9IjAuNzI5MiIgc3RvcC1jb2xvcj0iaHNsKDIyMSwgODklLCA0NSUpIiAvPgogICAgICAgIDxzdG9wIG9mZnNldD0iMC45MDYzIiBzdG9wLWNvbG9yPSJoc2woMjMxLCA5NCUsIDM2JSkiIC8+CiAgICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSJoc2woMjMxLCA5NiUsIDM2JSkiIC8+CiAgICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8L2RlZnM+CiAgICA8cGF0aAogICAgICBkPSJNMTEwIDU1QzExMCAyNC42MjQ0IDg1LjM3NTYgMCA1NSAwQzI0LjYyNDQgMCAwIDI0LjYyNDQgMCA1NUMwIDg1LjM3NTYgMjQuNjI0NCAxMTAgNTUgMTEwQzg1LjM3NTYgMTEwIDExMCA4NS4zNzU2IDExMCA1NVoiCiAgICAgIGZpbGw9InVybCgjZ3pyKSIgLz4KICA8L3N2Zz4KICAgIA=="}`,
+          backgroundImage: `url(${avatarUrl || `https://effigy.im/a/${address}`})`,
         }}
       ></div>
       <div className="flex flex-col min-w-0 flex-1">
