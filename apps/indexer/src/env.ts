@@ -3,7 +3,8 @@ import { z } from "zod";
 const moderationNotificationsEnabledSchema = z.object({
   MODERATION_TELEGRAM_BOT_TOKEN: z.string().min(1),
   MODERATION_TELEGRAM_CHANNEL_ID: z.string().min(1),
-  MODERATION_INDEXER_URL: z.string().url(),
+  MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url(),
+  MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().min(1),
 });
 
 const EnvSchema = z
@@ -17,7 +18,6 @@ const EnvSchema = z
       .enum(["0", "1"])
       .transform((val) => val === "1")
       .default("0"),
-    WEBHOOK_SECRET: z.string().min(1),
     MODERATION_ENABLED: z
       .enum(["0", "1"])
       .default("0")
@@ -28,7 +28,8 @@ const EnvSchema = z
       .transform((val) => val === "1"),
     MODERATION_TELEGRAM_BOT_TOKEN: z.string().optional(),
     MODERATION_TELEGRAM_CHANNEL_ID: z.string().optional(),
-    MODERATION_INDEXER_URL: z.string().url().optional(),
+    MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
+    MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
     PONDER_RPC_URL_8453: z.string().url().optional(),
     PONDER_START_BLOCK_8453: z.coerce.number().optional(),
   })
