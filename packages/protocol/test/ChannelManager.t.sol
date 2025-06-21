@@ -68,13 +68,17 @@ contract ChannelManagerTest is Test, IERC721Receiver {
     uint256 indexed channelId,
     string name,
     string description,
-    Metadata.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata,
+    address hook,
+    address owner
   );
   event ChannelUpdated(
     uint256 indexed channelId,
     string name,
     string description,
-    Metadata.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata,
+    address hook,
+    address owner
   );
   event HookSet(uint256 indexed channelId, address indexed hook);
   event HookStatusUpdated(
