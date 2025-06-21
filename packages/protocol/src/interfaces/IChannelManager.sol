@@ -40,7 +40,8 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
     string name,
     string description,
     Metadata.MetadataEntry[] metadata,
-    address hook
+    address hook,
+    address owner
   );
 
   /// @notice Emitted when a channel's configuration is updated
@@ -78,6 +79,16 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
     uint256 indexed channelId,
     bytes32 indexed key,
     bytes value
+  );
+
+  /// @notice Emitted when a channel (NFT) is transferred
+  /// @param channelId The unique identifier of the channel
+  /// @param from The address of the previous owner
+  /// @param to The address of the new owner
+  event ChannelTransferred(
+    uint256 indexed channelId,
+    address indexed from,
+    address indexed to
   );
 
   /// @notice Creates a new channel

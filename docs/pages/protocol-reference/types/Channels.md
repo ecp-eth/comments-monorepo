@@ -26,10 +26,6 @@ Struct containing channel configuration
 
 
 
-- **metadata:** (struct Metadata.MetadataEntry[]) The metadata of the channel as an array of key-value pairs
-
-
-
 - **hook:** (address) The hook of the channel. Hook must implement IHook interface.
 
 

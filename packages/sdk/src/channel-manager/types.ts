@@ -92,6 +92,12 @@ export type ContractReadFunctions = {
     args: ReadContractParameters<ChannelManagerABIType, "getChannel">,
   ) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
 
+  getChannelMetadata: (
+    args: ReadContractParameters<ChannelManagerABIType, "getChannelMetadata">,
+  ) => Promise<
+    ReadContractReturnType<ChannelManagerABIType, "getChannelMetadata">
+  >;
+
   channelExists: (
     args: ReadContractParameters<ChannelManagerABIType, "channelExists">,
   ) => Promise<ReadContractReturnType<ChannelManagerABIType, "channelExists">>;

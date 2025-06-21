@@ -79,10 +79,7 @@ library CommentOps {
     );
 
     // Store metadata in mappings
-    if (
-      metadata.length > 0 && // don't store hook metadata if the hook re-entered to delete the comment
-      comments[commentId].author != address(0)
-    ) {
+    if (metadata.length > 0) {
       if (metadata.length > 1000) {
         revert ICommentManager.MetadataTooLong();
       }
@@ -178,10 +175,7 @@ library CommentOps {
     );
 
     // Store metadata in mappings
-    if (
-      metadata.length > 0 && // don't store hook metadata if the hook re-entered to delete the comment
-      comments[commentId].author != address(0)
-    ) {
+    if (metadata.length > 0) {
       if (metadata.length > 1000) {
         revert ICommentManager.MetadataTooLong();
       }
@@ -266,7 +260,6 @@ library CommentOps {
   /// @param commentHookMetadata Storage mapping for comment hook metadata
   /// @param commentHookMetadataKeys Storage mapping for comment hook metadata keys
   /// @param msgSender The sender of the transaction
-  /// @param msgValue The ETH value sent with the transaction
   function deleteComment(
     bytes32 commentId,
     address author,
@@ -277,8 +270,7 @@ library CommentOps {
     mapping(bytes32 => bytes32[]) storage commentMetadataKeys,
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentHookMetadata,
     mapping(bytes32 => bytes32[]) storage commentHookMetadataKeys,
-    address msgSender,
-    uint256 msgValue
+    address msgSender
   ) external {
     Comments.Comment storage comment = comments[commentId];
 
@@ -321,24 +313,13 @@ library CommentOps {
 
     if (channel.hook != address(0) && channel.permissions.onCommentDelete) {
       IHook hook = IHook(channel.hook);
-      // Calculate hook value after protocol fee
-      // Calculate hook value after protocol fee
-      uint256 valueToPassToHook = channelManager
-        .deductProtocolHookTransactionFee(msgValue);
-      if (msgValue > valueToPassToHook) {
-        payable(address(channelManager)).transfer(msgValue - valueToPassToHook);
-      }
-
-      hook.onCommentDelete{ value: valueToPassToHook }(
+      hook.onCommentDelete(
         commentToDelete,
         metadata,
         hookMetadata,
         msgSender,
         commentId
       );
-    } else if (msgValue > 0) {
-      // refund excess payment if any
-      payable(msgSender).transfer(msgValue);
     }
   }
 

@@ -30,7 +30,7 @@ Edit an existing comment
 
 
 
-### deleteComment(bytes32 commentId, address author, contract IChannelManager channelManager, mapping(bytes32 => struct Comments.Comment) comments, mapping(bytes32 => bool) deleted, mapping(bytes32 => mapping(bytes32 => bytes)) commentMetadata, mapping(bytes32 => bytes32[]) commentMetadataKeys, mapping(bytes32 => mapping(bytes32 => bytes)) commentHookMetadata, mapping(bytes32 => bytes32[]) commentHookMetadataKeys, address msgSender, uint256 msgValue) (external)
+### deleteComment(bytes32 commentId, address author, contract IChannelManager channelManager, mapping(bytes32 => struct Comments.Comment) comments, mapping(bytes32 => bool) deleted, mapping(bytes32 => mapping(bytes32 => bytes)) commentMetadata, mapping(bytes32 => bytes32[]) commentMetadataKeys, mapping(bytes32 => mapping(bytes32 => bytes)) commentHookMetadata, mapping(bytes32 => bytes32[]) commentHookMetadataKeys, address msgSender) (external)
 
 Delete a comment
 

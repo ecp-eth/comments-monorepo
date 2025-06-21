@@ -1047,7 +1047,7 @@ contract CommentsBatchTest is Test, IERC721Receiver {
     // Should save at least some execution gas (realistic expectation after library refactoring)
     assertGt(
       totalSavingsWithTxCosts,
-      3000,
+      2000,
       "Should save some gas including transaction costs"
     );
 

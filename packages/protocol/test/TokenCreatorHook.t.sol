@@ -337,27 +337,6 @@ contract TokenCreatorHookTest is Test {
     commentManager.postComment(commentData, "");
   }
 
-  // Helper functions
-  function _createChannelData(
-    Metadata.MetadataEntry[] memory metadata
-  ) internal pure returns (Channels.Channel memory) {
-    return
-      Channels.Channel({
-        name: "",
-        description: "",
-        metadata: metadata,
-        hook: address(0),
-        permissions: Hooks.Permissions({
-          onInitialize: false,
-          onCommentAdd: false,
-          onCommentEdit: false,
-          onCommentDelete: false,
-          onChannelUpdate: false,
-          onCommentHookDataUpdate: false
-        })
-      });
-  }
-
   function _addressToString(
     address addr
   ) internal pure returns (string memory) {

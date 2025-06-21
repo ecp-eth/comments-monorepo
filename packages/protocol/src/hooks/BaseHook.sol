@@ -105,7 +105,7 @@ abstract contract BaseHook is IHook, ERC165 {
     Metadata.MetadataEntry[] calldata hookMetadata,
     address msgSender,
     bytes32 commentId
-  ) external payable virtual returns (bool) {
+  ) external virtual returns (bool) {
     return
       _onCommentDelete(
         commentData,

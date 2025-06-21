@@ -206,7 +206,7 @@ const CommentManagerABI: readonly [{
   }];
   name: "deleteComment";
   outputs: readonly [];
-  stateMutability: "payable";
+  stateMutability: "nonpayable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -232,7 +232,7 @@ const CommentManagerABI: readonly [{
   }];
   name: "deleteCommentWithSig";
   outputs: readonly [];
-  stateMutability: "payable";
+  stateMutability: "nonpayable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -1498,6 +1498,10 @@ const CommentManagerABI: readonly [{
 }, {
   inputs: readonly [];
   name: "ParentCommentNotInSameChannel";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "ReactionCannotBeEdited";
   type: "error";
 }, {
   inputs: readonly [];

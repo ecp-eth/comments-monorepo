@@ -11,9 +11,6 @@ import "./types/Comments.sol";
 import "./types/Channels.sol";
 import "./types/Metadata.sol";
 import "./interfaces/IHook.sol";
-import "./types/Comments.sol";
-import "./types/Channels.sol";
-import "./types/Metadata.sol";
 
 /// @title ChannelManager - A contract for managing comment channels and their hooks as NFTs
 /// @notice This contract allows creation and management of channels with configurable hooks, where each channel is an NFT
@@ -50,8 +47,9 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
       0,
       channelZero.name,
       channelZero.description,
-      channelZero.metadata,
-      channelZero.hook
+      new Metadata.MetadataEntry[](0),
+      channelZero.hook,
+      initialOwner
     );
   }
 
@@ -145,7 +143,14 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     channel.description = description;
     _createChannelMetadata(channelId, metadata);
 
-    emit ChannelCreated(channelId, name, description, metadata, hook);
+    emit ChannelCreated(
+      channelId,
+      name,
+      description,
+      metadata,
+      hook,
+      msg.sender
+    );
 
     // Add hook if provided
     if (hook != address(0)) {
@@ -280,6 +285,10 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
     if (!_channelExists(channelId)) revert ChannelDoesNotExist();
     if (ownerOf(channelId) != msg.sender) revert UnauthorizedCaller();
 
+    mapping(bytes32 => bytes) storage channelMetadataForId = channelMetadata[
+      channelId
+    ];
+    bytes32[] storage channelMetadataKeysForId = channelMetadataKeys[channelId];
     // Apply metadata operations
     for (uint i = 0; i < operations.length; i++) {
       Metadata.MetadataEntryOp memory op = operations[i];
@@ -294,11 +303,11 @@ contract ChannelManager is IChannelManager, ProtocolFees, ERC721Enumerable {
         // Check if this is a new key for gas optimization
         bool isNewKey = !_channelMetadataKeyExists(channelId, op.key);
 
-        channelMetadata[channelId][op.key] = op.value;
+        channelMetadataForId[op.key] = op.value;
 
         // Only add to keys array if it's a new key
         if (isNewKey) {
-          channelMetadataKeys[channelId].push(op.key);
+          channelMetadataKeysForId.push(op.key);
         }
 
         emit ChannelMetadataSet(channelId, op.key, op.value);

@@ -59,7 +59,7 @@ contract NoopHook is IHook {
     Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable override returns (bool) {
+  ) external override returns (bool) {
     return true;
   }
 

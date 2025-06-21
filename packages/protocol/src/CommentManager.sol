@@ -261,6 +261,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     onlyAuthor(comments[commentId].author)
     notStale(editData.deadline)
     commentExists(commentId)
+    noEditingReactions(comments[commentId].commentType)
     validateNonce(comments[commentId].author, editData.app, editData.nonce)
   {
     Comments.Comment storage comment = comments[commentId];
@@ -325,6 +326,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     internal
     notStale(editData.deadline)
     commentExists(commentId)
+    noEditingReactions(comments[commentId].commentType)
     validateNonce(comments[commentId].author, editData.app, editData.nonce)
   {
     Comments.Comment storage comment = comments[commentId];
@@ -405,20 +407,29 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   }
 
   /// @inheritdoc ICommentManager
-  function deleteComment(bytes32 commentId) public payable {
-    _deleteComment(commentId, msg.sender, msg.value);
+  function deleteComment(bytes32 commentId) public {
+    _deleteComment(commentId, msg.sender);
   }
 
   /// @notice Internal function to handle comment deletion logic
   /// @param commentId The unique identifier of the comment to delete
   /// @param author The address of the comment author
-  /// @param value The value to be paid for the comment
   function _deleteComment(
     bytes32 commentId,
-    address author,
-    uint256 value
+    address author
   ) internal commentExists(commentId) onlyAuthor(comments[commentId].author) {
-    _removeComment(commentId, author, value);
+    CommentOps.deleteComment(
+      commentId,
+      author,
+      channelManager,
+      comments,
+      deleted,
+      commentMetadata,
+      commentMetadataKeys,
+      commentHookMetadata,
+      commentHookMetadataKeys,
+      msg.sender
+    );
   }
 
   /// @inheritdoc ICommentManager
@@ -428,14 +439,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     uint256 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) public payable {
+  ) external {
     _deleteCommentWithSig(
       commentId,
       app,
       deadline,
       authorSignature,
-      appSignature,
-      msg.value
+      appSignature
     );
   }
 
@@ -445,14 +455,12 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
   /// @param deadline The deadline for the signature
   /// @param authorSignature The author signature
   /// @param appSignature The app signature
-  /// @param value The value to be paid for the comment
   function _deleteCommentWithSig(
     bytes32 commentId,
     address app,
     uint256 deadline,
     bytes calldata authorSignature,
-    bytes calldata appSignature,
-    uint256 value
+    bytes calldata appSignature
   ) internal notStale(deadline) commentExists(commentId) {
     Comments.Comment storage comment = comments[commentId];
     address author = comment.author;
@@ -486,34 +494,22 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       );
 
     if (isAuthorizedByAuthor || isAuthorizedByApprovedApp) {
-      _removeComment(commentId, author, value);
+      CommentOps.deleteComment(
+        commentId,
+        author,
+        channelManager,
+        comments,
+        deleted,
+        commentMetadata,
+        commentMetadataKeys,
+        commentHookMetadata,
+        commentHookMetadataKeys,
+        msg.sender
+      );
       return;
     }
 
     revert NotAuthorized(msg.sender, author);
-  }
-
-  /// @notice Internal function to handle comment deletion logic
-  /// @param commentId The unique identifier of the comment to delete
-  /// @param author The address of the comment author
-  function _removeComment(
-    bytes32 commentId,
-    address author,
-    uint256 value
-  ) internal {
-    CommentOps.deleteComment(
-      commentId,
-      author,
-      channelManager,
-      comments,
-      deleted,
-      commentMetadata,
-      commentMetadataKeys,
-      commentHookMetadata,
-      commentHookMetadataKeys,
-      msg.sender,
-      value
-    );
   }
 
   /// @notice Internal function to get metadata for a comment
@@ -837,6 +833,13 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     _;
   }
 
+  modifier noEditingReactions(uint8 commentType) {
+    if (commentType == Comments.COMMENT_TYPE_REACTION) {
+      revert ReactionCannotBeEdited();
+    }
+    _;
+  }
+
   modifier validateNonce(address author, address app, uint256 nonce) {
     Approvals.validateNonce(author, app, nonce, nonces);
     _;
@@ -1001,7 +1004,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
     bytes32 commentId = Batching.decodeDeleteCommentData(operation);
 
     // Call deleteComment function directly (preserves msg.sender)
-    _deleteComment(commentId, msg.sender, operation.value);
+    _deleteComment(commentId, msg.sender);
 
     return "";
   }
@@ -1018,8 +1021,7 @@ contract CommentManager is ICommentManager, ReentrancyGuard, Ownable {
       deleteData.app,
       deleteData.deadline,
       operation.signatures[0], // author signature
-      operation.signatures[1], // app signature
-      operation.value
+      operation.signatures[1] // app signature
     );
 
     return "";

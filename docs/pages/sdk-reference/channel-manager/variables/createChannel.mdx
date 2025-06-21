@@ -216,19 +216,6 @@ const createChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
         name: "description";
         type: "string";
       }, {
-        components: readonly [{
-           internalType: ...;
-           name: ...;
-           type: ...;
-         }, {
-           internalType: ...;
-           name: ...;
-           type: ...;
-        }];
-        internalType: "struct Metadata.MetadataEntry[]";
-        name: "metadata";
-        type: "tuple[]";
-      }, {
         internalType: "address";
         name: "hook";
         type: "address";
@@ -782,6 +769,11 @@ const createChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      internalType: "address";
      name: "hook";
      type: "address";
+   }, {
+     indexed: false;
+     internalType: "address";
+     name: "owner";
+     type: "address";
   }];
   name: "ChannelCreated";
   type: "event";
@@ -814,6 +806,26 @@ const createChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "bytes";
   }];
   name: "ChannelMetadataSet";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+   }, {
+     indexed: true;
+     internalType: "address";
+     name: "from";
+     type: "address";
+   }, {
+     indexed: true;
+     internalType: "address";
+     name: "to";
+     type: "address";
+  }];
+  name: "ChannelTransferred";
   type: "event";
 }, {
   anonymous: false;
@@ -1349,19 +1361,6 @@ Create a new channel
         `internalType`: `"string"`;
         `name`: `"description"`;
         `type`: `"string"`;
-      \}, \{
-        `components`: readonly \[\{
-           `internalType`: ...;
-           `name`: ...;
-           `type`: ...;
-         \}, \{
-           `internalType`: ...;
-           `name`: ...;
-           `type`: ...;
-        \}\];
-        `internalType`: `"struct Metadata.MetadataEntry[]"`;
-        `name`: `"metadata"`;
-        `type`: `"tuple[]"`;
       \}, \{
         `internalType`: `"address"`;
         `name`: `"hook"`;
@@ -1916,6 +1915,11 @@ Create a new channel
      `internalType`: `"address"`;
      `name`: `"hook"`;
      `type`: `"address"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
   \}\];
   `name`: `"ChannelCreated"`;
   `type`: `"event"`;
@@ -1948,6 +1952,26 @@ Create a new channel
      `type`: `"bytes"`;
   \}\];
   `name`: `"ChannelMetadataSet"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"uint256"`;
+     `name`: `"channelId"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"from"`;
+     `type`: `"address"`;
+   \}, \{
+     `indexed`: `true`;
+     `internalType`: `"address"`;
+     `name`: `"to"`;
+     `type`: `"address"`;
+  \}\];
+  `name`: `"ChannelTransferred"`;
   `type`: `"event"`;
 \}, \{
   `anonymous`: `false`;

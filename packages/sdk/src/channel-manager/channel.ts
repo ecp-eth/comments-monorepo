@@ -106,7 +106,7 @@ export type GetChannelParams = {
   readContract: ContractReadFunctions["getChannel"];
 };
 
-export type GetChannelResult = Channel;
+export type GetChannelResult = Omit<Channel, "metadata">;
 
 const GetChannelParamsSchema = z.object({
   channelId: z.bigint(),
@@ -126,20 +126,66 @@ export async function getChannel(
   const { channelId, channelManagerAddress } =
     GetChannelParamsSchema.parse(params);
 
-  const { name, description, metadata, hook, permissions } =
-    await params.readContract({
-      address: channelManagerAddress,
-      abi: ChannelManagerABI,
-      functionName: "getChannel",
-      args: [channelId],
-    });
+  const { name, description, hook, permissions } = await params.readContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerABI,
+    functionName: "getChannel",
+    args: [channelId],
+  });
 
   return {
     name,
     description: !description ? undefined : description,
-    metadata: !metadata || metadata.length === 0 ? undefined : [...metadata],
     hook: isZeroHex(hook) ? undefined : hook,
     permissions,
+  };
+}
+
+export type GetChannelMetadataParams = {
+  /**
+   * The ID of the channel to get metadata for
+   */
+  channelId: bigint;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  readContract: ContractReadFunctions["getChannelMetadata"];
+};
+
+export type GetChannelMetadataResult = {
+  metadata: MetadataEntry[];
+};
+
+const GetChannelMetadataParamsSchema = z.object({
+  channelId: z.bigint(),
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Get channel metadata
+ *
+ * @param params - The parameters for getting channel metadata
+ * @throws If the channel does not exist
+ * @returns The channel metadata
+ */
+export async function getChannelMetadata(
+  params: GetChannelMetadataParams,
+): Promise<GetChannelMetadataResult> {
+  const { channelId, channelManagerAddress } =
+    GetChannelMetadataParamsSchema.parse(params);
+
+  const metadata = await params.readContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerABI,
+    functionName: "getChannelMetadata",
+    args: [channelId],
+  });
+
+  return {
+    metadata: metadata as MetadataEntry[],
   };
 }
 

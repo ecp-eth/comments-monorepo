@@ -562,7 +562,6 @@ contract HookSystemSecurityTest is Test, IERC721Receiver {
         Channels.Channel({
           name: "test",
           description: "test",
-          metadata: dummyMetadata,
           hook: address(0),
           permissions: Hooks.Permissions({
             onInitialize: false,

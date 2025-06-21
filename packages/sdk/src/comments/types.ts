@@ -185,7 +185,7 @@ export type ContractWriteFunctions = {
   deleteCommentWithSig: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
-      "payable",
+      "nonpayable",
       "deleteCommentWithSig"
     >,
   ) => Promise<Hex>;
@@ -193,7 +193,7 @@ export type ContractWriteFunctions = {
   deleteComment: (
     args: ContractFunctionParameters<
       CommentManagerABIType,
-      "payable",
+      "nonpayable",
       "deleteComment"
     >,
   ) => Promise<Hex>;

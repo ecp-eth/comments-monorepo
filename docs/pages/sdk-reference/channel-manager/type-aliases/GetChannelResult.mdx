@@ -7,7 +7,7 @@
 # Type Alias: GetChannelResult
 
 ```ts
-type GetChannelResult = Channel;
+type GetChannelResult = Omit<Channel, "metadata">;
 ```
 
 Defined in: [packages/sdk/src/channel-manager/channel.ts:109](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L109)

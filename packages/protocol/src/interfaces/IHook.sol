@@ -52,7 +52,7 @@ interface IHook is IERC165 {
     Metadata.MetadataEntry[] calldata hookMetadata,
     address msgSender,
     bytes32 commentId
-  ) external payable returns (bool success);
+  ) external returns (bool success);
 
   /// @notice Execute after a comment is edited
   /// @param commentData The comment data that was edited

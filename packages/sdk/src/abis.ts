@@ -263,7 +263,7 @@ export const CommentManagerABI = [
       },
     ],
     outputs: [],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -296,7 +296,7 @@ export const CommentManagerABI = [
       },
     ],
     outputs: [],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -1933,6 +1933,11 @@ export const CommentManagerABI = [
   },
   {
     type: "error",
+    name: "ReactionCannotBeEdited",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "Reentrancy",
     inputs: [],
   },
@@ -2248,23 +2253,6 @@ export const ChannelManagerABI = [
             name: "description",
             type: "string",
             internalType: "string",
-          },
-          {
-            name: "metadata",
-            type: "tuple[]",
-            internalType: "struct Metadata.MetadataEntry[]",
-            components: [
-              {
-                name: "key",
-                type: "bytes32",
-                internalType: "bytes32",
-              },
-              {
-                name: "value",
-                type: "bytes",
-                internalType: "bytes",
-              },
-            ],
           },
           {
             name: "hook",
@@ -2983,6 +2971,12 @@ export const ChannelManagerABI = [
         indexed: false,
         internalType: "address",
       },
+      {
+        name: "owner",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
     ],
     anonymous: false,
   },
@@ -3020,6 +3014,31 @@ export const ChannelManagerABI = [
         type: "bytes",
         indexed: false,
         internalType: "bytes",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "ChannelTransferred",
+    inputs: [
+      {
+        name: "channelId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
+      {
+        name: "from",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "to",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
     ],
     anonymous: false,

@@ -174,6 +174,8 @@ interface ICommentManager {
   error MetadataTooLong();
   /// @notice Error thrown when value is insufficient for comment creation fee
   error InsufficientValue(uint256 providedValue, uint256 requiredValue);
+  /// @notice Error thrown when reaction cannot be edited
+  error ReactionCannotBeEdited();
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata
@@ -197,7 +199,7 @@ interface ICommentManager {
 
   /// @notice Deletes a comment when called by the author directly
   /// @param commentId The unique identifier of the comment to delete
-  function deleteComment(bytes32 commentId) external payable;
+  function deleteComment(bytes32 commentId) external;
 
   /// @notice Deletes a comment with author signature verification
   /// @param commentId The unique identifier of the comment to delete
@@ -211,7 +213,7 @@ interface ICommentManager {
     uint256 deadline,
     bytes calldata authorSignature,
     bytes calldata appSignature
-  ) external payable;
+  ) external;
 
   /// @notice Edits a comment when called by the author directly
   /// @param commentId The unique identifier of the comment to edit

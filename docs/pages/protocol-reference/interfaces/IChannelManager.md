@@ -21,7 +21,7 @@ Emitted when the base URI for NFT metadata is updated
 
 
 
-### `ChannelCreated(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata, address hook)`
+### `ChannelCreated(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata, address hook, address owner)`
 
 Emitted when a new channel is created
 
@@ -52,6 +52,13 @@ Emitted when a hook's enabled status is updated
 ### `ChannelMetadataSet(uint256 channelId, bytes32 key, bytes value)`
 
 Emitted when channel metadata is set
+
+
+
+
+### `ChannelTransferred(uint256 channelId, address from, address to)`
+
+Emitted when a channel (NFT) is transferred
 
 
 

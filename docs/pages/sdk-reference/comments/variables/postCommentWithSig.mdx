@@ -206,7 +206,7 @@ const postCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
   }];
   name: "deleteComment";
   outputs: readonly [];
-  stateMutability: "payable";
+  stateMutability: "nonpayable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -232,7 +232,7 @@ const postCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
   }];
   name: "deleteCommentWithSig";
   outputs: readonly [];
-  stateMutability: "payable";
+  stateMutability: "nonpayable";
   type: "function";
 }, {
   inputs: readonly [{
@@ -1501,6 +1501,10 @@ const postCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
   type: "error";
 }, {
   inputs: readonly [];
+  name: "ReactionCannotBeEdited";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "Reentrancy";
   type: "error";
 }, {
@@ -1737,7 +1741,7 @@ Posts a comment with author signature verification
   \}\];
   `name`: `"deleteComment"`;
   `outputs`: readonly \[\];
-  `stateMutability`: `"payable"`;
+  `stateMutability`: `"nonpayable"`;
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -1763,7 +1767,7 @@ Posts a comment with author signature verification
   \}\];
   `name`: `"deleteCommentWithSig"`;
   `outputs`: readonly \[\];
-  `stateMutability`: `"payable"`;
+  `stateMutability`: `"nonpayable"`;
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -3029,6 +3033,10 @@ Posts a comment with author signature verification
 \}, \{
   `inputs`: readonly \[\];
   `name`: `"ParentCommentNotInSameChannel"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ReactionCannotBeEdited"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
