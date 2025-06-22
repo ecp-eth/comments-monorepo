@@ -124,8 +124,9 @@ contract TokenCreatorHookTest is Test {
       "Test Description",
       invalidMetadata
     );
-    vm.expectRevert(TokenCreatorHook.InvalidTokenAddress.selector);
+    channelManager.setHook(channelId, address(0));
 
+    vm.expectRevert(TokenCreatorHook.InvalidTokenAddress.selector);
     channelManager.setHook(channelId, address(hook));
     vm.stopPrank();
   }
@@ -156,6 +157,8 @@ contract TokenCreatorHookTest is Test {
       "Test Description",
       invalidMetadata
     );
+    channelManager.setHook(channelId, address(0));
+
     vm.expectRevert(TokenCreatorHook.InvalidTokenCreator.selector);
 
     channelManager.setHook(channelId, address(hook));
@@ -188,6 +191,8 @@ contract TokenCreatorHookTest is Test {
       "Test Description",
       invalidMetadata
     );
+    channelManager.setHook(channelId, address(0));
+
     vm.expectRevert(TokenCreatorHook.InvalidTokenChainId.selector);
 
     channelManager.setHook(channelId, address(hook));
@@ -202,6 +207,8 @@ contract TokenCreatorHookTest is Test {
       "Test Description",
       validMetadataOps
     );
+    channelManager.setHook(channelId, address(0));
+
     channelManager.setHook(channelId, address(hook));
     vm.stopPrank();
 
