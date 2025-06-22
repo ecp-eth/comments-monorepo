@@ -83,16 +83,6 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
     bytes value
   );
 
-  /// @notice Emitted when a channel (NFT) is transferred
-  /// @param channelId The unique identifier of the channel
-  /// @param from The address of the previous owner
-  /// @param to The address of the new owner
-  event ChannelTransferred(
-    uint256 indexed channelId,
-    address indexed from,
-    address indexed to
-  );
-
   /// @notice Creates a new channel
   /// @param name The name of the channel
   /// @param description The description of the channel

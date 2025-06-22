@@ -815,26 +815,6 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      name: "channelId";
      type: "uint256";
    }, {
-     indexed: true;
-     internalType: "address";
-     name: "from";
-     type: "address";
-   }, {
-     indexed: true;
-     internalType: "address";
-     name: "to";
-     type: "address";
-  }];
-  name: "ChannelTransferred";
-  type: "event";
-}, {
-  anonymous: false;
-  inputs: readonly [{
-     indexed: true;
-     internalType: "uint256";
-     name: "channelId";
-     type: "uint256";
-   }, {
      indexed: false;
      internalType: "string";
      name: "name";
@@ -1956,26 +1936,6 @@ Update a channel
      `type`: `"bytes"`;
   \}\];
   `name`: `"ChannelMetadataSet"`;
-  `type`: `"event"`;
-\}, \{
-  `anonymous`: `false`;
-  `inputs`: readonly \[\{
-     `indexed`: `true`;
-     `internalType`: `"uint256"`;
-     `name`: `"channelId"`;
-     `type`: `"uint256"`;
-   \}, \{
-     `indexed`: `true`;
-     `internalType`: `"address"`;
-     `name`: `"from"`;
-     `type`: `"address"`;
-   \}, \{
-     `indexed`: `true`;
-     `internalType`: `"address"`;
-     `name`: `"to"`;
-     `type`: `"address"`;
-  \}\];
-  `name`: `"ChannelTransferred"`;
   `type`: `"event"`;
 \}, \{
   `anonymous`: `false`;

@@ -56,13 +56,6 @@ Emitted when channel metadata is set
 
 
 
-### `ChannelTransferred(uint256 channelId, address from, address to)`
-
-Emitted when a channel (NFT) is transferred
-
-
-
-
 
 ## Functions
 

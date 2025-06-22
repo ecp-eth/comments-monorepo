@@ -3020,31 +3020,6 @@ export const ChannelManagerABI = [
   },
   {
     type: "event",
-    name: "ChannelTransferred",
-    inputs: [
-      {
-        name: "channelId",
-        type: "uint256",
-        indexed: true,
-        internalType: "uint256",
-      },
-      {
-        name: "from",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "to",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "ChannelUpdated",
     inputs: [
       {
