@@ -56,6 +56,13 @@ export async function resolveNFTMetadata(
       args: [channelId],
     });
 
+    const metadata = await client.readContract({
+      address: CHANNEL_MANAGER_ADDRESS,
+      abi: ChannelManagerABI,
+      functionName: "getChannelMetadata",
+      args: [channelId],
+    });
+
     if (!channel.name) {
       return Response.json(
         {
@@ -69,9 +76,9 @@ export async function resolveNFTMetadata(
 
     const attributes: NFTAttribute[] = [];
 
-    if (channel.metadata) {
+    if (metadata) {
       // Convert readonly array to mutable array
-      const metadataEntries = [...channel.metadata] as MetadataEntry[];
+      const metadataEntries = [...metadata] as MetadataEntry[];
 
       // Decode the metadata types from the entries
       const keyTypeMap = decodeMetadataTypes(metadataEntries);

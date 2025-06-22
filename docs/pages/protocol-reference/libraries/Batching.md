@@ -12,13 +12,6 @@
 
 
 
-## Events
-
-### `BatchOperationExecuted(address sender, uint256 operationsCount, uint256 totalValue)`
-
-Event emitted when a batch operation is executed
-
-
 
 
 ## Functions
@@ -68,20 +61,6 @@ Decode batch operation data for DELETE_COMMENT_WITH_SIG
 ### encodeCommentIdResult(bytes32 commentId) → bytes result (external)
 
 Encode a comment ID as result data
-
-
-
-
-### getEmptyResult() → bytes result (external)
-
-Get empty result for operations that don't return data
-
-
-
-
-### emitBatchOperationExecuted(address sender, uint256 operationsCount, uint256 totalValue) (external)
-
-Emit batch operation executed event
 
 
 

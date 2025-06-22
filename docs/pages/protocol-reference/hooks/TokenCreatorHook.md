@@ -86,7 +86,7 @@ Get all channels with their token information
 
 
 
-### _onInitialize(address, [struct Channels.Channel](/protocol-reference/types/Channels#channel) channel, uint256 channelId) → bool (internal)
+### _onInitialize(address, [struct Channels.Channel](/protocol-reference/types/Channels#channel), uint256 channelId, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata) → bool (internal)
 
 
 

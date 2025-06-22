@@ -116,16 +116,6 @@ contract DeployScript is Script {
       revert("ChannelManager deployment failed");
     }
     if (!isSimulation) {
-      // Update contract addresses
-      try channelManager.updateCommentsContract(address(comments)) {
-        console.log("ChannelManager comments contract updated successfully");
-      } catch Error(string memory reason) {
-        console.log(
-          "Failed to update ChannelManager comments contract:",
-          reason
-        );
-        revert("Contract configuration failed");
-      }
       try comments.updateChannelContract(address(channelManager)) {
         console.log("CommentManager channel contract updated successfully");
       } catch Error(string memory reason) {

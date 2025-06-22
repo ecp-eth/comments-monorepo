@@ -207,7 +207,7 @@ contract PaymastersTest is Test, IERC721Receiver {
       if (
         logEntry.topics[0] ==
         keccak256(
-          "ChannelCreated(uint256,string,string,(bytes32,bytes)[],address)"
+          "ChannelCreated(uint256,string,string,(bytes32,bytes)[],address,address)"
         )
       ) {
         // The channel ID is in the first topic after the event signature

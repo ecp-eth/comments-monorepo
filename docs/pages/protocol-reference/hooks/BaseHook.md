@@ -36,14 +36,14 @@ Checks if the contract implements the specified interface
 
 
 
-### onInitialize(address channel, [struct Channels.Channel](/protocol-reference/types/Channels#channel) channelData, uint256 channelId) → bool (external)
+### onInitialize(address channelManager, [struct Channels.Channel](/protocol-reference/types/Channels#channel) channelData, uint256 channelId, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata) → bool (external)
 
 Execute after a hook is initialized on a channel
 
 
 
 
-### _onInitialize(address, [struct Channels.Channel](/protocol-reference/types/Channels#channel), uint256) → bool (internal)
+### _onInitialize(address, [struct Channels.Channel](/protocol-reference/types/Channels#channel), uint256, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry)) → bool (internal)
 
 
 

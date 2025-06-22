@@ -221,7 +221,6 @@ library TestUtils {
     channelManager = new ChannelManager(owner);
 
     // update contract addresses
-    channelManager.updateCommentsContract(address(comments));
     comments.updateChannelContract(address(channelManager));
 
     return (comments, channelManager);
@@ -252,14 +251,16 @@ library TestUtils {
     return appSignature;
   }
 
+  // will generate identical commentIds
   function generateDummyCreateComment(
     address author,
-    address app
+    address app,
+    string memory content
   ) internal view returns (Comments.CreateComment memory) {
     Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](0);
     return
       Comments.CreateComment({
-        content: "Test comment",
+        content: content,
         metadata: metadata,
         targetUri: "",
         commentType: 0, // COMMENT_TYPE_COMMENT

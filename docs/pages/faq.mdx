@@ -36,3 +36,19 @@ If there's enough interest from developers we are open to adding support for new
 ## Will ECP build an App to compete with my App built on ECP?
 
 We want to avoid misalignment and competition between the ECP protocol team and potential integrators. We may build apps in the future to try to help drive the growth of ECP, but our current approach is to focused on aligning other builders to build on ECP, and avoiding building a traditional social super app.
+
+## Any limitations?
+
+Yes. We have made the following tradeoffs with the contract design:
+
+1. Hooks are responsible for refunding any excess value sent to them.
+1. Hooks are not permissioned and you should only interact with hooks you trust.
+1. Paymasters can be tricked into signing messages that they did not intend to be considered authors of.
+1. Hooks are allowed to re-enter the CommentManager to post/edit/delete comments in the same transaction, so as to reply, for example.
+1. Channels names, descriptions and Comment contents can be really long, beyond what is reasonable for an app to index or display.
+1. Channels can change their hooks, frontrunning users posting to them. This can be mitigated by transferring ownership of the channel to a contract that implements a timelock.
+1. Protocol parameters can be changed at a moments notice, frontrunning users. This will be mitigated by transferring ownership of the protocol contracts to a governance contract with timelocks.
+1. Long deadlines can be exploited to delay sharing a comment
+1. Deduplication of identical comments by the same author should be done via using a different deadline for each comment.
+1. Metadata is limited to 1000 items to prevent gas-DOS attacks.
+1. An approval gives the app the permission to delete comments, including comments posted by another app for this user.

@@ -22,7 +22,7 @@
 
 
 
-### onInitialize(address channel, [struct Channels.Channel](/protocol-reference/types/Channels#channel) channelData, uint256 channelId) → bool success (external)
+### onInitialize(address channelManager, [struct Channels.Channel](/protocol-reference/types/Channels#channel) channelData, uint256 channelId, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata) → bool success (external)
 
 Execute after a hook is initialized on a channel
 

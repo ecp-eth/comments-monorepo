@@ -87,6 +87,14 @@ interface ICommentManager {
     Metadata.MetadataEntry[] metadata
   );
 
+  /// @notice Emitted when hook metadata is updated
+  /// @param commentId Unique identifier of the comment
+  /// @param operations Array of metadata operations
+  event CommentHookDataUpdate(
+    bytes32 indexed commentId,
+    Metadata.MetadataEntryOp[] operations
+  );
+
   /// @notice Emitted when an author approves an app signer
   /// @param author Address of the author giving approval
   /// @param app Address being approved
@@ -154,6 +162,20 @@ interface ICommentManager {
   error BatchOperationFailed(uint256 operationIndex, bytes reason);
   /// @notice Error thrown when reaction has no parentId or targetUri
   error InvalidReactionReference(string reason);
+  /// @notice Error thrown when comment already exists
+  error CommentAlreadyExists();
+  /// @notice Error thrown when comment is already deleted
+  error CommentAlreadyDeleted();
+  /// @notice Error thrown when metadata key is empty
+  error InvalidKey();
+  /// @notice Error thrown when hook metadata is too long, this can be used to gas-DOS comment edits/deletes
+  error HookMetadataTooLong();
+  /// @notice Error thrown when metadata is too long, this can be used to gas-DOS comment edits/deletes
+  error MetadataTooLong();
+  /// @notice Error thrown when value is insufficient for comment creation fee
+  error InsufficientValue(uint256 providedValue, uint256 requiredValue);
+  /// @notice Error thrown when reaction cannot be edited
+  error ReactionCannotBeEdited();
 
   /// @notice Posts a comment directly from the author's address
   /// @param commentData The comment data struct containing content and metadata

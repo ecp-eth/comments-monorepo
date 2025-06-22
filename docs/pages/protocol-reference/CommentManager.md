@@ -19,6 +19,12 @@ Implements EIP-712 for typed structured data hashing and signing
 
 
 
+### `commentDoesNotExist(bytes32 commentId)`
+
+
+
+
+
 ### `commentExists(bytes32 commentId)`
 
 
@@ -38,6 +44,12 @@ Implements EIP-712 for typed structured data hashing and signing
 
 
 ### `onlyParentIdOrTargetUri(bytes32 parentId, string targetUri)`
+
+
+
+
+
+### `noEditingReactions(uint8 commentType)`
 
 
 
@@ -152,16 +164,23 @@ Deletes a comment when called by the author directly
 
 
 
-### deleteCommentWithSig(bytes32 commentId, address app, uint256 deadline, bytes authorSignature, bytes appSignature) (public)
+### _deleteComment(bytes32 commentId, address author) (internal)
+
+Internal function to handle comment deletion logic
+
+
+
+
+### deleteCommentWithSig(bytes32 commentId, address app, uint256 deadline, bytes authorSignature, bytes appSignature) (external)
 
 Deletes a comment with author signature verification
 
 
 
 
-### _deleteComment(bytes32 commentId, address author) (internal)
+### _deleteCommentWithSig(bytes32 commentId, address app, uint256 deadline, bytes authorSignature, bytes appSignature) (internal)
 
-Internal function to handle comment deletion logic
+Internal function to handle comment deletion with signature logic
 
 
 

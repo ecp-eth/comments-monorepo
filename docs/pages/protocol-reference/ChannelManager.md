@@ -11,13 +11,6 @@ Implements channel management with the following security features:
 
 
 
-## Modifiers
-
-### `onlyCommentsContract()`
-
-
-
-
 
 
 
@@ -66,7 +59,7 @@ Creates a new channel
 
 
 
-### updateChannel(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata) (external)
+### updateChannel(uint256 channelId, string name, string description, [struct Metadata.MetadataEntryOp[]](/protocol-reference/types/Metadata#metadataentryop) metadataOperations) (external)
 
 Updates an existing channel's configuration
 
@@ -94,13 +87,6 @@ Checks if a channel exists
 
 
 
-### updateCommentsContract(address _commentsContract) (external)
-
-Updates the comments contract address (only owner)
-
-
-
-
 ### setBaseURI(string baseURI_) (external)
 
 Sets the base URI for NFT metadata
@@ -115,7 +101,14 @@ Returns the base URI for token metadata
 
 Internal function that overrides ERC721's _baseURI()
 
-### setChannelMetadata(uint256 channelId, [struct Metadata.MetadataEntryOp[]](/protocol-reference/types/Metadata#metadataentryop) operations) (external)
+### _createChannelMetadata(uint256 channelId, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata) (internal)
+
+Internal function to create channel metadata
+
+
+
+
+### _setChannelMetadata(uint256 channelId, [struct Metadata.MetadataEntryOp[]](/protocol-reference/types/Metadata#metadataentryop) operations) (internal)
 
 Sets metadata for a channel
 

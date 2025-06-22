@@ -47,7 +47,8 @@ contract NoopHook is IHook {
   function onInitialize(
     address,
     Channels.Channel memory,
-    uint256
+    uint256,
+    Metadata.MetadataEntry[] calldata
   ) external pure override returns (bool) {
     return true;
   }
@@ -58,7 +59,7 @@ contract NoopHook is IHook {
     Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external payable override returns (bool) {
+  ) external override returns (bool) {
     return true;
   }
 

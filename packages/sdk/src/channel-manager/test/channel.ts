@@ -19,7 +19,6 @@ import {
   updateChannel,
   setChannelCreationFee,
   withdrawFees,
-  updateCommentsContract,
   setBaseURI,
 } from "../channel.js";
 import { ChannelManagerABI } from "../../abis.js";
@@ -151,7 +150,6 @@ describe("channel", () => {
       assert.deepEqual(channel, {
         name: "Test channel getChannel",
         description: undefined,
-        metadata: undefined,
         hook: undefined,
         permissions: {
           onCommentAdd: false,
@@ -297,7 +295,6 @@ describe("channel", () => {
       assert.deepEqual(channel, {
         name: "Updated channel",
         description: "New description",
-        metadata: undefined,
         hook: undefined,
         permissions: {
           onCommentAdd: false,
@@ -384,23 +381,6 @@ describe("channel", () => {
       });
 
       assert.ok(logs.length > 0, "FeesWithdrawn event should be found");
-    });
-  });
-
-  describe("updateCommentsContract()", () => {
-    it("updates comments contract", async () => {
-      const newContractAddress = "0x1234567890123456789012345678901234567890";
-      const result = await updateCommentsContract({
-        commentsContract: newContractAddress,
-        writeContract: client.writeContract,
-        channelManagerAddress,
-      });
-
-      const receipt = await client.waitForTransactionReceipt({
-        hash: result.txHash,
-      });
-
-      assert.equal(receipt.status, "success");
     });
   });
 

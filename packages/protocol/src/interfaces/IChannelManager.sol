@@ -22,6 +22,12 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   error ZeroAddress();
   /// @notice Error thrown when unauthorized caller tries to access function
   error UnauthorizedCaller();
+  /// @notice Error thrown when metadata key is empty
+  error InvalidKey();
+  /// @notice Error thrown when channel name is empty
+  error EmptyChannelName();
+  /// @notice Error thrown when hook is already set
+  error HookAlreadySet();
 
   /// @notice Emitted when the base URI for NFT metadata is updated
   /// @param baseURI The new base URI
@@ -36,7 +42,8 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
     string name,
     string description,
     Metadata.MetadataEntry[] metadata,
-    address hook
+    address hook,
+    address owner
   );
 
   /// @notice Emitted when a channel's configuration is updated
@@ -70,7 +77,11 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   /// @param channelId The unique identifier of the channel
   /// @param key The metadata key
   /// @param value The metadata value
-  event ChannelMetadataSet(uint256 indexed channelId, bytes32 key, bytes value);
+  event ChannelMetadataSet(
+    uint256 indexed channelId,
+    bytes32 indexed key,
+    bytes value
+  );
 
   /// @notice Creates a new channel
   /// @param name The name of the channel
@@ -96,22 +107,18 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   /// @param channelId The unique identifier of the channel
   /// @param name The new name of the channel
   /// @param description The new description of the channel
-  /// @param metadata The new metadata entries
+  /// @param metadataOperations The new metadata entries as operations
   function updateChannel(
     uint256 channelId,
     string calldata name,
     string calldata description,
-    Metadata.MetadataEntry[] calldata metadata
+    Metadata.MetadataEntryOp[] calldata metadataOperations
   ) external;
 
   /// @notice Sets the hook for a channel
   /// @param channelId The unique identifier of the channel
   /// @param hook The address of the hook contract
   function setHook(uint256 channelId, address hook) external;
-
-  /// @notice Updates the comments contract address (only owner)
-  /// @param _commentsContract The new comments contract address
-  function updateCommentsContract(address _commentsContract) external;
 
   /// @notice Sets the base URI for NFT metadata
   /// @param baseURI_ The new base URI
@@ -121,14 +128,6 @@ interface IChannelManager is IProtocolFees, IERC721Enumerable {
   /// @param channelId Unique identifier of the channel
   /// @return exists Whether the channel exists
   function channelExists(uint256 channelId) external view returns (bool);
-
-  /// @notice Sets metadata for a channel
-  /// @param channelId The unique identifier of the channel
-  /// @param operations Array of metadata operations to perform
-  function setChannelMetadata(
-    uint256 channelId,
-    Metadata.MetadataEntryOp[] calldata operations
-  ) external;
 
   /// @notice Get all metadata for a channel
   /// @param channelId The unique identifier of the channel

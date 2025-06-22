@@ -21,7 +21,7 @@ Emitted when the base URI for NFT metadata is updated
 
 
 
-### `ChannelCreated(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata, address hook)`
+### `ChannelCreated(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata, address hook, address owner)`
 
 Emitted when a new channel is created
 
@@ -73,7 +73,7 @@ Get a channel by its ID
 
 
 
-### updateChannel(uint256 channelId, string name, string description, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry) metadata) (external)
+### updateChannel(uint256 channelId, string name, string description, [struct Metadata.MetadataEntryOp[]](/protocol-reference/types/Metadata#metadataentryop) metadataOperations) (external)
 
 Updates an existing channel's configuration
 
@@ -83,13 +83,6 @@ Updates an existing channel's configuration
 ### setHook(uint256 channelId, address hook) (external)
 
 Sets the hook for a channel
-
-
-
-
-### updateCommentsContract(address _commentsContract) (external)
-
-Updates the comments contract address (only owner)
 
 
 
@@ -104,13 +97,6 @@ Sets the base URI for NFT metadata
 ### channelExists(uint256 channelId) → bool (external)
 
 Checks if a channel exists
-
-
-
-
-### setChannelMetadata(uint256 channelId, [struct Metadata.MetadataEntryOp[]](/protocol-reference/types/Metadata#metadataentryop) operations) (external)
-
-Sets metadata for a channel
 
 
 

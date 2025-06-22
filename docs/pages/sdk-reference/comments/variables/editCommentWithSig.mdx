@@ -1236,6 +1236,34 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
      name: "commentId";
      type: "bytes32";
    }, {
+     components: readonly [{
+        internalType: "enum Metadata.MetadataOperation";
+        name: "operation";
+        type: "uint8";
+      }, {
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     indexed: false;
+     internalType: "struct Metadata.MetadataEntryOp[]";
+     name: "operations";
+     type: "tuple[]";
+  }];
+  name: "CommentHookDataUpdate";
+  type: "event";
+}, {
+  anonymous: false;
+  inputs: readonly [{
+     indexed: true;
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+   }, {
      indexed: true;
      internalType: "bytes32";
      name: "key";
@@ -1325,11 +1353,35 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
   type: "error";
 }, {
   inputs: readonly [];
+  name: "CommentAlreadyDeleted";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "CommentAlreadyExists";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "CommentDoesNotExist";
   type: "error";
 }, {
   inputs: readonly [];
+  name: "HookMetadataTooLong";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "HookNotEnabled";
+  type: "error";
+}, {
+  inputs: readonly [{
+     internalType: "uint256";
+     name: "providedValue";
+     type: "uint256";
+   }, {
+     internalType: "uint256";
+     name: "requiredValue";
+     type: "uint256";
+  }];
+  name: "InsufficientValue";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1362,6 +1414,10 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
      type: "string";
   }];
   name: "InvalidCommentReference";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "InvalidKey";
   type: "error";
 }, {
   inputs: readonly [{
@@ -1413,6 +1469,10 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
   type: "error";
 }, {
   inputs: readonly [];
+  name: "MetadataTooLong";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "NewOwnerIsZeroAddress";
   type: "error";
 }, {
@@ -1438,6 +1498,10 @@ const editCommentWithSig: (...args) => Promise<WaitableWriteContractHelperResult
 }, {
   inputs: readonly [];
   name: "ParentCommentNotInSameChannel";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "ReactionCannotBeEdited";
   type: "error";
 }, {
   inputs: readonly [];
@@ -2707,6 +2771,34 @@ Edit a comment
      `name`: `"commentId"`;
      `type`: `"bytes32"`;
    \}, \{
+     `components`: readonly \[\{
+        `internalType`: `"enum Metadata.MetadataOperation"`;
+        `name`: `"operation"`;
+        `type`: `"uint8"`;
+      \}, \{
+        `internalType`: `"bytes32"`;
+        `name`: `"key"`;
+        `type`: `"bytes32"`;
+      \}, \{
+        `internalType`: `"bytes"`;
+        `name`: `"value"`;
+        `type`: `"bytes"`;
+     \}\];
+     `indexed`: `false`;
+     `internalType`: `"struct Metadata.MetadataEntryOp[]"`;
+     `name`: `"operations"`;
+     `type`: `"tuple[]"`;
+  \}\];
+  `name`: `"CommentHookDataUpdate"`;
+  `type`: `"event"`;
+\}, \{
+  `anonymous`: `false`;
+  `inputs`: readonly \[\{
+     `indexed`: `true`;
+     `internalType`: `"bytes32"`;
+     `name`: `"commentId"`;
+     `type`: `"bytes32"`;
+   \}, \{
      `indexed`: `true`;
      `internalType`: `"bytes32"`;
      `name`: `"key"`;
@@ -2796,11 +2888,35 @@ Edit a comment
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
+  `name`: `"CommentAlreadyDeleted"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"CommentAlreadyExists"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
   `name`: `"CommentDoesNotExist"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
+  `name`: `"HookMetadataTooLong"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
   `name`: `"HookNotEnabled"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\{
+     `internalType`: `"uint256"`;
+     `name`: `"providedValue"`;
+     `type`: `"uint256"`;
+   \}, \{
+     `internalType`: `"uint256"`;
+     `name`: `"requiredValue"`;
+     `type`: `"uint256"`;
+  \}\];
+  `name`: `"InsufficientValue"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
@@ -2833,6 +2949,10 @@ Edit a comment
      `type`: `"string"`;
   \}\];
   `name`: `"InvalidCommentReference"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InvalidKey"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\{
@@ -2884,6 +3004,10 @@ Edit a comment
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
+  `name`: `"MetadataTooLong"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
   `name`: `"NewOwnerIsZeroAddress"`;
   `type`: `"error"`;
 \}, \{
@@ -2909,6 +3033,10 @@ Edit a comment
 \}, \{
   `inputs`: readonly \[\];
   `name`: `"ParentCommentNotInSameChannel"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"ReactionCannotBeEdited"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];

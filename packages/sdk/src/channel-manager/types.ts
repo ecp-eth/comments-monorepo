@@ -78,14 +78,6 @@ export type ContractWriteFunctions = {
     >,
   ) => Promise<Hex>;
 
-  updateCommentsContract: (
-    args: ContractFunctionParameters<
-      ChannelManagerABIType,
-      "nonpayable",
-      "updateCommentsContract"
-    >,
-  ) => Promise<Hex>;
-
   withdrawFees: (
     args: ContractFunctionParameters<
       ChannelManagerABIType,
@@ -99,6 +91,12 @@ export type ContractReadFunctions = {
   getChannel: (
     args: ReadContractParameters<ChannelManagerABIType, "getChannel">,
   ) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
+
+  getChannelMetadata: (
+    args: ReadContractParameters<ChannelManagerABIType, "getChannelMetadata">,
+  ) => Promise<
+    ReadContractReturnType<ChannelManagerABIType, "getChannelMetadata">
+  >;
 
   channelExists: (
     args: ReadContractParameters<ChannelManagerABIType, "channelExists">,

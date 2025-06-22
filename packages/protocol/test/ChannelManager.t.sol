@@ -68,13 +68,17 @@ contract ChannelManagerTest is Test, IERC721Receiver {
     uint256 indexed channelId,
     string name,
     string description,
-    Metadata.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata,
+    address hook,
+    address owner
   );
   event ChannelUpdated(
     uint256 indexed channelId,
     string name,
     string description,
-    Metadata.MetadataEntry[] metadata
+    Metadata.MetadataEntry[] metadata,
+    address hook,
+    address owner
   );
   event HookSet(uint256 indexed channelId, address indexed hook);
   event HookStatusUpdated(
@@ -113,10 +117,11 @@ contract ChannelManagerTest is Test, IERC721Receiver {
     );
 
     Channels.Channel memory channel = channelManager.getChannel(channelId);
-
+    Metadata.MetadataEntry[] memory metadata2 = channelManager
+      .getChannelMetadata(channelId);
     assertEq(channel.name, name);
     assertEq(channel.description, description);
-    assertEq(channel.metadata.length, metadata.length);
+    assertEq(metadata2.length, metadata.length);
     assertEq(address(channel.hook), address(0));
     assertEq(address(channelManager).balance - initialBalance, 0.02 ether);
   }
@@ -151,10 +156,10 @@ contract ChannelManagerTest is Test, IERC721Receiver {
     // Update the channel
     string memory newName = "Updated Name";
     string memory newDescription = "Updated Description";
-    Metadata.MetadataEntry[] memory newMetadata = new Metadata.MetadataEntry[](
-      1
-    );
-    newMetadata[0] = Metadata.MetadataEntry({
+    Metadata.MetadataEntryOp[]
+      memory newMetadata = new Metadata.MetadataEntryOp[](1);
+    newMetadata[0] = Metadata.MetadataEntryOp({
+      operation: Metadata.MetadataOperation.SET,
       key: "string updated",
       value: abi.encode(true)
     });
@@ -168,9 +173,15 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
     Channels.Channel memory channel = channelManager.getChannel(channelId);
 
+    Metadata.MetadataEntry[] memory metadata = channelManager
+      .getChannelMetadata(channelId);
+    assertEq(metadata.length, newMetadata.length);
+    for (uint256 i = 0; i < newMetadata.length; i++) {
+      assertEq(metadata[i].key, newMetadata[i].key);
+    }
+
     assertEq(channel.name, newName);
     assertEq(channel.description, newDescription);
-    assertEq(channel.metadata.length, newMetadata.length);
   }
 
   function test_SetHook() public {
@@ -246,12 +257,22 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
     // Measure gas for old implementation
     uint256 oldGasStart = gasleft();
-    channelManager.setChannelMetadata(channelId, oldOperations);
+    channelManager.updateChannel(
+      channelId,
+      "Test Channel",
+      "Test Description",
+      oldOperations
+    );
     uint256 oldGasUsed = oldGasStart - gasleft();
 
     // Measure gas for new implementation
     uint256 newGasStart = gasleft();
-    channelManager.setChannelMetadata(channelId, newOperations);
+    channelManager.updateChannel(
+      channelId,
+      "Test Channel",
+      "Test Description",
+      newOperations
+    );
     uint256 newGasUsed = newGasStart - gasleft();
 
     // Test partial updates
@@ -270,7 +291,12 @@ contract ChannelManagerTest is Test, IERC721Receiver {
 
     // Measure gas for partial update
     uint256 partialGasStart = gasleft();
-    channelManager.setChannelMetadata(channelId, partialOperations);
+    channelManager.updateChannel(
+      channelId,
+      "Test Channel",
+      "Test Description",
+      partialOperations
+    );
     uint256 partialGasUsed = partialGasStart - gasleft();
 
     // Log gas costs for comparison
@@ -307,7 +333,12 @@ contract ChannelManagerTest is Test, IERC721Receiver {
       value: abi.encode("value2")
     });
 
-    channelManager.setChannelMetadata(channelId, setOperations);
+    channelManager.updateChannel(
+      channelId,
+      "Test Channel",
+      "Test Description",
+      setOperations
+    );
 
     // Now delete one and update the other
     Metadata.MetadataEntryOp[]
@@ -323,7 +354,12 @@ contract ChannelManagerTest is Test, IERC721Receiver {
       value: abi.encode("updated value2")
     });
 
-    channelManager.setChannelMetadata(channelId, updateOperations);
+    channelManager.updateChannel(
+      channelId,
+      "Test Channel",
+      "Test Description",
+      updateOperations
+    );
 
     // Verify the results
     bytes memory value1 = channelManager.getChannelMetadataValue(

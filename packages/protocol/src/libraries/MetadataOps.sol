@@ -216,12 +216,21 @@ library MetadataOps {
     mapping(bytes32 => mapping(bytes32 => bytes)) storage commentMetadata,
     mapping(bytes32 => bytes32[]) storage commentMetadataKeys
   ) external {
+    mapping(bytes32 => bytes) storage commentMetadataForId = commentMetadata[
+      commentId
+    ];
+    bytes32[] storage commentMetadataKeysForId = commentMetadataKeys[commentId];
     for (uint i = 0; i < metadata.length; i++) {
       bytes32 key = metadata[i].key;
       bytes memory val = metadata[i].value;
 
-      commentMetadata[commentId][key] = val;
-      commentMetadataKeys[commentId].push(key);
+      // Ensure the key is not empty
+      if (key == bytes32(0)) revert ICommentManager.InvalidKey();
+
+      commentMetadataForId[key] = val;
+      commentMetadataKeysForId.push(key);
+
+      emit ICommentManager.CommentMetadataSet(commentId, key, val);
     }
   }
 
@@ -244,6 +253,9 @@ library MetadataOps {
     for (uint i = 0; i < hookMetadata.length; i++) {
       bytes32 key = hookMetadata[i].key;
       bytes memory val = hookMetadata[i].value;
+
+      // Ensure the key is not empty
+      if (key == bytes32(0)) revert ICommentManager.InvalidKey();
 
       commentHookMetadataForId[key] = val;
       commentHookMetadataKeysForId.push(key);

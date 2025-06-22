@@ -34,7 +34,7 @@
 
 
 
-### onInitialize(address, [struct Channels.Channel](/protocol-reference/types/Channels#channel), uint256) → bool (external)
+### onInitialize(address, [struct Channels.Channel](/protocol-reference/types/Channels#channel), uint256, [struct Metadata.MetadataEntry[]](/protocol-reference/types/Metadata#metadataentry)) → bool (external)
 
 
 

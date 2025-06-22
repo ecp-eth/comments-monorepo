@@ -216,19 +216,6 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
         name: "description";
         type: "string";
       }, {
-        components: readonly [{
-           internalType: ...;
-           name: ...;
-           type: ...;
-         }, {
-           internalType: ...;
-           name: ...;
-           type: ...;
-        }];
-        internalType: "struct Metadata.MetadataEntry[]";
-        name: "metadata";
-        type: "tuple[]";
-      }, {
         internalType: "address";
         name: "hook";
         type: "address";
@@ -507,33 +494,6 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "function";
 }, {
   inputs: readonly [{
-     internalType: "uint256";
-     name: "channelId";
-     type: "uint256";
-   }, {
-     components: readonly [{
-        internalType: "enum Metadata.MetadataOperation";
-        name: "operation";
-        type: "uint8";
-      }, {
-        internalType: "bytes32";
-        name: "key";
-        type: "bytes32";
-      }, {
-        internalType: "bytes";
-        name: "value";
-        type: "bytes";
-     }];
-     internalType: "struct Metadata.MetadataEntryOp[]";
-     name: "operations";
-     type: "tuple[]";
-  }];
-  name: "setChannelMetadata";
-  outputs: readonly [];
-  stateMutability: "nonpayable";
-  type: "function";
-}, {
-  inputs: readonly [{
      internalType: "uint96";
      name: "fee";
      type: "uint96";
@@ -689,6 +649,10 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      type: "string";
    }, {
      components: readonly [{
+        internalType: "enum Metadata.MetadataOperation";
+        name: "operation";
+        type: "uint8";
+      }, {
         internalType: "bytes32";
         name: "key";
         type: "bytes32";
@@ -697,21 +661,11 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
         name: "value";
         type: "bytes";
      }];
-     internalType: "struct Metadata.MetadataEntry[]";
-     name: "metadata";
+     internalType: "struct Metadata.MetadataEntryOp[]";
+     name: "metadataOperations";
      type: "tuple[]";
   }];
   name: "updateChannel";
-  outputs: readonly [];
-  stateMutability: "nonpayable";
-  type: "function";
-}, {
-  inputs: readonly [{
-     internalType: "address";
-     name: "_commentsContract";
-     type: "address";
-  }];
-  name: "updateCommentsContract";
   outputs: readonly [];
   stateMutability: "nonpayable";
   type: "function";
@@ -815,6 +769,11 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      internalType: "address";
      name: "hook";
      type: "address";
+   }, {
+     indexed: false;
+     internalType: "address";
+     name: "owner";
+     type: "address";
   }];
   name: "ChannelCreated";
   type: "event";
@@ -836,7 +795,7 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
      name: "channelId";
      type: "uint256";
    }, {
-     indexed: false;
+     indexed: true;
      internalType: "bytes32";
      name: "key";
      type: "bytes32";
@@ -1113,6 +1072,14 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
   type: "error";
 }, {
   inputs: readonly [];
+  name: "EmptyChannelName";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "HookAlreadySet";
+  type: "error";
+}, {
+  inputs: readonly [];
   name: "InsufficientFee";
   type: "error";
 }, {
@@ -1126,6 +1093,10 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
 }, {
   inputs: readonly [];
   name: "InvalidHookInterface";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "InvalidKey";
   type: "error";
 }, {
   inputs: readonly [];
@@ -1154,7 +1125,7 @@ const updateChannel: (...args) => Promise<WaitableWriteContractHelperResult<read
 }], "ChannelUpdated">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:187](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L187)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:236](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L236)
 
 Update a channel
 
@@ -1374,19 +1345,6 @@ Update a channel
         `internalType`: `"string"`;
         `name`: `"description"`;
         `type`: `"string"`;
-      \}, \{
-        `components`: readonly \[\{
-           `internalType`: ...;
-           `name`: ...;
-           `type`: ...;
-         \}, \{
-           `internalType`: ...;
-           `name`: ...;
-           `type`: ...;
-        \}\];
-        `internalType`: `"struct Metadata.MetadataEntry[]"`;
-        `name`: `"metadata"`;
-        `type`: `"tuple[]"`;
       \}, \{
         `internalType`: `"address"`;
         `name`: `"hook"`;
@@ -1666,33 +1624,6 @@ Update a channel
   `type`: `"function"`;
 \}, \{
   `inputs`: readonly \[\{
-     `internalType`: `"uint256"`;
-     `name`: `"channelId"`;
-     `type`: `"uint256"`;
-   \}, \{
-     `components`: readonly \[\{
-        `internalType`: `"enum Metadata.MetadataOperation"`;
-        `name`: `"operation"`;
-        `type`: `"uint8"`;
-      \}, \{
-        `internalType`: `"bytes32"`;
-        `name`: `"key"`;
-        `type`: `"bytes32"`;
-      \}, \{
-        `internalType`: `"bytes"`;
-        `name`: `"value"`;
-        `type`: `"bytes"`;
-     \}\];
-     `internalType`: `"struct Metadata.MetadataEntryOp[]"`;
-     `name`: `"operations"`;
-     `type`: `"tuple[]"`;
-  \}\];
-  `name`: `"setChannelMetadata"`;
-  `outputs`: readonly \[\];
-  `stateMutability`: `"nonpayable"`;
-  `type`: `"function"`;
-\}, \{
-  `inputs`: readonly \[\{
      `internalType`: `"uint96"`;
      `name`: `"fee"`;
      `type`: `"uint96"`;
@@ -1848,6 +1779,10 @@ Update a channel
      `type`: `"string"`;
    \}, \{
      `components`: readonly \[\{
+        `internalType`: `"enum Metadata.MetadataOperation"`;
+        `name`: `"operation"`;
+        `type`: `"uint8"`;
+      \}, \{
         `internalType`: `"bytes32"`;
         `name`: `"key"`;
         `type`: `"bytes32"`;
@@ -1856,21 +1791,11 @@ Update a channel
         `name`: `"value"`;
         `type`: `"bytes"`;
      \}\];
-     `internalType`: `"struct Metadata.MetadataEntry[]"`;
-     `name`: `"metadata"`;
+     `internalType`: `"struct Metadata.MetadataEntryOp[]"`;
+     `name`: `"metadataOperations"`;
      `type`: `"tuple[]"`;
   \}\];
   `name`: `"updateChannel"`;
-  `outputs`: readonly \[\];
-  `stateMutability`: `"nonpayable"`;
-  `type`: `"function"`;
-\}, \{
-  `inputs`: readonly \[\{
-     `internalType`: `"address"`;
-     `name`: `"_commentsContract"`;
-     `type`: `"address"`;
-  \}\];
-  `name`: `"updateCommentsContract"`;
   `outputs`: readonly \[\];
   `stateMutability`: `"nonpayable"`;
   `type`: `"function"`;
@@ -1974,6 +1899,11 @@ Update a channel
      `internalType`: `"address"`;
      `name`: `"hook"`;
      `type`: `"address"`;
+   \}, \{
+     `indexed`: `false`;
+     `internalType`: `"address"`;
+     `name`: `"owner"`;
+     `type`: `"address"`;
   \}\];
   `name`: `"ChannelCreated"`;
   `type`: `"event"`;
@@ -1995,7 +1925,7 @@ Update a channel
      `name`: `"channelId"`;
      `type`: `"uint256"`;
    \}, \{
-     `indexed`: `false`;
+     `indexed`: `true`;
      `internalType`: `"bytes32"`;
      `name`: `"key"`;
      `type`: `"bytes32"`;
@@ -2272,6 +2202,14 @@ Update a channel
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
+  `name`: `"EmptyChannelName"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"HookAlreadySet"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
   `name`: `"InsufficientFee"`;
   `type`: `"error"`;
 \}, \{
@@ -2285,6 +2223,10 @@ Update a channel
 \}, \{
   `inputs`: readonly \[\];
   `name`: `"InvalidHookInterface"`;
+  `type`: `"error"`;
+\}, \{
+  `inputs`: readonly \[\];
+  `name`: `"InvalidKey"`;
   `type`: `"error"`;
 \}, \{
   `inputs`: readonly \[\];
