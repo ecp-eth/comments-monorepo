@@ -1,4 +1,4 @@
-import { HexSchema } from "@ecp.eth/sdk/core";
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod";
 
 const webhookCallbackDataSchema = z.object({

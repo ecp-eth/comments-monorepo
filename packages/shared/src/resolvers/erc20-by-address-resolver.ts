@@ -2,7 +2,7 @@ import DataLoader from "dataloader";
 import type { Hex } from "viem";
 import type { ChainID, ResolvedERC20Data } from "./erc20.types";
 import { z } from "zod";
-import { HexSchema } from "@ecp.eth/sdk/core";
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 
 export type ERC20ByAddressResolverKey = Hex;
 
