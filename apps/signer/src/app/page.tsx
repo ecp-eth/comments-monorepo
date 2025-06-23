@@ -45,13 +45,13 @@ export default function HomePage() {
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
                 <div>Request: {"{"}</div>
                 <div className="ml-4">
-                  "author": "0x...",
+                  &quot;author&quot;: &quot;0x...&quot;,
                   <br />
-                  "content": "Comment text",
+                  &quot;content&quot;: &quot;Comment text&quot;,
                   <br />
-                  "metadata": [],
+                  &quot;metadata&quot;: [],
                   <br />
-                  "targetUri": "https://example.com"
+                  &quot;targetUri&quot;: &quot;https://example.com&quot;
                 </div>
                 <div>{"}"}</div>
               </div>
@@ -87,15 +87,15 @@ export default function HomePage() {
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
                 <div>Request: {"{"}</div>
                 <div className="ml-4">
-                  "author": "0x...",
+                  &quot;author&quot;: &quot;0x...&quot;,
                   <br />
-                  "content": "Comment text",
+                  &quot;content&quot;: &quot;Comment text&quot;,
                   <br />
-                  "metadata": [],
+                  &quot;metadata&quot;: [],
                   <br />
-                  "targetUri": "https://example.com",
+                  &quot;targetUri&quot;: &quot;https://example.com&quot;,
                   <br />
-                  "submitIfApproved": true
+                  &quot;submitIfApproved&quot;: true
                 </div>
                 <div>{"}"}</div>
               </div>
@@ -130,13 +130,13 @@ export default function HomePage() {
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
                 <div>Request: {"{"}</div>
                 <div className="ml-4">
-                  "signTypedDataParams": {"{"} ... {"}"},
+                  &quot;signTypedDataParams&quot;: {"{"} ... {"}"},
                   <br />
-                  "appSignature": "0x...",
+                  &quot;appSignature&quot;: &quot;0x...&quot;,
                   <br />
-                  "authorSignature": "0x...",
+                  &quot;authorSignature&quot;: &quot;0x...&quot;,
                   <br />
-                  "chainId": 1
+                  &quot;chainId&quot;: 1
                 </div>
                 <div>{"}"}</div>
               </div>
@@ -171,15 +171,15 @@ export default function HomePage() {
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
                 <div>Request: {"{"}</div>
                 <div className="ml-4">
-                  "commentId": "0x...",
+                  &quot;commentId&quot;: &quot;0x...&quot;,
                   <br />
-                  "content": "Updated comment text",
+                  &quot;content&quot;: &quot;Updated comment text&quot;,
                   <br />
-                  "author": "0x...",
+                  &quot;author&quot;: &quot;0x...&quot;,
                   <br />
-                  "metadata": [],
+                  &quot;metadata&quot;: [],
                   <br />
-                  "chainId": 1
+                  &quot;chainId&quot;: 1
                 </div>
                 <div>{"}"}</div>
               </div>
@@ -214,17 +214,17 @@ export default function HomePage() {
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
                 <div>Request: {"{"}</div>
                 <div className="ml-4">
-                  "commentId": "0x...",
+                  &quot;commentId&quot;: &quot;0x...&quot;,
                   <br />
-                  "content": "Updated comment text",
+                  &quot;content&quot;: &quot;Updated comment text&quot;,
                   <br />
-                  "author": "0x...",
+                  &quot;author&quot;: &quot;0x...&quot;,
                   <br />
-                  "metadata": [],
+                  &quot;metadata&quot;: [],
                   <br />
-                  "submitIfApproved": true,
+                  &quot;submitIfApproved&quot;: true,
                   <br />
-                  "chainId": 1
+                  &quot;chainId&quot;: 1
                 </div>
                 <div>{"}"}</div>
               </div>
@@ -259,15 +259,15 @@ export default function HomePage() {
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
                 <div>Request: {"{"}</div>
                 <div className="ml-4">
-                  "signTypedDataParams": {"{"} ... {"}"},
+                  &quot;signTypedDataParams&quot;: {"{"} ... {"}"},
                   <br />
-                  "appSignature": "0x...",
+                  &quot;appSignature&quot;: &quot;0x...&quot;,
                   <br />
-                  "authorSignature": "0x...",
+                  &quot;authorSignature&quot;: &quot;0x...&quot;,
                   <br />
-                  "edit": {"{"} ... {"}"},
+                  &quot;edit&quot;: {"{"} ... {"}"},
                   <br />
-                  "chainId": 1
+                  &quot;chainId&quot;: 1
                 </div>
                 <div>{"}"}</div>
               </div>
@@ -302,13 +302,13 @@ export default function HomePage() {
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
                 <div>Request: {"{"}</div>
                 <div className="ml-4">
-                  "author": "0x...",
+                  &quot;author&quot;: &quot;0x...&quot;,
                   <br />
-                  "commentId": "0x...",
+                  &quot;commentId&quot;: &quot;0x...&quot;,
                   <br />
-                  "submitIfApproved": true,
+                  &quot;submitIfApproved&quot;: true,
                   <br />
-                  "chainId": 1
+                  &quot;chainId&quot;: 1
                 </div>
                 <div>{"}"}</div>
               </div>
@@ -343,13 +343,13 @@ export default function HomePage() {
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
                 <div>Request: {"{"}</div>
                 <div className="ml-4">
-                  "signTypedDataParams": {"{"} ... {"}"},
+                  &quot;signTypedDataParams&quot;: {"{"} ... {"}"},
                   <br />
-                  "appSignature": "0x...",
+                  &quot;appSignature&quot;: &quot;0x...&quot;,
                   <br />
-                  "authorSignature": "0x...",
+                  &quot;authorSignature&quot;: &quot;0x...&quot;,
                   <br />
-                  "chainId": 1
+                  &quot;chainId&quot;: 1
                 </div>
                 <div>{"}"}</div>
               </div>
@@ -403,7 +403,8 @@ export default function HomePage() {
             </h3>
             <ul className="list-disc list-inside text-sm text-gray-600 ml-4">
               <li>
-                <code>GASLESS_METHOD</code> - "private-key" or "privy"
+                <code>GASLESS_METHOD</code> - &quot;private-key&quot; or
+                &quot;privy&quot;
               </li>
               <li>
                 <strong>Private Key Method:</strong>{" "}
