@@ -5,15 +5,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const lottieSize = 64;
 const END_FRAME = 60;
 
-type HeartAnimationProps = {
+type HeartButtonProps = {
   isHearted: boolean;
   pending?: boolean;
 };
 
-export function HeartAnimation({
-  isHearted,
-  pending = false,
-}: HeartAnimationProps) {
+/**
+ * React component with a heart button that animates when the user clicks on it.
+ * This component uses `lottie-react` (peer dependency) to render the animation.
+ *
+ * It does not work on React Native.
+ * @param param0
+ * @returns
+ */
+export function HeartButton({ isHearted, pending = false }: HeartButtonProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const animatingState = useRef<{
     direction: "hearted" | "unhearted";
@@ -81,6 +86,7 @@ export function HeartAnimation({
       // then play the animation
       playHeartedAnimation();
     } else {
+      // then play the animation
       gotoFrame(isHearted);
     }
 

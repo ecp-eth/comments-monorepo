@@ -126,6 +126,7 @@ function BaseCommentForm({
   const connectAccount = useConnectAccount();
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const onSubmitRef = useFreshRef(onSubmit);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const suggestions = useIndexerSuggestions({
     indexerApiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
@@ -188,7 +189,11 @@ function BaseCommentForm({
             }),
           );
 
-        const result = await onSubmit({ author, content, references });
+        const result = await onSubmitRef.current?.({
+          author,
+          content,
+          references,
+        });
 
         return result;
       } catch (e) {
@@ -393,7 +398,7 @@ export function CommentForm({
       }
 
       const pendingOperation = await submitCommentMutationFunction({
-        address: author,
+        author: author,
         commentRequest: {
           chainId,
           content,

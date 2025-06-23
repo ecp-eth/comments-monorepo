@@ -2,6 +2,10 @@ import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import type { Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { CommentActionButton } from "./CommentActionButton";
 import { RetryButton } from "./RetryButton";
+import { type PropsWithChildren, useMemo } from "react";
+import { HeartButton } from "@ecp.eth/shared/components";
+import { COMMENT_REACTION_LIKE_CONTENT } from "@/lib/constants";
+import { cn } from "@ecp.eth/shared/helpers";
 
 interface CommentActionOrStatusProps {
   comment: CommentType;
@@ -10,6 +14,9 @@ interface CommentActionOrStatusProps {
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
   onRetryEditClick: () => void;
+  onLikeClick: () => void;
+  onUnlikeClick: () => void;
+  isLiking?: boolean;
 }
 
 export function CommentActionOrStatus({
@@ -19,6 +26,9 @@ export function CommentActionOrStatus({
   onRetryDeleteClick,
   onRetryPostClick,
   onRetryEditClick,
+  onLikeClick,
+  onUnlikeClick,
+  isLiking,
 }: CommentActionOrStatusProps) {
   const isDeleting =
     comment.pendingOperation?.action === "delete" &&
@@ -39,74 +49,118 @@ export function CommentActionOrStatus({
     comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "pending";
 
+  const likedByViewer = useMemo(() => {
+    return (
+      (comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT]?.length ?? 0) >
+      0
+    );
+  }, [comment.viewerReactions]);
+
   if (didPostingFailed) {
     return (
-      <div className="flex items-center gap-1 text-xs text-destructive">
+      <ButtonStatus>
         <MessageCircleWarningIcon className="w-3 h-3" />
         <span>
           Could not post the comment.{" "}
           <RetryButton onClick={onRetryPostClick}>Retry</RetryButton>
         </span>
-      </div>
+      </ButtonStatus>
     );
   }
 
   if (didDeletingFailed) {
     return (
-      <div className="flex items-center gap-1 text-xs text-destructive">
+      <ButtonStatus>
         <MessageCircleWarningIcon className="w-3 h-3" />
         <span>
           Could not delete the comment.{" "}
           <RetryButton onClick={onRetryDeleteClick}>Retry</RetryButton>
         </span>
-      </div>
+      </ButtonStatus>
     );
   }
 
   if (didEditingFailed) {
     return (
-      <div className="flex items-center gap-1 text-xs text-destructive">
+      <ButtonStatus>
         <MessageCircleWarningIcon className="w-3 h-3" />
         <span>
           Could not edit the comment.{" "}
           <RetryButton onClick={onRetryEditClick}>Retry</RetryButton>
         </span>
-      </div>
+      </ButtonStatus>
     );
   }
 
   if (isDeleting) {
     return (
-      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+      <ButtonStatus muted={true}>
         <Loader2Icon className="w-3 h-3 animate-spin" />
         <span>Deleting...</span>
-      </div>
+      </ButtonStatus>
     );
   }
 
   if (isEditing) {
     return (
-      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+      <ButtonStatus muted={true}>
         <Loader2Icon className="w-3 h-3 animate-spin" />
         <span>Editing...</span>
-      </div>
+      </ButtonStatus>
     );
   }
 
   if (isPosting) {
     return (
-      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+      <ButtonStatus muted={true}>
         <Loader2Icon className="w-3 h-3 animate-spin" />
         <span>Posting...</span>
-      </div>
+      </ButtonStatus>
     );
   }
 
-  if (comment.pendingOperation || !hasAccountConnected) {
+  if (
+    (comment.pendingOperation &&
+      comment.pendingOperation.state.status !== "success") ||
+    !hasAccountConnected
+  ) {
     return null;
   }
 
   return (
-    <CommentActionButton onClick={onReplyClick}>reply</CommentActionButton>
+    <div className="flex items-center gap-2">
+      <CommentActionButton onClick={onReplyClick}>reply</CommentActionButton>
+      <CommentActionButton>
+        <HeartButton
+          pending={isLiking}
+          onIsHeartedChange={(isHearted) => {
+            if (isHearted) {
+              onLikeClick();
+            } else {
+              onUnlikeClick();
+            }
+          }}
+          isHearted={likedByViewer}
+        />
+
+        {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
+      </CommentActionButton>
+    </div>
+  );
+}
+
+function ButtonStatus({
+  muted = false,
+  children,
+}: PropsWithChildren<{ muted?: boolean }>) {
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-1 text-xs",
+        muted ? "text-muted-foreground" : "text-destructive",
+      )}
+    >
+      {children}
+    </div>
   );
 }

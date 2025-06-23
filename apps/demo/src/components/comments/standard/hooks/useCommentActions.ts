@@ -517,6 +517,8 @@ export function useCommentActions({
       try {
         onBeforeStart?.();
 
+        await switchChainAsync({ chainId: comment.chainId });
+
         const { txHash } = await deleteCommentMutation({
           commentId: reaction.id,
         });
