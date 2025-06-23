@@ -75,6 +75,7 @@ export const channel = onchainTable(
     id: t.bigint().primaryKey(),
     createdAt: t.timestamp({ withTimezone: true }).notNull(),
     updatedAt: t.timestamp({ withTimezone: true }).notNull(),
+    owner: t.hex().notNull(),
     name: t.text().notNull(),
     description: t.text().notNull(),
     metadata: t.jsonb().$type<IndexerAPIMetadataSchemaType>().notNull(),
@@ -83,6 +84,7 @@ export const channel = onchainTable(
   (table) => ({
     createdAtIdx: index().on(table.createdAt),
     updatedAtIdx: index().on(table.updatedAt),
+    ownerIdx: index().on(table.owner),
   }),
 );
 

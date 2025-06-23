@@ -41,6 +41,7 @@ paths:
                     type:
                       - string
                       - 'null'
+                  owner: {}
                   name:
                     type: string
                   description:
@@ -60,6 +61,7 @@ paths:
                   - id
                   - createdAt
                   - updatedAt
+                  - owner
                   - name
                   - description
                   - metadata
@@ -83,23 +85,20 @@ paths:
       description: Retrieve a list of channels based on the criteria
       parameters:
         - schema:
-            type: object
-            properties:
-              createdAt:
-                type:
-                  - string
-                  - 'null'
-              id:
-                type: string
-                pattern: ^d+$
-            required:
-              - createdAt
-              - id
+            type: string
             description: >-
               Non inclusive cursor from which to fetch the channels based on
               sort
+            pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: cursor
+          in: query
+        - schema:
+            type: string
+            description: Filter channels by owner
+            pattern: ^0x[a-fA-F0-9]+$
+          required: false
+          name: owner
           in: query
         - schema:
             type: integer
@@ -144,6 +143,7 @@ paths:
                           type:
                             - string
                             - 'null'
+                        owner: {}
                         name:
                           type: string
                         description:
@@ -163,6 +163,7 @@ paths:
                         - id
                         - createdAt
                         - updatedAt
+                        - owner
                         - name
                         - description
                         - metadata
@@ -191,34 +192,32 @@ paths:
         - comments
       description: Retrieve a list of comments based on the criteria
       parameters:
-        - schema: {}
+        - schema:
+            type: string
+            pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: author
           in: query
         - schema:
+            type: string
             description: The viewer's address
+            pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: viewer
           in: query
         - schema:
+            type: string
             description: The address of the app signer
+            pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: app
           in: query
         - schema:
-            type: object
-            properties:
-              createdAt:
-                type:
-                  - string
-                  - 'null'
-              id: {}
-            required:
-              - createdAt
-              - id
+            type: string
             description: >-
               Non inclusive cursor from which to fetch the comments based on
               sort
+            pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: cursor
           in: query
@@ -1233,34 +1232,32 @@ paths:
           required: true
           name: commentId
           in: path
-        - schema: {}
+        - schema:
+            type: string
+            pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: author
           in: query
         - schema:
+            type: string
             description: The viewer's address
+            pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: viewer
           in: query
         - schema:
+            type: string
             description: The address of the app signer
+            pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: app
           in: query
         - schema:
-            type: object
-            properties:
-              createdAt:
-                type:
-                  - string
-                  - 'null'
-              id: {}
-            required:
-              - createdAt
-              - id
+            type: string
             description: >-
               Non inclusive cursor from which to fetch the comments based on
               sort
+            pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: cursor
           in: query
@@ -2269,12 +2266,16 @@ paths:
       description: Retrieve a list of approvals according to the criteria
       parameters:
         - schema:
+            type: string
             description: The author's address
+            pattern: ^0x[a-fA-F0-9]+$
           required: true
           name: author
           in: query
         - schema:
+            type: string
             description: The address of the app signer
+            pattern: ^0x[a-fA-F0-9]+$
           required: true
           name: app
           in: query
@@ -2312,14 +2313,18 @@ paths:
                       properties:
                         id:
                           type: string
-                        app: {}
+                        app:
+                          type: string
+                          pattern: ^0x[a-fA-F0-9]+$
                         deletedAt:
                           type:
                             - string
                             - 'null'
                         chainId:
                           type: integer
-                        txHash: {}
+                        txHash:
+                          type: string
+                          pattern: ^0x[a-fA-F0-9]+$
                       required:
                         - id
                         - app
@@ -2349,7 +2354,9 @@ paths:
       description: Retrieve author ENS / Farcaster data
       parameters:
         - schema:
+            type: string
             description: The author's address
+            pattern: ^0x[a-fA-F0-9]+$
           required: true
           name: authorAddress
           in: path
@@ -2397,7 +2404,9 @@ paths:
       description: Check if an address is marked as muted
       parameters:
         - schema:
+            type: string
             description: The address of the muted account
+            pattern: ^0x[a-fA-F0-9]+$
           required: true
           name: address
           in: path
@@ -2410,7 +2419,9 @@ paths:
                 type: object
                 properties:
                   address:
+                    type: string
                     description: The address of the muted account
+                    pattern: ^0x[a-fA-F0-9]+$
                   createdAt:
                     type:
                       - string
@@ -2451,7 +2462,9 @@ paths:
         be indexed
       parameters:
         - schema:
+            type: string
             description: The address of the muted account
+            pattern: ^0x[a-fA-F0-9]+$
           required: true
           name: address
           in: path
@@ -2508,7 +2521,9 @@ paths:
               type: object
               properties:
                 address:
+                  type: string
                   description: The address of the muted account
+                  pattern: ^0x[a-fA-F0-9]+$
                 reason:
                   type: string
                   description: The reason for muting the account
@@ -2523,7 +2538,9 @@ paths:
                 type: object
                 properties:
                   address:
+                    type: string
                     description: The address of the muted account
+                    pattern: ^0x[a-fA-F0-9]+$
                 required:
                   - address
         '400':
@@ -2569,19 +2586,11 @@ paths:
       description: Get a list of comments pending moderation
       parameters:
         - schema:
-            type: object
-            properties:
-              createdAt:
-                type:
-                  - string
-                  - 'null'
-              id: {}
-            required:
-              - createdAt
-              - id
+            type: string
             description: >-
               Non inclusive cursor from which to fetch the comments based on
               sort
+            pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: cursor
           in: query
@@ -3092,7 +3101,9 @@ paths:
       description: Change the moderation status of a comment
       parameters:
         - schema:
+            type: string
             description: The ID of the comment to moderate
+            pattern: ^0x[a-fA-F0-9]+$
           required: true
           name: commentId
           in: path
@@ -3584,7 +3595,9 @@ paths:
       description: Get a comment by ID with its moderation status
       parameters:
         - schema:
+            type: string
             description: The ID of the comment to moderate
+            pattern: ^0x[a-fA-F0-9]+$
           required: true
           name: commentId
           in: path

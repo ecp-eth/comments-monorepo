@@ -11,6 +11,7 @@ type FetchChannelsOptions = {
   apiUrl?: string;
   cursor?: Hex;
   limit?: number;
+  owner?: Hex;
   retries?: number;
   signal?: AbortSignal;
   sort?: IndexerAPISortSchemaType;
@@ -47,7 +48,7 @@ URL on which /api/channels endpoint will be called
 optional cursor: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:545](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L545)
+Defined in: [packages/sdk/src/indexer/api.ts:549](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L549)
 
 The cursor to fetch channels from
 
@@ -59,7 +60,7 @@ The cursor to fetch channels from
 optional limit: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:557](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L557)
+Defined in: [packages/sdk/src/indexer/api.ts:561](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L561)
 
 The number of channels to fetch
 
@@ -71,13 +72,25 @@ The number of channels to fetch
 
 ***
 
+### owner?
+
+```ts
+optional owner: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:539](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L539)
+
+Filter channels by owner
+
+***
+
 ### retries?
 
 ```ts
 optional retries: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:541](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L541)
+Defined in: [packages/sdk/src/indexer/api.ts:545](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L545)
 
 Number of times to retry the signing operation in case of failure.
 
@@ -95,7 +108,7 @@ Number of times to retry the signing operation in case of failure.
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:558](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L558)
+Defined in: [packages/sdk/src/indexer/api.ts:562](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L562)
 
 ***
 
@@ -105,7 +118,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:558](https://github.com/ecp-eth/com
 optional sort: IndexerAPISortSchemaType;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:551](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L551)
+Defined in: [packages/sdk/src/indexer/api.ts:555](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L555)
 
 The sort order, either `asc` or `desc`
 

@@ -25,12 +25,13 @@ type IndexerAPIListChannelsSchemaType = {
         value: `0x${string}`;
      }[];
      name: string;
+     owner: `0x${string}`;
      updatedAt: Date;
   }[];
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:72](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L72)
+Defined in: [packages/sdk/src/indexer/schemas.ts:73](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L73)
 
 ## Type declaration
 
@@ -89,6 +90,7 @@ results: {
      value: `0x${string}`;
   }[];
   name: string;
+  owner: `0x${string}`;
   updatedAt: Date;
 }[];
 ```

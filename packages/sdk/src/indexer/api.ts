@@ -534,6 +534,10 @@ export type FetchChannelsOptions = {
    */
   apiUrl?: string;
   /**
+   * Filter channels by owner
+   */
+  owner?: Hex;
+  /**
    * Number of times to retry the signing operation in case of failure.
    *
    * @default 3
@@ -561,6 +565,7 @@ export type FetchChannelsOptions = {
 const FetchChannelsOptionsSchema = z.object({
   apiUrl: z.string().url().default(INDEXER_API_URL),
   retries: z.number().int().positive().default(3),
+  owner: HexSchema.optional(),
   cursor: HexSchema.optional(),
   sort: IndexerAPISortSchema.default("desc"),
   limit: z.number().int().positive().default(50),
@@ -575,7 +580,7 @@ const FetchChannelsOptionsSchema = z.object({
 export async function fetchChannels(
   options: FetchChannelsOptions,
 ): Promise<IndexerAPIListChannelsSchemaType> {
-  const { apiUrl, limit, cursor, retries, sort, signal } =
+  const { apiUrl, limit, cursor, retries, sort, signal, owner } =
     FetchChannelsOptionsSchema.parse(options);
 
   const fetchChannelsTask = Effect.tryPromise(async (signal) => {
@@ -586,6 +591,10 @@ export async function fetchChannels(
 
     if (cursor) {
       url.searchParams.set("cursor", cursor);
+    }
+
+    if (owner) {
+      url.searchParams.set("owner", owner);
     }
 
     const response = await fetch(url.toString(), {
