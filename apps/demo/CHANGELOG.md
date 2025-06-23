@@ -1,5 +1,13 @@
 # @ecp.eth/demo
 
+## 0.1.22
+
+### Patch Changes
+
+- Updated dependencies [0853483]
+  - @ecp.eth/sdk@0.0.21
+  - @ecp.eth/shared@0.0.9
+
 ## 0.1.21
 
 ### Patch Changes
