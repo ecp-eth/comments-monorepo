@@ -1,0 +1,37 @@
+{
+  "name": "@ecp.eth/signer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^15.3.0",
+    "react": "~19.1.0",
+    "react-dom": "~19.1.0",
+    "viem": "^2.29.2",
+    "zod": "^3.24.2"
+  },
+  "peerDependencies": {
+    "@privy-io/server-auth": "^1.26.0",
+    "@ecp.eth/sdk": "^0.0.18",
+    "@ecp.eth/shared": "^0.0.8"
+  },
+  "devDependencies": {
+    "@ecp.eth/eslint-config": "workspace:*",
+    "@ecp.eth/sdk": "workspace:*",
+    "@ecp.eth/shared": "workspace:*",
+    "@privy-io/server-auth": "^1.26.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.8.3"
+  }
+}
