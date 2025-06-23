@@ -93,6 +93,24 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
   );
 
   ponder.on("CommentsV1ChannelManager:Transfer", async ({ event, context }) => {
+    const channel = await context.db.find(schema.channel, {
+      id: event.args.tokenId,
+    });
+
+    if (!channel) {
+      Sentry.captureMessage(
+        `Channel not found when transferring ownership (probably freshly created channel)`,
+        {
+          level: "warning",
+          extra: {
+            tokenId: event.args.tokenId,
+          },
+        },
+      );
+
+      return;
+    }
+
     await context.db
       .update(schema.channel, {
         id: event.args.tokenId,
