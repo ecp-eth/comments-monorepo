@@ -82,8 +82,8 @@ const BaseCommentInputDataSchema = z.object({
   author: HexSchema,
   app: HexSchema,
 
-  channelId: z.bigint().default(DEFAULT_CHANNEL_ID),
-  deadline: z.bigint(),
+  channelId: z.coerce.bigint().default(DEFAULT_CHANNEL_ID),
+  deadline: z.coerce.bigint(),
   parentId: HexSchema,
 
   content: z.string(),
