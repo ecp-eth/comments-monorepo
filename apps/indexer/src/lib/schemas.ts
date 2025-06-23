@@ -168,7 +168,8 @@ export const GetCommentsQuerySchema = z.object({
     description: "The channel ID",
   }),
   commentType: z.coerce.number().int().min(0).max(255).optional().openapi({
-    description: "The comment type (e.g. 0=comment, 1=reaction)",
+    description:
+      "The comment type (e.g. 0=comment, 1=reaction, not passed = all)",
   }),
   chainId: ChainIdSchema,
   moderationStatus: z

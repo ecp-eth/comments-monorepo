@@ -6,6 +6,8 @@ import type {
   OnRetryPostComment,
   OnEditComment,
   OnRetryEditComment,
+  OnLikeComment,
+  OnUnlikeComment,
 } from "../../core/CommentActionsContext";
 import type { Hex } from "viem";
 import { waitForTransactionReceipt } from "@wagmi/core";
@@ -16,6 +18,8 @@ import {
   useCommentSubmission,
   useCommentEdition,
   useCommentRetryEdition,
+  useReactionSubmission,
+  useReactionRemoval,
 } from "@ecp.eth/shared/hooks";
 import {
   submitCommentMutationFunction,
@@ -26,8 +30,15 @@ import {
   usePostComment,
   useEditComment,
 } from "@ecp.eth/sdk/comments/react";
-import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
+import type {
+  PendingDeleteCommentOperationSchemaType,
+  PendingPostCommentOperationSchemaType,
+} from "@ecp.eth/shared/schemas";
+import {
+  COMMENT_REACTION_LIKE_CONTENT,
+  TX_RECEIPT_TIMEOUT,
+} from "@/lib/constants";
+import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 
 type UseCommentActionsProps = {
   connectedAddress: Hex | undefined;
@@ -46,6 +57,11 @@ export function useCommentActions({
   const { mutateAsync: deleteCommentMutation } = useDeleteComment();
   const { mutateAsync: postCommentMutation } = usePostComment();
   const { mutateAsync: editCommentMutation } = useEditComment();
+  const reactionSubmission = useReactionSubmission(
+    COMMENT_REACTION_LIKE_CONTENT,
+  );
+  const reactionRemoval = useReactionRemoval(COMMENT_REACTION_LIKE_CONTENT);
+
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {
@@ -186,7 +202,7 @@ export function useCommentActions({
       const { comment } = params;
 
       const pendingOperation = await submitCommentMutationFunction({
-        address: params.address,
+        address: connectedAddress,
         zeroExSwap: null,
         references: comment.references,
         commentRequest: {
@@ -247,7 +263,13 @@ export function useCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, commentSubmission, postCommentMutation, switchChainAsync],
+    [
+      connectedAddress,
+      switchChainAsync,
+      postCommentMutation,
+      commentSubmission,
+      wagmiConfig,
+    ],
   );
 
   const editComment = useCallback<OnEditComment>(
@@ -381,6 +403,128 @@ export function useCommentActions({
     ],
   );
 
+  const likeComment = useCallback<OnLikeComment>(
+    async (params) => {
+      const { comment, queryKey, onBeforeStart, onFailed } = params;
+
+      onBeforeStart?.();
+
+      let pendingOperation: PendingPostCommentOperationSchemaType | undefined =
+        undefined;
+
+      try {
+        pendingOperation = await submitCommentMutationFunction({
+          address: connectedAddress,
+          zeroExSwap: null,
+          commentRequest: {
+            content: COMMENT_REACTION_LIKE_CONTENT,
+            metadata: [],
+            commentType: COMMENT_TYPE_REACTION,
+            parentId: comment.id,
+          },
+          switchChainAsync(chainId) {
+            return switchChainAsync({ chainId });
+          },
+          async writeContractAsync({
+            signCommentResponse: { signature: appSignature, data: commentData },
+          }) {
+            const { txHash } = await postCommentMutation({
+              appSignature,
+              comment: commentData,
+            });
+
+            return txHash;
+          },
+        });
+
+        reactionSubmission.start({
+          ...params,
+          queryKey,
+          pendingOperation,
+        });
+
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
+          hash: pendingOperation.txHash,
+          timeout: TX_RECEIPT_TIMEOUT,
+        });
+
+        if (receipt.status !== "success") {
+          throw new Error("Transaction reverted");
+        }
+
+        reactionSubmission.success({
+          ...params,
+          queryKey,
+          pendingOperation,
+        });
+      } catch (e) {
+        onFailed?.();
+
+        if (pendingOperation) {
+          reactionSubmission.error({
+            ...params,
+            queryKey,
+            pendingOperation,
+          });
+        }
+
+        throw e;
+      }
+    },
+    [
+      reactionSubmission,
+      connectedAddress,
+      postCommentMutation,
+      switchChainAsync,
+      wagmiConfig,
+    ],
+  );
+
+  const unlikeComment = useCallback<OnUnlikeComment>(
+    async (params) => {
+      const { comment, queryKey: parentCommentQueryKey } = params;
+
+      const reaction = comment.viewerReactions?.[
+        COMMENT_REACTION_LIKE_CONTENT
+      ]?.find((reaction) => reaction.parentId === comment.id);
+
+      if (!reaction) {
+        throw new Error("Reaction not found");
+      }
+
+      const reactionRemovalParams = {
+        reactionId: reaction.id,
+        parentCommentId: comment.id,
+        queryKey: parentCommentQueryKey,
+      };
+
+      try {
+        const { txHash } = await deleteCommentMutation({
+          commentId: reaction.id,
+        });
+
+        // Optimistically remove the reaction from the UI
+        reactionRemoval.start(reactionRemovalParams);
+
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
+          hash: txHash,
+          timeout: TX_RECEIPT_TIMEOUT,
+        });
+
+        if (receipt.status !== "success") {
+          throw new Error("Transaction reverted");
+        }
+
+        reactionRemoval.success(reactionRemovalParams);
+      } catch (e) {
+        reactionRemoval.error(reactionRemovalParams);
+
+        throw e;
+      }
+    },
+    [reactionRemoval, deleteCommentMutation, wagmiConfig],
+  );
+
   return useMemo(
     () => ({
       deleteComment,
@@ -388,6 +532,8 @@ export function useCommentActions({
       postComment,
       editComment,
       retryEditComment,
+      likeComment,
+      unlikeComment,
     }),
     [
       deleteComment,
@@ -395,6 +541,8 @@ export function useCommentActions({
       postComment,
       editComment,
       retryEditComment,
+      likeComment,
+      unlikeComment,
     ],
   );
 }

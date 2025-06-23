@@ -1,10 +1,11 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { APIErrorResponseSchema } from "../../lib/schemas";
-import { updateCommentModerationStatus } from "../../management/services/moderation";
+
 import { moderationNotificationsService } from "../../services";
 import { HTTPException } from "hono/http-exception";
 import { CommentSelectType } from "ponder:schema";
 import { MAX_WEBHOOK_REQUEST_AGE_IN_MS } from "../../lib/constants";
+import { commentModerationService } from "../../management/services";
 
 const webhookRequestBodySchema = z.object({
   callback_query: z.object({
@@ -71,13 +72,13 @@ export function setupWebhook(app: OpenAPIHono) {
 
       switch (command.action) {
         case "approve":
-          comment = await updateCommentModerationStatus(
+          comment = await commentModerationService.updateModerationStatus(
             command.commentId,
             "approved",
           );
           break;
         case "reject":
-          comment = await updateCommentModerationStatus(
+          comment = await commentModerationService.updateModerationStatus(
             command.commentId,
             "rejected",
           );

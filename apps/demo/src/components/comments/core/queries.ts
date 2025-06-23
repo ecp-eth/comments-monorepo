@@ -1,15 +1,15 @@
 import type { Hex } from "viem";
 
 export function createRootCommentsQueryKey(
-  address: Hex | undefined,
+  author: Hex | undefined,
   targetUri: string,
 ) {
-  return ["comments", address, targetUri];
+  return ["comments", author, targetUri];
 }
 
 export function createCommentRepliesQueryKey(
-  address: Hex | undefined,
+  author: Hex | undefined,
   commentId: Hex,
 ) {
-  return ["comments", address, commentId];
+  return ["comments", author, commentId];
 }

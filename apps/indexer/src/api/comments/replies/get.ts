@@ -42,6 +42,7 @@ const getCommentsRoute = createRoute({
     },
   },
 });
+
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
     const {

@@ -2,8 +2,10 @@ import { useCallback, useMemo } from "react";
 import type {
   CommentActionsContextType,
   OnDeleteComment,
+  OnLikeComment,
   OnPostComment,
   OnRetryPostComment,
+  OnUnlikeComment,
 } from "../../core/CommentActionsContext";
 import { concat, type Hex, encodeFunctionData, numberToHex, size } from "viem";
 import {
@@ -21,13 +23,25 @@ import {
 import {
   useCommentDeletion,
   useCommentSubmission,
+  useReactionRemoval,
+  useReactionSubmission,
 } from "@ecp.eth/shared/hooks";
 import { submitCommentMutationFunction } from "../../standard/queries";
-import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
+import type {
+  PendingDeleteCommentOperationSchemaType,
+  PendingPostCommentOperationSchemaType,
+} from "@ecp.eth/shared/schemas";
+import {
+  COMMENT_REACTION_LIKE_CONTENT,
+  TX_RECEIPT_TIMEOUT,
+} from "@/lib/constants";
 import { useDeleteComment } from "@ecp.eth/sdk/comments/react";
 import { useCommentActions as useStandardCommentActions } from "../../standard/hooks/useCommentActions";
-import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
+import {
+  COMMENT_MANAGER_ADDRESS,
+  COMMENT_TYPE_REACTION,
+  CommentManagerABI,
+} from "@ecp.eth/sdk";
 import type { QuoteViewState } from "../0x/QuoteView";
 import type { IndexerAPICommentZeroExSwapSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { createMetadataEntry } from "@ecp.eth/sdk/comments/metadata";
@@ -52,8 +66,12 @@ export function useCommentActions({
   const { signTypedDataAsync } = useSignTypedData();
   const commentDeletion = useCommentDeletion();
   const commentSubmission = useCommentSubmission();
-
   const { mutateAsync: deleteCommentMutation } = useDeleteComment();
+  const reactionSubmission = useReactionSubmission(
+    COMMENT_REACTION_LIKE_CONTENT,
+  );
+  const reactionRemoval = useReactionRemoval(COMMENT_REACTION_LIKE_CONTENT);
+
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {
@@ -162,7 +180,7 @@ export function useCommentActions({
       };
 
       const pendingOperation = await submitCommentMutationFunction({
-        address: params.address,
+        address: connectedAddress,
         zeroExSwap,
         references: comment.references,
         commentRequest: {
@@ -248,12 +266,129 @@ export function useCommentActions({
       }
     },
     [
+      wagmiConfig,
       signTypedDataAsync,
+      connectedAddress,
       switchChainAsync,
       sendCallsAsync,
       commentSubmission,
-      wagmiConfig,
     ],
+  );
+
+  const likeComment = useCallback<OnLikeComment>(
+    async (params) => {
+      const { comment, queryKey, onBeforeStart, onFailed } = params;
+
+      onBeforeStart?.();
+
+      let pendingOperation: PendingPostCommentOperationSchemaType | undefined =
+        undefined;
+
+      try {
+        pendingOperation = await submitCommentMutationFunction({
+          address: connectedAddress,
+          zeroExSwap: null,
+          commentRequest: {
+            content: COMMENT_REACTION_LIKE_CONTENT,
+            metadata: [],
+            commentType: COMMENT_TYPE_REACTION,
+            parentId: comment.id,
+          },
+          switchChainAsync(chainId) {
+            return switchChainAsync({ chainId });
+          },
+          async writeContractAsync({
+            signCommentResponse: { signature: appSignature, data: commentData },
+          }) {
+            const { txHash } = await postCommentMutation({
+              appSignature,
+              comment: commentData,
+            });
+
+            return txHash;
+          },
+        });
+
+        reactionSubmission.start({
+          ...params,
+          queryKey,
+          pendingOperation,
+        });
+
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
+          hash: pendingOperation.txHash,
+          timeout: TX_RECEIPT_TIMEOUT,
+        });
+
+        if (receipt.status !== "success") {
+          throw new Error("Transaction reverted");
+        }
+
+        reactionSubmission.success({
+          ...params,
+          queryKey,
+          pendingOperation,
+        });
+      } catch (e) {
+        onFailed?.();
+
+        if (pendingOperation) {
+          reactionSubmission.error({
+            ...params,
+            queryKey,
+            pendingOperation,
+          });
+        }
+
+        throw e;
+      }
+    },
+    [reactionSubmission, connectedAddress, switchChainAsync, wagmiConfig],
+  );
+
+  const unlikeComment = useCallback<OnUnlikeComment>(
+    async (params) => {
+      const { comment, queryKey: parentCommentQueryKey } = params;
+
+      const reaction = comment.viewerReactions?.[
+        COMMENT_REACTION_LIKE_CONTENT
+      ]?.find((reaction) => reaction.parentId === comment.id);
+
+      if (!reaction) {
+        throw new Error("Reaction not found");
+      }
+
+      const reactionRemovalParams = {
+        reactionId: reaction.id,
+        parentCommentId: comment.id,
+        queryKey: parentCommentQueryKey,
+      };
+
+      try {
+        const { txHash } = await deleteCommentMutation({
+          commentId: reaction.id,
+        });
+
+        // Optimistically remove the reaction from the UI
+        reactionRemoval.start(reactionRemovalParams);
+
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
+          hash: txHash,
+          timeout: TX_RECEIPT_TIMEOUT,
+        });
+
+        if (receipt.status !== "success") {
+          throw new Error("Transaction reverted");
+        }
+
+        reactionRemoval.success(reactionRemovalParams);
+      } catch (e) {
+        reactionRemoval.error(reactionRemovalParams);
+
+        throw e;
+      }
+    },
+    [reactionRemoval, deleteCommentMutation, wagmiConfig],
   );
 
   return useMemo(
@@ -263,6 +398,8 @@ export function useCommentActions({
       postComment,
       editComment,
       retryEditComment,
+      likeComment,
+      unlikeComment,
     }),
     [
       deleteComment,
@@ -270,6 +407,26 @@ export function useCommentActions({
       postComment,
       editComment,
       retryEditComment,
+      likeComment,
+      unlikeComment,
     ],
   );
+}
+
+function postCommentMutation(arg0: {
+  appSignature: `0x${string}`;
+  comment: {
+    author: `0x${string}`;
+    targetUri: string;
+    app: `0x${string}`;
+    channelId: bigint;
+    commentType: number;
+    id: `0x${string}`;
+    content: string;
+    metadata: { value: `0x${string}`; key: `0x${string}` }[];
+    parentId: `0x${string}`;
+    deadline: bigint;
+  };
+}): { txHash: any } | PromiseLike<{ txHash: any }> {
+  throw new Error("Function not implemented.");
 }

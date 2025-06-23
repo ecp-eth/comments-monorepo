@@ -1,5 +1,5 @@
 type CommentActionButtonProps = {
-  onClick: () => void;
+  onClick?: () => void;
   children: React.ReactNode;
 };
 

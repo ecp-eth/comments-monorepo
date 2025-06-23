@@ -35,6 +35,7 @@ type SubmitGaslessCommentVariables =
       content: string;
       targetUri: string;
       metadata: MetadataEntry[];
+      commentType?: number;
       references: IndexerAPICommentReferencesSchemaType;
     }
   | {
@@ -42,6 +43,7 @@ type SubmitGaslessCommentVariables =
       content: string;
       parentId: Hex;
       metadata: MetadataEntry[];
+      commentType?: number;
       references: IndexerAPICommentReferencesSchemaType;
     };
 
@@ -51,12 +53,14 @@ type SubmitGaslessCommentVariablesInternal =
       content: string;
       targetUri: string;
       metadata: MetadataEntry[];
+      commentType?: number;
     }
   | {
       author: Hex;
       content: string;
       parentId: Hex;
       metadata: MetadataEntry[];
+      commentType?: number;
     };
 
 type PostPriorNotApprovedResult = GaslessPostCommentResponseSchemaType &

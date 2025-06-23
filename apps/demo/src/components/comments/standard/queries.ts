@@ -28,13 +28,20 @@ import type {
   PendingPostCommentOperationSchemaType,
   SignEditCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
+import { DistributiveOmit } from "@ecp.eth/shared/types";
 
 export class SubmitCommentMutationError extends Error {}
 export class SubmitEditCommentMutationError extends Error {}
 
 type SubmitCommentParams = {
+  /**
+   * The address of the wallet that is submitting the comment.
+   */
   address: Hex | undefined;
-  commentRequest: Omit<SignCommentPayloadRequestSchemaType, "author">;
+  commentRequest: DistributiveOmit<
+    SignCommentPayloadRequestSchemaType,
+    "author"
+  >;
   zeroExSwap: IndexerAPICommentZeroExSwapSchemaType | null;
   switchChainAsync: (chainId: number) => Promise<Chain>;
   writeContractAsync: (params: {

@@ -8,3 +8,5 @@ export { useCommentRetrySubmission } from "./useCommentRetrySubmission.js";
 export { useIsAccountStatusResolved } from "./useIsAccountStatusResolved.js";
 export { useCommentEdition } from "./useCommentEdition.js";
 export { useCommentRetryEdition } from "./useCommentRetryEdition.js";
+export { useReactionSubmission } from "./useReactionSubmission.js";
+export { useReactionRemoval } from "./useReactionRemoval.js";

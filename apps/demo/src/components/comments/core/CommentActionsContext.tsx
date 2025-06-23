@@ -30,7 +30,6 @@ export type OnRetryPostCommentParams = {
 };
 
 export type OnPostCommentParams<TExtra = unknown> = {
-  address: Hex;
   comment:
     | {
         // reply doesn't need targetUri
@@ -103,6 +102,36 @@ export type OnRetryEditCommentParams = {
   onStart?: () => void;
 };
 
+export type OnLikeCommentParams = {
+  /**
+   * Comment to like
+   */
+  comment: Comment;
+  /**
+   * Query key to a query where comment is stored
+   */
+  queryKey: QueryKey;
+  /**
+   * Called when transaction was created.
+   */
+  onBeforeStart?: () => void;
+  /**
+   * Called when transaction was failed.
+   */
+  onFailed?: () => void;
+};
+
+export type OnUnlikeCommentParams = {
+  /**
+   * Comment to unlike
+   */
+  comment: Comment;
+  /**
+   * Query key to a query where comment is stored
+   */
+  queryKey: QueryKey;
+};
+
 export type OnRetryEditComment = (
   params: OnRetryEditCommentParams,
 ) => Promise<void>;
@@ -115,12 +144,16 @@ export type OnPostComment<TExtra = unknown> = (
   params: OnPostCommentParams<TExtra>,
 ) => Promise<void>;
 export type OnEditComment = (params: OnEditCommentParams) => Promise<void>;
+export type OnLikeComment = (params: OnLikeCommentParams) => Promise<void>;
+export type OnUnlikeComment = (params: OnUnlikeCommentParams) => Promise<void>;
 export type CommentActionsContextType<TExtraPostComment = unknown> = {
   deleteComment: OnDeleteComment;
   postComment: OnPostComment<TExtraPostComment>;
   retryPostComment: OnRetryPostComment;
   editComment: OnEditComment;
   retryEditComment: OnRetryEditComment;
+  likeComment: OnLikeComment;
+  unlikeComment: OnUnlikeComment;
 };
 
 export const CommentActionsContext =

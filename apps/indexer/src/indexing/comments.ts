@@ -6,12 +6,8 @@ import {
 } from "../lib/utils";
 import { getMutedAccount } from "../management/services/muted-accounts";
 import schema from "ponder:schema";
-import { env } from "../env";
 import { getAddress } from "viem";
-import {
-  getCommentModerationStatus,
-  insertCommentModerationStatus,
-} from "../management/services/moderation";
+import { commentModerationService } from "../management/services";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
 import {
@@ -25,9 +21,8 @@ import { erc20ByTickerResolver } from "../resolvers/erc20-by-ticker-resolver";
 import { farcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
 import { farcasterByNameResolver } from "../resolvers/farcaster-by-name-resolver";
 import { urlResolver } from "../resolvers/url-resolver";
-import { moderationNotificationsService } from "../services";
 
-const defaultModerationStatus = env.MODERATION_ENABLED ? "pending" : "approved";
+import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 
 const resolverCommentReferences: ResolveCommentReferencesOptions = {
   ensByAddressResolver,
@@ -87,14 +82,30 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         return;
       }
 
+      if (event.args.commentType === COMMENT_TYPE_REACTION) {
+        const reactionType = event.args.content;
+
+        await context.db
+          .update(schema.comment, {
+            id: parentId,
+          })
+          .set({
+            reactionCounts: {
+              ...parentComment.reactionCounts,
+              [reactionType]:
+                (parentComment.reactionCounts?.[reactionType] ?? 0) + 1,
+            },
+          });
+      }
+
       // if parent comment doesn't have a root comment id then it is a root comment itself
       rootCommentId = parentComment.rootCommentId ?? parentComment.id;
     }
 
     // We need to check if the comment already has a moderation status
     // this is useful during the reindex process
-    const moderationStatus = await getCommentModerationStatus(
-      event.args.commentId,
+    const moderationResult = await commentModerationService.moderate(
+      event.args,
     );
 
     const referencesResolutionResult = await resolveCommentReferences(
@@ -122,35 +133,16 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       logIndex: event.log.logIndex,
       channelId: event.args.channelId,
       commentType: event.args.commentType,
-      ...(moderationStatus
-        ? {
-            moderationStatus: moderationStatus.status,
-            moderationStatusChangedAt: moderationStatus.changedAt,
-          }
-        : {
-            moderationStatus: defaultModerationStatus,
-            moderationStatusChangedAt: createdAt,
-          }),
+      moderationStatus: moderationResult.result.status,
+      moderationStatusChangedAt: moderationResult.result.changedAt,
       zeroExSwap,
       references: referencesResolutionResult.references,
       referencesResolutionStatus: referencesResolutionResult.status,
       referencesResolutionStatusChangedAt: new Date(),
+      reactionCounts: {},
     });
 
-    // this is new comment so ensure we use correct default moderation status
-    if (!moderationStatus) {
-      await insertCommentModerationStatus(
-        event.args.commentId,
-        defaultModerationStatus,
-      );
-
-      await moderationNotificationsService.notifyPendingModeration({
-        id: event.args.commentId,
-        author: event.args.author,
-        content: event.args.content,
-        targetUri,
-      });
-    }
+    await moderationResult.saveAndNotify();
   });
 
   // Handle hook metadata setting separately
@@ -201,16 +193,47 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       id: event.args.commentId,
     });
 
-    if (
-      existingComment &&
-      getAddress(existingComment.author) === getAddress(event.args.author)
-    ) {
+    if (!existingComment) {
+      return;
+    }
+
+    if (getAddress(existingComment.author) === getAddress(event.args.author)) {
       await context.db
         .update(schema.comment, {
           id: event.args.commentId,
         })
         .set({
           deletedAt: new Date(Number(event.block.timestamp) * 1000),
+        });
+    }
+
+    if (
+      existingComment.commentType === COMMENT_TYPE_REACTION &&
+      existingComment.parentId
+    ) {
+      const parentComment = await context.db.find(schema.comment, {
+        id: existingComment.parentId,
+      });
+
+      if (!parentComment) {
+        return;
+      }
+
+      const reactionCounts = parentComment.reactionCounts;
+
+      if (!reactionCounts) {
+        return;
+      }
+
+      reactionCounts[existingComment.content] =
+        (reactionCounts[existingComment.content] ?? 1) - 1;
+
+      await context.db
+        .update(schema.comment, {
+          id: existingComment.parentId,
+        })
+        .set({
+          reactionCounts,
         });
     }
   });

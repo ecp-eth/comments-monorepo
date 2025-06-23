@@ -26,6 +26,18 @@ const EnvSchema = z
       .enum(["0", "1"])
       .default("0")
       .transform((val) => val === "1"),
+    MODERATION_KNOWN_REACTIONS: z
+      .string()
+      .default("")
+      .transform(
+        (val) =>
+          new Set(
+            val
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean),
+          ),
+      ),
     MODERATION_TELEGRAM_BOT_TOKEN: z.string().optional(),
     MODERATION_TELEGRAM_CHANNEL_ID: z.string().optional(),
     MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url().optional(),

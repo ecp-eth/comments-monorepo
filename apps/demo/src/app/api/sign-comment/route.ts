@@ -38,7 +38,7 @@ export async function POST(
 
   const passedCommentData = parsedBodyResult.data;
 
-  const { content, author, metadata } = passedCommentData;
+  const { content, author, metadata, commentType } = passedCommentData;
 
   // const { content, targetUri, parentId, author } = parsedBodyResult.data;
 
@@ -88,6 +88,7 @@ export async function POST(
     metadata,
     author,
     app: app.address,
+    commentType,
 
     ...("parentId" in passedCommentData
       ? {

@@ -67,6 +67,10 @@ export function CommentActionOrStatus({
     return (
       <div className="flex items-center gap-1 text-xs text-destructive">
         <MessageCircleWarningIcon className="w-3 h-3" />
+        <span>
+          Could not edit the comment.{" "}
+          <RetryButton onClick={onRetryEditClick}>Retry</RetryButton>
+        </span>
       </div>
     );
   }

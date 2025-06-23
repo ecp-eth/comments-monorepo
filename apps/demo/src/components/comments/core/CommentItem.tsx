@@ -30,10 +30,16 @@ type CommentItemProps = {
 };
 
 export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
-  const { deleteComment, retryPostComment, retryEditComment } =
-    useCommentActions();
+  const {
+    deleteComment,
+    retryPostComment,
+    retryEditComment,
+    likeComment,
+    unlikeComment,
+  } = useCommentActions();
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
   const rootQueryKey = useMemo(
     () => createRootCommentsQueryKey(connectedAddress, window.location.href),
     [connectedAddress],
@@ -60,8 +66,21 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   }, [comment, retryPostComment, rootQueryKey]);
 
   const onRetryEditClick = useCallback(() => {
-    retryEditComment({ comment, queryKey });
-  }, [comment, retryEditComment, queryKey]);
+    retryEditComment({ comment, queryKey: rootQueryKey });
+  }, [comment, retryEditComment, rootQueryKey]);
+
+  const onLikeClick = useCallback(() => {
+    likeComment({
+      comment,
+      queryKey: rootQueryKey,
+      onBeforeStart: () => setIsLiking(true),
+      onFailed: () => setIsLiking(false),
+    });
+  }, [comment, likeComment, rootQueryKey]);
+
+  const onUnlikeClick = useCallback(() => {
+    unlikeComment({ comment, queryKey: rootQueryKey });
+  }, [comment, unlikeComment, rootQueryKey]);
 
   const repliesQuery = useInfiniteQuery({
     enabled: comment.pendingOperation?.action !== "post",
@@ -161,6 +180,9 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
           onRetryDeleteClick={onDeleteClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
+          onLikeClick={onLikeClick}
+          onUnlikeClick={onUnlikeClick}
+          isLiking={isLiking}
           optimisticReferences={
             comment.pendingOperation?.action === "post"
               ? comment.pendingOperation.references
