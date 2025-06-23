@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.21
+
+### Patch Changes
+
+- 0853483: add base mainnet
+
 ## 0.0.20
 
 ### Patch Changes

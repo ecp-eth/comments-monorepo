@@ -1,5 +1,11 @@
 # @ecp.eth/protocol
 
+## 1.1.2
+
+### Patch Changes
+
+- 0853483: add base mainnet
+
 ## 1.1.1
 
 ### Patch Changes
