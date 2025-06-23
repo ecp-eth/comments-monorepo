@@ -1,5 +1,13 @@
 # @ecp.eth/sdk
 
+## 0.0.20
+
+### Patch Changes
+
+- f6bdd0a: fix(sdk): coerce string to bigint
+- 35c9cc3: feat(indexer): index channel ownership and allow to list by owner
+  feat(sdk): allow to list channels by owner
+
 ## 0.0.19
 
 ### Patch Changes

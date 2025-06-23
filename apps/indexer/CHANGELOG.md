@@ -1,5 +1,16 @@
 # @ecp.eth/indexer
 
+## 0.0.14
+
+### Patch Changes
+
+- 35c9cc3: feat(indexer): index channel ownership and allow to list by owner
+  feat(sdk): allow to list channels by owner
+- Updated dependencies [f6bdd0a]
+- Updated dependencies [35c9cc3]
+  - @ecp.eth/sdk@0.0.20
+  - @ecp.eth/shared@0.0.9
+
 ## 0.0.13
 
 ### Patch Changes
