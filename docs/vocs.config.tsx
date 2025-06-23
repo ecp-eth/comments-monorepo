@@ -58,6 +58,10 @@ export default defineConfig({
           text: "Smart Contracts",
           link: "/integration-options/contract-interactions",
         },
+        {
+          text: "Signer API Service",
+          link: "/integration-options/signer-api-service",
+        },
       ],
     },
     {

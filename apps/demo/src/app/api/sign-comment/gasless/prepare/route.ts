@@ -42,7 +42,7 @@ export async function POST(
   }
 
   const passedCommentData = parsedBodyResult.data;
-  const { author, content, submitIfApproved } = passedCommentData;
+  const { author, content, metadata, submitIfApproved } = passedCommentData;
 
   const rateLimitResult = await signCommentRateLimiter.isRateLimited(author);
 
@@ -80,7 +80,7 @@ export async function POST(
     content,
     author,
     app: app.address,
-
+    metadata,
     ...("parentId" in passedCommentData
       ? {
           parentId: passedCommentData.parentId,
