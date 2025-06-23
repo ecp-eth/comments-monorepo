@@ -12,7 +12,10 @@
     "SENTRY_DSN",
     "SENTRY_ORG",
     "SENTRY_PROJECT",
-    "NEXT_PUBLIC_SENTRY_DSN"
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "NEXT_PUBLIC_PINATA_GATEWAY_URL",
+    "NEYNAR_API_KEY",
+    "PINATA_JWT"
   ],
   "globalPassThroughEnv": [
     "ALLOWED_CHAIN_IDS",
@@ -22,6 +25,7 @@
     "FUND_ADDRESS",
     "CI",
     "COMMENTS_INDEXER_URL",
+    "ENS_RPC_URL",
     "SUBMITTER_PRIVATE_KEY",
     "NEYNAR_API_KEY",
     "RAILWAY_DEPLOYMENT_ID",
@@ -31,7 +35,9 @@
     "PRIVY_WALLET_ADDRESS",
     "PRIVY_WALLET_ID",
     "RPC_URL_*",
-    "WEBHOOK_SECRET"
+    "WEBHOOK_SECRET",
+    "ENSNODE_SUBGRAPH_URL",
+    "SIM_API_KEY"
   ],
   "tasks": {
     "build": {

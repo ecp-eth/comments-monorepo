@@ -114,6 +114,7 @@ export function useCommentActions({
       const pendingOperation = await submitCommentMutationFunction({
         address: connectedAddress,
         zeroExSwap: null,
+        references: comment.references,
         commentRequest: {
           content: comment.content,
           metadata: comment.metadata,
@@ -187,6 +188,7 @@ export function useCommentActions({
       const pendingOperation = await submitCommentMutationFunction({
         address: params.address,
         zeroExSwap: null,
+        references: comment.references,
         commentRequest: {
           content: comment.content,
           metadata: comment.metadata ?? [],

@@ -23,10 +23,25 @@ if (!(chain.id in SUPPORTED_CHAINS)) {
   throw new Error(`Chain ${chain.id} not supported`);
 }
 
-export const transport =
-  chain.id === prodChain.id
-    ? http(publicEnv.NEXT_PUBLIC_RPC_URL)
-    : http("http://localhost:8545");
+if (!(chain.id in SUPPORTED_CHAINS)) {
+  throw new Error(`Chain ${chain.id} not supported`);
+}
+
+/**
+ * Chains that are used to resolve address when typing a comment
+ */
+export const supportedChains = {
+  [prodChain.id]: {
+    chain: prodChain,
+    transport: http(publicEnv.NEXT_PUBLIC_RPC_URL),
+  },
+  [anvil.id]: {
+    chain: anvil,
+    transport: http("http://localhost:8545"),
+  },
+};
+
+export const transport = supportedChains[chain.id].transport;
 
 export const getConfig = () =>
   getDefaultConfig({

@@ -1,5 +1,6 @@
 import {
   IndexerAPIAuthorDataSchema,
+  IndexerAPICommentReferencesSchema,
   IndexerAPICommentSchema,
   type IndexerAPICommentSchemaType,
   IndexerAPICommentZeroExSwapSchema,
@@ -81,6 +82,7 @@ export const PendingPostCommentOperationSchema = z.object({
       error: z.instanceof(Error),
     }),
   ]),
+  references: IndexerAPICommentReferencesSchema,
 });
 
 export type PendingPostCommentOperationSchemaType = z.infer<

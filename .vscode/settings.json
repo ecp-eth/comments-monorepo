@@ -23,6 +23,8 @@
     "packages/shared/helpers": true,
     "packages/shared/hooks": true,
     "packages/shared/schemas": true,
-    "packages/shared/types": true
+    "packages/shared/types": true,
+    "packages/shared/token-list": true,
+    "packages/shared/resolvers": true
   }
 }

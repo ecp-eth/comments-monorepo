@@ -1,0 +1,100 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentReferenceSchemaType
+
+# Type Alias: IndexerAPICommentReferenceSchemaType
+
+```ts
+type IndexerAPICommentReferenceSchemaType = 
+  | {
+  address: `0x${string}`;
+  avatarUrl: null | string;
+  name: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "ens";
+  url: string;
+}
+  | {
+  address: `0x${string}`;
+  displayName: null | string;
+  fid: number;
+  fname: string;
+  pfpUrl: null | string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "farcaster";
+  url: string;
+  username: string;
+}
+  | {
+  address: `0x${string}`;
+  chainId: null | number;
+  chains: {
+     caip: string;
+     chainId: number;
+  }[];
+  decimals: number;
+  logoURI: null | string;
+  name: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  symbol: string;
+  type: "erc20";
+}
+  | {
+  description: null | string;
+  favicon: null | string;
+  opengraph:   | null
+     | {
+     description: null | string;
+     image: string;
+     title: string;
+     url: string;
+   };
+  position: {
+     end: number;
+     start: number;
+  };
+  title: string;
+  type: "webpage";
+  url: string;
+}
+  | {
+  mediaType: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "file";
+  url: string;
+}
+  | {
+  mediaType: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "image";
+  url: string;
+}
+  | {
+  mediaType: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "video";
+  url: string;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:282](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L282)

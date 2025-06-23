@@ -1,7 +1,7 @@
-import { Textarea } from "@/components/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useAccount } from "wagmi";
+import { ImageIcon } from "lucide-react";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { z } from "zod";
 import { InvalidCommentError } from "./errors";
@@ -10,6 +10,7 @@ import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import { useCommentActions } from "./CommentActionsContext";
 import type { QueryKey } from "@tanstack/react-query";
 import type { Hex } from "viem";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import {
@@ -17,10 +18,25 @@ import {
   createRootCommentsQueryKey,
 } from "./queries";
 import type { Comment } from "@ecp.eth/shared/schemas";
+import { Editor, EditorRef } from "./CommentTextEditor/Editor";
+import { useUploadFiles } from "./CommentTextEditor/hooks/useUploadFiles";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  ALLOWED_UPLOAD_MIME_TYPES,
+  MAX_UPLOAD_FILE_SIZE,
+} from "@/lib/constants";
+import { extractReferences } from "./CommentTextEditor/extract-references";
 
 type OnSubmitFunction = (params: {
   author: Hex;
   content: string;
+  references: IndexerAPICommentReferencesSchemaType;
 }) => Promise<void>;
 
 type BaseCommentFormProps = {
@@ -29,11 +45,13 @@ type BaseCommentFormProps = {
    */
   autoFocus?: boolean;
   disabled?: boolean;
-  defaultContent?: string;
   /**
-   * Called when user pressed escape or left the form empty or unchanged (blurred with empty or unchanged content)
+   * Default comment content, will be parsed as markdown.
    */
-  onCancel?: () => void;
+  defaultContent?: {
+    content: string;
+    references: IndexerAPICommentReferencesSchemaType;
+  };
   /**
    * Called when transaction was created and also successfully processed.
    */
@@ -51,6 +69,17 @@ type BaseCommentFormProps = {
    * @default "Posting..."
    */
   submitPendingLabel?: string;
+  /**
+   * Called when user pressed cancel button.
+   *
+   * If this is not provided, the cancel button will not be shown.
+   */
+  onCancel?: () => void;
+  /**
+   * Label for the cancel button.
+   * @default "Cancel"
+   */
+  cancelLabel?: string;
 };
 
 function BaseCommentForm({
@@ -63,13 +92,15 @@ function BaseCommentForm({
   submitIdleLabel = "Post",
   submitPendingLabel = "Posting...",
   onSubmitSuccess,
+  cancelLabel = "Cancel",
 }: BaseCommentFormProps) {
   const [formState, setFormState] = useState<"idle" | "post">("idle");
   const { address } = useAccount();
   const connectAccount = useConnectAccount();
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [content, setContent] = useState(defaultContent || "");
+  const editorRef = useRef<EditorRef>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
+  const { uploadFiles } = useUploadFiles();
 
   const submitMutation = useMutation({
     mutationFn: async (formData: FormData): Promise<void> => {
@@ -79,7 +110,36 @@ function BaseCommentForm({
 
         setFormState(submitAction);
 
-        const result = await onSubmit({ author, content });
+        if (!editorRef.current?.editor) {
+          throw new Error("Editor is not initialized");
+        }
+
+        const filesToUpload = editorRef.current?.getFilesForUpload() || [];
+
+        await uploadFiles(filesToUpload, {
+          onSuccess(uploadedFile) {
+            editorRef.current?.setFileAsUploaded(uploadedFile);
+          },
+          onError(fileId) {
+            editorRef.current?.setFileUploadAsFailed(fileId);
+          },
+        });
+
+        const references = extractReferences(
+          editorRef.current.editor.getJSON(),
+        );
+
+        // validate content
+        const content = z
+          .string()
+          .trim()
+          .parse(
+            editorRef.current.editor.getText({
+              blockSeparator: "\n",
+            }),
+          );
+
+        const result = await onSubmit({ author, content, references });
 
         return result;
       } catch (e) {
@@ -95,75 +155,144 @@ function BaseCommentForm({
       }
     },
     onSuccess() {
-      setContent("");
+      editorRef.current?.clear();
       submitMutation.reset();
       onSubmitSuccessRef.current?.();
     },
+    onError(error) {
+      if (error instanceof InvalidCommentError) {
+        editorRef.current?.focus();
+      }
+    },
   });
 
-  useEffect(() => {
-    if (submitMutation.error instanceof InvalidCommentError) {
-      textAreaRef.current?.focus();
-    }
-  }, [submitMutation.error]);
-
   const isSubmitting = submitMutation.isPending;
-  const trimmedContent = content.trim();
-  const isContentValid = trimmedContent.length > 0;
+
+  const handleFileSelect = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      let files = Array.from(event.target.files || []);
+
+      if (files.length === 0) {
+        return;
+      }
+
+      let removedDueToMimeType = 0;
+      let removedDueToSize = 0;
+
+      files = files.filter((file) => {
+        if (!ALLOWED_UPLOAD_MIME_TYPES.includes(file.type)) {
+          removedDueToMimeType++;
+
+          return false;
+        }
+
+        if (file.size > MAX_UPLOAD_FILE_SIZE) {
+          removedDueToSize++;
+
+          return false;
+        }
+
+        return true;
+      });
+
+      if (removedDueToMimeType > 0 || removedDueToSize) {
+        toast.error("Some files were removed", {
+          description: "Some files were removed due to file type or size",
+        });
+      }
+
+      if (files.length === 0) {
+        return;
+      }
+
+      editorRef.current?.addFiles(files);
+
+      // Reset the input so the same file can be selected again
+      event.target.value = "";
+    },
+    [],
+  );
+
+  const handleAddFileClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
   return (
     <form
-      action={(formData) => {
+      action={async (formData: FormData) => {
         try {
-          submitMutation.mutateAsync(formData);
-        } catch (e) {
-          // do not rethrow because we already handle the error in the mutation and also effect
-          // we don't need to also propagate the error to React
-          console.error(e);
+          await submitMutation.mutateAsync(formData);
+        } catch {
+          /* empty - handled by useMutation */
         }
       }}
       className="mb-4 flex flex-col gap-2"
     >
-      <Textarea
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept={ALLOWED_UPLOAD_MIME_TYPES.join(",")}
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+      <Editor
         autoFocus={autoFocus}
-        onBlur={() => {
+        className="w-full p-2 border border-gray-300 rounded"
+        disabled={isSubmitting || disabled}
+        placeholder={placeholder}
+        defaultValue={defaultContent}
+        ref={editorRef}
+        onEscapePress={() => {
           if (isSubmitting) {
             return;
           }
 
-          if (
-            !content ||
-            (defaultContent != null && content === defaultContent)
-          ) {
-            onCancel?.();
-          }
+          onCancel?.();
         }}
-        name="comment"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onKeyUp={(e) => {
-          if (!isSubmitting && e.key === "Escape") {
-            onCancel?.();
-          }
-        }}
-        placeholder={placeholder}
-        className="w-full p-2 border border-gray-300 rounded"
-        disabled={isSubmitting || disabled}
-        required
-        ref={textAreaRef}
       />
       <div className="flex gap-2 justify-between">
         {address && <CommentBoxAuthor address={address} />}
         <div className="flex gap-2 items-center ml-auto">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  aria-label="Add media"
+                  variant="outline"
+                  size="icon"
+                  type="button"
+                  onClick={handleAddFileClick}
+                  disabled={isSubmitting || disabled}
+                >
+                  <ImageIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Add media</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <Button
             name="action"
             value="post"
             type="submit"
             className="px-4 py-2 rounded"
-            disabled={isSubmitting || !isContentValid}
+            disabled={isSubmitting}
           >
             {formState === "post" ? submitPendingLabel : submitIdleLabel}
           </Button>
+          {onCancel && (
+            <Button
+              className="px-4 py-2 rounded"
+              disabled={isSubmitting}
+              onClick={onCancel}
+              type="button"
+              variant="outline"
+            >
+              {cancelLabel}
+            </Button>
+          )}
         </div>
       </div>
       {submitMutation.error && (
@@ -198,7 +327,7 @@ export function CommentForm<TExtraSubmitData = unknown>({
   const onSubmitStartRef = useFreshRef(onSubmitStart);
 
   const handleSubmit = useCallback<OnSubmitFunction>(
-    async ({ author, content }) => {
+    async ({ author, content, references }) => {
       let queryKey: QueryKey;
 
       if (parentId) {
@@ -214,11 +343,13 @@ export function CommentForm<TExtraSubmitData = unknown>({
               author,
               content,
               parentId,
+              references,
             }
           : {
               author,
               content,
               targetUri: window.location.href,
+              references,
             },
         queryKey,
         extra,
@@ -287,7 +418,10 @@ export function CommentEditForm<TExtraEditData = unknown>({
   return (
     <BaseCommentForm
       {...props}
-      defaultContent={comment.content}
+      defaultContent={{
+        content: comment.content,
+        references: comment.references,
+      }}
       onSubmit={handleSubmit}
       submitIdleLabel={submitIdleLabel}
       submitPendingLabel={submitPendingLabel}

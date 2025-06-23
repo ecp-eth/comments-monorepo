@@ -164,6 +164,7 @@ export function useCommentActions({
       const pendingOperation = await submitCommentMutationFunction({
         address: params.address,
         zeroExSwap,
+        references: comment.references,
         commentRequest: {
           content: comment.content,
           metadata: [

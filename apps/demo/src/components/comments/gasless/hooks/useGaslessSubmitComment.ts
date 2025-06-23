@@ -8,7 +8,10 @@ import {
   type PrepareSignedGaslessEditCommentNotApprovedResponseSchemaType,
 } from "@/lib/schemas";
 import { useGaslessTransaction } from "@ecp.eth/sdk/comments/react";
-import type { IndexerAPIAuthorDataSchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import type {
+  IndexerAPIAuthorDataSchemaType,
+  IndexerAPICommentReferencesSchemaType,
+} from "@ecp.eth/sdk/indexer/schemas";
 import { useConnectAccount } from "@ecp.eth/shared/hooks";
 import type {
   PendingEditCommentOperationSchemaType,
@@ -32,12 +35,14 @@ type SubmitGaslessCommentVariables =
       content: string;
       targetUri: string;
       metadata: MetadataEntry[];
+      references: IndexerAPICommentReferencesSchemaType;
     }
   | {
       isApproved: boolean;
       content: string;
       parentId: Hex;
       metadata: MetadataEntry[];
+      references: IndexerAPICommentReferencesSchemaType;
     };
 
 type SubmitGaslessCommentVariablesInternal =
@@ -174,6 +179,7 @@ export function useGaslessSubmitComment(
           action: "post",
           chainId: result.chainId,
           state: { status: "pending" },
+          references: variables.references,
         };
       }
 
@@ -194,6 +200,7 @@ export function useGaslessSubmitComment(
         action: "post",
         chainId: result.chainId,
         state: { status: "pending" },
+        references: variables.references,
       };
     },
   });

@@ -158,6 +158,11 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
           onRetryDeleteClick={onDeleteClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
+          optimisticReferences={
+            comment.pendingOperation?.action === "post"
+              ? comment.pendingOperation.references
+              : undefined
+          }
         />
       )}
       {isReplying && (
@@ -184,6 +189,8 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
           key={`${reply.id}-${reply.deletedAt}`}
           comment={reply}
           queryKey={queryKey}
+          // make sure to update replies on top level comment because we are using flat replies mode
+          parentCommentId={comment.id}
         />
       ))}
       {repliesQuery.hasNextPage && (

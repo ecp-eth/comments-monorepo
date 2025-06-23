@@ -8,7 +8,9 @@ import {
   encryptWebhookCallbackData,
 } from "../utils/webhook";
 import type { CommentSelectType } from "ponder:schema";
-import { ensDataResolver } from "../lib/ens-data-resolver";
+import { ensByAddressResolver } from "../resolvers/ens-by-address-resolver";
+import type { Hex } from "@ecp.eth/sdk/core";
+import { farcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
 
 type ModerationNotificationsServiceOptions = {
   telegramBotToken: string;
@@ -16,6 +18,18 @@ type ModerationNotificationsServiceOptions = {
   telegramWebhookUrl: string;
   telegramWebhookSecret: string;
 };
+
+function resolveAuthor(author: Hex): Promise<string | Hex> {
+  return ensByAddressResolver.load(author).then((data) => {
+    if (data) {
+      return data.name;
+    }
+
+    return farcasterByAddressResolver
+      .load(author)
+      .then((data) => data?.fname ?? author);
+  });
+}
 
 export class ModerationNotificationsService
   implements ModerationNotificationsServiceInterface
@@ -45,11 +59,11 @@ export class ModerationNotificationsService
   async notifyPendingModeration(
     comment: ModerationNotificationServicePendingComment,
   ) {
-    const author = await ensDataResolver.load(comment.author);
+    const author = await resolveAuthor(comment.author);
     const message = `🆕 New comment pending moderation
 
 ID: \`${comment.id}\`
-Author: \`${author.ens ? author.ens.name : author.address}\`
+Author: \`${author}\`
 Target: \`${comment.targetUri}\`
 
 Content:
@@ -101,9 +115,15 @@ ${comment.content}
 
   async updateMessageWithModerationStatus(
     messageId: number,
-    { author, id, content, moderationStatus, targetUri }: CommentSelectType,
+    {
+      author: authorAddress,
+      id,
+      content,
+      moderationStatus,
+      targetUri,
+    }: CommentSelectType,
   ) {
-    const authorData = await ensDataResolver.load(author);
+    const author = await resolveAuthor(authorAddress);
 
     const statusEmoji = moderationStatus === "approved" ? "✅" : "❌";
     const statusText =
@@ -112,7 +132,7 @@ ${comment.content}
     const updatedMessage = `${statusEmoji} Comment ${statusText}
 
 ID: \`${id}\`
-Author: \`${authorData.ens ? authorData.ens.name : authorData.address}\`
+Author: \`${author}\`
 Target: \`${targetUri}\`
 
 Content:
