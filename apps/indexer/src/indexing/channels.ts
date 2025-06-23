@@ -13,6 +13,7 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
       await context.db.insert(schema.channel).values({
         createdAt,
         updatedAt,
+        owner: event.args.owner,
         id: event.args.channelId,
         name: event.args.name,
         description: event.args.description,
@@ -90,4 +91,14 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
         });
     },
   );
+
+  ponder.on("CommentsV1ChannelManager:Transfer", async ({ event, context }) => {
+    await context.db
+      .update(schema.channel, {
+        id: event.args.tokenId,
+      })
+      .set({
+        owner: event.args.to,
+      });
+  });
 }

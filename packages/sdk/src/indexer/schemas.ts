@@ -44,6 +44,7 @@ export const IndexerAPIChannelSchema = z.object({
   id: z.coerce.bigint(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  owner: HexSchema,
   name: z.string(),
   description: z.string(),
   metadata: IndexerAPIMetadataSchema,

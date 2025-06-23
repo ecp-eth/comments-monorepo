@@ -17,11 +17,12 @@ function fetchChannel(options): Promise<{
      value: `0x${string}`;
   }[];
   name: string;
+  owner: `0x${string}`;
   updatedAt: string;
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:651](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L651)
+Defined in: [packages/sdk/src/indexer/api.ts:660](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L660)
 
 Fetch a single channel by ID from the Indexer API
 
@@ -43,6 +44,7 @@ Fetch a single channel by ID from the Indexer API
      `value`: `` `0x${string}` ``;
   \}[];
   `name`: `string`;
+  `owner`: `` `0x${string}` ``;
   `updatedAt`: `string`;
 \}\>
 

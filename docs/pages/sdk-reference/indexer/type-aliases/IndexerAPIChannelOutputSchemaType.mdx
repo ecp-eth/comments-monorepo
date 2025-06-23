@@ -17,11 +17,12 @@ type IndexerAPIChannelOutputSchemaType = {
      value: `0x${string}`;
   }[];
   name: string;
+  owner: `0x${string}`;
   updatedAt: string;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L63)
+Defined in: [packages/sdk/src/indexer/schemas.ts:64](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L64)
 
 ## Type declaration
 
@@ -62,6 +63,12 @@ metadata: {
 
 ```ts
 name: string;
+```
+
+### owner
+
+```ts
+owner: `0x${string}` = HexSchema;
 ```
 
 ### updatedAt

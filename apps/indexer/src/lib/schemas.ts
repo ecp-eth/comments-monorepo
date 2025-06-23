@@ -4,14 +4,19 @@ import {
   IndexerAPIPaginationSchema,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { z } from "@hono/zod-openapi";
-import { normalizeUrl } from "./utils";
 import { hexToString } from "viem";
+import { normalizeUrl } from "./utils";
+
+export const OpenAPIHexSchema = HexSchema.openapi({
+  type: "string",
+  pattern: "^0x[a-fA-F0-9]+$",
+});
 
 /**
  * Path params schema for resolving an author ENS / Farcaster data.
  */
 export const GetAuthorParamsSchema = z.object({
-  authorAddress: HexSchema.openapi({
+  authorAddress: OpenAPIHexSchema.openapi({
     description: "The author's address",
   }),
 });
@@ -20,7 +25,7 @@ export const GetAuthorParamsSchema = z.object({
  * Path params schema for unmuting an account.
  */
 export const DeleteMutedAccountParamSchema = z.object({
-  address: HexSchema.openapi({
+  address: OpenAPIHexSchema.openapi({
     description: "The address of the muted account",
   }),
 });
@@ -29,7 +34,7 @@ export const DeleteMutedAccountParamSchema = z.object({
  * Path params schema for checking if an address is marked as muted.
  */
 export const GetMutedAccountParamSchema = z.object({
-  address: HexSchema.openapi({
+  address: OpenAPIHexSchema.openapi({
     description: "The address of the muted account",
   }),
 });
@@ -38,7 +43,7 @@ export const GetMutedAccountParamSchema = z.object({
  * Response schema for checking if an address is marked as muted.
  */
 export const GetMutedAccountResponseSchema = z.object({
-  address: HexSchema.openapi({
+  address: OpenAPIHexSchema.openapi({
     description: "The address of the muted account",
   }),
   createdAt: z.coerce.date().openapi({
@@ -50,7 +55,7 @@ export const GetMutedAccountResponseSchema = z.object({
  * Request body schema for marking an account as muted.
  */
 export const PostMutedAccountBodySchema = z.object({
-  address: HexSchema.openapi({
+  address: OpenAPIHexSchema.openapi({
     description: "The address of the muted account",
   }),
   reason: z.string().optional().openapi({
@@ -62,7 +67,7 @@ export const PostMutedAccountBodySchema = z.object({
  * Response schema for marking an account as muted.
  */
 export const PostMutedAccountResponseSchema = z.object({
-  address: HexSchema.openapi({
+  address: OpenAPIHexSchema.openapi({
     description: "The address of the muted account",
   }),
 });
@@ -71,7 +76,7 @@ export const PostMutedAccountResponseSchema = z.object({
  * Path params schema for deleting a comment.
  */
 export const DeleteCommentParamSchema = z.object({
-  commentId: HexSchema.openapi({
+  commentId: OpenAPIHexSchema.openapi({
     description: "The ID of the comment to delete",
   }),
 });
@@ -122,16 +127,18 @@ export const InputCommentCursorSchema = z.preprocess((value, ctx) => {
  * Query string schema for getting a list of comments.
  */
 export const GetCommentsQuerySchema = z.object({
-  author: HexSchema.optional(),
-  viewer: HexSchema.optional().openapi({
+  author: OpenAPIHexSchema.optional(),
+  viewer: OpenAPIHexSchema.optional().openapi({
     description: "The viewer's address",
   }),
-  app: HexSchema.optional().openapi({
+  app: OpenAPIHexSchema.optional().openapi({
     description: "The address of the app signer",
   }),
   cursor: InputCommentCursorSchema.optional().openapi({
     description:
       "Non inclusive cursor from which to fetch the comments based on sort",
+    type: "string",
+    pattern: "^0x[a-fA-F0-9]+$",
   }),
   channelId: z.coerce.bigint().optional().openapi({
     description: "The channel ID",
@@ -198,10 +205,10 @@ export const GetCommentRepliesParamSchema = z.object({
  * Query string schema for getting a list of approvals.
  */
 export const GetApprovalsQuerySchema = z.object({
-  author: HexSchema.openapi({
+  author: OpenAPIHexSchema.openapi({
     description: "The author's address",
   }),
-  app: HexSchema.openapi({
+  app: OpenAPIHexSchema.openapi({
     description: "The address of the app signer",
   }),
   limit: z.coerce.number().int().positive().max(100).default(50).openapi({
@@ -217,10 +224,10 @@ export const GetApprovalsQuerySchema = z.object({
  */
 export const GetApprovalSchema = z.object({
   id: z.string(),
-  app: HexSchema,
+  app: OpenAPIHexSchema,
   deletedAt: z.coerce.date().nullable(),
   chainId: z.number().int(),
-  txHash: HexSchema,
+  txHash: OpenAPIHexSchema,
 });
 
 /**
@@ -238,6 +245,8 @@ export const GetCommentsPendingModerationQuerySchema = z.object({
   cursor: InputCommentCursorSchema.optional().openapi({
     description:
       "Non inclusive cursor from which to fetch the comments based on sort",
+    type: "string",
+    pattern: "^0x[a-fA-F0-9]+$",
   }),
   limit: z.coerce.number().int().min(1).max(100).default(50).openapi({
     description: "The number of comments to return",
@@ -287,6 +296,11 @@ export const GetChannelsQuerySchema = z.object({
   cursor: InputChannelCursorSchema.optional().openapi({
     description:
       "Non inclusive cursor from which to fetch the channels based on sort",
+    type: "string",
+    pattern: "^0x[a-fA-F0-9]+$",
+  }),
+  owner: OpenAPIHexSchema.optional().openapi({
+    description: "Filter channels by owner",
   }),
   limit: z.coerce.number().int().min(1).max(100).default(50).openapi({
     description: "The number of channels to return",
@@ -306,7 +320,7 @@ export const GetChannelParamsSchema = z.object({
  * Path params schema for moderating a comment.
  */
 export const ChangeModerationStatusOnCommentParamsSchema = z.object({
-  commentId: HexSchema.openapi({
+  commentId: OpenAPIHexSchema.openapi({
     description: "The ID of the comment to moderate",
   }),
 });

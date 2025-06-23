@@ -34,12 +34,13 @@ const getChannelsRoute = createRoute({
  */
 export function setupGetChannels(app: OpenAPIHono) {
   app.openapi(getChannelsRoute, async (c) => {
-    const { sort, limit, cursor } = c.req.valid("query");
+    const { sort, limit, cursor, owner } = c.req.valid("query");
 
     const hasPreviousChannelsQuery = cursor
       ? db.query.channel
           .findFirst({
             where: and(
+              ...(owner ? [eq(schema.channel.owner, owner)] : []),
               // use opposite order for asc and desc
               ...(sort === "asc"
                 ? [
@@ -74,6 +75,7 @@ export function setupGetChannels(app: OpenAPIHono) {
 
     const channelsQuery = db.query.channel.findMany({
       where: and(
+        ...(owner ? [eq(schema.channel.owner, owner)] : []),
         ...(sort === "desc" && !!cursor
           ? [
               or(
@@ -108,8 +110,6 @@ export function setupGetChannels(app: OpenAPIHono) {
       channelsQuery,
       hasPreviousChannelsQuery,
     ]);
-
-    console.log({ previousChannel });
 
     const nextChannel = channels[channels.length - 1];
     const results = channels.slice(0, limit);
