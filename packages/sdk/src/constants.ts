@@ -1,5 +1,5 @@
 import { toHex } from "viem/utils";
-import { baseSepolia, anvil, type Chain } from "viem/chains";
+import { baseSepolia, anvil, base, type Chain } from "viem/chains";
 import type { Hex } from "./core/schemas.js";
 
 const localCommentAddressManager = "0xc9deBB99EA31E376eB78303662B4Ba56b8E808d7";
@@ -34,6 +34,11 @@ export type SupportedChainConfig = {
  * The supported chains and their corresponding contract addresses.
  */
 export const SUPPORTED_CHAINS = {
+  [base.id]: {
+    chain: base,
+    commentManagerAddress: COMMENT_MANAGER_ADDRESS,
+    channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+  } as SupportedChainConfig,
   [baseSepolia.id]: {
     chain: baseSepolia,
     commentManagerAddress: COMMENT_MANAGER_ADDRESS,
