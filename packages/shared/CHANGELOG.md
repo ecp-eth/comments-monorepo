@@ -1,5 +1,13 @@
 # @ecp.eth/shared
 
+## 0.0.9
+
+### Patch Changes
+
+- 46c875f: new contracts
+- Updated dependencies [46c875f]
+  - @ecp.eth/sdk@0.0.19
+
 ## 0.0.8
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @ecp.eth/protocol
 
+## 1.1.1
+
+### Patch Changes
+
+- 46c875f: new contracts
+
 ## 1.1.0
 
 ### Minor Changes

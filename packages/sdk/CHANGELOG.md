@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.19
+
+### Patch Changes
+
+- 46c875f: new contracts
+
 ## 0.0.18
 
 ### Patch Changes
