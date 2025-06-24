@@ -136,6 +136,7 @@ const ChainIdSchema = z
     return undefined;
   }, z.array(z.coerce.number().int().positive()))
   .openapi({
+    type: "string",
     description:
       "Filters by chain ID. Can be a single chain id or comma-separated list of chain ids (e.g. 1,137,10)",
   });
