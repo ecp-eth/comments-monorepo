@@ -28,7 +28,7 @@ const entry = files
   .filter(Boolean);
 
 export default defineConfig({
-  entry: entry,
+  entry,
   splitting: false,
   dts: true,
   clean: true,

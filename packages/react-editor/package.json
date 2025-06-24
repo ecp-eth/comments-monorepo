@@ -75,6 +75,7 @@
     "viem": "^2.29.2"
   },
   "devDependencies": {
+    "@ecp.eth/build-tools": "workspace:^",
     "@ecp.eth/eslint-config": "workspace:*",
     "@ecp.eth/typescript-config": "workspace:*",
     "@ecp.eth/sdk": "workspace:*",
@@ -92,7 +93,6 @@
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
     "build": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
-    "build:dev": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
     "lint": "eslint \"./src/**/*.ts\"",
     "test": "vitest run",
     "test:watch": "vitest"
