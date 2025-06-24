@@ -60,10 +60,7 @@ For more details on different posting flows, see [Post Comment Flows](/post-comm
 Here's how to create and post a comment using the SDK:
 
 ```ts
-import {
-  createCommentData,
-  createCommentTypedData,
-} from "@ecp.eth/sdk/comments";
+import { createCommentData } from "@ecp.eth/sdk/comments";
 import { usePostComment } from "@ecp.eth/sdk/comments/react";
 import { waitForTransactionReceipt } from "wagmi";
 import { parseEther } from "viem";
