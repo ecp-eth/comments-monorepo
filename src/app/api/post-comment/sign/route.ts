@@ -48,7 +48,8 @@ export async function POST(
     }
 
     const passedCommentData = parsedBodyResult.data;
-    const { content, author, metadata, chainConfig } = passedCommentData;
+    const { content, author, metadata, chainConfig, commentType } =
+      passedCommentData;
 
     // Check if author is muted (if indexer URL is configured)
     if (env.COMMENTS_INDEXER_URL) {
@@ -79,6 +80,7 @@ export async function POST(
         : {
             targetUri: passedCommentData.targetUri,
           }),
+      commentType,
     });
 
     const typedCommentData = createCommentTypedData({
