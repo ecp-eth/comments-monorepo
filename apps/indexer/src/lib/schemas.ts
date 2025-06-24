@@ -6,6 +6,7 @@ import {
 import { z } from "@hono/zod-openapi";
 import { hexToString } from "viem";
 import { normalizeUrl } from "./utils";
+import { SUPPORTED_CHAIN_IDS } from "../env";
 
 export const OpenAPIHexSchema = HexSchema.openapi({
   type: "string",
@@ -124,21 +125,26 @@ export const InputCommentCursorSchema = z.preprocess((value, ctx) => {
 }, CommentCursorSchema);
 
 const ChainIdSchema = z
-  .preprocess((val) => {
-    if (typeof val === "string") {
-      return val.split(",");
-    }
+  .preprocess(
+    (val) => {
+      if (typeof val === "string") {
+        return val.split(",");
+      }
 
-    if (typeof val === "number") {
-      return [val];
-    }
+      if (typeof val === "number") {
+        return [val];
+      }
 
-    return undefined;
-  }, z.array(z.coerce.number().int().positive()))
+      return undefined;
+    },
+    z.array(z.coerce.number().int().positive(), {
+      message: `Invalid chain ID. Supported chains are: ${SUPPORTED_CHAIN_IDS.join(", ")}`,
+    }),
+  )
   .openapi({
     type: "string",
     description:
-      "Filters by chain ID. Can be a single chain id or comma-separated list of chain ids (e.g. 1,137,10)",
+      "Filters by chain ID. Can be a single chain id or comma-separated list of chain ids (e.g. 1,137,10).",
   });
 
 /**
