@@ -50,8 +50,14 @@ export async function POST(
     }
 
     const passedCommentData = parsedBodyResult.data;
-    const { content, author, metadata, chainConfig, submitIfApproved } =
-      passedCommentData;
+    const {
+      content,
+      author,
+      metadata,
+      chainConfig,
+      submitIfApproved,
+      commentType,
+    } = passedCommentData;
 
     if (env.COMMENTS_INDEXER_URL) {
       if (
@@ -80,6 +86,7 @@ export async function POST(
             targetUri: passedCommentData.targetUri,
           }),
       metadata,
+      commentType,
     });
 
     const typedCommentData = createCommentTypedData({

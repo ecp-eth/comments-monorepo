@@ -16,6 +16,10 @@ import type {
   JsonObject,
 } from "./types.js";
 
+export const CommentTypeSchema = z.number().int().min(0).max(255);
+
+export type CommentTypeSchemaType = z.infer<typeof CommentTypeSchema>;
+
 export const JsonLiteralSchema = z.union([
   z.string(),
   z.number(),
@@ -56,7 +60,7 @@ export const CommentDataSchema = z.object({
 
   content: z.string(),
   targetUri: z.string(),
-  commentType: z.number(),
+  commentType: CommentTypeSchema,
   authMethod: z.nativeEnum(AuthorAuthMethod),
   metadata: MetadataArraySchema.default([]),
 
@@ -89,7 +93,7 @@ const BaseCommentInputDataSchema = z.object({
   content: z.string(),
   metadata: MetadataArraySchema.default([]),
   targetUri: z.string(),
-  commentType: z.number().int().min(0).max(255).default(DEFAULT_COMMENT_TYPE),
+  commentType: CommentTypeSchema.default(DEFAULT_COMMENT_TYPE),
 });
 
 export const RootCommentInputDataSchema = BaseCommentInputDataSchema.omit({
