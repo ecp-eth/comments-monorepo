@@ -1,11 +1,11 @@
 import { PinataSDK, type UploadResponse } from "pinata";
 import { publicEnv } from "@/publicEnv";
 import { useMemo } from "react";
+import { GenerateUploadUrlResponseSchema } from "@/lib/schemas";
 import type {
   UploadTrackerFileToUpload,
   UploadTrackerUploadedFile,
-} from "../extensions/UploadTracker";
-import { GenerateUploadUrlResponseSchema } from "@/lib/schemas";
+} from "@ecp.eth/react-editor/types";
 
 type UploadCallbacks = {
   onError?: (uploadedFileId: string, error: Error) => void;

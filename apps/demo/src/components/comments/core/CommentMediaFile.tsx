@@ -1,3 +1,7 @@
+import type {
+  UploadTrackerFileComponent,
+  UploadTrackerFileComponentProps,
+} from "@ecp.eth/react-editor/types";
 import { FileIcon } from "lucide-react";
 
 export function CommentMediaFile({
@@ -24,3 +28,14 @@ export function CommentMediaFile({
 
   return content;
 }
+
+export const CommentEditorMediaFile: UploadTrackerFileComponent = ({
+  file,
+}: UploadTrackerFileComponentProps) => {
+  return (
+    <CommentMediaFile
+      url={"url" in file ? file.url : undefined}
+      name={file.name}
+    />
+  );
+};

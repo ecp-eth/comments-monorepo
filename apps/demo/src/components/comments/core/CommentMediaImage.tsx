@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MediaDimensions } from "./types";
 import { getMediaOrientation } from "./utils";
+import type {
+  UploadTrackerImageComponent,
+  UploadTrackerImageComponentProps,
+} from "@ecp.eth/react-editor/types";
 
 export function CommentMediaImage({
   fileOrUrl,
@@ -70,3 +74,14 @@ export function CommentMediaImage({
     </div>
   );
 }
+
+export const CommentEditorMediaImage: UploadTrackerImageComponent = ({
+  file,
+}: UploadTrackerImageComponentProps) => {
+  return (
+    <CommentMediaImage
+      fileOrUrl={"url" in file ? file.url : file.file}
+      alt={file.name}
+    />
+  );
+};

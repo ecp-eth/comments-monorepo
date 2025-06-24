@@ -18,8 +18,7 @@ import {
   createRootCommentsQueryKey,
 } from "./queries";
 import type { Comment } from "@ecp.eth/shared/schemas";
-import { Editor, EditorRef } from "./CommentTextEditor/Editor";
-import { useUploadFiles } from "./CommentTextEditor/hooks/useUploadFiles";
+import { Editor, EditorRef } from "@ecp.eth/react-editor/editor";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import {
   Tooltip,
@@ -31,7 +30,13 @@ import {
   ALLOWED_UPLOAD_MIME_TYPES,
   MAX_UPLOAD_FILE_SIZE,
 } from "@/lib/constants";
-import { extractReferences } from "./CommentTextEditor/extract-references";
+import { extractReferences } from "@ecp.eth/react-editor/extract-references";
+import { useMentionSuggestions } from "./hooks/useMentionSuggestions";
+import type { SearchSuggestionsFunction } from "@ecp.eth/react-editor/types";
+import { CommentEditorMediaVideo } from "./CommentMediaVideo";
+import { CommentEditorMediaImage } from "./CommentMediaImage";
+import { CommentEditorMediaFile } from "./CommentMediaFile";
+import { useUploadFiles } from "./hooks/useUploadFiles";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -101,6 +106,16 @@ function BaseCommentForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const { uploadFiles } = useUploadFiles();
+  const searchAddressSuggestions = useMentionSuggestions("@");
+
+  // Create searchSuggestions function that matches the expected interface
+  const searchSuggestions: SearchSuggestionsFunction = useCallback(
+    async (query: string) => {
+      const response = await searchAddressSuggestions(query);
+      return response.suggestions;
+    },
+    [searchAddressSuggestions],
+  );
 
   const submitMutation = useMutation({
     mutationFn: async (formData: FormData): Promise<void> => {
@@ -243,6 +258,7 @@ function BaseCommentForm({
         placeholder={placeholder}
         defaultValue={defaultContent}
         ref={editorRef}
+        searchSuggestions={searchSuggestions}
         onEscapePress={() => {
           if (isSubmitting) {
             return;
@@ -250,6 +266,9 @@ function BaseCommentForm({
 
           onCancel?.();
         }}
+        videoComponent={CommentEditorMediaVideo}
+        imageComponent={CommentEditorMediaImage}
+        fileComponent={CommentEditorMediaFile}
       />
       <div className="flex gap-2 justify-between">
         {address && <CommentBoxAuthor address={address} />}
