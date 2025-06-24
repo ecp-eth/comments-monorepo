@@ -2,7 +2,12 @@
 
 ## Typescript SDK
 
-You can use our TypeScript SDK `@ecp.eth/sdk` to access data on chain, comments from the indexer or interact with the contract.
+The `@ecp.eth/sdk` provides a comprehensive set of tools for interacting with the ECP protocol, including:
+
+- Creating and managing comments
+- Interacting with the smart contract
+- Fetching comments and replies from the indexer
+- Handling comment data and signatures
 
 ### Installation
 
@@ -28,46 +33,140 @@ pnpm add viem wagmi @tanstack/react-query @tanstack/query-core
 
 :::
 
+### Core Concepts
+
+#### Comment Data
+
+The SDK provides utilities for creating and managing comment data. Each comment requires:
+
+- Content
+- Author address
+- App address
+- Either parent ID for replies or target URI for top-level comments
+
+#### Contract Interaction
+
+The SDK supports multiple comment posting flows, with the simplest being the "author pays gas" flow where:
+
+1. The author posts and pays for gas
+2. The app server authorizes the post by signing the comment data
+
+For more details on different posting flows, see [Post Comment Flows](/post-comment-flows).
+
 ### Examples
 
-#### Fetch comments
+#### Creating and Posting Comments
 
-```ts twoslash
-/// <reference types="@ecp.eth/sdk" />
-// ---cut---
-import { fetchComments } from "@ecp.eth/sdk/indexer";
+Here's how to create and post a comment using the SDK:
 
-console.log("fetching comments...");
+```ts
+import { createCommentData } from "@ecp.eth/sdk/comments";
+import { usePostComment } from "@ecp.eth/sdk/comments/react";
+import { waitForTransactionReceipt } from "wagmi";
+import { parseEther } from "viem";
 
-const comments = await fetchComments({
-  // the url of indexer api
-  apiUrl: "https://api.ethcomments.xyz",
-  // the uri of commenting target - replace with your own url to limit comments to a specific page
-  targetUri: "https://demo.ethcomments.xyz",
+const comment = {
+  content: "Hello, world!",
+  author: "0x...", // author's address
+  targetUri: "https://example.com",
+};
+
+// 1. Obtain the app signature from your backend
+// You can use the Signer API Service to generate the signature
+// @see https://github.com/ecp-eth/comments-monorepo/blob/main/apps/signer/README.md
+//
+// Or see the next section for server-side signing
+const { signature: appSignature, commentData } = await fetch("/api/sign", {
+  method: "POST",
+  body: JSON.stringify({
+    comment,
+  }),
+}).then((res) => res.json());
+
+// 2. Post the comment (using wagmi)
+// You can use the `usePostComment` hook to post the comment
+const { mutateAsync: postCommentAsync } = usePostComment();
+
+const { txHash } = await postCommentAsync({
+  variables: {
+    comment: commentData,
+    appSignature,
+    fee: parseEther("0.001"), // optional, fee to pay for the comment
+  },
 });
 
-console.log(
-  "here is a list of comments for https://demo.ethcomments.xyz",
-  comments,
-);
+await waitForTransactionReceipt({
+  hash: txHash,
+});
 ```
 
-The response is a list of comments and pagination information, see [`IndexerAPIListCommentsSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPIListCommentsSchemaType).
+#### Server-Side Signing
 
-##### API reference
+For security, the app signature should be generated on the server:
 
-- [`fetchComments`](/sdk-reference/indexer/functions/fetchComments)
-- [`FetchCommentsOptions`](/sdk-reference/indexer/type-aliases/FetchCommentsOptions)
-- [`IndexerAPIListCommentsSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPIListCommentsSchemaType)
+```ts
+import {
+  createCommentData,
+  createCommentTypedData,
+} from "@ecp.eth/sdk/comments";
+import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
+import { privateKeyToAccount } from "viem/accounts";
+import { baseSepolia } from "viem/chains";
+import { hashTypedData } from "viem";
 
-#### Fetch replies
+const chainConfig = SUPPORTED_CHAINS[baseSepolia.id];
 
-```ts twoslash
-/// <reference types="@ecp.eth/sdk" />
-// ---cut---
+const app = privateKeyToAccount(process.env.APP_SIGNER_PRIVATE_KEY);
+
+const content = ""; // content obtained from the client
+const author = ""; // author's address obtained from the client
+const targetUri = ""; // target URI obtained from the client
+
+// 1. Create comment data
+const commentData = createCommentData({
+  content,
+  targetUri,
+  author,
+  app: app.address,
+});
+
+// 2. Create typed data for signing (EIP-712)
+const typedCommentData = createCommentTypedData({
+  commentData,
+  chainId: chainConfig.chain.id,
+});
+
+// Sign using app's private key
+const signature = await app.signTypedData(typedCommentData);
+const hash = hashTypedData(typedCommentData);
+
+return {
+  hash,
+  signature,
+  commentData,
+};
+```
+
+#### Fetching Comments
+
+```ts
+import { fetchComments } from "@ecp.eth/sdk/indexer";
+
+const comments = await fetchComments({
+  apiUrl: "https://api.ethcomments.xyz",
+  targetUri: "https://example.com",
+});
+
+console.log("Comments:", comments);
+```
+
+The response includes a list of comments and pagination information, see [`IndexerAPIListCommentsSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPIListCommentsSchemaType).
+
+#### Fetching Replies
+
+```ts
 import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 
-// fetch replies for a comment based on its id
 const replies = await fetchCommentReplies({
   apiUrl: "https://api.ethcomments.xyz",
   commentId:
@@ -75,20 +174,49 @@ const replies = await fetchCommentReplies({
 });
 ```
 
-##### API reference
+### Best Practices
 
-- [`fetchCommentReplies`](/sdk-reference/indexer/functions/fetchCommentReplies)
-- [`FetchCommentRepliesOptions`](/sdk-reference/indexer/type-aliases/FetchCommentRepliesOptions)
+1. **Security**
 
-#### Create a comment
+   - Never expose app signer's private key on the client side
+   - Store private keys in environment variables (without `NEXT_PUBLIC_` prefix for Next.js)
+   - Implement proper error handling
 
-[`CommentForm reference code`](https://github.com/ecp-eth/comments-monorepo/blob/feat/docs-fixes/apps/demo/src/components/comments/core/CommentForm.tsx#L183)
+2. **Performance**
 
-##### API reference
+   - Monitor gas costs and adjust gas limits accordingly
+   - Implement retry mechanisms for failed transactions
+   - Consider implementing application-level rate limiting
+
+3. **User Experience**
+   - Consider implementing anti-spam measures
+   - Provide clear feedback for transaction status
+   - Handle network errors gracefully
+
+### API Reference
+
+#### Core Functions
+
+- [`createCommentData`](/sdk-reference/comments/functions/createCommentData)
+- [`createCommentTypedData`](/sdk-reference/comments/functions/createCommentTypedData)
 - [`postComment`](/sdk-reference/comments/variables/postComment)
 - [`postCommentWithSig`](/sdk-reference/comments/variables/postCommentWithSig)
+
+#### Indexer Functions
+
+- [`fetchComments`](/sdk-reference/indexer/functions/fetchComments)
+- [`fetchCommentReplies`](/sdk-reference/indexer/functions/fetchCommentReplies)
+
+#### Types
+
 - [`PostCommentParams`](/sdk-reference/comments/type-aliases/PostCommentParams)
+- [`FetchCommentsOptions`](/sdk-reference/indexer/type-aliases/FetchCommentsOptions)
+- [`FetchCommentRepliesOptions`](/sdk-reference/indexer/type-aliases/FetchCommentRepliesOptions)
+- [`IndexerAPIListCommentsSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPIListCommentsSchemaType)
 
-### SDK Reference
+### Additional Resources
 
-For more details about the SDK functionality, check out our [SDK Reference](/sdk-reference).
+- [Protocol API Reference](/protocol-reference/CommentManager) for contract functions
+- [Demo App Source Code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo) for complete implementation examples
+- [Post Comment Flows](/post-comment-flows) for different posting strategies
+- [Test with Anvil](/test-with-anvil) for local development setup
