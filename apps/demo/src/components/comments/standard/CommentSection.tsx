@@ -21,6 +21,7 @@ import { CommentItem } from "../core/CommentItem";
 import { useCommentActions } from "./hooks/useCommentActions";
 import { createRootCommentsQueryKey } from "../core/queries";
 import { CommentActionsProvider } from "./context";
+import { chain } from "@/lib/wagmi";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
@@ -45,6 +46,7 @@ export function CommentSection() {
       },
       queryFn: ({ pageParam, signal }) => {
         return fetchComments({
+          chainId: chain.id,
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
           targetUri: currentUrl,
@@ -75,6 +77,7 @@ export function CommentSection() {
     queryKey,
     fetchComments({ cursor, signal }) {
       return fetchComments({
+        chainId: chain.id,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         targetUri: currentUrl,

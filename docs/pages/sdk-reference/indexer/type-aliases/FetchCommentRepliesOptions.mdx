@@ -10,6 +10,7 @@
 type FetchCommentRepliesOptions = {
   apiUrl?: string;
   app?: Hex;
+  chainId: number | number[];
   channelId?: bigint;
   commentId: Hex;
   commentType?: number;
@@ -25,7 +26,7 @@ type FetchCommentRepliesOptions = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:217](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L217)
+Defined in: [packages/sdk/src/indexer/api.ts:229](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L229)
 
 The options for `fetchCommentReplies()`
 
@@ -37,7 +38,7 @@ The options for `fetchCommentReplies()`
 optional apiUrl: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:231](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L231)
+Defined in: [packages/sdk/src/indexer/api.ts:247](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L247)
 
 URL on which /api/comments/$commentId/replies endpoint will be called
 
@@ -55,9 +56,21 @@ URL on which /api/comments/$commentId/replies endpoint will be called
 optional app: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:235](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L235)
+Defined in: [packages/sdk/src/indexer/api.ts:251](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L251)
 
 Filters to only comments sent using this app signer key.
+
+***
+
+### chainId
+
+```ts
+chainId: number | number[];
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:237](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L237)
+
+Filter replies by chain ID(s)
 
 ***
 
@@ -67,7 +80,7 @@ Filters to only comments sent using this app signer key.
 optional channelId: bigint;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:275](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L275)
+Defined in: [packages/sdk/src/indexer/api.ts:291](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L291)
 
 Filter replies by channel ID
 
@@ -79,7 +92,7 @@ Filter replies by channel ID
 commentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:221](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L221)
+Defined in: [packages/sdk/src/indexer/api.ts:233](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L233)
 
 The ID of the comment to fetch replies for
 
@@ -91,7 +104,7 @@ The ID of the comment to fetch replies for
 optional commentType: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:260](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L260)
+Defined in: [packages/sdk/src/indexer/api.ts:276](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L276)
 
 Filter replies by comment type
 
@@ -103,7 +116,7 @@ Filter replies by comment type
 optional cursor: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:245](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L245)
+Defined in: [packages/sdk/src/indexer/api.ts:261](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L261)
 
 The cursor to fetch comments from
 
@@ -115,7 +128,7 @@ The cursor to fetch comments from
 optional limit: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:279](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L279)
+Defined in: [packages/sdk/src/indexer/api.ts:295](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L295)
 
 #### Default
 
@@ -131,7 +144,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:279](https://github.com/ecp-eth/com
 optional mode: IndexerAPICommentListModeSchemaType;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:256](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L256)
+Defined in: [packages/sdk/src/indexer/api.ts:272](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L272)
 
 The mode to fetch replies in by default it returns only the first level of replies.
 If flat is used it will return all replies sorted by timestamp in descending order.
@@ -152,7 +165,7 @@ optional moderationStatus:
   | IndexerAPICommentModerationStatusSchemaType[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:269](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L269)
+Defined in: [packages/sdk/src/indexer/api.ts:285](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L285)
 
 Filter replies by moderation status.
 
@@ -169,7 +182,7 @@ If moderation is disabled, this parameter is ignored.
 optional retries: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:241](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L241)
+Defined in: [packages/sdk/src/indexer/api.ts:257](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L257)
 
 Number of times to retry the signing operation in case of failure.
 
@@ -187,7 +200,7 @@ Number of times to retry the signing operation in case of failure.
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:280](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L280)
+Defined in: [packages/sdk/src/indexer/api.ts:296](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L296)
 
 ***
 
@@ -197,7 +210,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:280](https://github.com/ecp-eth/com
 optional sort: IndexerAPISortSchemaType;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:249](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L249)
+Defined in: [packages/sdk/src/indexer/api.ts:265](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L265)
 
 #### Default
 
@@ -213,6 +226,6 @@ Defined in: [packages/sdk/src/indexer/api.ts:249](https://github.com/ecp-eth/com
 optional viewer: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:225](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L225)
+Defined in: [packages/sdk/src/indexer/api.ts:241](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L241)
 
 The viewer's address. This is useful when the content moderation is enabled on the indexer.

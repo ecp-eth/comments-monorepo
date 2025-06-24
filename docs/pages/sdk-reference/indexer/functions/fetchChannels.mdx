@@ -16,6 +16,7 @@ function fetchChannels(options): Promise<{
      startCursor?: `0x${string}`;
   };
   results: {
+     chainId: number;
      createdAt: Date;
      description: string;
      hook: null | `0x${string}`;
@@ -31,7 +32,7 @@ function fetchChannels(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:580](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L580)
+Defined in: [packages/sdk/src/indexer/api.ts:609](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L609)
 
 Fetch channels from the Indexer API
 
@@ -52,6 +53,7 @@ Fetch channels from the Indexer API
      `startCursor?`: `` `0x${string}` ``;
   \};
   `results`: \{
+     `chainId`: `number`;
      `createdAt`: `Date`;
      `description`: `string`;
      `hook`: `null` \| `` `0x${string}` ``;

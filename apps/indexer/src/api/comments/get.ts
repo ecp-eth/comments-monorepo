@@ -62,6 +62,7 @@ export default (app: OpenAPIHono) => {
       channelId,
       commentType,
       moderationStatus,
+      chainId,
     } = c.req.valid("query");
 
     const sharedConditions = [
@@ -73,6 +74,9 @@ export default (app: OpenAPIHono) => {
       commentType != null
         ? eq(schema.comment.commentType, commentType)
         : undefined,
+      chainId.length === 1
+        ? eq(schema.comment.chainId, chainId[0]!)
+        : inArray(schema.comment.chainId, chainId),
     ];
 
     const repliesConditions: (SQL<unknown> | undefined)[] = [];

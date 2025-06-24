@@ -8,6 +8,7 @@
 
 ```ts
 type IndexerAPIChannelSchemaType = {
+  chainId: number;
   createdAt: Date;
   description: string;
   hook: null | `0x${string}`;
@@ -22,9 +23,15 @@ type IndexerAPIChannelSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:54](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L54)
+Defined in: [packages/sdk/src/indexer/schemas.ts:55](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L55)
 
 ## Type declaration
+
+### chainId
+
+```ts
+chainId: number;
+```
 
 ### createdAt
 

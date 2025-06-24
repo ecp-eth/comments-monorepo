@@ -27,6 +27,7 @@ import {
   EmbedConfigProviderByAuthorConfig,
   useEmbedConfig,
 } from "../EmbedConfigProvider";
+import { useChainId } from "wagmi";
 
 type QueryData = InfiniteData<
   CommentPageSchemaType,
@@ -45,6 +46,7 @@ export function CommentSectionReadonly({
   const { currentTimestamp, disablePromotion } =
     useEmbedConfig<EmbedConfigProviderByAuthorConfig>();
   const queryKey = useMemo(() => ["comments-by-author", author], [author]);
+  const chainId = useChainId();
 
   const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
@@ -61,6 +63,7 @@ export function CommentSectionReadonly({
           author,
           limit: pageParam.limit,
           cursor: pageParam.cursor,
+          chainId,
           signal,
         });
 
@@ -92,6 +95,7 @@ export function CommentSectionReadonly({
         limit: 20,
         cursor: data?.pages[0].pagination.startCursor,
         sort: "asc",
+        chainId,
         signal,
       });
 

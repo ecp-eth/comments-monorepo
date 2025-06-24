@@ -19,6 +19,7 @@ import { COMMENT_BOX_AVERAGE_HEIGHT } from "../lib/constants";
 import { publicEnv } from "../env";
 import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
+import { chain } from "../wagmi.config";
 
 type RepliesSectionProps = {
   rootComment: IndexerAPICommentSchemaType;
@@ -85,7 +86,7 @@ function RepliesSection({
           apiUrl: publicEnv.EXPO_PUBLIC_INDEXER_URL,
           app: publicEnv.EXPO_PUBLIC_APP_SIGNER_ADDRESS,
           commentId: rootComment.id,
-
+          chainId: chain.id,
           limit: pageParam.limit,
           cursor: pageParam.cursor,
           signal,

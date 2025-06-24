@@ -54,6 +54,7 @@ export default (app: OpenAPIHono) => {
       channelId,
       commentType,
       moderationStatus,
+      chainId,
     } = c.req.valid("query");
     const { commentId } = c.req.valid("param");
 
@@ -63,6 +64,9 @@ export default (app: OpenAPIHono) => {
       commentType != null
         ? eq(schema.comment.commentType, commentType)
         : undefined,
+      chainId.length === 1
+        ? eq(schema.comment.chainId, chainId[0]!)
+        : inArray(schema.comment.chainId, chainId),
     ];
 
     if (mode === "flat") {

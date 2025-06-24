@@ -416,6 +416,7 @@ moderateComments
             "Comment ID": comment.id,
             "Created At": comment.createdAt,
             "Updated At": comment.updatedAt,
+            "Chain ID": comment.chainId,
             "Author (address)": comment.author.address,
             "Author (ENS)": comment.author.ens?.name,
             "Author (FC)": comment.author.farcaster?.username,

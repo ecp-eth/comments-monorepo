@@ -34,6 +34,10 @@ export type FetchCommentsOptions = {
    */
   author?: Hex;
   /**
+   * Filter comments by chain ID(s)
+   */
+  chainId: number | number[];
+  /**
    * The viewer's address. This is useful when the content moderation is enabled on the indexer.
    */
   viewer?: Hex;
@@ -101,6 +105,7 @@ export type FetchCommentsOptions = {
 const FetchCommentsOptionsSchema = z.object({
   targetUri: z.string().url().optional(),
   author: HexSchema.optional(),
+  chainId: z.union([z.number().int(), z.array(z.number().int())]),
   apiUrl: z.string().url().default(INDEXER_API_URL),
   app: HexSchema.optional(),
   channelId: z.coerce.bigint().optional(),
@@ -126,6 +131,7 @@ export async function fetchComments(
   options: FetchCommentsOptions,
 ): Promise<IndexerAPIListCommentsSchemaType> {
   const {
+    chainId,
     apiUrl,
     author,
     limit,
@@ -151,6 +157,12 @@ export async function fetchComments(
 
     if (author) {
       url.searchParams.set("author", author);
+    }
+
+    if (Array.isArray(chainId)) {
+      url.searchParams.set("chainId", chainId.join(","));
+    } else {
+      url.searchParams.set("chainId", chainId.toString());
     }
 
     url.searchParams.set("sort", sort);
@@ -220,6 +232,10 @@ export type FetchCommentRepliesOptions = {
    */
   commentId: Hex;
   /**
+   * Filter replies by chain ID(s)
+   */
+  chainId: number | number[];
+  /**
    * The viewer's address. This is useful when the content moderation is enabled on the indexer.
    */
   viewer?: Hex;
@@ -282,6 +298,7 @@ export type FetchCommentRepliesOptions = {
 
 const FetchCommentRepliesOptionSchema = z.object({
   commentId: HexSchema,
+  chainId: z.union([z.number().int(), z.array(z.number().int())]),
   apiUrl: z.string().url().default(INDEXER_API_URL),
   app: HexSchema.optional(),
   retries: z.number().int().positive().default(3),
@@ -307,6 +324,7 @@ export async function fetchCommentReplies(
   options: FetchCommentRepliesOptions,
 ): Promise<IndexerAPIListCommentRepliesSchemaType> {
   const {
+    chainId,
     apiUrl,
     commentId,
     limit,
@@ -324,6 +342,12 @@ export async function fetchCommentReplies(
 
   const fetchRepliesTask = Effect.tryPromise(async (signal) => {
     const url = new URL(`/api/comments/${commentId}/replies`, apiUrl);
+
+    if (Array.isArray(chainId)) {
+      url.searchParams.set("chainId", chainId.join(","));
+    } else {
+      url.searchParams.set("chainId", chainId.toString());
+    }
 
     url.searchParams.set("limit", limit.toString());
     url.searchParams.set("sort", sort);
@@ -538,6 +562,10 @@ export type FetchChannelsOptions = {
    */
   owner?: Hex;
   /**
+   * Filter channels by chain ID(s)
+   */
+  chainId: number | number[];
+  /**
    * Number of times to retry the signing operation in case of failure.
    *
    * @default 3
@@ -566,6 +594,7 @@ const FetchChannelsOptionsSchema = z.object({
   apiUrl: z.string().url().default(INDEXER_API_URL),
   retries: z.number().int().positive().default(3),
   owner: HexSchema.optional(),
+  chainId: z.union([z.number().int(), z.array(z.number().int())]),
   cursor: HexSchema.optional(),
   sort: IndexerAPISortSchema.default("desc"),
   limit: z.number().int().positive().default(50),
@@ -580,7 +609,7 @@ const FetchChannelsOptionsSchema = z.object({
 export async function fetchChannels(
   options: FetchChannelsOptions,
 ): Promise<IndexerAPIListChannelsSchemaType> {
-  const { apiUrl, limit, cursor, retries, sort, signal, owner } =
+  const { apiUrl, limit, cursor, retries, sort, signal, owner, chainId } =
     FetchChannelsOptionsSchema.parse(options);
 
   const fetchChannelsTask = Effect.tryPromise(async (signal) => {
@@ -595,6 +624,12 @@ export async function fetchChannels(
 
     if (owner) {
       url.searchParams.set("owner", owner);
+    }
+
+    if (Array.isArray(chainId)) {
+      url.searchParams.set("chainId", chainId.join(","));
+    } else {
+      url.searchParams.set("chainId", chainId.toString());
     }
 
     const response = await fetch(url.toString(), {

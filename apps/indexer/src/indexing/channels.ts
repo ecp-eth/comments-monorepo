@@ -19,6 +19,7 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
         description: event.args.description,
         hook: event.args.hook === ZERO_ADDRESS ? null : event.args.hook,
         metadata: event.args.metadata.slice(),
+        chainId: context.chain.id,
       });
     },
   );

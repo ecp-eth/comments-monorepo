@@ -19,8 +19,8 @@
   },
   "peerDependencies": {
     "@privy-io/server-auth": "^1.26.0",
-    "@ecp.eth/sdk": "^0.0.18",
-    "@ecp.eth/shared": "^0.0.8"
+    "@ecp.eth/sdk": "^0.0.21",
+    "@ecp.eth/shared": "^0.0.9"
   },
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",
