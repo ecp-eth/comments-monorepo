@@ -68,26 +68,25 @@ import { usePostComment } from "@ecp.eth/sdk/comments/react";
 import { waitForTransactionReceipt } from "wagmi";
 import { parseEther } from "viem";
 
-// 1. Create comment data
-const commentData = createCommentData({
+const comment = {
   content: "Hello, world!",
-  targetUri: "https://example.com",
   author: "0x...", // author's address
-  app: "0x...", // app's address
-  parentId: undefined, // optional, for replies
-});
+  targetUri: "https://example.com",
+};
 
-// 2. Obtain the app signature from your backend
+// 1. Obtain the app signature from your backend
 // You can use the Signer API Service to generate the signature
 // @see https://github.com/ecp-eth/comments-monorepo/blob/main/apps/signer/README.md
-const appSignature = await fetch("/api/sign", {
+//
+// Or see the next section for server-side signing
+const { signature: appSignature, commentData } = await fetch("/api/sign", {
   method: "POST",
   body: JSON.stringify({
-    commentData,
+    comment,
   }),
-}).then((res) => res.text());
+}).then((res) => res.json());
 
-// 3. Post the comment (using wagmi)
+// 2. Post the comment (using wagmi)
 // You can use the `usePostComment` hook to post the comment
 const { mutateAsync: postCommentAsync } = usePostComment();
 
@@ -113,25 +112,38 @@ import {
   createCommentData,
   createCommentTypedData,
 } from "@ecp.eth/sdk/comments";
+import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
+import { privateKeyToAccount } from "viem/accounts";
+import { baseSepolia } from "viem/chains";
 
-// Server-side code
+const chainConfig = SUPPORTED_CHAINS[baseSepolia.id];
+
+const app = privateKeyToAccount(process.env.APP_SIGNER_PRIVATE_KEY);
+
+const content = ""; // content obtained from the client
+const author = ""; // author's address obtained from the client
+const targetUri = ""; // target URI obtained from the client
+
+// 1. Create comment data
 const commentData = createCommentData({
   content,
   targetUri,
-  parentId,
   author,
   app: app.address,
 });
 
+// 2. Create typed data for signing (EIP-712)
 const typedCommentData = createCommentTypedData({
   commentData,
-  chainId: chain.id,
+  chainId: chainConfig.chain.id,
 });
 
 // Sign using app's private key
 const signature = await app.signTypedData(typedCommentData);
+const hash = hashTypedData(typedCommentData);
 
 return {
+  hash,
   signature,
   commentData,
 };
