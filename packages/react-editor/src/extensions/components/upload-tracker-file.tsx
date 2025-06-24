@@ -1,12 +1,12 @@
 import type {
-  UploadTrackerFile,
+  UploadTrackerFile as UploadTrackerFileType,
   UploadTrackerFileComponent,
   UploadTrackerImageComponent,
   UploadTrackerVideoComponent,
 } from "../types.js";
 
 type UploadTrackerFileProps = {
-  file: UploadTrackerFile;
+  file: UploadTrackerFileType;
   onDeleteClick: () => void;
   imageComponent: UploadTrackerImageComponent;
   videoComponent: UploadTrackerVideoComponent;
