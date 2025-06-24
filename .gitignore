@@ -77,4 +77,5 @@ packages/shared/schemas
 packages/shared/types
 packages/shared/token-list
 packages/shared/resolvers
+packages/shared/renderer
 packages/shared/services/*

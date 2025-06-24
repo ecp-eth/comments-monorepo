@@ -26,6 +26,7 @@
     "packages/shared/types": true,
     "packages/shared/token-list": true,
     "packages/shared/resolvers": true,
+    "packages/shared/renderer": true,
     "packages/shared/services/*": true
   }
 }
