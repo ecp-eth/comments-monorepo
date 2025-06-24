@@ -64,8 +64,8 @@ import {
   createCommentData,
   createCommentTypedData,
 } from "@ecp.eth/sdk/comments";
-import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
-import { useWriteContract } from "wagmi";
+import { usePostComment } from "@ecp.eth/sdk/comments/react";
+import { waitForTransactionReceipt } from "wagmi";
 
 // 1. Create comment data
 const commentData = createCommentData({
@@ -76,13 +76,7 @@ const commentData = createCommentData({
   parentId: undefined, // optional, for replies
 });
 
-// 2. Create typed data for signing (EIP-712)
-const typedCommentData = createCommentTypedData({
-  commentData,
-  chainId: 1, // mainnet
-});
-
-// 3. Obtain the app signature from your backend
+// 2. Obtain the app signature from your backend
 // You can use the Signer API Service to generate the signature
 // @see https://github.com/ecp-eth/comments-monorepo/blob/main/apps/signer/README.md
 const appSignature = await fetch("/api/sign", {
@@ -92,14 +86,20 @@ const appSignature = await fetch("/api/sign", {
   }),
 }).then((res) => res.text());
 
-// 4. Post the comment (using wagmi)
-const { writeContractAsync } = useWriteContract();
+// 3. Post the comment (using wagmi)
+// You can use the `usePostComment` hook to post the comment
+const { mutateAsync: postCommentAsync } = usePostComment();
 
-await writeContractAsync({
-  abi: CommentManagerABI,
-  address: COMMENT_MANAGER_ADDRESS,
-  functionName: "postComment",
-  args: [commentData, appSignature], // appSignature from server
+const { txHash } = await postCommentAsync({
+  variables: {
+    comment: commentData,
+    appSignature,
+    fee: parseEther("0.001"), // optional, fee to pay for the comment
+  },
+});
+
+await waitForTransactionReceipt({
+  hash: txHash,
 });
 ```
 
