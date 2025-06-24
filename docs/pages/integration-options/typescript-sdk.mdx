@@ -82,7 +82,17 @@ const typedCommentData = createCommentTypedData({
   chainId: 1, // mainnet
 });
 
-// 3. Post the comment (using wagmi)
+// 3. Obtain the app signature from your backend
+// You can use the Signer API Service to generate the signature
+// @see https://github.com/ecp-eth/comments-monorepo/blob/main/apps/signer/README.md
+const appSignature = await fetch("/api/sign", {
+  method: "POST",
+  body: JSON.stringify({
+    commentData,
+  }),
+}).then((res) => res.text());
+
+// 4. Post the comment (using wagmi)
 const { writeContractAsync } = useWriteContract();
 
 await writeContractAsync({

@@ -59,13 +59,19 @@ contract MyProtocol {
   /// @param commentData The comment data including content, metadata, and other parameters
   /// @return The ID of the created comment
   function postComment(
-    Comments.CreateComment memory commentData
+    Comments.CreateComment memory commentData,
+    bytes memory authorSignature
   ) external payable returns (bytes32) {
     require(address(this) == commentData.app, "Only the app can post comments");
 
     // When msg.sender equals app (address(this)), the protocol skips app signature verification
     // This is why we can pass an empty string as appSignature
-    return commentManager.postComment{ value: msg.value }(commentData, "");
+    return
+      commentManager.postCommentWithSig{ value: msg.value }(
+        commentData,
+        authorSignature,
+        ""
+      );
   }
 }
 ```
@@ -81,6 +87,7 @@ pragma solidity ^0.8.20;
 import "@ecp.eth/protocol/src/interfaces/IHook.sol";
 import "@ecp.eth/protocol/src/types/Hooks.sol";
 import "@ecp.eth/protocol/src/types/Comments.sol";
+import "@ecp.eth/protocol/src/types/Channels.sol";
 import "@ecp.eth/protocol/src/types/Metadata.sol";
 
 contract MyCustomHook is IHook {
@@ -95,7 +102,7 @@ contract MyCustomHook is IHook {
   {
     return
       Hooks.Permissions({
-        onInitialize: true,
+        onInitialize: false,
         onCommentAdd: true,
         onCommentDelete: false,
         onCommentEdit: false,
@@ -104,6 +111,19 @@ contract MyCustomHook is IHook {
       });
   }
 
+  /// @notice Execute after a hook is initialized on a channel
+  function onInitialize(
+    address channelManager,
+    Channels.Channel memory channelData,
+    uint256 channelId,
+    Metadata.MetadataEntry[] calldata metadata
+  ) external returns (bool success) {
+    // Your custom initialization logic here
+    // For example, set up initial state for the channel
+    return true;
+  }
+
+  /// @notice Execute after a comment is processed
   function onCommentAdd(
     Comments.Comment calldata comment,
     Metadata.MetadataEntry[] calldata metadata,
@@ -124,7 +144,55 @@ contract MyCustomHook is IHook {
     return hookMetadata;
   }
 
-  // Implement other required hook functions...
+  /// @notice Execute after a comment is deleted
+  function onCommentDelete(
+    Comments.Comment calldata comment,
+    Metadata.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata hookMetadata,
+    address caller,
+    bytes32 commentId
+  ) external returns (bool success) {
+    // Your custom deletion logic here
+    // For example, clean up associated data, update counters, etc.
+    return true;
+  }
+
+  /// @notice Execute after a comment is edited
+  function onCommentEdit(
+    Comments.Comment calldata comment,
+    Metadata.MetadataEntry[] calldata metadata,
+    address caller,
+    bytes32 commentId
+  ) external payable returns (Metadata.MetadataEntry[] memory) {
+    // Your custom edit logic here
+    // For example, validate edits, update metadata, etc.
+    return new Metadata.MetadataEntry[](0);
+  }
+
+  /// @notice Execute after a channel is updated
+  function onChannelUpdate(
+    address channel,
+    uint256 channelId,
+    Channels.Channel calldata channelData,
+    Metadata.MetadataEntry[] calldata metadata
+  ) external returns (bool success) {
+    // Your custom channel update logic here
+    // For example, update hook state, validate changes, etc.
+    return true;
+  }
+
+  /// @notice Execute to update hook data for an existing comment
+  function onCommentHookDataUpdate(
+    Comments.Comment calldata comment,
+    Metadata.MetadataEntry[] calldata metadata,
+    Metadata.MetadataEntry[] calldata hookMetadata,
+    address caller,
+    bytes32 commentId
+  ) external returns (Metadata.MetadataEntryOp[] memory operations) {
+    // Your custom hook data update logic here
+    // For example, modify existing hook metadata, add new entries, etc.
+    return new Metadata.MetadataEntryOp[](0);
+  }
 }
 ```
 
