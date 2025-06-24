@@ -45,8 +45,11 @@ export function CommentSectionReadonly({
 }: CommentSectionReadonlyProps) {
   const { currentTimestamp, disablePromotion } =
     useEmbedConfig<EmbedConfigProviderByAuthorConfig>();
-  const queryKey = useMemo(() => ["comments-by-author", author], [author]);
   const chainId = useChainId();
+  const queryKey = useMemo(
+    () => ["comments-by-author", chainId, author],
+    [author, chainId],
+  );
 
   const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
@@ -86,7 +89,7 @@ export function CommentSectionReadonly({
   // check for new comments
   useQuery({
     enabled: !!data,
-    queryKey: ["comments-by-author-new-comments-check", author],
+    queryKey: ["comments-by-author-new-comments-check", chainId, author],
     queryFn: async ({ client, signal }) => {
       const newComments = await fetchComments({
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,

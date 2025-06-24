@@ -47,12 +47,12 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const chainId = useChainId();
   const queryKey = useMemo(
-    () => createCommentRepliesQueryKey(connectedAddress, comment.id),
-    [comment.id, connectedAddress],
+    () => createCommentRepliesQueryKey(connectedAddress, chainId, comment.id),
+    [comment.id, connectedAddress, chainId],
   );
   const rootQueryKey = useMemo(
-    () => createRootCommentsQueryKey(connectedAddress, targetUri),
-    [targetUri, connectedAddress],
+    () => createRootCommentsQueryKey(connectedAddress, chainId, targetUri),
+    [targetUri, connectedAddress, chainId],
   );
 
   const repliesQuery = useInfiniteQuery({

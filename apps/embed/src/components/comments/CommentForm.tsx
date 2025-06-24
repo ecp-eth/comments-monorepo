@@ -216,9 +216,9 @@ export function CommentForm({
       // we need to create the query key because if user wasn't connected the query key from props
       // would not target the query for the user's address
       if (!parentId) {
-        queryKey = createRootCommentsQueryKey(author, targetUri);
+        queryKey = createRootCommentsQueryKey(author, chainId, targetUri);
       } else {
-        queryKey = createCommentRepliesQueryKey(author, parentId);
+        queryKey = createCommentRepliesQueryKey(author, chainId, parentId);
       }
 
       const pendingOperation = await submitCommentMutationFunction({

@@ -48,8 +48,8 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   const { targetUri, disablePromotion, restrictMaximumContainerWidth } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
-    () => createRootCommentsQueryKey(address, targetUri),
-    [targetUri, address],
+    () => createRootCommentsQueryKey(address, chainId, targetUri),
+    [targetUri, address, chainId],
   );
 
   const isAccountStatusResolved = useIsAccountStatusResolved();
