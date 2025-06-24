@@ -1,1 +1,1 @@
-export * from "./useHandleDefaultEditorValue.js";
+export * from "./use-handle-default-editor-value.js";

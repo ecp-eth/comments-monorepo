@@ -11,7 +11,7 @@ import {
   type UploadTrackerVideoComponent,
   type UploadTrackerFileComponent,
 } from "./types.js";
-import { UploadTrackerFile as RenderUploadTrackerFileComponent } from "./components/UploadTrackerFile.js";
+import { UploadTrackerFile as RenderUploadTrackerFileComponent } from "./components/upload-tracker-file.js";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {

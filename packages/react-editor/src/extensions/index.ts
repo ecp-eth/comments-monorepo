@@ -1,2 +1,2 @@
-export * from "./Mention.js";
-export * from "./UploadTracker.js";
+export * from "./mention-extension.js";
+export * from "./upload-tracker.js";

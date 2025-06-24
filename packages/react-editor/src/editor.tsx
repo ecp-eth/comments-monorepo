@@ -10,17 +10,17 @@ import { Text } from "@tiptap/extension-text";
 import { Link } from "@tiptap/extension-link";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { useImperativeHandle, useState } from "react";
-import { MentionExtension } from "./extensions/Mention.js";
+import { MentionExtension } from "./extensions/mention-extension.js";
 import {
   type UploadTrackerUploadedFile,
   type UploadTrackerAttributes,
   type UploadTrackerFileToUpload,
   UPLOAD_TRACKER_NODE_NAME,
   UploadTracker,
-} from "./extensions/UploadTracker.js";
+} from "./extensions/upload-tracker.js";
 import { HardBreak } from "@tiptap/extension-hard-break";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
-import { useHandleDefaultEditorValue } from "./hooks/useHandleDefaultEditorValue.js";
+import { useHandleDefaultEditorValue } from "./hooks/use-handle-default-editor-value.js";
 import type {
   LinkAttributes,
   UploadTrackerFileComponent,

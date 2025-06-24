@@ -3,7 +3,7 @@ import { JSONContent } from "@tiptap/core";
 import {
   UPLOAD_TRACKER_NODE_NAME,
   type UploadTrackerAttributes,
-} from "./extensions/UploadTracker.js";
+} from "./extensions/upload-tracker.js";
 import type { MentionItem } from "./extensions/types.js";
 
 export function extractReferences(

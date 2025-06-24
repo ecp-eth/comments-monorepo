@@ -5,7 +5,7 @@ import {
   Suggestions,
   type SuggestionsRef,
   type SuggestionsProps,
-} from "./components/Suggestions.js";
+} from "./components/suggestions.js";
 import { isValidQuery } from "./helpers.js";
 import type {
   MentionItem,
