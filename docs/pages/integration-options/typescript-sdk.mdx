@@ -66,6 +66,7 @@ import {
 } from "@ecp.eth/sdk/comments";
 import { usePostComment } from "@ecp.eth/sdk/comments/react";
 import { waitForTransactionReceipt } from "wagmi";
+import { parseEther } from "viem";
 
 // 1. Create comment data
 const commentData = createCommentData({
