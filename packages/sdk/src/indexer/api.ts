@@ -18,7 +18,7 @@ import {
   IndexerAPIChannelOutputSchema,
   type IndexerAPIChannelOutputSchemaType,
 } from "./schemas.js";
-import { DEFAULT_COMMENT_TYPE, INDEXER_API_URL } from "../constants.js";
+import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
 
 /**
