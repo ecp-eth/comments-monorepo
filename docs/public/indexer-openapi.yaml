@@ -248,7 +248,7 @@ paths:
               - 'null'
             minimum: 0
             maximum: 255
-            description: The comment type (e.g. 0=comment, 1=reaction)
+            description: The comment type (e.g. 0=comment, 1=reaction, not passed = all)
           required: false
           name: commentType
           in: query
@@ -733,6 +733,443 @@ paths:
                                   - url
                                   - position
                                   - mediaType
+                        viewerReactions:
+                          type: object
+                          additionalProperties:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                app: {}
+                                author:
+                                  type: object
+                                  properties:
+                                    address: {}
+                                    ens:
+                                      type: object
+                                      properties:
+                                        name:
+                                          type: string
+                                        avatarUrl:
+                                          type:
+                                            - string
+                                            - 'null'
+                                      required:
+                                        - name
+                                        - avatarUrl
+                                    farcaster:
+                                      type: object
+                                      properties:
+                                        fid:
+                                          type: integer
+                                        pfpUrl:
+                                          type: string
+                                        displayName:
+                                          type: string
+                                        username:
+                                          type: string
+                                      required:
+                                        - fid
+                                        - username
+                                  required:
+                                    - address
+                                id: {}
+                                channelId:
+                                  type: string
+                                  pattern: ^d+$
+                                commentType:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 255
+                                content:
+                                  type: string
+                                chainId:
+                                  type: integer
+                                deletedAt:
+                                  type:
+                                    - string
+                                    - 'null'
+                                logIndex:
+                                  type:
+                                    - integer
+                                    - 'null'
+                                metadata:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      key: {}
+                                      value: {}
+                                    required:
+                                      - key
+                                      - value
+                                hookMetadata:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      key: {}
+                                      value: {}
+                                    required:
+                                      - key
+                                      - value
+                                parentId: {}
+                                targetUri:
+                                  type: string
+                                txHash: {}
+                                cursor: {}
+                                moderationStatus:
+                                  type: string
+                                  enum: *ref_0
+                                moderationStatusChangedAt:
+                                  type:
+                                    - string
+                                    - 'null'
+                                createdAt:
+                                  type:
+                                    - string
+                                    - 'null'
+                                updatedAt:
+                                  type:
+                                    - string
+                                    - 'null'
+                                revision:
+                                  type: integer
+                                zeroExSwap:
+                                  type:
+                                    - object
+                                    - 'null'
+                                  properties:
+                                    from:
+                                      type: object
+                                      properties:
+                                        address: {}
+                                        amount:
+                                          type: string
+                                          pattern: ^\d+(\.\d+)?$
+                                        symbol:
+                                          type: string
+                                      required:
+                                        - address
+                                        - amount
+                                        - symbol
+                                    to:
+                                      type: object
+                                      properties:
+                                        address: {}
+                                        amount:
+                                          type: string
+                                          pattern: ^\d+(\.\d+)?$
+                                        symbol:
+                                          type: string
+                                      required:
+                                        - address
+                                        - amount
+                                        - symbol
+                                  required:
+                                    - from
+                                    - to
+                                references:
+                                  type: array
+                                  items:
+                                    anyOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - ens
+                                          avatarUrl:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          name:
+                                            type: string
+                                          address: {}
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          url:
+                                            type: string
+                                            format: uri
+                                        required:
+                                          - type
+                                          - avatarUrl
+                                          - name
+                                          - address
+                                          - position
+                                          - url
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - erc20
+                                          symbol:
+                                            type: string
+                                          logoURI:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          name:
+                                            type: string
+                                          address: {}
+                                          decimals:
+                                            type: integer
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          chainId:
+                                            type:
+                                              - integer
+                                              - 'null'
+                                            exclusiveMinimum: 0
+                                          chains:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                caip:
+                                                  type: string
+                                                chainId:
+                                                  type: integer
+                                                  exclusiveMinimum: 0
+                                              required:
+                                                - caip
+                                                - chainId
+                                        required:
+                                          - type
+                                          - symbol
+                                          - logoURI
+                                          - name
+                                          - address
+                                          - decimals
+                                          - position
+                                          - chainId
+                                          - chains
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - farcaster
+                                          address: {}
+                                          fid:
+                                            type: integer
+                                          fname:
+                                            type: string
+                                          username:
+                                            type: string
+                                          displayName:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          pfpUrl:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          url:
+                                            type: string
+                                            format: uri
+                                        required:
+                                          - type
+                                          - address
+                                          - fid
+                                          - fname
+                                          - username
+                                          - displayName
+                                          - pfpUrl
+                                          - position
+                                          - url
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - webpage
+                                          url:
+                                            type: string
+                                            format: uri
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          title:
+                                            type: string
+                                          description:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          favicon:
+                                            type:
+                                              - string
+                                              - 'null'
+                                            format: uri
+                                          opengraph:
+                                            type:
+                                              - object
+                                              - 'null'
+                                            properties:
+                                              title:
+                                                type: string
+                                              description:
+                                                type:
+                                                  - string
+                                                  - 'null'
+                                              image:
+                                                type: string
+                                                format: uri
+                                              url:
+                                                type: string
+                                                format: uri
+                                            required:
+                                              - title
+                                              - description
+                                              - image
+                                              - url
+                                        required:
+                                          - type
+                                          - url
+                                          - position
+                                          - title
+                                          - description
+                                          - favicon
+                                          - opengraph
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - file
+                                          url:
+                                            type: string
+                                            format: uri
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          mediaType:
+                                            type: string
+                                        required:
+                                          - type
+                                          - url
+                                          - position
+                                          - mediaType
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - image
+                                          url:
+                                            type: string
+                                            format: uri
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          mediaType:
+                                            type: string
+                                        required:
+                                          - type
+                                          - url
+                                          - position
+                                          - mediaType
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - video
+                                          url:
+                                            type: string
+                                            format: uri
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          mediaType:
+                                            type: string
+                                        required:
+                                          - type
+                                          - url
+                                          - position
+                                          - mediaType
+                              required:
+                                - app
+                                - author
+                                - id
+                                - channelId
+                                - commentType
+                                - content
+                                - chainId
+                                - deletedAt
+                                - logIndex
+                                - metadata
+                                - hookMetadata
+                                - parentId
+                                - targetUri
+                                - txHash
+                                - cursor
+                                - moderationStatus
+                                - moderationStatusChangedAt
+                                - createdAt
+                                - updatedAt
+                                - revision
+                                - zeroExSwap
+                                - references
+                        reactionCounts:
+                          type: object
+                          additionalProperties:
+                            type: number
                         replies:
                           type: object
                           properties:
@@ -741,8 +1178,13 @@ paths:
                               properties:
                                 moderationEnabled:
                                   type: boolean
+                                moderationKnownReactions:
+                                  type: array
+                                  items:
+                                    type: string
                               required:
                                 - moderationEnabled
+                                - moderationKnownReactions
                             results:
                               type: array
                               items:
@@ -1151,6 +1593,443 @@ paths:
                                             - url
                                             - position
                                             - mediaType
+                                  viewerReactions:
+                                    type: object
+                                    additionalProperties:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          app: {}
+                                          author:
+                                            type: object
+                                            properties:
+                                              address: {}
+                                              ens:
+                                                type: object
+                                                properties:
+                                                  name:
+                                                    type: string
+                                                  avatarUrl:
+                                                    type:
+                                                      - string
+                                                      - 'null'
+                                                required:
+                                                  - name
+                                                  - avatarUrl
+                                              farcaster:
+                                                type: object
+                                                properties:
+                                                  fid:
+                                                    type: integer
+                                                  pfpUrl:
+                                                    type: string
+                                                  displayName:
+                                                    type: string
+                                                  username:
+                                                    type: string
+                                                required:
+                                                  - fid
+                                                  - username
+                                            required:
+                                              - address
+                                          id: {}
+                                          channelId:
+                                            type: string
+                                            pattern: ^d+$
+                                          commentType:
+                                            type: integer
+                                            minimum: 0
+                                            maximum: 255
+                                          content:
+                                            type: string
+                                          chainId:
+                                            type: integer
+                                          deletedAt:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          logIndex:
+                                            type:
+                                              - integer
+                                              - 'null'
+                                          metadata:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                key: {}
+                                                value: {}
+                                              required:
+                                                - key
+                                                - value
+                                          hookMetadata:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                key: {}
+                                                value: {}
+                                              required:
+                                                - key
+                                                - value
+                                          parentId: {}
+                                          targetUri:
+                                            type: string
+                                          txHash: {}
+                                          cursor: {}
+                                          moderationStatus:
+                                            type: string
+                                            enum: *ref_0
+                                          moderationStatusChangedAt:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          createdAt:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          updatedAt:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          revision:
+                                            type: integer
+                                          zeroExSwap:
+                                            type:
+                                              - object
+                                              - 'null'
+                                            properties:
+                                              from:
+                                                type: object
+                                                properties:
+                                                  address: {}
+                                                  amount:
+                                                    type: string
+                                                    pattern: ^\d+(\.\d+)?$
+                                                  symbol:
+                                                    type: string
+                                                required:
+                                                  - address
+                                                  - amount
+                                                  - symbol
+                                              to:
+                                                type: object
+                                                properties:
+                                                  address: {}
+                                                  amount:
+                                                    type: string
+                                                    pattern: ^\d+(\.\d+)?$
+                                                  symbol:
+                                                    type: string
+                                                required:
+                                                  - address
+                                                  - amount
+                                                  - symbol
+                                            required:
+                                              - from
+                                              - to
+                                          references:
+                                            type: array
+                                            items:
+                                              anyOf:
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - ens
+                                                    avatarUrl:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    name:
+                                                      type: string
+                                                    address: {}
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                  required:
+                                                    - type
+                                                    - avatarUrl
+                                                    - name
+                                                    - address
+                                                    - position
+                                                    - url
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - erc20
+                                                    symbol:
+                                                      type: string
+                                                    logoURI:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    name:
+                                                      type: string
+                                                    address: {}
+                                                    decimals:
+                                                      type: integer
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    chainId:
+                                                      type:
+                                                        - integer
+                                                        - 'null'
+                                                      exclusiveMinimum: 0
+                                                    chains:
+                                                      type: array
+                                                      items:
+                                                        type: object
+                                                        properties:
+                                                          caip:
+                                                            type: string
+                                                          chainId:
+                                                            type: integer
+                                                            exclusiveMinimum: 0
+                                                        required:
+                                                          - caip
+                                                          - chainId
+                                                  required:
+                                                    - type
+                                                    - symbol
+                                                    - logoURI
+                                                    - name
+                                                    - address
+                                                    - decimals
+                                                    - position
+                                                    - chainId
+                                                    - chains
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - farcaster
+                                                    address: {}
+                                                    fid:
+                                                      type: integer
+                                                    fname:
+                                                      type: string
+                                                    username:
+                                                      type: string
+                                                    displayName:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    pfpUrl:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                  required:
+                                                    - type
+                                                    - address
+                                                    - fid
+                                                    - fname
+                                                    - username
+                                                    - displayName
+                                                    - pfpUrl
+                                                    - position
+                                                    - url
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - webpage
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    title:
+                                                      type: string
+                                                    description:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    favicon:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                      format: uri
+                                                    opengraph:
+                                                      type:
+                                                        - object
+                                                        - 'null'
+                                                      properties:
+                                                        title:
+                                                          type: string
+                                                        description:
+                                                          type:
+                                                            - string
+                                                            - 'null'
+                                                        image:
+                                                          type: string
+                                                          format: uri
+                                                        url:
+                                                          type: string
+                                                          format: uri
+                                                      required:
+                                                        - title
+                                                        - description
+                                                        - image
+                                                        - url
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - title
+                                                    - description
+                                                    - favicon
+                                                    - opengraph
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - file
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - image
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - video
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                        required:
+                                          - app
+                                          - author
+                                          - id
+                                          - channelId
+                                          - commentType
+                                          - content
+                                          - chainId
+                                          - deletedAt
+                                          - logIndex
+                                          - metadata
+                                          - hookMetadata
+                                          - parentId
+                                          - targetUri
+                                          - txHash
+                                          - cursor
+                                          - moderationStatus
+                                          - moderationStatusChangedAt
+                                          - createdAt
+                                          - updatedAt
+                                          - revision
+                                          - zeroExSwap
+                                          - references
+                                  reactionCounts:
+                                    type: object
+                                    additionalProperties:
+                                      type: number
                                 required:
                                   - app
                                   - author
@@ -1174,6 +2053,8 @@ paths:
                                   - revision
                                   - zeroExSwap
                                   - references
+                                  - viewerReactions
+                                  - reactionCounts
                             pagination:
                               type: object
                               properties:
@@ -1216,6 +2097,8 @@ paths:
                         - revision
                         - zeroExSwap
                         - references
+                        - viewerReactions
+                        - reactionCounts
                         - replies
                   pagination:
                     type: object
@@ -1237,8 +2120,13 @@ paths:
                     properties:
                       moderationEnabled:
                         type: boolean
+                      moderationKnownReactions:
+                        type: array
+                        items:
+                          type: string
                     required:
                       - moderationEnabled
+                      - moderationKnownReactions
                 required:
                   - results
                   - pagination
@@ -1296,7 +2184,7 @@ paths:
               - 'null'
             minimum: 0
             maximum: 255
-            description: The comment type (e.g. 0=comment, 1=reaction)
+            description: The comment type (e.g. 0=comment, 1=reaction, not passed = all)
           required: false
           name: commentType
           in: query
@@ -1767,6 +2655,443 @@ paths:
                                   - url
                                   - position
                                   - mediaType
+                        viewerReactions:
+                          type: object
+                          additionalProperties:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                app: {}
+                                author:
+                                  type: object
+                                  properties:
+                                    address: {}
+                                    ens:
+                                      type: object
+                                      properties:
+                                        name:
+                                          type: string
+                                        avatarUrl:
+                                          type:
+                                            - string
+                                            - 'null'
+                                      required:
+                                        - name
+                                        - avatarUrl
+                                    farcaster:
+                                      type: object
+                                      properties:
+                                        fid:
+                                          type: integer
+                                        pfpUrl:
+                                          type: string
+                                        displayName:
+                                          type: string
+                                        username:
+                                          type: string
+                                      required:
+                                        - fid
+                                        - username
+                                  required:
+                                    - address
+                                id: {}
+                                channelId:
+                                  type: string
+                                  pattern: ^d+$
+                                commentType:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 255
+                                content:
+                                  type: string
+                                chainId:
+                                  type: integer
+                                deletedAt:
+                                  type:
+                                    - string
+                                    - 'null'
+                                logIndex:
+                                  type:
+                                    - integer
+                                    - 'null'
+                                metadata:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      key: {}
+                                      value: {}
+                                    required:
+                                      - key
+                                      - value
+                                hookMetadata:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      key: {}
+                                      value: {}
+                                    required:
+                                      - key
+                                      - value
+                                parentId: {}
+                                targetUri:
+                                  type: string
+                                txHash: {}
+                                cursor: {}
+                                moderationStatus:
+                                  type: string
+                                  enum: *ref_0
+                                moderationStatusChangedAt:
+                                  type:
+                                    - string
+                                    - 'null'
+                                createdAt:
+                                  type:
+                                    - string
+                                    - 'null'
+                                updatedAt:
+                                  type:
+                                    - string
+                                    - 'null'
+                                revision:
+                                  type: integer
+                                zeroExSwap:
+                                  type:
+                                    - object
+                                    - 'null'
+                                  properties:
+                                    from:
+                                      type: object
+                                      properties:
+                                        address: {}
+                                        amount:
+                                          type: string
+                                          pattern: ^\d+(\.\d+)?$
+                                        symbol:
+                                          type: string
+                                      required:
+                                        - address
+                                        - amount
+                                        - symbol
+                                    to:
+                                      type: object
+                                      properties:
+                                        address: {}
+                                        amount:
+                                          type: string
+                                          pattern: ^\d+(\.\d+)?$
+                                        symbol:
+                                          type: string
+                                      required:
+                                        - address
+                                        - amount
+                                        - symbol
+                                  required:
+                                    - from
+                                    - to
+                                references:
+                                  type: array
+                                  items:
+                                    anyOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - ens
+                                          avatarUrl:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          name:
+                                            type: string
+                                          address: {}
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          url:
+                                            type: string
+                                            format: uri
+                                        required:
+                                          - type
+                                          - avatarUrl
+                                          - name
+                                          - address
+                                          - position
+                                          - url
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - erc20
+                                          symbol:
+                                            type: string
+                                          logoURI:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          name:
+                                            type: string
+                                          address: {}
+                                          decimals:
+                                            type: integer
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          chainId:
+                                            type:
+                                              - integer
+                                              - 'null'
+                                            exclusiveMinimum: 0
+                                          chains:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                caip:
+                                                  type: string
+                                                chainId:
+                                                  type: integer
+                                                  exclusiveMinimum: 0
+                                              required:
+                                                - caip
+                                                - chainId
+                                        required:
+                                          - type
+                                          - symbol
+                                          - logoURI
+                                          - name
+                                          - address
+                                          - decimals
+                                          - position
+                                          - chainId
+                                          - chains
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - farcaster
+                                          address: {}
+                                          fid:
+                                            type: integer
+                                          fname:
+                                            type: string
+                                          username:
+                                            type: string
+                                          displayName:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          pfpUrl:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          url:
+                                            type: string
+                                            format: uri
+                                        required:
+                                          - type
+                                          - address
+                                          - fid
+                                          - fname
+                                          - username
+                                          - displayName
+                                          - pfpUrl
+                                          - position
+                                          - url
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - webpage
+                                          url:
+                                            type: string
+                                            format: uri
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          title:
+                                            type: string
+                                          description:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          favicon:
+                                            type:
+                                              - string
+                                              - 'null'
+                                            format: uri
+                                          opengraph:
+                                            type:
+                                              - object
+                                              - 'null'
+                                            properties:
+                                              title:
+                                                type: string
+                                              description:
+                                                type:
+                                                  - string
+                                                  - 'null'
+                                              image:
+                                                type: string
+                                                format: uri
+                                              url:
+                                                type: string
+                                                format: uri
+                                            required:
+                                              - title
+                                              - description
+                                              - image
+                                              - url
+                                        required:
+                                          - type
+                                          - url
+                                          - position
+                                          - title
+                                          - description
+                                          - favicon
+                                          - opengraph
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - file
+                                          url:
+                                            type: string
+                                            format: uri
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          mediaType:
+                                            type: string
+                                        required:
+                                          - type
+                                          - url
+                                          - position
+                                          - mediaType
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - image
+                                          url:
+                                            type: string
+                                            format: uri
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          mediaType:
+                                            type: string
+                                        required:
+                                          - type
+                                          - url
+                                          - position
+                                          - mediaType
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - video
+                                          url:
+                                            type: string
+                                            format: uri
+                                          position:
+                                            type: object
+                                            properties:
+                                              start:
+                                                type: integer
+                                              end:
+                                                type: integer
+                                            required:
+                                              - start
+                                              - end
+                                          mediaType:
+                                            type: string
+                                        required:
+                                          - type
+                                          - url
+                                          - position
+                                          - mediaType
+                              required:
+                                - app
+                                - author
+                                - id
+                                - channelId
+                                - commentType
+                                - content
+                                - chainId
+                                - deletedAt
+                                - logIndex
+                                - metadata
+                                - hookMetadata
+                                - parentId
+                                - targetUri
+                                - txHash
+                                - cursor
+                                - moderationStatus
+                                - moderationStatusChangedAt
+                                - createdAt
+                                - updatedAt
+                                - revision
+                                - zeroExSwap
+                                - references
+                        reactionCounts:
+                          type: object
+                          additionalProperties:
+                            type: number
                         replies:
                           type: object
                           properties:
@@ -1775,8 +3100,13 @@ paths:
                               properties:
                                 moderationEnabled:
                                   type: boolean
+                                moderationKnownReactions:
+                                  type: array
+                                  items:
+                                    type: string
                               required:
                                 - moderationEnabled
+                                - moderationKnownReactions
                             results:
                               type: array
                               items:
@@ -2185,6 +3515,443 @@ paths:
                                             - url
                                             - position
                                             - mediaType
+                                  viewerReactions:
+                                    type: object
+                                    additionalProperties:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          app: {}
+                                          author:
+                                            type: object
+                                            properties:
+                                              address: {}
+                                              ens:
+                                                type: object
+                                                properties:
+                                                  name:
+                                                    type: string
+                                                  avatarUrl:
+                                                    type:
+                                                      - string
+                                                      - 'null'
+                                                required:
+                                                  - name
+                                                  - avatarUrl
+                                              farcaster:
+                                                type: object
+                                                properties:
+                                                  fid:
+                                                    type: integer
+                                                  pfpUrl:
+                                                    type: string
+                                                  displayName:
+                                                    type: string
+                                                  username:
+                                                    type: string
+                                                required:
+                                                  - fid
+                                                  - username
+                                            required:
+                                              - address
+                                          id: {}
+                                          channelId:
+                                            type: string
+                                            pattern: ^d+$
+                                          commentType:
+                                            type: integer
+                                            minimum: 0
+                                            maximum: 255
+                                          content:
+                                            type: string
+                                          chainId:
+                                            type: integer
+                                          deletedAt:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          logIndex:
+                                            type:
+                                              - integer
+                                              - 'null'
+                                          metadata:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                key: {}
+                                                value: {}
+                                              required:
+                                                - key
+                                                - value
+                                          hookMetadata:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                key: {}
+                                                value: {}
+                                              required:
+                                                - key
+                                                - value
+                                          parentId: {}
+                                          targetUri:
+                                            type: string
+                                          txHash: {}
+                                          cursor: {}
+                                          moderationStatus:
+                                            type: string
+                                            enum: *ref_0
+                                          moderationStatusChangedAt:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          createdAt:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          updatedAt:
+                                            type:
+                                              - string
+                                              - 'null'
+                                          revision:
+                                            type: integer
+                                          zeroExSwap:
+                                            type:
+                                              - object
+                                              - 'null'
+                                            properties:
+                                              from:
+                                                type: object
+                                                properties:
+                                                  address: {}
+                                                  amount:
+                                                    type: string
+                                                    pattern: ^\d+(\.\d+)?$
+                                                  symbol:
+                                                    type: string
+                                                required:
+                                                  - address
+                                                  - amount
+                                                  - symbol
+                                              to:
+                                                type: object
+                                                properties:
+                                                  address: {}
+                                                  amount:
+                                                    type: string
+                                                    pattern: ^\d+(\.\d+)?$
+                                                  symbol:
+                                                    type: string
+                                                required:
+                                                  - address
+                                                  - amount
+                                                  - symbol
+                                            required:
+                                              - from
+                                              - to
+                                          references:
+                                            type: array
+                                            items:
+                                              anyOf:
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - ens
+                                                    avatarUrl:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    name:
+                                                      type: string
+                                                    address: {}
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                  required:
+                                                    - type
+                                                    - avatarUrl
+                                                    - name
+                                                    - address
+                                                    - position
+                                                    - url
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - erc20
+                                                    symbol:
+                                                      type: string
+                                                    logoURI:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    name:
+                                                      type: string
+                                                    address: {}
+                                                    decimals:
+                                                      type: integer
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    chainId:
+                                                      type:
+                                                        - integer
+                                                        - 'null'
+                                                      exclusiveMinimum: 0
+                                                    chains:
+                                                      type: array
+                                                      items:
+                                                        type: object
+                                                        properties:
+                                                          caip:
+                                                            type: string
+                                                          chainId:
+                                                            type: integer
+                                                            exclusiveMinimum: 0
+                                                        required:
+                                                          - caip
+                                                          - chainId
+                                                  required:
+                                                    - type
+                                                    - symbol
+                                                    - logoURI
+                                                    - name
+                                                    - address
+                                                    - decimals
+                                                    - position
+                                                    - chainId
+                                                    - chains
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - farcaster
+                                                    address: {}
+                                                    fid:
+                                                      type: integer
+                                                    fname:
+                                                      type: string
+                                                    username:
+                                                      type: string
+                                                    displayName:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    pfpUrl:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                  required:
+                                                    - type
+                                                    - address
+                                                    - fid
+                                                    - fname
+                                                    - username
+                                                    - displayName
+                                                    - pfpUrl
+                                                    - position
+                                                    - url
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - webpage
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    title:
+                                                      type: string
+                                                    description:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    favicon:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                      format: uri
+                                                    opengraph:
+                                                      type:
+                                                        - object
+                                                        - 'null'
+                                                      properties:
+                                                        title:
+                                                          type: string
+                                                        description:
+                                                          type:
+                                                            - string
+                                                            - 'null'
+                                                        image:
+                                                          type: string
+                                                          format: uri
+                                                        url:
+                                                          type: string
+                                                          format: uri
+                                                      required:
+                                                        - title
+                                                        - description
+                                                        - image
+                                                        - url
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - title
+                                                    - description
+                                                    - favicon
+                                                    - opengraph
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - file
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - image
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - video
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                        required:
+                                          - app
+                                          - author
+                                          - id
+                                          - channelId
+                                          - commentType
+                                          - content
+                                          - chainId
+                                          - deletedAt
+                                          - logIndex
+                                          - metadata
+                                          - hookMetadata
+                                          - parentId
+                                          - targetUri
+                                          - txHash
+                                          - cursor
+                                          - moderationStatus
+                                          - moderationStatusChangedAt
+                                          - createdAt
+                                          - updatedAt
+                                          - revision
+                                          - zeroExSwap
+                                          - references
+                                  reactionCounts:
+                                    type: object
+                                    additionalProperties:
+                                      type: number
                                 required:
                                   - app
                                   - author
@@ -2208,6 +3975,8 @@ paths:
                                   - revision
                                   - zeroExSwap
                                   - references
+                                  - viewerReactions
+                                  - reactionCounts
                             pagination:
                               type: object
                               properties:
@@ -2250,6 +4019,8 @@ paths:
                         - revision
                         - zeroExSwap
                         - references
+                        - viewerReactions
+                        - reactionCounts
                         - replies
                   pagination:
                     type: object
@@ -2271,8 +4042,13 @@ paths:
                     properties:
                       moderationEnabled:
                         type: boolean
+                      moderationKnownReactions:
+                        type: array
+                        items:
+                          type: string
                     required:
                       - moderationEnabled
+                      - moderationKnownReactions
                 required:
                   - results
                   - pagination
