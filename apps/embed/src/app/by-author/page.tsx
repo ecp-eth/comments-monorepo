@@ -47,6 +47,7 @@ export default async function EmbedCommentsByAuthorPage({
 
   try {
     const comments = await fetchComments({
+      chainId: config.chainId,
       app: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       author,

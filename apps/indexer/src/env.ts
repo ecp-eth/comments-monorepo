@@ -67,3 +67,13 @@ if (!_env.success) {
 }
 
 export const env = _env.data;
+
+export const SUPPORTED_CHAIN_IDS: number[] = [];
+
+for (const [key] of Object.entries(process.env)) {
+  if (key.startsWith("PONDER_RPC_URL_")) {
+    const chainId = key.substring("PONDER_RPC_URL_".length);
+
+    SUPPORTED_CHAIN_IDS.push(z.coerce.number().int().positive().parse(chainId));
+  }
+}

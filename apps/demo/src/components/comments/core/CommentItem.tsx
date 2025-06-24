@@ -22,6 +22,7 @@ import {
   createCommentRepliesQueryKey,
   createRootCommentsQueryKey,
 } from "./queries";
+import { chain } from "@/lib/wagmi";
 
 type CommentItemProps = {
   connectedAddress: Hex | undefined;
@@ -88,6 +89,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
       const response = await fetchCommentReplies({
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        chainId: chain.id,
         cursor: pageParam.cursor,
         limit: pageParam.limit,
         commentId: comment.id,
@@ -116,6 +118,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
     queryKey,
     fetchComments({ cursor, signal }) {
       return fetchCommentReplies({
+        chainId: chain.id,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         commentId: comment.id,

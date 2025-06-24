@@ -16,6 +16,7 @@ type IndexerAPIListChannelsOutputSchemaType = {
      startCursor?: `0x${string}`;
   };
   results: {
+     chainId: number;
      createdAt: string;
      description: string;
      hook: null | `0x${string}`;
@@ -31,7 +32,7 @@ type IndexerAPIListChannelsOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:83](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L83)
+Defined in: [packages/sdk/src/indexer/schemas.ts:84](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L84)
 
 ## Type declaration
 
@@ -81,6 +82,7 @@ optional startCursor: `0x${string}`;
 
 ```ts
 results: {
+  chainId: number;
   createdAt: string;
   description: string;
   hook: null | `0x${string}`;

@@ -8,6 +8,7 @@
 
 ```ts
 function fetchChannel(options): Promise<{
+  chainId: number;
   createdAt: string;
   description: string;
   hook: null | `0x${string}`;
@@ -22,7 +23,7 @@ function fetchChannel(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:660](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L660)
+Defined in: [packages/sdk/src/indexer/api.ts:695](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L695)
 
 Fetch a single channel by ID from the Indexer API
 
@@ -35,6 +36,7 @@ Fetch a single channel by ID from the Indexer API
 ## Returns
 
 `Promise`\<\{
+  `chainId`: `number`;
   `createdAt`: `string`;
   `description`: `string`;
   `hook`: `null` \| `` `0x${string}` ``;

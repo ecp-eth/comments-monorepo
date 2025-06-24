@@ -1,6 +1,6 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { and, asc, desc, eq, gt, gte, lt, lte, or } from "ponder";
+import { and, asc, desc, eq, gt, gte, lt, lte, or, inArray } from "ponder";
 import { IndexerAPIListChannelsOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { GetChannelsQuerySchema } from "../../lib/schemas";
@@ -34,13 +34,16 @@ const getChannelsRoute = createRoute({
  */
 export function setupGetChannels(app: OpenAPIHono) {
   app.openapi(getChannelsRoute, async (c) => {
-    const { sort, limit, cursor, owner } = c.req.valid("query");
+    const { sort, limit, cursor, owner, chainId } = c.req.valid("query");
 
     const hasPreviousChannelsQuery = cursor
       ? db.query.channel
           .findFirst({
             where: and(
               ...(owner ? [eq(schema.channel.owner, owner)] : []),
+              ...(chainId.length === 1
+                ? [eq(schema.channel.chainId, chainId[0]!)]
+                : [inArray(schema.channel.chainId, chainId)]),
               // use opposite order for asc and desc
               ...(sort === "asc"
                 ? [
@@ -76,6 +79,9 @@ export function setupGetChannels(app: OpenAPIHono) {
     const channelsQuery = db.query.channel.findMany({
       where: and(
         ...(owner ? [eq(schema.channel.owner, owner)] : []),
+        ...(chainId.length === 1
+          ? [eq(schema.channel.chainId, chainId[0]!)]
+          : [inArray(schema.channel.chainId, chainId)]),
         ...(sort === "desc" && !!cursor
           ? [
               or(

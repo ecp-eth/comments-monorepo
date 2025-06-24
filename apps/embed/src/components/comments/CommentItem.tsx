@@ -27,6 +27,7 @@ import {
   type EmbedConfigProviderByTargetURIConfig,
 } from "../EmbedConfigProvider";
 import { useRetryEditComment } from "./hooks/useRetryEditComment";
+import { useChainId } from "wagmi";
 
 type CommentItemProps = {
   connectedAddress: Hex | undefined;
@@ -44,13 +45,14 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   });
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const chainId = useChainId();
   const queryKey = useMemo(
-    () => createCommentRepliesQueryKey(connectedAddress, comment.id),
-    [comment.id, connectedAddress],
+    () => createCommentRepliesQueryKey(connectedAddress, chainId, comment.id),
+    [comment.id, connectedAddress, chainId],
   );
   const rootQueryKey = useMemo(
-    () => createRootCommentsQueryKey(connectedAddress, targetUri),
-    [targetUri, connectedAddress],
+    () => createRootCommentsQueryKey(connectedAddress, chainId, targetUri),
+    [targetUri, connectedAddress, chainId],
   );
 
   const repliesQuery = useInfiniteQuery({
@@ -77,6 +79,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
     refetchOnWindowFocus: false,
     queryFn: async ({ pageParam, signal }) => {
       const response = await fetchCommentReplies({
+        chainId,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         cursor: pageParam.cursor,
@@ -107,6 +110,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
     queryKey,
     fetchComments({ cursor, signal }) {
       return fetchCommentReplies({
+        chainId,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         commentId: comment.id,

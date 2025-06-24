@@ -26,16 +26,18 @@ import type {
 
 export function createRootCommentsQueryKey(
   address: Hex | undefined,
+  chainId: number,
   targetUri: string,
 ) {
-  return ["comments", address, targetUri];
+  return ["comments", address, chainId, targetUri];
 }
 
 export function createCommentRepliesQueryKey(
   address: Hex | undefined,
+  chainId: number,
   commentId: Hex,
 ) {
-  return ["comments", address, commentId];
+  return ["comments", address, chainId, commentId];
 }
 
 export class SubmitCommentMutationError extends Error {}

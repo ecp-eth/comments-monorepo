@@ -26,7 +26,7 @@ import {
 } from "@ecp.eth/shared/schemas";
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { publicEnv } from "@/publicEnv";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import { PoweredBy } from "@ecp.eth/shared/components";
 import { CommentItem } from "./CommentItem";
 import { createRootCommentsQueryKey } from "./queries";
@@ -44,11 +44,12 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   useAutoBodyMinHeight();
 
   const { address } = useAccount();
+  const chainId = useChainId();
   const { targetUri, disablePromotion, restrictMaximumContainerWidth } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
-    () => createRootCommentsQueryKey(address, targetUri),
-    [targetUri, address],
+    () => createRootCommentsQueryKey(address, chainId, targetUri),
+    [targetUri, address, chainId],
   );
 
   const isAccountStatusResolved = useIsAccountStatusResolved();
@@ -71,6 +72,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     } as ListCommentsQueryPageParamsSchemaType,
     queryFn: async ({ pageParam, signal }) => {
       const response = await fetchComments({
+        chainId,
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         targetUri,
@@ -105,6 +107,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     queryKey,
     fetchComments(options) {
       return fetchComments({
+        chainId,
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         targetUri,

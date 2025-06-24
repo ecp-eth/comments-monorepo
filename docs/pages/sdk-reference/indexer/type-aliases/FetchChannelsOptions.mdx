@@ -9,6 +9,7 @@
 ```ts
 type FetchChannelsOptions = {
   apiUrl?: string;
+  chainId: number | number[];
   cursor?: Hex;
   limit?: number;
   owner?: Hex;
@@ -18,7 +19,7 @@ type FetchChannelsOptions = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:529](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L529)
+Defined in: [packages/sdk/src/indexer/api.ts:553](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L553)
 
 The options for `fetchChannels()`
 
@@ -30,7 +31,7 @@ The options for `fetchChannels()`
 optional apiUrl: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:535](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L535)
+Defined in: [packages/sdk/src/indexer/api.ts:559](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L559)
 
 URL on which /api/channels endpoint will be called
 
@@ -42,13 +43,25 @@ URL on which /api/channels endpoint will be called
 
 ***
 
+### chainId
+
+```ts
+chainId: number | number[];
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:567](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L567)
+
+Filter channels by chain ID(s)
+
+***
+
 ### cursor?
 
 ```ts
 optional cursor: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:549](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L549)
+Defined in: [packages/sdk/src/indexer/api.ts:577](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L577)
 
 The cursor to fetch channels from
 
@@ -60,7 +73,7 @@ The cursor to fetch channels from
 optional limit: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:561](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L561)
+Defined in: [packages/sdk/src/indexer/api.ts:589](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L589)
 
 The number of channels to fetch
 
@@ -78,7 +91,7 @@ The number of channels to fetch
 optional owner: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:539](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L539)
+Defined in: [packages/sdk/src/indexer/api.ts:563](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L563)
 
 Filter channels by owner
 
@@ -90,7 +103,7 @@ Filter channels by owner
 optional retries: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:545](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L545)
+Defined in: [packages/sdk/src/indexer/api.ts:573](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L573)
 
 Number of times to retry the signing operation in case of failure.
 
@@ -108,7 +121,7 @@ Number of times to retry the signing operation in case of failure.
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:562](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L562)
+Defined in: [packages/sdk/src/indexer/api.ts:590](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L590)
 
 ***
 
@@ -118,7 +131,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:562](https://github.com/ecp-eth/com
 optional sort: IndexerAPISortSchemaType;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:555](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L555)
+Defined in: [packages/sdk/src/indexer/api.ts:583](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L583)
 
 The sort order, either `asc` or `desc`
 

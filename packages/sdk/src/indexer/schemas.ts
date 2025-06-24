@@ -49,6 +49,7 @@ export const IndexerAPIChannelSchema = z.object({
   description: z.string(),
   metadata: IndexerAPIMetadataSchema,
   hook: HexSchema.nullable(),
+  chainId: z.number().int(),
 });
 
 export type IndexerAPIChannelSchemaType = z.infer<

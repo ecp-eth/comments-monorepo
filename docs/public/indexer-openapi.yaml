@@ -57,6 +57,8 @@ paths:
                         - key
                         - value
                   hook: {}
+                  chainId:
+                    type: integer
                 required:
                   - id
                   - createdAt
@@ -66,6 +68,7 @@ paths:
                   - description
                   - metadata
                   - hook
+                  - chainId
         '404':
           description: Channel not found
           content:
@@ -99,6 +102,14 @@ paths:
             pattern: ^0x[a-fA-F0-9]+$
           required: false
           name: owner
+          in: query
+        - schema:
+            type: string
+            description: >-
+              Filters by chain ID. Can be a single chain id or comma-separated
+              list of chain ids (e.g. 1,137,10).
+          required: true
+          name: chainId
           in: query
         - schema:
             type: integer
@@ -159,6 +170,8 @@ paths:
                               - key
                               - value
                         hook: {}
+                        chainId:
+                          type: integer
                       required:
                         - id
                         - createdAt
@@ -168,6 +181,7 @@ paths:
                         - description
                         - metadata
                         - hook
+                        - chainId
                   pagination:
                     type: object
                     properties:
@@ -237,6 +251,14 @@ paths:
             description: The comment type (e.g. 0=comment, 1=reaction)
           required: false
           name: commentType
+          in: query
+        - schema:
+            type: string
+            description: >-
+              Filters by chain ID. Can be a single chain id or comma-separated
+              list of chain ids (e.g. 1,137,10).
+          required: true
+          name: chainId
           in: query
         - schema:
             anyOf:
@@ -1279,6 +1301,14 @@ paths:
           name: commentType
           in: query
         - schema:
+            type: string
+            description: >-
+              Filters by chain ID. Can be a single chain id or comma-separated
+              list of chain ids (e.g. 1,137,10).
+          required: true
+          name: chainId
+          in: query
+        - schema:
             anyOf:
               - type: string
                 enum: *ref_0
@@ -2278,6 +2308,14 @@ paths:
             pattern: ^0x[a-fA-F0-9]+$
           required: true
           name: app
+          in: query
+        - schema:
+            type: string
+            description: >-
+              Filters by chain ID. Can be a single chain id or comma-separated
+              list of chain ids (e.g. 1,137,10).
+          required: true
+          name: chainId
           in: query
         - schema:
             type: integer

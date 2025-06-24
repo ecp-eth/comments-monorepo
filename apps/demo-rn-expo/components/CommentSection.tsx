@@ -23,6 +23,7 @@ import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
 import { COMMENT_BOX_AVERAGE_HEIGHT } from "../lib/constants";
 import { useOptimisticCommentingManager } from "../hooks/useOptimisticCommentingManager";
 import { useDeleteComment } from "../hooks/useDeleteComment";
+import { chain } from "../wagmi.config";
 
 type CommentSectionProps = {
   onReply: (comment: IndexerAPICommentSchemaType) => void;
@@ -60,7 +61,7 @@ export function CommentSection({
           apiUrl: publicEnv.EXPO_PUBLIC_INDEXER_URL,
           targetUri: publicEnv.EXPO_PUBLIC_TARGET_URI,
           app: publicEnv.EXPO_PUBLIC_APP_SIGNER_ADDRESS,
-
+          chainId: chain.id,
           limit: pageParam.limit,
           cursor: pageParam.cursor,
           signal,

@@ -127,6 +127,7 @@ export function CommentSectionGasless() {
       },
       queryFn: ({ pageParam, signal }) => {
         return fetchComments({
+          chainId: chain.id,
           apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
           app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
           targetUri: currentUrl,
@@ -157,6 +158,7 @@ export function CommentSectionGasless() {
     queryKey,
     fetchComments({ cursor, signal }) {
       return fetchComments({
+        chainId: chain.id,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         targetUri: currentUrl,
