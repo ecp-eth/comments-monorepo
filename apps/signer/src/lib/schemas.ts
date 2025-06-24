@@ -4,6 +4,7 @@ import {
   DeleteCommentTypedDataSchema,
   EditCommentDataSchema,
   EditCommentTypedDataSchema,
+  CommentTypeSchema,
   MetadataArraySchema,
 } from "@ecp.eth/sdk/comments/schemas";
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
@@ -35,6 +36,7 @@ const sharedCommentSchema = z.object({
   content: z.string().trim().nonempty(),
   metadata: MetadataArraySchema,
   chainId: AllowedChainIdSchema.default(env.DEFAULT_CHAIN_ID),
+  commentType: CommentTypeSchema.optional(),
 });
 
 // Request schema for standard signing
