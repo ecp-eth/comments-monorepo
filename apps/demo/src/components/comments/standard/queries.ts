@@ -28,7 +28,7 @@ import type {
   PendingPostCommentOperationSchemaType,
   SignEditCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
-import { DistributiveOmit } from "@ecp.eth/shared/types";
+import type { DistributiveOmit } from "@ecp.eth/shared/types";
 
 export class SubmitCommentMutationError extends Error {}
 export class SubmitEditCommentMutationError extends Error {}
@@ -37,7 +37,7 @@ type SubmitCommentParams = {
   /**
    * The address of the wallet that is submitting the comment.
    */
-  address: Hex | undefined;
+  author: Hex | undefined;
   commentRequest: DistributiveOmit<
     SignCommentPayloadRequestSchemaType,
     "author"
@@ -52,20 +52,20 @@ type SubmitCommentParams = {
 };
 
 export async function submitCommentMutationFunction({
-  address,
+  author,
   commentRequest,
   switchChainAsync,
   writeContractAsync,
   zeroExSwap,
   references,
 }: SubmitCommentParams): Promise<PendingPostCommentOperationSchemaType> {
-  if (!address) {
+  if (!author) {
     throw new SubmitCommentMutationError("Wallet not connected.");
   }
 
   // ignore errors here, we don't want to block the comment submission
   const resolvedAuthor = await fetchAuthorData({
-    address,
+    address: author,
     apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   }).catch((e) => {
     console.error(e);
@@ -74,7 +74,7 @@ export async function submitCommentMutationFunction({
 
   const parseResult = SignCommentPayloadRequestSchema.safeParse({
     ...commentRequest,
-    author: address,
+    author: author,
   });
 
   if (!parseResult.success) {

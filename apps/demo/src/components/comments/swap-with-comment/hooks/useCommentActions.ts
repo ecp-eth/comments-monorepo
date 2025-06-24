@@ -67,10 +67,10 @@ export function useCommentActions({
   const commentDeletion = useCommentDeletion();
   const commentSubmission = useCommentSubmission();
   const { mutateAsync: deleteCommentMutation } = useDeleteComment();
-  const reactionSubmission = useReactionSubmission(
+  const likeReactionSubmission = useReactionSubmission(
     COMMENT_REACTION_LIKE_CONTENT,
   );
-  const reactionRemoval = useReactionRemoval(COMMENT_REACTION_LIKE_CONTENT);
+  const likeReactionRemoval = useReactionRemoval(COMMENT_REACTION_LIKE_CONTENT);
 
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
@@ -180,7 +180,7 @@ export function useCommentActions({
       };
 
       const pendingOperation = await submitCommentMutationFunction({
-        address: connectedAddress,
+        author: connectedAddress,
         zeroExSwap,
         references: comment.references,
         commentRequest: {
@@ -277,7 +277,7 @@ export function useCommentActions({
 
   const likeComment = useCallback<OnLikeComment>(
     async (params) => {
-      const { comment, queryKey, onBeforeStart, onFailed } = params;
+      const { comment, queryKey, onBeforeStart, onFailed, onSuccess } = params;
 
       onBeforeStart?.();
 
@@ -286,7 +286,7 @@ export function useCommentActions({
 
       try {
         pendingOperation = await submitCommentMutationFunction({
-          address: connectedAddress,
+          author: connectedAddress,
           zeroExSwap: null,
           commentRequest: {
             content: COMMENT_REACTION_LIKE_CONTENT,
@@ -294,6 +294,7 @@ export function useCommentActions({
             commentType: COMMENT_TYPE_REACTION,
             parentId: comment.id,
           },
+          references: [],
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
@@ -309,7 +310,7 @@ export function useCommentActions({
           },
         });
 
-        reactionSubmission.start({
+        likeReactionSubmission.start({
           ...params,
           queryKey,
           pendingOperation,
@@ -324,7 +325,9 @@ export function useCommentActions({
           throw new Error("Transaction reverted");
         }
 
-        reactionSubmission.success({
+        onSuccess?.();
+
+        likeReactionSubmission.success({
           ...params,
           queryKey,
           pendingOperation,
@@ -333,7 +336,7 @@ export function useCommentActions({
         onFailed?.();
 
         if (pendingOperation) {
-          reactionSubmission.error({
+          likeReactionSubmission.error({
             ...params,
             queryKey,
             pendingOperation,
@@ -343,12 +346,16 @@ export function useCommentActions({
         throw e;
       }
     },
-    [reactionSubmission, connectedAddress, switchChainAsync, wagmiConfig],
+    [likeReactionSubmission, connectedAddress, switchChainAsync, wagmiConfig],
   );
 
   const unlikeComment = useCallback<OnUnlikeComment>(
     async (params) => {
-      const { comment, queryKey: parentCommentQueryKey } = params;
+      const {
+        comment,
+        queryKey: parentCommentQueryKey,
+        onBeforeStart,
+      } = params;
 
       const reaction = comment.viewerReactions?.[
         COMMENT_REACTION_LIKE_CONTENT
@@ -365,12 +372,14 @@ export function useCommentActions({
       };
 
       try {
+        onBeforeStart?.();
+
         const { txHash } = await deleteCommentMutation({
           commentId: reaction.id,
         });
 
         // Optimistically remove the reaction from the UI
-        reactionRemoval.start(reactionRemovalParams);
+        likeReactionRemoval.start(reactionRemovalParams);
 
         const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: txHash,
@@ -381,14 +390,14 @@ export function useCommentActions({
           throw new Error("Transaction reverted");
         }
 
-        reactionRemoval.success(reactionRemovalParams);
+        likeReactionRemoval.success(reactionRemovalParams);
       } catch (e) {
-        reactionRemoval.error(reactionRemovalParams);
+        likeReactionRemoval.error(reactionRemovalParams);
 
         throw e;
       }
     },
-    [reactionRemoval, deleteCommentMutation, wagmiConfig],
+    [likeReactionRemoval, deleteCommentMutation, wagmiConfig],
   );
 
   return useMemo(

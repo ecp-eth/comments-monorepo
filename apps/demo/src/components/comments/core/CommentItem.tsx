@@ -74,12 +74,17 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
       comment,
       queryKey: rootQueryKey,
       onBeforeStart: () => setIsLiking(true),
+      onSuccess: () => setIsLiking(false),
       onFailed: () => setIsLiking(false),
     });
   }, [comment, likeComment, rootQueryKey]);
 
   const onUnlikeClick = useCallback(() => {
-    unlikeComment({ comment, queryKey: rootQueryKey });
+    unlikeComment({
+      comment,
+      queryKey: rootQueryKey,
+      onBeforeStart: () => setIsLiking(false),
+    });
   }, [comment, unlikeComment, rootQueryKey]);
 
   const repliesQuery = useInfiniteQuery({
@@ -147,6 +152,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         signal,
         viewer: connectedAddress,
         mode: "flat",
+        commentType: 0,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,

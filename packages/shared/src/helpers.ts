@@ -260,7 +260,7 @@ export function insertPendingCommentToPage(
   return queryData;
 }
 
-function getModerationStatus(
+export function getModerationStatus(
   extra: IndexerAPIExtraSchemaType,
   comment: CommentDataWithIdSchemaType,
 ): "pending" | "approved" {

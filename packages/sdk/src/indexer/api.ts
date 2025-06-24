@@ -18,7 +18,7 @@ import {
   IndexerAPIChannelOutputSchema,
   type IndexerAPIChannelOutputSchemaType,
 } from "./schemas.js";
-import { INDEXER_API_URL } from "../constants.js";
+import { DEFAULT_COMMENT_TYPE, INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
 
 /**
@@ -184,11 +184,13 @@ export async function fetchComments(
       url.searchParams.set("mode", mode);
     }
 
-    if (channelId) {
+    // channelId can be 0
+    if (channelId != null) {
       url.searchParams.set("channelId", channelId.toString());
     }
 
-    if (commentType) {
+    // commentType can be 0
+    if (commentType != null) {
       url.searchParams.set("commentType", commentType.toString());
     }
 
@@ -368,11 +370,13 @@ export async function fetchCommentReplies(
       url.searchParams.set("mode", mode);
     }
 
-    if (channelId) {
+    // channelId can be 0
+    if (channelId != null) {
       url.searchParams.set("channelId", channelId.toString());
     }
 
-    if (commentType) {
+    // commentType can be 0
+    if (commentType != null) {
       url.searchParams.set("commentType", commentType.toString());
     }
 

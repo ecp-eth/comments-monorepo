@@ -7,61 +7,34 @@ import schema, { CommentSelectType } from "ponder:schema";
 import { HTTPException } from "hono/http-exception";
 import { ModerationNotificationsService } from "../../services/types";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 
-export class CommentNotFoundError extends HTTPException {
-  constructor(commentId: Hex) {
-    super(404, {
-      message: `Comment not found for id ${commentId}`,
-      res: new Response(
-        JSON.stringify({
-          message: `Comment not found for id ${commentId}`,
-        }),
-        {
-          status: 404,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      ),
+abstract class BaseCommentModerationException extends HTTPException {
+  constructor(status: ContentfulStatusCode, message: string) {
+    super(status, {
+      message,
+      res: new Response(JSON.stringify({ message }), {
+        status,
+        headers: { "Content-Type": "application/json" },
+      }),
     });
   }
 }
-
-export class CommentModerationStatusNotFoundError extends HTTPException {
+export class CommentNotFoundError extends BaseCommentModerationException {
   constructor(commentId: Hex) {
-    super(404, {
-      message: `Comment moderation status not found for comment ${commentId}`,
-      res: new Response(
-        JSON.stringify({
-          message: `Comment moderation status not found for comment ${commentId}`,
-        }),
-        {
-          status: 404,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      ),
-    });
+    super(404, `Comment not found for id ${commentId}`);
   }
 }
 
-export class CommentAlreadyInStatusError extends HTTPException {
+export class CommentModerationStatusNotFoundError extends BaseCommentModerationException {
+  constructor(commentId: Hex) {
+    super(404, `Comment moderation status not found for comment ${commentId}`);
+  }
+}
+
+export class CommentAlreadyInStatusError extends BaseCommentModerationException {
   constructor(status: ModerationStatus) {
-    super(400, {
-      message: `Comment is already in status ${status}`,
-      res: new Response(
-        JSON.stringify({
-          message: `Comment is already in status ${status}`,
-        }),
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      ),
-    });
+    super(400, `Comment is already in status ${status}`);
   }
 }
 

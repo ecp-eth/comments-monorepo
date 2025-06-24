@@ -55,12 +55,17 @@ export function ReplyItem({
       comment,
       queryKey,
       onBeforeStart: () => setIsLiking(true),
+      onSuccess: () => setIsLiking(false),
       onFailed: () => setIsLiking(false),
     });
   }, [comment, likeComment, queryKey]);
 
   const onUnlikeClick = useCallback(() => {
-    unlikeComment({ comment, queryKey });
+    unlikeComment({
+      comment,
+      queryKey,
+      onBeforeStart: () => setIsLiking(false),
+    });
   }, [comment, unlikeComment, queryKey]);
 
   return (

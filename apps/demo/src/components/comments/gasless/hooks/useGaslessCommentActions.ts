@@ -61,10 +61,10 @@ export function useGaslessCommentActions({
   const { mutateAsync: submitEditComment } = editCommentMutation;
   const commentEdition = useCommentEdition();
   const commentRetryEdition = useCommentRetryEdition();
-  const reactionSubmission = useReactionSubmission(
+  const likeReactionSubmission = useReactionSubmission(
     COMMENT_REACTION_LIKE_CONTENT,
   );
-  const reactionRemoval = useReactionRemoval(COMMENT_REACTION_LIKE_CONTENT);
+  const likeReactionRemoval = useReactionRemoval(COMMENT_REACTION_LIKE_CONTENT);
 
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
@@ -332,6 +332,7 @@ export function useGaslessCommentActions({
         queryKey: parentCommentQueryKey,
         onBeforeStart,
         onFailed,
+        onSuccess,
       } = params;
 
       onBeforeStart?.();
@@ -346,9 +347,10 @@ export function useGaslessCommentActions({
           commentType: COMMENT_TYPE_REACTION,
           parentId: comment.id,
           isApproved: hasApproval,
+          references: [],
         });
 
-        reactionSubmission.start({
+        likeReactionSubmission.start({
           ...params,
           queryKey: parentCommentQueryKey,
           pendingOperation,
@@ -363,7 +365,9 @@ export function useGaslessCommentActions({
           throw new Error("Transaction reverted");
         }
 
-        reactionSubmission.success({
+        onSuccess?.();
+
+        likeReactionSubmission.success({
           ...params,
           queryKey: parentCommentQueryKey,
           pendingOperation,
@@ -372,7 +376,7 @@ export function useGaslessCommentActions({
         onFailed?.();
 
         if (pendingOperation) {
-          reactionSubmission.error({
+          likeReactionSubmission.error({
             ...params,
             queryKey: parentCommentQueryKey,
             pendingOperation,
@@ -382,12 +386,16 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [hasApproval, reactionSubmission, submitComment, wagmiConfig],
+    [hasApproval, likeReactionSubmission, submitComment, wagmiConfig],
   );
 
   const unlikeComment = useCallback<OnUnlikeComment>(
     async (params) => {
-      const { comment, queryKey: parentCommentQueryKey } = params;
+      const {
+        comment,
+        queryKey: parentCommentQueryKey,
+        onBeforeStart,
+      } = params;
 
       const reaction = comment.viewerReactions?.[
         COMMENT_REACTION_LIKE_CONTENT
@@ -404,13 +412,15 @@ export function useGaslessCommentActions({
       };
 
       try {
+        onBeforeStart?.();
+
         const txHash = await deleteCommentMutation.mutateAsync({
           comment: reaction,
           submitIfApproved: hasApproval,
         });
 
         // Optimistically remove the reaction from the UI
-        reactionRemoval.start(reactionRemovalParams);
+        likeReactionRemoval.start(reactionRemovalParams);
 
         const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: txHash,
@@ -421,14 +431,14 @@ export function useGaslessCommentActions({
           throw new Error("Transaction reverted");
         }
 
-        reactionRemoval.success(reactionRemovalParams);
+        likeReactionRemoval.success(reactionRemovalParams);
       } catch (e) {
-        reactionRemoval.error(reactionRemovalParams);
+        likeReactionRemoval.error(reactionRemovalParams);
 
         throw e;
       }
     },
-    [deleteCommentMutation, hasApproval, reactionRemoval, wagmiConfig],
+    [deleteCommentMutation, hasApproval, likeReactionRemoval, wagmiConfig],
   );
 
   return useMemo(

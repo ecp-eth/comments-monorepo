@@ -2,7 +2,7 @@ import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
   type IndexerAPIModerationChangeModerationStatusOnCommentSchemaType,
-  IndexerAPICommentSchemaType,
+  type IndexerAPICommentSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
 import type { CommentSelectType } from "ponder:schema";
@@ -106,24 +106,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
             resolvedAuthorEnsData,
             resolvedAuthorFarcasterData,
           ),
-          viewerReactions:
-            viewerReactions?.reduce(
-              (acc, reaction) => {
-                const reactionFormatted = {
-                  ...formatComment(reaction),
-                  author: {
-                    address: reaction.author,
-                  },
-                };
-
-                const container = (acc[reaction.content] =
-                  acc[reaction.content] ?? []);
-                container.push(reactionFormatted);
-
-                return acc;
-              },
-              {} as Record<string, IndexerAPICommentSchemaType[]>,
-            ) ?? {},
+          viewerReactions: formatViewerReactions(viewerReactions),
           replies: {
             extra: {
               moderationEnabled: env.MODERATION_ENABLED,
@@ -218,27 +201,32 @@ function formatComment(
     metadata: comment.metadata ?? [],
     hookMetadata: comment.hookMetadata ?? [],
     cursor: getCommentCursor(comment.id as Hex, comment.createdAt),
-    viewerReactions:
-      comment.viewerReactions?.reduce(
-        (acc, reaction) => {
-          const reactionFormatted = {
-            ...formatComment(reaction),
-            author: {
-              address: reaction.author,
-            },
-          };
-
-          const container = (acc[reaction.content] =
-            acc[reaction.content] ?? []);
-          container.push(reactionFormatted);
-
-          return acc;
-        },
-        {} as Record<string, IndexerAPICommentSchemaType[]>,
-      ) ?? {},
-
+    viewerReactions: formatViewerReactions(comment.viewerReactions),
     reactionCounts: comment.reactionCounts ?? {},
   };
+}
+
+function formatViewerReactions(
+  viewerReactions?: CommentSelectType[],
+): Record<string, IndexerAPICommentSchemaType[]> {
+  return (
+    viewerReactions?.reduce(
+      (acc, reaction) => {
+        const reactionFormatted = {
+          ...formatComment(reaction),
+          author: {
+            address: reaction.author,
+          },
+        };
+
+        const container = (acc[reaction.content] = acc[reaction.content] ?? []);
+        container.push(reactionFormatted);
+
+        return acc;
+      },
+      {} as Record<string, IndexerAPICommentSchemaType[]>,
+    ) ?? {}
+  );
 }
 
 function resolveUserData<

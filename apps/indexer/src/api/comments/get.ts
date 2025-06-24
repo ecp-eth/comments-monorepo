@@ -81,6 +81,7 @@ export default (app: OpenAPIHono) => {
     ];
 
     const repliesConditions: (SQL<unknown> | undefined)[] = [];
+    const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];
 
     const moderationStatusFilter =
       normalizeModerationStatusFilter(moderationStatus);
@@ -110,8 +111,6 @@ export default (app: OpenAPIHono) => {
       }
     }
 
-    const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];
-
     if (viewer) {
       viewerReactionsConditions.push(
         eq(schema.comment.author, viewer),
@@ -120,7 +119,7 @@ export default (app: OpenAPIHono) => {
       );
     }
 
-    const hasPreviousCommentsQuery = cursor
+    const previousCommentsQuery = cursor
       ? db.query.comment
           .findFirst({
             where: and(
@@ -220,7 +219,7 @@ export default (app: OpenAPIHono) => {
 
     const [comments, previousComment] = await Promise.all([
       commentsQuery,
-      hasPreviousCommentsQuery,
+      previousCommentsQuery,
     ]);
 
     const formattedComments =

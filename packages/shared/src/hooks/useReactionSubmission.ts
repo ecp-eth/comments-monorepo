@@ -15,7 +15,7 @@ import {
 } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useMemo } from "react";
-import { isSameHex } from "../helpers.js";
+import { isSameHex, getModerationStatus } from "../helpers.js";
 
 type OnReactionSubmissionParams = {
   /**
@@ -150,9 +150,13 @@ function insertPendingReactionToPage(
     revision: 0,
     metadata: [],
     hookMetadata: [],
-    moderationStatus: "approved",
+    moderationStatus: getModerationStatus(
+      queryData.pages[0].extra,
+      response.data,
+    ),
     moderationStatusChangedAt: new Date(),
     zeroExSwap: zeroExSwap ?? null,
+    references: [],
   };
 
   // Initialize viewerReactions if it doesn't exist and add the reaction

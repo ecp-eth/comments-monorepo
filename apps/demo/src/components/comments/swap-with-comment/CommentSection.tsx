@@ -87,6 +87,7 @@ export function CommentSection() {
         signal,
         viewer,
         mode: "flat",
+        commentType: 0,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,

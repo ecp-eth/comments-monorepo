@@ -112,9 +112,13 @@ export type OnLikeCommentParams = {
    */
   queryKey: QueryKey;
   /**
-   * Called when transaction was created.
+   * Called before transaction was created.
    */
   onBeforeStart?: () => void;
+  /**
+   * Called when transaction was successful.
+   */
+  onSuccess?: () => void;
   /**
    * Called when transaction was failed.
    */
@@ -130,6 +134,10 @@ export type OnUnlikeCommentParams = {
    * Query key to a query where comment is stored
    */
   queryKey: QueryKey;
+  /**
+   * Called before transaction was created.
+   */
+  onBeforeStart?: () => void;
 };
 
 export type OnRetryEditComment = (
