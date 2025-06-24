@@ -64,8 +64,6 @@ contract DebugGasUsage is Test, IERC721Receiver {
     debugDeleteComment();
     debugDeleteCommentWithSigs();
     debugParseCAIP19();
-    debugDeleteComment();
-    debugDeleteCommentWithSigs();
   }
 
   function debugSetupChannel() public {
@@ -214,7 +212,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
   function debugEditComment() public {
     // Create comment data using direct construction
     createCommentData = Comments.CreateComment({
-      content: "Test comment 3",
+      content: "Test comment 4",
       metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0, // COMMENT_TYPE_COMMENT,
@@ -315,7 +313,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
   function debugDeleteComment() public {
     // Create a comment to be deleted
     createCommentData = Comments.CreateComment({
-      content: "Test comment for deletion",
+      content: "Test comment 7 for deletion",
       metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0,
@@ -345,7 +343,7 @@ contract DebugGasUsage is Test, IERC721Receiver {
   function debugDeleteCommentWithSigs() public {
     // Create a comment to be deleted
     createCommentData = Comments.CreateComment({
-      content: "Test comment for deletion with sigs",
+      content: "Test comment 8 for deletion with sigs",
       metadata: new Metadata.MetadataEntry[](0),
       targetUri: "",
       commentType: 0,
