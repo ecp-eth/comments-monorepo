@@ -19,7 +19,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@0x/0x-parser": "^2.10.1",
+    "@0x/0x-parser": "2.10.3",
     "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/shared": "workspace:*",
     "@hono/node-server": "^1.13.8",
