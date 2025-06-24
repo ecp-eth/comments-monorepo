@@ -1,6 +1,6 @@
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { JSONContent } from "@tiptap/core";
-import type { LinkAttributes, MentionItem } from "./extensions/types";
+import type { LinkAttributes, MentionItem } from "./extensions/types.js";
 
 const URL_REGEX = /^(https?:\/\/[^\s<>[\]{}|\\^]+)/u;
 

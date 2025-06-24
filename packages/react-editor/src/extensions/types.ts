@@ -1,3 +1,4 @@
+import type { ComponentType } from "react";
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { Attribute } from "@tiptap/core";
 
@@ -74,3 +75,24 @@ export type MentionItemKeys =
 export type MentionAttributes = {
   [K in MentionItemKeys]: Attribute;
 };
+
+export type UploadTrackerImageComponentProps = {
+  file: UploadTrackerFile;
+};
+
+export type UploadTrackerImageComponent =
+  ComponentType<UploadTrackerImageComponentProps>;
+
+export type UploadTrackerVideoComponentProps = {
+  file: UploadTrackerFile;
+};
+
+export type UploadTrackerVideoComponent =
+  ComponentType<UploadTrackerVideoComponentProps>;
+
+export type UploadTrackerFileComponentProps = {
+  file: UploadTrackerFile;
+};
+
+export type UploadTrackerFileComponent =
+  ComponentType<UploadTrackerFileComponentProps>;

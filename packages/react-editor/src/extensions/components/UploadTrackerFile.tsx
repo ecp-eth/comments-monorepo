@@ -1,11 +1,16 @@
-import { type UploadTrackerFile } from "../types";
+import type {
+  UploadTrackerFile,
+  UploadTrackerFileComponent,
+  UploadTrackerImageComponent,
+  UploadTrackerVideoComponent,
+} from "../types.js";
 
 type UploadTrackerFileProps = {
   file: UploadTrackerFile;
   onDeleteClick: () => void;
-  renderImage?: (file: UploadTrackerFile) => React.ReactNode;
-  renderVideo?: (file: UploadTrackerFile) => React.ReactNode;
-  renderFile?: (file: UploadTrackerFile) => React.ReactNode;
+  imageComponent: UploadTrackerImageComponent;
+  videoComponent: UploadTrackerVideoComponent;
+  fileComponent: UploadTrackerFileComponent;
   className?: string;
   deleteButtonClassName?: string;
 };
@@ -13,9 +18,9 @@ type UploadTrackerFileProps = {
 export function UploadTrackerFile({
   file,
   onDeleteClick,
-  renderImage,
-  renderVideo,
-  renderFile,
+  imageComponent: ImageComponent,
+  videoComponent: VideoComponent,
+  fileComponent: FileComponent,
   className = "w-[100px] h-[100px] p-2 border rounded-md bg-muted/30 relative",
   deleteButtonClassName = "absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-muted shadow-sm border rounded-full p-1",
 }: UploadTrackerFileProps) {
@@ -47,17 +52,9 @@ export function UploadTrackerFile({
         </svg>
       </button>
 
-      {isVideo && renderVideo ? (
-        renderVideo(file)
-      ) : isImage && renderImage ? (
-        renderImage(file)
-      ) : renderFile ? (
-        renderFile(file)
-      ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <span className="text-sm text-muted-foreground">{file.name}</span>
-        </div>
-      )}
+      {isVideo ? <VideoComponent file={file} /> : null}
+      {isImage ? <ImageComponent file={file} /> : null}
+      {!isImage && !isVideo ? <FileComponent file={file} /> : null}
     </div>
   );
 }

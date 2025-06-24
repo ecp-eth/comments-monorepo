@@ -1,4 +1,4 @@
-import { isValidQuery } from "../helpers";
+import { isValidQuery } from "../helpers.js";
 import { cn, getChainById } from "@ecp.eth/shared/helpers";
 import type { SuggestionProps } from "@tiptap/suggestion";
 import {
@@ -10,7 +10,7 @@ import {
 } from "react";
 import * as chains from "viem/chains";
 import type { Hex } from "viem";
-import type { Erc20MentionSuggestion, MentionItem } from "../types";
+import type { Erc20MentionSuggestion, MentionItem } from "../types.js";
 
 export type SuggestionsProps = SuggestionProps<MentionItem> & {
   minimumQueryLength: number;

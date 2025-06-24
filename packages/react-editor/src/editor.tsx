@@ -10,21 +10,26 @@ import { Text } from "@tiptap/extension-text";
 import { Link } from "@tiptap/extension-link";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { useImperativeHandle, useState } from "react";
-import { MentionExtension } from "./extensions/Mention";
+import { MentionExtension } from "./extensions/Mention.js";
 import {
   type UploadTrackerUploadedFile,
   type UploadTrackerAttributes,
   type UploadTrackerFileToUpload,
   UPLOAD_TRACKER_NODE_NAME,
   UploadTracker,
-} from "./extensions/UploadTracker";
+} from "./extensions/UploadTracker.js";
 import { HardBreak } from "@tiptap/extension-hard-break";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
-import { useHandleDefaultEditorValue } from "./hooks/useHandleDefaultEditorValue";
-import type { LinkAttributes } from "./extensions/types";
+import { useHandleDefaultEditorValue } from "./hooks/useHandleDefaultEditorValue.js";
+import type {
+  LinkAttributes,
+  UploadTrackerFileComponent,
+  UploadTrackerImageComponent,
+  UploadTrackerVideoComponent,
+} from "./extensions/types.js";
 import { cn } from "@ecp.eth/shared/helpers";
-import { ALLOWED_UPLOAD_MIME_TYPES } from "./constants";
-import type { SearchSuggestionsFunction } from "./types";
+import { ALLOWED_UPLOAD_MIME_TYPES } from "./constants.js";
+import type { SearchSuggestionsFunction } from "./types.js";
 
 export type EditorRef = {
   focus: () => void;
@@ -61,6 +66,9 @@ export type EditorProps = {
   onBlur?: () => void;
   onEscapePress?: () => void;
   searchSuggestions: SearchSuggestionsFunction;
+  imageComponent: UploadTrackerImageComponent;
+  videoComponent: UploadTrackerVideoComponent;
+  fileComponent: UploadTrackerFileComponent;
 };
 
 export function Editor({
@@ -74,6 +82,9 @@ export function Editor({
   onEscapePress,
   defaultValue,
   searchSuggestions,
+  imageComponent,
+  videoComponent,
+  fileComponent,
 }: EditorProps) {
   const [isDragging, setIsDragging] = useState(false);
   const content = useHandleDefaultEditorValue(
@@ -110,7 +121,11 @@ export function Editor({
           char: "@",
         },
       }),
-      UploadTracker,
+      UploadTracker.configure({
+        imageComponent,
+        videoComponent,
+        fileComponent,
+      }),
     ],
     editorProps: {
       attributes: {

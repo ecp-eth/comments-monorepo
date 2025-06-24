@@ -4,7 +4,7 @@ import {
   UPLOAD_TRACKER_NODE_NAME,
   type UploadTrackerAttributes,
 } from "./extensions/UploadTracker.js";
-import type { MentionItem } from "./extensions/types";
+import type { MentionItem } from "./extensions/types.js";
 
 export function extractReferences(
   content: JSONContent,

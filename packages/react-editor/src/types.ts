@@ -1,6 +1,6 @@
-import type { MentionItem } from "./extensions/types";
+import type { MentionItem } from "./extensions/types.js";
 
-export * from "./extensions/types";
+export * from "./extensions/types.js";
 
 export type SearchSuggestionsFunction = (
   query: string,

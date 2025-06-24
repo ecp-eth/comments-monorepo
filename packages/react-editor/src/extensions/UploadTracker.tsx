@@ -7,8 +7,11 @@ import {
   type UploadTrackerUploadedFile,
   type UploadTrackerAttributes,
   type UploadTrackerFileToUpload,
-} from "./types";
-import { UploadTrackerFile as UploadTrackerFileComponent } from "./components/UploadTrackerFile";
+  type UploadTrackerImageComponent,
+  type UploadTrackerVideoComponent,
+  type UploadTrackerFileComponent,
+} from "./types.js";
+import { UploadTrackerFile as RenderUploadTrackerFileComponent } from "./components/UploadTrackerFile.js";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -29,7 +32,13 @@ export type {
 
 export const UPLOAD_TRACKER_NODE_NAME = "uploadTracker";
 
-export const UploadTracker = Node.create({
+type UploadTrackerOptions = {
+  imageComponent: UploadTrackerImageComponent;
+  videoComponent: UploadTrackerVideoComponent;
+  fileComponent: UploadTrackerFileComponent;
+};
+
+export const UploadTracker = Node.create<UploadTrackerOptions>({
   name: UPLOAD_TRACKER_NODE_NAME,
   group: "block",
   atom: true, // Makes it a single unit that can't be edited internally
@@ -77,7 +86,7 @@ export const UploadTracker = Node.create({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(UploadTrackerView);
+    return ReactNodeViewRenderer(createUploadTrackerView(this.options));
   },
 
   addCommands() {
@@ -256,7 +265,25 @@ export const UploadTracker = Node.create({
   },
 });
 
-export function UploadTrackerView({ editor, node }: NodeViewProps) {
+type UploadTrackerViewProps = NodeViewProps & {
+  imageComponent: UploadTrackerImageComponent;
+  videoComponent: UploadTrackerVideoComponent;
+  fileComponent: UploadTrackerFileComponent;
+};
+
+function createUploadTrackerView(options: UploadTrackerOptions) {
+  return (props: NodeViewProps) => {
+    return <UploadTrackerView {...props} {...options} />;
+  };
+}
+
+function UploadTrackerView({
+  editor,
+  node,
+  imageComponent,
+  videoComponent,
+  fileComponent,
+}: UploadTrackerViewProps) {
   const attrs = node.attrs as UploadTrackerAttributes;
   const uploads = attrs.uploads || [];
 
@@ -268,9 +295,12 @@ export function UploadTrackerView({ editor, node }: NodeViewProps) {
     <NodeViewWrapper>
       <div className="mt-2 flex flex-wrap gap-2 p-2">
         {uploads.map((file: UploadTrackerFile) => (
-          <UploadTrackerFileComponent
+          <RenderUploadTrackerFileComponent
             key={file.id}
             file={file}
+            imageComponent={imageComponent}
+            videoComponent={videoComponent}
+            fileComponent={fileComponent}
             onDeleteClick={() => {
               editor.commands.removeUploadedFile(file.id);
             }}

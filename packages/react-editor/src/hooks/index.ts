@@ -1,1 +1,1 @@
-export * from "./useHandleDefaultEditorValue";
+export * from "./useHandleDefaultEditorValue.js";

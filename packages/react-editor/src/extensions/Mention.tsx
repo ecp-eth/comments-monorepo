@@ -5,9 +5,15 @@ import {
   Suggestions,
   type SuggestionsRef,
   type SuggestionsProps,
-} from "./components/Suggestions";
-import { isValidQuery } from "./helpers";
-import type { MentionItem, MentionItemKeys } from "./types";
+} from "./components/Suggestions.js";
+import { isValidQuery } from "./helpers.js";
+import type {
+  MentionItem,
+  MentionItemKeys,
+  UploadTrackerFileComponent,
+  UploadTrackerImageComponent,
+  UploadTrackerVideoComponent,
+} from "./types.js";
 
 const MINIMUM_QUERY_LENGTH = 2;
 
@@ -19,6 +25,9 @@ type MentionAttributes = {
 
 type MentionExtensionOptions = MentionOptions<SuggestionItem, MentionItem> & {
   searchSuggestions: (query: string) => Promise<SuggestionItem[]>;
+  imageComponent: UploadTrackerImageComponent;
+  videoComponent: UploadTrackerVideoComponent;
+  fileComponent: UploadTrackerFileComponent;
 };
 
 export const MentionExtension = Mention.extend<MentionExtensionOptions>({
