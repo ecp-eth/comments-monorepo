@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { IndexingFunctionArgs } from "ponder:registry";
 import { env } from "../env";
 import { base } from "viem/chains";
@@ -75,27 +76,45 @@ export function createZeroExSwapResolver(
 
       // Try to parse swap directly from transaction hash
       // Note: metadata is not available in CommentAdded event, it comes from separate CommentMetadataSet events
-      const swap = await parseSwap({
-        publicClient,
-        transactionHash: event.transaction.hash,
-      });
+      try {
+        const swap = await parseSwap({
+          publicClient,
+          transactionHash: event.transaction.hash,
+        });
 
-      if (!swap) {
-        return null;
+        if (!swap) {
+          return null;
+        }
+
+        return {
+          from: {
+            symbol: swap.tokenIn.symbol,
+            address: swap.tokenIn.address as Hex,
+            amount: swap.tokenIn.amount,
+          },
+          to: {
+            symbol: swap.tokenOut.symbol,
+            address: swap.tokenOut.address as Hex,
+            amount: swap.tokenOut.amount,
+          },
+        };
+      } catch (e) {
+        if (
+          e instanceof Error &&
+          e.message.includes("This is an ERC-4337 transaction.")
+        ) {
+          Sentry.captureException(e, {
+            extra: {
+              transactionHash: event.transaction.hash,
+              chainId: context.chain.id,
+            },
+          });
+
+          return null;
+        }
+
+        throw e;
       }
-
-      return {
-        from: {
-          symbol: swap.tokenIn.symbol,
-          address: swap.tokenIn.address as Hex,
-          amount: swap.tokenIn.amount,
-        },
-        to: {
-          symbol: swap.tokenOut.symbol,
-          address: swap.tokenOut.address as Hex,
-          amount: swap.tokenOut.amount,
-        },
-      };
     },
   };
 }
