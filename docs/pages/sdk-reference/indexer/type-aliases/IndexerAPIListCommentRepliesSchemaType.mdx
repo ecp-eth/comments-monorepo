@@ -10,6 +10,7 @@
 type IndexerAPIListCommentRepliesSchemaType = {
   extra: {
      moderationEnabled: boolean;
+     moderationKnownReactions: string[];
   };
   pagination: {
      endCursor?: `0x${string}`;
@@ -162,7 +163,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:406](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L406)
+Defined in: [packages/sdk/src/indexer/schemas.ts:418](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L418)
 
 ## Type declaration
 
@@ -171,6 +172,7 @@ Defined in: [packages/sdk/src/indexer/schemas.ts:406](https://github.com/ecp-eth
 ```ts
 extra: {
   moderationEnabled: boolean;
+  moderationKnownReactions: string[];
 } = IndexerAPIExtraSchema;
 ```
 
@@ -178,6 +180,12 @@ extra: {
 
 ```ts
 moderationEnabled: boolean;
+```
+
+#### extra.moderationKnownReactions
+
+```ts
+moderationKnownReactions: string[];
 ```
 
 ### pagination

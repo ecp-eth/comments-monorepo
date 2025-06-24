@@ -334,6 +334,17 @@ export type IndexerAPICommentOutputSchemaType = z.infer<
   typeof IndexerAPICommentOutputSchema
 >;
 
+export const IndexerAPICommentReactionSchema = IndexerAPICommentSchema.extend({
+  viewerReactions: z.record(z.array(IndexerAPICommentSchema)),
+  reactionCounts: z.record(z.number()),
+});
+
+export const IndexerAPICommentReactionOutputSchema =
+  IndexerAPICommentOutputSchema.extend({
+    viewerReactions: z.record(z.array(IndexerAPICommentOutputSchema)),
+    reactionCounts: z.record(z.number()),
+  });
+
 export const IndexerAPIPaginationSchema = z.object({
   limit: z.number().int(),
   offset: z.number().int(),
@@ -346,15 +357,16 @@ export type IndexerAPIPaginationSchemaType = z.infer<
 
 export const IndexerAPIExtraSchema = z.object({
   moderationEnabled: z.boolean(),
+  moderationKnownReactions: z.array(z.string()),
 });
 
 export type IndexerAPIExtraSchemaType = z.infer<typeof IndexerAPIExtraSchema>;
 
 export const IndexerAPICommentWithRepliesSchema =
-  IndexerAPICommentSchema.extend({
+  IndexerAPICommentReactionSchema.extend({
     replies: z.object({
       extra: IndexerAPIExtraSchema,
-      results: z.array(IndexerAPICommentSchema),
+      results: z.array(IndexerAPICommentReactionSchema),
       pagination: IndexerAPICursorPaginationSchema,
     }),
   });
@@ -364,10 +376,10 @@ export type IndexerAPICommentWithRepliesSchemaType = z.infer<
 >;
 
 export const IndexerAPICommentWithRepliesOutputSchema =
-  IndexerAPICommentOutputSchema.extend({
+  IndexerAPICommentReactionOutputSchema.extend({
     replies: z.object({
       extra: IndexerAPIExtraSchema,
-      results: z.array(IndexerAPICommentOutputSchema),
+      results: z.array(IndexerAPICommentReactionOutputSchema),
       pagination: IndexerAPICursorPaginationSchema,
     }),
   });

@@ -88,6 +88,7 @@ export async function POST(
       : {
           targetUri: passedCommentData.targetUri,
         }),
+    commentType: passedCommentData.commentType,
   });
 
   const chainId = chain.id;

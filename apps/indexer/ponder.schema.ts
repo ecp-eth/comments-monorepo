@@ -44,8 +44,11 @@ export const comment = onchainTable(
       .text({ enum: ["success", "pending", "partial", "failed"] })
       .notNull()
       .default("pending"),
-    referencesResolutionStatusChangedAt: t
-      .timestamp({ withTimezone: true })
+    referencesResolutionStatusChangedAt: t.timestamp({ withTimezone: true }),
+    reactionCounts: t
+      .jsonb()
+      .$type<Record<string, number>>()
+      .default({})
       .notNull(),
   }),
   (table) => ({
@@ -116,7 +119,7 @@ export const approval = onchainTable(
 );
 
 export const commentRelations = relations(comment, ({ one, many }) => ({
-  // Each comment may have many response comments (children) that reference it.
+  // Each comment may have many direct replies (children) that reference it.
   replies: many(comment, {
     relationName: "comment_replies",
   }),
@@ -132,8 +135,16 @@ export const commentRelations = relations(comment, ({ one, many }) => ({
     fields: [comment.rootCommentId],
     references: [comment.id],
   }),
-  // Each root comment may have many replies (children) that reference it.
+  // Each root comment may have many replies (descendants) that reference it.
   flatReplies: many(comment, {
     relationName: "comment_flat_replies",
+  }),
+  viewerReactions: many(comment, {
+    relationName: "comment_viewer_reactions",
+  }),
+  reactionTarget: one(comment, {
+    relationName: "comment_viewer_reactions",
+    fields: [comment.parentId],
+    references: [comment.id],
   }),
 }));

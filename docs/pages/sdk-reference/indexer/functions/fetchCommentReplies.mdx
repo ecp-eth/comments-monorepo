@@ -10,6 +10,7 @@
 function fetchCommentReplies(options): Promise<{
   extra: {
      moderationEnabled: boolean;
+     moderationKnownReactions: string[];
   };
   pagination: {
      endCursor?: `0x${string}`;
@@ -162,7 +163,7 @@ function fetchCommentReplies(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:323](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L323)
+Defined in: [packages/sdk/src/indexer/api.ts:325](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L325)
 
 Fetch replies for a comment from the Indexer API
 
@@ -177,6 +178,7 @@ Fetch replies for a comment from the Indexer API
 `Promise`\<\{
   `extra`: \{
      `moderationEnabled`: `boolean`;
+     `moderationKnownReactions`: `string`[];
   \};
   `pagination`: \{
      `endCursor?`: `` `0x${string}` ``;

@@ -104,7 +104,7 @@ export function useNewCommentsChecker({
     const newComments = queryResult.data;
 
     // this also has new comments (not written by us, so let user decide if they want to see them, see fetchNewComments())
-    if (hasNewComments(queryData, queryResult.data)) {
+    if (hasNewComments(queryData, newComments)) {
       return;
     }
 

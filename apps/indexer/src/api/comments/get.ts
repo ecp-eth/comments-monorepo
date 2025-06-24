@@ -21,6 +21,7 @@ import { REPLIES_PER_COMMENT } from "../../lib/constants";
 import { env } from "../../env";
 import type { SQL } from "drizzle-orm";
 import { normalizeModerationStatusFilter } from "./helpers";
+import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 
 const getCommentsRoute = createRoute({
   method: "get",
@@ -80,6 +81,8 @@ export default (app: OpenAPIHono) => {
     ];
 
     const repliesConditions: (SQL<unknown> | undefined)[] = [];
+    const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];
+
     const moderationStatusFilter =
       normalizeModerationStatusFilter(moderationStatus);
 
@@ -108,7 +111,15 @@ export default (app: OpenAPIHono) => {
       }
     }
 
-    const hasPreviousCommentsQuery = cursor
+    if (viewer) {
+      viewerReactionsConditions.push(
+        eq(schema.comment.author, viewer),
+        eq(schema.comment.commentType, COMMENT_TYPE_REACTION),
+        isNull(schema.comment.deletedAt),
+      );
+    }
+
+    const previousCommentsQuery = cursor
       ? db.query.comment
           .findFirst({
             where: and(
@@ -148,10 +159,31 @@ export default (app: OpenAPIHono) => {
     const commentsQuery = db.query.comment.findMany({
       with: {
         [mode === "flat" ? "flatReplies" : "replies"]: {
-          where: and(...repliesConditions),
+          where: and(
+            ...repliesConditions,
+            // replies should be same as the containing comment type
+            commentType != null
+              ? eq(schema.comment.commentType, commentType)
+              : undefined,
+          ),
           orderBy: [desc(schema.comment.createdAt), desc(schema.comment.id)],
           limit: REPLIES_PER_COMMENT + 1,
+          with: {
+            viewerReactions: viewer
+              ? {
+                  where: and(
+                    ...repliesConditions,
+                    ...viewerReactionsConditions,
+                  ),
+                }
+              : undefined,
+          },
         },
+        viewerReactions: viewer
+          ? {
+              where: and(...repliesConditions, ...viewerReactionsConditions),
+            }
+          : undefined,
       },
       where: and(
         ...sharedConditions,
@@ -187,7 +219,7 @@ export default (app: OpenAPIHono) => {
 
     const [comments, previousComment] = await Promise.all([
       commentsQuery,
-      hasPreviousCommentsQuery,
+      previousCommentsQuery,
     ]);
 
     const formattedComments =

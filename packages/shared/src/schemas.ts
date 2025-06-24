@@ -23,8 +23,12 @@ export const CommentDataWithIdSchema = CreateCommentDataSchema.extend({
   metadata: MetadataEntrySchema.array(),
 });
 
+export type CommentDataWithIdSchemaType = z.infer<
+  typeof CommentDataWithIdSchema
+>;
+
 // this is just for type checking
-({}) as z.infer<typeof CommentDataWithIdSchema> satisfies CommentInputData;
+({}) as CommentDataWithIdSchemaType satisfies CommentInputData;
 
 /**
  * Parses response from API endpoint for usage in client
@@ -154,6 +158,8 @@ type CommentSchemaType = IndexerAPICommentSchemaType & {
     results: CommentSchemaType[];
     pagination: IndexerAPICursorPaginationSchemaType;
   };
+  viewerReactions?: Record<string, IndexerAPICommentSchemaType[]>;
+  reactionCounts?: Record<string, number>;
 };
 
 type CommentSchemaInputType = IndexerAPICommentSchemaType & {
@@ -163,6 +169,8 @@ type CommentSchemaInputType = IndexerAPICommentSchemaType & {
     results: CommentSchemaInputType[];
     pagination: IndexerAPICursorPaginationSchemaType;
   };
+  viewerReactions?: Record<string, IndexerAPICommentSchemaType[]>;
+  reactionCounts?: Record<string, number>;
 };
 
 export const CommentSchema: z.ZodType<
@@ -177,6 +185,8 @@ export const CommentSchema: z.ZodType<
       pagination: IndexerAPICursorPaginationSchema,
     })
     .optional(),
+  viewerReactions: z.record(z.array(IndexerAPICommentSchema)).optional(),
+  reactionCounts: z.record(z.number()).optional(),
   pendingOperation: PendingCommentOperationSchema.optional(),
 });
 

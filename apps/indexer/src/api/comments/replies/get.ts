@@ -12,6 +12,8 @@ import {
 import { REPLIES_PER_COMMENT } from "../../../lib/constants";
 import { env } from "../../../env";
 import { normalizeModerationStatusFilter } from "../helpers";
+import { SQL } from "drizzle-orm";
+import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 
 const getCommentsRoute = createRoute({
   method: "get",
@@ -42,6 +44,7 @@ const getCommentsRoute = createRoute({
     },
   },
 });
+
 export default (app: OpenAPIHono) => {
   app.openapi(getCommentsRoute, async (c) => {
     const {
@@ -68,6 +71,7 @@ export default (app: OpenAPIHono) => {
         ? eq(schema.comment.chainId, chainId[0]!)
         : inArray(schema.comment.chainId, chainId),
     ];
+    const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];
 
     if (mode === "flat") {
       const rootComment = await db.query.comment.findFirst({
@@ -98,6 +102,9 @@ export default (app: OpenAPIHono) => {
       sharedConditions.push(
         inArray(schema.comment.moderationStatus, moderationStatusFilter),
       );
+      viewerReactionsConditions.push(
+        inArray(schema.comment.moderationStatus, moderationStatusFilter),
+      );
     } else if (env.MODERATION_ENABLED) {
       const onlyApproved = eq(schema.comment.moderationStatus, "approved");
 
@@ -105,9 +112,21 @@ export default (app: OpenAPIHono) => {
         sharedConditions.push(
           or(onlyApproved, eq(schema.comment.author, viewer)),
         );
+        viewerReactionsConditions.push(
+          or(onlyApproved, eq(schema.comment.author, viewer)),
+        );
       } else {
         sharedConditions.push(onlyApproved);
+        viewerReactionsConditions.push(onlyApproved);
       }
+    }
+
+    if (viewer) {
+      viewerReactionsConditions.push(
+        eq(schema.comment.author, viewer),
+        eq(schema.comment.commentType, COMMENT_TYPE_REACTION),
+        isNull(schema.comment.deletedAt),
+      );
     }
 
     // use reverse order to find previous reply
@@ -148,6 +167,13 @@ export default (app: OpenAPIHono) => {
       : undefined;
 
     const repliesQuery = db.query.comment.findMany({
+      with: {
+        viewerReactions: viewer
+          ? {
+              where: and(...viewerReactionsConditions),
+            }
+          : undefined,
+      },
       where: and(
         ...sharedConditions,
         ...(sort === "desc" && !!cursor

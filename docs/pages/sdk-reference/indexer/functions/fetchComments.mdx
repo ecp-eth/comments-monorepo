@@ -10,6 +10,7 @@
 function fetchComments(options): Promise<{
   extra: {
      moderationEnabled: boolean;
+     moderationKnownReactions: string[];
   };
   pagination: {
      endCursor?: `0x${string}`;
@@ -53,6 +54,7 @@ function fetchComments(options): Promise<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     reactionCounts: Record<string, number>;
      references: (
         | {
         address: `0x${string}`;
@@ -144,6 +146,7 @@ function fetchComments(options): Promise<{
      replies: {
         extra: {
            moderationEnabled: boolean;
+           moderationKnownReactions: string[];
         };
         pagination: {
            endCursor?: `0x${string}`;
@@ -187,6 +190,7 @@ function fetchComments(options): Promise<{
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${(...)}`;
@@ -270,6 +274,34 @@ function fetchComments(options): Promise<{
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
+           viewerReactions: Record<string, {
+              app: `0x${(...)}`;
+              author: {
+                 address: ...;
+                 ens?: ...;
+                 farcaster?: ...;
+              };
+              chainId: number;
+              channelId: bigint;
+              commentType: number;
+              content: string;
+              createdAt: Date;
+              cursor: `0x${(...)}`;
+              deletedAt: ... | ...;
+              hookMetadata: ...[];
+              id: `0x${(...)}`;
+              logIndex: ... | ...;
+              metadata: ...[];
+              moderationStatus: ... | ... | ...;
+              moderationStatusChangedAt: Date;
+              parentId: ... | ...;
+              references: ...[];
+              revision: number;
+              targetUri: string;
+              txHash: `0x${(...)}`;
+              updatedAt: Date;
+              zeroExSwap: ... | ...;
+           }[]>;
            zeroExSwap:   | null
               | {
               from: {
@@ -289,6 +321,138 @@ function fetchComments(options): Promise<{
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     viewerReactions: Record<string, {
+        app: `0x${string}`;
+        author: {
+           address: `0x${string}`;
+           ens?: {
+              avatarUrl: ... | ...;
+              name: string;
+           };
+           farcaster?: {
+              displayName?: ... | ...;
+              fid: number;
+              pfpUrl?: ... | ...;
+              username: string;
+           };
+        };
+        chainId: number;
+        channelId: bigint;
+        commentType: number;
+        content: string;
+        createdAt: Date;
+        cursor: `0x${string}`;
+        deletedAt: null | Date;
+        hookMetadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        id: `0x${string}`;
+        logIndex: null | number;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationStatus: "approved" | "pending" | "rejected";
+        moderationStatusChangedAt: Date;
+        parentId: null | `0x${string}`;
+        references: (
+           | {
+           address: `0x${(...)}`;
+           avatarUrl: ... | ...;
+           name: string;
+           position: {
+              end: ...;
+              start: ...;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${(...)}`;
+           displayName: ... | ...;
+           fid: number;
+           fname: string;
+           pfpUrl: ... | ...;
+           position: {
+              end: ...;
+              start: ...;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${(...)}`;
+           chainId: ... | ...;
+           chains: ...[];
+           decimals: number;
+           logoURI: ... | ...;
+           name: string;
+           position: {
+              end: ...;
+              start: ...;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: ... | ...;
+           favicon: ... | ...;
+           opengraph: ... | ...;
+           position: {
+              end: ...;
+              start: ...;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: ...;
+              start: ...;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: ...;
+              start: ...;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: ...;
+              start: ...;
+           };
+           type: "video";
+           url: string;
+        })[];
+        revision: number;
+        targetUri: string;
+        txHash: `0x${string}`;
+        updatedAt: Date;
+        zeroExSwap:   | null
+           | {
+           from: {
+              address: `0x${(...)}`;
+              amount: string;
+              symbol: string;
+           };
+           to: {
+              address: `0x${(...)}`;
+              amount: string;
+              symbol: string;
+           };
+         };
+     }[]>;
      zeroExSwap:   | null
         | {
         from: {
@@ -321,6 +485,7 @@ Fetch comments from the Indexer API
 `Promise`\<\{
   `extra`: \{
      `moderationEnabled`: `boolean`;
+     `moderationKnownReactions`: `string`[];
   \};
   `pagination`: \{
      `endCursor?`: `` `0x${string}` ``;
@@ -364,6 +529,7 @@ Fetch comments from the Indexer API
      `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
      `moderationStatusChangedAt`: `Date`;
      `parentId`: `null` \| `` `0x${string}` ``;
+     `reactionCounts`: `Record`\<`string`, `number`\>;
      `references`: (
         \| \{
         `address`: `` `0x${string}` ``;
@@ -455,6 +621,7 @@ Fetch comments from the Indexer API
      `replies`: \{
         `extra`: \{
            `moderationEnabled`: `boolean`;
+           `moderationKnownReactions`: `string`[];
         \};
         `pagination`: \{
            `endCursor?`: `` `0x${string}` ``;
@@ -498,6 +665,7 @@ Fetch comments from the Indexer API
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
+           `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
               \| \{
               `address`: `` `0x${(...)}` ``;
@@ -581,6 +749,34 @@ Fetch comments from the Indexer API
            `targetUri`: `string`;
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
+           `viewerReactions`: `Record`\<`string`, \{
+              `app`: `` `0x${(...)}` ``;
+              `author`: \{
+                 `address`: ...;
+                 `ens?`: ...;
+                 `farcaster?`: ...;
+              \};
+              `chainId`: `number`;
+              `channelId`: `bigint`;
+              `commentType`: `number`;
+              `content`: `string`;
+              `createdAt`: `Date`;
+              `cursor`: `` `0x${(...)}` ``;
+              `deletedAt`: ... \| ...;
+              `hookMetadata`: ...[];
+              `id`: `` `0x${(...)}` ``;
+              `logIndex`: ... \| ...;
+              `metadata`: ...[];
+              `moderationStatus`: ... \| ... \| ...;
+              `moderationStatusChangedAt`: `Date`;
+              `parentId`: ... \| ...;
+              `references`: ...[];
+              `revision`: `number`;
+              `targetUri`: `string`;
+              `txHash`: `` `0x${(...)}` ``;
+              `updatedAt`: `Date`;
+              `zeroExSwap`: ... \| ...;
+           \}[]\>;
            `zeroExSwap`:   \| `null`
               \| \{
               `from`: \{
@@ -600,6 +796,138 @@ Fetch comments from the Indexer API
      `targetUri`: `string`;
      `txHash`: `` `0x${string}` ``;
      `updatedAt`: `Date`;
+     `viewerReactions`: `Record`\<`string`, \{
+        `app`: `` `0x${string}` ``;
+        `author`: \{
+           `address`: `` `0x${string}` ``;
+           `ens?`: \{
+              `avatarUrl`: ... \| ...;
+              `name`: `string`;
+           \};
+           `farcaster?`: \{
+              `displayName?`: ... \| ...;
+              `fid`: `number`;
+              `pfpUrl?`: ... \| ...;
+              `username`: `string`;
+           \};
+        \};
+        `chainId`: `number`;
+        `channelId`: `bigint`;
+        `commentType`: `number`;
+        `content`: `string`;
+        `createdAt`: `Date`;
+        `cursor`: `` `0x${string}` ``;
+        `deletedAt`: `null` \| `Date`;
+        `hookMetadata`: \{
+           `key`: `` `0x${string}` ``;
+           `value`: `` `0x${string}` ``;
+        \}[];
+        `id`: `` `0x${string}` ``;
+        `logIndex`: `null` \| `number`;
+        `metadata`: \{
+           `key`: `` `0x${string}` ``;
+           `value`: `` `0x${string}` ``;
+        \}[];
+        `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
+        `moderationStatusChangedAt`: `Date`;
+        `parentId`: `null` \| `` `0x${string}` ``;
+        `references`: (
+           \| \{
+           `address`: `` `0x${(...)}` ``;
+           `avatarUrl`: ... \| ...;
+           `name`: `string`;
+           `position`: \{
+              `end`: ...;
+              `start`: ...;
+           \};
+           `type`: `"ens"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `address`: `` `0x${(...)}` ``;
+           `displayName`: ... \| ...;
+           `fid`: `number`;
+           `fname`: `string`;
+           `pfpUrl`: ... \| ...;
+           `position`: \{
+              `end`: ...;
+              `start`: ...;
+           \};
+           `type`: `"farcaster"`;
+           `url`: `string`;
+           `username`: `string`;
+         \}
+           \| \{
+           `address`: `` `0x${(...)}` ``;
+           `chainId`: ... \| ...;
+           `chains`: ...[];
+           `decimals`: `number`;
+           `logoURI`: ... \| ...;
+           `name`: `string`;
+           `position`: \{
+              `end`: ...;
+              `start`: ...;
+           \};
+           `symbol`: `string`;
+           `type`: `"erc20"`;
+         \}
+           \| \{
+           `description`: ... \| ...;
+           `favicon`: ... \| ...;
+           `opengraph`: ... \| ...;
+           `position`: \{
+              `end`: ...;
+              `start`: ...;
+           \};
+           `title`: `string`;
+           `type`: `"webpage"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `mediaType`: `string`;
+           `position`: \{
+              `end`: ...;
+              `start`: ...;
+           \};
+           `type`: `"file"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `mediaType`: `string`;
+           `position`: \{
+              `end`: ...;
+              `start`: ...;
+           \};
+           `type`: `"image"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `mediaType`: `string`;
+           `position`: \{
+              `end`: ...;
+              `start`: ...;
+           \};
+           `type`: `"video"`;
+           `url`: `string`;
+        \})[];
+        `revision`: `number`;
+        `targetUri`: `string`;
+        `txHash`: `` `0x${string}` ``;
+        `updatedAt`: `Date`;
+        `zeroExSwap`:   \| `null`
+           \| \{
+           `from`: \{
+              `address`: `` `0x${(...)}` ``;
+              `amount`: `string`;
+              `symbol`: `string`;
+           \};
+           `to`: \{
+              `address`: `` `0x${(...)}` ``;
+              `amount`: `string`;
+              `symbol`: `string`;
+           \};
+         \};
+     \}[]\>;
      `zeroExSwap`:   \| `null`
         \| \{
         `from`: \{

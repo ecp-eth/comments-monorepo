@@ -337,7 +337,6 @@ export function CommentForm<TExtraSubmitData = unknown>({
       }
 
       const result = await postComment({
-        address: author,
         comment: parentId
           ? {
               author,

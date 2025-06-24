@@ -26,6 +26,18 @@ const EnvSchema = z
       .enum(["0", "1"])
       .default("0")
       .transform((val) => val === "1"),
+    MODERATION_KNOWN_REACTIONS: z
+      .string()
+      .default("")
+      .transform(
+        (val) =>
+          new Set(
+            val
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean),
+          ),
+      ),
     MODERATION_TELEGRAM_BOT_TOKEN: z.string().optional(),
     MODERATION_TELEGRAM_CHANNEL_ID: z.string().optional(),
     MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
@@ -63,7 +75,7 @@ const _env = EnvSchema.safeParse(process.env);
 
 if (!_env.success) {
   console.error(_env.error.format());
-  throw new Error("Invalid environment variables");
+  throw new Error("Invalid environment variables:" + _env.error.format());
 }
 
 export const env = _env.data;

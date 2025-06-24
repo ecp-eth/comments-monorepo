@@ -20,11 +20,16 @@ export function ReplyItem({
   queryKey,
   parentCommentId,
 }: ReplyItemProps) {
-  const { deleteComment, retryPostComment, retryEditComment } =
-    useCommentActions();
+  const {
+    deleteComment,
+    retryPostComment,
+    retryEditComment,
+    likeComment,
+    unlikeComment,
+  } = useCommentActions();
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [isLiking, setIsLiking] = useState(false);
   const onReplyClick = useCallback(() => {
     setIsReplying(true);
   }, []);
@@ -44,6 +49,24 @@ export function ReplyItem({
   const onRetryEditClick = useCallback(() => {
     retryEditComment({ comment, queryKey });
   }, [comment, retryEditComment, queryKey]);
+
+  const onLikeClick = useCallback(() => {
+    likeComment({
+      comment,
+      queryKey,
+      onBeforeStart: () => setIsLiking(true),
+      onSuccess: () => setIsLiking(false),
+      onFailed: () => setIsLiking(false),
+    });
+  }, [comment, likeComment, queryKey]);
+
+  const onUnlikeClick = useCallback(() => {
+    unlikeComment({
+      comment,
+      queryKey,
+      onBeforeStart: () => setIsLiking(false),
+    });
+  }, [comment, unlikeComment, queryKey]);
 
   return (
     <div className={"mb-4 border-gray-200 border-l-2 pl-4"}>
@@ -67,6 +90,9 @@ export function ReplyItem({
           onRetryDeleteClick={onDeleteClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
+          onLikeClick={onLikeClick}
+          onUnlikeClick={onUnlikeClick}
+          isLiking={isLiking}
           optimisticReferences={
             comment.pendingOperation?.action === "post"
               ? comment.pendingOperation.references

@@ -7,6 +7,7 @@ import { z } from "@hono/zod-openapi";
 import { hexToString } from "viem";
 import { normalizeUrl } from "./utils";
 import { SUPPORTED_CHAIN_IDS } from "../env";
+import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
 
 export const OpenAPIHexSchema = HexSchema.openapi({
   type: "string",
@@ -168,7 +169,8 @@ export const GetCommentsQuerySchema = z.object({
     description: "The channel ID",
   }),
   commentType: z.coerce.number().int().min(0).max(255).optional().openapi({
-    description: "The comment type (e.g. 0=comment, 1=reaction)",
+    description:
+      "The comment type (e.g. 0=comment, 1=reaction, not passed = all)",
   }),
   chainId: ChainIdSchema,
   moderationStatus: z

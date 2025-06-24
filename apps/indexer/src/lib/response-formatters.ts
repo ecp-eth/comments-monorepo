@@ -2,6 +2,7 @@ import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
   type IndexerAPIModerationChangeModerationStatusOnCommentSchemaType,
+  type IndexerAPICommentSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
 import type { CommentSelectType } from "ponder:schema";
@@ -19,6 +20,7 @@ import { env } from "../env";
 type CommentFromDB = CommentSelectType & {
   replies?: CommentSelectType[];
   flatReplies?: CommentSelectType[];
+  viewerReactions?: CommentSelectType[];
 };
 
 /**
@@ -45,6 +47,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
       },
       extra: {
         moderationEnabled: env.MODERATION_ENABLED,
+        moderationKnownReactions: Array.from(env.MODERATION_KNOWN_REACTIONS),
       },
     };
   }
@@ -76,7 +79,12 @@ export async function resolveUserDataAndFormatListCommentsResponse({
 
   return {
     results: results.map(
-      ({ replies: nestedReplies, flatReplies, ...comment }) => {
+      ({
+        replies: nestedReplies,
+        flatReplies,
+        viewerReactions,
+        ...comment
+      }) => {
         const replies = nestedReplies ?? flatReplies ?? [];
         const resolvedAuthorEnsData = resolveUserData(
           resolvedAuthorsEnsData,
@@ -98,9 +106,13 @@ export async function resolveUserDataAndFormatListCommentsResponse({
             resolvedAuthorEnsData,
             resolvedAuthorFarcasterData,
           ),
+          viewerReactions: formatViewerReactions(viewerReactions),
           replies: {
             extra: {
               moderationEnabled: env.MODERATION_ENABLED,
+              moderationKnownReactions: Array.from(
+                env.MODERATION_KNOWN_REACTIONS,
+              ),
             },
             results: slicedReplies.map((reply) => {
               const resolvedAuthorEnsData = resolveUserData(
@@ -119,6 +131,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
                   resolvedAuthorEnsData,
                   resolvedAuthorFarcasterData,
                 ),
+
                 // do not go deeper than first level of replies
                 replies: {
                   results: [],
@@ -158,6 +171,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
     },
     extra: {
       moderationEnabled: env.MODERATION_ENABLED,
+      moderationKnownReactions: Array.from(env.MODERATION_KNOWN_REACTIONS),
     },
   };
 }
@@ -177,7 +191,9 @@ export function formatAuthor(
   };
 }
 
-function formatComment(comment: CommentSelectType) {
+function formatComment(
+  comment: CommentSelectType & { viewerReactions?: CommentSelectType[] },
+) {
   return {
     ...comment,
     id: HexSchema.parse(comment.id),
@@ -185,7 +201,32 @@ function formatComment(comment: CommentSelectType) {
     metadata: comment.metadata ?? [],
     hookMetadata: comment.hookMetadata ?? [],
     cursor: getCommentCursor(comment.id as Hex, comment.createdAt),
+    viewerReactions: formatViewerReactions(comment.viewerReactions),
+    reactionCounts: comment.reactionCounts ?? {},
   };
+}
+
+function formatViewerReactions(
+  viewerReactions?: CommentSelectType[],
+): Record<string, IndexerAPICommentSchemaType[]> {
+  return (
+    viewerReactions?.reduce(
+      (acc, reaction) => {
+        const reactionFormatted = {
+          ...formatComment(reaction),
+          author: {
+            address: reaction.author,
+          },
+        };
+
+        const container = (acc[reaction.content] = acc[reaction.content] ?? []);
+        container.push(reactionFormatted);
+
+        return acc;
+      },
+      {} as Record<string, IndexerAPICommentSchemaType[]>,
+    ) ?? {}
+  );
 }
 
 function resolveUserData<

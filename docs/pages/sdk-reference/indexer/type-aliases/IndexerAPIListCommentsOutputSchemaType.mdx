@@ -10,6 +10,7 @@
 type IndexerAPIListCommentsOutputSchemaType = {
   extra: {
      moderationEnabled: boolean;
+     moderationKnownReactions: string[];
   };
   pagination: {
      endCursor?: `0x${string}`;
@@ -53,6 +54,7 @@ type IndexerAPIListCommentsOutputSchemaType = {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
+     reactionCounts: Record<string, number>;
      references: (
         | {
         address: `0x${string}`;
@@ -144,6 +146,7 @@ type IndexerAPIListCommentsOutputSchemaType = {
      replies: {
         extra: {
            moderationEnabled: boolean;
+           moderationKnownReactions: string[];
         };
         pagination: {
            endCursor?: `0x${string}`;
@@ -187,6 +190,7 @@ type IndexerAPIListCommentsOutputSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: string;
            parentId: null | `0x${string}`;
+           reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${string}`;
@@ -279,6 +283,44 @@ type IndexerAPIListCommentsOutputSchemaType = {
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: string;
+           viewerReactions: Record<string, {
+              app: `0x${string}`;
+              author: {
+                 address: `0x${(...)}`;
+                 ens?: ... | ...;
+                 farcaster?: ... | ...;
+              };
+              chainId: number;
+              channelId: string;
+              commentType: number;
+              content: string;
+              createdAt: string;
+              cursor: `0x${string}`;
+              deletedAt: null | string;
+              hookMetadata: {
+                 key: ...;
+                 value: ...;
+              }[];
+              id: `0x${string}`;
+              logIndex: null | number;
+              metadata: {
+                 key: ...;
+                 value: ...;
+              }[];
+              moderationStatus: "approved" | "pending" | "rejected";
+              moderationStatusChangedAt: string;
+              parentId: null | `0x${(...)}`;
+              references: (... | ... | ... | ... | ... | ... | ...)[];
+              revision: number;
+              targetUri: string;
+              txHash: `0x${string}`;
+              updatedAt: string;
+              zeroExSwap:   | null
+                 | {
+                 from: ...;
+                 to: ...;
+               };
+           }[]>;
            zeroExSwap:   | null
               | {
               from: {
@@ -298,221 +340,7 @@ type IndexerAPIListCommentsOutputSchemaType = {
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: string;
-     zeroExSwap:   | null
-        | {
-        from: {
-           address: `0x${string}`;
-           amount: string;
-           symbol: string;
-        };
-        to: {
-           address: `0x${string}`;
-           amount: string;
-           symbol: string;
-        };
-      };
-  }[];
-};
-```
-
-Defined in: [packages/sdk/src/indexer/schemas.ts:396](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L396)
-
-## Type declaration
-
-### extra
-
-```ts
-extra: {
-  moderationEnabled: boolean;
-} = IndexerAPIExtraSchema;
-```
-
-#### extra.moderationEnabled
-
-```ts
-moderationEnabled: boolean;
-```
-
-### pagination
-
-```ts
-pagination: {
-  endCursor?: `0x${string}`;
-  hasNext: boolean;
-  hasPrevious: boolean;
-  limit: number;
-  startCursor?: `0x${string}`;
-} = IndexerAPICursorPaginationSchema;
-```
-
-#### pagination.endCursor?
-
-```ts
-optional endCursor: `0x${string}`;
-```
-
-#### pagination.hasNext
-
-```ts
-hasNext: boolean;
-```
-
-#### pagination.hasPrevious
-
-```ts
-hasPrevious: boolean;
-```
-
-#### pagination.limit
-
-```ts
-limit: number;
-```
-
-#### pagination.startCursor?
-
-```ts
-optional startCursor: `0x${string}`;
-```
-
-### results
-
-```ts
-results: {
-  app: `0x${string}`;
-  author: {
-     address: `0x${string}`;
-     ens?: {
-        avatarUrl: null | string;
-        name: string;
-     };
-     farcaster?: {
-        displayName?: string;
-        fid: number;
-        pfpUrl?: string;
-        username: string;
-     };
-  };
-  chainId: number;
-  channelId: string;
-  commentType: number;
-  content: string;
-  createdAt: string;
-  cursor: `0x${string}`;
-  deletedAt: null | string;
-  hookMetadata: {
-     key: `0x${string}`;
-     value: `0x${string}`;
-  }[];
-  id: `0x${string}`;
-  logIndex: null | number;
-  metadata: {
-     key: `0x${string}`;
-     value: `0x${string}`;
-  }[];
-  moderationStatus: "approved" | "pending" | "rejected";
-  moderationStatusChangedAt: string;
-  parentId: null | `0x${string}`;
-  references: (
-     | {
-     address: `0x${string}`;
-     avatarUrl: null | string;
-     name: string;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "ens";
-     url: string;
-   }
-     | {
-     address: `0x${string}`;
-     displayName: null | string;
-     fid: number;
-     fname: string;
-     pfpUrl: null | string;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "farcaster";
-     url: string;
-     username: string;
-   }
-     | {
-     address: `0x${string}`;
-     chainId: null | number;
-     chains: {
-        caip: string;
-        chainId: number;
-     }[];
-     decimals: number;
-     logoURI: null | string;
-     name: string;
-     position: {
-        end: number;
-        start: number;
-     };
-     symbol: string;
-     type: "erc20";
-   }
-     | {
-     description: null | string;
-     favicon: null | string;
-     opengraph:   | null
-        | {
-        description: null | string;
-        image: string;
-        title: string;
-        url: string;
-      };
-     position: {
-        end: number;
-        start: number;
-     };
-     title: string;
-     type: "webpage";
-     url: string;
-   }
-     | {
-     mediaType: string;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "file";
-     url: string;
-   }
-     | {
-     mediaType: string;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "image";
-     url: string;
-   }
-     | {
-     mediaType: string;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "video";
-     url: string;
-  })[];
-  replies: {
-     extra: {
-        moderationEnabled: boolean;
-     };
-     pagination: {
-        endCursor?: `0x${string}`;
-        hasNext: boolean;
-        hasPrevious: boolean;
-        limit: number;
-        startCursor?: `0x${string}`;
-     };
-     results: {
+     viewerReactions: Record<string, {
         app: `0x${string}`;
         author: {
            address: `0x${string}`;
@@ -652,12 +480,556 @@ results: {
               symbol: string;
            };
          };
+     }[]>;
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
+  }[];
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:408](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L408)
+
+## Type declaration
+
+### extra
+
+```ts
+extra: {
+  moderationEnabled: boolean;
+  moderationKnownReactions: string[];
+} = IndexerAPIExtraSchema;
+```
+
+#### extra.moderationEnabled
+
+```ts
+moderationEnabled: boolean;
+```
+
+#### extra.moderationKnownReactions
+
+```ts
+moderationKnownReactions: string[];
+```
+
+### pagination
+
+```ts
+pagination: {
+  endCursor?: `0x${string}`;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  limit: number;
+  startCursor?: `0x${string}`;
+} = IndexerAPICursorPaginationSchema;
+```
+
+#### pagination.endCursor?
+
+```ts
+optional endCursor: `0x${string}`;
+```
+
+#### pagination.hasNext
+
+```ts
+hasNext: boolean;
+```
+
+#### pagination.hasPrevious
+
+```ts
+hasPrevious: boolean;
+```
+
+#### pagination.limit
+
+```ts
+limit: number;
+```
+
+#### pagination.startCursor?
+
+```ts
+optional startCursor: `0x${string}`;
+```
+
+### results
+
+```ts
+results: {
+  app: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens?: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster?: {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username: string;
+     };
+  };
+  chainId: number;
+  channelId: string;
+  commentType: number;
+  content: string;
+  createdAt: string;
+  cursor: `0x${string}`;
+  deletedAt: null | string;
+  hookMetadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  moderationStatusChangedAt: string;
+  parentId: null | `0x${string}`;
+  reactionCounts: Record<string, number>;
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+  })[];
+  replies: {
+     extra: {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+     };
+     pagination: {
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     };
+     results: {
+        app: `0x${string}`;
+        author: {
+           address: `0x${string}`;
+           ens?: {
+              avatarUrl: null | string;
+              name: string;
+           };
+           farcaster?: {
+              displayName?: string;
+              fid: number;
+              pfpUrl?: string;
+              username: string;
+           };
+        };
+        chainId: number;
+        channelId: string;
+        commentType: number;
+        content: string;
+        createdAt: string;
+        cursor: `0x${string}`;
+        deletedAt: null | string;
+        hookMetadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        id: `0x${string}`;
+        logIndex: null | number;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationStatus: "approved" | "pending" | "rejected";
+        moderationStatusChangedAt: string;
+        parentId: null | `0x${string}`;
+        reactionCounts: Record<string, number>;
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: ...;
+              chainId: ...;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           opengraph:   | null
+              | {
+              description: ...;
+              image: ...;
+              title: ...;
+              url: ...;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+        })[];
+        revision: number;
+        targetUri: string;
+        txHash: `0x${string}`;
+        updatedAt: string;
+        viewerReactions: Record<string, {
+           app: `0x${string}`;
+           author: {
+              address: `0x${(...)}`;
+              ens?: ... | ...;
+              farcaster?: ... | ...;
+           };
+           chainId: number;
+           channelId: string;
+           commentType: number;
+           content: string;
+           createdAt: string;
+           cursor: `0x${string}`;
+           deletedAt: null | string;
+           hookMetadata: {
+              key: ...;
+              value: ...;
+           }[];
+           id: `0x${string}`;
+           logIndex: null | number;
+           metadata: {
+              key: ...;
+              value: ...;
+           }[];
+           moderationStatus: "approved" | "pending" | "rejected";
+           moderationStatusChangedAt: string;
+           parentId: null | `0x${(...)}`;
+           references: (... | ... | ... | ... | ... | ... | ...)[];
+           revision: number;
+           targetUri: string;
+           txHash: `0x${string}`;
+           updatedAt: string;
+           zeroExSwap:   | null
+              | {
+              from: ...;
+              to: ...;
+            };
+        }[]>;
+        zeroExSwap:   | null
+           | {
+           from: {
+              address: `0x${string}`;
+              amount: string;
+              symbol: string;
+           };
+           to: {
+              address: `0x${string}`;
+              amount: string;
+              symbol: string;
+           };
+         };
      }[];
   };
   revision: number;
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: string;
+  viewerReactions: Record<string, {
+     app: `0x${string}`;
+     author: {
+        address: `0x${string}`;
+        ens?: {
+           avatarUrl: null | string;
+           name: string;
+        };
+        farcaster?: {
+           displayName?: string;
+           fid: number;
+           pfpUrl?: string;
+           username: string;
+        };
+     };
+     chainId: number;
+     channelId: string;
+     commentType: number;
+     content: string;
+     createdAt: string;
+     cursor: `0x${string}`;
+     deletedAt: null | string;
+     hookMetadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     id: `0x${string}`;
+     logIndex: null | number;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     moderationStatus: "approved" | "pending" | "rejected";
+     moderationStatusChangedAt: string;
+     parentId: null | `0x${string}`;
+     references: (
+        | {
+        address: `0x${string}`;
+        avatarUrl: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "ens";
+        url: string;
+      }
+        | {
+        address: `0x${string}`;
+        displayName: null | string;
+        fid: number;
+        fname: string;
+        pfpUrl: null | string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "farcaster";
+        url: string;
+        username: string;
+      }
+        | {
+        address: `0x${string}`;
+        chainId: null | number;
+        chains: {
+           caip: ...;
+           chainId: ...;
+        }[];
+        decimals: number;
+        logoURI: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        symbol: string;
+        type: "erc20";
+      }
+        | {
+        description: null | string;
+        favicon: null | string;
+        opengraph:   | null
+           | {
+           description: ...;
+           image: ...;
+           title: ...;
+           url: ...;
+         };
+        position: {
+           end: number;
+           start: number;
+        };
+        title: string;
+        type: "webpage";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "file";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "image";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "video";
+        url: string;
+     })[];
+     revision: number;
+     targetUri: string;
+     txHash: `0x${string}`;
+     updatedAt: string;
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
+  }[]>;
   zeroExSwap:   | null
      | {
      from: {

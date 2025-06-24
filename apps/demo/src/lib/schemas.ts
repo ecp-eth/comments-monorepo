@@ -9,6 +9,7 @@ import {
 } from "@ecp.eth/sdk/comments/schemas";
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
+import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
 
 export const GenerateUploadUrlResponseSchema = z.object({
   url: z.string().url(),
@@ -22,6 +23,7 @@ const sharedCommentSchema = z.object({
   author: HexSchema,
   content: z.string().trim().nonempty(),
   metadata: MetadataArraySchema,
+  commentType: z.number().default(DEFAULT_COMMENT_TYPE),
 });
 
 export const PrepareSignedGaslessCommentRequestBodySchema = z.union([
@@ -35,7 +37,7 @@ export const PrepareSignedGaslessCommentRequestBodySchema = z.union([
   }),
 ]);
 
-export type PrepareSignedGaslessCommentRequestBodySchemaType = z.infer<
+export type PrepareSignedGaslessCommentRequestBodySchemaType = z.input<
   typeof PrepareSignedGaslessCommentRequestBodySchema
 >;
 
@@ -148,7 +150,7 @@ export const SignCommentPayloadRequestSchema = z.union([
   }),
 ]);
 
-export type SignCommentPayloadRequestSchemaType = z.infer<
+export type SignCommentPayloadRequestSchemaType = z.input<
   typeof SignCommentPayloadRequestSchema
 >;
 
