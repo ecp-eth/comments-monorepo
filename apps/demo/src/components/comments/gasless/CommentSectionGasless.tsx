@@ -4,11 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import {
-  useAccount,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { createApprovalTypedData } from "@ecp.eth/sdk/comments";
 import {
   useGaslessTransaction,
@@ -52,10 +48,7 @@ export function CommentSectionGasless() {
     [currentUrl, viewer],
   );
 
-  const { mutateAsync: revokeApproval } = useRevokeApproval();
-
-  const removeApprovalContract = useWriteContract();
-
+  const revokeApproval = useRevokeApproval();
   const approvalStatus = useApprovalStatus();
 
   const approveGaslessTransactionsMutation = useGaslessTransaction({
@@ -114,7 +107,7 @@ export function CommentSectionGasless() {
   });
 
   const removeApprovalContractReceipt = useWaitForTransactionReceipt({
-    hash: removeApprovalContract.data,
+    hash: revokeApproval.data?.txHash,
   });
 
   const { data, isSuccess, error, hasNextPage, fetchNextPage } =
@@ -179,35 +172,30 @@ export function CommentSectionGasless() {
     hasApproval: !!approvalStatus.data?.approved,
   });
 
-  const { reset: resetApproveGaslessTransactionsMutation } =
-    approveGaslessTransactionsMutation;
-  const { reset: resetRemoveApprovalContract } = removeApprovalContract;
-  const { refetch: refetchApprovalStatus } = approvalStatus;
-
   useEffect(() => {
     if (approveContractReceipt.data?.status === "success") {
-      refetchApprovalStatus();
-      resetApproveGaslessTransactionsMutation();
-      removeApprovalContract.reset();
+      approvalStatus.refetch();
+      approveGaslessTransactionsMutation.reset();
+      revokeApproval.reset();
     }
   }, [
+    approvalStatus,
     approveContractReceipt.data?.status,
-    refetchApprovalStatus,
-    removeApprovalContract,
-    resetApproveGaslessTransactionsMutation,
+    approveGaslessTransactionsMutation,
+    revokeApproval,
   ]);
 
   useEffect(() => {
     if (removeApprovalContractReceipt.data?.status === "success") {
-      refetchApprovalStatus();
-      resetApproveGaslessTransactionsMutation();
-      resetRemoveApprovalContract();
+      approvalStatus.refetch();
+      approveGaslessTransactionsMutation.reset();
+      revokeApproval.reset();
     }
   }, [
-    refetchApprovalStatus,
+    approvalStatus,
     removeApprovalContractReceipt.data?.status,
-    resetApproveGaslessTransactionsMutation,
-    resetRemoveApprovalContract,
+    approveGaslessTransactionsMutation,
+    revokeApproval,
   ]);
 
   useEffect(() => {
@@ -228,7 +216,7 @@ export function CommentSectionGasless() {
     approvalStatus.isPending;
 
   const isRemovingApproval =
-    removeApprovalContract.isPending || removeApprovalContractReceipt.isLoading;
+    revokeApproval.isPending || removeApprovalContractReceipt.isLoading;
 
   const results = useMemo(() => {
     return data?.pages.flatMap((page) => page.results) ?? [];
@@ -272,7 +260,7 @@ export function CommentSectionGasless() {
                     throw new Error("No data found");
                   }
 
-                  revokeApproval({
+                  revokeApproval.mutateAsync({
                     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
                   });
                 }}
