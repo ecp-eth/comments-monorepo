@@ -8,9 +8,9 @@ import {
   encryptWebhookCallbackData,
 } from "../utils/webhook";
 import type { CommentSelectType } from "ponder:schema";
-import { ensByAddressResolver } from "../resolvers/ens-by-address-resolver";
 import type { Hex } from "@ecp.eth/sdk/core";
-import { farcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
+import { ensByAddressResolverService } from "./ens-by-address-resolver";
+import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver";
 
 type ModerationNotificationsServiceOptions = {
   telegramBotToken: string;
@@ -20,12 +20,12 @@ type ModerationNotificationsServiceOptions = {
 };
 
 function resolveAuthor(author: Hex): Promise<string | Hex> {
-  return ensByAddressResolver.load(author).then((data) => {
+  return ensByAddressResolverService.load(author).then((data) => {
     if (data) {
       return data.name;
     }
 
-    return farcasterByAddressResolver
+    return farcasterByAddressResolverService
       .load(author)
       .then((data) => data?.fname ?? author);
   });

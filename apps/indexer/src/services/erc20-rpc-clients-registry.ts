@@ -1,10 +1,7 @@
-import type {
-  ERC20ClientRegistry,
-  ERC20ClientConfig,
-} from "@ecp.eth/shared/resolvers";
 import { z } from "zod";
 import { createPublicClient, http } from "viem";
 import { getChainById } from "../utils/getChainById";
+import { type ERC20ClientConfig, type ERC20ClientRegistry } from "../resolvers";
 
 class ERC20RpcClientsRegistry implements ERC20ClientRegistry {
   private clientsByChainId: Record<number, ERC20ClientConfig>;
@@ -49,4 +46,4 @@ class ERC20RpcClientsRegistry implements ERC20ClientRegistry {
   }
 }
 
-export const erc20RpcClientsRegistry = new ERC20RpcClientsRegistry();
+export const erc20RpcClientsRegistryService = new ERC20RpcClientsRegistry();

@@ -1,11 +1,11 @@
 import { IndexerAPIAuthorDataSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { GetAuthorParamsSchema } from "../../lib/schemas";
-import { ensByAddressResolver } from "../../resolvers/ens-by-address-resolver";
-import { farcasterByAddressResolver } from "../../resolvers/farcaster-by-address-resolver";
 import { formatAuthor } from "../../lib/response-formatters";
 import { rateLimiter } from "hono-rate-limiter";
 import { generateRateLimiterKey } from "../../lib/rate-limiter-key-generator";
+import { ensByAddressResolverService } from "../../services/ens-by-address-resolver";
+import { farcasterByAddressResolverService } from "../../services/farcaster-by-address-resolver";
 
 const rateLimiterMiddleware = rateLimiter({
   standardHeaders: "draft-6",
@@ -41,8 +41,8 @@ export function setupGetAuthor(app: OpenAPIHono) {
 
     const [ens, farcaster] = await Promise.all([
       // we ignore nulls here as it is not as crucial and mostly the errors are thrown due to the address not being found
-      ensByAddressResolver.load(authorAddress).catch(() => null),
-      farcasterByAddressResolver.load(authorAddress).catch(() => null),
+      ensByAddressResolverService.load(authorAddress).catch(() => null),
+      farcasterByAddressResolverService.load(authorAddress).catch(() => null),
     ]);
 
     return c.json(formatAuthor(authorAddress, ens, farcaster), 200);

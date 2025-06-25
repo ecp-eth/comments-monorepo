@@ -1,22 +1,61 @@
+import DataLoader from "dataloader";
 import {
-  createENSByAddressResolver,
-  type ENSByAddressResolver,
-} from "@ecp.eth/shared/resolvers";
-import { type Hex } from "viem";
-import { env } from "../env";
-import { LRUCache } from "lru-cache";
-import type { ResolvedENSData } from "./types";
+  createPublicClient,
+  http,
+  type PublicClient,
+  type Hex,
+  getAddress,
+} from "viem";
+import { mainnet } from "viem/chains";
+import { normalize } from "viem/ens";
+import type { ResolvedENSData } from "./ens.types";
 
-// could also use redis
-const cacheMap = new LRUCache<Hex, Promise<ResolvedENSData | null>>({
-  max: 10000,
-  ttl: 14 * 24 * 60 * 60 * 1000, // 14 days
-  allowStale: true,
-});
+export type ENSByAddressResolver = DataLoader<Hex, ResolvedENSData | null>;
 
-export type { ENSByAddressResolver, ResolvedENSData };
+async function resolveEnsData(
+  client: PublicClient,
+  address: Hex,
+): Promise<ResolvedENSData | null> {
+  const name = await client.getEnsName({ address });
 
-export const ensByAddressResolver = createENSByAddressResolver({
-  chainRpcUrl: env.ENS_RPC_URL,
-  cacheMap,
-});
+  if (!name) {
+    return null;
+  }
+
+  const normalizedName = normalize(name);
+
+  const ensAddress = await client.getEnsAddress({ name: normalizedName });
+
+  if (!ensAddress || getAddress(ensAddress) !== getAddress(address)) {
+    return null;
+  }
+
+  const avatarUrl = await client.getEnsAvatar({ name: normalizedName });
+
+  return {
+    address: ensAddress,
+    name: normalizedName,
+    avatarUrl,
+    url: `https://app.ens.domains/${ensAddress}`,
+  };
+}
+
+export type ENSByAddressResolverOptions = {
+  chainRpcUrl: string;
+} & DataLoader.Options<Hex, ResolvedENSData | null>;
+
+export function createENSByAddressResolver({
+  chainRpcUrl,
+  ...dataLoaderOptions
+}: ENSByAddressResolverOptions): ENSByAddressResolver {
+  const publicClient = createPublicClient({
+    chain: mainnet,
+    transport: http(chainRpcUrl),
+  });
+
+  return new DataLoader<Hex, ResolvedENSData | null>(async (addresses) => {
+    return Promise.all(
+      addresses.map((address) => resolveEnsData(publicClient, address)),
+    );
+  }, dataLoaderOptions);
+}

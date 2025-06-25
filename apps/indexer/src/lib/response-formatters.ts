@@ -6,16 +6,11 @@ import {
 } from "@ecp.eth/sdk/indexer/schemas";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
 import type { CommentSelectType } from "ponder:schema";
-import {
-  ensByAddressResolver,
-  type ResolvedENSData,
-} from "../resolvers/ens-by-address-resolver";
-import {
-  farcasterByAddressResolver,
-  type ResolvedFarcasterData,
-} from "../resolvers/farcaster-by-address-resolver";
+import { ensByAddressResolverService } from "../services/ens-by-address-resolver";
+import { farcasterByAddressResolverService } from "../services/farcaster-by-address-resolver";
 import { getCommentCursor } from "@ecp.eth/sdk/indexer";
 import { env } from "../env";
+import type { ResolvedENSData, ResolvedFarcasterData } from "../resolvers";
 
 type CommentFromDB = CommentSelectType & {
   replies?: CommentSelectType[];
@@ -68,8 +63,8 @@ export async function resolveUserDataAndFormatListCommentsResponse({
 
   const [resolvedAuthorsEnsData, resolvedAuthorsFarcasterData] =
     await Promise.all([
-      ensByAddressResolver.loadMany([...authorAddresses]),
-      farcasterByAddressResolver.loadMany([...authorAddresses]),
+      ensByAddressResolverService.loadMany([...authorAddresses]),
+      farcasterByAddressResolverService.loadMany([...authorAddresses]),
     ]);
 
   const nextComment = comments[comments.length - 1];
@@ -251,8 +246,8 @@ export async function resolveAuthorDataAndFormatCommentChangeModerationStatusRes
   comment: CommentSelectType,
 ): Promise<IndexerAPIModerationChangeModerationStatusOnCommentSchemaType> {
   const [resolvedEnsData, resolvedFarcasterData] = await Promise.all([
-    ensByAddressResolver.load(comment.author),
-    farcasterByAddressResolver.load(comment.author),
+    ensByAddressResolverService.load(comment.author),
+    farcasterByAddressResolverService.load(comment.author),
   ]);
 
   return {

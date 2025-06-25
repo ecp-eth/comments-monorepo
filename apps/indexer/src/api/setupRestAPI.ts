@@ -12,6 +12,7 @@ import { setupGetPendingModerationComments } from "./moderate-comments/get";
 import { setupChangeCommentModerationStatus } from "./moderate-comments/[commentId]/patch";
 import { setupGetComment } from "./moderate-comments/[commentId]/get";
 import { setupWebhook } from "./webhook/post";
+import { setupGetAutocomplete } from "./autocomplete/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -27,6 +28,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupChangeCommentModerationStatus(app);
   setupGetComment(app);
   setupWebhook(app);
+  setupGetAutocomplete(app);
 
   return app;
 }

@@ -33,11 +33,6 @@
       "import": "./dist/esm/renderer.js",
       "default": "./dist/cjs/renderer.cjs"
     },
-    "./resolvers": {
-      "types": "./dist/esm/resolvers/index.d.ts",
-      "import": "./dist/esm/resolvers/index.js",
-      "default": "./dist/cjs/resolvers/index.cjs"
-    },
     "./schemas": {
       "types": "./dist/esm/schemas.d.ts",
       "import": "./dist/esm/schemas.js",
@@ -56,10 +51,10 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "dev": "npm run gen:token-list && tsup --format esm --out-dir dist/esm --watch",
+    "dev": "tsup --format esm --out-dir dist/esm --watch",
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
-    "build": "rm -rf dist && npm run gen:token-list && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
+    "build": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
     "lint": "eslint \"./src/**/*.ts\"",
     "gen:token-list": "node --experimental-strip-types scripts/token-list.ts",
     "test": "vitest run",
@@ -78,7 +73,6 @@
     "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.34.5",
     "clsx": "^2.1.1",
-    "dataloader": "^2.2.3",
     "eslint": "^9.19.0",
     "next": "^15.3.0",
     "nock": "^14.0.5",

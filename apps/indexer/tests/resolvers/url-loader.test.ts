@@ -1,13 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import nock from "nock";
-import {
-  urlResolver,
-  createURLResolver,
-} from "../../src/resolvers/url-resolver";
+import { createURLResolver } from "../../src/resolvers/url-resolver";
 
 nock.disableNetConnect();
 
 describe("url loader", () => {
+  const urlResolver = createURLResolver();
+
   beforeEach(() => {
     nock.cleanAll();
     urlResolver.clearAll();

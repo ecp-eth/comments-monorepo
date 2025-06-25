@@ -4,13 +4,15 @@ import {
   type ResolveCommentReferencesOptions,
 } from "../../src/lib/resolve-comment-references";
 import DataLoader from "dataloader";
-import type { ENSByNameResolver } from "../../src/resolvers/ens-by-name-resolver";
-import type { ENSByAddressResolver } from "../../src/resolvers/ens-by-address-resolver";
-import type { ERC20ByTickerResolver } from "../../src/resolvers/erc20-by-ticker-resolver";
-import type { FarcasterByAddressResolver } from "../../src/resolvers/farcaster-by-address-resolver";
-import type { ERC20ByAddressResolver } from "../../src/resolvers/erc20-by-address-resolver";
-import type { URLResolver } from "../../src/resolvers/url-resolver";
-import type { FarcasterByNameResolver } from "@ecp.eth/shared/resolvers";
+import type {
+  ENSByNameResolver,
+  ENSByAddressResolver,
+  ERC20ByTickerResolver,
+  FarcasterByAddressResolver,
+  ERC20ByAddressResolver,
+  URLResolver,
+  FarcasterByNameResolver,
+} from "../../src/resolvers";
 
 const ensByNameResolver: ENSByNameResolver = new DataLoader(async (keys) =>
   keys.map(() => null),
