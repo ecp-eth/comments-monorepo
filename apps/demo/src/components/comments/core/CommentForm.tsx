@@ -31,12 +31,15 @@ import {
   MAX_UPLOAD_FILE_SIZE,
 } from "@/lib/constants";
 import { extractReferences } from "@ecp.eth/react-editor/extract-references";
-import { useIndexerSuggestions } from "@ecp.eth/react-editor/hooks";
+import {
+  useIndexerSuggestions,
+  usePinataUploadFiles,
+} from "@ecp.eth/react-editor/hooks";
 import { CommentEditorMediaVideo } from "./CommentMediaVideo";
 import { CommentEditorMediaImage } from "./CommentMediaImage";
 import { CommentEditorMediaFile } from "./CommentMediaFile";
-import { useUploadFiles } from "./hooks/useUploadFiles";
 import { publicEnv } from "@/publicEnv";
+import { GenerateUploadUrlResponseSchema } from "@/lib/schemas";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -105,7 +108,27 @@ function BaseCommentForm({
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
-  const { uploadFiles } = useUploadFiles();
+  const uploads = usePinataUploadFiles({
+    allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
+    maxFileSize: MAX_UPLOAD_FILE_SIZE,
+    pinataGatewayUrl: publicEnv.NEXT_PUBLIC_PINATA_GATEWAY_URL,
+    generateUploadUrl: async (filename) => {
+      const response = await fetch("/api/generate-upload-url", {
+        method: "POST",
+        body: JSON.stringify({ filename }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate upload URL");
+      }
+
+      const { url } = GenerateUploadUrlResponseSchema.parse(
+        await response.json(),
+      );
+
+      return url;
+    },
+  });
   const suggestions = useIndexerSuggestions({
     apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   });
@@ -124,7 +147,7 @@ function BaseCommentForm({
 
         const filesToUpload = editorRef.current?.getFilesForUpload() || [];
 
-        await uploadFiles(filesToUpload, {
+        await uploads.uploadFiles(filesToUpload, {
           onSuccess(uploadedFile) {
             editorRef.current?.setFileAsUploaded(uploadedFile);
           },
@@ -245,8 +268,6 @@ function BaseCommentForm({
         className="hidden"
       />
       <Editor
-        allowedUploadMimeTypes={ALLOWED_UPLOAD_MIME_TYPES}
-        maxUploadFileSize={MAX_UPLOAD_FILE_SIZE}
         autoFocus={autoFocus}
         className="w-full p-2 border border-gray-300 rounded"
         disabled={isSubmitting || disabled}
@@ -254,6 +275,7 @@ function BaseCommentForm({
         defaultValue={defaultContent}
         ref={editorRef}
         suggestions={suggestions}
+        uploads={uploads}
         onEscapePress={() => {
           if (isSubmitting) {
             return;
