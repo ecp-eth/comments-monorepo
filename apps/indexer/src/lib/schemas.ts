@@ -7,7 +7,6 @@ import { z } from "@hono/zod-openapi";
 import { hexToString } from "viem";
 import { normalizeUrl } from "./utils";
 import { SUPPORTED_CHAIN_IDS } from "../env";
-import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
 
 export const OpenAPIHexSchema = HexSchema.openapi({
   type: "string",

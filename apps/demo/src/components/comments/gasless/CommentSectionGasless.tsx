@@ -205,7 +205,7 @@ export function CommentSectionGasless() {
     }
 
     toast.error(approveGaslessTransactionsMutation.error.message);
-  }, [approveGaslessTransactionsMutation.error, approvalStatus]);
+  }, [approveGaslessTransactionsMutation.error]);
 
   useEffect(() => {
     setCurrentUrl(window.location.href);
