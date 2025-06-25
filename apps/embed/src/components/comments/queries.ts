@@ -10,7 +10,10 @@ import {
   type SignCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
-import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
+import {
+  fetchAuthorData,
+  type IndexerAPICommentReferencesSchemaType,
+} from "@ecp.eth/sdk/indexer";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
 import {
   RateLimitedError,
@@ -46,6 +49,7 @@ export class SubmitEditCommentMutationError extends Error {}
 type SubmitCommentParams = {
   address: Hex | undefined;
   commentRequest: Omit<SignCommentPayloadRequestSchemaType, "author">;
+  references: IndexerAPICommentReferencesSchemaType;
   switchChainAsync: (chainId: number) => Promise<Chain>;
   writeContractAsync: (params: {
     signCommentResponse: SignCommentResponseClientSchemaType;
@@ -56,6 +60,7 @@ type SubmitCommentParams = {
 export async function submitCommentMutationFunction({
   address,
   commentRequest,
+  references,
   switchChainAsync,
   writeContractAsync,
 }: SubmitCommentParams): Promise<PendingPostCommentOperationSchemaType> {
@@ -135,7 +140,7 @@ export async function submitCommentMutationFunction({
       action: "post",
       state: { status: "pending" },
       chainId: commentData.chainId,
-      references: [],
+      references,
     };
   } catch (e) {
     if (

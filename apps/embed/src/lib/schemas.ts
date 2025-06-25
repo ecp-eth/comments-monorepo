@@ -6,6 +6,23 @@ import { MAX_COMMENT_LENGTH } from "./constants";
 import { decompressFromURI } from "lz-ts";
 import { MetadataEntrySchema } from "@ecp.eth/sdk/comments";
 
+export const BadRequestResponseSchema = z.record(
+  z.string(),
+  z.string().array(),
+);
+
+export const InternalServerErrorResponseSchema = z.object({
+  error: z.string(),
+});
+
+export const GenerateUploadUrlResponseSchema = z.object({
+  url: z.string().url(),
+});
+
+export type GenerateUploadUrlResponseSchemaType = z.infer<
+  typeof GenerateUploadUrlResponseSchema
+>;
+
 const sharedCommentSchema = z.object({
   author: HexSchema,
   content: z.string().trim().nonempty().max(MAX_COMMENT_LENGTH),

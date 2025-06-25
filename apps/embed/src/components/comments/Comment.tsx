@@ -17,11 +17,14 @@ import {
 import { Button } from "../ui/button";
 import { CommentAuthor } from "./CommentAuthor";
 import { CommentActionOrStatus } from "./CommentActionOrStatus";
-import { CommentText } from "@ecp.eth/shared/components";
 import {
-  EmbedConfigProviderByTargetURIConfig,
+  type EmbedConfigProviderByTargetURIConfig,
   useEmbedConfig,
 } from "../EmbedConfigProvider";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import { useMemo } from "react";
+import { renderToReact } from "./renderer";
+import { CommentMediaReference } from "./CommentMediaReference";
 
 export type OnRetryPostComment = (
   comment: CommentType,
@@ -36,6 +39,7 @@ interface CommentProps {
   onReplyClick: () => void;
   onEditClick: () => void;
   onRetryEditClick: () => void;
+  optimisticReferences: IndexerAPICommentReferencesSchemaType | undefined;
 }
 
 export function Comment({
@@ -46,10 +50,28 @@ export function Comment({
   onReplyClick,
   onEditClick,
   onRetryEditClick,
+  optimisticReferences,
 }: CommentProps) {
   const { currentTimestamp } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const { address: connectedAddress } = useAccount();
+
+  const { element: textElement, mediaReferences } = useMemo(() => {
+    let commentWithReferences = comment;
+
+    if (
+      comment.references.length === 0 &&
+      optimisticReferences &&
+      optimisticReferences.length > 0
+    ) {
+      commentWithReferences = {
+        ...comment,
+        references: optimisticReferences,
+      };
+    }
+
+    return renderToReact(commentWithReferences);
+  }, [comment, optimisticReferences]);
 
   const isAuthor =
     connectedAddress && comment.author
@@ -108,12 +130,20 @@ export function Comment({
           comment.deletedAt && "text-muted-foreground",
         )}
       >
-        <CommentText
-          // make sure comment is updated if was deleted
-          key={`${comment.deletedAt?.toISOString()}-${comment.updatedAt}-${comment.revision}`}
-          text={comment.content}
-        />
+        <div>{textElement}</div>
       </div>
+      {mediaReferences.length > 0 && (
+        <div className="flex gap-2 flex-wrap">
+          {mediaReferences.map((reference, referenceIndex) => {
+            return (
+              <CommentMediaReference
+                reference={reference}
+                key={referenceIndex}
+              />
+            );
+          })}
+        </div>
+      )}
       <div className="mb-2">
         <CommentActionOrStatus
           comment={comment}
