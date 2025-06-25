@@ -62,15 +62,22 @@ export function CommentMediaImage({
     />
   );
 
+  if (typeof fileOrUrl === "string") {
+    return (
+      <a
+        className="w-full h-full flex items-center justify-center"
+        href={fileOrUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {image}
+      </a>
+    );
+  }
+
   return (
     <div className="w-full h-full flex items-center justify-center">
-      {typeof fileOrUrl === "string" ? (
-        <a href={fileOrUrl} target="_blank" rel="noopener noreferrer">
-          {image}
-        </a>
-      ) : (
-        image
-      )}
+      {image}
     </div>
   );
 }
