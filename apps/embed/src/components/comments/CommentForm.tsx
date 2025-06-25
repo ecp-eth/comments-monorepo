@@ -76,10 +76,6 @@ type BaseCommentFormProps = {
     references: IndexerAPICommentReferencesSchemaType;
   };
   /**
-   * Called when user pressed escape or left the form empty or unchanged (blurred with empty or unchanged content)
-   */
-  onCancel?: () => void;
-  /**
    * Called when transaction was created and also successfully processed.
    */
   onSubmitSuccess?: OnSubmitSuccessFunction;
@@ -96,18 +92,31 @@ type BaseCommentFormProps = {
    * @default "Posting..."
    */
   submitPendingLabel?: string;
+
+  /**
+   * Called when user pressed cancel button.
+   *
+   * If this is not provided, the cancel button will not be shown.
+   */
+  onCancel?: () => void;
+  /**
+   * Label for the cancel button.
+   * @default "Cancel"
+   */
+  cancelLabel?: string;
 };
 
 function BaseCommentForm({
   autoFocus,
   disabled,
   defaultContent,
-  onCancel,
   onSubmitSuccess,
   onSubmit,
   placeholder = "What are your thoughts?",
   submitIdleLabel = "Comment",
   submitPendingLabel = "Please check your wallet to sign",
+  onCancel,
+  cancelLabel = "Cancel",
 }: BaseCommentFormProps) {
   const { address } = useAccount();
   const connectAccount = useConnectAccount();
@@ -318,14 +327,20 @@ function BaseCommentForm({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <Button
-            className="ml-auto"
-            type="submit"
-            disabled={isSubmitting || disabled}
-            size="sm"
-          >
+          <Button type="submit" disabled={isSubmitting || disabled} size="sm">
             {isSubmitting ? submitPendingLabel : submitIdleLabel}
           </Button>
+          {onCancel && (
+            <Button
+              disabled={isSubmitting}
+              onClick={onCancel}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              {cancelLabel}
+            </Button>
+          )}
         </div>
       </div>
       {submitMutation.error && (
