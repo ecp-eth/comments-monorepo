@@ -251,7 +251,7 @@ export function CommentSectionGasless() {
               >
                 {isApprovalPending
                   ? "Requesting Approval..."
-                  : "Give this app approval to post on your behalf"}
+                  : "Allow this app to post on your behalf"}
               </Button>
             </div>
           )}

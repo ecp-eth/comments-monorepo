@@ -116,8 +116,6 @@ export function HeartAnimation({
     }
   }, [animationLoaded]);
 
-  console.log("rendering isHearted", isHearted, "pending", pending);
-
   return (
     <div
       className="w-[24px] h-[24px] overflow-visible flex items-start justify-start relative"

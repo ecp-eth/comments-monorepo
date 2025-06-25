@@ -23,10 +23,6 @@ if (!(chain.id in SUPPORTED_CHAINS)) {
   throw new Error(`Chain ${chain.id} not supported`);
 }
 
-if (!(chain.id in SUPPORTED_CHAINS)) {
-  throw new Error(`Chain ${chain.id} not supported`);
-}
-
 /**
  * Chains that are used to resolve address when typing a comment
  */
