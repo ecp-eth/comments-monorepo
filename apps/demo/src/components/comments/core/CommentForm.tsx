@@ -35,9 +35,6 @@ import {
   useIndexerSuggestions,
   usePinataUploadFiles,
 } from "@ecp.eth/react-editor/hooks";
-import { CommentEditorMediaVideo } from "./CommentMediaVideo";
-import { CommentEditorMediaImage } from "./CommentMediaImage";
-import { CommentEditorMediaFile } from "./CommentMediaFile";
 import { publicEnv } from "@/publicEnv";
 import { GenerateUploadUrlResponseSchema } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
@@ -290,9 +287,6 @@ function BaseCommentForm({
 
           onCancel?.();
         }}
-        videoComponent={CommentEditorMediaVideo}
-        imageComponent={CommentEditorMediaImage}
-        fileComponent={CommentEditorMediaFile}
       />
       <div className="flex gap-2 justify-between">
         {address && <CommentBoxAuthor address={address} />}

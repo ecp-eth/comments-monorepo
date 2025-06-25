@@ -53,9 +53,6 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { ImageIcon } from "lucide-react";
-import { CommentEditorMediaVideo } from "./CommentMediaVideo";
-import { CommentEditorMediaImage } from "./CommentMediaImage";
-import { CommentEditorMediaFile } from "./CommentMediaFile";
 import { toast } from "sonner";
 import { suggestionsTheme } from "./editorTheme";
 
@@ -298,9 +295,6 @@ function BaseCommentForm({
 
           onCancel?.();
         }}
-        videoComponent={CommentEditorMediaVideo}
-        imageComponent={CommentEditorMediaImage}
-        fileComponent={CommentEditorMediaFile}
       />
       <div className="flex gap-2 justify-between">
         {address && <CommentFormAuthor address={address} />}

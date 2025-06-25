@@ -30,6 +30,9 @@ import type {
 } from "./extensions/types.js";
 import { cn } from "@ecp.eth/shared/helpers";
 import type { EditorSuggestionsService, UploadFilesService } from "./types.js";
+import { CommentEditorMediaImage } from "./components/CommentEditorMediaImage.js";
+import { CommentEditorMediaVideo } from "./components/CommentEditorMediaVideo.js";
+import { CommentEditorMediaFile } from "./components/CommentEditorMediaFile.js";
 
 export type EditorRef = {
   focus: () => void;
@@ -64,9 +67,18 @@ export type EditorProps = {
   suggestions: EditorSuggestionsService;
   suggestionsTheme?: MentionsExtensionTheme;
   uploads: UploadFilesService;
-  imageComponent: UploadTrackerImageComponent;
-  videoComponent: UploadTrackerVideoComponent;
-  fileComponent: UploadTrackerFileComponent;
+  /**
+   * @default CommentMediaImage
+   */
+  imageComponent?: UploadTrackerImageComponent;
+  /**
+   * @default CommentMediaVideo
+   */
+  videoComponent?: UploadTrackerVideoComponent;
+  /**
+   * @default CommentMediaFile
+   */
+  fileComponent?: UploadTrackerFileComponent;
 };
 
 export function Editor({
@@ -81,9 +93,9 @@ export function Editor({
   suggestions,
   suggestionsTheme,
   uploads,
-  imageComponent,
-  videoComponent,
-  fileComponent,
+  imageComponent = CommentEditorMediaImage,
+  videoComponent = CommentEditorMediaVideo,
+  fileComponent = CommentEditorMediaFile,
 }: EditorProps) {
   const [isDragging, setIsDragging] = useState(false);
   const content = useHandleDefaultEditorValue(

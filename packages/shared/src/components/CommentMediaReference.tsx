@@ -1,7 +1,7 @@
-import type { AllowedMediaReferences } from "./renderer";
-import { CommentMediaImage } from "./CommentMediaImage";
-import { CommentMediaVideo } from "./CommentMediaVideo";
-import { CommentMediaFile } from "./CommentMediaFile";
+import type { AllowedMediaReferences } from "../renderer.js";
+import { CommentMediaImage } from "./CommentMediaImage.js";
+import { CommentMediaVideo } from "./CommentMediaVideo.js";
+import { CommentMediaFile } from "./CommentMediaFile.js";
 
 export function CommentMediaReference({
   reference,

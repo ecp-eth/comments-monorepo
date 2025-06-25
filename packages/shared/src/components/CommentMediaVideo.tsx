@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { MediaDimensions } from "./types";
-import { getMediaOrientation } from "./utils";
-import type {
-  UploadTrackerVideoComponent,
-  UploadTrackerVideoComponentProps,
-} from "@ecp.eth/react-editor/types";
+import type { MediaDimensions } from "./types.js";
+import { getMediaOrientation } from "./utils.js";
 
 export function CommentMediaVideo({
   fileOrUrl: file,
@@ -66,9 +62,3 @@ export function CommentMediaVideo({
     </div>
   );
 }
-
-export const CommentEditorMediaVideo: UploadTrackerVideoComponent = ({
-  file,
-}: UploadTrackerVideoComponentProps) => {
-  return <CommentMediaVideo fileOrUrl={"url" in file ? file.url : file.file} />;
-};

@@ -14,8 +14,8 @@ import { useAccount } from "wagmi";
 import { CommentSwapInfo } from "./CommentSwapInfo";
 import { useMemo } from "react";
 import { renderToReact } from "./renderer";
-import { CommentMediaReference } from "./CommentMediaReference";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import { CommentMediaReference } from "@ecp.eth/shared/components";
 
 type CommentProps = {
   comment: CommentType;

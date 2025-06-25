@@ -24,7 +24,7 @@ import {
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { useMemo } from "react";
 import { renderToReact } from "./renderer";
-import { CommentMediaReference } from "./CommentMediaReference";
+import { CommentMediaReference } from "@ecp.eth/shared/components";
 
 export type OnRetryPostComment = (
   comment: CommentType,
