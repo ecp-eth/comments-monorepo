@@ -1,0 +1,83 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPIGetAutocompleteOutputSchemaType
+
+# Type Alias: IndexerAPIGetAutocompleteOutputSchemaType
+
+```ts
+type IndexerAPIGetAutocompleteOutputSchemaType = {
+  results: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     type: "ens";
+     url: string;
+     value: `0x${string}`;
+   }
+     | {
+     address: `0x${string}`;
+     caip19: string;
+     chainId: number;
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     symbol: string;
+     type: "erc20";
+     value: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName?: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl?: null | string;
+     type: "farcaster";
+     url: string;
+     username: string;
+     value: `0x${string}`;
+  })[];
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:572](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L572)
+
+## Type declaration
+
+### results
+
+```ts
+results: (
+  | {
+  address: `0x${string}`;
+  avatarUrl: null | string;
+  name: string;
+  type: "ens";
+  url: string;
+  value: `0x${string}`;
+}
+  | {
+  address: `0x${string}`;
+  caip19: string;
+  chainId: number;
+  decimals: number;
+  logoURI: null | string;
+  name: string;
+  symbol: string;
+  type: "erc20";
+  value: string;
+}
+  | {
+  address: `0x${string}`;
+  displayName?: null | string;
+  fid: number;
+  fname: string;
+  pfpUrl?: null | string;
+  type: "farcaster";
+  url: string;
+  username: string;
+  value: `0x${string}`;
+})[];
+```
