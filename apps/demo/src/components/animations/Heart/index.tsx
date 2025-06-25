@@ -16,6 +16,7 @@ export function HeartAnimation({
   onIsHeartedChange,
   pending = false,
 }: HeartAnimationProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const animatingState = useRef<{
     direction: "hearted" | "unhearted";
     animating: boolean;
@@ -36,6 +37,7 @@ export function HeartAnimation({
       return;
     }
 
+    containerRef.current?.classList.add("overflow-visible");
     animatingState.current.animating = true;
     animatingState.current.direction = "hearted";
 
@@ -52,6 +54,7 @@ export function HeartAnimation({
         return;
       }
 
+      containerRef.current?.classList.remove("overflow-visible");
       animatingState.current.animating = false;
       animatingState.current.direction = hearted ? "hearted" : "unhearted";
 
@@ -102,12 +105,6 @@ export function HeartAnimation({
 
     // If pending and hearted, keep repeating the animation
     playHeartedAnimation();
-
-    // do we want to repeat the animation?
-    // const interval = setInterval(() => {
-    //   lottieRef.current?.goToAndPlay(1, true);
-    // }, 300);
-    // return () => clearInterval(interval);
   }, [animationLoaded, pending, isHearted, playHeartedAnimation, gotoFrame]);
 
   useEffect(() => {
@@ -116,11 +113,10 @@ export function HeartAnimation({
     }
   }, [animationLoaded]);
 
-  console.log("rendering isHearted", isHearted, "pending", pending);
-
   return (
     <div
-      className="w-[24px] h-[24px] overflow-visible flex items-start justify-start relative"
+      ref={containerRef}
+      className="w-[24px] h-[24px] overflow-hidden flex items-start justify-start relative"
       role="button"
       aria-label={"Like comment"}
       aria-pressed={isHearted}
@@ -138,6 +134,7 @@ export function HeartAnimation({
         loop={false}
         autoplay={false}
         onComplete={() => {
+          containerRef.current?.classList.remove("overflow-visible");
           animatingState.current.animating = false;
         }}
         onDOMLoaded={() => {
