@@ -74,3 +74,17 @@ export type SearchSuggestionsFunction = (
   query: string,
   char: "@" | "$",
 ) => Promise<IndexerAPIGetAutocompleteOutputSchemaType>;
+
+export type MentionsExtensionTheme = {
+  suggestionsClassName?: string;
+  suggestionsNoResultsClassName?: string;
+  suggestionsItemClassName?: string;
+  suggestionsItemSelectedClassName?: string;
+  suggestionsItemAvatarClassName?: string;
+  suggestionsItemNameClassName?: string;
+  suggestionsItemHandleClassName?: string;
+  suggestionsItemInfoClassName?: string;
+  suggestionsItemChainClassName?: string;
+  suggestionsItemSymbolClassName?: string;
+  suggestionsItemDecimalsClassName?: string;
+};

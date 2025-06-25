@@ -10,11 +10,12 @@ import {
 } from "react";
 import * as chains from "viem/chains";
 import type { Hex } from "viem";
-import type { MentionItem } from "../types.js";
+import type { MentionItem, MentionsExtensionTheme } from "../types.js";
 import type { IndexerAPIAutocompleteERC20SchemaType } from "@ecp.eth/sdk/indexer";
 
 export type SuggestionsProps = SuggestionProps<MentionItem> & {
   minimumQueryLength: number;
+  theme?: MentionsExtensionTheme;
 };
 
 export type SuggestionsRef = {
@@ -22,7 +23,7 @@ export type SuggestionsRef = {
 };
 
 export const Suggestions = forwardRef(function Suggestions(
-  { command, items, query, minimumQueryLength }: SuggestionsProps,
+  { command, items, query, minimumQueryLength, theme }: SuggestionsProps,
   ref: React.Ref<SuggestionsRef>,
 ) {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -83,7 +84,12 @@ export const Suggestions = forwardRef(function Suggestions(
     return null;
   } else if (items.length === 0) {
     children = (
-      <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
+      <div
+        className={cn(
+          "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
+          theme?.suggestionsNoResultsClassName,
+        )}
+      >
         No results found
       </div>
     );
@@ -95,13 +101,24 @@ export const Suggestions = forwardRef(function Suggestions(
             ref={index === selectedIndex ? selectedItemRef : null}
             className={cn(
               "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
-              index === selectedIndex ? "bg-accent text-accent-foreground" : "",
+              theme?.suggestionsItemClassName,
+              index === selectedIndex
+                ? cn(
+                    "bg-accent text-accent-foreground",
+                    theme?.suggestionsItemSelectedClassName,
+                  )
+                : "",
             )}
             key={`${query}-${index}`}
             onClick={() => selectItem(index)}
           >
             {item.type === "ens" ? (
               <AccountSuggestion
+                className={theme?.suggestionsItemClassName}
+                avatarClassName={theme?.suggestionsItemAvatarClassName}
+                nameClassName={theme?.suggestionsItemNameClassName}
+                handleClassName={theme?.suggestionsItemHandleClassName}
+                infoClassName={theme?.suggestionsItemInfoClassName}
                 address={item.address}
                 name={item.name}
                 avatarUrl={item.avatarUrl}
@@ -110,6 +127,11 @@ export const Suggestions = forwardRef(function Suggestions(
             ) : null}
             {item.type === "farcaster" ? (
               <AccountSuggestion
+                className={theme?.suggestionsItemClassName}
+                avatarClassName={theme?.suggestionsItemAvatarClassName}
+                nameClassName={theme?.suggestionsItemNameClassName}
+                handleClassName={theme?.suggestionsItemHandleClassName}
+                infoClassName={theme?.suggestionsItemInfoClassName}
                 address={item.address}
                 avatarUrl={item.pfpUrl}
                 name={item.displayName || item.username}
@@ -117,7 +139,13 @@ export const Suggestions = forwardRef(function Suggestions(
               />
             ) : null}
             {item.type === "erc20" ? (
-              <ERC20TokenSuggestion suggestion={item} />
+              <ERC20TokenSuggestion
+                suggestion={item}
+                className={theme?.suggestionsItemClassName}
+                avatarClassName={theme?.suggestionsItemAvatarClassName}
+                symbolClassName={theme?.suggestionsItemSymbolClassName}
+                infoClassName={theme?.suggestionsItemInfoClassName}
+              />
             ) : null}
           </button>
         ))}
@@ -126,13 +154,23 @@ export const Suggestions = forwardRef(function Suggestions(
   }
 
   return (
-    <div className="flex flex-col z-50 min-w-[8rem] max-h-[250px] overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md suggestions-scrollbar">
+    <div
+      className={cn(
+        "flex flex-col z-50 min-w-[8rem] max-h-[250px] overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md suggestions-scrollbar",
+        theme?.suggestionsClassName,
+      )}
+    >
       {children}
     </div>
   );
 });
 
 type AccountSuggestionProps = {
+  className?: string;
+  avatarClassName?: string;
+  nameClassName?: string;
+  handleClassName?: string;
+  infoClassName?: string;
   address: Hex;
   avatarUrl: string | null | undefined;
   name: string;
@@ -144,18 +182,40 @@ function AccountSuggestion({
   avatarUrl,
   name,
   handle,
+  className,
+  avatarClassName,
+  nameClassName,
+  handleClassName,
+  infoClassName,
 }: AccountSuggestionProps) {
   return (
-    <div className="flex flex-row items-center gap-2 w-full min-w-0">
+    <div
+      className={cn(
+        "flex flex-row items-center gap-2 w-full min-w-0",
+        className,
+      )}
+    >
       <div
-        className="rounded-full bg-cover bg-center size-10 bg-muted border border-border flex-shrink-0"
+        className={cn(
+          "rounded-full bg-cover bg-center size-10 bg-muted border border-border flex-shrink-0",
+          avatarClassName,
+        )}
         style={{
           backgroundImage: `url(${avatarUrl || `https://effigy.im/a/${address}`})`,
         }}
       ></div>
-      <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-sm truncate w-full text-left">{name}</span>
-        <span className="text-sm text-muted-foreground truncate w-full text-left">
+      <div className={cn("flex flex-col min-w-0 flex-1", infoClassName)}>
+        <span
+          className={cn("text-sm truncate w-full text-left", nameClassName)}
+        >
+          {name}
+        </span>
+        <span
+          className={cn(
+            "text-sm text-muted-foreground truncate w-full text-left",
+            handleClassName,
+          )}
+        >
           {handle}
         </span>
       </div>
@@ -165,24 +225,51 @@ function AccountSuggestion({
 
 type ERC20TokenSuggestionProps = {
   suggestion: IndexerAPIAutocompleteERC20SchemaType;
+  className?: string;
+  avatarClassName?: string;
+  symbolClassName?: string;
+  infoClassName?: string;
+  chainClassName?: string;
 };
 
-function ERC20TokenSuggestion({ suggestion }: ERC20TokenSuggestionProps) {
+function ERC20TokenSuggestion({
+  suggestion,
+  className,
+  avatarClassName,
+  symbolClassName,
+  infoClassName,
+  chainClassName,
+}: ERC20TokenSuggestionProps) {
   return (
-    <div className="flex flex-row items-center gap-2 w-full min-w-0">
+    <div
+      className={cn(
+        "flex flex-row items-center gap-2 w-full min-w-0",
+        className,
+      )}
+    >
       <div
-        className="rounded-full bg-cover bg-center size-10 bg-muted border border-border flex-shrink-0"
+        className={cn(
+          "rounded-full bg-cover bg-center size-10 bg-muted border border-border flex-shrink-0",
+          avatarClassName,
+        )}
         style={{
           backgroundImage: suggestion.logoURI
             ? `url(${suggestion.logoURI})`
             : undefined,
         }}
       ></div>
-      <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-sm truncate w-full text-left">
+      <div className={cn("flex flex-col min-w-0 flex-1", infoClassName)}>
+        <span
+          className={cn("text-sm truncate w-full text-left", symbolClassName)}
+        >
           ${suggestion.symbol}
         </span>
-        <span className="text-sm text-muted-foreground truncate w-full text-left">
+        <span
+          className={cn(
+            "text-sm text-muted-foreground truncate w-full text-left",
+            chainClassName,
+          )}
+        >
           {getChainById(suggestion.chainId, Object.values(chains))?.name}
         </span>
       </div>

@@ -23,6 +23,7 @@ import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer
 import { useHandleDefaultEditorValue } from "./hooks/use-handle-default-editor-value.js";
 import type {
   LinkAttributes,
+  MentionsExtensionTheme,
   UploadTrackerFileComponent,
   UploadTrackerImageComponent,
   UploadTrackerVideoComponent,
@@ -61,6 +62,7 @@ export type EditorProps = {
   onBlur?: () => void;
   onEscapePress?: () => void;
   suggestions: EditorSuggestionsService;
+  suggestionsTheme?: MentionsExtensionTheme;
   uploads: UploadFilesService;
   imageComponent: UploadTrackerImageComponent;
   videoComponent: UploadTrackerVideoComponent;
@@ -77,6 +79,7 @@ export function Editor({
   onEscapePress,
   defaultValue,
   suggestions,
+  suggestionsTheme,
   uploads,
   imageComponent,
   videoComponent,
@@ -116,6 +119,7 @@ export function Editor({
         suggestion: {
           char: "@",
         },
+        theme: suggestionsTheme,
       }),
       UploadTracker.configure({
         imageComponent,
