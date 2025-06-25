@@ -29,7 +29,7 @@ import type {
 } from "./extensions/types.js";
 import { cn } from "@ecp.eth/shared/helpers";
 import { ALLOWED_UPLOAD_MIME_TYPES } from "./constants.js";
-import type { SearchSuggestionsFunction } from "./types.js";
+import type { EditorSuggestionsService } from "./types.js";
 
 export type EditorRef = {
   focus: () => void;
@@ -65,7 +65,7 @@ export type EditorProps = {
   ref?: React.Ref<EditorRef>;
   onBlur?: () => void;
   onEscapePress?: () => void;
-  searchSuggestions: SearchSuggestionsFunction;
+  suggestions: EditorSuggestionsService;
   imageComponent: UploadTrackerImageComponent;
   videoComponent: UploadTrackerVideoComponent;
   fileComponent: UploadTrackerFileComponent;
@@ -81,7 +81,7 @@ export function Editor({
   onBlur,
   onEscapePress,
   defaultValue,
-  searchSuggestions,
+  suggestions,
   imageComponent,
   videoComponent,
   fileComponent,
@@ -116,7 +116,7 @@ export function Editor({
       }),
       // ens, farcaster, erc20, address mentions
       MentionExtension.configure({
-        searchSuggestions,
+        searchSuggestions: suggestions.search,
         suggestion: {
           char: "@",
         },

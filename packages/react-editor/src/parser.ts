@@ -93,6 +93,7 @@ export function parse(
               name: reference.name,
               url: reference.url,
               avatarUrl: reference.avatarUrl,
+              value: reference.address,
             } satisfies MentionItem,
           });
 
@@ -121,6 +122,7 @@ export function parse(
               chainId: chain.chainId,
               decimals: reference.decimals,
               logoURI: reference.logoURI,
+              value: reference.address,
             } satisfies MentionItem,
           });
 
@@ -142,6 +144,7 @@ export function parse(
               pfpUrl: reference.pfpUrl,
               url: reference.url,
               fid: reference.fid,
+              value: reference.address,
             } satisfies MentionItem,
           });
 

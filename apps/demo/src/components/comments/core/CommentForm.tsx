@@ -31,8 +31,7 @@ import {
   MAX_UPLOAD_FILE_SIZE,
 } from "@/lib/constants";
 import { extractReferences } from "@ecp.eth/react-editor/extract-references";
-import { useMentionSuggestions } from "./hooks/useMentionSuggestions";
-import type { SearchSuggestionsFunction } from "@ecp.eth/react-editor/types";
+import { useIndexerSuggestions } from "@ecp.eth/react-editor/hooks";
 import { CommentEditorMediaVideo } from "./CommentMediaVideo";
 import { CommentEditorMediaImage } from "./CommentMediaImage";
 import { CommentEditorMediaFile } from "./CommentMediaFile";
@@ -106,16 +105,9 @@ function BaseCommentForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const { uploadFiles } = useUploadFiles();
-  const searchAddressSuggestions = useMentionSuggestions("@");
-
-  // Create searchSuggestions function that matches the expected interface
-  const searchSuggestions: SearchSuggestionsFunction = useCallback(
-    async (query: string) => {
-      const response = await searchAddressSuggestions(query);
-      return response.suggestions;
-    },
-    [searchAddressSuggestions],
-  );
+  const suggestions = useIndexerSuggestions({
+    apiUrl: process.env.NEXT_PUBLIC_INDEXER_API_URL,
+  });
 
   const submitMutation = useMutation({
     mutationFn: async (formData: FormData): Promise<void> => {
@@ -258,7 +250,7 @@ function BaseCommentForm({
         placeholder={placeholder}
         defaultValue={defaultContent}
         ref={editorRef}
-        searchSuggestions={searchSuggestions}
+        suggestions={suggestions}
         onEscapePress={() => {
           if (isSubmitting) {
             return;

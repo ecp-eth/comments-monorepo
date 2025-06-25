@@ -14,6 +14,7 @@ import type {
   UploadTrackerImageComponent,
   UploadTrackerVideoComponent,
 } from "./types.js";
+import type { SearchSuggestionsFunction } from "./types.js";
 
 const MINIMUM_QUERY_LENGTH = 2;
 
@@ -24,7 +25,7 @@ type MentionAttributes = {
 };
 
 type MentionExtensionOptions = MentionOptions<SuggestionItem, MentionItem> & {
-  searchSuggestions: (query: string) => Promise<SuggestionItem[]>;
+  searchSuggestions: SearchSuggestionsFunction;
   imageComponent: UploadTrackerImageComponent;
   videoComponent: UploadTrackerVideoComponent;
   fileComponent: UploadTrackerFileComponent;
@@ -171,6 +172,15 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
           };
         },
       },
+      value: {
+        default: undefined,
+        parseHTML: (element) => element.getAttribute("data-value"),
+        renderHTML: (attributes) => {
+          return {
+            "data-value": attributes.value,
+          };
+        },
+      },
     } satisfies MentionAttributes;
   },
   renderText({ node }) {
@@ -178,11 +188,11 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
 
     // in case of erc20 token render caip19
     if (attrs.type === "erc20") {
-      return attrs.caip19;
+      return attrs.value;
     }
 
     // for ens name, farcaster username or just address render address prefixed with mention
-    return `@${attrs.address}`;
+    return `@${attrs.value}`;
   },
   renderHTML({ node, HTMLAttributes }) {
     const attrs = node.attrs as MentionItem;
@@ -233,7 +243,9 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
     return {
       ...parent,
       async searchSuggestions() {
-        return [];
+        return {
+          results: [],
+        };
       },
       suggestion: {
         ...parent?.suggestion,
@@ -386,12 +398,20 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
   },
 
   onBeforeCreate() {
+    const char = this.options.suggestion.char;
+
+    if (char !== "$" && char !== "@") {
+      throw new Error("Invalid char, only @ and $ are allowed");
+    }
+
     this.options.suggestion.items = async ({ query }) => {
       if (!isValidQuery(query, MINIMUM_QUERY_LENGTH)) {
         return [];
       }
 
-      return await this.options.searchSuggestions(query);
+      const { results } = await this.options.searchSuggestions(query, char);
+
+      return results;
     };
   },
 });

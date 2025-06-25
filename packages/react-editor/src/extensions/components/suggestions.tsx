@@ -10,7 +10,8 @@ import {
 } from "react";
 import * as chains from "viem/chains";
 import type { Hex } from "viem";
-import type { Erc20MentionSuggestion, MentionItem } from "../types.js";
+import type { MentionItem } from "../types.js";
+import type { IndexerAPIAutocompleteERC20SchemaType } from "@ecp.eth/sdk/indexer";
 
 export type SuggestionsProps = SuggestionProps<MentionItem> & {
   minimumQueryLength: number;
@@ -163,7 +164,7 @@ function AccountSuggestion({
 }
 
 type ERC20TokenSuggestionProps = {
-  suggestion: Erc20MentionSuggestion;
+  suggestion: IndexerAPIAutocompleteERC20SchemaType;
 };
 
 function ERC20TokenSuggestion({ suggestion }: ERC20TokenSuggestionProps) {

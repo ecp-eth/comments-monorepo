@@ -1,6 +1,12 @@
 import type { ComponentType } from "react";
-import type { Hex } from "@ecp.eth/sdk/core";
 import type { Attribute } from "@tiptap/core";
+import type {
+  IndexerAPIAutocompleteERC20SchemaType,
+  IndexerAPIAutocompleteENSSchemaType,
+  IndexerAPIAutocompleteFarcasterSchemaType,
+  IndexerAPIAutocompleteSchemaType,
+  IndexerAPIGetAutocompleteOutputSchemaType,
+} from "@ecp.eth/sdk/indexer";
 
 export type UploadTrackerFileToUpload = {
   id: string;
@@ -32,45 +38,12 @@ export type LinkAttributes = {
   target: "_blank";
 };
 
-export type EnsMentionSuggestion = {
-  type: "ens";
-  address: Hex;
-  name: string;
-  avatarUrl: string | null;
-  url: string;
-};
-
-export type Erc20MentionSuggestion = {
-  type: "erc20";
-  name: string;
-  symbol: string;
-  address: Hex;
-  caip19: string;
-  chainId: number;
-  decimals: number;
-  logoURI: string | null;
-};
-
-export type FarcasterMentionSuggestion = {
-  type: "farcaster";
-  address: Hex;
-  fid: number;
-  fname: string;
-  displayName?: string | null;
-  username: string;
-  pfpUrl?: string | null;
-  url: string;
-};
-
-export type MentionItem =
-  | EnsMentionSuggestion
-  | Erc20MentionSuggestion
-  | FarcasterMentionSuggestion;
+export type MentionItem = IndexerAPIAutocompleteSchemaType;
 
 export type MentionItemKeys =
-  | keyof EnsMentionSuggestion
-  | keyof Erc20MentionSuggestion
-  | keyof FarcasterMentionSuggestion;
+  | keyof IndexerAPIAutocompleteENSSchemaType
+  | keyof IndexerAPIAutocompleteERC20SchemaType
+  | keyof IndexerAPIAutocompleteFarcasterSchemaType;
 
 export type MentionAttributes = {
   [K in MentionItemKeys]: Attribute;
@@ -96,3 +69,8 @@ export type UploadTrackerFileComponentProps = {
 
 export type UploadTrackerFileComponent =
   ComponentType<UploadTrackerFileComponentProps>;
+
+export type SearchSuggestionsFunction = (
+  query: string,
+  char: "@" | "$",
+) => Promise<IndexerAPIGetAutocompleteOutputSchemaType>;
