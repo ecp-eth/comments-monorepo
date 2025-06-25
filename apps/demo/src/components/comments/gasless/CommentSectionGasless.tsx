@@ -38,6 +38,7 @@ import { CommentItem } from "../core/CommentItem";
 import { CommentForm } from "../core/CommentForm";
 import { createRootCommentsQueryKey } from "../core/queries";
 import { CommentActionsProvider } from "./context";
+import { toast } from "sonner";
 
 export function CommentSectionGasless() {
   const { address: viewer } = useAccount();
@@ -94,7 +95,7 @@ export function CommentSectionGasless() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to post approval signature");
+        throw new Error("Server failed to post approval signature");
       }
 
       return ChangeApprovalStatusResponseSchema.parse(await response.json())
@@ -197,6 +198,14 @@ export function CommentSectionGasless() {
     approveGaslessTransactionsMutation,
     revokeApproval,
   ]);
+
+  useEffect(() => {
+    if (!approveGaslessTransactionsMutation.error) {
+      return;
+    }
+
+    toast.error(approveGaslessTransactionsMutation.error.message);
+  }, [approveGaslessTransactionsMutation.error, approvalStatus]);
 
   useEffect(() => {
     setCurrentUrl(window.location.href);
