@@ -11,6 +11,11 @@ function createQueryKey(char: string, query: string): QueryKey {
 }
 
 export type UseIndexerSuggestionsOptions = {
+  /**
+   * URL of the indexer API.
+   *
+   * If not provided, the default indexer API URL will be used.
+   */
   apiUrl?: string;
   /**
    * The debounce time in milliseconds.

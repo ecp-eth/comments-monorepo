@@ -454,6 +454,9 @@ importers:
       next-themes:
         specifier: ^0.4.4
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      pinata:
+        specifier: ^2.4.3
+        version: 2.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ~19.1.0
         version: 19.1.0
@@ -1113,6 +1116,9 @@ importers:
       eslint:
         specifier: ^9.19.0
         version: 9.28.0(jiti@2.4.2)
+      pinata:
+        specifier: ^2.4.3
+        version: 2.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ~19.1.0
         version: 19.1.0

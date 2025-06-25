@@ -28,11 +28,7 @@ import type {
   UploadTrackerVideoComponent,
 } from "./extensions/types.js";
 import { cn } from "@ecp.eth/shared/helpers";
-import {
-  ALLOWED_UPLOAD_MIME_TYPES,
-  MAX_UPLOAD_FILE_SIZE,
-} from "./constants.js";
-import type { EditorSuggestionsService } from "./types.js";
+import type { EditorSuggestionsService, UploadFilesService } from "./types.js";
 
 export type EditorRef = {
   focus: () => void;
@@ -50,14 +46,6 @@ export type EditorRef = {
 };
 
 export type EditorProps = {
-  /**
-   * @default ALLOWED_UPLOAD_MIME_TYPES
-   */
-  allowedUploadMimeTypes?: string[];
-  /**
-   * @default MAX_UPLOAD_FILE_SIZE
-   */
-  maxUploadFileSize?: number;
   className?: string;
   disabled?: boolean;
   defaultValue?: {
@@ -73,14 +61,13 @@ export type EditorProps = {
   onBlur?: () => void;
   onEscapePress?: () => void;
   suggestions: EditorSuggestionsService;
+  uploads: UploadFilesService;
   imageComponent: UploadTrackerImageComponent;
   videoComponent: UploadTrackerVideoComponent;
   fileComponent: UploadTrackerFileComponent;
 };
 
 export function Editor({
-  allowedUploadMimeTypes = ALLOWED_UPLOAD_MIME_TYPES,
-  maxUploadFileSize = MAX_UPLOAD_FILE_SIZE,
   className,
   disabled = false,
   placeholder,
@@ -90,6 +77,7 @@ export function Editor({
   onEscapePress,
   defaultValue,
   suggestions,
+  uploads,
   imageComponent,
   videoComponent,
   fileComponent,
@@ -232,7 +220,7 @@ export function Editor({
     }
 
     const isAllowed = files.every((file) =>
-      allowedUploadMimeTypes.includes(file.type),
+      uploads.allowedMimeTypes.includes(file.type),
     );
 
     if (!isAllowed) {
@@ -260,8 +248,8 @@ export function Editor({
 
     const isAllowed = files.every(
       (file) =>
-        allowedUploadMimeTypes.includes(file.type) &&
-        file.size <= maxUploadFileSize,
+        uploads.allowedMimeTypes.includes(file.type) &&
+        file.size <= uploads.maxFileSize,
     );
 
     if (!isAllowed) {
