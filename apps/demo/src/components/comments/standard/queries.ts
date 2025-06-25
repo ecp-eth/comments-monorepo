@@ -139,13 +139,18 @@ export async function submitCommentMutationFunction({
       references,
     };
   } catch (e) {
-    if (
-      e instanceof ContractFunctionExecutionError &&
-      e.shortMessage.includes("User rejected the request.")
-    ) {
-      throw new SubmitCommentMutationError(
-        "Could not post the comment because the transaction was rejected.",
-      );
+    if (e instanceof ContractFunctionExecutionError) {
+      if (e.shortMessage.includes("User rejected the request.")) {
+        throw new SubmitCommentMutationError("Transaction was rejected.");
+      }
+
+      if (e.details.includes("has not been authorized by the user")) {
+        throw new SubmitCommentMutationError(
+          "Transaction not authorized. Please ensure your wallet is unlocked and the session is active.",
+        );
+      }
+
+      throw new SubmitCommentMutationError(e.details);
     }
 
     console.error(e);

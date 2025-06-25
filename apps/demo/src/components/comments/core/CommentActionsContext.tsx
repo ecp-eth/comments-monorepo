@@ -122,7 +122,7 @@ export type OnLikeCommentParams = {
   /**
    * Called when transaction was failed.
    */
-  onFailed?: () => void;
+  onFailed?: (error: unknown) => void;
 };
 
 export type OnUnlikeCommentParams = {
@@ -138,6 +138,10 @@ export type OnUnlikeCommentParams = {
    * Called before transaction was created.
    */
   onBeforeStart?: () => void;
+  /**
+   * Called when transaction was failed.
+   */
+  onFailed?: (error: unknown) => void;
 };
 
 export type OnRetryEditComment = (

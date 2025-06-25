@@ -373,7 +373,7 @@ export function useGaslessCommentActions({
           pendingOperation,
         });
       } catch (e) {
-        onFailed?.();
+        onFailed?.(e);
 
         if (pendingOperation) {
           likeReactionSubmission.error({
@@ -395,6 +395,7 @@ export function useGaslessCommentActions({
         comment,
         queryKey: parentCommentQueryKey,
         onBeforeStart,
+        onFailed,
       } = params;
 
       const reaction = comment.viewerReactions?.[
@@ -433,6 +434,8 @@ export function useGaslessCommentActions({
 
         likeReactionRemoval.success(reactionRemovalParams);
       } catch (e) {
+        onFailed?.(e);
+
         likeReactionRemoval.error(reactionRemovalParams);
 
         throw e;

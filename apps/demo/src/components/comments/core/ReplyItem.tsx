@@ -5,6 +5,8 @@ import type { QueryKey } from "@tanstack/react-query";
 import { CommentEditForm, CommentForm } from "./CommentForm";
 import { useCommentActions } from "./CommentActionsContext";
 import type { Hex } from "viem";
+import { toast } from "sonner";
+import { decapitalize } from "@ecp.eth/shared/helpers";
 
 type ReplyItemProps = {
   comment: CommentType;
@@ -56,7 +58,16 @@ export function ReplyItem({
       queryKey,
       onBeforeStart: () => setIsLiking(true),
       onSuccess: () => setIsLiking(false),
-      onFailed: () => setIsLiking(false),
+      onFailed: (e: unknown) => {
+        setIsLiking(false);
+
+        if (e instanceof Error) {
+          toast.error(`Error: ${decapitalize(e.message)}`);
+          return;
+        }
+
+        toast.error("Failed to like");
+      },
     });
   }, [comment, likeComment, queryKey]);
 
@@ -65,6 +76,14 @@ export function ReplyItem({
       comment,
       queryKey,
       onBeforeStart: () => setIsLiking(false),
+      onFailed: (e: unknown) => {
+        if (e instanceof Error) {
+          toast.error(`Error: ${decapitalize(e.message)}`);
+          return;
+        }
+
+        toast.error("Failed to unlike");
+      },
     });
   }, [comment, unlikeComment, queryKey]);
 
