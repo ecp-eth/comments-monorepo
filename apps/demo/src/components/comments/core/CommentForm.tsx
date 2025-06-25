@@ -36,6 +36,7 @@ import { CommentEditorMediaVideo } from "./CommentMediaVideo";
 import { CommentEditorMediaImage } from "./CommentMediaImage";
 import { CommentEditorMediaFile } from "./CommentMediaFile";
 import { useUploadFiles } from "./hooks/useUploadFiles";
+import { publicEnv } from "@/publicEnv";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -106,7 +107,7 @@ function BaseCommentForm({
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const { uploadFiles } = useUploadFiles();
   const suggestions = useIndexerSuggestions({
-    apiUrl: process.env.NEXT_PUBLIC_INDEXER_API_URL,
+    apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   });
 
   const submitMutation = useMutation({
