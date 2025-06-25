@@ -40,6 +40,7 @@ import { CommentEditorMediaImage } from "./CommentMediaImage";
 import { CommentEditorMediaFile } from "./CommentMediaFile";
 import { publicEnv } from "@/publicEnv";
 import { GenerateUploadUrlResponseSchema } from "@/lib/schemas";
+import { cn } from "@/lib/utils";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -269,7 +270,13 @@ function BaseCommentForm({
       />
       <Editor
         autoFocus={autoFocus}
-        className="w-full p-2 border border-gray-300 rounded"
+        className={cn(
+          "w-full p-2 border border-gray-300 rounded",
+          disabled && "opacity-50",
+          submitMutation.error &&
+            submitMutation.error instanceof InvalidCommentError &&
+            "border-destructive focus-visible:border-destructive",
+        )}
         disabled={isSubmitting || disabled}
         placeholder={placeholder}
         defaultValue={defaultContent}
