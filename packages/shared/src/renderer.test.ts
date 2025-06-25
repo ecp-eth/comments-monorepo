@@ -279,4 +279,235 @@ describe("renderToReact", () => {
     ]);
     expect(renderToStaticMarkup(result.element)).toBe("<p>Test</p>");
   });
+
+  describe("truncation", () => {
+    it("truncates by maxLength considering rendered text", () => {
+      const result = renderToReact({
+        content: "Hello @luc.eth world!",
+        references: [
+          {
+            type: "ens",
+            address: "0x225f137127d9067788314bc7fcc1f36746a3c3B5",
+            name: "luc.eth",
+            avatarUrl: "https://example.com/avatar.jpg",
+            url: "https://app.ens.domains/luc.eth",
+            position: {
+              start: 6,
+              end: 14,
+            },
+          },
+        ],
+        maxLength: 15, // "Hello @luc.eth " = 15 characters
+      });
+
+      expect(result.isTruncated).toBe(true);
+      expect(renderToStaticMarkup(result.element)).toBe(
+        '<p>Hello <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a>...</p>',
+      );
+    });
+
+    it("truncates by maxLength with regular text", () => {
+      const result = renderToReact({
+        content: "This is a very long text that should be truncated",
+        references: [],
+        maxLength: 20,
+      });
+
+      expect(result.isTruncated).toBe(true);
+      expect(renderToStaticMarkup(result.element)).toBe(
+        "<p>This is a very long...</p>",
+      );
+    });
+
+    it("truncates by maxLength with URLs", () => {
+      const result = renderToReact({
+        content: "Check this link: https://example.com/very-long-url",
+        references: [],
+        maxLength: 25, // "Check this link: https://" = 25 characters
+      });
+
+      expect(result.isTruncated).toBe(true);
+      expect(renderToStaticMarkup(result.element)).toBe(
+        "<p>Check this link:...</p>",
+      );
+    });
+
+    it("truncates by maxLines", () => {
+      const result = renderToReact({
+        content: "Line 1\nLine 2\nLine 3\nLine 4",
+        references: [],
+        maxLines: 2,
+      });
+
+      expect(result.isTruncated).toBe(true);
+      expect(renderToStaticMarkup(result.element)).toBe(
+        "<p>Line 1</p><p>Line 2</p>",
+      );
+    });
+
+    it("truncates by maxLines with references", () => {
+      const result = renderToReact({
+        content: "Line 1 with @luc.eth\nLine 2 with $USDC\nLine 3\nLine 4",
+        references: [
+          {
+            type: "ens",
+            address: "0x225f137127d9067788314bc7fcc1f36746a3c3B5",
+            name: "luc.eth",
+            avatarUrl: "https://example.com/avatar.jpg",
+            url: "https://app.ens.domains/luc.eth",
+            position: {
+              start: 12,
+              end: 20,
+            },
+          },
+          {
+            type: "erc20",
+            address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            name: "USD Coin",
+            symbol: "USDC",
+            logoURI: "https://example.com/usdc.png",
+            decimals: 6,
+            chainId: null,
+            chains: [
+              {
+                caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                chainId: 1,
+              },
+            ],
+            position: {
+              start: 33,
+              end: 38,
+            },
+          },
+        ],
+        maxLines: 2,
+      });
+
+      expect(result.isTruncated).toBe(true);
+      expect(renderToStaticMarkup(result.element)).toBe(
+        '<p>Line 1 with <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a></p><p>Line 2 with <span class="text-blue-500" title="USD Coin">$USDC</span></p>',
+      );
+    });
+
+    it("respects both maxLength and maxLines", () => {
+      const result = renderToReact({
+        content:
+          "Very long line that exceeds the length limit\nShort line\nAnother line",
+        references: [],
+        maxLength: 20,
+        maxLines: 2,
+      });
+
+      expect(result.isTruncated).toBe(true);
+      expect(renderToStaticMarkup(result.element)).toBe(
+        "<p>Very long line that...</p>",
+      );
+    });
+
+    it("does not truncate when limits are not exceeded", () => {
+      const result = renderToReact({
+        content: "Short text",
+        references: [],
+        maxLength: 100,
+        maxLines: 10,
+      });
+
+      expect(result.isTruncated).toBe(false);
+      expect(renderToStaticMarkup(result.element)).toBe("<p>Short text</p>");
+    });
+
+    it("handles truncation with mixed content types", () => {
+      const result = renderToReact({
+        content: "Hello @luc.eth! Check https://example.com and $USDC",
+        references: [
+          {
+            type: "ens",
+            address: "0x225f137127d9067788314bc7fcc1f36746a3c3B5",
+            name: "luc.eth",
+            avatarUrl: "https://example.com/avatar.jpg",
+            url: "https://app.ens.domains/luc.eth",
+            position: {
+              start: 6,
+              end: 14,
+            },
+          },
+          {
+            type: "webpage",
+            position: {
+              start: 22,
+              end: 41,
+            },
+            url: "https://example.com",
+            title: "Example",
+            description: "Example description",
+            favicon: null,
+            opengraph: null,
+          },
+          {
+            type: "erc20",
+            address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            name: "USD Coin",
+            symbol: "USDC",
+            logoURI: "https://example.com/usdc.png",
+            decimals: 6,
+            chainId: null,
+            chains: [
+              {
+                caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                chainId: 1,
+              },
+            ],
+            position: {
+              start: 46,
+              end: 51,
+            },
+          },
+        ],
+        maxLength: 42, // "Hello @luc.eth! Check https://example.com " = 42 characters
+      });
+
+      expect(result.isTruncated).toBe(true);
+      expect(renderToStaticMarkup(result.element)).toBe(
+        '<p>Hello <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a>! Check <a class="underline" href="https://example.com" rel="noopener noreferrer" target="_blank">https://example.com</a>...</p>',
+      );
+    });
+
+    it("handles truncation with consecutive newlines", () => {
+      const result = renderToReact({
+        content: "Line 1\n\n\nLine 2\nLine 3",
+        references: [],
+        maxLines: 2,
+      });
+
+      expect(result.isTruncated).toBe(true);
+      expect(renderToStaticMarkup(result.element)).toBe(
+        "<p>Line 1</p><p>Line 2</p>",
+      );
+    });
+
+    it("handles truncation with unicode characters", () => {
+      const result = renderToReact({
+        content: "👀 Hello @luc.eth! 🎉",
+        references: [
+          {
+            type: "ens",
+            address: "0x225f137127d9067788314bc7fcc1f36746a3c3B5",
+            name: "luc.eth",
+            avatarUrl: "https://example.com/avatar.jpg",
+            url: "https://app.ens.domains/luc.eth",
+            position: {
+              start: 9,
+              end: 17,
+            },
+          },
+        ],
+        maxLength: 16, // "👀 Hello @luc.eth" = 16 characters (counting unicode as one character)
+      });
+
+      expect(result.isTruncated).toBe(true);
+      expect(renderToStaticMarkup(result.element)).toBe(
+        '<p>👀 Hello <a class="text-blue-500" href="https://app.ens.domains/luc.eth" rel="noopener noreferrer" target="_blank">@luc.eth</a>...</p>',
+      );
+    });
+  });
 });

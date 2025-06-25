@@ -1,17 +1,11 @@
-import { truncateText } from "../helpers.js";
-import { Fragment, useState } from "react";
-
-function renderCommentContent(content: string) {
-  return content.split("\n").flatMap((line, index) => {
-    const nodes: React.ReactNode[] = [];
-    nodes.push(<Fragment key={`line-${index}`}>{line}</Fragment>);
-    nodes.push(<br key={`line-break-${index}`} />);
-    return nodes;
-  });
-}
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import { renderToReact } from "../renderer.js";
+import { useMemo, useState } from "react";
 
 type CommentTextProps = {
-  text: string;
+  className?: string;
+  content: string;
+  references: IndexerAPICommentReferencesSchemaType;
   /**
    * @default 200
    */
@@ -23,23 +17,34 @@ type CommentTextProps = {
 };
 
 export function CommentText({
-  text,
+  className,
+  content,
+  references,
   maxLength = 200,
   maxLines = 5,
 }: CommentTextProps) {
-  const [shownText, setShownText] = useState(() =>
-    truncateText(text, maxLength, maxLines),
-  );
-  const isTruncated = text.length > shownText.length;
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { element, isTruncated } = useMemo(() => {
+    return renderToReact({
+      content,
+      references,
+      ...(isExpanded
+        ? { maxLength: undefined, maxLines: undefined }
+        : {
+            maxLength,
+            maxLines,
+          }),
+    });
+  }, [content, references, maxLength, maxLines, isExpanded]);
 
   return (
-    <>
-      {renderCommentContent(shownText)}
-      {isTruncated ? (
+    <div className={className}>
+      {element}
+      {isTruncated && !isExpanded ? (
         <>
           {" "}
           <button
-            onClick={() => setShownText(text)}
+            onClick={() => setIsExpanded(true)}
             className="text-accent-foreground inline whitespace-nowrap underline"
             type="button"
           >
@@ -47,6 +52,6 @@ export function CommentText({
           </button>
         </>
       ) : null}
-    </>
+    </div>
   );
 }

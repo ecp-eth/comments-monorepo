@@ -18,7 +18,12 @@ export type AllowedMediaReferences =
 
 type ReferenceRenderer<
   TReference extends IndexerAPICommentReferenceSchemaType,
-> = (reference: TReference) => React.ReactElement | typeof KEEP_ORIGINAL_TEXT;
+> = {
+  length: (reference: TReference) => number;
+  render: (
+    reference: TReference,
+  ) => React.ReactElement | typeof KEEP_ORIGINAL_TEXT;
+};
 
 type ReferenceRendererKey = {
   [K in IndexerAPICommentReferenceSchemaType["type"]]: ReferenceRenderer<
@@ -27,64 +32,106 @@ type ReferenceRendererKey = {
 };
 
 const referenceRenderers: Partial<ReferenceRendererKey> = {
-  ens(reference) {
-    return (
-      <a
-        className="text-blue-500"
-        href={reference.url}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        @{reference.name}
-      </a>
-    );
+  ens: {
+    length(reference) {
+      return `@${reference.name}`.length;
+    },
+    render(reference) {
+      return (
+        <a
+          className="text-blue-500"
+          href={reference.url}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          @{reference.name}
+        </a>
+      );
+    },
   },
-  farcaster(reference) {
-    return (
-      <a
-        className="text-blue-500"
-        href={reference.url}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        @{reference.fname}
-      </a>
-    );
+  farcaster: {
+    length(reference) {
+      return `@${reference.fname}`.length;
+    },
+    render(reference) {
+      return (
+        <a
+          className="text-blue-500"
+          href={reference.url}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          @{reference.fname}
+        </a>
+      );
+    },
   },
-  erc20(reference) {
-    return (
-      <span
-        className="text-blue-500"
-        title={reference.name || reference.address}
-      >
-        ${reference.symbol}
-      </span>
-    );
+  erc20: {
+    length(reference) {
+      return `$${reference.symbol}`.length;
+    },
+    render(reference) {
+      return (
+        <span
+          className="text-blue-500"
+          title={reference.name || reference.address}
+        >
+          ${reference.symbol}
+        </span>
+      );
+    },
   },
 };
 
 type RenderToReactProps = {
   content: string;
   references: IndexerAPICommentReferencesSchemaType;
+  maxLength?: number;
+  maxLines?: number;
 };
 
 type RenderResult = {
   element: React.ReactElement;
   mediaReferences: AllowedMediaReferences[];
+  isTruncated: boolean;
 };
 
 export function renderToReact({
   content,
   references,
+  maxLength,
+  maxLines,
 }: RenderToReactProps): RenderResult {
   const { mediaReferences, content: contentWithoutMediaReferences } =
     processMediaReferences(content, references);
+
+  // Adjust reference positions to account for removed media references
+  const adjustedReferences = references.map((reference) => {
+    // Find how many media references were removed before this reference
+    const mediaRefsBefore = mediaReferences.filter(
+      (mediaRef) => mediaRef.position.start < reference.position.start,
+    );
+
+    // Calculate the total length of removed media references
+    const removedLength = mediaRefsBefore.reduce((total, mediaRef) => {
+      return total + (mediaRef.position.end - mediaRef.position.start);
+    }, 0);
+
+    return {
+      ...reference,
+      position: {
+        start: reference.position.start - removedLength,
+        end: reference.position.end - removedLength,
+      },
+    };
+  });
+
   const referencesByPosition: Map<
     number,
     IndexerAPICommentReferenceSchemaType
   > = new Map();
 
-  for (const reference of references) {
+  for (const reference of adjustedReferences) {
     referencesByPosition.set(reference.position.start, reference);
   }
 
@@ -92,8 +139,18 @@ export function renderToReact({
   let currentParagraphText = "";
   let currentParagraph: React.ReactElement[] = [];
   let consecutiveNewLines = 0;
+  let currentRenderedLength = 0;
+  let currentRenderedLines = 0;
+  let isTruncated = false;
 
   const flushParagraphText = () => {
+    if (
+      isTruncated &&
+      (currentParagraph.length > 0 || currentParagraphText.length > 0)
+    ) {
+      currentParagraphText = currentParagraphText.trim() + "...";
+    }
+
     if (currentParagraphText.length === 0) {
       return;
     }
@@ -105,6 +162,8 @@ export function renderToReact({
   const flushParagraph = () => {
     flushParagraphText();
 
+    currentRenderedLines++;
+
     if (currentParagraph.length > 0) {
       elements.push(
         <p key={elements.length}>
@@ -113,6 +172,18 @@ export function renderToReact({
       );
       currentParagraph = [];
     }
+  };
+
+  const shouldBeTruncated = (nextChunkLength: number) => {
+    if (maxLength && currentRenderedLength + nextChunkLength > maxLength) {
+      return true;
+    }
+
+    if (maxLines && currentRenderedLines >= maxLines) {
+      return true;
+    }
+
+    return false;
   };
 
   let pos = 0;
@@ -133,11 +204,20 @@ export function renderToReact({
         | undefined;
 
       if (renderer) {
-        const result = renderer(reference);
+        const result = renderer.render(reference);
 
         if (result !== KEEP_ORIGINAL_TEXT) {
+          const referenceLength = renderer.length(reference);
+
+          if (shouldBeTruncated(referenceLength)) {
+            isTruncated = true;
+            break;
+          }
+
           flushParagraphText();
+
           currentParagraph.push(result);
+          currentRenderedLength += referenceLength;
           pos = reference.position.end;
 
           continue;
@@ -170,6 +250,11 @@ export function renderToReact({
     if (urlMatch) {
       const url = urlMatch[0];
 
+      if (shouldBeTruncated(url.length)) {
+        isTruncated = true;
+        break;
+      }
+
       flushParagraphText();
 
       currentParagraph.push(
@@ -183,12 +268,19 @@ export function renderToReact({
         </a>,
       );
 
+      currentRenderedLength += url.length;
       pos += url.length;
 
       continue;
     }
 
+    if (shouldBeTruncated(1)) {
+      isTruncated = true;
+      break;
+    }
+
     currentParagraphText += char;
+    currentRenderedLength++;
 
     // Increment by proper code point length
     pos += codePoint > 0xffff ? 2 : 1;
@@ -199,6 +291,7 @@ export function renderToReact({
   return {
     element: <Fragment>{elements}</Fragment>,
     mediaReferences,
+    isTruncated,
   };
 }
 
