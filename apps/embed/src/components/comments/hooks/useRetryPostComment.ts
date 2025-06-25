@@ -66,6 +66,7 @@ export function useRetryPostComment({
                 targetUri: comment.targetUri,
               }),
         },
+        references: comment.references,
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
