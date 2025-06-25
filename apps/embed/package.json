@@ -11,6 +11,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@ecp.eth/react-editor": "workspace:*",
     "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/shared": "workspace:*",
     "@radix-ui/react-avatar": "^1.1.3",

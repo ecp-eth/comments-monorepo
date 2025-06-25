@@ -28,7 +28,10 @@ import type {
   UploadTrackerVideoComponent,
 } from "./extensions/types.js";
 import { cn } from "@ecp.eth/shared/helpers";
-import { ALLOWED_UPLOAD_MIME_TYPES } from "./constants.js";
+import {
+  ALLOWED_UPLOAD_MIME_TYPES,
+  MAX_UPLOAD_FILE_SIZE,
+} from "./constants.js";
 import type { EditorSuggestionsService } from "./types.js";
 
 export type EditorRef = {
@@ -51,6 +54,10 @@ export type EditorProps = {
    * @default ALLOWED_UPLOAD_MIME_TYPES
    */
   allowedUploadMimeTypes?: string[];
+  /**
+   * @default MAX_UPLOAD_FILE_SIZE
+   */
+  maxUploadFileSize?: number;
   className?: string;
   disabled?: boolean;
   defaultValue?: {
@@ -73,6 +80,7 @@ export type EditorProps = {
 
 export function Editor({
   allowedUploadMimeTypes = ALLOWED_UPLOAD_MIME_TYPES,
+  maxUploadFileSize = MAX_UPLOAD_FILE_SIZE,
   className,
   disabled = false,
   placeholder,
@@ -250,8 +258,10 @@ export function Editor({
       return;
     }
 
-    const isAllowed = files.every((file) =>
-      allowedUploadMimeTypes.includes(file.type),
+    const isAllowed = files.every(
+      (file) =>
+        allowedUploadMimeTypes.includes(file.type) &&
+        file.size <= maxUploadFileSize,
     );
 
     if (!isAllowed) {

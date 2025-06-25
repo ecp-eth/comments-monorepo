@@ -18,7 +18,7 @@ import {
   createRootCommentsQueryKey,
 } from "./queries";
 import type { Comment } from "@ecp.eth/shared/schemas";
-import { Editor, EditorRef } from "@ecp.eth/react-editor/editor";
+import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import {
   Tooltip,
@@ -245,6 +245,8 @@ function BaseCommentForm({
         className="hidden"
       />
       <Editor
+        allowedUploadMimeTypes={ALLOWED_UPLOAD_MIME_TYPES}
+        maxUploadFileSize={MAX_UPLOAD_FILE_SIZE}
         autoFocus={autoFocus}
         className="w-full p-2 border border-gray-300 rounded"
         disabled={isSubmitting || disabled}

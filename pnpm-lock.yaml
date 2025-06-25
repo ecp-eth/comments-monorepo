@@ -385,6 +385,9 @@ importers:
 
   apps/embed:
     dependencies:
+      '@ecp.eth/react-editor':
+        specifier: workspace:*
+        version: link:../../packages/react-editor
       '@ecp.eth/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
@@ -1037,6 +1040,12 @@ importers:
 
   packages/react-editor:
     dependencies:
+      '@ecp.eth/sdk':
+        specifier: workspace:*
+        version: link:../sdk
+      '@ecp.eth/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@tiptap/core':
         specifier: ^2.12.0
         version: 2.14.0(@tiptap/pm@2.14.0)
@@ -1086,12 +1095,6 @@ importers:
       '@ecp.eth/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@ecp.eth/sdk':
-        specifier: workspace:*
-        version: link:../sdk
-      '@ecp.eth/shared':
-        specifier: workspace:*
-        version: link:../shared
       '@ecp.eth/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
