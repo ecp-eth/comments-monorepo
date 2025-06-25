@@ -78,8 +78,6 @@ const ensResultSchema = z
     };
   });
 
-type ENSNodeResultType = z.infer<typeof ensResultSchema>;
-
 const domainFragment = gql`
   fragment DomainFragment on Domain {
     id
