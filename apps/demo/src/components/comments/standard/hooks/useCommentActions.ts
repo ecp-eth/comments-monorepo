@@ -461,7 +461,7 @@ export function useCommentActions({
           pendingOperation,
         });
       } catch (e) {
-        onFailed?.();
+        onFailed?.(e);
 
         if (pendingOperation) {
           likeReactionSubmission.error({
@@ -489,6 +489,7 @@ export function useCommentActions({
         comment,
         queryKey: parentCommentQueryKey,
         onBeforeStart,
+        onFailed,
       } = params;
 
       const reaction = comment.viewerReactions?.[
@@ -526,6 +527,8 @@ export function useCommentActions({
 
         likeReactionRemoval.success(reactionRemovalParams);
       } catch (e) {
+        onFailed?.(e);
+
         likeReactionRemoval.error(reactionRemovalParams);
 
         throw e;

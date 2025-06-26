@@ -23,6 +23,7 @@ import {
   createRootCommentsQueryKey,
 } from "./queries";
 import { chain } from "@/lib/wagmi";
+import { toast } from "sonner";
 
 type CommentItemProps = {
   connectedAddress: Hex | undefined;
@@ -75,7 +76,16 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
       queryKey: rootQueryKey,
       onBeforeStart: () => setIsLiking(true),
       onSuccess: () => setIsLiking(false),
-      onFailed: () => setIsLiking(false),
+      onFailed: (e: unknown) => {
+        setIsLiking(false);
+
+        if (e instanceof Error) {
+          toast.error(e.message);
+          return;
+        }
+
+        toast.error("Failed to like");
+      },
     });
   }, [comment, likeComment, rootQueryKey]);
 
@@ -84,6 +94,14 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
       comment,
       queryKey: rootQueryKey,
       onBeforeStart: () => setIsLiking(false),
+      onFailed: (e: unknown) => {
+        if (e instanceof Error) {
+          toast.error(e.message);
+          return;
+        }
+
+        toast.error("Failed to unlike");
+      },
     });
   }, [comment, unlikeComment, rootQueryKey]);
 
