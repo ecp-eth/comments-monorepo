@@ -9,7 +9,7 @@ interface RateLimiterOptions {
   /**
    * The number of tokens allowed per window
    *
-   * @default 10
+   * @default 60
    */
   tokensPerWindow?: number;
   /**
@@ -28,7 +28,7 @@ export class RateLimiter {
     redisToken,
     redisUrl,
     namespace,
-    tokensPerWindow = 10,
+    tokensPerWindow = 60,
     window = "1 m",
   }: RateLimiterOptions = {}) {
     if (!redisUrl || !redisToken) {
