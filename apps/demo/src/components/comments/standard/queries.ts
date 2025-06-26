@@ -252,13 +252,14 @@ export async function submitEditCommentMutationFunction({
       chainId: chain.id,
     };
   } catch (e) {
-    if (
-      e instanceof ContractFunctionExecutionError &&
-      e.shortMessage.includes("User rejected the request.")
-    ) {
-      throw new SubmitEditCommentMutationError(
-        "Could not edit the comment because the transaction was rejected.",
-      );
+    if (e instanceof ContractFunctionExecutionError) {
+      if (e.shortMessage.includes("User rejected the request.")) {
+        throw new SubmitEditCommentMutationError(
+          "Could not edit the comment because the transaction was rejected.",
+        );
+      }
+
+      throw new SubmitEditCommentMutationError(e.details);
     }
 
     console.error(e);
