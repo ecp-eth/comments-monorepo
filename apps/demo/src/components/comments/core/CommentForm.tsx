@@ -105,6 +105,7 @@ function BaseCommentForm({
   const connectAccount = useConnectAccount();
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const onSubmitRef = useFreshRef(onSubmit);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const uploads = usePinataUploadFiles({
     allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
@@ -135,6 +136,11 @@ function BaseCommentForm({
     mutationFn: async (formData: FormData): Promise<void> => {
       try {
         const author = await connectAccount();
+
+        if (!author) {
+          throw new Error("Author not found");
+        }
+
         const submitAction = formData.get("action") as "post";
 
         setFormState(submitAction);
@@ -168,7 +174,11 @@ function BaseCommentForm({
             }),
           );
 
-        const result = await onSubmit({ author, content, references });
+        const result = await onSubmitRef.current({
+          author,
+          content,
+          references,
+        });
 
         return result;
       } catch (e) {
