@@ -19,7 +19,7 @@ import {
   RateLimitedError,
   CommentFormSubmitError,
   InvalidCommentError,
-} from "./errors";
+} from "@ecp.eth/shared/errors";
 import type {
   Comment,
   PendingEditCommentOperationSchemaType,

@@ -18,6 +18,16 @@
       "import": "./dist/esm/components/index.js",
       "default": "./dist/cjs/components/index.cjs"
     },
+    "./components/*": {
+      "types": "./dist/esm/components/*.d.ts",
+      "import": "./dist/esm/components/*.js",
+      "default": "./dist/cjs/components/*.cjs"
+    },
+    "./errors": {
+      "types": "./dist/esm/errors.d.ts",
+      "import": "./dist/esm/errors.js",
+      "default": "./dist/cjs/errors.cjs"
+    },
     "./helpers": {
       "types": "./dist/esm/helpers.d.ts",
       "import": "./dist/esm/helpers.js",
@@ -27,6 +37,11 @@
       "types": "./dist/esm/hooks/index.d.ts",
       "import": "./dist/esm/hooks/index.js",
       "default": "./dist/cjs/hooks/index.cjs"
+    },
+    "./hooks/*": {
+      "types": "./dist/esm/hooks/*.d.ts",
+      "import": "./dist/esm/hooks/*.js",
+      "default": "./dist/cjs/hooks/*.cjs"
     },
     "./renderer": {
       "types": "./dist/esm/renderer.d.ts",

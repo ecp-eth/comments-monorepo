@@ -32,8 +32,8 @@ import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { useAccountModal } from "@rainbow-me/rainbowkit";
 import { publicEnv } from "@/publicEnv";
-import { CommentFormErrors } from "./CommentFormErrors";
-import { InvalidCommentError } from "./errors";
+import { CommentFormErrors } from "@ecp.eth/shared/components/CommentFormErrors";
+import { InvalidCommentError } from "@ecp.eth/shared/errors";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import { useEditComment, usePostComment } from "@ecp.eth/sdk/comments/react";
 import type { Comment } from "@ecp.eth/shared/schemas";
@@ -344,7 +344,10 @@ function BaseCommentForm({
         </div>
       </div>
       {submitMutation.error && (
-        <CommentFormErrors error={submitMutation.error} />
+        <CommentFormErrors
+          className="text-destructive"
+          error={submitMutation.error}
+        />
       )}
     </form>
   );
