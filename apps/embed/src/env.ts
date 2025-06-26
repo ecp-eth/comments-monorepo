@@ -26,6 +26,7 @@ const ServerEnvSchema = z
     SENTRY_ORG: z.string().optional(),
     SENTRY_PROJECT: z.string().optional(),
     SENTRY_AUTH_TOKEN: z.string().optional(),
+    PINATA_JWT: z.string().nonempty(),
   })
   .merge(publicEnvSchema);
 

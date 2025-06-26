@@ -4,8 +4,8 @@ import { useAccount } from "wagmi";
 import { ImageIcon } from "lucide-react";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { z } from "zod";
-import { InvalidCommentError } from "./errors";
-import { CommentFormErrors } from "./CommentFormErrors";
+import { InvalidCommentError } from "@ecp.eth/shared/errors";
+import { CommentFormErrors } from "@ecp.eth/shared/components/CommentFormErrors";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import { useCommentActions } from "./CommentActionsContext";
 import type { QueryKey } from "@tanstack/react-query";
@@ -18,8 +18,7 @@ import {
   createRootCommentsQueryKey,
 } from "./queries";
 import type { Comment } from "@ecp.eth/shared/schemas";
-import { Editor, EditorRef } from "./CommentTextEditor/Editor";
-import { useUploadFiles } from "./CommentTextEditor/hooks/useUploadFiles";
+import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import {
   Tooltip,
@@ -31,7 +30,14 @@ import {
   ALLOWED_UPLOAD_MIME_TYPES,
   MAX_UPLOAD_FILE_SIZE,
 } from "@/lib/constants";
-import { extractReferences } from "./CommentTextEditor/extract-references";
+import { extractReferences } from "@ecp.eth/react-editor/extract-references";
+import {
+  useIndexerSuggestions,
+  usePinataUploadFiles,
+} from "@ecp.eth/react-editor/hooks";
+import { publicEnv } from "@/publicEnv";
+import { GenerateUploadUrlResponseSchema } from "@/lib/schemas";
+import { cn } from "@/lib/utils";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -100,7 +106,30 @@ function BaseCommentForm({
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
-  const { uploadFiles } = useUploadFiles();
+  const uploads = usePinataUploadFiles({
+    allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
+    maxFileSize: MAX_UPLOAD_FILE_SIZE,
+    pinataGatewayUrl: publicEnv.NEXT_PUBLIC_PINATA_GATEWAY_URL,
+    generateUploadUrl: async (filename) => {
+      const response = await fetch("/api/generate-upload-url", {
+        method: "POST",
+        body: JSON.stringify({ filename }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate upload URL");
+      }
+
+      const { url } = GenerateUploadUrlResponseSchema.parse(
+        await response.json(),
+      );
+
+      return url;
+    },
+  });
+  const suggestions = useIndexerSuggestions({
+    indexerApiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+  });
 
   const submitMutation = useMutation({
     mutationFn: async (formData: FormData): Promise<void> => {
@@ -116,7 +145,7 @@ function BaseCommentForm({
 
         const filesToUpload = editorRef.current?.getFilesForUpload() || [];
 
-        await uploadFiles(filesToUpload, {
+        await uploads.uploadFiles(filesToUpload, {
           onSuccess(uploadedFile) {
             editorRef.current?.setFileAsUploaded(uploadedFile);
           },
@@ -238,11 +267,19 @@ function BaseCommentForm({
       />
       <Editor
         autoFocus={autoFocus}
-        className="w-full p-2 border border-gray-300 rounded"
+        className={cn(
+          "w-full p-2 border border-gray-300 rounded",
+          disabled && "opacity-50",
+          submitMutation.error &&
+            submitMutation.error instanceof InvalidCommentError &&
+            "border-destructive focus-visible:border-destructive",
+        )}
         disabled={isSubmitting || disabled}
         placeholder={placeholder}
         defaultValue={defaultContent}
         ref={editorRef}
+        suggestions={suggestions}
+        uploads={uploads}
         onEscapePress={() => {
           if (isSubmitting) {
             return;

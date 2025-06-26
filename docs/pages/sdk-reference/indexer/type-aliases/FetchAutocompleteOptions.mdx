@@ -1,0 +1,92 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / FetchAutocompleteOptions
+
+# Type Alias: FetchAutocompleteOptions
+
+```ts
+type FetchAutocompleteOptions = {
+  apiUrl?: string;
+  char: "@" | "$";
+  query: string;
+  retries?: number;
+  signal?: AbortSignal;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:738](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L738)
+
+The options for `fetchAutocomplete()`
+
+## Properties
+
+### apiUrl?
+
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:753](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L753)
+
+URL on which /api/autocomplete endpoint will be called
+
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+***
+
+### char
+
+```ts
+char: "@" | "$";
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:747](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L747)
+
+The prefix character. $ is more specific and looks only for ERC20 tokens (by address or symbol),
+@ is more general and looks for ENS/Farcaster name and ERC20 tokens.
+
+***
+
+### query
+
+```ts
+query: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:742](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L742)
+
+The query to autocomplete
+
+***
+
+### retries?
+
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:759](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L759)
+
+Number of times to retry the signing operation in case of failure.
+
+#### Default
+
+```ts
+3
+```
+
+***
+
+### signal?
+
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:760](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L760)

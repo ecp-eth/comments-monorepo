@@ -20,7 +20,7 @@ import {
   RateLimitedError,
   CommentFormSubmitError,
   InvalidCommentError,
-} from "../core/errors";
+} from "@ecp.eth/shared/errors";
 import { chain } from "@/lib/wagmi";
 import type {
   Comment,

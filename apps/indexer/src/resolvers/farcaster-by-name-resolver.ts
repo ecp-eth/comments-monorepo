@@ -1,25 +1,84 @@
+import DataLoader from "dataloader";
+import type { Hex } from "viem";
 import {
-  createFarcasterByNameResolver,
-  type FarcasterName,
-  type ResolvedFarcasterData,
-} from "@ecp.eth/shared/resolvers";
-import { LRUCache } from "lru-cache";
+  NeynarAPIClient,
+  Configuration as NeynarConfiguration,
+  isApiErrorResponse,
+} from "@neynar/nodejs-sdk";
 
-import { env } from "../env";
+import { type IndexerAPIFarcasterDataSchemaType } from "@ecp.eth/sdk/indexer";
+import type { FarcasterName, ResolvedFarcasterData } from "./farcaster.types";
+import { constructFname, extractFarcasterName } from "./farcaster.utils";
 
-export type { ResolvedFarcasterData } from "@ecp.eth/shared/resolvers";
+export type FarcasterByNameKey = string | FarcasterName;
 
-// could also use redis
-const cacheMap = new LRUCache<
-  FarcasterName,
-  Promise<ResolvedFarcasterData | null>
->({
-  max: 10000,
-  ttl: 14 * 24 * 60 * 60 * 1000, // 14 days
-  allowStale: true,
-});
+export type FarcasterByNameResolver = DataLoader<
+  FarcasterByNameKey,
+  ResolvedFarcasterData | null
+>;
 
-export const farcasterByNameResolver = createFarcasterByNameResolver({
-  neynarApiKey: env.NEYNAR_API_KEY,
-  cacheMap,
-});
+export type FarcasterByNameResolverOptions = {
+  neynarApiKey: string;
+  /**
+   * By default it generates https://farcaster.xyz/username url
+   */
+  generateProfileUrl?: (user: IndexerAPIFarcasterDataSchemaType) => string;
+} & Omit<
+  DataLoader.Options<FarcasterByNameKey, ResolvedFarcasterData | null>,
+  "batchLoadFn" | "maxBatchSize"
+>;
+
+export function createFarcasterByNameResolver({
+  neynarApiKey,
+  generateProfileUrl = (user) =>
+    new URL(`https://farcaster.xyz/${user.username}`).toString(),
+  ...dataLoaderOptions
+}: FarcasterByNameResolverOptions): FarcasterByNameResolver {
+  const neynarClient = new NeynarAPIClient(
+    new NeynarConfiguration({
+      apiKey: neynarApiKey,
+    }),
+  );
+
+  return new DataLoader<FarcasterByNameKey, ResolvedFarcasterData | null>(
+    async (names) => {
+      if (!names.length) {
+        return [];
+      }
+
+      return Promise.all(
+        names.map(async (name) => {
+          try {
+            const { user } = await neynarClient.lookupUserByUsername({
+              username: extractFarcasterName(name),
+            });
+
+            return {
+              fid: user.fid,
+              url: generateProfileUrl(user),
+              username: user.username,
+              address: user.custody_address as Hex,
+              fname: constructFname(user.username),
+              displayName: user.display_name,
+              pfpUrl: user.pfp_url,
+            };
+          } catch (e) {
+            if (isApiErrorResponse(e) && e.response.status === 404) {
+              return null;
+            }
+
+            console.error(e);
+
+            const err = e instanceof Error ? e : new Error(String(e));
+
+            throw err;
+          }
+        }),
+      );
+    },
+    {
+      ...dataLoaderOptions,
+      maxBatchSize: 1,
+    },
+  );
+}

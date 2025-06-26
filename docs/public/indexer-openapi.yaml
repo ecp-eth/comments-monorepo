@@ -5928,4 +5928,143 @@ paths:
                     description: The error message
                 required:
                   - message
+  /api/autocomplete:
+    get:
+      tags:
+        - autocomplete
+        - ens
+        - erc20
+        - farcaster
+      description: Retrieve a list of autocomplete suggestions
+      parameters:
+        - schema:
+            type: string
+            minLength: 2
+            description: The query to autocomplete
+          required: true
+          name: query
+          in: query
+        - schema:
+            type: string
+            enum:
+              - '@'
+              - $
+            description: >-
+              The prefix character. $ is more specific and looks only for ERC20
+              tokens (by address or symbol), @ is more general and looks for
+              ENS/Farcaster name and ERC20 tokens.
+          required: true
+          name: char
+          in: query
+      responses:
+        '200':
+          description: List of autocomplete suggestions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - ens
+                            address: {}
+                            name:
+                              type: string
+                            avatarUrl:
+                              type:
+                                - string
+                                - 'null'
+                            url:
+                              type: string
+                            value:
+                              description: >-
+                                The value in hex format of the autocomplete
+                                suggestion that should be used.
+                          required:
+                            - type
+                            - address
+                            - name
+                            - avatarUrl
+                            - url
+                            - value
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - erc20
+                            address: {}
+                            name:
+                              type: string
+                            symbol:
+                              type: string
+                            caip19:
+                              type: string
+                            chainId:
+                              type: integer
+                            decimals:
+                              type: integer
+                            logoURI:
+                              type:
+                                - string
+                                - 'null'
+                            value:
+                              type: string
+                              description: >-
+                                The value in CAIP-19 format of the autocomplete
+                                suggestion that should be used.
+                          required:
+                            - type
+                            - address
+                            - name
+                            - symbol
+                            - caip19
+                            - chainId
+                            - decimals
+                            - logoURI
+                            - value
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - farcaster
+                            address: {}
+                            fid:
+                              type: integer
+                            fname:
+                              type: string
+                            displayName:
+                              type:
+                                - string
+                                - 'null'
+                            username:
+                              type: string
+                            pfpUrl:
+                              type:
+                                - string
+                                - 'null'
+                            url:
+                              type: string
+                            value:
+                              description: >-
+                                The value in hex format of the autocomplete
+                                suggestion that should be used.
+                          required:
+                            - type
+                            - address
+                            - fid
+                            - fname
+                            - username
+                            - url
+                            - value
+                required:
+                  - results
 webhooks: {}

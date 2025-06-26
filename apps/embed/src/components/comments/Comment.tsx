@@ -17,11 +17,16 @@ import {
 import { Button } from "../ui/button";
 import { CommentAuthor } from "./CommentAuthor";
 import { CommentActionOrStatus } from "./CommentActionOrStatus";
-import { CommentText } from "@ecp.eth/shared/components";
 import {
-  EmbedConfigProviderByTargetURIConfig,
+  type EmbedConfigProviderByTargetURIConfig,
   useEmbedConfig,
 } from "../EmbedConfigProvider";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import { useMemo } from "react";
+import {
+  CommentText,
+  CommentMediaReferences,
+} from "@ecp.eth/shared/components";
 
 export type OnRetryPostComment = (
   comment: CommentType,
@@ -36,6 +41,7 @@ interface CommentProps {
   onReplyClick: () => void;
   onEditClick: () => void;
   onRetryEditClick: () => void;
+  optimisticReferences: IndexerAPICommentReferencesSchemaType | undefined;
 }
 
 export function Comment({
@@ -46,10 +52,23 @@ export function Comment({
   onReplyClick,
   onEditClick,
   onRetryEditClick,
+  optimisticReferences,
 }: CommentProps) {
   const { currentTimestamp } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const { address: connectedAddress } = useAccount();
+
+  const references = useMemo(() => {
+    if (
+      comment.references.length === 0 &&
+      optimisticReferences &&
+      optimisticReferences.length > 0
+    ) {
+      return optimisticReferences;
+    }
+
+    return comment.references;
+  }, [comment.references, optimisticReferences]);
 
   const isAuthor =
     connectedAddress && comment.author
@@ -102,18 +121,18 @@ export function Comment({
             </DropdownMenu>
           )}
       </div>
-      <div
+      <CommentText
         className={cn(
           "mb-2 text-foreground break-words hyphens-auto",
           comment.deletedAt && "text-muted-foreground",
         )}
-      >
-        <CommentText
-          // make sure comment is updated if was deleted
-          key={`${comment.deletedAt?.toISOString()}-${comment.updatedAt}-${comment.revision}`}
-          text={comment.content}
-        />
-      </div>
+        content={comment.content}
+        references={references}
+      />
+      <CommentMediaReferences
+        content={comment.content}
+        references={references}
+      />
       <div className="mb-2">
         <CommentActionOrStatus
           comment={comment}

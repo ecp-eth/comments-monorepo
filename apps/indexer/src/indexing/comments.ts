@@ -14,24 +14,24 @@ import {
   resolveCommentReferences,
   type ResolveCommentReferencesOptions,
 } from "../lib/resolve-comment-references";
-import { ensByAddressResolver } from "../resolvers/ens-by-address-resolver";
-import { ensByNameResolver } from "../resolvers/ens-by-name-resolver";
-import { erc20ByAddressResolver } from "../resolvers/erc20-by-address-resolver";
-import { erc20ByTickerResolver } from "../resolvers/erc20-by-ticker-resolver";
-import { farcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
-import { farcasterByNameResolver } from "../resolvers/farcaster-by-name-resolver";
-import { urlResolver } from "../resolvers/url-resolver";
+import { ensByAddressResolverService } from "../services/ens-by-address-resolver";
+import { ensByNameResolverService } from "../services/ens-by-name-resolver";
+import { erc20ByAddressResolverService } from "../services/erc20-by-address-resolver";
+import { erc20ByTickerResolverService } from "../services/erc20-by-ticker-resolver";
+import { farcasterByAddressResolverService } from "../services/farcaster-by-address-resolver";
+import { farcasterByNameResolverService } from "../services/farcaster-by-name-resolver";
+import { urlResolverService } from "../services/url-resolver";
 
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 
 const resolverCommentReferences: ResolveCommentReferencesOptions = {
-  ensByAddressResolver,
-  ensByNameResolver,
-  erc20ByAddressResolver,
-  erc20ByTickerResolver,
-  farcasterByAddressResolver,
-  farcasterByNameResolver,
-  urlResolver,
+  ensByAddressResolver: ensByAddressResolverService,
+  ensByNameResolver: ensByNameResolverService,
+  erc20ByAddressResolver: erc20ByAddressResolverService,
+  erc20ByTickerResolver: erc20ByTickerResolverService,
+  farcasterByAddressResolver: farcasterByAddressResolverService,
+  farcasterByNameResolver: farcasterByNameResolverService,
+  urlResolver: urlResolverService,
 };
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {

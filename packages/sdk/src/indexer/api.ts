@@ -17,6 +17,8 @@ import {
   type IndexerAPIListChannelsSchemaType,
   IndexerAPIChannelOutputSchema,
   type IndexerAPIChannelOutputSchemaType,
+  IndexerAPIGetAutocompleteOutputSchema,
+  type IndexerAPIGetAutocompleteOutputSchemaType,
 } from "./schemas.js";
 import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
@@ -724,6 +726,84 @@ export async function fetchChannel(
   });
 
   const repeatableTask = Effect.retry(fetchChannelTask, {
+    times: retries,
+  });
+
+  return Effect.runPromise(repeatableTask, { signal });
+}
+
+/**
+ * The options for `fetchAutocomplete()`
+ */
+export type FetchAutocompleteOptions = {
+  /**
+   * The query to autocomplete
+   */
+  query: string;
+  /**
+   * The prefix character. $ is more specific and looks only for ERC20 tokens (by address or symbol),
+   * @ is more general and looks for ENS/Farcaster name and ERC20 tokens.
+   */
+  char: "@" | "$";
+  /**
+   * URL on which /api/autocomplete endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+  signal?: AbortSignal;
+};
+
+const FetchAutocompleteOptionsSchema = z.object({
+  query: z.string().trim().min(2),
+  char: z.enum(["@", "$"]),
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  retries: z.number().int().positive().default(3),
+  signal: z.instanceof(AbortSignal).optional(),
+});
+
+/**
+ * Fetch autocomplete suggestions from the Indexer API
+ *
+ * @returns A promise that resolves to autocomplete suggestions fetched from the Indexer API
+ */
+export async function fetchAutocomplete(
+  options: FetchAutocompleteOptions,
+): Promise<IndexerAPIGetAutocompleteOutputSchemaType> {
+  const { query, char, apiUrl, retries, signal } =
+    FetchAutocompleteOptionsSchema.parse(options);
+
+  const fetchAutocompleteTask = Effect.tryPromise(async (signal) => {
+    const url = new URL("/api/autocomplete", apiUrl);
+
+    url.searchParams.set("query", query);
+    url.searchParams.set("char", char);
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-cache",
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch autocomplete: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+
+    return IndexerAPIGetAutocompleteOutputSchema.parse(responseData);
+  });
+
+  const repeatableTask = Effect.retry(fetchAutocompleteTask, {
     times: retries,
   });
 

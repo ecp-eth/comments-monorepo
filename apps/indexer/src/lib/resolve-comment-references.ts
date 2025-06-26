@@ -11,16 +11,16 @@ import type {
 } from "@ecp.eth/sdk/indexer";
 import type { CommentSelectType } from "ponder:schema";
 import type { Hex } from "viem";
-import type { ENSByAddressResolver } from "../resolvers/ens-by-address-resolver";
-import type { ENSByNameResolver } from "../resolvers/ens-by-name-resolver";
-import type { FarcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
-import type { ERC20ByTickerResolver } from "../resolvers/erc20-by-ticker-resolver";
-import type { ERC20ByAddressResolver } from "../resolvers/erc20-by-address-resolver";
-import type { URLResolver } from "../resolvers/url-resolver";
 import type {
+  ENSByAddressResolver,
+  ENSByNameResolver,
+  FarcasterByAddressResolver,
+  ERC20ByTickerResolver,
+  ERC20ByAddressResolver,
+  URLResolver,
   FarcasterByNameResolver,
   FarcasterName,
-} from "@ecp.eth/shared/resolvers";
+} from "../resolvers";
 
 export type ResolveCommentReferencesOptions = {
   ensByAddressResolver: ENSByAddressResolver;

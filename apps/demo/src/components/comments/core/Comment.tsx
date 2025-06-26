@@ -13,9 +13,11 @@ import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import { CommentSwapInfo } from "./CommentSwapInfo";
 import { useMemo } from "react";
-import { renderToReact } from "./renderer";
-import { CommentMediaReference } from "./CommentMediaReference";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import {
+  CommentText,
+  CommentMediaReferences,
+} from "@ecp.eth/shared/components";
 
 type CommentProps = {
   comment: CommentType;
@@ -45,22 +47,17 @@ export function Comment({
   optimisticReferences,
 }: CommentProps) {
   const { address: connectedAddress } = useAccount();
-  const { element: textElement, mediaReferences } = useMemo(() => {
-    let commentWithReferences = comment;
-
+  const references = useMemo(() => {
     if (
       comment.references.length === 0 &&
       optimisticReferences &&
       optimisticReferences.length > 0
     ) {
-      commentWithReferences = {
-        ...comment,
-        references: optimisticReferences,
-      };
+      return optimisticReferences;
     }
 
-    return renderToReact(commentWithReferences);
-  }, [comment, optimisticReferences]);
+    return comment.references;
+  }, [comment.references, optimisticReferences]);
 
   const isAuthor =
     connectedAddress && comment.author
@@ -115,26 +112,18 @@ export function Comment({
           <CommentSwapInfo swap={comment.zeroExSwap} />
         </div>
       )}
-      <div
+      <CommentText
         className={cn(
           "mb-2 break-words hyphens-auto text-foreground",
           comment.deletedAt && "text-muted-foreground",
         )}
-      >
-        <div>{textElement}</div>
-      </div>
-      {mediaReferences.length > 0 && (
-        <div className="flex gap-2 flex-wrap">
-          {mediaReferences.map((reference, referenceIndex) => {
-            return (
-              <CommentMediaReference
-                reference={reference}
-                key={referenceIndex}
-              />
-            );
-          })}
-        </div>
-      )}
+        content={comment.content}
+        references={references}
+      />
+      <CommentMediaReferences
+        content={comment.content}
+        references={references}
+      />
       <div className="mb-2">
         <CommentActionOrStatus
           comment={comment}

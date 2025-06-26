@@ -1,0 +1,103 @@
+{
+  "name": "@ecp.eth/react-editor",
+  "description": "React editor for Ethereum Comments Protocol",
+  "license": "MIT",
+  "author": "Ethereum Comments Protocol",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecp-eth/ecp.git"
+  },
+  "homepage": "https://ecp.eth",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "typings": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/cjs/index.cjs"
+    },
+    "./editor": {
+      "types": "./dist/esm/editor.d.ts",
+      "import": "./dist/esm/editor.js",
+      "default": "./dist/cjs/editor.cjs"
+    },
+    "./extensions": {
+      "types": "./dist/esm/extensions/index.d.ts",
+      "import": "./dist/esm/extensions/index.js",
+      "default": "./dist/cjs/extensions/index.cjs"
+    },
+    "./extract-references": {
+      "types": "./dist/esm/extract-references.d.ts",
+      "import": "./dist/esm/extract-references.js",
+      "default": "./dist/cjs/extract-references.cjs"
+    },
+    "./hooks": {
+      "types": "./dist/esm/hooks/index.d.ts",
+      "import": "./dist/esm/hooks/index.js",
+      "default": "./dist/cjs/hooks/index.cjs"
+    },
+    "./parser": {
+      "types": "./dist/esm/parser.d.ts",
+      "import": "./dist/esm/parser.js",
+      "default": "./dist/cjs/parser.cjs"
+    },
+    "./types": {
+      "types": "./dist/esm/types.d.ts",
+      "import": "./dist/esm/types.js",
+      "default": "./dist/cjs/types.cjs"
+    }
+  },
+  "dependencies": {
+    "@ecp.eth/sdk": "workspace:*",
+    "@ecp.eth/shared": "workspace:*",
+    "@tiptap/core": "^2.12.0",
+    "@tiptap/react": "^2.12.0",
+    "@tiptap/extension-document": "^2.12.0",
+    "@tiptap/extension-paragraph": "^2.12.0",
+    "@tiptap/extension-text": "^2.12.0",
+    "@tiptap/extension-link": "^2.12.0",
+    "@tiptap/extension-placeholder": "^2.12.0",
+    "@tiptap/extension-hard-break": "^2.12.0",
+    "@tiptap/extension-mention": "^2.12.0",
+    "@tiptap/suggestion": "^2.12.0",
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-model": "^1.25.1",
+    "prosemirror-transform": "^1.10.4",
+    "tippy.js": "^6.3.7"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": ">=5.0.0",
+    "pinata": "^2.4.3",
+    "react": "18 || 19",
+    "viem": "^2.29.2"
+  },
+  "devDependencies": {
+    "@ecp.eth/build-tools": "workspace:^",
+    "@ecp.eth/eslint-config": "workspace:*",
+    "@ecp.eth/typescript-config": "workspace:*",
+    "@tanstack/react-query": "^5.75.6",
+    "@types/node": "^22.13.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "pinata": "^2.4.3",
+    "eslint": "^9.19.0",
+    "react": "~19.1.0",
+    "react-dom": "~19.1.0",
+    "viem": "^2.29.2"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "dev": "tsup --format esm --out-dir dist/esm --watch",
+    "build:cjs": "tsup --format cjs --out-dir dist/cjs",
+    "build:esm": "tsup --format esm --out-dir dist/esm",
+    "build": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
+    "lint": "eslint \"./src/**/*.ts\"",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  }
+}

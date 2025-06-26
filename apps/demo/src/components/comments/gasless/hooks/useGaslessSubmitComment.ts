@@ -24,7 +24,7 @@ import {
   prepareSignedGaslessEditComment,
 } from "../queries";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
-import { InvalidCommentError, RateLimitedError } from "../../core/errors";
+import { InvalidCommentError, RateLimitedError } from "@ecp.eth/shared/errors";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { publicEnv } from "@/publicEnv";
 import type { MetadataEntry } from "@ecp.eth/sdk/comments";

@@ -1,4 +1,4 @@
-import { HexSchema } from "@ecp.eth/sdk/core/schemas";
+import { type Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
 import {
   IndexerAPICommentModerationStatusSchema,
   IndexerAPIPaginationSchema,
@@ -361,3 +361,20 @@ export const ChangeModerationStatusOnCommentBodySchema = z.object({
     description: "The moderation status of the comment",
   }),
 });
+
+export const ERC_20_CAIP_19_REGEX = /^eip155:(\d+)\/erc20:(0x[a-fA-F0-9]{40})$/;
+
+export type ERC20CAIP19 = `eip155:${number}/erc20:${Hex}`;
+
+export const ERC20Caip19Schema = z.custom<ERC20CAIP19>(
+  (val) => {
+    if (typeof val !== "string") {
+      return false;
+    }
+
+    return ERC_20_CAIP_19_REGEX.test(val);
+  },
+  {
+    message: "Invalid CAIP-19",
+  },
+);

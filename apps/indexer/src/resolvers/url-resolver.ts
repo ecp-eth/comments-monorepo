@@ -5,10 +5,9 @@ import type {
   IndexerAPICommentReferenceURLWebPageSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import DataLoader from "dataloader";
-import { LRUCache } from "lru-cache";
 import { parse as parseHTML } from "node-html-parser";
 
-type ResolvedURL =
+export type ResolvedURL =
   | Omit<IndexerAPICommentReferenceURLImageSchemaType, "position">
   | Omit<IndexerAPICommentReferenceURLVideoSchemaType, "position">
   | Omit<IndexerAPICommentReferenceURLFileSchemaType, "position">
@@ -143,7 +142,10 @@ function resolveFaviconUrl(href: string, pageUrl: string): string {
   return new URL(href, pageUrl).toString();
 }
 
-type URLResolverOptions = {
+type URLResolverOptions = Omit<
+  DataLoader.Options<string, ResolvedURL | null>,
+  "batchLoadFn"
+> & {
   /**
    * @default 5000
    */
@@ -152,21 +154,15 @@ type URLResolverOptions = {
 
 export function createURLResolver({
   timeout = 5000,
+  ...dataLoaderOptions
 }: URLResolverOptions = {}): URLResolver {
-  const cacheMap = new LRUCache<string, Promise<ResolvedURL | null>>({
-    max: 10000,
-    ttl: 14 * 24 * 60 * 60 * 1000, // 14 days
-    allowStale: true,
-  });
-
   return new DataLoader<string, ResolvedURL | null>(
     async (urls) => {
       return Promise.all(urls.map((url) => resolveURL(url, timeout)));
     },
     {
-      cacheMap,
+      maxBatchSize: 5,
+      ...dataLoaderOptions,
     },
   );
 }
-
-export const urlResolver = createURLResolver();

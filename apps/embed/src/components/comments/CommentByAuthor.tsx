@@ -76,7 +76,8 @@ export function CommentByAuthor({
         <CommentText
           // make sure comment is updated if was deleted
           key={comment.deletedAt?.toISOString()}
-          text={comment.content}
+          content={comment.content}
+          references={comment.references}
         />
       </div>
     </div>

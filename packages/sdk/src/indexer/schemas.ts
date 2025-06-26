@@ -501,3 +501,74 @@ export function convertRecordToIndexerMetadata(
 ): IndexerAPIMetadataEntrySchemaType[] {
   return convertRecordToContractFormat(metadataRecord);
 }
+
+export const IndexerAPIAutocompleteENSSchema = z.object({
+  type: z.literal("ens"),
+  address: HexSchema,
+  name: z.string(),
+  avatarUrl: z.string().nullable(),
+  url: z.string(),
+  value: HexSchema.describe(
+    "The value in hex format of the autocomplete suggestion that should be used.",
+  ),
+});
+
+export type IndexerAPIAutocompleteENSSchemaType = z.infer<
+  typeof IndexerAPIAutocompleteENSSchema
+>;
+
+export const IndexerAPIAutocompleteERC20Schema = z.object({
+  type: z.literal("erc20"),
+  address: HexSchema,
+  name: z.string(),
+  symbol: z.string(),
+  caip19: z.string(),
+  chainId: z.number().int(),
+  decimals: z.number().int(),
+  logoURI: z.string().nullable(),
+  value: z
+    .string()
+    .describe(
+      "The value in CAIP-19 format of the autocomplete suggestion that should be used.",
+    ),
+});
+
+export type IndexerAPIAutocompleteERC20SchemaType = z.infer<
+  typeof IndexerAPIAutocompleteERC20Schema
+>;
+
+export const IndexerAPIAutocompleteFarcasterSchema = z.object({
+  type: z.literal("farcaster"),
+  address: HexSchema,
+  fid: z.number().int(),
+  fname: z.string(),
+  displayName: z.string().nullish(),
+  username: z.string(),
+  pfpUrl: z.string().nullish(),
+  url: z.string(),
+  value: HexSchema.describe(
+    "The value in hex format of the autocomplete suggestion that should be used.",
+  ),
+});
+
+export type IndexerAPIAutocompleteFarcasterSchemaType = z.infer<
+  typeof IndexerAPIAutocompleteFarcasterSchema
+>;
+
+export const IndexerAPIAutocompleteSchema = z.discriminatedUnion("type", [
+  IndexerAPIAutocompleteENSSchema,
+  IndexerAPIAutocompleteERC20Schema,
+  IndexerAPIAutocompleteFarcasterSchema,
+]);
+
+export type IndexerAPIAutocompleteSchemaType = z.infer<
+  typeof IndexerAPIAutocompleteSchema
+>;
+
+export const IndexerAPIGetAutocompleteOutputSchema = z.object({
+  results: z.array(IndexerAPIAutocompleteSchema),
+});
+
+export type IndexerAPIGetAutocompleteOutputSchemaType = z.infer<
+  typeof IndexerAPIGetAutocompleteOutputSchema
+>;
