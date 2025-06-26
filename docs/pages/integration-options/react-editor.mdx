@@ -1,0 +1,323 @@
+# Integration Options
+
+## React Editor
+
+The React Editor provides a powerful, customizable rich text editor built on top of TipTap that supports mentions, file uploads, and seamless integration with the Ethereum Comments Protocol.
+
+## Features
+
+- **Rich Text Editing**: Built on TipTap with support for paragraphs, links, and formatting
+- **Mentions**: Support for ENS, Farcaster, and ERC-20 token mentions with autocomplete
+- **File Uploads**: Drag-and-drop file uploads with support for images, videos, and documents
+- **Reference Extraction**: Extract structured references from editor content
+- **Content Parsing**: Parse plain text with references back into rich content
+- **Customizable Components**: Fully customizable media components and themes
+- **TypeScript Support**: Full TypeScript support with comprehensive type definitions
+
+### Installation
+
+:::code-group
+
+```bash [npm]
+npm install @ecp.eth/react-editor
+# install peer dependencies
+npm install @tanstack/react-query pinata react viem
+```
+
+```bash [yarn]
+yarn add @ecp.eth/react-editor
+# install peer dependencies
+yarn add @tanstack/react-query pinata react viem
+```
+
+```bash [pnpm]
+pnpm add @ecp.eth/react-editor
+# install peer dependencies
+pnpm add @tanstack/react-query pinata react viem
+```
+
+:::
+
+### Quick Start
+
+```tsx twoslash
+// @moduleResolution: bundler
+// @errors: 2554
+import React from "react";
+import { Editor } from "@ecp.eth/react-editor/editor";
+import {
+  useIndexerSuggestions,
+  usePinataUploadFiles,
+} from "@ecp.eth/react-editor/hooks";
+
+function CommentEditor() {
+  const suggestions = useIndexerSuggestions();
+  const uploads = usePinataUploadFiles({
+    pinataGatewayUrl: "https://api.pinata.cloud",
+    generateUploadUrl: async (filename) => {
+      // Implement your own upload URL generation logic
+      return `https://api.pinata.cloud/files/${filename}`;
+    },
+  });
+
+  return (
+    <Editor
+      placeholder="Write your comment..."
+      suggestions={suggestions}
+      uploads={uploads}
+      onBlur={() => console.log("Editor lost focus")}
+    />
+  );
+}
+```
+
+### Core Components
+
+#### Editor
+
+The main editor component with full rich text editing capabilities.
+
+```tsx twoslash
+// @moduleResolution: bundler
+// @errors: 2686 2304
+import React from "react";
+import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor";
+import type {
+  EditorSuggestionsService,
+  UploadFilesService,
+} from "@ecp.eth/react-editor/types";
+import { useRef } from "react";
+
+declare const suggestionsService: EditorSuggestionsService;
+declare const uploadsService: UploadFilesService;
+
+function CommentEditor() {
+  const editorRef = useRef<EditorRef>(null);
+
+  return (
+    <Editor
+      ref={editorRef}
+      placeholder="Write your comment..."
+      suggestions={suggestionsService}
+      uploads={uploadsService}
+      autoFocus={true}
+      onBlur={() => console.log("Editor lost focus")}
+      onEscapePress={() => console.log("Escape pressed")}
+    />
+  );
+}
+```
+
+### Hooks
+
+#### useIndexerSuggestions
+
+Provides suggestions for ENS, Farcaster, and ERC-20 mentions using the ECP Indexer.
+
+```tsx twoslash
+// @moduleResolution: bundler
+import { useIndexerSuggestions } from "@ecp.eth/react-editor/hooks";
+
+const suggestions = useIndexerSuggestions({
+  apiUrl: "https://api.ethcomments.xyz", // optional, defaults to https://api.ethcomments.xyz
+});
+```
+
+#### usePinataUploadFiles
+
+Provides file upload functionality using Pinata IPFS service.
+
+```tsx twoslash
+// @moduleResolution: bundler
+import { usePinataUploadFiles } from "@ecp.eth/react-editor/hooks";
+
+const uploads = usePinataUploadFiles({
+  pinataGatewayUrl: "some.pinata.gateway.url",
+  generateUploadUrl: async (filename) => {
+    // Implement your own upload URL generation logic
+    return `https://api.pinata.cloud/files/${filename}`;
+  },
+});
+```
+
+#### useHandleDefaultEditorValue
+
+Handles setting default editor values with content and references.
+
+```tsx twoslash
+// @moduleResolution: bundler
+import { useHandleDefaultEditorValue } from "@ecp.eth/react-editor/hooks";
+
+const content = useHandleDefaultEditorValue("some content", []);
+```
+
+### Utilities
+
+#### extractReferences
+
+Extract structured references from editor content.
+
+```tsx twoslash
+// @moduleResolution: bundler
+// @errors: 2304
+import type { EditorRef } from "@ecp.eth/react-editor/editor";
+import { extractReferences } from "@ecp.eth/react-editor/extract-references";
+
+declare const editorRef: React.RefObject<EditorRef>;
+
+const editorContent = editorRef.current!.editor!.getJSON();
+const references = extractReferences(editorContent);
+```
+
+#### parse
+
+Parse plain text with references back into rich content.
+
+```tsx twoslash
+// @moduleResolution: bundler
+// @errors: 2304
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import { parse } from "@ecp.eth/react-editor/parser";
+
+declare const plainText: string;
+declare const references: IndexerAPICommentReferencesSchemaType;
+
+const richContent = parse(plainText, references);
+```
+
+### Configuration
+
+#### File Upload Limits
+
+```tsx twoslash
+// Default limits
+const ALLOWED_UPLOAD_MIME_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/gif",
+  "image/webp",
+  "video/mp4",
+  "video/webm",
+  "video/avi",
+  "video/quicktime",
+];
+
+const MAX_UPLOAD_FILE_SIZE = 1024 * 1024 * 10; // 10MB
+```
+
+#### Custom Media Components
+
+You can customize how media files are displayed:
+
+```tsx twoslash
+// @moduleResolution: bundler
+// @errors: 2307 2739 2686
+import React from "react";
+import { Editor } from "@ecp.eth/react-editor/editor";
+import type {
+  UploadTrackerImageComponent,
+  UploadTrackerVideoComponent,
+  UploadTrackerFileComponent,
+  UploadFilesService,
+  EditorSuggestionsService,
+} from "@ecp.eth/react-editor/types";
+
+declare const CustomImageComponent: UploadTrackerImageComponent;
+declare const CustomVideoComponent: UploadTrackerVideoComponent;
+declare const CustomFileComponent: UploadTrackerFileComponent;
+declare const uploadsService: UploadFilesService;
+declare const suggestionsService: EditorSuggestionsService;
+
+<Editor
+  imageComponent={CustomImageComponent}
+  videoComponent={CustomVideoComponent}
+  fileComponent={CustomFileComponent}
+  uploads={uploadsService}
+  suggestions={suggestionsService}
+  placeholder="Write your comment..."
+  // ... other props
+/>;
+```
+
+### Advanced Usage
+
+#### Custom Suggestions Service
+
+```tsx twoslash
+// @moduleResolution: bundler
+import type { EditorSuggestionsService } from "@ecp.eth/react-editor/types";
+
+const customSuggestions: EditorSuggestionsService = {
+  search: async (query: string) => {
+    // Implement your own search logic
+    return {
+      results: [
+        {
+          type: "ens",
+          address: "0x...",
+          name: "example.eth",
+          value: "0x...",
+          avatarUrl: null,
+          url: "https://app.ens.domains/example.eth",
+        },
+        {
+          type: "farcaster",
+          fid: 0,
+          username: "example",
+          address: "0x...",
+          fname: "example",
+          value: "0x...",
+          avatarUrl: null,
+          url: "https://app.farcaster.xyz/example",
+        },
+      ],
+    };
+  },
+};
+```
+
+#### Custom Upload Service
+
+```tsx twoslash
+// @moduleResolution: bundler
+// @errors: 2304
+import type {
+  UploadFilesService,
+  UploadTrackerFileToUpload,
+} from "@ecp.eth/react-editor/types";
+
+declare const uploadToYourService: (
+  file: UploadTrackerFileToUpload,
+) => Promise<string>;
+
+const customUploads: UploadFilesService = {
+  allowedMimeTypes: ["image/png", "image/jpeg"],
+  maxFileSize: 5 * 1024 * 1024, // 5MB
+  uploadFile: async (file, callbacks) => {
+    // Implement your own upload logic
+    const response = await uploadToYourService(file);
+    callbacks?.onSuccess?.(
+      {
+        id: file.id,
+        name: file.name,
+        url: response,
+        mimeType: file.mimeType,
+      },
+      response,
+    );
+    return response;
+  },
+  uploadFiles: async (files, callbacks) => {
+    // Implement batch upload logic
+    return Promise.all(
+      files.map((file) => customUploads.uploadFile(file, callbacks)),
+    );
+  },
+};
+```
+
+### Next Steps
+
+- Check out the [React Component Library](/integration-options/react-component-library) for pre-built comment components
+- Learn about [contract interactions](/integration-options/contract-interactions) for direct blockchain integration
+- Explore the [TypeScript SDK](/integration-options/typescript-sdk) for programmatic access

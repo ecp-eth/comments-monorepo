@@ -51,6 +51,10 @@ export default defineConfig({
           link: "/integration-options/react-component-library",
         },
         {
+          text: "React Editor",
+          link: "/integration-options/react-editor",
+        },
+        {
           text: "Iframe Widget (no code)",
           link: "/integration-options/embed-comments",
         },
