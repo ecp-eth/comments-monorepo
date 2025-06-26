@@ -1,7 +1,7 @@
 import React from "react";
 import { defineConfig } from "vocs";
 import { remarkMermaid } from "@theguild/remark-mermaid";
-import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
+import { COMMENT_MANAGER_ADDRESS, CHANNEL_MANAGER_ADDRESS } from "@ecp.eth/sdk";
 import remarkFindAndReplace from "./plugins/remark-find-replace";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -270,18 +270,12 @@ export default defineConfig({
         remarkFindAndReplace,
         {
           replacements: {
-            COMMENT_MANAGER_ADDRESS:
-              SUPPORTED_CHAINS[8453].commentManagerAddress,
-            CHANNEL_MANAGER_ADDRESS:
-              SUPPORTED_CHAINS[8453].channelManagerAddress,
-            BASE_SEPOLIA_COMMENT_MANAGER_ADDRESS:
-              SUPPORTED_CHAINS[84532].commentManagerAddress,
-            BASE_SEPOLIA_CHANNEL_MANAGER_ADDRESS:
-              SUPPORTED_CHAINS[84532].channelManagerAddress,
-            BASE_MAINNET_COMMENT_MANAGER_ADDRESS:
-              SUPPORTED_CHAINS[8453].commentManagerAddress,
-            BASE_MAINNET_CHANNEL_MANAGER_ADDRESS:
-              SUPPORTED_CHAINS[8453].channelManagerAddress,
+            COMMENT_MANAGER_ADDRESS,
+            CHANNEL_MANAGER_ADDRESS,
+            BASE_SEPOLIA_COMMENT_MANAGER_ADDRESS: COMMENT_MANAGER_ADDRESS,
+            BASE_SEPOLIA_CHANNEL_MANAGER_ADDRESS: CHANNEL_MANAGER_ADDRESS,
+            BASE_MAINNET_COMMENT_MANAGER_ADDRESS: COMMENT_MANAGER_ADDRESS,
+            BASE_MAINNET_CHANNEL_MANAGER_ADDRESS: CHANNEL_MANAGER_ADDRESS,
           },
         },
       ],
@@ -297,22 +291,22 @@ export default defineConfig({
     },
     define: {
       "import.meta.env.COMMENT_MANAGER_ADDRESS": JSON.stringify(
-        SUPPORTED_CHAINS[8453].commentManagerAddress,
+        COMMENT_MANAGER_ADDRESS,
       ),
       "import.meta.env.CHANNEL_MANAGER_ADDRESS": JSON.stringify(
-        SUPPORTED_CHAINS[8453].channelManagerAddress,
+        CHANNEL_MANAGER_ADDRESS,
       ),
       "import.meta.env.BASE_SEPOLIA_COMMENT_MANAGER_ADDRESS": JSON.stringify(
-        SUPPORTED_CHAINS[84532].commentManagerAddress,
+        COMMENT_MANAGER_ADDRESS,
       ),
       "import.meta.env.BASE_SEPOLIA_CHANNEL_MANAGER_ADDRESS": JSON.stringify(
-        SUPPORTED_CHAINS[84532].channelManagerAddress,
+        CHANNEL_MANAGER_ADDRESS,
       ),
       "import.meta.env.BASE_MAINNET_COMMENT_MANAGER_ADDRESS": JSON.stringify(
-        SUPPORTED_CHAINS[8453].commentManagerAddress,
+        COMMENT_MANAGER_ADDRESS,
       ),
       "import.meta.env.BASE_MAINNET_CHANNEL_MANAGER_ADDRESS": JSON.stringify(
-        SUPPORTED_CHAINS[8453].channelManagerAddress,
+        CHANNEL_MANAGER_ADDRESS,
       ),
     },
   },
