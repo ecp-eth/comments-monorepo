@@ -1,10 +1,91 @@
+import { ScrollToCommentButton } from "../../components/ScrollToCommentButton";
+
 # Integration Options
+
+## React Integration
+
+The Ethereum Comments Protocol provides comprehensive React integration options for both displaying and creating comments. This guide covers two main approaches:
+
+1. **React Component Library** - For displaying and embedding comments
+2. **React Editor** - For creating and editing comments with rich text capabilities
+
+## React Component Library
+
+The React component library provides pre-built, customizable UI components for seamless integration into your React applications. This is the recommended approach for most web applications that need to display comments.
+
+### Demo
+
+<ScrollToCommentButton />
+
+### Installation
+
+:::code-group
+
+```bash [npm]
+npm install @ecp.eth/sdk
+# install peer dependencies
+npm install react react-dom viem wagmi @tanstack/react-query @tanstack/query-core
+```
+
+```bash [yarn]
+yarn add @ecp.eth/sdk
+# install peer dependencies
+yarn add react react-dom viem wagmi @tanstack/react-query @tanstack/query-core
+```
+
+```bash [pnpm]
+pnpm add @ecp.eth/sdk
+# install peer dependencies
+pnpm add react react-dom viem wagmi @tanstack/react-query @tanstack/query-core
+```
+
+:::
+
+### Usage
+
+```tsx twoslash
+/// <reference types="@ecp.eth/sdk" />
+// ---cut---
+import React from "react";
+import { CommentsEmbed } from "@ecp.eth/sdk/embed";
+
+export function Comments() {
+  return (
+    <div>
+      <h3>Comments</h3>
+      <CommentsEmbed
+        uri={
+          new URL(
+            window.location.pathname,
+            // replace with your url
+            "https://demo.ethcomments.xyz",
+          )
+        }
+        theme={{
+          mode: "light",
+          // ...
+        }}
+      />
+    </div>
+  );
+}
+```
+
+- Please note that if you are rendering the `CommentsEmbed` with server-side rendering (SSR), you do not have access to the `window` object.
+  Instead, you may want to construct the `uri` out of the `HttpRequest` object of your server-side framework.
+- Please also read the `targetUri` carefully in [Comment Data](/comment-data-props) for choosing an appropriate `uri`.
+
+#### API reference
+
+- [`CommentsEmbed`](/sdk-reference/embed/functions/CommentsEmbed)
+- [`CommentsEmbedProps`](/sdk-reference/embed/type-aliases/CommentsEmbedProps)
+- [`EmbedConfigThemeSchema`](/sdk-reference/embed/variables/EmbedConfigThemeSchema) - detailed theme customization options
 
 ## React Editor
 
-Easiest way to add creating comments on ECP to your [React](https://react.dev/) or [Next.js](https://nextjs.org/) application. The React Editor provides a powerful, customizable rich text editor built on top of [TipTap](https://tiptap.dev/) that supports mentions, file uploads, and seamless integration with the Ethereum Comments Protocol.
+The React Editor provides a powerful, customizable rich text editor built on top of [TipTap](https://tiptap.dev/) that supports mentions, file uploads, and seamless integration with the Ethereum Comments Protocol. This is the easiest way to add comment creation capabilities to your [React](https://react.dev/) or [Next.js](https://nextjs.org/) application.
 
-## Features
+### Features
 
 - **Rich Text Editing**: Built on TipTap with support for paragraphs, links, and formatting
 - **Mentions**: Support for ENS, Farcaster, and ERC-20 token mentions with autocomplete
@@ -314,8 +395,62 @@ const customUploads: UploadFilesService = {
 };
 ```
 
-### Next Steps
+## Complete Example
 
-- Check out the [React Component Library](/integration-options/react-component-library) for pre-built comment components
+Here's how you might combine both the Component Library and Editor in a single application:
+
+```tsx twoslash
+// @moduleResolution: bundler
+// @errors: 2554 2686 2304
+import React, { useState } from "react";
+import { CommentsEmbed } from "@ecp.eth/sdk/embed";
+import { Editor } from "@ecp.eth/react-editor/editor";
+import {
+  useIndexerSuggestions,
+  usePinataUploadFiles,
+} from "@ecp.eth/react-editor/hooks";
+
+function CommentsSection() {
+  const [showEditor, setShowEditor] = useState(false);
+  const suggestions = useIndexerSuggestions();
+  const uploads = usePinataUploadFiles({
+    pinataGatewayUrl: "https://api.pinata.cloud",
+    generateUploadUrl: async (filename) => {
+      return `https://api.pinata.cloud/files/${filename}`;
+    },
+  });
+
+  return (
+    <div>
+      <h2>Comments</h2>
+
+      {/* Display existing comments */}
+      <CommentsEmbed
+        uri={new URL(window.location.pathname, "https://demo.ethcomments.xyz")}
+        theme={{ mode: "light" }}
+      />
+
+      {/* Add new comment button */}
+      <button onClick={() => setShowEditor(true)}>Add Comment</button>
+
+      {/* Comment editor */}
+      {showEditor && (
+        <div>
+          <Editor
+            placeholder="Write your comment..."
+            suggestions={suggestions}
+            uploads={uploads}
+            onBlur={() => setShowEditor(false)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+## Next Steps
+
+- Check out how to [retrieve comments and replies](/indexer/read-comments/)
 - Learn about [contract interactions](/integration-options/contract-interactions) for direct blockchain integration
 - Explore the [TypeScript SDK](/integration-options/typescript-sdk) for programmatic access
