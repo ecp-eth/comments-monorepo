@@ -2,11 +2,13 @@ import { createContext, useContext } from "react";
 
 export type CommentGaslessProviderContextType = {
   isApproved: boolean;
+  areApprovalsEnabled: boolean;
 };
 
 const CommentGaslessProviderContext =
   createContext<CommentGaslessProviderContextType>({
     isApproved: false,
+    areApprovalsEnabled: false,
   });
 
 export function CommentGaslessProvider({

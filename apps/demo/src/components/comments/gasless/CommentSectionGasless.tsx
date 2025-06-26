@@ -40,7 +40,13 @@ import { createRootCommentsQueryKey } from "../core/queries";
 import { CommentActionsProvider } from "./context";
 import { toast } from "sonner";
 
-export function CommentSectionGasless() {
+type CommentSectionGaslessProps = {
+  disableApprovals?: boolean;
+};
+
+export function CommentSectionGasless({
+  disableApprovals,
+}: CommentSectionGaslessProps) {
   const { address: viewer } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
   const [currentUrl, setCurrentUrl] = useState<string>("");
@@ -172,7 +178,7 @@ export function CommentSectionGasless() {
 
   const gaslessCommentActions = useGaslessCommentActions({
     connectedAddress: viewer,
-    hasApproval: !!approvalStatus.data?.approved,
+    hasApproval: !disableApprovals && !!approvalStatus.data?.approved,
   });
 
   useEffect(() => {
@@ -216,9 +222,11 @@ export function CommentSectionGasless() {
   const commentGaslessProviderValue =
     useMemo<CommentGaslessProviderContextType>(
       () => ({
-        isApproved: approvalStatus.data?.approved ?? false,
+        isApproved:
+          !disableApprovals && (approvalStatus.data?.approved ?? false),
+        areApprovalsEnabled: !disableApprovals,
       }),
-      [approvalStatus.data?.approved],
+      [approvalStatus.data?.approved, disableApprovals],
     );
 
   const isApprovalPending =
@@ -239,50 +247,54 @@ export function CommentSectionGasless() {
         <CommentSectionWrapper>
           <h2 className="text-lg font-semibold">Comments</h2>
 
-          {!!viewer && !approvalStatus.data?.approved && (
-            <div className="mb-4">
-              <Button
-                onClick={() => {
-                  approveGaslessTransactionsMutation.mutate();
-                }}
-                disabled={isApprovalPending}
-                variant="default"
-              >
-                {isApprovalPending
-                  ? "Requesting Approval..."
-                  : "Allow this app to post on your behalf"}
-              </Button>
-            </div>
-          )}
-          {!!viewer && approvalStatus.data?.approved && (
-            <div className="flex items-center gap-2">
-              <div className="text-sm text-gray-500">
-                App has approval to post on your behalf.
+          {!!viewer &&
+            !approvalStatus.data?.approved &&
+            commentGaslessProviderValue.areApprovalsEnabled && (
+              <div className="mb-4">
+                <Button
+                  onClick={() => {
+                    approveGaslessTransactionsMutation.mutate();
+                  }}
+                  disabled={isApprovalPending}
+                  variant="default"
+                >
+                  {isApprovalPending
+                    ? "Requesting Approval..."
+                    : "Allow this app to post on your behalf"}
+                </Button>
               </div>
-              <Button
-                variant="outline"
-                disabled={!approvalStatus.data || isRemovingApproval}
-                onClick={() => {
-                  if (
-                    !approvalStatus.data ||
-                    !approvalStatus.data.approved ||
-                    !viewer
-                  ) {
-                    throw new Error("No data found");
-                  }
+            )}
+          {!!viewer &&
+            approvalStatus.data?.approved &&
+            commentGaslessProviderValue.areApprovalsEnabled && (
+              <div className="flex items-center gap-2">
+                <div className="text-sm text-gray-500">
+                  App has approval to post on your behalf.
+                </div>
+                <Button
+                  variant="outline"
+                  disabled={!approvalStatus.data || isRemovingApproval}
+                  onClick={() => {
+                    if (
+                      !approvalStatus.data ||
+                      !approvalStatus.data.approved ||
+                      !viewer
+                    ) {
+                      throw new Error("No data found");
+                    }
 
-                  revokeApproval.mutateAsync({
-                    app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-                  });
-                }}
-              >
-                <X />
-                <span>
-                  {isRemovingApproval ? "Removing..." : "Remove Approval"}
-                </span>
-              </Button>
-            </div>
-          )}
+                    revokeApproval.mutateAsync({
+                      app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+                    });
+                  }}
+                >
+                  <X />
+                  <span>
+                    {isRemovingApproval ? "Removing..." : "Remove Approval"}
+                  </span>
+                </Button>
+              </div>
+            )}
           <CommentForm />
           {error && (
             <div>Error loading comments: {(error as Error).message}</div>

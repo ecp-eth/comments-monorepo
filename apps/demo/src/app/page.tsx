@@ -11,7 +11,7 @@ import { CommentSection as CommentSectionSwapWithComment } from "@/components/co
 import { PoweredBy } from "@ecp.eth/shared/components";
 import { publicEnv } from "@/publicEnv";
 
-type Tab = "default" | "gasless" | "swap";
+type Tab = "default" | "gasless" | "swap" | "approvals";
 
 export default function Home() {
   const { address } = useAccount();
@@ -49,13 +49,17 @@ export default function Home() {
             <TabsTrigger value="gasless">
               Gas Sponsored Transactions
             </TabsTrigger>
+            <TabsTrigger value="approvals">Approvals</TabsTrigger>
             {publicEnv.NEXT_PUBLIC_ENABLE_SWAPPING && (
               <TabsTrigger value="swap">Swap with comment</TabsTrigger>
             )}
           </TabsList>
         </Tabs>
         <div className="max-w-2xl mx-auto mt-8 flex flex-col gap-4">
-          {activeTab === "gasless" && <CommentSectionGasless />}
+          {activeTab === "gasless" && (
+            <CommentSectionGasless disableApprovals />
+          )}
+          {activeTab === "approvals" && <CommentSectionGasless />}
           {activeTab === "swap" && publicEnv.NEXT_PUBLIC_ENABLE_SWAPPING && (
             <CommentSectionSwapWithComment />
           )}
