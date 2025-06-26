@@ -128,7 +128,7 @@ function BaseCommentForm({
     },
   });
   const suggestions = useIndexerSuggestions({
-    apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+    indexerApiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   });
 
   const submitMutation = useMutation({

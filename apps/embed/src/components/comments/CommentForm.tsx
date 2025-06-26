@@ -124,7 +124,7 @@ function BaseCommentForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const suggestions = useIndexerSuggestions({
-    apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+    indexerApiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   });
   const uploads = usePinataUploadFiles({
     allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,

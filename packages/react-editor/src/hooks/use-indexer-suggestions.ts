@@ -16,7 +16,7 @@ export type UseIndexerSuggestionsOptions = {
    *
    * If not provided, the default indexer API URL will be used.
    */
-  apiUrl?: string;
+  indexerApiUrl?: string;
   /**
    * The debounce time in milliseconds.
    *
@@ -29,7 +29,7 @@ export type UseIndexerSuggestionsOptions = {
  * Hook to fetch suggestions from indexer API.
  */
 export function useIndexerSuggestions({
-  apiUrl,
+  indexerApiUrl,
   debounceMs = 200,
 }: UseIndexerSuggestionsOptions = {}): EditorSuggestionsService {
   const client = useQueryClient();
@@ -51,7 +51,7 @@ export function useIndexerSuggestions({
         queryKey: createQueryKey(char, query),
         queryFn: async ({ signal }) => {
           return fetchAutocomplete({
-            apiUrl,
+            apiUrl: indexerApiUrl,
             query,
             char,
             signal,
@@ -59,7 +59,7 @@ export function useIndexerSuggestions({
         },
       });
     },
-    [client, apiUrl],
+    [client, indexerApiUrl],
   );
 
   const debouncedFetch = useCallback<SearchSuggestionsFunction>(

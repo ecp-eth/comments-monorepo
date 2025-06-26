@@ -2,7 +2,7 @@
 
 ## React Editor
 
-The React Editor provides a powerful, customizable rich text editor built on top of TipTap that supports mentions, file uploads, and seamless integration with the Ethereum Comments Protocol.
+Easiest way to add creating comments on ECP to your [React](https://react.dev/) or [Next.js](https://nextjs.org/) application. The React Editor provides a powerful, customizable rich text editor built on top of [TipTap](https://tiptap.dev/) that supports mentions, file uploads, and seamless integration with the Ethereum Comments Protocol.
 
 ## Features
 
@@ -118,9 +118,7 @@ Provides suggestions for ENS, Farcaster, and ERC-20 mentions using the ECP Index
 // @moduleResolution: bundler
 import { useIndexerSuggestions } from "@ecp.eth/react-editor/hooks";
 
-const suggestions = useIndexerSuggestions({
-  apiUrl: "https://api.ethcomments.xyz", // optional, defaults to https://api.ethcomments.xyz
-});
+const suggestions = useIndexerSuggestions();
 ```
 
 #### usePinataUploadFiles
