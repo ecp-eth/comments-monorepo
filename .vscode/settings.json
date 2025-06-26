@@ -25,6 +25,7 @@
     "packages/shared/schemas": true,
     "packages/shared/types": true,
     "packages/shared/token-list": true,
-    "packages/shared/resolvers": true
+    "packages/shared/resolvers": true,
+    "packages/shared/services/*": true
   }
 }
