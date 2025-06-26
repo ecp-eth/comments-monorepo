@@ -24,7 +24,6 @@ import {
 } from "./queries";
 import { chain } from "@/lib/wagmi";
 import { toast } from "sonner";
-import { decapitalize } from "@ecp.eth/shared/helpers";
 
 type CommentItemProps = {
   connectedAddress: Hex | undefined;
