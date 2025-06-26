@@ -81,7 +81,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         setIsLiking(false);
 
         if (e instanceof Error) {
-          toast.error(`Error: ${decapitalize(e.message)}`);
+          toast.error(e.message);
           return;
         }
 
@@ -97,7 +97,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
       onBeforeStart: () => setIsLiking(false),
       onFailed: (e: unknown) => {
         if (e instanceof Error) {
-          toast.error(`Error: ${decapitalize(e.message)}`);
+          toast.error(e.message);
           return;
         }
 

@@ -6,7 +6,6 @@ import { CommentEditForm, CommentForm } from "./CommentForm";
 import { useCommentActions } from "./CommentActionsContext";
 import type { Hex } from "viem";
 import { toast } from "sonner";
-import { decapitalize } from "@ecp.eth/shared/helpers";
 
 type ReplyItemProps = {
   comment: CommentType;
@@ -62,7 +61,7 @@ export function ReplyItem({
         setIsLiking(false);
 
         if (e instanceof Error) {
-          toast.error(`Error: ${decapitalize(e.message)}`);
+          toast.error(e.message);
           return;
         }
 
@@ -78,7 +77,7 @@ export function ReplyItem({
       onBeforeStart: () => setIsLiking(false),
       onFailed: (e: unknown) => {
         if (e instanceof Error) {
-          toast.error(`Error: ${decapitalize(e.message)}`);
+          toast.error(e.message);
           return;
         }
 
