@@ -95,7 +95,9 @@ export function CommentSectionGasless() {
       });
 
       if (!response.ok) {
-        throw new Error("Server failed to post approval signature");
+        throw new Error(
+          "Failed to post approval signature, the service is temporarily unavailable, please try again later",
+        );
       }
 
       return ChangeApprovalStatusResponseSchema.parse(await response.json())
