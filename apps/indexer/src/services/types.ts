@@ -1,11 +1,13 @@
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { WebhookCallbackData } from "../utils/webhook";
-import { CommentSelectType } from "ponder:schema";
+import type { CommentSelectType } from "ponder:schema";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 
 export type ModerationNotificationServicePendingComment = {
   id: Hex;
   author: Hex;
   content: string;
+  references: IndexerAPICommentReferencesSchemaType;
   targetUri: string;
 };
 

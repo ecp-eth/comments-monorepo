@@ -1,4 +1,5 @@
 import { Telegraf } from "telegraf";
+import { renderToMarkdown } from "@ecp.eth/shared/renderer";
 import type {
   ModerationNotificationsService as ModerationNotificationsServiceInterface,
   ModerationNotificationServicePendingComment,
@@ -60,6 +61,10 @@ export class ModerationNotificationsService
     comment: ModerationNotificationServicePendingComment,
   ) {
     const author = await resolveAuthor(comment.author);
+    const renderResult = renderToMarkdown({
+      content: comment.content,
+      references: comment.references,
+    });
     const message = `🆕 New comment pending moderation
 
 ID: \`${comment.id}\`
@@ -68,7 +73,7 @@ Target: \`${comment.targetUri}\`
 
 Content:
 
-${comment.content}
+${renderResult.result}
 `;
 
     try {

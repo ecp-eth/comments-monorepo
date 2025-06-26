@@ -3,11 +3,12 @@ import { eq } from "ponder";
 import { Event } from "ponder:registry";
 import { getIndexerDb } from "../db";
 import { db } from "../../db";
-import schema, { CommentSelectType } from "ponder:schema";
+import schema, { type CommentSelectType } from "ponder:schema";
 import { HTTPException } from "hono/http-exception";
-import { ModerationNotificationsService } from "../../services/types";
+import type { ModerationNotificationsService } from "../../services/types";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
-import { ContentfulStatusCode } from "hono/utils/http-status";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 
 abstract class BaseCommentModerationException extends HTTPException {
   constructor(status: ContentfulStatusCode, message: string) {
@@ -69,6 +70,7 @@ export class CommentModerationService {
 
   async moderate(
     comment: Event<"CommentsV1:CommentAdded">["args"],
+    references: IndexerAPICommentReferencesSchemaType,
   ): Promise<ModerationStatusResult> {
     if (!this.enabled) {
       return {
@@ -115,7 +117,7 @@ export class CommentModerationService {
           );
 
           if (moderationStatus.status === "pending") {
-            await this.notifyTelegram(comment);
+            await this.notifyTelegram(comment, references);
           }
         }
       },
@@ -205,11 +207,13 @@ export class CommentModerationService {
 
   private async notifyTelegram(
     comment: Event<"CommentsV1:CommentAdded">["args"],
+    references: IndexerAPICommentReferencesSchemaType,
   ) {
     return this.notificationService.notifyPendingModeration({
       author: comment.author,
       content: comment.content,
       targetUri: comment.targetUri,
+      references,
       id: comment.commentId,
     });
   }
