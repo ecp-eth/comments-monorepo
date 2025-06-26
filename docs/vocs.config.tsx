@@ -1,7 +1,7 @@
 import React from "react";
 import { defineConfig } from "vocs";
 import { remarkMermaid } from "@theguild/remark-mermaid";
-import { CHANNEL_MANAGER_ADDRESS, COMMENT_MANAGER_ADDRESS } from "@ecp.eth/sdk";
+import { COMMENT_MANAGER_ADDRESS, CHANNEL_MANAGER_ADDRESS } from "@ecp.eth/sdk";
 import remarkFindAndReplace from "./plugins/remark-find-replace";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -270,8 +270,12 @@ export default defineConfig({
         remarkFindAndReplace,
         {
           replacements: {
-            COMMENT_MANAGER_ADDRESS: COMMENT_MANAGER_ADDRESS,
-            CHANNEL_MANAGER_ADDRESS: CHANNEL_MANAGER_ADDRESS,
+            COMMENT_MANAGER_ADDRESS,
+            CHANNEL_MANAGER_ADDRESS,
+            BASE_SEPOLIA_COMMENT_MANAGER_ADDRESS: COMMENT_MANAGER_ADDRESS,
+            BASE_SEPOLIA_CHANNEL_MANAGER_ADDRESS: CHANNEL_MANAGER_ADDRESS,
+            BASE_MAINNET_COMMENT_MANAGER_ADDRESS: COMMENT_MANAGER_ADDRESS,
+            BASE_MAINNET_CHANNEL_MANAGER_ADDRESS: CHANNEL_MANAGER_ADDRESS,
           },
         },
       ],
@@ -290,6 +294,18 @@ export default defineConfig({
         COMMENT_MANAGER_ADDRESS,
       ),
       "import.meta.env.CHANNEL_MANAGER_ADDRESS": JSON.stringify(
+        CHANNEL_MANAGER_ADDRESS,
+      ),
+      "import.meta.env.BASE_SEPOLIA_COMMENT_MANAGER_ADDRESS": JSON.stringify(
+        COMMENT_MANAGER_ADDRESS,
+      ),
+      "import.meta.env.BASE_SEPOLIA_CHANNEL_MANAGER_ADDRESS": JSON.stringify(
+        CHANNEL_MANAGER_ADDRESS,
+      ),
+      "import.meta.env.BASE_MAINNET_COMMENT_MANAGER_ADDRESS": JSON.stringify(
+        COMMENT_MANAGER_ADDRESS,
+      ),
+      "import.meta.env.BASE_MAINNET_CHANNEL_MANAGER_ADDRESS": JSON.stringify(
         CHANNEL_MANAGER_ADDRESS,
       ),
     },
