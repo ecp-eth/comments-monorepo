@@ -4,6 +4,13 @@ import type { LinkAttributes, MentionItem } from "./extensions/types.js";
 
 const URL_REGEX = /^(https?:\/\/[^\s<>[\]{}|\\^]+)/u;
 
+/**
+ * Parses the content and returns a JSONContent object for tiptap editor.
+ *
+ * @param content - The content to parse.
+ * @param references - The references to use.
+ * @returns The parsed content.
+ */
 export function parse(
   content: string,
   references: IndexerAPICommentReferencesSchemaType,
@@ -122,7 +129,7 @@ export function parse(
               chainId: chain.chainId,
               decimals: reference.decimals,
               logoURI: reference.logoURI,
-              value: reference.address,
+              value: chain.caip,
             } satisfies MentionItem,
           });
 
