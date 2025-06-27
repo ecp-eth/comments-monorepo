@@ -47,12 +47,8 @@ export default defineConfig({
           link: "/integration-options/typescript-sdk",
         },
         {
-          text: "React Components",
-          link: "/integration-options/react-component-library",
-        },
-        {
-          text: "React Editor",
-          link: "/integration-options/react-editor",
+          text: "React Integration",
+          link: "/integration-options/react-integration",
         },
         {
           text: "Iframe Widget (no code)",
@@ -61,10 +57,6 @@ export default defineConfig({
         {
           text: "Smart Contracts",
           link: "/integration-options/contract-interactions",
-        },
-        {
-          text: "Signer API Service",
-          link: "/integration-options/signer-api-service",
         },
       ],
     },
@@ -164,6 +156,11 @@ export default defineConfig({
         {
           text: "Blog with <CommentsEmbed />",
           link: "/demos/blog",
+        },
+
+        {
+          text: "Signer API Service",
+          link: "/demos/signer-api-service",
         },
       ],
     },
