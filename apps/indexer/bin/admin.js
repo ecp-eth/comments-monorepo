@@ -10,6 +10,7 @@ import { randomBytes } from "crypto";
 import { getPublicKeyAsync, signAsync, utils } from "@noble/ed25519";
 import pg from "pg";
 import { z } from "zod";
+import { renderToMarkdown } from "@ecp.eth/shared/renderer";
 
 const HexSchema = z.string().regex(/^0x[0-9a-fA-F]+$/);
 
@@ -424,7 +425,12 @@ moderateComments
         ]);
 
         console.log("Content----------");
-        console.log(comment.content);
+        console.log(
+          renderToMarkdown({
+            content: comment.content,
+            references: comment.references,
+          }).result,
+        );
         console.log("----------");
         console.groupEnd();
       }

@@ -172,6 +172,14 @@ export class CommentModerationService {
     return updatedComment;
   }
 
+  async getComment(commentId: Hex): Promise<CommentSelectType | undefined> {
+    const comment = await db.query.comment.findFirst({
+      where: eq(schema.comment.id, commentId),
+    });
+
+    return comment;
+  }
+
   private async insertCommentModerationStatus(
     commentId: Hex,
     status: ModerationStatus = "pending",
@@ -210,11 +218,13 @@ export class CommentModerationService {
     references: IndexerAPICommentReferencesSchemaType,
   ) {
     return this.notificationService.notifyPendingModeration({
+      channelId: comment.channelId,
       author: comment.author,
       content: comment.content,
       targetUri: comment.targetUri,
       references,
       id: comment.commentId,
+      parentId: comment.parentId,
     });
   }
 }

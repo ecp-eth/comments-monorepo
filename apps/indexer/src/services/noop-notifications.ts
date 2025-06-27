@@ -23,6 +23,16 @@ export class NoopNotificationsService
     });
   }
 
+  async updateMessageWithChangeAction(
+    messageId: number,
+    comment: CommentSelectType,
+  ) {
+    console.log("NoopNotificationsService: updateMessageWithChangeAction", {
+      messageId,
+      comment,
+    });
+  }
+
   decryptWebhookCallbackData(data: string): WebhookCallbackData {
     console.log("NoopNotificationsService: decryptWebhookCallbackData", data);
     throw new Error("Not implemented");

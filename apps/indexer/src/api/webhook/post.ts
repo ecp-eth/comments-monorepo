@@ -83,6 +83,42 @@ export function setupWebhook(app: OpenAPIHono) {
             "rejected",
           );
           break;
+        case "pending":
+          comment = await commentModerationService.updateModerationStatus(
+            command.commentId,
+            "pending",
+          );
+          break;
+        case "change":
+          comment = await commentModerationService.getComment(
+            command.commentId,
+          );
+
+          if (comment) {
+            await moderationNotificationsService.updateMessageWithChangeAction(
+              message.message_id,
+              comment,
+            );
+
+            return c.newResponse(null, 204);
+          }
+
+          break;
+        case "cancel":
+          comment = await commentModerationService.getComment(
+            command.commentId,
+          );
+
+          if (comment) {
+            await moderationNotificationsService.updateMessageWithModerationStatus(
+              message.message_id,
+              comment,
+            );
+
+            return c.newResponse(null, 204);
+          }
+
+          break;
         default:
           throw new HTTPException(400, {
             message: "Invalid action",
