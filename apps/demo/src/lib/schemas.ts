@@ -233,6 +233,7 @@ export const SignCommentResponseServerSchema = z.object({
 export const ChangeApprovalStatusRequestBodySchema = z.object({
   signTypedDataParams: AddApprovalTypedDataSchema,
   authorSignature: HexSchema,
+  authorAddress: HexSchema,
 });
 
 export type ChangeApprovalStatusRequestBodySchemaType = z.infer<

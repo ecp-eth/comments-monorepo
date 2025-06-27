@@ -1,11 +1,5 @@
 import { JSONResponse } from "@ecp.eth/shared/helpers";
-import {
-  createPublicClient,
-  createWalletClient,
-  hashTypedData,
-  publicActions,
-  recoverAddress,
-} from "viem";
+import { createPublicClient, createWalletClient, publicActions } from "viem";
 import {
   ApproveResponseSchema,
   BadRequestResponseSchema,
@@ -38,17 +32,27 @@ export async function POST(
     );
   }
 
-  const { signTypedDataParams, authorSignature } = parsedBodyResult.data;
+  const { authorSignature, signTypedDataParams, authorAddress } =
+    parsedBodyResult.data;
 
-  const hash = hashTypedData(signTypedDataParams);
-  const authorAddress = await recoverAddress({
-    hash,
-    signature: authorSignature,
-  });
   const publicClient = createPublicClient({
     chain,
     transport,
   });
+
+  const verified = await publicClient.verifyTypedData({
+    ...signTypedDataParams,
+    address: authorAddress,
+    signature: authorSignature,
+  });
+
+  if (!verified) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { signTypedDataParams: ["Invalid signature"] },
+      { status: 400 },
+    );
+  }
 
   // double check to avoid wasting gas on incorrect or unnecessary request
   // Check approval on chain and get nonce (multicall3 if available,
