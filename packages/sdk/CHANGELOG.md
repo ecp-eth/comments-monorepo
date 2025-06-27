@@ -1,5 +1,14 @@
 # @ecp.eth/sdk
 
+## 0.0.22
+
+### Patch Changes
+
+- 08b79a5: feat: add autocomplete endpoint
+- 2d0a2e5: feat: add support to reactions
+- 2119f39: chore(sdk): export CommentType schema
+- 3d71868: feat: filter channels, comments, approvals by chain ids
+
 ## 0.0.21
 
 ### Patch Changes
