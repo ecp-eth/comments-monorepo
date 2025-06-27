@@ -384,7 +384,7 @@ describe("extractReferences", () => {
     ]);
 
     expect(renderToStaticMarkup(rendered.element)).toEqual(
-      '<p>test</p><p><a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a>this shit </p><p><a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a> <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a></p>',
+      '<p>test</p><p><a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a></p><p>this shit </p><p><a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a> <a class="text-blue-500" href="https://farcaster.xyz/mskr" rel="noopener noreferrer" target="_blank">@mskr.fcast.id</a></p>',
     );
   });
 

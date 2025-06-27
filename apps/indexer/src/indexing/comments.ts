@@ -102,18 +102,19 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       rootCommentId = parentComment.rootCommentId ?? parentComment.id;
     }
 
-    // We need to check if the comment already has a moderation status
-    // this is useful during the reindex process
-    const moderationResult = await commentModerationService.moderate(
-      event.args,
-    );
-
     const referencesResolutionResult = await resolveCommentReferences(
       {
         chainId: context.chain.id,
         content: event.args.content,
       },
       resolverCommentReferences,
+    );
+
+    // We need to check if the comment already has a moderation status
+    // this is useful during the reindex process
+    const moderationResult = await commentModerationService.moderate(
+      event.args,
+      referencesResolutionResult.references,
     );
 
     await context.db.insert(schema.comment).values({

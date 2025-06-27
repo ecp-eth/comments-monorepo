@@ -16,94 +16,85 @@ export type AllowedMediaReferences =
   | IndexerAPICommentReferenceURLImageSchemaType
   | IndexerAPICommentReferenceURLFileSchemaType;
 
-type ReferenceRenderer<
+export type ReferenceRenderer<
+  TNode,
   TReference extends IndexerAPICommentReferenceSchemaType,
 > = {
   length: (reference: TReference) => number;
-  render: (
-    reference: TReference,
-  ) => React.ReactElement | typeof KEEP_ORIGINAL_TEXT;
+  render: (reference: TReference) => TNode | typeof KEEP_ORIGINAL_TEXT;
 };
 
-type ReferenceRendererKey = {
+export type ReferenceRenderers<TNode> = {
   [K in IndexerAPICommentReferenceSchemaType["type"]]: ReferenceRenderer<
+    TNode,
     Extract<IndexerAPICommentReferenceSchemaType, { type: K }>
   >;
 };
 
-const referenceRenderers: Partial<ReferenceRendererKey> = {
-  ens: {
-    length(reference) {
-      return `@${reference.name}`.length;
-    },
-    render(reference) {
-      return (
-        <a
-          className="text-blue-500"
-          href={reference.url}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          @{reference.name}
-        </a>
-      );
-    },
-  },
-  farcaster: {
-    length(reference) {
-      return `@${reference.fname}`.length;
-    },
-    render(reference) {
-      return (
-        <a
-          className="text-blue-500"
-          href={reference.url}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          @{reference.fname}
-        </a>
-      );
-    },
-  },
-  erc20: {
-    length(reference) {
-      return `$${reference.symbol}`.length;
-    },
-    render(reference) {
-      return (
-        <span
-          className="text-blue-500"
-          title={reference.name || reference.address}
-        >
-          ${reference.symbol}
-        </span>
-      );
-    },
-  },
+export type ElementRenderers<TNode = string> = {
+  paragraph: (children: TNode[]) => TNode;
+  text: (text: string) => TNode;
+  url: (url: string) => TNode;
 };
 
-type RenderToReactProps = {
+export type RenderOptions<
+  TNode,
+  TAllowedReferences extends IndexerAPICommentReferenceSchemaType,
+> = {
   content: string;
   references: IndexerAPICommentReferencesSchemaType;
   maxLength?: number;
   maxLines?: number;
+  /**
+   * Custom renderers for specific reference types
+   *
+   * if provided it will use only the provided renderers
+   */
+  renderers: Partial<ReferenceRenderers<TNode>>;
+  elementRenderers: ElementRenderers<TNode>;
+  /**
+   * Custom function to process media references, returned media references
+   *
+   * @param references - The references to process
+   * @returns The processed media references and the content without the media references
+   */
+  processMediaReferences?: (
+    content: string,
+    references: IndexerAPICommentReferenceSchemaType[],
+  ) => {
+    mediaReferences: TAllowedReferences[];
+    content: string;
+  };
 };
 
-type RenderResult = {
-  element: React.ReactElement;
-  mediaReferences: AllowedMediaReferences[];
+type RenderResult<
+  TNode,
+  TAllowedReferences extends IndexerAPICommentReferenceSchemaType,
+> = {
+  result: TNode[];
+  mediaReferences: TAllowedReferences[];
   isTruncated: boolean;
 };
 
-export function renderToReact({
+export function render<
+  TNode,
+  TAllowedReferences extends IndexerAPICommentReferenceSchemaType,
+>({
   content,
   references,
   maxLength,
   maxLines,
-}: RenderToReactProps): RenderResult {
+  renderers,
+  elementRenderers,
+  processMediaReferences,
+}: RenderOptions<TNode, TAllowedReferences>): RenderResult<
+  TNode,
+  TAllowedReferences
+> {
   const { mediaReferences, content: contentWithoutMediaReferences } =
-    processMediaReferences(content, references);
+    processMediaReferences
+      ? processMediaReferences(content, references)
+      : { content, mediaReferences: references };
 
   // Adjust reference positions to account for removed media references
   const adjustedReferences = references.map((reference) => {
@@ -135,9 +126,9 @@ export function renderToReact({
     referencesByPosition.set(reference.position.start, reference);
   }
 
-  const elements: React.ReactNode[] = [];
+  const elements: TNode[] = [];
   let currentParagraphText = "";
-  let currentParagraph: React.ReactElement[] = [];
+  let currentParagraph: TNode[] = [];
   let consecutiveNewLines = 0;
   let currentRenderedLength = 0;
   let currentRenderedLines = 0;
@@ -155,7 +146,7 @@ export function renderToReact({
       return;
     }
 
-    currentParagraph.push(<Fragment>{currentParagraphText}</Fragment>);
+    currentParagraph.push(elementRenderers.text(currentParagraphText));
     currentParagraphText = "";
   };
 
@@ -165,11 +156,7 @@ export function renderToReact({
     currentRenderedLines++;
 
     if (currentParagraph.length > 0) {
-      elements.push(
-        <p key={elements.length}>
-          {currentParagraph.map((el, i) => cloneElement(el, { key: i }))}
-        </p>,
-      );
+      elements.push(elementRenderers.paragraph(currentParagraph));
       currentParagraph = [];
     }
   };
@@ -196,11 +183,31 @@ export function renderToReact({
     }
 
     const char = String.fromCodePoint(codePoint);
+
+    // break on new line and merge consecutive new lines
+    if (char === "\n" || char === "\r") {
+      // skip the \r in \r\n
+      if (char === "\r" && contentWithoutMediaReferences[pos + 1] === "\n") {
+        pos++;
+      }
+
+      pos++;
+      consecutiveNewLines++;
+
+      if (consecutiveNewLines === 1) {
+        flushParagraph();
+      }
+
+      continue;
+    }
+
+    consecutiveNewLines = 0;
+
     const reference = referencesByPosition.get(pos);
 
     if (reference) {
-      const renderer = referenceRenderers[reference.type] as
-        | ReferenceRenderer<typeof reference>
+      const renderer = renderers[reference.type] as
+        | ReferenceRenderer<TNode, typeof reference>
         | undefined;
 
       if (renderer) {
@@ -225,24 +232,6 @@ export function renderToReact({
       }
     }
 
-    if (char === "\n" || char === "\r") {
-      // skip the \r in \r\n
-      if (char === "\r" && contentWithoutMediaReferences[pos + 1] === "\n") {
-        pos++;
-      }
-
-      pos++;
-      consecutiveNewLines++;
-
-      if (consecutiveNewLines === 1) {
-        flushParagraph();
-      }
-
-      continue;
-    }
-
-    consecutiveNewLines = 0;
-
     // check if there is an url
     const restOfText = contentWithoutMediaReferences.slice(pos);
     const urlMatch = restOfText.match(URL_REGEX);
@@ -257,16 +246,7 @@ export function renderToReact({
 
       flushParagraphText();
 
-      currentParagraph.push(
-        <a
-          className="underline"
-          href={url}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          {url}
-        </a>,
-      );
+      currentParagraph.push(elementRenderers.url(url));
 
       currentRenderedLength += url.length;
       pos += url.length;
@@ -289,7 +269,227 @@ export function renderToReact({
   flushParagraph();
 
   return {
-    element: <Fragment>{elements}</Fragment>,
+    result: elements,
+    mediaReferences: mediaReferences as TAllowedReferences[],
+    isTruncated,
+  };
+}
+
+const reactReferenceRenderers: Partial<ReferenceRenderers<React.ReactElement>> =
+  {
+    ens: {
+      length(reference) {
+        return `@${reference.name}`.length;
+      },
+      render(reference) {
+        return (
+          <a
+            className="text-blue-500"
+            href={reference.url}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            @{reference.name}
+          </a>
+        );
+      },
+    },
+    farcaster: {
+      length(reference) {
+        return `@${reference.fname}`.length;
+      },
+      render(reference) {
+        return (
+          <a
+            className="text-blue-500"
+            href={reference.url}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            @{reference.fname}
+          </a>
+        );
+      },
+    },
+    erc20: {
+      length(reference) {
+        return `$${reference.symbol}`.length;
+      },
+      render(reference) {
+        return (
+          <span
+            className="text-blue-500"
+            title={reference.name || reference.address}
+          >
+            ${reference.symbol}
+          </span>
+        );
+      },
+    },
+  };
+
+const reactElementRenderers: ElementRenderers<React.ReactElement> = {
+  paragraph(children) {
+    return (
+      <p key={children.length}>
+        {children.map((el, i) => cloneElement(el, { key: i }))}
+      </p>
+    );
+  },
+  text(text) {
+    return <Fragment>{text}</Fragment>;
+  },
+  url(url) {
+    return (
+      <a
+        className="underline"
+        href={url}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        {url}
+      </a>
+    );
+  },
+};
+
+export type RenderToReactResult = Omit<
+  RenderResult<React.ReactElement, AllowedMediaReferences>,
+  "result"
+> & {
+  element: React.ReactElement;
+};
+
+/**
+ * Renders the content to a React element
+ *
+ * @param options - The options for the renderer
+ * @returns The rendered element, media references and if the content was truncated
+ */
+export function renderToReact(
+  options: Omit<
+    RenderOptions<React.ReactElement, AllowedMediaReferences>,
+    "renderers" | "elementRenderers" | "processMediaReferences"
+  >,
+): RenderToReactResult {
+  const { result, mediaReferences, isTruncated } = render<
+    React.ReactElement,
+    AllowedMediaReferences
+  >({
+    ...options,
+    renderers: reactReferenceRenderers,
+    elementRenderers: reactElementRenderers,
+    processMediaReferences,
+  });
+
+  return {
+    element: <Fragment>{result}</Fragment>,
+    mediaReferences,
+    isTruncated,
+  };
+}
+
+const markdownReferenceRenderers: Partial<ReferenceRenderers<string>> = {
+  ens: {
+    length(reference) {
+      return `@${reference.name}`.length;
+    },
+    render(reference) {
+      return `[@${reference.name}](${reference.url})`;
+    },
+  },
+  farcaster: {
+    length(reference) {
+      return `@${reference.fname}`.length;
+    },
+    render(reference) {
+      return `[@${reference.fname}](${reference.url})`;
+    },
+  },
+  erc20: {
+    length(reference) {
+      return `$${reference.symbol}`.length;
+    },
+    render(reference) {
+      return `$${reference.symbol}`;
+    },
+  },
+  image: {
+    length(reference) {
+      return reference.url.length;
+    },
+    render(reference) {
+      return `![Image](${reference.url})`;
+    },
+  },
+  video: {
+    length(reference) {
+      return reference.url.length;
+    },
+    render(reference) {
+      return `![Video](${reference.url})`;
+    },
+  },
+  file: {
+    length(reference) {
+      return reference.url.length;
+    },
+    render(reference) {
+      return `[${reference.url}](${reference.url})`;
+    },
+  },
+  webpage: {
+    length(reference) {
+      return reference.url.length;
+    },
+    render(reference) {
+      return `[${reference.url}](${reference.url})`;
+    },
+  },
+};
+
+const markdownElementRenderers: ElementRenderers<string> = {
+  paragraph(children) {
+    return children.join("").trim() + "\n\n";
+  },
+  text(text) {
+    return text;
+  },
+  url(url) {
+    return `[${url}](${url})`;
+  },
+};
+
+type RenderToMarkdownResult = Omit<
+  RenderResult<string, IndexerAPICommentReferenceSchemaType>,
+  "result"
+> & {
+  result: string;
+};
+
+export function renderToMarkdown(
+  options: Omit<
+    RenderOptions<string, IndexerAPICommentReferenceSchemaType>,
+    "renderers" | "elementRenderers" | "processMediaReferences"
+  >,
+): RenderToMarkdownResult {
+  const { result, mediaReferences, isTruncated } = render<
+    string,
+    IndexerAPICommentReferenceSchemaType
+  >({
+    ...options,
+    renderers: markdownReferenceRenderers,
+    elementRenderers: markdownElementRenderers,
+    processMediaReferences(content) {
+      return {
+        content,
+        mediaReferences: [], // swallow all media references because we are rendering everything to a string
+      };
+    },
+  });
+
+  return {
+    result: result.join(""),
     mediaReferences,
     isTruncated,
   };
