@@ -1,5 +1,20 @@
 # @ecp.eth/shared
 
+## 0.0.10
+
+### Patch Changes
+
+- 2d0a2e5: feat: add support to reactions
+- 42bbc62: feat(shared): simple markdown renderer
+- 42bbc62: fix(shared): consecutive lines merge in renderer
+- 08b79a5: feat: CommentMediaReference and CommentText components
+- cf11594: feat(shared): rate limiter
+- Updated dependencies [08b79a5]
+- Updated dependencies [2d0a2e5]
+- Updated dependencies [2119f39]
+- Updated dependencies [3d71868]
+  - @ecp.eth/sdk@0.0.22
+
 ## 0.0.9
 
 ### Patch Changes

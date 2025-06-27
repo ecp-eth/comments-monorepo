@@ -1,6 +1,6 @@
 {
   "name": "@ecp.eth/signer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -19,8 +19,8 @@
   },
   "peerDependencies": {
     "@privy-io/server-auth": "^1.26.0",
-    "@ecp.eth/sdk": "^0.0.21",
-    "@ecp.eth/shared": "^0.0.9"
+    "@ecp.eth/sdk": "^0.0.22",
+    "@ecp.eth/shared": "^0.0.10"
   },
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",
