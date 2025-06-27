@@ -9,7 +9,7 @@ import {
   encryptWebhookCallbackData,
 } from "../utils/webhook";
 import type { CommentSelectType } from "ponder:schema";
-import type { Hex } from "@ecp.eth/sdk/core";
+import { isZeroHex, type Hex } from "@ecp.eth/sdk/core";
 import { ensByAddressResolverService } from "./ens-by-address-resolver";
 import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver";
 
@@ -67,9 +67,11 @@ export class ModerationNotificationsService
     });
     const message = `🆕 New comment pending moderation
 
-ID: \`${comment.id}\`
-Author: \`${author}\`
-Target: \`${comment.targetUri}\`
+**ID**: \`${comment.id}\`
+**Channel ID**: \`${comment.channelId}\`
+**Author**: \`${author}\`
+**Target**: \`${comment.targetUri}\`
+**Parent ID**: \`${!comment.parentId || isZeroHex(comment.parentId) ? "None" : comment.parentId}\`
 
 Content:
 
@@ -120,31 +122,9 @@ ${renderResult.result}
 
   async updateMessageWithModerationStatus(
     messageId: number,
-    {
-      author: authorAddress,
-      id,
-      content,
-      moderationStatus,
-      targetUri,
-    }: CommentSelectType,
+    comment: CommentSelectType,
   ) {
-    const author = await resolveAuthor(authorAddress);
-
-    const statusEmoji = moderationStatus === "approved" ? "✅" : "❌";
-    const statusText =
-      moderationStatus === "approved" ? "Approved" : "Rejected";
-
-    const updatedMessage = `${statusEmoji} Comment ${statusText}
-
-ID: \`${id}\`
-Author: \`${author}\`
-Target: \`${targetUri}\`
-
-Content:
-
-${content}
-
-**Status: ${statusText}**`;
+    const updatedMessage = await renderMessageContent(comment);
 
     try {
       await this.bot.telegram.editMessageText(
@@ -158,7 +138,21 @@ ${content}
             is_disabled: true,
           },
           reply_markup: {
-            inline_keyboard: [], // Remove the action buttons
+            inline_keyboard: [
+              [
+                {
+                  callback_data: encryptWebhookCallbackData(
+                    this.telegramWebhookSecret,
+                    {
+                      action: "change",
+                      commentId: comment.id,
+                      timestamp: Date.now(),
+                    },
+                  ),
+                  text: "Change",
+                },
+              ],
+            ],
           },
         },
       );
@@ -169,7 +163,133 @@ ${content}
     }
   }
 
+  async updateMessageWithChangeAction(
+    messageId: number,
+    comment: CommentSelectType,
+  ) {
+    const updatedMessage = await renderMessageContent(comment);
+
+    try {
+      await this.bot.telegram.editMessageText(
+        this.channelId,
+        messageId,
+        undefined,
+        updatedMessage,
+        {
+          parse_mode: "Markdown",
+          link_preview_options: {
+            is_disabled: true,
+          },
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  callback_data: encryptWebhookCallbackData(
+                    this.telegramWebhookSecret,
+                    {
+                      action: "approve",
+                      commentId: comment.id,
+                      timestamp: Date.now(),
+                    },
+                  ),
+                  text: "Approve",
+                },
+                {
+                  callback_data: encryptWebhookCallbackData(
+                    this.telegramWebhookSecret,
+                    {
+                      action: "pending",
+                      commentId: comment.id,
+                      timestamp: Date.now(),
+                    },
+                  ),
+                  text: "Pending",
+                },
+              ],
+              [
+                {
+                  callback_data: encryptWebhookCallbackData(
+                    this.telegramWebhookSecret,
+                    {
+                      action: "reject",
+                      commentId: comment.id,
+                      timestamp: Date.now(),
+                    },
+                  ),
+                  text: "Reject",
+                },
+                {
+                  callback_data: encryptWebhookCallbackData(
+                    this.telegramWebhookSecret,
+                    {
+                      action: "cancel",
+                      commentId: comment.id,
+                      timestamp: Date.now(),
+                    },
+                  ),
+                  text: "Cancel",
+                },
+              ],
+            ],
+          },
+        },
+      );
+    } catch (e) {
+      console.error(
+        "ModerationNotificationsService: error editing message with change action",
+        e,
+      );
+
+      throw e;
+    }
+  }
+
   decryptWebhookCallbackData(data: string) {
     return decryptWebhookCallbackData(this.telegramWebhookSecret, data);
+  }
+}
+
+async function renderMessageContent(
+  comment: CommentSelectType,
+): Promise<string> {
+  const author = await resolveAuthor(comment.author);
+  const renderResult = renderToMarkdown({
+    content: comment.content,
+    references: comment.references,
+  });
+
+  const status = resolveModerationStatus(comment.moderationStatus);
+
+  return `
+  ${status.emoji} Comment ${status.text}
+
+**ID**: \`${comment.id}\`
+**Channel ID**: \`${comment.channelId}\`
+**Author**: \`${author}\`
+**Target**: \`${comment.targetUri}\`
+**Parent ID**: \`${!comment.parentId || isZeroHex(comment.parentId) ? "None" : comment.parentId}\`
+**Status**: ${status.emoji} ${status.text}
+
+Content:
+
+${renderResult.result}
+`.trim();
+}
+
+function resolveModerationStatus(
+  moderationStatus: CommentSelectType["moderationStatus"],
+): {
+  emoji: string;
+  text: string;
+} {
+  switch (moderationStatus) {
+    case "approved":
+      return { emoji: "✅", text: "Approved" };
+    case "rejected":
+      return { emoji: "❌", text: "Rejected" };
+    case "pending":
+      return { emoji: "⏳", text: "Pending" };
+    default:
+      return { emoji: "❓", text: "Unknown" };
   }
 }

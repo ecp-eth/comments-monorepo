@@ -2,10 +2,44 @@ import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod";
 
 const webhookCallbackDataSchema = z.object({
-  action: z.enum(["approve", "reject"]),
+  action: z.enum(["approve", "reject", "pending", "change", "cancel"]),
   commentId: HexSchema,
   timestamp: z.number().int().nonnegative(),
 });
+
+function getActionByte(action: WebhookCallbackData["action"]) {
+  switch (action) {
+    case "approve":
+      return 0x01;
+    case "reject":
+      return 0x02;
+    case "pending":
+      return 0x03;
+    case "change":
+      return 0x04;
+    case "cancel":
+      return 0x05;
+    default:
+      throw new Error(`Invalid action: ${action}`);
+  }
+}
+
+function getActionFromByte(actionByte: number) {
+  switch (actionByte) {
+    case 0x01:
+      return "approve";
+    case 0x02:
+      return "reject";
+    case 0x03:
+      return "pending";
+    case 0x04:
+      return "change";
+    case 0x05:
+      return "cancel";
+    default:
+      throw new Error(`Invalid action byte: ${actionByte}`);
+  }
+}
 
 export type WebhookCallbackData = z.infer<typeof webhookCallbackDataSchema>;
 
@@ -14,7 +48,7 @@ const MAX_WEBHOOK_DATA_SIZE = 64;
 
 // Compact binary format for webhook data
 function serializeWebhookData(data: WebhookCallbackData): Buffer {
-  const actionByte = data.action === "approve" ? 0x01 : 0x02; // 1 B
+  const actionByte = getActionByte(data.action); // 1 B
   const commentIdBuffer = Buffer.from(data.commentId.slice(2), "hex"); // Remove "0x" prefix, 32 B
   const timestampBuffer = Buffer.alloc(4); // 4B
   // Convert milliseconds to seconds to fit in 32-bit unsigned integer
@@ -31,8 +65,8 @@ function serializeWebhookData(data: WebhookCallbackData): Buffer {
 }
 
 function deserializeWebhookData(buffer: Buffer): WebhookCallbackData {
-  const actionByte = buffer[0];
-  const action = actionByte === 0x01 ? "approve" : "reject";
+  const actionByte = buffer[0] ?? -1;
+  const action = getActionFromByte(actionByte);
   const commentId = ("0x" +
     buffer.subarray(1, 33).toString("hex")) as `0x${string}`;
   const timestampInSeconds = buffer.readUInt32BE(33);
