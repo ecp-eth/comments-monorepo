@@ -86,6 +86,10 @@ export function CommentSectionGasless({
       };
     },
     async sendSignedData({ signature, signTypedDataParams }) {
+      if (!viewer) {
+        throw new Error("No viewer address found");
+      }
+
       const response = await fetch("/api/approval", {
         method: "POST",
         headers: {
@@ -95,6 +99,7 @@ export function CommentSectionGasless({
           {
             signTypedDataParams,
             authorSignature: signature,
+            authorAddress: viewer,
           } satisfies ChangeApprovalStatusRequestBodySchemaType,
           bigintReplacer, // because typed data contains a bigint when parsed using our zod schemas
         ),

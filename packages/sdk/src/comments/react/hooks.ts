@@ -51,11 +51,7 @@ export function useGaslessTransaction<
         "signTypedDataParams" in prepareResult
           ? prepareResult.signTypedDataParams
           : prepareResult;
-      const signature = await signTypedDataFn(
-        "signTypedDataParams" in prepareResult
-          ? prepareResult.signTypedDataParams
-          : prepareResult,
-      );
+      const signature = await signTypedDataFn(signTypedDataParams);
 
       const signedData = await props.sendSignedData({
         signTypedDataParams,
