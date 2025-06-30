@@ -328,11 +328,59 @@ const reactReferenceRenderers: Partial<ReferenceRenderers<React.ReactElement>> =
     },
   };
 
+function hashKey(str: string) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0; // Convert to 32bit int
+  }
+  return (hash >>> 0).toString(36); // unsigned
+}
+
+function randomKey() {
+  return Math.random().toString(36).substring(2, 15);
+}
+
+function generateKey(
+  child: React.ReactElement<
+    unknown,
+    string | React.JSXElementConstructor<unknown>
+  >,
+) {
+  if (typeof child === "string") {
+    return hashKey(child);
+  }
+
+  if (child.key) {
+    return child.key;
+  }
+
+  if (
+    typeof child.props === "object" &&
+    child.props != null &&
+    "children" in child.props &&
+    typeof child.props.children === "object" &&
+    child.props.children != null &&
+    Array.isArray(child.props.children)
+  ) {
+    return child.props.children.reduce((acc, child) => {
+      return acc + "|" + generateKey(child);
+    }, "");
+  }
+
+  return randomKey();
+}
 const reactElementRenderers: ElementRenderers<React.ReactElement> = {
   paragraph(children) {
+    const key =
+      children.length +
+      children.reduce((acc, child) => {
+        return acc + "|" + generateKey(child);
+      }, "");
+
     return (
-      <p key={children.length}>
-        {children.map((el, i) => cloneElement(el, { key: i }))}
+      <p key={key}>
+        {children.map((el, i) => cloneElement(el, { key: key + i }))}
       </p>
     );
   },
@@ -342,6 +390,7 @@ const reactElementRenderers: ElementRenderers<React.ReactElement> = {
   url(url) {
     return (
       <a
+        key={hashKey(url)}
         className="underline"
         href={url}
         rel="noopener noreferrer"
