@@ -1,4 +1,4 @@
-import { cloneElement, Fragment } from "react";
+import { cloneElement, Fragment, isValidElement } from "react";
 import type {
   IndexerAPICommentReferenceURLVideoSchemaType,
   IndexerAPICommentReferenceURLImageSchemaType,
@@ -342,10 +342,9 @@ function randomKey() {
 }
 
 function generateKey(
-  child: React.ReactElement<
-    unknown,
-    string | React.JSXElementConstructor<unknown>
-  >,
+  child:
+    | React.ReactElement<unknown, string | React.JSXElementConstructor<unknown>>
+    | string,
 ) {
   if (typeof child === "string") {
     return hashKey(child);
@@ -364,6 +363,9 @@ function generateKey(
     Array.isArray(child.props.children)
   ) {
     return child.props.children.reduce((acc, child) => {
+      if (typeof child !== "string" && !isValidElement(child)) {
+        return acc;
+      }
       return acc + "|" + generateKey(child);
     }, "");
   }
