@@ -337,48 +337,48 @@ function hashKey(str: string) {
   return (hash >>> 0).toString(36); // unsigned
 }
 
-function randomKey() {
-  return Math.random().toString(36).substring(2, 15);
-}
-
 function generateKey(
-  child:
+  element:
     | React.ReactElement<unknown, string | React.JSXElementConstructor<unknown>>
     | string,
-) {
-  if (typeof child === "string") {
-    return hashKey(child);
+): undefined | string {
+  if (typeof element === "string") {
+    return hashKey(element);
   }
 
-  if (child.key) {
-    return child.key;
+  if (element.key) {
+    return element.key;
   }
 
   if (
-    typeof child.props === "object" &&
-    child.props != null &&
-    "children" in child.props &&
-    typeof child.props.children === "object" &&
-    child.props.children != null &&
-    Array.isArray(child.props.children)
+    typeof element.props === "object" &&
+    element.props != null &&
+    "children" in element.props &&
+    typeof element.props.children === "object" &&
+    element.props.children != null &&
+    Array.isArray(element.props.children)
   ) {
-    return child.props.children.reduce((acc, child) => {
-      if (typeof child !== "string" && !isValidElement(child)) {
-        return acc;
-      }
-      return acc + "|" + generateKey(child);
-    }, "");
+    return element.props.children
+      .map((child: unknown, index: number): undefined | string => {
+        if (typeof child !== "string" && !isValidElement(child)) {
+          return;
+        }
+        return generateKey(child) ?? `key-${index.toString()}`;
+      })
+      .filter(Boolean)
+      .join("-");
   }
 
-  return randomKey();
+  return;
 }
+
 const reactElementRenderers: ElementRenderers<React.ReactElement> = {
   paragraph(children) {
-    const key =
-      children.length +
-      children.reduce((acc, child) => {
-        return acc + "|" + generateKey(child);
-      }, "");
+    const key = children
+      .map((child, index) => {
+        return generateKey(child) ?? `key-${index.toString()}`;
+      })
+      .join("-");
 
     return (
       <p key={key}>
