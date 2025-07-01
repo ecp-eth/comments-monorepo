@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchComments } from "@ecp.eth/sdk/indexer";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { publicEnv } from "@/publicEnv";
 import {
   COMMENTS_PER_PAGE,
@@ -19,22 +19,20 @@ import { useAccount } from "wagmi";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { CommentItem } from "../core/CommentItem";
 import { useCommentActions } from "./hooks/useCommentActions";
-import { createRootCommentsQueryKey } from "../core/queries";
 import { CommentActionsProvider } from "./context";
 import { chain } from "@/lib/wagmi";
+import { useQueryKeyCreators } from "@/hooks/useQueryKeyCreators";
+import { useCurrentUrl } from "@/hooks/useCurrentUrl";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
-  const [currentUrl, setCurrentUrl] = useState<string>("");
+  const currentUrl = useCurrentUrl();
+  const { createRootCommentsQueryKey } = useQueryKeyCreators();
   const queryKey = useMemo(
-    () => createRootCommentsQueryKey(viewer, currentUrl),
-    [currentUrl, viewer],
+    () => createRootCommentsQueryKey(),
+    [createRootCommentsQueryKey],
   );
-
-  useEffect(() => {
-    setCurrentUrl(window.location.href);
-  }, []);
 
   const { data, isSuccess, error, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
@@ -103,42 +101,45 @@ export function CommentSection() {
   }, [data]);
 
   return (
-    <CommentActionsProvider value={commentActions}>
-      <CommentSectionWrapper>
-        <h2 className="text-lg font-semibold mb-4">Comments</h2>
-        <CommentForm />
-        {error && <div>Error loading comments: {(error as Error).message}</div>}
-        {isSuccess && (
-          <>
-            {hasNewComments && (
-              <Button
-                className="mb-4"
-                onClick={() => fetchNewComments()}
-                variant="secondary"
-                size="sm"
-              >
-                Load new comments
-              </Button>
-            )}
-            {results.map((comment) => (
-              <CommentItem
-                key={`${comment.id}-${comment.deletedAt}`}
-                comment={comment}
-                connectedAddress={viewer}
-              />
-            ))}
-            {hasNextPage && (
-              <Button
-                onClick={() => fetchNextPage()}
-                variant="secondary"
-                size="sm"
-              >
-                Load More
-              </Button>
-            )}
-          </>
-        )}
-      </CommentSectionWrapper>
-    </CommentActionsProvider>
+    <>
+      <CommentActionsProvider value={commentActions}>
+        <CommentSectionWrapper>
+          <h2 className="text-lg font-semibold mb-4">Comments</h2>
+          <CommentForm />
+          {error && (
+            <div>Error loading comments: {(error as Error).message}</div>
+          )}
+          {isSuccess && (
+            <>
+              {hasNewComments && (
+                <Button
+                  className="mb-4"
+                  onClick={() => fetchNewComments()}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Load new comments
+                </Button>
+              )}
+              {results.map((comment) => (
+                <CommentItem
+                  key={`${comment.id}-${comment.deletedAt}`}
+                  comment={comment}
+                />
+              ))}
+              {hasNextPage && (
+                <Button
+                  onClick={() => fetchNextPage()}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Load More
+                </Button>
+              )}
+            </>
+          )}
+        </CommentSectionWrapper>
+      </CommentActionsProvider>
+    </>
   );
 }

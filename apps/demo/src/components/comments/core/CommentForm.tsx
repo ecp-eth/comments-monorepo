@@ -13,10 +13,6 @@ import type { Hex } from "viem";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
-import {
-  createCommentRepliesQueryKey,
-  createRootCommentsQueryKey,
-} from "./queries";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
@@ -38,6 +34,7 @@ import {
 import { publicEnv } from "@/publicEnv";
 import { GenerateUploadUrlResponseSchema } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
+import { useQueryKeyCreators } from "@/hooks/useQueryKeyCreators";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -372,15 +369,17 @@ export function CommentForm<TExtraSubmitData = unknown>({
 }: CommentFormProps<TExtraSubmitData>) {
   const { postComment } = useCommentActions<TExtraSubmitData>();
   const onSubmitStartRef = useFreshRef(onSubmitStart);
+  const { createRootCommentsQueryKey, createCommentRepliesQueryKey } =
+    useQueryKeyCreators();
 
   const handleSubmit = useCallback<OnSubmitFunction>(
     async ({ author, content, references }) => {
       let queryKey: QueryKey;
 
       if (parentId) {
-        queryKey = createCommentRepliesQueryKey(author, parentId);
+        queryKey = createCommentRepliesQueryKey(parentId);
       } else {
-        queryKey = createRootCommentsQueryKey(author, window.location.href);
+        queryKey = createRootCommentsQueryKey();
       }
 
       const result = await postComment({

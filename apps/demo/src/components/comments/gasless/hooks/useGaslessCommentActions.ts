@@ -18,8 +18,10 @@ import {
   useCommentRetryEdition,
   useCommentRetrySubmission,
   useCommentSubmission,
+  useFreshRef,
   useReactionRemoval,
   useReactionSubmission,
+  useRetrieveCommentFromQueryData,
 } from "@ecp.eth/shared/hooks";
 import type {
   PendingDeleteCommentOperationSchemaType,
@@ -35,6 +37,7 @@ import {
   TX_RECEIPT_TIMEOUT,
 } from "@/lib/constants";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
+import { useQueryKeyCreators } from "@/hooks/useQueryKeyCreators";
 
 type UseGaslessCommentActionsProps = {
   connectedAddress: Hex | undefined;
@@ -65,6 +68,8 @@ export function useGaslessCommentActions({
     COMMENT_REACTION_LIKE_CONTENT,
   );
   const likeReactionRemoval = useReactionRemoval(COMMENT_REACTION_LIKE_CONTENT);
+  const getCommentFromCache = useRetrieveCommentFromQueryData();
+  const { createCommentQueryKey } = useQueryKeyCreators();
 
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
@@ -328,12 +333,20 @@ export function useGaslessCommentActions({
   const likeComment = useCallback<OnLikeComment>(
     async (params) => {
       const {
-        comment,
-        queryKey: parentCommentQueryKey,
+        comment: commentFromParams,
         onBeforeStart,
         onFailed,
         onSuccess,
       } = params;
+
+      const queryKey = createCommentQueryKey(commentFromParams);
+
+      // always get comment from cache in case the component passed in a stale comment (due to cached var)
+      const comment = getCommentFromCache(commentFromParams.id, queryKey);
+
+      if (!comment) {
+        throw new Error("Comment not found in cache");
+      }
 
       onBeforeStart?.();
 
@@ -352,7 +365,7 @@ export function useGaslessCommentActions({
 
         likeReactionSubmission.start({
           ...params,
-          queryKey: parentCommentQueryKey,
+          queryKey,
           pendingOperation,
         });
 
@@ -369,7 +382,7 @@ export function useGaslessCommentActions({
 
         likeReactionSubmission.success({
           ...params,
-          queryKey: parentCommentQueryKey,
+          queryKey,
           pendingOperation,
         });
       } catch (e) {
@@ -378,7 +391,7 @@ export function useGaslessCommentActions({
         if (pendingOperation) {
           likeReactionSubmission.error({
             ...params,
-            queryKey: parentCommentQueryKey,
+            queryKey,
             pendingOperation,
           });
         }
@@ -386,17 +399,28 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [hasApproval, likeReactionSubmission, submitComment, wagmiConfig],
+    [
+      createCommentQueryKey,
+      getCommentFromCache,
+      hasApproval,
+      likeReactionSubmission,
+      submitComment,
+      wagmiConfig,
+    ],
   );
 
   const unlikeComment = useCallback<OnUnlikeComment>(
     async (params) => {
-      const {
-        comment,
-        queryKey: parentCommentQueryKey,
-        onBeforeStart,
-        onFailed,
-      } = params;
+      const { comment: commentFromParams, onBeforeStart, onFailed } = params;
+
+      const queryKey = createCommentQueryKey(commentFromParams);
+
+      // always get comment from cache in case the component passed in a stale comment (due to cached var)
+      const comment = getCommentFromCache(commentFromParams.id, queryKey);
+
+      if (!comment) {
+        throw new Error("Comment not found in cache");
+      }
 
       const reaction = comment.viewerReactions?.[
         COMMENT_REACTION_LIKE_CONTENT
@@ -409,7 +433,7 @@ export function useGaslessCommentActions({
       const reactionRemovalParams = {
         reactionId: reaction.id,
         parentCommentId: comment.id,
-        queryKey: parentCommentQueryKey,
+        queryKey,
       };
 
       try {
@@ -441,27 +465,56 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [deleteCommentMutation, hasApproval, likeReactionRemoval, wagmiConfig],
+    [
+      createCommentQueryKey,
+      deleteCommentMutation,
+      getCommentFromCache,
+      hasApproval,
+      likeReactionRemoval,
+      wagmiConfig,
+    ],
   );
+
+  const deleteCommentRef = useFreshRef(deleteComment);
+  const retryPostCommentRef = useFreshRef(retryPostComment);
+  const postCommentRef = useFreshRef(postComment);
+  const editCommentRef = useFreshRef(editComment);
+  const retryEditCommentRef = useFreshRef(retryEditComment);
+  const likeCommentRef = useFreshRef(likeComment);
+  const unlikeCommentRef = useFreshRef(unlikeComment);
 
   return useMemo(
     () => ({
-      deleteComment,
-      retryPostComment,
-      postComment,
-      editComment,
-      retryEditComment,
-      likeComment,
-      unlikeComment,
+      deleteComment: (params: Parameters<typeof deleteComment>[0]) => {
+        return deleteCommentRef.current(params);
+      },
+      retryPostComment: (params: Parameters<typeof retryPostComment>[0]) => {
+        return retryPostCommentRef.current(params);
+      },
+      postComment: (params: Parameters<typeof postComment>[0]) => {
+        return postCommentRef.current(params);
+      },
+      editComment: (params: Parameters<typeof editComment>[0]) => {
+        return editCommentRef.current(params);
+      },
+      retryEditComment: (params: Parameters<typeof retryEditComment>[0]) => {
+        return retryEditCommentRef.current(params);
+      },
+      likeComment: (params: Parameters<typeof likeComment>[0]) => {
+        return likeCommentRef.current(params);
+      },
+      unlikeComment: (params: Parameters<typeof unlikeComment>[0]) => {
+        return unlikeCommentRef.current(params);
+      },
     }),
     [
-      deleteComment,
-      retryPostComment,
-      postComment,
-      editComment,
-      retryEditComment,
-      likeComment,
-      unlikeComment,
+      deleteCommentRef,
+      retryPostCommentRef,
+      postCommentRef,
+      editCommentRef,
+      retryEditCommentRef,
+      likeCommentRef,
+      unlikeCommentRef,
     ],
   );
 }

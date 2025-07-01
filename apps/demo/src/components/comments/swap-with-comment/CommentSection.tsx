@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchComments } from "@ecp.eth/sdk/indexer";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { publicEnv } from "@/publicEnv";
 import {
   COMMENTS_PER_PAGE,
@@ -18,23 +18,21 @@ import { CommentForm } from "./CommentForm";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { useAccount } from "wagmi";
 import { CommentItem } from "../core/CommentItem";
-import { createRootCommentsQueryKey } from "../core/queries";
 import { useCommentActions } from "./hooks/useCommentActions";
 import { CommentActionsProvider } from "./context";
 import { chain } from "@/lib/wagmi";
+import { useQueryKeyCreators } from "@/hooks/useQueryKeyCreators";
+import { useCurrentUrl } from "@/hooks/useCurrentUrl";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
-  const [currentUrl, setCurrentUrl] = useState<string>("");
+  const currentUrl = useCurrentUrl();
+  const { createRootCommentsQueryKey } = useQueryKeyCreators();
   const queryKey = useMemo(
-    () => createRootCommentsQueryKey(viewer, currentUrl),
-    [currentUrl, viewer],
+    () => createRootCommentsQueryKey(),
+    [createRootCommentsQueryKey],
   );
-
-  useEffect(() => {
-    setCurrentUrl(window.location.href);
-  }, []);
 
   const { data, isSuccess, error, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
@@ -55,6 +53,7 @@ export function CommentSection() {
           signal,
           viewer,
           mode: "flat",
+          commentType: 0,
         });
       },
       refetchOnMount: false,
@@ -123,7 +122,6 @@ export function CommentSection() {
               <CommentItem
                 key={`${comment.id}-${comment.deletedAt}`}
                 comment={comment}
-                connectedAddress={viewer}
               />
             ))}
             {hasNextPage && (

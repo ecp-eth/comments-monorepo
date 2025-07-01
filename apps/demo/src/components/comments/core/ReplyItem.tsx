@@ -54,7 +54,7 @@ export function ReplyItem({
   const onLikeClick = useCallback(() => {
     likeComment({
       comment,
-      queryKey,
+
       onBeforeStart: () => setIsLiking(true),
       onSuccess: () => setIsLiking(false),
       onFailed: (e: unknown) => {
@@ -68,12 +68,12 @@ export function ReplyItem({
         toast.error("Failed to like");
       },
     });
-  }, [comment, likeComment, queryKey]);
+  }, [comment, likeComment]);
 
   const onUnlikeClick = useCallback(() => {
     unlikeComment({
       comment,
-      queryKey,
+
       onBeforeStart: () => setIsLiking(false),
       onFailed: (e: unknown) => {
         if (e instanceof Error) {
@@ -84,7 +84,7 @@ export function ReplyItem({
         toast.error("Failed to unlike");
       },
     });
-  }, [comment, unlikeComment, queryKey]);
+  }, [comment, unlikeComment]);
 
   return (
     <div className={"mb-4 border-gray-200 border-l-2 pl-4"}>

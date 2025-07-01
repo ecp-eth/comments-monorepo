@@ -108,10 +108,6 @@ export type OnLikeCommentParams = {
    */
   comment: Comment;
   /**
-   * Query key to a query where comment is stored
-   */
-  queryKey: QueryKey;
-  /**
    * Called before transaction was created.
    */
   onBeforeStart?: () => void;
@@ -130,10 +126,6 @@ export type OnUnlikeCommentParams = {
    * Comment to unlike
    */
   comment: Comment;
-  /**
-   * Query key to a query where comment is stored
-   */
-  queryKey: QueryKey;
   /**
    * Called before transaction was created.
    */

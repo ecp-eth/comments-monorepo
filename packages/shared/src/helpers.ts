@@ -8,7 +8,7 @@ import {
   type PendingEditCommentOperationSchemaType,
   type PendingPostCommentOperationSchemaType,
 } from "./schemas.js";
-import type { InfiniteData } from "@tanstack/react-query";
+import type { InfiniteData, QueryKey } from "@tanstack/react-query";
 import { clsx, type ClassValue } from "clsx";
 import type { Chain, Hex } from "viem";
 import { http } from "wagmi";

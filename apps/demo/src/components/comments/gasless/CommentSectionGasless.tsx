@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { createApprovalTypedData } from "@ecp.eth/sdk/comments";
 import {
@@ -36,9 +36,10 @@ import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { useGaslessCommentActions } from "./hooks/useGaslessCommentActions";
 import { CommentItem } from "../core/CommentItem";
 import { CommentForm } from "../core/CommentForm";
-import { createRootCommentsQueryKey } from "../core/queries";
 import { CommentActionsProvider } from "./context";
 import { toast } from "sonner";
+import { useQueryKeyCreators } from "@/hooks/useQueryKeyCreators";
+import { useCurrentUrl } from "@/hooks/useCurrentUrl";
 
 type CommentSectionGaslessProps = {
   disableApprovals?: boolean;
@@ -49,10 +50,11 @@ export function CommentSectionGasless({
 }: CommentSectionGaslessProps) {
   const { address: viewer } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
-  const [currentUrl, setCurrentUrl] = useState<string>("");
+  const currentUrl = useCurrentUrl();
+  const { createRootCommentsQueryKey } = useQueryKeyCreators();
   const queryKey = useMemo(
-    () => createRootCommentsQueryKey(viewer, currentUrl),
-    [currentUrl, viewer],
+    () => createRootCommentsQueryKey(),
+    [createRootCommentsQueryKey],
   );
 
   const revokeApproval = useRevokeApproval();
@@ -143,6 +145,7 @@ export function CommentSectionGasless({
           signal,
           viewer,
           mode: "flat",
+          commentType: 0,
         });
       },
       refetchOnMount: false,
@@ -219,10 +222,6 @@ export function CommentSectionGasless({
 
     toast.error(approveGaslessTransactionsMutation.error.message);
   }, [approveGaslessTransactionsMutation.error]);
-
-  useEffect(() => {
-    setCurrentUrl(window.location.href);
-  }, []);
 
   const commentGaslessProviderValue =
     useMemo<CommentGaslessProviderContextType>(
@@ -320,7 +319,6 @@ export function CommentSectionGasless({
                 <CommentItem
                   key={`${comment.id}-${comment.deletedAt}`}
                   comment={comment}
-                  connectedAddress={viewer}
                 />
               ))}
               {hasNextPage && (

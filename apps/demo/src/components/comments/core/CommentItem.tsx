@@ -12,25 +12,21 @@ import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import type { Hex } from "viem";
 import { CommentActionButton } from "./CommentActionButton";
 import { Comment } from "./Comment";
 import { useCommentActions } from "./CommentActionsContext";
 import { CommentEditForm, CommentForm } from "./CommentForm";
 import { ReplyItem } from "./ReplyItem";
-import {
-  createCommentRepliesQueryKey,
-  createRootCommentsQueryKey,
-} from "./queries";
 import { chain } from "@/lib/wagmi";
 import { toast } from "sonner";
+import { useAccount } from "wagmi";
+import { useQueryKeyCreators } from "@/hooks/useQueryKeyCreators";
 
 type CommentItemProps = {
-  connectedAddress: Hex | undefined;
   comment: CommentType;
 };
 
-export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
+export function CommentItem({ comment }: CommentItemProps) {
   const {
     deleteComment,
     retryPostComment,
@@ -41,13 +37,16 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  const { address: connectedAddress } = useAccount();
+  const { createRootCommentsQueryKey, createCommentRepliesQueryKey } =
+    useQueryKeyCreators();
   const rootQueryKey = useMemo(
-    () => createRootCommentsQueryKey(connectedAddress, window.location.href),
-    [connectedAddress],
+    () => createRootCommentsQueryKey(),
+    [createRootCommentsQueryKey],
   );
   const queryKey = useMemo(
-    () => createCommentRepliesQueryKey(connectedAddress, comment.id),
-    [comment.id, connectedAddress],
+    () => createCommentRepliesQueryKey(comment.id),
+    [comment.id, createCommentRepliesQueryKey],
   );
 
   const onReplyClick = useCallback(() => {
@@ -73,7 +72,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   const onLikeClick = useCallback(() => {
     likeComment({
       comment,
-      queryKey: rootQueryKey,
+
       onBeforeStart: () => setIsLiking(true),
       onSuccess: () => setIsLiking(false),
       onFailed: (e: unknown) => {
@@ -87,12 +86,12 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         toast.error("Failed to like");
       },
     });
-  }, [comment, likeComment, rootQueryKey]);
+  }, [comment, likeComment]);
 
   const onUnlikeClick = useCallback(() => {
     unlikeComment({
       comment,
-      queryKey: rootQueryKey,
+
       onBeforeStart: () => setIsLiking(false),
       onFailed: (e: unknown) => {
         if (e instanceof Error) {
@@ -103,7 +102,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         toast.error("Failed to unlike");
       },
     });
-  }, [comment, unlikeComment, rootQueryKey]);
+  }, [comment, unlikeComment]);
 
   const repliesQuery = useInfiniteQuery({
     enabled: comment.pendingOperation?.action !== "post",
@@ -138,6 +137,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         signal,
         viewer: connectedAddress,
         mode: "flat",
+        commentType: 0,
       });
 
       return CommentPageSchema.parse(response);
@@ -186,7 +186,6 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         <CommentEditForm
           comment={comment}
           queryKey={rootQueryKey}
-          key={`${comment.id}-${comment.deletedAt}-edit`}
           onCancel={() => {
             setIsEditing(false);
           }}
@@ -196,7 +195,6 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         />
       ) : (
         <Comment
-          key={`${comment.id}-${comment.deletedAt}`}
           comment={comment}
           onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}

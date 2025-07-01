@@ -10,3 +10,4 @@ export { useCommentEdition } from "./useCommentEdition.js";
 export { useCommentRetryEdition } from "./useCommentRetryEdition.js";
 export { useReactionSubmission } from "./useReactionSubmission.js";
 export { useReactionRemoval } from "./useReactionRemoval.js";
+export { useRetrieveCommentFromQueryData } from "./useRetrieveCommentFromQueryData.js";
