@@ -124,7 +124,6 @@ export function CommentSection() {
               <CommentItem
                 key={`${comment.id}-${comment.deletedAt}`}
                 comment={comment}
-                connectedAddress={viewer}
               />
             ))}
             {hasNextPage && (

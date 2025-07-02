@@ -24,13 +24,14 @@ import {
 } from "./queries";
 import { chain } from "@/lib/wagmi";
 import { toast } from "sonner";
+import { useAccount } from "wagmi";
+import { useConsumePendingWalletConnectionActions } from "./PendingWalletConnectionActionsContext";
 
 type CommentItemProps = {
-  connectedAddress: Hex | undefined;
   comment: CommentType;
 };
 
-export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
+export function CommentItem({ comment }: CommentItemProps) {
   const {
     deleteComment,
     retryPostComment,
@@ -38,6 +39,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
     likeComment,
     unlikeComment,
   } = useCommentActions();
+  const { address: connectedAddress } = useAccount();
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
@@ -138,6 +140,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         signal,
         viewer: connectedAddress,
         mode: "flat",
+        commentType: 0,
       });
 
       return CommentPageSchema.parse(response);
@@ -180,13 +183,18 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
     return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
   }, [repliesQuery.data?.pages]);
 
+  useConsumePendingWalletConnectionActions({
+    commentId: comment.id,
+    onLikeAction: onLikeClick,
+    onUnlikeAction: onUnlikeClick,
+  });
+
   return (
     <div className={cn("mb-4 border-gray-200")}>
       {isEditing ? (
         <CommentEditForm
           comment={comment}
           queryKey={rootQueryKey}
-          key={`${comment.id}-${comment.deletedAt}-edit`}
           onCancel={() => {
             setIsEditing(false);
           }}
@@ -196,7 +204,6 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         />
       ) : (
         <Comment
-          key={`${comment.id}-${comment.deletedAt}`}
           comment={comment}
           onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}

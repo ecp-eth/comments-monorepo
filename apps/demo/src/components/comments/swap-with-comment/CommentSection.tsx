@@ -55,6 +55,7 @@ export function CommentSection() {
           signal,
           viewer,
           mode: "flat",
+          commentType: 0,
         });
       },
       refetchOnMount: false,
@@ -123,7 +124,6 @@ export function CommentSection() {
               <CommentItem
                 key={`${comment.id}-${comment.deletedAt}`}
                 comment={comment}
-                connectedAddress={viewer}
               />
             ))}
             {hasNextPage && (

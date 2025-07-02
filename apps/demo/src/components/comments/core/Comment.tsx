@@ -127,7 +127,6 @@ export function Comment({
       <div className="mb-2">
         <CommentActionOrStatus
           comment={comment}
-          hasAccountConnected={!!connectedAddress}
           onRetryDeleteClick={onRetryDeleteClick}
           onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
