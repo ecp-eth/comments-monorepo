@@ -48,6 +48,14 @@ export async function POST(
   const { author, commentId, content, metadata, submitIfApproved } =
     passedCommentData;
 
+  if (content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      { content: ["Comment content too large"] },
+      { status: 413 },
+    );
+  }
+
   const rateLimitResult = await signCommentRateLimiter.isRateLimited(author);
 
   if (!rateLimitResult.success) {

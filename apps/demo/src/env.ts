@@ -61,6 +61,7 @@ const EnvSchema = z
       .default("0")
       .transform((val) => val === "1"),
     PINATA_JWT: z.string().nonempty(),
+    COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().default(1024 * 10),
   })
   .merge(publicEnvSchema)
   .merge(EthSubmitterEnvSchema.partial())

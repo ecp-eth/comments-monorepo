@@ -47,6 +47,8 @@ const EnvSchema = z
     ENS_RPC_URL: z.string().url(),
     ENSNODE_SUBGRAPH_URL: z.string().url().optional(),
     SIM_API_KEY: z.string().nonempty(),
+    COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().default(1024 * 10),
+    TELEGRAM_MESSAGE_LENGTH_LIMIT: z.coerce.number().default(4000),
   })
   .superRefine((vars, ctx) => {
     if (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) {

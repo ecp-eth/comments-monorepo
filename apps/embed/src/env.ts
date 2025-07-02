@@ -27,6 +27,7 @@ const ServerEnvSchema = z
     SENTRY_PROJECT: z.string().optional(),
     SENTRY_AUTH_TOKEN: z.string().optional(),
     PINATA_JWT: z.string().nonempty(),
+    COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().default(1024 * 10),
   })
   .merge(publicEnvSchema);
 
