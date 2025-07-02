@@ -353,21 +353,30 @@ function generateKey(
   if (
     typeof element.props === "object" &&
     element.props != null &&
-    "children" in element.props &&
-    typeof element.props.children === "object" &&
-    element.props.children != null &&
-    Array.isArray(element.props.children)
+    "children" in element.props
   ) {
-    return element.props.children
-      .map((child: unknown, index: number): undefined | string => {
-        if (typeof child !== "string" && !isValidElement(child)) {
-          return;
-        }
-        return generateKey(child) ?? `key-${index.toString()}`;
-      })
-      .filter(Boolean)
-      .join("-");
+    if (typeof element.props.children === "string") {
+      return hashKey(element.props.children);
+    }
+
+    if (
+      typeof element.props.children === "object" &&
+      element.props.children != null &&
+      Array.isArray(element.props.children)
+    ) {
+      return element.props.children
+        .map((child: unknown, index: number): undefined | string => {
+          if (typeof child !== "string" && !isValidElement(child)) {
+            return;
+          }
+          return generateKey(child) ?? `key-inner-${index.toString()}`;
+        })
+        .filter(Boolean)
+        .join("-");
+    }
   }
+
+  console.warn("No key found for element", element);
 
   return;
 }
