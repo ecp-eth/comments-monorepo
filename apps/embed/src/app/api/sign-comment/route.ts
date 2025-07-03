@@ -35,7 +35,7 @@ export async function POST(req: Request) {
   if (content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
     return Response.json(
       {
-        error: "Comment content too large",
+        error: "Comment content length limit exceeded",
       },
       { status: 413 },
     );
