@@ -12,6 +12,7 @@ import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
+import { ContractFunctionExecutionError } from "viem";
 import { CommentActionButton } from "./CommentActionButton";
 import { Comment } from "./Comment";
 import { useCommentActions } from "./CommentActionsContext";
@@ -26,6 +27,7 @@ import { toast } from "sonner";
 import { useAccount } from "wagmi";
 import { useConsumePendingWalletConnectionActions } from "./PendingWalletConnectionActionsContext";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
+import { getSimplifiedErrorMessageFromContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 
 type CommentItemProps = {
   comment: CommentType;
@@ -81,12 +83,17 @@ export function CommentItem({ comment }: CommentItemProps) {
       onFailed: (e: unknown) => {
         setIsLiking(false);
 
-        if (e instanceof Error) {
-          toast.error(e.message);
+        if (!(e instanceof Error)) {
+          toast.error("Failed to like");
           return;
         }
 
-        toast.error("Failed to like");
+        const message =
+          e instanceof ContractFunctionExecutionError
+            ? getSimplifiedErrorMessageFromContractFunctionExecutionError(e)
+            : e.message;
+
+        toast.error(message);
       },
     });
   }, [comment, likeComment, rootQueryKey]);
@@ -97,12 +104,17 @@ export function CommentItem({ comment }: CommentItemProps) {
       queryKey: rootQueryKey,
       onBeforeStart: () => setIsLiking(false),
       onFailed: (e: unknown) => {
-        if (e instanceof Error) {
-          toast.error(e.message);
+        if (!(e instanceof Error)) {
+          toast.error("Failed to unlike");
           return;
         }
 
-        toast.error("Failed to unlike");
+        const message =
+          e instanceof ContractFunctionExecutionError
+            ? getSimplifiedErrorMessageFromContractFunctionExecutionError(e)
+            : e.message;
+
+        toast.error(message);
       },
     });
   }, [comment, unlikeComment, rootQueryKey]);
