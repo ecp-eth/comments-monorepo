@@ -1,4 +1,4 @@
-import { cloneElement, Fragment } from "react";
+import { cloneElement, Fragment, isValidElement } from "react";
 import type {
   IndexerAPICommentReferenceURLVideoSchemaType,
   IndexerAPICommentReferenceURLImageSchemaType,
@@ -328,11 +328,70 @@ const reactReferenceRenderers: Partial<ReferenceRenderers<React.ReactElement>> =
     },
   };
 
+function hashKey(str: string) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0; // Convert to 32bit int
+  }
+  return (hash >>> 0).toString(36); // unsigned
+}
+
+function generateKey(
+  element:
+    | React.ReactElement<unknown, string | React.JSXElementConstructor<unknown>>
+    | string,
+): undefined | string {
+  if (typeof element === "string") {
+    return hashKey(element);
+  }
+
+  if (element.key) {
+    return element.key;
+  }
+
+  if (
+    typeof element.props === "object" &&
+    element.props != null &&
+    "children" in element.props
+  ) {
+    if (typeof element.props.children === "string") {
+      return hashKey(element.props.children);
+    }
+
+    if (
+      typeof element.props.children === "object" &&
+      element.props.children != null &&
+      Array.isArray(element.props.children)
+    ) {
+      return element.props.children
+        .map((child: unknown, index: number): undefined | string => {
+          if (typeof child !== "string" && !isValidElement(child)) {
+            return;
+          }
+          return generateKey(child) ?? `key-inner-${index.toString()}`;
+        })
+        .filter(Boolean)
+        .join("-");
+    }
+  }
+
+  console.warn("No key found for element", element);
+
+  return;
+}
+
 const reactElementRenderers: ElementRenderers<React.ReactElement> = {
   paragraph(children) {
+    const key = children
+      .map((child, index) => {
+        return generateKey(child) ?? `key-${index.toString()}`;
+      })
+      .join("-");
+
     return (
-      <p key={children.length}>
-        {children.map((el, i) => cloneElement(el, { key: i }))}
+      <p key={key}>
+        {children.map((el, i) => cloneElement(el, { key: key + i }))}
       </p>
     );
   },
@@ -342,6 +401,7 @@ const reactElementRenderers: ElementRenderers<React.ReactElement> = {
   url(url) {
     return (
       <a
+        key={hashKey(url)}
         className="underline"
         href={url}
         rel="noopener noreferrer"
