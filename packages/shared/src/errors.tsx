@@ -37,7 +37,7 @@ export class RateLimitedError extends CommentFormSubmitError {
 }
 
 export class CommentContentTooLargeError extends CommentFormSubmitError {
-  constructor(message = "Comment content too large") {
+  constructor(message = "Comment content length limit exceeded") {
     super(<span className="inline-flex">{message}</span>);
   }
 }

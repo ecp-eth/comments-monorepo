@@ -4,11 +4,7 @@ import { useAccount } from "wagmi";
 import { ImageIcon } from "lucide-react";
 import { CommentBoxAuthor } from "./CommentBoxAuthor";
 import { z } from "zod";
-import {
-  CommentContentTooLargeError,
-  CommentFormSubmitError,
-  InvalidCommentError,
-} from "@ecp.eth/shared/errors";
+import { InvalidCommentError } from "@ecp.eth/shared/errors";
 import { CommentFormErrors } from "@ecp.eth/shared/components/CommentFormErrors";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import { useCommentActions } from "./CommentActionsContext";

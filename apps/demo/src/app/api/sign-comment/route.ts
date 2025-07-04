@@ -44,7 +44,7 @@ export async function POST(
     return new JSONResponse(
       BadRequestResponseSchema,
       {
-        content: ["Comment content too large"],
+        content: ["Comment content length limit exceeded"],
       },
       { status: 413 },
     );
