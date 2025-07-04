@@ -29,7 +29,7 @@ import type {
   SignEditCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
 import type { DistributiveOmit } from "@ecp.eth/shared/types";
-import { getSimplifiedErrorMessageFromContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 
 export class SubmitCommentMutationError extends Error {}
 export class SubmitEditCommentMutationError extends Error {}
@@ -141,8 +141,7 @@ export async function submitCommentMutationFunction({
     };
   } catch (e) {
     if (e instanceof ContractFunctionExecutionError) {
-      const simplifiedErrorMessage =
-        getSimplifiedErrorMessageFromContractFunctionExecutionError(e);
+      const simplifiedErrorMessage = formatContractFunctionExecutionError(e);
 
       if (simplifiedErrorMessage) {
         throw new SubmitCommentMutationError(simplifiedErrorMessage);

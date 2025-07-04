@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { useAccount } from "wagmi";
 import { useConsumePendingWalletConnectionActions } from "./PendingWalletConnectionActionsContext";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
-import { getSimplifiedErrorMessageFromContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 
 type CommentItemProps = {
   comment: CommentType;
@@ -90,7 +90,7 @@ export function CommentItem({ comment }: CommentItemProps) {
 
         const message =
           e instanceof ContractFunctionExecutionError
-            ? getSimplifiedErrorMessageFromContractFunctionExecutionError(e)
+            ? formatContractFunctionExecutionError(e)
             : e.message;
 
         toast.error(message);
@@ -111,7 +111,7 @@ export function CommentItem({ comment }: CommentItemProps) {
 
         const message =
           e instanceof ContractFunctionExecutionError
-            ? getSimplifiedErrorMessageFromContractFunctionExecutionError(e)
+            ? formatContractFunctionExecutionError(e)
             : e.message;
 
         toast.error(message);

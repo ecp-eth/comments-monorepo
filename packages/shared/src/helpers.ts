@@ -740,7 +740,7 @@ export function getNetworkFromProcessEnv(
   return networks;
 }
 
-export function getSimplifiedErrorMessageFromContractFunctionExecutionError(
+export function formatContractFunctionExecutionError(
   error: ContractFunctionExecutionError,
 ) {
   if (error.shortMessage.includes("User rejected the request")) {

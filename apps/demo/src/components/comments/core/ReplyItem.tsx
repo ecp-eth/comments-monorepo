@@ -4,8 +4,9 @@ import { useCallback, useState } from "react";
 import type { QueryKey } from "@tanstack/react-query";
 import { CommentEditForm, CommentForm } from "./CommentForm";
 import { useCommentActions } from "./CommentActionsContext";
-import type { Hex } from "viem";
+import { ContractFunctionExecutionError, type Hex } from "viem";
 import { toast } from "sonner";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 
 type ReplyItemProps = {
   comment: CommentType;
@@ -60,12 +61,17 @@ export function ReplyItem({
       onFailed: (e: unknown) => {
         setIsLiking(false);
 
-        if (e instanceof Error) {
-          toast.error(e.message);
+        if (!(e instanceof Error)) {
+          toast.error("Failed to like");
           return;
         }
 
-        toast.error("Failed to like");
+        const message =
+          e instanceof ContractFunctionExecutionError
+            ? formatContractFunctionExecutionError(e)
+            : e.message;
+
+        toast.error(message);
       },
     });
   }, [comment, likeComment, queryKey]);
@@ -76,12 +82,19 @@ export function ReplyItem({
       queryKey,
       onBeforeStart: () => setIsLiking(false),
       onFailed: (e: unknown) => {
-        if (e instanceof Error) {
-          toast.error(e.message);
+        setIsLiking(false);
+
+        if (!(e instanceof Error)) {
+          toast.error("Failed to like");
           return;
         }
 
-        toast.error("Failed to unlike");
+        const message =
+          e instanceof ContractFunctionExecutionError
+            ? formatContractFunctionExecutionError(e)
+            : e.message;
+
+        toast.error(message);
       },
     });
   }, [comment, unlikeComment, queryKey]);
