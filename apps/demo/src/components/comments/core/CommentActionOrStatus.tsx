@@ -7,7 +7,7 @@ import { HeartAnimation } from "@/components/animations/Heart";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@/lib/constants";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import { useAccount } from "wagmi";
-import { useAppendPendingWalletConnectionAction } from "./PendingWalletConnectionActionsContext";
+import { usePendingWalletConnectionActionsContext } from "./PendingWalletConnectionActionsContext";
 
 export function CommentActionOrStatus({
   comment,
@@ -52,8 +52,7 @@ export function CommentActionOrStatus({
   const onUnlikeClickRef = useFreshRef(onUnlikeClick);
   const onReplyClickRef = useFreshRef(onReplyClick);
   const connectAccount = useConnectAccount();
-  const appendPendingWalletConnectionAction =
-    useAppendPendingWalletConnectionAction();
+  const { addAction } = usePendingWalletConnectionActionsContext();
 
   const hasAccountConnected = !!connectedAddress;
 
@@ -163,7 +162,7 @@ export function CommentActionOrStatus({
           pending={isLiking}
           onIsHeartedChange={connectBeforeAction((isHearted) => {
             if (!hasAccountConnected) {
-              appendPendingWalletConnectionAction({
+              addAction({
                 type: isHearted ? "like" : "unlike",
                 commentId: comment.id,
               });

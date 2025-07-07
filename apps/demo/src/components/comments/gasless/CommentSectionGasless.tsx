@@ -40,6 +40,7 @@ import { CommentForm } from "../core/CommentForm";
 import { createRootCommentsQueryKey } from "../core/queries";
 import { CommentActionsProvider } from "./context";
 import { toast } from "sonner";
+import { useConnectedAction } from "./hooks/useConnectedAction";
 
 type CommentSectionGaslessProps = {
   disableApprovals?: boolean;
@@ -350,26 +351,4 @@ export function CommentSectionGasless({
       </CommentGaslessProvider>
     </CommentActionsProvider>
   );
-}
-
-function useConnectedAction(action: () => unknown) {
-  const approvalStatus = useApprovalStatus();
-  const [requestApprovalOnConnect, setRequestApprovalOnConnect] =
-    useState(false);
-  const { address: connectedAddress } = useAccount();
-
-  useEffect(() => {
-    if (
-      requestApprovalOnConnect &&
-      connectedAddress &&
-      !approvalStatus.isPending
-    ) {
-      action();
-      setRequestApprovalOnConnect(false);
-    }
-  }, [action, connectedAddress, requestApprovalOnConnect, approvalStatus]);
-
-  return {
-    setRequestApprovalOnConnect,
-  };
 }

@@ -499,9 +499,10 @@ export function useCommentActions({
         onFailed,
       } = params;
 
-      const reaction = comment.viewerReactions?.[
-        COMMENT_REACTION_LIKE_CONTENT
-      ]?.find((reaction) => reaction.parentId === comment.id);
+      const reactions =
+        comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT] ?? [];
+
+      const reaction = reactions[reactions.length - 1];
 
       if (!reaction) {
         throw new Error("Reaction not found");

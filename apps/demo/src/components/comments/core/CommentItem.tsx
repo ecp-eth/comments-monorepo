@@ -12,7 +12,6 @@ import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import type { Hex } from "viem";
 import { CommentActionButton } from "./CommentActionButton";
 import { Comment } from "./Comment";
 import { useCommentActions } from "./CommentActionsContext";
