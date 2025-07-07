@@ -112,7 +112,6 @@
     "zod": "^3.24.2"
   },
   "dependencies": {
-    "effect": "^3.12.9",
     "lz-ts": "^1.1.2"
   },
   "peerDependencies": {

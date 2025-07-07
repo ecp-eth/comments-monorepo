@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { runAsync } from "../core/utils.js";
 import { HexSchema, type Hex } from "../core/schemas.js";
 import {
   IndexerAPIListCommentRepliesSchema,
@@ -150,81 +150,81 @@ export async function fetchComments(
     moderationStatus,
   } = FetchCommentsOptionsSchema.parse(options);
 
-  const fetchCommentsTask = Effect.tryPromise(async (signal) => {
-    const url = new URL("/api/comments", apiUrl);
+  return runAsync(
+    async (signal) => {
+      const url = new URL("/api/comments", apiUrl);
 
-    if (targetUri) {
-      url.searchParams.set("targetUri", targetUri);
-    }
+      if (targetUri) {
+        url.searchParams.set("targetUri", targetUri);
+      }
 
-    if (author) {
-      url.searchParams.set("author", author);
-    }
+      if (author) {
+        url.searchParams.set("author", author);
+      }
 
-    if (Array.isArray(chainId)) {
-      url.searchParams.set("chainId", chainId.join(","));
-    } else {
-      url.searchParams.set("chainId", chainId.toString());
-    }
+      if (Array.isArray(chainId)) {
+        url.searchParams.set("chainId", chainId.join(","));
+      } else {
+        url.searchParams.set("chainId", chainId.toString());
+      }
 
-    url.searchParams.set("sort", sort);
-    url.searchParams.set("limit", limit.toString());
+      url.searchParams.set("sort", sort);
+      url.searchParams.set("limit", limit.toString());
 
-    if (app) {
-      url.searchParams.set("app", app);
-    }
+      if (app) {
+        url.searchParams.set("app", app);
+      }
 
-    if (cursor) {
-      url.searchParams.set("cursor", cursor);
-    }
+      if (cursor) {
+        url.searchParams.set("cursor", cursor);
+      }
 
-    if (viewer) {
-      url.searchParams.set("viewer", viewer);
-    }
+      if (viewer) {
+        url.searchParams.set("viewer", viewer);
+      }
 
-    if (mode) {
-      url.searchParams.set("mode", mode);
-    }
+      if (mode) {
+        url.searchParams.set("mode", mode);
+      }
 
-    // channelId can be 0
-    if (channelId != null) {
-      url.searchParams.set("channelId", channelId.toString());
-    }
+      // channelId can be 0
+      if (channelId != null) {
+        url.searchParams.set("channelId", channelId.toString());
+      }
 
-    // commentType can be 0
-    if (commentType != null) {
-      url.searchParams.set("commentType", commentType.toString());
-    }
+      // commentType can be 0
+      if (commentType != null) {
+        url.searchParams.set("commentType", commentType.toString());
+      }
 
-    if (typeof moderationStatus === "string") {
-      url.searchParams.set("moderationStatus", moderationStatus);
-    } else if (Array.isArray(moderationStatus) && moderationStatus.length > 0) {
-      url.searchParams.set("moderationStatus", moderationStatus.join(","));
-    }
+      if (typeof moderationStatus === "string") {
+        url.searchParams.set("moderationStatus", moderationStatus);
+      } else if (
+        Array.isArray(moderationStatus) &&
+        moderationStatus.length > 0
+      ) {
+        url.searchParams.set("moderationStatus", moderationStatus.join(","));
+      }
 
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-cache",
-      signal,
-    });
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-cache",
+        signal,
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch comments: ${response.statusText}`);
-    }
+      if (!response.ok) {
+        throw new Error(`Failed to fetch comments: ${response.statusText}`);
+      }
 
-    const responseData = await response.json();
+      const responseData = await response.json();
 
-    return IndexerAPIListCommentsSchema.parse(responseData);
-  });
-
-  const repeatableTask = Effect.retry(fetchCommentsTask, {
-    times: retries,
-  });
-
-  return Effect.runPromise(repeatableTask, { signal });
+      return IndexerAPIListCommentsSchema.parse(responseData);
+    },
+    { signal, retries },
+  );
 }
 
 /**
@@ -344,73 +344,73 @@ export async function fetchCommentReplies(
     moderationStatus,
   } = FetchCommentRepliesOptionSchema.parse(options);
 
-  const fetchRepliesTask = Effect.tryPromise(async (signal) => {
-    const url = new URL(`/api/comments/${commentId}/replies`, apiUrl);
+  return runAsync(
+    async (signal) => {
+      const url = new URL(`/api/comments/${commentId}/replies`, apiUrl);
 
-    if (Array.isArray(chainId)) {
-      url.searchParams.set("chainId", chainId.join(","));
-    } else {
-      url.searchParams.set("chainId", chainId.toString());
-    }
+      if (Array.isArray(chainId)) {
+        url.searchParams.set("chainId", chainId.join(","));
+      } else {
+        url.searchParams.set("chainId", chainId.toString());
+      }
 
-    url.searchParams.set("limit", limit.toString());
-    url.searchParams.set("sort", sort);
+      url.searchParams.set("limit", limit.toString());
+      url.searchParams.set("sort", sort);
 
-    if (app) {
-      url.searchParams.set("app", app);
-    }
+      if (app) {
+        url.searchParams.set("app", app);
+      }
 
-    if (cursor) {
-      url.searchParams.set("cursor", cursor);
-    }
+      if (cursor) {
+        url.searchParams.set("cursor", cursor);
+      }
 
-    if (viewer) {
-      url.searchParams.set("viewer", viewer);
-    }
+      if (viewer) {
+        url.searchParams.set("viewer", viewer);
+      }
 
-    if (mode) {
-      url.searchParams.set("mode", mode);
-    }
+      if (mode) {
+        url.searchParams.set("mode", mode);
+      }
 
-    // channelId can be 0
-    if (channelId != null) {
-      url.searchParams.set("channelId", channelId.toString());
-    }
+      // channelId can be 0
+      if (channelId != null) {
+        url.searchParams.set("channelId", channelId.toString());
+      }
 
-    // commentType can be 0
-    if (commentType != null) {
-      url.searchParams.set("commentType", commentType.toString());
-    }
+      // commentType can be 0
+      if (commentType != null) {
+        url.searchParams.set("commentType", commentType.toString());
+      }
 
-    if (typeof moderationStatus === "string") {
-      url.searchParams.set("moderationStatus", moderationStatus);
-    } else if (Array.isArray(moderationStatus) && moderationStatus.length > 0) {
-      url.searchParams.set("moderationStatus", moderationStatus.join(","));
-    }
+      if (typeof moderationStatus === "string") {
+        url.searchParams.set("moderationStatus", moderationStatus);
+      } else if (
+        Array.isArray(moderationStatus) &&
+        moderationStatus.length > 0
+      ) {
+        url.searchParams.set("moderationStatus", moderationStatus.join(","));
+      }
 
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-cache",
-      signal,
-    });
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-cache",
+        signal,
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch replies: ${response.statusText}`);
-    }
+      if (!response.ok) {
+        throw new Error(`Failed to fetch replies: ${response.statusText}`);
+      }
 
-    const responseData = await response.json();
+      const responseData = await response.json();
 
-    return IndexerAPIListCommentRepliesSchema.parse(responseData);
-  });
-
-  const repeatableTask = Effect.retry(fetchRepliesTask, {
-    times: retries,
-  });
-
-  return Effect.runPromise(repeatableTask, { signal });
+      return IndexerAPIListCommentRepliesSchema.parse(responseData);
+    },
+    { signal, retries },
+  );
 }
 
 /**
@@ -454,32 +454,29 @@ export async function fetchAuthorData(
   const { address, retries, apiUrl, signal } =
     FetchAuthorDataOptionsSchema.parse(options);
 
-  const fetchAuthorTask = Effect.tryPromise(async (signal) => {
-    const url = new URL(`/api/authors/${address}`, apiUrl);
+  return runAsync(
+    async (signal) => {
+      const url = new URL(`/api/authors/${address}`, apiUrl);
 
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-cache",
-      signal,
-    });
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-cache",
+        signal,
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch author data: ${response.statusText}`);
-    }
+      if (!response.ok) {
+        throw new Error(`Failed to fetch author data: ${response.statusText}`);
+      }
 
-    const responseData = await response.json();
+      const responseData = await response.json();
 
-    return IndexerAPIAuthorDataSchema.parse(responseData);
-  });
-
-  const repeatableTask = Effect.retry(fetchAuthorTask, {
-    times: retries,
-  });
-
-  return Effect.runPromise(repeatableTask, { signal });
+      return IndexerAPIAuthorDataSchema.parse(responseData);
+    },
+    { signal, retries },
+  );
 }
 
 /**
@@ -523,8 +520,8 @@ export async function isMuted(options: IsMutedOptions): Promise<boolean> {
   const { address, apiUrl, retries, signal } =
     isMutedOptionsSchema.parse(options);
 
-  const isMutedTask = Effect.retry(
-    Effect.tryPromise(async (signal) => {
+  return runAsync(
+    async (signal) => {
       const url = new URL(`/api/muted-accounts/${address}`, apiUrl);
 
       const response = await fetch(url.toString(), {
@@ -544,13 +541,9 @@ export async function isMuted(options: IsMutedOptions): Promise<boolean> {
       throw new Error(
         `Failed to check if address is muted: ${response.statusText} (${response.status})`,
       );
-    }),
-    {
-      times: retries,
     },
+    { signal, retries },
   );
-
-  return Effect.runPromise(isMutedTask, { signal });
 }
 
 /**
@@ -618,49 +611,46 @@ export async function fetchChannels(
   const { apiUrl, limit, cursor, retries, sort, signal, owner, chainId } =
     FetchChannelsOptionsSchema.parse(options);
 
-  const fetchChannelsTask = Effect.tryPromise(async (signal) => {
-    const url = new URL("/api/channels", apiUrl);
+  return runAsync(
+    async (signal) => {
+      const url = new URL("/api/channels", apiUrl);
 
-    url.searchParams.set("sort", sort);
-    url.searchParams.set("limit", limit.toString());
+      url.searchParams.set("sort", sort);
+      url.searchParams.set("limit", limit.toString());
 
-    if (cursor) {
-      url.searchParams.set("cursor", cursor);
-    }
+      if (cursor) {
+        url.searchParams.set("cursor", cursor);
+      }
 
-    if (owner) {
-      url.searchParams.set("owner", owner);
-    }
+      if (owner) {
+        url.searchParams.set("owner", owner);
+      }
 
-    if (Array.isArray(chainId)) {
-      url.searchParams.set("chainId", chainId.join(","));
-    } else {
-      url.searchParams.set("chainId", chainId.toString());
-    }
+      if (Array.isArray(chainId)) {
+        url.searchParams.set("chainId", chainId.join(","));
+      } else {
+        url.searchParams.set("chainId", chainId.toString());
+      }
 
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-cache",
-      signal,
-    });
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-cache",
+        signal,
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch channels: ${response.statusText}`);
-    }
+      if (!response.ok) {
+        throw new Error(`Failed to fetch channels: ${response.statusText}`);
+      }
 
-    const responseData = await response.json();
+      const responseData = await response.json();
 
-    return IndexerAPIListChannelsSchema.parse(responseData);
-  });
-
-  const repeatableTask = Effect.retry(fetchChannelsTask, {
-    times: retries,
-  });
-
-  return Effect.runPromise(repeatableTask, { signal });
+      return IndexerAPIListChannelsSchema.parse(responseData);
+    },
+    { signal, retries },
+  );
 }
 
 /**
@@ -704,32 +694,29 @@ export async function fetchChannel(
   const { channelId, apiUrl, retries, signal } =
     FetchChannelOptionsSchema.parse(options);
 
-  const fetchChannelTask = Effect.tryPromise(async (signal) => {
-    const url = new URL(`/api/channels/${channelId}`, apiUrl);
+  return runAsync(
+    async (signal) => {
+      const url = new URL(`/api/channels/${channelId}`, apiUrl);
 
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-cache",
-      signal,
-    });
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-cache",
+        signal,
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch channel: ${response.statusText}`);
-    }
+      if (!response.ok) {
+        throw new Error(`Failed to fetch channel: ${response.statusText}`);
+      }
 
-    const responseData = await response.json();
+      const responseData = await response.json();
 
-    return IndexerAPIChannelOutputSchema.parse(responseData);
-  });
-
-  const repeatableTask = Effect.retry(fetchChannelTask, {
-    times: retries,
-  });
-
-  return Effect.runPromise(repeatableTask, { signal });
+      return IndexerAPIChannelOutputSchema.parse(responseData);
+    },
+    { signal, retries },
+  );
 }
 
 /**
@@ -779,33 +766,30 @@ export async function fetchAutocomplete(
   const { query, char, apiUrl, retries, signal } =
     FetchAutocompleteOptionsSchema.parse(options);
 
-  const fetchAutocompleteTask = Effect.tryPromise(async (signal) => {
-    const url = new URL("/api/autocomplete", apiUrl);
+  return runAsync(
+    async (signal) => {
+      const url = new URL("/api/autocomplete", apiUrl);
 
-    url.searchParams.set("query", query);
-    url.searchParams.set("char", char);
+      url.searchParams.set("query", query);
+      url.searchParams.set("char", char);
 
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-cache",
-      signal,
-    });
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-cache",
+        signal,
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch autocomplete: ${response.statusText}`);
-    }
+      if (!response.ok) {
+        throw new Error(`Failed to fetch autocomplete: ${response.statusText}`);
+      }
 
-    const responseData = await response.json();
+      const responseData = await response.json();
 
-    return IndexerAPIGetAutocompleteOutputSchema.parse(responseData);
-  });
-
-  const repeatableTask = Effect.retry(fetchAutocompleteTask, {
-    times: retries,
-  });
-
-  return Effect.runPromise(repeatableTask, { signal });
+      return IndexerAPIGetAutocompleteOutputSchema.parse(responseData);
+    },
+    { signal, retries },
+  );
 }
