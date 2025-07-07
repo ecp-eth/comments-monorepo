@@ -311,6 +311,13 @@ export const IndexerAPICommentSchema = z.object({
   cursor: HexSchema,
   moderationStatus: IndexerAPICommentModerationStatusSchema,
   moderationStatusChangedAt: z.coerce.date(),
+  moderationClassifierResult: z.array(
+    z.object({
+      label: z.string(),
+      score: z.number(),
+    }),
+  ),
+  moderationClassifierScore: z.number(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   revision: z.number().int(),
