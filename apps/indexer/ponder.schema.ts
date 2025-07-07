@@ -35,6 +35,7 @@ export const comment = onchainTable(
     moderationStatusChangedAt: t.timestamp({ withTimezone: true }).notNull(),
     moderationClassifierResult: t
       .jsonb()
+      .notNull()
       .$type<CommentModerationLabelWithScore[]>()
       .default([]),
     // keeps the highest score of the moderation labels, can be used to find out if there is any label
