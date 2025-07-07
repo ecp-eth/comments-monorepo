@@ -4,7 +4,7 @@ import type {
   IndexerAPICommentZeroExSwapSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import type { IndexerAPIMetadataSchemaType } from "@ecp.eth/sdk/indexer/schemas";
-import { CommentModerationClassfierResult } from "./src/services/comment-moderation-classifier";
+import type { CommentModerationLabelWithScore } from "./src/services/mbd-comment-moderation-classifier";
 
 export const comment = onchainTable(
   "comment",
@@ -35,7 +35,7 @@ export const comment = onchainTable(
     moderationStatusChangedAt: t.timestamp({ withTimezone: true }).notNull(),
     moderationClassifierResult: t
       .jsonb()
-      .$type<CommentModerationClassfierResult>()
+      .$type<CommentModerationLabelWithScore[]>()
       .default([]),
     // keeps the highest score of the moderation labels, can be used to find out if there is any label
     // that has higher score than the threshold
