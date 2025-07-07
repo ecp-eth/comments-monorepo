@@ -7,6 +7,10 @@ const moderationNotificationsEnabledSchema = z.object({
   MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().min(1),
 });
 
+const moderationClassifierEnabledSchema = z.object({
+  MODERATION_MBD_API_KEY: z.string().nonempty(),
+});
+
 const EnvSchema = z
   .object({
     DATABASE_URL: z.string().url(),
@@ -38,6 +42,7 @@ const EnvSchema = z
               .filter(Boolean),
           ),
       ),
+    MODERATION_MBD_API_KEY: z.string().optional(),
     MODERATION_TELEGRAM_BOT_TOKEN: z.string().optional(),
     MODERATION_TELEGRAM_CHANNEL_ID: z.string().optional(),
     MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
@@ -47,10 +52,23 @@ const EnvSchema = z
     ENS_RPC_URL: z.string().url(),
     ENSNODE_SUBGRAPH_URL: z.string().url().optional(),
     SIM_API_KEY: z.string().nonempty(),
-    MBD_API_KEY: z.string().nonempty(),
   })
   .superRefine((vars, ctx) => {
-    if (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) {
+    if (!vars.MODERATION_ENABLED) {
+      return true;
+    }
+
+    const classifierResult = moderationClassifierEnabledSchema.safeParse(vars);
+
+    if (!classifierResult.success) {
+      classifierResult.error.issues.forEach((issue) => {
+        ctx.addIssue(issue);
+      });
+
+      return z.NEVER;
+    }
+
+    if (vars.MODERATION_ENABLE_NOTIFICATIONS) {
       const result = moderationNotificationsEnabledSchema.safeParse(vars);
 
       if (!result.success) {

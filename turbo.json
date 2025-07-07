@@ -43,11 +43,11 @@
     "PRIVY_AUTHORIZATION_KEY",
     "PRIVY_WALLET_ADDRESS",
     "PRIVY_WALLET_ID",
+    "MODERATION_*",
     "RPC_URL_*",
     "WEBHOOK_SECRET",
     "ENSNODE_SUBGRAPH_URL",
-    "SIM_API_KEY",
-    "MBD_API_KEY"
+    "SIM_API_KEY"
   ],
   "tasks": {
     "build": {

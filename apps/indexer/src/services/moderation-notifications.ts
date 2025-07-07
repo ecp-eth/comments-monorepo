@@ -3,6 +3,7 @@ import { renderToMarkdown } from "@ecp.eth/shared/renderer";
 import type {
   ModerationNotificationsService as ModerationNotificationsServiceInterface,
   ModerationNotificationServicePendingComment,
+  CommentModerationClassfierResult,
 } from "./types";
 import {
   decryptWebhookCallbackData,
@@ -59,6 +60,7 @@ export class ModerationNotificationsService
 
   async notifyPendingModeration(
     comment: ModerationNotificationServicePendingComment,
+    classifierResult: CommentModerationClassfierResult,
   ) {
     const author = await resolveAuthor(comment.author);
     const renderResult = renderToMarkdown({
@@ -72,6 +74,9 @@ export class ModerationNotificationsService
 **Author**: \`${author}\`
 **Target**: \`${comment.targetUri}\`
 **Parent ID**: \`${!comment.parentId || isZeroHex(comment.parentId) ? "None" : comment.parentId}\`
+**Classifier Score**: \`${(classifierResult.score * 100).toFixed(4)}%\`
+**Classifier Labels**: 
+\`${classifierResult.labels.map((l) => `- ${l.label} (${(l.score * 100).toFixed(4)}%)`).join("\n")}\`
 
 Content:
 
@@ -269,6 +274,9 @@ async function renderMessageContent(
 **Target**: \`${comment.targetUri}\`
 **Parent ID**: \`${!comment.parentId || isZeroHex(comment.parentId) ? "None" : comment.parentId}\`
 **Status**: ${status.emoji} ${status.text}
+**Classifier Score**: \`${(comment.moderationClassifierScore * 100).toFixed(4)}%\`
+**Classifier Labels**: 
+\`${comment.moderationClassifierResult.map((l) => `- ${l.label} (${(l.score * 100).toFixed(4)}%)`).join("\n")}\`
 
 Content:
 

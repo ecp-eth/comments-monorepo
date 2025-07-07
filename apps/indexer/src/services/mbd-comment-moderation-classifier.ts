@@ -1,45 +1,22 @@
 import DataLoader from "dataloader";
 import { z } from "zod";
-
-const CommentModerationLabel = z.enum([
-  "llm_generated",
-  "spam",
-  "sexual",
-  "hate",
-  "violence",
-  "harassment",
-  "self_harm",
-  "sexual_minors",
-  "hate_threatening",
-  "violence_graphic",
-]);
-
-type CommentModerationLabelType = z.infer<typeof CommentModerationLabel>;
+import {
+  CommentModerationClassfierResult,
+  type CommentModerationClassifierService,
+  CommentModerationLabel,
+} from "./types";
 
 const responseSchema = z.object({
   status_code: z.literal(200),
   body: z.array(
     z.array(
       z.object({
-        label: CommentModerationLabel.or(z.string().nonempty()),
+        label: z.nativeEnum(CommentModerationLabel).or(z.string().nonempty()),
         score: z.number(),
       }),
     ),
   ),
 });
-
-export type CommentModerationLabelWithScore = {
-  label: CommentModerationLabelType | string;
-  score: number;
-};
-
-export type CommentModerationClassfierResult = {
-  /**
-   * The highest score of the moderation labels.
-   */
-  score: number;
-  labels: CommentModerationLabelWithScore[];
-};
 
 type CommentModerationClassifierOptions = {
   apiKey: string;
@@ -50,10 +27,10 @@ type CommentModerationClassifierOptions = {
  *
  * @see https://docs.mbd.xyz/reference/post_casts-labels-for-text
  */
-export class CommentModerationClassifier extends DataLoader<
-  string,
-  CommentModerationClassfierResult
-> {
+export class CommentModerationClassifier
+  extends DataLoader<string, CommentModerationClassfierResult>
+  implements CommentModerationClassifierService
+{
   constructor(options: CommentModerationClassifierOptions) {
     super(
       async (contents) => {
