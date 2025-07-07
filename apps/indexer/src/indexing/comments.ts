@@ -139,9 +139,6 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       referencesResolutionResult.references,
     );
 
-    const moderationClassifierResult =
-      await commentModerationClassifierService.classify(event.args.content);
-
     await context.db.insert(schema.comment).values({
       id: event.args.commentId,
       content: event.args.content,
@@ -161,13 +158,13 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       commentType: event.args.commentType,
       moderationStatus: moderationResult.result.status,
       moderationStatusChangedAt: moderationResult.result.changedAt,
+      moderationClassifierResult: moderationResult.result.classifier.labels,
+      moderationClassifierScore: moderationResult.result.classifier.score,
       zeroExSwap,
       references: referencesResolutionResult.references,
       referencesResolutionStatus: referencesResolutionResult.status,
       referencesResolutionStatusChangedAt: new Date(),
       reactionCounts: {},
-      moderationClassifierResult: moderationClassifierResult.labels,
-      moderationClassifierScore: moderationClassifierResult.score,
     });
 
     await moderationResult.saveAndNotify();

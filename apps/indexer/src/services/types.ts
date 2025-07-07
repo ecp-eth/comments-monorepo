@@ -17,6 +17,7 @@ export interface ModerationNotificationsService {
   initialize: () => Promise<void>;
   notifyPendingModeration: (
     comment: ModerationNotificationServicePendingComment,
+    classifierResult: CommentModerationClassfierResult,
   ) => Promise<void>;
   updateMessageWithModerationStatus: (
     messageId: number,
@@ -27,4 +28,34 @@ export interface ModerationNotificationsService {
     comment: CommentSelectType,
   ) => Promise<void>;
   decryptWebhookCallbackData: (data: string) => WebhookCallbackData;
+}
+
+export enum CommentModerationLabel {
+  LLM_GENERATED = "llm_generated",
+  SPAM = "spam",
+  SEXUAL = "sexual",
+  HATE = "hate",
+  VIOLENCE = "violence",
+  HARASSMENT = "harassment",
+  SELF_HARM = "self_harm",
+  SEXUAL_MINORS = "sexual_minors",
+  HATE_THREATENING = "hate_threatening",
+  VIOLENCE_GRAPHIC = "violence_graphic",
+}
+
+export type CommentModerationLabelWithScore = {
+  label: CommentModerationLabel | string;
+  score: number;
+};
+
+export type CommentModerationClassfierResult = {
+  /**
+   * The highest score of the moderation labels.
+   */
+  score: number;
+  labels: CommentModerationLabelWithScore[];
+};
+
+export interface CommentModerationClassifierService {
+  classify: (content: string) => Promise<CommentModerationClassfierResult>;
 }

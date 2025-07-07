@@ -5,10 +5,14 @@ import { getIndexerDb } from "../db";
 import { db } from "../../db";
 import schema, { type CommentSelectType } from "ponder:schema";
 import { HTTPException } from "hono/http-exception";
-import type { ModerationNotificationsService } from "../../services/types";
+import type {
+  CommentModerationClassifierService,
+  ModerationNotificationsService,
+} from "../../services/types";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import type { CommentModerationClassfierResult } from "../../services/types";
 
 abstract class BaseCommentModerationException extends HTTPException {
   constructor(status: ContentfulStatusCode, message: string) {
@@ -45,12 +49,14 @@ interface CommentModerationServiceOptions {
   enabled: boolean;
   knownReactions: Set<string>;
   notificationService: ModerationNotificationsService;
+  classifierService: CommentModerationClassifierService;
 }
 
 interface ModerationStatusResult {
   result: {
     status: ModerationStatus;
     changedAt: Date;
+    classifier: CommentModerationClassfierResult;
   };
   saveAndNotify(): Promise<void>;
 }
@@ -60,12 +66,14 @@ export class CommentModerationService {
   private knownReactions: Set<string>;
   private notificationService: ModerationNotificationsService;
   private defaultModerationStatus: ModerationStatus;
+  private classifierService: CommentModerationClassifierService;
 
   constructor(options: CommentModerationServiceOptions) {
     this.enabled = options.enabled;
     this.knownReactions = options.knownReactions;
     this.notificationService = options.notificationService;
     this.defaultModerationStatus = options.enabled ? "pending" : "approved";
+    this.classifierService = options.classifierService;
   }
 
   async moderate(
@@ -77,6 +85,10 @@ export class CommentModerationService {
         result: {
           status: this.defaultModerationStatus,
           changedAt: new Date(),
+          classifier: {
+            score: 0,
+            labels: [],
+          },
         },
         saveAndNotify: async () => {},
       };
@@ -91,16 +103,25 @@ export class CommentModerationService {
         result: {
           status: "approved",
           changedAt: new Date(),
+          classifier: {
+            score: 0,
+            labels: [],
+          },
         },
         saveAndNotify: async () => {},
       };
     }
+
+    const classifierResult = await this.classifierService.classify(
+      comment.content,
+    );
 
     const result = await this.getCommentModerationStatus(comment.commentId);
 
     const moderationStatus = {
       status: result?.status ?? this.defaultModerationStatus,
       changedAt: result?.changedAt ?? new Date(),
+      classifier: classifierResult,
     };
 
     return {
@@ -117,7 +138,11 @@ export class CommentModerationService {
           );
 
           if (moderationStatus.status === "pending") {
-            await this.notifyTelegram(comment, references);
+            await this.notifyTelegram({
+              comment,
+              references,
+              classifierResult,
+            });
           }
         }
       },
@@ -213,18 +238,26 @@ export class CommentModerationService {
     return result;
   }
 
-  private async notifyTelegram(
-    comment: Event<"CommentsV1:CommentAdded">["args"],
-    references: IndexerAPICommentReferencesSchemaType,
-  ) {
-    return this.notificationService.notifyPendingModeration({
-      channelId: comment.channelId,
-      author: comment.author,
-      content: comment.content,
-      targetUri: comment.targetUri,
-      references,
-      id: comment.commentId,
-      parentId: comment.parentId,
-    });
+  private async notifyTelegram({
+    comment,
+    references,
+    classifierResult,
+  }: {
+    comment: Event<"CommentsV1:CommentAdded">["args"];
+    references: IndexerAPICommentReferencesSchemaType;
+    classifierResult: CommentModerationClassfierResult;
+  }) {
+    return this.notificationService.notifyPendingModeration(
+      {
+        channelId: comment.channelId,
+        author: comment.author,
+        content: comment.content,
+        targetUri: comment.targetUri,
+        references,
+        id: comment.commentId,
+        parentId: comment.parentId,
+      },
+      classifierResult,
+    );
   }
 }

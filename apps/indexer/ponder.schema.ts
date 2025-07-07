@@ -4,7 +4,7 @@ import type {
   IndexerAPICommentZeroExSwapSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import type { IndexerAPIMetadataSchemaType } from "@ecp.eth/sdk/indexer/schemas";
-import type { CommentModerationLabelWithScore } from "./src/services/mbd-comment-moderation-classifier";
+import type { CommentModerationLabelWithScore } from "./src/services/types";
 
 export const comment = onchainTable(
   "comment",
@@ -68,6 +68,7 @@ export const comment = onchainTable(
     deletedAtIdx: index().on(table.deletedAt),
     authorIdx: index().on(table.author),
     moderationStatusIdx: index().on(table.moderationStatus),
+    moderationClassifierScoreIdx: index().on(table.moderationClassifierScore),
     rootCommentIdIdx: index().on(table.rootCommentId),
     channelIdIdx: index().on(table.channelId),
     commentTypeIdx: index().on(table.commentType),
