@@ -47,6 +47,7 @@ const EnvSchema = z
     ENS_RPC_URL: z.string().url(),
     ENSNODE_SUBGRAPH_URL: z.string().url().optional(),
     SIM_API_KEY: z.string().nonempty(),
+    MBD_API_KEY: z.string().nonempty(),
   })
   .superRefine((vars, ctx) => {
     if (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) {

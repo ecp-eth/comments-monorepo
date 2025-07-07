@@ -4,6 +4,7 @@ import type {
   IndexerAPICommentZeroExSwapSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import type { IndexerAPIMetadataSchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import { CommentModerationClassfierResult } from "./src/services/comment-moderation-classifier";
 
 export const comment = onchainTable(
   "comment",
@@ -32,8 +33,14 @@ export const comment = onchainTable(
       .default("pending")
       .notNull(),
     moderationStatusChangedAt: t.timestamp({ withTimezone: true }).notNull(),
+    moderationClassifierResult: t
+      .jsonb()
+      .$type<CommentModerationClassfierResult>()
+      .default([]),
+    // keeps the highest score of the moderation labels, can be used to find out if there is any label
+    // that has higher score than the threshold
+    moderationClassifierScore: t.doublePrecision().notNull().default(0),
     revision: t.integer().notNull().default(0),
-    // find a way to define the column value as object or null
     zeroExSwap: t.jsonb().$type<IndexerAPICommentZeroExSwapSchemaType | null>(),
     references: t
       .jsonb()

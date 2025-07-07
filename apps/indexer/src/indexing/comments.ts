@@ -23,6 +23,7 @@ import { farcasterByNameResolverService } from "../services/farcaster-by-name-re
 import { urlResolverService } from "../services/url-resolver";
 
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
+import { commentModerationClassifierService } from "../services";
 
 const resolverCommentReferences: ResolveCommentReferencesOptions = {
   ensByAddressResolver: ensByAddressResolverService,
@@ -117,6 +118,9 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       referencesResolutionResult.references,
     );
 
+    const moderationClassifierResult =
+      await commentModerationClassifierService.classify(event.args.content);
+
     await context.db.insert(schema.comment).values({
       id: event.args.commentId,
       content: event.args.content,
@@ -141,6 +145,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       referencesResolutionStatus: referencesResolutionResult.status,
       referencesResolutionStatusChangedAt: new Date(),
       reactionCounts: {},
+      moderationClassifierResult: moderationClassifierResult.labels,
+      moderationClassifierScore: moderationClassifierResult.score,
     });
 
     await moderationResult.saveAndNotify();
