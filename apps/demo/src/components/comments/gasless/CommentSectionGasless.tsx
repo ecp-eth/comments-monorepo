@@ -41,6 +41,7 @@ import { createRootCommentsQueryKey } from "../core/queries";
 import { CommentActionsProvider } from "./context";
 import { toast } from "sonner";
 import { useConnectedAction } from "./hooks/useConnectedAction";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 type CommentSectionGaslessProps = {
   disableApprovals?: boolean;
@@ -150,7 +151,7 @@ export function CommentSectionGasless({
           signal,
           viewer,
           mode: "flat",
-          commentType: 0,
+          commentType: COMMENT_TYPE_COMMENT,
         });
       },
       refetchOnMount: false,
@@ -183,7 +184,7 @@ export function CommentSectionGasless({
         signal,
         viewer,
         mode: "flat",
-        commentType: 0,
+        commentType: COMMENT_TYPE_COMMENT,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,

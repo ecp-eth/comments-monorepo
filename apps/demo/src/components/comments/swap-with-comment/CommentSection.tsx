@@ -22,6 +22,7 @@ import { createRootCommentsQueryKey } from "../core/queries";
 import { useCommentActions } from "./hooks/useCommentActions";
 import { CommentActionsProvider } from "./context";
 import { chain } from "@/lib/wagmi";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
@@ -55,7 +56,7 @@ export function CommentSection() {
           signal,
           viewer,
           mode: "flat",
-          commentType: 0,
+          commentType: COMMENT_TYPE_COMMENT,
         });
       },
       refetchOnMount: false,
@@ -88,7 +89,7 @@ export function CommentSection() {
         signal,
         viewer,
         mode: "flat",
-        commentType: 0,
+        commentType: COMMENT_TYPE_COMMENT,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,

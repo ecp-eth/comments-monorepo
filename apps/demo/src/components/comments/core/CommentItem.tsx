@@ -25,6 +25,7 @@ import { chain } from "@/lib/wagmi";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
 import { useConsumePendingWalletConnectionActions } from "./PendingWalletConnectionActionsContext";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 type CommentItemProps = {
   comment: CommentType;
@@ -139,7 +140,7 @@ export function CommentItem({ comment }: CommentItemProps) {
         signal,
         viewer: connectedAddress,
         mode: "flat",
-        commentType: 0,
+        commentType: COMMENT_TYPE_COMMENT,
       });
 
       return CommentPageSchema.parse(response);
@@ -172,7 +173,7 @@ export function CommentItem({ comment }: CommentItemProps) {
         signal,
         viewer: connectedAddress,
         mode: "flat",
-        commentType: 0,
+        commentType: COMMENT_TYPE_COMMENT,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
