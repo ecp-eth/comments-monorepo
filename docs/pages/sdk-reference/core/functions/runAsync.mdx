@@ -1,0 +1,41 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [core](/sdk-reference/core/index.mdx) / runAsync
+
+# Function: runAsync()
+
+```ts
+function runAsync<T>(func, options): Promise<T>;
+```
+
+Defined in: [packages/sdk/src/core/utils.ts:155](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L155)
+
+Run an async function with retries and backoff.
+
+## Type Parameters
+
+### T
+
+`T`
+
+## Parameters
+
+### func
+
+(`signal?`) => `Promise`\<`T`\>
+
+The async function to run. The function receives the signal as a parameter.
+
+### options
+
+`RunAsyncOptions`
+
+The options for the function.
+
+## Returns
+
+`Promise`\<`T`\>
+
+The result of the function.
