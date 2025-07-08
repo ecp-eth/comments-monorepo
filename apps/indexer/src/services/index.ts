@@ -2,6 +2,7 @@ import { env } from "../env";
 import { CommentModerationClassifier } from "./mbd-comment-moderation-classifier";
 import { ModerationNotificationsService } from "./moderation-notifications";
 import { NoopNotificationsService } from "./noop-notifications";
+import { NoopCommentModerationClassifier } from "./noop-comment-moderation-classifier";
 
 export const moderationNotificationsService =
   env.MODERATION_TELEGRAM_BOT_TOKEN &&
@@ -16,7 +17,8 @@ export const moderationNotificationsService =
       })
     : new NoopNotificationsService();
 
-export const commentModerationClassifierService =
-  new CommentModerationClassifier({
-    apiKey: env.MBD_API_KEY,
-  });
+export const commentModerationClassifierService = env.MODERATION_MBD_API_KEY
+  ? new CommentModerationClassifier({
+      apiKey: env.MODERATION_MBD_API_KEY,
+    })
+  : new NoopCommentModerationClassifier();
