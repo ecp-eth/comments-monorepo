@@ -23,7 +23,6 @@ import { farcasterByNameResolverService } from "../services/farcaster-by-name-re
 import { urlResolverService } from "../services/url-resolver";
 
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
-import { commentModerationClassifierService } from "../services";
 
 const resolverCommentReferences: ResolveCommentReferencesOptions = {
   ensByAddressResolver: ensByAddressResolverService,
