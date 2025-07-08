@@ -7,10 +7,6 @@ const moderationNotificationsEnabledSchema = z.object({
   MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().min(1),
 });
 
-const moderationClassifierEnabledSchema = z.object({
-  MODERATION_MBD_API_KEY: z.string().nonempty(),
-});
-
 const EnvSchema = z
   .object({
     DATABASE_URL: z.string().url(),
@@ -56,16 +52,6 @@ const EnvSchema = z
   .superRefine((vars, ctx) => {
     if (!vars.MODERATION_ENABLED) {
       return true;
-    }
-
-    const classifierResult = moderationClassifierEnabledSchema.safeParse(vars);
-
-    if (!classifierResult.success) {
-      classifierResult.error.issues.forEach((issue) => {
-        ctx.addIssue(issue);
-      });
-
-      return z.NEVER;
     }
 
     if (vars.MODERATION_ENABLE_NOTIFICATIONS) {
