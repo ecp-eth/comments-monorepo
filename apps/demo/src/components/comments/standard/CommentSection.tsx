@@ -23,6 +23,7 @@ import { createRootCommentsQueryKey } from "../core/queries";
 import { CommentActionsProvider } from "./context";
 import { chain } from "@/lib/wagmi";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
+import { Heading2 } from "../core/Heading2";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
@@ -106,7 +107,7 @@ export function CommentSection() {
   return (
     <CommentActionsProvider value={commentActions}>
       <CommentSectionWrapper>
-        <h2 className="text-lg font-semibold mb-4">Comments</h2>
+        <Heading2>Comments</Heading2>
         <CommentForm />
         {error && <div>Error loading comments: {(error as Error).message}</div>}
         {isSuccess && (

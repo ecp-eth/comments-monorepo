@@ -42,6 +42,7 @@ import { CommentActionsProvider } from "./context";
 import { toast } from "sonner";
 import { useConnectedAction } from "./hooks/useConnectedAction";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
+import { Heading2 } from "../core/Heading2";
 
 type CommentSectionGaslessProps = {
   disableApprovals?: boolean;
@@ -260,7 +261,7 @@ export function CommentSectionGasless({
     <CommentActionsProvider value={gaslessCommentActions}>
       <CommentGaslessProvider value={commentGaslessProviderValue}>
         <CommentSectionWrapper>
-          <h2 className="text-lg font-semibold">Comments</h2>
+          <Heading2>Comments</Heading2>
 
           {!approvalStatus.data?.approved &&
             commentGaslessProviderValue.areApprovalsEnabled && (
