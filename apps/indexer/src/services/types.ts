@@ -13,11 +13,14 @@ export type ModerationNotificationServicePendingComment = {
   parentId: Hex;
 };
 
+export type ModerationNotificationsServiceCommentStatus = "create" | "update";
+
 export interface ModerationNotificationsService {
   initialize: () => Promise<void>;
   notifyPendingModeration: (
     comment: ModerationNotificationServicePendingComment,
     classifierResult: CommentModerationClassfierResult,
+    status: ModerationNotificationsServiceCommentStatus,
   ) => Promise<void>;
   updateMessageWithModerationStatus: (
     messageId: number,

@@ -5,6 +5,7 @@ import type {
   ModerationNotificationServicePendingComment,
   CommentModerationClassfierResult,
   CommentModerationLabelsWithScore,
+  ModerationNotificationsServiceCommentStatus,
 } from "./types";
 import {
   decryptWebhookCallbackData,
@@ -62,13 +63,14 @@ export class ModerationNotificationsService
   async notifyPendingModeration(
     comment: ModerationNotificationServicePendingComment,
     classifierResult: CommentModerationClassfierResult,
+    status: ModerationNotificationsServiceCommentStatus,
   ) {
     const author = await resolveAuthor(comment.author);
     const renderResult = renderToMarkdown({
       content: comment.content,
       references: comment.references,
     });
-    const message = `🆕 New comment pending moderation
+    const message = `${status === "create" ? "🆕 New" : "🔄 Updated"} comment pending moderation
 
 **ID**: \`${comment.id}\`
 **Channel ID**: \`${comment.channelId}\`

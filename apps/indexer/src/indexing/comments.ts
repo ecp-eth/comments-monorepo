@@ -23,6 +23,7 @@ import { farcasterByNameResolverService } from "../services/farcaster-by-name-re
 import { urlResolverService } from "../services/url-resolver";
 
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
+import type { ModerationStatusResult } from "../management/services/comment-moderation-service";
 
 const resolverCommentReferences: ResolveCommentReferencesOptions = {
   ensByAddressResolver: ensByAddressResolverService,
@@ -279,6 +280,15 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       resolverCommentReferences,
     );
 
+    let moderationResult: ModerationStatusResult | undefined;
+
+    if (existingComment.content !== event.args.content) {
+      moderationResult = await commentModerationService.moderateUpdate(
+        event.args,
+        referencesResolutionResult.references,
+      );
+    }
+
     await context.db
       .update(schema.comment, {
         id: event.args.commentId,
@@ -290,6 +300,14 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         references: referencesResolutionResult.references,
         referencesResolutionStatus: referencesResolutionResult.status,
         referencesResolutionStatusChangedAt: new Date(),
+        ...(moderationResult?.result && {
+          moderationStatus: moderationResult.result.status,
+          moderationStatusChangedAt: moderationResult.result.changedAt,
+          moderationClassifierResult: moderationResult.result.classifier.labels,
+          moderationClassifierScore: moderationResult.result.classifier.score,
+        }),
       });
+
+    moderationResult?.saveAndNotify();
   });
 }
