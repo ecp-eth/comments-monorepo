@@ -47,11 +47,11 @@ describe("CommentModerationClassifier", () => {
 
     expect(result).toEqual({
       score: 0.8,
-      labels: [
-        { label: "spam", score: 0.1 },
-        { label: "hate", score: 0.2 },
-        { label: "llm_generated", score: 0.8 },
-      ],
+      labels: {
+        spam: 0.1,
+        hate: 0.2,
+        llm_generated: 0.8,
+      },
     });
   });
 
@@ -110,17 +110,17 @@ describe("CommentModerationClassifier", () => {
     expect(results).toEqual([
       {
         score: 0.2,
-        labels: [
-          { label: "spam", score: 0.1 },
-          { label: "hate", score: 0.2 },
-        ],
+        labels: {
+          spam: 0.1,
+          hate: 0.2,
+        },
       },
       {
         score: 0.9,
-        labels: [
-          { label: "llm_generated", score: 0.9 },
-          { label: "spam", score: 0.3 },
-        ],
+        labels: {
+          llm_generated: 0.9,
+          spam: 0.3,
+        },
       },
     ]);
   });
