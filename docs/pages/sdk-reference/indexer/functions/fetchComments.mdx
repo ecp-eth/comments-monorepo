@@ -51,10 +51,7 @@ function fetchComments(options): Promise<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
@@ -192,10 +189,7 @@ function fetchComments(options): Promise<{
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
-           moderationClassifierResult: {
-              label: string;
-              score: number;
-           }[];
+           moderationClassifierResult: Record<string, number>;
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
@@ -302,7 +296,7 @@ function fetchComments(options): Promise<{
               id: `0x${(...)}`;
               logIndex: ... | ...;
               metadata: ...[];
-              moderationClassifierResult: ...[];
+              moderationClassifierResult: Record<..., ...>;
               moderationClassifierScore: number;
               moderationStatus: ... | ... | ...;
               moderationStatusChangedAt: Date;
@@ -365,10 +359,7 @@ function fetchComments(options): Promise<{
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
-        moderationClassifierResult: {
-           label: string;
-           score: number;
-        }[];
+        moderationClassifierResult: Record<string, number>;
         moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
@@ -543,10 +534,7 @@ Fetch comments from the Indexer API
         `key`: `` `0x${string}` ``;
         `value`: `` `0x${string}` ``;
      \}[];
-     `moderationClassifierResult`: \{
-        `label`: `string`;
-        `score`: `number`;
-     \}[];
+     `moderationClassifierResult`: `Record`\<`string`, `number`\>;
      `moderationClassifierScore`: `number`;
      `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
      `moderationStatusChangedAt`: `Date`;
@@ -684,10 +672,7 @@ Fetch comments from the Indexer API
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
            \}[];
-           `moderationClassifierResult`: \{
-              `label`: `string`;
-              `score`: `number`;
-           \}[];
+           `moderationClassifierResult`: `Record`\<`string`, `number`\>;
            `moderationClassifierScore`: `number`;
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
@@ -794,7 +779,7 @@ Fetch comments from the Indexer API
               `id`: `` `0x${(...)}` ``;
               `logIndex`: ... \| ...;
               `metadata`: ...[];
-              `moderationClassifierResult`: ...[];
+              `moderationClassifierResult`: `Record`\<..., ...\>;
               `moderationClassifierScore`: `number`;
               `moderationStatus`: ... \| ... \| ...;
               `moderationStatusChangedAt`: `Date`;
@@ -857,10 +842,7 @@ Fetch comments from the Indexer API
            `key`: `` `0x${string}` ``;
            `value`: `` `0x${string}` ``;
         \}[];
-        `moderationClassifierResult`: \{
-           `label`: `string`;
-           `score`: `number`;
-        \}[];
+        `moderationClassifierResult`: `Record`\<`string`, `number`\>;
         `moderationClassifierScore`: `number`;
         `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
         `moderationStatusChangedAt`: `Date`;

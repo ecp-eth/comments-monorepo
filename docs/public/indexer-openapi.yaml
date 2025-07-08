@@ -279,6 +279,17 @@ paths:
           name: moderationStatus
           in: query
         - schema:
+            type: string
+            description: >-
+              The moderation labels to exclude from the comments to return. This
+              filter works in conjunction with the `moderationStatus` filter.
+            example: spam,sexual
+            pattern: >-
+              ^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)$
+          required: false
+          name: excludeModerationLabels
+          in: query
+        - schema:
             type: integer
             minimum: 1
             maximum: 100
@@ -416,19 +427,15 @@ paths:
                             - string
                             - 'null'
                         moderationClassifierResult:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              label:
-                                type: string
-                              score:
-                                type: number
-                            required:
-                              - label
-                              - score
+                          type: object
+                          additionalProperties:
+                            type: number
+                            minimum: 0
+                            maximum: 1
                         moderationClassifierScore:
                           type: number
+                          minimum: 0
+                          maximum: 1
                         createdAt:
                           type:
                             - string
@@ -840,19 +847,15 @@ paths:
                                     - string
                                     - 'null'
                                 moderationClassifierResult:
-                                  type: array
-                                  items:
-                                    type: object
-                                    properties:
-                                      label:
-                                        type: string
-                                      score:
-                                        type: number
-                                    required:
-                                      - label
-                                      - score
+                                  type: object
+                                  additionalProperties:
+                                    type: number
+                                    minimum: 0
+                                    maximum: 1
                                 moderationClassifierScore:
                                   type: number
+                                  minimum: 0
+                                  maximum: 1
                                 createdAt:
                                   type:
                                     - string
@@ -1306,19 +1309,15 @@ paths:
                                       - string
                                       - 'null'
                                   moderationClassifierResult:
-                                    type: array
-                                    items:
-                                      type: object
-                                      properties:
-                                        label:
-                                          type: string
-                                        score:
-                                          type: number
-                                      required:
-                                        - label
-                                        - score
+                                    type: object
+                                    additionalProperties:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 1
                                   moderationClassifierScore:
                                     type: number
+                                    minimum: 0
+                                    maximum: 1
                                   createdAt:
                                     type:
                                       - string
@@ -1730,19 +1729,15 @@ paths:
                                               - string
                                               - 'null'
                                           moderationClassifierResult:
-                                            type: array
-                                            items:
-                                              type: object
-                                              properties:
-                                                label:
-                                                  type: string
-                                                score:
-                                                  type: number
-                                              required:
-                                                - label
-                                                - score
+                                            type: object
+                                            additionalProperties:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 1
                                           moderationClassifierScore:
                                             type: number
+                                            minimum: 0
+                                            maximum: 1
                                           createdAt:
                                             type:
                                               - string
@@ -2276,6 +2271,17 @@ paths:
           name: moderationStatus
           in: query
         - schema:
+            type: string
+            description: >-
+              The moderation labels to exclude from the comments to return. This
+              filter works in conjunction with the `moderationStatus` filter.
+            example: spam,sexual
+            pattern: >-
+              ^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)$
+          required: false
+          name: excludeModerationLabels
+          in: query
+        - schema:
             type: integer
             minimum: 1
             maximum: 100
@@ -2402,19 +2408,15 @@ paths:
                             - string
                             - 'null'
                         moderationClassifierResult:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              label:
-                                type: string
-                              score:
-                                type: number
-                            required:
-                              - label
-                              - score
+                          type: object
+                          additionalProperties:
+                            type: number
+                            minimum: 0
+                            maximum: 1
                         moderationClassifierScore:
                           type: number
+                          minimum: 0
+                          maximum: 1
                         createdAt:
                           type:
                             - string
@@ -2826,19 +2828,15 @@ paths:
                                     - string
                                     - 'null'
                                 moderationClassifierResult:
-                                  type: array
-                                  items:
-                                    type: object
-                                    properties:
-                                      label:
-                                        type: string
-                                      score:
-                                        type: number
-                                    required:
-                                      - label
-                                      - score
+                                  type: object
+                                  additionalProperties:
+                                    type: number
+                                    minimum: 0
+                                    maximum: 1
                                 moderationClassifierScore:
                                   type: number
+                                  minimum: 0
+                                  maximum: 1
                                 createdAt:
                                   type:
                                     - string
@@ -3292,19 +3290,15 @@ paths:
                                       - string
                                       - 'null'
                                   moderationClassifierResult:
-                                    type: array
-                                    items:
-                                      type: object
-                                      properties:
-                                        label:
-                                          type: string
-                                        score:
-                                          type: number
-                                      required:
-                                        - label
-                                        - score
+                                    type: object
+                                    additionalProperties:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 1
                                   moderationClassifierScore:
                                     type: number
+                                    minimum: 0
+                                    maximum: 1
                                   createdAt:
                                     type:
                                       - string
@@ -3716,19 +3710,15 @@ paths:
                                               - string
                                               - 'null'
                                           moderationClassifierResult:
-                                            type: array
-                                            items:
-                                              type: object
-                                              properties:
-                                                label:
-                                                  type: string
-                                                score:
-                                                  type: number
-                                              required:
-                                                - label
-                                                - score
+                                            type: object
+                                            additionalProperties:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 1
                                           moderationClassifierScore:
                                             type: number
+                                            minimum: 0
+                                            maximum: 1
                                           createdAt:
                                             type:
                                               - string
@@ -4654,19 +4644,15 @@ paths:
                             - string
                             - 'null'
                         moderationClassifierResult:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              label:
-                                type: string
-                              score:
-                                type: number
-                            required:
-                              - label
-                              - score
+                          type: object
+                          additionalProperties:
+                            type: number
+                            minimum: 0
+                            maximum: 1
                         moderationClassifierScore:
                           type: number
+                          minimum: 0
+                          maximum: 1
                         createdAt:
                           type:
                             - string
@@ -5171,19 +5157,15 @@ paths:
                       - string
                       - 'null'
                   moderationClassifierResult:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        label:
-                          type: string
-                        score:
-                          type: number
-                      required:
-                        - label
-                        - score
+                    type: object
+                    additionalProperties:
+                      type: number
+                      minimum: 0
+                      maximum: 1
                   moderationClassifierScore:
                     type: number
+                    minimum: 0
+                    maximum: 1
                   createdAt:
                     type:
                       - string
@@ -5669,19 +5651,15 @@ paths:
                       - string
                       - 'null'
                   moderationClassifierResult:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        label:
-                          type: string
-                        score:
-                          type: number
-                      required:
-                        - label
-                        - score
+                    type: object
+                    additionalProperties:
+                      type: number
+                      minimum: 0
+                      maximum: 1
                   moderationClassifierScore:
                     type: number
+                    minimum: 0
+                    maximum: 1
                   createdAt:
                     type:
                       - string
