@@ -91,6 +91,17 @@ const IndexerAPICommentReactionSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }>, "many">;
+  moderationClassifierResult: ZodArray<ZodObject<{
+     label: ZodString;
+     score: ZodNumber;
+   }, "strip", ZodTypeAny, {
+     label: string;
+     score: number;
+   }, {
+     label: string;
+     score: number;
+  }>, "many">;
+  moderationClassifierScore: ZodNumber;
   moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
   moderationStatusChangedAt: ZodDate;
   parentId: ZodNullable<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
@@ -352,6 +363,17 @@ const IndexerAPICommentReactionSchema: ZodObject<{
         key: `0x${(...)}`;
         value: `0x${(...)}`;
      }>, "many">;
+     moderationClassifierResult: ZodArray<ZodObject<{
+        label: ZodString;
+        score: ZodNumber;
+      }, "strip", ZodTypeAny, {
+        label: string;
+        score: number;
+      }, {
+        label: string;
+        score: number;
+     }>, "many">;
+     moderationClassifierScore: ZodNumber;
      moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
      moderationStatusChangedAt: ZodDate;
      parentId: ZodNullable<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
@@ -418,6 +440,11 @@ const IndexerAPICommentReactionSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: {
+        label: string;
+        score: number;
+     }[];
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -549,6 +576,11 @@ const IndexerAPICommentReactionSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: {
+        label: string;
+        score: number;
+     }[];
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -681,6 +713,11 @@ const IndexerAPICommentReactionSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
+  moderationClassifierResult: {
+     label: string;
+     score: number;
+  }[];
+  moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
@@ -809,6 +846,11 @@ const IndexerAPICommentReactionSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: {
+        label: string;
+        score: number;
+     }[];
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -963,6 +1005,11 @@ const IndexerAPICommentReactionSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
+  moderationClassifierResult: {
+     label: string;
+     score: number;
+  }[];
+  moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
@@ -1091,6 +1138,11 @@ const IndexerAPICommentReactionSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: {
+        label: string;
+        score: number;
+     }[];
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -1216,4 +1268,4 @@ const IndexerAPICommentReactionSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:337](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L337)
+Defined in: [packages/sdk/src/indexer/schemas.ts:344](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L344)

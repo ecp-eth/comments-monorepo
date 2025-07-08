@@ -51,6 +51,11 @@ function fetchComments(options): Promise<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: {
+        label: string;
+        score: number;
+     }[];
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -187,6 +192,11 @@ function fetchComments(options): Promise<{
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
+           moderationClassifierResult: {
+              label: string;
+              score: number;
+           }[];
+           moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
@@ -292,6 +302,8 @@ function fetchComments(options): Promise<{
               id: `0x${(...)}`;
               logIndex: ... | ...;
               metadata: ...[];
+              moderationClassifierResult: ...[];
+              moderationClassifierScore: number;
               moderationStatus: ... | ... | ...;
               moderationStatusChangedAt: Date;
               parentId: ... | ...;
@@ -353,6 +365,11 @@ function fetchComments(options): Promise<{
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
+        moderationClassifierResult: {
+           label: string;
+           score: number;
+        }[];
+        moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
@@ -526,6 +543,11 @@ Fetch comments from the Indexer API
         `key`: `` `0x${string}` ``;
         `value`: `` `0x${string}` ``;
      \}[];
+     `moderationClassifierResult`: \{
+        `label`: `string`;
+        `score`: `number`;
+     \}[];
+     `moderationClassifierScore`: `number`;
      `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
      `moderationStatusChangedAt`: `Date`;
      `parentId`: `null` \| `` `0x${string}` ``;
@@ -662,6 +684,11 @@ Fetch comments from the Indexer API
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
            \}[];
+           `moderationClassifierResult`: \{
+              `label`: `string`;
+              `score`: `number`;
+           \}[];
+           `moderationClassifierScore`: `number`;
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
@@ -767,6 +794,8 @@ Fetch comments from the Indexer API
               `id`: `` `0x${(...)}` ``;
               `logIndex`: ... \| ...;
               `metadata`: ...[];
+              `moderationClassifierResult`: ...[];
+              `moderationClassifierScore`: `number`;
               `moderationStatus`: ... \| ... \| ...;
               `moderationStatusChangedAt`: `Date`;
               `parentId`: ... \| ...;
@@ -828,6 +857,11 @@ Fetch comments from the Indexer API
            `key`: `` `0x${string}` ``;
            `value`: `` `0x${string}` ``;
         \}[];
+        `moderationClassifierResult`: \{
+           `label`: `string`;
+           `score`: `number`;
+        \}[];
+        `moderationClassifierScore`: `number`;
         `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
         `moderationStatusChangedAt`: `Date`;
         `parentId`: `null` \| `` `0x${string}` ``;

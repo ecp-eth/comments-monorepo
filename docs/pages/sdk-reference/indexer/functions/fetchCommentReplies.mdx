@@ -51,6 +51,11 @@ function fetchCommentReplies(options): Promise<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: {
+        label: string;
+        score: number;
+     }[];
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -219,6 +224,11 @@ Fetch replies for a comment from the Indexer API
         `key`: `` `0x${string}` ``;
         `value`: `` `0x${string}` ``;
      \}[];
+     `moderationClassifierResult`: \{
+        `label`: `string`;
+        `score`: `number`;
+     \}[];
+     `moderationClassifierScore`: `number`;
      `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
      `moderationStatusChangedAt`: `Date`;
      `parentId`: `null` \| `` `0x${string}` ``;
