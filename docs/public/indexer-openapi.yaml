@@ -415,6 +415,20 @@ paths:
                           type:
                             - string
                             - 'null'
+                        moderationClassifierResult:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              label:
+                                type: string
+                              score:
+                                type: number
+                            required:
+                              - label
+                              - score
+                        moderationClassifierScore:
+                          type: number
                         createdAt:
                           type:
                             - string
@@ -825,6 +839,20 @@ paths:
                                   type:
                                     - string
                                     - 'null'
+                                moderationClassifierResult:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      label:
+                                        type: string
+                                      score:
+                                        type: number
+                                    required:
+                                      - label
+                                      - score
+                                moderationClassifierScore:
+                                  type: number
                                 createdAt:
                                   type:
                                     - string
@@ -1161,6 +1189,8 @@ paths:
                                 - cursor
                                 - moderationStatus
                                 - moderationStatusChangedAt
+                                - moderationClassifierResult
+                                - moderationClassifierScore
                                 - createdAt
                                 - updatedAt
                                 - revision
@@ -1275,6 +1305,20 @@ paths:
                                     type:
                                       - string
                                       - 'null'
+                                  moderationClassifierResult:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        label:
+                                          type: string
+                                        score:
+                                          type: number
+                                      required:
+                                        - label
+                                        - score
+                                  moderationClassifierScore:
+                                    type: number
                                   createdAt:
                                     type:
                                       - string
@@ -1685,6 +1729,20 @@ paths:
                                             type:
                                               - string
                                               - 'null'
+                                          moderationClassifierResult:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                label:
+                                                  type: string
+                                                score:
+                                                  type: number
+                                              required:
+                                                - label
+                                                - score
+                                          moderationClassifierScore:
+                                            type: number
                                           createdAt:
                                             type:
                                               - string
@@ -2021,6 +2079,8 @@ paths:
                                           - cursor
                                           - moderationStatus
                                           - moderationStatusChangedAt
+                                          - moderationClassifierResult
+                                          - moderationClassifierScore
                                           - createdAt
                                           - updatedAt
                                           - revision
@@ -2048,6 +2108,8 @@ paths:
                                   - cursor
                                   - moderationStatus
                                   - moderationStatusChangedAt
+                                  - moderationClassifierResult
+                                  - moderationClassifierScore
                                   - createdAt
                                   - updatedAt
                                   - revision
@@ -2092,6 +2154,8 @@ paths:
                         - cursor
                         - moderationStatus
                         - moderationStatusChangedAt
+                        - moderationClassifierResult
+                        - moderationClassifierScore
                         - createdAt
                         - updatedAt
                         - revision
@@ -2337,6 +2401,20 @@ paths:
                           type:
                             - string
                             - 'null'
+                        moderationClassifierResult:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              label:
+                                type: string
+                              score:
+                                type: number
+                            required:
+                              - label
+                              - score
+                        moderationClassifierScore:
+                          type: number
                         createdAt:
                           type:
                             - string
@@ -2747,6 +2825,20 @@ paths:
                                   type:
                                     - string
                                     - 'null'
+                                moderationClassifierResult:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      label:
+                                        type: string
+                                      score:
+                                        type: number
+                                    required:
+                                      - label
+                                      - score
+                                moderationClassifierScore:
+                                  type: number
                                 createdAt:
                                   type:
                                     - string
@@ -3083,6 +3175,8 @@ paths:
                                 - cursor
                                 - moderationStatus
                                 - moderationStatusChangedAt
+                                - moderationClassifierResult
+                                - moderationClassifierScore
                                 - createdAt
                                 - updatedAt
                                 - revision
@@ -3197,6 +3291,20 @@ paths:
                                     type:
                                       - string
                                       - 'null'
+                                  moderationClassifierResult:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        label:
+                                          type: string
+                                        score:
+                                          type: number
+                                      required:
+                                        - label
+                                        - score
+                                  moderationClassifierScore:
+                                    type: number
                                   createdAt:
                                     type:
                                       - string
@@ -3607,6 +3715,20 @@ paths:
                                             type:
                                               - string
                                               - 'null'
+                                          moderationClassifierResult:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                label:
+                                                  type: string
+                                                score:
+                                                  type: number
+                                              required:
+                                                - label
+                                                - score
+                                          moderationClassifierScore:
+                                            type: number
                                           createdAt:
                                             type:
                                               - string
@@ -3943,6 +4065,8 @@ paths:
                                           - cursor
                                           - moderationStatus
                                           - moderationStatusChangedAt
+                                          - moderationClassifierResult
+                                          - moderationClassifierScore
                                           - createdAt
                                           - updatedAt
                                           - revision
@@ -3970,6 +4094,8 @@ paths:
                                   - cursor
                                   - moderationStatus
                                   - moderationStatusChangedAt
+                                  - moderationClassifierResult
+                                  - moderationClassifierScore
                                   - createdAt
                                   - updatedAt
                                   - revision
@@ -4014,6 +4140,8 @@ paths:
                         - cursor
                         - moderationStatus
                         - moderationStatusChangedAt
+                        - moderationClassifierResult
+                        - moderationClassifierScore
                         - createdAt
                         - updatedAt
                         - revision
@@ -4525,6 +4653,20 @@ paths:
                           type:
                             - string
                             - 'null'
+                        moderationClassifierResult:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              label:
+                                type: string
+                              score:
+                                type: number
+                            required:
+                              - label
+                              - score
+                        moderationClassifierScore:
+                          type: number
                         createdAt:
                           type:
                             - string
@@ -4861,6 +5003,8 @@ paths:
                         - cursor
                         - moderationStatus
                         - moderationStatusChangedAt
+                        - moderationClassifierResult
+                        - moderationClassifierScore
                         - createdAt
                         - updatedAt
                         - revision
@@ -5026,6 +5170,20 @@ paths:
                     type:
                       - string
                       - 'null'
+                  moderationClassifierResult:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        label:
+                          type: string
+                        score:
+                          type: number
+                      required:
+                        - label
+                        - score
+                  moderationClassifierScore:
+                    type: number
                   createdAt:
                     type:
                       - string
@@ -5362,6 +5520,8 @@ paths:
                   - cursor
                   - moderationStatus
                   - moderationStatusChangedAt
+                  - moderationClassifierResult
+                  - moderationClassifierScore
                   - createdAt
                   - updatedAt
                   - revision
@@ -5508,6 +5668,20 @@ paths:
                     type:
                       - string
                       - 'null'
+                  moderationClassifierResult:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        label:
+                          type: string
+                        score:
+                          type: number
+                      required:
+                        - label
+                        - score
+                  moderationClassifierScore:
+                    type: number
                   createdAt:
                     type:
                       - string
@@ -5844,6 +6018,8 @@ paths:
                   - cursor
                   - moderationStatus
                   - moderationStatusChangedAt
+                  - moderationClassifierResult
+                  - moderationClassifierScore
                   - createdAt
                   - updatedAt
                   - revision
