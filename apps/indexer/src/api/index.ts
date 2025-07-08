@@ -6,6 +6,9 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import setupRestAPI from "./setupRestAPI";
 import { HTTPException } from "hono/http-exception";
 import * as Sentry from "@sentry/node";
+import "@sentry/tracing";
+
+import { useSentry } from "@envelop/sentry";
 
 const app = new OpenAPIHono();
 
@@ -48,8 +51,8 @@ app.onError((err, c) => {
 });
 
 app.use("/sql/*", client({ db, schema }));
-app.use("/", graphql({ db, schema }));
-app.use("/graphql", graphql({ db, schema }));
+app.use("/", graphql({ db, schema }, { plugins: [useSentry()] }));
+app.use("/graphql", graphql({ db, schema }, { plugins: [useSentry()] }));
 
 // all apis are cors: * enabled
 app.use("/api/*", cors());

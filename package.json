@@ -24,10 +24,10 @@
     "lint-staged": "^16.0.0",
     "prettier": "^3.4.2",
     "prettier-plugin-solidity": "^2.0.0",
-    "vitest": "^3.1.4",
     "tsup": "^8.3.6",
     "turbo": "^2.5.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.4"
   },
   "packageManager": "pnpm@10.11.1",
   "engines": {
@@ -47,7 +47,8 @@
     "patchedDependencies": {
       "@privy-io/server-auth": "patches/@privy-io__server-auth.patch",
       "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch",
-      "@wagmi/connectors": "patches/@wagmi__connectors.patch"
+      "@wagmi/connectors": "patches/@wagmi__connectors.patch",
+      "ponder@0.11.18": "patches/ponder@0.11.18.patch"
     }
   },
   "lint-staged": {
