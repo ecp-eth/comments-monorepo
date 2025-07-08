@@ -51,7 +51,11 @@ export async function POST(
   if (content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
     return new JSONResponse(
       BadRequestResponseSchema,
-      { content: ["Comment content length limit exceeded"] },
+      {
+        content: [
+          `Comment content length limit exceeded (max ${env.COMMENT_CONTENT_LENGTH_LIMIT} characters)`,
+        ],
+      },
       { status: 413 },
     );
   }

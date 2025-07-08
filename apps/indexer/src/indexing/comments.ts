@@ -39,7 +39,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
     if (event.args.content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
       Sentry.captureMessage(
-        `Comment content length limit exceeded: ${event.args.commentId}`,
+        `Comment content length limit exceeded, comment id: ${event.args.commentId}`,
         {
           level: "info",
           extra: {
