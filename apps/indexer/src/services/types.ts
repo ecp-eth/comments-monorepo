@@ -31,29 +31,26 @@ export interface ModerationNotificationsService {
 }
 
 export enum CommentModerationLabel {
-  LLM_GENERATED = "llm_generated",
-  SPAM = "spam",
-  SEXUAL = "sexual",
-  HATE = "hate",
-  VIOLENCE = "violence",
   HARASSMENT = "harassment",
-  SELF_HARM = "self_harm",
-  SEXUAL_MINORS = "sexual_minors",
+  HATE = "hate",
   HATE_THREATENING = "hate_threatening",
+  LLM_GENERATED = "llm_generated",
+  SELF_HARM = "self_harm",
+  SEXUAL = "sexual",
+  SEXUAL_MINORS = "sexual_minors",
+  SPAM = "spam",
+  VIOLENCE = "violence",
   VIOLENCE_GRAPHIC = "violence_graphic",
 }
 
-export type CommentModerationLabelWithScore = {
-  label: CommentModerationLabel | string;
-  score: number;
-};
+export type CommentModerationLabelsWithScore = Record<string, number>;
 
 export type CommentModerationClassfierResult = {
   /**
    * The highest score of the moderation labels.
    */
   score: number;
-  labels: CommentModerationLabelWithScore[];
+  labels: CommentModerationLabelsWithScore;
 };
 
 export interface CommentModerationClassifierService {

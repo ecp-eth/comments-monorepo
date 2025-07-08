@@ -7,6 +7,8 @@ const moderationNotificationsEnabledSchema = z.object({
   MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().min(1),
 });
 
+const classificationScoreThresholdSchema = z.coerce.number().min(0).max(1);
+
 const EnvSchema = z
   .object({
     DATABASE_URL: z.string().url(),
@@ -48,6 +50,29 @@ const EnvSchema = z
     ENS_RPC_URL: z.string().url(),
     ENSNODE_SUBGRAPH_URL: z.string().url().optional(),
     SIM_API_KEY: z.string().nonempty(),
+
+    MODERATION_DEFAULT_CLASSIFICATION_SCORE_THRESHOLD:
+      classificationScoreThresholdSchema.default(0.2),
+    MODERATION_CLASSIFICATION_HARASSMENT_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_HATE_THREATENING_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_HATE_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_LLM_GENERATED_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_SELF_HARM_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_SEXUAL_MINORS_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_SEXUAL_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_SPAM_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_VIOLENCE_GRAPHIC_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_VIOLENCE_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
   })
   .superRefine((vars, ctx) => {
     if (!vars.MODERATION_ENABLED) {

@@ -1,7 +1,8 @@
 import {
-  CommentModerationClassifierService,
-  CommentModerationClassfierResult,
+  type CommentModerationClassifierService,
+  type CommentModerationClassfierResult,
   CommentModerationLabel,
+  type CommentModerationLabelsWithScore,
 } from "./types";
 
 /**
@@ -15,10 +16,11 @@ export class NoopCommentModerationClassifier
     // Return a result with all moderation labels set to score 0
     return {
       score: 0,
-      labels: Object.values(CommentModerationLabel).map((label) => ({
-        label,
-        score: 0,
-      })),
+      labels: Object.values(CommentModerationLabel).reduce((acc, label) => {
+        acc[label] = 0;
+
+        return acc;
+      }, {} as CommentModerationLabelsWithScore),
     };
   }
 }

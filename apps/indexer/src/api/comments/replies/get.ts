@@ -11,7 +11,10 @@ import {
 } from "../../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../../lib/constants";
 import { env } from "../../../env";
-import { normalizeModerationStatusFilter } from "../helpers";
+import {
+  convertExcludeModerationLabelsToConditions,
+  normalizeModerationStatusFilter,
+} from "../helpers";
 import { SQL } from "drizzle-orm";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 
@@ -58,11 +61,14 @@ export default (app: OpenAPIHono) => {
       commentType,
       moderationStatus,
       chainId,
+      excludeModerationLabels,
+      author,
     } = c.req.valid("query");
     const { commentId } = c.req.valid("param");
 
     const sharedConditions = [
       app ? eq(schema.comment.app, app) : undefined,
+      author ? eq(schema.comment.author, author) : undefined,
       channelId != null ? eq(schema.comment.channelId, channelId) : undefined,
       commentType != null
         ? eq(schema.comment.commentType, commentType)
@@ -70,6 +76,9 @@ export default (app: OpenAPIHono) => {
       chainId.length === 1
         ? eq(schema.comment.chainId, chainId[0]!)
         : inArray(schema.comment.chainId, chainId),
+      excludeModerationLabels
+        ? convertExcludeModerationLabelsToConditions(excludeModerationLabels)
+        : undefined,
     ];
     const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];
 

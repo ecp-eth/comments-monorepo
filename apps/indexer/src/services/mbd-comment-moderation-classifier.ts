@@ -4,6 +4,7 @@ import {
   CommentModerationClassfierResult,
   type CommentModerationClassifierService,
   CommentModerationLabel,
+  CommentModerationLabelsWithScore,
 } from "./types";
 
 const responseSchema = z.object({
@@ -34,7 +35,10 @@ export class CommentModerationClassifier
   constructor(options: CommentModerationClassifierOptions) {
     super(
       async (contents) => {
-        const url = new URL("/v2/casts/labels/for-text", "https://api.mbd.xyz");
+        const url = new URL(
+          "/v2/farcaster/casts/labels/for-text",
+          "https://api.mbd.xyz",
+        );
 
         const response = await fetch(url, {
           method: "POST",
@@ -74,9 +78,17 @@ export class CommentModerationClassifier
             );
           }
 
+          let score = 0;
+          const labelsWithScore: CommentModerationLabelsWithScore = {};
+
+          for (const label of labels) {
+            labelsWithScore[label.label] = label.score;
+            score = Math.max(score, label.score);
+          }
+
           return {
-            score: labels.reduce((max, label) => Math.max(max, label.score), 0),
-            labels,
+            score,
+            labels: labelsWithScore,
           };
         });
       },
