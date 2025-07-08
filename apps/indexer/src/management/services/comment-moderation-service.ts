@@ -87,7 +87,7 @@ export class CommentModerationService {
           changedAt: new Date(),
           classifier: {
             score: 0,
-            labels: [],
+            labels: {},
           },
         },
         saveAndNotify: async () => {},
@@ -105,7 +105,7 @@ export class CommentModerationService {
           changedAt: new Date(),
           classifier: {
             score: 0,
-            labels: [],
+            labels: {},
           },
         },
         saveAndNotify: async () => {},

@@ -1,10 +1,10 @@
-import { index, onchainTable, relations } from "ponder";
+import { index, onchainTable, relations, sql } from "ponder";
 import type {
   IndexerAPICommentReferencesSchemaType,
   IndexerAPICommentZeroExSwapSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import type { IndexerAPIMetadataSchemaType } from "@ecp.eth/sdk/indexer/schemas";
-import type { CommentModerationLabelWithScore } from "./src/services/types";
+import type { CommentModerationLabelsWithScore } from "./src/services/types";
 
 export const comment = onchainTable(
   "comment",
@@ -36,8 +36,7 @@ export const comment = onchainTable(
     moderationClassifierResult: t
       .jsonb()
       .notNull()
-      .$type<CommentModerationLabelWithScore[]>()
-      .default([]),
+      .$type<CommentModerationLabelsWithScore>(),
     // keeps the highest score of the moderation labels, can be used to find out if there is any label
     // that has higher score than the threshold
     moderationClassifierScore: t.doublePrecision().notNull().default(0),
@@ -69,12 +68,46 @@ export const comment = onchainTable(
     authorIdx: index().on(table.author),
     moderationStatusIdx: index().on(table.moderationStatus),
     moderationClassifierScoreIdx: index().on(table.moderationClassifierScore),
+    moderationClassifierResultIdx: index().using(
+      "gin",
+      table.moderationClassifierResult,
+    ),
     rootCommentIdIdx: index().on(table.rootCommentId),
     channelIdIdx: index().on(table.channelId),
     commentTypeIdx: index().on(table.commentType),
     referencesResolutionStatusIdx: index().on(table.referencesResolutionStatus),
     referencesResolutionStatusChangedAtIdx: index().on(
       table.referencesResolutionStatusChangedAt,
+    ),
+    moderationHarassmentScoreIdx: index().on(
+      sql`((${table.moderationClassifierResult}->>'harassment')::float)`,
+    ),
+    moderationHateScoreIdx: index().on(
+      sql`((${table.moderationClassifierResult}->>'hate')::float)`,
+    ),
+    moderationHateThreateningScoreIdx: index().on(
+      sql`((${table.moderationClassifierResult}->>'hate_threatening')::float)`,
+    ),
+    moderationLlmGeneratedScoreIdx: index().on(
+      sql`((${table.moderationClassifierResult}->>'llm_generated')::float)`,
+    ),
+    moderationSelfHarmScoreIdx: index().on(
+      sql`((${table.moderationClassifierResult}->>'self_harm')::float)`,
+    ),
+    moderationSexualMinorsScoreIdx: index().on(
+      sql`((${table.moderationClassifierResult}->>'sexual_minors')::float)`,
+    ),
+    moderationSexualScoreIdx: index().on(
+      sql`((${table.moderationClassifierResult}->>'sexual')::float)`,
+    ),
+    moderationSpamScoreIdx: index().on(
+      sql`((${table.moderationClassifierResult}->>'spam')::float)`,
+    ),
+    moderationViolenceScoreIdx: index().on(
+      sql`((${table.moderationClassifierResult}->>'violence')::float)`,
+    ),
+    moderationViolenceGraphicScoreIdx: index().on(
+      sql`((${table.moderationClassifierResult}->>'violence_graphic')::float)`,
     ),
   }),
 );

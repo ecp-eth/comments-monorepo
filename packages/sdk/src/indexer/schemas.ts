@@ -13,6 +13,23 @@ import type { Hex } from "../core/schemas.js";
 const bigintToString = z.coerce.bigint().transform((val) => val.toString());
 const dateToString = z.coerce.date().transform((val) => val.toISOString());
 
+export const IndexerAPIModerationClassificationLabelSchema = z.enum([
+  "llm_generated",
+  "spam",
+  "sexual",
+  "hate",
+  "violence",
+  "harassment",
+  "self_harm",
+  "sexual_minors",
+  "hate_threatening",
+  "violence_graphic",
+]);
+
+export type IndexerAPIModerationClassificationLabelSchemaType = z.infer<
+  typeof IndexerAPIModerationClassificationLabelSchema
+>;
+
 export const IndexerAPICursorPaginationSchema = z.object({
   limit: z.number().int(),
   hasNext: z.boolean(),
@@ -311,13 +328,11 @@ export const IndexerAPICommentSchema = z.object({
   cursor: HexSchema,
   moderationStatus: IndexerAPICommentModerationStatusSchema,
   moderationStatusChangedAt: z.coerce.date(),
-  moderationClassifierResult: z.array(
-    z.object({
-      label: z.string(),
-      score: z.number(),
-    }),
+  moderationClassifierResult: z.record(
+    IndexerAPIModerationClassificationLabelSchema.or(z.string().nonempty()),
+    z.number().min(0).max(1),
   ),
-  moderationClassifierScore: z.number(),
+  moderationClassifierScore: z.number().min(0).max(1),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   revision: z.number().int(),

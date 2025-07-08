@@ -4,6 +4,7 @@ import type {
   ModerationNotificationsService as ModerationNotificationsServiceInterface,
   ModerationNotificationServicePendingComment,
   CommentModerationClassfierResult,
+  CommentModerationLabelsWithScore,
 } from "./types";
 import {
   decryptWebhookCallbackData,
@@ -73,7 +74,7 @@ export class ModerationNotificationsService
 **Parent ID**: \`${!comment.parentId || isZeroHex(comment.parentId) ? "None" : comment.parentId}\`
 **Classifier Score**: \`${(classifierResult.score * 100).toFixed(4)}%\`
 **Classifier Labels**: 
-\`${classifierResult.labels.map((l) => `- ${l.label} (${(l.score * 100).toFixed(4)}%)`).join("\n")}\`
+\`${renderModerationClassifierResult(classifierResult.labels)}\`
 
 Content:
 
@@ -290,12 +291,20 @@ async function renderMessageContent(
 **Status**: ${status.emoji} ${status.text}
 **Classifier Score**: \`${(comment.moderationClassifierScore * 100).toFixed(4)}%\`
 **Classifier Labels**: 
-\`${comment.moderationClassifierResult.map((l) => `- ${l.label} (${(l.score * 100).toFixed(4)}%)`).join("\n")}\`
+\`${renderModerationClassifierResult(comment.moderationClassifierResult)}\`
 
 Content:
 
 ${renderResult.result}
 `.trim();
+}
+
+function renderModerationClassifierResult(
+  moderationClassifierResult: CommentModerationLabelsWithScore,
+) {
+  return Object.entries(moderationClassifierResult)
+    .map(([label, score]) => `- ${label} (${(score * 100).toFixed(4)}%)`)
+    .join("\n");
 }
 
 function resolveModerationStatus(

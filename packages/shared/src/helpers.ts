@@ -241,7 +241,7 @@ export function insertPendingCommentToPage(
       response.data,
     ),
     moderationStatusChangedAt: new Date(),
-    moderationClassifierResult: [],
+    moderationClassifierResult: {},
     moderationClassifierScore: 0,
     zeroExSwap: zeroExSwap ?? null,
     references: [],

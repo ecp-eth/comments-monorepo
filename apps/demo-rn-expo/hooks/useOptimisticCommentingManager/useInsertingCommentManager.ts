@@ -251,7 +251,7 @@ function createIndexerAPICommentDataFromPendingCommentOperation(
     pendingType,
     moderationStatus: "approved",
     moderationStatusChangedAt: new Date(),
-    moderationClassifierResult: [],
+    moderationClassifierResult: {},
     moderationClassifierScore: 0,
     viewerReactions: {},
     reactionCounts: {},

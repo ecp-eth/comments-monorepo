@@ -32,7 +32,7 @@ describe("CommentModerationClassifier", () => {
     };
 
     nock("https://api.mbd.xyz/v2")
-      .post("/casts/labels/for-text", {
+      .post("/farcaster/casts/labels/for-text", {
         text_inputs: ["Test comment"],
         label_category: "moderation",
       })
@@ -57,7 +57,7 @@ describe("CommentModerationClassifier", () => {
 
   it("should handle API errors gracefully", async () => {
     nock("https://api.mbd.xyz/v2")
-      .post("/casts/labels/for-text")
+      .post("/farcaster/casts/labels/for-text")
       .reply(400, { status_code: 400, body: "Error" });
 
     await expect(classifier.classify("Test comment")).rejects.toThrow(
@@ -72,7 +72,7 @@ describe("CommentModerationClassifier", () => {
     };
 
     nock("https://api.mbd.xyz/v2")
-      .post("/casts/labels/for-text")
+      .post("/farcaster/casts/labels/for-text")
       .reply(200, invalidResponse);
 
     await expect(classifier.classify("Test comment")).rejects.toThrow(
@@ -96,7 +96,7 @@ describe("CommentModerationClassifier", () => {
     };
 
     nock("https://api.mbd.xyz/v2")
-      .post("/casts/labels/for-text", {
+      .post("/farcaster/casts/labels/for-text", {
         text_inputs: ["Comment 1", "Comment 2"],
         label_category: "moderation",
       })
