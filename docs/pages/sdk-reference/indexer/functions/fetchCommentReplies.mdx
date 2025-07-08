@@ -51,10 +51,7 @@ function fetchCommentReplies(options): Promise<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
@@ -224,10 +221,7 @@ Fetch replies for a comment from the Indexer API
         `key`: `` `0x${string}` ``;
         `value`: `` `0x${string}` ``;
      \}[];
-     `moderationClassifierResult`: \{
-        `label`: `string`;
-        `score`: `number`;
-     \}[];
+     `moderationClassifierResult`: `Record`\<`string`, `number`\>;
      `moderationClassifierScore`: `number`;
      `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
      `moderationStatusChangedAt`: `Date`;

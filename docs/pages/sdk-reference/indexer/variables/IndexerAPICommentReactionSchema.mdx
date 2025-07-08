@@ -91,16 +91,7 @@ const IndexerAPICommentReactionSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }>, "many">;
-  moderationClassifierResult: ZodArray<ZodObject<{
-     label: ZodString;
-     score: ZodNumber;
-   }, "strip", ZodTypeAny, {
-     label: string;
-     score: number;
-   }, {
-     label: string;
-     score: number;
-  }>, "many">;
+  moderationClassifierResult: ZodRecord<ZodUnion<[ZodEnum<["llm_generated", "spam", "sexual", "hate", "violence", "harassment", "self_harm", "sexual_minors", "hate_threatening", "violence_graphic"]>, ZodString]>, ZodNumber>;
   moderationClassifierScore: ZodNumber;
   moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
   moderationStatusChangedAt: ZodDate;
@@ -363,16 +354,7 @@ const IndexerAPICommentReactionSchema: ZodObject<{
         key: `0x${(...)}`;
         value: `0x${(...)}`;
      }>, "many">;
-     moderationClassifierResult: ZodArray<ZodObject<{
-        label: ZodString;
-        score: ZodNumber;
-      }, "strip", ZodTypeAny, {
-        label: string;
-        score: number;
-      }, {
-        label: string;
-        score: number;
-     }>, "many">;
+     moderationClassifierResult: ZodRecord<ZodUnion<[ZodEnum<...>, ZodString]>, ZodNumber>;
      moderationClassifierScore: ZodNumber;
      moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
      moderationStatusChangedAt: ZodDate;
@@ -440,10 +422,7 @@ const IndexerAPICommentReactionSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
@@ -576,10 +555,7 @@ const IndexerAPICommentReactionSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
@@ -713,10 +689,7 @@ const IndexerAPICommentReactionSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
-  moderationClassifierResult: {
-     label: string;
-     score: number;
-  }[];
+  moderationClassifierResult: Record<string, number>;
   moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
@@ -846,10 +819,7 @@ const IndexerAPICommentReactionSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
@@ -1005,10 +975,7 @@ const IndexerAPICommentReactionSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
-  moderationClassifierResult: {
-     label: string;
-     score: number;
-  }[];
+  moderationClassifierResult: Record<string, number>;
   moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
@@ -1138,10 +1105,7 @@ const IndexerAPICommentReactionSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
@@ -1268,4 +1232,4 @@ const IndexerAPICommentReactionSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:344](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L344)
+Defined in: [packages/sdk/src/indexer/schemas.ts:359](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L359)

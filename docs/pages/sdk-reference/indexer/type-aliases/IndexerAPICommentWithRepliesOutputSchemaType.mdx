@@ -39,10 +39,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
-  moderationClassifierResult: {
-     label: string;
-     score: number;
-  }[];
+  moderationClassifierResult: Record<string, number>;
   moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
@@ -180,10 +177,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
-        moderationClassifierResult: {
-           label: string;
-           score: number;
-        }[];
+        moderationClassifierResult: Record<string, number>;
         moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: string;
@@ -313,10 +307,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
-           moderationClassifierResult: {
-              label: string;
-              score: number;
-           }[];
+           moderationClassifierResult: Record<string, number>;
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: string;
@@ -469,10 +460,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
@@ -599,7 +587,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:394](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L394)
+Defined in: [packages/sdk/src/indexer/schemas.ts:409](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L409)
 
 ## Type declaration
 
@@ -764,10 +752,7 @@ metadata: {
 ### moderationClassifierResult
 
 ```ts
-moderationClassifierResult: {
-  label: string;
-  score: number;
-}[];
+moderationClassifierResult: Record<string, number>;
 ```
 
 ### moderationClassifierScore
@@ -940,10 +925,7 @@ replies: {
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
@@ -1073,10 +1055,7 @@ replies: {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
-        moderationClassifierResult: {
-           label: string;
-           score: number;
-        }[];
+        moderationClassifierResult: Record<string, number>;
         moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: string;
@@ -1293,10 +1272,7 @@ results: {
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
-  moderationClassifierResult: {
-     label: string;
-     score: number;
-  }[];
+  moderationClassifierResult: Record<string, number>;
   moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
@@ -1426,10 +1402,7 @@ results: {
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
@@ -1606,10 +1579,7 @@ viewerReactions: Record<string, {
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
-  moderationClassifierResult: {
-     label: string;
-     score: number;
-  }[];
+  moderationClassifierResult: Record<string, number>;
   moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;

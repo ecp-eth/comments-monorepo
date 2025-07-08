@@ -39,10 +39,7 @@ type IndexerAPIModerationChangeModerationStatusOnCommentOutputSchemaType = {
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
-  moderationClassifierResult: {
-     label: string;
-     score: number;
-  }[];
+  moderationClassifierResult: Record<string, number>;
   moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
@@ -155,7 +152,7 @@ type IndexerAPIModerationChangeModerationStatusOnCommentOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:470](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L470)
+Defined in: [packages/sdk/src/indexer/schemas.ts:485](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L485)
 
 ## Type declaration
 
@@ -320,10 +317,7 @@ metadata: {
 ### moderationClassifierResult
 
 ```ts
-moderationClassifierResult: {
-  label: string;
-  score: number;
-}[];
+moderationClassifierResult: Record<string, number>;
 ```
 
 ### moderationClassifierScore

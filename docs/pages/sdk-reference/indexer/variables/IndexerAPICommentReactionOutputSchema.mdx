@@ -88,16 +88,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }>, "many">;
-  moderationClassifierResult: ZodArray<ZodObject<{
-     label: ZodString;
-     score: ZodNumber;
-   }, "strip", ZodTypeAny, {
-     label: string;
-     score: number;
-   }, {
-     label: string;
-     score: number;
-  }>, "many">;
+  moderationClassifierResult: ZodRecord<ZodUnion<[ZodEnum<["llm_generated", "spam", "sexual", "hate", "violence", "harassment", "self_harm", "sexual_minors", "hate_threatening", "violence_graphic"]>, ZodString]>, ZodNumber>;
   moderationClassifierScore: ZodNumber;
   moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
   parentId: ZodNullable<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
@@ -345,16 +336,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: ...;
         value: ...;
      }>, "many">;
-     moderationClassifierResult: ZodArray<ZodObject<{
-        label: ...;
-        score: ...;
-      }, "strip", ZodTypeAny, {
-        label: ...;
-        score: ...;
-      }, {
-        label: ...;
-        score: ...;
-     }>, "many">;
+     moderationClassifierResult: ZodRecord<ZodUnion<[..., ...]>, ZodNumber>;
      moderationClassifierScore: ZodNumber;
      moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
      parentId: ZodNullable<ZodType<`0x${(...)}`, ZodTypeDef, `0x${(...)}`>>;
@@ -410,10 +392,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
@@ -546,10 +525,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
@@ -683,10 +659,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
-  moderationClassifierResult: {
-     label: string;
-     score: number;
-  }[];
+  moderationClassifierResult: Record<string, number>;
   moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
@@ -816,10 +789,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
@@ -975,10 +945,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
-  moderationClassifierResult: {
-     label: string;
-     score: number;
-  }[];
+  moderationClassifierResult: Record<string, number>;
   moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
@@ -1108,10 +1075,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
-     moderationClassifierResult: {
-        label: string;
-        score: number;
-     }[];
+     moderationClassifierResult: Record<string, number>;
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
@@ -1238,4 +1202,4 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:349](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L349)
+Defined in: [packages/sdk/src/indexer/schemas.ts:364](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L364)
