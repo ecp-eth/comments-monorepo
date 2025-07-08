@@ -24,9 +24,9 @@ patchedDependencies:
   '@walletconnect/keyvaluestorage':
     hash: fa635ef184b19333685f9558a75691cbb42ca6d8a1cac03c5315f3afc2074483
     path: patches/@walletconnect__keyvaluestorage.patch
-  ponder@0.11.18:
-    hash: e20880616cd176ac1b41a1fa784ad8fb9248c5752a576c879ef4bba9444e3e7b
-    path: patches/ponder@0.11.18.patch
+  ponder:
+    hash: bdfb146ece159e9316f1b4a0941ff206600e5c995cecab64e4640870eee283b8
+    path: patches/ponder.patch
 
 importers:
 
@@ -626,8 +626,8 @@ importers:
         specifier: ^8.11.3
         version: 8.16.0
       ponder:
-        specifier: 0.11.18
-        version: 0.11.18(patch_hash=e20880616cd176ac1b41a1fa784ad8fb9248c5752a576c879ef4bba9444e3e7b)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(hono@4.7.11)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4)
+        specifier: 0.11.26
+        version: 0.11.26(patch_hash=bdfb146ece159e9316f1b4a0941ff206600e5c995cecab64e4640870eee283b8)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(hono@4.7.11)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4)
       telegraf:
         specifier: ^4.16.3
         version: 4.16.3
@@ -10284,8 +10284,8 @@ packages:
     resolution: {integrity: sha512-OBatVyC/N7SCW/FaDHrSd+vn0o5cS855TOmYi4OkdWUMSJCET/xip//ch8xGUvtr3i44X9LVyWwQlRMTN3pwSA==}
     engines: {node: '>=10'}
 
-  ponder@0.11.18:
-    resolution: {integrity: sha512-SrwndRHLhQ/D2vdLsEvV1Yp1D9YZWuM5WB2a9rOJAb5A9Y3JTbFRfSn4do/oVHQvpaDmgOPc6fgRgReynDofmg==}
+  ponder@0.11.26:
+    resolution: {integrity: sha512-BZVzfvt3MvRKoTbaNxvMj4XDLsEGzNXGnRdJ7Wamc+O+oY7ixaBfhQmHARU1p7zzFZjdIVpHQZQjMCSSKJ1isg==}
     engines: {node: '>=18.14'}
     hasBin: true
     peerDependencies:
@@ -24528,7 +24528,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.27.4
 
-  ponder@0.11.18(patch_hash=e20880616cd176ac1b41a1fa784ad8fb9248c5752a576c879ef4bba9444e3e7b)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(hono@4.7.11)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4):
+  ponder@0.11.26(patch_hash=bdfb146ece159e9316f1b4a0941ff206600e5c995cecab64e4640870eee283b8)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(hono@4.7.11)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(zod@3.24.4):
     dependencies:
       '@babel/code-frame': 7.27.1
       '@commander-js/extra-typings': 12.1.0(commander@12.1.0)
