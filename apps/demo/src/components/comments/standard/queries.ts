@@ -29,6 +29,7 @@ import type {
   SignEditCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
 import type { DistributiveOmit } from "@ecp.eth/shared/types";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 
 export class SubmitCommentMutationError extends Error {}
 export class SubmitEditCommentMutationError extends Error {}
@@ -140,14 +141,10 @@ export async function submitCommentMutationFunction({
     };
   } catch (e) {
     if (e instanceof ContractFunctionExecutionError) {
-      if (e.shortMessage.includes("User rejected the request.")) {
-        throw new SubmitCommentMutationError("Transaction was rejected.");
-      }
+      const simplifiedErrorMessage = formatContractFunctionExecutionError(e);
 
-      if (e.details.includes("has not been authorized by the user")) {
-        throw new SubmitCommentMutationError(
-          "Transaction not authorized. Please ensure your wallet is unlocked and the session is active.",
-        );
+      if (simplifiedErrorMessage) {
+        throw new SubmitCommentMutationError(simplifiedErrorMessage);
       }
 
       throw new SubmitCommentMutationError(e.details);

@@ -10,7 +10,7 @@ import {
 } from "./schemas.js";
 import type { InfiniteData } from "@tanstack/react-query";
 import { clsx, type ClassValue } from "clsx";
-import type { Chain, Hex } from "viem";
+import type { Chain, ContractFunctionExecutionError, Hex } from "viem";
 import { http } from "wagmi";
 import * as allChains from "wagmi/chains";
 import type { AuthorType, ProcessEnvNetwork } from "./types.js";
@@ -738,4 +738,18 @@ export function getNetworkFromProcessEnv(
   );
 
   return networks;
+}
+
+export function formatContractFunctionExecutionError(
+  error: ContractFunctionExecutionError,
+) {
+  if (error.shortMessage.includes("User rejected the request")) {
+    return "Transaction was rejected.";
+  }
+
+  if (error.shortMessage.includes("has not been authorized by the user")) {
+    return "Transaction not authorized. Please ensure your wallet is unlocked and the session is active.";
+  }
+
+  return error.details;
 }
