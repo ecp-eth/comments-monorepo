@@ -1,14 +1,16 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import { CommentActionButton } from "./CommentActionButton";
 import type { Comment } from "@ecp.eth/shared/schemas";
-import { type PropsWithChildren, useMemo } from "react";
+import { type PropsWithChildren, useCallback, useMemo } from "react";
 import { cn } from "@ecp.eth/shared/helpers";
 import { HeartAnimation } from "@/components/animations/Heart";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@/lib/constants";
+import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
+import { useAccount } from "wagmi";
+import { usePendingWalletConnectionActionsContext } from "./PendingWalletConnectionActionsContext";
 
 export function CommentActionOrStatus({
   comment,
-  hasAccountConnected,
   onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
@@ -18,7 +20,6 @@ export function CommentActionOrStatus({
   isLiking,
 }: {
   comment: Comment;
-  hasAccountConnected: boolean;
   onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
@@ -46,12 +47,36 @@ export function CommentActionOrStatus({
     comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "error";
 
+  const { address: connectedAddress } = useAccount();
+  const onLikeClickRef = useFreshRef(onLikeClick);
+  const onUnlikeClickRef = useFreshRef(onUnlikeClick);
+  const onReplyClickRef = useFreshRef(onReplyClick);
+  const connectAccount = useConnectAccount();
+  const { addAction } = usePendingWalletConnectionActionsContext();
+
+  const hasAccountConnected = !!connectedAddress;
+
   const likedByViewer = useMemo(() => {
     return (
       (comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT]?.length ?? 0) >
       0
     );
   }, [comment.viewerReactions]);
+
+  const connectBeforeAction = useCallback(
+    <TParams extends unknown[]>(
+      action: (...args: TParams) => Promise<unknown> | unknown,
+    ) => {
+      return async (...args: TParams) => {
+        if (!hasAccountConnected) {
+          await connectAccount();
+        }
+
+        await action(...args);
+      };
+    },
+    [connectAccount, hasAccountConnected],
+  );
 
   if (didPostingFailed) {
     return (
@@ -117,29 +142,41 @@ export function CommentActionOrStatus({
   }
 
   if (
-    (comment.pendingOperation &&
-      comment.pendingOperation.state.status !== "success") ||
-    !hasAccountConnected
+    comment.pendingOperation &&
+    comment.pendingOperation.state.status !== "success"
   ) {
     return null;
   }
 
   return (
     <div className="flex items-center gap-2">
-      <CommentActionButton onClick={onReplyClick}>reply</CommentActionButton>
+      <CommentActionButton
+        onClick={connectBeforeAction(() => {
+          onReplyClickRef.current();
+        })}
+      >
+        reply
+      </CommentActionButton>
       <CommentActionButton>
         <HeartAnimation
           pending={isLiking}
-          onIsHeartedChange={(isHearted) => {
-            if (isHearted) {
-              onLikeClick();
-            } else {
-              onUnlikeClick();
+          onIsHeartedChange={connectBeforeAction((isHearted) => {
+            if (!hasAccountConnected) {
+              addAction({
+                type: isHearted ? "like" : "unlike",
+                commentId: comment.id,
+              });
+              return;
             }
-          }}
+
+            if (isHearted) {
+              onLikeClickRef.current();
+            } else {
+              onUnlikeClickRef.current();
+            }
+          })}
           isHearted={likedByViewer}
         />
-
         {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
       </CommentActionButton>
     </div>

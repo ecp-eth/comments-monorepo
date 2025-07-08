@@ -24,6 +24,7 @@ import {
 import {
   useNewCommentsChecker,
   useIsAccountStatusResolved,
+  useConnectAccount,
 } from "@ecp.eth/shared/hooks";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import {
@@ -39,6 +40,8 @@ import { CommentForm } from "../core/CommentForm";
 import { createRootCommentsQueryKey } from "../core/queries";
 import { CommentActionsProvider } from "./context";
 import { toast } from "sonner";
+import { useConnectedAction } from "./hooks/useConnectedAction";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 type CommentSectionGaslessProps = {
   disableApprovals?: boolean;
@@ -48,6 +51,7 @@ export function CommentSectionGasless({
   disableApprovals,
 }: CommentSectionGaslessProps) {
   const { address: viewer } = useAccount();
+  const connectAccount = useConnectAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
@@ -116,6 +120,10 @@ export function CommentSectionGasless({
     },
   });
 
+  const { setRequestApprovalOnConnect } = useConnectedAction(() => {
+    approveGaslessTransactionsMutation.mutate();
+  });
+
   const approveContractReceipt = useWaitForTransactionReceipt({
     hash: approveGaslessTransactionsMutation.data,
   });
@@ -143,6 +151,7 @@ export function CommentSectionGasless({
           signal,
           viewer,
           mode: "flat",
+          commentType: COMMENT_TYPE_COMMENT,
         });
       },
       refetchOnMount: false,
@@ -175,7 +184,7 @@ export function CommentSectionGasless({
         signal,
         viewer,
         mode: "flat",
-        commentType: 0,
+        commentType: COMMENT_TYPE_COMMENT,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -235,9 +244,10 @@ export function CommentSectionGasless({
     );
 
   const isApprovalPending =
-    approveContractReceipt.isLoading ||
-    approveGaslessTransactionsMutation.isPending ||
-    approvalStatus.isPending;
+    (approveContractReceipt.isLoading ||
+      approveGaslessTransactionsMutation.isPending ||
+      approvalStatus.isPending) &&
+    !!viewer;
 
   const isRemovingApproval =
     revokeApproval.isPending || removeApprovalContractReceipt.isLoading;
@@ -252,12 +262,17 @@ export function CommentSectionGasless({
         <CommentSectionWrapper>
           <h2 className="text-lg font-semibold">Comments</h2>
 
-          {!!viewer &&
-            !approvalStatus.data?.approved &&
+          {!approvalStatus.data?.approved &&
             commentGaslessProviderValue.areApprovalsEnabled && (
               <div className="mb-4">
                 <Button
-                  onClick={() => {
+                  onClick={async () => {
+                    if (!viewer) {
+                      await connectAccount();
+                      setRequestApprovalOnConnect(true);
+                      return;
+                    }
+
                     approveGaslessTransactionsMutation.mutate();
                   }}
                   disabled={isApprovalPending}
@@ -320,7 +335,6 @@ export function CommentSectionGasless({
                 <CommentItem
                   key={`${comment.id}-${comment.deletedAt}`}
                   comment={comment}
-                  connectedAddress={viewer}
                 />
               ))}
               {hasNextPage && (

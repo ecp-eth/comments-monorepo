@@ -407,6 +407,13 @@ export function useCommentActions({
     async (params) => {
       const { comment, queryKey, onBeforeStart, onFailed, onSuccess } = params;
 
+      if (
+        (comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT]?.length ??
+          0) > 0
+      ) {
+        throw new Error("Comment already liked");
+      }
+
       onBeforeStart?.();
 
       let pendingOperation: PendingPostCommentOperationSchemaType | undefined =
@@ -492,9 +499,10 @@ export function useCommentActions({
         onFailed,
       } = params;
 
-      const reaction = comment.viewerReactions?.[
-        COMMENT_REACTION_LIKE_CONTENT
-      ]?.find((reaction) => reaction.parentId === comment.id);
+      const reactions =
+        comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT] ?? [];
+
+      const reaction = reactions[reactions.length - 1];
 
       if (!reaction) {
         throw new Error("Reaction not found");

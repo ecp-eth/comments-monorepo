@@ -21,11 +21,12 @@ export function HeartAnimation({
     direction: "hearted" | "unhearted";
     animating: boolean;
   }>({
-    // reverse the initial direction so the useEffect -> gotoFrame works
-    direction: isHearted ? "unhearted" : "hearted",
+    direction: isHearted ? "hearted" : "unhearted",
     animating: false,
   });
 
+  // this state helps the useEffect to avoid triggering animation for setting the initial frame according to `isHearted` prop
+  const [initialized, setInitialized] = useState(false);
   const [lastIsHearted, setLastIsHearted] = useState(isHearted);
   const [endFrame, setEndFrame] = useState(END_FRAME);
   const [animationLoaded, setAnimationLoaded] = useState(false);
@@ -47,12 +48,15 @@ export function HeartAnimation({
   const gotoFrame = useCallback(
     (hearted: boolean) => {
       if (
-        (animatingState.current.direction === "hearted" && hearted) ||
-        (animatingState.current.direction === "unhearted" && !hearted)
+        animatingState.current.animating &&
+        ((animatingState.current.direction === "hearted" && hearted) ||
+          (animatingState.current.direction === "unhearted" && !hearted))
       ) {
         // no need to go to frame if it is already animating to hearted frame
         return;
       }
+
+      setInitialized(true);
 
       containerRef.current?.classList.remove("overflow-visible");
       animatingState.current.animating = false;
@@ -75,6 +79,7 @@ export function HeartAnimation({
     }
 
     if (
+      initialized &&
       // if it a change (we don't want to animate if it is already hearted)
       isHearted !== lastIsHearted &&
       // from not hearted to hearted
@@ -86,6 +91,7 @@ export function HeartAnimation({
       gotoFrame(isHearted);
     }
 
+    setInitialized(true);
     setLastIsHearted(isHearted);
   }, [
     animationLoaded,
@@ -95,6 +101,7 @@ export function HeartAnimation({
     lastIsHearted,
     playHeartedAnimation,
     pending,
+    initialized,
   ]);
 
   // Handle pending state
@@ -103,7 +110,7 @@ export function HeartAnimation({
       return;
     }
 
-    // If pending and hearted, keep repeating the animation
+    // If pending and not hearted, play the hearted animation
     playHeartedAnimation();
   }, [animationLoaded, pending, isHearted, playHeartedAnimation, gotoFrame]);
 
