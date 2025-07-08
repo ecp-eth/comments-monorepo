@@ -107,7 +107,6 @@ jobs:
       ENS_RPC_URL: "https://ethereum-rpc.publicnode.com"
       NEYNAR_API_KEY: "NEYNAR_API_KEY"
       SIM_API_KEY: "SIM_API_KEY"
-      MODERATION_MBD_API_KEY: "MBD_API_KEY"
 
     name: Build and Test on Node.js 22
     steps:
