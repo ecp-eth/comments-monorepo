@@ -21,7 +21,7 @@ const mockDbService = {
   getCommentById: vi.fn(),
 } as ICommentDbService;
 
-describe.only("PremoderationService", () => {
+describe("PremoderationService", () => {
   let service: PremoderationService;
   const defaultModerationStatus: ModerationStatus = "pending";
 
