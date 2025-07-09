@@ -1,9 +1,9 @@
 import type { WebhookCallbackData } from "../utils/webhook";
-import type { ModerationNotificationsService } from "./types";
+import type { IModerationNotificationsService } from "./types";
 import type { CommentSelectType } from "ponder:schema";
 
 export class NoopNotificationsService
-  implements ModerationNotificationsService
+  implements IModerationNotificationsService
 {
   async initialize() {
     console.log("NoopNotificationsService: initialize");
@@ -11,6 +11,12 @@ export class NoopNotificationsService
 
   async notifyPendingModeration() {
     console.log("NoopNotificationsService: notifyPendingModeration");
+    return undefined;
+  }
+
+  async notifyAutomaticClassification() {
+    console.log("NoopNotificationsService: notifyAutomaticClassification");
+    return undefined;
   }
 
   async updateMessageWithModerationStatus(

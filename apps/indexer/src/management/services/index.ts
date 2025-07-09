@@ -2,12 +2,15 @@ import { env } from "../../env";
 import {
   moderationNotificationsService,
   commentModerationClassifierService,
+  premoderationService,
+  commentDbService,
 } from "../../services";
 import { CommentModerationService } from "./comment-moderation-service";
 
 export const commentModerationService = new CommentModerationService({
-  enabled: env.MODERATION_ENABLED,
   knownReactions: env.MODERATION_KNOWN_REACTIONS,
+  premoderationService,
   notificationService: moderationNotificationsService,
   classifierService: commentModerationClassifierService,
+  commentDbService,
 });

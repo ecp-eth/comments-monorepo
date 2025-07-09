@@ -24,7 +24,6 @@ import { urlResolverService } from "../services/url-resolver";
 
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import { env } from "../env";
-import type { ModerationStatusResult } from "../management/services/comment-moderation-service";
 
 const resolverCommentReferences: ResolveCommentReferencesOptions = {
   ensByAddressResolver: ensByAddressResolverService,
@@ -301,14 +300,11 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       resolverCommentReferences,
     );
 
-    let moderationResult: ModerationStatusResult | undefined;
-
-    if (existingComment.content !== event.args.content) {
-      moderationResult = await commentModerationService.moderateUpdate(
-        event.args,
-        referencesResolutionResult.references,
-      );
-    }
+    const moderationResult = await commentModerationService.moderateUpdate({
+      comment: event.args,
+      references: referencesResolutionResult.references,
+      existingComment,
+    });
 
     await context.db
       .update(schema.comment, {
@@ -321,14 +317,12 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         references: referencesResolutionResult.references,
         referencesResolutionStatus: referencesResolutionResult.status,
         referencesResolutionStatusChangedAt: new Date(),
-        ...(moderationResult?.result && {
-          moderationStatus: moderationResult.result.status,
-          moderationStatusChangedAt: moderationResult.result.changedAt,
-          moderationClassifierResult: moderationResult.result.classifier.labels,
-          moderationClassifierScore: moderationResult.result.classifier.score,
-        }),
+        moderationStatus: moderationResult.result.status,
+        moderationStatusChangedAt: moderationResult.result.changedAt,
+        moderationClassifierResult: moderationResult.result.classifier.labels,
+        moderationClassifierScore: moderationResult.result.classifier.score,
       });
 
-    moderationResult?.saveAndNotify();
+    await moderationResult.saveAndNotify();
   });
 }

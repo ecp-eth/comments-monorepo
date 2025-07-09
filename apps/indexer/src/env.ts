@@ -1,13 +1,17 @@
 import { z } from "zod";
 
 const moderationNotificationsEnabledSchema = z.object({
-  MODERATION_TELEGRAM_BOT_TOKEN: z.string().min(1),
-  MODERATION_TELEGRAM_CHANNEL_ID: z.string().min(1),
+  MODERATION_TELEGRAM_BOT_TOKEN: z.string().nonempty(),
+  MODERATION_TELEGRAM_CHANNEL_ID: z.string().nonempty(),
   MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url(),
-  MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().min(1),
+  MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().nonempty(),
 });
 
 const classificationScoreThresholdSchema = z.coerce.number().min(0).max(1);
+
+const moderationAutomaticClassificationEnabledSchema = z.object({
+  MODERATION_MBD_API_KEY: z.string().nonempty(),
+});
 
 const EnvSchema = z
   .object({
@@ -40,6 +44,10 @@ const EnvSchema = z
               .filter(Boolean),
           ),
       ),
+    MODERATION_ENABLE_AUTOMATIC_CLASSIFICATION: z
+      .enum(["0", "1"])
+      .default("0")
+      .transform((val) => val === "1"),
     MODERATION_MBD_API_KEY: z.string().optional(),
     MODERATION_TELEGRAM_BOT_TOKEN: z.string().optional(),
     MODERATION_TELEGRAM_CHANNEL_ID: z.string().optional(),
@@ -77,12 +85,21 @@ const EnvSchema = z
       classificationScoreThresholdSchema.optional(),
   })
   .superRefine((vars, ctx) => {
-    if (!vars.MODERATION_ENABLED) {
-      return true;
+    if (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) {
+      const result = moderationNotificationsEnabledSchema.safeParse(vars);
+
+      if (!result.success) {
+        result.error.issues.forEach((issue) => {
+          ctx.addIssue(issue);
+        });
+
+        return z.NEVER;
+      }
     }
 
-    if (vars.MODERATION_ENABLE_NOTIFICATIONS) {
-      const result = moderationNotificationsEnabledSchema.safeParse(vars);
+    if (vars.MODERATION_ENABLE_AUTOMATIC_CLASSIFICATION) {
+      const result =
+        moderationAutomaticClassificationEnabledSchema.safeParse(vars);
 
       if (!result.success) {
         result.error.issues.forEach((issue) => {

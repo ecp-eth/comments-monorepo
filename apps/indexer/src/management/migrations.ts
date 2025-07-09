@@ -6,6 +6,7 @@ import {
   type MigrationProvider,
 } from "kysely";
 import type { Hex } from "viem";
+import type { CommentModerationLabelsWithScore } from "../services/types";
 
 export type MutedAccountsTable = {
   account: Hex;
@@ -28,10 +29,19 @@ export type CommentModerationStatusesTable = {
   moderation_status: "pending" | "approved" | "rejected";
 };
 
+export type CommentClassificationResultsTable = {
+  comment_id: string;
+  created_at: Generated<Date>;
+  updated_at: Generated<Date>;
+  labels: CommentModerationLabelsWithScore;
+  score: number;
+};
+
 export type IndexerSchemaDB = {
   muted_accounts: MutedAccountsTable;
   api_keys: ApiKeysTable;
   comment_moderation_statuses: CommentModerationStatusesTable;
+  comment_classification_results: CommentClassificationResultsTable;
 };
 
 export type MutedAccountSelect = Selectable<MutedAccountsTable>;
@@ -92,6 +102,25 @@ class StaticMigrationsProvider implements MigrationProvider {
         },
         down: async (db: Kysely<IndexerSchemaDB>) => {
           await db.schema.dropTable("comment_moderation_statuses").execute();
+        },
+      },
+      "2025_07_09_13_37_00_comments_classification": {
+        up: async (db: Kysely<IndexerSchemaDB>) => {
+          await db.schema
+            .createTable("comment_classification_results")
+            .addColumn("comment_id", "text", (col) => col.primaryKey())
+            .addColumn("created_at", "timestamptz", (col) =>
+              col.notNull().defaultTo(sql`now()`),
+            )
+            .addColumn("updated_at", "timestamptz", (col) =>
+              col.notNull().defaultTo(sql`now()`),
+            )
+            .addColumn("labels", "jsonb", (col) => col.notNull())
+            .addColumn("score", "double precision", (col) => col.notNull())
+            .execute();
+        },
+        down: async (db: Kysely<IndexerSchemaDB>) => {
+          await db.schema.dropTable("comment_classification_results").execute();
         },
       },
     };

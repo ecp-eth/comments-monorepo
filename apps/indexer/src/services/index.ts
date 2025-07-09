@@ -3,6 +3,11 @@ import { CommentModerationClassifier } from "./mbd-comment-moderation-classifier
 import { ModerationNotificationsService } from "./moderation-notifications";
 import { NoopNotificationsService } from "./noop-notifications";
 import { NoopCommentModerationClassifier } from "./noop-comment-moderation-classifier";
+import { PremoderationService } from "./premoderation-service";
+import { PremoderationCacheService } from "./premoderation-cache-service";
+import { NoopPremoderationService } from "./noop-premoderation-service";
+import { CommentDbService } from "./comment-db-service";
+import { ClassificationCacheService } from "./classification-cache-service";
 
 export const moderationNotificationsService =
   env.MODERATION_TELEGRAM_BOT_TOKEN &&
@@ -17,8 +22,26 @@ export const moderationNotificationsService =
       })
     : new NoopNotificationsService();
 
-export const commentModerationClassifierService = env.MODERATION_MBD_API_KEY
-  ? new CommentModerationClassifier({
-      apiKey: env.MODERATION_MBD_API_KEY,
+const classifierCacheService = new ClassificationCacheService();
+
+export const commentModerationClassifierService =
+  env.MODERATION_ENABLE_AUTOMATIC_CLASSIFICATION && env.MODERATION_MBD_API_KEY
+    ? new CommentModerationClassifier({
+        apiKey: env.MODERATION_MBD_API_KEY,
+        cacheService: classifierCacheService,
+      })
+    : new NoopCommentModerationClassifier();
+
+const premoderationCacheService = new PremoderationCacheService();
+
+export const commentDbService = new CommentDbService({
+  cacheService: premoderationCacheService,
+});
+
+export const premoderationService = env.MODERATION_ENABLED
+  ? new PremoderationService({
+      defaultModerationStatus: "pending",
+      cacheService: premoderationCacheService,
+      dbService: commentDbService,
     })
-  : new NoopCommentModerationClassifier();
+  : new NoopPremoderationService();

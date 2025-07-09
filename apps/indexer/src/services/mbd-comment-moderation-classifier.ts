@@ -2,10 +2,13 @@ import DataLoader from "dataloader";
 import { z } from "zod";
 import {
   type CommentModerationClassfierResult,
-  type CommentModerationClassifierService,
+  type ICommentClassifierCacheService,
+  type ICommentModerationClassifierService,
   CommentModerationLabel,
   type CommentModerationLabelsWithScore,
+  ModerationNotificationServicePendingComment,
 } from "./types";
+import { CommentSelectType } from "ponder:schema";
 
 const responseSchema = z.object({
   status_code: z.literal(200),
@@ -21,6 +24,7 @@ const responseSchema = z.object({
 
 type CommentModerationClassifierOptions = {
   apiKey: string;
+  cacheService: ICommentClassifierCacheService;
 };
 
 /**
@@ -29,9 +33,14 @@ type CommentModerationClassifierOptions = {
  * @see https://docs.mbd.xyz/reference/post_casts-labels-for-text
  */
 export class CommentModerationClassifier
-  extends DataLoader<string, CommentModerationClassfierResult>
-  implements CommentModerationClassifierService
+  extends DataLoader<
+    string,
+    Omit<CommentModerationClassfierResult, "save" | "action">
+  >
+  implements ICommentModerationClassifierService
 {
+  private cacheService: ICommentClassifierCacheService;
+
   constructor(options: CommentModerationClassifierOptions) {
     super(
       async (contents) => {
@@ -96,6 +105,8 @@ export class CommentModerationClassifier
         cache: false,
       },
     );
+
+    this.cacheService = options.cacheService;
   }
 
   /**
@@ -103,7 +114,60 @@ export class CommentModerationClassifier
    * @param content The comment content to classify
    * @returns Array of labels with scores
    */
-  async classify(content: string): Promise<CommentModerationClassfierResult> {
-    return this.load(content);
+  async classify(
+    comment: ModerationNotificationServicePendingComment,
+  ): Promise<CommentModerationClassfierResult> {
+    const cachedResult = await this.cacheService.getByCommentId(comment.id);
+
+    if (cachedResult) {
+      return {
+        action: "skipped",
+        labels: cachedResult.labels,
+        score: cachedResult.score,
+        save: async () => {},
+      };
+    }
+
+    const result = await this.load(comment.content);
+
+    return {
+      action: "classified",
+      labels: result.labels,
+      score: result.score,
+      save: async () => {
+        await this.cacheService.setByCommentId(comment.id, {
+          labels: result.labels,
+          score: result.score,
+        });
+      },
+    };
+  }
+
+  async classifyUpdate(
+    comment: ModerationNotificationServicePendingComment,
+    existingComment: CommentSelectType,
+  ): Promise<CommentModerationClassfierResult> {
+    if (comment.content === existingComment.content) {
+      return {
+        action: "skipped",
+        labels: existingComment.moderationClassifierResult,
+        score: existingComment.moderationClassifierScore,
+        save: async () => {},
+      };
+    }
+
+    const result = await this.load(comment.content);
+
+    return {
+      action: "classified",
+      labels: result.labels,
+      score: result.score,
+      save: async () => {
+        await this.cacheService.setByCommentId(comment.id, {
+          labels: result.labels,
+          score: result.score,
+        });
+      },
+    };
   }
 }
