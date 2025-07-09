@@ -41,7 +41,7 @@
     "node-html-parser": "^7.0.1",
     "normalize-url": "^8.0.1",
     "pg": "^8.11.3",
-    "ponder": "0.11.18",
+    "ponder": "0.11.26",
     "telegraf": "^4.16.3",
     "viem": "^2.29.2",
     "xxhash-wasm": "^1.1.0",
