@@ -52,7 +52,7 @@ interface CommentModerationServiceOptions {
   classifierService: CommentModerationClassifierService;
 }
 
-interface ModerationStatusResult {
+export interface ModerationStatusResult {
   result: {
     status: ModerationStatus;
     changedAt: Date;
@@ -81,17 +81,7 @@ export class CommentModerationService {
     references: IndexerAPICommentReferencesSchemaType,
   ): Promise<ModerationStatusResult> {
     if (!this.enabled) {
-      return {
-        result: {
-          status: this.defaultModerationStatus,
-          changedAt: new Date(),
-          classifier: {
-            score: 0,
-            labels: {},
-          },
-        },
-        saveAndNotify: async () => {},
-      };
+      return this.createNoopModerationStatusResult();
     }
 
     // commentType 1 represents reactions
@@ -99,17 +89,7 @@ export class CommentModerationService {
       comment.commentType === COMMENT_TYPE_REACTION &&
       this.knownReactions.has(comment.content)
     ) {
-      return {
-        result: {
-          status: "approved",
-          changedAt: new Date(),
-          classifier: {
-            score: 0,
-            labels: {},
-          },
-        },
-        saveAndNotify: async () => {},
-      };
+      return this.createNoopModerationStatusResult();
     }
 
     const classifierResult = await this.classifierService.classify(
@@ -138,13 +118,56 @@ export class CommentModerationService {
           );
 
           if (moderationStatus.status === "pending") {
-            await this.notifyTelegram({
+            await this.sendNewNotification({
               comment,
               references,
               classifierResult,
             });
           }
         }
+      },
+    };
+  }
+
+  async moderateUpdate(
+    comment: Event<"CommentsV1:CommentEdited">["args"],
+    references: IndexerAPICommentReferencesSchemaType,
+  ): Promise<ModerationStatusResult> {
+    if (!this.enabled) {
+      return this.createNoopModerationStatusResult();
+    }
+
+    // commentType 1 represents reactions
+    if (
+      comment.commentType === COMMENT_TYPE_REACTION &&
+      this.knownReactions.has(comment.content)
+    ) {
+      return this.createNoopModerationStatusResult();
+    }
+
+    const classifierResult = await this.classifierService.classify(
+      comment.content,
+    );
+
+    const status = "pending" as const;
+
+    return {
+      result: {
+        changedAt: new Date(),
+        classifier: classifierResult,
+        status,
+      },
+      saveAndNotify: async () => {
+        if (!this.enabled) {
+          return;
+        }
+
+        await this.updateModerationStatus(comment.commentId, status);
+        await this.sendUpdateNotification({
+          comment,
+          references,
+          classifierResult,
+        });
       },
     };
   }
@@ -205,6 +228,20 @@ export class CommentModerationService {
     return comment;
   }
 
+  private createNoopModerationStatusResult(): ModerationStatusResult {
+    return {
+      result: {
+        status: this.defaultModerationStatus,
+        changedAt: new Date(),
+        classifier: {
+          score: 0,
+          labels: {},
+        },
+      },
+      saveAndNotify: async () => {},
+    };
+  }
+
   private async insertCommentModerationStatus(
     commentId: Hex,
     status: ModerationStatus = "pending",
@@ -238,7 +275,7 @@ export class CommentModerationService {
     return result;
   }
 
-  private async notifyTelegram({
+  private async sendNewNotification({
     comment,
     references,
     classifierResult,
@@ -258,6 +295,31 @@ export class CommentModerationService {
         parentId: comment.parentId,
       },
       classifierResult,
+      "create",
+    );
+  }
+
+  private async sendUpdateNotification({
+    comment,
+    references,
+    classifierResult,
+  }: {
+    comment: Event<"CommentsV1:CommentEdited">["args"];
+    references: IndexerAPICommentReferencesSchemaType;
+    classifierResult: CommentModerationClassfierResult;
+  }) {
+    return this.notificationService.notifyPendingModeration(
+      {
+        channelId: comment.channelId,
+        author: comment.author,
+        content: comment.content,
+        targetUri: comment.targetUri,
+        references,
+        id: comment.commentId,
+        parentId: comment.parentId,
+      },
+      classifierResult,
+      "update",
     );
   }
 }

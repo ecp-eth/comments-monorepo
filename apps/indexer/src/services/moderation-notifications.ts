@@ -5,6 +5,7 @@ import type {
   ModerationNotificationServicePendingComment,
   CommentModerationClassfierResult,
   CommentModerationLabelsWithScore,
+  ModerationNotificationsServiceCommentStatus,
 } from "./types";
 import {
   decryptWebhookCallbackData,
@@ -63,9 +64,10 @@ export class ModerationNotificationsService
   async notifyPendingModeration(
     comment: ModerationNotificationServicePendingComment,
     classifierResult: CommentModerationClassfierResult,
+    status: ModerationNotificationsServiceCommentStatus,
   ) {
     const author = await resolveAuthor(comment.author);
-    let message = `🆕 New comment pending moderation
+    let message = `${status === "create" ? "🆕 New" : "🔄 Updated"} comment pending moderation
 
 **ID**: \`${comment.id}\`
 **Channel ID**: \`${comment.channelId}\`
@@ -81,6 +83,7 @@ Content:
 `;
 
     const remainingLength = env.TELEGRAM_MESSAGE_LENGTH_LIMIT - message.length;
+
     if (remainingLength <= 0) {
       console.error(
         "ModerationNotificationsService: message length limit exceeded too early, not enough remaining length for the message",
