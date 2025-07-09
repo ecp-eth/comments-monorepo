@@ -1,10 +1,10 @@
 import DataLoader from "dataloader";
 import { z } from "zod";
 import {
-  CommentModerationClassfierResult,
+  type CommentModerationClassfierResult,
   type CommentModerationClassifierService,
   CommentModerationLabel,
-  CommentModerationLabelsWithScore,
+  type CommentModerationLabelsWithScore,
 } from "./types";
 
 const responseSchema = z.object({

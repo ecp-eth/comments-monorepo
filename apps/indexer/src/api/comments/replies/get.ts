@@ -1,6 +1,6 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { and, asc, desc, eq, gt, lt, or, isNull, inArray } from "ponder";
+import { and, asc, desc, eq, gt, lt, lte, or, isNull, inArray } from "ponder";
 import { IndexerAPIListCommentRepliesOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../../lib/response-formatters";
@@ -15,7 +15,7 @@ import {
   convertExcludeModerationLabelsToConditions,
   normalizeModerationStatusFilter,
 } from "../helpers";
-import { SQL } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 
 const getCommentsRoute = createRoute({
@@ -63,6 +63,7 @@ export default (app: OpenAPIHono) => {
       chainId,
       excludeModerationLabels,
       author,
+      moderationScore,
     } = c.req.valid("query");
     const { commentId } = c.req.valid("param");
 
@@ -78,6 +79,9 @@ export default (app: OpenAPIHono) => {
         : inArray(schema.comment.chainId, chainId),
       excludeModerationLabels
         ? convertExcludeModerationLabelsToConditions(excludeModerationLabels)
+        : undefined,
+      moderationScore != null
+        ? lte(schema.comment.moderationClassifierScore, moderationScore)
         : undefined,
     ];
     const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];

@@ -66,6 +66,7 @@ export default (app: OpenAPIHono) => {
       channelId,
       commentType,
       moderationStatus,
+      moderationScore,
       chainId,
       excludeModerationLabels,
     } = c.req.valid("query");
@@ -84,6 +85,9 @@ export default (app: OpenAPIHono) => {
         : inArray(schema.comment.chainId, chainId),
       excludeModerationLabels
         ? convertExcludeModerationLabelsToConditions(excludeModerationLabels)
+        : undefined,
+      moderationScore != null
+        ? lte(schema.comment.moderationClassifierScore, moderationScore)
         : undefined,
     ];
 
