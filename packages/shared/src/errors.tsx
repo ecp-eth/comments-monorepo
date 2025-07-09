@@ -35,3 +35,29 @@ export class RateLimitedError extends CommentFormSubmitError {
     super(<span className="inline-flex">{message}</span>);
   }
 }
+
+export class CommentContentTooLargeError extends CommentFormSubmitError {
+  constructor(message = "Comment content length limit exceeded") {
+    super(<span className="inline-flex">{message}</span>);
+  }
+}
+
+/**
+ * Throws an error based on the known response status codes
+ * if the code is not known, it will not throw an error
+ *
+ * @param response - The response to throw an error for
+ */
+export const throwKnownResponseCodeError = async (response: Response) => {
+  if (response.status === 429) {
+    throw new RateLimitedError();
+  }
+
+  if (response.status === 400) {
+    throw new CommentFormSubmitError(await response.json());
+  }
+
+  if (response.status === 413) {
+    throw new CommentContentTooLargeError();
+  }
+};

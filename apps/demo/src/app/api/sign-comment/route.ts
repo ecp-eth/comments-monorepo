@@ -40,6 +40,18 @@ export async function POST(
 
   const { content, author, metadata, commentType } = passedCommentData;
 
+  if (content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
+    return new JSONResponse(
+      BadRequestResponseSchema,
+      {
+        content: [
+          `Comment content length limit exceeded (max ${env.COMMENT_CONTENT_LENGTH_LIMIT} characters)`,
+        ],
+      },
+      { status: 413 },
+    );
+  }
+
   // const { content, targetUri, parentId, author } = parsedBodyResult.data;
 
   // Validate target URL is valid

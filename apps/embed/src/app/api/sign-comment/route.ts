@@ -32,6 +32,15 @@ export async function POST(req: Request) {
   const passedCommentData = parseResult.data;
   const { content, author, chainId } = passedCommentData;
 
+  if (content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
+    return Response.json(
+      {
+        error: `Comment content length limit exceeded (max ${env.COMMENT_CONTENT_LENGTH_LIMIT} characters)`,
+      },
+      { status: 413 },
+    );
+  }
+
   const rateLimiterResult = await signCommentRateLimiter.isRateLimited(author);
 
   if (!rateLimiterResult.success) {

@@ -23,6 +23,7 @@ import { farcasterByNameResolverService } from "../services/farcaster-by-name-re
 import { urlResolverService } from "../services/url-resolver";
 
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
+import { env } from "../env";
 
 const resolverCommentReferences: ResolveCommentReferencesOptions = {
   ensByAddressResolver: ensByAddressResolverService,
@@ -36,6 +37,26 @@ const resolverCommentReferences: ResolveCommentReferencesOptions = {
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
+    if (event.args.content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
+      Sentry.captureMessage(
+        `Comment content length limit exceeded, comment id: ${event.args.commentId}`,
+        {
+          level: "info",
+          extra: {
+            commentId: event.args.commentId,
+            app: event.args.app,
+            chainId: context.chain.id,
+            author: event.args.author,
+            txHash: event.transaction.hash,
+            logIndex: event.log.logIndex,
+            parentCommentId: event.args.parentId,
+          },
+        },
+      );
+
+      return;
+    }
+
     const targetUri = transformCommentTargetUri(event.args.targetUri);
 
     if (await getMutedAccount(event.args.author)) {

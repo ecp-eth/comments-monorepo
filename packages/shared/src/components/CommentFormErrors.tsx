@@ -12,7 +12,20 @@ export function CommentFormErrors({
 }: CommentFormErrorsProps) {
   return (
     <div className={cn("text-xs text-red-500 flex flex-col gap-1", className)}>
-      {error instanceof CommentFormSubmitError ? error.render() : error.message}
+      {isCommentFormSubmitError(error) ? error.render() : error.message}
     </div>
+  );
+}
+
+/**
+ * Check if an error is typeof CommentFormSubmitError,
+ * Use duck typing to avoid CommentFormSubmitError reference issue introduced by bundling
+ */
+function isCommentFormSubmitError(
+  error: Error,
+): error is CommentFormSubmitError {
+  return (
+    error instanceof CommentFormSubmitError ||
+    ("render" in error && typeof error.render === "function")
   );
 }

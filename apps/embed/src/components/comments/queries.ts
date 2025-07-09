@@ -19,6 +19,7 @@ import {
   RateLimitedError,
   CommentFormSubmitError,
   InvalidCommentError,
+  throwKnownResponseCodeError,
 } from "@ecp.eth/shared/errors";
 import type {
   Comment,
@@ -103,13 +104,7 @@ export async function submitCommentMutationFunction({
   });
 
   if (!response.ok) {
-    if (response.status === 429) {
-      throw new RateLimitedError();
-    }
-
-    if (response.status === 400) {
-      throw new CommentFormSubmitError(await response.json());
-    }
+    await throwKnownResponseCodeError(response);
 
     throw new SubmitCommentMutationError(
       "Failed to obtain signed comment data, please try again.",
@@ -215,13 +210,7 @@ export async function submitEditCommentMutationFunction({
   });
 
   if (!response.ok) {
-    if (response.status === 429) {
-      throw new RateLimitedError();
-    }
-
-    if (response.status === 400) {
-      throw new CommentFormSubmitError(await response.json());
-    }
+    await throwKnownResponseCodeError(response);
 
     throw new SubmitEditCommentMutationError(
       "Failed to obtain signed comment data, please try again.",

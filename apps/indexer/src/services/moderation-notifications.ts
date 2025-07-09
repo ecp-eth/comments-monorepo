@@ -12,6 +12,7 @@ import type { CommentSelectType } from "ponder:schema";
 import { isZeroHex, type Hex } from "@ecp.eth/sdk/core";
 import { ensByAddressResolverService } from "./ens-by-address-resolver";
 import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver";
+import { env } from "process";
 
 type ModerationNotificationsServiceOptions = {
   telegramBotToken: string;
@@ -61,11 +62,7 @@ export class ModerationNotificationsService
     comment: ModerationNotificationServicePendingComment,
   ) {
     const author = await resolveAuthor(comment.author);
-    const renderResult = renderToMarkdown({
-      content: comment.content,
-      references: comment.references,
-    });
-    const message = `🆕 New comment pending moderation
+    let message = `🆕 New comment pending moderation
 
 **ID**: \`${comment.id}\`
 **Channel ID**: \`${comment.channelId}\`
@@ -75,8 +72,25 @@ export class ModerationNotificationsService
 
 Content:
 
-${renderResult.result}
 `;
+
+    const remainingLength = env.TELEGRAM_MESSAGE_LENGTH_LIMIT - message.length;
+    if (remainingLength <= 0) {
+      console.error(
+        "ModerationNotificationsService: message length limit exceeded too early, not enough remaining length for the message",
+        message,
+      );
+
+      return;
+    }
+
+    const renderResult = renderToMarkdown({
+      content: comment.content,
+      references: comment.references,
+      maxLength: remainingLength,
+    });
+
+    message += renderResult.result;
 
     try {
       await this.bot.telegram.sendMessage(this.channelId, message, {
