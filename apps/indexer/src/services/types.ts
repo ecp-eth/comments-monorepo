@@ -2,6 +2,9 @@ import type { Hex } from "@ecp.eth/sdk/core";
 import type { WebhookCallbackData } from "../utils/webhook";
 import type { CommentSelectType } from "ponder:schema";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import type { Convenience, Message } from "telegraf/types";
+import type { CommentReportStatus } from "../management/types";
+import type { CommentReportSelectType } from "../management/migrations";
 
 export type ModerationStatus = "pending" | "approved" | "rejected";
 
@@ -33,7 +36,6 @@ export type ModerationNotificationServiceNotifyAutomaticClassificationParams = {
 export type ModerationNotificationsServiceCommentStatus = "create" | "update";
 
 export interface IModerationNotificationsService {
-  initialize: () => Promise<void>;
   /**
    * Notify Telegram that a comment is pending moderation.
    * @param params - The parameters for the notification.
@@ -48,7 +50,7 @@ export interface IModerationNotificationsService {
    * @param params - The parameters for the notification.
    * @returns The message ID if the message was sent, undefined if the message has not been sent because the message length limit was exceeded.
    */
-  notifyAutomaticClassification: (
+  notifyAutomaticallyClassified: (
     params: ModerationNotificationServiceNotifyAutomaticClassificationParams,
     status: ModerationNotificationsServiceCommentStatus,
   ) => Promise<number | undefined>;
@@ -60,7 +62,26 @@ export interface IModerationNotificationsService {
     messageId: number,
     comment: CommentSelectType,
   ) => Promise<void>;
-  decryptWebhookCallbackData: (data: string) => WebhookCallbackData;
+}
+
+export type ReportsNotificationsServiceNotifyReportParams = {
+  comment: CommentSelectType;
+  report: CommentReportSelectType;
+};
+
+export type ReportsNotificationsServiceNotifyReportStatusChangeParams = {
+  messageId: number;
+  comment: CommentSelectType;
+  report: CommentReportSelectType;
+};
+
+export interface IReportsNotificationsService {
+  notifyReportCreated: (
+    params: ReportsNotificationsServiceNotifyReportParams,
+  ) => Promise<number | undefined>;
+  notifyReportStatusChanged: (
+    params: ReportsNotificationsServiceNotifyReportStatusChangeParams,
+  ) => Promise<void>;
 }
 
 export enum CommentModerationLabel {
@@ -164,4 +185,71 @@ export interface ICommentDbService {
     commentId: Hex,
     status: ModerationStatus,
   ) => Promise<CommentSelectType | undefined>;
+}
+
+export interface ICommentReportsService {
+  /**
+   * Report a comment with a message
+   * @param commentId The ID of the comment to report
+   * @param reportee The address of the user reporting the comment
+   * @param message Optional message explaining the report (max 200 chars)
+   */
+  report(commentId: Hex, reportee: Hex, message?: string): Promise<void>;
+  /**
+   * Change the status of a report
+   * @param messageId The message ID of the report
+   * @param reportId The ID of the report to change the status of
+   * @param status The new status of the report
+   */
+  changeStatus(
+    messageId: number,
+    reportId: string,
+    status: CommentReportStatus,
+  ): Promise<void>;
+  /**
+   * Request a status change for a report
+   * @param messageId The message ID of the report
+   * @param reportId The ID of the report to request a status change for
+   */
+  requestStatusChange(messageId: number, reportId: string): Promise<void>;
+  /**
+   * Cancel a status change request for a report
+   * @param messageId The message ID of the report
+   * @param reportId The ID of the report to cancel the status change for
+   */
+  cancelStatusChange(messageId: number, reportId: string): Promise<void>;
+}
+
+export interface ITelegramNotificationsService {
+  initialize: () => Promise<void>;
+  encryptWebhookCallbackData: (data: WebhookCallbackData) => string;
+  decryptWebhookCallbackData: (data: string) => WebhookCallbackData;
+  sendMessage: (
+    message: string,
+    extra?: Convenience.ExtraReplyMessage,
+  ) => Promise<Message.TextMessage | undefined>;
+  /**
+   * Send a message with webhook actions.
+   * @param message The message to send.
+   * @param actions The actions to add to the message.
+   * @param extra Extra options to pass to the message.
+   * @returns The message object if the message was sent, undefined if the message has not been sent because the notification service is disabled.
+   */
+  sendMessageWithWebhookActions: (
+    message: string,
+    actions: {
+      action: WebhookCallbackData;
+      text: string;
+    }[],
+    extra?: Omit<Convenience.ExtraReplyMessage, "reply_markup">,
+  ) => Promise<Message.TextMessage | undefined>;
+  updateMessageWithWebhookActions: (
+    messageId: number,
+    message: string,
+    actions: {
+      action: WebhookCallbackData;
+      text: string;
+    }[],
+    extra?: Omit<Convenience.ExtraEditMessageText, "inline_keyboard">,
+  ) => Promise<void>;
 }

@@ -1,11 +1,12 @@
 import {
-  Generated,
-  Kysely,
-  Selectable,
+  type Generated,
+  type Kysely,
+  type Selectable,
   sql,
   type MigrationProvider,
 } from "kysely";
 import type { Hex } from "viem";
+import type { CommentModerationStatus, CommentReportStatus } from "./types";
 import type { CommentModerationLabelsWithScore } from "../services/types";
 
 export type MutedAccountsTable = {
@@ -23,25 +24,38 @@ export type ApiKeysTable = {
 };
 
 export type CommentModerationStatusesTable = {
-  comment_id: string;
+  comment_id: Hex;
   created_at: Generated<Date>;
   updated_at: Generated<Date>;
-  moderation_status: "pending" | "approved" | "rejected";
+  moderation_status: CommentModerationStatus;
 };
 
 export type CommentClassificationResultsTable = {
-  comment_id: string;
+  comment_id: Hex;
   created_at: Generated<Date>;
   updated_at: Generated<Date>;
   labels: CommentModerationLabelsWithScore;
   score: number;
 };
 
+export type CommentReportsTable = {
+  id: Generated<string>;
+  comment_id: Hex;
+  reportee: Hex;
+  message: string | null;
+  created_at: Generated<Date>;
+  updated_at: Generated<Date>;
+  status: CommentReportStatus;
+};
+
+export type CommentReportSelectType = Selectable<CommentReportsTable>;
+
 export type IndexerSchemaDB = {
   muted_accounts: MutedAccountsTable;
   api_keys: ApiKeysTable;
   comment_moderation_statuses: CommentModerationStatusesTable;
   comment_classification_results: CommentClassificationResultsTable;
+  comment_reports: CommentReportsTable;
 };
 
 export type MutedAccountSelect = Selectable<MutedAccountsTable>;
@@ -121,6 +135,40 @@ class StaticMigrationsProvider implements MigrationProvider {
         },
         down: async (db: Kysely<IndexerSchemaDB>) => {
           await db.schema.dropTable("comment_classification_results").execute();
+        },
+      },
+      "2025_07_09_15_53_00_comment_reports": {
+        up: async (db: Kysely<IndexerSchemaDB>) => {
+          await db.schema
+            .createTable("comment_reports")
+            .addColumn("id", "text", (col) =>
+              col.primaryKey().defaultTo(sql`gen_random_uuid()`),
+            )
+            .addColumn("comment_id", "text", (col) => col.notNull())
+            .addColumn("created_at", "timestamptz", (col) =>
+              col.notNull().defaultTo(sql`now()`),
+            )
+            .addColumn("updated_at", "timestamptz", (col) =>
+              col.notNull().defaultTo(sql`now()`),
+            )
+            .addColumn("reportee", "text", (col) => col.notNull())
+            .addColumn("message", "text")
+            .addColumn("status", "text", (col) =>
+              col
+                .notNull()
+                .defaultTo("pending")
+                .check(sql`status IN ('pending', 'resolved', 'closed')`),
+            )
+            .execute();
+
+          await db.schema
+            .createIndex("comment_reports_by_status_idx")
+            .on("comment_reports")
+            .column("status")
+            .execute();
+        },
+        down: async (db: Kysely<IndexerSchemaDB>) => {
+          await db.schema.dropTable("comment_reports").execute();
         },
       },
     };

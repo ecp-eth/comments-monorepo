@@ -82,16 +82,18 @@ export class CommentDbService implements ICommentDbService {
         throw new CommentNotFoundError(commentId);
       }
 
+      const changedAt = new Date();
+
       await this.cacheService.setStatusByCommentId(commentId, {
         status,
-        changedAt: new Date(),
+        changedAt,
       });
 
       return await tx
         .update(schema.comment)
         .set({
           moderationStatus: status,
-          moderationStatusChangedAt: new Date(),
+          moderationStatusChangedAt: changedAt,
         })
         .where(eq(schema.comment.id, comment.id))
         .returning();

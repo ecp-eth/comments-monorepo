@@ -326,3 +326,32 @@ export const RemoveApprovalTypedDataSchema = z.object({
 export type RemoveApprovalTypedDataSchemaType = z.infer<
   typeof RemoveApprovalTypedDataSchema
 >;
+
+export const ReportCommentTypedDataSchema = z.object({
+  primaryType: z.literal("ReportComment"),
+  domain: z.object({
+    name: z.literal(DOMAIN_NAME),
+    version: z.literal(DOMAIN_VERSION),
+    chainId: z.number(),
+    verifyingContract: HexSchema,
+  }),
+  message: z.object({
+    commentId: HexSchema,
+    reportee: HexSchema,
+    message: z.string().max(200).optional(),
+    deadline: z.coerce.bigint(),
+  }),
+  types: z.object({
+    ReportComment: z.array(
+      z.union([
+        z.object({ name: z.literal("commentId"), type: z.literal("bytes32") }),
+        z.object({ name: z.literal("reportee"), type: z.literal("address") }),
+        z.object({ name: z.literal("message"), type: z.literal("string") }),
+      ]),
+    ),
+  }),
+});
+
+export type ReportCommentTypedDataSchemaType = z.infer<
+  typeof ReportCommentTypedDataSchema
+>;

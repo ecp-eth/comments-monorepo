@@ -83,9 +83,17 @@ const EnvSchema = z
       classificationScoreThresholdSchema.optional(),
     MODERATION_CLASSIFICATION_VIOLENCE_THRESHOLD:
       classificationScoreThresholdSchema.optional(),
+
+    REPORTS_NOTIFICATIONS_ENABLED: z
+      .enum(["0", "1"])
+      .default("0")
+      .transform((val) => val === "1"),
   })
   .superRefine((vars, ctx) => {
-    if (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) {
+    if (
+      (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) ||
+      env.REPORTS_NOTIFICATIONS_ENABLED
+    ) {
       const result = moderationNotificationsEnabledSchema.safeParse(vars);
 
       if (!result.success) {
