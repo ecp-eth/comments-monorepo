@@ -47,7 +47,9 @@
     "RPC_URL_*",
     "WEBHOOK_SECRET",
     "ENSNODE_SUBGRAPH_URL",
-    "SIM_API_KEY"
+    "SIM_API_KEY",
+    "COMMENT_CONTENT_LENGTH_LIMIT",
+    "TELEGRAM_MESSAGE_LENGTH_LIMIT"
   ],
   "tasks": {
     "build": {
