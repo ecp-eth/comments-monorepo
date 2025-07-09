@@ -279,6 +279,16 @@ paths:
           name: moderationStatus
           in: query
         - schema:
+            type: number
+            description: >-
+              The moderation score of the comments to return. If the comment's
+              moderation score exceeds the provided value, it is not returned.
+            minimum: 0
+            maximum: 1
+          required: false
+          name: moderationScore
+          in: query
+        - schema:
             type: string
             description: >-
               The moderation labels to exclude from the comments to return. This
@@ -2269,6 +2279,16 @@ paths:
               moderation is enabled).
           required: false
           name: moderationStatus
+          in: query
+        - schema:
+            type: number
+            description: >-
+              The moderation score of the comments to return. If the comment's
+              moderation score exceeds the provided value, it is not returned.
+            minimum: 0
+            maximum: 1
+          required: false
+          name: moderationScore
           in: query
         - schema:
             type: string

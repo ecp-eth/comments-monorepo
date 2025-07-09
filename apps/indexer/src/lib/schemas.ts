@@ -190,6 +190,13 @@ export const GetCommentsQuerySchema = z.object({
       description:
         "The moderation status of the comments to return. If omitted it will return comments based on moderation settings (approved if moderation is enabled).",
     }),
+  moderationScore: z.coerce.number().min(0).max(1).optional().openapi({
+    description:
+      "The moderation score of the comments to return. If the comment's moderation score exceeds the provided value, it is not returned.",
+    minimum: 0,
+    maximum: 1,
+    type: "number",
+  }),
   excludeModerationLabels: z
     .preprocess(
       (val) => {
