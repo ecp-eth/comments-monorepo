@@ -338,8 +338,7 @@ export const ReportCommentTypedDataSchema = z.object({
   message: z.object({
     commentId: HexSchema,
     reportee: HexSchema,
-    message: z.string().max(200).optional(),
-    deadline: z.coerce.bigint(),
+    message: z.string().max(200),
   }),
   types: z.object({
     ReportComment: z.array(
