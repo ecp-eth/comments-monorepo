@@ -9,6 +9,7 @@ import type { Hex } from "viem";
 import type { CommentReportSelectType } from "../management/migrations";
 
 type ReportsNotificationServiceOptions = {
+  enabled: boolean;
   telegramNotificationsService: ITelegramNotificationsService;
   resolveAuthor: (author: Hex) => Promise<string | Hex>;
 };
@@ -16,10 +17,12 @@ type ReportsNotificationServiceOptions = {
 export class ReportsNotificationsService
   implements IReportsNotificationsService
 {
+  private enabled: boolean;
   private telegramNotificationsService: ITelegramNotificationsService;
   private resolveAuthor: (author: Hex) => Promise<string | Hex>;
 
   constructor(options: ReportsNotificationServiceOptions) {
+    this.enabled = options.enabled;
     this.telegramNotificationsService = options.telegramNotificationsService;
     this.resolveAuthor = options.resolveAuthor;
   }
@@ -28,6 +31,11 @@ export class ReportsNotificationsService
     comment,
     report,
   }: ReportsNotificationsServiceNotifyReportParams) {
+    if (!this.enabled) {
+      console.log("ReportsNotificationsService#notifyReportCreated: disabled");
+      return;
+    }
+
     try {
       const message = await this.renderReportMessage(comment, report);
 
@@ -67,6 +75,13 @@ export class ReportsNotificationsService
     comment,
     report,
   }: ReportsNotificationsServiceNotifyReportStatusChangeParams) {
+    if (!this.enabled) {
+      console.log(
+        "ReportsNotificationsService#notifyReportStatusChanged: disabled",
+      );
+      return;
+    }
+
     try {
       const message = await this.renderReportUpdateMessage(comment, report);
 

@@ -47,6 +47,7 @@ export const telegramNotificationsService = new TelegramNotificationsService(
 
 export const moderationNotificationsService =
   new ModerationNotificationsService({
+    enabled: env.MODERATION_ENABLE_NOTIFICATIONS,
     telegramNotificationsService,
     resolveAuthor,
   });
@@ -70,6 +71,7 @@ export const commentDbService = new CommentDbService({
 export const managementCommentDbService = new ManagementCommentDbService();
 
 export const reportsNotificationsService = new ReportsNotificationsService({
+  enabled: env.REPORTS_NOTIFICATIONS_ENABLED,
   telegramNotificationsService,
   resolveAuthor,
 });

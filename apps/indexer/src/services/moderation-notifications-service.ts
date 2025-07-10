@@ -21,6 +21,7 @@ class CommentLengthLimitExceededError extends Error {
 }
 
 type ModerationNotificationsServiceOptions = {
+  enabled: boolean;
   telegramNotificationsService: ITelegramNotificationsService;
   resolveAuthor: (author: Hex) => Promise<string | Hex>;
 };
@@ -28,10 +29,12 @@ type ModerationNotificationsServiceOptions = {
 export class ModerationNotificationsService
   implements IModerationNotificationsService
 {
+  private enabled: boolean;
   private telegramNotificationsService: ITelegramNotificationsService;
   private resolveAuthor: (author: Hex) => Promise<string | Hex>;
 
   constructor(options: ModerationNotificationsServiceOptions) {
+    this.enabled = options.enabled;
     this.telegramNotificationsService = options.telegramNotificationsService;
     this.resolveAuthor = options.resolveAuthor;
   }
@@ -40,6 +43,13 @@ export class ModerationNotificationsService
     { comment }: ModerationNotificationServiceNotifyPendingModerationParams,
     status: ModerationNotificationsServiceCommentStatus,
   ) {
+    if (!this.enabled) {
+      console.log(
+        "ModerationNotificationsService#notifyPendingModeration: disabled",
+      );
+      return;
+    }
+
     try {
       const message = await this.renderNewPendingModerationMessage(
         comment,
@@ -86,6 +96,13 @@ export class ModerationNotificationsService
     comment,
     classifierResult,
   }: ModerationNotificationServiceNotifyAutomaticClassificationParams) {
+    if (!this.enabled) {
+      console.log(
+        "ModerationNotificationsService#notifyAutomaticallyClassified: disabled",
+      );
+      return;
+    }
+
     try {
       const message = messageId
         ? await this.renderAutomaticClassificationMessageAsReply(
@@ -123,6 +140,13 @@ export class ModerationNotificationsService
     messageId: number,
     comment: CommentSelectType,
   ) {
+    if (!this.enabled) {
+      console.log(
+        "ModerationNotificationsService#updateMessageWithModerationStatus: disabled",
+      );
+      return;
+    }
+
     try {
       const updatedMessage = await this.renderMessageContent(comment);
 
@@ -151,6 +175,13 @@ export class ModerationNotificationsService
     messageId: number,
     comment: CommentSelectType,
   ) {
+    if (!this.enabled) {
+      console.log(
+        "ModerationNotificationsService#updateMessageWithChangeAction: disabled",
+      );
+      return;
+    }
+
     try {
       const updatedMessage = await this.renderMessageContent(comment);
 
