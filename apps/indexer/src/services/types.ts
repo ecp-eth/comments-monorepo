@@ -148,6 +148,10 @@ export interface IPremoderationCacheService {
   getStatusByCommentId(
     commentId: Hex,
   ): Promise<PremoderationCacheServiceStatus | undefined>;
+  insertStatusByCommentId(
+    commentId: Hex,
+    status: PremoderationCacheServiceStatus,
+  ): Promise<void>;
   setStatusByCommentId(
     commentId: Hex,
     status: PremoderationCacheServiceStatus,

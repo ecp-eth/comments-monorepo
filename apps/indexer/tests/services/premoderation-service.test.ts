@@ -14,6 +14,7 @@ import type { Hex } from "@ecp.eth/sdk/core";
 const mockCacheService = {
   getStatusByCommentId: vi.fn(),
   setStatusByCommentId: vi.fn(),
+  insertStatusByCommentId: vi.fn(),
 } as IPremoderationCacheService;
 
 const mockDbService = {
@@ -65,7 +66,7 @@ describe("PremoderationService", () => {
       expect(mockCacheService.getStatusByCommentId).toHaveBeenCalledWith(
         mockComment.id,
       );
-      expect(mockCacheService.setStatusByCommentId).not.toHaveBeenCalled();
+      expect(mockCacheService.insertStatusByCommentId).not.toHaveBeenCalled();
     });
 
     test("should return default status if no cached status exists", async () => {
@@ -94,7 +95,7 @@ describe("PremoderationService", () => {
 
       // Test save function
       await result.save();
-      expect(mockCacheService.setStatusByCommentId).toHaveBeenCalledWith(
+      expect(mockCacheService.insertStatusByCommentId).toHaveBeenCalledWith(
         mockComment.id,
         {
           status: defaultModerationStatus,
