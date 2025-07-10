@@ -297,7 +297,7 @@ paths:
             pattern: >-
               ^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)$
           required: false
-          name: excludeModerationLabels
+          name: excludeByModerationLabels
           in: query
         - schema:
             type: integer
@@ -2299,7 +2299,7 @@ paths:
             pattern: >-
               ^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)$
           required: false
-          name: excludeModerationLabels
+          name: excludeByModerationLabels
           in: query
         - schema:
             type: integer
