@@ -112,10 +112,13 @@ export class ReportsNotificationsService
   ) {
     const author = await this.resolveAuthor(report.reportee);
 
-    let formattedMessage = `🆕 New report for comment ${comment.id} by ${author}`;
+    let formattedMessage = `🆕 New report for comment
+
+Comment ID: ${comment.id}
+Author: ${author}`.trim();
 
     if (report.message) {
-      formattedMessage += `\n\nMessage: ${report.message}`;
+      formattedMessage += `\n\nMessage:\n\n${report.message}`;
     }
 
     return formattedMessage;
@@ -127,10 +130,12 @@ export class ReportsNotificationsService
   ) {
     const author = await this.resolveAuthor(report.reportee);
 
-    let formattedMessage = `🔄 Updated report for comment ${comment.id} by ${author}`;
+    let formattedMessage = `🔄 Updated report for comment
+Comment ID: ${comment.id}
+Author: ${author}`.trim();
 
     if (report.message) {
-      formattedMessage += `\n\nMessage: ${report.message}`;
+      formattedMessage += `\n\nMessage:\n\n${report.message}`;
     }
 
     formattedMessage += `\n\nStatus: ${report.status}`;
