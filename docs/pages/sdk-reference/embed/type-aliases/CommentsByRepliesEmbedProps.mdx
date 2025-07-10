@@ -2,24 +2,30 @@
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [embed](/sdk-reference/embed/index.mdx) / CommentsEmbedProps
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [embed](/sdk-reference/embed/index.mdx) / CommentsByRepliesEmbedProps
 
-# Type Alias: CommentsEmbedProps
+# Type Alias: CommentsByRepliesEmbedProps
 
 ```ts
-type CommentsEmbedProps = {
+type CommentsByRepliesEmbedProps = {
+  commentId: Hex;
   containerProps?: React.HTMLAttributes<HTMLDivElement>;
   embedUri?: string;
   iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
-  uri: string | URL;
 } & EmbedConfigSchemaInputType;
 ```
 
-Defined in: [packages/sdk/src/embed/react.tsx:18](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/react.tsx#L18)
-
-The props for `<CommentsEmbed />` component.
+Defined in: [packages/sdk/src/embed/react.tsx:99](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/react.tsx#L99)
 
 ## Type declaration
+
+### commentId
+
+```ts
+commentId: Hex;
+```
+
+The comment ID to filter replies by
 
 ### containerProps?
 
@@ -44,11 +50,3 @@ optional iframeProps: React.IframeHTMLAttributes<HTMLIFrameElement>;
 ```
 
 Allows to pass custom props to iframe
-
-### uri
-
-```ts
-uri: string | URL;
-```
-
-URL of the page to embed comments for. Comments for this uri are rendered in iframe's page.

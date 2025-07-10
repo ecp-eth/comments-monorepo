@@ -15,6 +15,9 @@ type CreateCommentsEmbedURLParams = {
    }
      | {
      author: Hex;
+   }
+     | {
+     commentId: Hex;
    };
 };
 ```
@@ -58,9 +61,12 @@ source:
 }
   | {
   author: Hex;
+}
+  | {
+  commentId: Hex;
 };
 ```
 
 Defined in: [packages/sdk/src/embed/utils.ts:21](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L21)
 
-The target URI or author address to embed comments for.
+The target URI, author address, or comment ID to embed comments for.
