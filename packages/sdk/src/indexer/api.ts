@@ -19,6 +19,8 @@ import {
   type IndexerAPIChannelOutputSchemaType,
   IndexerAPIGetAutocompleteOutputSchema,
   type IndexerAPIGetAutocompleteOutputSchemaType,
+  IndexerAPIModerationClassificationLabelSchema,
+  IndexerAPIModerationClassificationLabelSchemaType,
 } from "./schemas.js";
 import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
@@ -96,6 +98,22 @@ export type FetchCommentsOptions = {
    */
   mode?: IndexerAPICommentListModeSchemaType;
   /**
+   * Filter comments by moderation score.
+   *
+   * Only comments with moderation score lower or equal to the provided value are returned.
+   * This can be used to bypass premoderation, make sure to pass all moderation statuses to moderationStatus parameter
+   * if the premoderation is enabled.
+   */
+  moderationScore?: number;
+  /**
+   * Filter comments by moderation labels.
+   *
+   * Only comments with moderation labels not included in the provided array are returned.
+   * This can be used to bypass premoderation, make sure to pass all moderation statuses to moderationStatus parameter
+   * if the premoderation is enabled.
+   */
+  excludeByModerationLabels?: IndexerAPIModerationClassificationLabelSchemaType[];
+  /**
    * The number of comments to fetch
    *
    * @default 50
@@ -122,6 +140,10 @@ const FetchCommentsOptionsSchema = z.object({
   signal: z.instanceof(AbortSignal).optional(),
   mode: IndexerAPICommentListModeSchema.optional(),
   viewer: HexSchema.optional(),
+  moderationScore: z.coerce.number().min(0).max(1).optional(),
+  excludeByModerationLabels: z
+    .array(IndexerAPIModerationClassificationLabelSchema)
+    .optional(),
 });
 
 /**
@@ -148,6 +170,8 @@ export async function fetchComments(
     channelId,
     commentType,
     moderationStatus,
+    moderationScore,
+    excludeByModerationLabels,
   } = FetchCommentsOptionsSchema.parse(options);
 
   return runAsync(
@@ -204,6 +228,17 @@ export async function fetchComments(
         moderationStatus.length > 0
       ) {
         url.searchParams.set("moderationStatus", moderationStatus.join(","));
+      }
+
+      if (moderationScore) {
+        url.searchParams.set("moderationScore", moderationScore.toString());
+      }
+
+      if (excludeByModerationLabels) {
+        url.searchParams.set(
+          "excludeByModerationLabels",
+          excludeByModerationLabels.join(","),
+        );
       }
 
       const response = await fetch(url.toString(), {
@@ -290,6 +325,22 @@ export type FetchCommentRepliesOptions = {
     | IndexerAPICommentModerationStatusSchemaType
     | IndexerAPICommentModerationStatusSchemaType[];
   /**
+   * Filter replies by moderation score.
+   *
+   * Only comments with moderation score lower or equal to the provided value are returned.
+   * This can be used to bypass premoderation, make sure to pass all moderation statuses to moderationStatus parameter
+   * if the premoderation is enabled.
+   */
+  moderationScore?: number;
+  /**
+   * Filter replies by moderation labels.
+   *
+   * Only comments with moderation labels not included in the provided array are returned.
+   * This can be used to bypass premoderation, make sure to pass all moderation statuses to moderationStatus parameter
+   * if the premoderation is enabled.
+   */
+  excludeByModerationLabels?: IndexerAPIModerationClassificationLabelSchemaType[];
+  /**
    * Filter replies by channel ID
    */
   channelId?: bigint;
@@ -317,6 +368,10 @@ const FetchCommentRepliesOptionSchema = z.object({
   moderationStatus: IndexerAPICommentModerationStatusSchema.or(
     z.array(IndexerAPICommentModerationStatusSchema),
   ).optional(),
+  moderationScore: z.coerce.number().min(0).max(1).optional(),
+  excludeByModerationLabels: z
+    .array(IndexerAPIModerationClassificationLabelSchema)
+    .optional(),
 });
 
 /**
@@ -342,6 +397,8 @@ export async function fetchCommentReplies(
     commentType,
     channelId,
     moderationStatus,
+    moderationScore,
+    excludeByModerationLabels,
   } = FetchCommentRepliesOptionSchema.parse(options);
 
   return runAsync(
@@ -390,6 +447,17 @@ export async function fetchCommentReplies(
         moderationStatus.length > 0
       ) {
         url.searchParams.set("moderationStatus", moderationStatus.join(","));
+      }
+
+      if (moderationScore) {
+        url.searchParams.set("moderationScore", moderationScore.toString());
+      }
+
+      if (excludeByModerationLabels) {
+        url.searchParams.set(
+          "excludeByModerationLabels",
+          excludeByModerationLabels.join(","),
+        );
       }
 
       const response = await fetch(url.toString(), {
