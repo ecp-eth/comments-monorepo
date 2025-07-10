@@ -92,7 +92,7 @@ const EnvSchema = z
   .superRefine((vars, ctx) => {
     if (
       (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) ||
-      env.REPORTS_NOTIFICATIONS_ENABLED
+      vars.REPORTS_NOTIFICATIONS_ENABLED
     ) {
       const result = moderationNotificationsEnabledSchema.safeParse(vars);
 
