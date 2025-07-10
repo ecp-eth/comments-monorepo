@@ -68,7 +68,7 @@ export default (app: OpenAPIHono) => {
       moderationStatus,
       moderationScore,
       chainId,
-      excludeModerationLabels,
+      excludeByModerationLabels: excludeModerationLabels,
     } = c.req.valid("query");
 
     const sharedConditions = [

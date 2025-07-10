@@ -61,7 +61,7 @@ export default (app: OpenAPIHono) => {
       commentType,
       moderationStatus,
       chainId,
-      excludeModerationLabels,
+      excludeByModerationLabels: excludeModerationLabels,
       author,
       moderationScore,
     } = c.req.valid("query");

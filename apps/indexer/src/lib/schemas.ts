@@ -197,7 +197,7 @@ export const GetCommentsQuerySchema = z.object({
     maximum: 1,
     type: "number",
   }),
-  excludeModerationLabels: z
+  excludeByModerationLabels: z
     .preprocess(
       (val) => {
         if (typeof val === "string") {
