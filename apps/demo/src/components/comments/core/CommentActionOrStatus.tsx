@@ -1,13 +1,14 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import { CommentActionButton } from "./CommentActionButton";
 import type { Comment } from "@ecp.eth/shared/schemas";
-import { type PropsWithChildren, useCallback, useMemo } from "react";
+import { type PropsWithChildren, useCallback } from "react";
 import { cn } from "@ecp.eth/shared/helpers";
 import { HeartAnimation } from "@/components/animations/Heart";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@/lib/constants";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import { useAccount } from "wagmi";
 import { usePendingWalletConnectionActionsContext } from "./PendingWalletConnectionActionsContext";
+import { useCommentIsHearted } from "./hooks/useCommentIsHearted";
 
 export function CommentActionOrStatus({
   comment,
@@ -52,16 +53,10 @@ export function CommentActionOrStatus({
   const onUnlikeClickRef = useFreshRef(onUnlikeClick);
   const onReplyClickRef = useFreshRef(onReplyClick);
   const connectAccount = useConnectAccount();
+  const isHearted = useCommentIsHearted(comment);
   const { addAction } = usePendingWalletConnectionActionsContext();
 
   const hasAccountConnected = !!connectedAddress;
-
-  const likedByViewer = useMemo(() => {
-    return (
-      (comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT]?.length ?? 0) >
-      0
-    );
-  }, [comment.viewerReactions]);
 
   const connectBeforeAction = useCallback(
     <TParams extends unknown[]>(
@@ -157,26 +152,26 @@ export function CommentActionOrStatus({
       >
         reply
       </CommentActionButton>
-      <CommentActionButton>
-        <HeartAnimation
-          pending={isLiking}
-          onIsHeartedChange={connectBeforeAction((isHearted) => {
-            if (!hasAccountConnected) {
-              addAction({
-                type: isHearted ? "like" : "unlike",
-                commentId: comment.id,
-              });
-              return;
-            }
+      <CommentActionButton
+        onClick={connectBeforeAction(() => {
+          const newIsHearted = !isHearted;
 
-            if (isHearted) {
-              onLikeClickRef.current();
-            } else {
-              onUnlikeClickRef.current();
-            }
-          })}
-          isHearted={likedByViewer}
-        />
+          if (!hasAccountConnected) {
+            addAction({
+              type: newIsHearted ? "like" : "unlike",
+              commentId: comment.id,
+            });
+            return;
+          }
+
+          if (newIsHearted) {
+            onLikeClickRef.current();
+          } else {
+            onUnlikeClickRef.current();
+          }
+        })}
+      >
+        <HeartAnimation pending={isLiking} isHearted={isHearted} />
         {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
       </CommentActionButton>
     </div>
