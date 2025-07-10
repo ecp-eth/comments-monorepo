@@ -71,7 +71,7 @@ export const commentDbService = new CommentDbService({
 export const managementCommentDbService = new ManagementCommentDbService();
 
 export const reportsNotificationsService = new ReportsNotificationsService({
-  enabled: env.REPORTS_NOTIFICATIONS_ENABLED,
+  enabled: env.REPORTS_ENABLE_NOTIFICATIONS,
   telegramNotificationsService,
   resolveAuthor,
 });
