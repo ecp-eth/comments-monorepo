@@ -8,7 +8,7 @@ import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import { publicEnv } from "@/publicEnv";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import { ContractFunctionExecutionError, type Hex } from "viem";
+import { ContractFunctionExecutionError } from "viem";
 import {
   MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
   NEW_COMMENTS_CHECK_INTERVAL,
@@ -31,7 +31,9 @@ import { useAccount, useChainId } from "wagmi";
 import { useLikeComment } from "./hooks/useLikeComment";
 import { useUnlikeComment } from "./hooks/useUnlikeComment";
 import { toast } from "sonner";
-import { getSimplifiedErrorMessageFromContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 type CommentItemProps = {
   comment: CommentType;
@@ -95,6 +97,7 @@ export function CommentItem({ comment }: CommentItemProps) {
         signal,
         viewer: connectedAddress,
         mode: "flat",
+        commentType: COMMENT_TYPE_COMMENT,
       });
 
       return CommentPageSchema.parse(response);
@@ -127,6 +130,7 @@ export function CommentItem({ comment }: CommentItemProps) {
         signal,
         viewer: connectedAddress,
         mode: "flat",
+        commentType: COMMENT_TYPE_COMMENT,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -165,7 +169,7 @@ export function CommentItem({ comment }: CommentItemProps) {
 
           const message =
             e instanceof ContractFunctionExecutionError
-              ? getSimplifiedErrorMessageFromContractFunctionExecutionError(e)
+              ? formatContractFunctionExecutionError(e)
               : e.message;
 
           toast.error(message);
@@ -191,7 +195,7 @@ export function CommentItem({ comment }: CommentItemProps) {
 
           const message =
             e instanceof ContractFunctionExecutionError
-              ? getSimplifiedErrorMessageFromContractFunctionExecutionError(e)
+              ? formatContractFunctionExecutionError(e)
               : e.message;
 
           toast.error(message);
@@ -213,6 +217,12 @@ export function CommentItem({ comment }: CommentItemProps) {
   const replies = useMemo(() => {
     return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
   }, [repliesQuery.data?.pages]);
+
+  useConsumePendingWalletConnectionActions({
+    commentId: comment.id,
+    onLikeAction: onLikeClick,
+    onUnlikeAction: onUnlikeClick,
+  });
 
   return (
     <div className="mb-4 border-muted">
@@ -240,8 +250,6 @@ export function CommentItem({ comment }: CommentItemProps) {
               ? comment.pendingOperation.references
               : undefined
           }
-          onLikeClick={onLikeClick}
-          onUnlikeClick={onUnlikeClick}
           isLiking={isLiking}
         />
       )}

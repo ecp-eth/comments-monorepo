@@ -28,6 +28,7 @@ import type {
   SignEditCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
 import { DistributiveOmit } from "@tanstack/react-query";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 
 export function createRootCommentsQueryKey(
   address: Hex | undefined,
@@ -142,21 +143,18 @@ export async function submitCommentMutationFunction({
       references,
     };
   } catch (e) {
-    if (e instanceof ContractFunctionExecutionError) {
-      if (e.shortMessage.includes("User rejected the request.")) {
-        throw new SubmitCommentMutationError(
-          "Could not post the comment because the transaction was rejected.",
-        );
-      }
-
-      throw new SubmitCommentMutationError(e.details);
+    if (!(e instanceof Error)) {
+      throw new SubmitCommentMutationError(
+        "Failed to post comment, please try again.",
+      );
     }
 
-    console.error(e);
+    const message =
+      e instanceof ContractFunctionExecutionError
+        ? formatContractFunctionExecutionError(e)
+        : e.message;
 
-    throw new SubmitCommentMutationError(
-      "Failed to post comment, please try again.",
-    );
+    throw new SubmitCommentMutationError(message);
   }
 }
 

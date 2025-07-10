@@ -12,9 +12,16 @@
  * wallet is connected with up-to-date data and props
  */
 import { Hex } from "@ecp.eth/sdk/core/schemas";
-import { createContext, useContext, useEffect, useMemo, useRef } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { useAccount } from "wagmi";
-import { useFreshRef } from "@ecp.eth/shared/hooks";
+import { useConnectAccount, useFreshRef } from "../hooks";
 
 type PendingWalletConnectionAction =
   | {
@@ -73,6 +80,10 @@ export const PendingWalletConnectionActionsProvider = ({
 
       for (let len = actions.length; len > 0; len--) {
         const action = actions[len - 1];
+        if (!action) {
+          continue;
+        }
+
         const handler = handlers[action.commentId];
         if (!handler) {
           continue;
@@ -153,4 +164,41 @@ export const useConsumePendingWalletConnectionActions = ({
     onLikeActionRef,
     onUnlikeActionRef,
   ]);
+};
+
+/**
+ * The hook returns a function that ensures wallet is connected before calling into the callback,
+ * then it executes the action returned from the callback.
+ *
+ */
+export const useConnectBeforeAction = () => {
+  const { addAction } = usePendingWalletConnectionActionsContext();
+  const { address: connectedAddress } = useAccount();
+  const connectAccount = useConnectAccount();
+
+  return useCallback(
+    <TParams extends unknown[]>(
+      getAction: (
+        ...args: TParams
+      ) =>
+        | Promise<PendingWalletConnectionAction | void>
+        | PendingWalletConnectionAction
+        | void,
+    ) => {
+      return async (...args: TParams) => {
+        if (!connectedAddress) {
+          await connectAccount();
+        }
+
+        const action = await getAction(...args);
+
+        if (!action) {
+          return;
+        }
+
+        addAction(action);
+      };
+    },
+    [addAction, connectAccount, connectedAddress],
+  );
 };

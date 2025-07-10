@@ -27,8 +27,6 @@ type CommentProps = {
   onRetryPostClick: () => void;
   onEditClick: () => void;
   onRetryEditClick: () => void;
-  onLikeClick: () => void;
-  onUnlikeClick: () => void;
   isLiking?: boolean;
   optimisticReferences: IndexerAPICommentReferencesSchemaType | undefined;
 };
@@ -41,8 +39,6 @@ export function Comment({
   onReplyClick,
   onEditClick,
   onRetryEditClick,
-  onLikeClick,
-  onUnlikeClick,
   isLiking,
   optimisticReferences,
 }: CommentProps) {
@@ -131,8 +127,6 @@ export function Comment({
           onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
           onRetryEditClick={onRetryEditClick}
-          onLikeClick={onLikeClick}
-          onUnlikeClick={onUnlikeClick}
           isLiking={isLiking}
         />
       </div>

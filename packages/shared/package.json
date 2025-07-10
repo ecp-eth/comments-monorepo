@@ -23,6 +23,11 @@
       "import": "./dist/esm/components/*.js",
       "default": "./dist/cjs/components/*.cjs"
     },
+    "./constants": {
+      "types": "./dist/esm/constants.d.ts",
+      "import": "./dist/esm/constants.js",
+      "default": "./dist/cjs/constants.cjs"
+    },
     "./errors": {
       "types": "./dist/esm/errors.d.ts",
       "import": "./dist/esm/errors.js",

@@ -5,6 +5,7 @@ import { WagmiProvider } from "wagmi";
 import { getWagmiConfig } from "../lib/wagmi";
 import { useMemo } from "react";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { PendingWalletConnectionActionsProvider } from "@ecp.eth/shared/components";
 import { ApplyTheme } from "@/components/ApplyTheme";
 import {
   EmbedConfigProvider,
@@ -39,7 +40,11 @@ export function Providers<
       <ApplyTheme>
         <QueryClientProvider client={queryClient}>
           <WagmiProvider config={wagmiConfig} initialState={initialState}>
-            <RainbowKitProvider>{children}</RainbowKitProvider>
+            <RainbowKitProvider>
+              <PendingWalletConnectionActionsProvider>
+                {children}
+              </PendingWalletConnectionActionsProvider>
+            </RainbowKitProvider>
           </WagmiProvider>
         </QueryClientProvider>
       </ApplyTheme>

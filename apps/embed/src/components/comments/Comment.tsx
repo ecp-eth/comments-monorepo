@@ -41,8 +41,6 @@ interface CommentProps {
   onReplyClick: () => void;
   onEditClick: () => void;
   onRetryEditClick: () => void;
-  onLikeClick: () => void;
-  onUnlikeClick: () => void;
   isLiking?: boolean;
   optimisticReferences: IndexerAPICommentReferencesSchemaType | undefined;
 }
@@ -55,8 +53,6 @@ export function Comment({
   onReplyClick,
   onEditClick,
   onRetryEditClick,
-  onLikeClick,
-  onUnlikeClick,
   isLiking,
   optimisticReferences,
 }: CommentProps) {
@@ -142,13 +138,10 @@ export function Comment({
       <div className="mb-2">
         <CommentActionOrStatus
           comment={comment}
-          hasAccountConnected={!!connectedAddress}
           onRetryDeleteClick={onRetryDeleteClick}
           onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
           onRetryEditClick={onRetryEditClick}
-          onLikeClick={onLikeClick}
-          onUnlikeClick={onUnlikeClick}
           isLiking={isLiking}
         />
       </div>

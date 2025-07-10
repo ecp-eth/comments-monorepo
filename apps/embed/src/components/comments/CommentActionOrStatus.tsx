@@ -1,33 +1,32 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import type { Comment as CommentType } from "@ecp.eth/shared/schemas";
+import { type PropsWithChildren } from "react";
+import {
+  HeartButton,
+  useConnectBeforeAction,
+} from "@ecp.eth/shared/components";
+import {} from "@ecp.eth/shared/components";
+import { useCommentIsHearted, useFreshRef } from "@ecp.eth/shared/hooks";
+import { cn } from "@ecp.eth/shared/helpers";
+import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { CommentActionButton } from "./CommentActionButton";
 import { RetryButton } from "./RetryButton";
-import { type PropsWithChildren, useMemo } from "react";
-import { HeartButton } from "@ecp.eth/shared/components";
-import { COMMENT_REACTION_LIKE_CONTENT } from "@/lib/constants";
-import { cn } from "@ecp.eth/shared/helpers";
 
 interface CommentActionOrStatusProps {
   comment: CommentType;
-  hasAccountConnected: boolean;
   onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
   onRetryEditClick: () => void;
-  onLikeClick: () => void;
-  onUnlikeClick: () => void;
   isLiking?: boolean;
 }
 
 export function CommentActionOrStatus({
   comment,
-  hasAccountConnected,
   onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
   onRetryEditClick,
-  onLikeClick,
-  onUnlikeClick,
   isLiking,
 }: CommentActionOrStatusProps) {
   const isDeleting =
@@ -49,12 +48,9 @@ export function CommentActionOrStatus({
     comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "pending";
 
-  const likedByViewer = useMemo(() => {
-    return (
-      (comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT]?.length ?? 0) >
-      0
-    );
-  }, [comment.viewerReactions]);
+  const onReplyClickRef = useFreshRef(onReplyClick);
+  const isHearted = useCommentIsHearted(comment);
+  const connectBeforeAction = useConnectBeforeAction();
 
   if (didPostingFailed) {
     return (
@@ -120,29 +116,32 @@ export function CommentActionOrStatus({
   }
 
   if (
-    (comment.pendingOperation &&
-      comment.pendingOperation.state.status !== "success") ||
-    !hasAccountConnected
+    comment.pendingOperation &&
+    comment.pendingOperation.state.status !== "success"
   ) {
     return null;
   }
 
   return (
     <div className="flex items-center gap-2">
-      <CommentActionButton onClick={onReplyClick}>reply</CommentActionButton>
-      <CommentActionButton>
-        <HeartButton
-          pending={isLiking}
-          onIsHeartedChange={(isHearted) => {
-            if (isHearted) {
-              onLikeClick();
-            } else {
-              onUnlikeClick();
-            }
-          }}
-          isHearted={likedByViewer}
-        />
+      <CommentActionButton
+        onClick={connectBeforeAction(() => {
+          onReplyClickRef.current();
+        })}
+      >
+        reply
+      </CommentActionButton>
+      <CommentActionButton
+        onClick={connectBeforeAction(() => {
+          const newIsHearted = !isHearted;
 
+          return {
+            type: newIsHearted ? "like" : "unlike",
+            commentId: comment.id,
+          };
+        })}
+      >
+        <HeartButton pending={isLiking} isHearted={isHearted} />
         {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
       </CommentActionButton>
     </div>

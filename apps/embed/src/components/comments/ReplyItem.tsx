@@ -10,8 +10,9 @@ import type { QueryKey } from "@tanstack/react-query";
 import { useLikeComment } from "./hooks/useLikeComment";
 import { useUnlikeComment } from "./hooks/useUnlikeComment";
 import { toast } from "sonner";
-import { getSimplifiedErrorMessageFromContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { useAccount } from "wagmi";
+import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
 
 type ReplyItemProps = {
   comment: CommentType;
@@ -71,7 +72,7 @@ export function ReplyItem({
 
         const message =
           e instanceof ContractFunctionExecutionError
-            ? getSimplifiedErrorMessageFromContractFunctionExecutionError(e)
+            ? formatContractFunctionExecutionError(e)
             : e.message;
 
         toast.error(message);
@@ -94,13 +95,19 @@ export function ReplyItem({
 
         const message =
           e instanceof ContractFunctionExecutionError
-            ? getSimplifiedErrorMessageFromContractFunctionExecutionError(e)
+            ? formatContractFunctionExecutionError(e)
             : e.message;
 
         toast.error(message);
       },
     });
   }, [comment, queryKey, unlikeComment]);
+
+  useConsumePendingWalletConnectionActions({
+    commentId: comment.id,
+    onLikeAction: onLikeClick,
+    onUnlikeAction: onUnlikeClick,
+  });
 
   return (
     <div className="mb-4 border-muted border-l-2 pl-4">
@@ -124,8 +131,6 @@ export function ReplyItem({
           onRetryDeleteClick={onDeleteClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
-          onLikeClick={onLikeClick}
-          onUnlikeClick={onUnlikeClick}
           isLiking={isLiking}
           optimisticReferences={
             comment.pendingOperation?.action === "post"

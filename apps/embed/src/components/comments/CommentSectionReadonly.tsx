@@ -28,6 +28,7 @@ import {
   useEmbedConfig,
 } from "../EmbedConfigProvider";
 import { useChainId } from "wagmi";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 type QueryData = InfiniteData<
   CommentPageSchemaType,
@@ -68,6 +69,7 @@ export function CommentSectionReadonly({
           cursor: pageParam.cursor,
           chainId,
           signal,
+          commentType: COMMENT_TYPE_COMMENT,
         });
 
         return CommentPageSchema.parse(response);
@@ -100,6 +102,7 @@ export function CommentSectionReadonly({
         sort: "asc",
         chainId,
         signal,
+        commentType: COMMENT_TYPE_COMMENT,
       });
 
       if (newComments.results.length === 0) {

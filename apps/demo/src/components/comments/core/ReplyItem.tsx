@@ -7,6 +7,7 @@ import { useCommentActions } from "./CommentActionsContext";
 import { ContractFunctionExecutionError, type Hex } from "viem";
 import { toast } from "sonner";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
 
 type ReplyItemProps = {
   comment: CommentType;
@@ -99,6 +100,12 @@ export function ReplyItem({
     });
   }, [comment, unlikeComment, queryKey]);
 
+  useConsumePendingWalletConnectionActions({
+    commentId: comment.id,
+    onLikeAction: onLikeClick,
+    onUnlikeAction: onUnlikeClick,
+  });
+
   return (
     <div className={"mb-4 border-gray-200 border-l-2 pl-4"}>
       {isEditing ? (
@@ -121,8 +128,6 @@ export function ReplyItem({
           onRetryDeleteClick={onDeleteClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
-          onLikeClick={onLikeClick}
-          onUnlikeClick={onUnlikeClick}
           isLiking={isLiking}
           optimisticReferences={
             comment.pendingOperation?.action === "post"

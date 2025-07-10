@@ -9,10 +9,8 @@ import {
   PendingPostCommentOperationSchemaType,
   type Comment,
 } from "@ecp.eth/shared/schemas";
-import {
-  COMMENT_REACTION_LIKE_CONTENT,
-  TX_RECEIPT_TIMEOUT,
-} from "@/lib/constants";
+import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
+import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { submitCommentMutationFunction } from "../queries";
 
 type UseLikeCommentProps = {

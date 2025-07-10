@@ -30,6 +30,7 @@
     "packages/shared/services/*": true,
     "packages/shared/components/*": true,
     "packages/shared/errors": true,
-    "packages/shared/hooks/*": true
+    "packages/shared/hooks/*": true,
+    "packages/shared/constants": true
   }
 }

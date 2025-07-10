@@ -1,4 +1,4 @@
-import { PendingWalletConnectionActionsProvider } from "./PendingWalletConnectionActionsContext";
+import { PendingWalletConnectionActionsProvider } from "@ecp.eth/shared/components";
 
 export function CommentSectionWrapper({
   children,
