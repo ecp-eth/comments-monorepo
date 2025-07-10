@@ -27,12 +27,12 @@ export class PremoderationCacheService implements IPremoderationCacheService {
     const db = getIndexerDb();
 
     await db
-      .insertInto("comment_moderation_statuses")
-      .values({
-        comment_id: commentId,
+      .updateTable("comment_moderation_statuses")
+      .set({
         moderation_status: status.status,
         updated_at: status.changedAt,
       })
+      .where("comment_id", "=", commentId)
       .execute();
   }
 }
