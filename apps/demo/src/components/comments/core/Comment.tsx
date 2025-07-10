@@ -18,6 +18,8 @@ import {
   CommentText,
   CommentMediaReferences,
 } from "@ecp.eth/shared/components";
+import { CommentActionLink } from "./CommentActionButton";
+import { publicEnv } from "@/publicEnv";
 
 type CommentProps = {
   comment: CommentType;
@@ -126,6 +128,18 @@ export function Comment({
           onRetryEditClick={onRetryEditClick}
           isLiking={isLiking}
         />
+      </div>
+      <div className="mb-2">
+        <CommentActionLink
+          href={publicEnv.NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL.replace(
+            "{txHash}",
+            comment.txHash,
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          view on block explorer
+        </CommentActionLink>
       </div>
     </>
   );
