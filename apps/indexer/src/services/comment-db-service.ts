@@ -34,8 +34,8 @@ export class CommentModerationStatusNotFoundError extends BaseCommentModerationE
 }
 
 export class CommentAlreadyInStatusError extends BaseCommentModerationException {
-  constructor(status: ModerationStatus) {
-    super(400, `Comment is already in status ${status}`);
+  constructor(commentId: Hex, status: ModerationStatus) {
+    super(400, `Comment ${commentId} is already in status ${status}`);
   }
 }
 
@@ -71,7 +71,7 @@ export class CommentDbService implements ICommentDbService {
       }
 
       if (commentModerationStatus.status === status) {
-        throw new CommentAlreadyInStatusError(status);
+        throw new CommentAlreadyInStatusError(commentId, status);
       }
 
       const comment = await tx.query.comment.findFirst({
