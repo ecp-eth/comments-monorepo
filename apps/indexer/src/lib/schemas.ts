@@ -125,6 +125,36 @@ export const InputCommentCursorSchema = z.preprocess((value, ctx) => {
   }
 }, CommentCursorSchema);
 
+const ReportsCursorSchema = z.object({
+  createdAt: z.coerce.date(),
+  id: z.string().uuid(),
+});
+
+export type ReportsCursorSchemaType = z.infer<typeof ReportsCursorSchema>;
+
+export const InputReportsCursorSchema = z.preprocess((value, ctx) => {
+  try {
+    const parsed = HexSchema.parse(value);
+    const hex = hexToString(parsed);
+    const [createdAt, id] = z
+      .tuple([z.coerce.number().positive(), z.string().uuid()])
+      .parse(hex.split(":"));
+
+    return {
+      createdAt,
+      id,
+    };
+  } catch {
+    ctx.addIssue({
+      code: "custom",
+      message: "Invalid reports cursor",
+      path: ["cursor"],
+    });
+
+    return z.NEVER;
+  }
+}, ReportsCursorSchema);
+
 const ChainIdSchema = z
   .preprocess(
     (val) => {

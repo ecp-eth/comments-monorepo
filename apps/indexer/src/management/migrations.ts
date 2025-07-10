@@ -42,7 +42,7 @@ export type CommentReportsTable = {
   id: Generated<string>;
   comment_id: Hex;
   reportee: Hex;
-  message: string | null;
+  message: string;
   created_at: Generated<Date>;
   updated_at: Generated<Date>;
   status: CommentReportStatus;
@@ -152,7 +152,7 @@ class StaticMigrationsProvider implements MigrationProvider {
               col.notNull().defaultTo(sql`now()`),
             )
             .addColumn("reportee", "text", (col) => col.notNull())
-            .addColumn("message", "text")
+            .addColumn("message", "text", (col) => col.notNull())
             .addColumn("status", "text", (col) =>
               col
                 .notNull()
@@ -165,6 +165,12 @@ class StaticMigrationsProvider implements MigrationProvider {
             .createIndex("comment_reports_by_status_idx")
             .on("comment_reports")
             .column("status")
+            .execute();
+
+          await db.schema
+            .createIndex("comment_reports_by_created_at_idx")
+            .on("comment_reports")
+            .column("created_at")
             .execute();
         },
         down: async (db: Kysely<IndexerSchemaDB>) => {

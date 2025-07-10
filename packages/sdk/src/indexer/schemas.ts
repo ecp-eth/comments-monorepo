@@ -594,3 +594,50 @@ export const IndexerAPIGetAutocompleteOutputSchema = z.object({
 export type IndexerAPIGetAutocompleteOutputSchemaType = z.infer<
   typeof IndexerAPIGetAutocompleteOutputSchema
 >;
+
+export const IndexerAPIReportStatusSchema = z.enum([
+  "pending",
+  "resolved",
+  "closed",
+]);
+
+export const IndexerAPIReportSchema = z.object({
+  id: z.string().uuid(),
+  commentId: HexSchema,
+  reportee: HexSchema,
+  message: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  status: IndexerAPIReportStatusSchema,
+});
+
+export type IndexerAPIReportSchemaType = z.infer<typeof IndexerAPIReportSchema>;
+
+export const IndexerAPIReportOutputSchema = IndexerAPIReportSchema.extend({
+  id: z.string().uuid(),
+  createdAt: dateToString,
+  updatedAt: dateToString,
+});
+
+export type IndexerAPIReportOutputSchemaType = z.infer<
+  typeof IndexerAPIReportOutputSchema
+>;
+
+export const IndexerAPIReportsListPendingSchema = z.object({
+  results: z.array(IndexerAPIReportSchema),
+  pagination: IndexerAPICursorPaginationSchema,
+});
+
+export type IndexerAPIReportsListPendingSchemaType = z.infer<
+  typeof IndexerAPIReportsListPendingSchema
+>;
+
+export const IndexerAPIReportsListPendingOutputSchema =
+  IndexerAPIReportsListPendingSchema.extend({
+    results: z.array(IndexerAPIReportOutputSchema),
+    pagination: IndexerAPICursorPaginationSchema,
+  });
+
+export type IndexerAPIReportsListPendingOutputSchemaType = z.infer<
+  typeof IndexerAPIReportsListPendingOutputSchema
+>;

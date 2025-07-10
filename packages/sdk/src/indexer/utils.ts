@@ -20,3 +20,13 @@ export function getCommentCursor(commentId: Hex, timestamp: Date): Hex {
 export function getChannelCursor(channelId: bigint, timestamp: Date): Hex {
   return stringToHex(`${timestamp.getTime()}:${channelId.toString()}`);
 }
+
+/**
+ * Get the cursor for a report
+ * @param id The ID of the report
+ * @param timestamp The timestamp of the report
+ * @returns The cursor for the report
+ */
+export function getReportsCursor(id: string, timestamp: Date): Hex {
+  return stringToHex(`${timestamp.getTime()}:${id}`);
+}

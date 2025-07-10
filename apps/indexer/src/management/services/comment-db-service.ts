@@ -41,7 +41,7 @@ export class ManagementCommentDbService {
       .values({
         comment_id: commentId,
         reportee,
-        message: message || null,
+        message,
         created_at: new Date(),
         status: "pending",
       })
