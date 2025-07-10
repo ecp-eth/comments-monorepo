@@ -193,16 +193,16 @@ export const EmbedConfigSupportedChainIdsSchema = z
     // ethereum mainnet
     // z.literal(1),
     // base
-    // z.literal(8453),
+    z.literal(8453),
     // base sepolia
-    z.literal(84532),
+    // z.literal(84532),
     // ethereum sepolia
     // z.literal(11155111),
     // anvil
     z.literal(31337),
   ])
   .optional()
-  .default(isNodeEnvDev() ? 31337 : 84532);
+  .default(isNodeEnvDev() ? 31337 : 8453);
 
 /**
  * The type for supported chain ids
