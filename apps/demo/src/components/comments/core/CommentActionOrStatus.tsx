@@ -8,6 +8,7 @@ import {
   useConnectBeforeAction,
 } from "@ecp.eth/shared/components";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
+import { useReportCommentDialog } from "./ReportCommentDialogProvider";
 import { useCommentIsHearted } from "@ecp.eth/shared/hooks";
 
 export function CommentActionOrStatus({
@@ -43,6 +44,7 @@ export function CommentActionOrStatus({
     comment.pendingOperation.state.status === "error";
 
   const isHearted = useCommentIsHearted(comment);
+  const { open } = useReportCommentDialog();
   const connectBeforeAction = useConnectBeforeAction();
 
   if (didPostingFailed) {
@@ -139,6 +141,14 @@ export function CommentActionOrStatus({
       >
         <HeartButton pending={isLiking} isHearted={isHearted} />
         {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
+      </CommentActionButton>
+
+      <CommentActionButton
+        onClick={connectBeforeAction(() => {
+          open(comment);
+        })}
+      >
+        report
       </CommentActionButton>
     </div>
   );
