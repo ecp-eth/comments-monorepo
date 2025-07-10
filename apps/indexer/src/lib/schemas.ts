@@ -7,6 +7,7 @@ import { z } from "@hono/zod-openapi";
 import { hexToString } from "viem";
 import { normalizeUrl } from "./utils";
 import { SUPPORTED_CHAIN_IDS } from "../env";
+import { CommentModerationLabel } from "../services/types";
 
 export const OpenAPIHexSchema = HexSchema.openapi({
   type: "string",
@@ -188,6 +189,33 @@ export const GetCommentsQuerySchema = z.object({
     .openapi({
       description:
         "The moderation status of the comments to return. If omitted it will return comments based on moderation settings (approved if moderation is enabled).",
+    }),
+  moderationScore: z.coerce.number().min(0).max(1).optional().openapi({
+    description:
+      "The moderation score of the comments to return. If the comment's moderation score exceeds the provided value, it is not returned.",
+    minimum: 0,
+    maximum: 1,
+    type: "number",
+  }),
+  excludeByModerationLabels: z
+    .preprocess(
+      (val) => {
+        if (typeof val === "string") {
+          return val.split(",");
+        }
+
+        return val;
+      },
+      z.array(z.nativeEnum(CommentModerationLabel)),
+    )
+    .optional()
+    .openapi({
+      description:
+        "The moderation labels to exclude from the comments to return. This filter works in conjunction with the `moderationStatus` filter.",
+      type: "string",
+      example: "spam,sexual",
+      pattern:
+        "^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)$",
     }),
   // zod-openapi plugin doesn't automatically infer the minimum value from `int().positive()`
   // so use min(1) for better compatibility

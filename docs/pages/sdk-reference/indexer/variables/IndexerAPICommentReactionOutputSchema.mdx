@@ -88,6 +88,8 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }>, "many">;
+  moderationClassifierResult: ZodRecord<ZodUnion<[ZodEnum<["llm_generated", "spam", "sexual", "hate", "violence", "harassment", "self_harm", "sexual_minors", "hate_threatening", "violence_graphic"]>, ZodString]>, ZodNumber>;
+  moderationClassifierScore: ZodNumber;
   moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
   parentId: ZodNullable<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
   references: ZodArray<ZodUnion<[ZodObject<{
@@ -334,6 +336,8 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: ...;
         value: ...;
      }>, "many">;
+     moderationClassifierResult: ZodRecord<ZodUnion<[..., ...]>, ZodNumber>;
+     moderationClassifierScore: ZodNumber;
      moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
      parentId: ZodNullable<ZodType<`0x${(...)}`, ZodTypeDef, `0x${(...)}`>>;
      references: ZodArray<ZodUnion<[..., ..., ...]>, "many">;
@@ -388,6 +392,8 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
@@ -519,6 +525,8 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -651,6 +659,8 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
+  moderationClassifierResult: Record<string, number>;
+  moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
@@ -779,6 +789,8 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
@@ -933,6 +945,8 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
+  moderationClassifierResult: Record<string, number>;
+  moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
@@ -1061,6 +1075,8 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -1186,4 +1202,4 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:342](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L342)
+Defined in: [packages/sdk/src/indexer/schemas.ts:364](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L364)

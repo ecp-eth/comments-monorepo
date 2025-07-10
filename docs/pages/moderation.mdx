@@ -54,7 +54,19 @@ The indexer service implements additional spam prevention measures and tools:
    - Implements basic profanity detection
    - Can be extended with more advanced content analysis
 
-3. **Comment Premoderation (Opt in)**
+3. **Automatic Content Classification (Opt in)**
+
+   - Uses [mbd.xyz](https://www.mbd.xyz) API to automatically classify comments for specific moderation labels
+   - Labels include: spam, harassment, hate speech, sexual content, violence, self-harm, and more
+   - Each label comes with a confidence score between 0 and 1
+   - API users can:
+     - Filter out comments with specific moderation labels using `excludeModerationLabels`
+     - Set a global moderation score threshold using `moderationScore` to exclude comments with high scores
+   - This helps maintain content quality without manual intervention
+
+   > **Important**: If you want to use only automatic content classification and ignore premoderation, you must explicitly request comments of all moderation statuses (using the `moderationStatus` parameter) when premoderation is enabled on the indexer. This allows you to "opt out" of premoderation and rely solely on automatic classification.
+
+4. **Comment Premoderation (Opt in)**
    - Comments can be configured to require moderator approval before appearing in the feed
    - When enabled, new comments are initially hidden and only become visible after explicit approval
    - Moderators can approve or reject comments through the [Admin CLI](/indexer/admin-cli-comments-premoderation), directly through [Indexer API](/indexer-reference/restful) or through a Telegram bot

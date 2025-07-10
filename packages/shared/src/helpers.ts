@@ -241,6 +241,8 @@ export function insertPendingCommentToPage(
       response.data,
     ),
     moderationStatusChangedAt: new Date(),
+    moderationClassifierResult: {},
+    moderationClassifierScore: 0,
     zeroExSwap: zeroExSwap ?? null,
     references: [],
     replies: {
@@ -262,7 +264,7 @@ export function insertPendingCommentToPage(
 
 export function getModerationStatus(
   extra: IndexerAPIExtraSchemaType,
-  comment: CommentDataWithIdSchemaType,
+  comment: Pick<CommentDataWithIdSchemaType, "commentType" | "content">,
 ): "pending" | "approved" {
   if (!extra.moderationEnabled) {
     return "approved";
@@ -421,10 +423,18 @@ export function markPendingEditCommentAsPending(
   >,
   pendingOperation: PendingEditCommentOperationSchemaType,
 ) {
+  if (!queryData.pages[0]) {
+    return queryData;
+  }
+
   for (const page of queryData.pages) {
     for (const comment of page.results) {
       if (isSameHex(comment.id, pendingOperation.response.data.commentId)) {
         comment.content = pendingOperation.response.data.content;
+        comment.moderationStatus = getModerationStatus(
+          queryData.pages[0].extra,
+          comment,
+        );
         comment.revision++;
         comment.pendingOperation = pendingOperation;
 

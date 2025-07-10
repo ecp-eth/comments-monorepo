@@ -51,6 +51,8 @@ function fetchCommentReplies(options): Promise<{
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -163,7 +165,7 @@ function fetchCommentReplies(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:327](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L327)
+Defined in: [packages/sdk/src/indexer/api.ts:382](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L382)
 
 Fetch replies for a comment from the Indexer API
 
@@ -219,6 +221,8 @@ Fetch replies for a comment from the Indexer API
         `key`: `` `0x${string}` ``;
         `value`: `` `0x${string}` ``;
      \}[];
+     `moderationClassifierResult`: `Record`\<`string`, `number`\>;
+     `moderationClassifierScore`: `number`;
      `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
      `moderationStatusChangedAt`: `Date`;
      `parentId`: `null` \| `` `0x${string}` ``;

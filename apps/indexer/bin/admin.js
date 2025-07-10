@@ -400,15 +400,11 @@ moderateComments
        * @type {any}
        */
       const rawResponse = await response.json();
+
       /**
-       * @type {import('@ecp.eth/sdk/indexer/schemas').IndexerAPIListCommentsSchemaType}
+       * @type {import('@ecp.eth/sdk/indexer/schemas').IndexerAPIModerationGetPendingCommentsSchemaType}
        */
       const result = rawResponse;
-
-      if (!result.extra.moderationEnabled) {
-        console.error("Moderation is not enabled on this instance");
-        process.exit(1);
-      }
 
       for (const comment of result.results) {
         console.group(comment.id);

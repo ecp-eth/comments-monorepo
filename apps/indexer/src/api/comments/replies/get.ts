@@ -1,6 +1,6 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { and, asc, desc, eq, gt, lt, or, isNull, inArray } from "ponder";
+import { and, asc, desc, eq, gt, lt, lte, or, isNull, inArray } from "ponder";
 import { IndexerAPIListCommentRepliesOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../../lib/response-formatters";
@@ -11,8 +11,11 @@ import {
 } from "../../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../../lib/constants";
 import { env } from "../../../env";
-import { normalizeModerationStatusFilter } from "../helpers";
-import { SQL } from "drizzle-orm";
+import {
+  convertExcludeModerationLabelsToConditions,
+  normalizeModerationStatusFilter,
+} from "../helpers";
+import type { SQL } from "drizzle-orm";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 
 const getCommentsRoute = createRoute({
@@ -58,11 +61,15 @@ export default (app: OpenAPIHono) => {
       commentType,
       moderationStatus,
       chainId,
+      excludeByModerationLabels: excludeModerationLabels,
+      author,
+      moderationScore,
     } = c.req.valid("query");
     const { commentId } = c.req.valid("param");
 
     const sharedConditions = [
       app ? eq(schema.comment.app, app) : undefined,
+      author ? eq(schema.comment.author, author) : undefined,
       channelId != null ? eq(schema.comment.channelId, channelId) : undefined,
       commentType != null
         ? eq(schema.comment.commentType, commentType)
@@ -70,6 +77,12 @@ export default (app: OpenAPIHono) => {
       chainId.length === 1
         ? eq(schema.comment.chainId, chainId[0]!)
         : inArray(schema.comment.chainId, chainId),
+      excludeModerationLabels
+        ? convertExcludeModerationLabelsToConditions(excludeModerationLabels)
+        : undefined,
+      moderationScore != null
+        ? lte(schema.comment.moderationClassifierScore, moderationScore)
+        : undefined,
     ];
     const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];
 

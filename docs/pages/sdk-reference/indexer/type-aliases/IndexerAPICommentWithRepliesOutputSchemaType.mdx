@@ -39,6 +39,8 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
+  moderationClassifierResult: Record<string, number>;
+  moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
@@ -175,6 +177,8 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
+        moderationClassifierResult: Record<string, number>;
+        moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: string;
         parentId: null | `0x${string}`;
@@ -303,6 +307,8 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
+           moderationClassifierResult: Record<string, number>;
+           moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: string;
            parentId: null | `0x${string}`;
@@ -454,6 +460,8 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
@@ -579,7 +587,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:387](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L387)
+Defined in: [packages/sdk/src/indexer/schemas.ts:409](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L409)
 
 ## Type declaration
 
@@ -739,6 +747,18 @@ metadata: {
   key: `0x${string}`;
   value: `0x${string}`;
 }[] = IndexerAPIMetadataSchema;
+```
+
+### moderationClassifierResult
+
+```ts
+moderationClassifierResult: Record<string, number>;
+```
+
+### moderationClassifierScore
+
+```ts
+moderationClassifierScore: number;
 ```
 
 ### moderationStatus
@@ -905,6 +925,8 @@ replies: {
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
@@ -1033,6 +1055,8 @@ replies: {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
+        moderationClassifierResult: Record<string, number>;
+        moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: string;
         parentId: null | `0x${string}`;
@@ -1248,6 +1272,8 @@ results: {
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
+  moderationClassifierResult: Record<string, number>;
+  moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
@@ -1376,6 +1402,8 @@ results: {
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
@@ -1551,6 +1579,8 @@ viewerReactions: Record<string, {
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
+  moderationClassifierResult: Record<string, number>;
+  moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;

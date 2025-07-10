@@ -51,6 +51,8 @@ type IndexerAPIListCommentsSchemaType = {
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
@@ -187,6 +189,8 @@ type IndexerAPIListCommentsSchemaType = {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
+           moderationClassifierResult: Record<string, number>;
+           moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
@@ -307,6 +311,8 @@ type IndexerAPIListCommentsSchemaType = {
                  key: ...;
                  value: ...;
               }[];
+              moderationClassifierResult: Record<string, number>;
+              moderationClassifierScore: number;
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
@@ -372,6 +378,8 @@ type IndexerAPIListCommentsSchemaType = {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
+        moderationClassifierResult: Record<string, number>;
+        moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
@@ -498,7 +506,7 @@ type IndexerAPIListCommentsSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:397](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L397)
+Defined in: [packages/sdk/src/indexer/schemas.ts:419](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L419)
 
 ## Type declaration
 
@@ -600,6 +608,8 @@ results: {
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
+  moderationClassifierResult: Record<string, number>;
+  moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
@@ -736,6 +746,8 @@ results: {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
+        moderationClassifierResult: Record<string, number>;
+        moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
@@ -856,6 +868,8 @@ results: {
               key: ...;
               value: ...;
            }[];
+           moderationClassifierResult: Record<string, number>;
+           moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${(...)}`;
@@ -921,6 +935,8 @@ results: {
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;

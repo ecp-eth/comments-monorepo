@@ -47,6 +47,8 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
@@ -159,7 +161,7 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:448](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L448)
+Defined in: [packages/sdk/src/indexer/schemas.ts:470](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L470)
 
 ## Type declaration
 
@@ -240,6 +242,8 @@ results: {
      key: `0x${string}`;
      value: `0x${string}`;
   }[];
+  moderationClassifierResult: Record<string, number>;
+  moderationClassifierScore: number;
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;

@@ -279,6 +279,27 @@ paths:
           name: moderationStatus
           in: query
         - schema:
+            type: number
+            description: >-
+              The moderation score of the comments to return. If the comment's
+              moderation score exceeds the provided value, it is not returned.
+            minimum: 0
+            maximum: 1
+          required: false
+          name: moderationScore
+          in: query
+        - schema:
+            type: string
+            description: >-
+              The moderation labels to exclude from the comments to return. This
+              filter works in conjunction with the `moderationStatus` filter.
+            example: spam,sexual
+            pattern: >-
+              ^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)$
+          required: false
+          name: excludeByModerationLabels
+          in: query
+        - schema:
             type: integer
             minimum: 1
             maximum: 100
@@ -415,6 +436,16 @@ paths:
                           type:
                             - string
                             - 'null'
+                        moderationClassifierResult:
+                          type: object
+                          additionalProperties:
+                            type: number
+                            minimum: 0
+                            maximum: 1
+                        moderationClassifierScore:
+                          type: number
+                          minimum: 0
+                          maximum: 1
                         createdAt:
                           type:
                             - string
@@ -825,6 +856,16 @@ paths:
                                   type:
                                     - string
                                     - 'null'
+                                moderationClassifierResult:
+                                  type: object
+                                  additionalProperties:
+                                    type: number
+                                    minimum: 0
+                                    maximum: 1
+                                moderationClassifierScore:
+                                  type: number
+                                  minimum: 0
+                                  maximum: 1
                                 createdAt:
                                   type:
                                     - string
@@ -1161,6 +1202,8 @@ paths:
                                 - cursor
                                 - moderationStatus
                                 - moderationStatusChangedAt
+                                - moderationClassifierResult
+                                - moderationClassifierScore
                                 - createdAt
                                 - updatedAt
                                 - revision
@@ -1275,6 +1318,16 @@ paths:
                                     type:
                                       - string
                                       - 'null'
+                                  moderationClassifierResult:
+                                    type: object
+                                    additionalProperties:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 1
+                                  moderationClassifierScore:
+                                    type: number
+                                    minimum: 0
+                                    maximum: 1
                                   createdAt:
                                     type:
                                       - string
@@ -1685,6 +1738,16 @@ paths:
                                             type:
                                               - string
                                               - 'null'
+                                          moderationClassifierResult:
+                                            type: object
+                                            additionalProperties:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 1
+                                          moderationClassifierScore:
+                                            type: number
+                                            minimum: 0
+                                            maximum: 1
                                           createdAt:
                                             type:
                                               - string
@@ -2021,6 +2084,8 @@ paths:
                                           - cursor
                                           - moderationStatus
                                           - moderationStatusChangedAt
+                                          - moderationClassifierResult
+                                          - moderationClassifierScore
                                           - createdAt
                                           - updatedAt
                                           - revision
@@ -2048,6 +2113,8 @@ paths:
                                   - cursor
                                   - moderationStatus
                                   - moderationStatusChangedAt
+                                  - moderationClassifierResult
+                                  - moderationClassifierScore
                                   - createdAt
                                   - updatedAt
                                   - revision
@@ -2092,6 +2159,8 @@ paths:
                         - cursor
                         - moderationStatus
                         - moderationStatusChangedAt
+                        - moderationClassifierResult
+                        - moderationClassifierScore
                         - createdAt
                         - updatedAt
                         - revision
@@ -2210,6 +2279,27 @@ paths:
               moderation is enabled).
           required: false
           name: moderationStatus
+          in: query
+        - schema:
+            type: number
+            description: >-
+              The moderation score of the comments to return. If the comment's
+              moderation score exceeds the provided value, it is not returned.
+            minimum: 0
+            maximum: 1
+          required: false
+          name: moderationScore
+          in: query
+        - schema:
+            type: string
+            description: >-
+              The moderation labels to exclude from the comments to return. This
+              filter works in conjunction with the `moderationStatus` filter.
+            example: spam,sexual
+            pattern: >-
+              ^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)$
+          required: false
+          name: excludeByModerationLabels
           in: query
         - schema:
             type: integer
@@ -2337,6 +2427,16 @@ paths:
                           type:
                             - string
                             - 'null'
+                        moderationClassifierResult:
+                          type: object
+                          additionalProperties:
+                            type: number
+                            minimum: 0
+                            maximum: 1
+                        moderationClassifierScore:
+                          type: number
+                          minimum: 0
+                          maximum: 1
                         createdAt:
                           type:
                             - string
@@ -2747,6 +2847,16 @@ paths:
                                   type:
                                     - string
                                     - 'null'
+                                moderationClassifierResult:
+                                  type: object
+                                  additionalProperties:
+                                    type: number
+                                    minimum: 0
+                                    maximum: 1
+                                moderationClassifierScore:
+                                  type: number
+                                  minimum: 0
+                                  maximum: 1
                                 createdAt:
                                   type:
                                     - string
@@ -3083,6 +3193,8 @@ paths:
                                 - cursor
                                 - moderationStatus
                                 - moderationStatusChangedAt
+                                - moderationClassifierResult
+                                - moderationClassifierScore
                                 - createdAt
                                 - updatedAt
                                 - revision
@@ -3197,6 +3309,16 @@ paths:
                                     type:
                                       - string
                                       - 'null'
+                                  moderationClassifierResult:
+                                    type: object
+                                    additionalProperties:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 1
+                                  moderationClassifierScore:
+                                    type: number
+                                    minimum: 0
+                                    maximum: 1
                                   createdAt:
                                     type:
                                       - string
@@ -3607,6 +3729,16 @@ paths:
                                             type:
                                               - string
                                               - 'null'
+                                          moderationClassifierResult:
+                                            type: object
+                                            additionalProperties:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 1
+                                          moderationClassifierScore:
+                                            type: number
+                                            minimum: 0
+                                            maximum: 1
                                           createdAt:
                                             type:
                                               - string
@@ -3943,6 +4075,8 @@ paths:
                                           - cursor
                                           - moderationStatus
                                           - moderationStatusChangedAt
+                                          - moderationClassifierResult
+                                          - moderationClassifierScore
                                           - createdAt
                                           - updatedAt
                                           - revision
@@ -3970,6 +4104,8 @@ paths:
                                   - cursor
                                   - moderationStatus
                                   - moderationStatusChangedAt
+                                  - moderationClassifierResult
+                                  - moderationClassifierScore
                                   - createdAt
                                   - updatedAt
                                   - revision
@@ -4014,6 +4150,8 @@ paths:
                         - cursor
                         - moderationStatus
                         - moderationStatusChangedAt
+                        - moderationClassifierResult
+                        - moderationClassifierScore
                         - createdAt
                         - updatedAt
                         - revision
@@ -4525,6 +4663,16 @@ paths:
                           type:
                             - string
                             - 'null'
+                        moderationClassifierResult:
+                          type: object
+                          additionalProperties:
+                            type: number
+                            minimum: 0
+                            maximum: 1
+                        moderationClassifierScore:
+                          type: number
+                          minimum: 0
+                          maximum: 1
                         createdAt:
                           type:
                             - string
@@ -4861,6 +5009,8 @@ paths:
                         - cursor
                         - moderationStatus
                         - moderationStatusChangedAt
+                        - moderationClassifierResult
+                        - moderationClassifierScore
                         - createdAt
                         - updatedAt
                         - revision
@@ -5026,6 +5176,16 @@ paths:
                     type:
                       - string
                       - 'null'
+                  moderationClassifierResult:
+                    type: object
+                    additionalProperties:
+                      type: number
+                      minimum: 0
+                      maximum: 1
+                  moderationClassifierScore:
+                    type: number
+                    minimum: 0
+                    maximum: 1
                   createdAt:
                     type:
                       - string
@@ -5362,6 +5522,8 @@ paths:
                   - cursor
                   - moderationStatus
                   - moderationStatusChangedAt
+                  - moderationClassifierResult
+                  - moderationClassifierScore
                   - createdAt
                   - updatedAt
                   - revision
@@ -5508,6 +5670,16 @@ paths:
                     type:
                       - string
                       - 'null'
+                  moderationClassifierResult:
+                    type: object
+                    additionalProperties:
+                      type: number
+                      minimum: 0
+                      maximum: 1
+                  moderationClassifierScore:
+                    type: number
+                    minimum: 0
+                    maximum: 1
                   createdAt:
                     type:
                       - string
@@ -5844,6 +6016,8 @@ paths:
                   - cursor
                   - moderationStatus
                   - moderationStatusChangedAt
+                  - moderationClassifierResult
+                  - moderationClassifierScore
                   - createdAt
                   - updatedAt
                   - revision

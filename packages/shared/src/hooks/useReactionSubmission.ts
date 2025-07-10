@@ -155,6 +155,8 @@ function insertPendingReactionToPage(
       response.data,
     ),
     moderationStatusChangedAt: new Date(),
+    moderationClassifierResult: {},
+    moderationClassifierScore: 0,
     zeroExSwap: zeroExSwap ?? null,
     references: [],
   };

@@ -1,10 +1,16 @@
 import { z } from "zod";
 
 const moderationNotificationsEnabledSchema = z.object({
-  MODERATION_TELEGRAM_BOT_TOKEN: z.string().min(1),
-  MODERATION_TELEGRAM_CHANNEL_ID: z.string().min(1),
+  MODERATION_TELEGRAM_BOT_TOKEN: z.string().nonempty(),
+  MODERATION_TELEGRAM_CHANNEL_ID: z.string().nonempty(),
   MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url(),
-  MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().min(1),
+  MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().nonempty(),
+});
+
+const classificationScoreThresholdSchema = z.coerce.number().min(0).max(1);
+
+const moderationAutomaticClassificationEnabledSchema = z.object({
+  MODERATION_MBD_API_KEY: z.string().nonempty(),
 });
 
 const EnvSchema = z
@@ -38,6 +44,11 @@ const EnvSchema = z
               .filter(Boolean),
           ),
       ),
+    MODERATION_ENABLE_AUTOMATIC_CLASSIFICATION: z
+      .enum(["0", "1"])
+      .default("0")
+      .transform((val) => val === "1"),
+    MODERATION_MBD_API_KEY: z.string().optional(),
     MODERATION_TELEGRAM_BOT_TOKEN: z.string().optional(),
     MODERATION_TELEGRAM_CHANNEL_ID: z.string().optional(),
     MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
@@ -49,10 +60,46 @@ const EnvSchema = z
     SIM_API_KEY: z.string().nonempty(),
     COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().default(1024 * 10),
     TELEGRAM_MESSAGE_LENGTH_LIMIT: z.coerce.number().default(4000),
+
+    MODERATION_DEFAULT_CLASSIFICATION_SCORE_THRESHOLD:
+      classificationScoreThresholdSchema.default(0.2),
+    MODERATION_CLASSIFICATION_HARASSMENT_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_HATE_THREATENING_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_HATE_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_LLM_GENERATED_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_SELF_HARM_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_SEXUAL_MINORS_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_SEXUAL_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_SPAM_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_VIOLENCE_GRAPHIC_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
+    MODERATION_CLASSIFICATION_VIOLENCE_THRESHOLD:
+      classificationScoreThresholdSchema.optional(),
   })
   .superRefine((vars, ctx) => {
     if (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) {
       const result = moderationNotificationsEnabledSchema.safeParse(vars);
+
+      if (!result.success) {
+        result.error.issues.forEach((issue) => {
+          ctx.addIssue(issue);
+        });
+
+        return z.NEVER;
+      }
+    }
+
+    if (vars.MODERATION_ENABLE_AUTOMATIC_CLASSIFICATION) {
+      const result =
+        moderationAutomaticClassificationEnabledSchema.safeParse(vars);
 
       if (!result.success) {
         result.error.issues.forEach((issue) => {

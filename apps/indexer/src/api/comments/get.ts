@@ -20,7 +20,10 @@ import { GetCommentsQuerySchema } from "../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../lib/constants";
 import { env } from "../../env";
 import type { SQL } from "drizzle-orm";
-import { normalizeModerationStatusFilter } from "./helpers";
+import {
+  convertExcludeModerationLabelsToConditions,
+  normalizeModerationStatusFilter,
+} from "./helpers";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 
 const getCommentsRoute = createRoute({
@@ -63,7 +66,9 @@ export default (app: OpenAPIHono) => {
       channelId,
       commentType,
       moderationStatus,
+      moderationScore,
       chainId,
+      excludeByModerationLabels: excludeModerationLabels,
     } = c.req.valid("query");
 
     const sharedConditions = [
@@ -78,6 +83,12 @@ export default (app: OpenAPIHono) => {
       chainId.length === 1
         ? eq(schema.comment.chainId, chainId[0]!)
         : inArray(schema.comment.chainId, chainId),
+      excludeModerationLabels
+        ? convertExcludeModerationLabelsToConditions(excludeModerationLabels)
+        : undefined,
+      moderationScore != null
+        ? lte(schema.comment.moderationClassifierScore, moderationScore)
+        : undefined,
     ];
 
     const repliesConditions: (SQL<unknown> | undefined)[] = [];

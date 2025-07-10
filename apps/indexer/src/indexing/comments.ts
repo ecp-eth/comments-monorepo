@@ -157,6 +157,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       commentType: event.args.commentType,
       moderationStatus: moderationResult.result.status,
       moderationStatusChangedAt: moderationResult.result.changedAt,
+      moderationClassifierResult: moderationResult.result.classifier.labels,
+      moderationClassifierScore: moderationResult.result.classifier.score,
       zeroExSwap,
       references: referencesResolutionResult.references,
       referencesResolutionStatus: referencesResolutionResult.status,
@@ -298,6 +300,12 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       resolverCommentReferences,
     );
 
+    const moderationResult = await commentModerationService.moderateUpdate({
+      comment: event.args,
+      references: referencesResolutionResult.references,
+      existingComment,
+    });
+
     await context.db
       .update(schema.comment, {
         id: event.args.commentId,
@@ -309,6 +317,12 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         references: referencesResolutionResult.references,
         referencesResolutionStatus: referencesResolutionResult.status,
         referencesResolutionStatusChangedAt: new Date(),
+        moderationStatus: moderationResult.result.status,
+        moderationStatusChangedAt: moderationResult.result.changedAt,
+        moderationClassifierResult: moderationResult.result.classifier.labels,
+        moderationClassifierScore: moderationResult.result.classifier.score,
       });
+
+    await moderationResult.saveAndNotify();
   });
 }
