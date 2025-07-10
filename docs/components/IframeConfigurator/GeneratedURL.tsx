@@ -68,7 +68,11 @@ export default function GeneratedURL({
 }: {
   embedUri: string | undefined;
   config: EmbedConfigSchemaInputType;
-  source: { targetUri: string } | { author: Hex } | undefined;
+  source:
+    | { targetUri: string }
+    | { author: Hex }
+    | { commentId: Hex }
+    | undefined;
   autoHeightAdjustment: boolean;
 }) {
   const [copied, setCopied] = React.useState(false);

@@ -29,12 +29,20 @@ export type EmbedConfigProviderByTargetURIConfig =
     targetUri: string;
   };
 
+export type EmbedConfigProviderByRepliesConfig =
+  EmbedConfigProviderBaseConfig & {
+    commentId: Hex;
+  };
+
 const configContext = createContext<
-  EmbedConfigProviderByTargetURIConfig | EmbedConfigProviderByAuthorConfig
+  | EmbedConfigProviderByTargetURIConfig
+  | EmbedConfigProviderByAuthorConfig
+  | EmbedConfigProviderByRepliesConfig
 >({
   currentTimestamp: Date.now(),
   author: zeroAddress,
   targetUri: "",
+  commentId: zeroAddress,
   ...EmbedConfigSchema.parse({}),
 });
 
@@ -46,7 +54,8 @@ type EmbedConfigProviderProps<TConfig extends EmbedConfigProviderBaseConfig> = {
 export function EmbedConfigProvider<
   TConfig extends
     | EmbedConfigProviderByTargetURIConfig
-    | EmbedConfigProviderByAuthorConfig,
+    | EmbedConfigProviderByAuthorConfig
+    | EmbedConfigProviderByRepliesConfig,
 >({ value, children }: EmbedConfigProviderProps<TConfig>) {
   return (
     <configContext.Provider value={value}>{children}</configContext.Provider>
@@ -56,7 +65,8 @@ export function EmbedConfigProvider<
 export function useEmbedConfig<
   TConfig extends
     | EmbedConfigProviderByTargetURIConfig
-    | EmbedConfigProviderByAuthorConfig,
+    | EmbedConfigProviderByAuthorConfig
+    | EmbedConfigProviderByRepliesConfig,
 >() {
   return useContext(configContext) as TConfig;
 }

@@ -26,7 +26,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
 export default function IframeConfigurator() {
-  const [mode, setMode] = React.useState<"post" | "author">("post");
+  const [mode, setMode] = React.useState<"post" | "author" | "replies">("post");
   const [showAdvanced, setShowAdvanced] = React.useState(false);
   const [autoHeightAdjustment, setAutoHeightAdjustment] = React.useState(true);
   const [uri, setUri] = React.useState(
@@ -35,10 +35,15 @@ export default function IframeConfigurator() {
   const [author, setAuthor] = React.useState<Hex>(
     "0x0000000000000000000000000000000000000000",
   );
+  const [commentId, setCommentId] = React.useState<Hex>(
+    "0x0000000000000000000000000000000000000000",
+  );
   const [embedUri, setEmbedUri] = React.useState(
     mode === "post"
       ? publicEnv.VITE_ECP_ETH_EMBED_URL
-      : publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL,
+      : mode === "author"
+        ? publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL
+        : publicEnv.VITE_ECP_ETH_EMBED_BY_REPLIES_URL,
   );
   const [config, setConfig] =
     React.useState<EmbedConfigSchemaInputType>(DEFAULT_CONFIG);
@@ -49,7 +54,9 @@ export default function IframeConfigurator() {
     setEmbedUri(
       mode === "post"
         ? publicEnv.VITE_ECP_ETH_EMBED_URL
-        : publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL,
+        : mode === "author"
+          ? publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL
+          : publicEnv.VITE_ECP_ETH_EMBED_BY_REPLIES_URL,
     );
   }, [mode]);
 
@@ -145,10 +152,11 @@ export default function IframeConfigurator() {
               <SelectValue placeholder="Mode" />
             </SelectTrigger>
             <SelectContent id="mode-select">
-              <SelectItem value="post">Show comments by web page</SelectItem>
+              <SelectItem value="post">Show comments by target URL</SelectItem>
               <SelectItem value="author">
                 Show all comments by an author
               </SelectItem>
+              <SelectItem value="replies">Show replies to a comment</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -169,7 +177,7 @@ export default function IframeConfigurator() {
               placeholder="https://example.com"
             />
           </div>
-        ) : (
+        ) : mode === "author" ? (
           <div>
             <label
               className="block text-sm font-medium mb-2"
@@ -182,6 +190,22 @@ export default function IframeConfigurator() {
               type="text"
               value={author}
               onChange={(e) => setAuthor(e.target.value as Hex)}
+              placeholder="0x..."
+            />
+          </div>
+        ) : (
+          <div>
+            <label
+              className="block text-sm font-medium mb-2"
+              htmlFor="comment-id-input"
+            >
+              Comment ID
+            </label>
+            <Input
+              id="comment-id-input"
+              type="text"
+              value={commentId}
+              onChange={(e) => setCommentId(e.target.value as Hex)}
               placeholder="0x..."
             />
           </div>
@@ -567,7 +591,13 @@ export default function IframeConfigurator() {
           <GeneratedURL
             config={debouncedConfig}
             embedUri={embedUri}
-            source={mode === "post" ? { targetUri: uri } : { author }}
+            source={
+              mode === "post"
+                ? { targetUri: uri }
+                : mode === "author"
+                  ? { author }
+                  : { commentId }
+            }
             autoHeightAdjustment={autoHeightAdjustment}
           />
         </div>
@@ -576,7 +606,13 @@ export default function IframeConfigurator() {
           <h3 className="text-md font-medium !mb-4">Preview</h3>
           <CommentsEmbedPreview
             embedUri={embedUri}
-            source={mode === "post" ? { targetUri: uri } : { author }}
+            source={
+              mode === "post"
+                ? { targetUri: uri }
+                : mode === "author"
+                  ? { author }
+                  : { commentId }
+            }
             config={debouncedConfig}
           />
         </div>

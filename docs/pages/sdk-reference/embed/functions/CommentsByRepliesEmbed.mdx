@@ -1,0 +1,38 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [embed](/sdk-reference/embed/index.mdx) / CommentsByRepliesEmbed
+
+# Function: CommentsByRepliesEmbed()
+
+```ts
+function CommentsByRepliesEmbed(props): Element;
+```
+
+Defined in: [packages/sdk/src/embed/react.tsx:180](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/react.tsx#L180)
+
+Renders comments embed iframe for replies to a specific comment.
+
+This is client component only.
+
+## Parameters
+
+### props
+
+[`CommentsByRepliesEmbedProps`](/sdk-reference/embed/type-aliases/CommentsByRepliesEmbedProps.mdx)
+
+## Returns
+
+`Element`
+
+## Examples
+
+```tsx
+<CommentsByRepliesEmbed commentId="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" />
+```
+
+```tsx
+// force dark theme
+<CommentsByRepliesEmbed commentId="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" config={{ theme: { mode: 'dark' }}} />
+```

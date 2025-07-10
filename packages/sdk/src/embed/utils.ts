@@ -16,9 +16,9 @@ export type CreateCommentsEmbedURLParams = {
    */
   embedUri: string;
   /**
-   * The target URI or author address to embed comments for.
+   * The target URI, author address, or comment ID to embed comments for.
    */
-  source: { targetUri: string } | { author: Hex };
+  source: { targetUri: string } | { author: Hex } | { commentId: Hex };
   /**
    * The configuration for the comments embed.
    */
@@ -41,8 +41,10 @@ export function createCommentsEmbedURL({
 
   if ("targetUri" in source) {
     url.searchParams.set("targetUri", source.targetUri);
-  } else {
+  } else if ("author" in source) {
     url.searchParams.set("author", source.author);
+  } else {
+    url.searchParams.set("commentId", source.commentId);
   }
 
   if (config && EmbedConfigSchema.parse(config)) {
