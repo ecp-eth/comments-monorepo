@@ -52,7 +52,7 @@ export class PremoderationService implements ICommentPremoderationService {
       action: "premoderated",
       ...status,
       save: async () => {
-        await this.cacheService.setStatusByCommentId(comment.id, status);
+        await this.cacheService.insertStatusByCommentId(comment.id, status);
       },
     };
   }

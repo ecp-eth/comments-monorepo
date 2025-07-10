@@ -20,6 +20,22 @@ export class PremoderationCacheService implements IPremoderationCacheService {
     return result;
   }
 
+  async insertStatusByCommentId(
+    commentId: Hex,
+    status: PremoderationCacheServiceStatus,
+  ): Promise<void> {
+    const db = getIndexerDb();
+
+    await db
+      .insertInto("comment_moderation_statuses")
+      .values({
+        comment_id: commentId,
+        moderation_status: status.status,
+        updated_at: status.changedAt,
+      })
+      .execute();
+  }
+
   async setStatusByCommentId(
     commentId: Hex,
     status: PremoderationCacheServiceStatus,
