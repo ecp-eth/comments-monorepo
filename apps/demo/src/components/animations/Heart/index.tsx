@@ -7,13 +7,11 @@ const END_FRAME = 60;
 
 type HeartAnimationProps = {
   isHearted: boolean;
-  onIsHeartedChange?: (isHearted: boolean) => void;
   pending?: boolean;
 };
 
 export function HeartAnimation({
   isHearted,
-  onIsHeartedChange,
   pending = false,
 }: HeartAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -66,11 +64,6 @@ export function HeartAnimation({
     },
     [endFrame],
   );
-
-  const handleClick = () => {
-    const newValue = !isHearted;
-    onIsHeartedChange?.(newValue);
-  };
 
   // Handle animation when the hearted state changes
   useEffect(() => {
@@ -127,13 +120,6 @@ export function HeartAnimation({
       role="button"
       aria-label={"Like comment"}
       aria-pressed={isHearted}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          handleClick();
-        }
-      }}
-      onClick={handleClick}
     >
       <Lottie
         lottieRef={lottieRef}
