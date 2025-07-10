@@ -10,6 +10,7 @@ import {
   EmbedConfigProvider,
   EmbedConfigProviderByAuthorConfig,
   EmbedConfigProviderByTargetURIConfig,
+  EmbedConfigProviderByRepliesConfig,
 } from "@/components/EmbedConfigProvider";
 
 const queryClient = new QueryClient();
@@ -17,7 +18,8 @@ const queryClient = new QueryClient();
 export function Providers<
   TConfig extends
     | EmbedConfigProviderByTargetURIConfig
-    | EmbedConfigProviderByAuthorConfig,
+    | EmbedConfigProviderByAuthorConfig
+    | EmbedConfigProviderByRepliesConfig,
 >({ children, config }: { children: React.ReactNode; config: TConfig }) {
   const wagmiConfig = useMemo(() => getWagmiConfig(config.chainId), [config]);
   /**

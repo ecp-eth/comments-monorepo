@@ -2,6 +2,7 @@ import { Hex } from "@ecp.eth/sdk/core";
 import {
   CommentsEmbed,
   CommentsByAuthorEmbed,
+  CommentsByRepliesEmbed,
   createCommentsEmbedURL,
   type EmbedConfigSchemaInputType,
 } from "@ecp.eth/sdk/embed";
@@ -14,7 +15,7 @@ export default function CommentsEmbedPreview({
 }: {
   embedUri: string | undefined;
   config: EmbedConfigSchemaInputType;
-  source: { targetUri: string } | { author: Hex };
+  source: { targetUri: string } | { author: Hex } | { commentId: Hex };
 }) {
   if (typeof window === "undefined" || !embedUri) {
     return null;
@@ -33,9 +34,15 @@ export default function CommentsEmbedPreview({
 
     return "targetUri" in source ? (
       <CommentsEmbed uri={source.targetUri} embedUri={embedUri} {...config} />
-    ) : (
+    ) : "author" in source ? (
       <CommentsByAuthorEmbed
         author={source.author}
+        embedUri={embedUri}
+        {...config}
+      />
+    ) : (
+      <CommentsByRepliesEmbed
+        commentId={source.commentId}
         embedUri={embedUri}
         {...config}
       />

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createCommentsEmbedURL } from "./utils.js";
 import {
   COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL,
+  COMMENTS_EMBED_DEFAULT_BY_REPLIES_URL,
   COMMENTS_EMBED_DEFAULT_URL,
 } from "../constants.js";
 import {
@@ -95,6 +96,25 @@ export type CommentsByAuthorEmbedProps = {
   iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
 } & EmbedConfigSchemaInputType;
 
+export type CommentsByRepliesEmbedProps = {
+  /**
+   * The comment ID to filter replies by
+   */
+  commentId: Hex;
+  /**
+   * URL of the comments embed iframe page. This page is rendered in the iframe.
+   */
+  embedUri?: string;
+  /**
+   * Allows to pass custom props to iframe's wrapper element
+   */
+  containerProps?: React.HTMLAttributes<HTMLDivElement>;
+  /**
+   * Allows to pass custom props to iframe
+   */
+  iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
+} & EmbedConfigSchemaInputType;
+
 /**
  * Renders comments embed iframe for the given author.
  *
@@ -128,6 +148,49 @@ export function CommentsByAuthorEmbed({
       config: rest,
     });
   }, [embedUri, author, rest]);
+
+  return (
+    <CommentsEmbedInternal
+      src={iframeUri}
+      containerProps={containerProps}
+      iframeProps={iframeProps}
+    />
+  );
+}
+
+/**
+ * Renders comments embed iframe for replies to a specific comment.
+ *
+ * This is client component only.
+ *
+ * @category Components
+ * @param props
+ *
+ * @example
+ * ```tsx
+ * <CommentsByRepliesEmbed commentId="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" />
+ * ```
+ *
+ * @example
+ * ```tsx
+ * // force dark theme
+ * <CommentsByRepliesEmbed commentId="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" config={{ theme: { mode: 'dark' }}} />
+ * ```
+ */
+export function CommentsByRepliesEmbed({
+  embedUri = COMMENTS_EMBED_DEFAULT_BY_REPLIES_URL,
+  commentId,
+  containerProps,
+  iframeProps,
+  ...rest
+}: CommentsByRepliesEmbedProps) {
+  const iframeUri = useMemo(() => {
+    return createCommentsEmbedURL({
+      embedUri,
+      source: { commentId },
+      config: rest,
+    });
+  }, [embedUri, commentId, rest]);
 
   return (
     <CommentsEmbedInternal

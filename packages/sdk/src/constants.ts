@@ -88,6 +88,14 @@ export const COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL =
   "https://embed.ethcomments.xyz/by-author";
 
 /**
+ * The default `embedUri` for the CommentsByRepliesEmbed component.
+ * It runs a service that creates app signatures for requests and
+ * submits the transaction to the `CommentManager` contract.
+ */
+export const COMMENTS_EMBED_DEFAULT_BY_REPLIES_URL =
+  "https://embed.ethcomments.xyz/by-replies";
+
+/**
  * The default URL for the Indexer API.
  *
  * It is used to fetch comments and replies.
