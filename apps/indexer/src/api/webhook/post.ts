@@ -138,7 +138,7 @@ export function setupWebhook(app: OpenAPIHono) {
 
       return c.newResponse(null, 204);
     } catch (error) {
-      console.error(error);
+      console.error("Telegram webhook error", error);
 
       if (error instanceof HTTPException) {
         throw error;
