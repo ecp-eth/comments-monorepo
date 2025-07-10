@@ -84,7 +84,7 @@ const EnvSchema = z
     MODERATION_CLASSIFICATION_VIOLENCE_THRESHOLD:
       classificationScoreThresholdSchema.optional(),
 
-    REPORTS_NOTIFICATIONS_ENABLED: z
+    REPORTS_ENABLE_NOTIFICATIONS: z
       .enum(["0", "1"])
       .default("0")
       .transform((val) => val === "1"),
@@ -92,7 +92,7 @@ const EnvSchema = z
   .superRefine((vars, ctx) => {
     if (
       (vars.MODERATION_ENABLED && vars.MODERATION_ENABLE_NOTIFICATIONS) ||
-      vars.REPORTS_NOTIFICATIONS_ENABLED
+      vars.REPORTS_ENABLE_NOTIFICATIONS
     ) {
       const result = moderationNotificationsEnabledSchema.safeParse(vars);
 
