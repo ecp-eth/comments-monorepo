@@ -6241,4 +6241,357 @@ paths:
                             - value
                 required:
                   - results
+  /api/comments/{commentId}/reports:
+    post:
+      tags:
+        - comments
+      description: Report a comment
+      parameters:
+        - schema: {}
+          required: true
+          name: commentId
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reportee: {}
+                message:
+                  type: string
+                  maxLength: 200
+                signature:
+                  type: string
+                chainId:
+                  type: integer
+                  exclusiveMinimum: 0
+              required:
+                - reportee
+                - signature
+                - chainId
+      responses:
+        '204':
+          description: Comment reported successfully
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: When comment is not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/reports:
+    get:
+      tags:
+        - reports
+      description: Get a list of comment reports
+      parameters:
+        - schema:
+            type: string
+            description: Non inclusive cursor from which to fetch the reports based on sort
+            pattern: ^0x[a-fA-F0-9]+$
+          required: false
+          name: cursor
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+            description: The number of reports to return
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+            description: The sort order of the reports
+          required: false
+          name: sort
+          in: query
+        - schema:
+            type: string
+            enum: &ref_3
+              - pending
+              - resolved
+              - closed
+            default: pending
+          required: false
+          name: status
+          in: query
+      responses:
+        '200':
+          description: List of comment reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        commentId: {}
+                        reportee: {}
+                        message:
+                          type: string
+                        createdAt:
+                          type:
+                            - string
+                            - 'null'
+                        updatedAt:
+                          type:
+                            - string
+                            - 'null'
+                        status:
+                          type: string
+                          enum: *ref_3
+                      required:
+                        - id
+                        - commentId
+                        - reportee
+                        - message
+                        - createdAt
+                        - updatedAt
+                        - status
+                  pagination:
+                    type: object
+                    properties:
+                      limit:
+                        type: integer
+                      hasNext:
+                        type: boolean
+                      hasPrevious:
+                        type: boolean
+                      startCursor: {}
+                      endCursor: {}
+                    required:
+                      - limit
+                      - hasNext
+                      - hasPrevious
+                required:
+                  - results
+                  - pagination
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: When user is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/reports/{reportId}:
+    get:
+      tags:
+        - reports
+      description: Get a report by ID
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: reportId
+          in: path
+      responses:
+        '200':
+          description: Report details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  commentId: {}
+                  reportee: {}
+                  message:
+                    type: string
+                  createdAt:
+                    type:
+                      - string
+                      - 'null'
+                  updatedAt:
+                    type:
+                      - string
+                      - 'null'
+                  status:
+                    type: string
+                    enum: *ref_3
+                required:
+                  - id
+                  - commentId
+                  - reportee
+                  - message
+                  - createdAt
+                  - updatedAt
+                  - status
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: When user is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: When report is not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+    patch:
+      tags:
+        - reports
+      description: Update a report's status
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: reportId
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: *ref_3
+              required:
+                - status
+      responses:
+        '200':
+          description: Report updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  commentId: {}
+                  reportee: {}
+                  message:
+                    type: string
+                  createdAt:
+                    type:
+                      - string
+                      - 'null'
+                  updatedAt:
+                    type:
+                      - string
+                      - 'null'
+                  status:
+                    type: string
+                    enum: *ref_3
+                required:
+                  - id
+                  - commentId
+                  - reportee
+                  - message
+                  - createdAt
+                  - updatedAt
+                  - status
+        '400':
+          description: When request is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: When user is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: When report is not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
 webhooks: {}

@@ -1,0 +1,150 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / ReportCommentTypedDataSchemaType
+
+# Type Alias: ReportCommentTypedDataSchemaType
+
+```ts
+type ReportCommentTypedDataSchemaType = {
+  domain: {
+     chainId: number;
+     name: "Ethereum Comments Protocol";
+     verifyingContract: `0x${string}`;
+     version: "1";
+  };
+  message: {
+     commentId: `0x${string}`;
+     message: string;
+     reportee: `0x${string}`;
+  };
+  primaryType: "ReportComment";
+  types: {
+     ReportComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "reportee";
+        type: "address";
+      }
+        | {
+        name: "message";
+        type: "string";
+     })[];
+  };
+};
+```
+
+Defined in: [packages/sdk/src/comments/schemas.ts:354](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/schemas.ts#L354)
+
+## Type declaration
+
+### domain
+
+```ts
+domain: {
+  chainId: number;
+  name: "Ethereum Comments Protocol";
+  verifyingContract: `0x${string}`;
+  version: "1";
+};
+```
+
+#### domain.chainId
+
+```ts
+chainId: number;
+```
+
+#### domain.name
+
+```ts
+name: "Ethereum Comments Protocol";
+```
+
+#### domain.verifyingContract
+
+```ts
+verifyingContract: `0x${string}` = HexSchema;
+```
+
+#### domain.version
+
+```ts
+version: "1";
+```
+
+### message
+
+```ts
+message: {
+  commentId: `0x${string}`;
+  message: string;
+  reportee: `0x${string}`;
+};
+```
+
+#### message.commentId
+
+```ts
+commentId: `0x${string}` = HexSchema;
+```
+
+#### message.message
+
+```ts
+message: string;
+```
+
+#### message.reportee
+
+```ts
+reportee: `0x${string}` = HexSchema;
+```
+
+### primaryType
+
+```ts
+primaryType: "ReportComment";
+```
+
+### types
+
+```ts
+types: {
+  ReportComment: (
+     | {
+     name: "commentId";
+     type: "bytes32";
+   }
+     | {
+     name: "reportee";
+     type: "address";
+   }
+     | {
+     name: "message";
+     type: "string";
+  })[];
+};
+```
+
+#### types.ReportComment
+
+```ts
+ReportComment: (
+  | {
+  name: "commentId";
+  type: "bytes32";
+}
+  | {
+  name: "reportee";
+  type: "address";
+}
+  | {
+  name: "message";
+  type: "string";
+})[];
+```
