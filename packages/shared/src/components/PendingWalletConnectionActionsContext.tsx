@@ -169,7 +169,6 @@ export const useConsumePendingWalletConnectionActions = ({
 /**
  * The hook returns a function that ensures wallet is connected before calling into the callback,
  * then it executes the action returned from the callback.
- *
  */
 export const useConnectBeforeAction = () => {
   const { addAction } = usePendingWalletConnectionActionsContext();
