@@ -2,35 +2,45 @@
 
 The contracts are currently only deployed on the Base Sepolia as we decide where to deploy the production contracts.
 
-## Comment Manager Contract Details
-
-- **Contract ABI:** [View ABI Documentation](/protocol-reference/CommentManager)
-
 | Network      | Contract Address                        | Contract                                                                                   |
 | ------------ | --------------------------------------- | ------------------------------------------------------------------------------------------ |
 | Base Mainnet | `%BASE_MAINNET_COMMENT_MANAGER_ADDRESS` | [Base Mainnet](https://basescan.org/address/%BASE_MAINNET_COMMENT_MANAGER_ADDRESS)         |
 | Base Sepolia | `%BASE_SEPOLIA_COMMENT_MANAGER_ADDRESS` | [Base Sepolia](https://sepolia.basescan.org/address/%BASE_SEPOLIA_COMMENT_MANAGER_ADDRESS) |
 
+## Importing ABIs
+
+You can import the contract ABIs directly from the SDK:
+
+```typescript
+import { CommentManagerABI, ChannelManagerABI } from "@ecp.eth/sdk/abis";
+```
+
+- **Contract ABI Reference:** [View ABI Documentation](/protocol-reference/CommentManager) | [GitHub Source](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/protocol/abis.ts)
+
 ### Comment Manager Contract Functions
 
-| Function                | Description                                        | Note                                                           |
-| ----------------------- | -------------------------------------------------- | -------------------------------------------------------------- |
-| `postComment`           | Post a comment with app signature verification     | Requires author to be msg.sender                               |
-| `postCommentWithSig`    | Post a comment with both author and app signatures | Allows posting on behalf of author with signatures             |
-| `editComment`           | Edit a comment with app signature verification     | Requires author to be msg.sender                               |
-| `editCommentWithSig`    | Edit a comment with both author and app signatures | Allows editing on behalf of author with signatures             |
-| `deleteComment`         | Delete a comment when called by the author         | ⚠️ Deleted data may still be traceable or recoverable on-chain |
-| `deleteCommentWithSig`  | Delete a comment with signature verification       | ⚠️ Deleted data may still be traceable or recoverable on-chain |
-| `addApproval`           | Approve an app signer directly                     | Called by the author                                           |
-| `addApprovalWithSig`    | Approve an app signer with signature               | Allows approving on behalf of author with signature            |
-| `revokeApproval`        | Remove an app signer approval directly             | Called by the author                                           |
-| `removeApprovalWithSig` | Remove an app signer approval with signature       | Allows revoking on behalf of author with signature             |
+| Function                  | Description                                        | Note                                                           |
+| ------------------------- | -------------------------------------------------- | -------------------------------------------------------------- |
+| `postComment`             | Post a comment with app signature verification     | Requires author to be msg.sender                               |
+| `postCommentWithSig`      | Post a comment with both author and app signatures | Allows posting on behalf of author with signatures             |
+| `editComment`             | Edit a comment with app signature verification     | Requires author to be msg.sender                               |
+| `editCommentWithSig`      | Edit a comment with both author and app signatures | Allows editing on behalf of author with signatures             |
+| `deleteComment`           | Delete a comment when called by the author         | ⚠️ Deleted data may still be traceable or recoverable on-chain |
+| `deleteCommentWithSig`    | Delete a comment with signature verification       | ⚠️ Deleted data may still be traceable or recoverable on-chain |
+| `addApproval`             | Approve an app signer directly                     | Called by the author                                           |
+| `addApprovalWithSig`      | Approve an app signer with signature               | Allows approving on behalf of author with signature            |
+| `revokeApproval`          | Remove an app signer approval directly             | Called by the author                                           |
+| `removeApprovalWithSig`   | Remove an app signer approval with signature       | Allows revoking on behalf of author with signature             |
+| `getComment`              | Get a comment by ID                                |                                                                |
+| `getCommentMetadataKeys`  | Get the metadata keys for a comment                |                                                                |
+| `getCommentMetadataValue` | Get the metadata value for a comment               |                                                                |
+| ...                       | ...                                                | ...                                                            |
 
 For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/CommentManager).
 
 ## Channel Manager Contract Details
 
-- **Contract ABI:** [View ABI Documentation](/protocol-reference/ChannelManager)
+- **Contract ABI:** [View ABI Documentation](/protocol-reference/ChannelManager) | [GitHub Source](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/protocol/abis.ts)
 
 | Network      | Contract Address                        | Contract                                                                                   |
 | ------------ | --------------------------------------- | ------------------------------------------------------------------------------------------ |
