@@ -6268,6 +6268,7 @@ paths:
                   exclusiveMinimum: 0
               required:
                 - reportee
+                - message
                 - signature
                 - chainId
       responses:
