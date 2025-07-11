@@ -14,6 +14,7 @@ export const publicEnvSchema = z.object({
   NEXT_PUBLIC_COMMENT_AUTHOR_URL: z.string().url().optional(),
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
   NEXT_PUBLIC_PINATA_GATEWAY_URL: z.string().nonempty(),
+  NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL: z.string().nonempty(),
 });
 
 export const publicEnv = publicEnvSchema.parse({
@@ -30,4 +31,6 @@ export const publicEnv = publicEnvSchema.parse({
   NEXT_PUBLIC_COMMENT_AUTHOR_URL: process.env.NEXT_PUBLIC_COMMENT_AUTHOR_URL,
   NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   NEXT_PUBLIC_PINATA_GATEWAY_URL: process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL,
+  NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL:
+    process.env.NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL,
 });

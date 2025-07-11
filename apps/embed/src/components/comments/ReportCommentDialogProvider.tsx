@@ -82,7 +82,7 @@ export function ReportCommentDialogRenderer() {
         }
       }}
     >
-      <DialogContent>
+      <DialogContent className="apply-theme">
         <DialogHeader>
           <DialogTitle>Report Comment</DialogTitle>
           <DialogDescription>
