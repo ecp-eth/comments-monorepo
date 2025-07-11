@@ -1,0 +1,76 @@
+# Comment Reports Management
+
+The Indexer's Admin CLI provides commands to manage comment reports through the `reports` command group. This allows administrators to view and manage reports submitted by users regarding comments.
+
+## Prerequisites
+
+Before using the reports management commands, ensure you have:
+
+- Access to the indexer service
+- An API key with appropriate permissions
+- The Comments mono repository checked out
+
+## Common Options
+
+All reports management commands require the following options:
+
+- `-i, --id <id>` - The ID of the API key to use (required)
+- `-k, --private-key <key>` - The private key of the API key (required)
+- `-u, --url <url>` - The URL of the indexer service (default: https://api.ethcomments.xyz)
+
+## Available Commands
+
+### List Reports
+
+View all pending reports:
+
+```bash
+bin/admin.js reports list
+```
+
+This command displays a list of pending reports with the following information for each report:
+
+- Report ID
+- Creation timestamp
+- Reportee address
+- Report message (if provided)
+
+### Close Report
+
+Mark a report as closed without taking action:
+
+```bash
+bin/admin.js reports close <reportId>
+```
+
+This command changes the status of a report to "closed". Use this when a report doesn't require any action.
+
+### Resolve Report
+
+Mark a report as resolved after taking appropriate action:
+
+```bash
+bin/admin.js reports resolve <reportId>
+```
+
+This command changes the status of a report to "resolved". Use this when you've taken action on the report (e.g., [moderating the reported comment](/indexer/admin-cli-comments-premoderation)).
+
+## Error Handling
+
+The CLI will handle errors by:
+
+1. Displaying an error message with details about the failure
+2. Exiting with a non-zero status code
+
+Common error scenarios include:
+
+- Invalid API key or private key
+- Network connectivity issues
+- Invalid report IDs
+- Server-side errors
+
+## Security Notes
+
+- Keep your API private keys secure and never share them
+- All requests are authenticated using Ed25519 signatures
+- Requests are timestamped to prevent replay attacks

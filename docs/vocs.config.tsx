@@ -125,6 +125,10 @@ export default defineConfig({
               text: "Comments Premoderation",
               link: "/indexer/admin-cli-comments-premoderation",
             },
+            {
+              text: "Comment Reports",
+              link: "/indexer/admin-cli-comment-reports",
+            },
           ],
         },
         {
