@@ -36,7 +36,7 @@ export const supportedChains = {
   [anvil.id]: {
     chain: anvil,
     publicTransport: http("http://localhost:8545"),
-    privateTransport: http(env.PRIVATE_RPC_URL),
+    privateTransport: http("http://localhost:8545"),
   },
 };
 
