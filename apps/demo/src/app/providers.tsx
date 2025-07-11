@@ -5,6 +5,7 @@ import { WagmiProvider } from "wagmi";
 import { getConfig } from "../lib/wagmi";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { useState, useMemo } from "react";
+import { PendingWalletConnectionActionsProvider } from "@ecp.eth/shared/components";
 
 const queryClient = new QueryClient();
 
@@ -27,7 +28,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <WagmiProvider config={config} initialState={initialState}>
-        <RainbowKitProvider>{children}</RainbowKitProvider>
+        <RainbowKitProvider>
+          <PendingWalletConnectionActionsProvider>
+            {children}
+          </PendingWalletConnectionActionsProvider>
+        </RainbowKitProvider>
       </WagmiProvider>
     </QueryClientProvider>
   );
