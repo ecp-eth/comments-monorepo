@@ -6,7 +6,7 @@ import {
   InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
-import { chain, privateTransport } from "@/lib/wagmi";
+import { chain, privateTransport } from "@/lib/serverWagmi";
 import { editCommentWithSig } from "@ecp.eth/sdk/comments";
 import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { createWalletClient, publicActions } from "viem";

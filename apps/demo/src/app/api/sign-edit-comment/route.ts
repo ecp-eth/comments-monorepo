@@ -13,7 +13,7 @@ import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
-import { chain, privateTransport } from "@/lib/wagmi";
+import { chain, privateTransport } from "@/lib/serverWagmi";
 import { createPublicClient } from "viem";
 import { SignEditCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 

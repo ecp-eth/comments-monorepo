@@ -8,7 +8,7 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
-import { chain, privateTransport } from "@/lib/wagmi";
+import { chain, privateTransport } from "@/lib/serverWagmi";
 import {
   createEditCommentData,
   createEditCommentTypedData,

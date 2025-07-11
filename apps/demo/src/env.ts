@@ -94,6 +94,7 @@ declare global {
 const parseResult = EnvSchema.safeParse(process.env);
 
 if (!parseResult.success) {
+  console.error(parseResult.error);
   throw new InvalidServerEnvVariablesError(parseResult.error);
 }
 

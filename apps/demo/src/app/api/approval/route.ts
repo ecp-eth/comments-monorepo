@@ -7,7 +7,7 @@ import {
   InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
-import { chain, privateTransport } from "@/lib/wagmi";
+import { chain, privateTransport } from "@/lib/serverWagmi";
 import { getApprovalStatusAndNonce } from "@/lib/contract";
 import { addApprovalWithSig } from "@ecp.eth/sdk/comments";
 

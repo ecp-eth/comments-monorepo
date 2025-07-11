@@ -32,7 +32,7 @@ import {
   CommentGaslessProviderContextType,
 } from "./CommentGaslessProvider";
 import { useApprovalStatus } from "@/hooks/useApprovalStatus";
-import { chain } from "@/lib/wagmi";
+import { chain } from "@/lib/clientWagmi";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { useGaslessCommentActions } from "./hooks/useGaslessCommentActions";
 import { CommentItem } from "../core/CommentItem";

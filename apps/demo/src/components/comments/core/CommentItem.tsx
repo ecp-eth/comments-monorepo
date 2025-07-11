@@ -22,7 +22,7 @@ import {
   createCommentRepliesQueryKey,
   createRootCommentsQueryKey,
 } from "./queries";
-import { chain } from "@/lib/wagmi";
+import { chain } from "@/lib/clientWagmi";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
