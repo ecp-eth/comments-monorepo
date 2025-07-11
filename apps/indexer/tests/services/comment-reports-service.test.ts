@@ -126,7 +126,7 @@ describe("CommentReportsService", () => {
       id: "0x123",
       comment_id: mockComment.id,
       reportee: "0x456" as const,
-      message: null,
+      message: "",
       created_at: new Date(),
       updated_at: new Date(),
       status: "pending" as const,
@@ -142,12 +142,12 @@ describe("CommentReportsService", () => {
       void 0,
     );
 
-    await expect(service.report("0x123", "0x456")).resolves.not.toThrow();
+    await expect(service.report("0x123", "0x456", "")).resolves.not.toThrow();
 
     expect(mockManagementCommentDbService.insertReport).toHaveBeenCalledWith(
       "0x123",
       "0x456",
-      undefined,
+      "",
     );
     expect(mockNotificationService.notifyReportCreated).toHaveBeenCalledWith({
       comment: mockComment,

@@ -14,7 +14,7 @@ const ReportCommentParamsSchema = z.object({
 
 const ReportCommentBodySchema = z.object({
   reportee: HexSchema,
-  message: z.string().max(200).optional(),
+  message: z.string().max(200),
   signature: z.string(),
   chainId: z
     .number()

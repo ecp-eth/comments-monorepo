@@ -29,7 +29,7 @@ export class CommentReportsService implements ICommentReportsService {
     this.notificationService = options.notificationService;
   }
 
-  async report(commentId: Hex, reportee: Hex, message?: string): Promise<void> {
+  async report(commentId: Hex, reportee: Hex, message: string): Promise<void> {
     const comment = await this.commentDbService.getCommentById(commentId);
 
     if (!comment) {

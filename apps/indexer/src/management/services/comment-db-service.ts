@@ -32,7 +32,7 @@ export class ManagementCommentDbService {
   async insertReport(
     commentId: Hex,
     reportee: Hex,
-    message?: string,
+    message: string,
   ): Promise<CommentReportSelectType> {
     const db = getIndexerDb();
 
