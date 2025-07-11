@@ -6,7 +6,7 @@ import {
   InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
-import { chain, transport } from "@/lib/wagmi";
+import { chain, privateTransport } from "@/lib/wagmi";
 import { deleteCommentWithSig } from "@ecp.eth/sdk/comments";
 import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { createWalletClient, publicActions } from "viem";
@@ -45,7 +45,7 @@ export async function POST(
   const walletClient = createWalletClient({
     account: submitterAccount,
     chain,
-    transport,
+    transport: privateTransport,
   }).extend(publicActions);
 
   const isAppSignatureValid = await walletClient.verifyTypedData({

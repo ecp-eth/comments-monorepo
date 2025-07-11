@@ -4,6 +4,7 @@ import * as allChains from "wagmi/chains";
 import { publicEnv } from "@/publicEnv";
 import { getChainById } from "@ecp.eth/shared/helpers";
 import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
+import { env } from "@/env";
 
 const anvil = allChains.anvil;
 
@@ -29,21 +30,24 @@ if (!(chain.id in SUPPORTED_CHAINS)) {
 export const supportedChains = {
   [prodChain.id]: {
     chain: prodChain,
-    transport: http(publicEnv.NEXT_PUBLIC_RPC_URL),
+    publicTransport: http(publicEnv.NEXT_PUBLIC_RPC_URL),
+    privateTransport: http(env.PRIVATE_RPC_URL),
   },
   [anvil.id]: {
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    publicTransport: http("http://localhost:8545"),
+    privateTransport: http(env.PRIVATE_RPC_URL),
   },
 };
 
-export const transport = supportedChains[chain.id].transport;
+export const publicTransport = supportedChains[chain.id].publicTransport;
+export const privateTransport = supportedChains[chain.id].privateTransport;
 
 export const getConfig = () =>
   getDefaultConfig({
     chains: [chain],
     transports: {
-      [chain.id]: transport,
+      [chain.id]: publicTransport,
     },
     ssr: true,
     appName: "Comment App",

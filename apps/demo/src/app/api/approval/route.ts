@@ -7,7 +7,7 @@ import {
   InternalServerErrorResponseSchema,
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
-import { chain, transport } from "@/lib/wagmi";
+import { chain, privateTransport } from "@/lib/wagmi";
 import { getApprovalStatusAndNonce } from "@/lib/contract";
 import { addApprovalWithSig } from "@ecp.eth/sdk/comments";
 
@@ -37,7 +37,7 @@ export async function POST(
 
   const publicClient = createPublicClient({
     chain,
-    transport,
+    transport: privateTransport,
   });
 
   const verified = await publicClient.verifyTypedData({
@@ -58,7 +58,7 @@ export async function POST(
   // Check approval on chain and get nonce (multicall3 if available,
   // otherwise read contracts)
   const [{ result: isApproved }, { result: nonce }] =
-    await getApprovalStatusAndNonce<typeof transport, typeof chain>(
+    await getApprovalStatusAndNonce<typeof privateTransport, typeof chain>(
       publicClient,
       authorAddress,
     );
@@ -89,7 +89,7 @@ export async function POST(
   const walletClient = createWalletClient({
     account: submitterAccount,
     chain,
-    transport,
+    transport: privateTransport,
   }).extend(publicActions);
 
   try {
