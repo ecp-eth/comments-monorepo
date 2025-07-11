@@ -22,7 +22,6 @@ import {
 type CommentProps = {
   comment: CommentType;
   onDeleteClick: () => void;
-  onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
   onEditClick: () => void;
@@ -36,7 +35,6 @@ export function Comment({
   onDeleteClick,
   onRetryDeleteClick,
   onRetryPostClick,
-  onReplyClick,
   onEditClick,
   onRetryEditClick,
   isLiking,
@@ -124,7 +122,6 @@ export function Comment({
         <CommentActionOrStatus
           comment={comment}
           onRetryDeleteClick={onRetryDeleteClick}
-          onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
           onRetryEditClick={onRetryEditClick}
           isLiking={isLiking}

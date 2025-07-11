@@ -28,9 +28,6 @@ export function HeartButton({ isHearted, pending = false }: HeartButtonProps) {
     animating: false,
   });
 
-  // this state helps the useEffect to avoid triggering animation for setting the initial frame according to `isHearted` prop
-  const [initialized, setInitialized] = useState(false);
-  const [lastIsHearted, setLastIsHearted] = useState(isHearted);
   const [endFrame, setEndFrame] = useState(END_FRAME);
   const [animationLoaded, setAnimationLoaded] = useState(false);
   // using method on ref allows us to avoid unnecessary triggering of useEffect
@@ -59,8 +56,6 @@ export function HeartButton({ isHearted, pending = false }: HeartButtonProps) {
         return;
       }
 
-      setInitialized(true);
-
       containerRef.current?.classList.remove("overflow-visible");
       animatingState.current.animating = false;
       animatingState.current.direction = hearted ? "hearted" : "unhearted";
@@ -76,32 +71,8 @@ export function HeartButton({ isHearted, pending = false }: HeartButtonProps) {
       return;
     }
 
-    if (
-      initialized &&
-      // if it a change (we don't want to animate if it is already hearted)
-      isHearted !== lastIsHearted &&
-      // from not hearted to hearted
-      isHearted
-    ) {
-      // then play the animation
-      playHeartedAnimation();
-    } else {
-      // then play the animation
-      gotoFrame(isHearted);
-    }
-
-    setInitialized(true);
-    setLastIsHearted(isHearted);
-  }, [
-    animationLoaded,
-    endFrame,
-    gotoFrame,
-    isHearted,
-    lastIsHearted,
-    playHeartedAnimation,
-    pending,
-    initialized,
-  ]);
+    gotoFrame(isHearted);
+  }, [animationLoaded, endFrame, gotoFrame, isHearted, pending]);
 
   // Handle pending state
   useEffect(() => {

@@ -45,12 +45,21 @@ export const useLikeComment = () => {
   const { address: connectedAddress } = useAccount();
   const { data: client } = useConnectorClient();
 
+  console.log("useLikeComment rendered with client", client);
+
   return useCallback(
     async (params: UseLikeCommentProps) => {
       const { comment, queryKey, onBeforeStart, onFailed, onSuccess } = params;
 
       if (!client) {
         throw new Error("No client");
+      }
+
+      if (
+        (comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT]?.length ??
+          0) > 0
+      ) {
+        throw new Error("Comment already liked");
       }
 
       onBeforeStart?.();

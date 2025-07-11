@@ -20,7 +20,7 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useConnectorClient } from "wagmi";
 import { useConnectAccount, useFreshRef } from "../hooks";
 
 type PendingWalletConnectionAction =
@@ -31,11 +31,17 @@ type PendingWalletConnectionAction =
   | {
       type: "unlike";
       commentId: Hex;
+    }
+  | {
+      // for the ui to prepare for replying
+      type: "prepareReply";
+      commentId: Hex;
     };
 
 type PendingWalletConnectionActionHandler = {
   like: () => void;
   unlike: () => void;
+  prepareReply: () => void;
 };
 
 type PendingWalletConnectionActionHandlerRecord = Record<
@@ -67,34 +73,40 @@ export const PendingWalletConnectionActionsProvider = ({
   const actionsRef = useRef<PendingWalletConnectionAction[]>([]);
   const handlersRef = useRef<PendingWalletConnectionActionHandlerRecord>({});
   const { address: connectedAddress } = useAccount();
-  const connectedAddressRef = useFreshRef(connectedAddress);
+  const { data: client } = useConnectorClient();
+
+  const triggerActions = useCallback(() => {
+    // interestingly when useAccount is able to return the address, useConnectorClient still need to takes a bit of time.
+    // without checking it the like/unlike hooks in embed will failed as they rely on the client to be available
+    if (!connectedAddress || !client) {
+      return;
+    }
+
+    const actions = actionsRef.current;
+    const handlers = handlersRef.current;
+
+    for (let len = actions.length; len > 0; len--) {
+      const action = actions[len - 1];
+      if (!action) {
+        continue;
+      }
+
+      const handler = handlers[action.commentId];
+      if (!handler) {
+        continue;
+      }
+      // Remove the action from the array if handler is found.
+      actions.splice(len - 1, 1);
+
+      handler[action.type]();
+    }
+  }, [client, connectedAddress]);
+
+  useEffect(() => {
+    triggerActions();
+  }, [triggerActions]);
 
   const value = useMemo(() => {
-    const triggerActions = () => {
-      if (!connectedAddressRef.current) {
-        return;
-      }
-
-      const actions = actionsRef.current;
-      const handlers = handlersRef.current;
-
-      for (let len = actions.length; len > 0; len--) {
-        const action = actions[len - 1];
-        if (!action) {
-          continue;
-        }
-
-        const handler = handlers[action.commentId];
-        if (!handler) {
-          continue;
-        }
-        // Remove the action from the array if handler is found.
-        actions.splice(len - 1, 1);
-
-        handler[action.type]();
-      }
-    };
-
     return {
       addAction: (action: PendingWalletConnectionAction) => {
         actionsRef.current.push(action);
@@ -113,7 +125,7 @@ export const PendingWalletConnectionActionsProvider = ({
         delete handlersRef.current[commentId];
       },
     };
-  }, [connectedAddressRef]);
+  }, [triggerActions]);
 
   return (
     <PendingWalletConnectionActionsContext.Provider value={value}>
@@ -134,13 +146,16 @@ export const useConsumePendingWalletConnectionActions = ({
   commentId,
   onLikeAction,
   onUnlikeAction,
+  onPrepareReplyAction,
 }: {
   commentId: Hex;
   onLikeAction: (commentId: Hex) => void;
   onUnlikeAction: (commentId: Hex) => void;
+  onPrepareReplyAction: (commentId: Hex) => void;
 }) => {
   const onLikeActionRef = useFreshRef(onLikeAction);
   const onUnlikeActionRef = useFreshRef(onUnlikeAction);
+  const onPrepareReplyActionRef = useFreshRef(onPrepareReplyAction);
   const { addHandler, deleteHandler } =
     usePendingWalletConnectionActionsContext();
 
@@ -151,6 +166,9 @@ export const useConsumePendingWalletConnectionActions = ({
       },
       unlike: () => {
         onUnlikeActionRef.current(commentId);
+      },
+      prepareReply: () => {
+        onPrepareReplyActionRef.current(commentId);
       },
     });
 
@@ -163,6 +181,7 @@ export const useConsumePendingWalletConnectionActions = ({
     deleteHandler,
     onLikeActionRef,
     onUnlikeActionRef,
+    onPrepareReplyActionRef,
   ]);
 };
 

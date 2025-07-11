@@ -38,7 +38,6 @@ interface CommentProps {
   onDeleteClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
-  onReplyClick: () => void;
   onEditClick: () => void;
   onRetryEditClick: () => void;
   isLiking?: boolean;
@@ -50,7 +49,6 @@ export function Comment({
   onDeleteClick,
   onRetryDeleteClick,
   onRetryPostClick,
-  onReplyClick,
   onEditClick,
   onRetryEditClick,
   isLiking,
@@ -139,7 +137,6 @@ export function Comment({
         <CommentActionOrStatus
           comment={comment}
           onRetryDeleteClick={onRetryDeleteClick}
-          onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
           onRetryEditClick={onRetryEditClick}
           isLiking={isLiking}

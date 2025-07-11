@@ -104,6 +104,7 @@ export function ReplyItem({
     commentId: comment.id,
     onLikeAction: onLikeClick,
     onUnlikeAction: onUnlikeClick,
+    onPrepareReplyAction: onReplyClick,
   });
 
   return (
@@ -122,7 +123,6 @@ export function ReplyItem({
       ) : (
         <Comment
           comment={comment}
-          onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
           onDeleteClick={onDeleteClick}
           onRetryDeleteClick={onDeleteClick}

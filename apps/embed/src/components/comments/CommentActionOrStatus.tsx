@@ -14,7 +14,6 @@ import { RetryButton } from "./RetryButton";
 
 interface CommentActionOrStatusProps {
   comment: CommentType;
-  onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
   onRetryEditClick: () => void;
@@ -23,7 +22,6 @@ interface CommentActionOrStatusProps {
 
 export function CommentActionOrStatus({
   comment,
-  onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
   onRetryEditClick,
@@ -48,7 +46,6 @@ export function CommentActionOrStatus({
     comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "pending";
 
-  const onReplyClickRef = useFreshRef(onReplyClick);
   const isHearted = useCommentIsHearted(comment);
   const connectBeforeAction = useConnectBeforeAction();
 
@@ -126,7 +123,10 @@ export function CommentActionOrStatus({
     <div className="flex items-center gap-2">
       <CommentActionButton
         onClick={connectBeforeAction(() => {
-          onReplyClickRef.current();
+          return {
+            type: "prepareReply",
+            commentId: comment.id,
+          };
         })}
       >
         reply

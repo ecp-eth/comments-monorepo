@@ -151,6 +151,14 @@ export function CommentItem({ comment }: CommentItemProps) {
     retryEditComment({ comment, queryKey: rootQueryKey });
   }, [comment, retryEditComment, rootQueryKey]);
 
+  const onReplyClick = useCallback(() => {
+    setIsReplying(true);
+  }, []);
+
+  const onEditClick = useCallback(() => {
+    setIsEditing(true);
+  }, []);
+
   const onLikeClick = useCallback(async () => {
     setIsLiking(true);
     try {
@@ -206,14 +214,6 @@ export function CommentItem({ comment }: CommentItemProps) {
     }
   }, [unlikeComment, comment, rootQueryKey]);
 
-  const onReplyClick = useCallback(() => {
-    setIsReplying(true);
-  }, []);
-
-  const onEditClick = useCallback(() => {
-    setIsEditing(true);
-  }, []);
-
   const replies = useMemo(() => {
     return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
   }, [repliesQuery.data?.pages]);
@@ -222,6 +222,7 @@ export function CommentItem({ comment }: CommentItemProps) {
     commentId: comment.id,
     onLikeAction: onLikeClick,
     onUnlikeAction: onUnlikeClick,
+    onPrepareReplyAction: onReplyClick,
   });
 
   return (
@@ -242,7 +243,6 @@ export function CommentItem({ comment }: CommentItemProps) {
           onDeleteClick={onDeleteClick}
           onRetryDeleteClick={onDeleteClick}
           onRetryPostClick={onRetryPostClick}
-          onReplyClick={onReplyClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
           optimisticReferences={

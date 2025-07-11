@@ -199,6 +199,7 @@ export function CommentItem({ comment }: CommentItemProps) {
     commentId: comment.id,
     onLikeAction: onLikeClick,
     onUnlikeAction: onUnlikeClick,
+    onPrepareReplyAction: onReplyClick,
   });
 
   return (
@@ -217,7 +218,6 @@ export function CommentItem({ comment }: CommentItemProps) {
       ) : (
         <Comment
           comment={comment}
-          onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
           onDeleteClick={onDeleteClick}
           onRetryDeleteClick={onDeleteClick}

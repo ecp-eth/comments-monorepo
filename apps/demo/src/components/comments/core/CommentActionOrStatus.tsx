@@ -8,18 +8,16 @@ import {
   useConnectBeforeAction,
 } from "@ecp.eth/shared/components";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
-import { useFreshRef, useCommentIsHearted } from "@ecp.eth/shared/hooks";
+import { useCommentIsHearted } from "@ecp.eth/shared/hooks";
 
 export function CommentActionOrStatus({
   comment,
-  onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
   onRetryEditClick,
   isLiking,
 }: {
   comment: Comment;
-  onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
   onRetryEditClick: () => void;
@@ -44,7 +42,6 @@ export function CommentActionOrStatus({
     comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "error";
 
-  const onReplyClickRef = useFreshRef(onReplyClick);
   const isHearted = useCommentIsHearted(comment);
   const connectBeforeAction = useConnectBeforeAction();
 
@@ -122,7 +119,10 @@ export function CommentActionOrStatus({
     <div className="flex items-center gap-2">
       <CommentActionButton
         onClick={connectBeforeAction(() => {
-          onReplyClickRef.current();
+          return {
+            type: "prepareReply",
+            commentId: comment.id,
+          };
         })}
       >
         reply
