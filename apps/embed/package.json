@@ -29,6 +29,7 @@
     "blo": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.474.0",
     "lz-ts": "^1.1.2",
     "never": "^1.1.0",

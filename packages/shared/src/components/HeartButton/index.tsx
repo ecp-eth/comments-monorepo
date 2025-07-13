@@ -5,15 +5,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const lottieSize = 64;
 const END_FRAME = 60;
 
-type HeartAnimationProps = {
+type HeartButtonProps = {
   isHearted: boolean;
   pending?: boolean;
 };
 
-export function HeartAnimation({
-  isHearted,
-  pending = false,
-}: HeartAnimationProps) {
+/**
+ * React component with a heart button that animates when the user clicks on it.
+ * This component uses `lottie-react` (peer dependency) to render the animation.
+ *
+ * It does not work on React Native.
+ * @param param0
+ * @returns
+ */
+export function HeartButton({ isHearted, pending = false }: HeartButtonProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const animatingState = useRef<{
     direction: "hearted" | "unhearted";
@@ -23,9 +28,6 @@ export function HeartAnimation({
     animating: false,
   });
 
-  // this state helps the useEffect to avoid triggering animation for setting the initial frame according to `isHearted` prop
-  const [initialized, setInitialized] = useState(false);
-  const [lastIsHearted, setLastIsHearted] = useState(isHearted);
   const [endFrame, setEndFrame] = useState(END_FRAME);
   const [animationLoaded, setAnimationLoaded] = useState(false);
   // using method on ref allows us to avoid unnecessary triggering of useEffect
@@ -54,8 +56,6 @@ export function HeartAnimation({
         return;
       }
 
-      setInitialized(true);
-
       containerRef.current?.classList.remove("overflow-visible");
       animatingState.current.animating = false;
       animatingState.current.direction = hearted ? "hearted" : "unhearted";
@@ -71,31 +71,8 @@ export function HeartAnimation({
       return;
     }
 
-    if (
-      initialized &&
-      // if it a change (we don't want to animate if it is already hearted)
-      isHearted !== lastIsHearted &&
-      // from not hearted to hearted
-      isHearted
-    ) {
-      // then play the animation
-      playHeartedAnimation();
-    } else {
-      gotoFrame(isHearted);
-    }
-
-    setInitialized(true);
-    setLastIsHearted(isHearted);
-  }, [
-    animationLoaded,
-    endFrame,
-    gotoFrame,
-    isHearted,
-    lastIsHearted,
-    playHeartedAnimation,
-    pending,
-    initialized,
-  ]);
+    gotoFrame(isHearted);
+  }, [animationLoaded, endFrame, gotoFrame, isHearted, pending]);
 
   // Handle pending state
   useEffect(() => {

@@ -25,9 +25,9 @@ import {
 import { chain } from "@/lib/wagmi";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
-import { useConsumePendingWalletConnectionActions } from "./PendingWalletConnectionActionsContext";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
 
 type CommentItemProps = {
   comment: CommentType;
@@ -199,6 +199,7 @@ export function CommentItem({ comment }: CommentItemProps) {
     commentId: comment.id,
     onLikeAction: onLikeClick,
     onUnlikeAction: onUnlikeClick,
+    onPrepareReplyAction: onReplyClick,
   });
 
   return (
@@ -217,14 +218,11 @@ export function CommentItem({ comment }: CommentItemProps) {
       ) : (
         <Comment
           comment={comment}
-          onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
           onDeleteClick={onDeleteClick}
           onRetryDeleteClick={onDeleteClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
-          onLikeClick={onLikeClick}
-          onUnlikeClick={onUnlikeClick}
           isLiking={isLiking}
           optimisticReferences={
             comment.pendingOperation?.action === "post"

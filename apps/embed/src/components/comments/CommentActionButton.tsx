@@ -1,7 +1,7 @@
 import React from "react";
 
 interface CommentActionButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
   children: React.ReactNode;
 }
 

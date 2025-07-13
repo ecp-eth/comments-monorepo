@@ -30,11 +30,9 @@ import {
   useGaslessSubmitComment,
 } from "./useGaslessSubmitComment";
 import { useGaslessDeleteComment } from "./useGaslessDeleteComment";
-import {
-  COMMENT_REACTION_LIKE_CONTENT,
-  TX_RECEIPT_TIMEOUT,
-} from "@/lib/constants";
+import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
+import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 
 type UseGaslessCommentActionsProps = {
   connectedAddress: Hex | undefined;

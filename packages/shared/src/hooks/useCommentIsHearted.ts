@@ -1,5 +1,5 @@
-import { COMMENT_REACTION_LIKE_CONTENT } from "@/lib/constants";
-import type { Comment } from "@ecp.eth/shared/schemas";
+import { COMMENT_REACTION_LIKE_CONTENT } from "../constants";
+import type { Comment } from "../schemas";
 import { useEffect, useMemo, useState } from "react";
 
 export function useCommentIsHearted(comment: Comment) {

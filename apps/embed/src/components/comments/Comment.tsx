@@ -38,9 +38,9 @@ interface CommentProps {
   onDeleteClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
-  onReplyClick: () => void;
   onEditClick: () => void;
   onRetryEditClick: () => void;
+  isLiking?: boolean;
   optimisticReferences: IndexerAPICommentReferencesSchemaType | undefined;
 }
 
@@ -49,9 +49,9 @@ export function Comment({
   onDeleteClick,
   onRetryDeleteClick,
   onRetryPostClick,
-  onReplyClick,
   onEditClick,
   onRetryEditClick,
+  isLiking,
   optimisticReferences,
 }: CommentProps) {
   const { currentTimestamp } =
@@ -136,11 +136,10 @@ export function Comment({
       <div className="mb-2">
         <CommentActionOrStatus
           comment={comment}
-          hasAccountConnected={!!connectedAddress}
           onRetryDeleteClick={onRetryDeleteClick}
-          onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
           onRetryEditClick={onRetryEditClick}
+          isLiking={isLiking}
         />
       </div>
     </>

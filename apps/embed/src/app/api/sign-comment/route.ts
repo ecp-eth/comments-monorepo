@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   }
 
   const passedCommentData = parseResult.data;
-  const { content, author, chainId } = passedCommentData;
+  const { content, author, chainId, commentType } = passedCommentData;
 
   if (content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
     return Response.json(
@@ -91,6 +91,7 @@ export async function POST(req: Request) {
     content,
     author,
     app: account.address,
+    commentType,
 
     ...("parentId" in passedCommentData
       ? {

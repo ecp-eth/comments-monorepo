@@ -54,7 +54,7 @@ export function useRetryPostComment({
       }
 
       const pendingOperation = await submitCommentMutationFunction({
-        address: connectedAddress,
+        author: connectedAddress,
         commentRequest: {
           chainId: comment.pendingOperation.chainId,
           content: comment.content,

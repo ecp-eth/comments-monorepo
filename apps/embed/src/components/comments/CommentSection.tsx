@@ -32,6 +32,7 @@ import { CommentItem } from "./CommentItem";
 import { createRootCommentsQueryKey } from "./queries";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { cn } from "@ecp.eth/shared/helpers";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -81,6 +82,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
         signal,
         viewer: address,
         mode: "flat",
+        commentType: COMMENT_TYPE_COMMENT,
       });
 
       return CommentPageSchema.parse(response);
@@ -117,6 +119,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
         sort: "asc",
         viewer: address,
         mode: "flat",
+        commentType: COMMENT_TYPE_COMMENT,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -155,11 +158,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
           )}
           {results.length === 0 && <NoCommentsScreen />}
           {results.map((comment) => (
-            <CommentItem
-              comment={comment}
-              key={comment.id}
-              connectedAddress={address}
-            />
+            <CommentItem comment={comment} key={comment.id} />
           ))}
           {hasNextPage && (
             <Button

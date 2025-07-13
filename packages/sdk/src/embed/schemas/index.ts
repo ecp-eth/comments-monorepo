@@ -3,33 +3,6 @@ import { EmbedConfigSupportedFont } from "./fonts.js";
 
 export { EmbedConfigSupportedFont };
 
-/**
- * non-invasive, type safe check for node env
- * @returns true if the environment is "development"
- */
-function isNodeEnvDev(): boolean {
-  if (
-    !("process" in globalThis) ||
-    typeof (globalThis as Record<string, unknown>).process !== "object"
-  ) {
-    return false;
-  }
-
-  const process = (globalThis as Record<string, unknown>).process;
-
-  return (
-    "process" in globalThis &&
-    typeof (globalThis as Record<string, unknown>).process === "object" &&
-    typeof process === "object" &&
-    process != null &&
-    "env" in process &&
-    typeof process.env === "object" &&
-    process.env != null &&
-    "NODE_ENV" in process.env &&
-    process.env.NODE_ENV === "development"
-  );
-}
-
 const CSSTransparentColorSchema = z
   .literal("transparent")
   .describe("Valid CSS transparent color value");
@@ -202,7 +175,7 @@ export const EmbedConfigSupportedChainIdsSchema = z
     z.literal(31337),
   ])
   .optional()
-  .default(isNodeEnvDev() ? 31337 : 8453);
+  .default(__DEV__ ? 31337 : 8453);
 
 /**
  * The type for supported chain ids

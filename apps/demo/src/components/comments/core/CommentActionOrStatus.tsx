@@ -1,32 +1,26 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import { CommentActionButton } from "./CommentActionButton";
 import type { Comment } from "@ecp.eth/shared/schemas";
-import { type PropsWithChildren, useCallback } from "react";
+import { type PropsWithChildren } from "react";
 import { cn } from "@ecp.eth/shared/helpers";
-import { HeartAnimation } from "@/components/animations/Heart";
-import { COMMENT_REACTION_LIKE_CONTENT } from "@/lib/constants";
-import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
-import { useAccount } from "wagmi";
-import { usePendingWalletConnectionActionsContext } from "./PendingWalletConnectionActionsContext";
-import { useCommentIsHearted } from "./hooks/useCommentIsHearted";
+import {
+  HeartButton,
+  useConnectBeforeAction,
+} from "@ecp.eth/shared/components";
+import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
+import { useCommentIsHearted } from "@ecp.eth/shared/hooks";
 
 export function CommentActionOrStatus({
   comment,
-  onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
   onRetryEditClick,
-  onLikeClick,
-  onUnlikeClick,
   isLiking,
 }: {
   comment: Comment;
-  onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
   onRetryEditClick: () => void;
-  onLikeClick: () => void;
-  onUnlikeClick: () => void;
   isLiking?: boolean;
 }) {
   const isDeleting =
@@ -48,30 +42,8 @@ export function CommentActionOrStatus({
     comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "error";
 
-  const { address: connectedAddress } = useAccount();
-  const onLikeClickRef = useFreshRef(onLikeClick);
-  const onUnlikeClickRef = useFreshRef(onUnlikeClick);
-  const onReplyClickRef = useFreshRef(onReplyClick);
-  const connectAccount = useConnectAccount();
   const isHearted = useCommentIsHearted(comment);
-  const { addAction } = usePendingWalletConnectionActionsContext();
-
-  const hasAccountConnected = !!connectedAddress;
-
-  const connectBeforeAction = useCallback(
-    <TParams extends unknown[]>(
-      action: (...args: TParams) => Promise<unknown> | unknown,
-    ) => {
-      return async (...args: TParams) => {
-        if (!hasAccountConnected) {
-          await connectAccount();
-        }
-
-        await action(...args);
-      };
-    },
-    [connectAccount, hasAccountConnected],
-  );
+  const connectBeforeAction = useConnectBeforeAction();
 
   if (didPostingFailed) {
     return (
@@ -147,7 +119,10 @@ export function CommentActionOrStatus({
     <div className="flex items-center gap-2">
       <CommentActionButton
         onClick={connectBeforeAction(() => {
-          onReplyClickRef.current();
+          return {
+            type: "prepareReply",
+            commentId: comment.id,
+          };
         })}
       >
         reply
@@ -156,22 +131,13 @@ export function CommentActionOrStatus({
         onClick={connectBeforeAction(() => {
           const newIsHearted = !isHearted;
 
-          if (!hasAccountConnected) {
-            addAction({
-              type: newIsHearted ? "like" : "unlike",
-              commentId: comment.id,
-            });
-            return;
-          }
-
-          if (newIsHearted) {
-            onLikeClickRef.current();
-          } else {
-            onUnlikeClickRef.current();
-          }
+          return {
+            type: newIsHearted ? "like" : "unlike",
+            commentId: comment.id,
+          };
         })}
       >
-        <HeartAnimation pending={isLiking} isHearted={isHearted} />
+        <HeartButton pending={isLiking} isHearted={isHearted} />
         {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
       </CommentActionButton>
     </div>

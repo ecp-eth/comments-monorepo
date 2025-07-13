@@ -22,13 +22,10 @@ import {
 type CommentProps = {
   comment: CommentType;
   onDeleteClick: () => void;
-  onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
   onEditClick: () => void;
   onRetryEditClick: () => void;
-  onLikeClick: () => void;
-  onUnlikeClick: () => void;
   isLiking?: boolean;
   optimisticReferences: IndexerAPICommentReferencesSchemaType | undefined;
 };
@@ -38,11 +35,8 @@ export function Comment({
   onDeleteClick,
   onRetryDeleteClick,
   onRetryPostClick,
-  onReplyClick,
   onEditClick,
   onRetryEditClick,
-  onLikeClick,
-  onUnlikeClick,
   isLiking,
   optimisticReferences,
 }: CommentProps) {
@@ -128,11 +122,8 @@ export function Comment({
         <CommentActionOrStatus
           comment={comment}
           onRetryDeleteClick={onRetryDeleteClick}
-          onReplyClick={onReplyClick}
           onRetryPostClick={onRetryPostClick}
           onRetryEditClick={onRetryEditClick}
-          onLikeClick={onLikeClick}
-          onUnlikeClick={onUnlikeClick}
           isLiking={isLiking}
         />
       </div>

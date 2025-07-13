@@ -1,24 +1,31 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import type { Comment as CommentType } from "@ecp.eth/shared/schemas";
+import { type PropsWithChildren } from "react";
+import {
+  HeartButton,
+  useConnectBeforeAction,
+} from "@ecp.eth/shared/components";
+import {} from "@ecp.eth/shared/components";
+import { useCommentIsHearted, useFreshRef } from "@ecp.eth/shared/hooks";
+import { cn } from "@ecp.eth/shared/helpers";
+import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { CommentActionButton } from "./CommentActionButton";
 import { RetryButton } from "./RetryButton";
 
 interface CommentActionOrStatusProps {
   comment: CommentType;
-  hasAccountConnected: boolean;
-  onReplyClick: () => void;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
   onRetryEditClick: () => void;
+  isLiking?: boolean;
 }
 
 export function CommentActionOrStatus({
   comment,
-  hasAccountConnected,
-  onReplyClick,
   onRetryDeleteClick,
   onRetryPostClick,
   onRetryEditClick,
+  isLiking,
 }: CommentActionOrStatusProps) {
   const isDeleting =
     comment.pendingOperation?.action === "delete" &&
@@ -39,74 +46,120 @@ export function CommentActionOrStatus({
     comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "pending";
 
+  const isHearted = useCommentIsHearted(comment);
+  const connectBeforeAction = useConnectBeforeAction();
+
   if (didPostingFailed) {
     return (
-      <div className="flex items-center gap-1 text-xs text-destructive">
+      <ButtonStatus>
         <MessageCircleWarningIcon className="w-3 h-3" />
         <span>
           Could not post the comment.{" "}
           <RetryButton onClick={onRetryPostClick}>Retry</RetryButton>
         </span>
-      </div>
+      </ButtonStatus>
     );
   }
 
   if (didDeletingFailed) {
     return (
-      <div className="flex items-center gap-1 text-xs text-destructive">
+      <ButtonStatus>
         <MessageCircleWarningIcon className="w-3 h-3" />
         <span>
           Could not delete the comment.{" "}
           <RetryButton onClick={onRetryDeleteClick}>Retry</RetryButton>
         </span>
-      </div>
+      </ButtonStatus>
     );
   }
 
   if (didEditingFailed) {
     return (
-      <div className="flex items-center gap-1 text-xs text-destructive">
+      <ButtonStatus>
         <MessageCircleWarningIcon className="w-3 h-3" />
         <span>
           Could not edit the comment.{" "}
           <RetryButton onClick={onRetryEditClick}>Retry</RetryButton>
         </span>
-      </div>
+      </ButtonStatus>
     );
   }
 
   if (isDeleting) {
     return (
-      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+      <ButtonStatus muted={true}>
         <Loader2Icon className="w-3 h-3 animate-spin" />
         <span>Deleting...</span>
-      </div>
+      </ButtonStatus>
     );
   }
 
   if (isEditing) {
     return (
-      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+      <ButtonStatus muted={true}>
         <Loader2Icon className="w-3 h-3 animate-spin" />
         <span>Editing...</span>
-      </div>
+      </ButtonStatus>
     );
   }
 
   if (isPosting) {
     return (
-      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+      <ButtonStatus muted={true}>
         <Loader2Icon className="w-3 h-3 animate-spin" />
         <span>Posting...</span>
-      </div>
+      </ButtonStatus>
     );
   }
 
-  if (comment.pendingOperation || !hasAccountConnected) {
+  if (
+    comment.pendingOperation &&
+    comment.pendingOperation.state.status !== "success"
+  ) {
     return null;
   }
 
   return (
-    <CommentActionButton onClick={onReplyClick}>reply</CommentActionButton>
+    <div className="flex items-center gap-2">
+      <CommentActionButton
+        onClick={connectBeforeAction(() => {
+          return {
+            type: "prepareReply",
+            commentId: comment.id,
+          };
+        })}
+      >
+        reply
+      </CommentActionButton>
+      <CommentActionButton
+        onClick={connectBeforeAction(() => {
+          const newIsHearted = !isHearted;
+
+          return {
+            type: newIsHearted ? "like" : "unlike",
+            commentId: comment.id,
+          };
+        })}
+      >
+        <HeartButton pending={isLiking} isHearted={isHearted} />
+        {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
+      </CommentActionButton>
+    </div>
+  );
+}
+
+function ButtonStatus({
+  muted = false,
+  children,
+}: PropsWithChildren<{ muted?: boolean }>) {
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-1 text-xs",
+        muted ? "text-muted-foreground" : "text-destructive",
+      )}
+    >
+      {children}
+    </div>
   );
 }

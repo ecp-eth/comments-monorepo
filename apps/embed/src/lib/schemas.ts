@@ -5,6 +5,7 @@ import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { MAX_COMMENT_LENGTH } from "./constants";
 import { decompressFromURI } from "lz-ts";
 import { MetadataEntrySchema } from "@ecp.eth/sdk/comments";
+import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
 
 export const BadRequestResponseSchema = z.record(
   z.string(),
@@ -27,6 +28,7 @@ const sharedCommentSchema = z.object({
   author: HexSchema,
   content: z.string().trim().nonempty().max(MAX_COMMENT_LENGTH),
   chainId: z.number(),
+  commentType: z.number().default(DEFAULT_COMMENT_TYPE),
 });
 
 export const SignCommentPayloadRequestSchema = z.union([
@@ -38,7 +40,7 @@ export const SignCommentPayloadRequestSchema = z.union([
   }),
 ]);
 
-export type SignCommentPayloadRequestSchemaType = z.infer<
+export type SignCommentPayloadRequestSchemaType = z.input<
   typeof SignCommentPayloadRequestSchema
 >;
 

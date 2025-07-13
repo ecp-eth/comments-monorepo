@@ -8,7 +8,7 @@ import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import { publicEnv } from "@/publicEnv";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import type { Hex } from "viem";
+import { ContractFunctionExecutionError } from "viem";
 import {
   MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
   NEW_COMMENTS_CHECK_INTERVAL,
@@ -27,14 +27,20 @@ import {
   type EmbedConfigProviderByTargetURIConfig,
 } from "../EmbedConfigProvider";
 import { useRetryEditComment } from "./hooks/useRetryEditComment";
-import { useChainId } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
+import { useLikeComment } from "./hooks/useLikeComment";
+import { useUnlikeComment } from "./hooks/useUnlikeComment";
+import { toast } from "sonner";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 type CommentItemProps = {
-  connectedAddress: Hex | undefined;
   comment: CommentType;
 };
 
-export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
+export function CommentItem({ comment }: CommentItemProps) {
+  const { address: connectedAddress } = useAccount();
   const { targetUri } = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const deleteComment = useDeleteComment();
   const retryPostComment = useRetryPostComment({
@@ -43,6 +49,9 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
   const retryEditComment = useRetryEditComment({
     connectedAddress,
   });
+  const likeComment = useLikeComment();
+  const unlikeComment = useUnlikeComment();
+  const [isLiking, setIsLiking] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const chainId = useChainId();
@@ -88,6 +97,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         signal,
         viewer: connectedAddress,
         mode: "flat",
+        commentType: COMMENT_TYPE_COMMENT,
       });
 
       return CommentPageSchema.parse(response);
@@ -120,6 +130,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
         signal,
         viewer: connectedAddress,
         mode: "flat",
+        commentType: COMMENT_TYPE_COMMENT,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -148,9 +159,71 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
     setIsEditing(true);
   }, []);
 
+  const onLikeClick = useCallback(async () => {
+    setIsLiking(true);
+    try {
+      await likeComment({
+        comment,
+        queryKey: rootQueryKey,
+        onBeforeStart: () => setIsLiking(true),
+        onSuccess: () => setIsLiking(false),
+        onFailed: (e: unknown) => {
+          setIsLiking(false);
+
+          if (!(e instanceof Error)) {
+            toast.error("Failed to like");
+            return;
+          }
+
+          const message =
+            e instanceof ContractFunctionExecutionError
+              ? formatContractFunctionExecutionError(e)
+              : e.message;
+
+          toast.error(message);
+        },
+      });
+    } finally {
+      setIsLiking(false);
+    }
+  }, [likeComment, comment, rootQueryKey]);
+
+  const onUnlikeClick = useCallback(async () => {
+    setIsLiking(true);
+    try {
+      await unlikeComment({
+        comment,
+        queryKey: rootQueryKey,
+        onBeforeStart: () => setIsLiking(false),
+        onFailed: (e: unknown) => {
+          if (!(e instanceof Error)) {
+            toast.error("Failed to unlike");
+            return;
+          }
+
+          const message =
+            e instanceof ContractFunctionExecutionError
+              ? formatContractFunctionExecutionError(e)
+              : e.message;
+
+          toast.error(message);
+        },
+      });
+    } finally {
+      setIsLiking(false);
+    }
+  }, [unlikeComment, comment, rootQueryKey]);
+
   const replies = useMemo(() => {
     return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
   }, [repliesQuery.data?.pages]);
+
+  useConsumePendingWalletConnectionActions({
+    commentId: comment.id,
+    onLikeAction: onLikeClick,
+    onUnlikeAction: onUnlikeClick,
+    onPrepareReplyAction: onReplyClick,
+  });
 
   return (
     <div className="mb-4 border-muted">
@@ -170,7 +243,6 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
           onDeleteClick={onDeleteClick}
           onRetryDeleteClick={onDeleteClick}
           onRetryPostClick={onRetryPostClick}
-          onReplyClick={onReplyClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
           optimisticReferences={
@@ -178,6 +250,7 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
               ? comment.pendingOperation.references
               : undefined
           }
+          isLiking={isLiking}
         />
       )}
       {isReplying && (
@@ -202,7 +275,6 @@ export function CommentItem({ comment, connectedAddress }: CommentItemProps) {
           key={reply.id}
           comment={reply}
           queryKey={queryKey}
-          connectedAddress={connectedAddress}
           parentCommentId={comment.id}
         />
       ))}

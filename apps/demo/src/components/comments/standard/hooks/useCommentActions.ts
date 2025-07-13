@@ -34,11 +34,9 @@ import type {
   PendingDeleteCommentOperationSchemaType,
   PendingPostCommentOperationSchemaType,
 } from "@ecp.eth/shared/schemas";
-import {
-  COMMENT_REACTION_LIKE_CONTENT,
-  TX_RECEIPT_TIMEOUT,
-} from "@/lib/constants";
+import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
+import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 
 type UseCommentActionsProps = {
   connectedAddress: Hex | undefined;
@@ -517,6 +515,8 @@ export function useCommentActions({
       try {
         onBeforeStart?.();
 
+        await switchChainAsync({ chainId: comment.chainId });
+
         const { txHash } = await deleteCommentMutation({
           commentId: reaction.id,
         });
@@ -542,7 +542,7 @@ export function useCommentActions({
         throw e;
       }
     },
-    [likeReactionRemoval, deleteCommentMutation, wagmiConfig],
+    [switchChainAsync, deleteCommentMutation, likeReactionRemoval, wagmiConfig],
   );
 
   return useMemo(

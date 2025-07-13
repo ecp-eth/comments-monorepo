@@ -33,11 +33,7 @@ import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { useAccountModal } from "@rainbow-me/rainbowkit";
 import { publicEnv } from "@/publicEnv";
 import { CommentFormErrors } from "@ecp.eth/shared/components/CommentFormErrors";
-import {
-  CommentContentTooLargeError,
-  CommentFormSubmitError,
-  InvalidCommentError,
-} from "@ecp.eth/shared/errors";
+import { InvalidCommentError } from "@ecp.eth/shared/errors";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import { useEditComment, usePostComment } from "@ecp.eth/sdk/comments/react";
 import type { Comment } from "@ecp.eth/shared/schemas";
@@ -126,6 +122,7 @@ function BaseCommentForm({
   const connectAccount = useConnectAccount();
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const onSubmitRef = useFreshRef(onSubmit);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
   const suggestions = useIndexerSuggestions({
     indexerApiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
@@ -188,7 +185,11 @@ function BaseCommentForm({
             }),
           );
 
-        const result = await onSubmit({ author, content, references });
+        const result = await onSubmitRef.current?.({
+          author,
+          content,
+          references,
+        });
 
         return result;
       } catch (e) {
@@ -393,7 +394,7 @@ export function CommentForm({
       }
 
       const pendingOperation = await submitCommentMutationFunction({
-        address: author,
+        author: author,
         commentRequest: {
           chainId,
           content,
