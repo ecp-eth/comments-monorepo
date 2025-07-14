@@ -120,14 +120,19 @@ export function Comment({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="apply-theme">
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={connectBeforeAction(() => {
-                open(comment);
-              })}
-            >
-              Report
-            </DropdownMenuItem>
+            {!comment.deletedAt &&
+              comment.moderationStatus === "approved" &&
+              (!comment.pendingOperation ||
+                comment.pendingOperation.state.status === "success") && (
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={connectBeforeAction(() => {
+                    open(comment);
+                  })}
+                >
+                  Report
+                </DropdownMenuItem>
+              )}
             <DropdownMenuItem className="cursor-pointer" asChild>
               <Link
                 href={publicEnv.NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL.replace(
