@@ -6,5 +6,5 @@ export * from "./CommentMediaFile.js";
 export * from "./CommentMediaImage.js";
 export * from "./CommentMediaVideo.js";
 export * from "./CommentMediaReference.js";
-export { HeartButton } from "./HeartButton/";
+export { HeartButton } from "./HeartButton/index.js";
 export * from "./PendingWalletConnectionActionsContext.js";

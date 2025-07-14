@@ -1,6 +1,14 @@
-import Lottie, { LottieRefCurrentProps } from "lottie-react";
+import LottieRaw, { LottieRefCurrentProps } from "lottie-react";
 import heartJSON from "./heart.json";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+// when peer dep `lottie-react` is transpiled by next js, and then got imported/required by module transpiled using tsup,
+// the client side default export somehow got wrapped into an object `{ __esModule: true, default, ... }`,
+// while the default export was correctly imported on server side SSR.
+//
+// This is a workaround to ensure the default export is correctly imported on client side.
+const Lottie: typeof LottieRaw =
+  "default" in LottieRaw ? (LottieRaw.default as typeof LottieRaw) : LottieRaw;
 
 const lottieSize = 64;
 const END_FRAME = 60;
