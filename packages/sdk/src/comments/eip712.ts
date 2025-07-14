@@ -63,3 +63,11 @@ export const REMOVE_APPROVAL_TYPE = {
     { name: "deadline", type: "uint256" },
   ],
 } as const;
+
+export const REPORT_COMMENT_TYPE = {
+  ReportComment: [
+    { name: "commentId", type: "bytes32" },
+    { name: "reportee", type: "address" },
+    { name: "message", type: "string" },
+  ],
+} as const;

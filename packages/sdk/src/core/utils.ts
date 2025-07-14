@@ -123,7 +123,7 @@ export function createWaitableWriteContractHelper<
   };
 }
 
-type RunAsyncOptions = {
+export type RunAsyncOptions = {
   /**
    * The signal to abort the function.
    */

@@ -12,12 +12,16 @@ import { CommentAuthor } from "./CommentAuthor";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import { CommentSwapInfo } from "./CommentSwapInfo";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import {
   CommentText,
   CommentMediaReferences,
 } from "@ecp.eth/shared/components";
+import { publicEnv } from "@/publicEnv";
+import Link from "next/link";
+import { useReportCommentDialog } from "./ReportCommentDialogProvider";
+import { useConnectAccount } from "@ecp.eth/shared/hooks";
 
 type CommentProps = {
   comment: CommentType;
@@ -40,7 +44,25 @@ export function Comment({
   isLiking,
   optimisticReferences,
 }: CommentProps) {
+  const { open } = useReportCommentDialog();
   const { address: connectedAddress } = useAccount();
+  const connectAccount = useConnectAccount();
+
+  const connectBeforeAction = useCallback(
+    <TParams extends unknown[]>(
+      action: (...args: TParams) => Promise<unknown> | unknown,
+    ) => {
+      return async (...args: TParams) => {
+        if (!connectedAddress) {
+          await connectAccount();
+        }
+
+        await action(...args);
+      };
+    },
+    [connectAccount, connectedAddress],
+  );
+
   const references = useMemo(() => {
     if (
       comment.references.length === 0 &&
@@ -74,32 +96,59 @@ export function Comment({
           moderationStatus={comment.moderationStatus}
           timestamp={comment.createdAt}
         />
-        {isAuthor &&
-          !comment.deletedAt &&
-          (!comment.pendingOperation ||
-            comment.pendingOperation.state.status === "success") && (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">
-                <MoreVerticalIcon className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100">
+            <MoreVerticalIcon className="h-4 w-4" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {!comment.deletedAt &&
+              comment.moderationStatus === "approved" &&
+              (!comment.pendingOperation ||
+                comment.pendingOperation.state.status === "success") && (
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={onEditClick}
-                  disabled={isEditing}
+                  onClick={connectBeforeAction(() => {
+                    open(comment);
+                  })}
                 >
-                  Edit
+                  Report
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-red-600 cursor-pointer"
-                  onClick={onDeleteClick}
-                  disabled={isDeleting}
-                >
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+              )}
+            <DropdownMenuItem className="cursor-pointer" asChild>
+              <Link
+                href={publicEnv.NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL.replace(
+                  "{txHash}",
+                  comment.txHash,
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View on block explorer
+              </Link>
+            </DropdownMenuItem>
+            {isAuthor &&
+              !comment.deletedAt &&
+              (!comment.pendingOperation ||
+                comment.pendingOperation.state.status === "success") && (
+                <>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={onEditClick}
+                    disabled={isEditing}
+                  >
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-red-600 cursor-pointer"
+                    onClick={onDeleteClick}
+                    disabled={isDeleting}
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </>
+              )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       {comment.zeroExSwap && (
         <div className="mb-2">

@@ -107,6 +107,7 @@ jobs:
       ENS_RPC_URL: "https://ethereum-rpc.publicnode.com"
       NEYNAR_API_KEY: "NEYNAR_API_KEY"
       SIM_API_KEY: "SIM_API_KEY"
+      NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL: "https://basescan.org/tx/{txHash}"
 
     name: Build and Test on Node.js 22
     steps:

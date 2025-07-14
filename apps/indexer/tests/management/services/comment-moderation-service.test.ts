@@ -15,11 +15,9 @@ describe("CommentModerationService", () => {
   // Mock services
   const mockNotificationService: IModerationNotificationsService = {
     notifyPendingModeration: vi.fn(),
-    notifyAutomaticClassification: vi.fn(),
-    initialize: vi.fn(),
+    notifyAutomaticallyClassified: vi.fn(),
     updateMessageWithModerationStatus: vi.fn(),
     updateMessageWithChangeAction: vi.fn(),
-    decryptWebhookCallbackData: vi.fn(),
   };
 
   const mockPremoderationService: ICommentPremoderationService = {
@@ -161,7 +159,7 @@ describe("CommentModerationService", () => {
         mockNotificationService.notifyPendingModeration,
       ).toHaveBeenCalled();
       expect(
-        mockNotificationService.notifyAutomaticClassification,
+        mockNotificationService.notifyAutomaticallyClassified,
       ).toHaveBeenCalled();
     });
 
@@ -225,7 +223,7 @@ describe("CommentModerationService", () => {
         mockNotificationService.notifyPendingModeration,
       ).not.toHaveBeenCalled();
       expect(
-        mockNotificationService.notifyAutomaticClassification,
+        mockNotificationService.notifyAutomaticallyClassified,
       ).toHaveBeenCalled();
     });
 
@@ -294,7 +292,7 @@ describe("CommentModerationService", () => {
         mockNotificationService.notifyPendingModeration,
       ).toHaveBeenCalled();
       expect(
-        mockNotificationService.notifyAutomaticClassification,
+        mockNotificationService.notifyAutomaticallyClassified,
       ).not.toHaveBeenCalled();
     });
 
@@ -358,7 +356,7 @@ describe("CommentModerationService", () => {
         mockNotificationService.notifyPendingModeration,
       ).not.toHaveBeenCalled();
       expect(
-        mockNotificationService.notifyAutomaticClassification,
+        mockNotificationService.notifyAutomaticallyClassified,
       ).not.toHaveBeenCalled();
     });
   });
@@ -516,7 +514,7 @@ describe("CommentModerationService", () => {
         mockNotificationService.notifyPendingModeration,
       ).toHaveBeenCalled();
       expect(
-        mockNotificationService.notifyAutomaticClassification,
+        mockNotificationService.notifyAutomaticallyClassified,
       ).toHaveBeenCalled();
     });
 
@@ -590,7 +588,7 @@ describe("CommentModerationService", () => {
         mockNotificationService.notifyPendingModeration,
       ).not.toHaveBeenCalled();
       expect(
-        mockNotificationService.notifyAutomaticClassification,
+        mockNotificationService.notifyAutomaticallyClassified,
       ).toHaveBeenCalled();
     });
 
@@ -669,7 +667,7 @@ describe("CommentModerationService", () => {
         mockNotificationService.notifyPendingModeration,
       ).toHaveBeenCalled();
       expect(
-        mockNotificationService.notifyAutomaticClassification,
+        mockNotificationService.notifyAutomaticallyClassified,
       ).not.toHaveBeenCalled();
     });
 
@@ -743,7 +741,7 @@ describe("CommentModerationService", () => {
         mockNotificationService.notifyPendingModeration,
       ).not.toHaveBeenCalled();
       expect(
-        mockNotificationService.notifyAutomaticClassification,
+        mockNotificationService.notifyAutomaticallyClassified,
       ).not.toHaveBeenCalled();
     });
   });
@@ -758,30 +756,16 @@ describe("CommentModerationService", () => {
         mockPremoderationService.updateStatus as ReturnType<typeof vi.fn>
       ).mockResolvedValue(mockUpdatedComment);
 
-      const result = await service.updateModerationStatus(commentId, status);
+      const result = await service.updateModerationStatus({
+        commentId,
+        messageId: undefined,
+        status,
+      });
 
       expect(result).toEqual(mockUpdatedComment);
       expect(mockPremoderationService.updateStatus).toHaveBeenCalledWith(
         commentId,
         status,
-      );
-    });
-  });
-
-  describe("getComment", () => {
-    it("should fetch comment through comment db service", async () => {
-      const commentId = "0x123" as `0x${string}`;
-      const mockComment = { id: commentId };
-
-      (
-        mockCommentDbService.getCommentById as ReturnType<typeof vi.fn>
-      ).mockResolvedValue(mockComment);
-
-      const result = await service.getComment(commentId);
-
-      expect(result).toEqual(mockComment);
-      expect(mockCommentDbService.getCommentById).toHaveBeenCalledWith(
-        commentId,
       );
     });
   });

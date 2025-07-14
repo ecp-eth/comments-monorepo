@@ -1,24 +1,58 @@
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod";
 
-const webhookCallbackDataSchema = z.object({
-  action: z.enum(["approve", "reject", "pending", "change", "cancel"]),
+const moderationActionWebhookCallbackDataSchema = z.object({
+  action: z.enum([
+    "moderation-set-as-approved",
+    "moderation-set-as-rejected",
+    "moderation-set-as-pending",
+    "moderation-change-status",
+    "moderation-cancel",
+  ]),
   commentId: HexSchema,
   timestamp: z.number().int().nonnegative(),
 });
 
+const reportActionWebhookCallbackDataSchema = z.object({
+  action: z.enum([
+    "report-set-as-resolved",
+    "report-set-as-closed",
+    "report-change-status",
+    "report-set-as-pending",
+    "report-cancel",
+  ]),
+  reportId: HexSchema,
+  timestamp: z.number().int().nonnegative(),
+});
+
+const webhookCallbackDataSchema = z.discriminatedUnion("action", [
+  moderationActionWebhookCallbackDataSchema,
+  reportActionWebhookCallbackDataSchema,
+]);
+
 function getActionByte(action: WebhookCallbackData["action"]) {
   switch (action) {
-    case "approve":
+    case "moderation-set-as-approved":
       return 0x01;
-    case "reject":
+    case "moderation-set-as-rejected":
       return 0x02;
-    case "pending":
+    case "moderation-set-as-pending":
       return 0x03;
-    case "change":
+    case "moderation-change-status":
       return 0x04;
-    case "cancel":
+    case "moderation-cancel":
       return 0x05;
+    case "report-set-as-resolved":
+      return 0x06;
+    case "report-set-as-closed":
+      return 0x07;
+    case "report-change-status":
+      return 0x08;
+    case "report-set-as-pending":
+      return 0x09;
+    case "report-cancel":
+      return 0x0a;
+
     default:
       throw new Error(`Invalid action: ${action}`);
   }
@@ -27,15 +61,25 @@ function getActionByte(action: WebhookCallbackData["action"]) {
 function getActionFromByte(actionByte: number) {
   switch (actionByte) {
     case 0x01:
-      return "approve";
+      return "moderation-set-as-approved";
     case 0x02:
-      return "reject";
+      return "moderation-set-as-rejected";
     case 0x03:
-      return "pending";
+      return "moderation-set-as-pending";
     case 0x04:
-      return "change";
+      return "moderation-change-status";
     case 0x05:
-      return "cancel";
+      return "moderation-cancel";
+    case 0x06:
+      return "report-set-as-resolved";
+    case 0x07:
+      return "report-set-as-closed";
+    case 0x08:
+      return "report-change-status";
+    case 0x09:
+      return "report-set-as-pending";
+    case 0x0a:
+      return "report-cancel";
     default:
       throw new Error(`Invalid action byte: ${actionByte}`);
   }
@@ -49,7 +93,10 @@ const MAX_WEBHOOK_DATA_SIZE = 64;
 // Compact binary format for webhook data
 function serializeWebhookData(data: WebhookCallbackData): Buffer {
   const actionByte = getActionByte(data.action); // 1 B
-  const commentIdBuffer = Buffer.from(data.commentId.slice(2), "hex"); // Remove "0x" prefix, 32 B
+  const idBuffer = Buffer.from(
+    "commentId" in data ? data.commentId.slice(2) : data.reportId.slice(2),
+    "hex",
+  ); // Remove "0x" prefix, 32 B
   const timestampBuffer = Buffer.alloc(4); // 4B
   // Convert milliseconds to seconds to fit in 32-bit unsigned integer
   const timestampInSeconds = Math.floor(data.timestamp / 1000);
@@ -57,23 +104,33 @@ function serializeWebhookData(data: WebhookCallbackData): Buffer {
   timestampBuffer.writeUInt32BE(timestampInSeconds);
 
   // 37 B
-  return Buffer.concat([
-    Buffer.from([actionByte]),
-    commentIdBuffer,
-    timestampBuffer,
-  ]);
+  return Buffer.concat([Buffer.from([actionByte]), idBuffer, timestampBuffer]);
 }
 
 function deserializeWebhookData(buffer: Buffer): WebhookCallbackData {
   const actionByte = buffer[0] ?? -1;
   const action = getActionFromByte(actionByte);
-  const commentId = ("0x" +
-    buffer.subarray(1, 33).toString("hex")) as `0x${string}`;
+  const id = ("0x" + buffer.subarray(1, 33).toString("hex")) as `0x${string}`;
   const timestampInSeconds = buffer.readUInt32BE(33);
   // Convert seconds back to milliseconds
   const timestamp = timestampInSeconds * 1000;
 
-  return { action, commentId, timestamp };
+  switch (action) {
+    case "moderation-cancel":
+    case "moderation-change-status":
+    case "moderation-set-as-approved":
+    case "moderation-set-as-pending":
+    case "moderation-set-as-rejected":
+      return { action, commentId: id, timestamp };
+    case "report-cancel":
+    case "report-change-status":
+    case "report-set-as-resolved":
+    case "report-set-as-closed":
+    case "report-set-as-pending":
+      return { action, reportId: id, timestamp };
+    default:
+      throw new Error(`Invalid action: ${action}`);
+  }
 }
 
 export function encryptWebhookCallbackData(

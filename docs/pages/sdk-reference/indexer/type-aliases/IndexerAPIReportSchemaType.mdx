@@ -1,0 +1,65 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPIReportSchemaType
+
+# Type Alias: IndexerAPIReportSchemaType
+
+```ts
+type IndexerAPIReportSchemaType = {
+  commentId: `0x${string}`;
+  createdAt: Date;
+  id: string;
+  message: string;
+  reportee: `0x${string}`;
+  status: "pending" | "resolved" | "closed";
+  updatedAt: Date;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:614](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L614)
+
+## Type declaration
+
+### commentId
+
+```ts
+commentId: `0x${string}` = HexSchema;
+```
+
+### createdAt
+
+```ts
+createdAt: Date;
+```
+
+### id
+
+```ts
+id: string;
+```
+
+### message
+
+```ts
+message: string;
+```
+
+### reportee
+
+```ts
+reportee: `0x${string}` = HexSchema;
+```
+
+### status
+
+```ts
+status: "pending" | "resolved" | "closed" = IndexerAPIReportStatusSchema;
+```
+
+### updatedAt
+
+```ts
+updatedAt: Date;
+```

@@ -861,3 +861,100 @@ export async function fetchAutocomplete(
     { signal, retries },
   );
 }
+
+/**
+ * The options for `reportComment()`
+ */
+export type ReportCommentOptions = {
+  /**
+   * The ID of the comment to report
+   */
+  commentId: Hex;
+  /**
+   * The address of the user reporting the comment
+   */
+  reportee: Hex;
+  /**
+   * Optional message explaining the reason for the report
+   */
+  message?: string;
+  /**
+   * The signature of the report typed data
+   */
+  signature: Hex;
+  /**
+   * The chain ID where the comment was posted
+   */
+  chainId: number;
+  /**
+   * URL on which /api/comments/$commentId/reports endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  /**
+   * Number of times to retry the operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+  signal?: AbortSignal;
+};
+
+const ReportCommentOptionsSchema = z.object({
+  commentId: HexSchema,
+  reportee: HexSchema,
+  message: z.string().max(200).optional(),
+  signature: HexSchema,
+  chainId: z.number().int().positive(),
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  retries: z.number().int().positive().default(3),
+  signal: z.instanceof(AbortSignal).optional(),
+});
+
+/**
+ * Report a comment to the Indexer API
+ *
+ * @returns A promise that resolves when the comment is reported successfully
+ */
+export async function reportComment(
+  options: ReportCommentOptions,
+): Promise<void> {
+  const {
+    commentId,
+    reportee,
+    message,
+    signature,
+    chainId,
+    apiUrl,
+    retries,
+    signal,
+  } = ReportCommentOptionsSchema.parse(options);
+
+  return runAsync(
+    async (signal) => {
+      const url = new URL(`/api/comments/${commentId}/reports`, apiUrl);
+
+      const response = await fetch(url.toString(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          reportee,
+          message,
+          signature,
+          chainId,
+        }),
+        cache: "no-cache",
+        signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to report comment: ${response.statusText}`);
+      }
+    },
+    { signal, retries },
+  );
+}

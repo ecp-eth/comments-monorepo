@@ -4,6 +4,7 @@ import {
   DEFAULT_CHANNEL_ID,
   DEFAULT_COMMENT_TYPE,
   EMPTY_PARENT_ID,
+  MAX_COMMENT_REPORT_MESSAGE_LENGTH,
 } from "../constants.js";
 import { HexSchema, type Hex } from "../core/schemas.js";
 import { CommentManagerABI } from "../abis.js";
@@ -27,11 +28,14 @@ import {
   EditCommentDataSchema,
   EditCommentTypedDataSchema,
   type EditCommentTypedDataSchemaType,
+  ReportCommentTypedDataSchema,
+  type ReportCommentTypedDataSchemaType,
 } from "./schemas.js";
 import {
   ADD_COMMENT_TYPE,
   DELETE_COMMENT_TYPE,
   EDIT_COMMENT_TYPE,
+  REPORT_COMMENT_TYPE,
   DOMAIN_NAME,
   DOMAIN_VERSION,
 } from "./eip712.js";
@@ -962,3 +966,49 @@ export const editCommentWithSig = createWaitableWriteContractHelper(
     eventName: "CommentEdited",
   },
 );
+
+export type CreateReportCommentTypedDataParams = {
+  commentId: Hex;
+  reportee: Hex;
+  message?: string;
+  chainId: number;
+  commentsAddress?: Hex;
+};
+
+const CreateReportCommentTypedDataParamsSchema = z.object({
+  commentId: HexSchema,
+  reportee: HexSchema,
+  message: z.string().max(MAX_COMMENT_REPORT_MESSAGE_LENGTH).optional(),
+  chainId: z.number(),
+  commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
+});
+
+/**
+ * Create the EIP-712 typed data structure for reporting a comment
+ * @returns The typed data
+ */
+export function createReportCommentTypedData(
+  params: CreateReportCommentTypedDataParams,
+): ReportCommentTypedDataSchemaType {
+  const validatedParams =
+    CreateReportCommentTypedDataParamsSchema.parse(params);
+
+  const { commentId, reportee, message, chainId, commentsAddress } =
+    validatedParams;
+
+  return ReportCommentTypedDataSchema.parse({
+    domain: {
+      name: DOMAIN_NAME,
+      version: DOMAIN_VERSION,
+      chainId,
+      verifyingContract: commentsAddress,
+    },
+    types: REPORT_COMMENT_TYPE,
+    primaryType: "ReportComment",
+    message: {
+      commentId,
+      reportee,
+      message: message || "",
+    },
+  });
+}

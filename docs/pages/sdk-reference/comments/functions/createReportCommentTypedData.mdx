@@ -1,0 +1,192 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / createReportCommentTypedData
+
+# Function: createReportCommentTypedData()
+
+```ts
+function createReportCommentTypedData(params): {
+  domain: {
+     chainId: number;
+     name: "Ethereum Comments Protocol";
+     verifyingContract: `0x${string}`;
+     version: "1";
+  };
+  message: {
+     commentId: `0x${string}`;
+     message: string;
+     reportee: `0x${string}`;
+  };
+  primaryType: "ReportComment";
+  types: {
+     ReportComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "reportee";
+        type: "address";
+      }
+        | {
+        name: "message";
+        type: "string";
+     })[];
+  };
+};
+```
+
+Defined in: [packages/sdk/src/comments/comment.ts:990](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L990)
+
+Create the EIP-712 typed data structure for reporting a comment
+
+## Parameters
+
+### params
+
+[`CreateReportCommentTypedDataParams`](/sdk-reference/comments/type-aliases/CreateReportCommentTypedDataParams.mdx)
+
+## Returns
+
+```ts
+{
+  domain: {
+     chainId: number;
+     name: "Ethereum Comments Protocol";
+     verifyingContract: `0x${string}`;
+     version: "1";
+  };
+  message: {
+     commentId: `0x${string}`;
+     message: string;
+     reportee: `0x${string}`;
+  };
+  primaryType: "ReportComment";
+  types: {
+     ReportComment: (
+        | {
+        name: "commentId";
+        type: "bytes32";
+      }
+        | {
+        name: "reportee";
+        type: "address";
+      }
+        | {
+        name: "message";
+        type: "string";
+     })[];
+  };
+}
+```
+
+The typed data
+
+### domain
+
+```ts
+domain: {
+  chainId: number;
+  name: "Ethereum Comments Protocol";
+  verifyingContract: `0x${string}`;
+  version: "1";
+};
+```
+
+#### domain.chainId
+
+```ts
+chainId: number;
+```
+
+#### domain.name
+
+```ts
+name: "Ethereum Comments Protocol";
+```
+
+#### domain.verifyingContract
+
+```ts
+verifyingContract: `0x${string}` = HexSchema;
+```
+
+#### domain.version
+
+```ts
+version: "1";
+```
+
+### message
+
+```ts
+message: {
+  commentId: `0x${string}`;
+  message: string;
+  reportee: `0x${string}`;
+};
+```
+
+#### message.commentId
+
+```ts
+commentId: `0x${string}` = HexSchema;
+```
+
+#### message.message
+
+```ts
+message: string;
+```
+
+#### message.reportee
+
+```ts
+reportee: `0x${string}` = HexSchema;
+```
+
+### primaryType
+
+```ts
+primaryType: "ReportComment";
+```
+
+### types
+
+```ts
+types: {
+  ReportComment: (
+     | {
+     name: "commentId";
+     type: "bytes32";
+   }
+     | {
+     name: "reportee";
+     type: "address";
+   }
+     | {
+     name: "message";
+     type: "string";
+  })[];
+};
+```
+
+#### types.ReportComment
+
+```ts
+ReportComment: (
+  | {
+  name: "commentId";
+  type: "bytes32";
+}
+  | {
+  name: "reportee";
+  type: "address";
+}
+  | {
+  name: "message";
+  type: "string";
+})[];
+```

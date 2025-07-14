@@ -13,6 +13,10 @@ import { setupChangeCommentModerationStatus } from "./moderate-comments/[comment
 import { setupGetComment } from "./moderate-comments/[commentId]/get";
 import { setupWebhook } from "./webhook/post";
 import { setupGetAutocomplete } from "./autocomplete/get";
+import { setupReportComment } from "./comments/[commentId]/reports/post";
+import { setupGetReports } from "./reports/get";
+import { setupGetReport } from "./reports/[reportId]/get";
+import { setupPatchReport } from "./reports/[reportId]/patch";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -29,6 +33,10 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupGetComment(app);
   setupWebhook(app);
   setupGetAutocomplete(app);
+  setupReportComment(app);
+  setupGetReports(app);
+  setupGetReport(app);
+  setupPatchReport(app);
 
   return app;
 }

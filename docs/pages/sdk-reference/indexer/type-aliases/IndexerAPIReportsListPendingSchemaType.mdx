@@ -1,0 +1,88 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPIReportsListPendingSchemaType
+
+# Type Alias: IndexerAPIReportsListPendingSchemaType
+
+```ts
+type IndexerAPIReportsListPendingSchemaType = {
+  pagination: {
+     endCursor?: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor?: `0x${string}`;
+  };
+  results: {
+     commentId: `0x${string}`;
+     createdAt: Date;
+     id: string;
+     message: string;
+     reportee: `0x${string}`;
+     status: "pending" | "resolved" | "closed";
+     updatedAt: Date;
+  }[];
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:631](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L631)
+
+## Type declaration
+
+### pagination
+
+```ts
+pagination: {
+  endCursor?: `0x${string}`;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  limit: number;
+  startCursor?: `0x${string}`;
+} = IndexerAPICursorPaginationSchema;
+```
+
+#### pagination.endCursor?
+
+```ts
+optional endCursor: `0x${string}`;
+```
+
+#### pagination.hasNext
+
+```ts
+hasNext: boolean;
+```
+
+#### pagination.hasPrevious
+
+```ts
+hasPrevious: boolean;
+```
+
+#### pagination.limit
+
+```ts
+limit: number;
+```
+
+#### pagination.startCursor?
+
+```ts
+optional startCursor: `0x${string}`;
+```
+
+### results
+
+```ts
+results: {
+  commentId: `0x${string}`;
+  createdAt: Date;
+  id: string;
+  message: string;
+  reportee: `0x${string}`;
+  status: "pending" | "resolved" | "closed";
+  updatedAt: Date;
+}[];
+```

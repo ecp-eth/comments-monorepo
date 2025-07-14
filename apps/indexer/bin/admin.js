@@ -436,4 +436,156 @@ moderateComments
     }
   });
 
+const reports = new Command("reports")
+  .description("Manage comment reports")
+  .requiredOption("-i, --id <id>", "The ID of the API key to use")
+  .requiredOption("-k, --private-key <key>", "The private key of the API key")
+  .option(
+    "-u, --url <url>",
+    "The URL of indexer",
+    urlOptionValidator,
+    "https://api.ethcomments.xyz",
+  );
+
+program.addCommand(reports);
+
+reports
+  .command("list")
+  .description("Lists pending reports")
+  .action(async () => {
+    const { id, privateKey, url } = reports.opts();
+
+    try {
+      const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/reports`, url);
+
+      const response = await fetch(endpointUrl, {
+        headers: {
+          "X-API-Key": id,
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "GET",
+            endpointUrl,
+            "",
+            timestamp,
+          ),
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to list reports:", error);
+        process.exit(1);
+      }
+
+      /**
+       * @type {import('@ecp.eth/sdk/indexer/schemas').IndexerAPIReportsListPendingOutputSchemaType}
+       */
+      const result = await response.json();
+
+      for (const report of result.results) {
+        console.group(`Report by ${report.reportee}`);
+        console.table([
+          {
+            "Report ID": report.id,
+            "Created At": report.createdAt,
+            Reportee: report.reportee,
+          },
+        ]);
+        console.log("Message----------");
+        console.log(report.message || "No message");
+        console.log("----------");
+        console.groupEnd();
+      }
+    } catch (error) {
+      console.error("Failed to list reports:", error);
+      process.exit(1);
+    }
+  });
+
+reports
+  .command("close")
+  .description("Close a report")
+  .argument("<reportId>", "The ID of the report to close")
+  .action(async (reportId) => {
+    const { id, privateKey, url } = reports.opts();
+
+    try {
+      const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/reports/${reportId}`, url);
+      const body = JSON.stringify({ status: "closed" });
+
+      const response = await fetch(endpointUrl, {
+        method: "PATCH",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": id,
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "PATCH",
+            endpointUrl,
+            body,
+            timestamp,
+          ),
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to close report:", error);
+        process.exit(1);
+      }
+
+      console.log("Successfully closed report:", reportId);
+    } catch (error) {
+      console.error("Failed to close report:", error);
+      process.exit(1);
+    }
+  });
+
+reports
+  .command("resolve")
+  .description("Resolve a report")
+  .argument("<reportId>", "The ID of the report to resolve")
+  .action(async (reportId) => {
+    const { id, privateKey, url } = reports.opts();
+
+    try {
+      const timestamp = Date.now();
+      const endpointUrl = new URL(`/api/reports/${reportId}`, url);
+      const body = JSON.stringify({ status: "resolved" });
+
+      const response = await fetch(endpointUrl, {
+        method: "PATCH",
+        body,
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": id,
+          "X-API-Timestamp": timestamp.toString(),
+          "X-API-Signature": await createRequestSignature(
+            privateKey,
+            "PATCH",
+            endpointUrl,
+            body,
+            timestamp,
+          ),
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Failed to resolve report:", error);
+        process.exit(1);
+      }
+
+      console.log("Successfully resolved report:", reportId);
+    } catch (error) {
+      console.error("Failed to resolve report:", error);
+      process.exit(1);
+    }
+  });
+
 program.parse(process.argv);

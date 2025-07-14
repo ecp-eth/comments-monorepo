@@ -1,0 +1,130 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / ReportCommentOptions
+
+# Type Alias: ReportCommentOptions
+
+```ts
+type ReportCommentOptions = {
+  apiUrl?: string;
+  chainId: number;
+  commentId: Hex;
+  message?: string;
+  reportee: Hex;
+  retries?: number;
+  signal?: AbortSignal;
+  signature: Hex;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:868](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L868)
+
+The options for `reportComment()`
+
+## Properties
+
+### apiUrl?
+
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:894](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L894)
+
+URL on which /api/comments/$commentId/reports endpoint will be called
+
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+***
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:888](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L888)
+
+The chain ID where the comment was posted
+
+***
+
+### commentId
+
+```ts
+commentId: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:872](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L872)
+
+The ID of the comment to report
+
+***
+
+### message?
+
+```ts
+optional message: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:880](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L880)
+
+Optional message explaining the reason for the report
+
+***
+
+### reportee
+
+```ts
+reportee: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:876](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L876)
+
+The address of the user reporting the comment
+
+***
+
+### retries?
+
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:900](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L900)
+
+Number of times to retry the operation in case of failure.
+
+#### Default
+
+```ts
+3
+```
+
+***
+
+### signal?
+
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:901](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L901)
+
+***
+
+### signature
+
+```ts
+signature: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:884](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L884)
+
+The signature of the report typed data

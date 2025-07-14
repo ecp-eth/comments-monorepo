@@ -7,7 +7,7 @@ import {
 import { getMutedAccount } from "../management/services/muted-accounts";
 import schema from "ponder:schema";
 import { getAddress } from "viem";
-import { commentModerationService } from "../management/services";
+import { commentModerationService } from "../services";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
 import {

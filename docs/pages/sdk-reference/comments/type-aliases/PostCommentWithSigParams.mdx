@@ -17,7 +17,7 @@ type PostCommentWithSigParams = {
 };
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:113](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L113)
+Defined in: [packages/sdk/src/comments/comment.ts:117](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L117)
 
 ## Properties
 
@@ -27,7 +27,7 @@ Defined in: [packages/sdk/src/comments/comment.ts:113](https://github.com/ecp-et
 appSignature: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:123](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L123)
+Defined in: [packages/sdk/src/comments/comment.ts:127](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L127)
 
 The app signature
 
@@ -39,7 +39,7 @@ The app signature
 optional authorSignature: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:127](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L127)
+Defined in: [packages/sdk/src/comments/comment.ts:131](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L131)
 
 The author signature. Necessary if the author hasn't approved the signer to post comments on their behalf.
 
@@ -51,7 +51,7 @@ The author signature. Necessary if the author hasn't approved the signer to post
 comment: CommentInputData;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:119](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L119)
+Defined in: [packages/sdk/src/comments/comment.ts:123](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L123)
 
 The comment data
 
@@ -65,7 +65,7 @@ You can obtain this by using the `createCommentData()` function
 optional commentsAddress: Hex;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:136](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L136)
+Defined in: [packages/sdk/src/comments/comment.ts:140](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L140)
 
 The address of the comments contract
 
@@ -83,7 +83,7 @@ COMMENT_MANAGER_ADDRESS
 optional fee: bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:131](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L131)
+Defined in: [packages/sdk/src/comments/comment.ts:135](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L135)
 
 The fee for the comment
 
@@ -95,6 +95,6 @@ The fee for the comment
 writeContract: ContractWriteFunctions["postCommentWithSig"];
 ```
 
-Defined in: [packages/sdk/src/comments/comment.ts:140](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L140)
+Defined in: [packages/sdk/src/comments/comment.ts:144](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/comment.ts#L144)
 
 The write contract function

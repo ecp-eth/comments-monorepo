@@ -1,0 +1,82 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [core](/sdk-reference/core/index.mdx) / RunAsyncOptions
+
+# Type Alias: RunAsyncOptions
+
+```ts
+type RunAsyncOptions = {
+  backoff?:   | {
+     delay: number;
+     type: "exponential";
+   }
+     | {
+     delay: number;
+     type: "constant";
+   }
+     | {
+     type: "none";
+   };
+  retries?: number;
+  signal?: AbortSignal;
+};
+```
+
+Defined in: [packages/sdk/src/core/utils.ts:126](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L126)
+
+## Properties
+
+### backoff?
+
+```ts
+optional backoff: 
+  | {
+  delay: number;
+  type: "exponential";
+}
+  | {
+  delay: number;
+  type: "constant";
+}
+  | {
+  type: "none";
+};
+```
+
+Defined in: [packages/sdk/src/core/utils.ts:142](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L142)
+
+The backoff strategy to use.
+
+#### Default
+
+```ts
+{ type: "none" }
+```
+
+***
+
+### retries?
+
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/core/utils.ts:136](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L136)
+
+The number of times to retry the function in case of failure.
+
+If omitted, the function won't be retried.
+
+***
+
+### signal?
+
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/core/utils.ts:130](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L130)
+
+The signal to abort the function.

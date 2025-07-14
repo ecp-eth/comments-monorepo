@@ -10,6 +10,7 @@ import type {
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { CommentModerationClassfierResult } from "../../services/types";
+import { CommentNotFoundError } from "../../services/errors";
 
 type ModerationStatus = "pending" | "approved" | "rejected";
 
@@ -194,15 +195,58 @@ export class CommentModerationService {
     };
   }
 
-  async updateModerationStatus(
-    commentId: Hex,
-    status: ModerationStatus,
-  ): Promise<CommentSelectType | undefined> {
-    return this.premoderationService.updateStatus(commentId, status);
+  async updateModerationStatus({
+    commentId,
+    messageId,
+    status,
+  }: {
+    commentId: Hex;
+    messageId: number | undefined;
+    status: ModerationStatus;
+  }): Promise<CommentSelectType> {
+    const comment = await this.premoderationService.updateStatus(
+      commentId,
+      status,
+    );
+
+    if (!comment) {
+      throw new CommentNotFoundError(commentId);
+    }
+
+    if (messageId) {
+      await this.notificationService.updateMessageWithModerationStatus(
+        messageId,
+        comment,
+      );
+    }
+
+    return comment;
   }
 
-  async getComment(commentId: Hex): Promise<CommentSelectType | undefined> {
-    return this.commentDbService.getCommentById(commentId);
+  async requestStatusChange(messageId: number, commentId: Hex): Promise<void> {
+    const comment = await this.commentDbService.getCommentById(commentId);
+
+    if (!comment) {
+      throw new CommentNotFoundError(commentId);
+    }
+
+    await this.notificationService.updateMessageWithChangeAction(
+      messageId,
+      comment,
+    );
+  }
+
+  async cancelStatusChange(messageId: number, commentId: Hex): Promise<void> {
+    const comment = await this.commentDbService.getCommentById(commentId);
+
+    if (!comment) {
+      throw new CommentNotFoundError(commentId);
+    }
+
+    await this.notificationService.updateMessageWithModerationStatus(
+      messageId,
+      comment,
+    );
   }
 
   private createReactionModerationStatusResult(): ModerationStatusResult {
@@ -282,7 +326,7 @@ export class CommentModerationService {
     references: IndexerAPICommentReferencesSchemaType;
     classifierResult: CommentModerationClassfierResult;
   }) {
-    return this.notificationService.notifyAutomaticClassification(
+    return this.notificationService.notifyAutomaticallyClassified(
       {
         comment: {
           channelId: comment.channelId,
@@ -311,7 +355,7 @@ export class CommentModerationService {
     references: IndexerAPICommentReferencesSchemaType;
     classifierResult: CommentModerationClassfierResult;
   }) {
-    return this.notificationService.notifyAutomaticClassification(
+    return this.notificationService.notifyAutomaticallyClassified(
       {
         messageId,
         comment: {

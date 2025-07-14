@@ -108,3 +108,8 @@ export const INDEXER_API_URL = "https://api.ethcomments.xyz";
  * This is bytes32(0)
  */
 export const EMPTY_PARENT_ID = toHex(0, { size: 32 });
+
+/**
+ * The maximum length of a message for comment report.
+ */
+export const MAX_COMMENT_REPORT_MESSAGE_LENGTH = 200;

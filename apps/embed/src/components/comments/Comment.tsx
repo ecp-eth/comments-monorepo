@@ -22,11 +22,15 @@ import {
   useEmbedConfig,
 } from "../EmbedConfigProvider";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import {
   CommentText,
   CommentMediaReferences,
 } from "@ecp.eth/shared/components";
+import { publicEnv } from "@/publicEnv";
+import Link from "next/link";
+import { useConnectAccount } from "@ecp.eth/shared/hooks";
+import { useReportCommentDialog } from "./ReportCommentDialogProvider";
 
 export type OnRetryPostComment = (
   comment: CommentType,
@@ -57,6 +61,23 @@ export function Comment({
   const { currentTimestamp } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const { address: connectedAddress } = useAccount();
+  const connectAccount = useConnectAccount();
+  const { open } = useReportCommentDialog();
+
+  const connectBeforeAction = useCallback(
+    <TParams extends unknown[]>(
+      action: (...args: TParams) => Promise<unknown> | unknown,
+    ) => {
+      return async (...args: TParams) => {
+        if (!connectedAddress) {
+          await connectAccount();
+        }
+
+        await action(...args);
+      };
+    },
+    [connectAccount, connectedAddress],
+  );
 
   const references = useMemo(() => {
     if (
@@ -92,34 +113,56 @@ export function Comment({
           currentTimestamp={currentTimestamp}
           moderationStatus={comment.moderationStatus}
         />
-        {isAuthor &&
-          !comment.deletedAt &&
-          (!comment.pendingOperation ||
-            comment.pendingOperation.state.status === "success") && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="p-1 text-muted-foreground">
-                  <MoreVertical className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="apply-theme">
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={onEditClick}
-                  disabled={isEditing}
-                >
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-destructive cursor-pointer"
-                  onClick={onDeleteClick}
-                  disabled={isDeleting}
-                >
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="p-1 text-muted-foreground">
+              <MoreVertical className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="apply-theme">
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={connectBeforeAction(() => {
+                open(comment);
+              })}
+            >
+              Report
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer" asChild>
+              <Link
+                href={publicEnv.NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL.replace(
+                  "{txHash}",
+                  comment.txHash,
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View on block explorer
+              </Link>
+            </DropdownMenuItem>
+            {isAuthor &&
+              !comment.deletedAt &&
+              (!comment.pendingOperation ||
+                comment.pendingOperation.state.status === "success") && (
+                <>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={onEditClick}
+                    disabled={isEditing}
+                  >
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-destructive cursor-pointer"
+                    onClick={onDeleteClick}
+                    disabled={isDeleting}
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </>
+              )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <CommentText
         className={cn(

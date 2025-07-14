@@ -1,11 +1,13 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { APIErrorResponseSchema } from "../../lib/schemas";
 
-import { moderationNotificationsService } from "../../services";
+import {
+  commentReportsService,
+  telegramNotificationsService,
+} from "../../services";
 import { HTTPException } from "hono/http-exception";
-import { CommentSelectType } from "ponder:schema";
 import { MAX_WEBHOOK_REQUEST_AGE_IN_MS } from "../../lib/constants";
-import { commentModerationService } from "../../management/services";
+import { commentModerationService } from "../../services";
 
 const webhookRequestBodySchema = z.object({
   callback_query: z.object({
@@ -60,7 +62,7 @@ export function setupWebhook(app: OpenAPIHono) {
 
     try {
       const command =
-        moderationNotificationsService.decryptWebhookCallbackData(data);
+        telegramNotificationsService.decryptWebhookCallbackData(data);
 
       if (Date.now() - command.timestamp > MAX_WEBHOOK_REQUEST_AGE_IN_MS) {
         throw new HTTPException(400, {
@@ -68,73 +70,93 @@ export function setupWebhook(app: OpenAPIHono) {
         });
       }
 
-      let comment: CommentSelectType | undefined;
-
       switch (command.action) {
-        case "approve":
-          comment = await commentModerationService.updateModerationStatus(
-            command.commentId,
-            "approved",
-          );
+        case "moderation-set-as-approved":
+          await commentModerationService.updateModerationStatus({
+            commentId: command.commentId,
+            messageId: message.message_id,
+            status: "approved",
+          });
+
           break;
-        case "reject":
-          comment = await commentModerationService.updateModerationStatus(
-            command.commentId,
-            "rejected",
-          );
+        case "moderation-set-as-rejected":
+          await commentModerationService.updateModerationStatus({
+            commentId: command.commentId,
+            messageId: message.message_id,
+            status: "rejected",
+          });
+
           break;
-        case "pending":
-          comment = await commentModerationService.updateModerationStatus(
+        case "moderation-set-as-pending":
+          await commentModerationService.updateModerationStatus({
+            commentId: command.commentId,
+            messageId: message.message_id,
+            status: "pending",
+          });
+
+          break;
+        case "moderation-change-status":
+          await commentModerationService.requestStatusChange(
+            message.message_id,
             command.commentId,
+          );
+
+          break;
+        case "moderation-cancel":
+          await commentModerationService.cancelStatusChange(
+            message.message_id,
+            command.commentId,
+          );
+
+          return c.newResponse(null, 204);
+        case "report-set-as-resolved": {
+          await commentReportsService.changeStatus(
+            message.message_id,
+            command.reportId,
+            "resolved",
+          );
+
+          break;
+        }
+        case "report-set-as-closed": {
+          await commentReportsService.changeStatus(
+            message.message_id,
+            command.reportId,
+            "closed",
+          );
+
+          break;
+        }
+        case "report-set-as-pending": {
+          await commentReportsService.changeStatus(
+            message.message_id,
+            command.reportId,
             "pending",
           );
+
           break;
-        case "change":
-          comment = await commentModerationService.getComment(
-            command.commentId,
+        }
+        case "report-change-status": {
+          await commentReportsService.requestStatusChange(
+            message.message_id,
+            command.reportId,
           );
 
-          if (comment) {
-            await moderationNotificationsService.updateMessageWithChangeAction(
-              message.message_id,
-              comment,
-            );
-
-            return c.newResponse(null, 204);
-          }
-
           break;
-        case "cancel":
-          comment = await commentModerationService.getComment(
-            command.commentId,
+        }
+        case "report-cancel": {
+          await commentReportsService.cancelStatusChange(
+            message.message_id,
+            command.reportId,
           );
 
-          if (comment) {
-            await moderationNotificationsService.updateMessageWithModerationStatus(
-              message.message_id,
-              comment,
-            );
-
-            return c.newResponse(null, 204);
-          }
-
           break;
+        }
         default:
           throw new HTTPException(400, {
             message: "Invalid action",
           });
       }
-
-      if (!comment) {
-        throw new HTTPException(404, {
-          message: "Comment not found",
-        });
-      }
-
-      await moderationNotificationsService.updateMessageWithModerationStatus(
-        message.message_id,
-        comment,
-      );
 
       return c.newResponse(null, 204);
     } catch (error) {
