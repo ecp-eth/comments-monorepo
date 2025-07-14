@@ -1,5 +1,15 @@
 # @ecp.eth/shared
 
+## 0.0.11
+
+### Patch Changes
+
+- 1a07eea: feat: moderation content classification
+- Updated dependencies [1a07eea]
+- Updated dependencies [031b30c]
+- Updated dependencies [74cc5ec]
+  - @ecp.eth/sdk@0.0.23
+
 ## 0.0.10
 
 ### Patch Changes
