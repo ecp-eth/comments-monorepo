@@ -13,7 +13,7 @@ type IndexerAPIReportOutputSchemaType = {
   id: string;
   message: string;
   reportee: `0x${string}`;
-  status: "pending" | "closed" | "resolved";
+  status: "pending" | "resolved" | "closed";
   updatedAt: string;
 };
 ```
@@ -55,7 +55,7 @@ reportee: `0x${string}` = HexSchema;
 ### status
 
 ```ts
-status: "pending" | "closed" | "resolved" = IndexerAPIReportStatusSchema;
+status: "pending" | "resolved" | "closed" = IndexerAPIReportStatusSchema;
 ```
 
 ### updatedAt

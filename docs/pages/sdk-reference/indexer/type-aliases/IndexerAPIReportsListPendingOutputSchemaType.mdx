@@ -21,7 +21,7 @@ type IndexerAPIReportsListPendingOutputSchemaType = {
      id: string;
      message: string;
      reportee: `0x${string}`;
-     status: "pending" | "closed" | "resolved";
+     status: "pending" | "resolved" | "closed";
      updatedAt: string;
   }[];
 };
@@ -82,7 +82,7 @@ results: {
   id: string;
   message: string;
   reportee: `0x${string}`;
-  status: "pending" | "closed" | "resolved";
+  status: "pending" | "resolved" | "closed";
   updatedAt: string;
 }[];
 ```
