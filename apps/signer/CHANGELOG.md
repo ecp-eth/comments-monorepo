@@ -1,5 +1,15 @@
 # @ecp.eth/signer
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [1a07eea]
+- Updated dependencies [031b30c]
+- Updated dependencies [74cc5ec]
+  - @ecp.eth/shared@0.0.11
+  - @ecp.eth/sdk@0.0.23
+
 ## 0.1.1
 
 ### Patch Changes

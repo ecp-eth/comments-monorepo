@@ -1,5 +1,13 @@
 # @ecp.eth/sdk
 
+## 0.0.23
+
+### Patch Changes
+
+- 1a07eea: feat: moderation content classification
+- 031b30c: fix(sdk): default embed to base mainnet
+- 74cc5ec: chore: remove effect dependency
+
 ## 0.0.22
 
 ### Patch Changes
