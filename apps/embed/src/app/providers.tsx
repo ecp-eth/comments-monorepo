@@ -13,6 +13,10 @@ import {
   EmbedConfigProviderByTargetURIConfig,
   EmbedConfigProviderByRepliesConfig,
 } from "@/components/EmbedConfigProvider";
+import {
+  ReportCommentDialogProvider,
+  ReportCommentDialogRenderer,
+} from "@/components/comments/ReportCommentDialogProvider";
 
 const queryClient = new QueryClient();
 
@@ -42,7 +46,10 @@ export function Providers<
           <WagmiProvider config={wagmiConfig} initialState={initialState}>
             <RainbowKitProvider>
               <PendingWalletConnectionActionsProvider>
-                {children}
+                <ReportCommentDialogProvider>
+                  {children}
+                  <ReportCommentDialogRenderer />
+                </ReportCommentDialogProvider>
               </PendingWalletConnectionActionsProvider>
             </RainbowKitProvider>
           </WagmiProvider>

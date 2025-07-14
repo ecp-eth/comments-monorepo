@@ -4,6 +4,7 @@ import {
   DEFAULT_CHANNEL_ID,
   DEFAULT_COMMENT_TYPE,
   EMPTY_PARENT_ID,
+  MAX_COMMENT_REPORT_MESSAGE_LENGTH,
 } from "../constants.js";
 import { HexSchema, type Hex } from "../core/schemas.js";
 import { CommentManagerABI } from "../abis.js";
@@ -977,7 +978,7 @@ export type CreateReportCommentTypedDataParams = {
 const CreateReportCommentTypedDataParamsSchema = z.object({
   commentId: HexSchema,
   reportee: HexSchema,
-  message: z.string().max(200).optional(),
+  message: z.string().max(MAX_COMMENT_REPORT_MESSAGE_LENGTH).optional(),
   chainId: z.number(),
   commentsAddress: HexSchema.default(COMMENT_MANAGER_ADDRESS),
 });

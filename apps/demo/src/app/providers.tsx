@@ -6,6 +6,10 @@ import { getConfig } from "../lib/wagmi";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { useState, useMemo } from "react";
 import { PendingWalletConnectionActionsProvider } from "@ecp.eth/shared/components";
+import {
+  ReportCommentDialogProvider,
+  ReportCommentDialogRenderer,
+} from "@/components/comments/core/ReportCommentDialogProvider";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +34,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <WagmiProvider config={config} initialState={initialState}>
         <RainbowKitProvider>
           <PendingWalletConnectionActionsProvider>
-            {children}
+            <ReportCommentDialogProvider>
+              {children}
+              <ReportCommentDialogRenderer />
+            </ReportCommentDialogProvider>
           </PendingWalletConnectionActionsProvider>
         </RainbowKitProvider>
       </WagmiProvider>

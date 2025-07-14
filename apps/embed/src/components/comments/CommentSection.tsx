@@ -33,10 +33,6 @@ import { createRootCommentsQueryKey } from "./queries";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { cn } from "@ecp.eth/shared/helpers";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
-import {
-  ReportCommentDialogProvider,
-  ReportCommentDialogRenderer,
-} from "./ReportCommentDialogProvider";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -134,53 +130,48 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   }, [data]);
 
   return (
-    <ReportCommentDialogProvider>
-      <div
-        className={cn("mx-auto", restrictMaximumContainerWidth && "max-w-2xl")}
-      >
-        <h2 className="text-headline font-bold mb-4 text-foreground">
-          Comments
-        </h2>
-        <div className="mb-4">
-          <CommentForm />
-        </div>
-        {isLoading && <LoadingScreen />}
-        {error && (
-          <ErrorScreen
-            description="Failed to load comments. Please try again."
-            onRetry={() => refetch()}
-          />
-        )}
-        {isSuccess && (
-          <>
-            {hasNewComments && (
-              <Button
-                className="mb-4"
-                onClick={() => fetchNewComments()}
-                variant="secondary"
-                size="sm"
-              >
-                Load new comments
-              </Button>
-            )}
-            {results.length === 0 && <NoCommentsScreen />}
-            {results.map((comment) => (
-              <CommentItem comment={comment} key={comment.id} />
-            ))}
-            {hasNextPage && (
-              <Button
-                onClick={() => fetchNextPage()}
-                variant="secondary"
-                size="sm"
-              >
-                Load more
-              </Button>
-            )}
-          </>
-        )}
-        {!disablePromotion && <PoweredBy className="mt-4" />}
+    <div
+      className={cn("mx-auto", restrictMaximumContainerWidth && "max-w-2xl")}
+    >
+      <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
+      <div className="mb-4">
+        <CommentForm />
       </div>
-      <ReportCommentDialogRenderer />
-    </ReportCommentDialogProvider>
+      {isLoading && <LoadingScreen />}
+      {error && (
+        <ErrorScreen
+          description="Failed to load comments. Please try again."
+          onRetry={() => refetch()}
+        />
+      )}
+      {isSuccess && (
+        <>
+          {hasNewComments && (
+            <Button
+              className="mb-4"
+              onClick={() => fetchNewComments()}
+              variant="secondary"
+              size="sm"
+            >
+              Load new comments
+            </Button>
+          )}
+          {results.length === 0 && <NoCommentsScreen />}
+          {results.map((comment) => (
+            <CommentItem comment={comment} key={comment.id} />
+          ))}
+          {hasNextPage && (
+            <Button
+              onClick={() => fetchNextPage()}
+              variant="secondary"
+              size="sm"
+            >
+              Load more
+            </Button>
+          )}
+        </>
+      )}
+      {!disablePromotion && <PoweredBy className="mt-4" />}
+    </div>
   );
 }
