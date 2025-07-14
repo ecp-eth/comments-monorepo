@@ -29,21 +29,21 @@ if (!(chain.id in SUPPORTED_CHAINS)) {
 export const supportedChains = {
   [prodChain.id]: {
     chain: prodChain,
-    transport: http(publicEnv.NEXT_PUBLIC_RPC_URL),
+    publicTransport: http(publicEnv.NEXT_PUBLIC_RPC_URL),
   },
   [anvil.id]: {
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    publicTransport: http("http://localhost:8545"),
   },
 };
 
-export const transport = supportedChains[chain.id].transport;
+export const publicTransport = supportedChains[chain.id].publicTransport;
 
 export const getConfig = () =>
   getDefaultConfig({
     chains: [chain],
     transports: {
-      [chain.id]: transport,
+      [chain.id]: publicTransport,
     },
     ssr: true,
     appName: "Comment App",

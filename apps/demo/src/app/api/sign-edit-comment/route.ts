@@ -13,7 +13,7 @@ import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
-import { chain, transport } from "@/lib/wagmi";
+import { chain, privateTransport } from "@/lib/serverWagmi";
 import { createPublicClient } from "viem";
 import { SignEditCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 
@@ -87,7 +87,7 @@ export async function POST(
   const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
   const publicClient = createPublicClient({
     chain,
-    transport,
+    transport: privateTransport,
   });
   const nonce = await getNonce({
     author,

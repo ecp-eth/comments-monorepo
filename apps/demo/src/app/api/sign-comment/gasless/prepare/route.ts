@@ -8,7 +8,7 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
-import { chain, transport } from "@/lib/wagmi";
+import { chain, privateTransport } from "@/lib/serverWagmi";
 import {
   createCommentData,
   createCommentTypedData,
@@ -118,7 +118,7 @@ export async function POST(
     const walletClient = createWalletClient({
       account: submitterAccount,
       chain,
-      transport,
+      transport: privateTransport,
     }).extend(publicActions);
 
     // Check approval on chain

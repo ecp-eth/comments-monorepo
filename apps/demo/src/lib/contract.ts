@@ -1,6 +1,6 @@
 import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
 import { Address, Chain, PublicClient, Transport } from "viem";
-import { chain } from "@/lib/wagmi";
+import { chain } from "@/lib/clientWagmi";
 import { publicEnv } from "@/publicEnv";
 
 export async function getApprovalStatusAndNonce<

@@ -13,7 +13,7 @@ import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { signCommentRateLimiter } from "@/services/rate-limiter";
-import { chain } from "@/lib/wagmi";
+import { chain } from "@/lib/clientWagmi";
 
 const chainId = chain.id;
 

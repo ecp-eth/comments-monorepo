@@ -20,7 +20,7 @@ import {
   InvalidCommentError,
   throwKnownResponseCodeError,
 } from "@ecp.eth/shared/errors";
-import { chain } from "@/lib/wagmi";
+import { chain } from "@/lib/clientWagmi";
 import type {
   Comment,
   PendingEditCommentOperationSchemaType,

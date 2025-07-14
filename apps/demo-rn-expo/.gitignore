@@ -1,0 +1,15 @@
+# Expo
+.expo
+web-build
+expo-env.d.ts
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+# let's don't commit ejected expo code for now, waiting for expo v0.53 to be fully released
+ios
+app.json

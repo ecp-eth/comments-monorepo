@@ -51,6 +51,7 @@ const EnableSwappingSchema = z.discriminatedUnion(
 
 const EnvSchema = z
   .object({
+    PRIVATE_RPC_URL: z.string().url().optional(),
     APP_URL: z.string().url(),
     APP_SIGNER_PRIVATE_KEY: HexSchema,
     KV_REST_API_URL: z.string().url().optional(),
@@ -93,6 +94,7 @@ declare global {
 const parseResult = EnvSchema.safeParse(process.env);
 
 if (!parseResult.success) {
+  console.error(parseResult.error);
   throw new InvalidServerEnvVariablesError(parseResult.error);
 }
 

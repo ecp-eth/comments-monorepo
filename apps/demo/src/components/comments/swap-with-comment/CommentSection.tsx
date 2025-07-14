@@ -21,7 +21,7 @@ import { CommentItem } from "../core/CommentItem";
 import { createRootCommentsQueryKey } from "../core/queries";
 import { useCommentActions } from "./hooks/useCommentActions";
 import { CommentActionsProvider } from "./context";
-import { chain } from "@/lib/wagmi";
+import { chain } from "@/lib/clientWagmi";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { Heading2 } from "../core/Heading2";
 
