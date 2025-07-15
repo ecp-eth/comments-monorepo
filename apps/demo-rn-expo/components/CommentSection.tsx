@@ -24,6 +24,7 @@ import { COMMENT_BOX_AVERAGE_HEIGHT } from "../lib/constants";
 import { useOptimisticCommentingManager } from "../hooks/useOptimisticCommentingManager";
 import { useDeleteComment } from "../hooks/useDeleteComment";
 import { chain } from "../wagmi.config";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 type CommentSectionProps = {
   onReply: (comment: IndexerAPICommentSchemaType) => void;
@@ -65,6 +66,7 @@ export function CommentSection({
           limit: pageParam.limit,
           cursor: pageParam.cursor,
           signal,
+          commentType: COMMENT_TYPE_COMMENT,
         });
       },
       getNextPageParam: (lastPage) => {
