@@ -41,6 +41,7 @@ describe("CommentReportsService", () => {
   const mockCommentDbService: ICommentDbService = {
     getCommentById: vi.fn(),
     updateCommentModerationStatus: vi.fn(),
+    getCommentPendingModeration: vi.fn(),
   };
 
   const mockManagementCommentDbService = {

@@ -87,7 +87,10 @@ const reportChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
               nextStatus,
             );
 
-          const message = renderReport(updatedReport);
+          const message = renderReport(
+            updatedReport,
+            await ctx.resolveAuthor(updatedReport.reportee),
+          );
 
           await ctx.editMessageText(message.text, {
             entities: message.entities,

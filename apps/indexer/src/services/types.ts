@@ -9,6 +9,8 @@ import type { Handler } from "hono";
 
 export type ModerationStatus = "pending" | "approved" | "rejected";
 
+export type ResolveAuthorFunction = (author: Hex) => Promise<string | Hex>;
+
 export type ModerationNotificationServicePendingComment = {
   id: Hex;
   channelId: bigint;
@@ -181,6 +183,7 @@ export interface IPremoderationCacheService {
 }
 
 export interface ICommentDbService {
+  getCommentPendingModeration: () => Promise<CommentSelectType | undefined>;
   getCommentById(commentId: Hex): Promise<CommentSelectType | undefined>;
   updateCommentModerationStatus: (
     commentId: Hex,

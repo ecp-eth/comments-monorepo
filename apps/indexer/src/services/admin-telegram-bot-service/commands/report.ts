@@ -37,7 +37,10 @@ export class ReportCommand implements IAdminTelegramBotServiceCommand {
         );
       }
 
-      const message = renderReport(report);
+      const message = renderReport(
+        report,
+        await ctx.resolveAuthor(report.reportee),
+      );
 
       await ctx.reply(message.text, {
         entities: message.entities,

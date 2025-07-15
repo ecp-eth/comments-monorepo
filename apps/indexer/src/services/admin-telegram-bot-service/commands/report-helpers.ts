@@ -3,6 +3,7 @@ import type { CommentReportStatus } from "../../../management/types";
 import type { CommentReportSelectType } from "../../../management/migrations";
 import { z } from "zod";
 import { parse as parseUUID, stringify as stringifyUUID } from "uuid";
+import type { Hex } from "@ecp.eth/sdk/core";
 
 export function reportStatusToString(status: CommentReportStatus): string {
   switch (status) {
@@ -17,12 +18,18 @@ export function reportStatusToString(status: CommentReportStatus): string {
   }
 }
 
-export function renderReport(report: CommentReportSelectType): FormattedString {
+export function renderReport(
+  report: CommentReportSelectType,
+  reportee: Hex | string,
+): FormattedString {
   return FormattedString.bold("Report ID: ")
     .plain(report.id)
     .plain("\n")
     .bold("Comment ID: ")
     .plain(report.comment_id)
+    .plain("\n")
+    .bold("Reported by: ")
+    .plain(reportee)
     .plain("\n")
     .bold("Status: ")
     .plain(reportStatusToString(report.status))

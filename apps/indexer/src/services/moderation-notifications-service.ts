@@ -8,9 +8,10 @@ import type {
   ModerationNotificationServiceNotifyAutomaticClassificationParams,
   ModerationNotificationsServiceCommentStatus,
   ITelegramNotificationsService,
+  ResolveAuthorFunction,
 } from "./types";
 import type { CommentSelectType } from "ponder:schema";
-import { isZeroHex, type Hex } from "@ecp.eth/sdk/core";
+import { isZeroHex } from "@ecp.eth/sdk/core";
 import { env } from "../env";
 
 class CommentLengthLimitExceededError extends Error {
@@ -23,7 +24,7 @@ class CommentLengthLimitExceededError extends Error {
 type ModerationNotificationsServiceOptions = {
   enabled: boolean;
   telegramNotificationsService: ITelegramNotificationsService;
-  resolveAuthor: (author: Hex) => Promise<string | Hex>;
+  resolveAuthor: ResolveAuthorFunction;
 };
 
 export class ModerationNotificationsService
@@ -31,7 +32,7 @@ export class ModerationNotificationsService
 {
   private enabled: boolean;
   private telegramNotificationsService: ITelegramNotificationsService;
-  private resolveAuthor: (author: Hex) => Promise<string | Hex>;
+  private resolveAuthor: ResolveAuthorFunction;
 
   constructor(options: ModerationNotificationsServiceOptions) {
     this.enabled = options.enabled;

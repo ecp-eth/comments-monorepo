@@ -25,7 +25,10 @@ export class ReportPendingCommand implements IAdminTelegramBotServiceCommand {
         return ctx.reply("✅ No pending reports found.");
       }
 
-      const message = renderReport(report);
+      const message = renderReport(
+        report,
+        await ctx.resolveAuthor(report.reportee),
+      );
 
       // pass report id for menu
       ctx.match = report.id;

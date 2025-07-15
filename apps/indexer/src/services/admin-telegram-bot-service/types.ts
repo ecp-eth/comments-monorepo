@@ -1,5 +1,7 @@
 import type { Bot, Context } from "grammy";
 import type { ManagementCommentDbService } from "../../management/services/comment-db-service";
+import type { CommentDbService } from "../comment-db-service";
+import type { ResolveAuthorFunction } from "../types";
 
 /**
  * We have an enum for all menu ids because grammy uses the id directly in payload and payloads
@@ -8,6 +10,9 @@ import type { ManagementCommentDbService } from "../../management/services/comme
 export enum MenuId {
   REPORT_MAIN_MENU = "0",
   REPORT_CHANGE_STATUS_SUBMENU = "1",
+  MODERATE_MAIN_MENU = "2",
+  MODERATE_CHANGE_STATUS_SUBMENU = "3",
+  MODERATE_COMMENT_PREVIEW_MENU = "4",
 }
 
 export type IAdminTelegramBotServiceCommand_RegisterOptions = {
@@ -30,4 +35,6 @@ export interface IAdminTelegramBotServiceCommand {
 
 export type AdminTelegramBotServiceContext = Context & {
   commentManagementDbService: ManagementCommentDbService;
+  commentDbService: CommentDbService;
+  resolveAuthor: ResolveAuthorFunction;
 };

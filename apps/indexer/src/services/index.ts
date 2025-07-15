@@ -20,6 +20,8 @@ import { AdminTelegramBotService } from "./admin-telegram-bot-service";
 import { StartCommand } from "./admin-telegram-bot-service/commands/start";
 import { ReportCommand } from "./admin-telegram-bot-service/commands/report";
 import { ReportPendingCommand } from "./admin-telegram-bot-service/commands/report-pending";
+import { ModerateCommand } from "./admin-telegram-bot-service/commands/moderate";
+import { ModeratePendingCommand } from "./admin-telegram-bot-service/commands/moderate-pending";
 
 function resolveAuthor(author: Hex): Promise<string | Hex> {
   return ensByAddressResolverService.load(author).then((data) => {
@@ -118,7 +120,11 @@ export const telegramAdminBotService =
           new StartCommand(),
           new ReportCommand(),
           new ReportPendingCommand(),
+          new ModerateCommand(),
+          new ModeratePendingCommand(),
         ],
         commentManagementDbService: managementCommentDbService,
+        commentDbService,
+        resolveAuthor,
       })
     : new NoopAdminBotService();
