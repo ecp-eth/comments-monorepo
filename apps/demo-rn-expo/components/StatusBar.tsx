@@ -25,7 +25,9 @@ export function StatusBar() {
         }}
         style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
       >
-        <Text>Connected to</Text>
+        <Text>
+          {address && isHex(address) ? "Connected to" : "Not connected"}
+        </Text>
         <CurrentNetwork />
       </TouchableOpacity>
     </View>

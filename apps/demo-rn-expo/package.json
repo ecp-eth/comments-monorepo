@@ -11,7 +11,7 @@
     "customize": "expo customize",
     "check-types": "tsc --noEmit",
     "lint": "eslint \"./**/*.{ts,tsx}\"",
-    "api:schema:sync": "scripts/syncAPISchemas.sh"
+    "api:schema:sync": "scripts/sync-api-schemas.sh"
   },
   "dependencies": {
     "@ecp.eth/sdk": "~0.0.23",
