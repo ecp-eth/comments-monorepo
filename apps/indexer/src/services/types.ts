@@ -132,6 +132,7 @@ export interface ICommentClassifierCacheService {
     commentId: Hex,
     result: CommentClassifierCacheServiceResult,
   ): Promise<void>;
+  deleteByCommentId(commentId: Hex): Promise<void>;
 }
 
 export type CommentPremoderationServiceModerateResult = {
