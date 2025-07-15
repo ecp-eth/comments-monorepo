@@ -3,7 +3,7 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "expo start --clear --port 3005",
+    "start": "NODE_ENV=production expo start --clear --port 3005",
     "android": "expo start --android --port 3005",
     "ios": "expo start --ios --port 3005",
     "web": "expo start --web --port 3005",

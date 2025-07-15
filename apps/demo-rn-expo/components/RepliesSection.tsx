@@ -20,6 +20,7 @@ import { publicEnv } from "../env";
 import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
 import { chain } from "../wagmi.config";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 type RepliesSectionProps = {
   rootComment: IndexerAPICommentSchemaType;
@@ -90,6 +91,7 @@ function RepliesSection({
           limit: pageParam.limit,
           cursor: pageParam.cursor,
           signal,
+          commentType: COMMENT_TYPE_COMMENT,
         });
       },
       getNextPageParam: (lastPage) => {

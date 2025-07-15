@@ -14,9 +14,16 @@ const metadata = {
   },
 };
 
-export const chain = publicEnv.NODE_ENV === "production" ? base : anvil;
+export const chain = publicEnv.EXPO_PUBLIC_CHAIN === "base" ? base : anvil;
 export const projectId = publicEnv.EXPO_PUBLIC_REOWN_APP_ID;
-export const transport = http(publicEnv.EXPO_PUBLIC_RPC_URL);
+export const transport = http(publicEnv.EXPO_PUBLIC_RPC_URL, {
+  fetchOptions: {
+    headers: {
+      // the RPC URL used by api might has restricted origin
+      Origin: publicEnv.EXPO_PUBLIC_API_URL,
+    },
+  },
+});
 
 export const config = defaultWagmiConfig({
   chains: [chain],
