@@ -13,6 +13,36 @@ const moderationAutomaticClassificationEnabledSchema = z.object({
   MODERATION_MBD_API_KEY: z.string().nonempty(),
 });
 
+const telegramUserIdSchema = z.coerce.number().int().positive();
+const telegramUserIdsRequiredSchema = z.preprocess((val) => {
+  if (typeof val === "string") {
+    return val
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
+  return val;
+}, z.array(telegramUserIdSchema).min(1));
+const telegramUserIdsOptionalSchema = z.preprocess((val) => {
+  if (typeof val === "string") {
+    return val
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
+  return val;
+}, z.array(telegramUserIdSchema).optional());
+
+const adminTelegramBotSchema = z.object({
+  ADMIN_TELEGRAM_BOT_ALLOWED_USER_IDS: telegramUserIdsRequiredSchema,
+  ADMIN_TELEGRAM_BOT_TOKEN: z.string().nonempty(),
+  ADMIN_TELEGRAM_BOT_WEBHOOK_URL: z.string().url(),
+  ADMIN_TELEGRAM_BOT_WEBHOOK_SECRET: z.string().nonempty(),
+  ADMIN_TELEGRAM_BOT_API_ROOT_URL: z.string().url().optional(),
+});
+
 const EnvSchema = z
   .object({
     DATABASE_URL: z.string().url(),
@@ -88,6 +118,17 @@ const EnvSchema = z
       .enum(["0", "1"])
       .default("0")
       .transform((val) => val === "1"),
+
+    ADMIN_TELEGRAM_BOT_ENABLED: z
+      .enum(["0", "1"])
+      .default("0")
+      .transform((val) => val === "1"),
+    ADMIN_TELEGRAM_BOT_ALLOWED_USER_IDS:
+      telegramUserIdsOptionalSchema.optional(),
+    ADMIN_TELEGRAM_BOT_TOKEN: z.string().optional(),
+    ADMIN_TELEGRAM_BOT_WEBHOOK_URL: z.string().url().optional(),
+    ADMIN_TELEGRAM_BOT_WEBHOOK_SECRET: z.string().optional(),
+    ADMIN_TELEGRAM_BOT_API_ROOT_URL: z.string().url().optional(),
   })
   .superRefine((vars, ctx) => {
     if (
@@ -108,6 +149,18 @@ const EnvSchema = z
     if (vars.MODERATION_ENABLE_AUTOMATIC_CLASSIFICATION) {
       const result =
         moderationAutomaticClassificationEnabledSchema.safeParse(vars);
+
+      if (!result.success) {
+        result.error.issues.forEach((issue) => {
+          ctx.addIssue(issue);
+        });
+
+        return z.NEVER;
+      }
+    }
+
+    if (vars.ADMIN_TELEGRAM_BOT_ENABLED) {
+      const result = adminTelegramBotSchema.safeParse(vars);
 
       if (!result.success) {
         result.error.issues.forEach((issue) => {

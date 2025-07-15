@@ -66,3 +66,5 @@ packages/shared/errors
 packages/shared/hooks/*
 packages/shared/services/*
 packages/shared/constants
+
+.envrc

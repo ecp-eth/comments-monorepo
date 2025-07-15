@@ -65,6 +65,10 @@ export class CommentModerationClassifier
         });
 
         if (!response.ok) {
+          console.error(
+            `Failed to classify comments: API returned a non-200 status code ${response.status} (${await response.text()})`,
+          );
+
           throw new Error(
             `Failed to classify comments: API returned a non-200 status code ${response.status} (${response.statusText})`,
           );
