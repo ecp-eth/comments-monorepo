@@ -5,6 +5,137 @@ import { z } from "zod";
 import { parse as parseUUID, stringify as stringifyUUID } from "uuid";
 import type { Hex } from "@ecp.eth/sdk/core";
 
+type ReportCommand =
+  | {
+      action: "init";
+      reportId: string;
+    }
+  | {
+      action: "changeStatus";
+      reportId: string;
+      status: CommentReportStatus;
+    }
+  | {
+      action: "openChangeStatus";
+      reportId: string;
+    }
+  | {
+      action: "back";
+      reportId: string;
+    };
+
+const ACTION_TO_BYTE = {
+  init: 0xfe,
+  changeStatus: 0x01,
+  openChangeStatus: 0x00,
+  back: 0xff,
+} as const;
+
+export function reportCommandToPayload(command: ReportCommand): string {
+  const idBuffer = Buffer.from(parseUUID(command.reportId));
+
+  switch (command.action) {
+    case "openChangeStatus": {
+      const commandBuffer = Buffer.from([ACTION_TO_BYTE.openChangeStatus]);
+
+      return Buffer.concat([commandBuffer, idBuffer]).toString("base64url");
+    }
+    case "changeStatus": {
+      const commandBuffer = Buffer.from([ACTION_TO_BYTE.changeStatus]);
+      const statusBuffer = Buffer.from([reportStatusToByte(command.status)]);
+
+      return Buffer.concat([commandBuffer, idBuffer, statusBuffer]).toString(
+        "base64url",
+      );
+    }
+    case "back": {
+      const commandBuffer = Buffer.from([ACTION_TO_BYTE.back]);
+
+      return Buffer.concat([commandBuffer, idBuffer]).toString("base64url");
+    }
+    case "init": {
+      const commandBuffer = Buffer.from([ACTION_TO_BYTE.init]);
+
+      return Buffer.concat([commandBuffer, idBuffer]).toString("base64url");
+    }
+    default:
+      command satisfies never;
+
+      throw new Error(`Unknown command action`);
+  }
+}
+
+export function reportCommandFromPayload(payload: string): ReportCommand {
+  const buffer = Buffer.from(payload, "base64url");
+  const commandBuffer = buffer.subarray(0, 1);
+
+  if (commandBuffer.length !== 1) {
+    throw new Error("Invalid command length. Expected 1 byte.");
+  }
+
+  const idBuffer = buffer.subarray(1, 17);
+
+  if (idBuffer.length !== 16) {
+    throw new Error("Invalid ID length. Expected 16 bytes.");
+  }
+
+  switch (commandBuffer[0]) {
+    case ACTION_TO_BYTE.openChangeStatus:
+      return {
+        action: "openChangeStatus",
+        reportId: stringifyUUID(idBuffer),
+      };
+    case ACTION_TO_BYTE.changeStatus: {
+      const statusBuffer = buffer.subarray(17, 18);
+
+      if (statusBuffer.length !== 1) {
+        throw new Error("Invalid status length. Expected 1 byte.");
+      }
+      const status = byteToReportStatus(statusBuffer[0]!);
+
+      return {
+        action: "changeStatus",
+        reportId: stringifyUUID(idBuffer),
+        status,
+      };
+    }
+    case ACTION_TO_BYTE.back:
+      return {
+        action: "back",
+        reportId: stringifyUUID(idBuffer),
+      };
+    case ACTION_TO_BYTE.init:
+      return {
+        action: "init",
+        reportId: stringifyUUID(idBuffer),
+      };
+    default:
+      throw new Error(`Unknown command byte: ${commandBuffer[0]}`);
+  }
+}
+
+export const reportCommandParser = z.string().transform((val, ctx) => {
+  if (typeof val !== "string") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Payload must be a base64url encoded string",
+    });
+
+    return z.NEVER;
+  }
+
+  try {
+    return reportCommandFromPayload(val);
+  } catch {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Invalid payload format",
+    });
+
+    return z.NEVER;
+  }
+});
+
 export function reportStatusToString(status: CommentReportStatus): string {
   switch (status) {
     case "pending":
@@ -41,59 +172,6 @@ export function renderReport(
     .plain(report.message.trim() || "<No message>");
 }
 
-export function uuidToPayload(uuid: string): string {
-  return Buffer.from(parseUUID(uuid)).toString("base64url");
-}
-
-export function uuidFromPayload(payload: string): string {
-  return stringifyUUID(Buffer.from(payload, "base64url"));
-}
-
-export const uuidFromBase64OrDirect = z.string().transform((val, ctx) => {
-  if (typeof val !== "string") {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "String must be either a valid UUID or a base64 encoded UUID",
-    });
-
-    return z.NEVER;
-  }
-
-  // First try direct UUID parsing
-  const directUuid = z.string().uuid().safeParse(val);
-
-  if (directUuid.success) {
-    return directUuid.data;
-  }
-
-  // If direct parsing fails, try base64 decoding
-  try {
-    const uuid = uuidFromPayload(val);
-
-    // Validate if the result is actually a UUID
-    const validUuid = z.string().uuid().safeParse(uuid);
-
-    if (validUuid.success) {
-      return validUuid.data;
-    }
-
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "String must be either a valid UUID or a base64 encoded UUID",
-    });
-
-    return z.NEVER;
-  } catch {
-    // If base64 decoding fails or result isn't a valid UUID
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "String must be either a valid UUID or a base64 encoded UUID",
-    });
-
-    return z.NEVER;
-  }
-});
-
 function reportStatusToByte(status: CommentReportStatus): number {
   switch (status) {
     case "pending":
@@ -119,97 +197,3 @@ function byteToReportStatus(byte: number): CommentReportStatus {
       throw new Error(`Unknown byte for report status: ${byte}`);
   }
 }
-
-/**
- * Formats the command for changing the status of a report.
- *
- * It first construct binary that consists of 16B of UUID + 1B for next status and then returns it as base64url encoded string.
- *
- * @param reportId - The ID of the report to change status for.
- * @param nextStatus - The next status to set for the report.
- */
-export function reportChangeStatusCommandToPayload(
-  reportId: string,
-  nextStatus: CommentReportStatus,
-): string {
-  const uuidBuffer = Buffer.from(parseUUID(reportId));
-  const statusBuffer = Buffer.from([reportStatusToByte(nextStatus)]);
-
-  // Concatenate the UUID buffer and the status buffer
-  const combinedBuffer = Buffer.concat([uuidBuffer, statusBuffer]);
-
-  // Return the base64url encoded string
-  return combinedBuffer.toString("base64url");
-}
-
-/**
- * Parses the base64url encoded payload containing the report ID and next status.
- * @param payload - The base64url encoded payload containing the report ID and next status.
- * @returns The report ID and next status.
- */
-export function reportChangeStatusCommandFromPayload(payload: string): {
-  reportId: string;
-  nextStatus: CommentReportStatus;
-} {
-  const buffer = Buffer.from(payload, "base64url");
-
-  if (buffer.length !== 17) {
-    throw new Error("Invalid payload length. Expected 17 bytes.");
-  }
-
-  const uuidBuffer = buffer.subarray(0, 16);
-
-  if (uuidBuffer.length !== 16) {
-    throw new Error("Invalid UUID length. Expected 16 bytes.");
-  }
-
-  const statusBuffer = buffer.subarray(16, 17);
-
-  if (statusBuffer.length !== 1) {
-    throw new Error("Invalid status length. Expected 1 byte.");
-  }
-
-  const reportId = stringifyUUID(uuidBuffer);
-  const nextStatus = byteToReportStatus(statusBuffer[0]!);
-
-  return {
-    reportId,
-    nextStatus,
-  };
-}
-
-export const reportChangeStatusCommandParser = z
-  .string()
-  .transform((val, ctx) => {
-    if (typeof val !== "string") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Payload must be a base64url encoded string",
-      });
-
-      return z.NEVER;
-    }
-
-    try {
-      const command = reportChangeStatusCommandFromPayload(val);
-
-      const { reportId, nextStatus } = z
-        .object({
-          reportId: z.string().uuid(),
-          nextStatus: z.enum(["pending", "resolved", "closed"]),
-        })
-        .parse(command);
-
-      return {
-        reportId,
-        nextStatus,
-      };
-    } catch {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Invalid payload format",
-      });
-
-      return z.NEVER;
-    }
-  });

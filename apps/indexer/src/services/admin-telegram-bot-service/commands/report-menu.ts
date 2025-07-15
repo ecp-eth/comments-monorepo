@@ -3,11 +3,9 @@ import { MenuId, type AdminTelegramBotServiceContext } from "../types";
 import type { CommentReportStatus } from "../../../management/types";
 import {
   renderReport,
-  reportChangeStatusCommandParser,
-  reportChangeStatusCommandToPayload,
+  reportCommandParser,
+  reportCommandToPayload,
   reportStatusToString,
-  uuidFromBase64OrDirect,
-  uuidToPayload,
 } from "./report-helpers";
 import { b, fmt } from "@grammyjs/parse-mode";
 
@@ -18,9 +16,12 @@ export const reportMenu = new Menu<AdminTelegramBotServiceContext>(
     {
       text: "Change status",
       payload(ctx) {
-        const reportId = uuidFromBase64OrDirect.parse(ctx.match);
+        const { reportId } = reportCommandParser.parse(ctx.match);
 
-        return uuidToPayload(reportId);
+        return reportCommandToPayload({
+          action: "openChangeStatus",
+          reportId,
+        });
       },
     },
     MenuId.REPORT_CHANGE_STATUS_SUBMENU,
@@ -33,8 +34,10 @@ const reportChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
   MenuId.REPORT_CHANGE_STATUS_SUBMENU,
 )
   .dynamic(async (ctx, range) => {
-    const reportId = uuidFromBase64OrDirect.parse(ctx.match);
-    const report = await ctx.commentManagementDbService.getReportById(reportId);
+    const command = reportCommandParser.parse(ctx.match);
+    const report = await ctx.commentManagementDbService.getReportById(
+      command.reportId,
+    );
 
     if (!report) {
       return;
@@ -50,24 +53,32 @@ const reportChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
       range.text(
         {
           text: reportStatusToString(status),
-          payload(ctx) {
-            const reportId = uuidFromBase64OrDirect.parse(ctx.match);
-
-            return reportChangeStatusCommandToPayload(reportId, status);
+          payload() {
+            return reportCommandToPayload({
+              action: "changeStatus",
+              reportId: command.reportId,
+              status,
+            });
           },
         },
         async (ctx) => {
-          const { reportId, nextStatus } =
-            reportChangeStatusCommandParser.parse(ctx.match);
+          const command = reportCommandParser.parse(ctx.match);
 
-          const report =
-            await ctx.commentManagementDbService.getReportById(reportId);
+          if (command.action !== "changeStatus") {
+            throw new Error(`Expected change status command`);
+          }
+
+          const report = await ctx.commentManagementDbService.getReportById(
+            command.reportId,
+          );
 
           if (!report) {
             await ctx.editMessageText("❌ Report not found.");
 
             return ctx.menu.close();
           }
+
+          const nextStatus = command.status;
 
           if (report.status === nextStatus) {
             const message = fmt`⚠️ Report is already in status ${b}${reportStatusToString(
@@ -83,7 +94,7 @@ const reportChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
 
           const updatedReport =
             await ctx.commentManagementDbService.updateReportStatus(
-              reportId,
+              report.id,
               nextStatus,
             );
 
@@ -106,9 +117,12 @@ const reportChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
   .back({
     text: "Back",
     payload(ctx) {
-      const reportId = uuidFromBase64OrDirect.parse(ctx.match);
+      const { reportId } = reportCommandParser.parse(ctx.match);
 
-      return uuidToPayload(reportId);
+      return reportCommandToPayload({
+        action: "back",
+        reportId,
+      });
     },
   });
 

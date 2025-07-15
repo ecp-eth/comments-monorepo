@@ -2,7 +2,7 @@ import type {
   IAdminTelegramBotServiceCommand,
   IAdminTelegramBotServiceCommand_RegisterOptions,
 } from "../types";
-import { renderReport } from "./report-helpers";
+import { renderReport, reportCommandToPayload } from "./report-helpers";
 import { reportMenu } from "./report-menu";
 
 /**
@@ -30,8 +30,11 @@ export class ReportPendingCommand implements IAdminTelegramBotServiceCommand {
         await ctx.resolveAuthor(report.reportee),
       );
 
-      // pass report id for menu
-      ctx.match = report.id;
+      // pass for report menu
+      ctx.match = reportCommandToPayload({
+        action: "init",
+        reportId: report.id,
+      });
 
       await ctx.reply(message.text, {
         entities: message.entities,

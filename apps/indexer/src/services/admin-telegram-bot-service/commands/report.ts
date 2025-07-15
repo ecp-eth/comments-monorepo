@@ -3,7 +3,7 @@ import {
   type IAdminTelegramBotServiceCommand_RegisterOptions,
 } from "../types";
 import { z } from "zod";
-import { renderReport } from "./report-helpers";
+import { renderReport, reportCommandToPayload } from "./report-helpers";
 import { reportMenu } from "./report-menu";
 
 export class ReportCommand implements IAdminTelegramBotServiceCommand {
@@ -36,6 +36,12 @@ export class ReportCommand implements IAdminTelegramBotServiceCommand {
           "❌ Report not found. Please provide a valid report ID.",
         );
       }
+
+      // pass for report menu
+      ctx.match = reportCommandToPayload({
+        action: "init",
+        reportId: report.id,
+      });
 
       const message = renderReport(
         report,

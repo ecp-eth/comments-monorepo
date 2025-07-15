@@ -80,7 +80,6 @@ export function commentModerationCommandFromPayload(
   payload: string,
 ): CommentModerationCommand {
   const buffer = Buffer.from(payload, "base64url");
-
   const commandBuffer = buffer.subarray(0, 1);
 
   if (commandBuffer.length !== 1) {
