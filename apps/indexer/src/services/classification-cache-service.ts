@@ -37,4 +37,13 @@ export class ClassificationCacheService
       })
       .execute();
   }
+
+  async deleteByCommentId(commentId: Hex): Promise<void> {
+    const db = getIndexerDb();
+
+    await db
+      .deleteFrom("comment_classification_results")
+      .where("comment_id", "=", commentId)
+      .execute();
+  }
 }

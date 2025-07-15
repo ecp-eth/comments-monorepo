@@ -65,6 +65,10 @@ export class CommentModerationClassifier
         });
 
         if (!response.ok) {
+          console.error(
+            `Failed to classify comments: API returned a non-200 status code ${response.status} (${await response.text()})`,
+          );
+
           throw new Error(
             `Failed to classify comments: API returned a non-200 status code ${response.status} (${response.statusText})`,
           );
@@ -128,24 +132,40 @@ export class CommentModerationClassifier
       };
     }
 
-    const result = await this.load(comment.content);
+    try {
+      const result = await this.load(comment.content);
 
-    return {
-      action: "classified",
-      labels: result.labels,
-      score: result.score,
-      save: async () => {
-        await this.cacheService.setByCommentId(comment.id, {
-          labels: result.labels,
-          score: result.score,
-        });
-      },
-    };
+      return {
+        action: "classified",
+        labels: result.labels,
+        score: result.score,
+        save: async () => {
+          await this.cacheService.setByCommentId(comment.id, {
+            labels: result.labels,
+            score: result.score,
+          });
+        },
+      };
+    } catch (error) {
+      console.error("CommentModerationClassifier error:", error);
+
+      // this will not save the result to  the cache so once the reindex will happen
+      // it will try to clasify the comment again
+      return {
+        action: "skipped",
+        labels: {},
+        score: 0,
+        save: async () => {},
+      };
+    }
   }
 
   async classifyUpdate(
     comment: ModerationNotificationServicePendingComment,
-    existingComment: CommentSelectType,
+    existingComment: Pick<
+      CommentSelectType,
+      "content" | "moderationClassifierResult" | "moderationClassifierScore"
+    >,
   ): Promise<CommentModerationClassfierResult> {
     if (comment.content === existingComment.content) {
       return {
@@ -156,18 +176,34 @@ export class CommentModerationClassifier
       };
     }
 
-    const result = await this.load(comment.content);
+    try {
+      const result = await this.load(comment.content);
 
-    return {
-      action: "classified",
-      labels: result.labels,
-      score: result.score,
-      save: async () => {
-        await this.cacheService.setByCommentId(comment.id, {
-          labels: result.labels,
-          score: result.score,
-        });
-      },
-    };
+      return {
+        action: "classified",
+        labels: result.labels,
+        score: result.score,
+        save: async () => {
+          await this.cacheService.setByCommentId(comment.id, {
+            labels: result.labels,
+            score: result.score,
+          });
+        },
+      };
+    } catch (error) {
+      console.error("CommentModerationClassifier error:", error);
+
+      // this will not save the result to  the cache so once the reindex will happen
+      // it will try to clasify the comment again
+      return {
+        action: "skipped",
+        labels: {},
+        score: 0,
+        save: async () => {
+          // If the classification fails, we should remove the cache entry so we can retry on reindex
+          await this.cacheService.deleteByCommentId(comment.id);
+        },
+      };
+    }
   }
 }
