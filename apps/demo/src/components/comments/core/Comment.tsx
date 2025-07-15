@@ -12,16 +12,16 @@ import { CommentAuthor } from "./CommentAuthor";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import { CommentSwapInfo } from "./CommentSwapInfo";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import {
   CommentText,
   CommentMediaReferences,
+  useConnectBeforeAction,
 } from "@ecp.eth/shared/components";
 import { publicEnv } from "@/publicEnv";
 import Link from "next/link";
 import { useReportCommentDialog } from "./ReportCommentDialogProvider";
-import { useConnectAccount } from "@ecp.eth/shared/hooks";
 
 type CommentProps = {
   comment: CommentType;
@@ -46,22 +46,8 @@ export function Comment({
 }: CommentProps) {
   const { open } = useReportCommentDialog();
   const { address: connectedAddress } = useAccount();
-  const connectAccount = useConnectAccount();
 
-  const connectBeforeAction = useCallback(
-    <TParams extends unknown[]>(
-      action: (...args: TParams) => Promise<unknown> | unknown,
-    ) => {
-      return async (...args: TParams) => {
-        if (!connectedAddress) {
-          await connectAccount();
-        }
-
-        await action(...args);
-      };
-    },
-    [connectAccount, connectedAddress],
-  );
+  const connectBeforeAction = useConnectBeforeAction();
 
   const references = useMemo(() => {
     if (
