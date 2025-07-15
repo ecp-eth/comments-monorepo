@@ -22,14 +22,14 @@ import {
   useEmbedConfig,
 } from "../EmbedConfigProvider";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import {
   CommentText,
   CommentMediaReferences,
+  useConnectBeforeAction,
 } from "@ecp.eth/shared/components";
 import { publicEnv } from "@/publicEnv";
 import Link from "next/link";
-import { useConnectAccount } from "@ecp.eth/shared/hooks";
 import { useReportCommentDialog } from "./ReportCommentDialogProvider";
 
 export type OnRetryPostComment = (
@@ -61,23 +61,9 @@ export function Comment({
   const { currentTimestamp } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const { address: connectedAddress } = useAccount();
-  const connectAccount = useConnectAccount();
   const { open } = useReportCommentDialog();
 
-  const connectBeforeAction = useCallback(
-    <TParams extends unknown[]>(
-      action: (...args: TParams) => Promise<unknown> | unknown,
-    ) => {
-      return async (...args: TParams) => {
-        if (!connectedAddress) {
-          await connectAccount();
-        }
-
-        await action(...args);
-      };
-    },
-    [connectAccount, connectedAddress],
-  );
+  const connectBeforeAction = useConnectBeforeAction();
 
   const references = useMemo(() => {
     if (
