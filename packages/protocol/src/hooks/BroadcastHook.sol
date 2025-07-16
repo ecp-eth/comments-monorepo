@@ -7,9 +7,6 @@ import { Comments } from "../types/Comments.sol";
 import { Channels } from "../types/Channels.sol";
 import { Metadata } from "../types/Metadata.sol";
 import { ChannelManager } from "../ChannelManager.sol";
-import {
-  EnumerableMap
-} from "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import {
   IERC721Receiver
@@ -19,8 +16,6 @@ import {
 /// @notice Hook that gates channels to only allow whitelisted creators to create channels and post top-level comments.
 /// @dev Similar to TokenCreatorHook but uses a whitelist instead of token ownership
 contract BroadcastHook is BaseHook, Ownable, IERC721Receiver {
-  using EnumerableMap for EnumerableMap.UintToAddressMap;
-
   /// @notice Error thrown when caller is not whitelisted
   error NotWhitelisted();
   /// @notice Error thrown when commenter is not the channel creator
@@ -61,9 +56,6 @@ contract BroadcastHook is BaseHook, Ownable, IERC721Receiver {
   // Mapping to track whitelisted addresses
   mapping(address => bool) private _whitelisted;
 
-  // Mapping to track channel creators
-  EnumerableMap.UintToAddressMap private _channelCreators;
-
   // Whether whitelist mode is enabled
   bool public whitelistModeEnabled = true;
 
@@ -102,9 +94,6 @@ contract BroadcastHook is BaseHook, Ownable, IERC721Receiver {
       address(this)
     );
 
-    // Store the channel creator
-    _channelCreators.set(channelId, msg.sender);
-
     // Transfer channel ownership to the actual creator
     channelManager.safeTransferFrom(address(this), msg.sender, channelId);
 
@@ -118,27 +107,6 @@ contract BroadcastHook is BaseHook, Ownable, IERC721Receiver {
     }
 
     return channelId;
-  }
-
-  /// @notice Get all channels
-  /// @return channelIds Array of channel IDs
-  /// @return creators Array of channel creators
-  function getChannels()
-    external
-    view
-    returns (uint256[] memory channelIds, address[] memory creators)
-  {
-    uint256 count = _channelCreators.length();
-    channelIds = new uint256[](count);
-    creators = new address[](count);
-
-    for (uint256 i = 0; i < count; i++) {
-      (uint256 channelId, address creator) = _channelCreators.at(i);
-      channelIds[i] = channelId;
-      creators[i] = creator;
-    }
-
-    return (channelIds, creators);
   }
 
   /// @notice Enable or disable whitelist mode
@@ -191,14 +159,11 @@ contract BroadcastHook is BaseHook, Ownable, IERC721Receiver {
       return new Metadata.MetadataEntry[](0);
     }
 
-    // Get the channel creator
-    (bool exists, address creator) = _channelCreators.tryGet(
-      commentData.channelId
-    );
-    require(exists, "Channel not found");
+    // Get the channel owner
+    address owner = channelManager.ownerOf(commentData.channelId);
 
-    // Only channel creator can post top-level comments
-    if (commentData.author != creator) {
+    // Only channel owner can post top-level comments
+    if (commentData.author != owner) {
       revert UnauthorizedCommenter();
     }
 
