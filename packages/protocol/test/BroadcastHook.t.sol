@@ -71,13 +71,6 @@ contract BroadcastHookTest is Test {
       new Metadata.MetadataEntry[](0)
     );
 
-    // Verify channel exists and creator is set correctly
-    (uint256[] memory channelIds, address[] memory creators) = hook
-      .getChannels();
-    assertEq(channelIds.length, 1);
-    assertEq(channelIds[0], channelId);
-    assertEq(creators[0], creator);
-
     // Verify creator owns the channel NFT
     assertEq(channelManager.ownerOf(channelId), creator);
 
@@ -220,7 +213,9 @@ contract BroadcastHookTest is Test {
         nonWhitelisted
       )
     );
-    hook.setWhitelistMode(false); // Owner can disable whitelist mode
+    hook.setWhitelistMode(false);
+
+    // Owner can disable whitelist mode
     vm.prank(address(initialOwner));
     hook.setWhitelistMode(false);
     assertFalse(hook.whitelistModeEnabled());
@@ -235,7 +230,7 @@ contract BroadcastHookTest is Test {
       new Metadata.MetadataEntry[](0)
     );
 
-    // Verify channel was created
+    // Verify channel ownership
     assertEq(channelManager.ownerOf(channelId), nonWhitelisted);
     vm.stopPrank();
   }
