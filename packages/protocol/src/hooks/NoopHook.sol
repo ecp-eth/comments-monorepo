@@ -59,7 +59,7 @@ contract NoopHook is IHook {
     Metadata.MetadataEntry[] calldata,
     address,
     bytes32
-  ) external override returns (bool) {
+  ) external pure override returns (bool) {
     return true;
   }
 
