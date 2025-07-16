@@ -45,8 +45,6 @@ export const useLikeComment = () => {
   const { address: connectedAddress } = useAccount();
   const { data: client } = useConnectorClient();
 
-  console.log("useLikeComment rendered with client", client);
-
   return useCallback(
     async (params: UseLikeCommentProps) => {
       const { comment, queryKey, onBeforeStart, onFailed, onSuccess } = params;

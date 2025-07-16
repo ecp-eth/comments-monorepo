@@ -39,12 +39,14 @@ export function createCommentsEmbedURL({
 }: CreateCommentsEmbedURLParams): string {
   const url = new URL(embedUri);
 
-  if ("targetUri" in source) {
+  if ("targetUri" in source && !!URL.parse(source.targetUri)) {
     url.searchParams.set("targetUri", source.targetUri);
   } else if ("author" in source) {
     url.searchParams.set("author", source.author);
-  } else {
+  } else if ("commentId" in source) {
     url.searchParams.set("commentId", source.commentId);
+  } else {
+    throw new Error("Invalid source");
   }
 
   if (config && EmbedConfigSchema.parse(config)) {

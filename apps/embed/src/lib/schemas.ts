@@ -68,12 +68,19 @@ export type SignEditCommentPayloadRequestSchemaType = z.infer<
   typeof SignEditCommentPayloadRequestSchema
 >;
 
-export const EmbedConfigFromSearchParamsSchema = z.preprocess((value) => {
-  try {
-    if (typeof value === "string") {
-      return JSON.parse(decompressFromURI(value));
+export const EmbedConfigFromSearchParamsSchema = z.preprocess(
+  (value) => {
+    try {
+      if (typeof value === "string") {
+        return JSON.parse(decompressFromURI(value));
+      }
+    } catch (err) {
+      console.warn("failed to parse config", err);
     }
-  } catch (err) {
-    console.warn("failed to parse config", err);
-  }
-}, EmbedConfigSchema.default({}));
+  },
+  EmbedConfigSchema.default({
+    chainId: 8453,
+    restrictMaximumContainerWidth: true,
+    disablePromotion: true,
+  }),
+);
