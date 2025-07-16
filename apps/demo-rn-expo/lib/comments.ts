@@ -1,20 +1,25 @@
-import { waitForTransactionReceipt } from "@wagmi/core";
+import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
 import { Hex, TransactionReceipt } from "viem";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 import { QueryClient } from "@tanstack/react-query";
 import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
+import {
+  postComment as postCommentFromSDK,
+  deleteComment as deleteCommentFromSDK,
+} from "@ecp.eth/sdk/comments";
 import { fetchAPI } from "./fetch";
 import { SignCommentPayloadRequestSchemaType } from "./generated/schemas";
-import {
-  deleteCommentViaCommentsV1,
-  postCommentAsViaCommentsV1,
-} from "./contracts";
 import { chain, config } from "../wagmi.config";
 import { FetchCommentInfinityQuerySchema } from "../hooks/useOptimisticCommentingManager/schemas";
 import type { CreateCommentData } from "@ecp.eth/sdk/comments/schemas";
+import { LOCAL_COMMENT_ADDRESS_MANAGER } from "./generated/contract-addresses";
 
 const chainId = chain.id;
+
+// for local testing we will have to manually set the comment manager address
+const commentManagerAddress =
+  config.chains[0].name === "Anvil" ? LOCAL_COMMENT_ADDRESS_MANAGER : undefined;
 
 type PostCommentResponse = {
   receipt: TransactionReceipt;
@@ -45,9 +50,11 @@ export const postComment = async (
     hash: commentId,
   } = signed;
 
-  const txHash = await postCommentAsViaCommentsV1({
-    commentData,
+  const { txHash } = await postCommentFromSDK({
+    commentsAddress: commentManagerAddress,
+    comment: commentData,
     appSignature,
+    writeContract: (opts) => writeContract(config, opts),
   });
 
   const receipt = await waitForTransactionReceipt(config, {
@@ -65,8 +72,10 @@ export const postComment = async (
 };
 
 export const deleteComment = async ({ commentId }: { commentId: Hex }) => {
-  await deleteCommentViaCommentsV1({
+  await deleteCommentFromSDK({
     commentId,
+    commentsAddress: commentManagerAddress,
+    writeContract: (opts) => writeContract(config, opts),
   });
 };
 
