@@ -20,8 +20,6 @@ contract BroadcastHook is BaseHook, Ownable, IERC721Receiver {
   error NotWhitelisted();
   /// @notice Error thrown when commenter is not the channel creator
   error UnauthorizedCommenter();
-  /// @notice Error thrown when metadata is invalid
-  error InvalidMetadata();
   /// @notice Error thrown when insufficient funds are provided
   error InsufficientFunds();
   /// @notice Error thrown when an invalid address is provided
