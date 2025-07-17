@@ -36,6 +36,7 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+.envrc
 
 # Proxy packages
 
@@ -66,5 +67,9 @@ packages/shared/errors
 packages/shared/hooks/*
 packages/shared/services/*
 packages/shared/constants
-
-.envrc
+packages/react-editor/editor
+packages/react-editor/extensions
+packages/react-editor/extract-references
+packages/react-editor/hooks
+packages/react-editor/parser
+packages/react-editor/types

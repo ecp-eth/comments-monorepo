@@ -31,6 +31,12 @@
     "packages/shared/components/*": true,
     "packages/shared/errors": true,
     "packages/shared/hooks/*": true,
-    "packages/shared/constants": true
+    "packages/shared/constants": true,
+    "packages/react-editor/editor": true,
+    "packages/react-editor/extensions": true,
+    "packages/react-editor/extract-references": true,
+    "packages/react-editor/hooks": true,
+    "packages/react-editor/parser": true,
+    "packages/react-editor/types": true
   }
 }
