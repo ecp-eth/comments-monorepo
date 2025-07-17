@@ -94,11 +94,11 @@ contract BroadcastHook is BaseHook, Ownable, IERC721Receiver {
       address(this)
     );
 
-    // Transfer channel ownership to the actual creator
-    channelManager.safeTransferFrom(address(this), msg.sender, channelId);
-
     // Emit channel created event
     emit ChannelCreated(channelId, msg.sender, name, description, metadata);
+
+    // Transfer channel ownership to the actual creator, this emits Transfer event from channel manager
+    channelManager.safeTransferFrom(address(this), msg.sender, channelId);
 
     // Return any excess funds
     if (msg.value > requiredFee) {
