@@ -11,6 +11,7 @@ import { IHook } from "../src/interfaces/IHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Metadata } from "../src/types/Metadata.sol";
 import { console } from "forge-std/console.sol";
+import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract BroadcastHookTest is Test {
   BroadcastHook public hook;
