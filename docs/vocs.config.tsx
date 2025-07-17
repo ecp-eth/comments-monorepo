@@ -254,6 +254,10 @@ export default defineConfig({
             { text: "All modules...", link: "/protocol-reference" },
           ],
         },
+        {
+          text: "React Editor",
+          link: "/react-editor/",
+        },
       ],
     },
   ],
