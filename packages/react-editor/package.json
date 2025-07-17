@@ -9,7 +9,6 @@
   },
   "homepage": "https://ecp.eth",
   "version": "0.0.3",
-  "private": true,
   "type": "module",
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/esm/index.js",
