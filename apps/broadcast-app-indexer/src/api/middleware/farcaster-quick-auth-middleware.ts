@@ -2,10 +2,15 @@ import { Errors, createClient } from "@farcaster/quick-auth";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { env } from "../../env";
+import { HexSchema, type Hex } from "@ecp.eth/sdk/core";
+import { z } from "zod";
 
 export type FarcasterQuickAuthEnv = {
   Variables: {
-    userFarcasterId: number; // The Farcaster user ID extracted from the JWT
+    user: {
+      fid: number;
+      address: Hex | null;
+    };
   };
 };
 
@@ -21,19 +26,26 @@ const client = createClient();
 export const farcasterQuickAuthMiddleware =
   createMiddleware<FarcasterQuickAuthEnv>(async (c, next) => {
     const authorization = c.req.header("Authorization");
+    const [, token] = authorization?.split(" ") || [];
 
-    if (!authorization || !authorization.startsWith("Bearer ")) {
+    if (!token) {
       throw new HTTPException(401, { message: "Missing token" });
     }
 
     try {
       const payload = await client.verifyJwt({
-        token: authorization.split(" ")[1] as string,
+        token,
         domain: env.BROADCAST_APP_MINI_APP_DOMAIN,
       });
 
-      c.set("userFarcasterId", payload.sub);
+      const address = await resolveUserPrimaryEthAddress(payload.sub);
+
+      c.set("user", {
+        fid: payload.sub,
+        address,
+      });
     } catch (e) {
+      console.error(e);
       if (e instanceof Errors.InvalidTokenError) {
         console.info("Invalid token:", e.message);
 
@@ -45,3 +57,55 @@ export const farcasterQuickAuthMiddleware =
 
     await next();
   });
+
+class FarcasterAPIError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number,
+  ) {
+    super(message);
+    this.name = "FarcasterAPIError";
+  }
+}
+
+class FarcasterAPIMalformedResponseError extends Error {
+  constructor(error: z.ZodError) {
+    super(
+      `Malformed response from Farcaster API:\n\n${JSON.stringify(error.flatten(), null, 2)}`,
+    );
+    this.name = "FarcasterAPIMalformedResponseError";
+  }
+}
+
+const primaryAddressResponseSchema = z.object({
+  result: z.object({
+    address: z.object({
+      address: HexSchema,
+    }),
+  }),
+});
+
+async function resolveUserPrimaryEthAddress(fid: number): Promise<Hex | null> {
+  try {
+    const response = await fetch(
+      `https://api.farcaster.xyz/fc/primary-address?fid=${fid}&protocol=ethereum`,
+    );
+
+    if (!response.ok) {
+      throw new FarcasterAPIError(
+        `Failed to fetch primary address for FID ${fid}: ${response.statusText}`,
+        response.status,
+      );
+    }
+
+    const data = primaryAddressResponseSchema.parse(await response.json());
+
+    return data.result.address.address;
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      throw new FarcasterAPIMalformedResponseError(e);
+    }
+
+    throw e;
+  }
+}
