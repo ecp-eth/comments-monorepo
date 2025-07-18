@@ -2,9 +2,13 @@ import { env } from "../env";
 import { NeynarNotificationsService } from "./neynar-notifications-service";
 import { NoopNotificationsService } from "./noop-notifications-service";
 import { INotificationsService } from "./types";
+import { db } from "./db";
 
-export { db } from "./db";
+export { db };
 
 export const notificationService: INotificationsService = env.NEYNAR_API_KEY
-  ? new NeynarNotificationsService()
+  ? new NeynarNotificationsService({
+      apiKey: env.NEYNAR_API_KEY,
+      db,
+    })
   : new NoopNotificationsService();
