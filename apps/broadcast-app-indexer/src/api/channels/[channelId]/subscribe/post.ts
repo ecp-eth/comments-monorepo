@@ -6,7 +6,7 @@ import {
   NotFoundResponse,
   UnsupportedMediaTypeResponse,
 } from "../../../shared-responses";
-import { db } from "../../../../services/db";
+import { db } from "../../../../services";
 import { schema } from "../../../../../schema";
 import { eq } from "drizzle-orm";
 
@@ -99,7 +99,7 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
         .insert(schema.channelSubscription)
         .values({
           channelId: channel.id,
-          userId: c.get("user").fid,
+          userFid: c.get("user").fid,
           notificationsEnabled,
         })
         .returning()

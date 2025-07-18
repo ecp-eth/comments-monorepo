@@ -5,7 +5,7 @@ import {
   InternalServerErrorResponse,
   NotFoundResponse,
 } from "../../../shared-responses";
-import { db } from "../../../../services/db";
+import { db } from "../../../../services";
 import { and, eq } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 
@@ -60,7 +60,7 @@ export async function channelUnsubscribePOST(api: OpenAPIHono): Promise<void> {
         .where(
           and(
             eq(schema.channelSubscription.channelId, channelId),
-            eq(schema.channelSubscription.userId, c.get("user").fid),
+            eq(schema.channelSubscription.userFid, c.get("user").fid),
           ),
         )
         .returning()
