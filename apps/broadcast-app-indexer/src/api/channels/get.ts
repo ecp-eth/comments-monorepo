@@ -28,14 +28,13 @@ const responseSchema = z.object({
 });
 
 export async function channelsGET(api: OpenAPIHono) {
-  // we have to use the OpenAPIHono type here to ensure the middleware types are applied correctly
-  (api as OpenAPIHono<FarcasterQuickAuthEnv>).openapi(
+  api.openapi(
     {
       method: "get",
       path: "/api/channels",
       tags: ["Channels"],
       description: "Get a list of channels",
-      middleware: [farcasterQuickAuthMiddleware],
+      middleware: [farcasterQuickAuthMiddleware] as const,
       request: {
         query: requestQuerySchema,
       },
@@ -57,10 +56,7 @@ export async function channelsGET(api: OpenAPIHono) {
       const result = await db.query.channel.findMany({
         with: {
           subscriptions: {
-            where: eq(
-              schema.channelSubscription.userId,
-              c.get("userFarcasterId"),
-            ),
+            where: eq(schema.channelSubscription.userId, c.get("user").fid),
           },
         },
         orderBy: [desc(schema.channel.createdAt)],
