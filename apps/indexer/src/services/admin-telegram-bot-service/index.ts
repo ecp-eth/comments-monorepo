@@ -69,7 +69,11 @@ export class AdminTelegramBotService implements IAdminTelegramBotService {
     });
 
     this.bot.use((ctx, next) => {
-      if (!this.allowedUserIds.includes(ctx.from?.id || 0)) {
+      if (!ctx.from) {
+        return;
+      }
+
+      if (!this.allowedUserIds.includes(ctx.from.id)) {
         return ctx.reply("❌ You are not authorized to use this bot.");
       }
 
