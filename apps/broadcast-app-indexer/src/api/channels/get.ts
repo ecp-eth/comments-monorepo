@@ -1,7 +1,7 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
 import { farcasterQuickAuthMiddleware } from "../middleware/farcaster-quick-auth-middleware";
 import { schema } from "../../../schema";
-import { db } from "../../services/db";
+import { db } from "../../services";
 import { desc, eq } from "drizzle-orm";
 import { ChannelResponse } from "../shared-responses";
 
@@ -47,7 +47,7 @@ export async function channelsGET(api: OpenAPIHono) {
       const result = await db.query.channel.findMany({
         with: {
           subscriptions: {
-            where: eq(schema.channelSubscription.userId, c.get("user").fid),
+            where: eq(schema.channelSubscription.userFid, c.get("user").fid),
           },
         },
         orderBy: [desc(schema.channel.createdAt)],

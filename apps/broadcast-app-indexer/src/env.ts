@@ -32,9 +32,10 @@ const ChainBaseConfig = z.union([
 const ChainConfig = z.intersection(ChainAnvilConfig, ChainBaseConfig);
 
 const BaseConfig = z.object({
-  BROADCAST_APP_MINI_APP_DOMAIN: z.string().nonempty(),
+  BROADCAST_APP_MINI_APP_URL: z.string().url(),
   DATABASE_URL: z.string().url(),
   DATABASE_SCHEMA: z.string().trim().nonempty(),
+  NEYNAR_API_KEY: z.string().optional(),
   SENTRY_DSN: z.string().optional(),
 });
 
