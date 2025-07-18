@@ -5,7 +5,7 @@ import {
 } from "../middleware/farcaster-quick-auth-middleware";
 import { schema } from "../../../schema";
 import { db } from "../../services/db";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 const requestQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),
@@ -63,6 +63,7 @@ export async function channelsGET(api: OpenAPIHono) {
             ),
           },
         },
+        orderBy: [desc(schema.channel.createdAt)],
         offset: (page - 1) * limit,
         limit,
       });
