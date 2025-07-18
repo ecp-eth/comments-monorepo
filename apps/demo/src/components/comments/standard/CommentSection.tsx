@@ -24,6 +24,7 @@ import { CommentActionsProvider } from "./context";
 import { chain } from "@/lib/clientWagmi";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { Heading2 } from "../core/Heading2";
+import { LoadingScreen } from "../core/LoadingScreen";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
@@ -38,7 +39,7 @@ export function CommentSection() {
     setCurrentUrl(window.location.href);
   }, []);
 
-  const { data, isSuccess, error, hasNextPage, fetchNextPage } =
+  const { data, isSuccess, error, hasNextPage, fetchNextPage, isPending } =
     useInfiniteQuery({
       enabled: isAccountStatusResolved && !!currentUrl,
       queryKey,
@@ -109,6 +110,7 @@ export function CommentSection() {
       <CommentSectionWrapper>
         <Heading2>Comments</Heading2>
         <CommentForm />
+        {isPending && <LoadingScreen />}
         {error && <div>Error loading comments: {(error as Error).message}</div>}
         {isSuccess && (
           <>

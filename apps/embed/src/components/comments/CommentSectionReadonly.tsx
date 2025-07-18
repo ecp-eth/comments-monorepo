@@ -52,7 +52,7 @@ export function CommentSectionReadonly({
     [author, chainId],
   );
 
-  const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
+  const { data, isPending, error, refetch, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
       queryKey,
       initialData,
@@ -143,7 +143,7 @@ export function CommentSectionReadonly({
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
-  if (isLoading) {
+  if (isPending) {
     return <LoadingScreen />;
   }
 

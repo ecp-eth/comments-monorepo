@@ -58,7 +58,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
   const {
     data,
     isSuccess,
-    isLoading,
+    isPending,
     error,
     refetch,
     hasNextPage,
@@ -137,7 +137,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
       <div className="mb-4">
         <CommentForm />
       </div>
-      {isLoading && <LoadingScreen />}
+      {isPending && <LoadingScreen />}
       {error && (
         <ErrorScreen
           description="Failed to load comments. Please try again."
