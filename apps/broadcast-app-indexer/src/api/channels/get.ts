@@ -1,11 +1,9 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
-import {
-  type FarcasterQuickAuthEnv,
-  farcasterQuickAuthMiddleware,
-} from "../middleware/farcaster-quick-auth-middleware";
+import { farcasterQuickAuthMiddleware } from "../middleware/farcaster-quick-auth-middleware";
 import { schema } from "../../../schema";
 import { db } from "../../services/db";
 import { desc, eq } from "drizzle-orm";
+import { ChannelResponse } from "../shared-responses";
 
 const requestQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),
@@ -13,14 +11,7 @@ const requestQuerySchema = z.object({
 });
 
 const responseSchema = z.object({
-  results: z.array(
-    z.object({
-      id: z.bigint().transform((val) => val.toString()),
-      name: z.string(),
-      description: z.string().nullable(),
-      isSubscribed: z.boolean(),
-    }),
-  ),
+  results: z.array(ChannelResponse),
   pageInfo: z.object({
     page: z.number().int().positive(),
     total: z.number().int().min(0),
@@ -71,6 +62,11 @@ export async function channelsGET(api: OpenAPIHono) {
             name: channel.name,
             description: channel.description,
             isSubscribed: channel.subscriptions.length > 0,
+            notificationsEnabled: channel.subscriptions.some(
+              (sub) => sub.notificationsEnabled,
+            ),
+            createdAt: channel.createdAt,
+            updatedAt: channel.updatedAt,
           };
         }),
         pageInfo: {
