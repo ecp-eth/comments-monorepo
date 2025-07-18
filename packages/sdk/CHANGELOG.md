@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.24
+
+### Patch Changes
+
+- 9ba157e: chore(sdk): output default chain id constants
+
 ## 0.0.23
 
 ### Patch Changes
