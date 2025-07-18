@@ -1,0 +1,1 @@
+ALTER TABLE "broadcast_app_indexer_offchain"."neynar_notification_service_queue" ADD COLUMN "notification_uuid" uuid DEFAULT gen_random_uuid() NOT NULL;

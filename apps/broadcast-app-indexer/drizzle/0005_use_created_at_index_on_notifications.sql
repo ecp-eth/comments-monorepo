@@ -1,0 +1,2 @@
+DROP INDEX "broadcast_app_indexer_offchain"."neynar_notification_service_queue_updated_at_idx";--> statement-breakpoint
+CREATE INDEX "neynar_notification_service_queue_created_at_idx" ON "broadcast_app_indexer_offchain"."neynar_notification_service_queue" USING btree ("created_at");
