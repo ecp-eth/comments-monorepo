@@ -112,11 +112,6 @@ export default function GeneratedURL({
         return;
       }
 
-      if (e.message.includes("Invalid source")) {
-        setError("Invalid source");
-        return;
-      }
-
       if (e instanceof ZodError) {
         console.warn("configuration issues", e.issues);
         setError("Configuration error");

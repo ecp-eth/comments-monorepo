@@ -113,3 +113,6 @@ export const EMPTY_PARENT_ID = toHex(0, { size: 32 });
  * The maximum length of a message for comment report.
  */
 export const MAX_COMMENT_REPORT_MESSAGE_LENGTH = 200;
+
+export const DEFAULT_CHAIN_ID = 8453;
+export const DEFAULT_CHAIN_ID_DEV = 31337;

@@ -5,7 +5,7 @@ import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { MAX_COMMENT_LENGTH } from "./constants";
 import { decompressFromURI } from "lz-ts";
 import { MetadataEntrySchema } from "@ecp.eth/sdk/comments";
-import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
+import { DEFAULT_CHAIN_ID, DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
 
 export const BadRequestResponseSchema = z.record(
   z.string(),
@@ -79,7 +79,7 @@ export const EmbedConfigFromSearchParamsSchema = z.preprocess(
     }
   },
   EmbedConfigSchema.default({
-    chainId: 8453,
+    chainId: DEFAULT_CHAIN_ID,
     restrictMaximumContainerWidth: true,
     disablePromotion: true,
   }),
