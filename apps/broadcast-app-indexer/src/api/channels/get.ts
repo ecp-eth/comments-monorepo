@@ -2,19 +2,52 @@ import { type OpenAPIHono, z } from "@hono/zod-openapi";
 import { farcasterQuickAuthMiddleware } from "../middleware/farcaster-quick-auth-middleware";
 import { schema } from "../../../schema";
 import { db } from "../../services";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, lt, or } from "drizzle-orm";
 import { ChannelResponse } from "../shared-responses";
 
+function toChannelCursor(channel: { id: bigint; createdAt: Date }): string {
+  return Buffer.from(
+    `${channel.id.toString()}:${channel.createdAt.toISOString()}`,
+  ).toString("base64url");
+}
+
+function fromChannelCursor(cursor: string): { id: bigint; createdAt: Date } {
+  const decoded = Buffer.from(cursor, "base64url").toString("utf-8");
+
+  const [id, createdAt] = decoded.split(":");
+
+  return z
+    .object({
+      id: z.coerce.bigint(),
+      createdAt: z.coerce.date(),
+    })
+    .parse({
+      id,
+      createdAt,
+    });
+}
+
 const requestQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).optional().default(1),
+  cursor: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val) return undefined;
+
+      return fromChannelCursor(val);
+    }),
   limit: z.coerce.number().int().min(1).max(100).optional().default(20),
+  onlySubscribed: z
+    .enum(["1", "0"])
+    .transform((val) => val === "1")
+    .default("0"),
 });
 
 const responseSchema = z.object({
   results: z.array(ChannelResponse),
   pageInfo: z.object({
-    page: z.number().int().positive(),
-    total: z.number().int().min(0),
+    hasNextPage: z.boolean(),
+    nextCursor: z.string().optional(),
   }),
 });
 
@@ -41,22 +74,37 @@ export async function channelsGET(api: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { limit, page } = c.req.valid("query");
+      const { limit, cursor, onlySubscribed } = c.req.valid("query");
 
-      const total = await db.$count(schema.channel);
-      const result = await db.query.channel.findMany({
+      const results = await db.query.channel.findMany({
         with: {
           subscriptions: {
             where: eq(schema.channelSubscription.userFid, c.get("user").fid),
           },
         },
-        orderBy: [desc(schema.channel.createdAt)],
-        offset: (page - 1) * limit,
-        limit,
+        where: and(
+          onlySubscribed
+            ? eq(schema.channelSubscription.userFid, c.get("user").fid)
+            : undefined,
+          cursor
+            ? or(
+                lt(schema.channel.createdAt, cursor.createdAt),
+                and(
+                  eq(schema.channel.createdAt, cursor.createdAt),
+                  lt(schema.channel.id, cursor.id),
+                ),
+              )
+            : undefined,
+        ),
+        orderBy: [desc(schema.channel.createdAt), desc(schema.channel.id)],
+        limit: limit + 1,
       });
 
+      const channels = results.slice(0, limit);
+      const [nextCursor] = results.slice(limit);
+
       return c.json({
-        results: result.map((channel) => {
+        results: channels.map((channel) => {
           return {
             id: channel.id,
             name: channel.name,
@@ -70,8 +118,8 @@ export async function channelsGET(api: OpenAPIHono) {
           };
         }),
         pageInfo: {
-          total,
-          page,
+          hasNextPage: nextCursor !== undefined,
+          nextCursor: nextCursor ? toChannelCursor(nextCursor) : undefined,
         },
       });
     },
