@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  version: 0.0.17
+  version: 0.0.18
   title: Indexer Restful API
 servers:
   - url: https://api.ethcomments.xyz
