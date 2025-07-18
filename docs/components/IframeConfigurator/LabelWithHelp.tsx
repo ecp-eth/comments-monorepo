@@ -5,12 +5,12 @@ export default function LabelWithHelp({
   help,
   htmlFor,
 }: {
-  htmlFor: string;
+  htmlFor?: string;
   label: string;
   help: string;
 }) {
   return (
-    <div className="flex items-center gap-1" title={help}>
+    <div className="flex items-center gap-1 mb-2" title={help}>
       <label className="text-sm font-medium" htmlFor={htmlFor}>
         {label}
       </label>

@@ -7,6 +7,7 @@ import {
   type EmbedConfigSchemaInputType,
 } from "@ecp.eth/sdk/embed";
 import { DEFAULT_CONFIG } from "./constants";
+import { CircleX, Info } from "lucide-react";
 
 export default function CommentsEmbedPreview({
   embedUri,
@@ -48,10 +49,18 @@ export default function CommentsEmbedPreview({
       />
     );
   } catch (e) {
+    if (e instanceof Error && e.message.includes("Invalid source")) {
+      return (
+        <div className="flex flex-col items-center justify-center py-6">
+          <Info className="w-10 h-10" />
+          <span className=" my-5">Missing configuration</span>
+        </div>
+      );
+    }
     return (
-      <div className="flex flex-col gap-2">
-        <span className="text-red-500">Could not create show a preview</span>
-        <pre className="font-mono w-full">{String(e)}</pre>
+      <div className="flex flex-col items-center justify-center py-6">
+        <CircleX stroke="red" className="w-10 h-10" />
+        <span className="text-red-500 my-5">Configuration Error</span>
       </div>
     );
   }

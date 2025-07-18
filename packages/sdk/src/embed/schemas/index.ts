@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { EmbedConfigSupportedFont } from "./fonts.js";
+import { DEFAULT_CHAIN_ID, DEFAULT_CHAIN_ID_DEV } from "../../constants.js";
 
 export { EmbedConfigSupportedFont };
 
@@ -162,20 +163,9 @@ export type EmbedConfigThemeSchemaType = z.infer<typeof EmbedConfigThemeSchema>;
  * The zod schema for supported chain ids
  */
 export const EmbedConfigSupportedChainIdsSchema = z
-  .union([
-    // ethereum mainnet
-    // z.literal(1),
-    // base
-    z.literal(8453),
-    // base sepolia
-    // z.literal(84532),
-    // ethereum sepolia
-    // z.literal(11155111),
-    // anvil
-    z.literal(31337),
-  ])
+  .union([z.literal(DEFAULT_CHAIN_ID), z.literal(DEFAULT_CHAIN_ID_DEV)])
   .optional()
-  .default(__DEV__ ? 31337 : 8453);
+  .default(__DEV__ ? DEFAULT_CHAIN_ID_DEV : DEFAULT_CHAIN_ID);
 
 /**
  * The type for supported chain ids
@@ -196,7 +186,7 @@ export const EmbedConfigSchema = z.object({
    * The id of the chain to post the comments to.
    * We don't filter chain id when fetching comments.
    *
-   * @default 84532
+   * default to {@link DEFAULT_CHAIN_ID}
    */
   chainId: EmbedConfigSupportedChainIdsSchema,
   /**
