@@ -43,6 +43,7 @@ import { toast } from "sonner";
 import { useConnectedAction } from "./hooks/useConnectedAction";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { Heading2 } from "../core/Heading2";
+import { LoadingScreen } from "../core/LoadingScreen";
 
 type CommentSectionGaslessProps = {
   disableApprovals?: boolean;
@@ -133,7 +134,7 @@ export function CommentSectionGasless({
     hash: revokeApproval.data?.txHash,
   });
 
-  const { data, isSuccess, error, hasNextPage, fetchNextPage } =
+  const { data, isSuccess, error, hasNextPage, fetchNextPage, isPending } =
     useInfiniteQuery({
       enabled: isAccountStatusResolved && !!currentUrl,
       queryKey,
@@ -317,6 +318,7 @@ export function CommentSectionGasless({
               </div>
             )}
           <CommentForm />
+          {isPending && <LoadingScreen />}
           {error && (
             <div>Error loading comments: {(error as Error).message}</div>
           )}

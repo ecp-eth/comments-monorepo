@@ -53,7 +53,7 @@ export function CommentSectionReplies({
     [commentId, chainId],
   );
 
-  const { data, isLoading, error, refetch, hasNextPage, fetchNextPage } =
+  const { data, isPending, error, refetch, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
       queryKey,
       initialData,
@@ -142,7 +142,7 @@ export function CommentSectionReplies({
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
-  if (isLoading) {
+  if (isPending) {
     return <LoadingScreen />;
   }
 
