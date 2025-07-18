@@ -5,8 +5,11 @@ import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer
 import type { Convenience, Message } from "telegraf/types";
 import type { CommentReportStatus } from "../management/types";
 import type { CommentReportSelectType } from "../management/migrations";
+import type { Handler } from "hono";
 
 export type ModerationStatus = "pending" | "approved" | "rejected";
+
+export type ResolveAuthorFunction = (author: Hex) => Promise<string | Hex>;
 
 export type ModerationNotificationServicePendingComment = {
   id: Hex;
@@ -181,6 +184,7 @@ export interface IPremoderationCacheService {
 }
 
 export interface ICommentDbService {
+  getCommentPendingModeration: () => Promise<CommentSelectType | undefined>;
   getCommentById(commentId: Hex): Promise<CommentSelectType | undefined>;
   updateCommentModerationStatus: (
     commentId: Hex,
@@ -253,4 +257,9 @@ export interface ITelegramNotificationsService {
     }[],
     extra?: Omit<Convenience.ExtraEditMessageText, "inline_keyboard">,
   ) => Promise<void>;
+}
+
+export interface IAdminTelegramBotService {
+  initialize: () => Promise<void>;
+  handleWebhookRequest: Handler;
 }

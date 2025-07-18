@@ -6,7 +6,7 @@ import type {
 import { HTTPException } from "hono/http-exception";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { Hex } from "@ecp.eth/sdk/core";
-import { eq } from "ponder";
+import { eq, desc } from "ponder";
 import schema, { type CommentSelectType } from "ponder:schema";
 import { db } from "../db";
 
@@ -53,6 +53,15 @@ export class CommentDbService implements ICommentDbService {
   async getCommentById(commentId: Hex): Promise<CommentSelectType | undefined> {
     const comment = await db.query.comment.findFirst({
       where: eq(schema.comment.id, commentId),
+    });
+
+    return comment;
+  }
+
+  async getCommentPendingModeration(): Promise<CommentSelectType | undefined> {
+    const comment = await db.query.comment.findFirst({
+      where: eq(schema.comment.moderationStatus, "pending"),
+      orderBy: desc(schema.comment.moderationStatusChangedAt),
     });
 
     return comment;

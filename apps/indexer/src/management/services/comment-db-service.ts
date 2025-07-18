@@ -24,6 +24,25 @@ export class ManagementCommentDbService {
   }
 
   /**
+   * Get a pending report
+   * This method retrieves the most recent pending report from the database.
+   * @returns A pending report if it exists, undefined otherwise
+   */
+  async getPendingReport(): Promise<CommentReportSelectType | undefined> {
+    const db = getIndexerDb();
+
+    const result = await db
+      .selectFrom("comment_reports")
+      .selectAll()
+      .where("status", "=", "pending")
+      .orderBy("created_at desc")
+      .limit(1)
+      .executeTakeFirst();
+
+    return result;
+  }
+
+  /**
    * Report a comment with a message
    * @param commentId The ID of the comment to report
    * @param reportee The address of the user reporting the comment

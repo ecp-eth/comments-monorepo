@@ -17,6 +17,7 @@ import { setupReportComment } from "./comments/[commentId]/reports/post";
 import { setupGetReports } from "./reports/get";
 import { setupGetReport } from "./reports/[reportId]/get";
 import { setupPatchReport } from "./reports/[reportId]/patch";
+import { setupAdminBotWebhook } from "./webhook/bot/post";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -37,6 +38,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupGetReports(app);
   setupGetReport(app);
   setupPatchReport(app);
+  setupAdminBotWebhook(app);
 
   return app;
 }

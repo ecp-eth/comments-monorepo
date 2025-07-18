@@ -34,6 +34,7 @@ describe("CommentModerationService", () => {
   const mockCommentDbService: ICommentDbService = {
     getCommentById: vi.fn(),
     updateCommentModerationStatus: vi.fn(),
+    getCommentPendingModeration: vi.fn(),
   };
 
   const knownReactions = new Set(["👍", "❤️"]);

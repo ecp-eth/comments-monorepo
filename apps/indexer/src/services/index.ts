@@ -15,6 +15,13 @@ import { ensByAddressResolverService } from "./ens-by-address-resolver";
 import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver";
 import { ReportsNotificationsService } from "./reports-notifications-service";
 import { TelegramNotificationsService } from "./telegram-notifications-service";
+import { NoopAdminBotService } from "./admin-noop-bot-service";
+import { AdminTelegramBotService } from "./admin-telegram-bot-service";
+import { StartCommand } from "./admin-telegram-bot-service/commands/start";
+import { ReportCommand } from "./admin-telegram-bot-service/commands/report";
+import { ReportPendingCommand } from "./admin-telegram-bot-service/commands/report-pending";
+import { ModerateCommand } from "./admin-telegram-bot-service/commands/moderate";
+import { ModeratePendingCommand } from "./admin-telegram-bot-service/commands/moderate-pending";
 
 function resolveAuthor(author: Hex): Promise<string | Hex> {
   return ensByAddressResolverService.load(author).then((data) => {
@@ -97,3 +104,27 @@ export const commentModerationService = new CommentModerationService({
   classifierService: commentModerationClassifierService,
   commentDbService,
 });
+
+export const telegramAdminBotService =
+  env.ADMIN_TELEGRAM_BOT_ENABLED &&
+  env.ADMIN_TELEGRAM_BOT_TOKEN &&
+  env.ADMIN_TELEGRAM_BOT_WEBHOOK_URL &&
+  env.ADMIN_TELEGRAM_BOT_WEBHOOK_SECRET
+    ? new AdminTelegramBotService({
+        botToken: env.ADMIN_TELEGRAM_BOT_TOKEN,
+        apiRootUrl: env.ADMIN_TELEGRAM_BOT_API_ROOT_URL,
+        allowedUserIds: env.ADMIN_TELEGRAM_BOT_ALLOWED_USER_IDS || [],
+        webhookUrl: env.ADMIN_TELEGRAM_BOT_WEBHOOK_URL,
+        webhookSecret: env.ADMIN_TELEGRAM_BOT_WEBHOOK_SECRET,
+        commands: [
+          new StartCommand(),
+          new ReportCommand(),
+          new ReportPendingCommand(),
+          new ModerateCommand(),
+          new ModeratePendingCommand(),
+        ],
+        commentManagementDbService: managementCommentDbService,
+        commentDbService,
+        resolveAuthor,
+      })
+    : new NoopAdminBotService();

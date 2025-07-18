@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ponder
+      POSTGRES_USER: ponder
+      POSTGRES_PASSWORD: ponder
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  tg-bot-api:
+    image: aiogram/telegram-bot-api:latest
+    environment:
+      - TELEGRAM_LOCAL=1
+      # 1. Create an application with api id and api hash (get them from https://my.telegram.org/apps)
+      - TELEGRAM_API_ID=${TELEGRAM_API_ID} # <-- place your api id here
+      - TELEGRAM_API_HASH=${TELEGRAM_API_HASH} # <-- place your api hash
+    ports:
+      - "8081:8081"

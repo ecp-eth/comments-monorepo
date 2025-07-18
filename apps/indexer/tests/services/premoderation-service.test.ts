@@ -20,6 +20,7 @@ const mockCacheService = {
 const mockDbService = {
   updateCommentModerationStatus: vi.fn(),
   getCommentById: vi.fn(),
+  getCommentPendingModeration: vi.fn(),
 } as ICommentDbService;
 
 describe("PremoderationService", () => {
