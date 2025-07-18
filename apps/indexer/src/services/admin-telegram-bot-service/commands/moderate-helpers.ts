@@ -39,8 +39,11 @@ export function commentModerationCommandToPayload(
   const idBuffer = Buffer.from(hexToBytes(command.commentId));
 
   switch (command.action) {
+    case "back":
+    case "init":
+    case "showCommentContent":
     case "openChangeStatus": {
-      const commandBuffer = Buffer.from([ACTION_TO_BYTE.openChangeStatus]);
+      const commandBuffer = Buffer.from([ACTION_TO_BYTE[command.action]]);
 
       return Buffer.concat([commandBuffer, idBuffer]).toString("base64url");
     }
@@ -53,21 +56,6 @@ export function commentModerationCommandToPayload(
       return Buffer.concat([commandBuffer, idBuffer, statusBuffer]).toString(
         "base64url",
       );
-    }
-    case "showCommentContent": {
-      const commandBuffer = Buffer.from([ACTION_TO_BYTE.showCommentContent]);
-
-      return Buffer.concat([commandBuffer, idBuffer]).toString("base64url");
-    }
-    case "init": {
-      const commandBuffer = Buffer.from([ACTION_TO_BYTE.init]);
-
-      return Buffer.concat([commandBuffer, idBuffer]).toString("base64url");
-    }
-    case "back": {
-      const commandBuffer = Buffer.from([ACTION_TO_BYTE.back]);
-
-      return Buffer.concat([commandBuffer, idBuffer]).toString("base64url");
     }
     default:
       command satisfies never;
@@ -169,6 +157,7 @@ function commentModerationStatusToByte(
     case "rejected":
       return 0x02;
     default:
+      status satisfies never;
       throw new Error(`Unknown moderation status: ${status}`);
   }
 }
@@ -199,6 +188,7 @@ export function moderationStatusToString(
     case "rejected":
       return "Rejected";
     default:
+      status satisfies never;
       throw new Error(`Unknown moderation status: ${status}`);
   }
 }

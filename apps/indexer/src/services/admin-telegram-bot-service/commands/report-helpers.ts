@@ -35,8 +35,10 @@ export function reportCommandToPayload(command: ReportCommand): string {
   const idBuffer = Buffer.from(parseUUID(command.reportId));
 
   switch (command.action) {
+    case "back":
+    case "init":
     case "openChangeStatus": {
-      const commandBuffer = Buffer.from([ACTION_TO_BYTE.openChangeStatus]);
+      const commandBuffer = Buffer.from([ACTION_TO_BYTE[command.action]]);
 
       return Buffer.concat([commandBuffer, idBuffer]).toString("base64url");
     }
@@ -47,16 +49,6 @@ export function reportCommandToPayload(command: ReportCommand): string {
       return Buffer.concat([commandBuffer, idBuffer, statusBuffer]).toString(
         "base64url",
       );
-    }
-    case "back": {
-      const commandBuffer = Buffer.from([ACTION_TO_BYTE.back]);
-
-      return Buffer.concat([commandBuffer, idBuffer]).toString("base64url");
-    }
-    case "init": {
-      const commandBuffer = Buffer.from([ACTION_TO_BYTE.init]);
-
-      return Buffer.concat([commandBuffer, idBuffer]).toString("base64url");
     }
     default:
       command satisfies never;
@@ -145,6 +137,7 @@ export function reportStatusToString(status: CommentReportStatus): string {
     case "closed":
       return "Closed";
     default:
+      status satisfies never;
       throw new Error(`Unknown report status: ${status}`);
   }
 }
@@ -181,6 +174,7 @@ function reportStatusToByte(status: CommentReportStatus): number {
     case "closed":
       return 0x02;
     default:
+      status satisfies never;
       throw new Error(`Unknown report status: ${status}`);
   }
 }
