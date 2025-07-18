@@ -5,7 +5,7 @@ import {
   ChannelResponse,
   NotFoundResponse,
 } from "../../shared-responses";
-import { db } from "../../../services/db";
+import { db } from "../../../services";
 import { eq } from "drizzle-orm";
 import { schema } from "../../../../schema";
 
@@ -64,7 +64,7 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
         where: eq(schema.channel.id, channelId),
         with: {
           subscriptions: {
-            where: eq(schema.channelSubscription.userId, c.get("user").fid),
+            where: eq(schema.channelSubscription.userFid, c.get("user").fid),
           },
         },
       });
