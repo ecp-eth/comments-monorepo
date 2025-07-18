@@ -46,7 +46,7 @@
     "use-debounce": "^10.0.4",
     "vite-tsconfig-paths": "^5.1.4",
     "vocs": "github:ecp-eth/vocs#main&path:/src",
-    "zod": "~3.25.76"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@ecp.eth/build-tools": "workspace:^",
