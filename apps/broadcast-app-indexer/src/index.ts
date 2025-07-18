@@ -1,7 +1,12 @@
 import "./sentry";
 import * as Sentry from "@sentry/node";
-import schema from "ponder:schema";
+import { schema } from "../schema";
 import { ponder } from "ponder:registry";
+import { db } from "./services/db";
+import { and, eq } from "drizzle-orm";
+import { isZeroHex } from "@ecp.eth/sdk/core";
+import { notificationService } from "./services";
+import { env } from "./env";
 
 ponder.on("BroadcastHook:ChannelCreated", async ({ event, context }) => {
   const channelEvent = event.args;
@@ -75,10 +80,44 @@ ponder.on("ChannelManager:ChannelUpdated", async ({ event, context }) => {
 });
 
 ponder.on("CommentManager:CommentAdded", async ({ event, context }) => {
-  /**
-   * 1. Check if the comment belongs to a channel we know
-   * 2. Check if the comment is top level
-   * 3. Check if we notified people about this comment
-   * 4. Notify people about the comment
-   */
+  const { commentId, channelId, parentId } = event.args;
+
+  if (!isZeroHex(parentId)) {
+    // this is not a top level comment
+    return;
+  }
+
+  const channel = await context.db.find(schema.channel, {
+    id: channelId,
+  });
+
+  if (!channel) {
+    // this comment doesn't belong to a channel we know
+    return;
+  }
+
+  const subscribers = await db.query.channelSubscription.findMany({
+    columns: {
+      userFid: true,
+    },
+    where: and(
+      eq(schema.channelSubscription.channelId, channelId),
+      eq(schema.channelSubscription.notificationsEnabled, true),
+    ),
+  });
+
+  const targetUrl = new URL(
+    `/channels/${channel.id}`,
+    env.BROADCAST_APP_MINI_APP_URL,
+  ).toString();
+
+  await notificationService.notify(
+    subscribers.map((s) => s.userFid),
+    commentId,
+    {
+      title: `New comment in channel`,
+      body: `Something new was posted in the channel you are subscribed to.`,
+      targetUrl,
+    },
+  );
 });

@@ -35,7 +35,7 @@ export const farcasterQuickAuthMiddleware =
     try {
       const payload = await client.verifyJwt({
         token,
-        domain: env.BROADCAST_APP_MINI_APP_DOMAIN,
+        domain: new URL(env.BROADCAST_APP_MINI_APP_URL).hostname,
       });
 
       const address = await resolveUserPrimaryEthAddress(payload.sub);

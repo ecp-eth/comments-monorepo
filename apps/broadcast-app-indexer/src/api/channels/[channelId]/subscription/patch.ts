@@ -6,7 +6,7 @@ import {
   NotFoundResponse,
   UnsupportedMediaTypeResponse,
 } from "../../../shared-responses";
-import { db } from "../../../../services/db";
+import { db } from "../../../../services";
 import { schema } from "../../../../../schema";
 import { and, eq } from "drizzle-orm";
 
@@ -109,7 +109,7 @@ export async function channelSubscriptionPATCH(
         .where(
           and(
             eq(schema.channelSubscription.channelId, channelId),
-            eq(schema.channelSubscription.userId, c.get("user").fid),
+            eq(schema.channelSubscription.userFid, c.get("user").fid),
           ),
         )
         .returning()
