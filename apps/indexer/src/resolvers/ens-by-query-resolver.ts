@@ -1,15 +1,84 @@
 import * as Sentry from "@sentry/node";
-import DataLoader from "dataloader";
-import type { ResolvedENSData } from "./ens.types";
-import { gql, request as graphqlRequest } from "graphql-request";
 import { z } from "zod";
+import DataLoader from "dataloader";
+import DeferredCtor, { Deferred } from "promise-deferred";
+import { gql, request as graphqlRequest } from "graphql-request";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core";
+import type { ResolvedENSData } from "./ens.types";
+
+const FULL_WALLET_ADDRESS_LENGTH = 42;
 
 export type ENSByQueryResolverKey = string;
 export type ENSByQueryResolver = DataLoader<
   ENSByQueryResolverKey,
   ResolvedENSData[] | null
 >;
+
+export type ENSByQueryResolverOptions = {
+  /**
+   * If not provided, the resolver will return null for all queries
+   */
+  subgraphUrl: string | null | undefined;
+} & DataLoader.Options<ENSByQueryResolverKey, ResolvedENSData[] | null>;
+
+/**
+ * Creates a resolver that uses ENSNode.io subgraph to resolve ENS data
+ */
+export function createENSByQueryResolver({
+  subgraphUrl,
+  ...dataLoaderOptions
+}: ENSByQueryResolverOptions): ENSByQueryResolver {
+  return new DataLoader(
+    async (queries) => {
+      if (!subgraphUrl) {
+        return queries.map(() => null);
+      }
+
+      const fullAddresses: Hex[] = [];
+      const fullAddressesDeferred: Deferred<ResolvedENSData[] | null>[] = [];
+
+      const promises = queries.map((query) => {
+        if (isFullAddress(query)) {
+          const deferred = new DeferredCtor<ResolvedENSData[]>();
+
+          fullAddresses.push(query);
+          fullAddressesDeferred.push(deferred);
+
+          return deferred.promise;
+        }
+
+        return searchEns(query, subgraphUrl);
+      });
+
+      if (fullAddresses.length > 0) {
+        searchEnsByExactAddressInBatch(fullAddresses, subgraphUrl).then(
+          (results) => {
+            if (results === null) {
+              fullAddressesDeferred.forEach((deferred) => {
+                deferred.resolve(null);
+              });
+              return;
+            }
+
+            fullAddressesDeferred.forEach((deferred, index) => {
+              deferred.resolve(results[index] ?? null);
+            });
+          },
+        );
+      }
+
+      return Promise.all(promises);
+    },
+    {
+      maxBatchSize: 5,
+      ...dataLoaderOptions,
+    },
+  );
+}
+
+function isFullAddress(query: string): query is Hex {
+  return query.startsWith("0x") && query.length === FULL_WALLET_ADDRESS_LENGTH;
+}
 
 function normalizeAvatarUrl(url: string): string | null {
   if (URL.canParse(url)) {
@@ -120,7 +189,7 @@ const searchByNameQuery = gql`
   }
 `;
 
-const searchByAddressQuery = gql`
+const searchByAddressStartsWithQuery = gql`
   ${domainFragment}
   query SearchByAddress($address: String!, $currentTimestamp: BigInt!) {
     domains(
@@ -136,22 +205,37 @@ const searchByAddressQuery = gql`
   }
 `;
 
+const searchByExactAddressInBatchQuery = gql`
+  ${domainFragment}
+  query SearchByAddress($addresses: [String!]!, $currentTimestamp: BigInt!) {
+    domains(
+      where: {
+        resolvedAddressId_in: $addresses
+        expiryDate_gte: $currentTimestamp
+        labelName_not: ""
+      }
+      first: 20
+    ) {
+      ...DomainFragment
+    }
+  }
+`;
+
 async function searchEns(
   query: string,
   subgraphUrl: string,
 ): Promise<ResolvedENSData[] | null> {
-  const currentTimestamp = Math.floor(Date.now() / 1000);
-
   if (query.startsWith(".")) {
     return null;
   }
 
+  const currentTimestamp = Math.floor(Date.now() / 1000);
   let results: ENSNodeResult;
 
   if (query.startsWith("0x")) {
     results = await graphqlRequest<ENSNodeResult>(
       subgraphUrl,
-      searchByAddressQuery,
+      searchByAddressStartsWithQuery,
       {
         address: query,
         currentTimestamp,
@@ -194,31 +278,56 @@ async function searchEns(
   }));
 }
 
-export type ENSByQueryResolverOptions = {
-  /**
-   * If not provided, the resolver will return null for all queries
-   */
-  subgraphUrl: string | null | undefined;
-} & DataLoader.Options<ENSByQueryResolverKey, ResolvedENSData[] | null>;
+async function searchEnsByExactAddressInBatch(
+  addresses: Hex[],
+  subgraphUrl: string,
+): Promise<ResolvedENSData[][] | null> {
+  const currentTimestamp = Math.floor(Date.now() / 1000);
 
-/**
- * Creates a resolver that uses ENSNode.io subgraph to resolve ENS data
- */
-export function createENSByQueryResolver({
-  subgraphUrl,
-  ...dataLoaderOptions
-}: ENSByQueryResolverOptions): ENSByQueryResolver {
-  return new DataLoader(
-    async (queries) => {
-      if (!subgraphUrl) {
-        return queries.map(() => null);
-      }
-
-      return Promise.all(queries.map((query) => searchEns(query, subgraphUrl)));
-    },
+  const results = await graphqlRequest<ENSNodeResult>(
+    subgraphUrl,
+    searchByExactAddressInBatchQuery,
     {
-      maxBatchSize: 5,
-      ...dataLoaderOptions,
+      addresses,
+      currentTimestamp,
     },
+  );
+
+  const parsedResults = ensResultSchema.safeParse(results);
+
+  if (!parsedResults.success) {
+    Sentry.captureMessage("ENSNode subgraph returned invalid data", {
+      level: "warning",
+      extra: {
+        addresses,
+        results,
+        error: parsedResults.error.flatten(),
+      },
+    });
+    return null;
+  }
+
+  if (parsedResults.data.domains.length === 0) {
+    return null;
+  }
+
+  const resolvedEnsDataMap = new Map<Hex, ResolvedENSData[]>();
+
+  parsedResults.data.domains.forEach((domain) => {
+    const address: Hex = domain.resolvedAddress.id.toLowerCase() as Hex;
+    const existing = resolvedEnsDataMap.get(address) ?? [];
+
+    existing.push({
+      address,
+      name: domain.name,
+      avatarUrl: domain.avatarUrl,
+      url: `https://app.ens.domains/${address}`,
+    });
+
+    resolvedEnsDataMap.set(address, existing);
+  });
+
+  return addresses.map(
+    (address) => resolvedEnsDataMap.get(address.toLowerCase() as Hex) ?? [],
   );
 }

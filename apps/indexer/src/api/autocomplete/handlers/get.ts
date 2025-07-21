@@ -103,6 +103,8 @@ export async function getAutocompleteHandler({
       }
     }
 
+    // this is the only case where we need to use `startWith` ens address reverse lookup atm,
+    // which is not very efficient, and very often resulting timeouts, maybe we should just avoid this case
     const results = await ensByQueryResolverService.load(query);
 
     if (results) {
