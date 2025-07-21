@@ -33,12 +33,6 @@ export class CommentModerationStatusNotFoundError extends BaseCommentModerationE
   }
 }
 
-export class CommentAlreadyInStatusError extends BaseCommentModerationException {
-  constructor(commentId: Hex, status: ModerationStatus) {
-    super(400, `Comment ${commentId} is already in status ${status}`);
-  }
-}
-
 type CommentDbServiceOptions = {
   cacheService: IPremoderationCacheService;
 };
@@ -79,16 +73,17 @@ export class CommentDbService implements ICommentDbService {
         throw new CommentModerationStatusNotFoundError(commentId);
       }
 
-      if (commentModerationStatus.status === status) {
-        throw new CommentAlreadyInStatusError(commentId, status);
-      }
-
       const comment = await tx.query.comment.findFirst({
         where: eq(schema.comment.id, commentId),
       });
 
       if (!comment) {
         throw new CommentNotFoundError(commentId);
+      }
+
+      // if the comment is already in the status, simply return the comment
+      if (commentModerationStatus.status === status) {
+        return [comment];
       }
 
       const changedAt = new Date();
