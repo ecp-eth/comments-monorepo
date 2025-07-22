@@ -11,4 +11,12 @@ export class NoopNotificationsService implements INotificationsService {
       `NoopNotificationsService: notify called with subscribers: ${subscribers.length}, commentId: ${commentId}, details: ${JSON.stringify(details)}`,
     );
   }
+
+  async process(): Promise<void> {
+    console.log("NoopNotificationsService: process called");
+  }
+
+  abort(): void {
+    console.log("NoopNotificationsService: abort called");
+  }
 }

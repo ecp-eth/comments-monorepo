@@ -12,3 +12,13 @@ export const notificationService: INotificationsService = env.NEYNAR_API_KEY
       db,
     })
   : new NoopNotificationsService();
+
+notificationService.process();
+
+if (globalThis.PONDER_COMMON) {
+  console.info("Registering notification service graceful shutdown handler");
+
+  globalThis.PONDER_COMMON.shutdown.add(async () => {
+    notificationService.abort();
+  });
+}
