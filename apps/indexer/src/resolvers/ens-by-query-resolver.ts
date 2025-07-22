@@ -72,7 +72,12 @@ export function createENSByQueryResolver({
 
             Sentry.captureMessage(
               "failed to batch query ENS with full addresses",
-              error,
+              {
+                level: "warning",
+                extra: {
+                  error,
+                },
+              },
             );
           });
       }
