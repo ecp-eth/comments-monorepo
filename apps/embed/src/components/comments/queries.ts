@@ -16,8 +16,6 @@ import {
 } from "@ecp.eth/sdk/indexer";
 import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
 import {
-  RateLimitedError,
-  CommentFormSubmitError,
   InvalidCommentError,
   throwKnownResponseCodeError,
 } from "@ecp.eth/shared/errors";

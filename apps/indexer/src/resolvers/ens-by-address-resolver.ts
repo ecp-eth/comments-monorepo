@@ -1,11 +1,5 @@
 import DataLoader from "dataloader";
-import {
-  createPublicClient,
-  http,
-  type PublicClient,
-  type Hex,
-  getAddress,
-} from "viem";
+import { createPublicClient, http, type PublicClient, type Hex } from "viem";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
 import type { ResolvedENSData } from "./ens.types";
@@ -18,39 +12,37 @@ async function resolveEnsData(
   address: Hex,
   ensByQueryResolver: ENSByQueryResolver,
 ): Promise<ResolvedENSData | null> {
+  // `client.getEnsName` is a reverse lookup, it doesn't return ens names supported by custom resolvers,
+  // such as .base.eth or .uni.eth, so try subgraph first as it covers all edge cases and support bundling
+  // it will be faster.
+  const results = await ensByQueryResolver.load(address);
+
+  if (results && results.length > 0 && results[0]) {
+    const result = results[0];
+
+    return {
+      address: result.address,
+      avatarUrl: result.avatarUrl,
+      name: result.name,
+      url: result.url,
+    };
+  }
+
   const name = await client.getEnsName({ address });
 
   if (!name) {
-    // try to search by address (this is helpful if the address is a .base.eth for example)
-    const results = await ensByQueryResolver.load(address);
-
-    if (results && results.length > 0) {
-      return {
-        address: results[0]!.address,
-        avatarUrl: results[0]!.avatarUrl,
-        name: results[0]!.name,
-        url: results[0]!.url,
-      };
-    }
-
     return null;
   }
 
   const normalizedName = normalize(name);
 
-  const ensAddress = await client.getEnsAddress({ name: normalizedName });
-
-  if (!ensAddress || getAddress(ensAddress) !== getAddress(address)) {
-    return null;
-  }
-
   const avatarUrl = await client.getEnsAvatar({ name: normalizedName });
 
   return {
-    address: ensAddress,
+    address,
     name: normalizedName,
     avatarUrl,
-    url: `https://app.ens.domains/${ensAddress}`,
+    url: `https://app.ens.domains/${address}`,
   };
 }
 
