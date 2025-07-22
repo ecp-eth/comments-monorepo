@@ -58,25 +58,55 @@ ponder.on("BroadcastHook:ChannelCreated", async ({ event, context }) => {
 ponder.on("ChannelManager:Transfer", async ({ event, context }) => {
   const { to, tokenId: channelId } = event.args;
 
-  await context.db
-    .update(schema.channel, {
-      id: channelId,
-    })
-    .set({
-      owner: to,
-      updatedAt: new Date(Number(event.block.timestamp) * 1000),
-    });
+  try {
+    await context.db
+      .update(schema.channel, {
+        id: channelId,
+      })
+      .set({
+        owner: to,
+        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+      });
+  } catch (error) {
+    if (error instanceof Error && error.name === "RecordNotFoundError") {
+      console.warn(
+        "Failed to update channel owner because it was not found. Probably not created by BroaadcastHook",
+        {
+          channelId,
+        },
+      );
+
+      return;
+    }
+
+    throw error;
+  }
 });
 
 ponder.on("ChannelManager:ChannelUpdated", async ({ event, context }) => {
   const { channelId, description, name, metadata } = event.args;
 
-  await context.db.update(schema.channel, { id: channelId }).set({
-    name,
-    description,
-    metadata: metadata.slice(),
-    updatedAt: new Date(Number(event.block.timestamp) * 1000),
-  });
+  try {
+    await context.db.update(schema.channel, { id: channelId }).set({
+      name,
+      description,
+      metadata: metadata.slice(),
+      updatedAt: new Date(Number(event.block.timestamp) * 1000),
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "RecordNotFoundError") {
+      console.warn(
+        "Failed to update channel because it was not found. Probably not created by BroaadcastHook",
+        {
+          channelId,
+        },
+      );
+
+      return;
+    }
+
+    throw WebTransportError;
+  }
 });
 
 ponder.on("CommentManager:CommentAdded", async ({ event, context }) => {
