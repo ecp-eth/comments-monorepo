@@ -79,6 +79,29 @@ export class NeynarNotificationsService implements INotificationsService {
         return;
       }
 
+      const notificationToProcessQuery = this.db
+        .select({
+          commentId: schema.neynarNotificationServiceQueue.commentId,
+        })
+        .from(schema.neynarNotificationServiceQueue)
+        .where(
+          or(
+            // select pending notification
+            eq(schema.neynarNotificationServiceQueue.status, "pending"),
+            // or select failed notification that still has attempts left
+            and(
+              eq(schema.neynarNotificationServiceQueue.status, "failed"),
+              lt(
+                schema.neynarNotificationServiceQueue.attempts,
+                this.maxAttempts, // only select failed notifications that have attempts left
+              ),
+            ),
+          ),
+        )
+        .orderBy(asc(schema.neynarNotificationServiceQueue.createdAt))
+        .limit(1)
+        .as("notificationToProcess");
+
       // set first pending or failed notification as processing and return
       const [notificationToProcess] = await this.db
         .update(schema.neynarNotificationServiceQueue)
@@ -86,27 +109,12 @@ export class NeynarNotificationsService implements INotificationsService {
           status: "processing",
           updatedAt: new Date(),
         })
-        .from(
-          this.db
-            .select()
-            .from(schema.neynarNotificationServiceQueue)
-            .where(
-              or(
-                // select pending notification
-                eq(schema.neynarNotificationServiceQueue.status, "pending"),
-                // or select failed notification that still has attempts left
-                and(
-                  eq(schema.neynarNotificationServiceQueue.status, "failed"),
-                  lt(
-                    schema.neynarNotificationServiceQueue.attempts,
-                    this.maxAttempts, // only select failed notifications that have attempts left
-                  ),
-                ),
-              ),
-            )
-            .orderBy(asc(schema.neynarNotificationServiceQueue.createdAt))
-            .limit(1)
-            .as("notificationToProcess"),
+        .from(notificationToProcessQuery)
+        .where(
+          eq(
+            schema.neynarNotificationServiceQueue.commentId,
+            notificationToProcessQuery.commentId,
+          ),
         )
         .returning()
         .execute();
@@ -211,5 +219,10 @@ export class NeynarNotificationsService implements INotificationsService {
           ),
         );
     }
+  }
+
+  abort(): void {
+    this.abortController.abort();
+    console.log("NeynarNotificationsService: Abort signal sent");
   }
 }

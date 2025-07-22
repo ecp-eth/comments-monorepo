@@ -27,4 +27,8 @@ export interface INotificationsService {
     commentId: Hex,
     details: NotificationDetails,
   ) => Promise<void>;
+
+  process(): Promise<void>;
+
+  abort(): void;
 }
