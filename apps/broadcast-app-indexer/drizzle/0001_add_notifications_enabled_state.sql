@@ -1,2 +1,0 @@
-ALTER TABLE "broadcast_app_indexer_offchain"."channel_subscription" ADD COLUMN "updated_at" timestamp with time zone DEFAULT now() NOT NULL;--> statement-breakpoint
-ALTER TABLE "broadcast_app_indexer_offchain"."channel_subscription" ADD COLUMN "notifications_enabled" boolean DEFAULT false NOT NULL;
