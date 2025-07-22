@@ -289,7 +289,7 @@ function BaseCommentForm({
       <Editor
         autoFocus={autoFocus}
         className={cn(
-          "w-full p-2 border border-gray-300 rounded text-foreground",
+          "w-[calc(100%-2px)] p-2 border border-gray-300 rounded text-foreground mx-[1px]",
           disabled && "opacity-50",
           submitMutation.error &&
             submitMutation.error instanceof InvalidCommentError &&
