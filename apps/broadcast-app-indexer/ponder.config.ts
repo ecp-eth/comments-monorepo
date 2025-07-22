@@ -22,11 +22,10 @@ export default createConfig({
       base: {
         id: base.id,
         rpc: env.CHAIN_BASE_RPC_URL,
-        startBlock: Math.min(
-          env.CHAIN_BASE_BROADCAST_HOOK_START_BLOCK || 0,
-          env.CHAIN_BASE_CHANNEL_MANAGER_START_BLOCK || 0,
-          env.CHAIN_BASE_COMMENT_MANAGER_START_BLOCK || 0,
-        ),
+        startBlock:
+          env.CHAIN_BASE_BROADCAST_HOOK_START_BLOCK ||
+          env.CHAIN_BASE_CHANNEL_MANAGER_START_BLOCK ||
+          env.CHAIN_BASE_COMMENT_MANAGER_START_BLOCK,
       },
     }),
   },
