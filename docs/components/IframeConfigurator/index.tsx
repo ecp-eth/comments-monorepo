@@ -68,6 +68,7 @@ export default function IframeConfigurator() {
       source: {
         targetUri: "",
       },
+      embedUri: "",
       config: DEFAULT_CONFIG,
       autoHeightAdjustment: true,
     },
@@ -82,39 +83,18 @@ export default function IframeConfigurator() {
   });
 
   const [debouncedConfig] = useDebounce(config, 500);
+  const getEmbedUri = React.useCallback(() => {
+    return mode === "post"
+      ? publicEnv.VITE_ECP_ETH_EMBED_URL
+      : mode === "author"
+        ? publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL
+        : publicEnv.VITE_ECP_ETH_EMBED_BY_REPLIES_URL;
+  }, [mode]);
 
   // Update embedUri when mode changes
   useEffect(() => {
-    form.setValue(
-      "embedUri",
-      mode === "post"
-        ? publicEnv.VITE_ECP_ETH_EMBED_URL
-        : mode === "author"
-          ? publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL
-          : publicEnv.VITE_ECP_ETH_EMBED_BY_REPLIES_URL,
-    );
-  }, [mode]);
-
-  const updateThemeColor = (
-    mode: "light" | "dark",
-    key: (typeof COLOR_FIELDS)[number]["key"],
-    value: string,
-  ) => {
-    const prev = form.getValues("config");
-    form.setValue("config", {
-      ...prev,
-      theme: {
-        ...prev.theme,
-        colors: {
-          ...prev.theme?.colors,
-          [mode]: {
-            ...prev.theme?.colors?.[mode],
-            [key]: value,
-          },
-        },
-      },
-    });
-  };
+    form.setValue("embedUri", getEmbedUri());
+  }, [getEmbedUri]);
 
   const updateFontFamily = (type: "system" | "google", value: string) => {
     const prev = form.getValues("config");
@@ -195,7 +175,6 @@ export default function IframeConfigurator() {
                           field.onChange({
                             targetUri: e.target.value,
                           });
-                          form.trigger();
                         }}
                         placeholder="https://example.com"
                       />
@@ -218,7 +197,6 @@ export default function IframeConfigurator() {
                         field.onChange({
                           author: e.target.value,
                         });
-                        form.trigger();
                       }}
                       placeholder="0x..."
                     />
@@ -241,7 +219,6 @@ export default function IframeConfigurator() {
                         field.onChange({
                           commentId: e.target.value,
                         });
-                        form.trigger();
                       }}
                       placeholder="0x..."
                     />
@@ -637,11 +614,7 @@ export default function IframeConfigurator() {
                     <FormControl>
                       <Input
                         type="text"
-                        placeholder={
-                          mode === "post"
-                            ? "https://embed.ethcomments.xyz"
-                            : "https://embed.ethcomments.xyz/by-author"
-                        }
+                        placeholder={getEmbedUri()}
                         {...field}
                       />
                     </FormControl>

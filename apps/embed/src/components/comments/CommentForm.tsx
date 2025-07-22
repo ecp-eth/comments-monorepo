@@ -289,7 +289,7 @@ function BaseCommentForm({
       <Editor
         autoFocus={autoFocus}
         className={cn(
-          "w-full p-2 border border-gray-300 rounded",
+          "w-full p-2 border border-gray-300 rounded text-foreground",
           disabled && "opacity-50",
           submitMutation.error &&
             submitMutation.error instanceof InvalidCommentError &&
@@ -324,7 +324,7 @@ function BaseCommentForm({
                   onClick={handleAddFileClick}
                   disabled={isSubmitting || disabled}
                 >
-                  <ImageIcon />
+                  <ImageIcon className="stroke-foreground" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
