@@ -11,7 +11,7 @@ import {
   jsonb,
   uuid,
 } from "drizzle-orm/pg-core";
-import { NotificationDetails } from "./src/services/types";
+import type { NotificationDetails } from "./src/services/types";
 
 export const offchainSchema = pgSchema("broadcast_app_indexer_offchain");
 
