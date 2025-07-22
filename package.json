@@ -48,7 +48,8 @@
       "@privy-io/server-auth": "patches/@privy-io__server-auth.patch",
       "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch",
       "@wagmi/connectors": "patches/@wagmi__connectors.patch",
-      "ponder": "patches/ponder.patch"
+      "ponder": "patches/ponder.patch",
+      "@rainbow-me/rainbowkit": "patches/@rainbow-me__rainbowkit.patch"
     }
   },
   "lint-staged": {

@@ -221,7 +221,8 @@ function CommentsEmbedInternal({
   iframeProps,
   src,
 }: CommentsEmbedInternalProps) {
-  const { iframeRef, dimensions } = useIframeDimensionsWatcher(src);
+  const { dimensions } = useIframeDimensionsWatcher(src);
+  useWalletButtonInterceptor(src);
 
   return (
     <div
@@ -241,7 +242,6 @@ function CommentsEmbedInternal({
           ...dimensions,
         }}
         src={src}
-        ref={iframeRef}
       ></iframe>
     </div>
   );
@@ -254,7 +254,6 @@ function useIframeDimensionsWatcher(iframeUri: string) {
   const [dimensions, setDimensions] = useState<{
     height: number;
   } | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const origin = useMemo(() => new URL(iframeUri).origin, [iframeUri]);
 
   useEffect(() => {
@@ -277,6 +276,55 @@ function useIframeDimensionsWatcher(iframeUri: string) {
 
   return {
     dimensions,
-    iframeRef,
   };
+}
+
+/**
+ * On mobile the uri scheme cannot be triggered directly within the iframe, so we had to intercept the message and open the link on the container level.
+ *
+ * p.s. we had to hack rainbowkit to make expose such window message event, check pnpm patch for details.
+ */
+function useWalletButtonInterceptor(embedUri: string) {
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const origin = new URL(embedUri).origin;
+
+    const handleMessage = (event: MessageEvent) => {
+      if (
+        event.data.type !== "rainbowkit-wallet-button-mobile-clicked" ||
+        origin !== event.origin
+      ) {
+        return;
+      }
+
+      const mobileUri = event.data.uri;
+
+      if (
+        mobileUri.toLowerCase().startsWith("javascript:") ||
+        mobileUri.toLowerCase().startsWith("data:")
+      ) {
+        console.warn("Blocked potentially dangerous URI scheme:", mobileUri);
+        return;
+      }
+
+      if (mobileUri.toLowerCase().startsWith("http")) {
+        const link = document.createElement("a");
+        link.href = mobileUri;
+        link.target = "_blank";
+        link.rel = "noreferrer noopener";
+        link.click();
+      } else {
+        window.location.href = mobileUri;
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [embedUri]);
 }
