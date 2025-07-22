@@ -51,8 +51,8 @@ export function createENSByQueryResolver({
       });
 
       if (fullAddresses.length > 0) {
-        searchEnsByExactAddressInBatch(fullAddresses, subgraphUrl).then(
-          (results) => {
+        searchEnsByExactAddressInBatch(fullAddresses, subgraphUrl)
+          .then((results) => {
             if (results === null) {
               fullAddressesDeferred.forEach((deferred) => {
                 deferred.resolve(null);
@@ -63,8 +63,18 @@ export function createENSByQueryResolver({
             fullAddressesDeferred.forEach((deferred, index) => {
               deferred.resolve(results[index] ?? null);
             });
-          },
-        );
+          })
+          .catch((error) => {
+            // Resolve all deferred promises with null on error
+            fullAddressesDeferred.forEach((deferred) => {
+              deferred.resolve(null);
+            });
+
+            Sentry.captureMessage(
+              "failed to batch query ENS with full addresses",
+              error,
+            );
+          });
       }
 
       return Promise.all(promises);
