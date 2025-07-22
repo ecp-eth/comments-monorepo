@@ -300,7 +300,7 @@ function useWalletButtonInterceptor(embedUri: string) {
         return;
       }
 
-      const mobileUri = event.data.uri;
+      const mobileUri = event.data.uri.toLowerCase();
 
       if (
         mobileUri.startsWith("javascript:") ||
