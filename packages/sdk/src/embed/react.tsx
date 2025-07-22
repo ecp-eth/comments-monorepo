@@ -326,5 +326,5 @@ function useWalletButtonInterceptor(embedUri: string) {
     return () => {
       window.removeEventListener("message", handleMessage);
     };
-  }, []);
+  }, [embedUri]);
 }
