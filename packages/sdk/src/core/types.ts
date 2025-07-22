@@ -30,6 +30,7 @@ export type WaitableWriteContractHelperResult<
     getContractEvents: PublicActions["getContractEvents"];
     waitForTransactionReceipt: PublicActions["waitForTransactionReceipt"];
   }) => Promise<
-    GetContractEventsReturnType<TAbi, TEventName>[number]["args"] | undefined
+    | GetContractEventsReturnType<TAbi, TEventName, true>[number]["args"]
+    | undefined
   >;
 };

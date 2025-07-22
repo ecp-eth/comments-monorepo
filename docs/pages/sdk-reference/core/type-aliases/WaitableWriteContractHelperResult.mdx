@@ -9,7 +9,7 @@
 ```ts
 type WaitableWriteContractHelperResult<TAbi, TEventName> = WriteContractHelperResult & {
   wait: (params) => Promise<
-     | GetContractEventsReturnType<TAbi, TEventName>[number]["args"]
+     | GetContractEventsReturnType<TAbi, TEventName, true>[number]["args"]
     | undefined>;
 };
 ```
@@ -22,7 +22,7 @@ Defined in: [packages/sdk/src/core/types.ts:22](https://github.com/ecp-eth/comme
 
 ```ts
 wait: (params) => Promise<
-  | GetContractEventsReturnType<TAbi, TEventName>[number]["args"]
+  | GetContractEventsReturnType<TAbi, TEventName, true>[number]["args"]
 | undefined>;
 ```
 
@@ -43,7 +43,7 @@ Wait for the return value of the method call
 #### Returns
 
 `Promise`\<
-  \| `GetContractEventsReturnType`\<`TAbi`, `TEventName`\>\[`number`\]\[`"args"`\]
+  \| `GetContractEventsReturnType`\<`TAbi`, `TEventName`, `true`\>\[`number`\]\[`"args"`\]
   \| `undefined`\>
 
 ## Type Parameters
