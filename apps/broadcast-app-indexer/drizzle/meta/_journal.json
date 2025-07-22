@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1752756942831,
+      "when": 1753192448022,
       "tag": "0000_init",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1752838039370,
-      "tag": "0001_add_notifications_enabled_state",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1752843972964,
-      "tag": "0002_add_neynar_notifications_state_table",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1752845196570,
-      "tag": "0003_add_notification_uuid_column",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1752845292827,
-      "tag": "0004_add_attempts_to_notifications",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1752845391060,
-      "tag": "0005_use_created_at_index_on_notifications",
       "breakpoints": true
     }
   ]

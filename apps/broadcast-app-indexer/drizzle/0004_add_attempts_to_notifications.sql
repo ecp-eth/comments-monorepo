@@ -1,1 +1,0 @@
-ALTER TABLE "broadcast_app_indexer_offchain"."neynar_notification_service_queue" ADD COLUMN "attempts" integer DEFAULT 0 NOT NULL;
