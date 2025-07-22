@@ -300,17 +300,17 @@ function useWalletButtonInterceptor(embedUri: string) {
         return;
       }
 
-      const mobileUri = event.data.uri.toLowerCase();
+      const mobileUri = event.data.uri;
 
       if (
-        mobileUri.startsWith("javascript:") ||
-        mobileUri.startsWith("data:")
+        mobileUri.toLowerCase().startsWith("javascript:") ||
+        mobileUri.toLowerCase().startsWith("data:")
       ) {
         console.warn("Blocked potentially dangerous URI scheme:", mobileUri);
         return;
       }
 
-      if (mobileUri.startsWith("http")) {
+      if (mobileUri.toLowerCase().startsWith("http")) {
         const link = document.createElement("a");
         link.href = mobileUri;
         link.target = "_blank";
