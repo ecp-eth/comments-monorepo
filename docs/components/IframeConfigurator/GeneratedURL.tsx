@@ -244,9 +244,9 @@ function generateScriptContent(url: string, autoHeightAdjustment: boolean) {
   const origin = new URL(url).origin;
 
   return (
-    `(${mandatoryScript.toString()})("${origin}");` +
+    `(${mandatoryScript.toString()})(${JSON.stringify(origin)});` +
     (autoHeightAdjustment
-      ? `(${heightAdjustmentScript.toString()})("${origin}");`
+      ? `(${heightAdjustmentScript.toString()})(${JSON.stringify(origin)});`
       : "")
   );
 }
