@@ -6,7 +6,7 @@ import {
   useConnectBeforeAction,
 } from "@ecp.eth/shared/components";
 import {} from "@ecp.eth/shared/components";
-import { useCommentIsHearted, useFreshRef } from "@ecp.eth/shared/hooks";
+import { useCommentIsHearted } from "@ecp.eth/shared/hooks";
 import { cn } from "@ecp.eth/shared/helpers";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { CommentActionButton } from "./CommentActionButton";
