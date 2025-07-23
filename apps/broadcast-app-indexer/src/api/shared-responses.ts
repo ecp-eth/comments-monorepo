@@ -25,3 +25,8 @@ export const ChannelResponse = z.object({
   isSubscribed: z.boolean(),
   notificationsEnabled: z.boolean(),
 });
+
+export const ChannelSubscriptionUpdateResponse = z.object({
+  channelId: z.bigint().transform((val) => val.toString()),
+  notificationsEnabled: z.boolean(),
+});
