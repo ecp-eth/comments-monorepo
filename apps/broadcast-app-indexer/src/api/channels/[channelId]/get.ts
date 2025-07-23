@@ -6,7 +6,7 @@ import {
   NotFoundResponse,
 } from "../../shared-responses";
 import { db } from "../../../services";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { schema } from "../../../../schema";
 
 export async function channelGET(api: OpenAPIHono): Promise<void> {
@@ -60,30 +60,40 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
     async (c) => {
       const { channelId } = c.req.valid("param");
 
-      const channel = await db.query.channel.findFirst({
-        where: eq(schema.channel.id, channelId),
-        with: {
-          subscriptions: {
-            where: eq(schema.channelSubscription.userFid, c.get("user").fid),
-          },
-        },
-      });
+      const [result] = await db
+        .select()
+        .from(schema.channel)
+        .leftJoin(
+          schema.channelSubscription,
+          and(
+            eq(schema.channel.id, schema.channelSubscription.channelId),
+            eq(schema.channelSubscription.userFid, c.get("user").fid),
+          ),
+        )
+        .where(eq(schema.channel.id, channelId))
+        .limit(1);
 
-      if (!channel) {
+      if (!result) {
         return c.json({ error: "Channel not found" }, 404);
       }
 
-      return c.json({
-        id: channel.id,
-        name: channel.name,
-        description: channel.description,
-        createdAt: channel.createdAt,
-        updatedAt: channel.updatedAt,
-        isSubscribed: channel.subscriptions.length > 0,
-        notificationsEnabled: channel.subscriptions.some(
-          (sub) => sub.notificationsEnabled,
-        ),
-      });
+      const { channel, channel_subscription } = result;
+
+      // hono doesn't run response schema validations therefore we need to validate the response manually
+      // which also works as formatter for bigints, etc
+      return c.json(
+        ChannelResponse.parse({
+          id: channel.id,
+          name: channel.name,
+          description: channel.description,
+          createdAt: channel.createdAt,
+          updatedAt: channel.updatedAt,
+          isSubscribed: !!channel_subscription,
+          notificationsEnabled:
+            channel_subscription?.notificationsEnabled ?? false,
+        }),
+        200,
+      );
     },
   );
 }
