@@ -481,11 +481,15 @@ paths:
                                   anyOf:
                                     - {}
                                     - type: string
+                                      enum:
+                                        - ''
                                 amount:
                                   anyOf:
                                     - type: string
                                       pattern: ^\d+(\.\d+)?$
                                     - type: string
+                                      enum:
+                                        - ''
                                 symbol:
                                   type: string
                               required:
@@ -906,11 +910,15 @@ paths:
                                           anyOf:
                                             - {}
                                             - type: string
+                                              enum:
+                                                - ''
                                         amount:
                                           anyOf:
                                             - type: string
                                               pattern: ^\d+(\.\d+)?$
                                             - type: string
+                                              enum:
+                                                - ''
                                         symbol:
                                           type: string
                                       required:
@@ -1373,11 +1381,15 @@ paths:
                                             anyOf:
                                               - {}
                                               - type: string
+                                                enum:
+                                                  - ''
                                           amount:
                                             anyOf:
                                               - type: string
                                                 pattern: ^\d+(\.\d+)?$
                                               - type: string
+                                                enum:
+                                                  - ''
                                           symbol:
                                             type: string
                                         required:
@@ -1798,11 +1810,15 @@ paths:
                                                     anyOf:
                                                       - {}
                                                       - type: string
+                                                        enum:
+                                                          - ''
                                                   amount:
                                                     anyOf:
                                                       - type: string
                                                         pattern: ^\d+(\.\d+)?$
                                                       - type: string
+                                                        enum:
+                                                          - ''
                                                   symbol:
                                                     type: string
                                                 required:
@@ -2492,11 +2508,15 @@ paths:
                                   anyOf:
                                     - {}
                                     - type: string
+                                      enum:
+                                        - ''
                                 amount:
                                   anyOf:
                                     - type: string
                                       pattern: ^\d+(\.\d+)?$
                                     - type: string
+                                      enum:
+                                        - ''
                                 symbol:
                                   type: string
                               required:
@@ -2917,11 +2937,15 @@ paths:
                                           anyOf:
                                             - {}
                                             - type: string
+                                              enum:
+                                                - ''
                                         amount:
                                           anyOf:
                                             - type: string
                                               pattern: ^\d+(\.\d+)?$
                                             - type: string
+                                              enum:
+                                                - ''
                                         symbol:
                                           type: string
                                       required:
@@ -3384,11 +3408,15 @@ paths:
                                             anyOf:
                                               - {}
                                               - type: string
+                                                enum:
+                                                  - ''
                                           amount:
                                             anyOf:
                                               - type: string
                                                 pattern: ^\d+(\.\d+)?$
                                               - type: string
+                                                enum:
+                                                  - ''
                                           symbol:
                                             type: string
                                         required:
@@ -3809,11 +3837,15 @@ paths:
                                                     anyOf:
                                                       - {}
                                                       - type: string
+                                                        enum:
+                                                          - ''
                                                   amount:
                                                     anyOf:
                                                       - type: string
                                                         pattern: ^\d+(\.\d+)?$
                                                       - type: string
+                                                        enum:
+                                                          - ''
                                                   symbol:
                                                     type: string
                                                 required:
@@ -4748,11 +4780,15 @@ paths:
                                   anyOf:
                                     - {}
                                     - type: string
+                                      enum:
+                                        - ''
                                 amount:
                                   anyOf:
                                     - type: string
                                       pattern: ^\d+(\.\d+)?$
                                     - type: string
+                                      enum:
+                                        - ''
                                 symbol:
                                   type: string
                               required:
@@ -5266,11 +5302,15 @@ paths:
                             anyOf:
                               - {}
                               - type: string
+                                enum:
+                                  - ''
                           amount:
                             anyOf:
                               - type: string
                                 pattern: ^\d+(\.\d+)?$
                               - type: string
+                                enum:
+                                  - ''
                           symbol:
                             type: string
                         required:
@@ -5765,11 +5805,15 @@ paths:
                             anyOf:
                               - {}
                               - type: string
+                                enum:
+                                  - ''
                           amount:
                             anyOf:
                               - type: string
                                 pattern: ^\d+(\.\d+)?$
                               - type: string
+                                enum:
+                                  - ''
                           symbol:
                             type: string
                         required:

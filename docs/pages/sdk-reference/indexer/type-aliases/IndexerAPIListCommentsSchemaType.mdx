@@ -335,7 +335,7 @@ type IndexerAPIListCommentsSchemaType = {
                  symbol: string;
               };
               to: {
-                 address: string;
+                 address: "" | `0x${(...)}`;
                  amount: string;
                  symbol: string;
               };
@@ -483,7 +483,7 @@ type IndexerAPIListCommentsSchemaType = {
               symbol: string;
            };
            to: {
-              address: string;
+              address: "" | `0x${(...)}`;
               amount: string;
               symbol: string;
            };
@@ -497,7 +497,7 @@ type IndexerAPIListCommentsSchemaType = {
            symbol: string;
         };
         to: {
-           address: string;
+           address: "" | `0x${string}`;
            amount: string;
            symbol: string;
         };
@@ -506,7 +506,7 @@ type IndexerAPIListCommentsSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:421](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L421)
+Defined in: [packages/sdk/src/indexer/schemas.ts:427](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L427)
 
 ## Type declaration
 
@@ -892,7 +892,7 @@ results: {
               symbol: string;
            };
            to: {
-              address: string;
+              address: "" | `0x${(...)}`;
               amount: string;
               symbol: string;
            };
@@ -1040,7 +1040,7 @@ results: {
            symbol: string;
         };
         to: {
-           address: string;
+           address: "" | `0x${(...)}`;
            amount: string;
            symbol: string;
         };
@@ -1054,7 +1054,7 @@ results: {
         symbol: string;
      };
      to: {
-        address: string;
+        address: "" | `0x${string}`;
         amount: string;
         symbol: string;
      };
