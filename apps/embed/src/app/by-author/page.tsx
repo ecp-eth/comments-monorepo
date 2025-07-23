@@ -9,6 +9,7 @@ import { env } from "@/env";
 import { CommentSectionReadonly } from "@/components/comments/CommentSectionReadonly";
 import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
 import { cn } from "@ecp.eth/shared/helpers";
+import { MainWrapper } from "@/components/MainWrapper";
 
 const SearchParamsSchema = z.object({
   author: HexSchema,
@@ -62,7 +63,7 @@ export default async function EmbedCommentsByAuthorPage({
           ...config,
         }}
       >
-        <main className="min-h-screen p-0 font-default">
+        <MainWrapper>
           <div
             className={cn(
               "mx-auto",
@@ -82,7 +83,7 @@ export default async function EmbedCommentsByAuthorPage({
               }}
             />
           </div>
-        </main>
+        </MainWrapper>
         <Toaster />
       </Providers>
     );
