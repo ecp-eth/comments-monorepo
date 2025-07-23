@@ -13,7 +13,7 @@ export async function channelUnsubscribePOST(api: OpenAPIHono): Promise<void> {
   api.openapi(
     {
       method: "post",
-      path: "/api/channels/[channelId]/unsubscribe",
+      path: "/api/channels/:channelId/unsubscribe",
       tags: ["Channels", "Subscriptions"],
       description: "Unsubscribes from a channel",
       middleware: [farcasterQuickAuthMiddleware] as const,

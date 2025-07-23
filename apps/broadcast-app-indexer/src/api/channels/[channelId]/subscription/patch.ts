@@ -2,6 +2,7 @@ import { type OpenAPIHono, z } from "@hono/zod-openapi";
 import { farcasterQuickAuthMiddleware } from "../../../middleware/farcaster-quick-auth-middleware";
 import {
   BadRequestResponse,
+  ChannelSubscriptionUpdateResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   UnsupportedMediaTypeResponse,
@@ -16,7 +17,7 @@ export async function channelSubscriptionPATCH(
   api.openapi(
     {
       method: "patch",
-      path: "/api/channels/[channelId]/subscription",
+      path: "/api/channels/:channelId/subscription",
       tags: ["Channels", "Subscriptions"],
       description: "Updates subscription settings for a channel",
       middleware: [farcasterQuickAuthMiddleware] as const,
@@ -39,10 +40,7 @@ export async function channelSubscriptionPATCH(
           description: "Successfully updated subscription settings",
           content: {
             "application/json": {
-              schema: z.object({
-                channelId: z.coerce.bigint(),
-                notificationsEnabled: z.boolean().default(false),
-              }),
+              schema: ChannelSubscriptionUpdateResponse,
             },
           },
         },
@@ -119,11 +117,13 @@ export async function channelSubscriptionPATCH(
         return c.json({ error: "Subscription not found" }, 404);
       }
 
+      // hono doesn't run response schema validations therefore we need to validate the response manually
+      // which also works as formatter for bigints, etc
       return c.json(
-        {
+        ChannelSubscriptionUpdateResponse.parse({
           channelId: subscription.channelId,
           notificationsEnabled: subscription.notificationsEnabled,
-        },
+        }),
         200,
       );
     },
