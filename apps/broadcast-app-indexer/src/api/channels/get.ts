@@ -2,7 +2,7 @@ import { type OpenAPIHono, z } from "@hono/zod-openapi";
 import { farcasterQuickAuthMiddleware } from "../middleware/farcaster-quick-auth-middleware";
 import { schema } from "../../../schema";
 import { db } from "../../services";
-import { and, desc, eq, lt, or } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, lt, or } from "drizzle-orm";
 import { ChannelResponse } from "../shared-responses";
 
 function toChannelCursor(channel: { id: bigint; createdAt: Date }): string {
@@ -40,7 +40,11 @@ const requestQuerySchema = z.object({
   onlySubscribed: z
     .enum(["1", "0"])
     .transform((val) => val === "1")
-    .default("0"),
+    .default("0")
+    .openapi({
+      description:
+        "If false is passed only unsubscribed channels will be returned",
+    }),
 });
 
 const responseSchema = z.object({
@@ -76,52 +80,63 @@ export async function channelsGET(api: OpenAPIHono) {
     async (c) => {
       const { limit, cursor, onlySubscribed } = c.req.valid("query");
 
-      const results = await db.query.channel.findMany({
-        with: {
-          subscriptions: {
-            where: eq(schema.channelSubscription.userFid, c.get("user").fid),
-          },
-        },
-        where: and(
-          onlySubscribed
-            ? eq(schema.channelSubscription.userFid, c.get("user").fid)
-            : undefined,
-          cursor
-            ? or(
-                lt(schema.channel.createdAt, cursor.createdAt),
-                and(
-                  eq(schema.channel.createdAt, cursor.createdAt),
-                  lt(schema.channel.id, cursor.id),
-                ),
-              )
-            : undefined,
-        ),
-        orderBy: [desc(schema.channel.createdAt), desc(schema.channel.id)],
-        limit: limit + 1,
-      });
+      const results = await db
+        .select()
+        .from(schema.channel)
+        .leftJoin(
+          schema.channelSubscription,
+          and(
+            eq(schema.channel.id, schema.channelSubscription.channelId),
+            eq(schema.channelSubscription.userFid, c.get("user").fid),
+          ),
+        )
+        .where(
+          and(
+            cursor
+              ? or(
+                  lt(schema.channel.createdAt, cursor.createdAt),
+                  and(
+                    eq(schema.channel.createdAt, cursor.createdAt),
+                    lt(schema.channel.id, cursor.id),
+                  ),
+                )
+              : undefined,
+            onlySubscribed
+              ? isNotNull(schema.channelSubscription.userFid)
+              : isNull(schema.channelSubscription.userFid),
+          ),
+        )
+        .orderBy(desc(schema.channel.createdAt), desc(schema.channel.id))
+        .limit(limit + 1);
 
-      const channels = results.slice(0, limit);
+      const pageResults = results.slice(0, limit);
       const [nextCursor] = results.slice(limit);
 
-      return c.json({
-        results: channels.map((channel) => {
-          return {
-            id: channel.id,
-            name: channel.name,
-            description: channel.description,
-            isSubscribed: channel.subscriptions.length > 0,
-            notificationsEnabled: channel.subscriptions.some(
-              (sub) => sub.notificationsEnabled,
-            ),
-            createdAt: channel.createdAt,
-            updatedAt: channel.updatedAt,
-          };
+      // hono doesn't run response schema validations therefore we need to validate the response manually
+      // which also works as formatter for bigints, etc
+      return c.json(
+        responseSchema.parse({
+          results: pageResults.map(({ channel, channel_subscription }) => {
+            return {
+              id: channel.id,
+              name: channel.name,
+              description: channel.description,
+              isSubscribed: channel_subscription !== null,
+              notificationsEnabled:
+                channel_subscription?.notificationsEnabled ?? false,
+              createdAt: channel.createdAt,
+              updatedAt: channel.updatedAt,
+            };
+          }),
+          pageInfo: {
+            hasNextPage: nextCursor !== undefined,
+            nextCursor: nextCursor
+              ? toChannelCursor(nextCursor.channel)
+              : undefined,
+          },
         }),
-        pageInfo: {
-          hasNextPage: nextCursor !== undefined,
-          nextCursor: nextCursor ? toChannelCursor(nextCursor) : undefined,
-        },
-      });
+        200,
+      );
     },
   );
 }
