@@ -8,38 +8,18 @@ import {
 } from "@ecp.eth/sdk/embed";
 import { CircleX, Info } from "lucide-react";
 import { DEFAULT_CONFIG } from "./constants";
-import { useMemo } from "react";
 import { Button } from "../ui/button";
 import { ZodError } from "zod";
 
 function CodeSnippet({
   url,
   autoHeightAdjustment,
+  scriptContent,
 }: {
   url: string;
+  scriptContent: string;
   autoHeightAdjustment: boolean;
 }) {
-  const origin = useMemo(() => new URL(url).origin, [url]);
-  function scriptContent(origin: string) {
-    window.addEventListener("message", (event) => {
-      if (
-        event.origin !== origin ||
-        event.data.type !== "@ecp.eth/sdk/embed/resize"
-      ) {
-        return;
-      }
-      const embedIframe = document.querySelector(
-        "iframe[title=Comments]",
-      ) as HTMLElement;
-
-      if (!embedIframe) {
-        return;
-      }
-
-      embedIframe.style.height = event.data.height + "px";
-    });
-  }
-
   return (
     <>
       <iframe
@@ -55,9 +35,7 @@ function CodeSnippet({
         }}
         title="Comments"
       ></iframe>
-      {autoHeightAdjustment && (
-        <script>{`(${scriptContent.toString()})("${origin}")`}</script>
-      )}
+      <script>{scriptContent}</script>
     </>
   );
 }
@@ -100,9 +78,16 @@ export default function GeneratedURL({
             : undefined,
       });
       const frameSrc = new URL(url).origin;
+      const scriptContent = generateScriptContent(url, autoHeightAdjustment);
+
       const snippet = renderToString(
-        <CodeSnippet url={url} autoHeightAdjustment={autoHeightAdjustment} />,
+        <CodeSnippet
+          url={url}
+          autoHeightAdjustment={autoHeightAdjustment}
+          scriptContent={scriptContent ?? ""}
+        />,
       );
+
       setFrameSrc(frameSrc);
       setSnippet(snippet);
       setError(undefined);
@@ -201,5 +186,67 @@ export default function GeneratedURL({
         </span>
       </div>
     </div>
+  );
+}
+
+function heightAdjustmentScript(origin: string) {
+  window.addEventListener("message", (event) => {
+    if (
+      event.origin !== origin ||
+      event.data.type !== "@ecp.eth/sdk/embed/resize"
+    ) {
+      return;
+    }
+    const embedIframe = document.querySelector(
+      "iframe[title=Comments]",
+    ) as HTMLElement;
+
+    if (!embedIframe) {
+      return;
+    }
+
+    embedIframe.style.height = event.data.height + "px";
+  });
+}
+
+function mandatoryScript(origin: string) {
+  window.addEventListener("message", (event: MessageEvent) => {
+    if (
+      event.data.type !== "rainbowkit-wallet-button-mobile-clicked" ||
+      origin !== event.origin
+    ) {
+      return;
+    }
+
+    const mobileUri = event.data.uri;
+
+    if (
+      mobileUri.toLowerCase().startsWith("javascript:") ||
+      mobileUri.toLowerCase().startsWith("data:")
+    ) {
+      console.warn("Blocked potentially dangerous URI scheme:", mobileUri);
+      return;
+    }
+
+    if (mobileUri.toLowerCase().startsWith("http")) {
+      const link = document.createElement("a");
+      link.href = mobileUri;
+      link.target = "_blank";
+      link.rel = "noreferrer noopener";
+      link.click();
+    } else {
+      window.location.href = mobileUri;
+    }
+  });
+}
+
+function generateScriptContent(url: string, autoHeightAdjustment: boolean) {
+  const origin = new URL(url).origin;
+
+  return (
+    `(${mandatoryScript.toString()})("${origin}");` +
+    (autoHeightAdjustment
+      ? `(${heightAdjustmentScript.toString()})("${origin}");`
+      : "")
   );
 }
