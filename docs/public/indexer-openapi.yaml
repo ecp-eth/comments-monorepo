@@ -477,10 +477,19 @@ paths:
                             to:
                               type: object
                               properties:
-                                address: {}
+                                address:
+                                  anyOf:
+                                    - {}
+                                    - type: string
+                                      enum:
+                                        - ''
                                 amount:
-                                  type: string
-                                  pattern: ^\d+(\.\d+)?$
+                                  anyOf:
+                                    - type: string
+                                      pattern: ^\d+(\.\d+)?$
+                                    - type: string
+                                      enum:
+                                        - ''
                                 symbol:
                                   type: string
                               required:
@@ -897,10 +906,19 @@ paths:
                                     to:
                                       type: object
                                       properties:
-                                        address: {}
+                                        address:
+                                          anyOf:
+                                            - {}
+                                            - type: string
+                                              enum:
+                                                - ''
                                         amount:
-                                          type: string
-                                          pattern: ^\d+(\.\d+)?$
+                                          anyOf:
+                                            - type: string
+                                              pattern: ^\d+(\.\d+)?$
+                                            - type: string
+                                              enum:
+                                                - ''
                                         symbol:
                                           type: string
                                       required:
@@ -1359,10 +1377,19 @@ paths:
                                       to:
                                         type: object
                                         properties:
-                                          address: {}
+                                          address:
+                                            anyOf:
+                                              - {}
+                                              - type: string
+                                                enum:
+                                                  - ''
                                           amount:
-                                            type: string
-                                            pattern: ^\d+(\.\d+)?$
+                                            anyOf:
+                                              - type: string
+                                                pattern: ^\d+(\.\d+)?$
+                                              - type: string
+                                                enum:
+                                                  - ''
                                           symbol:
                                             type: string
                                         required:
@@ -1779,10 +1806,19 @@ paths:
                                               to:
                                                 type: object
                                                 properties:
-                                                  address: {}
+                                                  address:
+                                                    anyOf:
+                                                      - {}
+                                                      - type: string
+                                                        enum:
+                                                          - ''
                                                   amount:
-                                                    type: string
-                                                    pattern: ^\d+(\.\d+)?$
+                                                    anyOf:
+                                                      - type: string
+                                                        pattern: ^\d+(\.\d+)?$
+                                                      - type: string
+                                                        enum:
+                                                          - ''
                                                   symbol:
                                                     type: string
                                                 required:
@@ -2468,10 +2504,19 @@ paths:
                             to:
                               type: object
                               properties:
-                                address: {}
+                                address:
+                                  anyOf:
+                                    - {}
+                                    - type: string
+                                      enum:
+                                        - ''
                                 amount:
-                                  type: string
-                                  pattern: ^\d+(\.\d+)?$
+                                  anyOf:
+                                    - type: string
+                                      pattern: ^\d+(\.\d+)?$
+                                    - type: string
+                                      enum:
+                                        - ''
                                 symbol:
                                   type: string
                               required:
@@ -2888,10 +2933,19 @@ paths:
                                     to:
                                       type: object
                                       properties:
-                                        address: {}
+                                        address:
+                                          anyOf:
+                                            - {}
+                                            - type: string
+                                              enum:
+                                                - ''
                                         amount:
-                                          type: string
-                                          pattern: ^\d+(\.\d+)?$
+                                          anyOf:
+                                            - type: string
+                                              pattern: ^\d+(\.\d+)?$
+                                            - type: string
+                                              enum:
+                                                - ''
                                         symbol:
                                           type: string
                                       required:
@@ -3350,10 +3404,19 @@ paths:
                                       to:
                                         type: object
                                         properties:
-                                          address: {}
+                                          address:
+                                            anyOf:
+                                              - {}
+                                              - type: string
+                                                enum:
+                                                  - ''
                                           amount:
-                                            type: string
-                                            pattern: ^\d+(\.\d+)?$
+                                            anyOf:
+                                              - type: string
+                                                pattern: ^\d+(\.\d+)?$
+                                              - type: string
+                                                enum:
+                                                  - ''
                                           symbol:
                                             type: string
                                         required:
@@ -3770,10 +3833,19 @@ paths:
                                               to:
                                                 type: object
                                                 properties:
-                                                  address: {}
+                                                  address:
+                                                    anyOf:
+                                                      - {}
+                                                      - type: string
+                                                        enum:
+                                                          - ''
                                                   amount:
-                                                    type: string
-                                                    pattern: ^\d+(\.\d+)?$
+                                                    anyOf:
+                                                      - type: string
+                                                        pattern: ^\d+(\.\d+)?$
+                                                      - type: string
+                                                        enum:
+                                                          - ''
                                                   symbol:
                                                     type: string
                                                 required:
@@ -4704,10 +4776,19 @@ paths:
                             to:
                               type: object
                               properties:
-                                address: {}
+                                address:
+                                  anyOf:
+                                    - {}
+                                    - type: string
+                                      enum:
+                                        - ''
                                 amount:
-                                  type: string
-                                  pattern: ^\d+(\.\d+)?$
+                                  anyOf:
+                                    - type: string
+                                      pattern: ^\d+(\.\d+)?$
+                                    - type: string
+                                      enum:
+                                        - ''
                                 symbol:
                                   type: string
                               required:
@@ -5217,10 +5298,19 @@ paths:
                       to:
                         type: object
                         properties:
-                          address: {}
+                          address:
+                            anyOf:
+                              - {}
+                              - type: string
+                                enum:
+                                  - ''
                           amount:
-                            type: string
-                            pattern: ^\d+(\.\d+)?$
+                            anyOf:
+                              - type: string
+                                pattern: ^\d+(\.\d+)?$
+                              - type: string
+                                enum:
+                                  - ''
                           symbol:
                             type: string
                         required:
@@ -5711,10 +5801,19 @@ paths:
                       to:
                         type: object
                         properties:
-                          address: {}
+                          address:
+                            anyOf:
+                              - {}
+                              - type: string
+                                enum:
+                                  - ''
                           amount:
-                            type: string
-                            pattern: ^\d+(\.\d+)?$
+                            anyOf:
+                              - type: string
+                                pattern: ^\d+(\.\d+)?$
+                              - type: string
+                                enum:
+                                  - ''
                           symbol:
                             type: string
                         required:

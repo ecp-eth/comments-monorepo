@@ -156,7 +156,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
            symbol: string;
         };
         to: {
-           address: `0x${string}`;
+           address: "" | `0x${string}`;
            amount: string;
            symbol: string;
         };
@@ -165,7 +165,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:440](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L440)
+Defined in: [packages/sdk/src/indexer/schemas.ts:448](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L448)
 
 ## Type declaration
 
@@ -372,7 +372,7 @@ results: {
         symbol: string;
      };
      to: {
-        address: `0x${string}`;
+        address: "" | `0x${string}`;
         amount: string;
         symbol: string;
      };

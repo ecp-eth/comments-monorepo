@@ -14,14 +14,14 @@ type IndexerAPICommentZeroExSwapSchemaType = {
      symbol: string;
   };
   to: {
-     address: `0x${string}`;
+     address: "" | `0x${string}`;
      amount: string;
      symbol: string;
   };
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:174](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L174)
+Defined in: [packages/sdk/src/indexer/schemas.ts:182](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L182)
 
 ## Type declaration
 
@@ -57,7 +57,7 @@ symbol: string;
 
 ```ts
 to: {
-  address: `0x${string}`;
+  address: "" | `0x${string}`;
   amount: string;
   symbol: string;
 };
@@ -66,13 +66,13 @@ to: {
 #### to.address
 
 ```ts
-address: `0x${string}` = HexSchema;
+address: "" | `0x${string}` = IndexerAPIZeroExSwapPossibleEmptyAddressSchema;
 ```
 
 #### to.amount
 
 ```ts
-amount: string = IndexerAPIZeroExTokenAmountSchema;
+amount: string = IndexerAPIZeroExSwapPossiblyEmptyTokenAmountSchema;
 ```
 
 #### to.symbol

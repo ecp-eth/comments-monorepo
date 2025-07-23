@@ -158,15 +158,23 @@ export const IndexerAPIZeroExTokenAmountSchema = z.coerce
     message: "Amount must be a number with optional decimal part",
   });
 
+export const IndexerAPIZeroExSwapPossibleEmptyAddressSchema = HexSchema.or(
+  z.literal(""),
+);
+export const IndexerAPIZeroExSwapPossiblyEmptyTokenAmountSchema =
+  IndexerAPIZeroExTokenAmountSchema.or(z.literal(""));
+
 export const IndexerAPICommentZeroExSwapSchema = z.object({
   from: z.object({
     address: HexSchema,
     amount: IndexerAPIZeroExTokenAmountSchema,
     symbol: z.string(),
   }),
+  // in case of native sell 0x swap parser can fallback to empty strings
+  // if it can't find the log for the taker
   to: z.object({
-    address: HexSchema,
-    amount: IndexerAPIZeroExTokenAmountSchema,
+    address: IndexerAPIZeroExSwapPossibleEmptyAddressSchema,
+    amount: IndexerAPIZeroExSwapPossiblyEmptyTokenAmountSchema,
     symbol: z.string(),
   }),
 });

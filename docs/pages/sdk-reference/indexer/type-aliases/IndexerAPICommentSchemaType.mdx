@@ -144,7 +144,7 @@ type IndexerAPICommentSchemaType = {
         symbol: string;
      };
      to: {
-        address: `0x${string}`;
+        address: "" | `0x${string}`;
         amount: string;
         symbol: string;
      };
@@ -152,7 +152,7 @@ type IndexerAPICommentSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:343](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L343)
+Defined in: [packages/sdk/src/indexer/schemas.ts:351](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L351)
 
 ## Type declaration
 
@@ -473,7 +473,7 @@ zeroExSwap:
      symbol: string;
   };
   to: {
-     address: `0x${string}`;
+     address: "" | `0x${string}`;
      amount: string;
      symbol: string;
   };

@@ -144,7 +144,7 @@ type IndexerAPIModerationChangeModerationStatusOnCommentOutputSchemaType = {
         symbol: string;
      };
      to: {
-        address: `0x${string}`;
+        address: "" | `0x${string}`;
         amount: string;
         symbol: string;
      };
@@ -152,7 +152,7 @@ type IndexerAPIModerationChangeModerationStatusOnCommentOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:485](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L485)
+Defined in: [packages/sdk/src/indexer/schemas.ts:493](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L493)
 
 ## Type declaration
 
@@ -473,7 +473,7 @@ zeroExSwap:
      symbol: string;
   };
   to: {
-     address: `0x${string}`;
+     address: "" | `0x${string}`;
      amount: string;
      symbol: string;
   };

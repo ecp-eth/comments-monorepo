@@ -252,15 +252,15 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         symbol: string;
      }>;
      to: ZodObject<{
-        address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
-        amount: ZodString;
+        address: ZodUnion<[ZodType<..., ..., ...>, ZodLiteral<...>]>;
+        amount: ZodUnion<[ZodString, ZodLiteral<...>]>;
         symbol: ZodString;
       }, "strip", ZodTypeAny, {
-        address: `0x${string}`;
+        address: "" | `0x${string}`;
         amount: string;
         symbol: string;
       }, {
-        address: `0x${string}`;
+        address: "" | `0x${string}`;
         amount: string;
         symbol: string;
      }>;
@@ -271,7 +271,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         symbol: string;
      };
      to: {
-        address: `0x${string}`;
+        address: "" | `0x${string}`;
         amount: string;
         symbol: string;
      };
@@ -282,7 +282,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         symbol: string;
      };
      to: {
-        address: `0x${string}`;
+        address: "" | `0x${string}`;
         amount: string;
         symbol: string;
      };
@@ -488,7 +488,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
            symbol: string;
         };
         to: {
-           address: `0x${(...)}`;
+           address: ... | ...;
            amount: string;
            symbol: string;
         };
@@ -621,7 +621,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
            symbol: string;
         };
         to: {
-           address: `0x${(...)}`;
+           address: ... | ...;
            amount: string;
            symbol: string;
         };
@@ -894,7 +894,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
            symbol: string;
         };
         to: {
-           address: `0x${string}`;
+           address: "" | `0x${string}`;
            amount: string;
            symbol: string;
         };
@@ -908,7 +908,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         symbol: string;
      };
      to: {
-        address: `0x${string}`;
+        address: "" | `0x${string}`;
         amount: string;
         symbol: string;
      };
@@ -1180,7 +1180,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
            symbol: string;
         };
         to: {
-           address: `0x${string}`;
+           address: "" | `0x${string}`;
            amount: string;
            symbol: string;
         };
@@ -1194,7 +1194,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         symbol: string;
      };
      to: {
-        address: `0x${string}`;
+        address: "" | `0x${string}`;
         amount: string;
         symbol: string;
      };
@@ -1202,4 +1202,4 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:364](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L364)
+Defined in: [packages/sdk/src/indexer/schemas.ts:372](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L372)
