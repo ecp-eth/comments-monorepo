@@ -174,6 +174,7 @@ export class NeynarNotificationsService implements INotificationsService {
         await this.db
           .update(schema.neynarNotificationServiceQueue)
           .set({
+            pendingSubscriberFids: ramainingFids,
             status: "completed",
             updatedAt: new Date(),
           })
