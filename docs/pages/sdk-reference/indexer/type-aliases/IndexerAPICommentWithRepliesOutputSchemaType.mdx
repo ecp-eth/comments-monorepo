@@ -403,7 +403,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
                  symbol: string;
               };
               to: {
-                 address: `0x${(...)}`;
+                 address: string;
                  amount: string;
                  symbol: string;
               };
@@ -417,7 +417,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
               symbol: string;
            };
            to: {
-              address: `0x${string}`;
+              address: string;
               amount: string;
               symbol: string;
            };
@@ -565,7 +565,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
            symbol: string;
         };
         to: {
-           address: `0x${string}`;
+           address: string;
            amount: string;
            symbol: string;
         };
@@ -579,7 +579,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
         symbol: string;
      };
      to: {
-        address: `0x${string}`;
+        address: string;
         amount: string;
         symbol: string;
      };
@@ -587,7 +587,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:409](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L409)
+Defined in: [packages/sdk/src/indexer/schemas.ts:411](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L411)
 
 ## Type declaration
 
@@ -1151,7 +1151,7 @@ replies: {
               symbol: string;
            };
            to: {
-              address: `0x${(...)}`;
+              address: string;
               amount: string;
               symbol: string;
            };
@@ -1165,7 +1165,7 @@ replies: {
            symbol: string;
         };
         to: {
-           address: `0x${string}`;
+           address: string;
            amount: string;
            symbol: string;
         };
@@ -1498,7 +1498,7 @@ results: {
            symbol: string;
         };
         to: {
-           address: `0x${(...)}`;
+           address: string;
            amount: string;
            symbol: string;
         };
@@ -1512,7 +1512,7 @@ results: {
         symbol: string;
      };
      to: {
-        address: `0x${string}`;
+        address: string;
         amount: string;
         symbol: string;
      };
@@ -1684,7 +1684,7 @@ viewerReactions: Record<string, {
         symbol: string;
      };
      to: {
-        address: `0x${string}`;
+        address: string;
         amount: string;
         symbol: string;
      };
@@ -1704,7 +1704,7 @@ zeroExSwap:
      symbol: string;
   };
   to: {
-     address: `0x${string}`;
+     address: string;
      amount: string;
      symbol: string;
   };
