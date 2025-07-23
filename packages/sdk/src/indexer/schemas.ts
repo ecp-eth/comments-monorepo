@@ -164,9 +164,11 @@ export const IndexerAPICommentZeroExSwapSchema = z.object({
     amount: IndexerAPIZeroExTokenAmountSchema,
     symbol: z.string(),
   }),
+  // in case of native sell 0x swap parser can fallback to empty strings
+  // if it can't find the log for the taker
   to: z.object({
-    address: HexSchema,
-    amount: IndexerAPIZeroExTokenAmountSchema,
+    address: HexSchema.or(z.string()),
+    amount: IndexerAPIZeroExTokenAmountSchema.or(z.string()),
     symbol: z.string(),
   }),
 });
