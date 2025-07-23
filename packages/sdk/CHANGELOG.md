@@ -1,5 +1,12 @@
 # @ecp.eth/sdk
 
+## 0.0.25
+
+### Patch Changes
+
+- 4930d66: fix(sdk): use strict event typing
+- bbed557: fix(indexer): allow empty strings in 0x swap "to" data
+
 ## 0.0.24
 
 ### Patch Changes
