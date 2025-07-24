@@ -151,7 +151,7 @@ export function CommentItem({ comment }: CommentItemProps) {
         commentId: comment.id,
         signal,
         viewer: connectedAddress,
-        mode: "flat",
+        mode: comment.parentId ? undefined : "flat",
         commentType: COMMENT_TYPE_COMMENT,
       });
 
@@ -184,7 +184,7 @@ export function CommentItem({ comment }: CommentItemProps) {
         sort: "asc",
         signal,
         viewer: connectedAddress,
-        mode: "flat",
+        mode: comment.parentId ? undefined : "flat",
         commentType: COMMENT_TYPE_COMMENT,
       });
     },
