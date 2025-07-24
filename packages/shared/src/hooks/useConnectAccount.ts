@@ -5,6 +5,7 @@ import { useAccount, useAccountEffect } from "wagmi";
 import { useFreshRef } from "./useFreshRef.js";
 
 const CONNECT_WALLET_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+const WALLET_CONNECT_DIALOG_MINIMAL_HEIGHT = 480;
 
 type Deferred = {
   resolve: (account: Hex) => void;
@@ -70,6 +71,7 @@ export function useConnectAccount() {
     deferredRef.current = deferred;
 
     if (openConnectModal) {
+      setDialogMinimalHeight();
       openConnectModal();
     } else {
       deferred.reject(
@@ -80,6 +82,23 @@ export function useConnectAccount() {
     return deferred.promise.finally(() => {
       clearTimeout(deferred.timeout);
       deferredRef.current = null;
+      resetDialogMinimalHeight();
     });
   }, [address, openConnectModal]);
+}
+
+let originalMinHeight: string | undefined;
+
+function setDialogMinimalHeight() {
+  originalMinHeight = document.body.style.minHeight;
+
+  document.body.style.minHeight = `${WALLET_CONNECT_DIALOG_MINIMAL_HEIGHT}px`;
+}
+
+function resetDialogMinimalHeight() {
+  if (originalMinHeight == null) {
+    return;
+  }
+  document.body.style.minHeight = originalMinHeight;
+  originalMinHeight = undefined;
 }
