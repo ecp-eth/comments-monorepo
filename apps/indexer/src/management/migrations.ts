@@ -180,6 +180,12 @@ class StaticMigrationsProvider implements MigrationProvider {
       },
       "2025_07_24_09_18_00_add_maintenance_functions": {
         up: async (db: Kysely<IndexerSchemaDB>) => {
+          /**
+           * This function retrieves schemas that match the UUID pattern and:
+           * - Checks if they have a table named comments (invalid schema - should be droppped)
+           * - Checks if they have a table named comment with a created_at column (valid schema)
+           *   - if so it returns the latest comment created at timestamp or null (in the case of null, schema should be dropped)
+           */
           await db.executeQuery(
             sql`
             CREATE OR REPLACE FUNCTION ${sql.ref(ECP_INDEXER_SCHEMA_NAME)}.get_comment_schema_status()
@@ -258,6 +264,11 @@ class StaticMigrationsProvider implements MigrationProvider {
           `.compile(db),
           );
 
+          /**
+           * This function drops schemas that:
+           * - are older than a specified number of days (default 30)
+           * - has dry run enabled by default (pass false if you want to really drop them)
+           */
           await db.executeQuery(
             sql`
             CREATE OR REPLACE FUNCTION ${sql.ref(ECP_INDEXER_SCHEMA_NAME)}.drop_schemas_older_than(
@@ -324,6 +335,12 @@ class StaticMigrationsProvider implements MigrationProvider {
             `.compile(db),
           );
 
+          /**
+           * This function drops empty schemas that:
+           * - have no comments table
+           * - have no latest comment created at timestamp (i.e., no comments)
+           * - has dry run enabled by default (pass false if you want to really drop them)
+           */
           await db.executeQuery(
             sql`
             CREATE OR REPLACE FUNCTION ${sql.ref(ECP_INDEXER_SCHEMA_NAME)}.drop_empty_schemas(
