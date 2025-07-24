@@ -20,7 +20,6 @@ import {
   CommentPageSchema,
 } from "@ecp.eth/shared/schemas";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
-import { CommentByAuthor } from "./CommentByAuthor";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { publicEnv } from "@/publicEnv";
 import { PoweredBy } from "@ecp.eth/shared/components";
@@ -30,6 +29,7 @@ import {
 } from "../EmbedConfigProvider";
 import { useChainId } from "wagmi";
 import { CommentForm } from "./CommentForm";
+import { CommentItem } from "./CommentItem";
 
 type QueryData = InfiniteData<
   CommentPageSchemaType,
@@ -45,7 +45,7 @@ export function CommentSectionReplies({
   initialData,
   commentId,
 }: CommentSectionRepliesProps) {
-  const { currentTimestamp, disablePromotion } =
+  const { disablePromotion } =
     useEmbedConfig<EmbedConfigProviderByRepliesConfig>();
   const chainId = useChainId();
   const queryKey = useMemo(
@@ -166,11 +166,7 @@ export function CommentSectionReplies({
       </div>
       {results.length === 0 && <NoCommentsScreen />}
       {results.map((comment) => (
-        <CommentByAuthor
-          comment={comment}
-          key={comment.id}
-          currentTimestamp={currentTimestamp}
-        />
+        <CommentItem comment={comment} key={comment.id} />
       ))}
       {hasNextPage && (
         <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
