@@ -19,22 +19,22 @@ import { CommentManagerABI, ChannelManagerABI } from "@ecp.eth/sdk/abis";
 
 ### Comment Manager Contract Functions
 
-| Function                  | Description                                        | Note                                                           |
-| ------------------------- | -------------------------------------------------- | -------------------------------------------------------------- |
-| `postComment`             | Post a comment with app signature verification     | Requires author to be msg.sender                               |
-| `postCommentWithSig`      | Post a comment with both author and app signatures | Allows posting on behalf of author with signatures             |
-| `editComment`             | Edit a comment with app signature verification     | Requires author to be msg.sender                               |
-| `editCommentWithSig`      | Edit a comment with both author and app signatures | Allows editing on behalf of author with signatures             |
-| `deleteComment`           | Delete a comment when called by the author         | ⚠️ Deleted data may still be traceable or recoverable on-chain |
-| `deleteCommentWithSig`    | Delete a comment with signature verification       | ⚠️ Deleted data may still be traceable or recoverable on-chain |
-| `addApproval`             | Approve an app signer directly                     | Called by the author                                           |
-| `addApprovalWithSig`      | Approve an app signer with signature               | Allows approving on behalf of author with signature            |
-| `revokeApproval`          | Remove an app signer approval directly             | Called by the author                                           |
-| `removeApprovalWithSig`   | Remove an app signer approval with signature       | Allows revoking on behalf of author with signature             |
-| `getComment`              | Get a comment by ID                                |                                                                |
-| `getCommentMetadataKeys`  | Get the metadata keys for a comment                |                                                                |
-| `getCommentMetadataValue` | Get the metadata value for a comment               |                                                                |
-| ...                       | ...                                                | ...                                                            |
+| Function                  | Description                                        | Note                                                          |
+| ------------------------- | -------------------------------------------------- | ------------------------------------------------------------- |
+| `postComment`             | Post a comment with app signature verification     | Requires author to be msg.sender                              |
+| `postCommentWithSig`      | Post a comment with both author and app signatures | Allows posting on behalf of author with signatures            |
+| `editComment`             | Edit a comment with app signature verification     | Requires author to be msg.sender                              |
+| `editCommentWithSig`      | Edit a comment with both author and app signatures | Allows editing on behalf of author with signatures            |
+| `deleteComment`           | Delete a comment when called by the author         | ⚠️ Deleted data may still be traceable or recoverable onchain |
+| `deleteCommentWithSig`    | Delete a comment with signature verification       | ⚠️ Deleted data may still be traceable or recoverable onchain |
+| `addApproval`             | Approve an app signer directly                     | Called by the author                                          |
+| `addApprovalWithSig`      | Approve an app signer with signature               | Allows approving on behalf of author with signature           |
+| `revokeApproval`          | Remove an app signer approval directly             | Called by the author                                          |
+| `removeApprovalWithSig`   | Remove an app signer approval with signature       | Allows revoking on behalf of author with signature            |
+| `getComment`              | Get a comment by ID                                |                                                               |
+| `getCommentMetadataKeys`  | Get the metadata keys for a comment                |                                                               |
+| `getCommentMetadataValue` | Get the metadata value for a comment               |                                                               |
+| ...                       | ...                                                | ...                                                           |
 
 For detailed information about all functions, events, and structs, please refer to the [Contract ABI Documentation](/protocol-reference/CommentManager).
 
