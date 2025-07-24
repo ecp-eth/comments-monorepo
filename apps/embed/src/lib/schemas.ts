@@ -5,7 +5,7 @@ import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { MAX_COMMENT_LENGTH } from "./constants";
 import { decompressFromURI } from "lz-ts";
 import { MetadataEntrySchema } from "@ecp.eth/sdk/comments";
-import { DEFAULT_CHAIN_ID, DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
+import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
 
 export const BadRequestResponseSchema = z.record(
   z.string(),
@@ -68,19 +68,12 @@ export type SignEditCommentPayloadRequestSchemaType = z.infer<
   typeof SignEditCommentPayloadRequestSchema
 >;
 
-export const EmbedConfigFromSearchParamsSchema = z.preprocess(
-  (value) => {
-    try {
-      if (typeof value === "string") {
-        return JSON.parse(decompressFromURI(value));
-      }
-    } catch (err) {
-      console.warn("failed to parse config", err);
+export const EmbedConfigFromSearchParamsSchema = z.preprocess((value) => {
+  try {
+    if (typeof value === "string") {
+      return JSON.parse(decompressFromURI(value));
     }
-  },
-  EmbedConfigSchema.default({
-    chainId: DEFAULT_CHAIN_ID,
-    restrictMaximumContainerWidth: true,
-    disablePromotion: true,
-  }),
-);
+  } catch (err) {
+    console.warn("failed to parse config", err);
+  }
+}, EmbedConfigSchema.default({}));
