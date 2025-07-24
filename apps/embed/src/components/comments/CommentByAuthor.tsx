@@ -10,7 +10,10 @@ import {
   formatDate,
 } from "@ecp.eth/shared/helpers";
 import { useCommentRelativeTime } from "@ecp.eth/shared/hooks";
-import { CommentText } from "@ecp.eth/shared/components";
+import {
+  CommentMediaReferences,
+  CommentText,
+} from "@ecp.eth/shared/components";
 
 interface CommentByAuthorProps {
   comment: CommentType;
@@ -67,19 +70,18 @@ export function CommentByAuthor({
           </div>
         </div>
       </div>
-      <div
+      <CommentText
         className={cn(
-          "mb-2 text-foreground",
+          "mb-2 text-foreground break-words hyphens-auto",
           comment.deletedAt && "text-muted-foreground",
         )}
-      >
-        <CommentText
-          // make sure comment is updated if was deleted
-          key={comment.deletedAt?.toISOString()}
-          content={comment.content}
-          references={comment.references}
-        />
-      </div>
+        content={comment.content}
+        references={comment.references}
+      />
+      <CommentMediaReferences
+        content={comment.content}
+        references={comment.references}
+      />
     </div>
   );
 }
