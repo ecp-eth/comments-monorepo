@@ -3,7 +3,7 @@ import { env } from "../env";
 import pg from "pg";
 import { IndexerSchemaDB } from "./migrations";
 
-const SCHEMA_NAME = "ecp_indexer_schema";
+export const ECP_INDEXER_SCHEMA_NAME = "ecp_indexer_schema";
 
 let db: Kysely<IndexerSchemaDB> | undefined = undefined;
 
@@ -19,7 +19,7 @@ export function getIndexerDb(): Kysely<IndexerSchemaDB> {
         max: 10,
       }),
     }),
-    plugins: [new WithSchemaPlugin(SCHEMA_NAME)],
+    plugins: [new WithSchemaPlugin(ECP_INDEXER_SCHEMA_NAME)],
     ...(process.env.NODE_ENV === "development" && { log: console.log }),
   });
 
