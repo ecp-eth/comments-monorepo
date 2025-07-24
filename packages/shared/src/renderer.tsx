@@ -531,7 +531,14 @@ export function renderToMarkdown(
   options: Omit<
     RenderOptions<string, IndexerAPICommentReferenceSchemaType>,
     "renderers" | "elementRenderers" | "processMediaReferences"
-  >,
+  > & {
+    elementRenderers?: Partial<
+      RenderOptions<
+        string,
+        IndexerAPICommentReferenceSchemaType
+      >["elementRenderers"]
+    >;
+  },
 ): RenderToMarkdownResult {
   const { result, mediaReferences, isTruncated } = render<
     string,
@@ -539,7 +546,10 @@ export function renderToMarkdown(
   >({
     ...options,
     renderers: markdownReferenceRenderers,
-    elementRenderers: markdownElementRenderers,
+    elementRenderers: {
+      ...markdownElementRenderers,
+      ...options.elementRenderers,
+    },
     processMediaReferences(content) {
       return {
         content,
