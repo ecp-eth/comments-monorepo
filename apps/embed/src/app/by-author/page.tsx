@@ -8,7 +8,7 @@ import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { env } from "@/env";
 import { CommentSectionReadonly } from "@/components/comments/CommentSectionReadonly";
 import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
-import { cn } from "@ecp.eth/shared/helpers";
+import { MainWrapper } from "@/components/MainWrapper";
 
 const SearchParamsSchema = z.object({
   author: HexSchema,
@@ -62,27 +62,22 @@ export default async function EmbedCommentsByAuthorPage({
           ...config,
         }}
       >
-        <main className="min-h-screen p-0 font-default">
-          <div
-            className={cn(
-              "mx-auto",
-              config.restrictMaximumContainerWidth && "max-w-4xl",
-            )}
-          >
-            <CommentSectionReadonly
-              author={author}
-              initialData={{
-                pages: [comments],
-                pageParams: [
-                  {
-                    limit: comments.pagination.limit,
-                    cursor: comments.pagination.endCursor,
-                  },
-                ],
-              }}
-            />
-          </div>
-        </main>
+        <MainWrapper
+          restrictMaximumContainerWidth={config.restrictMaximumContainerWidth}
+        >
+          <CommentSectionReadonly
+            author={author}
+            initialData={{
+              pages: [comments],
+              pageParams: [
+                {
+                  limit: comments.pagination.limit,
+                  cursor: comments.pagination.endCursor,
+                },
+              ],
+            }}
+          />
+        </MainWrapper>
         <Toaster />
       </Providers>
     );
