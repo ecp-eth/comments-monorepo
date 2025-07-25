@@ -9,6 +9,7 @@ import {
 import { CommentModerationStatus } from "../../../management/types";
 import { b, fmt } from "@grammyjs/parse-mode";
 import { renderToMarkdown } from "@ecp.eth/shared/renderer";
+import { escapeTelegramMarkdownTextElement } from "../../../utils/escapeTelegramMarkdownTextElement";
 
 export const moderateMenu = new Menu<AdminTelegramBotServiceContext>(
   MenuId.MODERATE_MAIN_MENU,
@@ -60,6 +61,9 @@ export const moderateMenu = new Menu<AdminTelegramBotServiceContext>(
         content: comment.content,
         references: comment.references,
         maxLength: 4000,
+        elementRenderers: {
+          text: escapeTelegramMarkdownTextElement,
+        },
       });
 
       await ctx.reply(renderResult.result, {

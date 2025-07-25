@@ -1108,5 +1108,19 @@ describe("renderToMarkdown", () => {
         "[https://example.com](https://example.com)\n\n",
       );
     });
+
+    it("allows to pass custom element renderers", () => {
+      const elementRenderers = {
+        text: (text: string) => `**${text}**`,
+      };
+
+      const result = renderToMarkdown({
+        content: "Hello, world!",
+        references: [],
+        elementRenderers,
+      });
+
+      expect(result.result).toBe("**Hello, world!**\n\n");
+    });
   });
 });

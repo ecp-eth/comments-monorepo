@@ -13,6 +13,7 @@ import type {
 import type { CommentSelectType } from "ponder:schema";
 import { isZeroHex } from "@ecp.eth/sdk/core";
 import { env } from "../env";
+import { escapeTelegramMarkdownTextElement } from "../utils/escapeTelegramMarkdownTextElement";
 
 class CommentLengthLimitExceededError extends Error {
   constructor(message: string) {
@@ -316,6 +317,9 @@ Content:
       content: comment.content,
       references: comment.references,
       maxLength: remainingLength,
+      elementRenderers: {
+        text: (text) => escapeTelegramMarkdownTextElement(text),
+      },
     });
 
     return message + renderResult.result;
