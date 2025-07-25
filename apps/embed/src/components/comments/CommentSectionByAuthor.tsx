@@ -40,7 +40,7 @@ type CommentSectionReadonlyProps = {
   initialData?: QueryData;
 };
 
-export function CommentSectionReadonly({
+export function CommentSectionByAuthor({
   initialData,
   author,
 }: CommentSectionReadonlyProps) {
