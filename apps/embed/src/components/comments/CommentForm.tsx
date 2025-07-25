@@ -476,7 +476,7 @@ function CommentFormAuthor({ address }: { address: Hex }) {
 
       {address && !openAccountModal && openChainModal && (
         <button
-          className="text-xs text-destructive"
+          className="text-xs bg-destructive rounded-sm px-2"
           onClick={() => openChainModal()}
           type="button"
         >

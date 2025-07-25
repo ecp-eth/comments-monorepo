@@ -14,6 +14,8 @@ import {
   CommentMediaReferences,
   CommentText,
 } from "@ecp.eth/shared/components";
+import { CommentActionLikeButton } from "./CommentActionLikeButton";
+import { usePendingActionSetup } from "./hooks/usePendingActionSetup";
 
 interface CommentByAuthorProps {
   comment: CommentType;
@@ -33,6 +35,11 @@ export function CommentByAuthor({
     comment.createdAt,
     currentTimestamp,
   );
+
+  const { isLiking } = usePendingActionSetup({
+    comment,
+    queryKey: ["comments", comment.id],
+  });
 
   return (
     <div className="mb-4 border-l-2 border-muted pl-4">
@@ -82,6 +89,9 @@ export function CommentByAuthor({
         content={comment.content}
         references={comment.references}
       />
+      <div className="mb-2">
+        <CommentActionLikeButton isLiking={isLiking} comment={comment} />
+      </div>
     </div>
   );
 }

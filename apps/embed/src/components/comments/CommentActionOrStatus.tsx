@@ -1,16 +1,12 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import type { Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { type PropsWithChildren } from "react";
-import {
-  HeartButton,
-  useConnectBeforeAction,
-} from "@ecp.eth/shared/components";
+import { useConnectBeforeAction } from "@ecp.eth/shared/components";
 import {} from "@ecp.eth/shared/components";
-import { useCommentIsHearted } from "@ecp.eth/shared/hooks";
 import { cn } from "@ecp.eth/shared/helpers";
-import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { CommentActionButton } from "./CommentActionButton";
 import { RetryButton } from "./RetryButton";
+import { CommentActionLikeButton } from "./CommentActionLikeButton";
 
 interface CommentActionOrStatusProps {
   comment: CommentType;
@@ -46,7 +42,6 @@ export function CommentActionOrStatus({
     comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "pending";
 
-  const isHearted = useCommentIsHearted(comment);
   const connectBeforeAction = useConnectBeforeAction();
 
   if (didPostingFailed) {
@@ -131,19 +126,7 @@ export function CommentActionOrStatus({
       >
         reply
       </CommentActionButton>
-      <CommentActionButton
-        onClick={connectBeforeAction(() => {
-          const newIsHearted = !isHearted;
-
-          return {
-            type: newIsHearted ? "like" : "unlike",
-            commentId: comment.id,
-          };
-        })}
-      >
-        <HeartButton pending={isLiking} isHearted={isHearted} />
-        {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
-      </CommentActionButton>
+      <CommentActionLikeButton isLiking={isLiking} comment={comment} />
     </div>
   );
 }
