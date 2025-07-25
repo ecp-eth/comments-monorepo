@@ -30,7 +30,7 @@ import {
 } from "@/lib/constants";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
-import { useAccountModal } from "@rainbow-me/rainbowkit";
+import { useAccountModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { publicEnv } from "@/publicEnv";
 import { CommentFormErrors } from "@ecp.eth/shared/components/CommentFormErrors";
 import { InvalidCommentError } from "@ecp.eth/shared/errors";
@@ -462,6 +462,7 @@ export function CommentForm({
 
 function CommentFormAuthor({ address }: { address: Hex }) {
   const { openAccountModal } = useAccountModal();
+  const { openChainModal } = useChainModal();
   const queryResult = useQuery({
     queryKey: ["author", address],
     queryFn: () => {
@@ -482,6 +483,15 @@ function CommentFormAuthor({ address }: { address: Hex }) {
         {getCommentAuthorNameOrAddress(queryResult.data ?? { address })}
       </div>
 
+      {address && !openAccountModal && openChainModal && (
+        <button
+          className="text-xs text-destructive"
+          onClick={() => openChainModal()}
+          type="button"
+        >
+          wrong network
+        </button>
+      )}
       {openAccountModal && (
         <button
           className="text-account-edit-link text-xs"
