@@ -54,7 +54,7 @@ export async function resolveUserDataAndFormatListCommentsResponse({
       authorAddresses.add(comment.author);
     }
 
-    for (const reply of comment.replies ?? []) {
+    for (const reply of comment.replies ?? comment.flatReplies ?? []) {
       if (reply.author) {
         authorAddresses.add(reply.author);
       }
@@ -72,87 +72,15 @@ export async function resolveUserDataAndFormatListCommentsResponse({
   const startComment = results[0];
   const endComment = results[results.length - 1];
 
+  const resolveUserDataAndFormatSingleCommentResponse =
+    createUserDataAndFormatSingleCommentResponseResolver(
+      replyLimit,
+      resolvedAuthorsEnsData,
+      resolvedAuthorsFarcasterData,
+    );
+
   return {
-    results: results.map(
-      ({
-        replies: nestedReplies,
-        flatReplies,
-        viewerReactions,
-        ...comment
-      }) => {
-        const replies = nestedReplies ?? flatReplies ?? [];
-        const resolvedAuthorEnsData = resolveUserData(
-          resolvedAuthorsEnsData,
-          comment.author,
-        );
-        const resolvedAuthorFarcasterData = resolveUserData(
-          resolvedAuthorsFarcasterData,
-          comment.author,
-        );
-
-        const slicedReplies = replies.slice(0, replyLimit);
-        const startReply = slicedReplies[0];
-        const endReply = slicedReplies[slicedReplies.length - 1];
-
-        return {
-          ...formatComment(comment),
-          author: formatAuthor(
-            comment.author,
-            resolvedAuthorEnsData,
-            resolvedAuthorFarcasterData,
-          ),
-          viewerReactions: formatViewerReactions(viewerReactions),
-          replies: {
-            extra: {
-              moderationEnabled: env.MODERATION_ENABLED,
-              moderationKnownReactions: Array.from(
-                env.MODERATION_KNOWN_REACTIONS,
-              ),
-            },
-            results: slicedReplies.map((reply) => {
-              const resolvedAuthorEnsData = resolveUserData(
-                resolvedAuthorsEnsData,
-                reply.author,
-              );
-              const resolvedAuthorFarcasterData = resolveUserData(
-                resolvedAuthorsFarcasterData,
-                reply.author,
-              );
-
-              return {
-                ...formatComment(reply),
-                author: formatAuthor(
-                  reply.author,
-                  resolvedAuthorEnsData,
-                  resolvedAuthorFarcasterData,
-                ),
-
-                // do not go deeper than first level of replies
-                replies: {
-                  results: [],
-                  pagination: {
-                    limit: 0,
-                    hasNext: false,
-                    hasPrevious: false,
-                  },
-                },
-              };
-            }),
-            pagination: {
-              limit: replyLimit,
-              hasNext: replies.length > replyLimit,
-              hasPrevious: false,
-              startCursor: startReply
-                ? getCommentCursor(startReply.id as Hex, startReply.createdAt)
-                : undefined,
-              endCursor: endReply
-                ? getCommentCursor(endReply.id as Hex, endReply.createdAt)
-                : undefined,
-            },
-          },
-        };
-      },
-    ),
+    results: results.map(resolveUserDataAndFormatSingleCommentResponse),
     pagination: {
       limit,
       hasNext: nextComment !== endComment,
@@ -170,6 +98,91 @@ export async function resolveUserDataAndFormatListCommentsResponse({
     },
   };
 }
+
+export const createUserDataAndFormatSingleCommentResponseResolver = (
+  replyLimit: number,
+  resolvedAuthorsEnsData: (ResolvedENSData | Error | null)[],
+  resolvedAuthorsFarcasterData: (ResolvedFarcasterData | Error | null)[],
+) => {
+  return (comment: CommentFromDB) => {
+    const {
+      replies: nestedReplies,
+      flatReplies,
+      viewerReactions,
+      author,
+    } = comment;
+
+    const resolvedAuthorEnsData = resolveUserData(
+      resolvedAuthorsEnsData,
+      author,
+    );
+    const resolvedAuthorFarcasterData = resolveUserData(
+      resolvedAuthorsFarcasterData,
+      author,
+    );
+
+    const replies = nestedReplies ?? flatReplies ?? [];
+    const slicedReplies = replies.slice(0, replyLimit);
+    const startReply = slicedReplies[0];
+    const endReply = slicedReplies[slicedReplies.length - 1];
+
+    return {
+      ...formatComment(comment),
+      author: formatAuthor(
+        author,
+        resolvedAuthorEnsData,
+        resolvedAuthorFarcasterData,
+      ),
+      viewerReactions: formatViewerReactions(viewerReactions),
+      replies: {
+        extra: {
+          moderationEnabled: env.MODERATION_ENABLED,
+          moderationKnownReactions: Array.from(env.MODERATION_KNOWN_REACTIONS),
+        },
+        results: slicedReplies.map((reply) => {
+          const resolvedAuthorEnsData = resolveUserData(
+            resolvedAuthorsEnsData,
+            reply.author,
+          );
+          const resolvedAuthorFarcasterData = resolveUserData(
+            resolvedAuthorsFarcasterData,
+            reply.author,
+          );
+
+          return {
+            ...formatComment(reply),
+            author: formatAuthor(
+              reply.author,
+              resolvedAuthorEnsData,
+              resolvedAuthorFarcasterData,
+            ),
+
+            // do not go deeper than first level of replies
+            replies: {
+              results: [],
+              pagination: {
+                limit: 0,
+                hasNext: false,
+                hasPrevious: false,
+              },
+            },
+          };
+        }),
+        pagination: {
+          limit: replyLimit,
+          hasNext: replies.length > replyLimit,
+          hasPrevious: false,
+          startCursor: startReply
+            ? getCommentCursor(startReply.id as Hex, startReply.createdAt)
+            : undefined,
+          endCursor: endReply
+            ? getCommentCursor(endReply.id as Hex, endReply.createdAt)
+            : undefined,
+        },
+      },
+    };
+  };
+};
 
 /**
  * This function formats the author data for API response

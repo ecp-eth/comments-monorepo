@@ -761,5 +761,5 @@ export function formatContractFunctionExecutionError(
     return "Transaction not authorized. Please ensure your wallet is unlocked and the session is active.";
   }
 
-  return error.details;
+  return error.shortMessage;
 }

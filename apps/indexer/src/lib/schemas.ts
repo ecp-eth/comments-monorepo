@@ -179,6 +179,34 @@ const ChainIdSchema = z
   });
 
 /**
+ * Path params schema for getting one single comment.
+ */
+export const GetCommentParamSchema = z.object({
+  commentId: HexSchema.openapi({
+    description: "The ID of the comment to retrieve",
+  }),
+});
+
+/**
+ * Query string schema for getting one single comment.
+ */
+export const GetCommentQuerySchema = z.object({
+  viewer: OpenAPIHexSchema.optional().openapi({
+    description:
+      "The viewer's address, for personalized data such as reactions",
+  }),
+  chainId: ChainIdSchema,
+  mode: z.enum(["nested", "flat"]).default("nested").openapi({
+    description:
+      "The mode to fetch comments in. Nested will return only the first level of comments. Flat will return all replies sorted by timestamp in descending order.",
+  }),
+  commentType: z.coerce.number().int().min(0).max(255).optional().openapi({
+    description:
+      "The comment type (e.g. 0=comment, 1=reaction, not passed = all)",
+  }),
+});
+
+/**
  * Query string schema for getting a list of comments.
  */
 export const GetCommentsQuerySchema = z.object({
