@@ -48,7 +48,7 @@ const getCommentRoute = createRoute({
   },
 });
 
-export function setupGetComment(app: OpenAPIHono) {
+export function setupGetModerateComment(app: OpenAPIHono) {
   app.openapi(getCommentRoute, async (c) => {
     const { commentId } = c.req.valid("param");
 
