@@ -16,9 +16,21 @@ const ChainBaseConfig = z.union([
   z.object({
     CHAIN_BASE_BROADCAST_HOOK_ADDRESS: HexSchema,
     CHAIN_BASE_RPC_URL: z.string().url(),
-    CHAIN_BASE_BROADCAST_HOOK_START_BLOCK: z.number().min(0).optional(),
-    CHAIN_BASE_COMMENT_MANAGER_START_BLOCK: z.number().min(0).optional(),
-    CHAIN_BASE_CHANNEL_MANAGER_START_BLOCK: z.number().min(0).optional(),
+    CHAIN_BASE_BROADCAST_HOOK_START_BLOCK: z.coerce
+      .number()
+      .int()
+      .min(0)
+      .optional(),
+    CHAIN_BASE_COMMENT_MANAGER_START_BLOCK: z.coerce
+      .number()
+      .int()
+      .min(0)
+      .optional(),
+    CHAIN_BASE_CHANNEL_MANAGER_START_BLOCK: z.coerce
+      .number()
+      .int()
+      .min(0)
+      .optional(),
   }),
   z.object({
     CHAIN_BASE_BROADCAST_HOOK_ADDRESS: z.never().optional(),
