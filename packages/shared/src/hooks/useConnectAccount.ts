@@ -90,12 +90,22 @@ export function useConnectAccount() {
 let originalMinHeight: string | undefined;
 
 function setDialogMinimalHeight() {
-  originalMinHeight = document.body.style.minHeight;
+  if (!document) {
+    return;
+  }
+
+  if (originalMinHeight == null) {
+    originalMinHeight = document.body.style.minHeight;
+  }
 
   document.body.style.minHeight = `${WALLET_CONNECT_DIALOG_MINIMAL_HEIGHT}px`;
 }
 
 function resetDialogMinimalHeight() {
+  if (!document) {
+    return;
+  }
+
   if (originalMinHeight == null) {
     return;
   }
