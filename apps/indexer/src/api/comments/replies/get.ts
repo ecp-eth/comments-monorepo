@@ -23,7 +23,7 @@ const getCommentsRoute = createRoute({
   path: "/api/comments/{commentId}/replies",
   tags: ["comments"],
   description:
-    "Return a single comments according to the id and additional criteria",
+    "Return replies to a comment according to the comment id and additional criteria",
   request: {
     query: GetCommentRepliesQuerySchema,
     params: GetCommentRepliesParamSchema,
@@ -35,7 +35,7 @@ const getCommentsRoute = createRoute({
           schema: IndexerAPIListCommentRepliesOutputSchema,
         },
       },
-      description: "Retrieve specific comment with its replies",
+      description: "Retrieve replies to the specified comment",
     },
     400: {
       content: {
