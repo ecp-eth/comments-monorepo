@@ -43,7 +43,7 @@ type CommentSectionReadonlyProps = {
   fetchCommentParams: FetchCommentsOptions;
 };
 
-export function CommentSectionReadonly({
+export function CommentSectionByAuthor({
   initialData,
   author,
   fetchCommentParams,
