@@ -6,6 +6,7 @@
     "build": "NODE_OPTIONS='--max-old-space-size=8192' turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./examples/embed-demo-blog --filter=!./docs --filter=!./packages/protocol --filter=!./examples/snippets --filter=!./apps/nft-base-uri-server --filter=!./examples/signer",
     "build:dev": "turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./examples/embed-demo-blog --filter=!./docs",
     "build:indexer": "turbo build --filter=./apps/indexer...",
+    "build:broadcast-mini-app-indexer": "turbo build --filter=./apps/broadcast-app-indexer...",
     "dev": "turbo dev --filter=./apps/demo... --filter=./apps/indexer --filter=./packages/protocol --filter=./packages/test-protocol",
     "dev:broadcast-mini-app": "turbo dev --filter=./apps/broadcast-app --filter=./apps/broadcast-app-indexer... --filter=./apps/indexer... --filter=./packages/protocol",
     "dev:indexer": "turbo dev --filter=./apps/indexer... --filter=./packages/protocol",
