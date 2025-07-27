@@ -91,8 +91,9 @@
     "dev": "tsup --format esm --out-dir dist/esm --watch",
     "build:cjs": "NODE_OPTIONS='--max-old-space-size=8192' tsup --format cjs --out-dir dist/cjs",
     "build:esm": "NODE_OPTIONS='--max-old-space-size=8192' tsup --format esm --out-dir dist/esm",
-    "build": "rm -rf dist && NODE_ENV=production npm run build:cjs && NODE_ENV=production npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
-    "build:dev": "rm -rf dist && NODE_ENV=development npm run build:cjs && NODE_ENV=development npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
+    "build:all": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
+    "build:dev": "export NODE_ENV=development && pnpm run build:all",
+    "build": "export NODE_ENV=production && pnpm run build:all",
     "test": "node --experimental-transform-types --no-warnings ./scripts/run-tests.ts",
     "test:watch": "pnpm run test --watch",
     "lint": "eslint \"./src/**/*.ts\""

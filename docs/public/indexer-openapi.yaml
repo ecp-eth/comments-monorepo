@@ -2218,7 +2218,7 @@ paths:
               filter works in conjunction with the `moderationStatus` filter.
             example: spam,sexual
             pattern: >-
-              ^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)$
+              ^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)(,(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic))*$
           required: false
           name: excludeByModerationLabels
           in: query
@@ -4163,7 +4163,9 @@ paths:
     get:
       tags:
         - comments
-      description: Return a single comments according to the id and additional criteria
+      description: >-
+        Return replies to a comment according to the comment id and additional
+        criteria
       parameters:
         - schema:
             description: The comment ID
@@ -4256,7 +4258,7 @@ paths:
               filter works in conjunction with the `moderationStatus` filter.
             example: spam,sexual
             pattern: >-
-              ^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)$
+              ^(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic)(,(llm_generated|spam|sexual|hate|violence|harassment|self_harm|sexual_minors|hate_threatening|violence_graphic))*$
           required: false
           name: excludeByModerationLabels
           in: query
@@ -4290,7 +4292,7 @@ paths:
           in: query
       responses:
         '200':
-          description: Retrieve specific comment with its replies
+          description: Retrieve replies to the specified comment
           content:
             application/json:
               schema:
