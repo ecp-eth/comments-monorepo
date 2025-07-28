@@ -120,6 +120,7 @@ export async function channelsGET(api: OpenAPIHono) {
             return {
               id: channel.id,
               name: channel.name,
+              owner: channel.owner,
               description: channel.description,
               isSubscribed: channel_subscription !== null,
               notificationsEnabled:
