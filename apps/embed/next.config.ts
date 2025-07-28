@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
+  // below is to fixed warning mentioned here: https://github.com/vercel/next.js/discussions/76247
+  serverExternalPackages: ["import-in-the-middle", "require-in-the-middle"],
 };
 
 export default withSentryConfig(nextConfig, {
