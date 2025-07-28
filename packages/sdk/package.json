@@ -106,6 +106,7 @@
     "@types/node": "^22.14.1",
     "@types/react": "~19.1.0",
     "eslint": "^9.19.0",
+    "nock": "^14.0.5",
     "node-resolve-ts": "^1.0.2",
     "react": "~19.1.0",
     "viem": "^2.29.2",
