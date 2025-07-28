@@ -40,6 +40,7 @@ import { useUnsubscribeToChannel } from "@/hooks/useUnsubscribeFromChannel";
 import { useSetNotificationStatusOnChannel } from "@/hooks/useSetNotificationStatusOnChannel";
 import type { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
 import { cn } from "@/lib/utils";
+import { EditorComposer } from "@/components/editor-composer";
 
 const channelResponseSchema = z.object({
   id: z.coerce.bigint(),
@@ -232,6 +233,7 @@ export default function ChannelPage(props: {
 
   const channel = channelQuery.data;
   const comments = commentsQuery.data.results;
+  const isOwner = false;
 
   return (
     <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col">
@@ -337,6 +339,8 @@ export default function ChannelPage(props: {
               onReply={setReplyingTo}
             />
           ))}
+
+          {isOwner && <EditorComposer channelId={channel.id} />}
         </div>
       </ScrollArea>
 
@@ -352,12 +356,11 @@ export default function ChannelPage(props: {
         </div>
       )}
 
-      {/* Reply Bottom Sheet */}
       <ReplyBottomSheet
+        channelId={channel.id}
         isOpen={!!replyingTo}
         onClose={() => setReplyingTo(null)}
         originalComment={replyingTo}
-        onSubmitSuccess={() => setReplyingTo(null)}
       />
     </div>
   );
