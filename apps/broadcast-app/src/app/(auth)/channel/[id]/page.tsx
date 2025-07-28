@@ -42,6 +42,7 @@ import type { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
 import { cn } from "@/lib/utils";
 import { EditorComposer } from "@/components/editor-composer";
 import { ChannelSchema } from "@/api/schemas";
+import { useScrollToBottom } from "@/hooks/useScrollToBottom";
 
 class ChannelNotFoundError extends Error {
   constructor() {
@@ -137,6 +138,8 @@ export default function ChannelPage(props: {
     },
   });
 
+  const scrollRef = useScrollToBottom([commentsQuery.data]);
+
   if (commentsQuery.status === "pending" || channelQuery.status === "pending") {
     return (
       <div className="h-screen max-w-[400px] mx-auto bg-background">
@@ -227,7 +230,7 @@ export default function ChannelPage(props: {
 
   const channel = channelQuery.data;
   const comments = commentsQuery.data.results;
-  const isOwner = false;
+  const isOwner = address?.toLowerCase() === channel.owner.toLowerCase();
 
   return (
     <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col">
@@ -324,17 +327,22 @@ export default function ChannelPage(props: {
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4">
-          {comments.map((comment) => (
-            <CommentItem
-              key={comment.id}
-              comment={comment}
-              onReply={setReplyingTo}
-            />
-          ))}
+      <ScrollArea
+        className="flex-1"
+        viewportClassName="flex flex-col justify-end"
+      >
+        <div ref={scrollRef} className="p-4 h-full flex flex-col justify-end">
+          <div className="space-y-4">
+            {comments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                onReply={setReplyingTo}
+              />
+            ))}
 
-          {isOwner && <EditorComposer channelId={channel.id} />}
+            {isOwner && <EditorComposer channelId={channel.id} />}
+          </div>
         </div>
       </ScrollArea>
 
