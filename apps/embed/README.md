@@ -37,6 +37,14 @@ pnpm dev
 
 This will start the server at [http://localhost:3002](http://localhost:3002).
 
+### Build dependent libs in dev mode
+
+Run below command before starting the server to build libs in dev mode. Libs in dev mode is configured with dev contract address for working with Anvil node locally.
+
+```bash
+pnpm dlx turbo build:dev
+```
+
 ### Environment Variables
 
 Copy `.env.example` to `.env` and configure the following required environment variables:
