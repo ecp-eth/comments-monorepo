@@ -1,3 +1,4 @@
+import { HexSchema } from "@ecp.eth/sdk/core";
 import { z } from "@hono/zod-openapi";
 
 export const BadRequestResponse = z.object({
@@ -20,6 +21,7 @@ export const ChannelResponse = z.object({
   id: z.bigint().transform((val) => val.toString()),
   name: z.string(),
   description: z.string(),
+  owner: HexSchema,
   createdAt: z.date().transform((val) => val.toISOString()),
   updatedAt: z.date().transform((val) => val.toISOString()),
   isSubscribed: z.boolean(),
