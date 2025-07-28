@@ -15,20 +15,19 @@ import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { blo } from "blo";
 
 interface ReplyBottomSheetProps {
+  channelId: bigint;
   isOpen: boolean;
   onClose: () => void;
   originalComment: IndexerAPICommentSchemaType | null;
-  onSubmitSuccess: () => void;
 }
 
 export function ReplyBottomSheet({
+  channelId,
   isOpen,
   onClose,
   originalComment,
-  onSubmitSuccess,
 }: ReplyBottomSheetProps) {
   const handleSubmit = () => {
-    onSubmitSuccess();
     onClose();
   };
 
@@ -83,9 +82,11 @@ export function ReplyBottomSheet({
 
           {/* Reply Editor */}
           <EditorComposer
-            onPost={handleSubmit}
+            autoFocus
+            onSubmitSuccess={handleSubmit}
             placeholder="Write your reply..."
             submitLabel="Reply"
+            channelId={channelId}
           />
         </div>
       </SheetContent>
