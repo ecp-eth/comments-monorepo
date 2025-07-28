@@ -740,6 +740,7 @@ await fetchComments({
                     src="/interface-logo.png"
                     alt="Interface.social"
                     className="h-16 w-auto object-contain rounded-lg"
+                    loading="lazy"
                   />
                 </div>
                 <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">
