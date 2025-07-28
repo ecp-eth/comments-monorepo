@@ -721,6 +721,71 @@ await fetchComments({
         </div>
       </section>
 
+      {/* Built on ECP Section */}
+      <section className="py-16 px-4 bg-gray-50 dark:bg-gray-800">
+        <div className="container mx-auto text-center">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            Built on ECP
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+            Discover applications and projects built on the Ethereum Comments
+            Protocol
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <Card className="border-2 hover:border-indigo-400 transition-colors bg-white dark:bg-gray-700 group border-gray-200 dark:border-gray-600">
+              <CardContent className="pt-6 text-center">
+                <div className="flex justify-center mb-4">
+                  <img
+                    src="/interface-logo.png"
+                    alt="Interface.social"
+                    className="h-16 w-auto object-contain rounded-lg"
+                  />
+                </div>
+                <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">
+                  Interface.social
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Mobile companion for your Ethereum journey
+                </p>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link
+                    href="https://interface.social"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Post your take on Interface
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 hover:border-indigo-400 transition-colors bg-white dark:bg-gray-700 group border-gray-200 dark:border-gray-600">
+              <CardContent className="pt-6 text-center">
+                <div className="flex justify-center mb-4">
+                  <GithubIcon className="h-16 w-16 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
+                </div>
+                <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">
+                  Awesome ECP
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  A curated list of projects, tools, and resources built on ECP
+                </p>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link
+                    href="https://github.com/ecp-eth/awesome-ecp"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View More Projects
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Call to Action */}
       <section className="py-16 px-4 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto text-center">
@@ -757,6 +822,7 @@ await fetchComments({
           </div>
         </div>
       </section>
+
       {/* From the Team Section */}
       <section className="py-16 px-4 bg-gray-900">
         <div className="container mx-auto text-center">
@@ -820,7 +886,6 @@ await fetchComments({
           </div>
         </div>
       </section>
-
       {/* Footer */}
       <footer className="border-t border-gray-200 dark:border-gray-800 py-12 px-4">
         <div className="container mx-auto">
