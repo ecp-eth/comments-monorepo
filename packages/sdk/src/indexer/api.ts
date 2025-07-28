@@ -20,9 +20,9 @@ import {
   IndexerAPIGetAutocompleteOutputSchema,
   type IndexerAPIGetAutocompleteOutputSchemaType,
   IndexerAPIModerationClassificationLabelSchema,
-  IndexerAPIModerationClassificationLabelSchemaType,
+  type IndexerAPIModerationClassificationLabelSchemaType,
   IndexerAPICommentWithRepliesSchema,
-  IndexerAPICommentWithRepliesSchemaType,
+  type IndexerAPICommentWithRepliesSchemaType,
 } from "./schemas.js";
 import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
