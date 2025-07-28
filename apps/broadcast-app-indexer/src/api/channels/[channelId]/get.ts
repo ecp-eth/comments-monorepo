@@ -86,6 +86,7 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
           id: channel.id,
           name: channel.name,
           description: channel.description,
+          owner: channel.owner,
           createdAt: channel.createdAt,
           updatedAt: channel.updatedAt,
           isSubscribed: !!channel_subscription,
