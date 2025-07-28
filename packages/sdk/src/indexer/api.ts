@@ -21,9 +21,118 @@ import {
   type IndexerAPIGetAutocompleteOutputSchemaType,
   IndexerAPIModerationClassificationLabelSchema,
   IndexerAPIModerationClassificationLabelSchemaType,
+  IndexerAPICommentWithRepliesSchema,
+  IndexerAPICommentWithRepliesSchemaType,
 } from "./schemas.js";
 import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
+
+const FetchCommentOptionsSchema = z.object({
+  /**
+   * The ID of the comment to fetch
+   */
+  commentId: HexSchema,
+  /**
+   * Filter comments by chain ID(s)
+   */
+  chainId: z.union([z.number().int(), z.array(z.number().int())]),
+  /**
+   * Filter comments by comment type
+   */
+  commentType: z.number().int().min(0).max(255).optional(),
+  /**
+   * The mode to fetch comments in by default it returns only the first level of comments.
+   * If flat is used it will return all comments sorted by timestamp in descending order.
+   *
+   * @default "nested"
+   */
+  mode: IndexerAPICommentListModeSchema.optional(),
+  /**
+   * The viewer's address. This is useful when the content moderation is enabled on the indexer.
+   */
+  viewer: HexSchema.optional(),
+  /**
+   * URL on which /api/comments endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  /**
+   * The signal to abort the request
+   */
+  signal: z.instanceof(AbortSignal).optional(),
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries: z.number().int().positive().default(3),
+});
+
+export type FetchCommentOptions = z.input<typeof FetchCommentOptionsSchema>;
+
+/**
+ * Fetch one single comment from the Indexer API
+ *
+ * @returns A promise that resolves the comment fetched from the Indexer API
+ */
+export async function fetchComment(
+  options: FetchCommentOptions,
+): Promise<IndexerAPICommentWithRepliesSchemaType> {
+  const {
+    commentId,
+    chainId,
+    viewer,
+    mode,
+    commentType,
+    apiUrl,
+    signal,
+    retries,
+  } = FetchCommentOptionsSchema.parse(options);
+
+  return runAsync(
+    async (signal) => {
+      const url = new URL(`/api/comments/${commentId}`, apiUrl);
+
+      if (Array.isArray(chainId)) {
+        url.searchParams.set("chainId", chainId.join(","));
+      } else {
+        url.searchParams.set("chainId", chainId.toString());
+      }
+
+      if (viewer) {
+        url.searchParams.set("viewer", viewer);
+      }
+
+      if (mode) {
+        url.searchParams.set("mode", mode);
+      }
+
+      // commentType can be 0
+      if (commentType != null) {
+        url.searchParams.set("commentType", commentType.toString());
+      }
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-cache",
+        signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch comments: ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+
+      return IndexerAPICommentWithRepliesSchema.parse(responseData);
+    },
+    { signal, retries },
+  );
+}
 
 /**
  * The options for `fetchComments()`
