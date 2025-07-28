@@ -41,14 +41,7 @@ import { useSetNotificationStatusOnChannel } from "@/hooks/useSetNotificationSta
 import type { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
 import { cn } from "@/lib/utils";
 import { EditorComposer } from "@/components/editor-composer";
-
-const channelResponseSchema = z.object({
-  id: z.coerce.bigint(),
-  name: z.string(),
-  description: z.string().nullable(),
-  isSubscribed: z.boolean(),
-  notificationsEnabled: z.boolean(),
-});
+import { ChannelSchema } from "@/api/schemas";
 
 class ChannelNotFoundError extends Error {
   constructor() {
@@ -118,7 +111,7 @@ export default function ChannelPage(props: {
         );
       }
 
-      return channelResponseSchema.parse(await channelResponse.json());
+      return ChannelSchema.parse(await channelResponse.json());
     },
   });
 
@@ -173,6 +166,7 @@ export default function ChannelPage(props: {
   }
 
   if (channelQuery.status === "error") {
+    console.error("Error fetching channel:", channelQuery.error);
     const isNotFoundError = channelQuery.error instanceof ChannelNotFoundError;
 
     return (
