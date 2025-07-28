@@ -2,29 +2,13 @@
 import { sdk } from "@farcaster/miniapp-sdk";
 import { publicEnv } from "@/env/public";
 import { useQuery } from "@tanstack/react-query";
-import z from "zod";
 import { AlertTriangleIcon, RotateCwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChannelCard } from "@/components/channel-card";
 import { cn } from "@/lib/utils";
-
-const channelSchema = z.object({
-  id: z.coerce.bigint(),
-  name: z.string(),
-  description: z.string().nullable(),
-  isSubscribed: z.boolean(),
-  notificationsEnabled: z.boolean(),
-});
-
-const responseSchema = z.object({
-  results: z.array(channelSchema),
-  pageInfo: z.object({
-    hasNextPage: z.boolean(),
-    nextCursor: z.string().optional(),
-  }),
-});
+import { ListChannelsResponseSchema } from "@/api/schemas";
 
 export default function MyChannelsPage() {
   const { data, error, status, isRefetching, refetch } = useQuery({
@@ -43,11 +27,12 @@ export default function MyChannelsPage() {
         throw new Error(`Failed to fetch channels: ${response.statusText}`);
       }
 
-      return responseSchema.parse(await response.json());
+      return ListChannelsResponseSchema.parse(await response.json());
     },
   });
 
   if (error) {
+    console.error("Error fetching channels:", error);
     return (
       <div className="h-full flex flex-col items-center justify-center p-4 text-center">
         <AlertTriangleIcon className="h-12 w-12 text-destructive mb-4" />
