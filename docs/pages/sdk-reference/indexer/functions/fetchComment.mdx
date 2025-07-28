@@ -1,0 +1,1204 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / fetchComment
+
+# Function: fetchComment()
+
+```ts
+function fetchComment(options): Promise<{
+  app: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens?: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster?: {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username: string;
+     };
+  };
+  chainId: number;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  cursor: `0x${string}`;
+  deletedAt: null | Date;
+  hookMetadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationClassifierResult: Record<string, number>;
+  moderationClassifierScore: number;
+  moderationStatus: "approved" | "pending" | "rejected";
+  moderationStatusChangedAt: Date;
+  parentId: null | `0x${string}`;
+  reactionCounts: Record<string, number>;
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+  })[];
+  replies: {
+     extra: {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+     };
+     pagination: {
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     };
+     results: {
+        app: `0x${string}`;
+        author: {
+           address: `0x${string}`;
+           ens?: {
+              avatarUrl: null | string;
+              name: string;
+           };
+           farcaster?: {
+              displayName?: string;
+              fid: number;
+              pfpUrl?: string;
+              username: string;
+           };
+        };
+        chainId: number;
+        channelId: bigint;
+        commentType: number;
+        content: string;
+        createdAt: Date;
+        cursor: `0x${string}`;
+        deletedAt: null | Date;
+        hookMetadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        id: `0x${string}`;
+        logIndex: null | number;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationClassifierResult: Record<string, number>;
+        moderationClassifierScore: number;
+        moderationStatus: "approved" | "pending" | "rejected";
+        moderationStatusChangedAt: Date;
+        parentId: null | `0x${string}`;
+        reactionCounts: Record<string, number>;
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           opengraph:   | null
+              | {
+              description: ... | ...;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+        })[];
+        revision: number;
+        targetUri: string;
+        txHash: `0x${string}`;
+        updatedAt: Date;
+        viewerReactions: Record<string, {
+           app: `0x${string}`;
+           author: {
+              address: `0x${string}`;
+              ens?: {
+                 avatarUrl: ...;
+                 name: ...;
+              };
+              farcaster?: {
+                 displayName?: ...;
+                 fid: ...;
+                 pfpUrl?: ...;
+                 username: ...;
+              };
+           };
+           chainId: number;
+           channelId: bigint;
+           commentType: number;
+           content: string;
+           createdAt: Date;
+           cursor: `0x${string}`;
+           deletedAt: null | Date;
+           hookMetadata: {
+              key: `0x${(...)}`;
+              value: `0x${(...)}`;
+           }[];
+           id: `0x${string}`;
+           logIndex: null | number;
+           metadata: {
+              key: `0x${(...)}`;
+              value: `0x${(...)}`;
+           }[];
+           moderationClassifierResult: Record<string, number>;
+           moderationClassifierScore: number;
+           moderationStatus: "approved" | "pending" | "rejected";
+           moderationStatusChangedAt: Date;
+           parentId: null | `0x${string}`;
+           references: (
+              | {
+              address: ...;
+              avatarUrl: ...;
+              name: ...;
+              position: ...;
+              type: ...;
+              url: ...;
+            }
+              | {
+              address: ...;
+              displayName: ...;
+              fid: ...;
+              fname: ...;
+              pfpUrl: ...;
+              position: ...;
+              type: ...;
+              url: ...;
+              username: ...;
+            }
+              | {
+              address: ...;
+              chainId: ...;
+              chains: ...;
+              decimals: ...;
+              logoURI: ...;
+              name: ...;
+              position: ...;
+              symbol: ...;
+              type: ...;
+            }
+              | {
+              description: ...;
+              favicon: ...;
+              opengraph: ...;
+              position: ...;
+              title: ...;
+              type: ...;
+              url: ...;
+            }
+              | {
+              mediaType: ...;
+              position: ...;
+              type: ...;
+              url: ...;
+            }
+              | {
+              mediaType: ...;
+              position: ...;
+              type: ...;
+              url: ...;
+            }
+              | {
+              mediaType: ...;
+              position: ...;
+              type: ...;
+              url: ...;
+           })[];
+           revision: number;
+           targetUri: string;
+           txHash: `0x${string}`;
+           updatedAt: Date;
+           zeroExSwap:   | null
+              | {
+              from: {
+                 address: ...;
+                 amount: ...;
+                 symbol: ...;
+              };
+              to: {
+                 address: ...;
+                 amount: ...;
+                 symbol: ...;
+              };
+            };
+        }[]>;
+        zeroExSwap:   | null
+           | {
+           from: {
+              address: `0x${string}`;
+              amount: string;
+              symbol: string;
+           };
+           to: {
+              address: "" | `0x${string}`;
+              amount: string;
+              symbol: string;
+           };
+         };
+     }[];
+  };
+  revision: number;
+  targetUri: string;
+  txHash: `0x${string}`;
+  updatedAt: Date;
+  viewerReactions: Record<string, {
+     app: `0x${string}`;
+     author: {
+        address: `0x${string}`;
+        ens?: {
+           avatarUrl: null | string;
+           name: string;
+        };
+        farcaster?: {
+           displayName?: string;
+           fid: number;
+           pfpUrl?: string;
+           username: string;
+        };
+     };
+     chainId: number;
+     channelId: bigint;
+     commentType: number;
+     content: string;
+     createdAt: Date;
+     cursor: `0x${string}`;
+     deletedAt: null | Date;
+     hookMetadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     id: `0x${string}`;
+     logIndex: null | number;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
+     moderationStatus: "approved" | "pending" | "rejected";
+     moderationStatusChangedAt: Date;
+     parentId: null | `0x${string}`;
+     references: (
+        | {
+        address: `0x${string}`;
+        avatarUrl: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "ens";
+        url: string;
+      }
+        | {
+        address: `0x${string}`;
+        displayName: null | string;
+        fid: number;
+        fname: string;
+        pfpUrl: null | string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "farcaster";
+        url: string;
+        username: string;
+      }
+        | {
+        address: `0x${string}`;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
+        logoURI: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        symbol: string;
+        type: "erc20";
+      }
+        | {
+        description: null | string;
+        favicon: null | string;
+        opengraph:   | null
+           | {
+           description: ... | ...;
+           image: string;
+           title: string;
+           url: string;
+         };
+        position: {
+           end: number;
+           start: number;
+        };
+        title: string;
+        type: "webpage";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "file";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "image";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "video";
+        url: string;
+     })[];
+     revision: number;
+     targetUri: string;
+     txHash: `0x${string}`;
+     updatedAt: Date;
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: "" | `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
+  }[]>;
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: "" | `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
+}>;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:79](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L79)
+
+Fetch one single comment from the Indexer API
+
+## Parameters
+
+### options
+
+#### apiUrl?
+
+`string` = `...`
+
+URL on which /api/comments endpoint will be called
+
+**Default**
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+#### chainId
+
+`number` \| `number`[] = `...`
+
+Filter comments by chain ID(s)
+
+#### commentId
+
+`` `0x${string}` `` = `HexSchema`
+
+The ID of the comment to fetch
+
+#### commentType?
+
+`number` = `...`
+
+Filter comments by comment type
+
+#### mode?
+
+`"flat"` \| `"nested"` = `...`
+
+The mode to fetch comments in by default it returns only the first level of comments.
+If flat is used it will return all comments sorted by timestamp in descending order.
+
+**Default**
+
+```ts
+"nested"
+```
+
+#### retries?
+
+`number` = `...`
+
+Number of times to retry the signing operation in case of failure.
+
+**Default**
+
+```ts
+3
+```
+
+#### signal?
+
+`AbortSignal` = `...`
+
+The signal to abort the request
+
+#### viewer?
+
+`` `0x${string}` `` = `...`
+
+The viewer's address. This is useful when the content moderation is enabled on the indexer.
+
+## Returns
+
+`Promise`\<\{
+  `app`: `` `0x${string}` ``;
+  `author`: \{
+     `address`: `` `0x${string}` ``;
+     `ens?`: \{
+        `avatarUrl`: `null` \| `string`;
+        `name`: `string`;
+     \};
+     `farcaster?`: \{
+        `displayName?`: `string`;
+        `fid`: `number`;
+        `pfpUrl?`: `string`;
+        `username`: `string`;
+     \};
+  \};
+  `chainId`: `number`;
+  `channelId`: `bigint`;
+  `commentType`: `number`;
+  `content`: `string`;
+  `createdAt`: `Date`;
+  `cursor`: `` `0x${string}` ``;
+  `deletedAt`: `null` \| `Date`;
+  `hookMetadata`: \{
+     `key`: `` `0x${string}` ``;
+     `value`: `` `0x${string}` ``;
+  \}[];
+  `id`: `` `0x${string}` ``;
+  `logIndex`: `null` \| `number`;
+  `metadata`: \{
+     `key`: `` `0x${string}` ``;
+     `value`: `` `0x${string}` ``;
+  \}[];
+  `moderationClassifierResult`: `Record`\<`string`, `number`\>;
+  `moderationClassifierScore`: `number`;
+  `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
+  `moderationStatusChangedAt`: `Date`;
+  `parentId`: `null` \| `` `0x${string}` ``;
+  `reactionCounts`: `Record`\<`string`, `number`\>;
+  `references`: (
+     \| \{
+     `address`: `` `0x${string}` ``;
+     `avatarUrl`: `null` \| `string`;
+     `name`: `string`;
+     `position`: \{
+        `end`: `number`;
+        `start`: `number`;
+     \};
+     `type`: `"ens"`;
+     `url`: `string`;
+   \}
+     \| \{
+     `address`: `` `0x${string}` ``;
+     `displayName`: `null` \| `string`;
+     `fid`: `number`;
+     `fname`: `string`;
+     `pfpUrl`: `null` \| `string`;
+     `position`: \{
+        `end`: `number`;
+        `start`: `number`;
+     \};
+     `type`: `"farcaster"`;
+     `url`: `string`;
+     `username`: `string`;
+   \}
+     \| \{
+     `address`: `` `0x${string}` ``;
+     `chainId`: `null` \| `number`;
+     `chains`: \{
+        `caip`: `string`;
+        `chainId`: `number`;
+     \}[];
+     `decimals`: `number`;
+     `logoURI`: `null` \| `string`;
+     `name`: `string`;
+     `position`: \{
+        `end`: `number`;
+        `start`: `number`;
+     \};
+     `symbol`: `string`;
+     `type`: `"erc20"`;
+   \}
+     \| \{
+     `description`: `null` \| `string`;
+     `favicon`: `null` \| `string`;
+     `opengraph`:   \| `null`
+        \| \{
+        `description`: `null` \| `string`;
+        `image`: `string`;
+        `title`: `string`;
+        `url`: `string`;
+      \};
+     `position`: \{
+        `end`: `number`;
+        `start`: `number`;
+     \};
+     `title`: `string`;
+     `type`: `"webpage"`;
+     `url`: `string`;
+   \}
+     \| \{
+     `mediaType`: `string`;
+     `position`: \{
+        `end`: `number`;
+        `start`: `number`;
+     \};
+     `type`: `"file"`;
+     `url`: `string`;
+   \}
+     \| \{
+     `mediaType`: `string`;
+     `position`: \{
+        `end`: `number`;
+        `start`: `number`;
+     \};
+     `type`: `"image"`;
+     `url`: `string`;
+   \}
+     \| \{
+     `mediaType`: `string`;
+     `position`: \{
+        `end`: `number`;
+        `start`: `number`;
+     \};
+     `type`: `"video"`;
+     `url`: `string`;
+  \})[];
+  `replies`: \{
+     `extra`: \{
+        `moderationEnabled`: `boolean`;
+        `moderationKnownReactions`: `string`[];
+     \};
+     `pagination`: \{
+        `endCursor?`: `` `0x${string}` ``;
+        `hasNext`: `boolean`;
+        `hasPrevious`: `boolean`;
+        `limit`: `number`;
+        `startCursor?`: `` `0x${string}` ``;
+     \};
+     `results`: \{
+        `app`: `` `0x${string}` ``;
+        `author`: \{
+           `address`: `` `0x${string}` ``;
+           `ens?`: \{
+              `avatarUrl`: `null` \| `string`;
+              `name`: `string`;
+           \};
+           `farcaster?`: \{
+              `displayName?`: `string`;
+              `fid`: `number`;
+              `pfpUrl?`: `string`;
+              `username`: `string`;
+           \};
+        \};
+        `chainId`: `number`;
+        `channelId`: `bigint`;
+        `commentType`: `number`;
+        `content`: `string`;
+        `createdAt`: `Date`;
+        `cursor`: `` `0x${string}` ``;
+        `deletedAt`: `null` \| `Date`;
+        `hookMetadata`: \{
+           `key`: `` `0x${string}` ``;
+           `value`: `` `0x${string}` ``;
+        \}[];
+        `id`: `` `0x${string}` ``;
+        `logIndex`: `null` \| `number`;
+        `metadata`: \{
+           `key`: `` `0x${string}` ``;
+           `value`: `` `0x${string}` ``;
+        \}[];
+        `moderationClassifierResult`: `Record`\<`string`, `number`\>;
+        `moderationClassifierScore`: `number`;
+        `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
+        `moderationStatusChangedAt`: `Date`;
+        `parentId`: `null` \| `` `0x${string}` ``;
+        `reactionCounts`: `Record`\<`string`, `number`\>;
+        `references`: (
+           \| \{
+           `address`: `` `0x${string}` ``;
+           `avatarUrl`: `null` \| `string`;
+           `name`: `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"ens"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `address`: `` `0x${string}` ``;
+           `displayName`: `null` \| `string`;
+           `fid`: `number`;
+           `fname`: `string`;
+           `pfpUrl`: `null` \| `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"farcaster"`;
+           `url`: `string`;
+           `username`: `string`;
+         \}
+           \| \{
+           `address`: `` `0x${string}` ``;
+           `chainId`: `null` \| `number`;
+           `chains`: \{
+              `caip`: `string`;
+              `chainId`: `number`;
+           \}[];
+           `decimals`: `number`;
+           `logoURI`: `null` \| `string`;
+           `name`: `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `symbol`: `string`;
+           `type`: `"erc20"`;
+         \}
+           \| \{
+           `description`: `null` \| `string`;
+           `favicon`: `null` \| `string`;
+           `opengraph`:   \| `null`
+              \| \{
+              `description`: ... \| ...;
+              `image`: `string`;
+              `title`: `string`;
+              `url`: `string`;
+            \};
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `title`: `string`;
+           `type`: `"webpage"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `mediaType`: `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"file"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `mediaType`: `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"image"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `mediaType`: `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"video"`;
+           `url`: `string`;
+        \})[];
+        `revision`: `number`;
+        `targetUri`: `string`;
+        `txHash`: `` `0x${string}` ``;
+        `updatedAt`: `Date`;
+        `viewerReactions`: `Record`\<`string`, \{
+           `app`: `` `0x${string}` ``;
+           `author`: \{
+              `address`: `` `0x${string}` ``;
+              `ens?`: \{
+                 `avatarUrl`: ...;
+                 `name`: ...;
+              \};
+              `farcaster?`: \{
+                 `displayName?`: ...;
+                 `fid`: ...;
+                 `pfpUrl?`: ...;
+                 `username`: ...;
+              \};
+           \};
+           `chainId`: `number`;
+           `channelId`: `bigint`;
+           `commentType`: `number`;
+           `content`: `string`;
+           `createdAt`: `Date`;
+           `cursor`: `` `0x${string}` ``;
+           `deletedAt`: `null` \| `Date`;
+           `hookMetadata`: \{
+              `key`: `` `0x${(...)}` ``;
+              `value`: `` `0x${(...)}` ``;
+           \}[];
+           `id`: `` `0x${string}` ``;
+           `logIndex`: `null` \| `number`;
+           `metadata`: \{
+              `key`: `` `0x${(...)}` ``;
+              `value`: `` `0x${(...)}` ``;
+           \}[];
+           `moderationClassifierResult`: `Record`\<`string`, `number`\>;
+           `moderationClassifierScore`: `number`;
+           `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
+           `moderationStatusChangedAt`: `Date`;
+           `parentId`: `null` \| `` `0x${string}` ``;
+           `references`: (
+              \| \{
+              `address`: ...;
+              `avatarUrl`: ...;
+              `name`: ...;
+              `position`: ...;
+              `type`: ...;
+              `url`: ...;
+            \}
+              \| \{
+              `address`: ...;
+              `displayName`: ...;
+              `fid`: ...;
+              `fname`: ...;
+              `pfpUrl`: ...;
+              `position`: ...;
+              `type`: ...;
+              `url`: ...;
+              `username`: ...;
+            \}
+              \| \{
+              `address`: ...;
+              `chainId`: ...;
+              `chains`: ...;
+              `decimals`: ...;
+              `logoURI`: ...;
+              `name`: ...;
+              `position`: ...;
+              `symbol`: ...;
+              `type`: ...;
+            \}
+              \| \{
+              `description`: ...;
+              `favicon`: ...;
+              `opengraph`: ...;
+              `position`: ...;
+              `title`: ...;
+              `type`: ...;
+              `url`: ...;
+            \}
+              \| \{
+              `mediaType`: ...;
+              `position`: ...;
+              `type`: ...;
+              `url`: ...;
+            \}
+              \| \{
+              `mediaType`: ...;
+              `position`: ...;
+              `type`: ...;
+              `url`: ...;
+            \}
+              \| \{
+              `mediaType`: ...;
+              `position`: ...;
+              `type`: ...;
+              `url`: ...;
+           \})[];
+           `revision`: `number`;
+           `targetUri`: `string`;
+           `txHash`: `` `0x${string}` ``;
+           `updatedAt`: `Date`;
+           `zeroExSwap`:   \| `null`
+              \| \{
+              `from`: \{
+                 `address`: ...;
+                 `amount`: ...;
+                 `symbol`: ...;
+              \};
+              `to`: \{
+                 `address`: ...;
+                 `amount`: ...;
+                 `symbol`: ...;
+              \};
+            \};
+        \}[]\>;
+        `zeroExSwap`:   \| `null`
+           \| \{
+           `from`: \{
+              `address`: `` `0x${string}` ``;
+              `amount`: `string`;
+              `symbol`: `string`;
+           \};
+           `to`: \{
+              `address`: `""` \| `` `0x${string}` ``;
+              `amount`: `string`;
+              `symbol`: `string`;
+           \};
+         \};
+     \}[];
+  \};
+  `revision`: `number`;
+  `targetUri`: `string`;
+  `txHash`: `` `0x${string}` ``;
+  `updatedAt`: `Date`;
+  `viewerReactions`: `Record`\<`string`, \{
+     `app`: `` `0x${string}` ``;
+     `author`: \{
+        `address`: `` `0x${string}` ``;
+        `ens?`: \{
+           `avatarUrl`: `null` \| `string`;
+           `name`: `string`;
+        \};
+        `farcaster?`: \{
+           `displayName?`: `string`;
+           `fid`: `number`;
+           `pfpUrl?`: `string`;
+           `username`: `string`;
+        \};
+     \};
+     `chainId`: `number`;
+     `channelId`: `bigint`;
+     `commentType`: `number`;
+     `content`: `string`;
+     `createdAt`: `Date`;
+     `cursor`: `` `0x${string}` ``;
+     `deletedAt`: `null` \| `Date`;
+     `hookMetadata`: \{
+        `key`: `` `0x${string}` ``;
+        `value`: `` `0x${string}` ``;
+     \}[];
+     `id`: `` `0x${string}` ``;
+     `logIndex`: `null` \| `number`;
+     `metadata`: \{
+        `key`: `` `0x${string}` ``;
+        `value`: `` `0x${string}` ``;
+     \}[];
+     `moderationClassifierResult`: `Record`\<`string`, `number`\>;
+     `moderationClassifierScore`: `number`;
+     `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
+     `moderationStatusChangedAt`: `Date`;
+     `parentId`: `null` \| `` `0x${string}` ``;
+     `references`: (
+        \| \{
+        `address`: `` `0x${string}` ``;
+        `avatarUrl`: `null` \| `string`;
+        `name`: `string`;
+        `position`: \{
+           `end`: `number`;
+           `start`: `number`;
+        \};
+        `type`: `"ens"`;
+        `url`: `string`;
+      \}
+        \| \{
+        `address`: `` `0x${string}` ``;
+        `displayName`: `null` \| `string`;
+        `fid`: `number`;
+        `fname`: `string`;
+        `pfpUrl`: `null` \| `string`;
+        `position`: \{
+           `end`: `number`;
+           `start`: `number`;
+        \};
+        `type`: `"farcaster"`;
+        `url`: `string`;
+        `username`: `string`;
+      \}
+        \| \{
+        `address`: `` `0x${string}` ``;
+        `chainId`: `null` \| `number`;
+        `chains`: \{
+           `caip`: `string`;
+           `chainId`: `number`;
+        \}[];
+        `decimals`: `number`;
+        `logoURI`: `null` \| `string`;
+        `name`: `string`;
+        `position`: \{
+           `end`: `number`;
+           `start`: `number`;
+        \};
+        `symbol`: `string`;
+        `type`: `"erc20"`;
+      \}
+        \| \{
+        `description`: `null` \| `string`;
+        `favicon`: `null` \| `string`;
+        `opengraph`:   \| `null`
+           \| \{
+           `description`: ... \| ...;
+           `image`: `string`;
+           `title`: `string`;
+           `url`: `string`;
+         \};
+        `position`: \{
+           `end`: `number`;
+           `start`: `number`;
+        \};
+        `title`: `string`;
+        `type`: `"webpage"`;
+        `url`: `string`;
+      \}
+        \| \{
+        `mediaType`: `string`;
+        `position`: \{
+           `end`: `number`;
+           `start`: `number`;
+        \};
+        `type`: `"file"`;
+        `url`: `string`;
+      \}
+        \| \{
+        `mediaType`: `string`;
+        `position`: \{
+           `end`: `number`;
+           `start`: `number`;
+        \};
+        `type`: `"image"`;
+        `url`: `string`;
+      \}
+        \| \{
+        `mediaType`: `string`;
+        `position`: \{
+           `end`: `number`;
+           `start`: `number`;
+        \};
+        `type`: `"video"`;
+        `url`: `string`;
+     \})[];
+     `revision`: `number`;
+     `targetUri`: `string`;
+     `txHash`: `` `0x${string}` ``;
+     `updatedAt`: `Date`;
+     `zeroExSwap`:   \| `null`
+        \| \{
+        `from`: \{
+           `address`: `` `0x${string}` ``;
+           `amount`: `string`;
+           `symbol`: `string`;
+        \};
+        `to`: \{
+           `address`: `""` \| `` `0x${string}` ``;
+           `amount`: `string`;
+           `symbol`: `string`;
+        \};
+      \};
+  \}[]\>;
+  `zeroExSwap`:   \| `null`
+     \| \{
+     `from`: \{
+        `address`: `` `0x${string}` ``;
+        `amount`: `string`;
+        `symbol`: `string`;
+     \};
+     `to`: \{
+        `address`: `""` \| `` `0x${string}` ``;
+        `amount`: `string`;
+        `symbol`: `string`;
+     \};
+   \};
+\}\>
+
+A promise that resolves the comment fetched from the Indexer API
