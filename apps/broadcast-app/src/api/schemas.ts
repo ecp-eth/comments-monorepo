@@ -38,3 +38,24 @@ export const SignCommentResponseServerSchema = z.object({
   hash: HexSchema,
   data: CommentDataWithIdSchema,
 });
+
+export const ChannelSchema = z.object({
+  id: z.coerce.bigint(),
+  name: z.string(),
+  description: z.string(),
+  owner: HexSchema,
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  isSubscribed: z.boolean(),
+  notificationsEnabled: z.boolean(),
+});
+
+export type Channel = z.infer<typeof ChannelSchema>;
+
+export const ListChannelsResponseSchema = z.object({
+  results: z.array(ChannelSchema),
+  pageInfo: z.object({
+    hasNextPage: z.boolean(),
+    nextCursor: z.string().optional(),
+  }),
+});

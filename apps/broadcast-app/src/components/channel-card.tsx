@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, XIcon, BellIcon, BellOffIcon } from "lucide-react";
-import type { Channel } from "@/app/types";
+import type { Channel } from "@/api/schemas";
 import {
   AlreadySubscribedError,
   useSubscribeToChannel,
