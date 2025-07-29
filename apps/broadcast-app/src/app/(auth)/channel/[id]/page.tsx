@@ -118,7 +118,7 @@ export default function ChannelPage(props: {
 
   const commentsQuery = useQuery({
     enabled: channelQuery.status === "success",
-    queryKey: ["channel", id, "comments"],
+    queryKey: [address, "channel", id, "comments"],
     queryFn: async () => {
       const channelId = z.coerce.bigint().parse(id);
 
@@ -127,6 +127,8 @@ export default function ChannelPage(props: {
         channelId,
         apiUrl: publicEnv.NEXT_PUBLIC_INDEXER_URL,
         mode: "flat",
+        viewer: address,
+        moderationStatus: ["approved", "pending"],
       });
 
       return {
