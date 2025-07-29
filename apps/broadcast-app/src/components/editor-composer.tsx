@@ -22,7 +22,7 @@ import { type QueryKey, useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/env/public";
 import {
   GenerateUploadUrlResponseSchema,
-  SignCommentPayloadRequestSchema,
+  SignCommentPayloadRequestClientSchema,
   SignCommentResponseServerSchema,
 } from "@/api/schemas";
 import { postComment } from "@ecp.eth/sdk/comments";
@@ -38,6 +38,9 @@ import { getChannelCaipUri } from "@/lib/utils";
 import { useCommentSubmission } from "@ecp.eth/shared/hooks";
 import { SubmitCommentMutationError } from "@/errors";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
+import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
+import { base } from "viem/chains";
+import { sdk } from "@farcaster/miniapp-sdk";
 
 interface EditorComposerProps {
   /**
@@ -140,9 +143,12 @@ export function EditorComposer({
             }),
           );
 
-        const parseResult = SignCommentPayloadRequestSchema.safeParse({
+        const parseResult = SignCommentPayloadRequestClientSchema.safeParse({
+          author: address,
+          channelId,
           content,
           references,
+          metadata: [],
           ...(replyingTo
             ? { parentId: replyingTo.id }
             : {
@@ -161,13 +167,16 @@ export function EditorComposer({
 
         const commentData = parseResult.data;
 
-        const signCommentResponse = await fetch("/api/sign-comment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const signCommentResponse = await sdk.quickAuth.fetch(
+          "/api/sign-comment",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(commentData),
           },
-          body: JSON.stringify(commentData),
-        });
+        );
 
         if (!signCommentResponse.ok) {
           await throwKnownResponseCodeError(signCommentResponse);
@@ -188,6 +197,7 @@ export function EditorComposer({
         }
 
         const { txHash } = await postComment({
+          commentsAddress: SUPPORTED_CHAINS[base.id].commentManagerAddress,
           appSignature: signCommentResult.data.signature,
           comment: signCommentResult.data.data,
           writeContract: writeContractAsync,
@@ -244,6 +254,8 @@ export function EditorComposer({
             e.flatten().fieldErrors as Record<string, string[]>,
           );
         }
+
+        console.error(e);
 
         throw e;
       }
@@ -343,6 +355,14 @@ export function EditorComposer({
           onCancel?.();
         }}
       />
+
+      {submitMutation.error && (
+        <div className="text-red-500">
+          {submitMutation.error instanceof SubmitCommentMutationError
+            ? submitMutation.error.render()
+            : submitMutation.error.message}
+        </div>
+      )}
 
       <div className="flex items-center justify-end gap-2">
         <Button
