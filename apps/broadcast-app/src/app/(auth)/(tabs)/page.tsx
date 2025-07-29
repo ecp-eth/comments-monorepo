@@ -101,7 +101,7 @@ export default function DiscoverChannelsPage() {
         </div>
 
         {hasNextPage && (
-          <div className="flex justify-center p-4 self-end">
+          <div className="flex justify-center p-4">
             <Button
               disabled={isFetchingNextPage}
               className="w-full text-xs"
