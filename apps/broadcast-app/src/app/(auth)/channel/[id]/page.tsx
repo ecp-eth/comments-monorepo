@@ -141,6 +141,10 @@ export default function ChannelPage(props: {
     chainId,
   });
 
+  const [minimumContainerHeight, setMinimumContainerHeight] = useState(0);
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
   useLayoutEffect(() => {
     window.requestAnimationFrame(() => {
       const commentsContainer = window.document.querySelector(
@@ -152,11 +156,13 @@ export default function ChannelPage(props: {
           top: commentsContainer.scrollHeight,
           behavior: "instant",
         });
+
+        setMinimumContainerHeight(
+          commentsContainer.getBoundingClientRect().height,
+        );
       }
     });
   }, [commentsQuery.data]);
-
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // connect wallet if user is replying to a comment and not connected
   useEffect(() => {
@@ -374,7 +380,10 @@ export default function ChannelPage(props: {
         viewportClassName="px-4 comments-container"
         ref={scrollAreaRef}
       >
-        <div className="space-y-4">
+        <div
+          className="flex gap-4 flex-col justify-end"
+          style={{ minHeight: minimumContainerHeight }}
+        >
           <VisibilityTracker
             containerRef={scrollAreaRef}
             onVisibilityChange={(isVisible) => {
