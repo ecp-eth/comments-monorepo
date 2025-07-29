@@ -9,7 +9,7 @@ export function createChannelCommentsQueryKey({
   channelId,
   author,
 }: CreateChannelCommentsQueryKeyParams) {
-  return [author, "channel", channelId, "comments"] as const;
+  return [author, "channel", channelId.toString(), "comments"] as const;
 }
 
 type CreateChannelCommentRepliesQueryKeyParams = {
@@ -26,7 +26,7 @@ export function createChannelCommentRepliesQueryKey({
   return [
     author,
     "channel",
-    channelId,
+    channelId.toString(),
     "comments",
     parentId,
     "replies",
@@ -34,7 +34,7 @@ export function createChannelCommentRepliesQueryKey({
 }
 
 export function createChannelQueryKey(channelId: bigint) {
-  return ["channel", channelId] as const;
+  return ["channel", channelId.toString()] as const;
 }
 
 export function createDiscoverChannelsQueryKey() {
