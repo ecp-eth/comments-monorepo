@@ -19,8 +19,8 @@ export default function AuthLayout({
     sdk.actions.ready();
     sdk.back.enableWebNavigation();
 
-    sdk.isInMiniApp().then(() => {
-      setIsReady(true);
+    sdk.isInMiniApp().then((isInMiniApp) => {
+      setIsReady(isInMiniApp);
     });
   }, []);
 
