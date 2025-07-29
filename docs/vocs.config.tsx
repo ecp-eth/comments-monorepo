@@ -184,6 +184,10 @@ export default defineConfig({
           link: "/gas-costs",
         },
         {
+          text: "LLMs.txt",
+          link: "/llm-context",
+        },
+        {
           text: "FAQ",
           link: "/faq",
         },
