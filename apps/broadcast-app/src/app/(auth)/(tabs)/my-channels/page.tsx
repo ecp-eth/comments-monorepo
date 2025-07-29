@@ -9,10 +9,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChannelCard } from "@/components/channel-card";
 import { cn } from "@/lib/utils";
 import { ListChannelsResponseSchema } from "@/api/schemas";
+import { createMyChannelsQueryKey } from "@/queries";
 
 export default function MyChannelsPage() {
   const { data, error, status, isRefetching, refetch } = useQuery({
-    queryKey: ["my-channels"],
+    queryKey: createMyChannelsQueryKey(),
     queryFn: async () => {
       const url = new URL(
         "/api/channels",
