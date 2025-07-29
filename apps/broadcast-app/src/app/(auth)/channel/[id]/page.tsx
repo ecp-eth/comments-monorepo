@@ -1,9 +1,6 @@
 "use client";
 
-import { publicEnv } from "@/env/public";
-import { fetchComments } from "@ecp.eth/sdk/indexer";
-import { useQuery } from "@tanstack/react-query";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAccount, useChainId, useConnect, useDisconnect } from "wagmi";
 import z from "zod";
 import {
@@ -46,15 +43,16 @@ import { useSetNotificationStatusOnChannel } from "@/hooks/useSetNotificationSta
 import type { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
 import { cn } from "@/lib/utils";
 import { EditorComposer } from "@/components/editor-composer";
-import { useScrollToBottom } from "@/hooks/useScrollToBottom";
-import { createChannelCommentsQueryKey } from "@/queries";
 import { useRemoveChannelFromMyChannelsQuery } from "@/queries/my-channels";
 import { ChannelNotFoundError } from "@/errors";
 import {
   useChannelQuery,
+  useChannelCommentsQuery,
   useUpdateChannelInChannelQuery,
 } from "@/queries/channel";
 import { useRemoveChannelFromDiscoverQuery } from "@/queries/discover-channels";
+import { createChannelCommentsQueryKey } from "@/queries/query-keys";
+import { VisibilityTracker } from "@/components/visibility-tracker";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
@@ -136,29 +134,29 @@ export default function ChannelPage(props: {
     author: address,
   });
 
-  const commentsQuery = useQuery({
+  const commentsQuery = useChannelCommentsQuery({
     enabled: channelQuery.status === "success",
-    queryKey: commentsQueryKey,
-    queryFn: async () => {
-      const response = await fetchComments({
-        chainId,
-        channelId,
-        apiUrl: publicEnv.NEXT_PUBLIC_INDEXER_URL,
-        mode: "flat",
-        viewer: address,
-        moderationStatus: ["approved", "pending"],
-      });
-
-      return {
-        // use reversed order because we want to show the newest comments at the bottom
-        results: response.results.toReversed(),
-        pagination: response.pagination,
-        extra: response.extra,
-      };
-    },
+    channelId,
+    author: address,
+    chainId,
   });
 
-  const scrollRef = useScrollToBottom([commentsQuery.data]);
+  useLayoutEffect(() => {
+    window.requestAnimationFrame(() => {
+      const commentsContainer = window.document.querySelector(
+        ".comments-container",
+      );
+
+      if (commentsContainer) {
+        commentsContainer.scrollTo({
+          top: commentsContainer.scrollHeight,
+          behavior: "instant",
+        });
+      }
+    });
+  }, [commentsQuery.data]);
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // connect wallet if user is replying to a comment and not connected
   useEffect(() => {
@@ -260,7 +258,7 @@ export default function ChannelPage(props: {
   }
 
   const channel = channelQuery.data;
-  const comments = commentsQuery.data.results;
+  const comments = commentsQuery.data?.pages.flatMap((page) => page.results);
   const isOwner = address?.toLowerCase() === channel.owner.toLowerCase();
 
   return (
@@ -373,33 +371,44 @@ export default function ChannelPage(props: {
 
       <ScrollArea
         className="flex-1"
-        viewportClassName="flex flex-col justify-end"
+        viewportClassName="px-4 comments-container"
+        ref={scrollAreaRef}
       >
-        <div ref={scrollRef} className="p-4 h-full flex flex-col justify-end">
-          <div className="space-y-4">
-            {comments.map((comment) => (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                onReply={setReplyingTo}
-              />
-            ))}
+        <div className="space-y-4">
+          <VisibilityTracker
+            containerRef={scrollAreaRef}
+            onVisibilityChange={(isVisible) => {
+              if (
+                isVisible &&
+                !commentsQuery.isFetchingPreviousPage &&
+                commentsQuery.hasPreviousPage
+              ) {
+                commentsQuery.fetchPreviousPage();
+              }
+            }}
+          />
 
-            {isOwner && (
-              <EditorComposer
-                queryKey={commentsQueryKey}
-                channelId={channel.id}
-              />
-            )}
-
-            {!isOwner && comments.length === 0 && (
-              <div className="text-center text-muted-foreground">
-                No comments yet.
-              </div>
-            )}
-          </div>
+          {comments.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              onReply={setReplyingTo}
+            />
+          ))}
         </div>
       </ScrollArea>
+
+      {!isOwner && comments.length === 0 && (
+        <div className="text-center text-muted-foreground p-4">
+          No comments yet.
+        </div>
+      )}
+
+      {isOwner && (
+        <div className="px-4 pb-4">
+          <EditorComposer queryKey={commentsQueryKey} channelId={channel.id} />
+        </div>
+      )}
 
       {!address && (
         <div className="p-4 border-t">
