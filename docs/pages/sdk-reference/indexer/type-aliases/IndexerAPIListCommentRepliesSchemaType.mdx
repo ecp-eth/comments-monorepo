@@ -56,6 +56,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     reactionCounts: Record<string, number>;
      references: (
         | {
         address: `0x${string}`;
@@ -144,10 +145,350 @@ type IndexerAPIListCommentRepliesSchemaType = {
         type: "video";
         url: string;
      })[];
+     replies: {
+        extra: {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+        };
+        pagination: {
+           endCursor?: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${string}`;
+        };
+        results: {
+           app: `0x${string}`;
+           author: {
+              address: `0x${string}`;
+              ens?: {
+                 avatarUrl: null | string;
+                 name: string;
+              };
+              farcaster?: {
+                 displayName?: string;
+                 fid: number;
+                 pfpUrl?: string;
+                 username: string;
+              };
+           };
+           chainId: number;
+           channelId: bigint;
+           commentType: number;
+           content: string;
+           createdAt: Date;
+           cursor: `0x${string}`;
+           deletedAt: null | Date;
+           hookMetadata: {
+              key: `0x${string}`;
+              value: `0x${string}`;
+           }[];
+           id: `0x${string}`;
+           logIndex: null | number;
+           metadata: {
+              key: `0x${string}`;
+              value: `0x${string}`;
+           }[];
+           moderationClassifierResult: Record<string, number>;
+           moderationClassifierScore: number;
+           moderationStatus: "approved" | "pending" | "rejected";
+           moderationStatusChangedAt: Date;
+           parentId: null | `0x${string}`;
+           reactionCounts: Record<string, number>;
+           references: (
+              | {
+              address: `0x${string}`;
+              avatarUrl: null | string;
+              name: string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "ens";
+              url: string;
+            }
+              | {
+              address: `0x${string}`;
+              displayName: null | string;
+              fid: number;
+              fname: string;
+              pfpUrl: null | string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "farcaster";
+              url: string;
+              username: string;
+            }
+              | {
+              address: `0x${string}`;
+              chainId: null | number;
+              chains: {
+                 caip: ...;
+                 chainId: ...;
+              }[];
+              decimals: number;
+              logoURI: null | string;
+              name: string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              symbol: string;
+              type: "erc20";
+            }
+              | {
+              description: null | string;
+              favicon: null | string;
+              opengraph:   | null
+                 | {
+                 description: ...;
+                 image: ...;
+                 title: ...;
+                 url: ...;
+               };
+              position: {
+                 end: number;
+                 start: number;
+              };
+              title: string;
+              type: "webpage";
+              url: string;
+            }
+              | {
+              mediaType: string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "file";
+              url: string;
+            }
+              | {
+              mediaType: string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "image";
+              url: string;
+            }
+              | {
+              mediaType: string;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "video";
+              url: string;
+           })[];
+           revision: number;
+           targetUri: string;
+           txHash: `0x${string}`;
+           updatedAt: Date;
+           viewerReactions: Record<string, {
+              app: `0x${string}`;
+              author: {
+                 address: `0x${(...)}`;
+                 ens?: ... | ...;
+                 farcaster?: ... | ...;
+              };
+              chainId: number;
+              channelId: bigint;
+              commentType: number;
+              content: string;
+              createdAt: Date;
+              cursor: `0x${string}`;
+              deletedAt: null | Date;
+              hookMetadata: {
+                 key: ...;
+                 value: ...;
+              }[];
+              id: `0x${string}`;
+              logIndex: null | number;
+              metadata: {
+                 key: ...;
+                 value: ...;
+              }[];
+              moderationClassifierResult: Record<string, number>;
+              moderationClassifierScore: number;
+              moderationStatus: "approved" | "pending" | "rejected";
+              moderationStatusChangedAt: Date;
+              parentId: null | `0x${(...)}`;
+              references: (... | ... | ... | ... | ... | ... | ...)[];
+              revision: number;
+              targetUri: string;
+              txHash: `0x${string}`;
+              updatedAt: Date;
+              zeroExSwap:   | null
+                 | {
+                 from: ...;
+                 to: ...;
+               };
+           }[]>;
+           zeroExSwap:   | null
+              | {
+              from: {
+                 address: `0x${string}`;
+                 amount: string;
+                 symbol: string;
+              };
+              to: {
+                 address: "" | `0x${(...)}`;
+                 amount: string;
+                 symbol: string;
+              };
+            };
+        }[];
+     };
      revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     viewerReactions: Record<string, {
+        app: `0x${string}`;
+        author: {
+           address: `0x${string}`;
+           ens?: {
+              avatarUrl: null | string;
+              name: string;
+           };
+           farcaster?: {
+              displayName?: string;
+              fid: number;
+              pfpUrl?: string;
+              username: string;
+           };
+        };
+        chainId: number;
+        channelId: bigint;
+        commentType: number;
+        content: string;
+        createdAt: Date;
+        cursor: `0x${string}`;
+        deletedAt: null | Date;
+        hookMetadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        id: `0x${string}`;
+        logIndex: null | number;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationClassifierResult: Record<string, number>;
+        moderationClassifierScore: number;
+        moderationStatus: "approved" | "pending" | "rejected";
+        moderationStatusChangedAt: Date;
+        parentId: null | `0x${string}`;
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: ...;
+              chainId: ...;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           opengraph:   | null
+              | {
+              description: ...;
+              image: ...;
+              title: ...;
+              url: ...;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+        })[];
+        revision: number;
+        targetUri: string;
+        txHash: `0x${string}`;
+        updatedAt: Date;
+        zeroExSwap:   | null
+           | {
+           from: {
+              address: `0x${string}`;
+              amount: string;
+              symbol: string;
+           };
+           to: {
+              address: "" | `0x${(...)}`;
+              amount: string;
+              symbol: string;
+           };
+         };
+     }[]>;
      zeroExSwap:   | null
         | {
         from: {
@@ -272,6 +613,7 @@ results: {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  reactionCounts: Record<string, number>;
   references: (
      | {
      address: `0x${string}`;
@@ -360,10 +702,350 @@ results: {
      type: "video";
      url: string;
   })[];
+  replies: {
+     extra: {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+     };
+     pagination: {
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     };
+     results: {
+        app: `0x${string}`;
+        author: {
+           address: `0x${string}`;
+           ens?: {
+              avatarUrl: null | string;
+              name: string;
+           };
+           farcaster?: {
+              displayName?: string;
+              fid: number;
+              pfpUrl?: string;
+              username: string;
+           };
+        };
+        chainId: number;
+        channelId: bigint;
+        commentType: number;
+        content: string;
+        createdAt: Date;
+        cursor: `0x${string}`;
+        deletedAt: null | Date;
+        hookMetadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        id: `0x${string}`;
+        logIndex: null | number;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationClassifierResult: Record<string, number>;
+        moderationClassifierScore: number;
+        moderationStatus: "approved" | "pending" | "rejected";
+        moderationStatusChangedAt: Date;
+        parentId: null | `0x${string}`;
+        reactionCounts: Record<string, number>;
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: ...;
+              chainId: ...;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           opengraph:   | null
+              | {
+              description: ...;
+              image: ...;
+              title: ...;
+              url: ...;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+        })[];
+        revision: number;
+        targetUri: string;
+        txHash: `0x${string}`;
+        updatedAt: Date;
+        viewerReactions: Record<string, {
+           app: `0x${string}`;
+           author: {
+              address: `0x${(...)}`;
+              ens?: ... | ...;
+              farcaster?: ... | ...;
+           };
+           chainId: number;
+           channelId: bigint;
+           commentType: number;
+           content: string;
+           createdAt: Date;
+           cursor: `0x${string}`;
+           deletedAt: null | Date;
+           hookMetadata: {
+              key: ...;
+              value: ...;
+           }[];
+           id: `0x${string}`;
+           logIndex: null | number;
+           metadata: {
+              key: ...;
+              value: ...;
+           }[];
+           moderationClassifierResult: Record<string, number>;
+           moderationClassifierScore: number;
+           moderationStatus: "approved" | "pending" | "rejected";
+           moderationStatusChangedAt: Date;
+           parentId: null | `0x${(...)}`;
+           references: (... | ... | ... | ... | ... | ... | ...)[];
+           revision: number;
+           targetUri: string;
+           txHash: `0x${string}`;
+           updatedAt: Date;
+           zeroExSwap:   | null
+              | {
+              from: ...;
+              to: ...;
+            };
+        }[]>;
+        zeroExSwap:   | null
+           | {
+           from: {
+              address: `0x${string}`;
+              amount: string;
+              symbol: string;
+           };
+           to: {
+              address: "" | `0x${(...)}`;
+              amount: string;
+              symbol: string;
+           };
+         };
+     }[];
+  };
   revision: number;
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: Date;
+  viewerReactions: Record<string, {
+     app: `0x${string}`;
+     author: {
+        address: `0x${string}`;
+        ens?: {
+           avatarUrl: null | string;
+           name: string;
+        };
+        farcaster?: {
+           displayName?: string;
+           fid: number;
+           pfpUrl?: string;
+           username: string;
+        };
+     };
+     chainId: number;
+     channelId: bigint;
+     commentType: number;
+     content: string;
+     createdAt: Date;
+     cursor: `0x${string}`;
+     deletedAt: null | Date;
+     hookMetadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     id: `0x${string}`;
+     logIndex: null | number;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     moderationClassifierResult: Record<string, number>;
+     moderationClassifierScore: number;
+     moderationStatus: "approved" | "pending" | "rejected";
+     moderationStatusChangedAt: Date;
+     parentId: null | `0x${string}`;
+     references: (
+        | {
+        address: `0x${string}`;
+        avatarUrl: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "ens";
+        url: string;
+      }
+        | {
+        address: `0x${string}`;
+        displayName: null | string;
+        fid: number;
+        fname: string;
+        pfpUrl: null | string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "farcaster";
+        url: string;
+        username: string;
+      }
+        | {
+        address: `0x${string}`;
+        chainId: null | number;
+        chains: {
+           caip: ...;
+           chainId: ...;
+        }[];
+        decimals: number;
+        logoURI: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        symbol: string;
+        type: "erc20";
+      }
+        | {
+        description: null | string;
+        favicon: null | string;
+        opengraph:   | null
+           | {
+           description: ...;
+           image: ...;
+           title: ...;
+           url: ...;
+         };
+        position: {
+           end: number;
+           start: number;
+        };
+        title: string;
+        type: "webpage";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "file";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "image";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "video";
+        url: string;
+     })[];
+     revision: number;
+     targetUri: string;
+     txHash: `0x${string}`;
+     updatedAt: Date;
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: "" | `0x${(...)}`;
+           amount: string;
+           symbol: string;
+        };
+      };
+  }[]>;
   zeroExSwap:   | null
      | {
      from: {
