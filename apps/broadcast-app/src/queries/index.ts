@@ -32,7 +32,3 @@ export function createChannelCommentRepliesQueryKey({
     "replies",
   ] as const;
 }
-
-export function createChannelQueryKey(channelId: bigint) {
-  return ["channel", channelId.toString()] as const;
-}

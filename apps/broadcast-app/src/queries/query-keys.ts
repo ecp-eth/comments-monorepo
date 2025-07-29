@@ -5,3 +5,7 @@ export function createDiscoverChannelsQueryKey() {
 export function createMyChannelsQueryKey() {
   return ["my-channels"] as const;
 }
+
+export function createChannelQueryKey(channelId: bigint) {
+  return ["channel", channelId.toString()] as const;
+}
