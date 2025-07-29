@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangleIcon, RotateCwIcon } from "lucide-react";
+import { AlertTriangleIcon, Loader2Icon, RotateCwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,7 +9,16 @@ import { cn } from "@/lib/utils";
 import { useMyChannelsQuery } from "@/queries/my-channels";
 
 export default function MyChannelsPage() {
-  const { data, error, status, isRefetching, refetch } = useMyChannelsQuery();
+  const {
+    data,
+    error,
+    status,
+    isRefetching,
+    refetch,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useMyChannelsQuery();
 
   if (error) {
     console.error("Error fetching channels:", error);
@@ -57,7 +66,9 @@ export default function MyChannelsPage() {
     );
   }
 
-  if (data.results.length === 0) {
+  const channels = data.pages.flatMap((page) => page.results);
+
+  if (channels.length === 0) {
     return (
       <div className="h-full flex flex-col items-center justify-center p-4 text-center">
         <h2 className="text-lg font-semibold mb-2">
@@ -78,10 +89,26 @@ export default function MyChannelsPage() {
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4">
-          {data.results.map((channel) => (
+          {channels.map((channel) => (
             <ChannelCard key={channel.id} channel={channel} />
           ))}
         </div>
+
+        {hasNextPage && (
+          <div className="flex justify-center p-4">
+            <Button
+              className="w-full text-xs"
+              variant="ghost"
+              onClick={() => fetchNextPage()}
+            >
+              {isFetchingNextPage ? (
+                <Loader2Icon className="h-4 w-4 animate-spin" />
+              ) : (
+                "Load more"
+              )}
+            </Button>
+          </div>
+        )}
       </ScrollArea>
     </div>
   );
