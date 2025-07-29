@@ -127,7 +127,7 @@ export function ChannelCard({ channel }: ChannelCardProps) {
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0"
-            title="Notifications are not enabled for this app"
+            title="To manage notifications for this channel, you need to add the mini app"
             onClick={() => addMiniAppMutation.mutate()}
           >
             <BellOffIcon className="h-4 w-4" />
@@ -180,8 +180,7 @@ export function ChannelCard({ channel }: ChannelCardProps) {
               unsubscribeMutation.isPending && "animate-pulse",
             )}
           >
-            <XIcon className="h-3 w-3 mr-1" />
-            Unsubscribe
+            <XIcon className="h-3 w-3" />
           </Button>
         )}
       </div>
