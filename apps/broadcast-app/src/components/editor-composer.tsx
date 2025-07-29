@@ -5,6 +5,7 @@ import React, { useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, Loader2Icon, SendIcon } from "lucide-react";
 import {
+  CommentFormSubmitError,
   InvalidCommentError,
   throwKnownResponseCodeError,
 } from "@ecp.eth/shared/errors";
@@ -357,8 +358,8 @@ export function EditorComposer({
       />
 
       {submitMutation.error && (
-        <div className="text-red-500">
-          {submitMutation.error instanceof SubmitCommentMutationError
+        <div className="text-red-500 text-xs">
+          {submitMutation.error instanceof CommentFormSubmitError
             ? submitMutation.error.render()
             : submitMutation.error.message}
         </div>
