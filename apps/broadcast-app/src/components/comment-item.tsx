@@ -79,7 +79,7 @@ export function CommentItem({
             <span className="font-medium text-foreground">{nameOrAddress}</span>
             <span>•</span>
             <span>{formatDate(comment.createdAt)}</span>
-            {comment.updatedAt !== comment.createdAt && (
+            {comment.revision !== 0 && (
               <>
                 <span>•</span>
                 <span>edited</span>
@@ -88,7 +88,7 @@ export function CommentItem({
           </div>
 
           <div className="text-sm">
-            <p className="whitespace-pre-wrap break-words">{element}</p>
+            <div className="whitespace-pre-wrap break-words">{element}</div>
             {isTruncated && (
               <Button
                 variant="link"
