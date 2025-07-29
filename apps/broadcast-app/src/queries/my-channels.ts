@@ -1,5 +1,5 @@
 import { publicEnv } from "@/env/public";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { Channel, ListChannelsResponseSchema } from "@/api/schemas";
 import { useCallback } from "react";
@@ -10,15 +10,19 @@ import {
 } from "./query-keys";
 
 export function useMyChannelsQuery() {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: createMyChannelsQueryKey(),
-    queryFn: async () => {
+    queryFn: async ({ pageParam: cursor }) => {
       const url = new URL(
         "/api/channels",
         publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
       );
 
       url.searchParams.set("onlySubscribed", "1");
+
+      if (cursor) {
+        url.searchParams.set("cursor", cursor);
+      }
 
       const response = await sdk.quickAuth.fetch(url);
 
@@ -28,10 +32,23 @@ export function useMyChannelsQuery() {
 
       return ListChannelsResponseSchema.parse(await response.json());
     },
+    getNextPageParam(lastPage) {
+      if (lastPage.pageInfo.hasNextPage && lastPage.pageInfo.nextCursor) {
+        return lastPage.pageInfo.nextCursor;
+      }
+
+      return undefined;
+    },
+    initialPageParam: undefined as string | undefined,
   });
 }
 
-type MyChannelsQueryData = z.infer<typeof ListChannelsResponseSchema>;
+const myChannelsQuerySchema = z.object({
+  pages: z.array(ListChannelsResponseSchema),
+  pageParams: z.array(z.string().optional()),
+});
+
+type MyChannelsQueryData = z.infer<typeof myChannelsQuerySchema>;
 
 export function useRemoveChannelFromMyChannelsQuery() {
   const queryClient = useQueryClient();
@@ -49,13 +66,20 @@ export function useRemoveChannelFromMyChannelsQuery() {
             return undefined;
           }
 
-          const filteredResults = old.results.filter(
-            (channel) => channel.id !== channelId,
-          );
+          const queryData = myChannelsQuerySchema.parse(old);
 
           return {
-            ...old,
-            results: filteredResults,
+            pages: queryData.pages.map((page) => {
+              const filteredResults = page.results.filter(
+                (channel) => channel.id !== channelId,
+              );
+
+              return {
+                ...page,
+                results: filteredResults,
+              };
+            }),
+            pageParams: queryData.pageParams,
           };
         },
       );
@@ -81,11 +105,20 @@ export function useUpdateChannelInMyChannelsQuery() {
             return undefined;
           }
 
+          const queryData = myChannelsQuerySchema.parse(old);
+
           return {
-            ...old,
-            results: old.results.map((c) =>
-              c.id === channelId ? { ...c, ...channel } : c,
-            ),
+            pages: queryData.pages.map((page) => {
+              const updatedResults = page.results.map((c) =>
+                c.id === channelId ? { ...c, ...channel } : c,
+              );
+
+              return {
+                ...page,
+                results: updatedResults,
+              };
+            }),
+            pageParams: queryData.pageParams,
           };
         },
       );

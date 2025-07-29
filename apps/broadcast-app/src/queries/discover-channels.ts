@@ -1,8 +1,4 @@
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { publicEnv } from "@/env/public";
 import sdk from "@farcaster/miniapp-sdk";
 import { ListChannelsResponseSchema } from "@/api/schemas";
