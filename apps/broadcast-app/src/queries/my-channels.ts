@@ -1,7 +1,7 @@
 import { publicEnv } from "@/env/public";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { sdk } from "@farcaster/miniapp-sdk";
-import { ListChannelsResponseSchema } from "@/api/schemas";
+import { Channel, ListChannelsResponseSchema } from "@/api/schemas";
 import { useCallback } from "react";
 import z from "zod";
 import {
@@ -64,6 +64,31 @@ export function useRemoveChannelFromMyChannelsQuery() {
         exact: true,
         queryKey: createDiscoverChannelsQueryKey(),
       });
+    },
+    [queryClient],
+  );
+}
+
+export function useUpdateChannelInMyChannelsQuery() {
+  const queryClient = useQueryClient();
+
+  return useCallback(
+    (channelId: bigint, channel: Partial<Channel>) => {
+      queryClient.setQueryData(
+        createMyChannelsQueryKey(),
+        (old: MyChannelsQueryData | undefined) => {
+          if (!old) {
+            return undefined;
+          }
+
+          return {
+            ...old,
+            results: old.results.map((c) =>
+              c.id === channelId ? { ...c, ...channel } : c,
+            ),
+          };
+        },
+      );
     },
     [queryClient],
   );
