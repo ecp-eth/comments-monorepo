@@ -130,7 +130,12 @@ export function ChannelCard({ channel }: ChannelCardProps) {
             title="To manage notifications for this channel, you need to add the mini app"
             onClick={() => addMiniAppMutation.mutate()}
           >
-            <BellOffIcon className="h-4 w-4" />
+            <BellOffIcon
+              className={cn(
+                "h-4 w-4",
+                addMiniAppMutation.isPending && "animate-pulse",
+              )}
+            />
           </Button>
         )}
 
@@ -147,9 +152,19 @@ export function ChannelCard({ channel }: ChannelCardProps) {
             className="h-8 w-8 p-0"
           >
             {channel.notificationsEnabled ? (
-              <BellIcon className="h-4 w-4" />
+              <BellIcon
+                className={cn(
+                  "h-4 w-4",
+                  setNotificationStatusMutation.isPending && "animate-pulse",
+                )}
+              />
             ) : (
-              <BellOffIcon className="h-4 w-4" />
+              <BellOffIcon
+                className={cn(
+                  "h-4 w-4",
+                  setNotificationStatusMutation.isPending && "animate-pulse",
+                )}
+              />
             )}
           </Button>
         )}
@@ -159,12 +174,14 @@ export function ChannelCard({ channel }: ChannelCardProps) {
             disabled={subscribeMutation.isPending}
             size="sm"
             onClick={() => subscribeMutation.mutate()}
-            className={cn(
-              "text-xs",
-              subscribeMutation.isPending && "animate-pulse",
-            )}
+            className="text-xs"
           >
-            <PlusIcon className="h-3 w-3 mr-1" />
+            <PlusIcon
+              className={cn(
+                "h-3 w-3",
+                subscribeMutation.isPending && "animate-pulse",
+              )}
+            />
             Subscribe
           </Button>
         )}
@@ -175,12 +192,14 @@ export function ChannelCard({ channel }: ChannelCardProps) {
             variant="outline"
             size="sm"
             onClick={() => unsubscribeMutation.mutate()}
-            className={cn(
-              "text-xs bg-transparent",
-              unsubscribeMutation.isPending && "animate-pulse",
-            )}
+            className="text-xs bg-transparent"
           >
-            <XIcon className="h-3 w-3" />
+            <XIcon
+              className={cn(
+                "h-3 w-3",
+                unsubscribeMutation.isPending && "animate-pulse",
+              )}
+            />
           </Button>
         )}
       </div>
