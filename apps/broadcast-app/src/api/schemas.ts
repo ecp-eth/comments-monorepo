@@ -17,18 +17,50 @@ export const InternalServerErrorResponseSchema = z.object({
   error: z.string(),
 });
 
-const sharedCommentSchema = z.object({
+const sharedCommentServerSchema = z.object({
   author: HexSchema,
+  channelId: z.coerce.bigint(),
   content: z.string().trim().nonempty(),
   metadata: MetadataArraySchema,
   commentType: z.number().default(DEFAULT_COMMENT_TYPE),
 });
 
-export const SignCommentPayloadRequestSchema = z.union([
-  sharedCommentSchema.extend({
+/**
+ * Server schema for the payload of the sign-comment endpoint.
+ *
+ * This schema is used to parse the payload of the sign-comment endpoint.
+ * It is used to validate the payload of the sign-comment endpoint.
+ */
+export const SignCommentPayloadRequestServerSchema = z.union([
+  sharedCommentServerSchema.extend({
     targetUri: z.string().url(),
   }),
-  sharedCommentSchema.extend({
+  sharedCommentServerSchema.extend({
+    parentId: HexSchema,
+  }),
+]);
+
+const sharedCommentClientSchema = z.object({
+  author: HexSchema,
+  channelId: z.bigint().transform((val) => val.toString()),
+  content: z.string().trim().nonempty(),
+  metadata: MetadataArraySchema,
+  commentType: z.number().default(DEFAULT_COMMENT_TYPE),
+});
+
+/**
+ * Client schema for the payload of the sign-comment endpoint.
+ *
+ * This schema is used to parse the payload of the sign-comment endpoint.
+ * It is used to validate the payload of the sign-comment endpoint.
+ *
+ * It also formats bigint to string.
+ */
+export const SignCommentPayloadRequestClientSchema = z.union([
+  sharedCommentClientSchema.extend({
+    targetUri: z.string().url(),
+  }),
+  sharedCommentClientSchema.extend({
     parentId: HexSchema,
   }),
 ]);
