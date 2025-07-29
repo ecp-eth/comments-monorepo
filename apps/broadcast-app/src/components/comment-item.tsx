@@ -133,17 +133,15 @@ export function CommentItem({
               </span>
             </Button>
 
-            {!isReply && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 text-xs space-x-1"
-                onClick={() => onReply(comment)}
-              >
-                <Reply className="h-3 w-3" />
-                <span>Reply</span>
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto p-0 text-xs space-x-1"
+              onClick={() => onReply(comment)}
+            >
+              <Reply className="h-3 w-3" />
+              <span>Reply</span>
+            </Button>
           </div>
         </div>
       </div>
