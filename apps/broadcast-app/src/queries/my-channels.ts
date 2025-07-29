@@ -12,7 +12,7 @@ import {
 export function useMyChannelsQuery() {
   return useInfiniteQuery({
     queryKey: createMyChannelsQueryKey(),
-    queryFn: async ({ pageParam: cursor }) => {
+    queryFn: async ({ pageParam: cursor, signal }) => {
       const url = new URL(
         "/api/channels",
         publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
@@ -24,7 +24,7 @@ export function useMyChannelsQuery() {
         url.searchParams.set("cursor", cursor);
       }
 
-      const response = await sdk.quickAuth.fetch(url);
+      const response = await sdk.quickAuth.fetch(url, { signal });
 
       if (!response.ok) {
         throw new Error(`Failed to fetch channels: ${response.statusText}`);
