@@ -1,3 +1,4 @@
+import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod";
 
 const publicEnvSchema = z.object({
@@ -5,6 +6,7 @@ const publicEnvSchema = z.object({
   NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL: z.string().url(),
   NEXT_PUBLIC_PINATA_GATEWAY_URL: z.string().nonempty(),
   NEXT_PUBLIC_RPC_URL: z.string().url(),
+  NEXT_PUBLIC_APP_SIGNER_ADDRESS: HexSchema,
 });
 
 const result = publicEnvSchema.safeParse({
@@ -13,6 +15,7 @@ const result = publicEnvSchema.safeParse({
     process.env.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
   NEXT_PUBLIC_PINATA_GATEWAY_URL: process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL,
   NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL,
+  NEXT_PUBLIC_APP_SIGNER_ADDRESS: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
 });
 
 if (!result.success) {
