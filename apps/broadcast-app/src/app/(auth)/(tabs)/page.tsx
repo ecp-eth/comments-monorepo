@@ -8,10 +8,11 @@ import { ChannelCard } from "@/components/channel-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { ListChannelsResponseSchema } from "@/api/schemas";
+import { createDiscoverChannelsQueryKey } from "@/queries";
 
 export default function DiscoverChannelsPage() {
   const { data, error, status, isRefetching, refetch } = useQuery({
-    queryKey: ["discover-channels"],
+    queryKey: createDiscoverChannelsQueryKey(),
     queryFn: async () => {
       const url = new URL(
         "/api/channels",

@@ -43,6 +43,10 @@ import { cn } from "@/lib/utils";
 import { EditorComposer } from "@/components/editor-composer";
 import { ChannelSchema } from "@/api/schemas";
 import { useScrollToBottom } from "@/hooks/useScrollToBottom";
+import {
+  createChannelCommentsQueryKey,
+  createChannelQueryKey,
+} from "@/queries";
 
 class ChannelNotFoundError extends Error {
   constructor() {
@@ -92,7 +96,7 @@ export default function ChannelPage(props: {
   });
 
   const channelQuery = useQuery({
-    queryKey: ["channel", id],
+    queryKey: createChannelQueryKey(z.coerce.bigint().parse(id)),
     queryFn: async () => {
       const channelId = z.coerce.bigint().parse(id);
 
@@ -118,7 +122,10 @@ export default function ChannelPage(props: {
 
   const commentsQuery = useQuery({
     enabled: channelQuery.status === "success",
-    queryKey: [address, "channel", id, "comments"],
+    queryKey: createChannelCommentsQueryKey({
+      channelId: z.coerce.bigint().parse(id),
+      author: address,
+    }),
     queryFn: async () => {
       const channelId = z.coerce.bigint().parse(id);
 
