@@ -4,16 +4,19 @@ import { publicEnv } from "@/env/public";
 import { fetchComments } from "@ecp.eth/sdk/indexer";
 import sdk from "@farcaster/miniapp-sdk";
 import { useQuery } from "@tanstack/react-query";
-import { use, useState } from "react";
-import { useAccount, useChainId, useConnect } from "wagmi";
+import { use, useEffect, useState } from "react";
+import { useAccount, useChainId, useConnect, useDisconnect } from "wagmi";
 import z from "zod";
 import {
   AlertTriangleIcon,
   BellIcon,
   BellOffIcon,
+  InfoIcon,
   MoreVerticalIcon,
+  PlusIcon,
   RotateCwIcon,
   WalletIcon,
+  XIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -34,7 +37,10 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ReplyBottomSheet } from "@/components/reply-bottom-sheet";
-import { useSubscribeToChannel } from "@/hooks/useSubscribeToChannel";
+import {
+  AlreadySubscribedError,
+  useSubscribeToChannel,
+} from "@/hooks/useSubscribeToChannel";
 import { toast } from "sonner";
 import { useUnsubscribeToChannel } from "@/hooks/useUnsubscribeFromChannel";
 import { useSetNotificationStatusOnChannel } from "@/hooks/useSetNotificationStatusOnChannel";
@@ -59,7 +65,8 @@ export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
 }) {
   const { address } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { connect, connectAsync, connectors } = useConnect();
+  const { disconnect } = useDisconnect();
   const chainId = useChainId();
   const { id } = use(props.params);
   const [replyingTo, setReplyingTo] =
@@ -70,8 +77,13 @@ export default function ChannelPage(props: {
     onSuccess() {
       toast.success("Subscribed to channel");
     },
-    onError() {
-      toast.error("Failed to subscribe to channel");
+    onError(error) {
+      if (error instanceof AlreadySubscribedError) {
+        toast.error(`You are already subscribed to this channel`);
+      } else {
+        toast.error(`Failed to subscribe to channel: ${error.message}`);
+        console.error("Error subscribing to channel:", error);
+      }
     },
   });
 
@@ -120,12 +132,14 @@ export default function ChannelPage(props: {
     },
   });
 
+  const commentsQueryKey = createChannelCommentsQueryKey({
+    channelId: z.coerce.bigint().parse(id),
+    author: address,
+  });
+
   const commentsQuery = useQuery({
     enabled: channelQuery.status === "success",
-    queryKey: createChannelCommentsQueryKey({
-      channelId: z.coerce.bigint().parse(id),
-      author: address,
-    }),
+    queryKey: commentsQueryKey,
     queryFn: async () => {
       const channelId = z.coerce.bigint().parse(id);
 
@@ -148,6 +162,17 @@ export default function ChannelPage(props: {
   });
 
   const scrollRef = useScrollToBottom([commentsQuery.data]);
+
+  // connect wallet if user is replying to a comment and not connected
+  useEffect(() => {
+    if (!address && replyingTo) {
+      connectAsync({ connector: connectors[0] }).catch((e) => {
+        console.error(e);
+
+        setReplyingTo(null);
+      });
+    }
+  }, [address, replyingTo, connectAsync, connectors]);
 
   if (commentsQuery.status === "pending" || channelQuery.status === "pending") {
     return (
@@ -273,7 +298,15 @@ export default function ChannelPage(props: {
                   }
                 }}
               >
-                {channel.isSubscribed ? "Unsubscribe" : "Subscribe"}
+                {channel.isSubscribed ? (
+                  <>
+                    <XIcon className="h-4 w-4 mr-1" /> Unsubscribe
+                  </>
+                ) : (
+                  <>
+                    <PlusIcon className="h-4 w-4 mr-1" /> Subscribe
+                  </>
+                )}
               </DropdownMenuItem>
               {channel.isSubscribed && (
                 <DropdownMenuItem
@@ -287,21 +320,26 @@ export default function ChannelPage(props: {
                 >
                   {channel.notificationsEnabled ? (
                     <>
-                      <BellOffIcon className="h-4 w-4 mr-2" />
+                      <BellOffIcon className="h-4 w-4 mr-1" />
                       Disable Notifications
                     </>
                   ) : (
                     <>
-                      <BellIcon className="h-4 w-4 mr-2" />
+                      <BellIcon className="h-4 w-4 mr-1" />
                       Enable Notifications
                     </>
                   )}
                 </DropdownMenuItem>
               )}
+              {address && (
+                <DropdownMenuItem onClick={() => disconnect()}>
+                  <WalletIcon className="h-4 w-4 mr-1" /> Disconnect wallet
+                </DropdownMenuItem>
+              )}
               <Dialog>
                 <DialogTrigger asChild>
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    Show Details
+                    <InfoIcon className="h-4 w-4 mr-1" /> Show Details
                   </DropdownMenuItem>
                 </DialogTrigger>
                 <DialogContent className="max-w-[350px]">
@@ -350,7 +388,18 @@ export default function ChannelPage(props: {
               />
             ))}
 
-            {isOwner && <EditorComposer channelId={channel.id} />}
+            {isOwner && (
+              <EditorComposer
+                queryKey={commentsQueryKey}
+                channelId={channel.id}
+              />
+            )}
+
+            {!isOwner && comments.length === 0 && (
+              <div className="text-center text-muted-foreground">
+                No comments yet.
+              </div>
+            )}
           </div>
         </div>
       </ScrollArea>
@@ -367,12 +416,15 @@ export default function ChannelPage(props: {
         </div>
       )}
 
-      <ReplyBottomSheet
-        channelId={channel.id}
-        isOpen={!!replyingTo}
-        onClose={() => setReplyingTo(null)}
-        originalComment={replyingTo}
-      />
+      {address && (
+        <ReplyBottomSheet
+          channelId={channel.id}
+          isOpen={!!replyingTo}
+          onClose={() => setReplyingTo(null)}
+          originalComment={replyingTo}
+          queryKey={commentsQueryKey}
+        />
+      )}
     </div>
   );
 }
