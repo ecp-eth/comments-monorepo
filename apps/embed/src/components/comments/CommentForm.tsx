@@ -17,8 +17,6 @@ import {
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { cn } from "@/lib/utils";
 import {
-  createCommentRepliesQueryKey,
-  createRootCommentsQueryKey,
   submitCommentMutationFunction,
   submitEditCommentMutationFunction,
 } from "./queries";
@@ -365,11 +363,13 @@ type CommentFormProps = Omit<BaseCommentFormProps, "onSubmit"> & {
    */
   onSubmitStart?: () => void;
   parentId?: Hex;
+  queryKey: QueryKey;
 };
 
 export function CommentForm({
   onSubmitStart,
   parentId,
+  queryKey,
   ...props
 }: CommentFormProps) {
   const wagmiConfig = useConfig();
@@ -383,16 +383,6 @@ export function CommentForm({
 
   const submitCommentMutation = useCallback<OnSubmitFunction>(
     async ({ author, content, references }) => {
-      let queryKey: QueryKey;
-
-      // we need to create the query key because if user wasn't connected the query key from props
-      // would not target the query for the user's address
-      if (!parentId) {
-        queryKey = createRootCommentsQueryKey(author, chainId, targetUri);
-      } else {
-        queryKey = createCommentRepliesQueryKey(author, chainId, parentId);
-      }
-
       const pendingOperation = await submitCommentMutationFunction({
         author: author,
         commentRequest: {
@@ -451,6 +441,7 @@ export function CommentForm({
       onSubmitStartRef,
       parentId,
       postComment,
+      queryKey,
       switchChainAsync,
       targetUri,
       wagmiConfig,

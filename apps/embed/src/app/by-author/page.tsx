@@ -1,5 +1,5 @@
-import { HexSchema } from "@ecp.eth/sdk/core/schemas";
-import { fetchComments } from "@ecp.eth/sdk/indexer";
+import { Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
+import { fetchComments, FetchCommentsOptions } from "@ecp.eth/sdk/indexer";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
@@ -9,6 +9,8 @@ import { env } from "@/env";
 import { CommentSectionReadonly } from "@/components/comments/CommentSectionReadonly";
 import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
 import { MainWrapper } from "@/components/MainWrapper";
+import { cookies } from "next/headers";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 const SearchParamsSchema = z.object({
   author: HexSchema,
@@ -44,15 +46,21 @@ export default async function EmbedCommentsByAuthorPage({
   }
 
   const { author, config } = parseSearchParamsResult.data;
+  const cookieStore = await cookies();
+  // viewer cookie is set by useSyncViewerCookie hook inside CommentSection
+  const viewer = cookieStore.get("viewer")?.value as Hex | undefined;
 
   try {
-    const comments = await fetchComments({
+    const fetchCommentParams: FetchCommentsOptions = {
       chainId: config.chainId,
       app: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-      author,
+      commentType: COMMENT_TYPE_COMMENT,
       limit: COMMENTS_PER_PAGE,
-    });
+      author,
+      viewer,
+    };
+    const comments = await fetchComments(fetchCommentParams);
 
     return (
       <Providers
@@ -72,10 +80,11 @@ export default async function EmbedCommentsByAuthorPage({
               pageParams: [
                 {
                   limit: comments.pagination.limit,
-                  cursor: comments.pagination.endCursor,
+                  cursor: undefined,
                 },
               ],
             }}
+            fetchCommentParams={fetchCommentParams}
           />
         </MainWrapper>
         <Toaster />

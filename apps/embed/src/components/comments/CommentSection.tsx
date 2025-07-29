@@ -18,39 +18,43 @@ import {
   COMMENTS_PER_PAGE,
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
-import { fetchComments } from "@ecp.eth/sdk/indexer";
+import { fetchComments, FetchCommentsOptions } from "@ecp.eth/sdk/indexer";
 import {
   type ListCommentsQueryPageParamsSchemaType,
   type CommentPageSchemaType,
   CommentPageSchema,
 } from "@ecp.eth/shared/schemas";
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
-import { publicEnv } from "@/publicEnv";
 import { useAccount, useChainId } from "wagmi";
 import { PoweredBy } from "@ecp.eth/shared/components";
 import { CommentItem } from "./CommentItem";
-import { createRootCommentsQueryKey } from "./queries";
+import { createCommentItemsQueryKey } from "./queries";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { cn } from "@ecp.eth/shared/helpers";
-import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
+import { useSyncViewerCookie } from "@/hooks/useSyncViewerCookie";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
     CommentPageSchemaType,
     ListCommentsQueryPageParamsSchemaType
   >;
+  fetchCommentParams: FetchCommentsOptions;
 };
 
-export function CommentSection({ initialData }: CommentSectionProps) {
+export function CommentSection({
+  initialData,
+  fetchCommentParams,
+}: CommentSectionProps) {
+  useSyncViewerCookie();
   useAutoBodyMinHeight();
 
-  const { address } = useAccount();
+  const { address: connectedAddress } = useAccount();
   const chainId = useChainId();
   const { targetUri, disablePromotion, restrictMaximumContainerWidth } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
-    () => createRootCommentsQueryKey(address, chainId, targetUri),
-    [targetUri, address, chainId],
+    () => createCommentItemsQueryKey(connectedAddress, chainId, targetUri),
+    [targetUri, connectedAddress, chainId],
   );
 
   const isAccountStatusResolved = useIsAccountStatusResolved();
@@ -73,16 +77,11 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     } as ListCommentsQueryPageParamsSchemaType,
     queryFn: async ({ pageParam, signal }) => {
       const response = await fetchComments({
-        chainId,
-        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        targetUri,
+        ...fetchCommentParams,
         limit: pageParam.limit,
         cursor: pageParam.cursor,
+        viewer: connectedAddress,
         signal,
-        viewer: address,
-        mode: "flat",
-        commentType: COMMENT_TYPE_COMMENT,
       });
 
       return CommentPageSchema.parse(response);
@@ -109,17 +108,12 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     queryKey,
     fetchComments(options) {
       return fetchComments({
-        chainId,
-        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        targetUri,
+        ...fetchCommentParams,
+        sort: "asc",
         limit: COMMENTS_PER_PAGE,
         cursor: options.cursor,
         signal: options.signal,
-        sort: "asc",
-        viewer: address,
-        mode: "flat",
-        commentType: COMMENT_TYPE_COMMENT,
+        viewer: connectedAddress,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
@@ -135,7 +129,7 @@ export function CommentSection({ initialData }: CommentSectionProps) {
     >
       <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
       <div className="mb-4">
-        <CommentForm />
+        <CommentForm queryKey={queryKey} />
       </div>
       {isPending && <LoadingScreen />}
       {error && (

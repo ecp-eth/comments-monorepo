@@ -1,5 +1,8 @@
-import { HexSchema } from "@ecp.eth/sdk/core/schemas";
-import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
+import { Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
+import {
+  fetchCommentReplies,
+  FetchCommentRepliesOptions,
+} from "@ecp.eth/sdk/indexer";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
@@ -9,6 +12,8 @@ import { env } from "@/env";
 import { CommentSectionReplies } from "@/components/comments/CommentSectionReplies";
 import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
 import { MainWrapper } from "@/components/MainWrapper";
+import { cookies } from "next/headers";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 const SearchParamsSchema = z.object({
   commentId: HexSchema,
@@ -44,15 +49,22 @@ export default async function EmbedCommentsByRepliesPage({
   }
 
   const { commentId, config } = parseSearchParamsResult.data;
+  const cookieStore = await cookies();
+  // viewer cookie is set by useSyncViewerCookie hook inside CommentSection
+  const viewer = cookieStore.get("viewer")?.value as Hex | undefined;
 
   try {
-    const comments = await fetchCommentReplies({
+    const fetchCommentRepliesParams: FetchCommentRepliesOptions = {
       chainId: config.chainId,
       app: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-      commentId,
+      commentType: COMMENT_TYPE_COMMENT,
       limit: COMMENTS_PER_PAGE,
-    });
+      mode: "flat",
+      viewer,
+      commentId,
+    };
+    const comments = await fetchCommentReplies(fetchCommentRepliesParams);
 
     return (
       <Providers
@@ -70,12 +82,14 @@ export default async function EmbedCommentsByRepliesPage({
             initialData={{
               pages: [comments],
               pageParams: [
+                // the page param here is to describe how to fetch current page, not the next page
                 {
                   limit: comments.pagination.limit,
-                  cursor: comments.pagination.endCursor,
+                  cursor: undefined,
                 },
               ],
             }}
+            fetchCommentRepliesParams={fetchCommentRepliesParams}
           />
         </MainWrapper>
         <Toaster />
