@@ -92,6 +92,7 @@ export function ReplyBottomSheet({
             submitLabel="Reply"
             channelId={channelId}
             queryKey={queryKey}
+            replyingTo={originalComment}
           />
         </div>
       </SheetContent>
