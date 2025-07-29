@@ -2,7 +2,6 @@
 
 import { publicEnv } from "@/env/public";
 import { fetchComments } from "@ecp.eth/sdk/indexer";
-import sdk from "@farcaster/miniapp-sdk";
 import { useQuery } from "@tanstack/react-query";
 import { use, useEffect, useState } from "react";
 import { useAccount, useChainId, useConnect, useDisconnect } from "wagmi";
@@ -47,19 +46,15 @@ import { useSetNotificationStatusOnChannel } from "@/hooks/useSetNotificationSta
 import type { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
 import { cn } from "@/lib/utils";
 import { EditorComposer } from "@/components/editor-composer";
-import { ChannelSchema } from "@/api/schemas";
 import { useScrollToBottom } from "@/hooks/useScrollToBottom";
+import { createChannelCommentsQueryKey } from "@/queries";
+import { useRemoveChannelFromMyChannelsQuery } from "@/queries/my-channels";
+import { ChannelNotFoundError } from "@/errors";
 import {
-  createChannelCommentsQueryKey,
-  createChannelQueryKey,
-} from "@/queries";
-
-class ChannelNotFoundError extends Error {
-  constructor() {
-    super("Channel not found");
-    this.name = "ChannelNotFoundError";
-  }
-}
+  useChannelQuery,
+  useUpdateChannelInChannelQuery,
+} from "@/queries/channel";
+import { useRemoveChannelFromDiscoverQuery } from "@/queries/discover-channels";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
@@ -68,14 +63,31 @@ export default function ChannelPage(props: {
   const { connect, connectAsync, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const chainId = useChainId();
-  const { id } = use(props.params);
+  const { id: channelId } = z
+    .object({
+      id: z.coerce.bigint(),
+    })
+    .parse(use(props.params));
   const [replyingTo, setReplyingTo] =
     useState<IndexerAPICommentSchemaType | null>(null);
 
+  const removeChannelFromMyChannelsQuery =
+    useRemoveChannelFromMyChannelsQuery();
+
+  const removeChannelFromDiscoverQuery = useRemoveChannelFromDiscoverQuery();
+
+  const updateChannelInChannelQuery = useUpdateChannelInChannelQuery();
+
   const subscribeMutation = useSubscribeToChannel({
-    channelId: z.coerce.bigint().parse(id),
+    channelId,
     onSuccess() {
       toast.success("Subscribed to channel");
+
+      removeChannelFromDiscoverQuery(channelId);
+
+      updateChannelInChannelQuery(channelId, {
+        isSubscribed: true,
+      });
     },
     onError(error) {
       if (error instanceof AlreadySubscribedError) {
@@ -88,9 +100,15 @@ export default function ChannelPage(props: {
   });
 
   const unsubscribeMutation = useUnsubscribeToChannel({
-    channelId: z.coerce.bigint().parse(id),
+    channelId,
     onSuccess() {
       toast.success("Unsubscribed from channel");
+
+      removeChannelFromMyChannelsQuery(channelId);
+
+      updateChannelInChannelQuery(channelId, {
+        isSubscribed: false,
+      });
     },
     onError() {
       toast.error("Failed to unsubscribe from channel");
@@ -98,42 +116,23 @@ export default function ChannelPage(props: {
   });
 
   const setNotificationStatusMutation = useSetNotificationStatusOnChannel({
-    channelId: z.coerce.bigint().parse(id),
-    onSuccess() {
+    channelId,
+    onSuccess(result) {
       toast.success("Notifications enabled for channel");
+
+      updateChannelInChannelQuery(channelId, {
+        notificationsEnabled: result.notificationsEnabled,
+      });
     },
     onError() {
       toast.error("Failed to enable notifications for channel");
     },
   });
 
-  const channelQuery = useQuery({
-    queryKey: createChannelQueryKey(z.coerce.bigint().parse(id)),
-    queryFn: async () => {
-      const channelId = z.coerce.bigint().parse(id);
-
-      const channelUrl = new URL(
-        `/api/channels/${channelId}`,
-        publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
-      );
-      const channelResponse = await sdk.quickAuth.fetch(channelUrl);
-
-      if (channelResponse.status === 404) {
-        throw new ChannelNotFoundError();
-      }
-
-      if (!channelResponse.ok) {
-        throw new Error(
-          `Failed to fetch channel: ${channelResponse.statusText}`,
-        );
-      }
-
-      return ChannelSchema.parse(await channelResponse.json());
-    },
-  });
+  const channelQuery = useChannelQuery(channelId);
 
   const commentsQueryKey = createChannelCommentsQueryKey({
-    channelId: z.coerce.bigint().parse(id),
+    channelId,
     author: address,
   });
 
@@ -141,8 +140,6 @@ export default function ChannelPage(props: {
     enabled: channelQuery.status === "success",
     queryKey: commentsQueryKey,
     queryFn: async () => {
-      const channelId = z.coerce.bigint().parse(id);
-
       const response = await fetchComments({
         chainId,
         channelId,
