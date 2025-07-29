@@ -9,13 +9,9 @@ import { cn } from "@/lib/utils";
 
 interface BottomTabLayoutProps {
   children: React.ReactNode;
-  activeTab?: "discover" | "my-channels";
 }
 
-export default function BottomTabLayout({
-  children,
-  activeTab,
-}: BottomTabLayoutProps) {
+export default function BottomTabLayout({ children }: BottomTabLayoutProps) {
   const pathname = usePathname();
 
   return (
@@ -28,7 +24,7 @@ export default function BottomTabLayout({
             href="/"
             className={cn(
               "flex-1 flex flex-col items-center justify-center py-3 px-4 text-sm font-medium transition-colors",
-              activeTab === "discover" || pathname === "/"
+              pathname === "/"
                 ? "text-primary bg-primary/10"
                 : "text-muted-foreground hover:text-foreground",
             )}
@@ -41,7 +37,7 @@ export default function BottomTabLayout({
             href="/my-channels"
             className={cn(
               "flex-1 flex flex-col items-center justify-center py-3 px-4 text-sm font-medium transition-colors",
-              activeTab === "my-channels" || pathname === "/my-channels"
+              pathname === "/my-channels"
                 ? "text-primary bg-primary/10"
                 : "text-muted-foreground hover:text-foreground",
             )}
