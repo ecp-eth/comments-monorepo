@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function useScrollToBottom(deps: any[] = []) {
+export function useScrollToBottom(deps: unknown[] = []) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -18,6 +18,7 @@ export function useScrollToBottom(deps: any[] = []) {
     const timeoutId = setTimeout(scrollToBottom, 100);
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps); // Re-run when dependencies change
 
   return scrollRef;
