@@ -96,6 +96,7 @@ export function useChannelCommentsQuery({
     queryKey: createChannelCommentsQueryKey({ channelId, author }),
     queryFn: async ({ pageParam, signal }) => {
       const response = await fetchComments({
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         chainId,
         channelId,
         apiUrl: publicEnv.NEXT_PUBLIC_INDEXER_URL,
