@@ -18,7 +18,7 @@ import {
   usePinataUploadFiles,
 } from "@ecp.eth/react-editor/hooks";
 import { extractReferences } from "@ecp.eth/react-editor/extract-references";
-import { useMutation } from "@tanstack/react-query";
+import { type QueryKey, useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/env/public";
 import {
   GenerateUploadUrlResponseSchema,
@@ -28,10 +28,16 @@ import {
 import { postComment } from "@ecp.eth/sdk/comments";
 import { toast } from "sonner";
 import z from "zod";
-import { useChainId, useConfig, useWriteContract } from "wagmi";
+import { useAccount, useChainId, useConfig, useWriteContract } from "wagmi";
 import { waitForTransactionReceipt } from "@wagmi/core";
-import type { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
+import {
+  fetchAuthorData,
+  type IndexerAPICommentSchemaType,
+} from "@ecp.eth/sdk/indexer";
 import { getChannelCaipUri } from "@/lib/utils";
+import { useCommentSubmission } from "@ecp.eth/shared/hooks";
+import { SubmitCommentMutationError } from "@/errors";
+import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 
 interface EditorComposerProps {
   /**
@@ -45,6 +51,7 @@ interface EditorComposerProps {
   submittingLabel?: string;
   channelId: bigint;
   replyingTo?: IndexerAPICommentSchemaType;
+  queryKey: QueryKey;
 }
 
 export function EditorComposer({
@@ -56,8 +63,11 @@ export function EditorComposer({
   onSubmitSuccess,
   channelId,
   replyingTo,
+  queryKey,
 }: EditorComposerProps) {
+  const { address } = useAccount();
   const wagmiConfig = useConfig();
+  const commentSubmission = useCommentSubmission();
   const { writeContractAsync } = useWriteContract();
   const chainId = useChainId();
   const suggestions = useIndexerSuggestions();
@@ -88,8 +98,22 @@ export function EditorComposer({
     mutationFn: async (): Promise<void> => {
       try {
         if (!editorRef.current?.editor) {
-          throw new Error("Editor is not initialized");
+          throw new SubmitCommentMutationError("Editor is not initialized");
         }
+
+        if (!address) {
+          throw new SubmitCommentMutationError("Wallet not connected");
+        }
+
+        const resolvedAuthor = await fetchAuthorData({
+          address,
+          apiUrl: publicEnv.NEXT_PUBLIC_INDEXER_URL,
+        }).catch((e) => {
+          // supress the error, we don't want to block the comment submission
+          console.error(e);
+
+          return undefined;
+        });
 
         const filesToUpload = editorRef.current?.getFilesForUpload() || [];
 
@@ -148,7 +172,7 @@ export function EditorComposer({
         if (!signCommentResponse.ok) {
           await throwKnownResponseCodeError(signCommentResponse);
 
-          throw new Error(
+          throw new SubmitCommentMutationError(
             "Failed to obtain signed comment data, please try again.",
           );
         }
@@ -158,7 +182,7 @@ export function EditorComposer({
         );
 
         if (!signCommentResult.success) {
-          throw new Error(
+          throw new SubmitCommentMutationError(
             "Server returned malformed signed comment data, please try again.",
           );
         }
@@ -169,12 +193,50 @@ export function EditorComposer({
           writeContract: writeContractAsync,
         });
 
-        const receipt = await waitForTransactionReceipt(wagmiConfig, {
-          hash: txHash,
+        const pendingOperation: PendingPostCommentOperationSchemaType = {
+          action: "post",
+          type: "non-gasless",
+          txHash,
+          chainId,
+          references,
+          response: signCommentResult.data,
+          state: {
+            status: "pending",
+          },
+          resolvedAuthor,
+        };
+
+        commentSubmission.start({
+          pendingOperation,
+          queryKey,
         });
 
-        if (receipt.status !== "success") {
-          throw new Error("Failed to post comment");
+        try {
+          const receipt = await waitForTransactionReceipt(wagmiConfig, {
+            hash: txHash,
+          });
+
+          if (receipt.status !== "success") {
+            throw new SubmitCommentMutationError(
+              "Failed to post comment, transaction reverted.",
+            );
+          }
+
+          commentSubmission.success({
+            queryKey,
+            pendingOperation,
+          });
+        } catch (receiptError) {
+          commentSubmission.error({
+            queryKey,
+            commentId: pendingOperation.response.data.id,
+            error:
+              receiptError instanceof Error
+                ? receiptError
+                : new Error(String(receiptError)),
+          });
+
+          throw receiptError;
         }
       } catch (e) {
         if (e instanceof z.ZodError) {

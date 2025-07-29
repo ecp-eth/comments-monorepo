@@ -9,16 +9,19 @@ import {
 import { EditorComposer } from "@/components/editor-composer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { renderToReact } from "@ecp.eth/shared/renderer";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { blo } from "blo";
+import type { QueryKey } from "@tanstack/react-query";
+import { useFreshRef } from "@ecp.eth/shared/hooks";
 
 interface ReplyBottomSheetProps {
   channelId: bigint;
   isOpen: boolean;
   onClose: () => void;
   originalComment: IndexerAPICommentSchemaType | null;
+  queryKey: QueryKey;
 }
 
 export function ReplyBottomSheet({
@@ -26,10 +29,12 @@ export function ReplyBottomSheet({
   isOpen,
   onClose,
   originalComment,
+  queryKey,
 }: ReplyBottomSheetProps) {
-  const handleSubmit = () => {
-    onClose();
-  };
+  const onCloseRef = useFreshRef(onClose);
+  const handleSubmitSuccess = useCallback(() => {
+    onCloseRef.current?.();
+  }, [onCloseRef]);
 
   const renderResult = useMemo(() => {
     if (!originalComment) {
@@ -54,7 +59,7 @@ export function ReplyBottomSheet({
     originalComment.author.farcaster?.pfpUrl;
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
+    <Sheet open={isOpen} onOpenChange={onCloseRef.current}>
       <SheetContent side="bottom" className="max-w-[400px] mx-auto">
         <SheetHeader>
           <SheetTitle>Reply to message</SheetTitle>
@@ -80,13 +85,13 @@ export function ReplyBottomSheet({
             </p>
           </div>
 
-          {/* Reply Editor */}
           <EditorComposer
             autoFocus
-            onSubmitSuccess={handleSubmit}
+            onSubmitSuccess={handleSubmitSuccess}
             placeholder="Write your reply..."
             submitLabel="Reply"
             channelId={channelId}
+            queryKey={queryKey}
           />
         </div>
       </SheetContent>
