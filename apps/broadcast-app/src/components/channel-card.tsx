@@ -17,7 +17,11 @@ import { useMutation } from "@tanstack/react-query";
 import sdk from "@farcaster/miniapp-sdk";
 import { cn } from "@/lib/utils";
 import { useRemoveChannelFromDiscoverQuery } from "@/queries/discover-channels";
-import { useRemoveChannelFromMyChannelsQuery } from "@/queries/my-channels";
+import {
+  useRemoveChannelFromMyChannelsQuery,
+  useUpdateChannelInMyChannelsQuery,
+} from "@/queries/my-channels";
+import { useUpdateChannelInChannelQuery } from "@/queries/channel";
 
 interface ChannelCardProps {
   channel: Channel;
@@ -28,12 +32,19 @@ export function ChannelCard({ channel }: ChannelCardProps) {
   const removeChannelFromDiscoverQuery = useRemoveChannelFromDiscoverQuery();
   const removeChannelFromMyChannelsQuery =
     useRemoveChannelFromMyChannelsQuery();
+  const updateChannelInChannelQuery = useUpdateChannelInChannelQuery();
+  const updateChannelInMyChannelsQuery = useUpdateChannelInMyChannelsQuery();
   const subscribeMutation = useSubscribeToChannel({
     channelId: channel.id,
-    onSuccess() {
+    onSuccess(result) {
       toast.success(`Subscribed to channel ${channel.name}`);
 
       removeChannelFromDiscoverQuery(channel.id);
+
+      updateChannelInChannelQuery(channel.id, {
+        isSubscribed: true,
+        notificationsEnabled: result.notificationsEnabled,
+      });
     },
     onError(error) {
       if (error instanceof AlreadySubscribedError) {
@@ -53,6 +64,11 @@ export function ChannelCard({ channel }: ChannelCardProps) {
       toast.success(`Unsubscribed from channel ${channel.name}`);
 
       removeChannelFromMyChannelsQuery(channel.id);
+
+      updateChannelInChannelQuery(channel.id, {
+        isSubscribed: false,
+        notificationsEnabled: false,
+      });
     },
   });
   const setNotificationStatusMutation = useSetNotificationStatusOnChannel({
@@ -70,6 +86,14 @@ export function ChannelCard({ channel }: ChannelCardProps) {
       } else {
         toast.success(`Notifications disabled for channel ${channel.name}`);
       }
+
+      updateChannelInChannelQuery(channel.id, {
+        notificationsEnabled: data.notificationsEnabled,
+      });
+
+      updateChannelInMyChannelsQuery(channel.id, {
+        notificationsEnabled: data.notificationsEnabled,
+      });
     },
   });
   const addMiniAppMutation = useMutation({
