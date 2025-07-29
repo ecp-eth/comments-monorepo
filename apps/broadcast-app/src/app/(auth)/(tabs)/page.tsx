@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangleIcon, RotateCwIcon } from "lucide-react";
+import { AlertTriangleIcon, Loader2Icon, RotateCwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChannelCard } from "@/components/channel-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,8 +8,16 @@ import { cn } from "@/lib/utils";
 import { useDiscoverChannelsQuery } from "@/queries/discover-channels";
 
 export default function DiscoverChannelsPage() {
-  const { data, error, status, isRefetching, refetch } =
-    useDiscoverChannelsQuery();
+  const {
+    data,
+    error,
+    status,
+    isRefetching,
+    refetch,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useDiscoverChannelsQuery();
 
   if (error) {
     console.error("Error fetching channels:", error);
@@ -57,7 +65,9 @@ export default function DiscoverChannelsPage() {
     );
   }
 
-  if (data.results.length === 0) {
+  const channels = data.pages.flatMap((page) => page.results);
+
+  if (channels.length === 0) {
     return (
       <div className="h-full flex flex-col items-center justify-center p-4 text-center">
         <h2 className="text-lg font-semibold mb-2">No channels available.</h2>
@@ -83,12 +93,29 @@ export default function DiscoverChannelsPage() {
         <h1 className="text-2xl font-bold">Discover Channels</h1>
       </div>
 
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1" viewportClassName="h-full">
         <div className="p-4 space-y-3">
-          {data.results.map((channel) => (
+          {channels.map((channel) => (
             <ChannelCard key={channel.id} channel={channel} />
           ))}
         </div>
+
+        {hasNextPage && (
+          <div className="flex justify-center p-4 self-end">
+            <Button
+              disabled={isFetchingNextPage}
+              className="w-full text-xs"
+              variant="ghost"
+              onClick={() => fetchNextPage()}
+            >
+              {isFetchingNextPage ? (
+                <Loader2Icon className="h-4 w-4 animate-spin" />
+              ) : (
+                "Load more"
+              )}
+            </Button>
+          </div>
+        )}
       </ScrollArea>
     </div>
   );
