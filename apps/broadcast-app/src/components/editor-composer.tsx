@@ -350,6 +350,7 @@ export function EditorComposer({
           size="sm"
           disabled={submitMutation.isPending}
           onClick={handleAddFileClick}
+          type="button"
         >
           <ImageIcon className="h-4 w-4" />
         </Button>
