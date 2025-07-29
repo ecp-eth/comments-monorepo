@@ -1,32 +1,15 @@
 "use client";
-import { sdk } from "@farcaster/miniapp-sdk";
-import { publicEnv } from "@/env/public";
-import { useQuery } from "@tanstack/react-query";
+
 import { AlertTriangleIcon, RotateCwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChannelCard } from "@/components/channel-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { ListChannelsResponseSchema } from "@/api/schemas";
-import { createDiscoverChannelsQueryKey } from "@/queries";
+import { useDiscoverChannelsQuery } from "@/queries/discover-channels";
 
 export default function DiscoverChannelsPage() {
-  const { data, error, status, isRefetching, refetch } = useQuery({
-    queryKey: createDiscoverChannelsQueryKey(),
-    queryFn: async () => {
-      const url = new URL(
-        "/api/channels",
-        publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
-      );
-      const response = await sdk.quickAuth.fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch channels: ${response.statusText}`);
-      }
-
-      return ListChannelsResponseSchema.parse(await response.json());
-    },
-  });
+  const { data, error, status, isRefetching, refetch } =
+    useDiscoverChannelsQuery();
 
   if (error) {
     console.error("Error fetching channels:", error);
