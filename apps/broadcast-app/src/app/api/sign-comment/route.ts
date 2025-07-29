@@ -1,7 +1,8 @@
 import { serverEnv } from "@/env/server";
+import { Errors, createClient } from "@farcaster/quick-auth";
 import {
   BadRequestResponseSchema,
-  SignCommentPayloadRequestSchema,
+  SignCommentPayloadRequestServerSchema,
   SignCommentResponseServerSchema,
 } from "@/api/schemas";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
@@ -15,6 +16,8 @@ import { privateKeyToAccount } from "viem/accounts";
 import { chain } from "@/wagmi/config";
 import { publicEnv } from "@/env/public";
 
+const quickAuthClient = createClient();
+
 const chainId = chain.id;
 
 export async function POST(
@@ -24,7 +27,42 @@ export async function POST(
     typeof SignCommentResponseServerSchema | typeof BadRequestResponseSchema
   >
 > {
-  const parsedBodyResult = SignCommentPayloadRequestSchema.safeParse(
+  try {
+    const authorization = req.headers.get("authorization");
+    const [, token] = authorization?.split(" ") || [];
+
+    if (!token) {
+      return new JSONResponse(
+        BadRequestResponseSchema,
+        {
+          authorization: ["Missing token"],
+        },
+        { status: 401 },
+      );
+    }
+
+    await quickAuthClient.verifyJwt({
+      token,
+      domain: new URL(serverEnv.FARCASTER_MINI_APP_URL).hostname,
+    });
+  } catch (e) {
+    console.error(e);
+    if (e instanceof Errors.InvalidTokenError) {
+      console.info("Invalid token:", e.message);
+
+      return new JSONResponse(
+        BadRequestResponseSchema,
+        {
+          authorization: ["Invalid token"],
+        },
+        { status: 401 },
+      );
+    }
+
+    throw e;
+  }
+
+  const parsedBodyResult = SignCommentPayloadRequestServerSchema.safeParse(
     await req.json(),
   );
 
@@ -38,7 +76,8 @@ export async function POST(
 
   const passedCommentData = parsedBodyResult.data;
 
-  const { content, author, metadata, commentType } = passedCommentData;
+  const { content, author, metadata, commentType, channelId } =
+    passedCommentData;
 
   if (content.length > serverEnv.COMMENT_CONTENT_LENGTH_LIMIT) {
     return new JSONResponse(
@@ -72,7 +111,7 @@ export async function POST(
     author,
     app: app.address,
     commentType,
-
+    channelId,
     ...("parentId" in passedCommentData
       ? {
           parentId: passedCommentData.parentId,
