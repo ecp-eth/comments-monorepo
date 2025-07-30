@@ -7,7 +7,6 @@ import { ImageIcon, Loader2Icon, SendIcon } from "lucide-react";
 import {
   CommentFormSubmitError,
   InvalidCommentError,
-  throwKnownResponseCodeError,
 } from "@ecp.eth/shared/errors";
 import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor";
 import {
@@ -21,11 +20,7 @@ import {
 import { extractReferences } from "@ecp.eth/react-editor/extract-references";
 import { type QueryKey, useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/env/public";
-import {
-  GenerateUploadUrlResponseSchema,
-  SignCommentPayloadRequestClientSchema,
-  SignCommentResponseServerSchema,
-} from "@/api/schemas";
+import { GenerateUploadUrlResponseSchema } from "@/api/schemas";
 import { postComment } from "@ecp.eth/sdk/comments";
 import { toast } from "sonner";
 import z from "zod";
@@ -37,11 +32,11 @@ import {
 } from "@ecp.eth/sdk/indexer";
 import { getChannelCaipUri } from "@/lib/utils";
 import { useCommentSubmission } from "@ecp.eth/shared/hooks";
-import { SubmitCommentMutationError } from "@/errors";
+import { SignCommentError, SubmitCommentMutationError } from "@/errors";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 import { base } from "viem/chains";
-import { sdk } from "@farcaster/miniapp-sdk";
+import { signCommentOrReaction } from "@/api/sign-comment-or-reaction";
 
 interface EditorComposerProps {
   /**
@@ -144,11 +139,10 @@ export function EditorComposer({
             }),
           );
 
-        const parseResult = SignCommentPayloadRequestClientSchema.safeParse({
+        const signedCommentResponse = await signCommentOrReaction({
           author: address,
           channelId,
           content,
-          references,
           metadata: [],
           ...(replyingTo
             ? { parentId: replyingTo.id }
@@ -160,57 +154,21 @@ export function EditorComposer({
               }),
         });
 
-        if (!parseResult.success) {
-          throw new InvalidCommentError(
-            parseResult.error.flatten().fieldErrors,
-          );
-        }
-
-        const commentData = parseResult.data;
-
-        const signCommentResponse = await sdk.quickAuth.fetch(
-          "/api/sign-comment",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(commentData),
-          },
-        );
-
-        if (!signCommentResponse.ok) {
-          await throwKnownResponseCodeError(signCommentResponse);
-
-          throw new SubmitCommentMutationError(
-            "Failed to obtain signed comment data, please try again.",
-          );
-        }
-
-        const signCommentResult = SignCommentResponseServerSchema.safeParse(
-          await signCommentResponse.json(),
-        );
-
-        if (!signCommentResult.success) {
-          throw new SubmitCommentMutationError(
-            "Server returned malformed signed comment data, please try again.",
-          );
-        }
-
         const { txHash } = await postComment({
           commentsAddress: SUPPORTED_CHAINS[base.id].commentManagerAddress,
-          appSignature: signCommentResult.data.signature,
-          comment: signCommentResult.data.data,
+          appSignature: signedCommentResponse.signature,
+          comment: signedCommentResponse.data,
           writeContract: writeContractAsync,
         });
 
         const pendingOperation: PendingPostCommentOperationSchemaType = {
           action: "post",
           type: "non-gasless",
-          txHash,
+          txHash:
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
           chainId,
           references,
-          response: signCommentResult.data,
+          response: signedCommentResponse,
           state: {
             status: "pending",
           },
@@ -254,6 +212,8 @@ export function EditorComposer({
           throw new InvalidCommentError(
             e.flatten().fieldErrors as Record<string, string[]>,
           );
+        } else if (e instanceof SignCommentError) {
+          throw new SubmitCommentMutationError(e.message);
         }
 
         console.error(e);
@@ -358,7 +318,7 @@ export function EditorComposer({
       />
 
       {submitMutation.error && (
-        <div className="text-red-500 text-xs">
+        <div className="text-red-500 text-xs flex flex-col">
           {submitMutation.error instanceof CommentFormSubmitError
             ? submitMutation.error.render()
             : submitMutation.error.message}
