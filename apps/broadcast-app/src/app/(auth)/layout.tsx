@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { config } from "@/wagmi/config";
 import { MiniAppProvider } from "@/hooks/useMiniAppContext";
+import { PendingWalletConnectionActionsProvider } from "@/components/pending-wallet-connections-context";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,7 +39,11 @@ export default function AuthLayout({
   return (
     <QueryClientProvider client={queryClient}>
       <MiniAppProvider>
-        <WagmiProvider config={config}>{children}</WagmiProvider>
+        <WagmiProvider config={config}>
+          <PendingWalletConnectionActionsProvider>
+            {children}
+          </PendingWalletConnectionActionsProvider>
+        </WagmiProvider>
       </MiniAppProvider>
     </QueryClientProvider>
   );
