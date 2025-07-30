@@ -124,7 +124,7 @@ function insertPendingReactionToPage(
 
   const { response, txHash, chainId, zeroExSwap } = pendingOperation;
 
-  const results = queryData.pages[0].results;
+  const results = queryData.pages.flatMap((page) => page.results);
 
   const parentComment = results.find(
     (result) => result.id === pendingOperation.response.data.parentId,

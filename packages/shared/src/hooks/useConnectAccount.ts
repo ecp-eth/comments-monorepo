@@ -5,7 +5,6 @@ import { useAccount, useAccountEffect } from "wagmi";
 import { useFreshRef } from "./useFreshRef.js";
 
 const CONNECT_WALLET_TIMEOUT = 2 * 60 * 1000; // 2 minutes
-const WALLET_CONNECT_DIALOG_MINIMAL_HEIGHT = 480;
 
 type Deferred = {
   resolve: (account: Hex) => void;
@@ -18,11 +17,11 @@ type Deferred = {
  * This hook is used to connect to a wallet and returns the address.
  */
 export function useConnectAccount() {
-  const { address } = useAccount();
+  const { address: connectedAddress } = useAccount();
   const { openConnectModal, connectModalOpen } = useConnectModal();
   const previousConnectModalRef = useRef(connectModalOpen);
   const deferredRef = useRef<Deferred | null>(null);
-  const addressRef = useFreshRef(address);
+  const addressRef = useFreshRef(connectedAddress);
 
   useAccountEffect({
     onConnect(data) {
@@ -47,8 +46,8 @@ export function useConnectAccount() {
   }, [addressRef, connectModalOpen]);
 
   return useCallback(async (): Promise<Hex> => {
-    if (address) {
-      return address;
+    if (connectedAddress) {
+      return connectedAddress;
     }
 
     if (deferredRef.current && deferredRef.current.promise) {
@@ -71,7 +70,6 @@ export function useConnectAccount() {
     deferredRef.current = deferred;
 
     if (openConnectModal) {
-      setDialogMinimalHeight();
       openConnectModal();
     } else {
       deferred.reject(
@@ -82,33 +80,6 @@ export function useConnectAccount() {
     return deferred.promise.finally(() => {
       clearTimeout(deferred.timeout);
       deferredRef.current = null;
-      resetDialogMinimalHeight();
     });
-  }, [address, openConnectModal]);
-}
-
-let originalMinHeight: string | undefined;
-
-function setDialogMinimalHeight() {
-  if (!document) {
-    return;
-  }
-
-  if (originalMinHeight == null) {
-    originalMinHeight = document.body.style.minHeight;
-  }
-
-  document.body.style.minHeight = `${WALLET_CONNECT_DIALOG_MINIMAL_HEIGHT}px`;
-}
-
-function resetDialogMinimalHeight() {
-  if (!document) {
-    return;
-  }
-
-  if (originalMinHeight == null) {
-    return;
-  }
-  document.body.style.minHeight = originalMinHeight;
-  originalMinHeight = undefined;
+  }, [connectedAddress, openConnectModal]);
 }

@@ -1,5 +1,6 @@
 import {
   CommentPageSchema,
+  ListCommentsQueryPageParamsSchemaType,
   type Comment as CommentType,
 } from "@ecp.eth/shared/schemas";
 import { CommentActionButton } from "./CommentActionButton";
@@ -19,12 +20,14 @@ import { ReplyItem } from "./ReplyItem";
 import { useDeleteComment } from "./hooks/useDeleteComment";
 import { useRetryPostComment } from "./hooks/useRetryPostComment";
 import {
-  createCommentRepliesQueryKey,
-  createRootCommentsQueryKey,
+  createReplyItemsQueryKey,
+  createCommentItemsQueryKey,
 } from "./queries";
 import {
   useEmbedConfig,
   type EmbedConfigProviderByTargetURIConfig,
+  type EmbedConfigProviderByAuthorConfig,
+  type EmbedConfigProviderByRepliesConfig,
 } from "../EmbedConfigProvider";
 import { useRetryEditComment } from "./hooks/useRetryEditComment";
 import { useAccount, useChainId } from "wagmi";
@@ -41,7 +44,11 @@ type CommentItemProps = {
 
 export function CommentItem({ comment }: CommentItemProps) {
   const { address: connectedAddress } = useAccount();
-  const { targetUri } = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
+  const source = useEmbedConfig<
+    | EmbedConfigProviderByTargetURIConfig
+    | EmbedConfigProviderByRepliesConfig
+    | EmbedConfigProviderByAuthorConfig
+  >();
   const deleteComment = useDeleteComment();
   const retryPostComment = useRetryPostComment({
     connectedAddress,
@@ -55,35 +62,44 @@ export function CommentItem({ comment }: CommentItemProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const chainId = useChainId();
-  const queryKey = useMemo(
-    () => createCommentRepliesQueryKey(connectedAddress, chainId, comment.id),
+  const replyItemsQueryKey = useMemo(
+    () => createReplyItemsQueryKey(connectedAddress, chainId, comment.id),
     [comment.id, connectedAddress, chainId],
   );
-  const rootQueryKey = useMemo(
-    () => createRootCommentsQueryKey(connectedAddress, chainId, targetUri),
-    [targetUri, connectedAddress, chainId],
+  const commentItemsQueryKey = useMemo(
+    () =>
+      createCommentItemsQueryKey(
+        connectedAddress,
+        chainId,
+        "targetUri" in source
+          ? source.targetUri
+          : "commentId" in source
+            ? source.commentId
+            : source.author,
+      ),
+    [source, connectedAddress, chainId],
   );
+
+  const firstPageParamOfReplies: ListCommentsQueryPageParamsSchemaType =
+    useMemo(() => {
+      return {
+        cursor: undefined,
+        limit:
+          comment.replies?.pagination.limit ??
+          MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+      };
+    }, [comment.replies]);
 
   const repliesQuery = useInfiniteQuery({
     enabled: comment.pendingOperation?.action !== "post",
-    queryKey,
+    queryKey: replyItemsQueryKey,
     initialData: comment.replies
       ? {
           pages: [comment.replies],
-          pageParams: [
-            {
-              cursor: comment.replies.pagination.endCursor,
-              limit: comment.replies.pagination.limit,
-            },
-          ],
+          pageParams: [firstPageParamOfReplies],
         }
       : undefined,
-    initialPageParam: {
-      cursor: comment.replies?.pagination.endCursor,
-      limit:
-        comment.replies?.pagination.limit ??
-        MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
-    },
+    initialPageParam: firstPageParamOfReplies,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async ({ pageParam, signal }) => {
@@ -117,7 +133,7 @@ export function CommentItem({ comment }: CommentItemProps) {
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
     enabled: comment.pendingOperation?.action !== "post",
     queryData: repliesQuery.data,
-    queryKey,
+    queryKey: replyItemsQueryKey,
     fetchComments({ cursor, signal }) {
       return fetchCommentReplies({
         chainId,
@@ -139,17 +155,17 @@ export function CommentItem({ comment }: CommentItemProps) {
   const onDeleteClick = useCallback(() => {
     deleteComment({
       commentId: comment.id,
-      queryKey: rootQueryKey,
+      queryKey: commentItemsQueryKey,
     });
-  }, [comment, deleteComment, rootQueryKey]);
+  }, [comment, deleteComment, commentItemsQueryKey]);
 
   const onRetryPostClick = useCallback(() => {
-    retryPostComment({ comment, queryKey: rootQueryKey });
-  }, [comment, retryPostComment, rootQueryKey]);
+    retryPostComment({ comment, queryKey: commentItemsQueryKey });
+  }, [comment, retryPostComment, commentItemsQueryKey]);
 
   const onRetryEditClick = useCallback(() => {
-    retryEditComment({ comment, queryKey: rootQueryKey });
-  }, [comment, retryEditComment, rootQueryKey]);
+    retryEditComment({ comment, queryKey: commentItemsQueryKey });
+  }, [comment, retryEditComment, commentItemsQueryKey]);
 
   const onReplyClick = useCallback(() => {
     setIsReplying(true);
@@ -164,7 +180,7 @@ export function CommentItem({ comment }: CommentItemProps) {
     try {
       await likeComment({
         comment,
-        queryKey: rootQueryKey,
+        queryKey: commentItemsQueryKey,
         onBeforeStart: () => setIsLiking(true),
         onSuccess: () => setIsLiking(false),
         onFailed: (e: unknown) => {
@@ -186,14 +202,14 @@ export function CommentItem({ comment }: CommentItemProps) {
     } finally {
       setIsLiking(false);
     }
-  }, [likeComment, comment, rootQueryKey]);
+  }, [likeComment, comment, commentItemsQueryKey]);
 
   const onUnlikeClick = useCallback(async () => {
     setIsLiking(true);
     try {
       await unlikeComment({
         comment,
-        queryKey: rootQueryKey,
+        queryKey: commentItemsQueryKey,
         onBeforeStart: () => setIsLiking(false),
         onFailed: (e: unknown) => {
           if (!(e instanceof Error)) {
@@ -212,7 +228,7 @@ export function CommentItem({ comment }: CommentItemProps) {
     } finally {
       setIsLiking(false);
     }
-  }, [unlikeComment, comment, rootQueryKey]);
+  }, [unlikeComment, comment, commentItemsQueryKey]);
 
   const replies = useMemo(() => {
     return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
@@ -230,7 +246,7 @@ export function CommentItem({ comment }: CommentItemProps) {
       {isEditing ? (
         <CommentEditForm
           comment={comment}
-          queryKey={rootQueryKey}
+          queryKey={commentItemsQueryKey}
           onCancel={() => setIsEditing(false)}
           onSubmitStart={() => {
             setIsEditing(false);
@@ -261,6 +277,7 @@ export function CommentItem({ comment }: CommentItemProps) {
           }}
           placeholder="What are your thoughts?"
           parentId={comment.id}
+          queryKey={replyItemsQueryKey}
         />
       )}
       {hasNewComments && (
@@ -274,7 +291,7 @@ export function CommentItem({ comment }: CommentItemProps) {
         <ReplyItem
           key={reply.id}
           comment={reply}
-          queryKey={queryKey}
+          queryKey={replyItemsQueryKey}
           parentCommentId={comment.id}
         />
       ))}

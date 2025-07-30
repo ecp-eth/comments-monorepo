@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  type InfiniteData,
-  useInfiniteQuery,
-  useQuery,
-} from "@tanstack/react-query";
+import { type InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { ErrorScreen } from "../ErrorScreen";
 import { LoadingScreen } from "../LoadingScreen";
@@ -13,7 +9,7 @@ import {
   COMMENTS_PER_PAGE,
   NEW_COMMENTS_BY_AUTHOR_CHECK_INTERVAL,
 } from "@/lib/constants";
-import { fetchComments } from "@ecp.eth/sdk/indexer";
+import { fetchComments, FetchCommentsOptions } from "@ecp.eth/sdk/indexer";
 import {
   type CommentPageSchemaType,
   CommentPageSchema,
@@ -21,14 +17,19 @@ import {
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { CommentByAuthor } from "./CommentByAuthor";
 import { NoCommentsScreen } from "../NoCommentsScreen";
-import { publicEnv } from "@/publicEnv";
 import { PoweredBy } from "@ecp.eth/shared/components";
 import {
   EmbedConfigProviderByAuthorConfig,
   useEmbedConfig,
 } from "../EmbedConfigProvider";
-import { useChainId } from "wagmi";
-import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
+import { useAccount, useChainId } from "wagmi";
+import { createCommentItemsQueryKey } from "./queries";
+import {
+  useIsAccountStatusResolved,
+  useNewCommentsChecker,
+} from "@ecp.eth/shared/hooks";
+import { useSyncViewerCookie } from "@/hooks/useSyncViewerCookie";
+import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 
 type QueryData = InfiniteData<
   CommentPageSchemaType,
@@ -38,38 +39,42 @@ type QueryData = InfiniteData<
 type CommentSectionReadonlyProps = {
   author: Hex;
   initialData?: QueryData;
+  fetchCommentParams: FetchCommentsOptions;
 };
 
 export function CommentSectionReadonly({
   initialData,
   author,
+  fetchCommentParams,
 }: CommentSectionReadonlyProps) {
+  useSyncViewerCookie();
+  useAutoBodyMinHeight();
+
+  const { address: connectedAddress } = useAccount();
+  const isAccountStatusResolved = useIsAccountStatusResolved();
   const { currentTimestamp, disablePromotion } =
     useEmbedConfig<EmbedConfigProviderByAuthorConfig>();
   const chainId = useChainId();
   const queryKey = useMemo(
-    () => ["comments-by-author", chainId, author],
-    [author, chainId],
+    () => createCommentItemsQueryKey(connectedAddress, chainId, author),
+    [connectedAddress, chainId, author],
   );
 
   const { data, isPending, error, refetch, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
       queryKey,
       initialData,
-      initialPageParam: {
-        cursor: undefined as Hex | undefined,
+      initialPageParam: initialData?.pageParams[0] || {
+        cursor: undefined,
         limit: COMMENTS_PER_PAGE,
       },
       queryFn: async ({ pageParam, signal }) => {
         const response = await fetchComments({
-          app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-          apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-          author,
+          ...fetchCommentParams,
           limit: pageParam.limit,
           cursor: pageParam.cursor,
-          chainId,
+          viewer: connectedAddress,
           signal,
-          commentType: COMMENT_TYPE_COMMENT,
         });
 
         return CommentPageSchema.parse(response);
@@ -88,53 +93,19 @@ export function CommentSectionReadonly({
       },
     });
 
-  // check for new comments
-  useQuery({
-    enabled: !!data,
-    queryKey: ["comments-by-author-new-comments-check", chainId, author],
-    queryFn: async ({ client, signal }) => {
-      const newComments = await fetchComments({
-        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        author,
-        limit: 20,
-        cursor: data?.pages[0].pagination.startCursor,
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    enabled: isAccountStatusResolved,
+    queryData: data,
+    queryKey,
+    fetchComments(options) {
+      return fetchComments({
+        ...fetchCommentParams,
+        cursor: options.cursor,
+        signal: options.signal,
+        viewer: connectedAddress,
         sort: "asc",
-        chainId,
-        signal,
-        commentType: COMMENT_TYPE_COMMENT,
+        mode: "flat",
       });
-
-      if (newComments.results.length === 0) {
-        return newComments;
-      }
-
-      client.setQueryData<QueryData>(queryKey, (oldData): QueryData => {
-        if (!oldData) {
-          return {
-            pages: [newComments],
-            pageParams: [
-              {
-                cursor: newComments.pagination.endCursor,
-                limit: newComments.pagination.limit,
-              },
-            ],
-          };
-        }
-
-        return {
-          pages: [newComments, ...oldData.pages],
-          pageParams: [
-            {
-              cursor: newComments.pagination.endCursor,
-              limit: newComments.pagination.limit,
-            },
-            ...oldData.pageParams,
-          ],
-        };
-      });
-
-      return newComments;
     },
     refetchInterval: NEW_COMMENTS_BY_AUTHOR_CHECK_INTERVAL,
   });
@@ -159,6 +130,16 @@ export function CommentSectionReadonly({
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
+      {hasNewComments && (
+        <Button
+          className="mb-4"
+          onClick={() => fetchNewComments()}
+          variant="secondary"
+          size="sm"
+        >
+          Load new comments
+        </Button>
+      )}
       {results.length === 0 && <NoCommentsScreen />}
       {results.map((comment) => (
         <CommentByAuthor

@@ -28,20 +28,20 @@ import type {
 import { DistributiveOmit } from "@tanstack/react-query";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 
-export function createRootCommentsQueryKey(
-  address: Hex | undefined,
+export function createCommentItemsQueryKey(
+  viewer: Hex | undefined,
   chainId: number,
-  targetUri: string,
+  targetUriOrCommentIdOrAuthor: string,
 ) {
-  return ["comments", address, chainId, targetUri];
+  return ["CommentItems", viewer, chainId, targetUriOrCommentIdOrAuthor];
 }
 
-export function createCommentRepliesQueryKey(
-  address: Hex | undefined,
+export function createReplyItemsQueryKey(
+  viewer: Hex | undefined,
   chainId: number,
   commentId: Hex,
 ) {
-  return ["comments", address, chainId, commentId];
+  return ["ReplyItems", viewer, chainId, commentId];
 }
 
 export class SubmitCommentMutationError extends Error {}

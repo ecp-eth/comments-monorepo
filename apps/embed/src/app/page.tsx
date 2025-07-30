@@ -5,6 +5,12 @@ import { z } from "zod";
 import { Providers } from "./providers";
 import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
 import { MainWrapper } from "@/components/MainWrapper";
+import { env } from "@/env";
+import { fetchComments, FetchCommentsOptions } from "@ecp.eth/sdk/indexer";
+import { COMMENTS_PER_PAGE } from "@/lib/constants";
+import { cookies } from "next/headers";
+import { Hex } from "@ecp.eth/sdk/core/schemas";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 const SearchParamsSchema = z.object({
   targetUri: z.string().url(),
@@ -38,17 +44,22 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
   }
 
   const { targetUri, config } = parseSearchParamsResult.data;
+  const cookieStore = await cookies();
+  // viewer cookie is set by useSyncViewerCookie hook inside CommentSection
+  const viewer = cookieStore.get("viewer")?.value as Hex | undefined;
 
   try {
-    // at the moment we don't use server-side comments fetching because we don't know the address of the viewer
-    // which causes issues with the feed
-
-    /* const comments = await fetchComments({
+    const fetchCommentParams: FetchCommentsOptions = {
+      chainId: config.chainId,
       app: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-      targetUri,
       limit: COMMENTS_PER_PAGE,
-    });*/
+      commentType: COMMENT_TYPE_COMMENT,
+      mode: "flat",
+      viewer,
+      targetUri,
+    };
+    const comments = await fetchComments(fetchCommentParams);
 
     return (
       <Providers
@@ -62,15 +73,16 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
           restrictMaximumContainerWidth={config.restrictMaximumContainerWidth}
         >
           <CommentSection
-          /* initialData={{
-                    pages: [comments],
-                    pageParams: [
-                      {
-                        limit: comments.pagination.limit,
-                        cursor: comments.pagination.endCursor,
-                      },
-                    ],
-                  }}*/
+            initialData={{
+              pages: [comments],
+              pageParams: [
+                {
+                  limit: comments.pagination.limit,
+                  cursor: undefined,
+                },
+              ],
+            }}
+            fetchCommentParams={fetchCommentParams}
           />
         </MainWrapper>
         <Toaster />

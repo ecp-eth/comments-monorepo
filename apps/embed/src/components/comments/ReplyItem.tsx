@@ -150,6 +150,7 @@ export function ReplyItem({
           }}
           // make sure to update replies on top level comment because we are using flat replies mode
           parentId={parentCommentId}
+          queryKey={queryKey}
         />
       )}
     </div>

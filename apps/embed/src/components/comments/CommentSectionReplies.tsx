@@ -14,10 +14,15 @@ import {
   COMMENTS_PER_PAGE,
   NEW_COMMENTS_CHECK_INTERVAL,
 } from "@/lib/constants";
-import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
+import {
+  fetchComment,
+  fetchCommentReplies,
+  FetchCommentRepliesOptions,
+} from "@ecp.eth/sdk/indexer";
 import {
   type CommentPageSchemaType,
   CommentPageSchema,
+  ListCommentsQueryPageParamsSchemaType,
 } from "@ecp.eth/shared/schemas";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { NoCommentsScreen } from "../NoCommentsScreen";
@@ -27,113 +32,114 @@ import {
   EmbedConfigProviderByRepliesConfig,
   useEmbedConfig,
 } from "../EmbedConfigProvider";
-import { useChainId } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import { CommentForm } from "./CommentForm";
 import { CommentItem } from "./CommentItem";
+import { createCommentItemsQueryKey } from "./queries";
+import {
+  useIsAccountStatusResolved,
+  useNewCommentsChecker,
+} from "@ecp.eth/shared/hooks";
+import { useSyncViewerCookie } from "@/hooks/useSyncViewerCookie";
+import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 
 type QueryData = InfiniteData<
   CommentPageSchemaType,
-  { cursor: Hex | undefined; limit: number }
+  ListCommentsQueryPageParamsSchemaType
 >;
 
 type CommentSectionRepliesProps = {
   commentId: Hex;
   initialData?: QueryData;
+  fetchCommentRepliesParams: FetchCommentRepliesOptions;
 };
 
 export function CommentSectionReplies({
   initialData,
   commentId,
+  fetchCommentRepliesParams,
 }: CommentSectionRepliesProps) {
+  useSyncViewerCookie();
+  useAutoBodyMinHeight();
+
+  const { address: connectedAddress } = useAccount();
+  const isAccountStatusResolved = useIsAccountStatusResolved();
   const { disablePromotion } =
     useEmbedConfig<EmbedConfigProviderByRepliesConfig>();
   const chainId = useChainId();
   const queryKey = useMemo(
-    () => ["comments-by-replies", chainId, commentId],
-    [commentId, chainId],
+    () => createCommentItemsQueryKey(connectedAddress, chainId, commentId),
+    [connectedAddress, chainId, commentId],
   );
 
-  const { data, isPending, error, refetch, hasNextPage, fetchNextPage } =
-    useInfiniteQuery({
-      queryKey,
-      initialData,
-      initialPageParam: {
-        cursor: undefined as Hex | undefined,
-        limit: COMMENTS_PER_PAGE,
-      },
-      queryFn: async ({ pageParam, signal }) => {
-        const response = await fetchCommentReplies({
-          app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-          apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-          commentId,
-          limit: pageParam.limit,
-          cursor: pageParam.cursor,
-          chainId,
-          signal,
-        });
-
-        return CommentPageSchema.parse(response);
-      },
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      getNextPageParam(lastPage) {
-        if (!lastPage.pagination.hasNext) {
-          return;
-        }
-
-        return {
-          cursor: lastPage.pagination.endCursor,
-          limit: lastPage.pagination.limit,
-        };
-      },
-    });
-
-  // check for new comments
-  useQuery({
-    enabled: !!data,
-    queryKey: ["comments-by-replies-new-comments-check", chainId, commentId],
-    queryFn: async ({ client, signal }) => {
-      const newComments = await fetchCommentReplies({
-        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        commentId,
-        limit: 20,
-        cursor: data?.pages[0].pagination.startCursor,
-        sort: "asc",
+  const {
+    data: selectedComment,
+    isPending: selectedCommentPending,
+    isError: selectedCommentError,
+  } = useQuery({
+    queryKey: ["replies-by-comment", chainId, commentId],
+    queryFn: async () => {
+      return await fetchComment({
         chainId,
+        commentId,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+      });
+    },
+  });
+
+  const {
+    data,
+    isPending: isRepliesPending,
+    error: repliesError,
+    refetch,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    enabled: isAccountStatusResolved,
+    queryKey,
+    initialData,
+    initialPageParam: initialData?.pageParams[0] || {
+      cursor: undefined,
+      limit: COMMENTS_PER_PAGE,
+    },
+    queryFn: async ({ pageParam, signal }) => {
+      const response = await fetchCommentReplies({
+        ...fetchCommentRepliesParams,
+        cursor: pageParam.cursor,
+        limit: pageParam.limit,
+        viewer: connectedAddress,
         signal,
       });
 
-      if (newComments.results.length === 0) {
-        return newComments;
+      return CommentPageSchema.parse(response);
+    },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    getNextPageParam(lastPage) {
+      if (!lastPage.pagination.hasNext) {
+        return;
       }
 
-      client.setQueryData<QueryData>(queryKey, (oldData): QueryData => {
-        if (!oldData) {
-          return {
-            pages: [newComments],
-            pageParams: [
-              {
-                cursor: newComments.pagination.endCursor,
-                limit: newComments.pagination.limit,
-              },
-            ],
-          };
-        }
+      return {
+        cursor: lastPage.pagination.endCursor,
+        limit: lastPage.pagination.limit,
+      };
+    },
+  });
 
-        return {
-          pages: [newComments, ...oldData.pages],
-          pageParams: [
-            {
-              cursor: newComments.pagination.endCursor,
-              limit: newComments.pagination.limit,
-            },
-            ...oldData.pageParams,
-          ],
-        };
+  const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
+    enabled: isAccountStatusResolved && !!selectedComment,
+    queryData: data,
+    queryKey,
+    fetchComments(options) {
+      return fetchCommentReplies({
+        ...fetchCommentRepliesParams,
+        mode: selectedComment?.parentId ? "nested" : "flat",
+        cursor: options.cursor,
+        signal: options.signal,
+        viewer: connectedAddress,
+        sort: "asc",
       });
-
-      return newComments;
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,
   });
@@ -141,6 +147,9 @@ export function CommentSectionReplies({
   const results = useMemo(() => {
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
+
+  const isPending = selectedCommentPending || isRepliesPending;
+  const error = repliesError || selectedCommentError;
 
   if (isPending) {
     return <LoadingScreen />;
@@ -162,8 +171,19 @@ export function CommentSectionReplies({
         <CommentForm
           placeholder="What are your thoughts?"
           parentId={commentId}
+          queryKey={queryKey}
         />
       </div>
+      {hasNewComments && (
+        <Button
+          className="mb-4"
+          onClick={() => fetchNewComments()}
+          variant="secondary"
+          size="sm"
+        >
+          Load new comments
+        </Button>
+      )}
       {results.length === 0 && <NoCommentsScreen />}
       {results.map((comment) => (
         <CommentItem comment={comment} key={comment.id} />
