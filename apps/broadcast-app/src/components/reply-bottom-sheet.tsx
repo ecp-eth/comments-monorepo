@@ -40,7 +40,7 @@ export function ReplyBottomSheet({
   replyingToQueryKey,
 }: ReplyBottomSheetProps) {
   const onCloseRef = useFreshRef(onClose);
-  const handleSubmitSuccess = useCallback(() => {
+  const handleSubmitStart = useCallback(() => {
     onCloseRef.current?.();
   }, [onCloseRef]);
 
@@ -94,7 +94,7 @@ export function ReplyBottomSheet({
 
           <EditorComposer
             autoFocus
-            onSubmitSuccess={handleSubmitSuccess}
+            onSubmitStart={handleSubmitStart}
             placeholder="Write your reply..."
             submitLabel="Reply"
             channelId={channelId}
