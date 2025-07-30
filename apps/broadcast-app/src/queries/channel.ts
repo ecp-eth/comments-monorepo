@@ -117,12 +117,7 @@ export function useChannelCommentsQuery({
         // @todo determine sort because for previous page we need to reverse the sort
       });
 
-      return {
-        // use reversed order because we want to show the newest comments at the bottom
-        results: response.results.toReversed(),
-        pagination: response.pagination,
-        extra: response.extra,
-      };
+      return response;
     },
     getNextPageParam(lastPage) {
       if (lastPage.pagination.hasNext && lastPage.pagination.endCursor) {
