@@ -194,6 +194,12 @@ export default function ChannelPage(props: {
     }
   }, [address, replyingTo, connectAsync, connectors]);
 
+  const comments = useMemo(() => {
+    return (
+      commentsQuery.data?.pages.flatMap((page) => page.results) ?? []
+    ).toReversed();
+  }, [commentsQuery.data]);
+
   if (commentsQuery.status === "pending" || channelQuery.status === "pending") {
     return (
       <div className="h-screen max-w-[400px] mx-auto bg-background">
@@ -283,7 +289,6 @@ export default function ChannelPage(props: {
   }
 
   const channel = channelQuery.data;
-  const comments = commentsQuery.data?.pages.flatMap((page) => page.results);
   const isOwner = address?.toLowerCase() === channel.owner.toLowerCase();
 
   return (

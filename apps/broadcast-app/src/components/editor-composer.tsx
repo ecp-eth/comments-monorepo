@@ -37,6 +37,8 @@ import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/sche
 import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 import { base } from "viem/chains";
 import { signCommentOrReaction } from "@/api/sign-comment-or-reaction";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { ContractFunctionExecutionError } from "viem";
 
 interface EditorComposerProps {
   /**
@@ -164,8 +166,7 @@ export function EditorComposer({
         const pendingOperation: PendingPostCommentOperationSchemaType = {
           action: "post",
           type: "non-gasless",
-          txHash:
-            "0x0000000000000000000000000000000000000000000000000000000000000000",
+          txHash,
           chainId,
           references,
           response: signedCommentResponse,
@@ -214,6 +215,10 @@ export function EditorComposer({
           );
         } else if (e instanceof SignCommentError) {
           throw new SubmitCommentMutationError(e.message);
+        } else if (e instanceof ContractFunctionExecutionError) {
+          throw new SubmitCommentMutationError(
+            formatContractFunctionExecutionError(e),
+          );
         }
 
         console.error(e);
