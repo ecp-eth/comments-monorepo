@@ -369,6 +369,10 @@ export const IndexerAPICommentReactionSchema = IndexerAPICommentSchema.extend({
   reactionCounts: z.record(z.number()),
 });
 
+export type IndexerAPICommentReactionSchemaType = z.infer<
+  typeof IndexerAPICommentReactionSchema
+>;
+
 export const IndexerAPICommentReactionOutputSchema =
   IndexerAPICommentOutputSchema.extend({
     viewerReactions: z.record(z.array(IndexerAPICommentOutputSchema)),
