@@ -5,23 +5,22 @@ import type { Hex } from "./core/schemas.js";
 const localCommentAddressManager = "0xc9deBB99EA31E376eB78303662B4Ba56b8E808d7";
 const localChannelAddressManager = "0x0a84C0e74A01581e169bDBA0cb5Aa04786f37BA0";
 
+const commentManagerAddress = "0xb262C9278fBcac384Ef59Fc49E24d800152E19b1";
+const channelManagerAddress = "0xa1043eDBE1b0Ffe6C12a2b8ed5AfD7AcB2DEA396";
+
 /**
  * The address of the `CommentManager` contract.
  * It is created using the CREATE2 opcode so should be identical across chains if no collisions occur.
  */
 export const COMMENT_MANAGER_ADDRESS = (
-  __DEV__
-    ? localCommentAddressManager
-    : "0xb262C9278fBcac384Ef59Fc49E24d800152E19b1"
+  __DEV__ ? localCommentAddressManager : commentManagerAddress
 ) as Hex;
 
 /**
  * The address of the ChannelManager contract.
  */
 export const CHANNEL_MANAGER_ADDRESS = (
-  __DEV__
-    ? localChannelAddressManager
-    : "0xa1043eDBE1b0Ffe6C12a2b8ed5AfD7AcB2DEA396"
+  __DEV__ ? localChannelAddressManager : channelManagerAddress
 ) as Hex;
 
 export type SupportedChainConfig = {
@@ -36,13 +35,13 @@ export type SupportedChainConfig = {
 export const SUPPORTED_CHAINS = {
   [base.id]: {
     chain: base,
-    commentManagerAddress: COMMENT_MANAGER_ADDRESS,
-    channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+    commentManagerAddress: commentManagerAddress,
+    channelManagerAddress: channelManagerAddress,
   } as SupportedChainConfig,
   [baseSepolia.id]: {
     chain: baseSepolia,
-    commentManagerAddress: COMMENT_MANAGER_ADDRESS,
-    channelManagerAddress: CHANNEL_MANAGER_ADDRESS,
+    commentManagerAddress: commentManagerAddress,
+    channelManagerAddress: channelManagerAddress,
   } as SupportedChainConfig,
   [anvil.id]: {
     chain: anvil,
