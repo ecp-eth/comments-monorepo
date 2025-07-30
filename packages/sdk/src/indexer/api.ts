@@ -90,7 +90,7 @@ export async function fetchComment(
     retries,
   } = FetchCommentOptionsSchema.parse(options);
 
-  return runAsync(
+  const responseData = await runAsync(
     async (signal) => {
       const url = new URL(`/api/comments/${commentId}`, apiUrl);
 
@@ -126,12 +126,12 @@ export async function fetchComment(
         throw new Error(`Failed to fetch comments: ${response.statusText}`);
       }
 
-      const responseData = await response.json();
-
-      return IndexerAPICommentWithRepliesSchema.parse(responseData);
+      return await response.json();
     },
     { signal, retries },
   );
+
+  return IndexerAPICommentWithRepliesSchema.parse(responseData);
 }
 
 /**
@@ -283,7 +283,7 @@ export async function fetchComments(
     excludeByModerationLabels,
   } = FetchCommentsOptionsSchema.parse(options);
 
-  return runAsync(
+  const responseData = await runAsync(
     async (signal) => {
       const url = new URL("/api/comments", apiUrl);
 
@@ -363,12 +363,12 @@ export async function fetchComments(
         throw new Error(`Failed to fetch comments: ${response.statusText}`);
       }
 
-      const responseData = await response.json();
-
-      return IndexerAPIListCommentsSchema.parse(responseData);
+      return await response.json();
     },
     { signal, retries },
   );
+
+  return IndexerAPIListCommentsSchema.parse(responseData);
 }
 
 /**
@@ -510,7 +510,7 @@ export async function fetchCommentReplies(
     excludeByModerationLabels,
   } = FetchCommentRepliesOptionSchema.parse(options);
 
-  return runAsync(
+  const responseData = await runAsync(
     async (signal) => {
       const url = new URL(`/api/comments/${commentId}/replies`, apiUrl);
 
@@ -582,12 +582,12 @@ export async function fetchCommentReplies(
         throw new Error(`Failed to fetch replies: ${response.statusText}`);
       }
 
-      const responseData = await response.json();
-
-      return IndexerAPIListCommentRepliesSchema.parse(responseData);
+      return await response.json();
     },
     { signal, retries },
   );
+
+  return IndexerAPIListCommentRepliesSchema.parse(responseData);
 }
 
 /**
@@ -631,7 +631,7 @@ export async function fetchAuthorData(
   const { address, retries, apiUrl, signal } =
     FetchAuthorDataOptionsSchema.parse(options);
 
-  return runAsync(
+  const responseData = await runAsync(
     async (signal) => {
       const url = new URL(`/api/authors/${address}`, apiUrl);
 
@@ -648,12 +648,12 @@ export async function fetchAuthorData(
         throw new Error(`Failed to fetch author data: ${response.statusText}`);
       }
 
-      const responseData = await response.json();
-
-      return IndexerAPIAuthorDataSchema.parse(responseData);
+      return await response.json();
     },
     { signal, retries },
   );
+
+  return IndexerAPIAuthorDataSchema.parse(responseData);
 }
 
 /**
@@ -788,7 +788,7 @@ export async function fetchChannels(
   const { apiUrl, limit, cursor, retries, sort, signal, owner, chainId } =
     FetchChannelsOptionsSchema.parse(options);
 
-  return runAsync(
+  const responseData = await runAsync(
     async (signal) => {
       const url = new URL("/api/channels", apiUrl);
 
@@ -822,12 +822,12 @@ export async function fetchChannels(
         throw new Error(`Failed to fetch channels: ${response.statusText}`);
       }
 
-      const responseData = await response.json();
-
-      return IndexerAPIListChannelsSchema.parse(responseData);
+      return await response.json();
     },
     { signal, retries },
   );
+
+  return IndexerAPIListChannelsSchema.parse(responseData);
 }
 
 /**
@@ -871,7 +871,7 @@ export async function fetchChannel(
   const { channelId, apiUrl, retries, signal } =
     FetchChannelOptionsSchema.parse(options);
 
-  return runAsync(
+  const responseData = await runAsync(
     async (signal) => {
       const url = new URL(`/api/channels/${channelId}`, apiUrl);
 
@@ -888,12 +888,12 @@ export async function fetchChannel(
         throw new Error(`Failed to fetch channel: ${response.statusText}`);
       }
 
-      const responseData = await response.json();
-
-      return IndexerAPIChannelOutputSchema.parse(responseData);
+      return await response.json();
     },
     { signal, retries },
   );
+
+  return IndexerAPIChannelOutputSchema.parse(responseData);
 }
 
 /**
@@ -943,7 +943,7 @@ export async function fetchAutocomplete(
   const { query, char, apiUrl, retries, signal } =
     FetchAutocompleteOptionsSchema.parse(options);
 
-  return runAsync(
+  const responseData = await runAsync(
     async (signal) => {
       const url = new URL("/api/autocomplete", apiUrl);
 
@@ -963,12 +963,12 @@ export async function fetchAutocomplete(
         throw new Error(`Failed to fetch autocomplete: ${response.statusText}`);
       }
 
-      const responseData = await response.json();
-
-      return IndexerAPIGetAutocompleteOutputSchema.parse(responseData);
+      return await response.json();
     },
     { signal, retries },
   );
+
+  return IndexerAPIGetAutocompleteOutputSchema.parse(responseData);
 }
 
 /**

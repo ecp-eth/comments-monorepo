@@ -440,7 +440,7 @@ export type IndexerAPIListCommentsOutputSchemaType = z.infer<
 >;
 
 export const IndexerAPIListCommentRepliesSchema = z.object({
-  results: z.array(IndexerAPICommentSchema),
+  results: z.array(IndexerAPICommentWithRepliesSchema),
   pagination: IndexerAPICursorPaginationSchema,
   extra: IndexerAPIExtraSchema,
 });
