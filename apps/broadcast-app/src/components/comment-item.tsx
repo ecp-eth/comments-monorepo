@@ -5,28 +5,62 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { HeartIcon, Reply } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isZeroHex } from "@ecp.eth/sdk/core";
 import type {
+  IndexerAPICommentReactionSchemaType,
   IndexerAPICommentWithRepliesSchemaType,
-  IndexerAPICommentSchemaType,
+  IndexerAPIListCommentRepliesSchemaType,
 } from "@ecp.eth/sdk/indexer";
-import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
+import {
+  formatContractFunctionExecutionError,
+  getCommentAuthorNameOrAddress,
+} from "@ecp.eth/shared/helpers";
 import { renderToReact } from "@ecp.eth/shared/renderer";
 import { blo } from "blo";
 import { CommentMediaReferences } from "@ecp.eth/shared/components/CommentMediaReferences";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { useCommentIsHearted } from "@ecp.eth/shared/hooks";
+import {
+  useConnectBeforeAction,
+  useConsumePendingWalletConnectionActions,
+} from "./pending-wallet-connections-context";
+import {
+  type CommentRepliesQueryPageParam,
+  useCommentRepliesQuery,
+} from "@/queries/comment";
+import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/constants";
+import { chain } from "@/wagmi/config";
+import { useAccount } from "wagmi";
+import type { InfiniteData, QueryKey } from "@tanstack/react-query";
+import { useLikeComment } from "@/hooks/useLikeComment";
+import { toast } from "sonner";
+import { ContractFunctionExecutionError } from "viem";
+import {
+  createChannelCommentsQueryKey,
+  createCommentRepliesQueryKey,
+} from "@/queries/query-keys";
+import { useUnlikeComment } from "@/hooks/useUnlikeComment";
 
 interface CommentItemProps {
-  comment: IndexerAPICommentWithRepliesSchemaType | IndexerAPICommentSchemaType;
-  onReply: (comment: IndexerAPICommentSchemaType) => void;
-  isReply?: boolean;
+  comment:
+    | IndexerAPICommentWithRepliesSchemaType
+    | IndexerAPICommentReactionSchemaType;
+  threadComment: IndexerAPICommentWithRepliesSchemaType;
+  onReply: (
+    comment:
+      | IndexerAPICommentWithRepliesSchemaType
+      | IndexerAPICommentReactionSchemaType,
+    commentQueryKey: QueryKey,
+  ) => void;
 }
 
 export function CommentItem({
   comment,
+  threadComment,
   onReply,
-  isReply = false,
 }: CommentItemProps) {
+  const { address: viewer } = useAccount();
+  const isReply = !(!comment.parentId || isZeroHex(comment.parentId));
   const isHearted = useCommentIsHearted(comment);
   const nameOrAddress = getCommentAuthorNameOrAddress(comment.author);
   const avatarUrl =
@@ -42,6 +76,147 @@ export function CommentItem({
   }, [comment.content, comment.references]);
 
   const [showFullContent, setShowFullContent] = useState(isTruncated);
+
+  const repliesQueryKey = useMemo(
+    () =>
+      createCommentRepliesQueryKey({
+        commentId: threadComment.id,
+        viewer,
+      }),
+    [threadComment.id, viewer],
+  );
+
+  const connectBeforeAction = useConnectBeforeAction();
+  const likeComment = useLikeComment();
+  const unlikeComment = useUnlikeComment();
+
+  useConsumePendingWalletConnectionActions({
+    commentId: comment.id,
+    onLikeAction: () => {
+      if (!viewer) {
+        throw new Error("Please connect your wallet to like a comment");
+      }
+
+      likeComment.mutate({
+        address: viewer,
+        comment,
+        queryKey:
+          comment.id === threadComment.id
+            ? createChannelCommentsQueryKey({
+                channelId: comment.channelId,
+                viewer,
+              })
+            : repliesQueryKey,
+        onError(error) {
+          const message =
+            error instanceof ContractFunctionExecutionError
+              ? formatContractFunctionExecutionError(error)
+              : error.message;
+
+          toast.error(message);
+        },
+      });
+    },
+    onUnlikeAction: () => {
+      if (!viewer) {
+        throw new Error("Please connect your wallet to unlike a comment");
+      }
+
+      unlikeComment.mutate({
+        comment,
+        queryKey:
+          comment.id === threadComment.id
+            ? createChannelCommentsQueryKey({
+                channelId: comment.channelId,
+                viewer,
+              })
+            : repliesQueryKey,
+        onError(error) {
+          const message =
+            error instanceof ContractFunctionExecutionError
+              ? formatContractFunctionExecutionError(error)
+              : error.message;
+
+          toast.error(message);
+        },
+      });
+    },
+    onPrepareReplyAction: () => {
+      onReply(comment, repliesQueryKey);
+    },
+  });
+
+  const initialData = useMemo((): InfiniteData<
+    IndexerAPIListCommentRepliesSchemaType,
+    CommentRepliesQueryPageParam
+  > => {
+    if ("replies" in comment) {
+      return {
+        pages: [
+          {
+            extra: comment.replies.extra,
+            pagination: comment.replies.pagination,
+            results: comment.replies.results.map((reply) => ({
+              ...reply,
+              replies: {
+                extra: comment.replies.extra,
+                pagination: {
+                  hasNext: false,
+                  hasPrevious: false,
+                  limit: 0,
+                },
+                results: [],
+              },
+            })),
+          },
+        ],
+        pageParams: [
+          {
+            cursor: comment.replies.pagination.endCursor,
+            limit: comment.replies.pagination.limit,
+          },
+        ],
+      };
+    }
+
+    return {
+      pages: [
+        {
+          results: [],
+          extra: {
+            moderationEnabled: false,
+            moderationKnownReactions: [],
+          },
+          pagination: {
+            hasNext: false,
+            hasPrevious: false,
+            limit: MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+          },
+        },
+      ],
+      pageParams: [
+        { cursor: undefined, limit: MAX_INITIAL_REPLIES_ON_PARENT_COMMENT },
+      ],
+    };
+  }, [comment]);
+
+  const repliesQuery = useCommentRepliesQuery({
+    // replies are only fetched on first level because we are using flat mode
+    enabled: threadComment.id === comment.id,
+    chainId: chain.id,
+    channelId: comment.channelId,
+    commentId: comment.id,
+    viewer,
+    initialData,
+  });
+
+  const replies = useMemo(() => {
+    if (repliesQuery.status !== "success") {
+      return [];
+    }
+
+    return repliesQuery.data.pages.flatMap((page) => page.results);
+  }, [repliesQuery.status, repliesQuery.data]);
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("en-US", {
@@ -112,24 +287,36 @@ export function CommentItem({
 
           <div className="flex items-center space-x-4 pt-1">
             <Button
+              disabled={likeComment.isPending || unlikeComment.isPending}
               variant="ghost"
               size="sm"
               className={cn(
                 "h-auto p-0 text-xs space-x-1",
-                comment && "text-red-500",
+                (isHearted || likeComment.isPending) &&
+                  !unlikeComment.isPending &&
+                  "text-red-500",
               )}
-              onClick={() => {
-                // @todo: handle like
-              }}
+              onClick={connectBeforeAction(() => {
+                const newIsHearted = !isHearted;
+
+                return {
+                  type: newIsHearted ? "like" : "unlike",
+                  commentId: comment.id,
+                };
+              })}
             >
               <HeartIcon
-                className={cn("h-3 w-3", isHearted && "fill-current")}
+                className={cn(
+                  "h-3 w-3",
+                  (isHearted || likeComment.isPending) &&
+                    !unlikeComment.isPending &&
+                    "fill-current",
+                  (likeComment.isPending || unlikeComment.isPending) &&
+                    "animate-pulse",
+                )}
               />
               <span>
-                {"reactionCounts" in comment
-                  ? (comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ??
-                    0)
-                  : 0}
+                {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
               </span>
             </Button>
 
@@ -137,7 +324,12 @@ export function CommentItem({
               variant="ghost"
               size="sm"
               className="h-auto p-0 text-xs space-x-1"
-              onClick={() => onReply(comment)}
+              onClick={connectBeforeAction(() => {
+                return {
+                  type: "prepareReply",
+                  commentId: comment.id,
+                };
+              })}
             >
               <Reply className="h-3 w-3" />
               <span>Reply</span>
@@ -146,14 +338,14 @@ export function CommentItem({
         </div>
       </div>
 
-      {"replies" in comment && comment.replies.results.length > 0 && (
+      {replies.length > 0 && (
         <div className="space-y-3">
-          {comment.replies.results.map((reply) => (
+          {replies.map((reply) => (
             <CommentItem
               key={reply.id}
               comment={reply}
               onReply={onReply}
-              isReply
+              threadComment={threadComment}
             />
           ))}
         </div>

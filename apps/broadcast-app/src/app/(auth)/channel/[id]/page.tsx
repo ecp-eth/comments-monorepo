@@ -1,6 +1,13 @@
 "use client";
 
-import { use, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  use,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAccount, useChainId, useConnect, useDisconnect } from "wagmi";
 import z from "zod";
 import {
@@ -40,7 +47,10 @@ import {
 import { toast } from "sonner";
 import { useUnsubscribeToChannel } from "@/hooks/useUnsubscribeFromChannel";
 import { useSetNotificationStatusOnChannel } from "@/hooks/useSetNotificationStatusOnChannel";
-import type { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
+import type {
+  IndexerAPICommentReactionSchemaType,
+  IndexerAPICommentWithRepliesSchemaType,
+} from "@ecp.eth/sdk/indexer";
 import { cn } from "@/lib/utils";
 import { EditorComposer } from "@/components/editor-composer";
 import { useRemoveChannelFromMyChannelsQuery } from "@/queries/my-channels";
@@ -53,6 +63,7 @@ import {
 import { useRemoveChannelFromDiscoverQuery } from "@/queries/discover-channels";
 import { createChannelCommentsQueryKey } from "@/queries/query-keys";
 import { VisibilityTracker } from "@/components/visibility-tracker";
+import type { QueryKey } from "@tanstack/react-query";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
@@ -66,8 +77,12 @@ export default function ChannelPage(props: {
       id: z.coerce.bigint(),
     })
     .parse(use(props.params));
-  const [replyingTo, setReplyingTo] =
-    useState<IndexerAPICommentSchemaType | null>(null);
+  const [replyingTo, setReplyingTo] = useState<{
+    commentQueryKey: QueryKey;
+    comment:
+      | IndexerAPICommentWithRepliesSchemaType
+      | IndexerAPICommentReactionSchemaType;
+  } | null>(null);
 
   const removeChannelFromMyChannelsQuery =
     useRemoveChannelFromMyChannelsQuery();
@@ -129,10 +144,14 @@ export default function ChannelPage(props: {
 
   const channelQuery = useChannelQuery(channelId);
 
-  const commentsQueryKey = createChannelCommentsQueryKey({
-    channelId,
-    author: address,
-  });
+  const commentsQueryKey = useMemo(
+    () =>
+      createChannelCommentsQueryKey({
+        channelId,
+        viewer: address,
+      }),
+    [channelId, address],
+  );
 
   const commentsQuery = useChannelCommentsQuery({
     enabled: channelQuery.status === "success",
@@ -401,7 +420,13 @@ export default function ChannelPage(props: {
             <CommentItem
               key={comment.id}
               comment={comment}
-              onReply={setReplyingTo}
+              threadComment={comment}
+              onReply={(comment, commentQueryKey) => {
+                setReplyingTo({
+                  commentQueryKey,
+                  comment,
+                });
+              }}
             />
           ))}
         </div>
@@ -431,13 +456,13 @@ export default function ChannelPage(props: {
         </div>
       )}
 
-      {address && (
+      {address && replyingTo && (
         <ReplyBottomSheet
           channelId={channel.id}
           isOpen={!!replyingTo}
           onClose={() => setReplyingTo(null)}
-          originalComment={replyingTo}
-          queryKey={commentsQueryKey}
+          replyingTo={replyingTo.comment}
+          replyingToQueryKey={replyingTo.commentQueryKey}
         />
       )}
     </div>
