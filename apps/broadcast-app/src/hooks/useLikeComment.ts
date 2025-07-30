@@ -1,7 +1,3 @@
-import type {
-  IndexerAPICommentReactionSchemaType,
-  IndexerAPICommentWithRepliesSchemaType,
-} from "@ecp.eth/sdk/indexer";
 import { useConfig, useWriteContract } from "wagmi";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { signCommentOrReaction } from "@/api/sign-comment-or-reaction";
@@ -14,12 +10,11 @@ import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/sche
 import { chain } from "@/wagmi/config";
 import { useMutation, type QueryKey } from "@tanstack/react-query";
 import type { Hex } from "@ecp.eth/sdk/core";
+import type { Comment } from "@ecp.eth/shared/schemas";
 
 type LikeCommentProps = {
   address: Hex;
-  comment:
-    | IndexerAPICommentWithRepliesSchemaType
-    | IndexerAPICommentReactionSchemaType;
+  comment: Comment;
   /**
    * Query key to a query where comment is stored
    */
@@ -48,9 +43,7 @@ export function useLikeComment() {
       let pendingOperation: PendingPostCommentOperationSchemaType | undefined;
 
       try {
-        if (
-          comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT]?.length > 0
-        ) {
+        if (comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT]?.length) {
           throw new Error("Comment already liked");
         }
 

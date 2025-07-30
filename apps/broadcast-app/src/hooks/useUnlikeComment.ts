@@ -1,7 +1,3 @@
-import type {
-  IndexerAPICommentReactionSchemaType,
-  IndexerAPICommentWithRepliesSchemaType,
-} from "@ecp.eth/sdk/indexer";
 import { useConfig, useWriteContract } from "wagmi";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
@@ -12,11 +8,10 @@ import { useReactionRemoval } from "@ecp.eth/shared/hooks";
 import { chain } from "@/wagmi/config";
 import { useMutation, type QueryKey } from "@tanstack/react-query";
 import type { Hex } from "@ecp.eth/sdk/core";
+import type { Comment } from "@ecp.eth/shared/schemas";
 
 type UnlikeCommentProps = {
-  comment:
-    | IndexerAPICommentWithRepliesSchemaType
-    | IndexerAPICommentReactionSchemaType;
+  comment: Comment;
   /**
    * Query key to a query where comment is stored
    */

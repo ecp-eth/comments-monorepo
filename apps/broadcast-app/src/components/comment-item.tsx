@@ -3,14 +3,14 @@
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { HeartIcon, Reply } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  HeartIcon,
+  Loader2Icon,
+  ReplyIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isZeroHex } from "@ecp.eth/sdk/core";
-import type {
-  IndexerAPICommentReactionSchemaType,
-  IndexerAPICommentWithRepliesSchemaType,
-  IndexerAPIListCommentRepliesSchemaType,
-} from "@ecp.eth/sdk/indexer";
 import {
   formatContractFunctionExecutionError,
   getCommentAuthorNameOrAddress,
@@ -40,18 +40,13 @@ import {
   createCommentRepliesQueryKey,
 } from "@/queries/query-keys";
 import { useUnlikeComment } from "@/hooks/useUnlikeComment";
+import type { Comment, CommentPageSchemaType } from "@ecp.eth/shared/schemas";
+import { useRetryPostComment } from "@/hooks/useRetryPostComment";
 
 interface CommentItemProps {
-  comment:
-    | IndexerAPICommentWithRepliesSchemaType
-    | IndexerAPICommentReactionSchemaType;
-  threadComment: IndexerAPICommentWithRepliesSchemaType;
-  onReply: (
-    comment:
-      | IndexerAPICommentWithRepliesSchemaType
-      | IndexerAPICommentReactionSchemaType,
-    commentQueryKey: QueryKey,
-  ) => void;
+  comment: Comment;
+  threadComment: Comment;
+  onReply: (comment: Comment, commentQueryKey: QueryKey) => void;
 }
 
 export function CommentItem({
@@ -77,6 +72,14 @@ export function CommentItem({
 
   const [showFullContent, setShowFullContent] = useState(isTruncated);
 
+  const rootQueryKey = useMemo(
+    () =>
+      createChannelCommentsQueryKey({
+        channelId: comment.channelId,
+        viewer,
+      }),
+    [comment.channelId, viewer],
+  );
   const repliesQueryKey = useMemo(
     () =>
       createCommentRepliesQueryKey({
@@ -89,6 +92,7 @@ export function CommentItem({
   const connectBeforeAction = useConnectBeforeAction();
   const likeComment = useLikeComment();
   const unlikeComment = useUnlikeComment();
+  const retryPostComment = useRetryPostComment();
 
   useConsumePendingWalletConnectionActions({
     commentId: comment.id,
@@ -101,12 +105,7 @@ export function CommentItem({
         address: viewer,
         comment,
         queryKey:
-          comment.id === threadComment.id
-            ? createChannelCommentsQueryKey({
-                channelId: comment.channelId,
-                viewer,
-              })
-            : repliesQueryKey,
+          comment.id === threadComment.id ? rootQueryKey : repliesQueryKey,
         onError(error) {
           const message =
             error instanceof ContractFunctionExecutionError
@@ -125,12 +124,7 @@ export function CommentItem({
       unlikeComment.mutate({
         comment,
         queryKey:
-          comment.id === threadComment.id
-            ? createChannelCommentsQueryKey({
-                channelId: comment.channelId,
-                viewer,
-              })
-            : repliesQueryKey,
+          comment.id === threadComment.id ? rootQueryKey : repliesQueryKey,
         onError(error) {
           const message =
             error instanceof ContractFunctionExecutionError
@@ -147,10 +141,10 @@ export function CommentItem({
   });
 
   const initialData = useMemo((): InfiniteData<
-    IndexerAPIListCommentRepliesSchemaType,
+    CommentPageSchemaType,
     CommentRepliesQueryPageParam
   > => {
-    if ("replies" in comment) {
+    if (comment.replies) {
       return {
         pages: [
           {
@@ -159,7 +153,7 @@ export function CommentItem({
             results: comment.replies.results.map((reply) => ({
               ...reply,
               replies: {
-                extra: comment.replies.extra,
+                extra: comment.replies!.extra,
                 pagination: {
                   hasNext: false,
                   hasPrevious: false,
@@ -228,12 +222,7 @@ export function CommentItem({
   };
 
   return (
-    <div
-      className={cn(
-        "space-y-3",
-        isReply && "ml-8 pl-4 border-l-2 border-muted",
-      )}
-    >
+    <div className={cn("space-y-3", isReply && "pl-4 border-l-2 border-muted")}>
       <div className="flex space-x-3">
         <Avatar className="h-8 w-8 shrink-0">
           {avatarUrl ? (
@@ -286,60 +275,100 @@ export function CommentItem({
           )}
 
           <div className="flex items-center space-x-4 pt-1">
-            <Button
-              disabled={likeComment.isPending || unlikeComment.isPending}
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "h-auto p-0 text-xs space-x-1",
-                (isHearted || likeComment.isPending) &&
-                  !unlikeComment.isPending &&
-                  "text-red-500",
+            {comment.pendingOperation?.action === "post" &&
+              comment.pendingOperation.state.status === "pending" && (
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <Loader2Icon className="w-3 h-3 animate-spin" />
+                  <span className="text-xs ">Posting...</span>
+                </div>
               )}
-              onClick={connectBeforeAction(() => {
-                const newIsHearted = !isHearted;
 
-                return {
-                  type: newIsHearted ? "like" : "unlike",
-                  commentId: comment.id,
-                };
-              })}
-            >
-              <HeartIcon
+            {comment.pendingOperation?.action === "post" &&
+              comment.pendingOperation.state.status === "error" && (
+                <div className="flex items-center gap-1 text-red-500">
+                  <AlertTriangleIcon className="w-3 h-3" />
+                  <span className="text-xs">Failed to post.</span>
+                  <button
+                    className="font-semibold text-xs"
+                    type="button"
+                    onClick={() => {
+                      retryPostComment.mutate({
+                        comment,
+                        queryKey:
+                          comment.id === threadComment.id
+                            ? rootQueryKey
+                            : repliesQueryKey,
+                      });
+                    }}
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
+            {(!comment.pendingOperation ||
+              comment.pendingOperation.state.status === "success") && (
+              <Button
+                disabled={likeComment.isPending || unlikeComment.isPending}
+                variant="ghost"
+                size="sm"
                 className={cn(
-                  "h-3 w-3",
+                  "h-auto p-0 text-xs space-x-1",
                   (isHearted || likeComment.isPending) &&
                     !unlikeComment.isPending &&
-                    "fill-current",
-                  (likeComment.isPending || unlikeComment.isPending) &&
-                    "animate-pulse",
+                    "text-red-500",
                 )}
-              />
-              <span>
-                {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
-              </span>
-            </Button>
+                onClick={connectBeforeAction(() => {
+                  const newIsHearted = !isHearted;
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto p-0 text-xs space-x-1"
-              onClick={connectBeforeAction(() => {
-                return {
-                  type: "prepareReply",
-                  commentId: comment.id,
-                };
-              })}
-            >
-              <Reply className="h-3 w-3" />
-              <span>Reply</span>
-            </Button>
+                  return {
+                    type: newIsHearted ? "like" : "unlike",
+                    commentId: comment.id,
+                  };
+                })}
+              >
+                <HeartIcon
+                  className={cn(
+                    "h-3 w-3",
+                    (isHearted || likeComment.isPending) &&
+                      !unlikeComment.isPending &&
+                      "fill-current",
+                    (likeComment.isPending || unlikeComment.isPending) &&
+                      "animate-pulse",
+                  )}
+                />
+                <span>
+                  {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
+                </span>
+              </Button>
+            )}
+
+            {(!comment.pendingOperation ||
+              comment.pendingOperation.state.status === "success") && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 text-xs space-x-1"
+                onClick={connectBeforeAction(() => {
+                  return {
+                    type: "prepareReply",
+                    commentId: comment.id,
+                  };
+                })}
+              >
+                <ReplyIcon className="h-3 w-3" />
+                <span>Reply</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
 
       {replies.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-3 pl-8">
+          <Button variant="ghost" size="sm" type="button" className="text-xs">
+            Show newer replies
+          </Button>
           {replies.map((reply) => (
             <CommentItem
               key={reply.id}
@@ -348,6 +377,9 @@ export function CommentItem({
               threadComment={threadComment}
             />
           ))}
+          <Button variant="ghost" size="sm" type="button" className="text-xs">
+            Show older replies
+          </Button>
         </div>
       )}
     </div>

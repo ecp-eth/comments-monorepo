@@ -31,7 +31,7 @@ import {
   type IndexerAPICommentSchemaType,
 } from "@ecp.eth/sdk/indexer";
 import { getChannelCaipUri } from "@/lib/utils";
-import { useCommentSubmission } from "@ecp.eth/shared/hooks";
+import { useCommentSubmission, useFreshRef } from "@ecp.eth/shared/hooks";
 import { SignCommentError, SubmitCommentMutationError } from "@/errors";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
@@ -46,6 +46,7 @@ interface EditorComposerProps {
    */
   autoFocus?: boolean;
   onCancel?: () => void;
+  onSubmitStart?: () => void;
   onSubmitSuccess?: () => void;
   placeholder?: string;
   submitLabel?: string;
@@ -61,6 +62,7 @@ export function EditorComposer({
   placeholder = "What's on your mind?",
   submitLabel = "Post",
   submittingLabel = "Posting...",
+  onSubmitStart,
   onSubmitSuccess,
   channelId,
   replyingTo,
@@ -95,8 +97,11 @@ export function EditorComposer({
   });
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const onSubmitStartRef = useFreshRef(onSubmitStart);
   const submitMutation = useMutation({
     mutationFn: async (): Promise<void> => {
+      let pendingOperation: PendingPostCommentOperationSchemaType | undefined;
+
       try {
         if (!editorRef.current?.editor) {
           throw new SubmitCommentMutationError("Editor is not initialized");
@@ -163,7 +168,7 @@ export function EditorComposer({
           writeContract: writeContractAsync,
         });
 
-        const pendingOperation: PendingPostCommentOperationSchemaType = {
+        pendingOperation = {
           action: "post",
           type: "non-gasless",
           txHash,
@@ -181,34 +186,34 @@ export function EditorComposer({
           queryKey,
         });
 
-        try {
-          const receipt = await waitForTransactionReceipt(wagmiConfig, {
-            hash: txHash,
-          });
+        onSubmitStartRef.current?.();
 
-          if (receipt.status !== "success") {
-            throw new SubmitCommentMutationError(
-              "Failed to post comment, transaction reverted.",
-            );
-          }
+        // clear the editor because user can retry in submission directly under the comment
+        editorRef.current?.clear();
 
-          commentSubmission.success({
-            queryKey,
-            pendingOperation,
-          });
-        } catch (receiptError) {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
+          hash: txHash,
+        });
+
+        if (receipt.status !== "success") {
+          throw new SubmitCommentMutationError(
+            "Failed to post comment, transaction reverted.",
+          );
+        }
+
+        commentSubmission.success({
+          queryKey,
+          pendingOperation,
+        });
+      } catch (e) {
+        if (pendingOperation) {
           commentSubmission.error({
             queryKey,
             commentId: pendingOperation.response.data.id,
-            error:
-              receiptError instanceof Error
-                ? receiptError
-                : new Error(String(receiptError)),
+            error: e instanceof Error ? e : new Error(String(e)),
           });
-
-          throw receiptError;
         }
-      } catch (e) {
+
         if (e instanceof z.ZodError) {
           throw new InvalidCommentError(
             e.flatten().fieldErrors as Record<string, string[]>,
@@ -234,6 +239,9 @@ export function EditorComposer({
     onError(error) {
       if (error instanceof InvalidCommentError) {
         editorRef.current?.focus();
+      } else {
+        editorRef.current?.clear();
+        submitMutation.reset();
       }
     },
   });
@@ -323,7 +331,7 @@ export function EditorComposer({
       />
 
       {submitMutation.error && (
-        <div className="text-red-500 text-xs flex flex-col">
+        <div className="text-red-500 text-xs flex flex-col gap-1">
           {submitMutation.error instanceof CommentFormSubmitError
             ? submitMutation.error.render()
             : submitMutation.error.message}
