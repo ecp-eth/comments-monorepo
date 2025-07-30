@@ -14,12 +14,24 @@ export function createChannelQueryKey(channelId: bigint) {
 
 type CreateChannelCommentsQueryKeyParams = {
   channelId: bigint;
-  author: Hex | undefined;
+  viewer: Hex | undefined;
 };
 
 export function createChannelCommentsQueryKey({
   channelId,
-  author,
+  viewer,
 }: CreateChannelCommentsQueryKeyParams) {
-  return [author, "channel", channelId.toString(), "comments"] as const;
+  return ["comments", channelId.toString(), viewer] as const;
+}
+
+type CreateChannelCommentRepliesQueryKeyParams = {
+  viewer: Hex | undefined;
+  commentId: Hex;
+};
+
+export function createCommentRepliesQueryKey({
+  viewer,
+  commentId,
+}: CreateChannelCommentRepliesQueryKeyParams) {
+  return ["replies", commentId, viewer] as const;
 }
