@@ -1,6 +1,6 @@
 import {
-  InfiniteData,
-  QueryKey,
+  type InfiniteData,
+  type QueryKey,
   useInfiniteQuery,
   useQuery,
   useQueryClient,
@@ -15,9 +15,11 @@ import { useCallback } from "react";
 import { createChannelCommentsQueryKey } from "./query-keys";
 import {
   fetchComments,
-  IndexerAPIListCommentsSchemaType,
+  type IndexerAPIListCommentsSchemaType,
 } from "@ecp.eth/sdk/indexer";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
+import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/constants";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 export function useChannelQuery(channelId: bigint) {
   return useQuery({
@@ -66,6 +68,11 @@ export function useUpdateChannelInChannelQuery() {
   );
 }
 
+type ChannelCommentsQueryPageParam = {
+  cursor: Hex | undefined;
+  limit: number;
+};
+
 type UseChannelCommentsQueryParams = {
   channelId: bigint;
   author: Hex | undefined;
@@ -76,7 +83,7 @@ type UseChannelCommentsQueryParams = {
     Error,
     InfiniteData<IndexerAPIListCommentsSchemaType>,
     QueryKey,
-    { cursor: Hex; direction: "forward" | "backward" } | undefined
+    ChannelCommentsQueryPageParam | undefined
   >,
   | "queryKey"
   | "queryFn"
@@ -93,19 +100,21 @@ export function useChannelCommentsQuery({
 }: UseChannelCommentsQueryParams) {
   return useInfiniteQuery({
     ...options,
-    queryKey: createChannelCommentsQueryKey({ channelId, author }),
+    queryKey: createChannelCommentsQueryKey({ channelId, viewer: author }),
     queryFn: async ({ pageParam, signal }) => {
       const response = await fetchComments({
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         chainId,
         channelId,
         apiUrl: publicEnv.NEXT_PUBLIC_INDEXER_URL,
+        commentType: COMMENT_TYPE_COMMENT,
         mode: "flat",
         viewer: author,
         moderationStatus: ["approved", "pending"],
         signal,
         cursor: pageParam?.cursor,
-        sort: pageParam?.direction === "forward" ? "desc" : "desc",
+        limit: MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+        // @todo determine sort because for previous page we need to reverse the sort
       });
 
       return {
@@ -119,7 +128,7 @@ export function useChannelCommentsQuery({
       if (lastPage.pagination.hasNext && lastPage.pagination.endCursor) {
         return {
           cursor: lastPage.pagination.endCursor,
-          direction: "forward" as const,
+          limit: lastPage.pagination.limit,
         };
       }
 
@@ -132,14 +141,15 @@ export function useChannelCommentsQuery({
       ) {
         return {
           cursor: firstPage.pagination.startCursor,
-          direction: "backward" as const,
+          limit: firstPage.pagination.limit,
         };
       }
 
       return undefined;
     },
-    initialPageParam: undefined as
-      | { cursor: Hex; direction: "forward" | "backward" }
-      | undefined,
+    initialPageParam: {
+      cursor: undefined,
+      limit: MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+    } as ChannelCommentsQueryPageParam,
   });
 }

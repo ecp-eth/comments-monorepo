@@ -8,28 +8,36 @@ import {
 } from "@/components/ui/sheet";
 import { EditorComposer } from "@/components/editor-composer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
+import type {
+  IndexerAPICommentReactionSchemaType,
+  IndexerAPICommentWithRepliesSchemaType,
+} from "@ecp.eth/sdk/indexer";
 import { useCallback, useMemo } from "react";
 import { renderToReact } from "@ecp.eth/shared/renderer";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { blo } from "blo";
-import type { QueryKey } from "@tanstack/react-query";
 import { useFreshRef } from "@ecp.eth/shared/hooks";
+import type { QueryKey } from "@tanstack/react-query";
 
 interface ReplyBottomSheetProps {
   channelId: bigint;
   isOpen: boolean;
   onClose: () => void;
-  originalComment: IndexerAPICommentSchemaType | null;
-  queryKey: QueryKey;
+  replyingTo:
+    | IndexerAPICommentWithRepliesSchemaType
+    | IndexerAPICommentReactionSchemaType;
+  /**
+   * The query key to the query where the replying to comment is stored
+   */
+  replyingToQueryKey: QueryKey;
 }
 
 export function ReplyBottomSheet({
   channelId,
   isOpen,
   onClose,
-  originalComment,
-  queryKey,
+  replyingTo,
+  replyingToQueryKey,
 }: ReplyBottomSheetProps) {
   const onCloseRef = useFreshRef(onClose);
   const handleSubmitSuccess = useCallback(() => {
@@ -37,26 +45,25 @@ export function ReplyBottomSheet({
   }, [onCloseRef]);
 
   const renderResult = useMemo(() => {
-    if (!originalComment) {
+    if (!replyingTo) {
       return null;
     }
 
     return renderToReact({
-      content: originalComment.content,
-      references: originalComment.references,
+      content: replyingTo.content,
+      references: replyingTo.references,
       maxLength: 100,
       maxLines: 2,
     });
-  }, [originalComment]);
+  }, [replyingTo]);
 
-  if (!renderResult || !originalComment) {
+  if (!renderResult) {
     return null;
   }
 
-  const nameOrAddress = getCommentAuthorNameOrAddress(originalComment.author);
+  const nameOrAddress = getCommentAuthorNameOrAddress(replyingTo.author);
   const avatarUrl =
-    originalComment.author.ens?.avatarUrl ||
-    originalComment.author.farcaster?.pfpUrl;
+    replyingTo.author.ens?.avatarUrl || replyingTo.author.farcaster?.pfpUrl;
 
   return (
     <Sheet open={isOpen} onOpenChange={onCloseRef.current}>
@@ -71,7 +78,7 @@ export function ReplyBottomSheet({
             <div className="flex items-center space-x-2 mb-2">
               <Avatar className="h-6 w-6">
                 <AvatarImage
-                  src={avatarUrl || blo(originalComment.author.address)}
+                  src={avatarUrl || blo(replyingTo.author.address)}
                   alt={nameOrAddress}
                 />
                 <AvatarFallback>
@@ -80,9 +87,9 @@ export function ReplyBottomSheet({
               </Avatar>
               <span className="text-sm font-medium">{nameOrAddress}</span>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground">
               {renderResult.element}
-            </p>
+            </div>
           </div>
 
           <EditorComposer
@@ -91,8 +98,8 @@ export function ReplyBottomSheet({
             placeholder="Write your reply..."
             submitLabel="Reply"
             channelId={channelId}
-            queryKey={queryKey}
-            replyingTo={originalComment}
+            queryKey={replyingToQueryKey}
+            replyingTo={replyingTo}
           />
         </div>
       </SheetContent>

@@ -8,3 +8,10 @@ export class ChannelNotFoundError extends Error {
     this.name = "ChannelNotFoundError";
   }
 }
+
+export class SignCommentError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SignCommentError";
+  }
+}
