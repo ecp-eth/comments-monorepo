@@ -6,13 +6,11 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 import { createCommentRepliesQueryKey } from "./query-keys";
-import {
-  fetchCommentReplies,
-  type IndexerAPIListCommentRepliesSchemaType,
-} from "@ecp.eth/sdk/indexer";
+import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/constants";
 import { publicEnv } from "@/env/public";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
+import type { CommentPageSchemaType } from "@ecp.eth/shared/schemas";
 
 export type CommentRepliesQueryPageParam = {
   cursor: Hex | undefined;
@@ -26,9 +24,9 @@ type UseCommentRepliesQueryParams = {
   channelId: bigint;
 } & Omit<
   UndefinedInitialDataInfiniteOptions<
-    IndexerAPIListCommentRepliesSchemaType,
+    CommentPageSchemaType,
     Error,
-    InfiniteData<IndexerAPIListCommentRepliesSchemaType>,
+    InfiniteData<CommentPageSchemaType>,
     QueryKey,
     CommentRepliesQueryPageParam | undefined
   >,
