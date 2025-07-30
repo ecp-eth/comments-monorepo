@@ -6,7 +6,14 @@ import { WagmiProvider } from "wagmi";
 import { config } from "@/wagmi/config";
 import { MiniAppProvider } from "@/hooks/useMiniAppContext";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 export default function AuthLayout({
   children,
