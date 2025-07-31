@@ -2,6 +2,7 @@
 
 import {
   use,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -53,6 +54,7 @@ import type { Comment } from "@ecp.eth/shared/schemas";
 import type { Channel } from "@/api/schemas";
 import { useChannelNotificationsManager } from "@/hooks/useChannelNotificationsManager";
 import { Hex } from "@ecp.eth/sdk/core";
+import { EditCommentBottomSheet } from "@/components/edit-comment-bottom-sheet";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
@@ -66,6 +68,10 @@ export default function ChannelPage(props: {
     })
     .parse(use(props.params));
   const [replyingTo, setReplyingTo] = useState<{
+    commentQueryKey: QueryKey;
+    comment: Comment;
+  } | null>(null);
+  const [editingComment, setEditingComment] = useState<{
     commentQueryKey: QueryKey;
     comment: Comment;
   } | null>(null);
@@ -121,6 +127,26 @@ export default function ChannelPage(props: {
       });
     }
   }, [address, replyingTo, connectAsync, connectors]);
+
+  const handleReply = useCallback(
+    (comment: Comment, commentQueryKey: QueryKey) => {
+      setReplyingTo({
+        commentQueryKey,
+        comment,
+      });
+    },
+    [],
+  );
+
+  const handleEdit = useCallback(
+    (comment: Comment, commentQueryKey: QueryKey) => {
+      setEditingComment({
+        commentQueryKey,
+        comment,
+      });
+    },
+    [],
+  );
 
   const comments = useMemo(() => {
     return (
@@ -266,12 +292,8 @@ export default function ChannelPage(props: {
               key={comment.id}
               comment={comment}
               threadComment={comment}
-              onReply={(comment, commentQueryKey) => {
-                setReplyingTo({
-                  commentQueryKey,
-                  comment,
-                });
-              }}
+              onEdit={handleEdit}
+              onReply={handleReply}
             />
           ))}
         </div>
@@ -308,6 +330,15 @@ export default function ChannelPage(props: {
           onClose={() => setReplyingTo(null)}
           replyingTo={replyingTo.comment}
           replyingToQueryKey={replyingTo.commentQueryKey}
+        />
+      )}
+
+      {address && editingComment && (
+        <EditCommentBottomSheet
+          comment={editingComment.comment}
+          queryKey={editingComment.commentQueryKey}
+          isOpen={!!editingComment}
+          onClose={() => setEditingComment(null)}
         />
       )}
     </div>
