@@ -18,7 +18,7 @@ import {
   type IndexerAPIListCommentsSchemaType,
 } from "@ecp.eth/sdk/indexer";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
-import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/constants";
+import { MAX_COMMENTS_PER_PAGE } from "@/constants";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 export function useChannelQuery(channelId: bigint) {
@@ -113,7 +113,7 @@ export function useChannelCommentsQuery({
         moderationStatus: ["approved", "pending"],
         signal,
         cursor: pageParam?.cursor,
-        limit: MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+        limit: MAX_COMMENTS_PER_PAGE,
         // @todo determine sort because for previous page we need to reverse the sort
       });
 
@@ -144,7 +144,7 @@ export function useChannelCommentsQuery({
     },
     initialPageParam: {
       cursor: undefined,
-      limit: MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+      limit: MAX_COMMENTS_PER_PAGE,
     } as ChannelCommentsQueryPageParam,
   });
 }
