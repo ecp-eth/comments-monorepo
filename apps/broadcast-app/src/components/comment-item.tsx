@@ -57,6 +57,7 @@ interface CommentItemProps {
   threadComment: Comment;
   onReply: (comment: Comment, commentQueryKey: QueryKey) => void;
   onEdit: (comment: Comment, commentQueryKey: QueryKey) => void;
+  onReport: (comment: Comment) => void;
 }
 
 export function CommentItem({
@@ -64,6 +65,7 @@ export function CommentItem({
   threadComment,
   onReply,
   onEdit,
+  onReport,
 }: CommentItemProps) {
   const { address: viewer } = useAccount();
   const isReply = !(!comment.parentId || isZeroHex(comment.parentId));
@@ -244,11 +246,12 @@ export function CommentItem({
   };
 
   // Determine which actions are available
+  const isConnected = !!viewer;
   const isCommentAuthor =
     viewer && comment.author.address.toLowerCase() === viewer.toLowerCase();
   const canEdit = isCommentAuthor && !comment.deletedAt;
   const canDelete = isCommentAuthor && !comment.deletedAt;
-  const canReport = !isCommentAuthor && !comment.deletedAt;
+  const canReport = isConnected && !comment.deletedAt;
 
   // Only show dropdown if any action is available
   const hasAnyAction = canEdit || canDelete || canReport;
@@ -272,10 +275,10 @@ export function CommentItem({
     });
   }, [comment, threadComment, rootQueryKey, repliesQueryKey, deleteComment]);
 
-  const handleReportComment = () => {
-    // TODO: Implement report comment functionality
-    toast.info("Report functionality coming soon");
-  };
+  const onReportRef = useFreshRef(onReport);
+  const handleReportComment = useCallback(() => {
+    onReportRef.current?.(comment);
+  }, [comment, onReportRef]);
 
   return (
     <div className={cn("space-y-3", isReply && "pl-4 border-l-2 border-muted")}>
@@ -446,6 +449,7 @@ export function CommentItem({
               comment={reply}
               onReply={onReply}
               onEdit={onEdit}
+              onReport={onReport}
               threadComment={threadComment}
             />
           ))}
