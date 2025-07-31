@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +27,7 @@ import { renderToReact } from "@ecp.eth/shared/renderer";
 import { blo } from "blo";
 import { CommentMediaReferences } from "@ecp.eth/shared/components/CommentMediaReferences";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
-import { useCommentIsHearted } from "@ecp.eth/shared/hooks";
+import { useCommentIsHearted, useFreshRef } from "@ecp.eth/shared/hooks";
 import {
   useConnectBeforeAction,
   useConsumePendingWalletConnectionActions,
@@ -56,12 +56,14 @@ interface CommentItemProps {
   comment: Comment;
   threadComment: Comment;
   onReply: (comment: Comment, commentQueryKey: QueryKey) => void;
+  onEdit: (comment: Comment, commentQueryKey: QueryKey) => void;
 }
 
 export function CommentItem({
   comment,
   threadComment,
   onReply,
+  onEdit,
 }: CommentItemProps) {
   const { address: viewer } = useAccount();
   const isReply = !(!comment.parentId || isZeroHex(comment.parentId));
@@ -244,19 +246,23 @@ export function CommentItem({
   // Determine which actions are available
   const isCommentAuthor =
     viewer && comment.author.address.toLowerCase() === viewer.toLowerCase();
-  const canEdit = isCommentAuthor;
-  const canDelete = isCommentAuthor;
-  const canReport = !isCommentAuthor;
+  const canEdit = isCommentAuthor && !comment.deletedAt;
+  const canDelete = isCommentAuthor && !comment.deletedAt;
+  const canReport = !isCommentAuthor && !comment.deletedAt;
 
   // Only show dropdown if any action is available
   const hasAnyAction = canEdit || canDelete || canReport;
 
-  const handleEditComment = () => {
-    // TODO: Implement edit comment functionality
-    toast.info("Edit functionality coming soon");
-  };
+  const onEditRef = useFreshRef(onEdit);
 
-  const handleDeleteComment = () => {
+  const handleEditComment = useCallback(() => {
+    const queryKey =
+      comment.id === threadComment.id ? rootQueryKey : repliesQueryKey;
+
+    onEditRef.current?.(comment, queryKey);
+  }, [comment, threadComment, rootQueryKey, repliesQueryKey, onEditRef]);
+
+  const handleDeleteComment = useCallback(() => {
     const queryKey =
       comment.id === threadComment.id ? rootQueryKey : repliesQueryKey;
 
@@ -264,7 +270,7 @@ export function CommentItem({
       comment,
       queryKey,
     });
-  };
+  }, [comment, threadComment, rootQueryKey, repliesQueryKey, deleteComment]);
 
   const handleReportComment = () => {
     // TODO: Implement report comment functionality
@@ -439,6 +445,7 @@ export function CommentItem({
               key={reply.id}
               comment={reply}
               onReply={onReply}
+              onEdit={onEdit}
               threadComment={threadComment}
             />
           ))}
