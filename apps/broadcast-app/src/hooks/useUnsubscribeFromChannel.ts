@@ -1,20 +1,31 @@
 import { publicEnv } from "@/env/public";
 import sdk from "@farcaster/miniapp-sdk";
-import { useMutation, UseMutationOptions } from "@tanstack/react-query";
+import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
+import type { Channel } from "@/api/schemas";
+import { toast } from "sonner";
+import { useUpdateChannelInChannelQuery } from "@/queries/channel";
+import { useRemoveChannelFromMyChannelsQuery } from "@/queries/my-channels";
 
 type UseUnsubscribeToChannelOptions = {
-  channelId: bigint;
-} & Omit<UseMutationOptions<void, Error, void>, "mutationFn">;
+  channel: Channel;
+} & Omit<
+  UseMutationOptions<void, Error, void>,
+  "mutationFn" | "onSuccess" | "onError"
+>;
 
 export function useUnsubscribeToChannel({
-  channelId,
+  channel,
   ...options
 }: UseUnsubscribeToChannelOptions) {
+  const updateChannelInChannelQuery = useUpdateChannelInChannelQuery();
+  const removeChannelFromMyChannelsQuery =
+    useRemoveChannelFromMyChannelsQuery();
+
   return useMutation({
     ...options,
     mutationFn: async () => {
       const url = new URL(
-        `/api/channels/${channelId}/unsubscribe`,
+        `/api/channels/${channel.id}/unsubscribe`,
         publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
       );
       const response = await sdk.quickAuth.fetch(url, {
@@ -22,10 +33,25 @@ export function useUnsubscribeToChannel({
       });
 
       if (!response.ok) {
-        throw new Error(
+        console.error(
           `Failed to subscribe to channel:\n\nStatus: ${response.status}\n\nResponse: ${await response.text()}`,
         );
+
+        throw new Error("Server returned invalid response");
       }
+    },
+    onSuccess() {
+      toast.success(`Unsubscribed from channel ${channel.name}`);
+
+      removeChannelFromMyChannelsQuery(channel.id);
+
+      updateChannelInChannelQuery(channel.id, {
+        isSubscribed: false,
+        notificationsEnabled: false,
+      });
+    },
+    onError(error) {
+      toast.error(`Failed to unsubscribe from channel: ${error.message}`);
     },
   });
 }
