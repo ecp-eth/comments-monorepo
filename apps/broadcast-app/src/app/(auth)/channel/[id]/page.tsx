@@ -40,37 +40,25 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ReplyBottomSheet } from "@/components/reply-bottom-sheet";
-import {
-  AlreadySubscribedError,
-  useSubscribeToChannel,
-} from "@/hooks/useSubscribeToChannel";
-import { toast } from "sonner";
+import { useSubscribeToChannel } from "@/hooks/useSubscribeToChannel";
 import { useUnsubscribeToChannel } from "@/hooks/useUnsubscribeFromChannel";
-import { useSetNotificationStatusOnChannel } from "@/hooks/useSetNotificationStatusOnChannel";
-import type {
-  IndexerAPICommentReactionSchemaType,
-  IndexerAPICommentWithRepliesSchemaType,
-} from "@ecp.eth/sdk/indexer";
 import { cn } from "@/lib/utils";
 import { EditorComposer } from "@/components/editor-composer";
-import { useRemoveChannelFromMyChannelsQuery } from "@/queries/my-channels";
 import { ChannelNotFoundError } from "@/errors";
-import {
-  useChannelQuery,
-  useChannelCommentsQuery,
-  useUpdateChannelInChannelQuery,
-} from "@/queries/channel";
-import { useRemoveChannelFromDiscoverQuery } from "@/queries/discover-channels";
+import { useChannelQuery, useChannelCommentsQuery } from "@/queries/channel";
 import { createChannelCommentsQueryKey } from "@/queries/query-keys";
 import { VisibilityTracker } from "@/components/visibility-tracker";
 import type { QueryKey } from "@tanstack/react-query";
+import type { Comment } from "@ecp.eth/shared/schemas";
+import type { Channel } from "@/api/schemas";
+import { useChannelNotificationsManager } from "@/hooks/useChannelNotificationsManager";
+import { Hex } from "@ecp.eth/sdk/core";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
 }) {
   const { address } = useAccount();
   const { connect, connectAsync, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
   const chainId = useChainId();
   const { id: channelId } = z
     .object({
@@ -79,68 +67,8 @@ export default function ChannelPage(props: {
     .parse(use(props.params));
   const [replyingTo, setReplyingTo] = useState<{
     commentQueryKey: QueryKey;
-    comment:
-      | IndexerAPICommentWithRepliesSchemaType
-      | IndexerAPICommentReactionSchemaType;
+    comment: Comment;
   } | null>(null);
-
-  const removeChannelFromMyChannelsQuery =
-    useRemoveChannelFromMyChannelsQuery();
-
-  const removeChannelFromDiscoverQuery = useRemoveChannelFromDiscoverQuery();
-
-  const updateChannelInChannelQuery = useUpdateChannelInChannelQuery();
-
-  const subscribeMutation = useSubscribeToChannel({
-    channelId,
-    onSuccess() {
-      toast.success("Subscribed to channel");
-
-      removeChannelFromDiscoverQuery(channelId);
-
-      updateChannelInChannelQuery(channelId, {
-        isSubscribed: true,
-      });
-    },
-    onError(error) {
-      if (error instanceof AlreadySubscribedError) {
-        toast.error(`You are already subscribed to this channel`);
-      } else {
-        toast.error(`Failed to subscribe to channel: ${error.message}`);
-        console.error("Error subscribing to channel:", error);
-      }
-    },
-  });
-
-  const unsubscribeMutation = useUnsubscribeToChannel({
-    channelId,
-    onSuccess() {
-      toast.success("Unsubscribed from channel");
-
-      removeChannelFromMyChannelsQuery(channelId);
-
-      updateChannelInChannelQuery(channelId, {
-        isSubscribed: false,
-      });
-    },
-    onError() {
-      toast.error("Failed to unsubscribe from channel");
-    },
-  });
-
-  const setNotificationStatusMutation = useSetNotificationStatusOnChannel({
-    channelId,
-    onSuccess(result) {
-      toast.success("Notifications enabled for channel");
-
-      updateChannelInChannelQuery(channelId, {
-        notificationsEnabled: result.notificationsEnabled,
-      });
-    },
-    onError() {
-      toast.error("Failed to enable notifications for channel");
-    },
-  });
 
   const channelQuery = useChannelQuery(channelId);
 
@@ -307,95 +235,7 @@ export default function ChannelPage(props: {
             <h1 className="font-semibold truncate">{channel.name}</h1>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <MoreVerticalIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => {
-                  if (channel.isSubscribed) {
-                    unsubscribeMutation.mutate();
-                  } else {
-                    subscribeMutation.mutate();
-                  }
-                }}
-              >
-                {channel.isSubscribed ? (
-                  <>
-                    <XIcon className="h-4 w-4 mr-1" /> Unsubscribe
-                  </>
-                ) : (
-                  <>
-                    <PlusIcon className="h-4 w-4 mr-1" /> Subscribe
-                  </>
-                )}
-              </DropdownMenuItem>
-              {channel.isSubscribed && (
-                <DropdownMenuItem
-                  onClick={() => {
-                    if (channel.notificationsEnabled) {
-                      setNotificationStatusMutation.mutate(false);
-                    } else {
-                      setNotificationStatusMutation.mutate(true);
-                    }
-                  }}
-                >
-                  {channel.notificationsEnabled ? (
-                    <>
-                      <BellOffIcon className="h-4 w-4 mr-1" />
-                      Disable Notifications
-                    </>
-                  ) : (
-                    <>
-                      <BellIcon className="h-4 w-4 mr-1" />
-                      Enable Notifications
-                    </>
-                  )}
-                </DropdownMenuItem>
-              )}
-              {address && (
-                <DropdownMenuItem onClick={() => disconnect()}>
-                  <WalletIcon className="h-4 w-4 mr-1" /> Disconnect wallet
-                </DropdownMenuItem>
-              )}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    <InfoIcon className="h-4 w-4 mr-1" /> Show Details
-                  </DropdownMenuItem>
-                </DialogTrigger>
-                <DialogContent className="max-w-[350px]">
-                  <DialogHeader>
-                    <DialogTitle>Channel Details</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-16 w-16">
-                        <AvatarImage
-                          src={"/placeholder.svg"}
-                          alt={channel.name}
-                        />
-                        <AvatarFallback>
-                          {channel.name.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold">{channel.name}</h3>
-                      </div>
-                    </div>
-                    {channel.description && (
-                      <p className="text-sm text-muted-foreground">
-                        {channel.description}
-                      </p>
-                    )}
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ChannelDropdownMenu address={address} channel={channel} />
         </div>
       </div>
 
@@ -471,5 +311,131 @@ export default function ChannelPage(props: {
         />
       )}
     </div>
+  );
+}
+
+type ChannelDropdownMenuProps = {
+  address: Hex | undefined;
+  channel: Channel;
+};
+
+function ChannelDropdownMenu({ address, channel }: ChannelDropdownMenuProps) {
+  const { disconnect } = useDisconnect();
+  const subscribeMutation = useSubscribeToChannel({
+    channel,
+  });
+  const unsubscribeMutation = useUnsubscribeToChannel({
+    channel,
+  });
+  const {
+    status: notificationsStatus,
+    enableMutation: enableNotificationsMutation,
+    disableMutation: disableNotificationsMutation,
+  } = useChannelNotificationsManager(channel);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <MoreVerticalIcon className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          onClick={() => {
+            if (channel.isSubscribed) {
+              unsubscribeMutation.mutate();
+            } else {
+              subscribeMutation.mutate();
+            }
+          }}
+        >
+          {channel.isSubscribed ? (
+            <>
+              <XIcon className="h-4 w-4 mr-1" /> Unsubscribe
+            </>
+          ) : (
+            <>
+              <PlusIcon className="h-4 w-4 mr-1" /> Subscribe
+            </>
+          )}
+        </DropdownMenuItem>
+
+        {notificationsStatus === "app-not-added" && (
+          <DropdownMenuItem
+            onClick={() => {
+              enableNotificationsMutation.mutate();
+            }}
+          >
+            <BellOffIcon className="h-4 w-4 mr-1" /> Enable notifications
+          </DropdownMenuItem>
+        )}
+
+        {notificationsStatus === "app-disabled-notifications" && (
+          <DropdownMenuItem
+            disabled
+            title="To manage notifications for this channel, you need to enable notifications in the mini app settings"
+          >
+            <BellOffIcon className="h-4 w-4 mr-1" /> App disabled notifications
+          </DropdownMenuItem>
+        )}
+
+        {notificationsStatus === "enabled" && (
+          <DropdownMenuItem
+            onClick={() => {
+              disableNotificationsMutation.mutate();
+            }}
+          >
+            <BellOffIcon className="h-4 w-4 mr-1" /> Disable notifications
+          </DropdownMenuItem>
+        )}
+
+        {notificationsStatus === "disabled" && (
+          <DropdownMenuItem
+            onClick={() => {
+              enableNotificationsMutation.mutate();
+            }}
+          >
+            <BellIcon className="h-4 w-4 mr-1" /> Enable notifications
+          </DropdownMenuItem>
+        )}
+
+        {address && (
+          <DropdownMenuItem onClick={() => disconnect()}>
+            <WalletIcon className="h-4 w-4 mr-1" /> Disconnect wallet
+          </DropdownMenuItem>
+        )}
+        <Dialog>
+          <DialogTrigger asChild>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <InfoIcon className="h-4 w-4 mr-1" /> Show Details
+            </DropdownMenuItem>
+          </DialogTrigger>
+          <DialogContent className="max-w-[350px]">
+            <DialogHeader>
+              <DialogTitle>Channel Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <Avatar className="h-16 w-16">
+                  <AvatarImage src={"/placeholder.svg"} alt={channel.name} />
+                  <AvatarFallback>
+                    {channel.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-semibold">{channel.name}</h3>
+                </div>
+              </div>
+              {channel.description && (
+                <p className="text-sm text-muted-foreground">
+                  {channel.description}
+                </p>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
