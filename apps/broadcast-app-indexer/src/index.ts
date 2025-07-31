@@ -141,11 +141,18 @@ ponder.on("CommentManager:CommentAdded", async ({ event, context }) => {
     env.BROADCAST_APP_MINI_APP_URL,
   ).toString();
 
+  const channelName = channel.name;
+  let title = `New comment in ${channelName}`;
+
+  if (title.length > 32) {
+    title = title.slice(0, 29).trim() + "...";
+  }
+
   await notificationService.notify(
     subscribers.map((s) => s.userFid),
     commentId,
     {
-      title: `New comment in channel`,
+      title,
       body: `Something new was posted in the channel you are subscribed to.`,
       targetUrl,
     },
