@@ -5,125 +5,29 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, XIcon, BellIcon, BellOffIcon } from "lucide-react";
 import type { Channel } from "@/api/schemas";
-import {
-  AlreadySubscribedError,
-  useSubscribeToChannel,
-} from "@/hooks/useSubscribeToChannel";
-import { toast } from "sonner";
+import { useSubscribeToChannel } from "@/hooks/useSubscribeToChannel";
 import { useUnsubscribeToChannel } from "@/hooks/useUnsubscribeFromChannel";
-import { useSetNotificationStatusOnChannel } from "@/hooks/useSetNotificationStatusOnChannel";
-import { useMiniAppContext } from "@/hooks/useMiniAppContext";
-import { useMutation } from "@tanstack/react-query";
-import sdk from "@farcaster/miniapp-sdk";
 import { cn } from "@/lib/utils";
-import { useRemoveChannelFromDiscoverQuery } from "@/queries/discover-channels";
-import {
-  useRemoveChannelFromMyChannelsQuery,
-  useUpdateChannelInMyChannelsQuery,
-} from "@/queries/my-channels";
-import { useUpdateChannelInChannelQuery } from "@/queries/channel";
+import { useChannelNotificationsManager } from "@/hooks/useChannelNotificationsManager";
 
 interface ChannelCardProps {
   channel: Channel;
 }
 
 export function ChannelCard({ channel }: ChannelCardProps) {
-  const miniAppContext = useMiniAppContext();
-  const removeChannelFromDiscoverQuery = useRemoveChannelFromDiscoverQuery();
-  const removeChannelFromMyChannelsQuery =
-    useRemoveChannelFromMyChannelsQuery();
-  const updateChannelInChannelQuery = useUpdateChannelInChannelQuery();
-  const updateChannelInMyChannelsQuery = useUpdateChannelInMyChannelsQuery();
   const subscribeMutation = useSubscribeToChannel({
-    channelId: channel.id,
-    onSuccess(result) {
-      toast.success(`Subscribed to channel ${channel.name}`);
-
-      removeChannelFromDiscoverQuery(channel.id);
-
-      updateChannelInChannelQuery(channel.id, {
-        isSubscribed: true,
-        notificationsEnabled: result.notificationsEnabled,
-      });
-    },
-    onError(error) {
-      if (error instanceof AlreadySubscribedError) {
-        toast.error(`You are already subscribed to channel ${channel.name}`);
-      } else {
-        toast.error(`Failed to subscribe to channel: ${error.message}`);
-        console.error("Error subscribing to channel:", error);
-      }
-    },
+    channel,
   });
   const unsubscribeMutation = useUnsubscribeToChannel({
-    channelId: channel.id,
-    onError() {
-      toast.error(`Failed to unsubscribe from channel ${channel.name}`);
-    },
-    onSuccess() {
-      toast.success(`Unsubscribed from channel ${channel.name}`);
-
-      removeChannelFromMyChannelsQuery(channel.id);
-
-      updateChannelInChannelQuery(channel.id, {
-        isSubscribed: false,
-        notificationsEnabled: false,
-      });
-    },
+    channel,
   });
-  const setNotificationStatusMutation = useSetNotificationStatusOnChannel({
-    channelId: channel.id,
-    onError(error, variables) {
-      if (variables === true) {
-        toast.error("Failed to enable notifications");
-      } else {
-        toast.error("Failed to disable notifications");
-      }
-    },
-    onSuccess(data, variables) {
-      if (variables === true) {
-        toast.success(`Notifications enabled for channel ${channel.name}`);
-      } else {
-        toast.success(`Notifications disabled for channel ${channel.name}`);
-      }
+  const channelNotificationsManager = useChannelNotificationsManager(channel);
+  const {
+    status: notificationsStatus,
+    enableMutation: enableNotificationsMutation,
+    disableMutation: disableNotificationsMutation,
+  } = channelNotificationsManager;
 
-      updateChannelInChannelQuery(channel.id, {
-        notificationsEnabled: data.notificationsEnabled,
-      });
-
-      updateChannelInMyChannelsQuery(channel.id, {
-        notificationsEnabled: data.notificationsEnabled,
-      });
-    },
-  });
-  const addMiniAppMutation = useMutation({
-    mutationFn: async () => {
-      let notificationDetails = miniAppContext.client.notificationDetails;
-
-      if (!miniAppContext.client.added) {
-        const result = await sdk.actions.addMiniApp();
-
-        notificationDetails = result.notificationDetails;
-      }
-
-      return setNotificationStatusMutation.mutate(
-        // only if notifications are enabled in farcaster the notifications per channel can be enabled
-        !!notificationDetails && !channel.notificationsEnabled,
-      );
-    },
-    onSuccess() {
-      toast.success(`Notifications toggled for channel ${channel.name}`);
-    },
-    onError() {
-      toast.error(`Failed to toggle notifications for channel ${channel.name}`);
-    },
-  });
-
-  const canUseNotifications =
-    miniAppContext.client.added && !!miniAppContext.client.notificationDetails;
-  const needsToAddMiniApp =
-    !miniAppContext.client.added && channel.isSubscribed;
-  const canManageNotifications = channel.isSubscribed && canUseNotifications;
   const showSubscribeButton = !channel.isSubscribed;
   const showUnsubscribeButton = channel.isSubscribed;
 
@@ -151,51 +55,69 @@ export function ChannelCard({ channel }: ChannelCardProps) {
       </Link>
 
       <div className="flex items-center space-x-2 shrink-0">
-        {needsToAddMiniApp && (
+        {notificationsStatus === "app-not-added" && (
           <Button
-            disabled={addMiniAppMutation.isPending}
+            disabled={enableNotificationsMutation.isPending}
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0"
             title="To manage notifications for this channel, you need to add the mini app"
-            onClick={() => addMiniAppMutation.mutate()}
+            onClick={() => enableNotificationsMutation.mutate()}
           >
             <BellOffIcon
               className={cn(
                 "h-4 w-4",
-                addMiniAppMutation.isPending && "animate-pulse",
+                enableNotificationsMutation.isPending && "animate-pulse",
               )}
             />
           </Button>
         )}
 
-        {canManageNotifications && (
+        {notificationsStatus === "app-disabled-notifications" && (
           <Button
-            disabled={setNotificationStatusMutation.isPending}
+            disabled
             variant="ghost"
             size="sm"
-            onClick={() =>
-              setNotificationStatusMutation.mutate(
-                !channel.notificationsEnabled,
-              )
-            }
             className="h-8 w-8 p-0"
+            title="To manage notifications for this channel, you need to enable notifications in the mini app settings"
           >
-            {channel.notificationsEnabled ? (
-              <BellIcon
-                className={cn(
-                  "h-4 w-4",
-                  setNotificationStatusMutation.isPending && "animate-pulse",
-                )}
-              />
-            ) : (
-              <BellOffIcon
-                className={cn(
-                  "h-4 w-4",
-                  setNotificationStatusMutation.isPending && "animate-pulse",
-                )}
-              />
-            )}
+            <BellOffIcon className={cn("h-4 w-4")} />
+          </Button>
+        )}
+
+        {notificationsStatus === "enabled" && (
+          <Button
+            disabled={disableNotificationsMutation.isPending}
+            variant="ghost"
+            size="sm"
+            onClick={() => disableNotificationsMutation.mutate()}
+            className="h-8 w-8 p-0"
+            title="Disable notifications for this channel"
+          >
+            <BellIcon
+              className={cn(
+                "h-4 w-4",
+                disableNotificationsMutation.isPending && "animate-pulse",
+              )}
+            />
+          </Button>
+        )}
+
+        {notificationsStatus === "disabled" && (
+          <Button
+            disabled={enableNotificationsMutation.isPending}
+            variant="ghost"
+            size="sm"
+            onClick={() => enableNotificationsMutation.mutate()}
+            className="h-8 w-8 p-0"
+            title="Enable notifications for this channel"
+          >
+            <BellOffIcon
+              className={cn(
+                "h-4 w-4",
+                enableNotificationsMutation.isPending && "animate-pulse",
+              )}
+            />
           </Button>
         )}
 

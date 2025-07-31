@@ -8,24 +8,19 @@ import {
 } from "@/components/ui/sheet";
 import { EditorComposer } from "@/components/editor-composer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type {
-  IndexerAPICommentReactionSchemaType,
-  IndexerAPICommentWithRepliesSchemaType,
-} from "@ecp.eth/sdk/indexer";
 import { useCallback, useMemo } from "react";
 import { renderToReact } from "@ecp.eth/shared/renderer";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
 import { blo } from "blo";
 import { useFreshRef } from "@ecp.eth/shared/hooks";
 import type { QueryKey } from "@tanstack/react-query";
+import type { Comment } from "@ecp.eth/shared/schemas";
 
 interface ReplyBottomSheetProps {
   channelId: bigint;
   isOpen: boolean;
   onClose: () => void;
-  replyingTo:
-    | IndexerAPICommentWithRepliesSchemaType
-    | IndexerAPICommentReactionSchemaType;
+  replyingTo: Comment;
   /**
    * The query key to the query where the replying to comment is stored
    */
@@ -40,7 +35,7 @@ export function ReplyBottomSheet({
   replyingToQueryKey,
 }: ReplyBottomSheetProps) {
   const onCloseRef = useFreshRef(onClose);
-  const handleSubmitStart = useCallback(() => {
+  const handleSubmitSuccess = useCallback(() => {
     onCloseRef.current?.();
   }, [onCloseRef]);
 
@@ -94,7 +89,7 @@ export function ReplyBottomSheet({
 
           <EditorComposer
             autoFocus
-            onSubmitStart={handleSubmitStart}
+            onSubmitSuccess={handleSubmitSuccess}
             placeholder="Write your reply..."
             submitLabel="Reply"
             channelId={channelId}
