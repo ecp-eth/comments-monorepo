@@ -55,6 +55,7 @@ import type { Channel } from "@/api/schemas";
 import { useChannelNotificationsManager } from "@/hooks/useChannelNotificationsManager";
 import { Hex } from "@ecp.eth/sdk/core";
 import { EditCommentBottomSheet } from "@/components/edit-comment-bottom-sheet";
+import { ReportBottomSheet } from "@/components/report-bottom-sheet";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
@@ -75,6 +76,9 @@ export default function ChannelPage(props: {
     commentQueryKey: QueryKey;
     comment: Comment;
   } | null>(null);
+  const [reportingComment, setReportingComment] = useState<Comment | null>(
+    null,
+  );
 
   const channelQuery = useChannelQuery(channelId);
 
@@ -294,6 +298,7 @@ export default function ChannelPage(props: {
               threadComment={comment}
               onEdit={handleEdit}
               onReply={handleReply}
+              onReport={setReportingComment}
             />
           ))}
         </div>
@@ -339,6 +344,14 @@ export default function ChannelPage(props: {
           queryKey={editingComment.commentQueryKey}
           isOpen={!!editingComment}
           onClose={() => setEditingComment(null)}
+        />
+      )}
+
+      {address && reportingComment && (
+        <ReportBottomSheet
+          comment={reportingComment}
+          isOpen={!!reportingComment}
+          onClose={() => setReportingComment(null)}
         />
       )}
     </div>
