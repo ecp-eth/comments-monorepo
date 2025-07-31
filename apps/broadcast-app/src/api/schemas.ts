@@ -91,3 +91,23 @@ export const ListChannelsResponseSchema = z.object({
     nextCursor: z.string().optional(),
   }),
 });
+
+export const SignEditCommentPayloadRequestClientSchema = z.object({
+  author: HexSchema,
+  commentId: HexSchema,
+  content: z.string().trim().nonempty(),
+  metadata: MetadataArraySchema,
+});
+
+export const SignEditCommentResponseServerSchema = z.object({
+  signature: HexSchema,
+  hash: HexSchema,
+  data: z.object({
+    commentId: HexSchema,
+    content: z.string().trim().nonempty(),
+    metadata: MetadataArraySchema,
+    app: HexSchema,
+    nonce: z.coerce.bigint(),
+    deadline: z.coerce.bigint(),
+  }),
+});
