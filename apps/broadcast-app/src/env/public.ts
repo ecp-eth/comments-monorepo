@@ -8,6 +8,7 @@ const publicEnvSchema = z.object({
   NEXT_PUBLIC_RPC_URL: z.string().url(),
   NEXT_PUBLIC_APP_SIGNER_ADDRESS: HexSchema,
   NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS: HexSchema,
+  NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
 });
 
 const result = publicEnvSchema.safeParse({
@@ -19,6 +20,7 @@ const result = publicEnvSchema.safeParse({
   NEXT_PUBLIC_APP_SIGNER_ADDRESS: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
   NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS:
     process.env.NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS,
+  NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
 });
 
 if (!result.success) {
