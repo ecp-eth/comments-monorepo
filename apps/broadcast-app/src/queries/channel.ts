@@ -148,3 +148,31 @@ export function useChannelCommentsQuery({
     } as ChannelCommentsQueryPageParam,
   });
 }
+
+export function useMarkChannelCommentsAsHavingNewReplies() {
+  const queryClient = useQueryClient();
+
+  return useCallback(
+    (channelId: bigint, viewer: Hex | undefined) => {
+      queryClient.setQueryData(
+        createChannelCommentsQueryKey({ channelId, viewer }),
+        (
+          old: InfiniteData<IndexerAPIListCommentsSchemaType> | undefined,
+        ): InfiniteData<IndexerAPIListCommentsSchemaType> | undefined => {
+          if (!old) {
+            return undefined;
+          }
+
+          if (old.pages.length === 0) {
+            return old;
+          }
+
+          old.pages[0].pagination.hasPrevious = true;
+
+          return old;
+        },
+      );
+    },
+    [queryClient],
+  );
+}
