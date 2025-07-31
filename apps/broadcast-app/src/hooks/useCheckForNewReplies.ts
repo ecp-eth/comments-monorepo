@@ -9,11 +9,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 type UseCheckForNewReplies = {
+  /**
+   * Whether to check for new replies.
+   *
+   * @default true
+   */
+  enabled?: boolean;
   viewer: Hex | undefined;
   comment: Comment;
 };
 
 export function useCheckForNewReplies({
+  enabled = true,
   comment,
   viewer,
 }: UseCheckForNewReplies) {
@@ -23,7 +30,7 @@ export function useCheckForNewReplies({
 
   const query = useQuery({
     // we don't want to run the query immediately
-    enabled: isEnabled,
+    enabled: isEnabled && enabled,
     refetchInterval: CHECK_FOR_NEW_REPLIES_INTERVAL,
     queryKey: ["check-for-new-replies", comment.id],
     queryFn: async ({ signal }) => {
