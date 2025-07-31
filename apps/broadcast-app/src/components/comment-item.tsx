@@ -42,6 +42,7 @@ import {
 import { useUnlikeComment } from "@/hooks/useUnlikeComment";
 import type { Comment, CommentPageSchemaType } from "@ecp.eth/shared/schemas";
 import { useRetryPostComment } from "@/hooks/useRetryPostComment";
+import { useCheckForNewReplies } from "@/hooks/useCheckForNewReplies";
 
 interface CommentItemProps {
   comment: Comment;
@@ -207,6 +208,11 @@ export function CommentItem({
     commentId: comment.id,
     viewer,
     initialData,
+  });
+
+  useCheckForNewReplies({
+    comment: threadComment,
+    viewer,
   });
 
   const replies = useMemo(() => {
