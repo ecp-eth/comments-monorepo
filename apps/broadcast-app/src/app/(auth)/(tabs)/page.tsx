@@ -1,11 +1,18 @@
 "use client";
 
-import { AlertTriangleIcon, Loader2Icon, RotateCwIcon } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  Loader2Icon,
+  PlusIcon,
+  RotateCwIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChannelCard } from "@/components/channel-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useDiscoverChannelsQuery } from "@/queries/discover-channels";
+import { useState } from "react";
+import { ChannelCreationBottomSheet } from "@/components/channel-creation-bottom-sheet";
 
 export default function DiscoverChannelsPage() {
   const {
@@ -18,6 +25,7 @@ export default function DiscoverChannelsPage() {
     isFetchingNextPage,
     hasNextPage,
   } = useDiscoverChannelsQuery();
+  const [showChannelCreation, setShowChannelCreation] = useState(false);
 
   if (error) {
     console.error("Error fetching channels:", error);
@@ -72,17 +80,33 @@ export default function DiscoverChannelsPage() {
       <div className="h-full flex flex-col items-center justify-center p-4 text-center">
         <h2 className="text-lg font-semibold mb-2">No channels available.</h2>
         <p className="text-muted-foreground mb-4">Check again later.</p>
-        <Button
-          disabled={isRefetching}
-          onClick={() => refetch()}
-          variant="outline"
-          className="gap-2"
-        >
-          <RotateCwIcon
-            className={cn("h-4 w-4", isRefetching && "animate-spin")}
+        <div className="flex space-x-3">
+          <Button
+            disabled={isRefetching}
+            onClick={() => refetch()}
+            variant="outline"
+            className="gap-2"
+          >
+            <RotateCwIcon
+              className={cn("h-4 w-4", isRefetching && "animate-spin")}
+            />
+            Refresh
+          </Button>
+          <Button
+            className="gap-2"
+            onClick={() => setShowChannelCreation(true)}
+          >
+            <PlusIcon className="h-4 w-4" />
+            Create Channel
+          </Button>
+        </div>
+
+        {showChannelCreation && (
+          <ChannelCreationBottomSheet
+            isOpen={showChannelCreation}
+            onClose={() => setShowChannelCreation(false)}
           />
-          Refresh
-        </Button>
+        )}
       </div>
     );
   }
@@ -90,7 +114,18 @@ export default function DiscoverChannelsPage() {
   return (
     <div className="h-full flex flex-col">
       <div className="p-4 border-b">
-        <h1 className="text-2xl font-bold">Discover Channels</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Discover Channels</h1>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => setShowChannelCreation(true)}
+          >
+            <PlusIcon className="h-4 w-4" />
+            Create
+          </Button>
+        </div>
       </div>
 
       <ScrollArea className="flex-1" viewportClassName="h-full">
@@ -117,6 +152,13 @@ export default function DiscoverChannelsPage() {
           </div>
         )}
       </ScrollArea>
+
+      {showChannelCreation && (
+        <ChannelCreationBottomSheet
+          isOpen={showChannelCreation}
+          onClose={() => setShowChannelCreation(false)}
+        />
+      )}
     </div>
   );
 }
