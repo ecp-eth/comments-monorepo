@@ -201,7 +201,7 @@ export function EditorComposer({
                 }
               : signedCommentResponse.data,
             signature: signedCommentResponse.signature,
-            hash: txHash,
+            hash: signedCommentResponse.hash,
           },
           state: {
             status: "pending",
