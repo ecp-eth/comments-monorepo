@@ -63,7 +63,7 @@ export function useMiniAppContextState() {
       });
     };
 
-    sdk.addListener("miniAppAdded", onMiniAppAdded);
+    sdk.on("miniAppAdded", onMiniAppAdded);
 
     const onMiniAppRemoved = () => {
       setState((prevState) => ({
@@ -76,9 +76,10 @@ export function useMiniAppContextState() {
       }));
     };
 
-    sdk.addListener("miniAppRemoved", onMiniAppRemoved);
+    sdk.on("miniAppRemoved", onMiniAppRemoved);
 
     const onNotificationsDisabled = () => {
+      console.log("onNotificationsDisabled");
       setState((prevState) => ({
         ...prevState,
         client: {
@@ -88,9 +89,10 @@ export function useMiniAppContextState() {
       }));
     };
 
-    sdk.addListener("notificationsDisabled", onNotificationsDisabled);
+    sdk.on("notificationsDisabled", onNotificationsDisabled);
 
     const onNotificationsEnabled = () => {
+      console.log("onNotificationsEnabled");
       setState((prevState) => ({
         ...prevState,
         client: {
@@ -100,13 +102,13 @@ export function useMiniAppContextState() {
       }));
     };
 
-    sdk.addListener("notificationsEnabled", onNotificationsEnabled);
+    sdk.on("notificationsEnabled", onNotificationsEnabled);
 
     return () => {
-      sdk.removeListener("miniAppAdded", onMiniAppAdded);
-      sdk.removeListener("miniAppRemoved", onMiniAppRemoved);
-      sdk.removeListener("notificationsDisabled", onNotificationsDisabled);
-      sdk.removeListener("notificationsEnabled", onNotificationsEnabled);
+      sdk.off("miniAppAdded", onMiniAppAdded);
+      sdk.off("miniAppRemoved", onMiniAppRemoved);
+      sdk.off("notificationsDisabled", onNotificationsDisabled);
+      sdk.off("notificationsEnabled", onNotificationsEnabled);
     };
   }, []);
 

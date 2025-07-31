@@ -24,14 +24,18 @@ import { GenerateUploadUrlResponseSchema } from "@/api/schemas";
 import { postComment } from "@ecp.eth/sdk/comments";
 import { toast } from "sonner";
 import z from "zod";
-import { useAccount, useChainId, useConfig, useWriteContract } from "wagmi";
-import { waitForTransactionReceipt } from "@wagmi/core";
+import {
+  useAccount,
+  useChainId,
+  useWriteContract,
+  usePublicClient,
+} from "wagmi";
 import {
   fetchAuthorData,
   type IndexerAPICommentSchemaType,
 } from "@ecp.eth/sdk/indexer";
 import { getChannelCaipUri } from "@/lib/utils";
-import { useCommentSubmission, useFreshRef } from "@ecp.eth/shared/hooks";
+import { useCommentSubmission } from "@ecp.eth/shared/hooks";
 import { SignCommentError, SubmitCommentMutationError } from "@/errors";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
@@ -62,14 +66,13 @@ export function EditorComposer({
   placeholder = "What's on your mind?",
   submitLabel = "Post",
   submittingLabel = "Posting...",
-  onSubmitStart,
   onSubmitSuccess,
   channelId,
   replyingTo,
   queryKey,
 }: EditorComposerProps) {
   const { address } = useAccount();
-  const wagmiConfig = useConfig();
+  const publicClient = usePublicClient();
   const commentSubmission = useCommentSubmission();
   const { writeContractAsync } = useWriteContract();
   const chainId = useChainId();
@@ -97,7 +100,6 @@ export function EditorComposer({
   });
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const onSubmitStartRef = useFreshRef(onSubmitStart);
   const submitMutation = useMutation({
     mutationFn: async (): Promise<void> => {
       let pendingOperation: PendingPostCommentOperationSchemaType | undefined;
@@ -109,6 +111,10 @@ export function EditorComposer({
 
         if (!address) {
           throw new SubmitCommentMutationError("Wallet not connected");
+        }
+
+        if (!publicClient) {
+          throw new SubmitCommentMutationError("Public client not initialized");
         }
 
         const resolvedAuthor = await fetchAuthorData({
@@ -161,11 +167,16 @@ export function EditorComposer({
               }),
         });
 
-        const { txHash } = await postComment({
+        const { txHash, wait } = await postComment({
           commentsAddress: SUPPORTED_CHAINS[base.id].commentManagerAddress,
           appSignature: signedCommentResponse.signature,
           comment: signedCommentResponse.data,
           writeContract: writeContractAsync,
+        });
+
+        const postedComment = await wait({
+          getContractEvents: publicClient.getContractEvents,
+          waitForTransactionReceipt: publicClient.waitForTransactionReceipt,
         });
 
         pendingOperation = {
@@ -174,33 +185,37 @@ export function EditorComposer({
           txHash,
           chainId,
           references,
-          response: signedCommentResponse,
+          response: {
+            data: postedComment
+              ? {
+                  id: postedComment.commentId,
+                  app: postedComment.app,
+                  author: postedComment.author,
+                  channelId: postedComment.channelId,
+                  content: postedComment.content,
+                  commentType: postedComment.commentType,
+                  deadline: signedCommentResponse.data.deadline,
+                  metadata: postedComment.metadata.slice(),
+                  parentId: postedComment.parentId,
+                  targetUri: postedComment.targetUri,
+                }
+              : signedCommentResponse.data,
+            signature: signedCommentResponse.signature,
+            hash: txHash,
+          },
           state: {
             status: "pending",
           },
           resolvedAuthor,
         };
 
+        // insert
         commentSubmission.start({
           pendingOperation,
           queryKey,
         });
 
-        onSubmitStartRef.current?.();
-
-        // clear the editor because user can retry in submission directly under the comment
-        editorRef.current?.clear();
-
-        const receipt = await waitForTransactionReceipt(wagmiConfig, {
-          hash: txHash,
-        });
-
-        if (receipt.status !== "success") {
-          throw new SubmitCommentMutationError(
-            "Failed to post comment, transaction reverted.",
-          );
-        }
-
+        // mark as posted
         commentSubmission.success({
           queryKey,
           pendingOperation,
@@ -239,9 +254,6 @@ export function EditorComposer({
     onError(error) {
       if (error instanceof InvalidCommentError) {
         editorRef.current?.focus();
-      } else {
-        editorRef.current?.clear();
-        submitMutation.reset();
       }
     },
   });
