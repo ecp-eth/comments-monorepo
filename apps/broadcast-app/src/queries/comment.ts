@@ -15,6 +15,7 @@ import type { CommentPageSchemaType } from "@ecp.eth/shared/schemas";
 export type CommentRepliesQueryPageParam = {
   cursor: Hex | undefined;
   limit: number;
+  direction: "newer" | "older";
 };
 
 type UseCommentRepliesQueryParams = {
@@ -48,6 +49,7 @@ export function useCommentRepliesQuery({
     ...options,
     queryKey: createCommentRepliesQueryKey({ commentId, viewer }),
     queryFn: async ({ pageParam, signal }) => {
+      const sort = pageParam?.direction === "newer" ? "asc" : "desc";
       const response = await fetchCommentReplies({
         app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
         commentId,
@@ -61,8 +63,16 @@ export function useCommentRepliesQuery({
         cursor: pageParam?.cursor,
         limit: MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
         commentType: COMMENT_TYPE_COMMENT,
-        // @todo determine sort because for previous page we need to reverse the sort
+        sort,
       });
+
+      if (sort === "asc") {
+        return {
+          ...response,
+          // reverse the results because asc sort in API returns comments in reverse order
+          results: response.results.toReversed(),
+        };
+      }
 
       return response;
     },
@@ -71,6 +81,7 @@ export function useCommentRepliesQuery({
         return {
           cursor: lastPage.pagination.endCursor,
           limit: lastPage.pagination.limit,
+          direction: "older" as const,
         };
       }
     },
@@ -82,12 +93,14 @@ export function useCommentRepliesQuery({
         return {
           cursor: firstPage.pagination.startCursor,
           limit: firstPage.pagination.limit,
+          direction: "newer" as const,
         };
       }
     },
     initialPageParam: {
       cursor: undefined,
       limit: MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+      direction: "newer",
     } as CommentRepliesQueryPageParam,
   });
 }

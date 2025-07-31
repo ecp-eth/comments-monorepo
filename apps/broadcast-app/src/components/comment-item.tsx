@@ -168,6 +168,7 @@ export function CommentItem({
           {
             cursor: comment.replies.pagination.endCursor,
             limit: comment.replies.pagination.limit,
+            direction: "newer",
           },
         ],
       };
@@ -189,7 +190,11 @@ export function CommentItem({
         },
       ],
       pageParams: [
-        { cursor: undefined, limit: MAX_INITIAL_REPLIES_ON_PARENT_COMMENT },
+        {
+          cursor: undefined,
+          limit: MAX_INITIAL_REPLIES_ON_PARENT_COMMENT,
+          direction: "newer",
+        },
       ],
     };
   }, [comment]);
@@ -366,9 +371,21 @@ export function CommentItem({
 
       {replies.length > 0 && (
         <div className="space-y-3 pl-8">
-          <Button variant="ghost" size="sm" type="button" className="text-xs">
-            Show newer replies
-          </Button>
+          {repliesQuery.hasPreviousPage && (
+            <Button
+              disabled={repliesQuery.isFetchingPreviousPage}
+              variant="ghost"
+              size="sm"
+              type="button"
+              className={cn(
+                "text-xs",
+                repliesQuery.isFetchingPreviousPage && "animate-pulse",
+              )}
+              onClick={() => repliesQuery.fetchPreviousPage()}
+            >
+              Show newer replies
+            </Button>
+          )}
           {replies.map((reply) => (
             <CommentItem
               key={reply.id}
@@ -377,9 +394,21 @@ export function CommentItem({
               threadComment={threadComment}
             />
           ))}
-          <Button variant="ghost" size="sm" type="button" className="text-xs">
-            Show older replies
-          </Button>
+          {repliesQuery.hasNextPage && (
+            <Button
+              disabled={repliesQuery.isFetchingNextPage}
+              variant="ghost"
+              size="sm"
+              type="button"
+              className={cn(
+                "text-xs",
+                repliesQuery.isFetchingNextPage && "animate-pulse",
+              )}
+              onClick={() => repliesQuery.fetchNextPage()}
+            >
+              Show older replies
+            </Button>
+          )}
         </div>
       )}
     </div>
