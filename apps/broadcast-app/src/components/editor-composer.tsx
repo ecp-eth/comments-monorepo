@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
-import { ImageIcon, Loader2Icon, SendIcon } from "lucide-react";
+import { ImageIcon, Loader2Icon, SaveIcon, SendIcon } from "lucide-react";
 import {
   CommentFormSubmitError,
   InvalidCommentError,
@@ -21,7 +21,7 @@ import { extractReferences } from "@ecp.eth/react-editor/extract-references";
 import { type QueryKey, useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/env/public";
 import { GenerateUploadUrlResponseSchema } from "@/api/schemas";
-import { postComment } from "@ecp.eth/sdk/comments";
+import { editComment, postComment } from "@ecp.eth/sdk/comments";
 import { toast } from "sonner";
 import z from "zod";
 import {
@@ -35,25 +35,44 @@ import {
   type IndexerAPICommentSchemaType,
 } from "@ecp.eth/sdk/indexer";
 import { getChannelCaipUri } from "@/lib/utils";
-import { useCommentSubmission } from "@ecp.eth/shared/hooks";
+import { useCommentEdition, useCommentSubmission } from "@ecp.eth/shared/hooks";
 import { SignCommentError, SubmitCommentMutationError } from "@/errors";
-import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
+import type {
+  Comment,
+  PendingEditCommentOperationSchemaType,
+  PendingPostCommentOperationSchemaType,
+} from "@ecp.eth/shared/schemas";
 import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 import { base } from "viem/chains";
 import { signCommentOrReaction } from "@/api/sign-comment-or-reaction";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { ContractFunctionExecutionError } from "viem";
+import { signEditComment } from "@/api/sign-edit-comment";
 
 interface EditorComposerProps {
   /**
    * @default false
    */
   autoFocus?: boolean;
+  /**
+   * The comment to edit.
+   *
+   * If provided, the editor will be pre-filled with the comment content.
+   *
+   * If not provided, the editor will be used to create a new comment.
+   */
+  comment?: Comment;
   onCancel?: () => void;
   onSubmitStart?: () => void;
   onSubmitSuccess?: () => void;
   placeholder?: string;
   submitLabel?: string;
+  /**
+   * The icon to use for the submit button.
+   *
+   * @default 'send'
+   */
+  submitIcon?: "send" | "save";
   submittingLabel?: string;
   channelId: bigint;
   replyingTo?: IndexerAPICommentSchemaType;
@@ -62,18 +81,32 @@ interface EditorComposerProps {
 
 export function EditorComposer({
   autoFocus = false,
+  comment,
   onCancel,
   placeholder = "What's on your mind?",
   submitLabel = "Post",
   submittingLabel = "Posting...",
+  submitIcon = "send",
   onSubmitSuccess,
   channelId,
   replyingTo,
   queryKey,
 }: EditorComposerProps) {
+  const defaultValue = useMemo(() => {
+    if (!comment) {
+      return undefined;
+    }
+
+    return {
+      content: comment.content,
+      references: comment.references,
+    };
+  }, [comment]);
+
   const { address } = useAccount();
   const publicClient = usePublicClient();
   const commentSubmission = useCommentSubmission();
+  const commentEdition = useCommentEdition();
   const { writeContractAsync } = useWriteContract();
   const chainId = useChainId();
   const suggestions = useIndexerSuggestions();
@@ -102,8 +135,6 @@ export function EditorComposer({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const submitMutation = useMutation({
     mutationFn: async (): Promise<void> => {
-      let pendingOperation: PendingPostCommentOperationSchemaType | undefined;
-
       try {
         if (!editorRef.current?.editor) {
           throw new SubmitCommentMutationError("Editor is not initialized");
@@ -152,83 +183,117 @@ export function EditorComposer({
             }),
           );
 
-        const signedCommentResponse = await signCommentOrReaction({
-          author: address,
-          channelId,
-          content,
-          metadata: [],
-          ...(replyingTo
-            ? { parentId: replyingTo.id }
-            : {
-                targetUri: getChannelCaipUri({
-                  chainId,
-                  channelId,
-                }),
-              }),
-        });
+        if (comment) {
+          const signedCommentResponse = await signEditComment({
+            author: address,
+            commentId: comment.id,
+            content,
+            metadata: comment.metadata,
+          });
 
-        const { txHash, wait } = await postComment({
-          commentsAddress: SUPPORTED_CHAINS[base.id].commentManagerAddress,
-          appSignature: signedCommentResponse.signature,
-          comment: signedCommentResponse.data,
-          writeContract: writeContractAsync,
-        });
+          const { txHash, wait } = await editComment({
+            appSignature: signedCommentResponse.signature,
+            edit: signedCommentResponse.data,
+            writeContract: writeContractAsync,
+            commentsAddress: SUPPORTED_CHAINS[base.id].commentManagerAddress,
+          });
 
-        const postedComment = await wait({
-          getContractEvents: publicClient.getContractEvents,
-          waitForTransactionReceipt: publicClient.waitForTransactionReceipt,
-        });
+          await wait({
+            getContractEvents: publicClient.getContractEvents,
+            waitForTransactionReceipt: publicClient.waitForTransactionReceipt,
+          });
 
-        pendingOperation = {
-          action: "post",
-          type: "non-gasless",
-          txHash,
-          chainId,
-          references,
-          response: {
-            data: postedComment
-              ? {
-                  id: postedComment.commentId,
-                  app: postedComment.app,
-                  author: postedComment.author,
-                  channelId: postedComment.channelId,
-                  content: postedComment.content,
-                  commentType: postedComment.commentType,
-                  deadline: signedCommentResponse.data.deadline,
-                  metadata: postedComment.metadata.slice(),
-                  parentId: postedComment.parentId,
-                  targetUri: postedComment.targetUri,
-                }
-              : signedCommentResponse.data,
-            signature: signedCommentResponse.signature,
-            hash: signedCommentResponse.hash,
-          },
-          state: {
-            status: "pending",
-          },
-          resolvedAuthor,
-        };
+          const pendingOperation: PendingEditCommentOperationSchemaType = {
+            action: "edit",
+            chainId: comment.chainId,
+            response: signedCommentResponse,
+            state: {
+              status: "pending",
+            },
+            txHash,
+            type: "non-gasless",
+          };
 
-        // insert
-        commentSubmission.start({
-          pendingOperation,
-          queryKey,
-        });
-
-        // mark as posted
-        commentSubmission.success({
-          queryKey,
-          pendingOperation,
-        });
-      } catch (e) {
-        if (pendingOperation) {
-          commentSubmission.error({
+          commentEdition.start({
             queryKey,
-            commentId: pendingOperation.response.data.id,
-            error: e instanceof Error ? e : new Error(String(e)),
+            pendingOperation,
+          });
+
+          commentEdition.success({
+            queryKey,
+            pendingOperation,
+          });
+        } else {
+          const signedCommentResponse = await signCommentOrReaction({
+            author: address,
+            channelId,
+            content,
+            metadata: [],
+            ...(replyingTo
+              ? { parentId: replyingTo.id }
+              : {
+                  targetUri: getChannelCaipUri({
+                    chainId,
+                    channelId,
+                  }),
+                }),
+          });
+
+          const { txHash, wait } = await postComment({
+            commentsAddress: SUPPORTED_CHAINS[base.id].commentManagerAddress,
+            appSignature: signedCommentResponse.signature,
+            comment: signedCommentResponse.data,
+            writeContract: writeContractAsync,
+          });
+
+          const postedComment = await wait({
+            getContractEvents: publicClient.getContractEvents,
+            waitForTransactionReceipt: publicClient.waitForTransactionReceipt,
+          });
+
+          const pendingOperation: PendingPostCommentOperationSchemaType = {
+            action: "post",
+            type: "non-gasless",
+            txHash,
+            chainId,
+            references,
+            response: {
+              data: postedComment
+                ? {
+                    id: postedComment.commentId,
+                    app: postedComment.app,
+                    author: postedComment.author,
+                    channelId: postedComment.channelId,
+                    content: postedComment.content,
+                    commentType: postedComment.commentType,
+                    deadline: signedCommentResponse.data.deadline,
+                    metadata: postedComment.metadata.slice(),
+                    parentId: postedComment.parentId,
+                    targetUri: postedComment.targetUri,
+                  }
+                : signedCommentResponse.data,
+              signature: signedCommentResponse.signature,
+              hash: signedCommentResponse.hash,
+            },
+            state: {
+              status: "pending",
+            },
+            resolvedAuthor,
+          };
+
+          // insert
+          commentSubmission.start({
+            pendingOperation,
+            queryKey,
+          });
+
+          // mark as posted
+          commentSubmission.success({
+            queryKey,
+            pendingOperation,
           });
         }
-
+      } catch (e) {
         if (e instanceof z.ZodError) {
           throw new InvalidCommentError(
             e.flatten().fieldErrors as Record<string, string[]>,
@@ -328,6 +393,7 @@ export function EditorComposer({
       />
       <Editor
         autoFocus={autoFocus}
+        defaultValue={defaultValue}
         ref={editorRef}
         disabled={submitMutation.isPending}
         placeholder={placeholder}
@@ -369,8 +435,10 @@ export function EditorComposer({
         >
           {submitMutation.isPending ? (
             <Loader2Icon className="h-4 w-4 animate-spin" />
-          ) : (
+          ) : submitIcon === "send" ? (
             <SendIcon className="h-4 w-4" />
+          ) : (
+            <SaveIcon className="h-4 w-4" />
           )}
           {submitMutation.isPending ? submittingLabel : submitLabel}
         </Button>
