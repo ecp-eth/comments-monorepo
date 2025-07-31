@@ -160,7 +160,7 @@ export default function ChannelPage(props: {
 
   if (commentsQuery.status === "pending" || channelQuery.status === "pending") {
     return (
-      <div className="h-screen max-w-[400px] mx-auto bg-background">
+      <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col">
         <div className="p-4 border-b">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-muted rounded-full animate-pulse" />
@@ -170,7 +170,7 @@ export default function ChannelPage(props: {
             </div>
           </div>
         </div>
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 flex flex-col justify-end flex-grow">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="space-y-2">
               <div className="flex items-center space-x-2">
