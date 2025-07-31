@@ -4,10 +4,18 @@ import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  AlertTriangleIcon,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   HeartIcon,
-  Loader2Icon,
+  MoreHorizontalIcon,
   ReplyIcon,
+  EditIcon,
+  TrashIcon,
+  FlagIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isZeroHex } from "@ecp.eth/sdk/core";
@@ -40,8 +48,8 @@ import {
   createCommentRepliesQueryKey,
 } from "@/queries/query-keys";
 import { useUnlikeComment } from "@/hooks/useUnlikeComment";
+import { useDeleteComment } from "@/hooks/useDeleteComment";
 import type { Comment, CommentPageSchemaType } from "@ecp.eth/shared/schemas";
-import { useRetryPostComment } from "@/hooks/useRetryPostComment";
 import { useCheckForNewReplies } from "@/hooks/useCheckForNewReplies";
 
 interface CommentItemProps {
@@ -93,7 +101,7 @@ export function CommentItem({
   const connectBeforeAction = useConnectBeforeAction();
   const likeComment = useLikeComment();
   const unlikeComment = useUnlikeComment();
-  const retryPostComment = useRetryPostComment();
+  const deleteComment = useDeleteComment();
 
   useConsumePendingWalletConnectionActions({
     commentId: comment.id,
@@ -211,6 +219,7 @@ export function CommentItem({
   });
 
   useCheckForNewReplies({
+    enabled: threadComment.id === comment.id,
     comment: threadComment,
     viewer,
   });
@@ -230,6 +239,36 @@ export function CommentItem({
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  // Determine which actions are available
+  const isCommentAuthor =
+    viewer && comment.author.address.toLowerCase() === viewer.toLowerCase();
+  const canEdit = isCommentAuthor;
+  const canDelete = isCommentAuthor;
+  const canReport = !isCommentAuthor;
+
+  // Only show dropdown if any action is available
+  const hasAnyAction = canEdit || canDelete || canReport;
+
+  const handleEditComment = () => {
+    // TODO: Implement edit comment functionality
+    toast.info("Edit functionality coming soon");
+  };
+
+  const handleDeleteComment = () => {
+    const queryKey =
+      comment.id === threadComment.id ? rootQueryKey : repliesQueryKey;
+
+    deleteComment.mutate({
+      comment,
+      queryKey,
+    });
+  };
+
+  const handleReportComment = () => {
+    // TODO: Implement report comment functionality
+    toast.info("Report functionality coming soon");
   };
 
   return (
@@ -286,90 +325,93 @@ export function CommentItem({
           )}
 
           <div className="flex items-center space-x-4 pt-1">
-            {comment.pendingOperation?.action === "post" &&
-              comment.pendingOperation.state.status === "pending" && (
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <Loader2Icon className="w-3 h-3 animate-spin" />
-                  <span className="text-xs ">Posting...</span>
-                </div>
+            <Button
+              disabled={likeComment.isPending || unlikeComment.isPending}
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-auto p-0 text-xs space-x-1",
+                (isHearted || likeComment.isPending) &&
+                  !unlikeComment.isPending &&
+                  "text-red-500",
               )}
+              onClick={connectBeforeAction(() => {
+                const newIsHearted = !isHearted;
 
-            {comment.pendingOperation?.action === "post" &&
-              comment.pendingOperation.state.status === "error" && (
-                <div className="flex items-center gap-1 text-red-500">
-                  <AlertTriangleIcon className="w-3 h-3" />
-                  <span className="text-xs">Failed to post.</span>
-                  <button
-                    className="font-semibold text-xs"
-                    type="button"
-                    onClick={() => {
-                      retryPostComment.mutate({
-                        comment,
-                        queryKey:
-                          comment.id === threadComment.id
-                            ? rootQueryKey
-                            : repliesQueryKey,
-                      });
-                    }}
-                  >
-                    Retry
-                  </button>
-                </div>
-              )}
-
-            {(!comment.pendingOperation ||
-              comment.pendingOperation.state.status === "success") && (
-              <Button
-                disabled={likeComment.isPending || unlikeComment.isPending}
-                variant="ghost"
-                size="sm"
+                return {
+                  type: newIsHearted ? "like" : "unlike",
+                  commentId: comment.id,
+                };
+              })}
+            >
+              <HeartIcon
                 className={cn(
-                  "h-auto p-0 text-xs space-x-1",
+                  "h-3 w-3",
                   (isHearted || likeComment.isPending) &&
                     !unlikeComment.isPending &&
-                    "text-red-500",
+                    "fill-current",
+                  (likeComment.isPending || unlikeComment.isPending) &&
+                    "animate-pulse",
                 )}
-                onClick={connectBeforeAction(() => {
-                  const newIsHearted = !isHearted;
+              />
+              <span>
+                {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
+              </span>
+            </Button>
 
-                  return {
-                    type: newIsHearted ? "like" : "unlike",
-                    commentId: comment.id,
-                  };
-                })}
-              >
-                <HeartIcon
-                  className={cn(
-                    "h-3 w-3",
-                    (isHearted || likeComment.isPending) &&
-                      !unlikeComment.isPending &&
-                      "fill-current",
-                    (likeComment.isPending || unlikeComment.isPending) &&
-                      "animate-pulse",
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto p-0 text-xs space-x-1"
+              onClick={connectBeforeAction(() => {
+                return {
+                  type: "prepareReply",
+                  commentId: comment.id,
+                };
+              })}
+            >
+              <ReplyIcon className="h-3 w-3" />
+              <span>Reply</span>
+            </Button>
+
+            {hasAnyAction && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 text-xs"
+                  >
+                    <MoreHorizontalIcon className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {canEdit && (
+                    <DropdownMenuItem onClick={handleEditComment}>
+                      <EditIcon className="h-4 w-4 mr-2" />
+                      Edit comment
+                    </DropdownMenuItem>
                   )}
-                />
-                <span>
-                  {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
-                </span>
-              </Button>
-            )}
-
-            {(!comment.pendingOperation ||
-              comment.pendingOperation.state.status === "success") && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 text-xs space-x-1"
-                onClick={connectBeforeAction(() => {
-                  return {
-                    type: "prepareReply",
-                    commentId: comment.id,
-                  };
-                })}
-              >
-                <ReplyIcon className="h-3 w-3" />
-                <span>Reply</span>
-              </Button>
+                  {canDelete && (
+                    <DropdownMenuItem
+                      onClick={handleDeleteComment}
+                      disabled={deleteComment.isPending}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <TrashIcon className="h-4 w-4 mr-2" />
+                      {deleteComment.isPending
+                        ? "Deleting..."
+                        : "Delete comment"}
+                    </DropdownMenuItem>
+                  )}
+                  {canReport && (
+                    <DropdownMenuItem onClick={handleReportComment}>
+                      <FlagIcon className="h-4 w-4 mr-2" />
+                      Report comment
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </div>
