@@ -7,6 +7,7 @@ const publicEnvSchema = z.object({
   NEXT_PUBLIC_PINATA_GATEWAY_URL: z.string().nonempty(),
   NEXT_PUBLIC_RPC_URL: z.string().url(),
   NEXT_PUBLIC_APP_SIGNER_ADDRESS: HexSchema,
+  NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS: HexSchema,
 });
 
 const result = publicEnvSchema.safeParse({
@@ -16,6 +17,8 @@ const result = publicEnvSchema.safeParse({
   NEXT_PUBLIC_PINATA_GATEWAY_URL: process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL,
   NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL,
   NEXT_PUBLIC_APP_SIGNER_ADDRESS: process.env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+  NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS:
+    process.env.NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS,
 });
 
 if (!result.success) {
