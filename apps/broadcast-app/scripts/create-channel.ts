@@ -20,7 +20,7 @@ import { createWalletClient, http, parseEther, publicActions } from "viem";
 import { anvil, base } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 import { z } from "zod";
-import { BroadcastHookABI } from "./abi/generated/broadcast-hook-abi.ts";
+import { BroadcastHookABI } from "../src/abi/generated/broadcast-hook-abi.ts";
 
 /**
  * This is local address to the broadcast hook contract on anvil.
