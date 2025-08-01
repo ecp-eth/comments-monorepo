@@ -1,9 +1,9 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
-import { farcasterQuickAuthMiddleware } from "../middleware/farcaster-quick-auth-middleware";
-import { schema } from "../../../schema";
-import { db } from "../../services";
+import { farcasterQuickAuthMiddleware } from "../../../middleware/farcaster-quick-auth-middleware";
+import { schema } from "../../../../../schema";
+import { db } from "../../../../services";
 import { and, desc, eq, isNotNull, isNull, lt, or } from "drizzle-orm";
-import { ChannelResponse } from "../shared-responses";
+import { ChannelResponse } from "../../../shared-responses";
 import { HexSchema } from "@ecp.eth/sdk/core";
 
 function toChannelCursor(channel: { id: bigint; createdAt: Date }): string {
