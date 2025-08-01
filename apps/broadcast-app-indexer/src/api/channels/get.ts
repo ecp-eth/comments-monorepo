@@ -4,6 +4,7 @@ import { schema } from "../../../schema";
 import { db } from "../../services";
 import { and, desc, eq, isNotNull, isNull, lt, or } from "drizzle-orm";
 import { ChannelResponse } from "../shared-responses";
+import { HexSchema } from "@ecp.eth/sdk/core";
 
 function toChannelCursor(channel: { id: bigint; createdAt: Date }): string {
   return Buffer.from(
@@ -59,12 +60,15 @@ export async function channelsGET(api: OpenAPIHono) {
   api.openapi(
     {
       method: "get",
-      path: "/api/channels",
+      path: "/api/apps/:appId/channels",
       tags: ["Channels"],
       description: "Get a list of channels",
       middleware: [farcasterQuickAuthMiddleware] as const,
       request: {
         query: requestQuerySchema,
+        params: z.object({
+          appId: HexSchema,
+        }),
       },
       responses: {
         200: {
@@ -79,6 +83,7 @@ export async function channelsGET(api: OpenAPIHono) {
     },
     async (c) => {
       const { limit, cursor, onlySubscribed } = c.req.valid("query");
+      const { appId } = c.req.valid("param");
 
       const results = await db
         .select()
@@ -87,6 +92,7 @@ export async function channelsGET(api: OpenAPIHono) {
           schema.channelSubscription,
           and(
             eq(schema.channel.id, schema.channelSubscription.channelId),
+            eq(schema.channelSubscription.appId, appId),
             eq(schema.channelSubscription.userFid, c.get("user").fid),
           ),
         )

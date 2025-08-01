@@ -10,18 +10,20 @@ import {
 import { db } from "../../../../services";
 import { schema } from "../../../../../schema";
 import { and, eq } from "drizzle-orm";
+import { HexSchema } from "@ecp.eth/sdk/core";
 
 export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
   api.openapi(
     {
       method: "post",
-      path: "/api/channels/:channelId/subscribe",
+      path: "/api/apps/:appId/channels/:channelId/subscribe",
       tags: ["Channels", "Subscriptions"],
       description: "Subscribes to a channel",
       middleware: [farcasterQuickAuthMiddleware] as const,
       request: {
         params: z.object({
           channelId: z.coerce.bigint(),
+          appId: HexSchema,
         }),
         body: {
           content: {
@@ -85,7 +87,7 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
       },
     },
     async (c) => {
-      const { channelId } = c.req.valid("param");
+      const { channelId, appId } = c.req.valid("param");
 
       if (c.req.header("content-type") !== "application/json") {
         return c.json({ error: "Unsupported media type" }, 415);
@@ -97,6 +99,7 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
         .leftJoin(
           schema.channelSubscription,
           and(
+            eq(schema.channelSubscription.appId, appId),
             eq(schema.channel.id, schema.channelSubscription.channelId),
             eq(schema.channelSubscription.userFid, c.get("user").fid),
           ),
@@ -117,6 +120,7 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
       const [subscription] = await db
         .insert(schema.channelSubscription)
         .values({
+          appId,
           channelId: result.channel.id,
           userFid: c.get("user").fid,
           notificationsEnabled,

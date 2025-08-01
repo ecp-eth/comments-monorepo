@@ -8,6 +8,20 @@
       "when": 1753192448022,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1754031548159,
+      "tag": "0001_replace_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1754031605236,
+      "tag": "0002_rename_tables",
+      "breakpoints": true
     }
   ]
 }

@@ -1,15 +1,11 @@
-import type { Hex } from "@ecp.eth/sdk/core";
-import type { INotificationsService, NotificationDetails } from "./types";
+import type {
+  INotificationsService,
+  INotificationsService_NotifyArgs,
+} from "./types";
 
 export class NoopNotificationsService implements INotificationsService {
-  async notify(
-    subscribers: number[],
-    commentId: Hex,
-    details: NotificationDetails,
-  ): Promise<void> {
-    console.log(
-      `NoopNotificationsService: notify called with subscribers: ${subscribers.length}, commentId: ${commentId}, details: ${JSON.stringify(details)}`,
-    );
+  async notify(args: INotificationsService_NotifyArgs): Promise<void> {
+    console.log(`NoopNotificationsService: notify called`, args);
   }
 
   async process(): Promise<void> {

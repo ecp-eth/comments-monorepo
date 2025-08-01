@@ -10,6 +10,7 @@ import {
 import { db } from "../../../../services";
 import { schema } from "../../../../../schema";
 import { and, eq } from "drizzle-orm";
+import { HexSchema } from "@ecp.eth/sdk/core";
 
 export async function channelSubscriptionPATCH(
   api: OpenAPIHono,
@@ -17,13 +18,14 @@ export async function channelSubscriptionPATCH(
   api.openapi(
     {
       method: "patch",
-      path: "/api/channels/:channelId/subscription",
+      path: "/api/apps/:appId/channels/:channelId/subscription",
       tags: ["Channels", "Subscriptions"],
       description: "Updates subscription settings for a channel",
       middleware: [farcasterQuickAuthMiddleware] as const,
       request: {
         params: z.object({
           channelId: z.coerce.bigint(),
+          appId: HexSchema,
         }),
         body: {
           content: {
@@ -79,7 +81,7 @@ export async function channelSubscriptionPATCH(
       },
     },
     async (c) => {
-      const { channelId } = c.req.valid("param");
+      const { channelId, appId } = c.req.valid("param");
 
       if (c.req.header("Content-Type") !== "application/json") {
         return c.json({ error: "Unsupported media type" }, 415);
@@ -107,6 +109,7 @@ export async function channelSubscriptionPATCH(
         .where(
           and(
             eq(schema.channelSubscription.channelId, channelId),
+            eq(schema.channelSubscription.appId, appId),
             eq(schema.channelSubscription.userFid, c.get("user").fid),
           ),
         )

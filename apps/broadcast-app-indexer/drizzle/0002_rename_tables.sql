@@ -1,0 +1,6 @@
+ALTER TABLE "broadcast_app_indexer_offchain"."app_channel_subscription" RENAME TO "channel_subscription";--> statement-breakpoint
+ALTER TABLE "broadcast_app_indexer_offchain"."neynar_notification_service_notifications_queue" RENAME TO "neynar_notification_service_queue";--> statement-breakpoint
+ALTER TABLE "broadcast_app_indexer_offchain"."channel_subscription" DROP CONSTRAINT "app_channel_subscription_channel_id_app_id_user_fid_pk";--> statement-breakpoint
+ALTER TABLE "broadcast_app_indexer_offchain"."neynar_notification_service_queue" DROP CONSTRAINT "neynar_notification_service_notifications_queue_comment_id_app_id_pk";--> statement-breakpoint
+ALTER TABLE "broadcast_app_indexer_offchain"."channel_subscription" ADD CONSTRAINT "channel_subscription_channel_id_app_id_user_fid_pk" PRIMARY KEY("channel_id","app_id","user_fid");--> statement-breakpoint
+ALTER TABLE "broadcast_app_indexer_offchain"."neynar_notification_service_queue" ADD CONSTRAINT "neynar_notification_service_queue_comment_id_app_id_pk" PRIMARY KEY("comment_id","app_id");

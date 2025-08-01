@@ -22,3 +22,5 @@ export const channel = onchainTable(
     chainIdIdx: index().on(table.chainId),
   }),
 );
+
+export type ChannelSelectType = typeof channel.$inferSelect;
