@@ -44,20 +44,89 @@ const ChainBaseConfig = z.union([
 const ChainConfig = z.intersection(ChainAnvilConfig, ChainBaseConfig);
 
 const BaseConfig = z.object({
-  BROADCAST_APP_MINI_APP_URL: z.string().url(),
   DATABASE_URL: z.string().url(),
   DATABASE_SCHEMA: z.string().trim().nonempty(),
   NEYNAR_API_KEY: z.string().optional(),
   SENTRY_DSN: z.string().optional(),
+  BROADCAST_MINI_APPS: z
+    .record(
+      z.string(),
+      z.object({
+        uri: z.string().url(),
+        appId: HexSchema,
+        notificationUrl: z.string().url(),
+        notificationsIsolated: z
+          .enum(["1", "0"])
+          .default("1")
+          .transform((v) => v === "1"),
+      }),
+    )
+    .refine(
+      (check) => {
+        if (Object.keys(check).length === 0) {
+          return false;
+        }
+
+        return true;
+      },
+      {
+        message: "At least one BROADCAST_MINI_APP_{name}_URI must be set",
+      },
+    ),
 });
 
 const EnvSchema = z.intersection(BaseConfig, ChainConfig);
 
-const _env = EnvSchema.safeParse(process.env);
+const _env = EnvSchema.safeParse({
+  ...process.env,
+  BROADCAST_MINI_APPS: Object.entries(process.env).reduce(
+    (uris, [key, value]) => {
+      if (key.startsWith("BROADCAST_MINI_APP_") && value) {
+        const [, , , appName] = key.split("_");
+
+        if (!appName) {
+          return uris;
+        }
+
+        if (!uris[appName]) {
+          uris[appName] = {
+            uri: "",
+            appId: "",
+            notificationUrl: "",
+            notificationsIsolated: undefined,
+          };
+        }
+
+        if (key.endsWith(`${appName}_URI`)) {
+          uris[appName].uri = value;
+        } else if (key.endsWith(`${appName}_APP_SIGNER_ADDRESS`)) {
+          uris[appName].appId = value;
+        } else if (key.endsWith(`${appName}_NOTIFICATION_URI`)) {
+          uris[appName].notificationUrl = value;
+        } else if (key.endsWith(`${appName}_ISOLATE_NOTIFICATIONS`)) {
+          uris[appName].notificationsIsolated = value;
+        }
+      }
+
+      return uris;
+    },
+    {} as Record<
+      string,
+      {
+        uri: string;
+        appId: string;
+        notificationUrl: string;
+        notificationsIsolated: undefined | string;
+      }
+    >,
+  ),
+});
 
 if (!_env.success) {
-  console.error(_env.error.format());
-  throw new Error("Invalid environment variables:" + _env.error.format());
+  throw new Error(
+    "Invalid environment variables:" +
+      JSON.stringify(_env.error.format(), null, 2),
+  );
 }
 
 export const env = _env.data;
