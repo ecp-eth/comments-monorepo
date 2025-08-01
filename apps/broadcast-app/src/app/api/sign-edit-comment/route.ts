@@ -89,6 +89,7 @@ export async function POST(
   });
 
   const typedCommentData = createEditCommentTypedData({
+    commentsAddress: SUPPORTED_CHAINS[chainId].commentManagerAddress,
     edit,
     chainId,
     author,
