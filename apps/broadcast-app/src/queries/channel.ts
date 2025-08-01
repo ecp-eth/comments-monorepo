@@ -26,7 +26,7 @@ export function useChannelQuery(channelId: bigint) {
     queryKey: createChannelQueryKey(channelId),
     queryFn: async ({ signal }) => {
       const channelUrl = new URL(
-        `/api/channels/${channelId}`,
+        `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channelId}`,
         publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
       );
       const channelResponse = await sdk.quickAuth.fetch(channelUrl, {

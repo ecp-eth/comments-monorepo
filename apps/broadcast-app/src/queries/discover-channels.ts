@@ -14,7 +14,7 @@ export function useDiscoverChannelsQuery() {
     queryKey: createDiscoverChannelsQueryKey(),
     queryFn: async ({ pageParam: cursor, signal }) => {
       const url = new URL(
-        "/api/channels",
+        `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels`,
         publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
       );
 
