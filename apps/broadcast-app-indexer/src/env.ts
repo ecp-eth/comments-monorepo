@@ -59,6 +59,7 @@ const BaseConfig = z.object({
           .enum(["1", "0"])
           .default("1")
           .transform((v) => v === "1"),
+        neynarApiKey: z.string().optional(),
       }),
     )
     .refine(
@@ -94,6 +95,7 @@ const _env = EnvSchema.safeParse({
             appId: "",
             notificationUrl: "",
             notificationsIsolated: undefined,
+            neynarApiKey: undefined,
           };
         }
 
@@ -105,6 +107,8 @@ const _env = EnvSchema.safeParse({
           uris[appName].notificationUrl = value;
         } else if (key.endsWith(`${appName}_ISOLATE_NOTIFICATIONS`)) {
           uris[appName].notificationsIsolated = value;
+        } else if (key.endsWith(`${appName}_NEYNAR_API_KEY`)) {
+          uris[appName].neynarApiKey = value;
         }
       }
 
@@ -117,6 +121,7 @@ const _env = EnvSchema.safeParse({
         appId: string;
         notificationUrl: string;
         notificationsIsolated: undefined | string;
+        neynarApiKey: undefined | string;
       }
     >,
   ),
