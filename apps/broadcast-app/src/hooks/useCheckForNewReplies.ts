@@ -30,16 +30,15 @@ export function useCheckForNewReplies({
 
   const query = useQuery({
     // we don't want to run the query immediately
-    enabled: isEnabled && enabled,
+    enabled: isEnabled && enabled && !!comment.replies,
     refetchInterval: CHECK_FOR_NEW_REPLIES_INTERVAL,
     queryKey: ["check-for-new-replies", comment.id],
     queryFn: async ({ signal }) => {
-      const { cursor } = comment;
+      const cursor = comment.replies?.pagination.startCursor;
 
       const response = await fetchCommentReplies({
-        cursor,
         limit: 1,
-        sort: "asc",
+        ...(cursor && { cursor, sort: "asc" }),
         commentId: comment.id,
         chainId: comment.chainId,
         channelId: comment.channelId,
@@ -53,7 +52,7 @@ export function useCheckForNewReplies({
       });
 
       if (response.results.length > 0) {
-        markChannelCommentsAsHavingNewReplies(comment.channelId, viewer);
+        markChannelCommentsAsHavingNewReplies(comment.id, viewer);
       }
 
       return response;
