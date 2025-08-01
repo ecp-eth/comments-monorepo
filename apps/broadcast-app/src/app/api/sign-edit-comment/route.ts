@@ -16,6 +16,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { chain } from "@/wagmi/config";
 import { createPublicClient } from "viem";
 import { publicEnv } from "@/env/public";
+import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 
 const chainId = chain.id;
 
@@ -73,6 +74,7 @@ export async function POST(
     transport: http(serverEnv.PRIVATE_RPC_URL),
   });
   const nonce = await getNonce({
+    commentsAddress: SUPPORTED_CHAINS[chain.id].commentManagerAddress,
     author,
     app: app.address,
     readContract: publicClient.readContract,
