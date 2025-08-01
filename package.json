@@ -55,5 +55,8 @@
   "lint-staged": {
     "*.{js,ts,tsx,sol}": "prettier --write"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@ecp.eth/build-tools": "workspace:^"
+  }
 }

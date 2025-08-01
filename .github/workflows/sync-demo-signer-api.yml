@@ -1,0 +1,64 @@
+# Sync the demo signer api to a separate repo
+name: Sync demo signer api
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - $default-branch
+      # test branch
+      - docs/1-click-demo-fix
+    paths:
+      - "apps/signer/**"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: setup pnpm
+        uses: "pnpm/action-setup@v2"
+
+      - name: configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: install dependencies
+        run: pnpm install
+
+      - name: install build tools
+        run: pnpm install -w @ecp.eth/build-tools
+
+      - name: replace signer package.json workspace version
+        run: pnpm replace-workspace-version apps/signer/package.json
+
+      - name: copy patches
+        run: |
+          mkdir -p apps/signer/patches
+          cp -r patches/* apps/signer/patches/
+
+      - name: commit changes
+        run: |
+          git add -A
+          git commit -m "chore: sync signer api"
+
+      - name: split signer code into template branch
+        run: |
+          git subtree split --prefix apps/signer -b template-signer-api
+
+      - name: test install and build with npm
+        run: |
+          git checkout template-signer-api
+          rm -rf node_modules
+          pnpm install
+          pnpm run build
+
+      - name: force push template branch
+        run: git push -f origin template-signer-api

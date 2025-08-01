@@ -7,7 +7,8 @@
     "proxy-package": "./bin/proxy-package.js",
     "prepend-mdx-comment": "./bin/prepend-mdx-comment.sh",
     "add-mdx-autogen-warning": "./bin/add-mdx-autogen-warning.sh",
-    "generate-readme-as-index-mdx": "./bin/generate-readme-as-index-mdx.sh"
+    "generate-readme-as-index-mdx": "./bin/generate-readme-as-index-mdx.sh",
+    "replace-workspace-version": "./bin/replace-workspace-version.js"
   },
   "scripts": {
     "proxy-package": "tsx ./src/proxy-package.ts"
