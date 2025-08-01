@@ -1,6 +1,7 @@
 import { createClient, type Client } from "@farcaster/quick-auth";
 import { HonoRequest } from "hono";
 import { MiniAppConfigRegistryService } from "./mini-app-config-registry-service";
+import z from "zod";
 
 type FarcasterQuickAuthOptions = {
   /**
@@ -26,7 +27,18 @@ export class FarcasterQuickAuthService {
   }
 
   async verifyAndDecodeRequest(token: string, req: HonoRequest) {
-    const domain = new URL(req.url).hostname.toLowerCase();
+    const originResult = z
+      .string()
+      .url()
+      .safeParse(req.header("Origin") || req.header("X-MINI-APP-URL"));
+
+    if (!originResult.success) {
+      throw new FarcasterQuickAuthInvalidOriginError(
+        originResult.error.message,
+      );
+    }
+
+    const domain = new URL(originResult.data).hostname.toLowerCase();
 
     if (!this.allowedHostnames.has(domain)) {
       throw new FarcasterQuickAuthInvalidHostnameError(domain);
@@ -44,5 +56,11 @@ export class FarcasterQuickAuthService {
 export class FarcasterQuickAuthInvalidHostnameError extends Error {
   constructor(domain: string) {
     super(`FarcasterQuickAuth: Invalid hostname: ${domain}`);
+  }
+}
+
+export class FarcasterQuickAuthInvalidOriginError extends Error {
+  constructor(origin: string) {
+    super(`FarcasterQuickAuth: Invalid origin: ${origin}`);
   }
 }
