@@ -1,11 +1,14 @@
-import type { Hex } from "@ecp.eth/sdk/core";
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
-import type { INotificationsService, NotificationDetails } from "./types";
+import type {
+  INotificationsService,
+  INotificationsService_NotifyArgs,
+} from "./types";
 import { db } from "./db";
 import { and, asc, eq, lt, or } from "drizzle-orm";
 import { schema } from "../../schema";
 import type { NeynarNotificationServiceQueueSelectType } from "../../schema.offchain";
 import z from "zod";
+import { MiniAppConfigRegistryService } from "./mini-app-config-registry-service";
 
 const notificationValidator = z.object({
   body: z.string().min(1).max(128),
@@ -33,6 +36,7 @@ type NeynarNotificationsServiceOptions = {
    * @default 3
    */
   maxAttempts?: number;
+  miniAppConfigRegistryService: MiniAppConfigRegistryService;
 };
 
 export class NeynarNotificationsService implements INotificationsService {
@@ -41,6 +45,7 @@ export class NeynarNotificationsService implements INotificationsService {
   private delay: number;
   private client: NeynarAPIClient;
   private maxAttempts: number;
+  private miniAppConfigRegistryService: MiniAppConfigRegistryService;
 
   constructor(options: NeynarNotificationsServiceOptions) {
     this.db = options.db;
@@ -50,24 +55,67 @@ export class NeynarNotificationsService implements INotificationsService {
     this.client = new NeynarAPIClient({
       apiKey: options.apiKey,
     });
+    this.miniAppConfigRegistryService = options.miniAppConfigRegistryService;
   }
 
-  async notify(
-    subscribers: number[],
-    commentId: Hex,
-    details: NotificationDetails,
-  ): Promise<void> {
-    notificationValidator.parse(details);
+  async notify({
+    channel,
+    comment,
+  }: INotificationsService_NotifyArgs): Promise<void> {
+    const channelName = channel.name;
+    let title = `New comment in ${channelName}`;
 
-    await this.db
-      .insert(schema.neynarNotificationServiceQueue)
-      .values({
-        commentId,
-        pendingSubscriberFids: subscribers,
-        status: "pending",
-        notification: details,
-      })
-      .onConflictDoNothing();
+    if (title.length > 32) {
+      title = title.slice(0, 29).trim() + "...";
+    }
+
+    const description =
+      "Something new was posted in the channel you are subscribed to.";
+
+    /**
+     * Receives only notifications for comments created by itself
+     */
+    const isolatedApps = this.miniAppConfigRegistryService.getAppsByAppId(
+      comment.app,
+    );
+
+    /**
+     * Receives notifications for all comments
+     */
+    const nonIsolatedApps =
+      this.miniAppConfigRegistryService.getAppsByAppId("*");
+
+    const allApps = [...isolatedApps, ...nonIsolatedApps];
+
+    for (const app of allApps) {
+      const subscribers = await this.db.query.channelSubscription.findMany({
+        columns: {
+          userFid: true,
+        },
+        where: and(
+          eq(schema.channelSubscription.appId, app.appId),
+          eq(schema.channelSubscription.channelId, comment.channelId),
+          eq(schema.channelSubscription.notificationsEnabled, true),
+        ),
+      });
+
+      await this.db
+        .insert(schema.neynarNotificationServiceQueue)
+        .values({
+          commentId: comment.commentId,
+          appId: app.appId,
+          pendingSubscriberFids: subscribers.map((s) => s.userFid),
+          status: "pending" as const,
+          notification: notificationValidator.parse({
+            title,
+            description,
+            targetUrl: app.notificationUrl
+              .replaceAll("{commentId}", comment.commentId)
+              .replaceAll("{channelId}", comment.channelId.toString()),
+          }),
+        })
+        .onConflictDoNothing();
+    }
   }
 
   async process(): Promise<void> {

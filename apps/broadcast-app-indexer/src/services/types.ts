@@ -1,4 +1,5 @@
-import { Hex } from "@ecp.eth/sdk/core";
+import type { Event } from "ponder:registry";
+import type { ChannelSelectType } from "../../ponder.schema";
 
 export type NotificationDetails = {
   /**
@@ -21,12 +22,13 @@ export type NotificationDetails = {
   targetUrl: string;
 };
 
+export type INotificationsService_NotifyArgs = {
+  comment: Event<"CommentManager:CommentAdded">["args"];
+  channel: ChannelSelectType;
+};
+
 export interface INotificationsService {
-  notify: (
-    subscribers: number[],
-    commentId: Hex,
-    details: NotificationDetails,
-  ) => Promise<void>;
+  notify: (args: INotificationsService_NotifyArgs) => Promise<void>;
 
   process(): Promise<void>;
 
