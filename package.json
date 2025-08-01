@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
+    "build:dev": "next build",
     "start": "next start",
     "lint": "next lint",
     "check-types": "tsc --noEmit"
@@ -17,13 +18,7 @@
     "viem": "^2.29.2",
     "zod": "^3.25.76"
   },
-  "peerDependencies": {
-    "@privy-io/server-auth": "^1.26.0",
-    "@ecp.eth/sdk": "^0.0.25",
-    "@ecp.eth/shared": "^0.0.11"
-  },
   "devDependencies": {
-    "@ecp.eth/eslint-config": "workspace:*",
     "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/shared": "workspace:*",
     "@privy-io/server-auth": "^1.26.0",
