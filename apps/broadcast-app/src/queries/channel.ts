@@ -6,7 +6,10 @@ import {
   useQueryClient,
   type UndefinedInitialDataInfiniteOptions,
 } from "@tanstack/react-query";
-import { createChannelQueryKey } from "./query-keys";
+import {
+  createChannelQueryKey,
+  createCommentRepliesQueryKey,
+} from "./query-keys";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { publicEnv } from "@/env/public";
 import { ChannelNotFoundError } from "@/errors";
@@ -153,9 +156,9 @@ export function useMarkChannelCommentsAsHavingNewReplies() {
   const queryClient = useQueryClient();
 
   return useCallback(
-    (channelId: bigint, viewer: Hex | undefined) => {
+    (commentId: Hex, viewer: Hex | undefined) => {
       queryClient.setQueryData(
-        createChannelCommentsQueryKey({ channelId, viewer }),
+        createCommentRepliesQueryKey({ commentId, viewer }),
         (
           old: InfiniteData<IndexerAPIListCommentsSchemaType> | undefined,
         ): InfiniteData<IndexerAPIListCommentsSchemaType> | undefined => {
