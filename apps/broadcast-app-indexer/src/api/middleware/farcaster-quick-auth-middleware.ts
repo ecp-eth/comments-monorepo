@@ -43,13 +43,13 @@ export const farcasterQuickAuthMiddleware =
         address,
       });
     } catch (e) {
-      console.error(e);
-
       if (e instanceof Errors.InvalidTokenError) {
         console.info("Invalid token:", e.message);
 
         throw new HTTPException(401, { message: "Invalid token" });
       }
+
+      console.error(e);
 
       throw e;
     }
