@@ -1,0 +1,79 @@
+# Sync the demo signer api to a separate repo
+name: Sync demo signer api
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/signer/**"
+
+jobs:
+  sync:
+    env:
+      RPC_URL_8453: "http://localhost:8545"
+      APP_SIGNER_PRIVATE_KEY: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+      COMMENTS_INDEXER_URL: "https://api.ethcomments.xyz"
+      GASLESS_METHOD: "private-key"
+      GASLESS_APP_SIGNER_PRIVATE_KEY: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+      GASLESS_SUBMITTER_PRIVATE_KEY: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: setup pnpm
+        uses: "pnpm/action-setup@v2"
+
+      - name: "Setup Node.js"
+        uses: "actions/setup-node@v4"
+        with:
+          node-version-file: ".node-version"
+          cache: "pnpm"
+
+      - name: configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: install dependencies
+        run: pnpm install
+
+      - name: replace signer package.json workspace version
+        run: pnpm replace-workspace-version apps/signer/package.json
+
+      - name: merge signer package.json template
+        run: pnpm merge-json apps/signer/package.json apps/signer/template.package.json
+
+      - name: copy over patches and files
+        run: |
+          mkdir -p apps/signer/patches
+          cp patches/@privy-io__server-auth.patch apps/signer/patches/@privy-io__server-auth.patch
+          cp .node-version apps/signer/.node-version
+
+      - name: commit changes
+        run: |
+          git add -A
+          git commit -m "chore: prepare for sync signer template"
+
+      - name: split signer code into template branch
+        run: |
+          git subtree split --prefix apps/signer -b template-signer-api
+
+      - name: test install and build with npm
+        run: |
+          git checkout template-signer-api
+          rm -rf node_modules
+          pnpm install
+          pnpm run build
+          git add -A
+          git commit -m "chore: include lockfile"
+
+      - name: force push template branch
+        run: git push -f origin template-signer-api
