@@ -22,7 +22,7 @@ export function useSetNotificationStatusOnChannel({
     ...options,
     mutationFn: async (notificationsEnabled: boolean) => {
       const url = new URL(
-        `/api/channels/${channelId}/subscription`,
+        `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channelId}/subscription`,
         publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
       );
 
