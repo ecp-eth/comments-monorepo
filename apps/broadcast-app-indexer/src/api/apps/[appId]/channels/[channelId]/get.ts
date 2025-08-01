@@ -1,13 +1,13 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
-import { farcasterQuickAuthMiddleware } from "../../middleware/farcaster-quick-auth-middleware";
+import { farcasterQuickAuthMiddleware } from "../../../../middleware/farcaster-quick-auth-middleware";
 import {
   BadRequestResponse,
   ChannelResponse,
   NotFoundResponse,
-} from "../../shared-responses";
-import { db } from "../../../services";
+} from "../../../../shared-responses";
+import { db } from "../../../../../services";
 import { and, eq } from "drizzle-orm";
-import { schema } from "../../../../schema";
+import { schema } from "../../../../../../schema";
 import { HexSchema } from "@ecp.eth/sdk/core";
 
 export async function channelGET(api: OpenAPIHono): Promise<void> {
