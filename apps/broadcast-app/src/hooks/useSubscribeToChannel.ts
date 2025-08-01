@@ -49,7 +49,7 @@ export function useSubscribeToChannel({
       }
 
       const url = new URL(
-        `/api/channels/${channel.id}/subscribe`,
+        `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channel.id}/subscribe`,
         publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
       );
 

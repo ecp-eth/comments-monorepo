@@ -25,7 +25,7 @@ export function useUnsubscribeToChannel({
     ...options,
     mutationFn: async () => {
       const url = new URL(
-        `/api/channels/${channel.id}/unsubscribe`,
+        `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channel.id}/unsubscribe`,
         publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
       );
       const response = await sdk.quickAuth.fetch(url, {
