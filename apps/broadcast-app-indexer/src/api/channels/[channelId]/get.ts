@@ -8,18 +8,20 @@ import {
 import { db } from "../../../services";
 import { and, eq } from "drizzle-orm";
 import { schema } from "../../../../schema";
+import { HexSchema } from "@ecp.eth/sdk/core";
 
 export async function channelGET(api: OpenAPIHono): Promise<void> {
   api.openapi(
     {
       method: "get",
-      path: "/api/channels/:channelId",
+      path: "/api/apps/:appId/channels/:channelId",
       tags: ["Channels"],
       description: "Get a channel by ID",
       middleware: [farcasterQuickAuthMiddleware] as const,
       request: {
         params: z.object({
           channelId: z.coerce.bigint(),
+          appId: HexSchema,
         }),
       },
       responses: {
@@ -58,7 +60,7 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
       },
     },
     async (c) => {
-      const { channelId } = c.req.valid("param");
+      const { channelId, appId } = c.req.valid("param");
 
       const [result] = await db
         .select()
@@ -67,6 +69,7 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
           schema.channelSubscription,
           and(
             eq(schema.channel.id, schema.channelSubscription.channelId),
+            eq(schema.channelSubscription.appId, appId),
             eq(schema.channelSubscription.userFid, c.get("user").fid),
           ),
         )

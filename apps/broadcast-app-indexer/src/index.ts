@@ -110,7 +110,7 @@ ponder.on("ChannelManager:ChannelUpdated", async ({ event, context }) => {
 });
 
 ponder.on("CommentManager:CommentAdded", async ({ event, context }) => {
-  const { commentId, channelId, parentId } = event.args;
+  const { channelId, parentId } = event.args;
 
   if (!isZeroHex(parentId)) {
     // this is not a top level comment
@@ -126,35 +126,8 @@ ponder.on("CommentManager:CommentAdded", async ({ event, context }) => {
     return;
   }
 
-  const subscribers = await db.query.channelSubscription.findMany({
-    columns: {
-      userFid: true,
-    },
-    where: and(
-      eq(schema.channelSubscription.channelId, channelId),
-      eq(schema.channelSubscription.notificationsEnabled, true),
-    ),
+  await notificationService.notify({
+    comment: event.args,
+    channel,
   });
-
-  const targetUrl = new URL(
-    `/channels/${channel.id}`,
-    env.BROADCAST_APP_MINI_APP_URL,
-  ).toString();
-
-  const channelName = channel.name;
-  let title = `New comment in ${channelName}`;
-
-  if (title.length > 32) {
-    title = title.slice(0, 29).trim() + "...";
-  }
-
-  await notificationService.notify(
-    subscribers.map((s) => s.userFid),
-    commentId,
-    {
-      title,
-      body: `Something new was posted in the channel you are subscribed to.`,
-      targetUrl,
-    },
-  );
 });

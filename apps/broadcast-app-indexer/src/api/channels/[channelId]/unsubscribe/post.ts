@@ -8,18 +8,20 @@ import {
 import { db } from "../../../../services";
 import { and, eq } from "drizzle-orm";
 import { schema } from "../../../../../schema";
+import { HexSchema } from "@ecp.eth/sdk/core";
 
 export async function channelUnsubscribePOST(api: OpenAPIHono): Promise<void> {
   api.openapi(
     {
       method: "post",
-      path: "/api/channels/:channelId/unsubscribe",
+      path: "/api/apps/:appId/channels/:channelId/unsubscribe",
       tags: ["Channels", "Subscriptions"],
       description: "Unsubscribes from a channel",
       middleware: [farcasterQuickAuthMiddleware] as const,
       request: {
         params: z.object({
           channelId: z.coerce.bigint(),
+          appId: HexSchema,
         }),
       },
       responses: {
@@ -53,13 +55,14 @@ export async function channelUnsubscribePOST(api: OpenAPIHono): Promise<void> {
       },
     },
     async (c) => {
-      const { channelId } = c.req.valid("param");
+      const { channelId, appId } = c.req.valid("param");
 
       const deletedSubscription = await db
         .delete(schema.channelSubscription)
         .where(
           and(
             eq(schema.channelSubscription.channelId, channelId),
+            eq(schema.channelSubscription.appId, appId),
             eq(schema.channelSubscription.userFid, c.get("user").fid),
           ),
         )
