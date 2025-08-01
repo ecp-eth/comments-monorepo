@@ -15,6 +15,7 @@ import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { chain } from "@/wagmi/config";
 import { publicEnv } from "@/env/public";
+import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 
 const quickAuthClient = createClient();
 
@@ -122,6 +123,7 @@ export async function POST(
   });
 
   const typedCommentData = createCommentTypedData({
+    commentsAddress: SUPPORTED_CHAINS[chainId].commentManagerAddress,
     commentData,
     chainId,
   });
