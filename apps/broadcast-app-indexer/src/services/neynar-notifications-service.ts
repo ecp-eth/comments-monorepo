@@ -9,6 +9,7 @@ import { schema } from "../../schema";
 import type { NeynarNotificationServiceQueueSelectType } from "../../schema.offchain";
 import z from "zod";
 import { MiniAppConfigRegistryService } from "./mini-app-config-registry-service";
+import type { Hex } from "@ecp.eth/sdk/core";
 
 const notificationValidator = z.object({
   body: z.string().min(1).max(128),
@@ -27,7 +28,7 @@ type NeynarNotificationsServiceOptions = {
    */
   delay?: number;
   /**
-   * Neynar API key
+   * Neynar API key (global) used if the app doesn't have its own api key
    */
   apiKey: string;
   /**
@@ -43,7 +44,7 @@ export class NeynarNotificationsService implements INotificationsService {
   private db: typeof db;
   private abortController: AbortController;
   private delay: number;
-  private client: NeynarAPIClient;
+  private appClients: Record<Hex, NeynarAPIClient>;
   private maxAttempts: number;
   private miniAppConfigRegistryService: MiniAppConfigRegistryService;
 
@@ -52,10 +53,22 @@ export class NeynarNotificationsService implements INotificationsService {
     this.abortController = new AbortController();
     this.delay = options.delay ?? 300;
     this.maxAttempts = options.maxAttempts ?? 3;
-    this.client = new NeynarAPIClient({
+    this.miniAppConfigRegistryService = options.miniAppConfigRegistryService;
+
+    const globalClient = new NeynarAPIClient({
       apiKey: options.apiKey,
     });
-    this.miniAppConfigRegistryService = options.miniAppConfigRegistryService;
+
+    this.appClients = Object.fromEntries(
+      this.miniAppConfigRegistryService.getAllApps().map((app) => [
+        app.appId.toLowerCase() as Hex,
+        app.neynarApiKey
+          ? new NeynarAPIClient({
+              apiKey: app.neynarApiKey,
+            })
+          : globalClient,
+      ]),
+    );
   }
 
   async notify({
@@ -207,7 +220,16 @@ export class NeynarNotificationsService implements INotificationsService {
     }
 
     try {
-      await this.client.publishFrameNotifications({
+      const client =
+        this.appClients[notification.appId.toLocaleLowerCase() as Hex];
+
+      if (!client) {
+        throw new Error(
+          `NeynarNotificationsService: No client found for appId: ${notification.appId}`,
+        );
+      }
+
+      await client.publishFrameNotifications({
         targetFids,
         notification: {
           body: notification.notification.body,

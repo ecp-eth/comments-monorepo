@@ -5,6 +5,7 @@ type MiniAppConfig = {
   appId: Hex;
   notificationUrl: string;
   notificationsIsolated: boolean;
+  neynarApiKey?: string;
 };
 
 type MiniAppConfigRegistryServiceOptions = {
