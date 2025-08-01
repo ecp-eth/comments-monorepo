@@ -69,7 +69,7 @@ export class NeynarNotificationsService implements INotificationsService {
       title = title.slice(0, 29).trim() + "...";
     }
 
-    const description =
+    const body =
       "Something new was posted in the channel you are subscribed to.";
 
     /**
@@ -108,7 +108,7 @@ export class NeynarNotificationsService implements INotificationsService {
           status: "pending" as const,
           notification: notificationValidator.parse({
             title,
-            description,
+            body,
             targetUrl: app.notificationUrl
               .replaceAll("{commentId}", comment.commentId)
               .replaceAll("{channelId}", comment.channelId.toString()),
