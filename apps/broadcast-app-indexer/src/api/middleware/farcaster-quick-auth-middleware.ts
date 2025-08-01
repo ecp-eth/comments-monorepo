@@ -1,9 +1,9 @@
-import { Errors, createClient } from "@farcaster/quick-auth";
+import { Errors } from "@farcaster/quick-auth";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
-import { env } from "../../env";
 import { HexSchema, type Hex } from "@ecp.eth/sdk/core";
 import { z } from "zod";
+import { farcasterQuickAuthService } from "../../services";
 
 export type FarcasterQuickAuthEnv = {
   Variables: {
@@ -13,8 +13,6 @@ export type FarcasterQuickAuthEnv = {
     };
   };
 };
-
-const client = createClient();
 
 /**
  * Middleware to authenticate Farcaster users using QuickAuth.
@@ -33,10 +31,10 @@ export const farcasterQuickAuthMiddleware =
     }
 
     try {
-      const payload = await client.verifyJwt({
+      const payload = await farcasterQuickAuthService.verifyAndDecodeRequest(
         token,
-        domain: new URL(env.BROADCAST_APP_MINI_APP_URL).hostname,
-      });
+        c.req,
+      );
 
       const address = await resolveUserPrimaryEthAddress(payload.sub);
 
@@ -46,6 +44,7 @@ export const farcasterQuickAuthMiddleware =
       });
     } catch (e) {
       console.error(e);
+
       if (e instanceof Errors.InvalidTokenError) {
         console.info("Invalid token:", e.message);
 
