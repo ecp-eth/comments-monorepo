@@ -13,6 +13,7 @@ import { useAccount, useChainId, useConnect, useDisconnect } from "wagmi";
 import z from "zod";
 import {
   AlertTriangleIcon,
+  ArrowLeftIcon,
   BellIcon,
   BellOffIcon,
   InfoIcon,
@@ -56,10 +57,12 @@ import { useChannelNotificationsManager } from "@/hooks/useChannelNotificationsM
 import { Hex } from "@ecp.eth/sdk/core";
 import { EditCommentBottomSheet } from "@/components/edit-comment-bottom-sheet";
 import { ReportBottomSheet } from "@/components/report-bottom-sheet";
+import { useRouter } from "next/navigation";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
 }) {
+  const router = useRouter();
   const { address } = useAccount();
   const { connect, connectAsync, connectors } = useConnect();
   const chainId = useChainId();
@@ -254,6 +257,15 @@ export default function ChannelPage(props: {
       {/* Sticky Header */}
       <div className="sticky top-0 z-10 bg-background border-b p-4">
         <div className="flex items-center space-x-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 shrink-0"
+            onClick={() => router.back()}
+          >
+            <ArrowLeftIcon className="h-4 w-4" />
+          </Button>
+
           <Avatar className="h-10 w-10">
             <AvatarImage src={"/placeholder.svg"} alt={channel.name} />
             <AvatarFallback>
