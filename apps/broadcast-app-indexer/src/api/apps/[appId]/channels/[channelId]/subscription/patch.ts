@@ -1,14 +1,14 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
-import { farcasterQuickAuthMiddleware } from "../../../middleware/farcaster-quick-auth-middleware";
+import { farcasterQuickAuthMiddleware } from "../../../../../middleware/farcaster-quick-auth-middleware";
 import {
   BadRequestResponse,
   ChannelSubscriptionUpdateResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   UnsupportedMediaTypeResponse,
-} from "../../../shared-responses";
-import { db } from "../../../../services";
-import { schema } from "../../../../../schema";
+} from "../../../../../shared-responses";
+import { db } from "../../../../../../services";
+import { schema } from "../../../../../../../schema";
 import { and, eq } from "drizzle-orm";
 import { HexSchema } from "@ecp.eth/sdk/core";
 
