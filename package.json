@@ -19,8 +19,8 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@ecp.eth/sdk": "workspace:*",
-    "@ecp.eth/shared": "workspace:*",
+    "@ecp.eth/sdk": "^0.0.25",
+    "@ecp.eth/shared": "^0.0.11",
     "@privy-io/server-auth": "^1.26.0",
     "@types/node": "^20",
     "@types/react": "~19.1.0",
