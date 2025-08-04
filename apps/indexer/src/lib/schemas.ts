@@ -204,6 +204,17 @@ export const GetCommentQuerySchema = z.object({
     description:
       "The comment type (e.g. 0=comment, 1=reaction, not passed = all)",
   }),
+  isReplyDeleted: z
+    .enum(["1", "0"])
+    .transform((val) => val === "1")
+    .optional()
+    .openapi({
+      description:
+        "Whether to return only deleted replies or only undeleted replies. If omitted it will return both deleted and undeleted replies.",
+      example: "1",
+      type: "string",
+      pattern: "^(1|0)$",
+    }),
 });
 
 /**
@@ -295,6 +306,17 @@ export const GetCommentsQuerySchema = z.object({
     description:
       "The mode to fetch comments in. Nested will return only the first level of comments. Flat will return all replies sorted by timestamp in descending order.",
   }),
+  isDeleted: z
+    .enum(["1", "0"])
+    .transform((val) => val === "1")
+    .optional()
+    .openapi({
+      description:
+        "Whether to return only deleted or only undeleted comments. If omitted it will return both deleted and undeleted comments.",
+      example: "1",
+      type: "string",
+      pattern: "^(1|0)$",
+    }),
 });
 
 /**

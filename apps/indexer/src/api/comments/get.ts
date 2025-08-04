@@ -8,6 +8,7 @@ import {
   gt,
   gte,
   inArray,
+  isNotNull,
   isNull,
   lt,
   lte,
@@ -69,9 +70,10 @@ export default (app: OpenAPIHono) => {
       moderationScore,
       chainId,
       excludeByModerationLabels: excludeModerationLabels,
+      isDeleted,
     } = c.req.valid("query");
 
-    const sharedConditions = [
+    const sharedConditions: (SQL<unknown> | undefined)[] = [
       author ? eq(schema.comment.author, author) : undefined,
       isNull(schema.comment.parentId),
       targetUri ? eq(schema.comment.targetUri, targetUri) : undefined,
@@ -88,6 +90,11 @@ export default (app: OpenAPIHono) => {
         : undefined,
       moderationScore != null
         ? lte(schema.comment.moderationClassifierScore, moderationScore)
+        : undefined,
+      isDeleted != null
+        ? isDeleted
+          ? isNotNull(schema.comment.deletedAt)
+          : isNull(schema.comment.deletedAt)
         : undefined,
     ];
 

@@ -28,48 +28,68 @@ import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
 
 const FetchCommentOptionsSchema = z.object({
+  commentId: HexSchema,
+  chainId: z.union([z.number().int(), z.array(z.number().int())]),
+  commentType: z.number().int().min(0).max(255).optional(),
+  mode: IndexerAPICommentListModeSchema.optional(),
+  isReplyDeleted: z.boolean().optional(),
+  viewer: HexSchema.optional(),
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  signal: z.instanceof(AbortSignal).optional(),
+  retries: z.number().int().positive().default(3),
+});
+
+export type FetchCommentOptions = {
   /**
    * The ID of the comment to fetch
    */
-  commentId: HexSchema,
+  commentId: Hex;
   /**
    * Filter comments by chain ID(s)
    */
-  chainId: z.union([z.number().int(), z.array(z.number().int())]),
+  chainId: number | number[];
   /**
-   * Filter comments by comment type
+   * The viewer's address. This is useful when the content moderation is enabled on the indexer.
    */
-  commentType: z.number().int().min(0).max(255).optional(),
+  viewer?: Hex;
   /**
    * The mode to fetch comments in by default it returns only the first level of comments.
    * If flat is used it will return all comments sorted by timestamp in descending order.
    *
    * @default "nested"
    */
-  mode: IndexerAPICommentListModeSchema.optional(),
+  mode?: IndexerAPICommentListModeSchemaType;
   /**
-   * The viewer's address. This is useful when the content moderation is enabled on the indexer.
+   * Whether to return only deleted replies or only undeleted replies.
+   * If omitted it will return both deleted and undeleted replies.
    */
-  viewer: HexSchema.optional(),
+  isReplyDeleted?: boolean;
+  /**
+   * Filter comments by comment type
+   */
+  commentType?: number;
   /**
    * URL on which /api/comments endpoint will be called
    *
    * @default "https://api.ethcomments.xyz"
    */
-  apiUrl: z.string().url().default(INDEXER_API_URL),
+  apiUrl?: string;
   /**
    * The signal to abort the request
    */
-  signal: z.instanceof(AbortSignal).optional(),
+  signal?: AbortSignal;
   /**
    * Number of times to retry the signing operation in case of failure.
    *
    * @default 3
    */
-  retries: z.number().int().positive().default(3),
-});
+  retries?: number;
+};
 
-export type FetchCommentOptions = z.input<typeof FetchCommentOptionsSchema>;
+// type check for FetchCommentOptions
+void ({} as FetchCommentOptions satisfies z.input<
+  typeof FetchCommentOptionsSchema
+>);
 
 /**
  * Fetch one single comment from the Indexer API
@@ -88,6 +108,7 @@ export async function fetchComment(
     apiUrl,
     signal,
     retries,
+    isReplyDeleted,
   } = FetchCommentOptionsSchema.parse(options);
 
   const responseData = await runAsync(
@@ -111,6 +132,10 @@ export async function fetchComment(
       // commentType can be 0
       if (commentType != null) {
         url.searchParams.set("commentType", commentType.toString());
+      }
+
+      if (isReplyDeleted != null) {
+        url.searchParams.set("isReplyDeleted", isReplyDeleted ? "1" : "0");
       }
 
       const response = await fetch(url.toString(), {
@@ -173,6 +198,11 @@ export type FetchCommentsOptions = {
    */
   commentType?: number;
   /**
+   * Whether to return only deleted comments or only undeleted comments.
+   * If omitted it will return both deleted and undeleted comments.
+   */
+  isDeleted?: boolean;
+  /**
    * Filter comments by moderation status.
    *
    * By default API returns only approved comments if moderation is enabled for all comments except
@@ -231,6 +261,11 @@ export type FetchCommentsOptions = {
   signal?: AbortSignal;
 };
 
+// type check for FetchCommentsOptions
+void ({} as FetchCommentsOptions satisfies z.input<
+  typeof FetchCommentsOptionsSchema
+>);
+
 const FetchCommentsOptionsSchema = z.object({
   targetUri: z.string().url().optional(),
   author: HexSchema.optional(),
@@ -239,6 +274,7 @@ const FetchCommentsOptionsSchema = z.object({
   app: HexSchema.optional(),
   channelId: z.coerce.bigint().optional(),
   commentType: z.number().int().min(0).max(255).optional(),
+  isDeleted: z.boolean().optional(),
   moderationStatus: IndexerAPICommentModerationStatusSchema.or(
     z.array(IndexerAPICommentModerationStatusSchema),
   ).optional(),
@@ -281,6 +317,7 @@ export async function fetchComments(
     moderationStatus,
     moderationScore,
     excludeByModerationLabels,
+    isDeleted,
   } = FetchCommentsOptionsSchema.parse(options);
 
   const responseData = await runAsync(
@@ -318,6 +355,10 @@ export async function fetchComments(
 
       if (mode) {
         url.searchParams.set("mode", mode);
+      }
+
+      if (isDeleted != null) {
+        url.searchParams.set("isDeleted", isDeleted ? "1" : "0");
       }
 
       // channelId can be 0
@@ -383,6 +424,11 @@ export type FetchCommentRepliesOptions = {
    * Filter replies by chain ID(s)
    */
   chainId: number | number[];
+  /**
+   * Whether to return only deleted replies or only undeleted replies.
+   * If omitted it will return both deleted and undeleted replies.
+   */
+  isReplyDeleted?: boolean;
   /**
    * The viewer's address. This is useful when the content moderation is enabled on the indexer.
    */
@@ -481,7 +527,13 @@ const FetchCommentRepliesOptionSchema = z.object({
   excludeByModerationLabels: z
     .array(IndexerAPIModerationClassificationLabelSchema)
     .optional(),
+  isReplyDeleted: z.boolean().optional(),
 });
+
+// type check for FetchCommentRepliesOptions
+void ({} as FetchCommentRepliesOptions satisfies z.input<
+  typeof FetchCommentRepliesOptionSchema
+>);
 
 /**
  * Fetch replies for a comment from the Indexer API
@@ -508,6 +560,7 @@ export async function fetchCommentReplies(
     moderationStatus,
     moderationScore,
     excludeByModerationLabels,
+    isReplyDeleted,
   } = FetchCommentRepliesOptionSchema.parse(options);
 
   const responseData = await runAsync(
@@ -537,6 +590,10 @@ export async function fetchCommentReplies(
 
       if (mode) {
         url.searchParams.set("mode", mode);
+      }
+
+      if (isReplyDeleted != null) {
+        url.searchParams.set("isReplyDeleted", isReplyDeleted ? "1" : "0");
       }
 
       // channelId can be 0
@@ -620,6 +677,11 @@ const FetchAuthorDataOptionsSchema = z.object({
   signal: z.instanceof(AbortSignal).optional(),
 });
 
+// type check for FetchAuthorDataOptions
+void ({} as FetchAuthorDataOptions satisfies z.input<
+  typeof FetchAuthorDataOptionsSchema
+>);
+
 /**
  * Fetch author data from the Indexer API
  *
@@ -660,32 +722,40 @@ export async function fetchAuthorData(
  * The options for `isMuted()`
  */
 const isMutedOptionsSchema = z.object({
-  /**
-   * Author's address
-   */
   address: HexSchema,
-  /**
-   * URL on which /api/muted-accounts/$address endpoint will be called
-   *
-   * @default "https://api.ethcomments.xyz"
-   */
   apiUrl: z.string().url().default(INDEXER_API_URL),
-  /**
-   * Abort signal for requests
-   */
   signal: z.instanceof(AbortSignal).optional(),
-  /**
-   * Number of times to retry the signing operation in case of failure.
-   *
-   * @default 3
-   */
   retries: z.number().int().positive().default(3),
 });
 
 /**
  * The options for `isMuted()`
  */
-export type IsMutedOptions = z.input<typeof isMutedOptionsSchema>;
+export type IsMutedOptions = {
+  /**
+   * Author's address
+   */
+  address: Hex;
+  /**
+   * URL on which /api/muted-accounts/$address endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  /**
+   * Abort signal for requests
+   */
+  signal?: AbortSignal;
+  /**
+   * Number of times to retry the signing operation in case of failure.
+   *
+   * @default 3
+   */
+  retries?: number;
+};
+
+// type check for IsMutedOptions
+void ({} as IsMutedOptions satisfies z.input<typeof isMutedOptionsSchema>);
 
 /**
  * Checks if an address is marked as a muted on the indexer of your choice.
@@ -777,6 +847,11 @@ const FetchChannelsOptionsSchema = z.object({
   signal: z.instanceof(AbortSignal).optional(),
 });
 
+// type check for FetchChannelsOptions
+void ({} as FetchChannelsOptions satisfies z.input<
+  typeof FetchChannelsOptionsSchema
+>);
+
 /**
  * Fetch channels from the Indexer API
  *
@@ -860,6 +935,11 @@ const FetchChannelOptionsSchema = z.object({
   signal: z.instanceof(AbortSignal).optional(),
 });
 
+// type check for FetchChannelOptions
+void ({} as FetchChannelOptions satisfies z.input<
+  typeof FetchChannelOptionsSchema
+>);
+
 /**
  * Fetch a single channel by ID from the Indexer API
  *
@@ -931,6 +1011,11 @@ const FetchAutocompleteOptionsSchema = z.object({
   retries: z.number().int().positive().default(3),
   signal: z.instanceof(AbortSignal).optional(),
 });
+
+// type check for FetchAutocompleteOptions
+void ({} as FetchAutocompleteOptions satisfies z.input<
+  typeof FetchAutocompleteOptionsSchema
+>);
 
 /**
  * Fetch autocomplete suggestions from the Indexer API
@@ -1020,6 +1105,11 @@ const ReportCommentOptionsSchema = z.object({
   retries: z.number().int().positive().default(3),
   signal: z.instanceof(AbortSignal).optional(),
 });
+
+// type check for ReportCommentOptions
+void ({} as ReportCommentOptions satisfies z.input<
+  typeof ReportCommentOptionsSchema
+>);
 
 /**
  * Report a comment to the Indexer API

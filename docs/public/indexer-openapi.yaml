@@ -249,6 +249,16 @@ paths:
           required: false
           name: commentType
           in: query
+        - schema:
+            type: string
+            description: >-
+              Whether to return only deleted replies or only undeleted replies.
+              If omitted it will return both deleted and undeleted replies.
+            example: '1'
+            pattern: ^(1|0)$
+          required: false
+          name: isReplyDeleted
+          in: query
       responses:
         '200':
           description: A single comment
@@ -2260,6 +2270,16 @@ paths:
               timestamp in descending order.
           required: false
           name: mode
+          in: query
+        - schema:
+            type: string
+            description: >-
+              Whether to return only deleted or only undeleted comments. If
+              omitted it will return both deleted and undeleted comments.
+            example: '1'
+            pattern: ^(1|0)$
+          required: false
+          name: isDeleted
           in: query
       responses:
         '200':
@@ -4289,6 +4309,16 @@ paths:
               timestamp in descending order.
           required: false
           name: mode
+          in: query
+        - schema:
+            type: string
+            description: >-
+              Whether to return only deleted or only undeleted comments. If
+              omitted it will return both deleted and undeleted comments.
+            example: '1'
+            pattern: ^(1|0)$
+          required: false
+          name: isDeleted
           in: query
       responses:
         '200':
