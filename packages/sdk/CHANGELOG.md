@@ -1,5 +1,14 @@
 # @ecp.eth/sdk
 
+## 0.0.26
+
+### Patch Changes
+
+- fe879cc: fix(sdk): export correct addresses in SUPPORTED_CHAINS in local dev
+- 10cc538: feat(sdk): add api to retrieve single comment from indexer
+- bec2b78: feat(sdk): add isDeleted and isReplyDeleted filter to `fetchComment()`, `fetchComments()`, `fetchCommentReplies()`
+- aa089a7: fix(sdk): export IndexerAPICommentReactionSchema
+
 ## 0.0.25
 
 ### Patch Changes
