@@ -1,8 +1,8 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { and, desc, eq, inArray, isNull, or } from "ponder";
+import { and, desc, eq, inArray, isNotNull, isNull, or } from "ponder";
 import { IndexerAPICommentWithRepliesOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { createUserDataAndFormatSingleCommentResponseResolver } from "../../../lib/response-formatters";
 import { env } from "../../../env";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
@@ -55,7 +55,8 @@ const getCommentRoute = createRoute({
 export const setupGetComment = (app: OpenAPIHono) => {
   app.openapi(getCommentRoute, async (c) => {
     const { commentId } = c.req.valid("param");
-    const { viewer, chainId, mode, commentType } = c.req.valid("query");
+    const { viewer, chainId, mode, commentType, isReplyDeleted } =
+      c.req.valid("query");
 
     const sharedConditions: (SQL<unknown> | undefined)[] = [
       eq(schema.comment.id, commentId as `0x${string}`),
@@ -64,7 +65,13 @@ export const setupGetComment = (app: OpenAPIHono) => {
         : inArray(schema.comment.chainId, chainId),
     ];
 
-    const repliesConditions: (SQL<unknown> | undefined)[] = [];
+    const repliesConditions: (SQL<unknown> | undefined)[] = [
+      isReplyDeleted != null
+        ? isReplyDeleted
+          ? isNotNull(schema.comment.deletedAt)
+          : isNull(schema.comment.deletedAt)
+        : undefined,
+    ];
     const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];
 
     // Apply moderation filtering to replies

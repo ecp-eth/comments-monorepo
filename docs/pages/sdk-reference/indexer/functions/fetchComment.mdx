@@ -566,7 +566,7 @@ function fetchComment(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:79](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L79)
+Defined in: [packages/sdk/src/indexer/api.ts:101](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L101)
 
 Fetch one single comment from the Indexer API
 
@@ -574,72 +574,7 @@ Fetch one single comment from the Indexer API
 
 ### options
 
-#### apiUrl?
-
-`string` = `...`
-
-URL on which /api/comments endpoint will be called
-
-**Default**
-
-```ts
-"https://api.ethcomments.xyz"
-```
-
-#### chainId
-
-`number` \| `number`[] = `...`
-
-Filter comments by chain ID(s)
-
-#### commentId
-
-`` `0x${string}` `` = `HexSchema`
-
-The ID of the comment to fetch
-
-#### commentType?
-
-`number` = `...`
-
-Filter comments by comment type
-
-#### mode?
-
-`"flat"` \| `"nested"` = `...`
-
-The mode to fetch comments in by default it returns only the first level of comments.
-If flat is used it will return all comments sorted by timestamp in descending order.
-
-**Default**
-
-```ts
-"nested"
-```
-
-#### retries?
-
-`number` = `...`
-
-Number of times to retry the signing operation in case of failure.
-
-**Default**
-
-```ts
-3
-```
-
-#### signal?
-
-`AbortSignal` = `...`
-
-The signal to abort the request
-
-#### viewer?
-
-`` `0x${string}` `` = `...`
-
-The viewer's address. This is useful when the content moderation is enabled on the indexer.
+[`FetchCommentOptions`](/sdk-reference/indexer/type-aliases/FetchCommentOptions.mdx)
 
 ## Returns
 

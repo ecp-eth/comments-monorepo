@@ -10,24 +10,27 @@
 type FetchCommentOptions = {
   apiUrl?: string;
   chainId: number | number[];
-  commentId: `0x${string}`;
+  commentId: Hex;
   commentType?: number;
-  mode?: "flat" | "nested";
+  isReplyDeleted?: boolean;
+  mode?: IndexerAPICommentListModeSchemaType;
   retries?: number;
   signal?: AbortSignal;
-  viewer?: `0x${string}`;
+  viewer?: Hex;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:72](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L72)
+Defined in: [packages/sdk/src/indexer/api.ts:42](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L42)
 
-## Type declaration
+## Properties
 
 ### apiUrl?
 
 ```ts
 optional apiUrl: string;
 ```
+
+Defined in: [packages/sdk/src/indexer/api.ts:76](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L76)
 
 URL on which /api/comments endpoint will be called
 
@@ -37,21 +40,31 @@ URL on which /api/comments endpoint will be called
 "https://api.ethcomments.xyz"
 ```
 
+***
+
 ### chainId
 
 ```ts
 chainId: number | number[];
 ```
 
+Defined in: [packages/sdk/src/indexer/api.ts:50](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L50)
+
 Filter comments by chain ID(s)
+
+***
 
 ### commentId
 
 ```ts
-commentId: `0x${string}` = HexSchema;
+commentId: Hex;
 ```
 
+Defined in: [packages/sdk/src/indexer/api.ts:46](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L46)
+
 The ID of the comment to fetch
+
+***
 
 ### commentType?
 
@@ -59,13 +72,32 @@ The ID of the comment to fetch
 optional commentType: number;
 ```
 
+Defined in: [packages/sdk/src/indexer/api.ts:70](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L70)
+
 Filter comments by comment type
+
+***
+
+### isReplyDeleted?
+
+```ts
+optional isReplyDeleted: boolean;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:66](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L66)
+
+Whether to return only deleted replies or only undeleted replies.
+If omitted it will return both deleted and undeleted replies.
+
+***
 
 ### mode?
 
 ```ts
-optional mode: "flat" | "nested";
+optional mode: IndexerAPICommentListModeSchemaType;
 ```
+
+Defined in: [packages/sdk/src/indexer/api.ts:61](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L61)
 
 The mode to fetch comments in by default it returns only the first level of comments.
 If flat is used it will return all comments sorted by timestamp in descending order.
@@ -76,11 +108,15 @@ If flat is used it will return all comments sorted by timestamp in descending or
 "nested"
 ```
 
+***
+
 ### retries?
 
 ```ts
 optional retries: number;
 ```
+
+Defined in: [packages/sdk/src/indexer/api.ts:86](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L86)
 
 Number of times to retry the signing operation in case of failure.
 
@@ -90,18 +126,26 @@ Number of times to retry the signing operation in case of failure.
 3
 ```
 
+***
+
 ### signal?
 
 ```ts
 optional signal: AbortSignal;
 ```
 
+Defined in: [packages/sdk/src/indexer/api.ts:80](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L80)
+
 The signal to abort the request
+
+***
 
 ### viewer?
 
 ```ts
-optional viewer: `0x${string}`;
+optional viewer: Hex;
 ```
+
+Defined in: [packages/sdk/src/indexer/api.ts:54](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L54)
 
 The viewer's address. This is useful when the content moderation is enabled on the indexer.

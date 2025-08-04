@@ -1,6 +1,18 @@
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { and, asc, desc, eq, gt, lt, lte, or, isNull, inArray } from "ponder";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  gt,
+  lt,
+  lte,
+  or,
+  isNull,
+  inArray,
+  isNotNull,
+} from "ponder";
 import { IndexerAPIListCommentRepliesOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../../lib/response-formatters";
@@ -64,10 +76,11 @@ export default (app: OpenAPIHono) => {
       excludeByModerationLabels: excludeModerationLabels,
       author,
       moderationScore,
+      isDeleted,
     } = c.req.valid("query");
     const { commentId } = c.req.valid("param");
 
-    const sharedConditions = [
+    const sharedConditions: (SQL<unknown> | undefined)[] = [
       app ? eq(schema.comment.app, app) : undefined,
       author ? eq(schema.comment.author, author) : undefined,
       channelId != null ? eq(schema.comment.channelId, channelId) : undefined,
@@ -82,6 +95,11 @@ export default (app: OpenAPIHono) => {
         : undefined,
       moderationScore != null
         ? lte(schema.comment.moderationClassifierScore, moderationScore)
+        : undefined,
+      isDeleted != null
+        ? isDeleted
+          ? isNotNull(schema.comment.deletedAt)
+          : isNull(schema.comment.deletedAt)
         : undefined,
     ];
     const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];
