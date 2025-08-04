@@ -13,6 +13,7 @@ import type {
   URLResolver,
   FarcasterByNameResolver,
 } from "../../src/resolvers";
+import { Hex } from "viem";
 
 const ensByNameResolver: ENSByNameResolver = new DataLoader(async (keys) =>
   keys.map(() => null),
@@ -159,6 +160,50 @@ describe("resolveCommentReferences", () => {
             end: 17,
           },
           url: "https://app.ens.domains/luc.eth",
+        },
+      ]);
+    });
+
+    it("resolves ens name with subdomains", async () => {
+      resolveEnsByName.mockResolvedValue({
+        address: ("0x" + "0".repeat(40)) as Hex,
+        name: "test.normx.eth",
+        avatarUrl: null,
+        url: "https://app.ens.domains/test.normx.eth",
+      });
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content: "test.normx.eth @test.normx.eth",
+        },
+        options,
+      );
+
+      expect(resolveEnsByName).toHaveBeenCalledTimes(2);
+
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          type: "ens",
+          name: "test.normx.eth",
+          address: ("0x" + "0".repeat(40)) as Hex,
+          avatarUrl: null,
+          position: {
+            start: 0,
+            end: 14,
+          },
+          url: "https://app.ens.domains/test.normx.eth",
+        },
+        {
+          type: "ens",
+          name: "test.normx.eth",
+          address: ("0x" + "0".repeat(40)) as Hex,
+          avatarUrl: null,
+          position: {
+            start: 15,
+            end: 30,
+          },
+          url: "https://app.ens.domains/test.normx.eth",
         },
       ]);
     });
