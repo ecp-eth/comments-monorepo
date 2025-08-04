@@ -87,11 +87,9 @@ export type FetchCommentOptions = {
 };
 
 // type check for FetchCommentOptions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type TestFetchCommentOptionsType = AssertType<
-  FetchCommentOptions,
-  z.input<typeof FetchCommentOptionsSchema>
->;
+void ({} as FetchCommentOptions satisfies z.input<
+  typeof FetchCommentOptionsSchema
+>);
 
 /**
  * Fetch one single comment from the Indexer API
@@ -264,11 +262,9 @@ export type FetchCommentsOptions = {
 };
 
 // type check for FetchCommentsOptions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type TestFetchCommentsOptionsType = AssertType<
-  FetchCommentsOptions,
-  z.input<typeof FetchCommentsOptionsSchema>
->;
+void ({} as FetchCommentsOptions satisfies z.input<
+  typeof FetchCommentsOptionsSchema
+>);
 
 const FetchCommentsOptionsSchema = z.object({
   targetUri: z.string().url().optional(),
@@ -535,11 +531,9 @@ const FetchCommentRepliesOptionSchema = z.object({
 });
 
 // type check for FetchCommentRepliesOptions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type TestFetchCommentRepliesOptionsType = AssertType<
-  FetchCommentRepliesOptions,
-  z.input<typeof FetchCommentRepliesOptionSchema>
->;
+void ({} as FetchCommentRepliesOptions satisfies z.input<
+  typeof FetchCommentRepliesOptionSchema
+>);
 
 /**
  * Fetch replies for a comment from the Indexer API
@@ -684,11 +678,9 @@ const FetchAuthorDataOptionsSchema = z.object({
 });
 
 // type check for FetchAuthorDataOptions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type TestFetchAuthorDataOptionsType = AssertType<
-  FetchAuthorDataOptions,
-  z.input<typeof FetchAuthorDataOptionsSchema>
->;
+void ({} as FetchAuthorDataOptions satisfies z.input<
+  typeof FetchAuthorDataOptionsSchema
+>);
 
 /**
  * Fetch author data from the Indexer API
@@ -763,11 +755,7 @@ export type IsMutedOptions = {
 };
 
 // type check for IsMutedOptions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type TestIsMutedOptionsType = AssertType<
-  IsMutedOptions,
-  z.input<typeof isMutedOptionsSchema>
->;
+void ({} as IsMutedOptions satisfies z.input<typeof isMutedOptionsSchema>);
 
 /**
  * Checks if an address is marked as a muted on the indexer of your choice.
@@ -860,11 +848,9 @@ const FetchChannelsOptionsSchema = z.object({
 });
 
 // type check for FetchChannelsOptions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type TestFetchChannelsOptionsType = AssertType<
-  FetchChannelsOptions,
-  z.input<typeof FetchChannelsOptionsSchema>
->;
+void ({} as FetchChannelsOptions satisfies z.input<
+  typeof FetchChannelsOptionsSchema
+>);
 
 /**
  * Fetch channels from the Indexer API
@@ -950,11 +936,9 @@ const FetchChannelOptionsSchema = z.object({
 });
 
 // type check for FetchChannelOptions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type TestFetchChannelOptionsType = AssertType<
-  FetchChannelOptions,
-  z.input<typeof FetchChannelOptionsSchema>
->;
+void ({} as FetchChannelOptions satisfies z.input<
+  typeof FetchChannelOptionsSchema
+>);
 
 /**
  * Fetch a single channel by ID from the Indexer API
@@ -1029,11 +1013,9 @@ const FetchAutocompleteOptionsSchema = z.object({
 });
 
 // type check for FetchAutocompleteOptions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type TestFetchAutocompleteOptionsType = AssertType<
-  FetchAutocompleteOptions,
-  z.input<typeof FetchAutocompleteOptionsSchema>
->;
+void ({} as FetchAutocompleteOptions satisfies z.input<
+  typeof FetchAutocompleteOptionsSchema
+>);
 
 /**
  * Fetch autocomplete suggestions from the Indexer API
@@ -1125,11 +1107,9 @@ const ReportCommentOptionsSchema = z.object({
 });
 
 // type check for ReportCommentOptions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type TestReportCommentOptionsType = AssertType<
-  ReportCommentOptions,
-  z.input<typeof ReportCommentOptionsSchema>
->;
+void ({} as ReportCommentOptions satisfies z.input<
+  typeof ReportCommentOptionsSchema
+>);
 
 /**
  * Report a comment to the Indexer API
