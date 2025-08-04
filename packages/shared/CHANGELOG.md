@@ -1,5 +1,16 @@
 # @ecp.eth/shared
 
+## 0.0.12
+
+### Patch Changes
+
+- 5c63aab: feat(shared): add a possibility to override element renderers in renderToMarkdown
+- Updated dependencies [fe879cc]
+- Updated dependencies [10cc538]
+- Updated dependencies [bec2b78]
+- Updated dependencies [aa089a7]
+  - @ecp.eth/sdk@0.0.26
+
 ## 0.0.11
 
 ### Patch Changes
