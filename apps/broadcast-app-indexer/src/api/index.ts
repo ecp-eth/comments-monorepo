@@ -29,11 +29,6 @@ app.onError((err, c) => {
     console.error(err);
   }
 
-  if (err instanceof HTTPException) {
-    // Get the custom response
-    return err.getResponse();
-  }
-
   // Capture error in Sentry
   Sentry.captureException(err, {
     extra: {
@@ -41,6 +36,11 @@ app.onError((err, c) => {
       method: c.req.method,
     },
   });
+
+  if (err instanceof HTTPException) {
+    // Get the custom response
+    return err.getResponse();
+  }
 
   return Response.json({ message: "Internal server error" }, { status: 500 });
 });
