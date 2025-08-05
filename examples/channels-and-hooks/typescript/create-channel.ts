@@ -2,8 +2,6 @@ import {
   createChannel,
   getChannelCreationFee,
 } from "@ecp.eth/sdk/channel-manager";
-import { CHANNEL_MANAGER_ADDRESS } from "@ecp.eth/sdk";
-import { ChannelManagerABI } from "@ecp.eth/sdk/abis";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { parseEnv } from "./util";
@@ -11,7 +9,6 @@ import {
   createMetadataEntry,
   MetadataTypeValues,
 } from "@ecp.eth/sdk/comments/metadata";
-import { sepolia } from "viem/chains";
 
 const { privateKey, rpcUrl, chain } = parseEnv();
 
