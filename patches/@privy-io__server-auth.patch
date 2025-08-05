@@ -1,26 +1,13 @@
 diff --git a/dist/dts/viem.d.mts b/dist/dts/viem.d.mts
-index 6ffed073a4ddcc69ce67648a69176e5550b7b456..42bea92d9a90aeea00fb06e4e939b5900aaa3ebc 100644
+index 2d6ee0e0175e05b26e32190dd05775d5d08a3abd..027549d94658f08d7dac5c7bc90d6ce96642c73b 100644
 --- a/dist/dts/viem.d.mts
 +++ b/dist/dts/viem.d.mts
 @@ -1,6 +1,6 @@
  import { LocalAccount } from 'viem/accounts';
 -import { PrivyClient } from './index.js';
--import { H as Hex } from './public-BAGJecXe.js';
+-import { H as Hex } from './public-DQ5eO1J3.js';
 +import { PrivyClient } from './index.mts';
-+import { H as Hex } from './public-BAGJecXe.mts';
++import { H as Hex } from './public-DQ5eO1J3.mts';
  import '@solana/web3.js';
  import 'redaxios';
  import '@privy-io/public-api';
-diff --git a/package.json b/package.json
-index f07f9de48462d12c1584d029c09fb625b9c8708c..8538c355226f6fdb40ffd2eb24cf57b45cb93026 100644
---- a/package.json
-+++ b/package.json
-@@ -88,6 +88,8 @@
-     "@noble/hashes": "^1.5.0",
-     "@privy-io/public-api": "2.32.0",
-     "@solana/web3.js": "^1.95.8",
-+    "@hpke/chacha20poly1305": "^1.6.2",
-+    "@hpke/core": "^1.7.2",
-     "canonicalize": "^2.0.0",
-     "dotenv": "^16.0.3",
-     "jose": "^4.10.4",

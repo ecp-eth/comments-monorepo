@@ -16,7 +16,7 @@ overrides:
 
 patchedDependencies:
   '@privy-io/server-auth':
-    hash: 78088c76aea7ad10983f0789b33590118cecdd976346ac52e3b965b6bed7202a
+    hash: 3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c
     path: patches/@privy-io__server-auth.patch
   '@rainbow-me/rainbowkit':
     hash: de27859521ffa1f2f5bc03d5400233e30552e5f51b766007d69da9b01003d1c8
@@ -90,8 +90,8 @@ importers:
         specifier: ^2.13.1
         version: 2.44.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@privy-io/server-auth':
-        specifier: 1.26.0
-        version: 1.26.0(patch_hash=78088c76aea7ad10983f0789b33590118cecdd976346ac52e3b965b6bed7202a)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
+        specifier: 1.30.0
+        version: 1.30.0(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
       '@radix-ui/react-avatar':
         specifier: ^1.1.3
         version: 1.1.10(@types/react-dom@19.1.5(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -658,8 +658,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared
       '@privy-io/server-auth':
-        specifier: 1.26.0
-        version: 1.26.0(patch_hash=78088c76aea7ad10983f0789b33590118cecdd976346ac52e3b965b6bed7202a)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
+        specifier: ^1.30.0
+        version: 1.30.0(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
       '@types/node':
         specifier: ^20
         version: 20.11.17
@@ -2861,16 +2861,15 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.8
 
-  '@privy-io/api-base@1.5.1':
-    resolution: {integrity: sha512-UokueOxl2hoW+kfFTzwV8uqwCNajSaJJEGSWHpsuKvdDQ8ePwXe53Gr5ptnKznaZlMLivc25mrv92bVEJbclfQ==}
+  '@privy-io/api-base@1.5.2':
+    resolution: {integrity: sha512-0eJBoQNmCSsWSWhzEVSU8WqPm7bgeN6VaAmqeXvjk8Ni0jM8nyTYjmRAqiCSs3mRzsnlQVchkGR6lsMTHkHKbw==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
 
-  '@privy-io/public-api@2.32.0':
-    resolution: {integrity: sha512-zbqU7+mWSFLyurr0JVrpoRsMEtFp4VLXcqesrh60ZfPbYuUN+ULoY/mNrHFrvtSQCB0wq+sU3b679kS36g88XA==}
-    engines: {node: '>=18.0.0', npm: '>=8.0.0'}
+  '@privy-io/public-api@2.42.0':
+    resolution: {integrity: sha512-cmo4Bx85f6zdxojjTmc9z+bxaoINGP8HzsMTor7e8olQcHvVxnol0otcMs1haG+6wrvZL7zn6+SBlQtK0bQmJg==}
 
-  '@privy-io/server-auth@1.26.0':
-    resolution: {integrity: sha512-E6pbxgx01RfB4BQ4c1JhrAOSPXqR9/c/GEJBq5iF+/CKrRdRXUMH1Q7OEPnjHCIEcYNErLwkydaql/QH5NNz0A==}
+  '@privy-io/server-auth@1.30.0':
+    resolution: {integrity: sha512-3pBKB4836P2qrein9a1mnWLwskuJWI5fvc7rykwBNkRwC9suFPpjozJkGmI1gour5AsEs2klDsg2fZZPzLM8uA==}
     peerDependencies:
       ethers: ^6
       viem: ~2.29.2
@@ -13885,13 +13884,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@privy-io/api-base@1.5.1':
+  '@privy-io/api-base@1.5.2':
     dependencies:
       zod: 3.25.76
 
-  '@privy-io/public-api@2.32.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)':
+  '@privy-io/public-api@2.42.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)':
     dependencies:
-      '@privy-io/api-base': 1.5.1
+      '@privy-io/api-base': 1.5.2
       bs58: 5.0.0
       libphonenumber-js: 1.12.8
       viem: 2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -13901,11 +13900,13 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@privy-io/server-auth@1.26.0(patch_hash=78088c76aea7ad10983f0789b33590118cecdd976346ac52e3b965b6bed7202a)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))':
+  '@privy-io/server-auth@1.30.0(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))':
     dependencies:
+      '@hpke/chacha20poly1305': 1.6.2
+      '@hpke/core': 1.7.2
       '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0
-      '@privy-io/public-api': 2.32.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
+      '@privy-io/public-api': 2.42.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@solana/web3.js': 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       canonicalize: 2.1.0
       dotenv: 16.5.0
