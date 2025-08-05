@@ -25,12 +25,12 @@ export class MiniAppConfigRegistryService {
     for (const [, app] of Object.entries(this.apps)) {
       const appId = app.appId.toLowerCase() as Hex;
 
-      if (!this.appIdToApp[appId]) {
-        this.appIdToApp[appId] = [];
-      }
-
       if (app.notificationsIsolated) {
-        this.appIdToApp[appId]!.push(app);
+        const appsById = this.appIdToApp[appId] ?? [];
+
+        appsById.push(app);
+
+        this.appIdToApp[appId] = appsById;
       } else {
         this.appIdToApp["*"].push(app);
       }
