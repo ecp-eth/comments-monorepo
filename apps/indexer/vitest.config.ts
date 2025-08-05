@@ -9,5 +9,10 @@ process.env.ENS_RPC_URL ||= "https://ethereum-rpc.publicnode.com";
 process.env.SIM_API_KEY ||= "test";
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  plugins: [
+    // @ts-expect-error - something incompatible regarding the types
+    tsconfigPaths({
+      skip: (dir) => dir.includes("demo-rn-expo"),
+    }),
+  ],
 });
