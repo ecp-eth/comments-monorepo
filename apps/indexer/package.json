@@ -33,7 +33,7 @@
     "@grammyjs/parse-mode": "^2.2.0",
     "@hono/node-server": "^1.18.2",
     "@hono/zod-openapi": "^1.1.0",
-    "@neynar/nodejs-sdk": "^2.13.1",
+    "@neynar/nodejs-sdk": "^2.44.0",
     "@noble/ed25519": "^2.2.3",
     "@ponder/client": "0.11.32",
     "@sentry/node": "^9.3.0",
@@ -66,7 +66,7 @@
     "eslint": "^9.19.0",
     "globals": "^15.14.0",
     "nock": "^14.0.5",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.4"
+    "vite-tsconfig-paths": "5.1.4",
+    "vitest": "3.2.4"
   }
 }
