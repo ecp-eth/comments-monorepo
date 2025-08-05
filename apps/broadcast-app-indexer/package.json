@@ -19,7 +19,7 @@
     "serve": "ponder serve",
     "lint": "eslint \"./src/**/*.ts\"",
     "check-types": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "sync:broadcast-hook:abi": "node ../../packages/protocol/build-broadcast-hook-abi.js > src/abi/generated/broadcast-hook-abi.ts"
   },
