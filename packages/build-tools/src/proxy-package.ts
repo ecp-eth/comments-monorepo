@@ -1,5 +1,3 @@
-#!/usr/bin/env npx --yes tsx
-
 /**
  * Proxy Packages (as termed by the wagmi team) are package.json files stored in
  * directories named after exported modules. They redirect import requests
