@@ -39,12 +39,11 @@
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "0.41.0",
     "hono": "^4.5.0",
-    "kysely": "^0.26.3",
     "lru-cache": "^11.0.2",
     "pg": "^8.11.3",
     "ponder": "0.11.26",
     "viem": "^2.29.2",
-    "zod": "^3.25.27"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",
@@ -53,7 +52,7 @@
     "eslint": "^9.19.0",
     "globals": "^15.14.0",
     "nock": "^14.0.5",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.4"
+    "vite-tsconfig-paths": "5.1.4",
+    "vitest": "3.2.4"
   }
 }
