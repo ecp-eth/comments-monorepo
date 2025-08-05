@@ -3,7 +3,7 @@
 ## Approvals
 
 The protocol implements an approvals system that allows comment authors to delegate the ability for an app to post comments on their behalf.
-This enables a smooth UX by which a user signs a one time approval transaction, and the app can post comments on their behalf without the need for the user to sign each transaction.
+This enables a smooth UX where a user signs a one-time approval transaction, and the app can post comments on their behalf without requiring the user to sign each comment.
 These approvals can be revoked by the user at any time.
 
 ### Approval Expiry
@@ -46,7 +46,7 @@ if (expiry > 0 && expiry > Math.floor(Date.now() / 1000)) {
 
 #### Smart Contract Interface
 
-The approval functions now require an expiry parameter:
+The approval functions require an expiry parameter:
 
 ```solidity
 // Add approval with expiry
@@ -71,20 +71,38 @@ function getApprovalExpiry(
 
 ## Signatures
 
-Comments require different signatures depending on whether the author has granted approval to the app:
+Comments require different signatures depending on whether the author has granted approval to the app.
 
-**With Approval:** When a user has granted approval to an app, comments only need to be signed by the app. The app can post comments on the user's behalf using the pre-existing approval.
+### With Approval
 
-**Without Approval:** When no approval exists, comments must be signed by both the app and the comment author.
+When a user has granted approval to an app, the app can post comments on the user’s behalf. This is done using the `withSig` methods (e.g. `postCommentWithSig`), where:
 
-This means that every comment is attributable to an app and author. This enables the app to impose offchain limitations and gating on which comments it wants to co-sign, as well as allowing the app to choose whether to index and display comments from other apps or not.
+- The **author signature can be omitted** (pass an empty string).
+- The app signature is required, and the transaction can be sent by any relayer (this enables gasless UX) or the app itself.
+
+```typescript
+await postCommentWithSig({
+  author,
+  app,
+  content,
+  // authorSignature: omitted
+  appSignature,
+  ...
+});
+```
+
+> 🔒 **Note:** The simpler `postComment` method is **not suitable** for use with approvals, because it must be called directly by the author and cannot rely on app-level delegation.
+
+### Without Approval
+
+If no approval exists, comments must be signed by both the app and the author. This means that every comment is attributable to an app and author. This enables the app to impose offchain limitations and gating on which comments it wants to co-sign, as well as allowing the app to choose whether to index and display comments from other apps or not.
 If interacting with the protocol directly, the user can also choose to self sign the comment, signing with their address as the app and author.
 
 ## Authentication Methods
 
-Each comment stores how it was authenticated onchain via an `authMethod` field.
+Each comment stores how it was authenticated onchain via an `authMethod` field:
 
-- **`0` (DIRECT_TX)** - User signed transaction directly
+- **`0` (DIRECT_TX)** - User signed and submitted the transaction directly
 - **`1` (APP_APPROVAL)** - User pre-approved the app
 - **`2` (AUTHOR_SIGNATURE)** - User signed comment hash
 
