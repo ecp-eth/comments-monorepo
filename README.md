@@ -1,8 +1,10 @@
+[deploy-vercel]: https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fecp-eth%2Fcomments-monorepo%2Ftree%2Ftemplate-signer-api&env=RPC_URL_8453,APP_SIGNER_PRIVATE_KEY,COMMENTS_INDEXER_URL&envDescription=For%20detailed%20Environment%20Variables%20configuration%20please%20see%3A&envLink=https%3A%2F%2Fdocs.ethcomments.xyz%2Fdemos%2Fsigner-api-service%23environment-variables&project-name=signer-api-service&repository-name=signer-api-service "1 click deploy to Vercel"
+
 # ECP Comments Signer
 
 A Next.js API service for signing ECP comments. Provides both standard signing and gasless signing endpoints for posting, editing, and deleting comments.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fecp-eth%2Fcomments-monorepo%2Fapps%2Fsigner&env=ENABLED_CHAINS,APP_SIGNER_PRIVATE_KEY)
+[![Deploy with Vercel](https://vercel.com/button)][deploy-vercel]
 
 ## Features
 
@@ -40,7 +42,8 @@ A Next.js API service for signing ECP comments. Provides both standard signing a
    ```
 
 4. **Deploy to Vercel:**
-   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ecp-eth/comments-monorepo/apps/signer)
+
+   [![Deploy with Vercel](https://vercel.com/button)][deploy-vercel]
 
 ## Environment Variables
 

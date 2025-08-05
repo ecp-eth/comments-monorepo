@@ -1,6 +1,6 @@
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod";
-import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
+import { DEFAULT_CHAIN_ID, SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 
 export function getRpcUrl(chainId: number) {
   return process.env[`RPC_URL_${chainId}`];
@@ -39,14 +39,19 @@ ${JSON.stringify(this.validationError.flatten(), null, 2)}
 // Required environment variables for basic signing
 const BaseEnvSchema = z.object({
   APP_SIGNER_PRIVATE_KEY: HexSchema.optional(),
-  ENABLED_CHAINS: z.preprocess((val) => {
-    if (typeof val === "string") {
-      return val.split(",").map(Number);
-    }
+  ENABLED_CHAINS: z
+    .preprocess((val) => {
+      if (typeof val === "string") {
+        return val.split(",").map(Number);
+      }
 
-    return val;
-  }, z.array(ChainIdSchema).min(1)),
-  DEFAULT_CHAIN_ID: ChainIdSchema,
+      return val;
+    }, z.array(ChainIdSchema).min(1))
+    // default to base mainnet since indexer supports it,
+    // also this makes vercel 1 click deployment env var configuration easier
+    // the user only need to specify RPC url to make it deployed
+    .default([DEFAULT_CHAIN_ID]),
+  DEFAULT_CHAIN_ID: ChainIdSchema.default(DEFAULT_CHAIN_ID),
   COMMENTS_INDEXER_URL: z.string().url().optional(),
 });
 
