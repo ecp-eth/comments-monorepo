@@ -85,10 +85,7 @@ const hookCommentFee = await publicClient.readContract({
 console.log("Hook comment fee:", hookCommentFee);
 
 // 5. Calculate the total fee required
-// Caveat: In real world situation please use one of the big decimal libraries to
-// avoid precision loss when converting back and forth between big int and number
-
-const totalFee = commentCreationFee + BigInt(Number(hookCommentFee) / (10000 - transactionHookFee) * 10000);
+totalFee += (feeRequiredByHook * 10000n) / BigInt(10000 - transactionHookFee);
 
 console.log("Total fee required:", totalFee);
 ```

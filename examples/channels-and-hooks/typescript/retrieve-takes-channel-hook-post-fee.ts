@@ -32,8 +32,8 @@ async function main() {
     transport: http(rpcUrl),
   });
 
-  async function getFeeRequiredByHook(hookAddress: Hex) {
-    let feeRequiredByHook: BigInt | undefined;
+  async function getFeeRequiredByHook(hookAddress: Hex): Promise<bigint> {
+    let feeRequiredByHook: bigint | undefined;
 
     try {
       console.log("Reading takes channel hook comment fee");
@@ -119,10 +119,8 @@ async function main() {
 
     console.log("Transaction hook fee:", transactionHookFee);
 
-    // in real world situation please use one of the big decimal libraries to avoid precision loss
-    totalFee += BigInt(
-      (Number(feeRequiredByHook) / (10000 - transactionHookFee)) * 10000,
-    );
+    totalFee +=
+      (feeRequiredByHook * 10000n) / BigInt(10000 - transactionHookFee);
 
     return totalFee;
   }
