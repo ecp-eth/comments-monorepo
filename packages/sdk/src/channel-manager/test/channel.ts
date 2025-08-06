@@ -18,8 +18,10 @@ import {
   ownerOf,
   updateChannel,
   setChannelCreationFee,
+  setCommentCreationFee,
   withdrawFees,
   setBaseURI,
+  getCommentCreationFee,
 } from "../channel.js";
 import { ChannelManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
@@ -55,17 +57,29 @@ describe("channel", () => {
   }).extend(publicActions);
 
   async function resetFees() {
-    const creationFee = await setChannelCreationFee({
+    const channelCreationFee = await setChannelCreationFee({
       fee: parseEther("0.02"),
       writeContract: client.writeContract,
       channelManagerAddress,
     });
 
-    const receipt = await client.waitForTransactionReceipt({
-      hash: creationFee.txHash,
+    const channelCreationFeeReceipt = await client.waitForTransactionReceipt({
+      hash: channelCreationFee.txHash,
     });
 
-    assert.equal(receipt.status, "success");
+    assert.equal(channelCreationFeeReceipt.status, "success");
+
+    const commentCreationFee = await setCommentCreationFee({
+      fee: parseEther("0.00"),
+      writeContract: client.writeContract,
+      channelManagerAddress,
+    });
+
+    const commentCreationFeeReceipt = await client.waitForTransactionReceipt({
+      hash: commentCreationFee.txHash,
+    });
+
+    assert.equal(commentCreationFeeReceipt.status, "success");
   }
 
   beforeEach(async () => {
@@ -342,6 +356,93 @@ describe("channel", () => {
 
       // Verify the new fee
       const fee = await getChannelCreationFee({
+        readContract: client.readContract,
+        channelManagerAddress,
+      });
+
+      assert.deepEqual(fee, { fee: newFee });
+    });
+  });
+
+  describe("getCommentCreationFee()", () => {
+    it("returns the fee", async () => {
+      const fee = await getCommentCreationFee({
+        readContract: client.readContract,
+        channelManagerAddress,
+      });
+
+      assert.deepEqual(
+        fee,
+        { fee: parseEther("0.00") },
+        "should return default comment creation fee",
+      );
+    });
+
+    it("returns updated fee", async () => {
+      const result = await setCommentCreationFee({
+        fee: parseEther("0.05"),
+        writeContract: client.writeContract,
+        channelManagerAddress,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      assert.equal(receipt.status, "success");
+
+      const fee = await getCommentCreationFee({
+        readContract: client.readContract,
+        channelManagerAddress,
+      });
+
+      assert.deepEqual(
+        fee,
+        { fee: parseEther("0.05") },
+        "should return updated comment creation fee",
+      );
+    });
+  });
+
+  describe("setCommentCreationFee()", () => {
+    it("fails if the account is not an owner", async () => {
+      await assert.rejects(
+        async () => {
+          const result = await setCommentCreationFee({
+            fee: parseEther("0.03"),
+            writeContract: client2.writeContract,
+            channelManagerAddress,
+          });
+
+          await client.waitForTransactionReceipt({
+            hash: result.txHash,
+          });
+        },
+        (err: unknown) => {
+          const error = err as ContractFunctionExecutionError;
+          assert.ok(err instanceof ContractFunctionExecutionError);
+          assert.ok(error.message.includes("Error: Unauthorized()"));
+          return true;
+        },
+      );
+    });
+
+    it("sets new fee", async () => {
+      const newFee = parseEther("0.03");
+      const result = await setCommentCreationFee({
+        fee: newFee,
+        writeContract: client.writeContract,
+        channelManagerAddress,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      assert.equal(receipt.status, "success");
+
+      // Verify the new fee
+      const fee = await getCommentCreationFee({
         readContract: client.readContract,
         channelManagerAddress,
       });

@@ -34,6 +34,12 @@ import {
   setBaseURI,
   type ChannelExistsParams,
   channelExists,
+  type GetCommentCreationFeeParams,
+  type GetCommentCreationFeeResult,
+  getCommentCreationFee,
+  type SetCommentCreationFeeParams,
+  type SetCommentCreationFeeResult,
+  setCommentCreationFee,
 } from "../channel.js";
 
 export type UseCreateChannelParams = Omit<CreateChannelParams, "writeContract">;
@@ -301,6 +307,92 @@ export function useSetChannelCreationFee(
     ...options,
     mutationFn: (params) => {
       return setChannelCreationFee({
+        ...params,
+        writeContract: writeContractAsync,
+      });
+    },
+  });
+}
+
+export type UseGetCommentCreationFeeParams = Omit<
+  GetCommentCreationFeeParams,
+  "readContract"
+>;
+export type UseGetCommentCreationFeeOptions = Omit<
+  UseQueryOptions<GetCommentCreationFeeResult, Error>,
+  "queryKey" | "queryFn"
+>;
+export type UseGetCommentCreationFeeResult = UseQueryResult<
+  GetCommentCreationFeeResult,
+  Error
+>;
+
+/**
+ * Get the creation fee from channel manager
+ *
+ * @param params - The parameters for getting the creation fee from channel manager
+ * @param options - The options for the query
+ * @returns The result of the query
+ */
+export function useGetCommentCreationFee(
+  params: UseGetCommentCreationFeeParams = {},
+  options: UseGetCommentCreationFeeOptions = {},
+): UseGetCommentCreationFeeResult {
+  const client = usePublicClient();
+
+  return useQuery({
+    ...options,
+    enabled: options.enabled && !!client,
+    queryKey: ["commentCreationFee", params.channelManagerAddress],
+    queryFn: async () => {
+      const result = await getCommentCreationFee({
+        ...params,
+        readContract: async (params) => {
+          if (!client) {
+            throw new Error("Client not found");
+          }
+
+          return client.readContract(params);
+        },
+      });
+      return result;
+    },
+  });
+}
+
+export type UseSetCommentCreationFeeParams = Omit<
+  SetCommentCreationFeeParams,
+  "writeContract"
+>;
+export type UseSetCommentCreationFeeOptions = Omit<
+  UseMutationOptions<
+    SetCommentCreationFeeResult,
+    Error,
+    UseSetCommentCreationFeeParams
+  >,
+  "mutationFn"
+>;
+export type UseSetCommentCreationFeeResult = UseMutationResult<
+  SetCommentCreationFeeResult,
+  Error,
+  UseSetCommentCreationFeeParams
+>;
+
+/**
+ * Set the fee for creating a new comment
+ *
+ * @param options - The options for the mutation
+ * @returns The result of the mutation
+ */
+export function useSetCommentCreationFee(
+  options: UseSetCommentCreationFeeOptions = {},
+): UseSetCommentCreationFeeResult {
+  const { writeContractAsync } = useWriteContract();
+
+  return useMutation({
+    ...options,
+    mutationFn: (params) => {
+      return setCommentCreationFee({
         ...params,
         writeContract: writeContractAsync,
       });

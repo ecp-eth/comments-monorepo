@@ -54,6 +54,14 @@ export type ContractWriteFunctions = {
     >,
   ) => Promise<Hex>;
 
+  setCommentCreationFee: (
+    args: ContractFunctionParameters<
+      ChannelManagerABIType,
+      "nonpayable",
+      "setCommentCreationFee"
+    >,
+  ) => Promise<Hex>;
+
   setHook: (
     args: ContractFunctionParameters<
       ChannelManagerABIType,
@@ -113,6 +121,15 @@ export type ContractReadFunctions = {
     >,
   ) => Promise<
     ReadContractReturnType<ChannelManagerABIType, "getChannelCreationFee">
+  >;
+
+  getCommentCreationFee: (
+    args: ReadContractParameters<
+      ChannelManagerABIType,
+      "getCommentCreationFee"
+    >,
+  ) => Promise<
+    ReadContractReturnType<ChannelManagerABIType, "getCommentCreationFee">
   >;
 
   getHookTransactionFee: (
