@@ -3,7 +3,7 @@ import { AdminTelegramBotServiceContext, MenuId } from "../types";
 import {
   commentModerationCommandToPayload,
   moderationCommandParser,
-  moderationStatusToString,
+  moderationStatusToActionString,
   renderComment,
 } from "./moderate-helpers";
 import { CommentModerationStatus } from "../../../management/types";
@@ -108,7 +108,7 @@ const moderateChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
 
       range.text(
         {
-          text: moderationStatusToString(status),
+          text: moderationStatusToActionString(status),
           payload() {
             return commentModerationCommandToPayload({
               action: "changeStatus",
