@@ -13,12 +13,13 @@ type ContractReadFunctions = {
   getChannel: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
   getChannelCreationFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelCreationFee">>;
   getChannelMetadata: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelMetadata">>;
+  getCommentCreationFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getCommentCreationFee">>;
   getHookTransactionFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getHookTransactionFee">>;
   ownerOf: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "ownerOf">>;
 };
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:90](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L90)
+Defined in: [packages/sdk/src/channel-manager/types.ts:98](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L98)
 
 ## Properties
 
@@ -28,7 +29,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:90](https://github.com/ec
 channelExists: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "channelExists">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:101](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L101)
+Defined in: [packages/sdk/src/channel-manager/types.ts:109](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L109)
 
 #### Parameters
 
@@ -48,7 +49,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:101](https://github.com/e
 deductProtocolHookTransactionFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "deductProtocolHookTransactionFee">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:127](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L127)
+Defined in: [packages/sdk/src/channel-manager/types.ts:144](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L144)
 
 #### Parameters
 
@@ -68,7 +69,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:127](https://github.com/e
 getChannel: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannel">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:91](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L91)
+Defined in: [packages/sdk/src/channel-manager/types.ts:99](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L99)
 
 #### Parameters
 
@@ -88,7 +89,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:91](https://github.com/ec
 getChannelCreationFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelCreationFee">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:109](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L109)
+Defined in: [packages/sdk/src/channel-manager/types.ts:117](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L117)
 
 #### Parameters
 
@@ -108,7 +109,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:109](https://github.com/e
 getChannelMetadata: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getChannelMetadata">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:95](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L95)
+Defined in: [packages/sdk/src/channel-manager/types.ts:103](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L103)
 
 #### Parameters
 
@@ -122,13 +123,33 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:95](https://github.com/ec
 
 ***
 
+### getCommentCreationFee()
+
+```ts
+getCommentCreationFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getCommentCreationFee">>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:126](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L126)
+
+#### Parameters
+
+##### args
+
+`ReadContractParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"getCommentCreationFee"`\>
+
+#### Returns
+
+`Promise`\<`ReadContractReturnType`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"getCommentCreationFee"`\>\>
+
+***
+
 ### getHookTransactionFee()
 
 ```ts
 getHookTransactionFee: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "getHookTransactionFee">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:118](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L118)
+Defined in: [packages/sdk/src/channel-manager/types.ts:135](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L135)
 
 #### Parameters
 
@@ -148,7 +169,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:118](https://github.com/e
 ownerOf: (args) => Promise<ReadContractReturnType<ChannelManagerABIType, "ownerOf">>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:105](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L105)
+Defined in: [packages/sdk/src/channel-manager/types.ts:113](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L113)
 
 #### Parameters
 
