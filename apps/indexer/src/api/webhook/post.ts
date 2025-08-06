@@ -1,5 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { APIErrorResponseSchema } from "../../lib/schemas";
+import * as Sentry from "@sentry/node";
 
 import {
   commentReportsService,
@@ -65,9 +66,14 @@ export function setupWebhook(app: OpenAPIHono) {
         telegramNotificationsService.decryptWebhookCallbackData(data);
 
       if (Date.now() - command.timestamp > MAX_WEBHOOK_REQUEST_AGE_IN_MS) {
-        throw new HTTPException(400, {
-          message: "Webhook request is too old",
+        Sentry.captureMessage("Webhook request is too old.", {
+          level: "warning",
+          extra: {
+            command,
+          },
         });
+
+        return c.newResponse(null, 204);
       }
 
       switch (command.action) {
@@ -153,8 +159,13 @@ export function setupWebhook(app: OpenAPIHono) {
           break;
         }
         default:
-          throw new HTTPException(400, {
-            message: "Invalid action",
+          command satisfies never;
+
+          Sentry.captureMessage("Invalid action", {
+            level: "warning",
+            extra: {
+              command,
+            },
           });
       }
 
