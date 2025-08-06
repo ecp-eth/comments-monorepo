@@ -44,7 +44,15 @@ Let's use the "Takes" channel used by [interface.social](https://interface.socia
 ```typescript
 
 ...
-// 1. Get the hook address from the channel
+// 1. Get the comment creation fee required by the protocol
+
+const { fee: commentCreationFee } = await getCommentCreationFee({
+  readContract: publicClient.readContract,
+});
+
+console.log("Comment creation fee:", commentCreationFee);
+
+// 2. Get the hook address from the channel
 
 const channel = await getChannel({
   channelId,
@@ -53,13 +61,10 @@ const channel = await getChannel({
 
 console.log("Channel hook address:", channel.hook);
 
-// 2. Get the comment creation fee required by the protocol
-
-const { fee: commentCreationFee } = await getCommentCreationFee({
-  readContract: publicClient.readContract,
-});
-
-console.log("Comment creation fee:", commentCreationFee);
+// if the channel has no hook, use the comment creation fee as the total fee required
+if (!channel.hook) {
+  return commentCreationFee;
+}
 
 // 3. Get the hook transaction fee required by the protocol
 
@@ -85,9 +90,11 @@ const hookCommentFee = await publicClient.readContract({
 console.log("Hook comment fee:", hookCommentFee);
 
 // 5. Calculate the total fee required
-totalFee += (feeRequiredByHook * 10000n) / BigInt(10000 - transactionHookFee);
+const totalFee = commentCreationFee + (feeRequiredByHook * 10000n) / BigInt(10000 - transactionHookFee);
 
 console.log("Total fee required:", totalFee);
+
+return totalFee;
 ```
 
 For full examples, please refer to the [examples](/examples/channels-and-hooks/typescript/retrieve-takes-channel-hook-post-fee.ts)
