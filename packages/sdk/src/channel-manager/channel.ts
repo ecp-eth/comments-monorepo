@@ -428,6 +428,93 @@ export async function setChannelCreationFee(
   };
 }
 
+export type GetCommentCreationFeeParams = {
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  readContract: ContractReadFunctions["getCommentCreationFee"];
+};
+
+export type GetCommentCreationFeeResult = {
+  fee: bigint;
+};
+
+const GetCommentCreationFeeParamsSchema = z.object({
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+});
+
+/**
+ * Get the creation fee from channel manager
+ *
+ * @param params - The parameters for getting the creation fee from channel manager
+ * @returns The creation fee from channel manager
+ */
+export async function getCommentCreationFee(
+  params: GetCommentCreationFeeParams,
+): Promise<GetCommentCreationFeeResult> {
+  const { channelManagerAddress } =
+    GetCommentCreationFeeParamsSchema.parse(params);
+
+  const fee = await params.readContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerABI,
+    functionName: "getCommentCreationFee",
+    args: [],
+  });
+
+  return { fee };
+}
+
+export type SetCommentCreationFeeParams = {
+  /**
+   * The fee for creating a comment in wei
+   */
+  fee: bigint;
+  /**
+   * The address of the channel manager
+   *
+   * @default CHANNEL_MANAGER_ADDRESS
+   */
+  channelManagerAddress?: Hex;
+  writeContract: ContractWriteFunctions["setCommentCreationFee"];
+};
+
+export type SetCommentCreationFeeResult = {
+  txHash: Hex;
+};
+
+const SetCommentCreationFeeParamsSchema = z.object({
+  channelManagerAddress: HexSchema.default(CHANNEL_MANAGER_ADDRESS),
+  fee: z.bigint().min(0n),
+});
+
+/**
+ * Set the fee for creating a new comment
+ *
+ * @param params - The parameters for setting the fee for creating a new comment
+ * @returns The transaction hash of the set creation fee
+ */
+export async function setCommentCreationFee(
+  params: SetCommentCreationFeeParams,
+): Promise<SetCommentCreationFeeResult> {
+  const { channelManagerAddress, fee } =
+    SetCommentCreationFeeParamsSchema.parse(params);
+
+  const txHash = await params.writeContract({
+    address: channelManagerAddress,
+    abi: ChannelManagerABI,
+    functionName: "setCommentCreationFee",
+    args: [fee],
+  });
+
+  return {
+    txHash,
+  };
+}
+
 export type WithdrawFeesParams = {
   /**
    * The address of the recipient

@@ -11,6 +11,7 @@ type ContractWriteFunctions = {
   createChannel: (args) => Promise<Hex>;
   setBaseURI: (args) => Promise<Hex>;
   setChannelCreationFee: (args) => Promise<Hex>;
+  setCommentCreationFee: (args) => Promise<Hex>;
   setHook: (args) => Promise<Hex>;
   setHookTransactionFee: (args) => Promise<Hex>;
   updateChannel: (args) => Promise<Hex>;
@@ -84,13 +85,33 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:49](https://github.com/ec
 
 ***
 
+### setCommentCreationFee()
+
+```ts
+setCommentCreationFee: (args) => Promise<Hex>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:57](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L57)
+
+#### Parameters
+
+##### args
+
+`ContractFunctionParameters`\<[`ChannelManagerABIType`](/sdk-reference/channel-manager/types/type-aliases/ChannelManagerABIType.mdx), `"nonpayable"`, `"setCommentCreationFee"`\>
+
+#### Returns
+
+`Promise`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx)\>
+
+***
+
 ### setHook()
 
 ```ts
 setHook: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:57](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L57)
+Defined in: [packages/sdk/src/channel-manager/types.ts:65](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L65)
 
 #### Parameters
 
@@ -110,7 +131,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:57](https://github.com/ec
 setHookTransactionFee: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:65](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L65)
+Defined in: [packages/sdk/src/channel-manager/types.ts:73](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L73)
 
 #### Parameters
 
@@ -130,7 +151,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:65](https://github.com/ec
 updateChannel: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:73](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L73)
+Defined in: [packages/sdk/src/channel-manager/types.ts:81](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L81)
 
 #### Parameters
 
@@ -150,7 +171,7 @@ Defined in: [packages/sdk/src/channel-manager/types.ts:73](https://github.com/ec
 withdrawFees: (args) => Promise<Hex>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:81](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L81)
+Defined in: [packages/sdk/src/channel-manager/types.ts:89](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L89)
 
 #### Parameters
 
