@@ -5,29 +5,30 @@ The protocol implements several fee mechanisms:
 1. Channel Creation Fee (default: 0.02 ETH)
 
    - Paid when creating a new channel
-   - Can be adjusted by protocol owner
+   - Can be adjusted by the protocol owner
    - Can be retrieved by calling `getChannelCreationFee()`[/protocol-reference/ProtocolFees#getchannelcreationfee--uint96-external] on `ChannelManager`
 
 2. Comment Creation Fee (default: 0)
 
-   - Can be enabled for spam prevention
-   - Set by protocol owner
+   - Can be enabled to prevent spam
+   - Set by the protocol owner
    - Can be retrieved by calling `getCommentCreationFee()`[/protocol-reference/ProtocolFees#getcommentcreationfee--uint96-external] on `ChannelManager`
 
 3. Hook Transaction Fee (default: 2%)
 
-   - Applied to total fee passed to hooks
-   - Basis points (1 bp = 0.01%)
-   - Maximum 100%
+   - Applied to the total fee passed to hooks
+   - Measured in basis points (1 bp = 0.01%)
+   - Maximum is 100%
 
 4. Hook Fee
-   - Hook contract may or may not implement a fee mechanism
-   - How the fee is taken is totally up to the hook contract implementation, here is no standard way at the moment to retrieve the value for hook fee
-   - **We are working on a SDK helper function** to do a best effort to retrieve the fee required by known hook contracts
+   - The hook contract may or may not implement a fee mechanism
+   - How the fee is taken is entirely up to the hook contract implementation
+   - There is currently no standard way to retrieve the hook fee value
+   - **We are working on an SDK helper function** to estimate the required fee based on known hook contracts
 
 ## Example: Calculating fee required for posting a comment
 
-When posting a comment (including replies), the fee consists of above mentioned `comment creation fee` and `total fee passed to the hook`.
+When posting a comment (including replies), the fee consists of the `comment creation fee` and the `total fee passed to the hook`.
 
 ```
 Total fee required = Comment creation fee + Total fee passed to the hook
@@ -39,10 +40,9 @@ The `total fee passed to the hook` is calculated as follows:
 Total fee passed to the hook = fee required by the hook / (1 - Hook transaction fee)
 ```
 
-Let's use the "Takes" channel used by [interface.social](https://interface.social) as example, here are steps required to calculate the total fee required for posting a comment:
+Let's use the "Takes" channel used by [interface.social](https://interface.social) as an example. Here are the steps required to calculate the total fee needed to post a comment:
 
 ```typescript
-
 ...
 // 1. Get the comment creation fee required by the protocol
 
