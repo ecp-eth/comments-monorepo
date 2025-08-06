@@ -28,6 +28,7 @@ import { useAccount } from "wagmi";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
+import { Loader2Icon } from "lucide-react";
 
 type CommentItemProps = {
   comment: CommentType;
@@ -261,8 +262,18 @@ export function CommentItem({ comment }: CommentItemProps) {
       ))}
       {repliesQuery.hasNextPage && (
         <div className="mb-2">
-          <CommentActionButton onClick={() => repliesQuery.fetchNextPage()}>
-            show more replies
+          <CommentActionButton
+            className="gap-2"
+            disabled={repliesQuery.isFetchingNextPage}
+            onClick={() => repliesQuery.fetchNextPage()}
+          >
+            {repliesQuery.isFetchingNextPage ? (
+              <>
+                <Loader2Icon className="animate-spin h-4 w-4" /> loading...
+              </>
+            ) : (
+              "show more replies"
+            )}
           </CommentActionButton>
         </div>
       )}

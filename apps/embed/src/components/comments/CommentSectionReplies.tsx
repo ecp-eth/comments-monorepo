@@ -42,6 +42,7 @@ import {
 } from "@ecp.eth/shared/hooks";
 import { useSyncViewerCookie } from "@/hooks/useSyncViewerCookie";
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
+import { Loader2Icon } from "lucide-react";
 
 type QueryData = InfiniteData<
   CommentPageSchemaType,
@@ -94,6 +95,7 @@ export function CommentSectionReplies({
     refetch,
     hasNextPage,
     fetchNextPage,
+    isFetchingNextPage,
   } = useInfiniteQuery({
     enabled: isAccountStatusResolved,
     queryKey,
@@ -189,8 +191,20 @@ export function CommentSectionReplies({
         <CommentItem comment={comment} key={comment.id} />
       ))}
       {hasNextPage && (
-        <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
-          Load More
+        <Button
+          className="gap-2"
+          disabled={isFetchingNextPage}
+          onClick={() => fetchNextPage()}
+          variant="secondary"
+          size="sm"
+        >
+          {isFetchingNextPage ? (
+            <>
+              <Loader2Icon className="animate-spin h-4 w-4" /> Loading...
+            </>
+          ) : (
+            "Load More"
+          )}
         </Button>
       )}
       {!disablePromotion && <PoweredBy className="mt-4" />}

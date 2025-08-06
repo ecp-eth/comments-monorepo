@@ -25,6 +25,7 @@ import { chain } from "@/lib/clientWagmi";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { Heading2 } from "../core/Heading2";
 import { LoadingScreen } from "../core/LoadingScreen";
+import { Loader2Icon } from "lucide-react";
 
 export function CommentSection() {
   const { address: viewer } = useAccount();
@@ -39,41 +40,48 @@ export function CommentSection() {
     setCurrentUrl(window.location.href);
   }, []);
 
-  const { data, isSuccess, error, hasNextPage, fetchNextPage, isPending } =
-    useInfiniteQuery({
-      enabled: isAccountStatusResolved && !!currentUrl,
-      queryKey,
-      initialPageParam: {
-        cursor: undefined as Hex | undefined,
-        limit: COMMENTS_PER_PAGE,
-      },
-      queryFn: ({ pageParam, signal }) => {
-        return fetchComments({
-          chainId: chain.id,
-          apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-          app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-          targetUri: currentUrl,
-          cursor: pageParam.cursor,
-          limit: pageParam.limit,
-          signal,
-          viewer,
-          mode: "flat",
-          commentType: COMMENT_TYPE_COMMENT,
-        });
-      },
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      getNextPageParam(lastPage) {
-        if (!lastPage.pagination.hasNext) {
-          return;
-        }
+  const {
+    data,
+    isSuccess,
+    error,
+    hasNextPage,
+    fetchNextPage,
+    isPending,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    enabled: isAccountStatusResolved && !!currentUrl,
+    queryKey,
+    initialPageParam: {
+      cursor: undefined as Hex | undefined,
+      limit: COMMENTS_PER_PAGE,
+    },
+    queryFn: ({ pageParam, signal }) => {
+      return fetchComments({
+        chainId: chain.id,
+        apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        targetUri: currentUrl,
+        cursor: pageParam.cursor,
+        limit: pageParam.limit,
+        signal,
+        viewer,
+        mode: "flat",
+        commentType: COMMENT_TYPE_COMMENT,
+      });
+    },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    getNextPageParam(lastPage) {
+      if (!lastPage.pagination.hasNext) {
+        return;
+      }
 
-        return {
-          cursor: lastPage.pagination.endCursor,
-          limit: lastPage.pagination.limit,
-        };
-      },
-    });
+      return {
+        cursor: lastPage.pagination.endCursor,
+        limit: lastPage.pagination.limit,
+      };
+    },
+  });
 
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
     enabled: isAccountStatusResolved && !!currentUrl,
@@ -132,11 +140,19 @@ export function CommentSection() {
             ))}
             {hasNextPage && (
               <Button
+                className="gap-2"
+                disabled={isFetchingNextPage}
                 onClick={() => fetchNextPage()}
                 variant="secondary"
                 size="sm"
               >
-                Load More
+                {isFetchingNextPage ? (
+                  <>
+                    <Loader2Icon className="animate-spin h-4 w-4" /> Loading...
+                  </>
+                ) : (
+                  "Load More"
+                )}
               </Button>
             )}
           </>
