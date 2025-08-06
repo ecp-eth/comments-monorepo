@@ -6238,16 +6238,20 @@ paths:
       parameters:
         - schema:
             type: string
-            description: The author's address
+            description: >-
+              The author's address. Can be used to filter approvals by author.
+              Either `author` or `app` must be provided or both.
             pattern: ^0x[a-fA-F0-9]+$
-          required: true
+          required: false
           name: author
           in: query
         - schema:
             type: string
-            description: The address of the app signer
+            description: >-
+              The address of the app signer. Can be used to filter approvals by
+              app. Either `author` or `app` must be provided or both.
             pattern: ^0x[a-fA-F0-9]+$
-          required: true
+          required: false
           name: app
           in: query
         - schema:

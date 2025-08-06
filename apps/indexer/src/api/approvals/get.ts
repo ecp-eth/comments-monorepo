@@ -33,8 +33,8 @@ export default (app: OpenAPIHono) => {
 
     const query = db.query.approval.findMany({
       where: and(
-        eq(schema.approval.author, author),
-        eq(schema.approval.app, app),
+        app ? eq(schema.approval.app, app) : undefined,
+        author ? eq(schema.approval.author, author) : undefined,
         chainId.length === 1
           ? eq(schema.approval.chainId, chainId[0]!)
           : inArray(schema.approval.chainId, chainId),

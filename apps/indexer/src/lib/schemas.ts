@@ -338,21 +338,36 @@ export const GetCommentRepliesParamSchema = z.object({
 /**
  * Query string schema for getting a list of approvals.
  */
-export const GetApprovalsQuerySchema = z.object({
-  author: OpenAPIHexSchema.openapi({
-    description: "The author's address",
-  }),
-  app: OpenAPIHexSchema.openapi({
-    description: "The address of the app signer",
-  }),
-  chainId: ChainIdSchema,
-  limit: z.coerce.number().int().positive().max(100).default(50).openapi({
-    description: "The number of comments to return",
-  }),
-  offset: z.coerce.number().int().min(0).default(0).openapi({
-    description: "The offset of the comments to return",
-  }),
-});
+export const GetApprovalsQuerySchema = z
+  .object({
+    author: OpenAPIHexSchema.openapi({
+      description:
+        "The author's address. Can be used to filter approvals by author. Either `author` or `app` must be provided or both.",
+    }).optional(),
+    app: OpenAPIHexSchema.openapi({
+      description:
+        "The address of the app signer. Can be used to filter approvals by app. Either `author` or `app` must be provided or both.",
+    }).optional(),
+    chainId: ChainIdSchema,
+    limit: z.coerce.number().int().positive().max(100).default(50).openapi({
+      description: "The number of comments to return",
+    }),
+    offset: z.coerce.number().int().min(0).default(0).openapi({
+      description: "The offset of the comments to return",
+    }),
+  })
+  .refine(
+    (val) => {
+      if (val.author || val.app) {
+        return true;
+      }
+
+      return false;
+    },
+    {
+      message: "Either `author` or `app` must be provided or both.",
+    },
+  );
 
 /**
  * Schema for a single approval.
