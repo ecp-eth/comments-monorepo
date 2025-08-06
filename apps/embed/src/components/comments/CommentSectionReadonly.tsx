@@ -30,6 +30,7 @@ import {
 } from "@ecp.eth/shared/hooks";
 import { useSyncViewerCookie } from "@/hooks/useSyncViewerCookie";
 import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
+import { Loader2Icon } from "lucide-react";
 
 type QueryData = InfiniteData<
   CommentPageSchemaType,
@@ -60,38 +61,45 @@ export function CommentSectionReadonly({
     [connectedAddress, chainId, author],
   );
 
-  const { data, isPending, error, refetch, hasNextPage, fetchNextPage } =
-    useInfiniteQuery({
-      queryKey,
-      initialData,
-      initialPageParam: initialData?.pageParams[0] || {
-        cursor: undefined,
-        limit: COMMENTS_PER_PAGE,
-      },
-      queryFn: async ({ pageParam, signal }) => {
-        const response = await fetchComments({
-          ...fetchCommentParams,
-          limit: pageParam.limit,
-          cursor: pageParam.cursor,
-          viewer: connectedAddress,
-          signal,
-        });
+  const {
+    data,
+    isPending,
+    error,
+    refetch,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey,
+    initialData,
+    initialPageParam: initialData?.pageParams[0] || {
+      cursor: undefined,
+      limit: COMMENTS_PER_PAGE,
+    },
+    queryFn: async ({ pageParam, signal }) => {
+      const response = await fetchComments({
+        ...fetchCommentParams,
+        limit: pageParam.limit,
+        cursor: pageParam.cursor,
+        viewer: connectedAddress,
+        signal,
+      });
 
-        return CommentPageSchema.parse(response);
-      },
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      getNextPageParam(lastPage) {
-        if (!lastPage.pagination.hasNext) {
-          return;
-        }
+      return CommentPageSchema.parse(response);
+    },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    getNextPageParam(lastPage) {
+      if (!lastPage.pagination.hasNext) {
+        return;
+      }
 
-        return {
-          cursor: lastPage.pagination.endCursor,
-          limit: lastPage.pagination.limit,
-        };
-      },
-    });
+      return {
+        cursor: lastPage.pagination.endCursor,
+        limit: lastPage.pagination.limit,
+      };
+    },
+  });
 
   const { hasNewComments, fetchNewComments } = useNewCommentsChecker({
     enabled: isAccountStatusResolved,
@@ -149,8 +157,20 @@ export function CommentSectionReadonly({
         />
       ))}
       {hasNextPage && (
-        <Button onClick={() => fetchNextPage()} variant="secondary" size="sm">
-          Load More
+        <Button
+          className="gap-2"
+          disabled={isFetchingNextPage}
+          onClick={() => fetchNextPage()}
+          variant="secondary"
+          size="sm"
+        >
+          {isFetchingNextPage ? (
+            <>
+              <Loader2Icon className="animate-spin h-4 w-4" /> Loading...
+            </>
+          ) : (
+            "Load More"
+          )}
         </Button>
       )}
       {!disablePromotion && <PoweredBy className="mt-4" />}

@@ -32,6 +32,7 @@ import { createCommentItemsQueryKey } from "./queries";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { cn } from "@ecp.eth/shared/helpers";
 import { useSyncViewerCookie } from "@/hooks/useSyncViewerCookie";
+import { Loader2Icon } from "lucide-react";
 
 type CommentSectionProps = {
   initialData?: InfiniteData<
@@ -67,6 +68,7 @@ export function CommentSection({
     refetch,
     hasNextPage,
     fetchNextPage,
+    isFetchingNextPage,
   } = useInfiniteQuery({
     enabled: isAccountStatusResolved,
     queryKey,
@@ -156,11 +158,19 @@ export function CommentSection({
           ))}
           {hasNextPage && (
             <Button
+              className="gap-2"
+              disabled={isFetchingNextPage}
               onClick={() => fetchNextPage()}
               variant="secondary"
               size="sm"
             >
-              Load more
+              {isFetchingNextPage ? (
+                <>
+                  <Loader2Icon className="animate-spin h-4 w-4" /> Loading...
+                </>
+              ) : (
+                "Load more"
+              )}
             </Button>
           )}
         </>
