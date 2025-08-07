@@ -61,7 +61,7 @@ export class CommentReportsService implements ICommentReportsService {
     }
 
     if (report.status === status) {
-      throw new ReportStatusAlreadySetError(reportId, status);
+      throw new ReportStatusAlreadySetError(reportId, status, messageId);
     }
 
     const comment = await this.commentDbService.getCommentById(
@@ -69,7 +69,7 @@ export class CommentReportsService implements ICommentReportsService {
     );
 
     if (!comment) {
-      throw new CommentNotFoundError(report.comment_id);
+      throw new CommentNotFoundError(report.comment_id, messageId);
     }
 
     const updatedReport =
@@ -89,7 +89,7 @@ export class CommentReportsService implements ICommentReportsService {
       await this.managementCommentDbService.getReportById(reportId);
 
     if (!report) {
-      throw new ReportNotFoundError(reportId);
+      throw new ReportNotFoundError(reportId, messageId);
     }
 
     const comment = await this.commentDbService.getCommentById(
@@ -97,7 +97,7 @@ export class CommentReportsService implements ICommentReportsService {
     );
 
     if (!comment) {
-      throw new CommentNotFoundError(report.comment_id);
+      throw new CommentNotFoundError(report.comment_id, messageId);
     }
 
     await this.notificationService.notifyReportStatusChanged({
@@ -115,7 +115,7 @@ export class CommentReportsService implements ICommentReportsService {
       await this.managementCommentDbService.getReportById(reportId);
 
     if (!report) {
-      throw new ReportNotFoundError(reportId);
+      throw new ReportNotFoundError(reportId, messageId);
     }
 
     const comment = await this.commentDbService.getCommentById(
@@ -123,7 +123,7 @@ export class CommentReportsService implements ICommentReportsService {
     );
 
     if (!comment) {
-      throw new CommentNotFoundError(report.comment_id);
+      throw new CommentNotFoundError(report.comment_id, messageId);
     }
 
     await this.notificationService.notifyReportStatusChanged({
