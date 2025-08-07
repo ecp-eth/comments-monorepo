@@ -193,6 +193,22 @@ export function moderationStatusToString(
   }
 }
 
+export function moderationStatusToActionString(
+  status: CommentModerationStatus,
+): string {
+  switch (status) {
+    case "pending":
+      return "Mark as pending";
+    case "approved":
+      return "Approve";
+    case "rejected":
+      return "Reject";
+    default:
+      status satisfies never;
+      throw new Error(`Unknown moderation status: ${status}`);
+  }
+}
+
 export function renderComment(
   comment: CommentSelectType,
   author: Hex | string,
