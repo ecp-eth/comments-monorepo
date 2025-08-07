@@ -1,5 +1,5 @@
 {
-  "name": "@ecp.eth/examples-channels-and-hooks",
+  "name": "@ecp.eth/examples-snippets",
   "private": true,
   "scripts": {
     "ts:create-channel": "tsx typescript/create-channel.ts",

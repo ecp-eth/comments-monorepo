@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "check-types": "turbo run check-types",
-    "build": "NODE_OPTIONS='--max-old-space-size=8192' turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./apps/embed-demo-blog --filter=!./docs --filter=!./packages/protocol --filter=!./examples/channels-and-hooks --filter=!./apps/nft-base-uri-server --filter=!./apps/signer",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./apps/embed-demo-blog --filter=!./docs --filter=!./packages/protocol --filter=!./examples/snippets --filter=!./apps/nft-base-uri-server --filter=!./apps/signer",
     "build:dev": "turbo build --filter=!./apps/demo --filter=!./apps/embed --filter=!./apps/embed-demo-blog --filter=!./docs",
     "build:indexer": "turbo build --filter=./apps/indexer...",
     "dev": "turbo dev --filter=./apps/demo... --filter=./apps/indexer --filter=./packages/protocol --filter=./packages/test-protocol",
