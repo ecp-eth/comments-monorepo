@@ -41,6 +41,19 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
   );
 
   ponder.on(
+    "CommentsV1ChannelManager:HookStatusUpdated",
+    async ({ event, context }) => {
+      await context.db
+        .update(schema.channel, {
+          id: event.args.channelId,
+        })
+        .set({
+          hook: event.args.enabled ? event.args.hook : null,
+        });
+    },
+  );
+
+  ponder.on(
     "CommentsV1ChannelManager:ChannelMetadataSet",
     async ({ event, context }) => {
       const channel = await context.db.find(schema.channel, {
