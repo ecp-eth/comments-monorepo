@@ -23,7 +23,7 @@
   "devDependencies": {
     "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/shared": "workspace:*",
-    "@privy-io/server-auth": "1.26.0",
+    "@privy-io/server-auth": "^1.30.0",
     "@types/node": "^20",
     "@types/react": "~19.1.0",
     "@types/react-dom": "~19.1.0",
