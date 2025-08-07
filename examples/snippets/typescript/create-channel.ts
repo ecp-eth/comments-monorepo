@@ -12,6 +12,9 @@ import {
 
 const { privateKey, rpcUrl, chain } = parseEnv();
 
+/**
+ * This example shows how to create a channel.
+ */
 async function main() {
   // Initialize account, ensure the account has enough balance to pay for the channel creation fee
   const account = privateKeyToAccount(privateKey);

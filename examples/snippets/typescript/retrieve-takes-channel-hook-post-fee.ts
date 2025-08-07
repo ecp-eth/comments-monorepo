@@ -25,6 +25,9 @@ const flatFeeHookCommentFeeABI = parseAbi([
   "function HOOK_FEE() view returns (uint256)",
 ]);
 
+/**
+ * This example shows how to retrieve the total posting fee for posting a comment to "Takes" channel used by interfaces.social.
+ */
 async function main() {
   // public client for read only operations
   const publicClient = createPublicClient({
