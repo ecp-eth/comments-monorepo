@@ -17,8 +17,6 @@ import { Metadata } from "../src/types/Metadata.sol";
 
 // Fee charging hook contract
 contract FlatFeeHook is BaseHook {
-  uint256 public constant COMMENT_FEE = 0.001 ether;
-  uint256 public constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
   uint256 public constant HOOK_FEE = 900000000000000; // 0.0009 ether (after 10% protocol fee)
 
   address public feeCollector;
@@ -102,7 +100,6 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
   // Protocol fee is 10% by default
   uint16 constant PROTOCOL_FEE_PERCENTAGE = 1000; // 10%
-  uint256 constant COMMENT_FEE = 0.001 ether;
   uint96 constant HOOK_REGISTRATION_FEE = 0.02 ether;
   uint96 constant CHANNEL_CREATION_FEE = 0.02 ether;
   uint256 constant HOOK_FEE = 900000000000000; // 0.0009 ether (after 10% protocol fee)

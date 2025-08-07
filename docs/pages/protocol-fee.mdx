@@ -1,0 +1,99 @@
+# Protocol Fees
+
+The protocol implements several fee mechanisms:
+
+1. Channel Creation Fee (default: 0.02 ETH)
+
+   - Paid when creating a new channel
+   - Can be adjusted by the protocol owner
+   - Can be retrieved by calling `getChannelCreationFee()`[/protocol-reference/ProtocolFees#getchannelcreationfee--uint96-external] on `ChannelManager`
+
+2. Comment Creation Fee (default: 0)
+
+   - Can be enabled for spam prevention
+   - Set by the protocol owner
+   - Can be retrieved by calling `getCommentCreationFee()`[/protocol-reference/ProtocolFees#getcommentcreationfee--uint96-external] on `ChannelManager`
+
+3. Hook Transaction Fee (default: 2%)
+
+   - Applied to the total fee passed to hooks
+   - Measured in basis points (1 bp = 0.01%)
+
+4. Hook Fee
+   - The hook contract may or may not implement a fee mechanism
+   - How the fee is taken is entirely up to the hook contract implementation
+   - There is currently no standard way to retrieve the hook fee value
+   - **We are working on an SDK helper function** to estimate the required fee based on known hook contracts
+
+## Example: Calculating fee required for posting a comment
+
+When posting a comment (including replies), the fee consists of the `comment creation fee` and the `total fee passed to the hook`.
+
+```
+Total fee required = Comment creation fee + Total fee passed to the hook
+```
+
+The `total fee passed to the hook` is calculated as follows:
+
+```
+Total fee passed to the hook = fee required by the hook / (1 - Hook transaction fee)
+```
+
+Let's use the "Takes" channel used by [interface.social](https://interface.social) as an example. Here are the steps required to calculate the total fee needed to post a comment:
+
+```typescript
+...
+// 1. Get the comment creation fee required by the protocol
+
+const { fee: commentCreationFee } = await getCommentCreationFee({
+  readContract: publicClient.readContract,
+});
+
+console.log("Comment creation fee:", commentCreationFee);
+
+// 2. Get the hook address from the channel
+
+const channel = await getChannel({
+  channelId,
+  readContract: publicClient.readContract,
+});
+
+console.log("Channel hook address:", channel.hook);
+
+// if the channel has no hook, use the comment creation fee as the total fee required
+if (!channel.hook) {
+  return commentCreationFee;
+}
+
+// 3. Get the hook transaction fee required by the protocol
+
+const { fee: transactionHookFee } = await getHookTransactionFee({
+  readContract: publicClient.readContract,
+});
+
+console.log("Transaction hook fee:", transactionHookFee);
+
+// 4. Since we know the hook is a "Takes" channel hook, we know they have a
+// commentFee function to retrieve the fee required by the hook
+
+const takesChannelHookCommentFeeABI = parseAbi([
+  "function commentFee() view returns (uint256)",
+]);
+
+const hookCommentFee = await publicClient.readContract({
+  abi: takesChannelHookCommentFeeABI,
+  address: channel.hook ?? never('hook address not found'),
+  functionName: "commentFee",
+});
+
+console.log("Hook comment fee:", hookCommentFee);
+
+// 5. Calculate the total fee required
+const totalFee = commentCreationFee + (hookCommentFee * 10000n) / BigInt(10000 - transactionHookFee);
+
+console.log("Total fee required:", totalFee);
+
+return totalFee;
+```
+
+For full examples, please refer to the [examples](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/channels-and-hooks/typescript/retrieve-takes-channel-hook-post-fee.ts)

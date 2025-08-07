@@ -88,6 +88,10 @@ export default defineConfig({
           link: "/hooks",
         },
         {
+          text: "Protocol Fees",
+          link: "/protocol-fee",
+        },
+        {
           text: "Moderation & Spam",
           link: "/moderation",
         },
