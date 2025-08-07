@@ -210,7 +210,7 @@ export class CommentModerationService {
     );
 
     if (!comment) {
-      throw new CommentNotFoundError(commentId);
+      throw new CommentNotFoundError(commentId, messageId);
     }
 
     if (messageId) {
@@ -227,7 +227,7 @@ export class CommentModerationService {
     const comment = await this.commentDbService.getCommentById(commentId);
 
     if (!comment) {
-      throw new CommentNotFoundError(commentId);
+      throw new CommentNotFoundError(commentId, messageId);
     }
 
     await this.notificationService.updateMessageWithChangeAction(
@@ -240,7 +240,7 @@ export class CommentModerationService {
     const comment = await this.commentDbService.getCommentById(commentId);
 
     if (!comment) {
-      throw new CommentNotFoundError(commentId);
+      throw new CommentNotFoundError(commentId, messageId);
     }
 
     await this.notificationService.updateMessageWithModerationStatus(

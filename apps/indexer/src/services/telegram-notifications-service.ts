@@ -1,4 +1,4 @@
-import { Telegraf } from "telegraf";
+import { Telegraf, TelegramError } from "telegraf";
 import type { ITelegramNotificationsService } from "./types";
 import {
   decryptWebhookCallbackData,
@@ -6,6 +6,7 @@ import {
   type WebhookCallbackData,
 } from "../utils/webhook";
 import type { Convenience } from "telegraf/types";
+import { ServiceError } from "./errors";
 
 type TelegramNotificationsServiceOptions =
   | {
@@ -129,6 +130,32 @@ export class TelegramNotificationsService
     return msg;
   }
 
+  async sendErrorReplyToMessage(messageId: number, error: ServiceError) {
+    if (!this.state.enabled) {
+      console.error("TelegramNotificationsService: ", { messageId, error });
+
+      return;
+    }
+
+    await this.state.bot.telegram.sendMessage(
+      this.state.channelId,
+      `
+      ❌ Error:
+
+      ${error.message}
+      `.trim(),
+      {
+        reply_parameters: {
+          message_id: messageId,
+        },
+        parse_mode: "Markdown",
+        link_preview_options: {
+          is_disabled: true,
+        },
+      },
+    );
+  }
+
   async updateMessageWithWebhookActions(
     messageId: number,
     message: string,
@@ -143,26 +170,45 @@ export class TelegramNotificationsService
       return;
     }
 
-    await this.state.bot.telegram.editMessageText(
-      this.state.channelId,
-      messageId,
-      undefined,
-      message,
-      {
-        parse_mode: "Markdown",
-        link_preview_options: {
-          is_disabled: true,
+    try {
+      await this.state.bot.telegram.editMessageText(
+        this.state.channelId,
+        messageId,
+        undefined,
+        message,
+        {
+          parse_mode: "Markdown",
+          link_preview_options: {
+            is_disabled: true,
+          },
+          reply_markup: {
+            inline_keyboard: actions.map((action) => [
+              {
+                callback_data: this.encryptWebhookCallbackData(action.action),
+                text: action.text,
+              },
+            ]),
+          },
+          ...extra,
         },
-        reply_markup: {
-          inline_keyboard: actions.map((action) => [
-            {
-              callback_data: this.encryptWebhookCallbackData(action.action),
-              text: action.text,
-            },
-          ]),
-        },
-        ...extra,
-      },
-    );
+      );
+    } catch (e) {
+      if (
+        e instanceof TelegramError &&
+        e.code === 400 &&
+        e.message.includes("message is not modified")
+      ) {
+        // we are sending a message that doesn't change the content at all
+        console.warn(
+          "TelegramNotificationsService#updateMessageWithWebhookActions(): message is not modified",
+          messageId,
+        );
+
+        // we can swallow this error as the message is already in the desired state
+        return;
+      }
+
+      throw e;
+    }
   }
 }

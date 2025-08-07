@@ -6,9 +6,10 @@ import {
   commentReportsService,
   telegramNotificationsService,
 } from "../../services";
-import { HTTPException } from "hono/http-exception";
 import { MAX_WEBHOOK_REQUEST_AGE_IN_MS } from "../../lib/constants";
 import { commentModerationService } from "../../services";
+import { ServiceError } from "../../services/errors";
+import { HTTPException } from "hono/http-exception";
 
 const webhookRequestBodySchema = z.object({
   callback_query: z.object({
@@ -114,7 +115,7 @@ export function setupWebhook(app: OpenAPIHono) {
             command.commentId,
           );
 
-          return c.newResponse(null, 204);
+          break;
         case "report-set-as-resolved": {
           await commentReportsService.changeStatus(
             message.message_id,
@@ -171,14 +172,29 @@ export function setupWebhook(app: OpenAPIHono) {
 
       return c.newResponse(null, 204);
     } catch (error) {
-      console.error("Telegram webhook error", error);
+      if (error instanceof ServiceError && error.telegramMessageId != null) {
+        await telegramNotificationsService.sendErrorReplyToMessage(
+          error.telegramMessageId,
+          error,
+        );
+
+        // since this error has telegramMessageId we can swallow it because we will send an error reply to telegram
+        return c.newResponse(null, 204);
+      }
+
+      Sentry.captureException(error);
+
+      // this is some uknown error, we want telegram to repeat the call until we figure out what to do
+      // this can mean that error is just temporary and it will resolve (for example DB connection issue)
+      // or there is something that we aren't handling properly in the handlers
 
       if (error instanceof HTTPException) {
+        // this is some error that we want to propagate to the user
         throw error;
       }
 
-      throw new HTTPException(400, {
-        message: "Invalid webhook data",
+      throw new HTTPException(500, {
+        message: "Internal server error",
       });
     }
   });
