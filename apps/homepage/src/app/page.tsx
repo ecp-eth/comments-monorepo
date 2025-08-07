@@ -749,6 +749,8 @@ await fetchComments({
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
                   Mobile companion for your Ethereum journey
                 </p>
+              </CardContent>
+              <CardFooter>
                 <Button variant="outline" className="w-full" asChild>
                   <Link
                     href="https://interface.social"
@@ -758,7 +760,7 @@ await fetchComments({
                     Post your take on Interface
                   </Link>
                 </Button>
-              </CardContent>
+              </CardFooter>
             </Card>
 
             <Card className="border-2 hover:border-indigo-400 transition-colors bg-white dark:bg-gray-700 group border-gray-200 dark:border-gray-600">
@@ -772,6 +774,8 @@ await fetchComments({
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
                   A curated list of projects, tools, and resources built on ECP
                 </p>
+              </CardContent>
+              <CardFooter>
                 <Button variant="outline" className="w-full" asChild>
                   <Link
                     href="https://github.com/ecp-eth/awesome-ecp"
@@ -781,7 +785,7 @@ await fetchComments({
                     View More Projects
                   </Link>
                 </Button>
-              </CardContent>
+              </CardFooter>
             </Card>
           </div>
         </div>
