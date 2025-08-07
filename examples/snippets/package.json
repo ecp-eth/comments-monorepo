@@ -4,6 +4,7 @@
   "scripts": {
     "ts:create-channel": "tsx typescript/create-channel.ts",
     "ts:retrieve-takes-channel-hook-post-fee": "tsx typescript/retrieve-takes-channel-hook-post-fee.ts",
+    "ts:fetch-comments-without-moderation": "tsx typescript/fetch-comments-without-moderation.ts",
     "sol:create-channel": "dotenv -c .local -- bash -c 'forge script solidity/CreateChannel.s.sol --rpc-url $RPC_URL --broadcast --force'"
   },
   "dependencies": {
