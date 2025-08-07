@@ -10,7 +10,7 @@ The protocol implements several fee mechanisms:
 
 2. Comment Creation Fee (default: 0)
 
-   - Can be enabled to prevent spam
+   - Can be enabled for spam prevention
    - Set by the protocol owner
    - Can be retrieved by calling `getCommentCreationFee()`[/protocol-reference/ProtocolFees#getcommentcreationfee--uint96-external] on `ChannelManager`
 
@@ -90,11 +90,11 @@ const hookCommentFee = await publicClient.readContract({
 console.log("Hook comment fee:", hookCommentFee);
 
 // 5. Calculate the total fee required
-const totalFee = commentCreationFee + (feeRequiredByHook * 10000n) / BigInt(10000 - transactionHookFee);
+const totalFee = commentCreationFee + (hookCommentFee * 10000n) / BigInt(10000 - transactionHookFee);
 
 console.log("Total fee required:", totalFee);
 
 return totalFee;
 ```
 
-For full examples, please refer to the [examples](/examples/channels-and-hooks/typescript/retrieve-takes-channel-hook-post-fee.ts)
+For full examples, please refer to the [examples](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/channels-and-hooks/typescript/retrieve-takes-channel-hook-post-fee.ts)
