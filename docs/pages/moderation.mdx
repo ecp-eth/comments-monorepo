@@ -87,3 +87,26 @@ For production deployments, consider implementing or using service providers for
 - Integration with specialized moderation service providers
 - Community-based moderation systems
 - CAPTCHA or similar challenge-response systems
+
+## Bypassing Moderation for Immediate Display
+
+If you want comments to appear immediately in your application without waiting for moderation approval, you can bypass the moderation system by including both approved and pending comments in your queries:
+
+### Using the SDK
+
+```typescript
+import { fetchComments } from "@ecp.eth/sdk/indexer";
+
+const comments = await fetchComments({
+  moderationStatus: ["approved", "pending"], // Show comments immediately
+  chainId: 8453,
+});
+```
+
+### Using the REST API
+
+```bash
+curl "https://api.ethcomments.xyz/api/comments?chainId=8453&moderationStatus=approved,pending"
+```
+
+This approach allows you to display comments as soon as they are posted while still maintaining the ability to remove inappropriate content through the moderation system if needed.

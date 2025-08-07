@@ -60,6 +60,25 @@ query {
 }
 ```
 
+**Important**: The hosted indexer has moderation enabled by default. If you want comments to appear immediately without waiting for moderation approval, you can filter by moderation status in your GraphQL queries:
+
+```graphql
+query {
+  comments(
+    where: {
+      OR: [{ moderationStatus: "approved" }, { moderationStatus: "pending" }]
+    }
+    limit: 10
+  ) {
+    items {
+      id
+      content
+      moderationStatus
+    }
+  }
+}
+```
+
 ## Direct database access via ponder client
 
 Ponder access is available at `https://api.ethcomments.xyz/sql`, it allows you to query the indexer database directly.

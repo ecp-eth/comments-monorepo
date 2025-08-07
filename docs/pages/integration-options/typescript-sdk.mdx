@@ -155,9 +155,19 @@ import { fetchComments } from "@ecp.eth/sdk/indexer";
 const comments = await fetchComments({
   apiUrl: "https://api.ethcomments.xyz",
   targetUri: "https://example.com",
+  chainId: 8453,
 });
 
 console.log("Comments:", comments);
+```
+
+**Important**: The hosted indexer has moderation enabled by default. If you want comments to appear immediately without waiting for moderation approval, add `moderationStatus: ["approved", "pending"]` to your query parameters. This will show both approved comments and comments pending moderation review.
+
+```ts
+const comments = await fetchComments({
+  moderationStatus: ["approved", "pending"],
+  chainId: 8453,
+});
 ```
 
 The response includes a list of comments and pagination information, see [`IndexerAPIListCommentsSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPIListCommentsSchemaType).
