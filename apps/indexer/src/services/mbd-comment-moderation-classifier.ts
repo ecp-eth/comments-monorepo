@@ -212,7 +212,10 @@ export class CommentModerationClassifier
         score: 0,
         save: async () => {
           // If the classification fails, we should remove the cache entry so we can retry on reindex
-          await this.cacheService.deleteByCommentId(comment.id);
+          await this.cacheService.deleteByCommentId(
+            comment.id,
+            comment.revision,
+          );
         },
       };
     }

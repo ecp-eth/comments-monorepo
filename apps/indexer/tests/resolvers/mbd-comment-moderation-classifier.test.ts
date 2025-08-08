@@ -334,6 +334,7 @@ describe("CommentModerationClassifier", () => {
 
       expect(mockClassifierCacheService.deleteByCommentId).toHaveBeenCalledWith(
         "0x123",
+        0,
       );
     });
   });
