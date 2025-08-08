@@ -7128,7 +7128,6 @@ paths:
                   enum: *ref_0
                   description: The moderation status of the comment
               required:
-                - revision
                 - moderationStatus
       responses:
         '200':
