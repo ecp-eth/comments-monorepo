@@ -69,43 +69,45 @@ export class PremoderationCacheService implements IPremoderationCacheService {
   ): Promise<void> {
     const db = getIndexerDb();
 
-    await db
-      .insertInto("comment_moderation_statuses")
-      .values({
-        comment_id: commentId,
-        moderation_status: status.status,
-        revision: status.revision,
-        updated_at: status.changedAt,
-      })
-      .onConflict((cb) =>
-        cb.columns(["comment_id", "revision"]).doUpdateSet({
+    await db.transaction().execute(async (tx) => {
+      await tx
+        .insertInto("comment_moderation_statuses")
+        .values({
+          comment_id: commentId,
+          moderation_status: status.status,
+          revision: status.revision,
+          updated_at: status.changedAt,
+        })
+        .onConflict((cb) =>
+          cb.columns(["comment_id", "revision"]).doUpdateSet({
+            moderation_status: status.status,
+            updated_at: status.changedAt,
+          }),
+        )
+        .execute();
+
+      if (status.status === "pending") {
+        // if the new status is pending, keep the old revisions untouched
+        // also ignore newer revisions
+        return;
+      }
+
+      await tx
+        .updateTable("comment_moderation_statuses")
+        .set({
           moderation_status: status.status,
           updated_at: status.changedAt,
-        }),
-      )
-      .execute();
-
-    if (status.status === "pending") {
-      // if the new status is pending, keep the old revisions untouched
-      // also ignore newer revisions
-      return;
-    }
-
-    await db
-      .updateTable("comment_moderation_statuses")
-      .set({
-        moderation_status: status.status,
-        updated_at: status.changedAt,
-      })
-      .where("comment_id", "=", commentId)
-      .where((wb) => {
-        // new status is not pending, mark all older pending revisions to be of the same status
-        // this solves an issue when someone edits a comment multiple times and it wasn't premoderated
-        return wb.or([
-          wb("revision", "<", status.revision),
-          wb("moderation_status", "=", "pending"),
-        ]);
-      })
-      .execute();
+        })
+        .where("comment_id", "=", commentId)
+        .where((wb) => {
+          // new status is not pending, mark all older pending revisions to be of the same status
+          // this solves an issue when someone edits a comment multiple times and it wasn't premoderated
+          return wb.or([
+            wb("revision", "<", status.revision),
+            wb("moderation_status", "=", "pending"),
+          ]);
+        })
+        .execute();
+    });
   }
 }
