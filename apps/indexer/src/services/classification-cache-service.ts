@@ -39,6 +39,12 @@ export class ClassificationCacheService
         labels: params.result.labels,
         score: params.result.score,
       })
+      .onConflict((cb) =>
+        cb.columns(["comment_id", "revision"]).doUpdateSet({
+          labels: params.result.labels,
+          score: params.result.score,
+        }),
+      )
       .execute();
   }
 
