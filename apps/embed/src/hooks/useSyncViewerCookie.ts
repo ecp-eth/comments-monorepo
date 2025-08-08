@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAccount } from "wagmi";
 
 export function useSyncViewerCookie() {
-  const { address } = useAccount();
+  const { address, status } = useAccount();
 
   useEffect(() => {
     if (address) {
@@ -12,5 +12,5 @@ export function useSyncViewerCookie() {
 
     // remove the cookie if the user is not connected
     document.cookie = `viewer=; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-  }, [address]);
+  }, [address, status]);
 }

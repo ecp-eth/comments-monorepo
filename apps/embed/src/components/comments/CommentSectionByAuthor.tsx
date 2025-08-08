@@ -53,6 +53,7 @@ export function CommentSectionByAuthor({
 
   const { address: connectedAddress } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
+
   const { currentTimestamp, disablePromotion } =
     useEmbedConfig<EmbedConfigProviderByAuthorConfig>();
   const chainId = useChainId();
@@ -70,6 +71,7 @@ export function CommentSectionByAuthor({
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
+    enabled: isAccountStatusResolved,
     queryKey,
     initialData,
     initialPageParam: initialData?.pageParams[0] || {
@@ -122,7 +124,9 @@ export function CommentSectionByAuthor({
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
-  if (isPending) {
+  const isPreparing = isPending || !isAccountStatusResolved;
+
+  if (isPreparing) {
     return <LoadingScreen />;
   }
 

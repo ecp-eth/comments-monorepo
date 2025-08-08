@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { cn, formatAuthorLink } from "@/lib/utils";
 import { type Comment as CommentType } from "@ecp.eth/shared/schemas";
 import Link from "next/link";
@@ -16,6 +16,12 @@ import {
 } from "@ecp.eth/shared/components";
 import { CommentActionLikeButton } from "./CommentActionLikeButton";
 import { usePendingActionSetup } from "./hooks/usePendingActionSetup";
+import { createCommentItemsQueryKey } from "./queries";
+import { useAccount, useChainId } from "wagmi";
+import {
+  EmbedConfigProviderByAuthorConfig,
+  useEmbedConfig,
+} from "../EmbedConfigProvider";
 
 interface CommentByAuthorProps {
   comment: CommentType;
@@ -29,16 +35,23 @@ export function CommentByAuthor({
   comment,
   currentTimestamp,
 }: CommentByAuthorProps) {
+  const { address: connectedAddress } = useAccount();
+  const chainId = useChainId();
+  const source = useEmbedConfig<EmbedConfigProviderByAuthorConfig>();
   const authorNameOrAddress = getCommentAuthorNameOrAddress(comment.author);
   const authorUrl = formatAuthorLink(comment.author);
   const commentRelativeTime = useCommentRelativeTime(
     comment.createdAt,
     currentTimestamp,
   );
+  const queryKey = useMemo(
+    () => createCommentItemsQueryKey(connectedAddress, chainId, source.author),
+    [chainId, connectedAddress, source.author],
+  );
 
   const { isLiking } = usePendingActionSetup({
     comment,
-    queryKey: ["comments", comment.id],
+    queryKey,
   });
 
   return (

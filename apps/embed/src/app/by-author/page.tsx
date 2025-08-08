@@ -57,6 +57,7 @@ export default async function EmbedCommentsByAuthorPage({
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       commentType: COMMENT_TYPE_COMMENT,
       limit: COMMENTS_PER_PAGE,
+      mode: "flat",
       author,
       viewer,
     };
