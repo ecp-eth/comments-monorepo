@@ -94,7 +94,6 @@ export class PremoderationCacheService implements IPremoderationCacheService {
     await db
       .updateTable("comment_moderation_statuses")
       .set({
-        revision: status.revision,
         moderation_status: status.status,
         updated_at: status.changedAt,
       })
@@ -103,7 +102,7 @@ export class PremoderationCacheService implements IPremoderationCacheService {
         // new status is not pending, mark all older pending revisions to be of the same status
         // this solves an issue when someone edits a comment multiple times and it wasn't premoderated
         return wb.or([
-          wb("revision", "<=", status.revision),
+          wb("revision", "<", status.revision),
           wb("moderation_status", "=", "pending"),
         ]);
       })
