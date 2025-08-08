@@ -10,7 +10,7 @@ const moderationActionWebhookCallbackDataSchema = z.object({
     "moderation-cancel",
   ]),
   commentId: HexSchema,
-  commentRevision: z.number().int().nonnegative(),
+  commentRevision: z.number().int().nonnegative().max(65535),
   timestamp: z.number().int().nonnegative(),
 });
 
