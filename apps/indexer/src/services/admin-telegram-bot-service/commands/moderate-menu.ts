@@ -146,10 +146,11 @@ const moderateChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
           }
 
           const updatedComment =
-            await ctx.commentDbService.updateCommentModerationStatus(
-              comment.id,
-              nextStatus,
-            );
+            await ctx.commentDbService.updateCommentModerationStatus({
+              commentId: comment.id,
+              commentRevision: comment.revision,
+              status: nextStatus,
+            });
 
           if (!updatedComment) {
             await ctx.editMessageText("❌ Failed to update comment status.");

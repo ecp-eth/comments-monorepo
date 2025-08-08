@@ -10,6 +10,7 @@ export class ClassificationCacheService
 {
   async getByCommentId(
     commentId: Hex,
+    commentRevision: number,
   ): Promise<CommentClassifierCacheServiceResult | undefined> {
     const db = getIndexerDb();
 
@@ -17,23 +18,26 @@ export class ClassificationCacheService
       .selectFrom("comment_classification_results")
       .select(["labels", "score"])
       .where("comment_id", "=", commentId)
+      .where("revision", "=", commentRevision)
       .executeTakeFirst();
 
     return result;
   }
 
-  async setByCommentId(
-    commentId: Hex,
-    result: CommentClassifierCacheServiceResult,
-  ): Promise<void> {
+  async setByCommentId(params: {
+    commentId: Hex;
+    commentRevision: number;
+    result: CommentClassifierCacheServiceResult;
+  }): Promise<void> {
     const db = getIndexerDb();
 
     await db
       .insertInto("comment_classification_results")
       .values({
-        comment_id: commentId,
-        labels: result.labels,
-        score: result.score,
+        comment_id: params.commentId,
+        revision: params.commentRevision,
+        labels: params.result.labels,
+        score: params.result.score,
       })
       .execute();
   }

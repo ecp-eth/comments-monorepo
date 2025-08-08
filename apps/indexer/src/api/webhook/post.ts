@@ -81,6 +81,7 @@ export function setupWebhook(app: OpenAPIHono) {
         case "moderation-set-as-approved":
           await commentModerationService.updateModerationStatus({
             commentId: command.commentId,
+            commentRevision: command.commentRevision,
             messageId: message.message_id,
             status: "approved",
           });
@@ -89,6 +90,7 @@ export function setupWebhook(app: OpenAPIHono) {
         case "moderation-set-as-rejected":
           await commentModerationService.updateModerationStatus({
             commentId: command.commentId,
+            commentRevision: command.commentRevision,
             messageId: message.message_id,
             status: "rejected",
           });
@@ -97,6 +99,7 @@ export function setupWebhook(app: OpenAPIHono) {
         case "moderation-set-as-pending":
           await commentModerationService.updateModerationStatus({
             commentId: command.commentId,
+            commentRevision: command.commentRevision,
             messageId: message.message_id,
             status: "pending",
           });

@@ -10,6 +10,7 @@ const moderationActionWebhookCallbackDataSchema = z.object({
     "moderation-cancel",
   ]),
   commentId: HexSchema,
+  commentRevision: z.number().int().nonnegative(),
   timestamp: z.number().int().nonnegative(),
 });
 
@@ -100,11 +101,22 @@ function serializeWebhookData(data: WebhookCallbackData): Buffer {
   const timestampBuffer = Buffer.alloc(4); // 4B
   // Convert milliseconds to seconds to fit in 32-bit unsigned integer
   const timestampInSeconds = Math.floor(data.timestamp / 1000);
-
   timestampBuffer.writeUInt32BE(timestampInSeconds);
 
-  // 37 B
-  return Buffer.concat([Buffer.from([actionByte]), idBuffer, timestampBuffer]);
+  let commentRevisionBuffer = Buffer.alloc(2);
+
+  if ("commentRevision" in data) {
+    commentRevisionBuffer = Buffer.alloc(2);
+    commentRevisionBuffer.writeUInt16BE(data.commentRevision);
+  }
+
+  // 39 B
+  return Buffer.concat([
+    Buffer.from([actionByte]),
+    idBuffer,
+    timestampBuffer,
+    commentRevisionBuffer,
+  ]);
 }
 
 function deserializeWebhookData(buffer: Buffer): WebhookCallbackData {
@@ -112,6 +124,7 @@ function deserializeWebhookData(buffer: Buffer): WebhookCallbackData {
   const action = getActionFromByte(actionByte);
   const id = ("0x" + buffer.subarray(1, 33).toString("hex")) as `0x${string}`;
   const timestampInSeconds = buffer.readUInt32BE(33);
+  const commentRevision = buffer.readUint16BE(37);
   // Convert seconds back to milliseconds
   const timestamp = timestampInSeconds * 1000;
 
@@ -121,7 +134,7 @@ function deserializeWebhookData(buffer: Buffer): WebhookCallbackData {
     case "moderation-set-as-approved":
     case "moderation-set-as-pending":
     case "moderation-set-as-rejected":
-      return { action, commentId: id, timestamp };
+      return { action, commentId: id, timestamp, commentRevision };
     case "report-cancel":
     case "report-change-status":
     case "report-set-as-resolved":

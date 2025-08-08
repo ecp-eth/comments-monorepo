@@ -7117,11 +7117,18 @@ paths:
             schema:
               type: object
               properties:
+                revision:
+                  type: integer
+                  minimum: 0
+                  description: >-
+                    The revision of the comment. If omitted it will update the
+                    latest revision and all older pending revisions.
                 moderationStatus:
                   type: string
                   enum: *ref_0
                   description: The moderation status of the comment
               required:
+                - revision
                 - moderationStatus
       responses:
         '200':

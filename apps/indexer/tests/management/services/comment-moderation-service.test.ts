@@ -143,6 +143,7 @@ describe("CommentModerationService", () => {
         parentId: mockComment.parentId,
         references: mockReferences,
         targetUri: mockComment.targetUri,
+        revision: 0,
       });
 
       expect(mockClassifierService.classify).toHaveBeenCalledWith({
@@ -153,6 +154,7 @@ describe("CommentModerationService", () => {
         parentId: mockComment.parentId,
         references: mockReferences,
         targetUri: mockComment.targetUri,
+        revision: 0,
       });
       expect(mockPremoderationResult.save).toHaveBeenCalled();
       expect(mockClassifierResult.save).toHaveBeenCalled();
@@ -207,6 +209,7 @@ describe("CommentModerationService", () => {
         parentId: mockComment.parentId,
         references: mockReferences,
         targetUri: mockComment.targetUri,
+        revision: 0,
       });
 
       expect(mockClassifierService.classify).toHaveBeenCalledWith({
@@ -217,6 +220,7 @@ describe("CommentModerationService", () => {
         parentId: mockComment.parentId,
         references: mockReferences,
         targetUri: mockComment.targetUri,
+        revision: 0,
       });
       expect(mockPremoderationResult.save).toHaveBeenCalled();
       expect(mockClassifierResult.save).toHaveBeenCalled();
@@ -276,6 +280,7 @@ describe("CommentModerationService", () => {
         parentId: mockComment.parentId,
         references: mockReferences,
         targetUri: mockComment.targetUri,
+        revision: 0,
       });
 
       expect(mockClassifierService.classify).toHaveBeenCalledWith({
@@ -286,6 +291,7 @@ describe("CommentModerationService", () => {
         parentId: mockComment.parentId,
         references: mockReferences,
         targetUri: mockComment.targetUri,
+        revision: 0,
       });
       expect(mockPremoderationResult.save).toHaveBeenCalled();
       expect(mockClassifierResult.save).toHaveBeenCalled();
@@ -340,6 +346,7 @@ describe("CommentModerationService", () => {
         parentId: mockComment.parentId,
         references: mockReferences,
         targetUri: mockComment.targetUri,
+        revision: 0,
       });
 
       expect(mockClassifierService.classify).toHaveBeenCalledWith({
@@ -350,6 +357,7 @@ describe("CommentModerationService", () => {
         parentId: mockComment.parentId,
         references: mockReferences,
         targetUri: mockComment.targetUri,
+        revision: 0,
       });
       expect(mockPremoderationResult.save).toHaveBeenCalled();
       expect(mockClassifierResult.save).toHaveBeenCalled();
@@ -424,6 +432,7 @@ describe("CommentModerationService", () => {
         comment: unchangedComment,
         references: mockReferences,
         existingComment: mockExistingComment,
+        commentRevision: 0,
       });
 
       expect(result.result).toEqual({
@@ -471,6 +480,7 @@ describe("CommentModerationService", () => {
         comment: mockComment,
         references: mockReferences,
         existingComment: mockExistingComment,
+        commentRevision: 0,
       });
 
       expect(result.result).toEqual({
@@ -493,6 +503,7 @@ describe("CommentModerationService", () => {
           parentId: mockComment.parentId,
           references: mockReferences,
           targetUri: mockComment.targetUri,
+          revision: 0,
         },
         mockExistingComment,
       );
@@ -506,6 +517,7 @@ describe("CommentModerationService", () => {
           parentId: mockComment.parentId,
           references: mockReferences,
           targetUri: mockComment.targetUri,
+          revision: 0,
         },
         mockExistingComment,
       );
@@ -545,6 +557,7 @@ describe("CommentModerationService", () => {
         comment: mockComment,
         references: mockReferences,
         existingComment: mockExistingComment,
+        commentRevision: 0,
       });
 
       expect(result.result).toEqual({
@@ -567,6 +580,7 @@ describe("CommentModerationService", () => {
           parentId: mockComment.parentId,
           references: mockReferences,
           targetUri: mockComment.targetUri,
+          revision: 0,
         },
         mockExistingComment,
       );
@@ -580,6 +594,7 @@ describe("CommentModerationService", () => {
           parentId: mockComment.parentId,
           references: mockReferences,
           targetUri: mockComment.targetUri,
+          revision: 0,
         },
         mockExistingComment,
       );
@@ -624,6 +639,7 @@ describe("CommentModerationService", () => {
         comment: mockComment,
         references: mockReferences,
         existingComment: mockExistingComment,
+        commentRevision: 0,
       });
 
       expect(result.result).toEqual({
@@ -646,6 +662,7 @@ describe("CommentModerationService", () => {
           parentId: mockComment.parentId,
           references: mockReferences,
           targetUri: mockComment.targetUri,
+          revision: 0,
         },
         mockExistingComment,
       );
@@ -659,6 +676,7 @@ describe("CommentModerationService", () => {
           parentId: mockComment.parentId,
           references: mockReferences,
           targetUri: mockComment.targetUri,
+          revision: 0,
         },
         mockExistingComment,
       );
@@ -698,6 +716,7 @@ describe("CommentModerationService", () => {
         comment: mockComment,
         references: mockReferences,
         existingComment: mockExistingComment,
+        commentRevision: 0,
       });
 
       expect(result.result).toEqual({
@@ -720,6 +739,7 @@ describe("CommentModerationService", () => {
           parentId: mockComment.parentId,
           references: mockReferences,
           targetUri: mockComment.targetUri,
+          revision: 0,
         },
         mockExistingComment,
       );
@@ -733,6 +753,7 @@ describe("CommentModerationService", () => {
           parentId: mockComment.parentId,
           references: mockReferences,
           targetUri: mockComment.targetUri,
+          revision: 0,
         },
         mockExistingComment,
       );
@@ -761,13 +782,15 @@ describe("CommentModerationService", () => {
         commentId,
         messageId: undefined,
         status,
+        commentRevision: 0,
       });
 
       expect(result).toEqual(mockUpdatedComment);
-      expect(mockPremoderationService.updateStatus).toHaveBeenCalledWith(
+      expect(mockPremoderationService.updateStatus).toHaveBeenCalledWith({
         commentId,
+        commentRevision: 0,
         status,
-      );
+      });
     });
   });
 });

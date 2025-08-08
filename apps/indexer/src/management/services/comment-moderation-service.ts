@@ -58,6 +58,8 @@ export class CommentModerationService {
       return this.createReactionModerationStatusResult();
     }
 
+    const DEFAULT_REVISION_ON_ADD = 0;
+
     const formattedComment = {
       author: comment.author,
       channelId: comment.channelId,
@@ -66,6 +68,7 @@ export class CommentModerationService {
       parentId: comment.parentId,
       references,
       targetUri: comment.targetUri,
+      revision: DEFAULT_REVISION_ON_ADD,
     };
 
     const [premoderationResult, classifierResult] = await Promise.all([
@@ -93,6 +96,7 @@ export class CommentModerationService {
         if (premoderationResult.action !== "skipped") {
           messageId = await this.sendNewNotification({
             comment,
+            commentRevision: DEFAULT_REVISION_ON_ADD,
             references,
             classifierResult,
           });
@@ -102,6 +106,7 @@ export class CommentModerationService {
           await this.sendNewAutomaticClassification({
             messageId,
             comment,
+            commentRevision: DEFAULT_REVISION_ON_ADD,
             references,
             classifierResult,
           });
@@ -112,10 +117,12 @@ export class CommentModerationService {
 
   async moderateUpdate({
     comment,
+    commentRevision,
     references,
     existingComment,
   }: {
     comment: Event<"CommentsV1:CommentEdited">["args"];
+    commentRevision: number;
     references: IndexerAPICommentReferencesSchemaType;
     existingComment: CommentSelectType;
   }): Promise<ModerationStatusResult> {
@@ -125,6 +132,12 @@ export class CommentModerationService {
       this.knownReactions.has(comment.content)
     ) {
       return this.createReactionModerationStatusResult();
+    }
+
+    if (commentRevision === existingComment.revision) {
+      throw new Error(
+        `Comment revision is the same as the existing comment revision: ${commentRevision}`,
+      );
     }
 
     if (comment.content === existingComment.content) {
@@ -149,6 +162,7 @@ export class CommentModerationService {
       parentId: comment.parentId,
       references,
       targetUri: comment.targetUri,
+      revision: commentRevision,
     };
 
     const [premoderationResult, classifierResult] = await Promise.all([
@@ -178,6 +192,7 @@ export class CommentModerationService {
         if (premoderationResult.action !== "skipped") {
           messageId = await this.sendUpdateNotification({
             comment,
+            commentRevision,
             references,
             classifierResult,
           });
@@ -187,6 +202,7 @@ export class CommentModerationService {
           await this.sendUpdateAutomaticClassification({
             messageId,
             comment,
+            commentRevision,
             references,
             classifierResult,
           });
@@ -197,17 +213,23 @@ export class CommentModerationService {
 
   async updateModerationStatus({
     commentId,
+    commentRevision,
     messageId,
     status,
   }: {
     commentId: Hex;
+    /**
+     * If omitted it will update the latest revision and all older pending revisions.
+     */
+    commentRevision: number | undefined;
     messageId: number | undefined;
     status: ModerationStatus;
   }): Promise<CommentSelectType> {
-    const comment = await this.premoderationService.updateStatus(
+    const comment = await this.premoderationService.updateStatus({
       commentId,
+      commentRevision,
       status,
-    );
+    });
 
     if (!comment) {
       throw new CommentNotFoundError(commentId, messageId);
@@ -265,10 +287,12 @@ export class CommentModerationService {
 
   private async sendNewNotification({
     comment,
+    commentRevision,
     references,
     classifierResult,
   }: {
     comment: Event<"CommentsV1:CommentAdded">["args"];
+    commentRevision: number;
     references: IndexerAPICommentReferencesSchemaType;
     classifierResult: CommentModerationClassfierResult;
   }) {
@@ -282,6 +306,7 @@ export class CommentModerationService {
           references,
           id: comment.commentId,
           parentId: comment.parentId,
+          revision: commentRevision,
         },
         classifierResult,
       },
@@ -291,10 +316,12 @@ export class CommentModerationService {
 
   private async sendUpdateNotification({
     comment,
+    commentRevision,
     references,
     classifierResult,
   }: {
     comment: Event<"CommentsV1:CommentEdited">["args"];
+    commentRevision: number;
     references: IndexerAPICommentReferencesSchemaType;
     classifierResult: CommentModerationClassfierResult;
   }) {
@@ -308,6 +335,7 @@ export class CommentModerationService {
           references,
           id: comment.commentId,
           parentId: comment.parentId,
+          revision: commentRevision,
         },
         classifierResult,
       },
@@ -318,11 +346,13 @@ export class CommentModerationService {
   private async sendNewAutomaticClassification({
     messageId,
     comment,
+    commentRevision,
     references,
     classifierResult,
   }: {
     messageId?: number;
     comment: Event<"CommentsV1:CommentAdded">["args"];
+    commentRevision: number;
     references: IndexerAPICommentReferencesSchemaType;
     classifierResult: CommentModerationClassfierResult;
   }) {
@@ -336,6 +366,7 @@ export class CommentModerationService {
           references,
           id: comment.commentId,
           parentId: comment.parentId,
+          revision: commentRevision,
         },
         messageId,
         classifierResult,
@@ -347,11 +378,13 @@ export class CommentModerationService {
   private async sendUpdateAutomaticClassification({
     messageId,
     comment,
+    commentRevision,
     references,
     classifierResult,
   }: {
     messageId?: number;
     comment: Event<"CommentsV1:CommentEdited">["args"];
+    commentRevision: number;
     references: IndexerAPICommentReferencesSchemaType;
     classifierResult: CommentModerationClassfierResult;
   }) {
@@ -366,6 +399,7 @@ export class CommentModerationService {
           references,
           id: comment.commentId,
           parentId: comment.parentId,
+          revision: commentRevision,
         },
         classifierResult,
       },
