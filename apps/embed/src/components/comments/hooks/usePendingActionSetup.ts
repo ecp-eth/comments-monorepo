@@ -9,7 +9,7 @@ import { type Comment } from "@ecp.eth/shared/schemas";
 
 type UseLikeReactionSetupProps = {
   comment: Comment;
-  queryKey: string[];
+  queryKey: (string | number | undefined)[];
   onReplyAction?: () => void;
 };
 
