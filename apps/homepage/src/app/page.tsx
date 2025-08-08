@@ -734,7 +734,7 @@ await fetchComments({
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Card className="border-2 hover:border-indigo-400 transition-colors bg-white dark:bg-gray-700 group border-gray-200 dark:border-gray-600">
-              <CardContent className="pt-6 text-center">
+              <CardContent className="pt-6 flex-grow text-center">
                 <div className="flex justify-center mb-4">
                   <img
                     src="/interface-logo.png"
@@ -764,7 +764,7 @@ await fetchComments({
             </Card>
 
             <Card className="border-2 hover:border-indigo-400 transition-colors bg-white dark:bg-gray-700 group border-gray-200 dark:border-gray-600">
-              <CardContent className="pt-6 text-center">
+              <CardContent className="pt-6 flex-grow text-center">
                 <div className="flex justify-center mb-4">
                   <GithubIcon className="h-16 w-16 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                 </div>
