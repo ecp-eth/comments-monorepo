@@ -99,14 +99,10 @@ export class PremoderationCacheService implements IPremoderationCacheService {
           updated_at: status.changedAt,
         })
         .where("comment_id", "=", commentId)
-        .where((wb) => {
-          // new status is not pending, mark all older pending revisions to be of the same status
-          // this solves an issue when someone edits a comment multiple times and it wasn't premoderated
-          return wb.or([
-            wb("revision", "<", status.revision),
-            wb("moderation_status", "=", "pending"),
-          ]);
-        })
+        // new status is not pending, mark all older pending revisions to be of the same status
+        // this solves an issue when someone edits a comment multiple times and it wasn't premoderated
+        .where("revision", "<", status.revision)
+        .where("moderation_status", "=", "pending")
         .execute();
     });
   }
