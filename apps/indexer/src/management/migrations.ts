@@ -29,6 +29,7 @@ export type CommentModerationStatusesTable = {
   created_at: Generated<Date>;
   updated_at: Generated<Date>;
   moderation_status: CommentModerationStatus;
+  revision: number;
 };
 
 export type CommentClassificationResultsTable = {
@@ -37,6 +38,7 @@ export type CommentClassificationResultsTable = {
   updated_at: Generated<Date>;
   labels: CommentModerationLabelsWithScore;
   score: number;
+  revision: number;
 };
 
 export type CommentReportsTable = {
@@ -399,6 +401,85 @@ class StaticMigrationsProvider implements MigrationProvider {
           );
         },
       },
+      "2025_08_07_15_45_00_isolate_premoderation_statuses_and_classification_results_by_revision":
+        {
+          up: async (db: Kysely<IndexerSchemaDB>) => {
+            await db.schema
+              .alterTable("comment_moderation_statuses")
+              .addColumn("revision", "integer", (col) =>
+                col.notNull().defaultTo(0),
+              )
+              .execute();
+
+            await db.schema
+              .alterTable("comment_moderation_statuses")
+              .dropConstraint("comment_moderation_statuses_pkey")
+              .execute();
+
+            await db.schema
+              .alterTable("comment_moderation_statuses")
+              .addPrimaryKeyConstraint("comment_moderation_statuses_pkey", [
+                "comment_id",
+                "revision",
+              ])
+              .execute();
+
+            await db.schema
+              .alterTable("comment_classification_results")
+              .addColumn("revision", "integer", (col) =>
+                col.notNull().defaultTo(0),
+              )
+              .execute();
+
+            await db.schema
+              .alterTable("comment_classification_results")
+              .dropConstraint("comment_classification_results_pkey")
+              .execute();
+
+            await db.schema
+              .alterTable("comment_classification_results")
+              .addPrimaryKeyConstraint("comment_classification_results_pkey", [
+                "comment_id",
+                "revision",
+              ])
+              .execute();
+          },
+          down: async (db: Kysely<IndexerSchemaDB>) => {
+            await db.schema
+              .alterTable("comment_moderation_statuses")
+              .dropColumn("revision")
+              .execute();
+
+            await db.schema
+              .alterTable("comment_moderation_statuses")
+              .dropConstraint("comment_moderation_statuses_pkey")
+              .execute();
+
+            await db.schema
+              .alterTable("comment_moderation_statuses")
+              .addPrimaryKeyConstraint("comment_moderation_statuses_pkey", [
+                "comment_id",
+              ])
+              .execute();
+
+            await db.schema
+              .alterTable("comment_classification_results")
+              .dropColumn("revision")
+              .execute();
+
+            await db.schema
+              .alterTable("comment_classification_results")
+              .dropConstraint("comment_classification_results_pkey")
+              .execute();
+
+            await db.schema
+              .alterTable("comment_classification_results")
+              .addPrimaryKeyConstraint("comment_classification_results_pkey", [
+                "comment_id",
+              ])
+              .execute();
+          },
+        },
     };
   }
 }

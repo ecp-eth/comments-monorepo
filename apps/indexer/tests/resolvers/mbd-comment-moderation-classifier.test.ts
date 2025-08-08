@@ -70,6 +70,7 @@ describe("CommentModerationClassifier", () => {
         parentId: "0x123",
         references: [],
         targetUri: "https://example.com",
+        revision: 0,
       });
 
       expect(result).toEqual({
@@ -98,6 +99,7 @@ describe("CommentModerationClassifier", () => {
           parentId: "0x123",
           references: [],
           targetUri: "https://example.com",
+          revision: 0,
         }),
       ).resolves.toEqual({
         action: "skipped",
@@ -128,6 +130,7 @@ describe("CommentModerationClassifier", () => {
           parentId: "0x123",
           references: [],
           targetUri: "https://example.com",
+          revision: 0,
         }),
       ).resolves.toEqual({
         action: "skipped",
@@ -170,6 +173,7 @@ describe("CommentModerationClassifier", () => {
           parentId: "0x123",
           references: [],
           targetUri: "https://example.com",
+          revision: 0,
         }),
         classifier.classify({
           author: "0x123",
@@ -179,6 +183,7 @@ describe("CommentModerationClassifier", () => {
           parentId: "0x123",
           references: [],
           targetUri: "https://example.com",
+          revision: 0,
         }),
       ]);
 
@@ -216,6 +221,7 @@ describe("CommentModerationClassifier", () => {
           parentId: "0x123",
           references: [],
           targetUri: "https://example.com",
+          revision: 0,
         },
         {
           content: "Unchanged comment",
@@ -269,6 +275,7 @@ describe("CommentModerationClassifier", () => {
           parentId: "0x123",
           references: [],
           targetUri: "https://example.com",
+          revision: 0,
         },
         {
           content: "Updated comment edit",
@@ -307,6 +314,7 @@ describe("CommentModerationClassifier", () => {
           parentId: "0x123",
           references: [],
           targetUri: "https://example.com",
+          revision: 0,
         },
         {
           content: "Updated comment edit",
@@ -326,6 +334,7 @@ describe("CommentModerationClassifier", () => {
 
       expect(mockClassifierCacheService.deleteByCommentId).toHaveBeenCalledWith(
         "0x123",
+        0,
       );
     });
   });

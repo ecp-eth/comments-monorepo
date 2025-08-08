@@ -480,6 +480,15 @@ export const ChangeModerationStatusOnCommentParamsSchema = z.object({
  * Request body schema for changing the moderation status of a comment.
  */
 export const ChangeModerationStatusOnCommentBodySchema = z.object({
+  revision: z
+    .number()
+    .int()
+    .nonnegative()
+    .openapi({
+      description:
+        "The revision of the comment. If omitted it will update the latest revision and all older pending revisions.",
+    })
+    .optional(),
   moderationStatus: IndexerAPICommentModerationStatusSchema.openapi({
     description: "The moderation status of the comment",
   }),

@@ -31,6 +31,7 @@ export class PremoderationService implements ICommentPremoderationService {
   ): Promise<CommentPremoderationServiceModerateResult> {
     const cachedStatus = await this.cacheService.getStatusByCommentId(
       comment.id,
+      comment.revision,
     );
 
     if (cachedStatus) {
@@ -43,16 +44,19 @@ export class PremoderationService implements ICommentPremoderationService {
       };
     }
 
-    const status = {
-      status: this.defaultModerationStatus,
-      changedAt: new Date(),
-    };
+    const changedAt = new Date();
+    const status = this.defaultModerationStatus;
 
     return {
       action: "premoderated",
-      ...status,
+      changedAt,
+      status,
       save: async () => {
-        await this.cacheService.insertStatusByCommentId(comment.id, status);
+        await this.cacheService.insertStatusByCommentId(comment.id, {
+          changedAt,
+          revision: comment.revision,
+          status,
+        });
       },
     };
   }
@@ -81,15 +85,28 @@ export class PremoderationService implements ICommentPremoderationService {
         await this.cacheService.setStatusByCommentId(comment.id, {
           status,
           changedAt,
+          revision: comment.revision,
         });
       },
     };
   }
 
-  async updateStatus(
-    commentId: Hex,
-    status: ModerationStatus,
-  ): Promise<CommentSelectType | undefined> {
-    return this.dbService.updateCommentModerationStatus(commentId, status);
+  async updateStatus({
+    commentId,
+    commentRevision,
+    status,
+  }: {
+    commentId: Hex;
+    /**
+     * If omitted it will update the latest revision and all older pending revisions.
+     */
+    commentRevision: number | undefined;
+    status: ModerationStatus;
+  }): Promise<CommentSelectType | undefined> {
+    return this.dbService.updateCommentModerationStatus({
+      commentId,
+      commentRevision,
+      status,
+    });
   }
 }

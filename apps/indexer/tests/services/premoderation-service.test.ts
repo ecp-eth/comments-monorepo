@@ -13,6 +13,7 @@ import type { Hex } from "@ecp.eth/sdk/core";
 // Mock services
 const mockCacheService = {
   getStatusByCommentId: vi.fn(),
+  getLatestStatusByCommentId: vi.fn(),
   setStatusByCommentId: vi.fn(),
   insertStatusByCommentId: vi.fn(),
 } as IPremoderationCacheService;
@@ -46,10 +47,12 @@ describe("PremoderationService", () => {
         references: [],
         targetUri: "test://uri",
         parentId: "0x789" as Hex,
+        revision: 0,
       };
       const mockCachedStatus: PremoderationCacheServiceStatus = {
         status: "approved",
         changedAt: new Date(),
+        revision: 0,
       };
 
       vi.mocked(mockCacheService.getStatusByCommentId).mockResolvedValueOnce(
@@ -66,6 +69,7 @@ describe("PremoderationService", () => {
       });
       expect(mockCacheService.getStatusByCommentId).toHaveBeenCalledWith(
         mockComment.id,
+        mockComment.revision,
       );
       expect(mockCacheService.insertStatusByCommentId).not.toHaveBeenCalled();
     });
@@ -79,6 +83,7 @@ describe("PremoderationService", () => {
         references: [],
         targetUri: "test://uri",
         parentId: "0x789" as Hex,
+        revision: 0,
       };
 
       vi.mocked(mockCacheService.getStatusByCommentId).mockResolvedValueOnce(
@@ -101,6 +106,7 @@ describe("PremoderationService", () => {
         {
           status: defaultModerationStatus,
           changedAt: expect.any(Date),
+          revision: mockComment.revision,
         },
       );
     });
@@ -116,6 +122,7 @@ describe("PremoderationService", () => {
         references: [],
         targetUri: "test://uri",
         parentId: "0x789" as Hex,
+        revision: 0,
       };
       const mockExistingComment = {
         id: "0x123" as Hex,
@@ -147,6 +154,7 @@ describe("PremoderationService", () => {
         references: [],
         targetUri: "test://uri",
         parentId: "0x789" as Hex,
+        revision: 0,
       };
       const mockExistingComment = {
         id: "0x123" as Hex,
@@ -174,6 +182,7 @@ describe("PremoderationService", () => {
         {
           status: "pending",
           changedAt: expect.any(Date),
+          revision: mockComment.revision,
         },
       );
     });
@@ -192,13 +201,18 @@ describe("PremoderationService", () => {
         mockDbService.updateCommentModerationStatus,
       ).mockResolvedValueOnce(mockUpdatedComment);
 
-      const result = await service.updateStatus(commentId, newStatus);
+      const result = await service.updateStatus({
+        commentId,
+        commentRevision: 0,
+        status: newStatus,
+      });
 
       expect(result).toBe(mockUpdatedComment);
-      expect(mockDbService.updateCommentModerationStatus).toHaveBeenCalledWith(
+      expect(mockDbService.updateCommentModerationStatus).toHaveBeenCalledWith({
         commentId,
-        newStatus,
-      );
+        commentRevision: 0,
+        status: newStatus,
+      });
     });
 
     test("should handle undefined result from db service", async () => {
@@ -209,13 +223,18 @@ describe("PremoderationService", () => {
         mockDbService.updateCommentModerationStatus,
       ).mockResolvedValueOnce(undefined);
 
-      const result = await service.updateStatus(commentId, newStatus);
+      const result = await service.updateStatus({
+        commentId,
+        commentRevision: 0,
+        status: newStatus,
+      });
 
       expect(result).toBeUndefined();
-      expect(mockDbService.updateCommentModerationStatus).toHaveBeenCalledWith(
+      expect(mockDbService.updateCommentModerationStatus).toHaveBeenCalledWith({
         commentId,
-        newStatus,
-      );
+        commentRevision: 0,
+        status: newStatus,
+      });
     });
   });
 });

@@ -61,13 +61,23 @@ export class CommentDbService implements ICommentDbService {
     return comment;
   }
 
-  async updateCommentModerationStatus(
-    commentId: Hex,
-    status: ModerationStatus,
-  ): Promise<CommentSelectType | undefined> {
+  async updateCommentModerationStatus({
+    commentId,
+    commentRevision,
+    status,
+  }: {
+    commentId: Hex;
+    commentRevision: number | undefined;
+    status: ModerationStatus;
+  }): Promise<CommentSelectType | undefined> {
     const [updatedComment] = await db.transaction(async (tx) => {
       const commentModerationStatus =
-        await this.cacheService.getStatusByCommentId(commentId);
+        commentRevision != null
+          ? await this.cacheService.getStatusByCommentId(
+              commentId,
+              commentRevision,
+            )
+          : await this.cacheService.getLatestStatusByCommentId(commentId);
 
       if (!commentModerationStatus) {
         throw new CommentModerationStatusNotFoundError(commentId);
@@ -91,6 +101,7 @@ export class CommentDbService implements ICommentDbService {
       await this.cacheService.setStatusByCommentId(commentId, {
         status,
         changedAt,
+        revision: commentModerationStatus.revision,
       });
 
       return await tx

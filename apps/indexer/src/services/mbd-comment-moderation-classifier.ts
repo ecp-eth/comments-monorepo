@@ -121,7 +121,10 @@ export class CommentModerationClassifier
   async classify(
     comment: ModerationNotificationServicePendingComment,
   ): Promise<CommentModerationClassfierResult> {
-    const cachedResult = await this.cacheService.getByCommentId(comment.id);
+    const cachedResult = await this.cacheService.getByCommentId(
+      comment.id,
+      comment.revision,
+    );
 
     if (cachedResult) {
       return {
@@ -140,9 +143,13 @@ export class CommentModerationClassifier
         labels: result.labels,
         score: result.score,
         save: async () => {
-          await this.cacheService.setByCommentId(comment.id, {
-            labels: result.labels,
-            score: result.score,
+          await this.cacheService.setByCommentId({
+            commentId: comment.id,
+            commentRevision: comment.revision,
+            result: {
+              labels: result.labels,
+              score: result.score,
+            },
           });
         },
       };
@@ -184,9 +191,13 @@ export class CommentModerationClassifier
         labels: result.labels,
         score: result.score,
         save: async () => {
-          await this.cacheService.setByCommentId(comment.id, {
-            labels: result.labels,
-            score: result.score,
+          await this.cacheService.setByCommentId({
+            commentId: comment.id,
+            commentRevision: comment.revision,
+            result: {
+              labels: result.labels,
+              score: result.score,
+            },
           });
         },
       };
@@ -201,7 +212,10 @@ export class CommentModerationClassifier
         score: 0,
         save: async () => {
           // If the classification fails, we should remove the cache entry so we can retry on reindex
-          await this.cacheService.deleteByCommentId(comment.id);
+          await this.cacheService.deleteByCommentId(
+            comment.id,
+            comment.revision,
+          );
         },
       };
     }

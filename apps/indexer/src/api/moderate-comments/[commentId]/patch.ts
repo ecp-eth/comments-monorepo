@@ -65,11 +65,12 @@ const changeCommentModerationStatusRoute = createRoute({
 export function setupChangeCommentModerationStatus(app: OpenAPIHono) {
   app.openapi(changeCommentModerationStatusRoute, async (c) => {
     const { commentId } = c.req.valid("param");
-    const { moderationStatus } = c.req.valid("json");
+    const { moderationStatus, revision } = c.req.valid("json");
 
     const updatedComment =
       await commentModerationService.updateModerationStatus({
         commentId,
+        commentRevision: revision,
         messageId: undefined,
         status: moderationStatus,
       });

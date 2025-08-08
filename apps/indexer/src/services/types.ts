@@ -19,6 +19,7 @@ export type ModerationNotificationServicePendingComment = {
   references: IndexerAPICommentReferencesSchemaType;
   targetUri: string;
   parentId: Hex;
+  revision: number;
 };
 
 export type ModerationNotificationServiceNotifyPendingModerationParams = {
@@ -130,12 +131,14 @@ export type CommentClassifierCacheServiceResult = {
 export interface ICommentClassifierCacheService {
   getByCommentId(
     commentId: Hex,
+    commentRevision: number,
   ): Promise<CommentClassifierCacheServiceResult | undefined>;
-  setByCommentId(
-    commentId: Hex,
-    result: CommentClassifierCacheServiceResult,
-  ): Promise<void>;
-  deleteByCommentId(commentId: Hex): Promise<void>;
+  setByCommentId(params: {
+    commentId: Hex;
+    commentRevision: number;
+    result: CommentClassifierCacheServiceResult;
+  }): Promise<void>;
+  deleteByCommentId(commentId: Hex, commentRevision: number): Promise<void>;
 }
 
 export type CommentPremoderationServiceModerateResult = {
@@ -158,19 +161,28 @@ export interface ICommentPremoderationService {
     existingComment: CommentSelectType,
   ) => Promise<CommentPremoderationServiceModerateResult>;
 
-  updateStatus: (
-    commentId: Hex,
-    status: ModerationStatus,
-  ) => Promise<CommentSelectType | undefined>;
+  updateStatus: (params: {
+    commentId: Hex;
+    /**
+     * If omitted it will update the latest revision and all older pending revisions.
+     */
+    commentRevision: number | undefined;
+    status: ModerationStatus;
+  }) => Promise<CommentSelectType | undefined>;
 }
 
 export type PremoderationCacheServiceStatus = {
   status: ModerationStatus;
   changedAt: Date;
+  revision: number;
 };
 
 export interface IPremoderationCacheService {
   getStatusByCommentId(
+    commentId: Hex,
+    commentRevision: number,
+  ): Promise<PremoderationCacheServiceStatus | undefined>;
+  getLatestStatusByCommentId(
     commentId: Hex,
   ): Promise<PremoderationCacheServiceStatus | undefined>;
   insertStatusByCommentId(
@@ -186,10 +198,14 @@ export interface IPremoderationCacheService {
 export interface ICommentDbService {
   getCommentPendingModeration: () => Promise<CommentSelectType | undefined>;
   getCommentById(commentId: Hex): Promise<CommentSelectType | undefined>;
-  updateCommentModerationStatus: (
-    commentId: Hex,
-    status: ModerationStatus,
-  ) => Promise<CommentSelectType | undefined>;
+  updateCommentModerationStatus: (params: {
+    commentId: Hex;
+    /**
+     * If omitted it will update the latest revision and all older pending revisions.
+     */
+    commentRevision: number | undefined;
+    status: ModerationStatus;
+  }) => Promise<CommentSelectType | undefined>;
 }
 
 export interface ICommentReportsService {

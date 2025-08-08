@@ -300,8 +300,11 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       resolverCommentReferences,
     );
 
+    const newCommentRevision = existingComment.revision + 1;
+
     const moderationResult = await commentModerationService.moderateUpdate({
       comment: event.args,
+      commentRevision: newCommentRevision,
       references: referencesResolutionResult.references,
       existingComment,
     });
@@ -312,7 +315,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       })
       .set({
         content: event.args.content,
-        revision: existingComment.revision + 1,
+        revision: newCommentRevision,
         updatedAt,
         references: referencesResolutionResult.references,
         referencesResolutionStatus: referencesResolutionResult.status,
