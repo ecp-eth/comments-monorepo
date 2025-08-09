@@ -43,7 +43,7 @@ type CommentSectionReadonlyProps = {
   fetchCommentParams: FetchCommentsOptions;
 };
 
-export function CommentSectionReadonly({
+export function CommentSectionByAuthor({
   initialData,
   author,
   fetchCommentParams,
@@ -53,6 +53,7 @@ export function CommentSectionReadonly({
 
   const { address: connectedAddress } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
+
   const { currentTimestamp, disablePromotion } =
     useEmbedConfig<EmbedConfigProviderByAuthorConfig>();
   const chainId = useChainId();
@@ -70,6 +71,7 @@ export function CommentSectionReadonly({
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
+    enabled: isAccountStatusResolved,
     queryKey,
     initialData,
     initialPageParam: initialData?.pageParams[0] || {
@@ -122,7 +124,9 @@ export function CommentSectionReadonly({
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
-  if (isPending) {
+  const isPreparing = isPending || !isAccountStatusResolved;
+
+  if (isPreparing) {
     return <LoadingScreen />;
   }
 

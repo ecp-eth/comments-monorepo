@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Providers } from "../providers";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { env } from "@/env";
-import { CommentSectionReadonly } from "@/components/comments/CommentSectionReadonly";
+import { CommentSectionByAuthor } from "@/components/comments/CommentSectionByAuthor";
 import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
 import { MainWrapper } from "@/components/MainWrapper";
 import { cookies } from "next/headers";
@@ -57,6 +57,7 @@ export default async function EmbedCommentsByAuthorPage({
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       commentType: COMMENT_TYPE_COMMENT,
       limit: COMMENTS_PER_PAGE,
+      mode: "flat",
       author,
       viewer,
     };
@@ -73,7 +74,7 @@ export default async function EmbedCommentsByAuthorPage({
         <MainWrapper
           restrictMaximumContainerWidth={config.restrictMaximumContainerWidth}
         >
-          <CommentSectionReadonly
+          <CommentSectionByAuthor
             author={author}
             initialData={{
               pages: [comments],
