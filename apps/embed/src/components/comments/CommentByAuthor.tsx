@@ -11,10 +11,10 @@ import {
 } from "@ecp.eth/shared/helpers";
 import { useCommentRelativeTime } from "@ecp.eth/shared/hooks";
 import {
+  CommentActionLikeButton,
   CommentMediaReferences,
   CommentText,
 } from "@ecp.eth/shared/components";
-import { CommentActionLikeButton } from "./CommentActionLikeButton";
 import { usePendingActionSetup } from "./hooks/usePendingActionSetup";
 import { createCommentItemsQueryKey } from "./queries";
 import { useAccount, useChainId } from "wagmi";

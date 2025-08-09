@@ -3,7 +3,6 @@ import {
   ListCommentsQueryPageParamsSchemaType,
   type Comment as CommentType,
 } from "@ecp.eth/shared/schemas";
-import { CommentActionButton } from "./CommentActionButton";
 import { fetchCommentReplies } from "@ecp.eth/sdk/indexer";
 import { useNewCommentsChecker } from "@ecp.eth/shared/hooks";
 import { publicEnv } from "@/publicEnv";
@@ -35,7 +34,10 @@ import { useLikeComment } from "./hooks/useLikeComment";
 import { useUnlikeComment } from "./hooks/useUnlikeComment";
 import { toast } from "sonner";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
-import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
+import {
+  CommentActionButton,
+  useConsumePendingWalletConnectionActions,
+} from "@ecp.eth/shared/components";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { Loader2Icon } from "lucide-react";
 
