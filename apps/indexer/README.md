@@ -23,6 +23,29 @@ We are running a free hosted version of this indexer at https://api.ethcomments.
 - [GraphQL references and playground](https://api.ethcomments.xyz/graphql)
 - [Source code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer)
 
+#### TypeScript SDK
+
+You can query the Indexer directly from your app using our TypeScript SDK:
+
+:::code-group
+
+```bash [npm]
+npm install @ecp.eth/sdk
+```
+
+```bash [yarn]
+yarn add @ecp.eth/sdk
+```
+
+```bash [pnpm]
+pnpm add @ecp.eth/sdk
+```
+
+:::
+
+- [Integration guide](https://docs.ethcomments.xyz/integration-options/typescript-sdk)
+- [Indexer SDK reference](https://docs.ethcomments.xyz/sdk-reference/indexer)
+
 ## Self hosting the Indexer
 
 Clone the repo from the [Source code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer)
