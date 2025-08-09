@@ -9,22 +9,25 @@ import { type Comment } from "@ecp.eth/shared/schemas";
 
 type UseLikeReactionSetupProps = {
   comment: Comment;
-  queryKey: (string | number | undefined)[];
-  onReplyAction?: () => void;
+  queryKey: readonly unknown[];
 };
 
 /**
  * helper hook to setup pending actions for a comment
  */
-export function usePendingActionSetup({
+export function useSetupPendingAction({
   comment,
   queryKey,
-  onReplyAction,
 }: UseLikeReactionSetupProps) {
+  const [isReplying, setIsReplying] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
   const likeComment = useLikeComment();
   const unlikeComment = useUnlikeComment();
+
+  const onReplyClick = useCallback(() => {
+    setIsReplying(true);
+  }, []);
 
   const onLikeClick = useCallback(async () => {
     setIsLiking(true);
@@ -85,10 +88,12 @@ export function usePendingActionSetup({
     commentId: comment.id,
     onLikeAction: onLikeClick,
     onUnlikeAction: onUnlikeClick,
-    onPrepareReplyAction: onReplyAction ?? (() => {}),
+    onPrepareReplyAction: onReplyClick,
   });
 
   return {
     isLiking,
+    isReplying,
+    setIsReplying,
   };
 }
