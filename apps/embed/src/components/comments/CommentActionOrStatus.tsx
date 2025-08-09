@@ -1,12 +1,14 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import type { Comment as CommentType } from "@ecp.eth/shared/schemas";
 import { type PropsWithChildren } from "react";
-import { useConnectBeforeAction } from "@ecp.eth/shared/components";
+import {
+  CommentActionButton,
+  CommentActionLikeButton,
+  useConnectBeforeAction,
+} from "@ecp.eth/shared/components";
 import {} from "@ecp.eth/shared/components";
 import { cn } from "@ecp.eth/shared/helpers";
-import { CommentActionButton } from "./CommentActionButton";
 import { RetryButton } from "./RetryButton";
-import { CommentActionLikeButton } from "./CommentActionLikeButton";
 
 interface CommentActionOrStatusProps {
   comment: CommentType;

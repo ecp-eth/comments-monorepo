@@ -1,11 +1,9 @@
-import type { Comment as CommentType } from "@ecp.eth/shared/schemas";
-import { useCommentIsHearted } from "@ecp.eth/shared/hooks";
-import {
-  HeartButton,
-  useConnectBeforeAction,
-} from "@ecp.eth/shared/components";
 import { CommentActionButton } from "./CommentActionButton";
-import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
+import { useConnectBeforeAction } from "./PendingWalletConnectionActionsContext";
+import { HeartButton } from "./HeartButton";
+import type { Comment as CommentType } from "../schemas";
+import { useCommentIsHearted } from "../hooks";
+import { COMMENT_REACTION_LIKE_CONTENT } from "../constants";
 
 type CommentLikeButtonProps = {
   comment: CommentType;

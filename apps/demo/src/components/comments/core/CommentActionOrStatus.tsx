@@ -1,14 +1,12 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
-import { CommentActionButton } from "./CommentActionButton";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { type PropsWithChildren } from "react";
 import { cn } from "@ecp.eth/shared/helpers";
 import {
-  HeartButton,
+  CommentActionButton,
+  CommentActionLikeButton,
   useConnectBeforeAction,
 } from "@ecp.eth/shared/components";
-import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
-import { useCommentIsHearted } from "@ecp.eth/shared/hooks";
 
 export function CommentActionOrStatus({
   comment,
@@ -42,7 +40,6 @@ export function CommentActionOrStatus({
     comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "error";
 
-  const isHearted = useCommentIsHearted(comment);
   const connectBeforeAction = useConnectBeforeAction();
 
   if (didPostingFailed) {
@@ -127,19 +124,7 @@ export function CommentActionOrStatus({
       >
         reply
       </CommentActionButton>
-      <CommentActionButton
-        onClick={connectBeforeAction(() => {
-          const newIsHearted = !isHearted;
-
-          return {
-            type: newIsHearted ? "like" : "unlike",
-            commentId: comment.id,
-          };
-        })}
-      >
-        <HeartButton pending={isLiking} isHearted={isHearted} />
-        {comment.reactionCounts?.[COMMENT_REACTION_LIKE_CONTENT] ?? 0}
-      </CommentActionButton>
+      <CommentActionLikeButton isLiking={isLiking} comment={comment} />
     </div>
   );
 }
