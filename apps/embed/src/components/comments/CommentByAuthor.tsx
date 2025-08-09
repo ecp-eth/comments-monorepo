@@ -15,7 +15,7 @@ import {
   CommentMediaReferences,
   CommentText,
 } from "@ecp.eth/shared/components";
-import { usePendingActionSetup } from "./hooks/usePendingActionSetup";
+import { useSetupPendingAction } from "./hooks/useSetupPendingAction";
 import { createCommentItemsQueryKey } from "./queries";
 import { useAccount, useChainId } from "wagmi";
 import {
@@ -49,7 +49,7 @@ export function CommentByAuthor({
     [chainId, connectedAddress, source.author],
   );
 
-  const { isLiking } = usePendingActionSetup({
+  const { isLiking } = useSetupPendingAction({
     comment,
     queryKey,
   });

@@ -5,14 +5,10 @@ import { CommentEditForm, CommentForm } from "./CommentForm";
 import { useDeleteComment } from "./hooks/useDeleteComment";
 import { useRetryPostComment } from "./hooks/useRetryPostComment";
 import { useRetryEditComment } from "./hooks/useRetryEditComment";
-import { ContractFunctionExecutionError, type Hex } from "viem";
+import { type Hex } from "viem";
 import type { QueryKey } from "@tanstack/react-query";
-import { useLikeComment } from "./hooks/useLikeComment";
-import { useUnlikeComment } from "./hooks/useUnlikeComment";
-import { toast } from "sonner";
-import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { useAccount } from "wagmi";
-import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
+import { useSetupPendingAction } from "./hooks/useSetupPendingAction";
 
 type ReplyItemProps = {
   comment: CommentType;
@@ -29,16 +25,8 @@ export function ReplyItem({
   const deleteComment = useDeleteComment();
   const retryPostComment = useRetryPostComment({ connectedAddress });
   const retryEditComment = useRetryEditComment({ connectedAddress });
-  const likeComment = useLikeComment();
-  const unlikeComment = useUnlikeComment();
 
-  const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [isLiking, setIsLiking] = useState(false);
-
-  const onReplyClick = useCallback(() => {
-    setIsReplying(true);
-  }, []);
 
   const onEditClick = useCallback(() => {
     setIsEditing(true);
@@ -56,58 +44,9 @@ export function ReplyItem({
     retryEditComment({ comment, queryKey });
   }, [comment, retryEditComment, queryKey]);
 
-  const onLikeClick = useCallback(() => {
-    likeComment({
-      comment,
-      queryKey,
-      onBeforeStart: () => setIsLiking(true),
-      onSuccess: () => setIsLiking(false),
-      onFailed: (e: unknown) => {
-        setIsLiking(false);
-
-        if (!(e instanceof Error)) {
-          toast.error("Failed to like");
-          return;
-        }
-
-        const message =
-          e instanceof ContractFunctionExecutionError
-            ? formatContractFunctionExecutionError(e)
-            : e.message;
-
-        toast.error(message);
-      },
-    });
-  }, [comment, likeComment, queryKey]);
-
-  const onUnlikeClick = useCallback(() => {
-    unlikeComment({
-      comment,
-      queryKey,
-      onBeforeStart: () => setIsLiking(false),
-      onFailed: (e: unknown) => {
-        setIsLiking(false);
-
-        if (!(e instanceof Error)) {
-          toast.error("Failed to like");
-          return;
-        }
-
-        const message =
-          e instanceof ContractFunctionExecutionError
-            ? formatContractFunctionExecutionError(e)
-            : e.message;
-
-        toast.error(message);
-      },
-    });
-  }, [comment, queryKey, unlikeComment]);
-
-  useConsumePendingWalletConnectionActions({
-    commentId: comment.id,
-    onLikeAction: onLikeClick,
-    onUnlikeAction: onUnlikeClick,
-    onPrepareReplyAction: onReplyClick,
+  const { isLiking, isReplying, setIsReplying } = useSetupPendingAction({
+    comment,
+    queryKey,
   });
 
   return (
