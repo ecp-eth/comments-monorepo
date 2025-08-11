@@ -23,6 +23,8 @@ import { ReportPendingCommand } from "./admin-telegram-bot-service/commands/repo
 import { ModerateCommand } from "./admin-telegram-bot-service/commands/moderate";
 import { ModeratePendingCommand } from "./admin-telegram-bot-service/commands/moderate-pending";
 
+export { db } from "./db";
+
 function resolveAuthor(author: Hex): Promise<string | Hex> {
   return ensByAddressResolverService.load(author).then((data) => {
     if (data) {
