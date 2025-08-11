@@ -1,7 +1,7 @@
 import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
 import { useLikeComment } from "./useLikeComment";
 import { useUnlikeComment } from "./useUnlikeComment";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ContractFunctionExecutionError } from "viem";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { toast } from "sonner";
@@ -19,7 +19,7 @@ export function useSetupPendingAction({
   comment,
   queryKey,
 }: UseLikeReactionSetupProps) {
-  const [isMounted, setIsMounted] = useState(false);
+  const isMountedRef = useRef(false);
   const [isReplying, setIsReplying] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
@@ -27,7 +27,10 @@ export function useSetupPendingAction({
   const unlikeComment = useUnlikeComment();
 
   useEffect(() => {
-    setIsMounted(true);
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
   const onReplyClick = useCallback(() => {
@@ -35,58 +38,51 @@ export function useSetupPendingAction({
   }, []);
 
   const onLikeClick = useCallback(async () => {
-    setIsLiking(true);
-    try {
-      await likeComment({
-        comment,
-        queryKey,
-        onBeforeStart: () => setIsLiking(true),
-        onSuccess: () => setIsLiking(false),
-        onFailed: (e: unknown) => {
-          setIsLiking(false);
-
-          if (!(e instanceof Error)) {
-            toast.error("Failed to like");
-            return;
-          }
-
-          const message =
-            e instanceof ContractFunctionExecutionError
-              ? formatContractFunctionExecutionError(e)
-              : e.message;
-
-          toast.error(message);
-        },
-      });
-    } finally {
-      setIsLiking(false);
+    if (isLiking) {
+      return;
     }
-  }, [likeComment, comment, queryKey]);
+
+    await likeComment({
+      comment,
+      queryKey,
+      onBeforeStart: () => setIsLiking(true),
+      onSuccess: () => setIsLiking(false),
+      onFailed: (e: unknown) => {
+        setIsLiking(false);
+
+        if (!(e instanceof Error)) {
+          toast.error("Failed to like");
+          return;
+        }
+
+        const message =
+          e instanceof ContractFunctionExecutionError
+            ? formatContractFunctionExecutionError(e)
+            : e.message;
+
+        toast.error(message);
+      },
+    });
+  }, [isLiking, likeComment, comment, queryKey]);
 
   const onUnlikeClick = useCallback(async () => {
-    setIsLiking(true);
-    try {
-      await unlikeComment({
-        comment,
-        queryKey,
-        onBeforeStart: () => setIsLiking(false),
-        onFailed: (e: unknown) => {
-          if (!(e instanceof Error)) {
-            toast.error("Failed to unlike");
-            return;
-          }
+    await unlikeComment({
+      comment,
+      queryKey,
+      onFailed: (e: unknown) => {
+        if (!(e instanceof Error)) {
+          toast.error("Failed to unlike");
+          return;
+        }
 
-          const message =
-            e instanceof ContractFunctionExecutionError
-              ? formatContractFunctionExecutionError(e)
-              : e.message;
+        const message =
+          e instanceof ContractFunctionExecutionError
+            ? formatContractFunctionExecutionError(e)
+            : e.message;
 
-          toast.error(message);
-        },
-      });
-    } finally {
-      setIsLiking(false);
-    }
+        toast.error(message);
+      },
+    });
   }, [unlikeComment, comment, queryKey]);
 
   useConsumePendingWalletConnectionActions({
@@ -100,7 +96,7 @@ export function useSetupPendingAction({
     isLiking,
     isReplying,
     setIsReplying: (value: boolean) => {
-      if (!isMounted) {
+      if (!isMountedRef.current) {
         return;
       }
 
