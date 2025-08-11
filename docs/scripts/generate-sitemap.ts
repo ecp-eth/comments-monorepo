@@ -50,11 +50,16 @@ function scanDirectory(dirPath: string, basePath: string = ""): SitemapUrl[] {
           }
         }
 
-        // Convert path separators to URL separators
+        // Convert Windows path separators to URL path separators
         urlPath = urlPath.replace(/\\/g, "/");
 
-        const fullUrl =
-          `${BASE_URL}/${urlPath}`.replace(/\/+$/, "") || BASE_URL;
+        // Remove leading slash if present
+        if (urlPath.startsWith("/")) {
+          urlPath = urlPath.substring(1);
+        }
+
+        // TODO: why ? urlPath comes from relativePath, and relativePath is already joined with basePath
+        const fullUrl = urlPath ? `${BASE_URL}/${urlPath}` : BASE_URL;
 
         // Determine priority based on URL path
         let priority = "0.8";
@@ -131,7 +136,8 @@ function main() {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  fs.writeFileSync(outputFile, sitemapXml);
+  // Write the sitemap file
+  fs.writeFileSync(outputFile, sitemapXml, "utf8");
 
   console.log(`\nSitemap generated successfully at: ${outputFile}`);
   console.log(`\nTotal URLs: ${urls.length}`);

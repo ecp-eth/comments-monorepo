@@ -38,4 +38,10 @@ The script generates a `sitemap.xml` file in the `public/` directory with:
 
 ### Integration
 
-The script is automatically run during the build process via the `build` script in `package.json`.
+The sitemap generation is automatically integrated into the build process:
+
+```bash
+pnpm run build  # This will generate the sitemap before building
+```
+
+The sitemap will be available at `https://docs.ethcomments.xyz/sitemap.xml` after deployment.
