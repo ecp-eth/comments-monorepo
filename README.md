@@ -13,8 +13,13 @@ This monorepo contains all the auxilliary tools and libraries of the Ethereum Co
 - `demo/` - Main demo application showcasing ECP integration
 - `embed/` - Embeddable components for ECP
 - `homepage/` - Project homepage and documentation
+
+
+### Examples (`/examples`)
+
 - `embed-demo-blog/` - Demo blog with embedded ECP comments
 - `demo-rn-expo/` - React Native demo application
+- `signer/` - Minimal boilerplate for deploying your own signer API 
 
 ### Packages (`/packages`)
 

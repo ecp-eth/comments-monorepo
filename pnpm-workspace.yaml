@@ -2,7 +2,7 @@ packages:
   - apps/*
   # had to exclude expo rn from monorepo becasue it can only works with react 19.0.0
   # having 2 versions of react will cause duplication of wagmi and cause react context referencing error.
-  - "!apps/demo-rn-expo"
+  - "!examples/demo-rn-expo"
   - packages/*
   - examples/*
   - docs
