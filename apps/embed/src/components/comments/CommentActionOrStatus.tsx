@@ -6,7 +6,6 @@ import {
   CommentActionLikeButton,
   useConnectBeforeAction,
 } from "@ecp.eth/shared/components";
-import {} from "@ecp.eth/shared/components";
 import { cn } from "@ecp.eth/shared/helpers";
 import { RetryButton } from "./RetryButton";
 

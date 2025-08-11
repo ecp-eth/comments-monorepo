@@ -5,7 +5,7 @@ import type { Comment as CommentType } from "../schemas";
 import { useCommentIsHearted } from "../hooks";
 import { COMMENT_REACTION_LIKE_CONTENT } from "../constants";
 
-type CommentLikeButtonProps = {
+type CommentActionLikeButtonProps = {
   comment: CommentType;
   isLiking?: boolean;
 };
@@ -13,7 +13,7 @@ type CommentLikeButtonProps = {
 export function CommentActionLikeButton({
   comment,
   isLiking,
-}: CommentLikeButtonProps) {
+}: CommentActionLikeButtonProps) {
   const isHearted = useCommentIsHearted(comment);
   const connectBeforeAction = useConnectBeforeAction();
 
