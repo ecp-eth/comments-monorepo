@@ -172,8 +172,8 @@ export interface ICommentPremoderationService {
 }
 
 export type PremoderationCacheServiceStatus = {
-  status: ModerationStatus;
-  changedAt: Date;
+  moderationStatus: ModerationStatus;
+  updatedAt: Date;
   revision: number;
 };
 

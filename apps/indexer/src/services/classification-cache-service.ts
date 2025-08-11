@@ -3,23 +3,31 @@ import type {
   CommentClassifierCacheServiceResult,
   ICommentClassifierCacheService,
 } from "./types";
-import { getIndexerDb } from "../management/db";
+import { db as dbService } from "../services";
+import { and, eq } from "drizzle-orm";
+import { schema } from "../../schema";
 
 export class ClassificationCacheService
   implements ICommentClassifierCacheService
 {
+  constructor(private db: typeof dbService) {}
+
   async getByCommentId(
     commentId: Hex,
     commentRevision: number,
   ): Promise<CommentClassifierCacheServiceResult | undefined> {
-    const db = getIndexerDb();
-
-    const result = await db
-      .selectFrom("comment_classification_results")
-      .select(["labels", "score"])
-      .where("comment_id", "=", commentId)
-      .where("revision", "=", commentRevision)
-      .executeTakeFirst();
+    const result = await this.db.query.commentClassificationResults
+      .findFirst({
+        columns: {
+          labels: true,
+          score: true,
+        },
+        where: and(
+          eq(schema.commentClassificationResults.commentId, commentId),
+          eq(schema.commentClassificationResults.revision, commentRevision),
+        ),
+      })
+      .execute();
 
     return result;
   }
@@ -29,22 +37,24 @@ export class ClassificationCacheService
     commentRevision: number;
     result: CommentClassifierCacheServiceResult;
   }): Promise<void> {
-    const db = getIndexerDb();
-
-    await db
-      .insertInto("comment_classification_results")
+    await this.db
+      .insert(schema.commentClassificationResults)
       .values({
-        comment_id: params.commentId,
+        commentId: params.commentId,
         revision: params.commentRevision,
         labels: params.result.labels,
         score: params.result.score,
       })
-      .onConflict((cb) =>
-        cb.columns(["comment_id", "revision"]).doUpdateSet({
+      .onConflictDoUpdate({
+        target: [
+          schema.commentClassificationResults.commentId,
+          schema.commentClassificationResults.revision,
+        ],
+        set: {
           labels: params.result.labels,
           score: params.result.score,
-        }),
-      )
+        },
+      })
       .execute();
   }
 
@@ -52,12 +62,14 @@ export class ClassificationCacheService
     commentId: Hex,
     commentRevision: number,
   ): Promise<void> {
-    const db = getIndexerDb();
-
-    await db
-      .deleteFrom("comment_classification_results")
-      .where("comment_id", "=", commentId)
-      .where("revision", "=", commentRevision)
+    await this.db
+      .delete(schema.commentClassificationResults)
+      .where(
+        and(
+          eq(schema.commentClassificationResults.commentId, commentId),
+          eq(schema.commentClassificationResults.revision, commentRevision),
+        ),
+      )
       .execute();
   }
 }

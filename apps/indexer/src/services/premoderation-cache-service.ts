@@ -3,25 +3,30 @@ import type {
   PremoderationCacheServiceStatus,
 } from "./types";
 import type { Hex } from "@ecp.eth/sdk/core";
-import { getIndexerDb } from "../management/db";
+import { db as dbService } from "../services";
+import { and, desc, eq, lt } from "drizzle-orm";
+import { schema } from "../../schema";
 
 export class PremoderationCacheService implements IPremoderationCacheService {
+  constructor(private db: typeof dbService) {}
+
   async getStatusByCommentId(
     commentId: Hex,
     commentRevision: number,
   ): Promise<PremoderationCacheServiceStatus | undefined> {
-    const db = getIndexerDb();
-
-    const result = await db
-      .selectFrom("comment_moderation_statuses")
-      .select([
-        "moderation_status as status",
-        "updated_at as changedAt",
-        "revision",
-      ])
-      .where("comment_id", "=", commentId)
-      .where("revision", "=", commentRevision)
-      .executeTakeFirst();
+    const result = await this.db.query.commentModerationStatuses
+      .findFirst({
+        columns: {
+          revision: true,
+          updatedAt: true,
+          moderationStatus: true,
+        },
+        where: and(
+          eq(schema.commentModerationStatuses.commentId, commentId),
+          eq(schema.commentModerationStatuses.revision, commentRevision),
+        ),
+      })
+      .execute();
 
     return result;
   }
@@ -29,19 +34,17 @@ export class PremoderationCacheService implements IPremoderationCacheService {
   async getLatestStatusByCommentId(
     commentId: Hex,
   ): Promise<PremoderationCacheServiceStatus | undefined> {
-    const db = getIndexerDb();
-
-    const result = await db
-      .selectFrom("comment_moderation_statuses")
-      .select([
-        "moderation_status as status",
-        "updated_at as changedAt",
-        "revision",
-      ])
-      .where("comment_id", "=", commentId)
-      .orderBy("revision", "desc")
-      .limit(1)
-      .executeTakeFirst();
+    const result = await this.db.query.commentModerationStatuses
+      .findFirst({
+        columns: {
+          revision: true,
+          updatedAt: true,
+          moderationStatus: true,
+        },
+        where: eq(schema.commentModerationStatuses.commentId, commentId),
+        orderBy: desc(schema.commentModerationStatuses.revision),
+      })
+      .execute();
 
     return result;
   }
@@ -50,15 +53,13 @@ export class PremoderationCacheService implements IPremoderationCacheService {
     commentId: Hex,
     status: PremoderationCacheServiceStatus,
   ): Promise<void> {
-    const db = getIndexerDb();
-
-    await db
-      .insertInto("comment_moderation_statuses")
+    await this.db
+      .insert(schema.commentModerationStatuses)
       .values({
-        comment_id: commentId,
+        commentId,
         revision: status.revision,
-        moderation_status: status.status,
-        updated_at: status.changedAt,
+        moderationStatus: status.moderationStatus,
+        updatedAt: status.updatedAt,
       })
       .execute();
   }
@@ -67,42 +68,48 @@ export class PremoderationCacheService implements IPremoderationCacheService {
     commentId: Hex,
     status: PremoderationCacheServiceStatus,
   ): Promise<void> {
-    const db = getIndexerDb();
-
-    await db.transaction().execute(async (tx) => {
+    await this.db.transaction(async (tx) => {
       await tx
-        .insertInto("comment_moderation_statuses")
+        .insert(schema.commentModerationStatuses)
         .values({
-          comment_id: commentId,
-          moderation_status: status.status,
+          commentId,
+          moderationStatus: status.moderationStatus,
           revision: status.revision,
-          updated_at: status.changedAt,
+          updatedAt: status.updatedAt,
         })
-        .onConflict((cb) =>
-          cb.columns(["comment_id", "revision"]).doUpdateSet({
-            moderation_status: status.status,
-            updated_at: status.changedAt,
-          }),
-        )
+        .onConflictDoUpdate({
+          target: [
+            schema.commentModerationStatuses.commentId,
+            schema.commentModerationStatuses.revision,
+          ],
+          set: {
+            moderationStatus: status.moderationStatus,
+            updatedAt: status.updatedAt,
+          },
+        })
         .execute();
 
-      if (status.status === "pending") {
+      if (status.moderationStatus === "pending") {
         // if the new status is pending, keep the old revisions untouched
         // also ignore newer revisions
         return;
       }
 
       await tx
-        .updateTable("comment_moderation_statuses")
+        .update(schema.commentModerationStatuses)
         .set({
-          moderation_status: status.status,
-          updated_at: status.changedAt,
+          moderationStatus: status.moderationStatus,
+          updatedAt: status.updatedAt,
         })
-        .where("comment_id", "=", commentId)
-        // new status is not pending, mark all older pending revisions to be of the same status
-        // this solves an issue when someone edits a comment multiple times and it wasn't premoderated
-        .where("revision", "<", status.revision)
-        .where("moderation_status", "=", "pending")
+        .where(
+          and(
+            eq(schema.commentModerationStatuses.commentId, commentId),
+            // new status is not pending, mark all older pending revisions to be of the same status
+            // this solves an issue when someone edits a comment multiple times and it wasn't premoderated
+            lt(schema.commentModerationStatuses.revision, status.revision),
+            eq(schema.commentModerationStatuses.moderationStatus, "pending"),
+          ),
+        )
         .execute();
     });
   }

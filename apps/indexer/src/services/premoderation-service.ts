@@ -38,8 +38,8 @@ export class PremoderationService implements ICommentPremoderationService {
       // this is skipped status because it is already stored in the cache
       return {
         action: "skipped",
-        status: cachedStatus.status,
-        changedAt: cachedStatus.changedAt,
+        status: cachedStatus.moderationStatus,
+        changedAt: cachedStatus.updatedAt,
         save: async () => {},
       };
     }
@@ -53,9 +53,9 @@ export class PremoderationService implements ICommentPremoderationService {
       status,
       save: async () => {
         await this.cacheService.insertStatusByCommentId(comment.id, {
-          changedAt,
+          updatedAt: changedAt,
           revision: comment.revision,
-          status,
+          moderationStatus: status,
         });
       },
     };
@@ -83,8 +83,8 @@ export class PremoderationService implements ICommentPremoderationService {
       changedAt,
       save: async () => {
         await this.cacheService.setStatusByCommentId(comment.id, {
-          status,
-          changedAt,
+          moderationStatus: status,
+          updatedAt: changedAt,
           revision: comment.revision,
         });
       },

@@ -64,7 +64,7 @@ export const moderationNotificationsService =
     resolveAuthor,
   });
 
-const classifierCacheService = new ClassificationCacheService();
+const classifierCacheService = new ClassificationCacheService(db);
 
 export const commentModerationClassifierService =
   env.MODERATION_ENABLE_AUTOMATIC_CLASSIFICATION && env.MODERATION_MBD_API_KEY
@@ -74,7 +74,7 @@ export const commentModerationClassifierService =
       })
     : new NoopCommentModerationClassifier();
 
-const premoderationCacheService = new PremoderationCacheService();
+const premoderationCacheService = new PremoderationCacheService(db);
 
 export const commentDbService = new CommentDbService({
   cacheService: premoderationCacheService,

@@ -50,8 +50,8 @@ describe("PremoderationService", () => {
         revision: 0,
       };
       const mockCachedStatus: PremoderationCacheServiceStatus = {
-        status: "approved",
-        changedAt: new Date(),
+        moderationStatus: "approved",
+        updatedAt: new Date(),
         revision: 0,
       };
 
@@ -63,8 +63,8 @@ describe("PremoderationService", () => {
 
       expect(result).toEqual({
         action: "skipped",
-        status: mockCachedStatus.status,
-        changedAt: mockCachedStatus.changedAt,
+        status: mockCachedStatus.moderationStatus,
+        changedAt: mockCachedStatus.updatedAt,
         save: expect.any(Function),
       });
       expect(mockCacheService.getStatusByCommentId).toHaveBeenCalledWith(

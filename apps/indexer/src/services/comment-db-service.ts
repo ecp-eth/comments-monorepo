@@ -92,15 +92,15 @@ export class CommentDbService implements ICommentDbService {
       }
 
       // if the comment is already in the status, simply return the comment
-      if (commentModerationStatus.status === status) {
+      if (commentModerationStatus.moderationStatus === status) {
         return [comment];
       }
 
       const changedAt = new Date();
 
       await this.cacheService.setStatusByCommentId(commentId, {
-        status,
-        changedAt,
+        moderationStatus: status,
+        updatedAt: changedAt,
         revision: commentModerationStatus.revision,
       });
 

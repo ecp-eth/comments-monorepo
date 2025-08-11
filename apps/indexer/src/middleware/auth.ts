@@ -2,7 +2,6 @@ import { type Context, type HonoRequest, type MiddlewareHandler } from "hono";
 import { verifyAsync } from "@noble/ed25519";
 import { HTTPException } from "hono/http-exception";
 import { managementAuthService } from "../services";
-import type { Hex } from "viem";
 
 const MAX_REQUEST_AGE_MS = 1 * 60 * 1000; // 1 minute
 
@@ -41,7 +40,7 @@ export function authMiddleware(): MiddlewareHandler {
       });
     }
 
-    const publicKey = await managementAuthService.getPublicKey(keyId as Hex);
+    const publicKey = await managementAuthService.getPublicKey(keyId);
 
     if (!publicKey) {
       throw new HTTPException(401, {

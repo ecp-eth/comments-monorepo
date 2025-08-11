@@ -47,7 +47,6 @@
     "graphql-request": "^7.2.0",
     "hono": "^4.5.0",
     "hono-rate-limiter": "^0.4.2",
-    "kysely": "^0.26.3",
     "lru-cache": "^11.0.2",
     "node-html-parser": "^7.0.1",
     "normalize-url": "^8.0.1",
@@ -63,7 +62,6 @@
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",
     "@types/node": "^22.13.1",
-    "@types/pg": "^8.11.11",
     "@types/promise-deferred": "^2.0.5",
     "eslint": "^9.19.0",
     "globals": "^15.14.0",

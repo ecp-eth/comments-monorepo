@@ -14,12 +14,16 @@ import {
 import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants";
 import type { Hex } from "viem";
 import type { CommentReportStatus } from "./src/management/types";
+import type {
+  CommentModerationLabelsWithScore,
+  ModerationStatus,
+} from "./src/services/types";
 
 export const offchainSchema = pgSchema(ECP_INDEXER_SCHEMA_NAME);
 
 export const apiKeys = offchainSchema.table("api_keys", {
-  id: text().notNull().primaryKey().$type<Hex>(),
-  publicKey: text().notNull().$type<Hex>(),
+  id: text().notNull().primaryKey(),
+  publicKey: text().notNull(),
   name: text().notNull().unique(),
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   lastUsedAt: timestamp({ withTimezone: true }),
@@ -31,7 +35,7 @@ export const commentClassificationResults = offchainSchema.table(
     commentId: text().notNull().$type<Hex>(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    labels: jsonb().notNull(),
+    labels: jsonb().notNull().$type<CommentModerationLabelsWithScore>(),
     score: doublePrecision().notNull(),
     revision: integer().notNull().default(0),
   },
@@ -44,7 +48,10 @@ export const commentModerationStatuses = offchainSchema.table(
     commentId: text().notNull().$type<Hex>(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    moderationStatus: text().notNull().default("pending"),
+    moderationStatus: text()
+      .notNull()
+      .default("pending")
+      .$type<ModerationStatus>(),
     revision: integer().notNull(),
   },
   (table) => [
