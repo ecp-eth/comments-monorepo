@@ -4,7 +4,7 @@ import {
   GetMutedAccountParamSchema,
   GetMutedAccountResponseSchema,
 } from "../../lib/schemas";
-import { getMutedAccount } from "../../management/services/muted-accounts";
+import { mutedAccountsManagementService } from "../../services";
 
 const isMutedRoute = createRoute({
   method: "get",
@@ -45,13 +45,14 @@ const isMutedRoute = createRoute({
 export function setupGetMutedAccount(app: OpenAPIHono) {
   app.openapi(isMutedRoute, async (c) => {
     const { address } = c.req.valid("param");
-    const mutedAccount = await getMutedAccount(address);
+    const mutedAccount =
+      await mutedAccountsManagementService.getMutedAccount(address);
 
     if (mutedAccount) {
       return c.json(
         {
           address: mutedAccount.account,
-          createdAt: mutedAccount.created_at,
+          createdAt: mutedAccount.createdAt,
         },
         200,
       );

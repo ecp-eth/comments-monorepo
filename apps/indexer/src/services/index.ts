@@ -24,6 +24,7 @@ import { ModerateCommand } from "./admin-telegram-bot-service/commands/moderate"
 import { ModeratePendingCommand } from "./admin-telegram-bot-service/commands/moderate-pending";
 import { db } from "./db";
 import { ManagementAuthService } from "../management/services/auth";
+import { MutedAccountsManagementService } from "../management/services/muted-accounts";
 
 export { db };
 
@@ -134,3 +135,6 @@ export const telegramAdminBotService =
         resolveAuthor,
       })
     : new NoopAdminBotService();
+
+export const mutedAccountsManagementService =
+  new MutedAccountsManagementService(db);

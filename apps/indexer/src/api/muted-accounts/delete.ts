@@ -3,8 +3,8 @@ import {
   APIErrorResponseSchema,
   DeleteMutedAccountParamSchema,
 } from "../../lib/schemas";
-import { unmuteAccount } from "../../management/services/muted-accounts";
 import { authMiddleware } from "../../middleware/auth";
+import { mutedAccountsManagementService } from "../../services";
 
 const unmuteAccountRoute = createRoute({
   method: "delete",
@@ -51,7 +51,7 @@ export function setupUnmuteAccount(app: OpenAPIHono) {
   app.openapi(unmuteAccountRoute, async (c) => {
     const { address } = c.req.valid("param");
 
-    const result = await unmuteAccount(address);
+    const result = await mutedAccountsManagementService.unmuteAccount(address);
 
     if (!result) {
       return c.json(

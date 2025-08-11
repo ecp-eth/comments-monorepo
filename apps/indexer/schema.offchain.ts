@@ -84,3 +84,5 @@ export const mutedAccounts = offchainSchema.table("muted_accounts", {
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   reason: text(),
 });
+
+export type MutedAccountSelectType = typeof mutedAccounts.$inferSelect;

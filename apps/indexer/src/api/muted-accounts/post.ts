@@ -5,7 +5,7 @@ import {
   PostMutedAccountResponseSchema,
 } from "../../lib/schemas";
 import { authMiddleware } from "../../middleware/auth";
-import { muteAccount } from "../../management/services/muted-accounts";
+import { mutedAccountsManagementService } from "../../services";
 
 const postMutedAccountRoute = createRoute({
   method: "post",
@@ -63,7 +63,10 @@ export function setupMarkAuthorAsMuted(app: OpenAPIHono) {
   app.openapi(postMutedAccountRoute, async (c) => {
     const { address, reason } = c.req.valid("json");
 
-    const result = await muteAccount(address, reason);
+    const result = await mutedAccountsManagementService.muteAccount(
+      address,
+      reason,
+    );
 
     if (!result) {
       return c.json(
