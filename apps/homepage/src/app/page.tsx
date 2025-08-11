@@ -732,7 +732,7 @@ await fetchComments({
             Protocol
           </p>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             <Card className="border-2 hover:border-indigo-400 transition-colors bg-white dark:bg-gray-700 group border-gray-200 dark:border-gray-600">
               <CardContent className="pt-6 flex-grow text-center">
                 <div className="flex justify-center mb-4">
@@ -758,6 +758,73 @@ await fetchComments({
                     rel="noopener noreferrer"
                   >
                     Post your take on Interface
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+
+            <Card className="border-2 hover:border-indigo-400 transition-colors bg-white dark:bg-gray-700 group border-gray-200 dark:border-gray-600">
+              <CardContent className="pt-6 flex-grow text-center">
+                <div className="flex justify-center mb-4">
+                  <img
+                    src="/town.png"
+                    alt="Town"
+                    className="h-16 w-auto object-contain rounded-lg"
+                    loading="lazy"
+                  />
+                </div>
+                <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">
+                  Town
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Join the ECP community on Telegram
+                </p>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link
+                    href="https://t.me/+vxh3qr_ivnczMTBk"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Join Town
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+
+            <Card className="border-2 hover:border-indigo-400 transition-colors bg-white dark:bg-gray-700 group border-gray-200 dark:border-gray-600">
+              <CardContent className="pt-6 flex-grow text-center">
+                <div className="flex justify-center mb-4">
+                  <svg
+                    width="64"
+                    height="64"
+                    viewBox="0 0 493 487"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="45"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                  >
+                    <path d="M350.5 426.182C299 459.5 215 476 128.486 426.182C97.8615 470.932 28 464.172 28 434.339C28 404.506 44.5 269 68 170C163.082 -74.5 499 24.9999 462 269C443.627 390.161 319.238 339.11 336.373 269M336.373 269C374.653 112.375 191.131 100.278 163.082 236.905C132.458 386.071 307.275 388.055 336.373 269Z"></path>
+                  </svg>
+                </div>
+                <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">
+                  Paper
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Discover and share content on Ethereum
+                </p>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link
+                    href="https://paper.ink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Visit Paper
                   </Link>
                 </Button>
               </CardFooter>
