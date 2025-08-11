@@ -1,8 +1,8 @@
 import { type Context, type HonoRequest, type MiddlewareHandler } from "hono";
 import { verifyAsync } from "@noble/ed25519";
 import { HTTPException } from "hono/http-exception";
-import { ManagementAuthService } from "../management/services/auth";
-import { getIndexerDb } from "../management/db";
+import { managementAuthService } from "../services";
+import type { Hex } from "viem";
 
 const MAX_REQUEST_AGE_MS = 1 * 60 * 1000; // 1 minute
 
@@ -27,8 +27,6 @@ const MAX_REQUEST_AGE_MS = 1 * 60 * 1000; // 1 minute
  * ```
  */
 export function authMiddleware(): MiddlewareHandler {
-  const authService = new ManagementAuthService(getIndexerDb());
-
   return async (c: Context, next) => {
     // Try to get signature from header first, then from query params
     const signature =
@@ -43,7 +41,7 @@ export function authMiddleware(): MiddlewareHandler {
       });
     }
 
-    const publicKey = await authService.getPublicKey(keyId);
+    const publicKey = await managementAuthService.getPublicKey(keyId as Hex);
 
     if (!publicKey) {
       throw new HTTPException(401, {

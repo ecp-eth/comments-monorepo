@@ -22,8 +22,8 @@ import { ReportCommand } from "./admin-telegram-bot-service/commands/report";
 import { ReportPendingCommand } from "./admin-telegram-bot-service/commands/report-pending";
 import { ModerateCommand } from "./admin-telegram-bot-service/commands/moderate";
 import { ModeratePendingCommand } from "./admin-telegram-bot-service/commands/moderate-pending";
-
 import { db } from "./db";
+import { ManagementAuthService } from "../management/services/auth";
 
 export { db };
 
@@ -78,6 +78,8 @@ const premoderationCacheService = new PremoderationCacheService();
 export const commentDbService = new CommentDbService({
   cacheService: premoderationCacheService,
 });
+
+export const managementAuthService = new ManagementAuthService(db);
 
 export const managementCommentDbService = new ManagementCommentDbService(db);
 
