@@ -5,7 +5,10 @@ import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer
 import type { Convenience, Message } from "telegraf/types";
 import type { CommentReportStatus } from "../management/types";
 import type { Handler } from "hono";
-import type { CommentReportSelectType } from "../../schema.offchain";
+import type {
+  CommentModerationStatusesSelectType,
+  CommentReportSelectType,
+} from "../../schema.offchain";
 
 export type ModerationStatus = "pending" | "approved" | "rejected";
 
@@ -169,76 +172,90 @@ export interface ICommentPremoderationService {
     commentRevision: number | undefined;
     status: ModerationStatus;
   }) => Promise<CommentSelectType | undefined>;
-}
 
-export type PremoderationCacheServiceStatus = {
-  moderationStatus: ModerationStatus;
-  updatedAt: Date;
-  revision: number;
-};
+  getCommentById: (commentId: Hex) => Promise<CommentSelectType | undefined>;
 
-export interface IPremoderationCacheService {
-  getStatusByCommentId(
+  getPendingComment: () => Promise<CommentSelectType | undefined>;
+
+  getStatusByCommentId: (
     commentId: Hex,
     commentRevision: number,
-  ): Promise<PremoderationCacheServiceStatus | undefined>;
-  getLatestStatusByCommentId(
-    commentId: Hex,
-  ): Promise<PremoderationCacheServiceStatus | undefined>;
-  insertStatusByCommentId(
-    commentId: Hex,
-    status: PremoderationCacheServiceStatus,
-  ): Promise<void>;
-  setStatusByCommentId(
-    commentId: Hex,
-    status: PremoderationCacheServiceStatus,
-  ): Promise<void>;
-}
+  ) => Promise<CommentModerationStatusesSelectType | undefined>;
 
-export interface ICommentDbService {
-  getCommentPendingModeration: () => Promise<CommentSelectType | undefined>;
-  getCommentById(commentId: Hex): Promise<CommentSelectType | undefined>;
-  updateCommentModerationStatus: (params: {
-    commentId: Hex;
-    /**
-     * If omitted it will update the latest revision and all older pending revisions.
-     */
-    commentRevision: number | undefined;
-    status: ModerationStatus;
-  }) => Promise<CommentSelectType | undefined>;
+  getLatestStatusByCommentId: (
+    commentId: Hex,
+  ) => Promise<CommentModerationStatusesSelectType | undefined>;
 }
 
 export interface ICommentReportsService {
   /**
    * Report a comment with a message
-   * @param commentId The ID of the comment to report
-   * @param reportee The address of the user reporting the comment
-   * @param message Optional message explaining the report (max 200 chars)
    */
-  report(commentId: Hex, reportee: Hex, message?: string): Promise<void>;
+  report(params: {
+    /**
+     * The ID of the comment to report
+     */
+    commentId: Hex;
+    /**
+     * The address of the user reporting the comment
+     */
+    reportee: Hex;
+    /**
+     * Optional message explaining the report (max 200 chars)
+     */
+    message: string | undefined;
+  }): Promise<void>;
+
   /**
    * Change the status of a report
-   * @param messageId The message ID of the report
-   * @param reportId The ID of the report to change the status of
-   * @param status The new status of the report
    */
-  changeStatus(
-    messageId: number,
-    reportId: string,
-    status: CommentReportStatus,
-  ): Promise<void>;
+  changeStatus(params: {
+    /**
+     * The ID of the report to change the status of
+     */
+    reportId: string;
+    /**
+     * The new status of the report
+     */
+    status: CommentReportStatus;
+    /**
+     * The message ID of the report for telegram notification
+     */
+    messageId?: number;
+  }): Promise<CommentReportSelectType>;
+
   /**
    * Request a status change for a report
-   * @param messageId The message ID of the report
    * @param reportId The ID of the report to request a status change for
+   * @param messageId The message ID of the report for telegram notification
    */
-  requestStatusChange(messageId: number, reportId: string): Promise<void>;
+  requestStatusChange(
+    reportId: string,
+    messageId?: number,
+  ): Promise<CommentReportSelectType>;
   /**
    * Cancel a status change request for a report
-   * @param messageId The message ID of the report
    * @param reportId The ID of the report to cancel the status change for
+   * @param messageId The message ID of the report for telegram notification
    */
-  cancelStatusChange(messageId: number, reportId: string): Promise<void>;
+  cancelStatusChange(
+    reportId: string,
+    messageId?: number,
+  ): Promise<CommentReportSelectType>;
+
+  /**
+   * Get a report by ID
+   * @param reportId The ID of the report to get
+   * @returns The report if it exists, undefined otherwise
+   */
+  getReportById(reportId: string): Promise<CommentReportSelectType | undefined>;
+
+  /**
+   * Get a pending report
+   * This method retrieves the most recent pending report from the database.
+   * @returns A pending report if it exists, undefined otherwise
+   */
+  getPendingReport(): Promise<CommentReportSelectType | undefined>;
 }
 
 export interface ITelegramNotificationsService {

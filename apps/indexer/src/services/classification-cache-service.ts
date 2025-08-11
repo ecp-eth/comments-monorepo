@@ -3,14 +3,14 @@ import type {
   CommentClassifierCacheServiceResult,
   ICommentClassifierCacheService,
 } from "./types";
-import { db as dbService } from "../services";
+import type { DB } from "./db";
 import { and, eq } from "drizzle-orm";
 import { schema } from "../../schema";
 
 export class ClassificationCacheService
   implements ICommentClassifierCacheService
 {
-  constructor(private db: typeof dbService) {}
+  constructor(private db: DB) {}
 
   async getByCommentId(
     commentId: Hex,

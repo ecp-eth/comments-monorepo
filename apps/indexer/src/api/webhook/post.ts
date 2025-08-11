@@ -120,44 +120,44 @@ export function setupWebhook(app: OpenAPIHono) {
 
           break;
         case "report-set-as-resolved": {
-          await commentReportsService.changeStatus(
-            message.message_id,
-            command.reportId,
-            "resolved",
-          );
+          await commentReportsService.changeStatus({
+            reportId: command.reportId,
+            status: "resolved",
+            messageId: message.message_id,
+          });
 
           break;
         }
         case "report-set-as-closed": {
-          await commentReportsService.changeStatus(
-            message.message_id,
-            command.reportId,
-            "closed",
-          );
+          await commentReportsService.changeStatus({
+            reportId: command.reportId,
+            status: "closed",
+            messageId: message.message_id,
+          });
 
           break;
         }
         case "report-set-as-pending": {
-          await commentReportsService.changeStatus(
-            message.message_id,
-            command.reportId,
-            "pending",
-          );
+          await commentReportsService.changeStatus({
+            reportId: command.reportId,
+            status: "pending",
+            messageId: message.message_id,
+          });
 
           break;
         }
         case "report-change-status": {
           await commentReportsService.requestStatusChange(
-            message.message_id,
             command.reportId,
+            message.message_id,
           );
 
           break;
         }
         case "report-cancel": {
           await commentReportsService.cancelStatusChange(
-            message.message_id,
             command.reportId,
+            message.message_id,
           );
 
           break;

@@ -1,12 +1,15 @@
 import { Bot, webhookCallback } from "grammy";
 import type { Handler } from "hono";
-import type { IAdminTelegramBotService, ResolveAuthorFunction } from "../types";
+import type {
+  IAdminTelegramBotService,
+  ICommentPremoderationService,
+  ICommentReportsService,
+  ResolveAuthorFunction,
+} from "../types";
 import type {
   AdminTelegramBotServiceContext,
   IAdminTelegramBotServiceCommand,
 } from "./types";
-import type { ManagementCommentDbService } from "../../management/services/comment-db-service";
-import type { CommentDbService } from "../comment-db-service";
 
 type AdminTelegramBotServiceConfig = {
   /**
@@ -37,8 +40,14 @@ type AdminTelegramBotServiceConfig = {
    * List of commands to register with the bot.
    */
   commands: IAdminTelegramBotServiceCommand[];
-  commentDbService: CommentDbService;
-  commentManagementDbService: ManagementCommentDbService;
+  /**
+   * Service for comment premoderation
+   */
+  premoderationService: ICommentPremoderationService;
+  /**
+   * Service for comment reports
+   */
+  reportsService: ICommentReportsService;
   resolveAuthor: ResolveAuthorFunction;
 };
 
@@ -61,9 +70,9 @@ export class AdminTelegramBotService implements IAdminTelegramBotService {
     this.commands = config.commands;
 
     this.bot.use((ctx, next) => {
-      ctx.commentManagementDbService = config.commentManagementDbService;
-      ctx.commentDbService = config.commentDbService;
       ctx.resolveAuthor = config.resolveAuthor;
+      ctx.premoderationService = config.premoderationService;
+      ctx.reportsService = config.reportsService;
 
       return next();
     });

@@ -42,6 +42,26 @@ export class CommentNotFoundError extends ServiceError {
   }
 }
 
+export class CommentModerationStatusNotFoundError extends ServiceError {
+  public readonly commentId: Hex;
+  public readonly commentRevision: number;
+
+  constructor(
+    commentId: Hex,
+    commentRevision: number,
+    telegramMessageId?: number,
+  ) {
+    super(
+      404,
+      `Comment moderation status not found for comment ${commentId} with revision ${commentRevision}`,
+      telegramMessageId,
+    );
+
+    this.commentId = commentId;
+    this.commentRevision = commentRevision;
+  }
+}
+
 export class ReportNotFoundError extends ServiceError {
   public readonly reportId: string;
 

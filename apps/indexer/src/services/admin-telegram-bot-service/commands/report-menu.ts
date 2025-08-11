@@ -35,9 +35,7 @@ const reportChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
 )
   .dynamic(async (ctx, range) => {
     const command = reportCommandParser.parse(ctx.match);
-    const report = await ctx.commentManagementDbService.getReportById(
-      command.reportId,
-    );
+    const report = await ctx.reportsService.getReportById(command.reportId);
 
     if (!report) {
       return;
@@ -68,7 +66,7 @@ const reportChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
             throw new Error(`Expected change status command`);
           }
 
-          const report = await ctx.commentManagementDbService.getReportById(
+          const report = await ctx.reportsService.getReportById(
             command.reportId,
           );
 
@@ -92,11 +90,10 @@ const reportChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
             return ctx.menu.back();
           }
 
-          const updatedReport =
-            await ctx.commentManagementDbService.updateReportStatus(
-              report.id,
-              nextStatus,
-            );
+          const updatedReport = await ctx.reportsService.changeStatus({
+            reportId: report.id,
+            status: nextStatus,
+          });
 
           const message = renderReport(
             updatedReport,

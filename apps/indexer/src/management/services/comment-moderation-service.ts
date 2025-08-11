@@ -5,7 +5,6 @@ import type {
   ICommentModerationClassifierService,
   ICommentPremoderationService,
   IModerationNotificationsService,
-  ICommentDbService,
 } from "../../services/types";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
@@ -19,7 +18,6 @@ interface CommentModerationServiceOptions {
   notificationService: IModerationNotificationsService;
   premoderationService: ICommentPremoderationService;
   classifierService: ICommentModerationClassifierService;
-  commentDbService: ICommentDbService;
 }
 
 export interface ModerationStatusResult {
@@ -36,14 +34,12 @@ export class CommentModerationService {
   private notificationService: IModerationNotificationsService;
   private classifierService: ICommentModerationClassifierService;
   private premoderationService: ICommentPremoderationService;
-  private commentDbService: ICommentDbService;
 
   constructor(options: CommentModerationServiceOptions) {
     this.knownReactions = options.knownReactions;
     this.notificationService = options.notificationService;
     this.classifierService = options.classifierService;
     this.premoderationService = options.premoderationService;
-    this.commentDbService = options.commentDbService;
   }
 
   async moderate(
@@ -246,7 +242,7 @@ export class CommentModerationService {
   }
 
   async requestStatusChange(messageId: number, commentId: Hex): Promise<void> {
-    const comment = await this.commentDbService.getCommentById(commentId);
+    const comment = await this.premoderationService.getCommentById(commentId);
 
     if (!comment) {
       throw new CommentNotFoundError(commentId, messageId);
@@ -259,7 +255,7 @@ export class CommentModerationService {
   }
 
   async cancelStatusChange(messageId: number, commentId: Hex): Promise<void> {
-    const comment = await this.commentDbService.getCommentById(commentId);
+    const comment = await this.premoderationService.getCommentById(commentId);
 
     if (!comment) {
       throw new CommentNotFoundError(commentId, messageId);

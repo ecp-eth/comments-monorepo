@@ -4,32 +4,35 @@ import type {
   ICommentPremoderationService,
   CommentPremoderationServiceModerateResult,
   ModerationStatus,
-  IPremoderationCacheService,
-  ICommentDbService,
 } from "./types";
 import type { Hex } from "@ecp.eth/sdk/core";
+import type { DB } from "./db";
+import { and, desc, eq } from "drizzle-orm";
+import { schema } from "../../schema";
+import type { CommentModerationStatusesSelectType } from "../../schema.offchain";
+import {
+  CommentModerationStatusNotFoundError,
+  CommentNotFoundError,
+} from "./errors";
 
 type PremoderationServiceOptions = {
   defaultModerationStatus: ModerationStatus;
-  cacheService: IPremoderationCacheService;
-  dbService: ICommentDbService;
+  db: DB;
 };
 
 export class PremoderationService implements ICommentPremoderationService {
   private defaultModerationStatus: ModerationStatus;
-  private cacheService: IPremoderationCacheService;
-  private dbService: ICommentDbService;
+  private db: DB;
 
   constructor(options: PremoderationServiceOptions) {
     this.defaultModerationStatus = options.defaultModerationStatus;
-    this.cacheService = options.cacheService;
-    this.dbService = options.dbService;
+    this.db = options.db;
   }
 
   async moderate(
     comment: ModerationNotificationServicePendingComment,
   ): Promise<CommentPremoderationServiceModerateResult> {
-    const cachedStatus = await this.cacheService.getStatusByCommentId(
+    const cachedStatus = await this.getStatusByCommentId(
       comment.id,
       comment.revision,
     );
@@ -52,11 +55,15 @@ export class PremoderationService implements ICommentPremoderationService {
       changedAt,
       status,
       save: async () => {
-        await this.cacheService.insertStatusByCommentId(comment.id, {
-          updatedAt: changedAt,
-          revision: comment.revision,
-          moderationStatus: status,
-        });
+        await this.db
+          .insert(schema.commentModerationStatuses)
+          .values({
+            commentId: comment.id,
+            moderationStatus: status,
+            updatedAt: changedAt,
+            revision: comment.revision,
+          })
+          .execute();
       },
     };
   }
@@ -82,11 +89,15 @@ export class PremoderationService implements ICommentPremoderationService {
       status,
       changedAt,
       save: async () => {
-        await this.cacheService.setStatusByCommentId(comment.id, {
-          moderationStatus: status,
-          updatedAt: changedAt,
-          revision: comment.revision,
-        });
+        await this.db
+          .insert(schema.commentModerationStatuses)
+          .values({
+            commentId: comment.id,
+            moderationStatus: status,
+            updatedAt: changedAt,
+            revision: comment.revision,
+          })
+          .execute();
       },
     };
   }
@@ -103,10 +114,99 @@ export class PremoderationService implements ICommentPremoderationService {
     commentRevision: number | undefined;
     status: ModerationStatus;
   }): Promise<CommentSelectType | undefined> {
-    return this.dbService.updateCommentModerationStatus({
-      commentId,
-      commentRevision,
-      status,
+    return await this.db.transaction(async (tx) => {
+      const commentModerationStatus =
+        commentRevision != null
+          ? await this.getStatusByCommentId(commentId, commentRevision)
+          : await this.getLatestStatusByCommentId(commentId);
+
+      if (!commentModerationStatus) {
+        throw new CommentModerationStatusNotFoundError(
+          commentId,
+          commentRevision ?? 0,
+        );
+      }
+
+      const comment = await tx.query.comment.findFirst({
+        where: eq(schema.comment.id, commentId),
+      });
+
+      if (!comment) {
+        throw new CommentNotFoundError(commentId);
+      }
+
+      // if the comment is already in the status, simply return the comment
+      if (commentModerationStatus.moderationStatus === status) {
+        return comment;
+      }
+
+      const changedAt = new Date();
+
+      await this.db
+        .insert(schema.commentModerationStatuses)
+        .values({
+          commentId,
+          moderationStatus: status,
+          updatedAt: changedAt,
+          revision: commentModerationStatus.revision,
+        })
+        .onConflictDoUpdate({
+          target: [
+            schema.commentModerationStatuses.commentId,
+            schema.commentModerationStatuses.revision,
+          ],
+          set: {
+            moderationStatus: status,
+            updatedAt: changedAt,
+          },
+        })
+        .execute();
+
+      const [updatedComment] = await this.db
+        .update(schema.comment)
+        .set({
+          moderationStatus: status,
+          moderationStatusChangedAt: changedAt,
+        })
+        .where(eq(schema.comment.id, commentId))
+        .returning()
+        .execute();
+
+      return updatedComment;
+    });
+  }
+
+  async getPendingComment(): Promise<CommentSelectType | undefined> {
+    return this.db.query.comment.findFirst({
+      where: eq(schema.comment.moderationStatus, "pending"),
+      orderBy: desc(schema.comment.moderationStatusChangedAt),
+    });
+  }
+
+  async getStatusByCommentId(
+    commentId: Hex,
+    commentRevision: number,
+  ): Promise<CommentModerationStatusesSelectType | undefined> {
+    return this.db.query.commentModerationStatuses.findFirst({
+      where: and(
+        eq(schema.commentModerationStatuses.commentId, commentId),
+        eq(schema.commentModerationStatuses.revision, commentRevision),
+      ),
+    });
+  }
+
+  async getLatestStatusByCommentId(
+    commentId: Hex,
+  ): Promise<CommentModerationStatusesSelectType | undefined> {
+    return this.db.query.commentModerationStatuses.findFirst({
+      where: eq(schema.commentModerationStatuses.commentId, commentId),
+      orderBy: desc(schema.commentModerationStatuses.revision),
+    });
+  }
+
+  async getCommentById(commentId: Hex): Promise<CommentSelectType | undefined> {
+    return this.db.query.comment.findFirst({
+      where: eq(schema.comment.id, commentId),
     });
   }
 }

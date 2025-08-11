@@ -27,7 +27,7 @@ export class ReportCommand implements IAdminTelegramBotServiceCommand {
         );
       }
 
-      const report = await ctx.commentManagementDbService.getReportById(
+      const report = await ctx.reportsService.getReportById(
         reportIdResult.data,
       );
 

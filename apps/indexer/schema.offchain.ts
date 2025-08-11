@@ -63,6 +63,9 @@ export const commentModerationStatuses = offchainSchema.table(
   ],
 );
 
+export type CommentModerationStatusesSelectType =
+  typeof commentModerationStatuses.$inferSelect;
+
 export const commentReports = offchainSchema.table(
   "comment_reports",
   {

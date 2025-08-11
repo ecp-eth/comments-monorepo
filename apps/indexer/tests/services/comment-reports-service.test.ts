@@ -1,11 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CommentReportsService } from "../../src/services/comment-reports-service";
-import type {
-  ICommentDbService,
-  IReportsNotificationsService,
-} from "../../src/services/types";
+import type { IReportsNotificationsService } from "../../src/services/types";
 import type { CommentSelectType } from "ponder:schema";
-import { ManagementCommentDbService } from "../../src/management/services/comment-db-service";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { schema } from "../../schema";
 
 describe("CommentReportsService", () => {
   const mockComment: CommentSelectType = {
@@ -38,32 +36,46 @@ describe("CommentReportsService", () => {
     reactionCounts: {},
   };
 
-  const mockCommentDbService: ICommentDbService = {
-    getCommentById: vi.fn(),
-    updateCommentModerationStatus: vi.fn(),
-    getCommentPendingModeration: vi.fn(),
-  };
-
-  const mockManagementCommentDbService = {
-    insertReport: vi.fn(),
-  } as unknown as ManagementCommentDbService;
-
   const mockNotificationService: IReportsNotificationsService = {
     notifyReportCreated: vi.fn(),
     notifyReportStatusChanged: vi.fn(),
   };
+
+  const db = drizzle.mock({
+    schema,
+  });
+
+  const commentFindFirstMock = vi.spyOn(db.query.comment, "findFirst");
+  const dbExecuteMock = vi.fn();
+  const dbReturningMock = vi.fn().mockImplementation(() => {
+    return {
+      execute: dbExecuteMock,
+    };
+  });
+  const dbInsertValuesMock = vi.fn().mockImplementation(() => {
+    return {
+      returning: dbReturningMock,
+    };
+  });
+  const dbInsertMock = vi.spyOn(db, "insert").mockImplementation(() => {
+    return {
+      values: dbInsertValuesMock,
+    } as any;
+  });
+  vi.spyOn(db, "transaction").mockImplementation((callback) => {
+    return callback(db as any);
+  });
+
+  const service = new CommentReportsService({
+    db,
+    notificationService: mockNotificationService,
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("should successfully report a comment", async () => {
-    const service = new CommentReportsService({
-      commentDbService: mockCommentDbService,
-      managementCommentDbService: mockManagementCommentDbService,
-      notificationService: mockNotificationService,
-    });
-
     const mockReport = {
       id: "0x123",
       commentId: mockComment.id,
@@ -74,25 +86,27 @@ describe("CommentReportsService", () => {
       status: "pending" as const,
     };
 
-    vi.mocked(mockCommentDbService.getCommentById).mockResolvedValue(
-      mockComment,
-    );
-    vi.mocked(mockManagementCommentDbService.insertReport).mockResolvedValue(
-      mockReport,
-    );
+    vi.mocked(commentFindFirstMock).mockResolvedValue(mockComment);
+    vi.mocked(dbExecuteMock).mockResolvedValueOnce([mockReport]);
     vi.mocked(mockNotificationService.notifyReportCreated).mockResolvedValue(
       void 0,
     );
 
     await expect(
-      service.report("0x123", "0x456", "test report"),
+      service.report({
+        commentId: "0x123",
+        reportee: "0x456",
+        message: "test report",
+      }),
     ).resolves.not.toThrow();
 
-    expect(mockManagementCommentDbService.insertReport).toHaveBeenCalledWith(
-      "0x123",
-      "0x456",
-      "test report",
-    );
+    expect(dbInsertMock).toHaveBeenCalledWith(schema.commentReports);
+    expect(dbInsertValuesMock).toHaveBeenCalledWith({
+      commentId: mockComment.id,
+      reportee: "0x456",
+      message: "test report",
+      status: "pending",
+    });
     expect(mockNotificationService.notifyReportCreated).toHaveBeenCalledWith({
       comment: mockComment,
       report: mockReport,
@@ -100,29 +114,21 @@ describe("CommentReportsService", () => {
   });
 
   it("should throw error when comment does not exist", async () => {
-    const service = new CommentReportsService({
-      commentDbService: mockCommentDbService,
-      managementCommentDbService: mockManagementCommentDbService,
-      notificationService: mockNotificationService,
-    });
-
-    vi.mocked(mockCommentDbService.getCommentById).mockResolvedValue(undefined);
+    vi.mocked(commentFindFirstMock).mockResolvedValue(undefined);
 
     await expect(
-      service.report("0x123", "0x456", "test report"),
+      service.report({
+        commentId: "0x123",
+        reportee: "0x456",
+        message: "test report",
+      }),
     ).rejects.toThrow("Comment 0x123 not found");
 
-    expect(mockManagementCommentDbService.insertReport).not.toHaveBeenCalled();
+    expect(dbInsertMock).not.toHaveBeenCalled();
     expect(mockNotificationService.notifyReportCreated).not.toHaveBeenCalled();
   });
 
   it("should handle report without message", async () => {
-    const service = new CommentReportsService({
-      commentDbService: mockCommentDbService,
-      managementCommentDbService: mockManagementCommentDbService,
-      notificationService: mockNotificationService,
-    });
-
     const mockReport = {
       id: "0x123",
       commentId: mockComment.id,
@@ -133,23 +139,21 @@ describe("CommentReportsService", () => {
       status: "pending" as const,
     };
 
-    vi.mocked(mockCommentDbService.getCommentById).mockResolvedValue(
-      mockComment,
-    );
-    vi.mocked(mockManagementCommentDbService.insertReport).mockResolvedValue(
-      mockReport,
-    );
+    vi.mocked(commentFindFirstMock).mockResolvedValue(mockComment);
+    vi.mocked(dbExecuteMock).mockResolvedValueOnce([mockReport]);
     vi.mocked(mockNotificationService.notifyReportCreated).mockResolvedValue(
       void 0,
     );
 
-    await expect(service.report("0x123", "0x456", "")).resolves.not.toThrow();
+    await expect(
+      service.report({
+        commentId: "0x123",
+        reportee: "0x456",
+        message: "",
+      }),
+    ).resolves.not.toThrow();
 
-    expect(mockManagementCommentDbService.insertReport).toHaveBeenCalledWith(
-      "0x123",
-      "0x456",
-      "",
-    );
+    expect(dbInsertMock).toHaveBeenCalledWith(schema.commentReports);
     expect(mockNotificationService.notifyReportCreated).toHaveBeenCalledWith({
       comment: mockComment,
       report: mockReport,

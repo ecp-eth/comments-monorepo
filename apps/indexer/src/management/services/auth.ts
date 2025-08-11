@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
-import { db as dbService } from "../../services";
+import type { DB } from "../../services/db";
 import { schema } from "../../../schema";
 
 export class ManagementAuthService {
-  constructor(private db: typeof dbService) {}
+  constructor(private db: DB) {}
 
   async getPublicKey(keyId: string): Promise<string | null> {
     const key = await this.db.query.apiKeys.findFirst({

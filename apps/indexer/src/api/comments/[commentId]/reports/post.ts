@@ -115,7 +115,11 @@ export function setupReportComment(app: OpenAPIHono) {
         );
       }
 
-      await commentReportsService.report(commentId, reportee, message);
+      await commentReportsService.report({
+        commentId,
+        reportee,
+        message,
+      });
 
       return c.newResponse(null, 204);
     } catch (error) {

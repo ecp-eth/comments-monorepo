@@ -19,7 +19,7 @@ export class ReportPendingCommand implements IAdminTelegramBotServiceCommand {
 
   register({ bot }: IAdminTelegramBotServiceCommand_RegisterOptions) {
     bot.command("report_pending", async (ctx) => {
-      const report = await ctx.commentManagementDbService.getPendingReport();
+      const report = await ctx.reportsService.getPendingReport();
 
       if (!report) {
         return ctx.reply("✅ No pending reports found.");

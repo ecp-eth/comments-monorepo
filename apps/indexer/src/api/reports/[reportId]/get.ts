@@ -2,7 +2,7 @@ import { createRoute, type OpenAPIHono, z } from "@hono/zod-openapi";
 import { APIErrorResponseSchema } from "../../../lib/schemas";
 import { authMiddleware } from "../../../middleware/auth";
 import { IndexerAPIReportOutputSchema } from "@ecp.eth/sdk/indexer";
-import { managementCommentDbService } from "../../../services";
+import { commentReportsService } from "../../../services";
 
 const GetReportParamsSchema = z.object({
   reportId: z.string().uuid(),
@@ -57,7 +57,7 @@ export function setupGetReport(app: OpenAPIHono) {
   app.openapi(getReportRoute, async (c) => {
     const { reportId } = c.req.valid("param");
 
-    const report = await managementCommentDbService.getReportById(reportId);
+    const report = await commentReportsService.getReportById(reportId);
 
     if (!report) {
       return c.json({ message: "Report not found" }, 404);

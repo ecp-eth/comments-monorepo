@@ -5,8 +5,7 @@ import {
   IndexerAPIReportOutputSchema,
   IndexerAPIReportStatusSchema,
 } from "@ecp.eth/sdk/indexer";
-import { managementCommentDbService } from "../../../services";
-import { ReportNotFoundError } from "../../../management/services/comment-db-service";
+import { commentReportsService } from "../../../services";
 
 const PatchReportParamsSchema = z.object({
   reportId: z.string().uuid(),
@@ -73,36 +72,23 @@ export function setupPatchReport(app: OpenAPIHono) {
     const { reportId } = c.req.valid("param");
     const { status } = c.req.valid("json");
 
-    try {
-      const updatedReport = await managementCommentDbService.updateReportStatus(
-        reportId,
+    const updatedReport = await commentReportsService.changeStatus({
+      reportId,
+      status,
+    });
+
+    return c.json(
+      {
+        id: updatedReport.id,
+        commentId: updatedReport.commentId,
+        reportee: updatedReport.reportee,
+        message: updatedReport.message,
+        createdAt: updatedReport.createdAt,
+        updatedAt: updatedReport.updatedAt,
         status,
-      );
-
-      return c.json(
-        {
-          id: updatedReport.id,
-          commentId: updatedReport.commentId,
-          reportee: updatedReport.reportee,
-          message: updatedReport.message,
-          createdAt: updatedReport.createdAt,
-          updatedAt: updatedReport.updatedAt,
-          status,
-        },
-        200,
-      );
-    } catch (error) {
-      if (error instanceof ReportNotFoundError) {
-        return c.json(
-          {
-            message: "Report not found",
-          },
-          404,
-        );
-      }
-
-      throw error;
-    }
+      },
+      200,
+    );
   });
 
   return app;

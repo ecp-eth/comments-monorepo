@@ -1,7 +1,9 @@
 import type { Bot, Context } from "grammy";
-import type { ManagementCommentDbService } from "../../management/services/comment-db-service";
-import type { CommentDbService } from "../comment-db-service";
-import type { ResolveAuthorFunction } from "../types";
+import type {
+  ICommentPremoderationService,
+  ICommentReportsService,
+  ResolveAuthorFunction,
+} from "../types";
 
 /**
  * We have an enum for all menu ids because grammy uses the id directly in payload and payloads
@@ -34,7 +36,7 @@ export interface IAdminTelegramBotServiceCommand {
 }
 
 export type AdminTelegramBotServiceContext = Context & {
-  commentManagementDbService: ManagementCommentDbService;
-  commentDbService: CommentDbService;
+  premoderationService: ICommentPremoderationService;
+  reportsService: ICommentReportsService;
   resolveAuthor: ResolveAuthorFunction;
 };

@@ -22,8 +22,7 @@ export class ModeratePendingCommand implements IAdminTelegramBotServiceCommand {
 
   register({ bot }: IAdminTelegramBotServiceCommand_RegisterOptions) {
     bot.command("moderate_pending", async (ctx) => {
-      const pendingComment =
-        await ctx.commentDbService.getCommentPendingModeration();
+      const pendingComment = await ctx.premoderationService.getPendingComment();
 
       if (!pendingComment) {
         return ctx.reply("✅ No pending comments found.");

@@ -3,12 +3,9 @@ import { CommentModerationClassifier } from "./mbd-comment-moderation-classifier
 import { ModerationNotificationsService } from "./moderation-notifications-service";
 import { NoopCommentModerationClassifier } from "./noop-comment-moderation-classifier";
 import { PremoderationService } from "./premoderation-service";
-import { PremoderationCacheService } from "./premoderation-cache-service";
 import { NoopPremoderationService } from "./noop-premoderation-service";
-import { CommentDbService } from "./comment-db-service";
 import { ClassificationCacheService } from "./classification-cache-service";
 import { CommentReportsService } from "./comment-reports-service";
-import { ManagementCommentDbService } from "../management/services/comment-db-service";
 import { CommentModerationService } from "../management/services/comment-moderation-service";
 import { Hex } from "@ecp.eth/sdk/core";
 import { ensByAddressResolverService } from "./ens-by-address-resolver";
@@ -74,15 +71,7 @@ export const commentModerationClassifierService =
       })
     : new NoopCommentModerationClassifier();
 
-const premoderationCacheService = new PremoderationCacheService(db);
-
-export const commentDbService = new CommentDbService({
-  cacheService: premoderationCacheService,
-});
-
 export const managementAuthService = new ManagementAuthService(db);
-
-export const managementCommentDbService = new ManagementCommentDbService(db);
 
 export const reportsNotificationsService = new ReportsNotificationsService({
   enabled: env.REPORTS_ENABLE_NOTIFICATIONS,
@@ -91,16 +80,14 @@ export const reportsNotificationsService = new ReportsNotificationsService({
 });
 
 export const commentReportsService = new CommentReportsService({
-  commentDbService,
-  managementCommentDbService,
+  db,
   notificationService: reportsNotificationsService,
 });
 
 export const premoderationService = env.MODERATION_ENABLED
   ? new PremoderationService({
       defaultModerationStatus: "pending",
-      cacheService: premoderationCacheService,
-      dbService: commentDbService,
+      db,
     })
   : new NoopPremoderationService();
 
@@ -109,7 +96,6 @@ export const commentModerationService = new CommentModerationService({
   premoderationService,
   notificationService: moderationNotificationsService,
   classifierService: commentModerationClassifierService,
-  commentDbService,
 });
 
 export const telegramAdminBotService =
@@ -130,8 +116,8 @@ export const telegramAdminBotService =
           new ModerateCommand(),
           new ModeratePendingCommand(),
         ],
-        commentManagementDbService: managementCommentDbService,
-        commentDbService,
+        premoderationService,
+        reportsService: commentReportsService,
         resolveAuthor,
       })
     : new NoopAdminBotService();
