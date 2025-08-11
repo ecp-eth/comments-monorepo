@@ -1,26 +1,30 @@
 import type { Hex } from "@ecp.eth/sdk/core";
-import { getIndexerDb } from "../db";
+import { db as dbService } from "../../services/db";
 import type { CommentReportStatus } from "../types";
-import type { CommentReportSelectType } from "../migrations";
+import { schema } from "../../../schema";
+import { desc, eq } from "drizzle-orm";
+import { CommentReportSelectType } from "../../../schema.offchain";
+
+export class CommentNotFoundError extends Error {}
+
+export class ReportNotFoundError extends Error {}
 
 export class ManagementCommentDbService {
+  constructor(private db: typeof dbService) {}
+
   /**
    * Get a report by comment ID
-   * @param commentId The ID of the comment to get the report for
+   * @param reportId The ID of the report to get
    * @returns The report if it exists, undefined otherwise
    */
   async getReportById(
     reportId: string,
   ): Promise<CommentReportSelectType | undefined> {
-    const db = getIndexerDb();
+    const report = await this.db.query.commentReports.findFirst({
+      where: eq(schema.commentReports.id, reportId),
+    });
 
-    const result = await db
-      .selectFrom("comment_reports")
-      .selectAll()
-      .where("id", "=", reportId)
-      .executeTakeFirst();
-
-    return result;
+    return report;
   }
 
   /**
@@ -29,21 +33,17 @@ export class ManagementCommentDbService {
    * @returns A pending report if it exists, undefined otherwise
    */
   async getPendingReport(): Promise<CommentReportSelectType | undefined> {
-    const db = getIndexerDb();
+    const pendingReport = await this.db.query.commentReports.findFirst({
+      where: eq(schema.commentReports.status, "pending"),
+      orderBy: desc(schema.commentReports.createdAt),
+    });
 
-    const result = await db
-      .selectFrom("comment_reports")
-      .selectAll()
-      .where("status", "=", "pending")
-      .orderBy("created_at desc")
-      .limit(1)
-      .executeTakeFirst();
-
-    return result;
+    return pendingReport;
   }
 
   /**
    * Report a comment with a message
+   *
    * @param commentId The ID of the comment to report
    * @param reportee The address of the user reporting the comment
    * @param message Optional message explaining the report
@@ -53,40 +53,58 @@ export class ManagementCommentDbService {
     reportee: Hex,
     message: string,
   ): Promise<CommentReportSelectType> {
-    const db = getIndexerDb();
+    return await this.db.transaction(async (tx) => {
+      const comment = await tx.query.comment.findFirst({
+        where: eq(schema.comment.id, commentId),
+      });
 
-    const result = await db
-      .insertInto("comment_reports")
-      .values({
-        comment_id: commentId,
-        reportee,
-        message,
-        created_at: new Date(),
-        status: "pending",
-      })
-      .returningAll()
-      .executeTakeFirstOrThrow();
+      if (!comment) {
+        throw new CommentNotFoundError();
+      }
 
-    return result;
+      const [result] = await this.db
+        .insert(schema.commentReports)
+        .values({
+          commentId: comment.id,
+          reportee,
+          message,
+          createdAt: new Date(),
+          status: "pending",
+        })
+        .returning()
+        .execute();
+
+      if (!result) {
+        throw new Error("Failed to insert report");
+      }
+
+      return result;
+    });
   }
 
   /**
    * Update the status of a report
-   * @param commentId The ID of the comment to update the report for
+   *
+   * @param reportId The ID of the report to update
    * @param status The new status of the report
    */
   async updateReportStatus(
     reportId: string,
     status: CommentReportStatus,
   ): Promise<CommentReportSelectType> {
-    const db = getIndexerDb();
+    const [result] = await this.db
+      .update(schema.commentReports)
+      .set({
+        status,
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.commentReports.id, reportId))
+      .returning()
+      .execute();
 
-    const result = await db
-      .updateTable("comment_reports")
-      .set({ status, updated_at: new Date() })
-      .where("id", "=", reportId)
-      .returningAll()
-      .executeTakeFirstOrThrow();
+    if (!result) {
+      throw new ReportNotFoundError();
+    }
 
     return result;
   }

@@ -12,12 +12,14 @@ import {
   check,
 } from "drizzle-orm/pg-core";
 import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants";
+import type { Hex } from "viem";
+import type { CommentReportStatus } from "./src/management/types";
 
 export const offchainSchema = pgSchema(ECP_INDEXER_SCHEMA_NAME);
 
 export const apiKeys = offchainSchema.table("api_keys", {
-  id: text().notNull().primaryKey(),
-  publicKey: text().notNull(),
+  id: text().notNull().primaryKey().$type<Hex>(),
+  publicKey: text().notNull().$type<Hex>(),
   name: text().notNull().unique(),
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   lastUsedAt: timestamp({ withTimezone: true }),
@@ -26,7 +28,7 @@ export const apiKeys = offchainSchema.table("api_keys", {
 export const commentClassificationResults = offchainSchema.table(
   "comment_classification_results",
   {
-    commentId: text().notNull(),
+    commentId: text().notNull().$type<Hex>(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     labels: jsonb().notNull(),
@@ -39,7 +41,7 @@ export const commentClassificationResults = offchainSchema.table(
 export const commentModerationStatuses = offchainSchema.table(
   "comment_moderation_statuses",
   {
-    commentId: text().notNull(),
+    commentId: text().notNull().$type<Hex>(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     moderationStatus: text().notNull().default("pending"),
@@ -58,12 +60,12 @@ export const commentReports = offchainSchema.table(
   "comment_reports",
   {
     id: uuid().notNull().primaryKey().defaultRandom(),
-    commentId: text().notNull(),
+    commentId: text().notNull().$type<Hex>(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    reportee: text().notNull(),
+    reportee: text().notNull().$type<Hex>(),
     message: text().notNull(),
-    status: text().notNull().default("pending"),
+    status: text().notNull().default("pending").$type<CommentReportStatus>(),
   },
   (table) => [
     check(
@@ -75,8 +77,10 @@ export const commentReports = offchainSchema.table(
   ],
 );
 
+export type CommentReportSelectType = typeof commentReports.$inferSelect;
+
 export const mutedAccounts = offchainSchema.table("muted_accounts", {
-  account: text().notNull().primaryKey(),
+  account: text().notNull().primaryKey().$type<Hex>(),
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   reason: text(),
 });

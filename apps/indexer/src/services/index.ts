@@ -23,7 +23,9 @@ import { ReportPendingCommand } from "./admin-telegram-bot-service/commands/repo
 import { ModerateCommand } from "./admin-telegram-bot-service/commands/moderate";
 import { ModeratePendingCommand } from "./admin-telegram-bot-service/commands/moderate-pending";
 
-export { db } from "./db";
+import { db } from "./db";
+
+export { db };
 
 function resolveAuthor(author: Hex): Promise<string | Hex> {
   return ensByAddressResolverService.load(author).then((data) => {
@@ -77,7 +79,7 @@ export const commentDbService = new CommentDbService({
   cacheService: premoderationCacheService,
 });
 
-export const managementCommentDbService = new ManagementCommentDbService();
+export const managementCommentDbService = new ManagementCommentDbService(db);
 
 export const reportsNotificationsService = new ReportsNotificationsService({
   enabled: env.REPORTS_ENABLE_NOTIFICATIONS,
