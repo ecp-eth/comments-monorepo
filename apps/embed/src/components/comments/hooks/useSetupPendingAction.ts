@@ -1,7 +1,7 @@
 import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
 import { useLikeComment } from "./useLikeComment";
 import { useUnlikeComment } from "./useUnlikeComment";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ContractFunctionExecutionError } from "viem";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { toast } from "sonner";
@@ -19,11 +19,16 @@ export function useSetupPendingAction({
   comment,
   queryKey,
 }: UseLikeReactionSetupProps) {
+  const [isMounted, setIsMounted] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
   const likeComment = useLikeComment();
   const unlikeComment = useUnlikeComment();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const onReplyClick = useCallback(() => {
     setIsReplying(true);
@@ -94,6 +99,12 @@ export function useSetupPendingAction({
   return {
     isLiking,
     isReplying,
-    setIsReplying,
+    setIsReplying: (value: boolean) => {
+      if (!isMounted) {
+        return;
+      }
+
+      setIsReplying(value);
+    },
   };
 }

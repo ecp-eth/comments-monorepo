@@ -37,7 +37,7 @@ type QueryData = InfiniteData<
   { cursor: Hex | undefined; limit: number }
 >;
 
-type CommentSectionReadonlyProps = {
+type CommentSectionByAuthorProps = {
   author: Hex;
   initialData?: QueryData;
   fetchCommentParams: FetchCommentsOptions;
@@ -47,7 +47,7 @@ export function CommentSectionByAuthor({
   initialData,
   author,
   fetchCommentParams,
-}: CommentSectionReadonlyProps) {
+}: CommentSectionByAuthorProps) {
   useSyncViewerCookie();
   useAutoBodyMinHeight();
 
