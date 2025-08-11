@@ -33,6 +33,7 @@ import { CommentActionButton } from "@ecp.eth/shared/components";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { Loader2Icon } from "lucide-react";
 import { useSetupPendingAction } from "./hooks/useSetupPendingAction";
+import { getAppSignerAddress } from "@/lib/utils";
 
 type CommentItemProps = {
   comment: CommentType;
@@ -40,7 +41,7 @@ type CommentItemProps = {
 
 export function CommentItem({ comment }: CommentItemProps) {
   const { address: connectedAddress } = useAccount();
-  const source = useEmbedConfig<
+  const config = useEmbedConfig<
     | EmbedConfigProviderByTargetURIConfig
     | EmbedConfigProviderByRepliesConfig
     | EmbedConfigProviderByAuthorConfig
@@ -64,13 +65,13 @@ export function CommentItem({ comment }: CommentItemProps) {
       createCommentItemsQueryKey(
         connectedAddress,
         chainId,
-        "targetUri" in source
-          ? source.targetUri
-          : "commentId" in source
-            ? source.commentId
-            : source.author,
+        "targetUri" in config
+          ? config.targetUri
+          : "commentId" in config
+            ? config.commentId
+            : config.author,
       ),
-    [source, connectedAddress, chainId],
+    [config, connectedAddress, chainId],
   );
 
   const firstPageParamOfReplies: ListCommentsQueryPageParamsSchemaType =
@@ -99,7 +100,7 @@ export function CommentItem({ comment }: CommentItemProps) {
       const response = await fetchCommentReplies({
         chainId,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        app: getAppSignerAddress(config.app),
         cursor: pageParam.cursor,
         limit: pageParam.limit,
         commentId: comment.id,
@@ -131,7 +132,7 @@ export function CommentItem({ comment }: CommentItemProps) {
       return fetchCommentReplies({
         chainId,
         apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        app: getAppSignerAddress(config.app),
         commentId: comment.id,
         cursor,
         limit: 10,

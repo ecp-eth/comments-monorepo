@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { EmbedConfigSupportedFont } from "./fonts.js";
 import { DEFAULT_CHAIN_ID, DEFAULT_CHAIN_ID_DEV } from "../../constants.js";
+import { HexSchema } from "../../core/schemas.js";
 
 export { EmbedConfigSupportedFont };
 
@@ -201,6 +202,18 @@ export const EmbedConfigSchema = z.object({
    * @default true
    */
   restrictMaximumContainerWidth: z.boolean().default(true),
+  /**
+   * Specify the app signer address the comments associated with.
+   *
+   * - Set it to "embed" will cause the embed to retrieve all comments posted by the embed app.
+   * - Set it to "all" will cause the embed to retrieve all comments from all apps.
+   * - Set it to a valid hex address will cause the embed to retrieve all comments posted by the specified app.
+   *
+   * @default "embed"
+   */
+  app: z
+    .union([HexSchema, z.literal("embed"), z.literal("all")])
+    .default("embed"),
 });
 
 /**

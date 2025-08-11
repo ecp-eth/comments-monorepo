@@ -59,6 +59,9 @@ const formSchema = z.object({
 
 export default function IframeConfigurator() {
   const [showAdvanced, setShowAdvanced] = React.useState(false);
+  const [appSigner, setAppSigner] = React.useState<"embed" | "custom" | "all">(
+    "embed",
+  );
 
   const form = useForm<z.input<typeof formSchema>>({
     mode: "all",
@@ -280,6 +283,59 @@ export default function IframeConfigurator() {
                   </FormItem>
                 )}
               />
+
+              <FormItem>
+                <FormLabel>App Signer Address</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={(value) => {
+                      setAppSigner(value as "embed" | "custom" | "all");
+
+                      if (value === "embed" || value === "all") {
+                        form.setValue("config.app", value);
+                      }
+                    }}
+                    value={appSigner}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Theme Mode" />
+                    </SelectTrigger>
+                    <SelectContent id="theme-mode-select">
+                      <SelectItem value="embed" defaultChecked>
+                        Default (embed app signer)
+                      </SelectItem>
+                      <SelectItem value="custom">Custom app signer</SelectItem>
+                      <SelectItem value="all">All apps</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+
+              {appSigner === "custom" && (
+                <FormField
+                  control={form.control}
+                  name="config.app"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Custom App Signer Address</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          {...field}
+                          value={
+                            field.value === "embed" || field.value === "all"
+                              ? ""
+                              : field.value
+                          }
+                          placeholder="0x..."
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}
