@@ -7,7 +7,7 @@ import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { toast } from "sonner";
 import { type Comment } from "@ecp.eth/shared/schemas";
 
-type UseLikeReactionSetupProps = {
+type UseSetupPendingActionProps = {
   comment: Comment;
   queryKey: readonly unknown[];
 };
@@ -18,7 +18,7 @@ type UseLikeReactionSetupProps = {
 export function useSetupPendingAction({
   comment,
   queryKey,
-}: UseLikeReactionSetupProps) {
+}: UseSetupPendingActionProps) {
   const isMountedRef = useRef(false);
   const [isReplying, setIsReplying] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
