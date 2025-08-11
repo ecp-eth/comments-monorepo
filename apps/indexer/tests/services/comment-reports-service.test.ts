@@ -66,11 +66,11 @@ describe("CommentReportsService", () => {
 
     const mockReport = {
       id: "0x123",
-      comment_id: mockComment.id,
+      commentId: mockComment.id,
       reportee: "0x456" as const,
       message: "test report",
-      created_at: new Date(),
-      updated_at: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       status: "pending" as const,
     };
 
@@ -125,11 +125,11 @@ describe("CommentReportsService", () => {
 
     const mockReport = {
       id: "0x123",
-      comment_id: mockComment.id,
+      commentId: mockComment.id,
       reportee: "0x456" as const,
       message: "",
-      created_at: new Date(),
-      updated_at: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       status: "pending" as const,
     };
 

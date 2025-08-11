@@ -65,11 +65,11 @@ export class CommentReportsService implements ICommentReportsService {
     }
 
     const comment = await this.commentDbService.getCommentById(
-      report.comment_id,
+      report.commentId,
     );
 
     if (!comment) {
-      throw new CommentNotFoundError(report.comment_id, messageId);
+      throw new CommentNotFoundError(report.commentId, messageId);
     }
 
     const updatedReport =
@@ -93,11 +93,11 @@ export class CommentReportsService implements ICommentReportsService {
     }
 
     const comment = await this.commentDbService.getCommentById(
-      report.comment_id,
+      report.commentId,
     );
 
     if (!comment) {
-      throw new CommentNotFoundError(report.comment_id, messageId);
+      throw new CommentNotFoundError(report.commentId, messageId);
     }
 
     await this.notificationService.notifyReportStatusChanged({
@@ -119,11 +119,11 @@ export class CommentReportsService implements ICommentReportsService {
     }
 
     const comment = await this.commentDbService.getCommentById(
-      report.comment_id,
+      report.commentId,
     );
 
     if (!comment) {
-      throw new CommentNotFoundError(report.comment_id, messageId);
+      throw new CommentNotFoundError(report.commentId, messageId);
     }
 
     await this.notificationService.notifyReportStatusChanged({

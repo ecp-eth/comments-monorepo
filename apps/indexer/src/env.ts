@@ -175,19 +175,13 @@ const EnvSchema = z
     return true;
   });
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace NodeJS {
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface ProcessEnv extends z.infer<typeof EnvSchema> {}
-  }
-}
-
 const _env = EnvSchema.safeParse(process.env);
 
 if (!_env.success) {
-  console.error(_env.error.format());
-  throw new Error("Invalid environment variables:" + _env.error.format());
+  throw new Error(
+    "Invalid environment variables:" +
+      JSON.stringify(_env.error.format(), null, 2),
+  );
 }
 
 export const env = _env.data;

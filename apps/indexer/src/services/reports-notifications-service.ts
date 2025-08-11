@@ -6,7 +6,7 @@ import type {
 } from "./types";
 import type { CommentSelectType } from "ponder:schema";
 import type { Hex } from "viem";
-import type { CommentReportSelectType } from "../management/migrations";
+import type { CommentReportSelectType } from "../../schema.offchain";
 
 type ReportsNotificationServiceOptions = {
   enabled: boolean;

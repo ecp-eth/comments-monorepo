@@ -4,10 +4,12 @@ import {
   transformCommentParentId,
   transformCommentTargetUri,
 } from "../lib/utils";
-import { getMutedAccount } from "../management/services/muted-accounts";
 import schema from "ponder:schema";
 import { getAddress } from "viem";
-import { commentModerationService } from "../services";
+import {
+  commentModerationService,
+  mutedAccountsManagementService,
+} from "../services";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
 import {
@@ -59,7 +61,9 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
     const targetUri = transformCommentTargetUri(event.args.targetUri);
 
-    if (await getMutedAccount(event.args.author)) {
+    if (
+      await mutedAccountsManagementService.getMutedAccount(event.args.author)
+    ) {
       return;
     }
 
@@ -264,7 +268,9 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
   ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
     // Check if the author is muted
-    if (await getMutedAccount(event.args.author)) {
+    if (
+      await mutedAccountsManagementService.getMutedAccount(event.args.author)
+    ) {
       return;
     }
 

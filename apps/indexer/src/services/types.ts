@@ -4,8 +4,8 @@ import type { CommentSelectType } from "ponder:schema";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { Convenience, Message } from "telegraf/types";
 import type { CommentReportStatus } from "../management/types";
-import type { CommentReportSelectType } from "../management/migrations";
 import type { Handler } from "hono";
+import type { CommentReportSelectType } from "../../schema.offchain";
 
 export type ModerationStatus = "pending" | "approved" | "rejected";
 

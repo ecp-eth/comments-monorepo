@@ -1,6 +1,6 @@
 import { FormattedString } from "@grammyjs/parse-mode";
 import type { CommentReportStatus } from "../../../management/types";
-import type { CommentReportSelectType } from "../../../management/migrations";
+import type { CommentReportSelectType } from "../../../../schema.offchain";
 import { z } from "zod";
 import { parse as parseUUID, stringify as stringifyUUID } from "uuid";
 import type { Hex } from "@ecp.eth/sdk/core";
@@ -150,7 +150,7 @@ export function renderReport(
     .plain(report.id)
     .plain("\n")
     .bold("Comment ID: ")
-    .plain(report.comment_id)
+    .plain(report.commentId)
     .plain("\n")
     .bold("Reported by: ")
     .plain(reportee)
@@ -159,7 +159,7 @@ export function renderReport(
     .plain(reportStatusToString(report.status))
     .plain("\n")
     .bold("Last updated at: ")
-    .plain(report.updated_at.toISOString())
+    .plain(report.updatedAt.toISOString())
     .plain("\n")
     .bold("Message: ")
     .plain(report.message.trim() || "<No message>");
