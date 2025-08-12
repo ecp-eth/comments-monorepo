@@ -6,7 +6,6 @@ import {
   type WebhookCallbackData,
 } from "../utils/webhook";
 import type { Convenience } from "telegraf/types";
-import { ServiceError } from "./errors";
 
 type TelegramNotificationsServiceOptions =
   | {

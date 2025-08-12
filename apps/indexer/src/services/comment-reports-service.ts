@@ -137,10 +137,8 @@ export class CommentReportsService implements ICommentReportsService {
       throw new CommentNotFoundError(report.commentId, callbackQuery);
     }
 
-    const updatedReport = await this.updateReportStatus(reportId, "pending");
-
     if (callbackQuery) {
-      await this.notificationService.notifyReportStatusChanged({
+      await this.notificationService.notifyReportStatusChangeCancelled({
         comment,
         messageId: callbackQuery.message.message_id,
         report,
@@ -148,7 +146,7 @@ export class CommentReportsService implements ICommentReportsService {
       });
     }
 
-    return updatedReport;
+    return report;
   }
 
   async requestStatusChange(
@@ -167,18 +165,16 @@ export class CommentReportsService implements ICommentReportsService {
       throw new CommentNotFoundError(report.commentId, callbackQuery);
     }
 
-    const updatedReport = await this.updateReportStatus(reportId, "pending");
-
     if (callbackQuery) {
-      await this.notificationService.notifyReportStatusChanged({
+      await this.notificationService.notifyReportStatusChangeRequested({
         messageId: callbackQuery.message.message_id,
         comment,
-        report: updatedReport,
+        report,
         callbackQuery,
       });
     }
 
-    return updatedReport;
+    return report;
   }
 
   private async getCommentById(

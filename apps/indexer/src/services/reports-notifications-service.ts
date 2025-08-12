@@ -7,6 +7,7 @@ import type {
 import type { CommentSelectType } from "ponder:schema";
 import type { Hex } from "viem";
 import type { CommentReportSelectType } from "../../schema.offchain";
+import { CommentReportStatus } from "../management/types";
 
 type ReportsNotificationServiceOptions = {
   enabled: boolean;
@@ -121,6 +122,118 @@ export class ReportsNotificationsService
     }
   }
 
+  async notifyReportStatusChangeRequested({
+    messageId,
+    comment,
+    report,
+    callbackQuery,
+  }: ReportsNotificationsServiceNotifyReportStatusChangeParams) {
+    if (!this.enabled) {
+      console.log(
+        "ReportsNotificationsService#notifyReportStatusChangeRequested: disabled",
+      );
+      return;
+    }
+
+    try {
+      const message = await this.renderReportUpdateMessage(comment, report);
+
+      await this.telegramNotificationsService.updateMessageWithWebhookActions(
+        messageId,
+        message,
+        [
+          ...(["pending", "resolved", "closed"] as const)
+            .filter((status) => status !== report.status)
+            .map((status) => ({
+              action: {
+                action: `report-set-as-${status}` as const,
+                reportId: report.id,
+                timestamp: Date.now(),
+              },
+              text: reportStatusToActionLabel(status),
+            })),
+          {
+            action: {
+              action: "report-cancel",
+              reportId: report.id,
+              timestamp: Date.now(),
+            },
+            text: "Cancel",
+          },
+        ],
+      );
+
+      if (callbackQuery) {
+        await this.telegramNotificationsService.answerCallbackQueryWithSuccess(
+          callbackQuery.id,
+          "Report status change requested",
+        );
+      }
+    } catch (e) {
+      console.error("ReportsNotificationsService: error sending message", e);
+
+      if (callbackQuery) {
+        await this.telegramNotificationsService.answerCallbackQueryWithError(
+          callbackQuery.id,
+          "Error editing message",
+        );
+      }
+
+      throw e;
+    }
+  }
+
+  async notifyReportStatusChangeCancelled({
+    messageId,
+    comment,
+    report,
+    callbackQuery,
+  }: ReportsNotificationsServiceNotifyReportStatusChangeParams) {
+    if (!this.enabled) {
+      console.log(
+        "ReportsNotificationsService#notifyReportStatusChangeCancelled: disabled",
+      );
+      return;
+    }
+
+    try {
+      const message = await this.renderReportUpdateMessage(comment, report);
+
+      await this.telegramNotificationsService.updateMessageWithWebhookActions(
+        messageId,
+        message,
+        [
+          {
+            action: {
+              action: "report-change-status",
+              reportId: report.id,
+              timestamp: Date.now(),
+            },
+            text: "Change status",
+          },
+        ],
+      );
+
+      if (callbackQuery) {
+        await this.telegramNotificationsService.answerCallbackQueryWithSuccess(
+          callbackQuery.id,
+          "Report status change cancelled",
+        );
+      }
+    } catch (e) {
+      console.error("ReportsNotificationsService: error sending message", e);
+
+      if (callbackQuery) {
+        await this.telegramNotificationsService.answerCallbackQueryWithError(
+          callbackQuery.id,
+          "Error editing message",
+        );
+      }
+
+      throw e;
+    }
+  }
+
   private async renderReportMessage(
     comment: CommentSelectType,
     report: CommentReportSelectType,
@@ -159,5 +272,20 @@ Author: ${author}`.trim();
     formattedMessage += `\n\nStatus: ${report.status}`;
 
     return formattedMessage;
+  }
+}
+
+function reportStatusToActionLabel(status: CommentReportStatus): string {
+  switch (status) {
+    case "pending":
+      return "Pending";
+    case "resolved":
+      return "Resolve";
+    case "closed":
+      return "Close";
+    default:
+      status satisfies never;
+
+      throw new Error(`Invalid report status: ${status}`);
   }
 }

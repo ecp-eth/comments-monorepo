@@ -106,6 +106,12 @@ export interface IReportsNotificationsService {
   notifyReportStatusChanged: (
     params: ReportsNotificationsServiceNotifyReportStatusChangeParams,
   ) => Promise<void>;
+  notifyReportStatusChangeRequested: (
+    params: ReportsNotificationsServiceNotifyReportStatusChangeParams,
+  ) => Promise<void>;
+  notifyReportStatusChangeCancelled: (
+    params: ReportsNotificationsServiceNotifyReportStatusChangeParams,
+  ) => Promise<void>;
 }
 
 export enum CommentModerationLabel {
