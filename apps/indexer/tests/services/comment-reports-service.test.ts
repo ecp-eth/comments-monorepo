@@ -39,6 +39,8 @@ describe("CommentReportsService", () => {
   const mockNotificationService: IReportsNotificationsService = {
     notifyReportCreated: vi.fn(),
     notifyReportStatusChanged: vi.fn(),
+    notifyReportStatusChangeRequested: vi.fn(),
+    notifyReportStatusChangeCancelled: vi.fn(),
   };
 
   const db = drizzle.mock({
