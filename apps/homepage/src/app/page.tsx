@@ -783,7 +783,7 @@ await fetchComments({
               <CardFooter>
                 <Button variant="outline" className="w-full" asChild>
                   <Link
-                    href="https://t.me/+vxh3qr_ivnczMTBk"
+                    href="https://t.me/+BpHx8Cm1I6M3OTc0"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
