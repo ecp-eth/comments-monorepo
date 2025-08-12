@@ -29,6 +29,7 @@ const patchReportRoute = createRoute({
           schema: PatchReportBodySchema,
         },
       },
+      required: true,
     },
   },
   responses: {
