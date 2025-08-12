@@ -83,4 +83,8 @@ if (env.SENTRY_DSN) {
   }
 } else {
   console.log("Sentry DSN not set");
+
+  Sentry.init({
+    debug: true,
+  });
 }

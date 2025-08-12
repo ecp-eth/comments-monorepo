@@ -80,6 +80,7 @@ const EnvSchema = z
       .default("0")
       .transform((val) => val === "1"),
     MODERATION_MBD_API_KEY: z.string().optional(),
+    MODERATION_TELEGRAM_API_ROOT_URL: z.string().url().optional(),
     MODERATION_TELEGRAM_BOT_TOKEN: z.string().optional(),
     MODERATION_TELEGRAM_CHANNEL_ID: z.string().optional(),
     MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url().optional(),

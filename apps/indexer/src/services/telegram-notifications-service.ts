@@ -15,6 +15,12 @@ type TelegramNotificationsServiceOptions =
       telegramChannelId: string;
       telegramWebhookUrl: string;
       telegramWebhookSecret: string;
+      /**
+       * Custom API root URL for the Telegram bot.
+       *
+       * This is useful for local development.
+       */
+      telegramApiRootUrl?: string;
     }
   | {
       enabled: false;
@@ -39,7 +45,11 @@ export class TelegramNotificationsService
     if (options.enabled) {
       this.state = {
         enabled: true,
-        bot: new Telegraf(options.telegramBotToken),
+        bot: new Telegraf(options.telegramBotToken, {
+          telegram: {
+            apiRoot: options.telegramApiRootUrl,
+          },
+        }),
         channelId: options.telegramChannelId,
         telegramWebhookUrl: options.telegramWebhookUrl,
         telegramWebhookSecret: options.telegramWebhookSecret,
