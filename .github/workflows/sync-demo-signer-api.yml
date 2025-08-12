@@ -8,11 +8,9 @@ on:
   push:
     branches:
       - main
-      # test the branch make sure the moved examples is working
-      - move-examples
     paths:
       - "examples/signer/**"
-      # in case we updated privy patch
+      # privy patch is used in the signer template as well so we need to retrigger this workflow when it changes
       - "patches/**"
 
 jobs:
