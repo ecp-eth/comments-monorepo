@@ -9,7 +9,9 @@ on:
     branches:
       - main
     paths:
-      - "apps/signer/**"
+      - "examples/signer/**"
+      # privy patch is used in the signer template as well so we need to retrigger this workflow when it changes
+      - "patches/**"
 
 jobs:
   sync:
@@ -46,16 +48,16 @@ jobs:
         run: pnpm install
 
       - name: replace signer package.json workspace version
-        run: pnpm replace-workspace-version apps/signer/package.json
+        run: pnpm replace-workspace-version examples/signer/package.json
 
       - name: merge signer package.json template
-        run: pnpm merge-json apps/signer/package.json apps/signer/template.package.json
+        run: pnpm merge-json examples/signer/package.json examples/signer/template.package.json
 
       - name: copy over patches and files
         run: |
-          mkdir -p apps/signer/patches
-          cp patches/@privy-io__server-auth.patch apps/signer/patches/@privy-io__server-auth.patch
-          cp .node-version apps/signer/.node-version
+          mkdir -p examples/signer/patches
+          cp patches/@privy-io__server-auth.patch examples/signer/patches/@privy-io__server-auth.patch
+          cp .node-version examples/signer/.node-version
 
       - name: commit changes
         run: |
@@ -64,7 +66,7 @@ jobs:
 
       - name: split signer code into template branch
         run: |
-          git subtree split --prefix apps/signer -b template-signer-api
+          git subtree split --prefix examples/signer -b template-signer-api
 
       - name: test install and build with npm
         run: |

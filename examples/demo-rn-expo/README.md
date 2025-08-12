@@ -1,6 +1,6 @@
 # Boilerplate React-native (Expo) Demo App
 
-[Source code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/demo-rn-expo)
+[Source code](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/demo-rn-expo)
 
 This is React Native (Expo) demo app for the [Ethereum Comments Protocol](https://docs.ethcomments.xyz).
 

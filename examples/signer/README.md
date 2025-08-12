@@ -24,7 +24,7 @@ A Next.js API service for signing ECP comments. Provides both standard signing a
 
    ```bash
    git clone https://github.com/ecp-eth/comments-monorepo.git
-   cd apps/signer
+   cd examples/signer
    pnpm install
    ```
 

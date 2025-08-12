@@ -35,7 +35,7 @@ export default function Footer() {
             className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
             rel="noopener noreferrer"
             target="_blank"
-            href="https://github.com/ecp-eth/comments-monorepo/apps/embed-demo-blog"
+            href="https://github.com/ecp-eth/comments-monorepo/tree/main/examples/embed-demo-blog"
           >
             <ArrowIcon />
             <p className="ml-2 h-7">view source</p>
