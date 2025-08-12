@@ -20,13 +20,11 @@ interface SitemapUrl {
 function getLastModified(filePath: string): string {
   // Prefer Git last commit date for stability across environments
   try {
-    repoRoot =
-      repoRoot ??
-      execSync("git rev-parse --show-toplevel", {
-        cwd: __dirname,
-      })
-        .toString()
-        .trim();
+    repoRoot ??= execSync("git rev-parse --show-toplevel", {
+      cwd: __dirname,
+    })
+      .toString()
+      .trim();
 
     const relativePath = path.relative(repoRoot, filePath);
 
