@@ -28,7 +28,7 @@ export class MutedAccountsManagementService {
   }
 
   async unmuteAccount(address: Hex): Promise<boolean> {
-    const result = await this.db
+    const [result] = await this.db
       .delete(schema.mutedAccounts)
       .where(eq(schema.mutedAccounts.account, normalizeAddress(address)))
       .returning()
