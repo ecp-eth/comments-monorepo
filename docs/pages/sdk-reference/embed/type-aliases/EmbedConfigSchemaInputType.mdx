@@ -8,6 +8,7 @@
 
 ```ts
 type EmbedConfigSchemaInputType = {
+  app?: `0x${string}` | "all" | "embed";
   chainId?: 8453 | 31337;
   disablePromotion?: boolean;
   restrictMaximumContainerWidth?: boolean;
@@ -1826,11 +1827,29 @@ type EmbedConfigSchemaInputType = {
 };
 ```
 
-Defined in: [packages/sdk/src/embed/schemas/index.ts:209](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L209)
+Defined in: [packages/sdk/src/embed/schemas/index.ts:222](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L222)
 
 Custom configuration for `<CommentEmbed />` component.
 
 ## Type declaration
+
+### app?
+
+```ts
+optional app: `0x${string}` | "all" | "embed";
+```
+
+Specify the app signer address the comments associated with.
+
+- Set it to "embed" will cause the embed to retrieve all comments posted by the embed app.
+- Set it to "all" will cause the embed to retrieve all comments from all apps.
+- Set it to a valid hex address will cause the embed to retrieve all comments posted by the specified app.
+
+#### Default
+
+```ts
+"embed"
+```
 
 ### chainId?
 
