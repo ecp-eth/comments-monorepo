@@ -206,7 +206,7 @@ export class CommentReportsService implements ICommentReportsService {
         throw new CommentNotFoundError(commentId);
       }
 
-      const [result] = await this.db
+      const [result] = await tx
         .insert(schema.commentReports)
         .values({
           commentId: comment.id,
