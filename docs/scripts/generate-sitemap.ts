@@ -1,11 +1,14 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { execSync } from "child_process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const BASE_URL = "https://docs.ethcomments.xyz";
+
+let repoRoot: string;
 
 interface SitemapUrl {
   loc: string;
@@ -15,6 +18,45 @@ interface SitemapUrl {
 }
 
 function getLastModified(filePath: string): string {
+  // Prefer Git last commit date for stability across environments
+  try {
+    repoRoot =
+      repoRoot ??
+      execSync("git rev-parse --show-toplevel", {
+        cwd: __dirname,
+      })
+        .toString()
+        .trim();
+
+    const relativePath = path.relative(repoRoot, filePath);
+
+    // Try committer date first; if unavailable, fall back to author date
+    const gitDate = execSync(`git log -1 --format=%cI -- "${relativePath}"`, {
+      cwd: repoRoot,
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+      .toString()
+      .trim();
+
+    if (gitDate) {
+      return new Date(gitDate).toISOString();
+    }
+
+    const authorDate = execSync(
+      `git log -1 --format=%aI -- "${relativePath}"`,
+      { cwd: repoRoot, stdio: ["ignore", "pipe", "ignore"] },
+    )
+      .toString()
+      .trim();
+
+    if (authorDate) {
+      return new Date(authorDate).toISOString();
+    }
+  } catch {
+    // Ignore and fall back to filesystem timestamp
+    console.warn(`Failed to get Git date for ${filePath}`);
+  }
+
   try {
     const stats = fs.statSync(filePath);
     return stats.mtime.toISOString();
