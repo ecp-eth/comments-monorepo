@@ -59,6 +59,7 @@ const dbUpdateReturningMock = vi.fn().mockImplementation(() => {
 const dbUpdateWhereMock = vi.fn().mockImplementation(() => {
   return {
     returning: dbUpdateReturningMock,
+    execute: dbUpdateExecuteMock,
   };
 });
 const dbUpdateSetMock = vi.fn().mockImplementation(() => {
@@ -328,13 +329,21 @@ describe("PremoderationService", () => {
         revision: 0,
       });
 
-      expect(dbUpdateMock).toHaveBeenCalledOnce();
       expect(dbUpdateMock).toHaveBeenCalledWith(schema.comment);
-      expect(dbUpdateSetMock).toHaveBeenCalledOnce();
       expect(dbUpdateSetMock).toHaveBeenCalledWith({
         moderationStatus: "approved" as ModerationStatus,
         moderationStatusChangedAt: expect.any(Date),
       });
+
+      // we changed to approved so it called update on previous moderation statuses
+      expect(dbUpdateMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbUpdateSetMock).toHaveBeenCalledWith({
+        moderationStatus: "approved" as ModerationStatus,
+      });
+
+      expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(2);
     });
 
     test("should update specific revision if revision is provided", async () => {
@@ -371,13 +380,21 @@ describe("PremoderationService", () => {
         revision: 1,
       });
 
-      expect(dbUpdateMock).toHaveBeenCalledOnce();
       expect(dbUpdateMock).toHaveBeenCalledWith(schema.comment);
-      expect(dbUpdateSetMock).toHaveBeenCalledOnce();
       expect(dbUpdateSetMock).toHaveBeenCalledWith({
         moderationStatus: "approved" as ModerationStatus,
         moderationStatusChangedAt: expect.any(Date),
       });
+
+      // we changed to approved so it called update on previous moderation statuses
+      expect(dbUpdateMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbUpdateSetMock).toHaveBeenCalledWith({
+        moderationStatus: "approved" as ModerationStatus,
+      });
+
+      expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(2);
     });
   });
 });
