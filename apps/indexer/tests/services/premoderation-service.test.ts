@@ -396,5 +396,48 @@ describe("PremoderationService", () => {
 
       expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(2);
     });
+
+    test("should not update previous moderation statuses if status is changing to pending", async () => {
+      const mockedComment = {
+        id: "0x123" as Hex,
+        content: "test comment",
+        moderationStatus: "approved" as ModerationStatus,
+        moderationStatusChangedAt: new Date(),
+      } as CommentSelectType;
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce({
+        commentId: "0x123" as Hex,
+        moderationStatus: "approved" as ModerationStatus,
+        updatedAt: new Date(),
+        revision: 1,
+      } as CommentModerationStatusesSelectType);
+      vi.mocked(commentFindFirstMock).mockResolvedValueOnce(mockedComment);
+      vi.mocked(dbUpdateExecuteMock).mockResolvedValueOnce([mockedComment]);
+
+      await service.updateStatus({
+        commentId: "0x123" as Hex,
+        commentRevision: 1,
+        status: "pending" as ModerationStatus,
+      });
+
+      expect(dbInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbExecuteInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertValuesMock).toHaveBeenCalledWith({
+        commentId: "0x123" as Hex,
+        moderationStatus: "pending" as ModerationStatus,
+        updatedAt: expect.any(Date),
+        revision: 1,
+      });
+
+      expect(dbUpdateMock).toHaveBeenCalledWith(schema.comment);
+      expect(dbUpdateSetMock).toHaveBeenCalledWith({
+        moderationStatus: "pending" as ModerationStatus,
+        moderationStatusChangedAt: expect.any(Date),
+      });
+
+      expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(1);
+    });
   });
 });
