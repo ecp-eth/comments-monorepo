@@ -1,0 +1,14 @@
+{
+  "pnpm": {
+    "overrides": {
+      "@privy-io/server-auth": "1.30.0"
+    },
+    "patchedDependencies": {
+      "@privy-io/server-auth": "patches/@privy-io__server-auth.patch"
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.11.1"
+}
