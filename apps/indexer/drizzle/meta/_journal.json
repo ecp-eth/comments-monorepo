@@ -15,6 +15,13 @@
       "when": 1754912023247,
       "tag": "0001_maintenance_functions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1755007366641,
+      "tag": "0002_moderation_status_by_status_idx",
+      "breakpoints": true
     }
   ]
 }

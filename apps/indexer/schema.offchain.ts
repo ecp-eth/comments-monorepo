@@ -60,6 +60,9 @@ export const commentModerationStatuses = offchainSchema.table(
       "moderation_status_enum",
       sql`${table.moderationStatus} IN ('pending', 'approved', 'rejected')`,
     ),
+    index("comment_moderation_statuses_by_status_idx").on(
+      table.moderationStatus,
+    ),
   ],
 );
 

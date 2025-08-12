@@ -1,0 +1,1 @@
+CREATE INDEX "comment_moderation_statuses_by_status_idx" ON "ecp_indexer_schema"."comment_moderation_statuses" USING btree ("moderation_status");
