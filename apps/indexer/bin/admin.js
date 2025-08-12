@@ -106,7 +106,7 @@ authAccount
       .returning()
       .execute();
 
-    if (!result) {
+    if (result.length === 0) {
       console.log("Failed to add API key, already exists");
 
       process.exit(1);
@@ -134,7 +134,7 @@ authAccount
       .returning()
       .execute();
 
-    if (!deleted) {
+    if (deleted.length === 0) {
       console.log("API key not found");
 
       process.exit(1);
