@@ -109,14 +109,14 @@ function serializeWebhookData(data: WebhookCallbackData): Buffer {
   let idBuffer: Buffer;
 
   if ("reportId" in data) {
-    // 36 B
+    // 36B
     idBuffer = Buffer.from(data.reportId);
   } else {
     // 32B without 0x prefix
     idBuffer = Buffer.from(data.commentId.slice(2), "hex");
   }
 
-  // 39B for commentId, 42B for reportId
+  // 39B for commentId, 43B for reportId
   return Buffer.concat([
     Buffer.from([actionByte]),
     idBuffer,

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { describe, it, expect } from "vitest";
 import {
   encryptWebhookCallbackData,
@@ -90,8 +91,8 @@ describe("webhook utils serialize/deserialize", () => {
     const key = getKeyBuffer(secret);
 
     const actionByte = 0x06; // report-set-as-resolved
-    const reportId = ("0x" + "aa".repeat(32)) as `0x${string}`;
-    const idBuffer = Buffer.from(reportId.slice(2), "hex");
+    const reportId = randomUUID();
+    const idBuffer = Buffer.from(reportId);
     const timestampMs = 1720000000000;
     const tsSeconds = Math.floor(timestampMs / 1000);
     const timestampBuffer = Buffer.alloc(4);
@@ -105,7 +106,7 @@ describe("webhook utils serialize/deserialize", () => {
       revisionZero,
     ]);
 
-    expect(serialized.length).toBe(39);
+    expect(serialized.length).toBe(43);
 
     const encrypted = xorWithKey(serialized, key).toString("binary");
     const result = decryptWebhookCallbackData(secret, encrypted);
@@ -122,27 +123,27 @@ describe("webhook utils serialize/deserialize", () => {
 
     const data: WebhookCallbackData = {
       action: "report-change-status" as const,
-      reportId: ("0x" + "bb".repeat(32)) as `0x${string}`,
+      reportId: randomUUID(),
       timestamp: 1730000000000,
     };
 
     const encryptedStr = encryptWebhookCallbackData(secret, data);
     const encrypted = Buffer.from(encryptedStr, "binary");
-    expect(encrypted.length).toBe(39);
+    expect(encrypted.length).toBe(43);
 
     const serialized = xorWithKey(encrypted, key);
-    expect(serialized.length).toBe(39);
+    expect(serialized.length).toBe(43);
 
     const actionByte = serialized[0];
     expect(actionByte).toBe(0x08); // report-change-status
 
-    const idHex = "0x" + serialized.subarray(1, 33).toString("hex");
+    const idHex = serialized.subarray(1, 37).toString("ascii");
     expect(idHex).toBe(data.reportId);
 
-    const tsSeconds = serialized.readUInt32BE(33);
+    const tsSeconds = serialized.readUInt32BE(37);
     expect(tsSeconds).toBe(Math.floor(data.timestamp / 1000));
 
     // Last two bytes should be zeros for report payloads
-    expect(serialized.readUInt16BE(37)).toBe(0);
+    expect(serialized.readUInt16BE(41)).toBe(0);
   });
 });
