@@ -11,7 +11,7 @@ import {
   uuid,
   check,
 } from "drizzle-orm/pg-core";
-import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants";
+import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants.ts";
 import type { Hex } from "viem";
 import type { CommentReportStatus } from "./src/management/types";
 import type {

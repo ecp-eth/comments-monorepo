@@ -10,7 +10,7 @@ import { randomBytes } from "crypto";
 import { getPublicKeyAsync, signAsync, utils } from "@noble/ed25519";
 import { z } from "zod";
 import { renderToMarkdown } from "@ecp.eth/shared/renderer";
-import { schema } from "../schema";
+import * as schema from "../schema.offchain.ts";
 import { eq } from "drizzle-orm";
 
 const HexSchema = z.string().regex(/^0x[0-9a-fA-F]+$/);
@@ -99,7 +99,7 @@ authAccount
       .values({
         id,
         name,
-        publicKey: `0x${Buffer.from(publicKey).toString("hex")}`,
+        publicKey: Buffer.from(publicKey).toString("hex"),
         createdAt: new Date(),
       })
       .onConflictDoNothing({ target: [schema.apiKeys.name] })
