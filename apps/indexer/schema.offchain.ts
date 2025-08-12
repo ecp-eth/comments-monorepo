@@ -21,13 +21,17 @@ import type {
 
 export const offchainSchema = pgSchema(ECP_INDEXER_SCHEMA_NAME);
 
-export const apiKeys = offchainSchema.table("api_keys", {
-  id: text().notNull().primaryKey(),
-  publicKey: text().notNull(),
-  name: text().notNull().unique(),
-  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  lastUsedAt: timestamp({ withTimezone: true }),
-});
+export const apiKeys = offchainSchema.table(
+  "api_keys",
+  {
+    id: text().notNull().primaryKey(),
+    publicKey: text().notNull(),
+    name: text().notNull().unique(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    lastUsedAt: timestamp({ withTimezone: true }),
+  },
+  (table) => [index("api_keys_by_public_key_idx").on(table.id)],
+);
 
 export const commentClassificationResults = offchainSchema.table(
   "comment_classification_results",
