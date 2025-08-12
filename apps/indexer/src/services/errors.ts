@@ -2,6 +2,7 @@ import { HTTPException } from "hono/http-exception";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { CommentReportStatus } from "../management/types";
+import type { TelegramCallbackQuery } from "./types";
 
 /**
  * Base class for all service-level errors
@@ -10,12 +11,12 @@ export abstract class ServiceError extends HTTPException {
   /**
    * Whether we should reply with this error to the telegram message
    */
-  public readonly telegramMessageId?: number;
+  public readonly telegramCallbackQuery?: TelegramCallbackQuery;
 
   constructor(
     status: ContentfulStatusCode,
     message: string,
-    telegramMessageId?: number,
+    telegramCallbackQuery?: TelegramCallbackQuery,
   ) {
     super(status, {
       message,
@@ -25,7 +26,7 @@ export abstract class ServiceError extends HTTPException {
       }),
     });
 
-    this.telegramMessageId = telegramMessageId;
+    this.telegramCallbackQuery = telegramCallbackQuery;
   }
 }
 
@@ -35,8 +36,8 @@ export abstract class ServiceError extends HTTPException {
 export class CommentNotFoundError extends ServiceError {
   public readonly commentId: Hex;
 
-  constructor(commentId: Hex, telegramMessageId?: number) {
-    super(404, `Comment ${commentId} not found`, telegramMessageId);
+  constructor(commentId: Hex, telegramCallbackQuery?: TelegramCallbackQuery) {
+    super(404, `Comment ${commentId} not found`, telegramCallbackQuery);
 
     this.commentId = commentId;
   }
@@ -49,12 +50,12 @@ export class CommentModerationStatusNotFoundError extends ServiceError {
   constructor(
     commentId: Hex,
     commentRevision: number,
-    telegramMessageId?: number,
+    telegramCallbackQuery?: TelegramCallbackQuery,
   ) {
     super(
       404,
       `Comment moderation status not found for comment ${commentId} with revision ${commentRevision}`,
-      telegramMessageId,
+      telegramCallbackQuery,
     );
 
     this.commentId = commentId;
@@ -65,8 +66,8 @@ export class CommentModerationStatusNotFoundError extends ServiceError {
 export class ReportNotFoundError extends ServiceError {
   public readonly reportId: string;
 
-  constructor(reportId: string, telegramMessageId?: number) {
-    super(404, `Report ${reportId} not found`, telegramMessageId);
+  constructor(reportId: string, telegramCallbackQuery?: TelegramCallbackQuery) {
+    super(404, `Report ${reportId} not found`, telegramCallbackQuery);
 
     this.reportId = reportId;
   }
@@ -76,12 +77,12 @@ export class ReportStatusAlreadySetError extends ServiceError {
   constructor(
     reportId: string,
     status: CommentReportStatus,
-    telegramMessageId?: number,
+    telegramCallbackQuery?: TelegramCallbackQuery,
   ) {
     super(
       400,
       `Report ${reportId} is already set to ${status}`,
-      telegramMessageId,
+      telegramCallbackQuery,
     );
   }
 }

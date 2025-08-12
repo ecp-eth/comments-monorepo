@@ -46,7 +46,7 @@ export class ReportsNotificationsService
             {
               action: {
                 action: "report-set-as-resolved",
-                reportId: comment.id,
+                reportId: report.id,
                 timestamp: Date.now(),
               },
               text: "Resolve",
@@ -54,7 +54,7 @@ export class ReportsNotificationsService
             {
               action: {
                 action: "report-set-as-closed",
-                reportId: comment.id,
+                reportId: report.id,
                 timestamp: Date.now(),
               },
               text: "Close",
@@ -74,6 +74,7 @@ export class ReportsNotificationsService
     messageId,
     comment,
     report,
+    callbackQuery,
   }: ReportsNotificationsServiceNotifyReportStatusChangeParams) {
     if (!this.enabled) {
       console.log(
@@ -92,15 +93,29 @@ export class ReportsNotificationsService
           {
             action: {
               action: "report-change-status",
-              reportId: comment.id,
+              reportId: report.id,
               timestamp: Date.now(),
             },
             text: "Change status",
           },
         ],
       );
+
+      if (callbackQuery) {
+        await this.telegramNotificationsService.answerCallbackQueryWithSuccess(
+          callbackQuery.id,
+          "Report status updated",
+        );
+      }
     } catch (e) {
       console.error("ReportsNotificationsService: error sending message", e);
+
+      if (callbackQuery) {
+        await this.telegramNotificationsService.answerCallbackQueryWithError(
+          callbackQuery.id,
+          "Error editing message",
+        );
+      }
 
       throw e;
     }
@@ -114,6 +129,7 @@ export class ReportsNotificationsService
 
     let formattedMessage = `🆕 New report for comment
 
+Report ID: ${report.id}
 Comment ID: ${comment.id}
 Author: ${author}`.trim();
 
@@ -131,6 +147,8 @@ Author: ${author}`.trim();
     const author = await this.resolveAuthor(report.reportee);
 
     let formattedMessage = `🔄 Updated report for comment
+
+Report ID: ${report.id}
 Comment ID: ${comment.id}
 Author: ${author}`.trim();
 

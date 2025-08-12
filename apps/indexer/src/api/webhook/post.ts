@@ -13,6 +13,7 @@ import { HTTPException } from "hono/http-exception";
 
 const webhookRequestBodySchema = z.object({
   callback_query: z.object({
+    id: z.string().nonempty(),
     data: z.string().nonempty(),
     message: z.object({
       message_id: z.number().int().nonnegative(),
@@ -58,9 +59,9 @@ const webhookRoute = createRoute({
 
 export function setupWebhook(app: OpenAPIHono) {
   app.openapi(webhookRoute, async (c) => {
-    const { callback_query } = c.req.valid("json");
+    const { callback_query: callbackQuery } = c.req.valid("json");
 
-    const { data, message } = callback_query;
+    const { data } = callbackQuery;
 
     try {
       const command =
@@ -74,6 +75,11 @@ export function setupWebhook(app: OpenAPIHono) {
           },
         });
 
+        await telegramNotificationsService.answerCallbackQueryWithError(
+          callbackQuery.id,
+          "Webhook request is too old.",
+        );
+
         return c.newResponse(null, 204);
       }
 
@@ -82,7 +88,7 @@ export function setupWebhook(app: OpenAPIHono) {
           await commentModerationService.updateModerationStatus({
             commentId: command.commentId,
             commentRevision: command.commentRevision,
-            messageId: message.message_id,
+            callbackQuery,
             status: "approved",
           });
 
@@ -91,7 +97,7 @@ export function setupWebhook(app: OpenAPIHono) {
           await commentModerationService.updateModerationStatus({
             commentId: command.commentId,
             commentRevision: command.commentRevision,
-            messageId: message.message_id,
+            callbackQuery,
             status: "rejected",
           });
 
@@ -100,22 +106,22 @@ export function setupWebhook(app: OpenAPIHono) {
           await commentModerationService.updateModerationStatus({
             commentId: command.commentId,
             commentRevision: command.commentRevision,
-            messageId: message.message_id,
+            callbackQuery,
             status: "pending",
           });
 
           break;
         case "moderation-change-status":
           await commentModerationService.requestStatusChange(
-            message.message_id,
             command.commentId,
+            callbackQuery,
           );
 
           break;
         case "moderation-cancel":
           await commentModerationService.cancelStatusChange(
-            message.message_id,
             command.commentId,
+            callbackQuery,
           );
 
           break;
@@ -123,7 +129,7 @@ export function setupWebhook(app: OpenAPIHono) {
           await commentReportsService.changeStatus({
             reportId: command.reportId,
             status: "resolved",
-            messageId: message.message_id,
+            callbackQuery,
           });
 
           break;
@@ -132,7 +138,7 @@ export function setupWebhook(app: OpenAPIHono) {
           await commentReportsService.changeStatus({
             reportId: command.reportId,
             status: "closed",
-            messageId: message.message_id,
+            callbackQuery,
           });
 
           break;
@@ -141,7 +147,7 @@ export function setupWebhook(app: OpenAPIHono) {
           await commentReportsService.changeStatus({
             reportId: command.reportId,
             status: "pending",
-            messageId: message.message_id,
+            callbackQuery,
           });
 
           break;
@@ -149,7 +155,7 @@ export function setupWebhook(app: OpenAPIHono) {
         case "report-change-status": {
           await commentReportsService.requestStatusChange(
             command.reportId,
-            message.message_id,
+            callbackQuery,
           );
 
           break;
@@ -157,13 +163,18 @@ export function setupWebhook(app: OpenAPIHono) {
         case "report-cancel": {
           await commentReportsService.cancelStatusChange(
             command.reportId,
-            message.message_id,
+            callbackQuery,
           );
 
           break;
         }
         default:
           command satisfies never;
+
+          await telegramNotificationsService.answerCallbackQueryWithError(
+            callbackQuery.id,
+            "Invalid action",
+          );
 
           Sentry.captureMessage("Invalid action", {
             level: "warning",
@@ -175,16 +186,17 @@ export function setupWebhook(app: OpenAPIHono) {
 
       return c.newResponse(null, 204);
     } catch (error) {
-      if (error instanceof ServiceError && error.telegramMessageId != null) {
-        await telegramNotificationsService.sendErrorReplyToMessage(
-          error.telegramMessageId,
-          error,
+      if (error instanceof ServiceError && error.telegramCallbackQuery) {
+        await telegramNotificationsService.answerCallbackQueryWithError(
+          error.telegramCallbackQuery.id,
+          error.message,
         );
 
-        // since this error has telegramMessageId we can swallow it because we will send an error reply to telegram
+        // since this error has telegramCallbackQuery we can swallow it because we will send an error reply to telegram
         return c.newResponse(null, 204);
       }
 
+      console.error(error);
       Sentry.captureException(error);
 
       // this is some uknown error, we want telegram to repeat the call until we figure out what to do

@@ -93,6 +93,7 @@ const reportChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
           const updatedReport = await ctx.reportsService.changeStatus({
             reportId: report.id,
             status: nextStatus,
+            callbackQuery: undefined, // handled grammy
           });
 
           const message = renderReport(

@@ -2,6 +2,7 @@ import type { Hex } from "@ecp.eth/sdk/core";
 import type {
   ICommentReportsService,
   IReportsNotificationsService,
+  TelegramCallbackQuery,
 } from "./types";
 import type { CommentReportStatus } from "../management/types";
 import type { DB } from "./db";
@@ -84,35 +85,36 @@ export class CommentReportsService implements ICommentReportsService {
   async changeStatus({
     reportId,
     status,
-    messageId,
+    callbackQuery,
   }: {
     reportId: string;
     status: CommentReportStatus;
-    messageId?: number;
+    callbackQuery?: TelegramCallbackQuery;
   }): Promise<CommentReportSelectType> {
     const report = await this.getReportById(reportId);
 
     if (!report) {
-      throw new ReportNotFoundError(reportId);
+      throw new ReportNotFoundError(reportId, callbackQuery);
     }
 
     if (report.status === status) {
-      throw new ReportStatusAlreadySetError(reportId, status, messageId);
+      throw new ReportStatusAlreadySetError(reportId, status, callbackQuery);
     }
 
     const comment = await this.getCommentById(report.commentId);
 
     if (!comment) {
-      throw new CommentNotFoundError(report.commentId, messageId);
+      throw new CommentNotFoundError(report.commentId, callbackQuery);
     }
 
     const updatedReport = await this.updateReportStatus(reportId, status);
 
-    if (messageId != null) {
+    if (callbackQuery) {
       await this.notificationService.notifyReportStatusChanged({
-        messageId,
+        messageId: callbackQuery.message.message_id,
         comment,
         report: updatedReport,
+        callbackQuery,
       });
     }
 
@@ -121,27 +123,28 @@ export class CommentReportsService implements ICommentReportsService {
 
   async cancelStatusChange(
     reportId: string,
-    messageId?: number,
+    callbackQuery?: TelegramCallbackQuery,
   ): Promise<CommentReportSelectType> {
     const report = await this.getReportById(reportId);
 
     if (!report) {
-      throw new ReportNotFoundError(reportId, messageId);
+      throw new ReportNotFoundError(reportId, callbackQuery);
     }
 
     const comment = await this.getCommentById(report.commentId);
 
     if (!comment) {
-      throw new CommentNotFoundError(report.commentId, messageId);
+      throw new CommentNotFoundError(report.commentId, callbackQuery);
     }
 
     const updatedReport = await this.updateReportStatus(reportId, "pending");
 
-    if (messageId != null) {
+    if (callbackQuery) {
       await this.notificationService.notifyReportStatusChanged({
         comment,
-        messageId,
+        messageId: callbackQuery.message.message_id,
         report,
+        callbackQuery,
       });
     }
 
@@ -150,27 +153,28 @@ export class CommentReportsService implements ICommentReportsService {
 
   async requestStatusChange(
     reportId: string,
-    messageId?: number,
+    callbackQuery?: TelegramCallbackQuery,
   ): Promise<CommentReportSelectType> {
     const report = await this.getReportById(reportId);
 
     if (!report) {
-      throw new ReportNotFoundError(reportId, messageId);
+      throw new ReportNotFoundError(reportId, callbackQuery);
     }
 
     const comment = await this.getCommentById(report.commentId);
 
     if (!comment) {
-      throw new CommentNotFoundError(report.commentId, messageId);
+      throw new CommentNotFoundError(report.commentId, callbackQuery);
     }
 
     const updatedReport = await this.updateReportStatus(reportId, "pending");
 
-    if (messageId != null) {
+    if (callbackQuery) {
       await this.notificationService.notifyReportStatusChanged({
-        messageId,
+        messageId: callbackQuery.message.message_id,
         comment,
         report: updatedReport,
+        callbackQuery,
       });
     }
 

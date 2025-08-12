@@ -9,10 +9,19 @@ import type {
   CommentModerationStatusesSelectType,
   CommentReportSelectType,
 } from "../../schema.offchain";
+import { ServiceError } from "./errors";
 
 export type ModerationStatus = "pending" | "approved" | "rejected";
 
 export type ResolveAuthorFunction = (author: Hex) => Promise<string | Hex>;
+
+export type TelegramCallbackQuery = {
+  id: string;
+  data: string;
+  message: {
+    message_id: number;
+  };
+};
 
 export type ModerationNotificationServicePendingComment = {
   id: Hex;
@@ -61,14 +70,22 @@ export interface IModerationNotificationsService {
     params: ModerationNotificationServiceNotifyAutomaticClassificationParams,
     status: ModerationNotificationsServiceCommentStatus,
   ) => Promise<number | undefined>;
-  updateMessageWithModerationStatus: (
-    messageId: number,
-    comment: CommentSelectType,
-  ) => Promise<void>;
-  updateMessageWithChangeAction: (
-    messageId: number,
-    comment: CommentSelectType,
-  ) => Promise<void>;
+  updateMessageWithModerationStatus: (params: {
+    messageId: number;
+    comment: CommentSelectType;
+    /**
+     * If set the service will answer the calback query
+     */
+    callbackQuery?: TelegramCallbackQuery;
+  }) => Promise<void>;
+  updateMessageWithChangeAction: (params: {
+    messageId: number;
+    comment: CommentSelectType;
+    /**
+     * If set the service will answer the calback query
+     */
+    callbackQuery?: TelegramCallbackQuery;
+  }) => Promise<void>;
 }
 
 export type ReportsNotificationsServiceNotifyReportParams = {
@@ -80,6 +97,7 @@ export type ReportsNotificationsServiceNotifyReportStatusChangeParams = {
   messageId: number;
   comment: CommentSelectType;
   report: CommentReportSelectType;
+  callbackQuery: TelegramCallbackQuery;
 };
 
 export interface IReportsNotificationsService {
@@ -219,28 +237,28 @@ export interface ICommentReportsService {
      */
     status: CommentReportStatus;
     /**
-     * The message ID of the report for telegram notification
+     * The telegram callback query to reply to
      */
-    messageId?: number;
+    callbackQuery: TelegramCallbackQuery | undefined;
   }): Promise<CommentReportSelectType>;
 
   /**
    * Request a status change for a report
    * @param reportId The ID of the report to request a status change for
-   * @param messageId The message ID of the report for telegram notification
+   * @param callbackQuery The telegram callback query to reply to
    */
   requestStatusChange(
     reportId: string,
-    messageId?: number,
+    callbackQuery?: TelegramCallbackQuery,
   ): Promise<CommentReportSelectType>;
   /**
    * Cancel a status change request for a report
    * @param reportId The ID of the report to cancel the status change for
-   * @param messageId The message ID of the report for telegram notification
+   * @param callbackQuery The telegram callback query to reply to
    */
   cancelStatusChange(
     reportId: string,
-    messageId?: number,
+    callbackQuery?: TelegramCallbackQuery,
   ): Promise<CommentReportSelectType>;
 
   /**
@@ -289,6 +307,14 @@ export interface ITelegramNotificationsService {
       text: string;
     }[],
     extra?: Omit<Convenience.ExtraEditMessageText, "inline_keyboard">,
+  ) => Promise<void>;
+  answerCallbackQueryWithSuccess: (
+    callbackQueryId: string,
+    text: string,
+  ) => Promise<void>;
+  answerCallbackQueryWithError: (
+    callbackQueryId: string,
+    text: string,
   ) => Promise<void>;
 }
 

@@ -776,7 +776,7 @@ describe("CommentModerationService", () => {
 
       const result = await service.updateModerationStatus({
         commentId,
-        messageId: undefined,
+        callbackQuery: undefined,
         status,
         commentRevision: 0,
       });
