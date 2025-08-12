@@ -777,7 +777,7 @@ await fetchComments({
                   Town
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Join the ECP community on Telegram
+                  Open source iOS app
                 </p>
               </CardContent>
               <CardFooter>
@@ -814,7 +814,7 @@ await fetchComments({
                   Paper
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Discover and share content on Ethereum
+                  Web app for browsing content
                 </p>
               </CardContent>
               <CardFooter>
