@@ -7,7 +7,7 @@ import type {
 } from "./types";
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { DB } from "./db";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, lt } from "drizzle-orm";
 import { schema } from "../../schema";
 import type { CommentModerationStatusesSelectType } from "../../schema.offchain";
 import {
@@ -170,6 +170,31 @@ export class PremoderationService implements ICommentPremoderationService {
         })
         .where(eq(schema.comment.id, commentId))
         .returning()
+        .execute();
+
+      if (status === "pending") {
+        // keep the old revisions untouched
+        return updatedComment;
+      }
+
+      // set old pending revisions to same status
+      await this.db
+        .update(schema.commentModerationStatuses)
+        .set({
+          moderationStatus: status,
+        })
+        .where(
+          // new status is not pending, mark all older pending revisions to be of the same status
+          // this solves an issue when someone edits a comment multiple times and it wasn't premoderated
+          and(
+            eq(schema.commentModerationStatuses.commentId, commentId),
+            eq(schema.commentModerationStatuses.moderationStatus, "pending"),
+            lt(
+              schema.commentModerationStatuses.revision,
+              commentModerationStatus.revision,
+            ),
+          ),
+        )
         .execute();
 
       return updatedComment;

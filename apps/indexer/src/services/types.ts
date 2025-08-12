@@ -9,7 +9,6 @@ import type {
   CommentModerationStatusesSelectType,
   CommentReportSelectType,
 } from "../../schema.offchain";
-import { ServiceError } from "./errors";
 
 export type ModerationStatus = "pending" | "approved" | "rejected";
 
