@@ -3,6 +3,7 @@ import { PremoderationService } from "../../src/services/premoderation-service";
 import type {
   ModerationStatus,
   ModerationNotificationServicePendingComment,
+  CommentModerationClassfierResult,
 } from "../../src/services/types";
 import type { CommentSelectType } from "ponder:schema";
 import type { Hex } from "@ecp.eth/sdk/core";
@@ -15,9 +16,30 @@ const db = drizzle.mock({
 });
 
 const service = new PremoderationService({
-  defaultModerationStatus: "pending",
+  classificationThreshold: 50,
   db,
 });
+
+const mockLowerRiskClassifierResult: CommentModerationClassfierResult = {
+  score: 0.49,
+  labels: { spam: 0.49 },
+  action: "classified",
+  save: vi.fn(),
+};
+
+const mockHighRiskClassifierResult: CommentModerationClassfierResult = {
+  score: 0.51,
+  labels: { spam: 0.51 },
+  action: "classified",
+  save: vi.fn(),
+};
+
+const mockSkippedLowRiskClassifierResult: CommentModerationClassfierResult = {
+  score: 0,
+  labels: { spam: 0 },
+  action: "skipped",
+  save: vi.fn(),
+};
 
 const commentFindFirstMock = vi.spyOn(db.query.comment, "findFirst");
 const commentModerationStatusesFindFirstMock = vi.spyOn(
@@ -95,6 +117,7 @@ describe("PremoderationService", () => {
         parentId: "0x789" as Hex,
         revision: 0,
       };
+
       const mockCachedStatus: CommentModerationStatusesSelectType = {
         createdAt: new Date(),
         moderationStatus: "approved",
@@ -107,7 +130,10 @@ describe("PremoderationService", () => {
         mockCachedStatus,
       );
 
-      const result = await service.moderate(mockComment);
+      const result = await service.moderate(
+        mockComment,
+        mockHighRiskClassifierResult,
+      );
 
       expect(result).toEqual({
         action: "skipped",
@@ -118,7 +144,7 @@ describe("PremoderationService", () => {
       expect(dbExecuteInsertMock).not.toHaveBeenCalled();
     });
 
-    test("should return default status if no cached status exists", async () => {
+    test("should return pending status given no cached status exists and classifier result is higher than threshold", async () => {
       const mockComment: ModerationNotificationServicePendingComment = {
         id: "0x123" as Hex,
         content: "test comment",
@@ -134,7 +160,96 @@ describe("PremoderationService", () => {
         undefined,
       );
 
-      const result = await service.moderate(mockComment);
+      const result = await service.moderate(
+        mockComment,
+        mockHighRiskClassifierResult,
+      );
+
+      expect(result).toEqual({
+        action: "premoderated",
+        status: "pending",
+        changedAt: expect.any(Date),
+        save: expect.any(Function),
+      });
+
+      // Test save function
+      await result.save();
+      expect(dbInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbExecuteInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertValuesMock).toHaveBeenCalledWith({
+        commentId: mockComment.id,
+        moderationStatus: "pending",
+        updatedAt: expect.any(Date),
+        revision: mockComment.revision,
+      });
+    });
+
+    test("should return approved status given no cached status exists and classifier result is lower than threshold", async () => {
+      const mockComment: ModerationNotificationServicePendingComment = {
+        id: "0x123" as Hex,
+        content: "test comment",
+        channelId: BigInt(1),
+        author: "0x456" as Hex,
+        references: [],
+        targetUri: "test://uri",
+        parentId: "0x789" as Hex,
+        revision: 0,
+      };
+
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce(
+        undefined,
+      );
+
+      const result = await service.moderate(
+        mockComment,
+        mockLowerRiskClassifierResult,
+      );
+
+      expect(result).toEqual({
+        action: "premoderated",
+        status: "approved",
+        changedAt: expect.any(Date),
+        save: expect.any(Function),
+      });
+
+      // Test save function
+      await result.save();
+      expect(dbInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbExecuteInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertValuesMock).toHaveBeenCalledWith({
+        commentId: mockComment.id,
+        moderationStatus: "approved",
+        updatedAt: expect.any(Date),
+        revision: mockComment.revision,
+      });
+    });
+
+    test("should return pending status no matter the risk score given classifier result is skipped", async () => {
+      const mockComment: ModerationNotificationServicePendingComment = {
+        id: "0x123" as Hex,
+        content: "test comment",
+        channelId: BigInt(1),
+        author: "0x456" as Hex,
+        references: [],
+        targetUri: "test://uri",
+        parentId: "0x789" as Hex,
+        revision: 0,
+      };
+
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce(
+        undefined,
+      );
+
+      const result = await service.moderate(
+        mockComment,
+        mockSkippedLowRiskClassifierResult,
+      );
 
       expect(result).toEqual({
         action: "premoderated",
@@ -181,6 +296,7 @@ describe("PremoderationService", () => {
       const result = await service.moderateUpdate(
         mockComment,
         mockExistingComment,
+        mockHighRiskClassifierResult,
       );
 
       expect(result).toEqual({
@@ -192,7 +308,7 @@ describe("PremoderationService", () => {
       expect(dbExecuteInsertMock).not.toHaveBeenCalled();
     });
 
-    test("should set status to pending if content has changed", async () => {
+    test("should set status to pending given the change is higher risk than the threshold", async () => {
       const mockComment: ModerationNotificationServicePendingComment = {
         id: "0x123" as Hex,
         content: "updated comment",
@@ -217,6 +333,107 @@ describe("PremoderationService", () => {
       const result = await service.moderateUpdate(
         mockComment,
         mockExistingComment,
+        mockHighRiskClassifierResult,
+      );
+
+      expect(result).toEqual({
+        action: "premoderated",
+        status: "pending",
+        changedAt: expect.any(Date),
+        save: expect.any(Function),
+      });
+
+      await result.save();
+
+      expect(dbInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbExecuteInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertValuesMock).toHaveBeenCalledWith({
+        commentId: mockComment.id,
+        moderationStatus: "pending",
+        updatedAt: expect.any(Date),
+        revision: mockComment.revision,
+      });
+    });
+
+    test("should set status to pending given the change is lower risk than the threshold", async () => {
+      const mockComment: ModerationNotificationServicePendingComment = {
+        id: "0x123" as Hex,
+        content: "updated comment",
+        channelId: BigInt(1),
+        author: "0x456" as Hex,
+        references: [],
+        targetUri: "test://uri",
+        parentId: "0x789" as Hex,
+        revision: 0,
+      };
+      const mockExistingComment = {
+        id: "0x123" as Hex,
+        content: "original comment",
+        moderationStatus: "approved" as ModerationStatus,
+        moderationStatusChangedAt: new Date(),
+      } as CommentSelectType;
+
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce(
+        undefined,
+      );
+
+      const result = await service.moderateUpdate(
+        mockComment,
+        mockExistingComment,
+        mockLowerRiskClassifierResult,
+      );
+
+      expect(result).toEqual({
+        action: "premoderated",
+        status: "approved",
+        changedAt: expect.any(Date),
+        save: expect.any(Function),
+      });
+
+      await result.save();
+
+      expect(dbInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbExecuteInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertValuesMock).toHaveBeenCalledWith({
+        commentId: mockComment.id,
+        moderationStatus: "approved",
+        updatedAt: expect.any(Date),
+        revision: mockComment.revision,
+      });
+    });
+
+    test("should set status to pending no matter the risk score given classifier result is skipped", async () => {
+      const mockComment: ModerationNotificationServicePendingComment = {
+        id: "0x123" as Hex,
+        content: "updated comment",
+        channelId: BigInt(1),
+        author: "0x456" as Hex,
+        references: [],
+        targetUri: "test://uri",
+        parentId: "0x789" as Hex,
+        revision: 0,
+      };
+      const mockExistingComment = {
+        id: "0x123" as Hex,
+        content: "original comment",
+        moderationStatus: "approved" as ModerationStatus,
+        moderationStatusChangedAt: new Date(),
+      } as CommentSelectType;
+
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce(
+        undefined,
+      );
+
+      const result = await service.moderateUpdate(
+        mockComment,
+        mockExistingComment,
+        mockSkippedLowRiskClassifierResult,
       );
 
       expect(result).toEqual({

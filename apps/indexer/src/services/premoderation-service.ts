@@ -4,6 +4,7 @@ import type {
   ICommentPremoderationService,
   CommentPremoderationServiceModerateResult,
   ModerationStatus,
+  CommentModerationClassfierResult,
 } from "./types";
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { DB } from "./db";
@@ -16,21 +17,22 @@ import {
 } from "./errors";
 
 type PremoderationServiceOptions = {
-  defaultModerationStatus: ModerationStatus;
+  classificationThreshold: number;
   db: DB;
 };
 
 export class PremoderationService implements ICommentPremoderationService {
-  private defaultModerationStatus: ModerationStatus;
+  private classificationThreshold: number;
   private db: DB;
 
   constructor(options: PremoderationServiceOptions) {
-    this.defaultModerationStatus = options.defaultModerationStatus;
+    this.classificationThreshold = options.classificationThreshold;
     this.db = options.db;
   }
 
   async moderate(
     comment: ModerationNotificationServicePendingComment,
+    classifierResult: CommentModerationClassfierResult,
   ): Promise<CommentPremoderationServiceModerateResult> {
     const cachedStatus = await this.getStatusByCommentId(
       comment.id,
@@ -48,7 +50,11 @@ export class PremoderationService implements ICommentPremoderationService {
     }
 
     const changedAt = new Date();
-    const status = this.defaultModerationStatus;
+    const status =
+      classifierResult.score * 100 < this.classificationThreshold &&
+      classifierResult.action === "classified"
+        ? "approved"
+        : "pending";
 
     return {
       action: "premoderated",
@@ -71,6 +77,7 @@ export class PremoderationService implements ICommentPremoderationService {
   async moderateUpdate(
     comment: ModerationNotificationServicePendingComment,
     existingComment: CommentSelectType,
+    classifierResult: CommentModerationClassfierResult,
   ): Promise<CommentPremoderationServiceModerateResult> {
     if (comment.content === existingComment.content) {
       return {
@@ -95,7 +102,12 @@ export class PremoderationService implements ICommentPremoderationService {
       };
     }
 
-    const status = "pending" as const;
+    const status =
+      classifierResult.score * 100 < this.classificationThreshold &&
+      classifierResult.action === "classified"
+        ? "approved"
+        : "pending";
+
     const changedAt = new Date();
 
     return {

@@ -2558,85 +2558,85 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedConfigFontSchemaType</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedConfigSchemaInputType</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedConfigSchemaOutputType</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedConfigSupportedChainIdsSchemaType</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedConfigThemeColorsSchemaType</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedConfigThemeOtherSchemaType</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedConfigThemePaletteSchemaType</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedConfigThemeSchemaType</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedGetDimensionsEventSchemaType</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedResizedEventSchemaType</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedConfigFontSchema</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedConfigFontSizeSchema</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedConfigSchema</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedConfigSupportedChainIdsSchema</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2648,37 +2648,37 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedConfigThemeColorsSchema</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedConfigThemeOtherSchema</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedConfigThemePaletteSchema</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedConfigThemeSchema</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedGetDimensionsEventSchema</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedResizedEventSchema</loc>
-    <lastmod>2025-07-18T09:46:11.000Z</lastmod>
+    <lastmod>2025-08-13T13:53:19.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>

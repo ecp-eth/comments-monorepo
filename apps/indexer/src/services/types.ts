@@ -180,11 +180,13 @@ export type CommentPremoderationServiceModerateParams =
 export interface ICommentPremoderationService {
   moderate: (
     comment: ModerationNotificationServicePendingComment,
+    classifierResult: CommentModerationClassfierResult,
   ) => Promise<CommentPremoderationServiceModerateResult>;
 
   moderateUpdate: (
     comment: ModerationNotificationServicePendingComment,
     existingComment: CommentSelectType,
+    classifierResult: CommentModerationClassfierResult,
   ) => Promise<CommentPremoderationServiceModerateResult>;
 
   updateStatus: (params: {
