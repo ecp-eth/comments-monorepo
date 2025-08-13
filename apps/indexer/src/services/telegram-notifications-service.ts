@@ -6,7 +6,6 @@ import {
   type WebhookCallbackData,
 } from "../utils/webhook";
 import type { Convenience } from "telegraf/types";
-import { ServiceError } from "./errors";
 
 type TelegramNotificationsServiceOptions =
   | {
@@ -15,6 +14,12 @@ type TelegramNotificationsServiceOptions =
       telegramChannelId: string;
       telegramWebhookUrl: string;
       telegramWebhookSecret: string;
+      /**
+       * Custom API root URL for the Telegram bot.
+       *
+       * This is useful for local development.
+       */
+      telegramApiRootUrl?: string;
     }
   | {
       enabled: false;
@@ -39,7 +44,11 @@ export class TelegramNotificationsService
     if (options.enabled) {
       this.state = {
         enabled: true,
-        bot: new Telegraf(options.telegramBotToken),
+        bot: new Telegraf(options.telegramBotToken, {
+          telegram: {
+            apiRoot: options.telegramApiRootUrl,
+          },
+        }),
         channelId: options.telegramChannelId,
         telegramWebhookUrl: options.telegramWebhookUrl,
         telegramWebhookSecret: options.telegramWebhookSecret,
@@ -73,6 +82,26 @@ export class TelegramNotificationsService
     }
 
     return decryptWebhookCallbackData(this.state.telegramWebhookSecret, data);
+  }
+
+  async answerCallbackQueryWithSuccess(callbackQueryId: string, text: string) {
+    if (!this.state.enabled) {
+      console.log("TelegramNotificationsService: disabled");
+      return;
+    }
+
+    await this.state.bot.telegram.answerCbQuery(callbackQueryId, text);
+  }
+
+  async answerCallbackQueryWithError(callbackQueryId: string, text: string) {
+    if (!this.state.enabled) {
+      console.log("TelegramNotificationsService: disabled");
+      return;
+    }
+
+    await this.state.bot.telegram.answerCbQuery(callbackQueryId, text, {
+      show_alert: true,
+    });
   }
 
   async sendMessage(message: string, extra?: Convenience.ExtraReplyMessage) {
@@ -128,32 +157,6 @@ export class TelegramNotificationsService
     );
 
     return msg;
-  }
-
-  async sendErrorReplyToMessage(messageId: number, error: ServiceError) {
-    if (!this.state.enabled) {
-      console.error("TelegramNotificationsService: ", { messageId, error });
-
-      return;
-    }
-
-    await this.state.bot.telegram.sendMessage(
-      this.state.channelId,
-      `
-      ❌ Error:
-
-      ${error.message}
-      `.trim(),
-      {
-        reply_parameters: {
-          message_id: messageId,
-        },
-        parse_mode: "Markdown",
-        link_preview_options: {
-          is_disabled: true,
-        },
-      },
-    );
   }
 
   async updateMessageWithWebhookActions(

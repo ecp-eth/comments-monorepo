@@ -9,6 +9,7 @@ import type {
   ModerationNotificationsServiceCommentStatus,
   ITelegramNotificationsService,
   ResolveAuthorFunction,
+  TelegramCallbackQuery,
 } from "./types";
 import type { CommentSelectType } from "ponder:schema";
 import { isZeroHex } from "@ecp.eth/sdk/core";
@@ -140,10 +141,15 @@ export class ModerationNotificationsService
     }
   }
 
-  async updateMessageWithModerationStatus(
-    messageId: number,
-    comment: CommentSelectType,
-  ) {
+  async updateMessageWithModerationStatus({
+    messageId,
+    comment,
+    callbackQuery,
+  }: {
+    messageId: number;
+    comment: CommentSelectType;
+    callbackQuery?: TelegramCallbackQuery;
+  }) {
     if (!this.enabled) {
       console.log(
         "ModerationNotificationsService#updateMessageWithModerationStatus: disabled",
@@ -169,17 +175,36 @@ export class ModerationNotificationsService
           },
         ],
       );
+
+      if (callbackQuery) {
+        await this.telegramNotificationsService.answerCallbackQueryWithSuccess(
+          callbackQuery.id,
+          "Comment moderation status updated",
+        );
+      }
     } catch (e) {
       console.error("ModerationNotificationsService: error editing message", e);
+
+      if (callbackQuery) {
+        await this.telegramNotificationsService.answerCallbackQueryWithError(
+          callbackQuery.id,
+          "Error editing message",
+        );
+      }
 
       throw e;
     }
   }
 
-  async updateMessageWithChangeAction(
-    messageId: number,
-    comment: CommentSelectType,
-  ) {
+  async updateMessageWithChangeAction({
+    messageId,
+    comment,
+    callbackQuery,
+  }: {
+    messageId: number;
+    comment: CommentSelectType;
+    callbackQuery?: TelegramCallbackQuery;
+  }) {
     if (!this.enabled) {
       console.log(
         "ModerationNotificationsService#updateMessageWithChangeAction: disabled",
@@ -232,6 +257,13 @@ export class ModerationNotificationsService
           },
         ],
       );
+
+      if (callbackQuery) {
+        await this.telegramNotificationsService.answerCallbackQueryWithSuccess(
+          callbackQuery.id,
+          "Menu updated",
+        );
+      }
     } catch (e) {
       if (e instanceof CommentLengthLimitExceededError) {
         return;
@@ -241,6 +273,13 @@ export class ModerationNotificationsService
         "ModerationNotificationsService: error editing message with change action",
         e,
       );
+
+      if (callbackQuery) {
+        await this.telegramNotificationsService.answerCallbackQueryWithError(
+          callbackQuery.id,
+          "Error editing message",
+        );
+      }
 
       throw e;
     }

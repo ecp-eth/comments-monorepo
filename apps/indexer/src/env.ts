@@ -46,6 +46,7 @@ const adminTelegramBotSchema = z.object({
 const EnvSchema = z
   .object({
     DATABASE_URL: z.string().url(),
+    DATABASE_SCHEMA: z.string().nonempty(),
     NEYNAR_API_KEY: z.string().min(1),
     SENTRY_DSN: z.string().optional(),
 
@@ -79,6 +80,7 @@ const EnvSchema = z
       .default("0")
       .transform((val) => val === "1"),
     MODERATION_MBD_API_KEY: z.string().optional(),
+    MODERATION_TELEGRAM_API_ROOT_URL: z.string().url().optional(),
     MODERATION_TELEGRAM_BOT_TOKEN: z.string().optional(),
     MODERATION_TELEGRAM_CHANNEL_ID: z.string().optional(),
     MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
@@ -174,19 +176,13 @@ const EnvSchema = z
     return true;
   });
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace NodeJS {
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface ProcessEnv extends z.infer<typeof EnvSchema> {}
-  }
-}
-
 const _env = EnvSchema.safeParse(process.env);
 
 if (!_env.success) {
-  console.error(_env.error.format());
-  throw new Error("Invalid environment variables:" + _env.error.format());
+  throw new Error(
+    "Invalid environment variables:" +
+      JSON.stringify(_env.error.format(), null, 2),
+  );
 }
 
 export const env = _env.data;

@@ -22,7 +22,7 @@ const reportActionWebhookCallbackDataSchema = z.object({
     "report-set-as-pending",
     "report-cancel",
   ]),
-  reportId: HexSchema,
+  reportId: z.string().uuid(),
   timestamp: z.number().int().nonnegative(),
 });
 
@@ -94,10 +94,6 @@ const MAX_WEBHOOK_DATA_SIZE = 64;
 // Compact binary format for webhook data
 function serializeWebhookData(data: WebhookCallbackData): Buffer {
   const actionByte = getActionByte(data.action); // 1 B
-  const idBuffer = Buffer.from(
-    "commentId" in data ? data.commentId.slice(2) : data.reportId.slice(2),
-    "hex",
-  ); // Remove "0x" prefix, 32 B
   const timestampBuffer = Buffer.alloc(4); // 4B
   // Convert milliseconds to seconds to fit in 32-bit unsigned integer
   const timestampInSeconds = Math.floor(data.timestamp / 1000);
@@ -110,7 +106,17 @@ function serializeWebhookData(data: WebhookCallbackData): Buffer {
     commentRevisionBuffer.writeUInt16BE(data.commentRevision);
   }
 
-  // 39 B
+  let idBuffer: Buffer;
+
+  if ("reportId" in data) {
+    // 36B
+    idBuffer = Buffer.from(data.reportId);
+  } else {
+    // 32B without 0x prefix
+    idBuffer = Buffer.from(data.commentId.slice(2), "hex");
+  }
+
+  // 39B for commentId, 43B for reportId
   return Buffer.concat([
     Buffer.from([actionByte]),
     idBuffer,
@@ -122,25 +128,34 @@ function serializeWebhookData(data: WebhookCallbackData): Buffer {
 function deserializeWebhookData(buffer: Buffer): WebhookCallbackData {
   const actionByte = buffer[0] ?? -1;
   const action = getActionFromByte(actionByte);
-  const id = ("0x" + buffer.subarray(1, 33).toString("hex")) as `0x${string}`;
-  const timestampInSeconds = buffer.readUInt32BE(33);
-  const commentRevision = buffer.readUint16BE(37);
-  // Convert seconds back to milliseconds
-  const timestamp = timestampInSeconds * 1000;
 
   switch (action) {
     case "moderation-cancel":
     case "moderation-change-status":
     case "moderation-set-as-approved":
     case "moderation-set-as-pending":
-    case "moderation-set-as-rejected":
+    case "moderation-set-as-rejected": {
+      const id = ("0x" +
+        buffer.subarray(1, 33).toString("hex")) as `0x${string}`;
+      const timestampInSeconds = buffer.readUInt32BE(33);
+      const commentRevision = buffer.readUint16BE(37);
+      // Convert seconds back to milliseconds
+      const timestamp = timestampInSeconds * 1000;
+
       return { action, commentId: id, timestamp, commentRevision };
+    }
     case "report-cancel":
     case "report-change-status":
     case "report-set-as-resolved":
     case "report-set-as-closed":
-    case "report-set-as-pending":
+    case "report-set-as-pending": {
+      const id = buffer.subarray(1, 37).toString("ascii"); // UUID
+      const timestampInSeconds = buffer.readUInt32BE(37);
+      // Convert seconds back to milliseconds
+      const timestamp = timestampInSeconds * 1000;
+
       return { action, reportId: id, timestamp };
+    }
     default:
       throw new Error(`Invalid action: ${action}`);
   }

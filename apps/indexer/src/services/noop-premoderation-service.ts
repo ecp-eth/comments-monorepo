@@ -4,6 +4,7 @@ import type {
   ICommentPremoderationService,
   CommentPremoderationServiceModerateResult,
 } from "./types";
+import type { CommentModerationStatusesSelectType } from "../../schema.offchain";
 
 export class NoopPremoderationService implements ICommentPremoderationService {
   async moderate(): Promise<CommentPremoderationServiceModerateResult> {
@@ -28,6 +29,26 @@ export class NoopPremoderationService implements ICommentPremoderationService {
   }
 
   async updateStatus(): Promise<CommentSelectType | undefined> {
+    return undefined;
+  }
+
+  async getPendingComment(): Promise<CommentSelectType | undefined> {
+    return undefined;
+  }
+
+  async getStatusByCommentId(): Promise<
+    CommentModerationStatusesSelectType | undefined
+  > {
+    return undefined;
+  }
+
+  async getLatestStatusByCommentId(): Promise<
+    CommentModerationStatusesSelectType | undefined
+  > {
+    return undefined;
+  }
+
+  async getCommentById(): Promise<CommentSelectType | undefined> {
     return undefined;
   }
 }

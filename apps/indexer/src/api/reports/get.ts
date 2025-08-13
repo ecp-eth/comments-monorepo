@@ -3,13 +3,15 @@ import {
   APIErrorResponseSchema,
   InputReportsCursorSchema,
 } from "../../lib/schemas";
-import { getIndexerDb } from "../../management/db";
 import { authMiddleware } from "../../middleware/auth";
 import {
   getReportsCursor,
   IndexerAPIReportsListPendingOutputSchema,
   IndexerAPIReportStatusSchema,
 } from "@ecp.eth/sdk/indexer";
+import { db } from "../../services";
+import { and, asc, desc, eq, gt, lt, or } from "drizzle-orm";
+import { schema } from "../../../schema";
 
 const GetReportsQuerySchema = z.object({
   cursor: InputReportsCursorSchema.optional().openapi({
@@ -67,85 +69,78 @@ const getReportsRoute = createRoute({
 export function setupGetReports(app: OpenAPIHono) {
   app.openapi(getReportsRoute, async (c) => {
     const { cursor, limit, sort, status } = c.req.valid("query");
-    const db = getIndexerDb();
 
     const hasPreviousReportsQuery = cursor
-      ? db
-          .selectFrom("comment_reports")
-          .select("id")
-          .where((eb) => {
-            const conditions = [];
-
-            conditions.push(eb("status", "=", status));
-
-            if (sort === "asc") {
-              conditions.push(
-                eb.or([
-                  eb.and([
-                    eb("created_at", "=", cursor.createdAt),
-                    eb("id", "<", cursor.id),
-                  ]),
-                  eb("created_at", "<", cursor.createdAt),
-                ]),
-              );
-            }
-
-            if (sort === "desc") {
-              conditions.push(
-                eb.or([
-                  eb.and([
-                    eb("created_at", "=", cursor.createdAt),
-                    eb("id", ">", cursor.id),
-                  ]),
-                  eb("created_at", ">", cursor.createdAt),
-                ]),
-              );
-            }
-
-            return eb.and(conditions);
+      ? db.query.commentReports
+          .findFirst({
+            columns: {
+              id: true,
+            },
+            where: and(
+              eq(schema.commentReports.status, status),
+              sort === "asc"
+                ? or(
+                    and(
+                      eq(schema.commentReports.createdAt, cursor.createdAt),
+                      lt(schema.commentReports.id, cursor.id),
+                    ),
+                    lt(schema.commentReports.createdAt, cursor.createdAt),
+                  )
+                : undefined,
+              sort === "desc"
+                ? or(
+                    and(
+                      eq(schema.commentReports.createdAt, cursor.createdAt),
+                      gt(schema.commentReports.id, cursor.id),
+                    ),
+                    gt(schema.commentReports.createdAt, cursor.createdAt),
+                  )
+                : undefined,
+            ),
+            orderBy: [
+              sort === "desc"
+                ? asc(schema.commentReports.createdAt)
+                : desc(schema.commentReports.createdAt),
+              sort === "desc"
+                ? asc(schema.commentReports.id)
+                : desc(schema.commentReports.id),
+            ],
           })
-          .orderBy("created_at", sort === "desc" ? "asc" : "desc")
-          .orderBy("id", sort === "desc" ? "asc" : "desc")
-          .limit(1)
-          .executeTakeFirst()
+          .execute()
       : undefined;
 
-    const reportsQuery = db
-      .selectFrom("comment_reports")
-      .selectAll()
-      .where((eb) => {
-        const conditions = [];
-
-        conditions.push(eb("status", "=", status));
-
-        if (cursor) {
-          if (sort === "desc") {
-            conditions.push(
-              eb.or([
-                eb.and([
-                  eb("created_at", "=", cursor.createdAt),
-                  eb("id", "<", cursor.id),
-                ]),
-                eb("created_at", "<", cursor.createdAt),
-              ]),
-            );
-          } else {
-            conditions.push(
-              eb.or([
-                eb.and([
-                  eb("created_at", "=", cursor.createdAt),
-                  eb("id", ">", cursor.id),
-                ]),
-                eb("created_at", ">", cursor.createdAt),
-              ]),
-            );
-          }
-        }
-        return eb.and(conditions);
-      })
-      .orderBy("created_at", sort === "desc" ? "desc" : "asc")
-      .orderBy("id", sort === "desc" ? "desc" : "asc")
-      .limit(limit + 1);
+    const reportsQuery = db.query.commentReports.findMany({
+      where: and(
+        eq(schema.commentReports.status, status),
+        sort === "asc" && cursor
+          ? or(
+              and(
+                eq(schema.commentReports.createdAt, cursor.createdAt),
+                gt(schema.commentReports.id, cursor.id),
+              ),
+              gt(schema.commentReports.createdAt, cursor.createdAt),
+            )
+          : undefined,
+        sort === "desc" && cursor
+          ? or(
+              and(
+                eq(schema.commentReports.createdAt, cursor.createdAt),
+                lt(schema.commentReports.id, cursor.id),
+              ),
+              lt(schema.commentReports.createdAt, cursor.createdAt),
+            )
+          : undefined,
+      ),
+      orderBy: [
+        sort === "desc"
+          ? desc(schema.commentReports.createdAt)
+          : asc(schema.commentReports.createdAt),
+        sort === "desc"
+          ? desc(schema.commentReports.id)
+          : asc(schema.commentReports.id),
+      ],
+      limit: limit + 1,
+    });
 
     const [reports, previousReport] = await Promise.all([
       reportsQuery.execute(),
@@ -167,19 +162,19 @@ export function setupGetReports(app: OpenAPIHono) {
       {
         results: reports.map((report) => ({
           id: report.id,
-          commentId: report.comment_id,
+          commentId: report.commentId,
           reportee: report.reportee,
           message: report.message,
-          createdAt: report.created_at,
-          updatedAt: report.updated_at,
+          createdAt: report.createdAt,
+          updatedAt: report.updatedAt,
           status: report.status,
         })),
         pagination: {
           endCursor: endReport
-            ? getReportsCursor(endReport.id, endReport.created_at)
+            ? getReportsCursor(endReport.id, endReport.createdAt)
             : undefined,
           startCursor: startReport
-            ? getReportsCursor(startReport.id, startReport.created_at)
+            ? getReportsCursor(startReport.id, startReport.createdAt)
             : undefined,
           limit,
           hasNext: hasNextPage,

@@ -8,7 +8,6 @@ import type {
   ICommentModerationClassifierService,
   ICommentPremoderationService,
   IModerationNotificationsService,
-  ICommentDbService,
 } from "../../../src/services/types";
 
 describe("CommentModerationService", () => {
@@ -24,17 +23,15 @@ describe("CommentModerationService", () => {
     moderate: vi.fn(),
     moderateUpdate: vi.fn(),
     updateStatus: vi.fn(),
+    getCommentById: vi.fn(),
+    getPendingComment: vi.fn(),
+    getStatusByCommentId: vi.fn(),
+    getLatestStatusByCommentId: vi.fn(),
   };
 
   const mockClassifierService: ICommentModerationClassifierService = {
     classify: vi.fn(),
     classifyUpdate: vi.fn(),
-  };
-
-  const mockCommentDbService: ICommentDbService = {
-    getCommentById: vi.fn(),
-    updateCommentModerationStatus: vi.fn(),
-    getCommentPendingModeration: vi.fn(),
   };
 
   const knownReactions = new Set(["👍", "❤️"]);
@@ -48,7 +45,6 @@ describe("CommentModerationService", () => {
       notificationService: mockNotificationService,
       premoderationService: mockPremoderationService,
       classifierService: mockClassifierService,
-      commentDbService: mockCommentDbService,
     });
   });
 
@@ -780,7 +776,7 @@ describe("CommentModerationService", () => {
 
       const result = await service.updateModerationStatus({
         commentId,
-        messageId: undefined,
+        callbackQuery: undefined,
         status,
         commentRevision: 0,
       });

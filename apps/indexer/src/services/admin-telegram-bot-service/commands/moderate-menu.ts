@@ -47,7 +47,7 @@ export const moderateMenu = new Menu<AdminTelegramBotServiceContext>(
         throw new Error(`Expected show comment content command`);
       }
 
-      const comment = await ctx.commentDbService.getCommentById(
+      const comment = await ctx.premoderationService.getCommentById(
         command.commentId,
       );
 
@@ -87,7 +87,8 @@ const moderateChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
 )
   .dynamic(async (ctx, range) => {
     const command = moderationCommandParser.parse(ctx.match);
-    const comment = await ctx.commentDbService.getCommentById(
+
+    const comment = await ctx.premoderationService.getCommentById(
       command.commentId,
     );
 
@@ -125,7 +126,7 @@ const moderateChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
           }
 
           const nextStatus = command.status;
-          const comment = await ctx.commentDbService.getCommentById(
+          const comment = await ctx.premoderationService.getCommentById(
             command.commentId,
           );
 
@@ -145,12 +146,11 @@ const moderateChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
             return ctx.menu.close();
           }
 
-          const updatedComment =
-            await ctx.commentDbService.updateCommentModerationStatus({
-              commentId: comment.id,
-              commentRevision: comment.revision,
-              status: nextStatus,
-            });
+          const updatedComment = await ctx.premoderationService.updateStatus({
+            commentId: comment.id,
+            commentRevision: comment.revision,
+            status: nextStatus,
+          });
 
           if (!updatedComment) {
             await ctx.editMessageText("❌ Failed to update comment status.");

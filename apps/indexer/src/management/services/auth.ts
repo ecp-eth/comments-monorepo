@@ -1,26 +1,25 @@
-import { Kysely } from "kysely";
-import type { IndexerSchemaDB } from "../migrations";
+import { eq } from "drizzle-orm";
+import type { DB } from "../../services/db";
+import { schema } from "../../../schema";
 
 export class ManagementAuthService {
-  constructor(private db: Kysely<IndexerSchemaDB>) {}
+  constructor(private db: DB) {}
 
   async getPublicKey(keyId: string): Promise<string | null> {
-    const key = await this.db
-      .selectFrom("api_keys")
-      .select("public_key")
-      .where("id", "=", keyId)
-      .executeTakeFirst();
+    const key = await this.db.query.apiKeys.findFirst({
+      where: eq(schema.apiKeys.id, keyId),
+    });
 
     if (!key) {
       return null;
     }
 
     await this.db
-      .updateTable("api_keys")
-      .set({ last_used_at: new Date() })
-      .where("id", "=", keyId)
+      .update(schema.apiKeys)
+      .set({ lastUsedAt: new Date() })
+      .where(eq(schema.apiKeys.id, keyId))
       .execute();
 
-    return key.public_key;
+    return key.publicKey;
   }
 }

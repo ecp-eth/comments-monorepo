@@ -5,7 +5,7 @@ import type {
   ICommentModerationClassifierService,
   ICommentPremoderationService,
   IModerationNotificationsService,
-  ICommentDbService,
+  TelegramCallbackQuery,
 } from "../../services/types";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
@@ -19,7 +19,6 @@ interface CommentModerationServiceOptions {
   notificationService: IModerationNotificationsService;
   premoderationService: ICommentPremoderationService;
   classifierService: ICommentModerationClassifierService;
-  commentDbService: ICommentDbService;
 }
 
 export interface ModerationStatusResult {
@@ -36,14 +35,12 @@ export class CommentModerationService {
   private notificationService: IModerationNotificationsService;
   private classifierService: ICommentModerationClassifierService;
   private premoderationService: ICommentPremoderationService;
-  private commentDbService: ICommentDbService;
 
   constructor(options: CommentModerationServiceOptions) {
     this.knownReactions = options.knownReactions;
     this.notificationService = options.notificationService;
     this.classifierService = options.classifierService;
     this.premoderationService = options.premoderationService;
-    this.commentDbService = options.commentDbService;
   }
 
   async moderate(
@@ -214,7 +211,7 @@ export class CommentModerationService {
   async updateModerationStatus({
     commentId,
     commentRevision,
-    messageId,
+    callbackQuery,
     status,
   }: {
     commentId: Hex;
@@ -222,7 +219,7 @@ export class CommentModerationService {
      * If omitted it will update the latest revision and all older pending revisions.
      */
     commentRevision: number | undefined;
-    messageId: number | undefined;
+    callbackQuery: TelegramCallbackQuery | undefined;
     status: ModerationStatus;
   }): Promise<CommentSelectType> {
     const comment = await this.premoderationService.updateStatus({
@@ -232,43 +229,52 @@ export class CommentModerationService {
     });
 
     if (!comment) {
-      throw new CommentNotFoundError(commentId, messageId);
+      throw new CommentNotFoundError(commentId, callbackQuery);
     }
 
-    if (messageId) {
-      await this.notificationService.updateMessageWithModerationStatus(
-        messageId,
+    if (callbackQuery) {
+      await this.notificationService.updateMessageWithModerationStatus({
+        messageId: callbackQuery.message.message_id,
         comment,
-      );
+        callbackQuery,
+      });
     }
 
     return comment;
   }
 
-  async requestStatusChange(messageId: number, commentId: Hex): Promise<void> {
-    const comment = await this.commentDbService.getCommentById(commentId);
+  async requestStatusChange(
+    commentId: Hex,
+    callbackQuery: TelegramCallbackQuery,
+  ): Promise<void> {
+    const comment = await this.premoderationService.getCommentById(commentId);
 
     if (!comment) {
-      throw new CommentNotFoundError(commentId, messageId);
+      throw new CommentNotFoundError(commentId, callbackQuery);
     }
 
-    await this.notificationService.updateMessageWithChangeAction(
-      messageId,
+    await this.notificationService.updateMessageWithChangeAction({
+      messageId: callbackQuery.message.message_id,
       comment,
-    );
+      callbackQuery,
+    });
   }
 
-  async cancelStatusChange(messageId: number, commentId: Hex): Promise<void> {
-    const comment = await this.commentDbService.getCommentById(commentId);
+  async cancelStatusChange(
+    commentId: Hex,
+    callbackQuery: TelegramCallbackQuery,
+  ): Promise<void> {
+    const comment = await this.premoderationService.getCommentById(commentId);
 
     if (!comment) {
-      throw new CommentNotFoundError(commentId, messageId);
+      throw new CommentNotFoundError(commentId, callbackQuery);
     }
 
-    await this.notificationService.updateMessageWithModerationStatus(
-      messageId,
+    await this.notificationService.updateMessageWithChangeAction({
+      messageId: callbackQuery.message.message_id,
       comment,
-    );
+      callbackQuery,
+    });
   }
 
   private createReactionModerationStatusResult(): ModerationStatusResult {

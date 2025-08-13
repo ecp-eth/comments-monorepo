@@ -71,7 +71,7 @@ export function setupChangeCommentModerationStatus(app: OpenAPIHono) {
       await commentModerationService.updateModerationStatus({
         commentId,
         commentRevision: revision,
-        messageId: undefined,
+        callbackQuery: undefined,
         status: moderationStatus,
       });
 

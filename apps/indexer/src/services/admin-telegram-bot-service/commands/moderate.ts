@@ -30,7 +30,9 @@ export class ModerateCommand implements IAdminTelegramBotServiceCommand {
         );
       }
 
-      const comment = await ctx.commentDbService.getCommentById(commentId.data);
+      const comment = await ctx.premoderationService.getCommentById(
+        commentId.data,
+      );
 
       if (!comment) {
         return ctx.reply(

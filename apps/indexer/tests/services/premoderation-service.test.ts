@@ -1,40 +1,86 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { PremoderationService } from "../../src/services/premoderation-service";
 import type {
-  IPremoderationCacheService,
-  ICommentDbService,
   ModerationStatus,
   ModerationNotificationServicePendingComment,
-  PremoderationCacheServiceStatus,
 } from "../../src/services/types";
 import type { CommentSelectType } from "ponder:schema";
 import type { Hex } from "@ecp.eth/sdk/core";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { schema } from "../../schema";
+import type { CommentModerationStatusesSelectType } from "../../schema.offchain";
 
-// Mock services
-const mockCacheService = {
-  getStatusByCommentId: vi.fn(),
-  getLatestStatusByCommentId: vi.fn(),
-  setStatusByCommentId: vi.fn(),
-  insertStatusByCommentId: vi.fn(),
-} as IPremoderationCacheService;
+const db = drizzle.mock({
+  schema,
+});
 
-const mockDbService = {
-  updateCommentModerationStatus: vi.fn(),
-  getCommentById: vi.fn(),
-  getCommentPendingModeration: vi.fn(),
-} as ICommentDbService;
+const service = new PremoderationService({
+  defaultModerationStatus: "pending",
+  db,
+});
+
+const commentFindFirstMock = vi.spyOn(db.query.comment, "findFirst");
+const commentModerationStatusesFindFirstMock = vi.spyOn(
+  db.query.commentModerationStatuses,
+  "findFirst",
+);
+const dbExecuteInsertMock = vi.fn();
+const dbReturningMock = vi.fn().mockImplementation(() => {
+  return {
+    execute: dbExecuteInsertMock,
+  };
+});
+const dbInsertOnConflictDoUpdateMock = vi.fn().mockImplementation(() => {
+  return {
+    execute: dbExecuteInsertMock,
+  };
+});
+const dbInsertValuesMock = vi.fn().mockImplementation(() => {
+  return {
+    execute: dbExecuteInsertMock,
+    returning: dbReturningMock,
+    onConflictDoUpdate: dbInsertOnConflictDoUpdateMock,
+  };
+});
+const dbInsertMock = vi.spyOn(db, "insert").mockImplementation(() => {
+  return {
+    values: dbInsertValuesMock,
+  } as any;
+});
+
+const dbUpdateExecuteMock = vi.fn();
+
+const dbUpdateReturningMock = vi.fn().mockImplementation(() => {
+  return {
+    execute: dbUpdateExecuteMock,
+  };
+});
+
+const dbUpdateWhereMock = vi.fn().mockImplementation(() => {
+  return {
+    returning: dbUpdateReturningMock,
+    execute: dbUpdateExecuteMock,
+  };
+});
+const dbUpdateSetMock = vi.fn().mockImplementation(() => {
+  return {
+    where: dbUpdateWhereMock,
+  } as any;
+});
+
+const dbUpdateMock = vi.spyOn(db, "update").mockImplementation(() => {
+  return {
+    set: dbUpdateSetMock,
+  } as any;
+});
+
+vi.spyOn(db, "transaction").mockImplementation((callback) => {
+  return callback(db as any);
+});
 
 describe("PremoderationService", () => {
-  let service: PremoderationService;
-  const defaultModerationStatus: ModerationStatus = "pending";
-
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new PremoderationService({
-      defaultModerationStatus,
-      cacheService: mockCacheService,
-      dbService: mockDbService,
-    });
   });
 
   describe("moderate", () => {
@@ -49,13 +95,15 @@ describe("PremoderationService", () => {
         parentId: "0x789" as Hex,
         revision: 0,
       };
-      const mockCachedStatus: PremoderationCacheServiceStatus = {
-        status: "approved",
-        changedAt: new Date(),
+      const mockCachedStatus: CommentModerationStatusesSelectType = {
+        createdAt: new Date(),
+        moderationStatus: "approved",
+        updatedAt: new Date(),
         revision: 0,
+        commentId: "0x123" as Hex,
       };
 
-      vi.mocked(mockCacheService.getStatusByCommentId).mockResolvedValueOnce(
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce(
         mockCachedStatus,
       );
 
@@ -63,15 +111,11 @@ describe("PremoderationService", () => {
 
       expect(result).toEqual({
         action: "skipped",
-        status: mockCachedStatus.status,
-        changedAt: mockCachedStatus.changedAt,
+        status: mockCachedStatus.moderationStatus,
+        changedAt: mockCachedStatus.updatedAt,
         save: expect.any(Function),
       });
-      expect(mockCacheService.getStatusByCommentId).toHaveBeenCalledWith(
-        mockComment.id,
-        mockComment.revision,
-      );
-      expect(mockCacheService.insertStatusByCommentId).not.toHaveBeenCalled();
+      expect(dbExecuteInsertMock).not.toHaveBeenCalled();
     });
 
     test("should return default status if no cached status exists", async () => {
@@ -86,7 +130,7 @@ describe("PremoderationService", () => {
         revision: 0,
       };
 
-      vi.mocked(mockCacheService.getStatusByCommentId).mockResolvedValueOnce(
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce(
         undefined,
       );
 
@@ -94,21 +138,24 @@ describe("PremoderationService", () => {
 
       expect(result).toEqual({
         action: "premoderated",
-        status: defaultModerationStatus,
+        status: "pending",
         changedAt: expect.any(Date),
         save: expect.any(Function),
       });
 
       // Test save function
       await result.save();
-      expect(mockCacheService.insertStatusByCommentId).toHaveBeenCalledWith(
-        mockComment.id,
-        {
-          status: defaultModerationStatus,
-          changedAt: expect.any(Date),
-          revision: mockComment.revision,
-        },
+      expect(dbInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
       );
+      expect(dbExecuteInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertValuesMock).toHaveBeenCalledWith({
+        commentId: mockComment.id,
+        moderationStatus: "pending",
+        updatedAt: expect.any(Date),
+        revision: mockComment.revision,
+      });
     });
   });
 
@@ -142,7 +189,7 @@ describe("PremoderationService", () => {
         changedAt: mockExistingComment.moderationStatusChangedAt,
         save: expect.any(Function),
       });
-      expect(mockCacheService.setStatusByCommentId).not.toHaveBeenCalled();
+      expect(dbExecuteInsertMock).not.toHaveBeenCalled();
     });
 
     test("should set status to pending if content has changed", async () => {
@@ -175,66 +222,224 @@ describe("PremoderationService", () => {
         save: expect.any(Function),
       });
 
-      // Test save function
       await result.save();
-      expect(mockCacheService.setStatusByCommentId).toHaveBeenCalledWith(
-        mockComment.id,
-        {
-          status: "pending",
-          changedAt: expect.any(Date),
-          revision: mockComment.revision,
-        },
+
+      expect(dbInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
       );
+      expect(dbExecuteInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertValuesMock).toHaveBeenCalledWith({
+        commentId: mockComment.id,
+        moderationStatus: "pending",
+        updatedAt: expect.any(Date),
+        revision: mockComment.revision,
+      });
     });
   });
 
   describe("updateStatus", () => {
-    test("should update comment moderation status", async () => {
-      const commentId = "0x123" as Hex;
-      const newStatus: ModerationStatus = "approved";
-      const mockUpdatedComment = {
-        id: commentId,
-        moderationStatus: newStatus,
-      } as CommentSelectType;
+    test("should throw error if comment moderation status is not found", async () => {
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce(
+        undefined,
+      );
 
-      vi.mocked(
-        mockDbService.updateCommentModerationStatus,
-      ).mockResolvedValueOnce(mockUpdatedComment);
-
-      const result = await service.updateStatus({
-        commentId,
-        commentRevision: 0,
-        status: newStatus,
-      });
-
-      expect(result).toBe(mockUpdatedComment);
-      expect(mockDbService.updateCommentModerationStatus).toHaveBeenCalledWith({
-        commentId,
-        commentRevision: 0,
-        status: newStatus,
-      });
+      await expect(
+        service.updateStatus({
+          commentId: "0x123" as Hex,
+          commentRevision: undefined,
+          status: "approved" as ModerationStatus,
+        }),
+      ).rejects.toThrow("Comment moderation status not found");
     });
 
-    test("should handle undefined result from db service", async () => {
-      const commentId = "0x123" as Hex;
-      const newStatus: ModerationStatus = "approved";
+    test("should throw error if comment is not found", async () => {
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce({
+        commentId: "0x123" as Hex,
+        moderationStatus: "pending" as ModerationStatus,
+        updatedAt: new Date(),
+        revision: 0,
+      } as CommentModerationStatusesSelectType);
+      vi.mocked(commentFindFirstMock).mockResolvedValueOnce(undefined);
 
-      vi.mocked(
-        mockDbService.updateCommentModerationStatus,
-      ).mockResolvedValueOnce(undefined);
+      await expect(
+        service.updateStatus({
+          commentId: "0x123" as Hex,
+          commentRevision: undefined,
+          status: "approved" as ModerationStatus,
+        }),
+      ).rejects.toThrow("Comment 0x123 not found");
+    });
+
+    test("should just return the comment as is if status is the same as the one provided", async () => {
+      const mockedComment = {
+        id: "0x123" as Hex,
+        content: "test comment",
+        moderationStatus: "pending" as ModerationStatus,
+        moderationStatusChangedAt: new Date(),
+      } as CommentSelectType;
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce({
+        commentId: "0x123" as Hex,
+        moderationStatus: "pending" as ModerationStatus,
+        updatedAt: new Date(),
+        revision: 0,
+      } as CommentModerationStatusesSelectType);
+      vi.mocked(commentFindFirstMock).mockResolvedValueOnce(mockedComment);
 
       const result = await service.updateStatus({
-        commentId,
-        commentRevision: 0,
-        status: newStatus,
+        commentId: "0x123" as Hex,
+        commentRevision: undefined,
+        status: "pending" as ModerationStatus,
       });
 
-      expect(result).toBeUndefined();
-      expect(mockDbService.updateCommentModerationStatus).toHaveBeenCalledWith({
-        commentId,
-        commentRevision: 0,
-        status: newStatus,
+      expect(result).toBe(mockedComment);
+    });
+
+    test("should update latest status if no revision is provided", async () => {
+      const mockedComment = {
+        id: "0x123" as Hex,
+        content: "test comment",
+        moderationStatus: "pending" as ModerationStatus,
+        moderationStatusChangedAt: new Date(),
+      } as CommentSelectType;
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce({
+        commentId: "0x123" as Hex,
+        moderationStatus: "pending" as ModerationStatus,
+        updatedAt: new Date(),
+        revision: 0,
+      } as CommentModerationStatusesSelectType);
+      vi.mocked(commentFindFirstMock).mockResolvedValueOnce(mockedComment);
+      vi.mocked(dbUpdateExecuteMock).mockResolvedValueOnce([mockedComment]);
+
+      await service.updateStatus({
+        commentId: "0x123" as Hex,
+        commentRevision: undefined,
+        status: "approved" as ModerationStatus,
       });
+
+      expect(dbInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbExecuteInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertValuesMock).toHaveBeenCalledWith({
+        commentId: "0x123" as Hex,
+        moderationStatus: "approved" as ModerationStatus,
+        updatedAt: expect.any(Date),
+        revision: 0,
+      });
+
+      expect(dbUpdateMock).toHaveBeenCalledWith(schema.comment);
+      expect(dbUpdateSetMock).toHaveBeenCalledWith({
+        moderationStatus: "approved" as ModerationStatus,
+        moderationStatusChangedAt: expect.any(Date),
+      });
+
+      // we changed to approved so it called update on previous moderation statuses
+      expect(dbUpdateMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbUpdateSetMock).toHaveBeenCalledWith({
+        moderationStatus: "approved" as ModerationStatus,
+        updatedAt: expect.any(Date),
+      });
+
+      expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(2);
+    });
+
+    test("should update specific revision if revision is provided", async () => {
+      const mockedComment = {
+        id: "0x123" as Hex,
+        content: "test comment",
+        moderationStatus: "pending" as ModerationStatus,
+        moderationStatusChangedAt: new Date(),
+      } as CommentSelectType;
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce({
+        commentId: "0x123" as Hex,
+        moderationStatus: "pending" as ModerationStatus,
+        updatedAt: new Date(),
+        revision: 1,
+      } as CommentModerationStatusesSelectType);
+      vi.mocked(commentFindFirstMock).mockResolvedValueOnce(mockedComment);
+      vi.mocked(dbUpdateExecuteMock).mockResolvedValueOnce([mockedComment]);
+
+      await service.updateStatus({
+        commentId: "0x123" as Hex,
+        commentRevision: 1,
+        status: "approved" as ModerationStatus,
+      });
+
+      expect(dbInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbExecuteInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertValuesMock).toHaveBeenCalledWith({
+        commentId: "0x123" as Hex,
+        moderationStatus: "approved" as ModerationStatus,
+        updatedAt: expect.any(Date),
+        revision: 1,
+      });
+
+      expect(dbUpdateMock).toHaveBeenCalledWith(schema.comment);
+      expect(dbUpdateSetMock).toHaveBeenCalledWith({
+        moderationStatus: "approved" as ModerationStatus,
+        moderationStatusChangedAt: expect.any(Date),
+      });
+
+      // we changed to approved so it called update on previous moderation statuses
+      expect(dbUpdateMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbUpdateSetMock).toHaveBeenCalledWith({
+        moderationStatus: "approved" as ModerationStatus,
+        updatedAt: expect.any(Date),
+      });
+
+      expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(2);
+    });
+
+    test("should not update previous moderation statuses if status is changing to pending", async () => {
+      const mockedComment = {
+        id: "0x123" as Hex,
+        content: "test comment",
+        moderationStatus: "approved" as ModerationStatus,
+        moderationStatusChangedAt: new Date(),
+      } as CommentSelectType;
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce({
+        commentId: "0x123" as Hex,
+        moderationStatus: "approved" as ModerationStatus,
+        updatedAt: new Date(),
+        revision: 1,
+      } as CommentModerationStatusesSelectType);
+      vi.mocked(commentFindFirstMock).mockResolvedValueOnce(mockedComment);
+      vi.mocked(dbUpdateExecuteMock).mockResolvedValueOnce([mockedComment]);
+
+      await service.updateStatus({
+        commentId: "0x123" as Hex,
+        commentRevision: 1,
+        status: "pending" as ModerationStatus,
+      });
+
+      expect(dbInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertMock).toHaveBeenCalledWith(
+        schema.commentModerationStatuses,
+      );
+      expect(dbExecuteInsertMock).toHaveBeenCalledOnce();
+      expect(dbInsertValuesMock).toHaveBeenCalledWith({
+        commentId: "0x123" as Hex,
+        moderationStatus: "pending" as ModerationStatus,
+        updatedAt: expect.any(Date),
+        revision: 1,
+      });
+
+      expect(dbUpdateMock).toHaveBeenCalledWith(schema.comment);
+      expect(dbUpdateSetMock).toHaveBeenCalledWith({
+        moderationStatus: "pending" as ModerationStatus,
+        moderationStatusChangedAt: expect.any(Date),
+      });
+
+      expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(1);
     });
   });
 });

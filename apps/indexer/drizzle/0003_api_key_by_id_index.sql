@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "api_keys_by_public_key_idx" ON "ecp_indexer_schema"."api_keys" USING btree ("id");

@@ -1,16 +1,17 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --experimental-strip-types
 
 import process from "node:process";
 import { Buffer } from "node:buffer";
 import console from "node:console";
 import { TextEncoder } from "node:util";
 import { Command, InvalidArgumentError } from "commander";
-import { Kysely, PostgresDialect, WithSchemaPlugin } from "kysely";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { randomBytes } from "crypto";
 import { getPublicKeyAsync, signAsync, utils } from "@noble/ed25519";
-import pg from "pg";
 import { z } from "zod";
 import { renderToMarkdown } from "@ecp.eth/shared/renderer";
+import * as schema from "../schema.offchain.ts";
+import { eq } from "drizzle-orm";
 
 const HexSchema = z.string().regex(/^0x[0-9a-fA-F]+$/);
 
@@ -56,14 +57,12 @@ function urlOptionValidator(val) {
  * Creates a Kysely instance for the given database URL.
  * @param {string} dbUrl - The database URL to connect to.
  *
- * @returns {Kysely<import('../src/management/migrations').IndexerSchemaDB>} A Kysely instance.
+ * @returns {import('drizzle-orm/node-postgres').NodePgDatabase<import('../schema').schema>} A Drizzle instance.
  */
 function getDb(dbUrl) {
-  return new Kysely({
-    dialect: new PostgresDialect({
-      pool: new pg.Pool({ connectionString: dbUrl }),
-    }),
-    plugins: [new WithSchemaPlugin("ecp_indexer_schema")],
+  return drizzle(dbUrl, {
+    schema,
+    casing: "snake_case",
   });
 }
 
@@ -96,19 +95,21 @@ authAccount
     const id = randomBytes(16).toString("hex");
 
     const result = await db
-      .insertInto("api_keys")
+      .insert(schema.apiKeys)
       .values({
         id,
         name,
-        public_key: Buffer.from(publicKey).toString("hex"),
-        created_at: new Date(),
+        publicKey: Buffer.from(publicKey).toString("hex"),
+        createdAt: new Date(),
       })
-      .onConflict((oc) => oc.column("name").doNothing())
-      .returningAll()
-      .executeTakeFirst();
+      .onConflictDoNothing({ target: [schema.apiKeys.name] })
+      .returning()
+      .execute();
 
-    if (!result) {
+    if (result.length === 0) {
       console.log("Failed to add API key, already exists");
+
+      process.exit(1);
     } else {
       console.table({
         ID: id,
@@ -116,9 +117,9 @@ authAccount
         "Private key": Buffer.from(privateKey).toString("hex"),
         "Public key": Buffer.from(publicKey).toString("hex"),
       });
-    }
 
-    await db.destroy();
+      process.exit(0);
+    }
   });
 
 authAccount
@@ -128,18 +129,20 @@ authAccount
     const db = getDb(authAccount.opts().dbUrl);
 
     const deleted = await db
-      .deleteFrom("api_keys")
-      .where("id", "=", id)
-      .returningAll()
-      .executeTakeFirst();
+      .delete(schema.apiKeys)
+      .where(eq(schema.apiKeys.id, id))
+      .returning()
+      .execute();
 
-    if (!deleted) {
+    if (deleted.length === 0) {
       console.log("API key not found");
+
+      process.exit(1);
     } else {
       console.log("API key deleted");
-    }
 
-    await db.destroy();
+      process.exit(0);
+    }
   });
 
 authAccount
@@ -148,18 +151,25 @@ authAccount
   .action(async () => {
     const db = getDb(authAccount.opts().dbUrl);
 
-    const keys = await db
-      .selectFrom("api_keys")
-      .select(["id", "created_at", "last_used_at"])
+    const keys = await db.query.apiKeys
+      .findMany({
+        columns: {
+          id: true,
+          createdAt: true,
+          lastUsedAt: true,
+        },
+      })
       .execute();
 
     if (keys.length === 0) {
       console.log("No API keys found");
+
+      process.exit(1);
     } else {
       console.table(keys);
-    }
 
-    await db.destroy();
+      process.exit(0);
+    }
   });
 
 const mutedAccounts = new Command("muted-accounts")

@@ -1,50 +1,51 @@
 import { getAddress, Hex } from "viem";
-import { getIndexerDb } from "../db";
-import type { MutedAccountSelect } from "../migrations";
+import type { DB } from "../../services/db";
+import type { MutedAccountSelectType } from "../../../schema.offchain";
+import { schema } from "../../../schema";
+import { eq } from "drizzle-orm";
 
 function normalizeAddress(address: Hex): Hex {
   return getAddress(address);
 }
 
-export async function muteAccount(
-  address: Hex,
-  reason?: string,
-): Promise<boolean> {
-  const db = getIndexerDb();
+export class MutedAccountsManagementService {
+  constructor(private db: DB) {}
 
-  const muted = await db
-    .insertInto("muted_accounts")
-    .values({ account: normalizeAddress(address), reason })
-    .onConflict((oc) => oc.column("account").doNothing())
-    .returningAll()
-    .executeTakeFirst();
+  async muteAccount(address: Hex, reason?: string): Promise<boolean> {
+    const [muted] = await this.db
+      .insert(schema.mutedAccounts)
+      .values({
+        account: normalizeAddress(address),
+        reason,
+      })
+      .onConflictDoNothing({
+        target: [schema.mutedAccounts.account],
+      })
+      .returning()
+      .execute();
 
-  return !!muted;
-}
+    return !!muted;
+  }
 
-export async function unmuteAccount(address: Hex): Promise<boolean> {
-  const db = getIndexerDb();
+  async unmuteAccount(address: Hex): Promise<boolean> {
+    const [result] = await this.db
+      .delete(schema.mutedAccounts)
+      .where(eq(schema.mutedAccounts.account, normalizeAddress(address)))
+      .returning()
+      .execute();
 
-  const result = await db
-    .deleteFrom("muted_accounts")
-    .where("account", "=", normalizeAddress(address))
-    .returningAll()
-    .executeTakeFirst();
+    return !!result;
+  }
 
-  return !!result;
-}
+  async getMutedAccount(
+    address: Hex,
+  ): Promise<MutedAccountSelectType | undefined> {
+    const muted = await this.db.query.mutedAccounts
+      .findFirst({
+        where: eq(schema.mutedAccounts.account, normalizeAddress(address)),
+      })
+      .execute();
 
-export async function getMutedAccount(
-  address: Hex,
-): Promise<MutedAccountSelect | undefined> {
-  const db = getIndexerDb();
-
-  const muted = await db
-    .selectFrom("muted_accounts")
-    .selectAll()
-    .where("account", "=", normalizeAddress(address))
-    .limit(1)
-    .executeTakeFirst();
-
-  return muted;
+    return muted;
+  }
 }
