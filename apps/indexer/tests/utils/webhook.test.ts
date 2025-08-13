@@ -68,10 +68,12 @@ describe("webhook utils serialize/deserialize", () => {
 
     const encryptedStr = encryptWebhookCallbackData(secret, data);
     const encrypted = Buffer.from(encryptedStr, "binary");
-    expect(encrypted.length).toBe(39);
+    const expectedLength =
+      1 + Buffer.byteLength(data.commentId.slice(2), "hex") + 4 + 2;
+    expect(encrypted.length).toBe(expectedLength);
 
     const serialized = xorWithKey(encrypted, key);
-    expect(serialized.length).toBe(39);
+    expect(serialized.length).toBe(expectedLength);
 
     const actionByte = serialized[0];
     expect(actionByte).toBe(0x02); // moderation-set-as-rejected
@@ -129,10 +131,12 @@ describe("webhook utils serialize/deserialize", () => {
 
     const encryptedStr = encryptWebhookCallbackData(secret, data);
     const encrypted = Buffer.from(encryptedStr, "binary");
-    expect(encrypted.length).toBe(43);
+    const expectedLength =
+      1 + Buffer.byteLength(data.reportId, "ascii") + 4 + 2;
+    expect(encrypted.length).toBe(expectedLength);
 
     const serialized = xorWithKey(encrypted, key);
-    expect(serialized.length).toBe(43);
+    expect(serialized.length).toBe(expectedLength);
 
     const actionByte = serialized[0];
     expect(actionByte).toBe(0x08); // report-change-status
