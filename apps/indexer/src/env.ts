@@ -46,7 +46,6 @@ const adminTelegramBotSchema = z.object({
 const EnvSchema = z
   .object({
     DATABASE_URL: z.string().url(),
-    DATABASE_SCHEMA: z.string().nonempty(),
     NEYNAR_API_KEY: z.string().min(1),
     SENTRY_DSN: z.string().optional(),
 

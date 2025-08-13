@@ -8,7 +8,7 @@ import { eq } from "ponder";
 import { authMiddleware } from "../../../middleware/auth";
 import { IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { resolveAuthorDataAndFormatCommentChangeModerationStatusResponse } from "../../../lib/response-formatters";
-import { db } from "../../../db";
+import { db } from "../../../services";
 
 const getCommentRoute = createRoute({
   method: "get",
