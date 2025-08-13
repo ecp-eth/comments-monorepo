@@ -182,6 +182,7 @@ export class PremoderationService implements ICommentPremoderationService {
         .update(schema.commentModerationStatuses)
         .set({
           moderationStatus: status,
+          updatedAt: changedAt,
         })
         .where(
           // new status is not pending, mark all older pending revisions to be of the same status
