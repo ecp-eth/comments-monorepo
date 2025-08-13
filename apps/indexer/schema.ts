@@ -18,7 +18,7 @@ if (globalThis.PONDER_NAMESPACE_BUILD) {
   schemaName = "public";
 
   console.warn(
-    "Do not us SKIP_DRIZZLE_SCHEMA_DETECTION if you actually want to use the real database. This is useful only for docs generation.",
+    "Do not use SKIP_DRIZZLE_SCHEMA_DETECTION if you actually want to use the real database. This is useful only for docs generation.",
   );
 } else {
   throw new Error(

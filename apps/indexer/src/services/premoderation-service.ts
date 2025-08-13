@@ -81,6 +81,20 @@ export class PremoderationService implements ICommentPremoderationService {
       };
     }
 
+    const cachedStatus = await this.getStatusByCommentId(
+      comment.id,
+      comment.revision,
+    );
+
+    if (cachedStatus) {
+      return {
+        action: "skipped",
+        status: cachedStatus.moderationStatus,
+        changedAt: cachedStatus.updatedAt,
+        save: async () => {},
+      };
+    }
+
     const status = "pending" as const;
     const changedAt = new Date();
 
