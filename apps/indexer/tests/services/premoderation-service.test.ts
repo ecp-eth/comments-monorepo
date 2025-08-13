@@ -341,6 +341,7 @@ describe("PremoderationService", () => {
       );
       expect(dbUpdateSetMock).toHaveBeenCalledWith({
         moderationStatus: "approved" as ModerationStatus,
+        updatedAt: expect.any(Date),
       });
 
       expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(2);
@@ -392,6 +393,7 @@ describe("PremoderationService", () => {
       );
       expect(dbUpdateSetMock).toHaveBeenCalledWith({
         moderationStatus: "approved" as ModerationStatus,
+        updatedAt: expect.any(Date),
       });
 
       expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(2);
