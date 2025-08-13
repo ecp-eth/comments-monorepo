@@ -32,12 +32,13 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { ChevronsDown } from "lucide-react";
+import { ChevronsDown, Info } from "lucide-react";
 
 const formSchema = z.object({
   mode: z.enum(["post", "author", "replies"]),
@@ -59,6 +60,9 @@ const formSchema = z.object({
 
 export default function IframeConfigurator() {
   const [showAdvanced, setShowAdvanced] = React.useState(false);
+  const [appSigner, setAppSigner] = React.useState<"embed" | "custom" | "all">(
+    "embed",
+  );
 
   const form = useForm<z.input<typeof formSchema>>({
     mode: "all",
@@ -280,6 +284,71 @@ export default function IframeConfigurator() {
                   </FormItem>
                 )}
               />
+
+              <FormItem>
+                <FormLabel>App Signer Address</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={(value) => {
+                      setAppSigner(value as "embed" | "custom" | "all");
+
+                      if (value === "embed" || value === "all") {
+                        form.setValue("config.app", value);
+                      }
+                    }}
+                    value={appSigner}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Theme Mode" />
+                    </SelectTrigger>
+                    <SelectContent id="theme-mode-select">
+                      <SelectItem value="embed" defaultChecked>
+                        Default (embed app signer)
+                      </SelectItem>
+                      <SelectItem value="custom">Custom app signer</SelectItem>
+                      <SelectItem value="all">All apps</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+
+              {appSigner === "custom" && (
+                <FormField
+                  control={form.control}
+                  name="config.app"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Custom App Signer Address (for retrieving comments)
+                      </FormLabel>
+                      <FormDescription className="text-yellow-400">
+                        <span className="align-middle">
+                          <Info className="w-3 h-3 stroke-yellow-400 inline-block" />
+                          &nbsp; This option specifies the app signer address
+                          used to retrieve comments. However the embed app will
+                          always use the embed signer for posting comments. If
+                          the signer addresses do not match, newly posted
+                          comments may not appear.
+                        </span>
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          {...field}
+                          value={
+                            field.value === "embed" || field.value === "all"
+                              ? ""
+                              : field.value
+                          }
+                          placeholder="0x..."
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}

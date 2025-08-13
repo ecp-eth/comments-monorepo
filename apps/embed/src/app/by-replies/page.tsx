@@ -14,6 +14,7 @@ import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
 import { MainWrapper } from "@/components/MainWrapper";
 import { cookies } from "next/headers";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
+import { getAppSignerAddress } from "@/lib/utils";
 
 const SearchParamsSchema = z.object({
   commentId: HexSchema,
@@ -56,7 +57,7 @@ export default async function EmbedCommentsByRepliesPage({
   try {
     const fetchCommentRepliesParams: FetchCommentRepliesOptions = {
       chainId: config.chainId,
-      app: env.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+      app: getAppSignerAddress(config.app),
       apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       commentType: COMMENT_TYPE_COMMENT,
       limit: COMMENTS_PER_PAGE,
