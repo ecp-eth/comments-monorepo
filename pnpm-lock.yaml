@@ -112,7 +112,7 @@ importers:
         version: 1.2.3(@types/react@19.1.6)(react@19.1.0)
       '@sentry/nextjs':
         specifier: ^9.3.0
-        version: 9.25.1(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.99.9)
+        version: 9.25.1(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.99.9(esbuild@0.25.5))
       '@tanstack/react-query':
         specifier: ^5.75.6
         version: 5.80.2(react@19.1.0)
@@ -128,6 +128,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      ethereum-identity-kit:
+        specifier: ^0.2.52
+        version: 0.2.52(@tanstack/react-query@5.80.2(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.15.5(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(@upstash/redis@1.35.0)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76))
       lucide-react:
         specifier: ^0.474.0
         version: 0.474.0(react@19.1.0)
@@ -146,6 +149,9 @@ importers:
       react-dom:
         specifier: ~19.1.0
         version: 19.1.0(react@19.1.0)
+      siwe:
+        specifier: ^3.0.0
+        version: 3.0.0(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       sonner:
         specifier: ^1.7.4
         version: 1.7.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -209,10 +215,10 @@ importers:
         version: 0.0.7(typescript@5.8.3)
       '@hono/node-server':
         specifier: ^1.13.8
-        version: 1.14.3(hono@4.7.11)
+        version: 1.14.3(hono@4.9.1)
       '@hono/zod-openapi':
         specifier: ^0.18.4
-        version: 0.18.4(hono@4.7.11)(zod@3.25.76)
+        version: 0.18.4(hono@4.9.1)(zod@3.25.76)
       '@neynar/nodejs-sdk':
         specifier: ^2.44.0
         version: 2.44.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -234,9 +240,12 @@ importers:
       drizzle-orm:
         specifier: 0.41.0
         version: 0.41.0(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(kysely@0.26.3)(pg@8.16.0)
+      ethereum-identity-kit:
+        specifier: ^0.2.52
+        version: 0.2.52(@tanstack/react-query@5.80.2(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.15.5(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(@upstash/redis@1.35.0)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76))
       hono:
-        specifier: ^4.5.0
-        version: 4.7.11
+        specifier: ^4.9.1
+        version: 4.9.1
       lru-cache:
         specifier: ^11.0.2
         version: 11.1.0
@@ -245,7 +254,7 @@ importers:
         version: 8.16.0
       ponder:
         specifier: 0.11.26
-        version: 0.11.26(patch_hash=dec41e464b638daab797e119752ab3b340f220a75f67b10de3f251728da5efac)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(hono@4.7.11)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
+        version: 0.11.26(patch_hash=dec41e464b638daab797e119752ab3b340f220a75f67b10de3f251728da5efac)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(hono@4.9.1)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
       viem:
         specifier: ~2.29.2
         version: 2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -300,7 +309,7 @@ importers:
         version: 2.44.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@privy-io/server-auth':
         specifier: 1.30.0
-        version: 1.30.0(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
+        version: 1.30.0(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
       '@radix-ui/react-avatar':
         specifier: ^1.1.3
         version: 1.1.10(@types/react-dom@19.1.5(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -463,7 +472,7 @@ importers:
         version: 2.2.5(patch_hash=de27859521ffa1f2f5bc03d5400233e30552e5f51b766007d69da9b01003d1c8)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.15.5(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(@upstash/redis@1.35.0)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76))
       '@sentry/nextjs':
         specifier: ^9.3.0
-        version: 9.25.1(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.99.9)
+        version: 9.25.1(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.99.9(esbuild@0.25.5))
       '@tanstack/react-query':
         specifier: ^5.75.6
         version: 5.80.2(react@19.1.0)
@@ -1004,7 +1013,7 @@ importers:
         version: link:../../packages/shared
       '@privy-io/server-auth':
         specifier: ^1.30.0
-        version: 1.30.0(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
+        version: 1.30.0(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
       '@types/node':
         specifier: ^20
         version: 20.11.17
@@ -1377,6 +1386,9 @@ packages:
 
   '@account-abstraction/contracts@0.8.0':
     resolution: {integrity: sha512-8krPx/gpnoT+5xAroagVCbeA7FbUigMZWXFKKPm+oghyr29Dksssdx5sI7xGv9212i4JPaDDUGFk58dpuwVgHA==}
+
+  '@adraffy/ens-normalize@1.10.1':
+    resolution: {integrity: sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==}
 
   '@adraffy/ens-normalize@1.11.0':
     resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
@@ -2885,6 +2897,9 @@ packages:
     resolution: {integrity: sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw==}
     engines: {node: ^14.21.3 || >=16}
 
+  '@noble/curves@1.2.0':
+    resolution: {integrity: sha512-oYclrNgRaM9SsBUBVbb8M6DTV7ZHRTKugureoYEncY5c65HOmRzvSiTE3y5CYaPYJA/GVkrhXEoF0M3Ya9PMnw==}
+
   '@noble/curves@1.4.2':
     resolution: {integrity: sha512-TavHr8qycMChk8UwMld0ZDRvatedkzWfH8IiaeGCfymOP5i0hSCozz9vHOL0nkwk7HRMlFnAiKpS2jrUmSybcw==}
 
@@ -2906,6 +2921,10 @@ packages:
 
   '@noble/ed25519@2.2.3':
     resolution: {integrity: sha512-iHV8eI2mRcUmOx159QNrU8vTpQ/Xm70yJ2cTk3Trc86++02usfqFoNl6x0p3JN81ZDS/1gx6xiK0OwrgqCT43g==}
+
+  '@noble/hashes@1.3.2':
+    resolution: {integrity: sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==}
+    engines: {node: '>= 16'}
 
   '@noble/hashes@1.4.0':
     resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
@@ -4586,8 +4605,23 @@ packages:
   '@solidity-parser/parser@0.20.1':
     resolution: {integrity: sha512-58I2sRpzaQUN+jJmWbHfbWf9AKfzqCI8JAdFB0vbyY+u8tBRcuTt9LxzasvR0LGQpcRv97eyV7l61FQ3Ib7zVw==}
 
+  '@spruceid/siwe-parser@3.0.0':
+    resolution: {integrity: sha512-Y92k63ilw/8jH9Ry4G2e7lQd0jZAvb0d/Q7ssSD0D9mp/Zt2aCXIc3g0ny9yhplpAx1QXHsMz/JJptHK/zDGdw==}
+
   '@stablelib/base64@1.0.1':
     resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
+
+  '@stablelib/binary@1.0.1':
+    resolution: {integrity: sha512-ClJWvmL6UBM/wjkvv/7m5VP3GMr9t0osr4yVgLZsLCOz4hGN9gIAFEqnJ0TsSMAN+n840nf2cHZnA5/KFqHC7Q==}
+
+  '@stablelib/int@1.0.1':
+    resolution: {integrity: sha512-byr69X/sDtDiIjIV6m4roLVWnNNlRGzsvxw+agj8CIEazqWGOQp2dTYgQhtyVXV9wpO6WyXRQUzLV/JRNumT2w==}
+
+  '@stablelib/random@1.0.2':
+    resolution: {integrity: sha512-rIsE83Xpb7clHPVRlBj8qNe5L8ISQOzjghYQm/dZ7VaM2KHYwMW5adjQjrzTZCchFnNCNhkwtnOBa9HTMJCI8w==}
+
+  '@stablelib/wipe@1.0.1':
+    resolution: {integrity: sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==}
 
   '@standard-schema/utils@0.3.0':
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
@@ -5178,6 +5212,9 @@ packages:
 
   '@types/node@22.15.29':
     resolution: {integrity: sha512-LNdjOkUDlU1RZb8e1kOIUpN1qQUlzGkEtbVNo53vbrwDg5om6oduhm4SiUaPW5ASTXhAiP0jInWG8Qx9fVlOeQ==}
+
+  '@types/node@22.7.5':
+    resolution: {integrity: sha512-jML7s2NAzMWc//QSJ1a3prpk78cOPchGvXJsC3C6R6PSMoooztvRVQEz89gmBTBY1SPMaqo5teB4uNHPdetShQ==}
 
   '@types/pg-pool@2.0.6':
     resolution: {integrity: sha512-TaAUE5rq2VQYxab5Ts7WZhKNmuN78Q6PiFonTDdpbx8a1H0M1vhy3rhiMjl+e2iHmogyMw7jZF4FrE6eJUy5HQ==}
@@ -5777,6 +5814,9 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  aes-js@4.0.0-beta.5:
+    resolution: {integrity: sha512-G965FqalsNyrPqgEGON7nIx1e/OVENSgiEIzyC63haUMuvNnwIgIjMs52hlTCKhkBny7A2ORNlfY9Zu+jmGk1Q==}
+
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -5863,6 +5903,9 @@ packages:
   anymatch@3.1.3:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
+
+  apg-js@4.4.0:
+    resolution: {integrity: sha512-fefmXFknJmtgtNEXfPwZKYkMFX4Fyeyz+fNF6JWp87biGOPslJbCBVU158zvKRZfHBKnJDy8CMM40oLFGkXT8Q==}
 
   apg-lite@1.0.5:
     resolution: {integrity: sha512-SlI+nLMQDzCZfS39ihzjGp3JNBQfJXyMi6cg9tkLOCPVErgFsUIAEdO9IezR7kbP5Xd0ozcPNQBkf9TO5cHgWw==}
@@ -7538,6 +7581,19 @@ packages:
   ethereum-cryptography@2.2.1:
     resolution: {integrity: sha512-r/W8lkHSiTLxUxW8Rf3u4HGB0xQweG2RyETjywylKZSzLWoWAijRz8WCuOtJ6wah+avllXBqZuk29HCCvhEIRg==}
 
+  ethereum-identity-kit@0.2.52:
+    resolution: {integrity: sha512-vP9XVrpN33qG/eblRX+isKmovkjEKquxdiW8CIF0psNcsqufdzdSrJA1aFvwt1b9ki7jmH8wBy5SE4of7PGXPg==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.0.0
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+      viem: ~2.29.2
+      wagmi: ^2.0.0
+
+  ethers@6.15.0:
+    resolution: {integrity: sha512-Kf/3ZW54L4UT0pZtsY/rf+EkBU7Qi5nnhonjUb8yTXcxH3cdcWrV2cRyk0Xk/4jK6OoHhxxZHriyhje20If2hQ==}
+    engines: {node: '>=14.0.0'}
+
   eval@0.1.8:
     resolution: {integrity: sha512-EzV94NYKoO09GLXGjXj9JIlXijVck4ONSr5wiCWDvhsvj5jxSrzTmRU/9C1DyB6uToszLs8aifA6NQ7lEQdvFw==}
     engines: {node: '>= 0.8'}
@@ -8052,6 +8108,10 @@ packages:
 
   hono@4.7.11:
     resolution: {integrity: sha512-rv0JMwC0KALbbmwJDEnxvQCeJh+xbS3KEWW5PC9cMJ08Ur9xgatI0HmtgYZfOdOSOeYsp5LO2cOhdI8cLEbDEQ==}
+    engines: {node: '>=16.9.0'}
+
+  hono@4.9.1:
+    resolution: {integrity: sha512-qfvdJ42t6CQE0N/iSCa8KsW8SQqYD67YB+TYbwPHlnALvX+s7ynh8otR1NEk5jXtUg73gpV/B82OSufDmwtX3w==}
     engines: {node: '>=16.9.0'}
 
   html-void-elements@3.0.0:
@@ -10858,6 +10918,11 @@ packages:
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
 
+  siwe@3.0.0:
+    resolution: {integrity: sha512-P2/ry7dHYJA6JJ5+veS//Gn2XDwNb3JMvuD6xiXX8L/PJ1SNVD4a3a8xqEbmANx+7kNQcD8YAh1B9bNKKvRy/g==}
+    peerDependencies:
+      ethers: ^5.6.8 || ^6.0.8
+
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
@@ -11427,6 +11492,9 @@ packages:
   tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
 
+  tslib@2.7.0:
+    resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
+
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -11619,6 +11687,9 @@ packages:
 
   undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+
+  undici-types@6.19.8:
+    resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
@@ -12355,6 +12426,8 @@ snapshots:
     dependencies:
       '@openzeppelin/contracts': 5.3.0
       '@uniswap/v3-periphery': 1.4.4
+
+  '@adraffy/ens-normalize@1.10.1': {}
 
   '@adraffy/ens-normalize@1.11.0': {}
 
@@ -13370,9 +13443,17 @@ snapshots:
     dependencies:
       hono: 4.7.11
 
+  '@hono/node-server@1.13.3(hono@4.9.1)':
+    dependencies:
+      hono: 4.9.1
+
   '@hono/node-server@1.14.3(hono@4.7.11)':
     dependencies:
       hono: 4.7.11
+
+  '@hono/node-server@1.14.3(hono@4.9.1)':
+    dependencies:
+      hono: 4.9.1
 
   '@hono/zod-openapi@0.18.4(hono@4.7.11)(zod@3.25.76)':
     dependencies:
@@ -13381,9 +13462,21 @@ snapshots:
       hono: 4.7.11
       zod: 3.25.76
 
+  '@hono/zod-openapi@0.18.4(hono@4.9.1)(zod@3.25.76)':
+    dependencies:
+      '@asteasolutions/zod-to-openapi': 7.3.2(zod@3.25.76)
+      '@hono/zod-validator': 0.4.3(hono@4.9.1)(zod@3.25.76)
+      hono: 4.9.1
+      zod: 3.25.76
+
   '@hono/zod-validator@0.4.3(hono@4.7.11)(zod@3.25.76)':
     dependencies:
       hono: 4.7.11
+      zod: 3.25.76
+
+  '@hono/zod-validator@0.4.3(hono@4.9.1)(zod@3.25.76)':
+    dependencies:
+      hono: 4.9.1
       zod: 3.25.76
 
   '@hookform/resolvers@5.1.1(react-hook-form@7.60.0(react@19.1.0))':
@@ -14024,6 +14117,10 @@ snapshots:
 
   '@noble/ciphers@1.3.0': {}
 
+  '@noble/curves@1.2.0':
+    dependencies:
+      '@noble/hashes': 1.3.2
+
   '@noble/curves@1.4.2':
     dependencies:
       '@noble/hashes': 1.4.0
@@ -14045,6 +14142,8 @@ snapshots:
       '@noble/hashes': 1.8.0
 
   '@noble/ed25519@2.2.3': {}
+
+  '@noble/hashes@1.3.2': {}
 
   '@noble/hashes@1.4.0': {}
 
@@ -14553,7 +14652,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@privy-io/server-auth@1.30.0(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))':
+  '@privy-io/server-auth@1.30.0(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))':
     dependencies:
       '@hpke/chacha20poly1305': 1.6.2
       '@hpke/core': 1.7.2
@@ -14570,6 +14669,7 @@ snapshots:
       ts-case-convert: 2.1.0
       type-fest: 3.13.1
     optionalDependencies:
+      ethers: 6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       viem: 2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
     transitivePeerDependencies:
       - bufferutil
@@ -16116,7 +16216,7 @@ snapshots:
 
   '@sentry/core@9.25.1': {}
 
-  '@sentry/nextjs@9.25.1(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.99.9)':
+  '@sentry/nextjs@9.25.1(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.99.9(esbuild@0.25.5))':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.34.0
@@ -16127,7 +16227,7 @@ snapshots:
       '@sentry/opentelemetry': 9.25.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.34.0)
       '@sentry/react': 9.25.1(react@19.1.0)
       '@sentry/vercel-edge': 9.25.1
-      '@sentry/webpack-plugin': 3.5.0(webpack@5.99.9)
+      '@sentry/webpack-plugin': 3.5.0(webpack@5.99.9(esbuild@0.25.5))
       chalk: 3.0.0
       next: 15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       resolve: 1.22.8
@@ -16222,12 +16322,12 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@sentry/core': 9.25.1
 
-  '@sentry/webpack-plugin@3.5.0(webpack@5.99.9)':
+  '@sentry/webpack-plugin@3.5.0(webpack@5.99.9(esbuild@0.25.5))':
     dependencies:
       '@sentry/bundler-plugin-core': 3.5.0
       unplugin: 1.0.1
       uuid: 9.0.1
-      webpack: 5.99.9
+      webpack: 5.99.9(esbuild@0.25.5)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -16382,7 +16482,25 @@ snapshots:
 
   '@solidity-parser/parser@0.20.1': {}
 
+  '@spruceid/siwe-parser@3.0.0':
+    dependencies:
+      '@noble/hashes': 1.8.0
+      apg-js: 4.4.0
+
   '@stablelib/base64@1.0.1': {}
+
+  '@stablelib/binary@1.0.1':
+    dependencies:
+      '@stablelib/int': 1.0.1
+
+  '@stablelib/int@1.0.1': {}
+
+  '@stablelib/random@1.0.2':
+    dependencies:
+      '@stablelib/binary': 1.0.1
+      '@stablelib/wipe': 1.0.1
+
+  '@stablelib/wipe@1.0.1': {}
 
   '@standard-schema/utils@0.3.0': {}
 
@@ -17261,6 +17379,10 @@ snapshots:
   '@types/node@22.15.29':
     dependencies:
       undici-types: 6.21.0
+
+  '@types/node@22.7.5':
+    dependencies:
+      undici-types: 6.19.8
 
   '@types/pg-pool@2.0.6':
     dependencies:
@@ -18357,6 +18479,8 @@ snapshots:
 
   acorn@8.15.0: {}
 
+  aes-js@4.0.0-beta.5: {}
+
   agent-base@6.0.2:
     dependencies:
       debug: 4.4.1(supports-color@8.1.1)
@@ -18441,6 +18565,8 @@ snapshots:
     dependencies:
       normalize-path: 3.0.0
       picomatch: 2.3.1
+
+  apg-js@4.4.0: {}
 
   apg-lite@1.0.5: {}
 
@@ -20504,6 +20630,27 @@ snapshots:
       '@scure/bip32': 1.4.0
       '@scure/bip39': 1.3.0
 
+  ethereum-identity-kit@0.2.52(@tanstack/react-query@5.80.2(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.15.5(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(@upstash/redis@1.35.0)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)):
+    dependencies:
+      '@tanstack/react-query': 5.80.2(react@19.1.0)
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      viem: 2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
+      wagmi: 2.15.5(@react-native-async-storage/async-storage@2.1.2(react-native@0.79.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@19.1.6)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.80.2)(@tanstack/react-query@5.80.2(react@19.1.0))(@types/react@19.1.6)(@upstash/redis@1.35.0)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
+
+  ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10):
+    dependencies:
+      '@adraffy/ens-normalize': 1.10.1
+      '@noble/curves': 1.2.0
+      '@noble/hashes': 1.3.2
+      '@types/node': 22.7.5
+      aes-js: 4.0.0-beta.5
+      tslib: 2.7.0
+      ws: 8.17.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   eval@0.1.8:
     dependencies:
       '@types/node': 22.15.29
@@ -21177,6 +21324,8 @@ snapshots:
       hono: 4.7.11
 
   hono@4.7.11: {}
+
+  hono@4.9.1: {}
 
   html-void-elements@3.0.0: {}
 
@@ -23640,6 +23789,84 @@ snapshots:
       - terser
       - zod
 
+  ponder@0.11.26(patch_hash=dec41e464b638daab797e119752ab3b340f220a75f67b10de3f251728da5efac)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(hono@4.9.1)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76):
+    dependencies:
+      '@babel/code-frame': 7.27.1
+      '@commander-js/extra-typings': 12.1.0(commander@12.1.0)
+      '@electric-sql/pglite': 0.2.13
+      '@escape.tech/graphql-armor-max-aliases': 2.6.1
+      '@escape.tech/graphql-armor-max-depth': 2.4.0
+      '@escape.tech/graphql-armor-max-tokens': 2.5.0
+      '@hono/node-server': 1.13.3(hono@4.9.1)
+      '@ponder/utils': 0.2.8(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
+      abitype: 0.10.3(typescript@5.8.3)(zod@3.25.76)
+      ansi-escapes: 7.0.0
+      commander: 12.1.0
+      conf: 12.0.0
+      dataloader: 2.2.3
+      detect-package-manager: 3.0.2
+      dotenv: 16.5.0
+      drizzle-orm: 0.41.0(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(kysely@0.26.3)(pg@8.16.0)
+      glob: 10.4.5
+      graphql: 16.11.0
+      graphql-yoga: 5.13.5(graphql@16.11.0)
+      hono: 4.9.1
+      http-terminator: 3.2.0
+      kysely: 0.26.3
+      pg: 8.16.0
+      pg-connection-string: 2.9.0
+      pg-copy-streams: 6.0.6
+      pg-query-emscripten: 5.1.0
+      picocolors: 1.1.1
+      pino: 8.21.0
+      prom-client: 15.1.3
+      semver: 7.7.2
+      stacktrace-parser: 0.1.11
+      superjson: 2.2.2
+      terminal-size: 4.0.0
+      viem: 2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
+      vite: 5.0.7(@types/node@22.15.29)(lightningcss@1.30.1)(terser@5.40.0)
+      vite-node: 1.0.2(@types/node@22.15.29)(lightningcss@1.30.1)(terser@5.40.0)
+      vite-tsconfig-paths: 4.3.1(typescript@5.8.3)(vite@5.0.7(@types/node@22.15.29)(lightningcss@1.30.1)(terser@5.40.0))
+    optionalDependencies:
+      typescript: 5.8.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-rds-data'
+      - '@cloudflare/workers-types'
+      - '@libsql/client'
+      - '@libsql/client-wasm'
+      - '@neondatabase/serverless'
+      - '@op-engineering/op-sqlite'
+      - '@opentelemetry/api'
+      - '@planetscale/database'
+      - '@prisma/client'
+      - '@tidbcloud/serverless'
+      - '@types/better-sqlite3'
+      - '@types/node'
+      - '@types/pg'
+      - '@types/sql.js'
+      - '@vercel/postgres'
+      - '@xata.io/client'
+      - better-sqlite3
+      - bun-types
+      - expo-sqlite
+      - gel
+      - knex
+      - less
+      - lightningcss
+      - mysql2
+      - pg-native
+      - postgres
+      - prisma
+      - sass
+      - sql.js
+      - sqlite3
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+      - zod
+
   pony-cause@2.1.11: {}
 
   possible-typed-array-names@1.1.0: {}
@@ -24885,6 +25112,12 @@ snapshots:
 
   sisteransi@1.0.5: {}
 
+  siwe@3.0.0(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)):
+    dependencies:
+      '@spruceid/siwe-parser': 3.0.0
+      '@stablelib/random': 1.0.2
+      ethers: 6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+
   slash@3.0.0: {}
 
   slash@5.1.0: {}
@@ -25427,14 +25660,16 @@ snapshots:
 
   terminal-size@4.0.0: {}
 
-  terser-webpack-plugin@5.3.14(webpack@5.99.9):
+  terser-webpack-plugin@5.3.14(esbuild@0.25.5)(webpack@5.99.9(esbuild@0.25.5)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
       schema-utils: 4.3.2
       serialize-javascript: 6.0.2
       terser: 5.40.0
-      webpack: 5.99.9
+      webpack: 5.99.9(esbuild@0.25.5)
+    optionalDependencies:
+      esbuild: 0.25.5
 
   terser@5.40.0:
     dependencies:
@@ -25607,6 +25842,8 @@ snapshots:
       strip-bom: 3.0.0
 
   tslib@1.14.1: {}
+
+  tslib@2.7.0: {}
 
   tslib@2.8.1: {}
 
@@ -25804,6 +26041,8 @@ snapshots:
   uncrypto@0.1.3: {}
 
   undici-types@5.26.5: {}
+
+  undici-types@6.19.8: {}
 
   undici-types@6.21.0: {}
 
@@ -26256,7 +26495,7 @@ snapshots:
   vocs@https://codeload.github.com/ecp-eth/vocs/tar.gz/39fa92ef16a94c025a9fbecfd4894f5a0fabec06#path:/src(@types/node@22.15.29)(@types/react-dom@19.1.5(@types/react@19.1.6))(@types/react@19.1.6)(acorn@8.14.1)(jiti@2.4.2)(lightningcss@1.30.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.41.1)(terser@5.40.0)(tsx@4.19.4)(typescript@5.8.3)(yaml@2.8.0):
     dependencies:
       '@floating-ui/react': 0.27.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@hono/node-server': 1.14.3(hono@4.7.11)
+      '@hono/node-server': 1.14.3(hono@4.9.1)
       '@mdx-js/react': 3.1.0(@types/react@19.1.6)(react@19.1.0)
       '@mdx-js/rollup': 3.1.0(acorn@8.14.1)(rollup@4.41.1)
       '@noble/hashes': 1.8.0
@@ -26286,7 +26525,7 @@ snapshots:
       fs-extra: 11.3.0
       globby: 14.1.0
       hastscript: 8.0.0
-      hono: 4.7.11
+      hono: 4.9.1
       mark.js: 8.11.1
       mdast-util-directive: 3.1.0
       mdast-util-from-markdown: 2.0.2
@@ -26433,7 +26672,7 @@ snapshots:
 
   webpack-virtual-modules@0.5.0: {}
 
-  webpack@5.99.9:
+  webpack@5.99.9(esbuild@0.25.5):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.7
@@ -26456,7 +26695,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.2
       tapable: 2.2.2
-      terser-webpack-plugin: 5.3.14(webpack@5.99.9)
+      terser-webpack-plugin: 5.3.14(esbuild@0.25.5)(webpack@5.99.9(esbuild@0.25.5))
       watchpack: 2.4.4
       webpack-sources: 3.3.2
     transitivePeerDependencies:
