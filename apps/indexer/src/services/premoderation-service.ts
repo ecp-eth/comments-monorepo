@@ -142,7 +142,7 @@ export class PremoderationService implements ICommentPremoderationService {
 
       const changedAt = new Date();
 
-      await this.db
+      await tx
         .insert(schema.commentModerationStatuses)
         .values({
           commentId,
@@ -162,7 +162,7 @@ export class PremoderationService implements ICommentPremoderationService {
         })
         .execute();
 
-      const [updatedComment] = await this.db
+      const [updatedComment] = await tx
         .update(schema.comment)
         .set({
           moderationStatus: status,
@@ -178,7 +178,7 @@ export class PremoderationService implements ICommentPremoderationService {
       }
 
       // set old pending revisions to same status
-      await this.db
+      await tx
         .update(schema.commentModerationStatuses)
         .set({
           moderationStatus: status,
