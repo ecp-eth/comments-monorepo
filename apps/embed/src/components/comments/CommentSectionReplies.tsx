@@ -150,10 +150,11 @@ export function CommentSectionReplies({
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
-  const isPending = selectedCommentPending || isRepliesPending;
+  const isPreparing =
+    selectedCommentPending || isRepliesPending || !isAccountStatusResolved;
   const error = repliesError || selectedCommentError;
 
-  if (isPending) {
+  if (isPreparing) {
     return <LoadingScreen />;
   }
 

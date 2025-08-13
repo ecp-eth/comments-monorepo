@@ -1,12 +1,11 @@
-import { cn } from "@/lib/utils";
-import React from "react";
+import { cn } from "../helpers";
 
-interface CommentActionButtonProps {
+type CommentActionButtonProps = {
   className?: string;
   disabled?: boolean;
   onClick?: () => void;
   children: React.ReactNode;
-}
+};
 
 export function CommentActionButton({
   className,

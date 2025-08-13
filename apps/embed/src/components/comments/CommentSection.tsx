@@ -49,16 +49,17 @@ export function CommentSection({
   useSyncViewerCookie();
   useAutoBodyMinHeight();
 
-  const { address: connectedAddress } = useAccount();
   const chainId = useChainId();
+
+  const { address: connectedAddress } = useAccount();
+  const isAccountStatusResolved = useIsAccountStatusResolved();
+
   const { targetUri, disablePromotion, restrictMaximumContainerWidth } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
     () => createCommentItemsQueryKey(connectedAddress, chainId, targetUri),
     [targetUri, connectedAddress, chainId],
   );
-
-  const isAccountStatusResolved = useIsAccountStatusResolved();
 
   const {
     data,
@@ -125,6 +126,8 @@ export function CommentSection({
     return data?.pages.flatMap((page) => page.results) ?? [];
   }, [data]);
 
+  const isPreparing = isPending || !isAccountStatusResolved;
+
   return (
     <div
       className={cn("mx-auto", restrictMaximumContainerWidth && "max-w-2xl")}
@@ -133,14 +136,14 @@ export function CommentSection({
       <div className="mb-4">
         <CommentForm queryKey={queryKey} />
       </div>
-      {isPending && <LoadingScreen />}
+      {isPreparing && <LoadingScreen />}
       {error && (
         <ErrorScreen
           description="Failed to load comments. Please try again."
           onRetry={() => refetch()}
         />
       )}
-      {isSuccess && (
+      {!isPreparing && isSuccess && (
         <>
           {hasNewComments && (
             <Button

@@ -8,3 +8,5 @@ export * from "./CommentMediaVideo.js";
 export * from "./CommentMediaReference.js";
 export { HeartButton } from "./HeartButton/index.js";
 export * from "./PendingWalletConnectionActionsContext.js";
+export * from "./CommentActionButton.js";
+export * from "./CommentActionLikeButton.js";
