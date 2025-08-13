@@ -32,12 +32,13 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { ChevronsDown } from "lucide-react";
+import { ChevronsDown, Info } from "lucide-react";
 
 const formSchema = z.object({
   mode: z.enum(["post", "author", "replies"]),
@@ -318,7 +319,19 @@ export default function IframeConfigurator() {
                   name="config.app"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Custom App Signer Address</FormLabel>
+                      <FormLabel>
+                        Custom App Signer Address (for retrieving comments)
+                      </FormLabel>
+                      <FormDescription className="text-yellow-400">
+                        <span className="align-middle">
+                          <Info className="w-3 h-3 stroke-yellow-400 inline-block" />
+                          &nbsp; This option specifies the app signer address
+                          used to retrieve comments. However the embed app will
+                          always use the embed signer for posting comments. If
+                          the signer addresses do not match, newly posted
+                          comments may not appear.
+                        </span>
+                      </FormDescription>
                       <FormControl>
                         <Input
                           type="text"
