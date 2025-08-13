@@ -43,6 +43,7 @@ const reportCommentRoute = createRoute({
           schema: ReportCommentBodySchema,
         },
       },
+      required: true,
     },
   },
   responses: {

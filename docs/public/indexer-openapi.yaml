@@ -6498,6 +6498,7 @@ paths:
         Marks account as muted, newer comments from this account won't be
         indexed
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -7112,6 +7113,7 @@ paths:
           name: commentId
           in: path
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -8115,6 +8117,7 @@ paths:
     post:
       description: Webhook to receive commands
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -8320,6 +8323,7 @@ paths:
           name: commentId
           in: path
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -8583,6 +8587,7 @@ paths:
           name: reportId
           in: path
       requestBody:
+        required: true
         content:
           application/json:
             schema:

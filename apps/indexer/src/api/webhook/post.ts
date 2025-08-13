@@ -32,6 +32,7 @@ const webhookRoute = createRoute({
           schema: webhookRequestBodySchema,
         },
       },
+      required: true,
     },
   },
   responses: {

@@ -23,6 +23,7 @@ const changeCommentModerationStatusRoute = createRoute({
           schema: ChangeModerationStatusOnCommentBodySchema,
         },
       },
+      required: true,
     },
   },
   responses: {

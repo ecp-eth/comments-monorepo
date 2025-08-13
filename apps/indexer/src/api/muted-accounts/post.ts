@@ -21,6 +21,7 @@ const postMutedAccountRoute = createRoute({
           schema: PostMutedAccountBodySchema,
         },
       },
+      required: true,
     },
   },
   responses: {
