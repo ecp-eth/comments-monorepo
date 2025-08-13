@@ -41,7 +41,8 @@ export const telegramNotificationsService = new TelegramNotificationsService(
   env.MODERATION_TELEGRAM_BOT_TOKEN &&
   env.MODERATION_TELEGRAM_CHANNEL_ID &&
   env.MODERATION_TELEGRAM_WEBHOOK_URL &&
-  env.MODERATION_TELEGRAM_WEBHOOK_SECRET
+  env.MODERATION_TELEGRAM_WEBHOOK_SECRET &&
+  env.MODERATION_ENABLE_NOTIFICATIONS
     ? {
         enabled: true,
         telegramBotToken: env.MODERATION_TELEGRAM_BOT_TOKEN,

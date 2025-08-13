@@ -210,6 +210,10 @@ describe("PremoderationService", () => {
         moderationStatusChangedAt: new Date(),
       } as CommentSelectType;
 
+      vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce(
+        undefined,
+      );
+
       const result = await service.moderateUpdate(
         mockComment,
         mockExistingComment,
