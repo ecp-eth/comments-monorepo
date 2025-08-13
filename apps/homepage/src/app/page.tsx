@@ -777,13 +777,13 @@ await fetchComments({
                   Town
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Join the ECP community on Telegram
+                  Open source iOS app
                 </p>
               </CardContent>
               <CardFooter>
                 <Button variant="outline" className="w-full" asChild>
                   <Link
-                    href="https://t.me/+vxh3qr_ivnczMTBk"
+                    href="https://t.me/+BpHx8Cm1I6M3OTc0"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -814,7 +814,7 @@ await fetchComments({
                   Paper
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Discover and share content on Ethereum
+                  Web app for browsing content
                 </p>
               </CardContent>
               <CardFooter>
