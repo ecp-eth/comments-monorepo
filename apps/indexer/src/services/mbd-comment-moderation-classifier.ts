@@ -183,6 +183,20 @@ export class CommentModerationClassifier
       };
     }
 
+    const cachedResult = await this.cacheService.getByCommentId(
+      comment.id,
+      comment.revision,
+    );
+
+    if (cachedResult) {
+      return {
+        action: "skipped",
+        labels: cachedResult.labels,
+        score: cachedResult.score,
+        save: async () => {},
+      };
+    }
+
     try {
       const result = await this.load(comment.content);
 
