@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { publicEnv } from "@/env/public";
 import { useMutation } from "@tanstack/react-query";
 import { useConnectAccount } from "@ecp.eth/shared/hooks/useConnectAccount";
 import { SiweMessage } from "siwe";
@@ -8,8 +7,10 @@ import { useAccount, useChainId, useConnect, useSignMessage } from "wagmi";
 import z from "zod";
 import { useMiniAppContext } from "@/hooks/useMiniAppContext";
 import { Loader2Icon } from "lucide-react";
+import { useAuth } from "@/components/auth-provider";
 
 export default function SignInPage() {
+  const auth = useAuth();
   const { address } = useAccount();
   const chainId = useChainId();
   const { isInMiniApp } = useMiniAppContext();
@@ -29,12 +30,7 @@ export default function SignInPage() {
         }
       }
 
-      const nonceResponse = await fetch(
-        new URL(
-          "/api/auth/siwe/nonce",
-          publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
-        ),
-      );
+      const nonceResponse = await fetch("/api/indexer/api/auth/siwe/nonce");
 
       if (!nonceResponse.ok) {
         throw new Error("Failed to get nonce");
@@ -64,23 +60,17 @@ export default function SignInPage() {
         message,
       });
 
-      const verifyResponse = await fetch(
-        new URL(
-          "/api/auth/siwe/verify",
-          publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
-        ),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message,
-            signature,
-            token: nonceToken,
-          }),
+      const verifyResponse = await fetch("/api/auth/siwe/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          message,
+          signature,
+          token: nonceToken,
+        }),
+      });
 
       if (!verifyResponse.ok) {
         throw new Error("Failed to verify signature");
@@ -105,6 +95,9 @@ export default function SignInPage() {
         accessToken,
         refreshToken,
       };
+    },
+    onSuccess() {
+      auth.setAsLoggedIn(true);
     },
   });
 
