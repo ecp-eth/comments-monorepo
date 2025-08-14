@@ -195,6 +195,10 @@ export default defineConfig({
           text: "FAQ",
           link: "/faq",
         },
+        {
+          text: "Improvement proposals",
+          link: "https://github.com/ecp-eth/ECPIP/discussions",
+        },
       ],
     },
     {
