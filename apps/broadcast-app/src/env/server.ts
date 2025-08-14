@@ -16,6 +16,7 @@ const serverEnvSchema = z.object({
   PRIVATE_RPC_URL: z.string().url(),
   COMMENT_CONTENT_LENGTH_LIMIT: z.number().int().positive().default(10240),
   APP_SIGNER_PRIVATE_KEY: HexSchema,
+  BROADCAST_APP_INDEXER_URL: z.string().url(),
 });
 
 const result = serverEnvSchema.safeParse(process.env);

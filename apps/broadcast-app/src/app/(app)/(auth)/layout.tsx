@@ -1,20 +1,15 @@
 "use client";
-import { useAccount } from "wagmi";
 import { redirect } from "next/navigation";
+import { useAuth } from "@/components/auth-provider";
 
 export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const account = useAccount();
+  const { isLoggedIn } = useAuth();
 
-  if (account.isReconnecting || account.isConnecting) {
-    // @todo render nice loading state
-    return <div>Reconnecting...</div>;
-  }
-
-  if (account.isDisconnected) {
+  if (!isLoggedIn) {
     return redirect("/sign-in");
   }
 
