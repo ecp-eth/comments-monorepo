@@ -1,6 +1,6 @@
 {
   "name": "@ecp.eth/nft-base-uri-server",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "private": true,
   "scripts": {
     "check-types": "tsc --noEmit",
