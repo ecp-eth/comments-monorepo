@@ -17,7 +17,7 @@ const queryClient = new QueryClient({
   },
 });
 
-export default function AuthLayout({
+export default function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -26,6 +26,7 @@ export default function AuthLayout({
   const [isInMiniApp, setIsInMiniApp] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // @todo do not block because of this, it should be done in the background
   useEffect(() => {
     async function ready() {
       try {

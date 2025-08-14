@@ -9,9 +9,11 @@ import {
   jsonb,
   uuid,
   numeric,
+  foreignKey,
 } from "drizzle-orm/pg-core";
 import type { NotificationDetails } from "./src/services/types";
 import type { Hex } from "viem";
+import { eq, sql } from "drizzle-orm";
 
 export const offchainSchema = pgSchema("broadcast_app_indexer_offchain");
 
@@ -44,19 +46,57 @@ export const channelSubscription = offchainSchema.table(
   {
     channelId: numeric({ scale: 0, precision: 78, mode: "bigint" }).notNull(),
     appId: text().notNull(),
-    userFid: integer().notNull(),
+    userAddress: text().notNull().$type<Hex>(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     order: integer().notNull().default(0),
-    notificationsEnabled: boolean().notNull().default(false),
   },
   (table) => [
-    primaryKey({ columns: [table.channelId, table.appId, table.userFid] }),
-    index("channel_subscription_notifications_enabled_idx").on(
-      table.notificationsEnabled,
-    ),
+    primaryKey({ columns: [table.channelId, table.appId, table.userAddress] }),
   ],
 );
+
+export const channelSubscriptionFarcasterNotificationSettings =
+  offchainSchema.table(
+    "channel_subscription_farcaster_notification_settings",
+    {
+      channelId: numeric({ scale: 0, precision: 78, mode: "bigint" }).notNull(),
+      appId: text().notNull(),
+      userAddress: text().notNull().$type<Hex>(),
+      userFid: integer().notNull(),
+      notificationsEnabled: boolean().notNull().default(false),
+      createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+      updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    },
+    (table) => [
+      primaryKey({
+        name: "channel_subscription_farcaster_notification_settings_pk",
+        columns: [
+          table.channelId,
+          table.appId,
+          table.userAddress,
+          table.userFid,
+        ],
+      }),
+      foreignKey({
+        name: "channel_subscription_farcaster_notification_settings_channel_id_app_id_user_address_fk",
+        columns: [table.channelId, table.appId, table.userAddress],
+        foreignColumns: [
+          channelSubscription.channelId,
+          channelSubscription.appId,
+          channelSubscription.userAddress,
+        ],
+      })
+        .onDelete("cascade")
+        .onUpdate("cascade"),
+
+      index(
+        "channel_subscription_farcaster_notification_settings_enabled_by_channel_app_idx",
+      )
+        .on(table.channelId, table.appId, table.notificationsEnabled)
+        .where(sql`${table.notificationsEnabled} = true`),
+    ],
+  );
 
 export const neynarNotificationServiceQueueStatus = offchainSchema.enum(
   "neynar_notification_service_queue_status",

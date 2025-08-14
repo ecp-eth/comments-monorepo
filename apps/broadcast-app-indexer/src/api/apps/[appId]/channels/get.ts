@@ -1,10 +1,10 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
-import { farcasterQuickAuthMiddleware } from "../../../middleware/farcaster-quick-auth-middleware";
 import { schema } from "../../../../../schema";
 import { db } from "../../../../services";
 import { and, desc, eq, isNotNull, isNull, lt, or } from "drizzle-orm";
 import { ChannelResponse } from "../../../shared-responses";
 import { HexSchema } from "@ecp.eth/sdk/core";
+import { siweMiddleware } from "../../../middleware/siwe";
 
 function toChannelCursor(channel: { id: bigint; createdAt: Date }): string {
   return Buffer.from(
@@ -63,7 +63,7 @@ export async function channelsGET(api: OpenAPIHono) {
       path: "/api/apps/:appId/channels",
       tags: ["Channels"],
       description: "Get a list of channels",
-      middleware: [farcasterQuickAuthMiddleware] as const,
+      middleware: siweMiddleware,
       request: {
         query: requestQuerySchema,
         params: z.object({
@@ -93,7 +93,25 @@ export async function channelsGET(api: OpenAPIHono) {
           and(
             eq(schema.channel.id, schema.channelSubscription.channelId),
             eq(schema.channelSubscription.appId, appId),
-            eq(schema.channelSubscription.userFid, c.get("user").fid),
+            eq(schema.channelSubscription.userAddress, c.get("user")!.address),
+          ),
+        )
+        .leftJoin(
+          schema.channelSubscriptionFarcasterNotificationSettings,
+          and(
+            eq(
+              schema.channelSubscriptionFarcasterNotificationSettings.channelId,
+              schema.channel.id,
+            ),
+            eq(
+              schema.channelSubscriptionFarcasterNotificationSettings.appId,
+              appId,
+            ),
+            eq(
+              schema.channelSubscriptionFarcasterNotificationSettings
+                .userAddress,
+              c.get("user")!.address,
+            ),
           ),
         )
         .where(
@@ -108,8 +126,8 @@ export async function channelsGET(api: OpenAPIHono) {
                 )
               : undefined,
             onlySubscribed
-              ? isNotNull(schema.channelSubscription.userFid)
-              : isNull(schema.channelSubscription.userFid),
+              ? isNotNull(schema.channelSubscription.userAddress)
+              : isNull(schema.channelSubscription.userAddress),
           ),
         )
         .orderBy(desc(schema.channel.createdAt), desc(schema.channel.id))
@@ -122,19 +140,26 @@ export async function channelsGET(api: OpenAPIHono) {
       // which also works as formatter for bigints, etc
       return c.json(
         responseSchema.parse({
-          results: pageResults.map(({ channel, channel_subscription }) => {
-            return {
-              id: channel.id,
-              name: channel.name,
-              owner: channel.owner,
-              description: channel.description,
-              isSubscribed: channel_subscription !== null,
-              notificationsEnabled:
-                channel_subscription?.notificationsEnabled ?? false,
-              createdAt: channel.createdAt,
-              updatedAt: channel.updatedAt,
-            };
-          }),
+          results: pageResults.map(
+            ({
+              channel,
+              channel_subscription,
+              channel_subscription_farcaster_notification_settings,
+            }) => {
+              return {
+                id: channel.id,
+                name: channel.name,
+                owner: channel.owner,
+                description: channel.description,
+                isSubscribed: channel_subscription !== null,
+                notificationsEnabled:
+                  channel_subscription_farcaster_notification_settings?.notificationsEnabled ??
+                  false,
+                createdAt: channel.createdAt,
+                updatedAt: channel.updatedAt,
+              };
+            },
+          ),
           pageInfo: {
             hasNextPage: nextCursor !== undefined,
             nextCursor: nextCursor

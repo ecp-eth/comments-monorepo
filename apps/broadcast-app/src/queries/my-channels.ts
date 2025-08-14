@@ -1,6 +1,5 @@
 import { publicEnv } from "@/env/public";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { sdk } from "@farcaster/miniapp-sdk";
 import { Channel, ListChannelsResponseSchema } from "@/api/schemas";
 import { useCallback } from "react";
 import z from "zod";
@@ -13,18 +12,18 @@ export function useMyChannelsQuery() {
   return useInfiniteQuery({
     queryKey: createMyChannelsQueryKey(),
     queryFn: async ({ pageParam: cursor, signal }) => {
-      const url = new URL(
-        `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels`,
-        publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
-      );
+      const searchParams = new URLSearchParams();
 
-      url.searchParams.set("onlySubscribed", "1");
+      searchParams.set("onlySubscribed", "1");
 
       if (cursor) {
-        url.searchParams.set("cursor", cursor);
+        searchParams.set("cursor", cursor);
       }
 
-      const response = await sdk.quickAuth.fetch(url, { signal });
+      const response = await fetch(
+        `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels${searchParams.size > 0 ? `?${searchParams.toString()}` : ""}`,
+        { signal },
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to fetch channels: ${response.statusText}`);

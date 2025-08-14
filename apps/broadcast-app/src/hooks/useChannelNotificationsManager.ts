@@ -31,9 +31,9 @@ export function useChannelNotificationsManager(
     channelId: channel.id,
   });
 
-  const isAppAdded = miniAppContext.client.added;
+  const isAppAdded = miniAppContext.isInMiniApp && miniAppContext.client.added;
   const doesAppHaveNotificationsEnabled =
-    !!miniAppContext.client.notificationDetails;
+    miniAppContext.isInMiniApp && !!miniAppContext.client.notificationDetails;
   const hasChannelNotificationsEnabled = channel.notificationsEnabled;
 
   let status: Status;

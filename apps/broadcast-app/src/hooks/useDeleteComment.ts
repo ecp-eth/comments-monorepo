@@ -1,5 +1,4 @@
-import { chain } from "@/wagmi/config";
-import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
+import { COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
 import { deleteComment } from "@ecp.eth/sdk/comments";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { useCommentDeletion } from "@ecp.eth/shared/hooks";
@@ -32,7 +31,7 @@ export function useDeleteComment() {
       const { txHash, wait } = await deleteComment({
         commentId: comment.id,
         writeContract: writeContractAsync,
-        commentsAddress: SUPPORTED_CHAINS[chain.id].commentManagerAddress,
+        commentsAddress: COMMENT_MANAGER_ADDRESS,
       });
 
       await wait({

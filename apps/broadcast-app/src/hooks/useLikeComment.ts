@@ -1,13 +1,13 @@
 import { useConfig, useWriteContract } from "wagmi";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { signCommentOrReaction } from "@/api/sign-comment-or-reaction";
-import { COMMENT_TYPE_REACTION, SUPPORTED_CHAINS } from "@ecp.eth/sdk";
+import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import { postComment } from "@ecp.eth/sdk/comments";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { TX_RECEIPT_TIMEOUT } from "@/constants";
 import { useReactionSubmission } from "@ecp.eth/shared/hooks";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-import { chain } from "@/wagmi/config";
+import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
 import { useMutation, type QueryKey } from "@tanstack/react-query";
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { Comment } from "@ecp.eth/shared/schemas";
@@ -57,7 +57,7 @@ export function useLikeComment() {
         });
 
         const { txHash } = await postComment({
-          commentsAddress: SUPPORTED_CHAINS[chain.id].commentManagerAddress,
+          commentsAddress: COMMENT_MANAGER_ADDRESS,
           appSignature: signedCommentResponse.signature,
           comment: signedCommentResponse.data,
           writeContract: writeContractAsync,

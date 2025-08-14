@@ -1,5 +1,4 @@
 import { serverEnv } from "@/env/server";
-import { Errors, createClient } from "@farcaster/quick-auth";
 import {
   BadRequestResponseSchema,
   SignCommentPayloadRequestServerSchema,
@@ -13,13 +12,8 @@ import {
 import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { chain } from "@/wagmi/config";
+import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
 import { publicEnv } from "@/env/public";
-import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
-
-const quickAuthClient = createClient();
-
-const chainId = chain.id;
 
 export async function POST(
   req: Request,
@@ -28,41 +22,6 @@ export async function POST(
     typeof SignCommentResponseServerSchema | typeof BadRequestResponseSchema
   >
 > {
-  try {
-    const authorization = req.headers.get("authorization");
-    const [, token] = authorization?.split(" ") || [];
-
-    if (!token) {
-      return new JSONResponse(
-        BadRequestResponseSchema,
-        {
-          authorization: ["Missing token"],
-        },
-        { status: 401 },
-      );
-    }
-
-    await quickAuthClient.verifyJwt({
-      token,
-      domain: new URL(serverEnv.FARCASTER_MINI_APP_URL).hostname,
-    });
-  } catch (e) {
-    console.error(e);
-    if (e instanceof Errors.InvalidTokenError) {
-      console.info("Invalid token:", e.message);
-
-      return new JSONResponse(
-        BadRequestResponseSchema,
-        {
-          authorization: ["Invalid token"],
-        },
-        { status: 401 },
-      );
-    }
-
-    throw e;
-  }
-
   const parsedBodyResult = SignCommentPayloadRequestServerSchema.safeParse(
     await req.json(),
   );
@@ -123,9 +82,9 @@ export async function POST(
   });
 
   const typedCommentData = createCommentTypedData({
-    commentsAddress: SUPPORTED_CHAINS[chainId].commentManagerAddress,
+    commentsAddress: COMMENT_MANAGER_ADDRESS,
     commentData,
-    chainId,
+    chainId: chain.id,
   });
 
   const signature = await app.signTypedData(typedCommentData);

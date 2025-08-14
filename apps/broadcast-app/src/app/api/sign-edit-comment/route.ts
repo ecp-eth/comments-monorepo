@@ -13,12 +13,9 @@ import {
 import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { chain } from "@/wagmi/config";
+import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
 import { createPublicClient } from "viem";
 import { publicEnv } from "@/env/public";
-import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
-
-const chainId = chain.id;
 
 export async function POST(
   req: Request,
@@ -74,7 +71,7 @@ export async function POST(
     transport: http(serverEnv.PRIVATE_RPC_URL),
   });
   const nonce = await getNonce({
-    commentsAddress: SUPPORTED_CHAINS[chain.id].commentManagerAddress,
+    commentsAddress: COMMENT_MANAGER_ADDRESS,
     author,
     app: app.address,
     readContract: publicClient.readContract,
@@ -89,9 +86,9 @@ export async function POST(
   });
 
   const typedCommentData = createEditCommentTypedData({
-    commentsAddress: SUPPORTED_CHAINS[chainId].commentManagerAddress,
+    commentsAddress: COMMENT_MANAGER_ADDRESS,
     edit,
-    chainId,
+    chainId: chain.id,
     author,
   });
 

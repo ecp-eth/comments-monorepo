@@ -1,11 +1,10 @@
 import { useConfig, useWriteContract } from "wagmi";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
-import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 import { deleteComment } from "@ecp.eth/sdk/comments";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { TX_RECEIPT_TIMEOUT } from "@/constants";
 import { useReactionRemoval } from "@ecp.eth/shared/hooks";
-import { chain } from "@/wagmi/config";
+import { COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
 import { useMutation, type QueryKey } from "@tanstack/react-query";
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { Comment } from "@ecp.eth/shared/schemas";
@@ -60,7 +59,7 @@ export function useUnlikeComment() {
         };
 
         const { txHash } = await deleteComment({
-          commentsAddress: SUPPORTED_CHAINS[chain.id].commentManagerAddress,
+          commentsAddress: COMMENT_MANAGER_ADDRESS,
           commentId: reaction.id,
           writeContract: writeContractAsync,
         });
