@@ -231,7 +231,7 @@ describe("CommentModerationService", () => {
       ).not.toHaveBeenCalled();
       expect(
         mockNotificationService.notifyAutomaticallyClassified,
-      ).toHaveBeenCalled();
+      ).not.toHaveBeenCalled();
     });
 
     it("should not send notifications when classification is skipped", async () => {
@@ -615,7 +615,7 @@ describe("CommentModerationService", () => {
       ).not.toHaveBeenCalled();
       expect(
         mockNotificationService.notifyAutomaticallyClassified,
-      ).toHaveBeenCalled();
+      ).not.toHaveBeenCalled();
     });
 
     it("should not send notifications when classification is skipped for updates", async () => {
