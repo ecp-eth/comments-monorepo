@@ -29,6 +29,13 @@
       "when": 1755062450871,
       "tag": "0003_api_key_by_id_index",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1755213129340,
+      "tag": "0004_sweet_bug",
+      "breakpoints": true
     }
   ]
 }

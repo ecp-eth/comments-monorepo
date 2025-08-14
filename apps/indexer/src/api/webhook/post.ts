@@ -18,6 +18,12 @@ const webhookRequestBodySchema = z.object({
     message: z.object({
       message_id: z.number().int().nonnegative(),
     }),
+    from: z
+      .object({
+        id: z.number().int().nonnegative(),
+        username: z.string().nullable(),
+      })
+      .optional(),
   }),
 });
 
@@ -62,7 +68,7 @@ export function setupWebhook(app: OpenAPIHono) {
   app.openapi(webhookRoute, async (c) => {
     const { callback_query: callbackQuery } = c.req.valid("json");
 
-    const { data } = callbackQuery;
+    const { data, from } = callbackQuery;
 
     try {
       const command =
@@ -84,6 +90,8 @@ export function setupWebhook(app: OpenAPIHono) {
         return c.newResponse(null, 204);
       }
 
+      const updatedBy = from?.username ?? from?.id.toString() ?? "unknown";
+
       switch (command.action) {
         case "moderation-set-as-approved":
           await commentModerationService.updateModerationStatus({
@@ -91,6 +99,7 @@ export function setupWebhook(app: OpenAPIHono) {
             commentRevision: command.commentRevision,
             callbackQuery,
             status: "approved",
+            updatedBy,
           });
 
           break;
@@ -100,6 +109,7 @@ export function setupWebhook(app: OpenAPIHono) {
             commentRevision: command.commentRevision,
             callbackQuery,
             status: "rejected",
+            updatedBy,
           });
 
           break;
@@ -109,6 +119,7 @@ export function setupWebhook(app: OpenAPIHono) {
             commentRevision: command.commentRevision,
             callbackQuery,
             status: "pending",
+            updatedBy,
           });
 
           break;

@@ -56,6 +56,7 @@ export const commentModerationStatuses = offchainSchema.table(
       .notNull()
       .default("pending")
       .$type<ModerationStatus>(),
+    updatedBy: text().notNull(),
     revision: integer().notNull(),
   },
   (table) => [
