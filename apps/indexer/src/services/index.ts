@@ -88,7 +88,8 @@ export const commentReportsService = new CommentReportsService({
 
 export const premoderationService = env.MODERATION_ENABLED
   ? new PremoderationService({
-      classificationThreshold: env.MODERATION_CLASSIFICATION_THRESHOLD,
+      classificationThreshold:
+        env.MODERATION_NOTIFICATION_TRIGGERING_CLASSIFICATION_THRESHOLD,
       db,
     })
   : new NoopPremoderationService();

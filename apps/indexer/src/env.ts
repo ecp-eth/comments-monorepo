@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 const moderationNotificationsEnabledSchema = z.object({
-  MODERATION_CLASSIFICATION_THRESHOLD: z.coerce.number().min(0).max(100),
+  MODERATION_NOTIFICATION_TRIGGERING_CLASSIFICATION_THRESHOLD: z.coerce
+    .number()
+    .min(0)
+    .max(100),
   MODERATION_TELEGRAM_BOT_TOKEN: z.string().nonempty(),
   MODERATION_TELEGRAM_CHANNEL_ID: z.string().nonempty(),
   MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url(),
@@ -59,7 +62,7 @@ const EnvSchema = z
       .enum(["0", "1"])
       .default("0")
       .transform((val) => val === "1"),
-    MODERATION_CLASSIFICATION_THRESHOLD: z.coerce
+    MODERATION_NOTIFICATION_TRIGGERING_CLASSIFICATION_THRESHOLD: z.coerce
       .number()
       .min(0)
       .max(100)
