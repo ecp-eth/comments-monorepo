@@ -86,21 +86,25 @@ export class CommentModerationService {
         },
       },
       saveAndNotify: async () => {
-        let messageId: number | undefined;
-
         await Promise.all([
           premoderationResult.save(),
           classifierResult.save(),
         ]);
 
-        if (premoderationResult.action !== "skipped") {
-          messageId = await this.sendNewNotification({
-            comment,
-            commentRevision: DEFAULT_REVISION_ON_ADD,
-            references,
-            classifierResult,
-          });
+        const skipNotification =
+          premoderationResult.status === "approved" ||
+          premoderationResult.action === "skipped";
+
+        if (skipNotification) {
+          return;
         }
+
+        const messageId = await this.sendNewNotification({
+          comment,
+          commentRevision: DEFAULT_REVISION_ON_ADD,
+          references,
+          classifierResult,
+        });
 
         if (classifierResult.action !== "skipped") {
           await this.sendNewAutomaticClassification({
@@ -186,20 +190,25 @@ export class CommentModerationService {
         changedAt: premoderationResult.changedAt,
       },
       saveAndNotify: async () => {
-        let messageId: number | undefined;
         await Promise.all([
           premoderationResult.save(),
           classifierResult.save(),
         ]);
 
-        if (premoderationResult.action !== "skipped") {
-          messageId = await this.sendUpdateNotification({
-            comment,
-            commentRevision,
-            references,
-            classifierResult,
-          });
+        const skipNotification =
+          premoderationResult.status === "approved" ||
+          premoderationResult.action === "skipped";
+
+        if (skipNotification) {
+          return;
         }
+
+        const messageId = await this.sendUpdateNotification({
+          comment,
+          commentRevision,
+          references,
+          classifierResult,
+        });
 
         if (classifierResult.action !== "skipped") {
           await this.sendUpdateAutomaticClassification({
