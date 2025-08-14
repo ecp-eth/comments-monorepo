@@ -22,6 +22,13 @@
       "when": 1754031605236,
       "tag": "0002_rename_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1755156670922,
+      "tag": "0003_siwe_auth",
+      "breakpoints": true
     }
   ]
 }

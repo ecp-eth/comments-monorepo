@@ -11,8 +11,33 @@ import {
   numeric,
 } from "drizzle-orm/pg-core";
 import type { NotificationDetails } from "./src/services/types";
+import type { Hex } from "viem";
 
 export const offchainSchema = pgSchema("broadcast_app_indexer_offchain");
+
+export const authSiweSession = offchainSchema.table("auth_siwe_session", {
+  id: uuid().notNull().defaultRandom().primaryKey(),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  userId: text().notNull().$type<Hex>(),
+});
+
+export const authSiweRefreshToken = offchainSchema.table(
+  "auth_siwe_refresh_token",
+  {
+    id: uuid().notNull().defaultRandom().primaryKey(),
+    sessionId: uuid()
+      .notNull()
+      .references(() => authSiweSession.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    isUsed: boolean().notNull().default(false),
+    expiresAt: timestamp({ withTimezone: true }).notNull(),
+  },
+);
 
 export const channelSubscription = offchainSchema.table(
   "channel_subscription",

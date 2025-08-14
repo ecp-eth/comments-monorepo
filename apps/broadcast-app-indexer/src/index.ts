@@ -2,11 +2,8 @@ import "./sentry";
 import * as Sentry from "@sentry/node";
 import { schema } from "../schema";
 import { ponder } from "ponder:registry";
-import { db } from "./services/db";
-import { and, eq } from "drizzle-orm";
 import { isZeroHex } from "@ecp.eth/sdk/core";
 import { notificationService } from "./services";
-import { env } from "./env";
 
 ponder.on("BroadcastHook:ChannelCreated", async ({ event, context }) => {
   const channelEvent = event.args;
