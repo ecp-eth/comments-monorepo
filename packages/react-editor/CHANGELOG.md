@@ -1,5 +1,15 @@
 # @ecp.eth/react-editor
 
+## 0.0.7
+
+### Patch Changes
+
+- 5287dd4: fix(react-editor): do not use ens/fname suggestion as address in content, keep the name as suggested
+- Updated dependencies [4f09abc]
+- Updated dependencies [db31c4c]
+  - @ecp.eth/sdk@0.0.27
+  - @ecp.eth/shared@0.0.12
+
 ## 0.0.6
 
 ### Patch Changes

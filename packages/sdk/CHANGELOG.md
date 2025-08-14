@@ -1,5 +1,12 @@
 # @ecp.eth/sdk
 
+## 0.0.27
+
+### Patch Changes
+
+- 4f09abc: Add `app` as configurable option to iframe embed config
+- db31c4c: feat(sdk): add `getCommentCreationFee` and `setCommentCreationFee` to sdk
+
 ## 0.0.26
 
 ### Patch Changes
