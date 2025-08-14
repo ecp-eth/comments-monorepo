@@ -74,6 +74,19 @@ const BaseConfig = z.object({
         message: "At least one BROADCAST_MINI_APP_{name}_URI must be set",
       },
     ),
+
+  JWT_NONCE_TOKEN_LIFETIME: z.coerce.number().int().positive().default(600),
+  JWT_ACCESS_TOKEN_LIFETIME: z.coerce.number().int().positive().default(900),
+  JWT_REFRESH_TOKEN_LIFETIME: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(2592000),
+  JWT_AUDIENCE_REFRESH: z.string().nonempty().default("refresh-token"),
+  JWT_AUDIENCE_ACCESS: z.string().nonempty().default("access-token"),
+  JWT_AUDIENCE_NONCE: z.string().nonempty().default("siwe-nonce"),
+  JWT_ISSUER: z.string().nonempty().default("broadcast-app-indexer"),
+  JWT_SECRET: z.string().nonempty(),
 });
 
 const EnvSchema = z.intersection(BaseConfig, ChainConfig);
