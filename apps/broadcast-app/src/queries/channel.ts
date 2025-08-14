@@ -10,7 +10,6 @@ import {
   createChannelQueryKey,
   createCommentRepliesQueryKey,
 } from "./query-keys";
-import { sdk } from "@farcaster/miniapp-sdk";
 import { publicEnv } from "@/env/public";
 import { ChannelNotFoundError } from "@/errors";
 import { Channel, ChannelSchema } from "@/api/schemas";
@@ -28,13 +27,12 @@ export function useChannelQuery(channelId: bigint) {
   return useQuery({
     queryKey: createChannelQueryKey(channelId),
     queryFn: async ({ signal }) => {
-      const channelUrl = new URL(
-        `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channelId}`,
-        publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
+      const channelResponse = await fetch(
+        `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channelId}`,
+        {
+          signal,
+        },
       );
-      const channelResponse = await sdk.quickAuth.fetch(channelUrl, {
-        signal,
-      });
 
       if (channelResponse.status === 404) {
         throw new ChannelNotFoundError();

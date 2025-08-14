@@ -101,16 +101,30 @@ export class NeynarNotificationsService implements INotificationsService {
     const allApps = [...isolatedApps, ...nonIsolatedApps];
 
     for (const app of allApps) {
-      const subscribers = await this.db.query.channelSubscription.findMany({
-        columns: {
-          userFid: true,
-        },
-        where: and(
-          eq(schema.channelSubscription.appId, app.appId),
-          eq(schema.channelSubscription.channelId, comment.channelId),
-          eq(schema.channelSubscription.notificationsEnabled, true),
-        ),
-      });
+      const subscribers =
+        await this.db.query.channelSubscriptionFarcasterNotificationSettings.findMany(
+          {
+            columns: {
+              userFid: true,
+            },
+            where: and(
+              eq(
+                schema.channelSubscriptionFarcasterNotificationSettings.appId,
+                app.appId,
+              ),
+              eq(
+                schema.channelSubscriptionFarcasterNotificationSettings
+                  .channelId,
+                comment.channelId,
+              ),
+              eq(
+                schema.channelSubscriptionFarcasterNotificationSettings
+                  .notificationsEnabled,
+                true,
+              ),
+            ),
+          },
+        );
 
       await this.db
         .insert(schema.neynarNotificationServiceQueue)

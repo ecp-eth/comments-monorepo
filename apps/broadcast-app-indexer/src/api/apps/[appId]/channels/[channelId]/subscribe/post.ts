@@ -1,5 +1,4 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
-import { farcasterQuickAuthMiddleware } from "../../../../../middleware/farcaster-quick-auth-middleware";
 import {
   BadRequestResponse,
   ChannelSubscriptionUpdateResponse,
@@ -11,6 +10,7 @@ import { db } from "../../../../../../services";
 import { schema } from "../../../../../../../schema";
 import { and, eq } from "drizzle-orm";
 import { HexSchema } from "@ecp.eth/sdk/core";
+import { siweMiddleware } from "../../../../../middleware/siwe";
 
 export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
   api.openapi(
@@ -19,7 +19,7 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
       path: "/api/apps/:appId/channels/:channelId/subscribe",
       tags: ["Channels", "Subscriptions"],
       description: "Subscribes to a channel",
-      middleware: [farcasterQuickAuthMiddleware] as const,
+      middleware: siweMiddleware,
       request: {
         params: z.object({
           channelId: z.coerce.bigint(),
@@ -29,6 +29,7 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
           content: {
             "application/json": {
               schema: z.object({
+                userFid: z.number(),
                 notificationsEnabled: z.boolean().default(false),
               }),
             },
@@ -101,7 +102,7 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
           and(
             eq(schema.channelSubscription.appId, appId),
             eq(schema.channel.id, schema.channelSubscription.channelId),
-            eq(schema.channelSubscription.userFid, c.get("user").fid),
+            eq(schema.channelSubscription.userAddress, c.get("user")!.address),
           ),
         )
         .where(eq(schema.channel.id, channelId))
@@ -115,29 +116,53 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
         return c.json({ error: "Already subscribed to the channel" }, 409);
       }
 
-      const { notificationsEnabled } = c.req.valid("json");
+      const { notificationsEnabled, userFid } = c.req.valid("json");
 
-      const [subscription] = await db
-        .insert(schema.channelSubscription)
-        .values({
-          appId,
-          channelId: result.channel.id,
-          userFid: c.get("user").fid,
-          notificationsEnabled,
-        })
-        .returning()
-        .execute();
+      const { subscription, notificationSettings } = await db.transaction(
+        async (tx) => {
+          const [subscription] = await tx
+            .insert(schema.channelSubscription)
+            .values({
+              appId,
+              channelId: result.channel.id,
+              userAddress: c.get("user")!.address,
+            })
+            .returning()
+            .execute();
 
-      if (!subscription) {
-        throw new Error("Failed to create subscription");
-      }
+          if (!subscription) {
+            throw new Error("Failed to create subscription");
+          }
+
+          const [notificationSettings] = await tx
+            .insert(schema.channelSubscriptionFarcasterNotificationSettings)
+            .values({
+              userFid,
+              appId: subscription.appId,
+              channelId: subscription.channelId,
+              userAddress: subscription.userAddress,
+              notificationsEnabled,
+            })
+            .returning()
+            .execute();
+
+          if (!notificationSettings) {
+            throw new Error("Failed to create notification settings");
+          }
+
+          return {
+            subscription,
+            notificationSettings,
+          };
+        },
+      );
 
       // hono doesn't run response schema validations therefore we need to validate the response manually
       // which also works as formatter for bigints, etc
       return c.json(
         ChannelSubscriptionUpdateResponse.parse({
           channelId: subscription.channelId,
-          notificationsEnabled: subscription.notificationsEnabled,
+          notificationsEnabled: notificationSettings.notificationsEnabled,
         }),
         201,
       );

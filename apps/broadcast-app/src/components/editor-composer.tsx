@@ -47,7 +47,7 @@ import { signCommentOrReaction } from "@/api/sign-comment-or-reaction";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { ContractFunctionExecutionError } from "viem";
 import { signEditComment } from "@/api/sign-edit-comment";
-import { chain } from "@/wagmi/config";
+import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
 
 interface EditorComposerProps {
   /**
@@ -195,7 +195,7 @@ export function EditorComposer({
             appSignature: signedCommentResponse.signature,
             edit: signedCommentResponse.data,
             writeContract: writeContractAsync,
-            commentsAddress: SUPPORTED_CHAINS[chain.id].commentManagerAddress,
+            commentsAddress: COMMENT_MANAGER_ADDRESS,
           });
 
           await wait({
@@ -240,7 +240,7 @@ export function EditorComposer({
           });
 
           const { txHash, wait } = await postComment({
-            commentsAddress: SUPPORTED_CHAINS[chain.id].commentManagerAddress,
+            commentsAddress: COMMENT_MANAGER_ADDRESS,
             appSignature: signedCommentResponse.signature,
             comment: signedCommentResponse.data,
             writeContract: writeContractAsync,

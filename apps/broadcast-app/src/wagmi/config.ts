@@ -25,3 +25,11 @@ export const miniAppConfig = createConfig({
   },
   connectors: [miniAppConnector()],
 });
+
+export const COMMENT_MANAGER_ADDRESS =
+  SUPPORTED_CHAINS[chain.id as keyof typeof SUPPORTED_CHAINS]
+    .commentManagerAddress;
+
+export const CHANNEL_MANAGER_ADDRESS =
+  SUPPORTED_CHAINS[chain.id as keyof typeof SUPPORTED_CHAINS]
+    .channelManagerAddress;

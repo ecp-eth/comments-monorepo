@@ -1,0 +1,1 @@
+ALTER TABLE "broadcast_app_indexer_offchain"."channel_subscription_farcaster_notification_settings" ADD CONSTRAINT "channel_subscription_farcaster_notification_settings_pk" PRIMARY KEY("channel_id","app_id","user_address","user_fid");

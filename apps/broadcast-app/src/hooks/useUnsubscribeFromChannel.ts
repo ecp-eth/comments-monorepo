@@ -1,5 +1,4 @@
 import { publicEnv } from "@/env/public";
-import sdk from "@farcaster/miniapp-sdk";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import type { Channel } from "@/api/schemas";
 import { toast } from "sonner";
@@ -24,13 +23,12 @@ export function useUnsubscribeToChannel({
   return useMutation({
     ...options,
     mutationFn: async () => {
-      const url = new URL(
-        `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channel.id}/unsubscribe`,
-        publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
+      const response = await fetch(
+        `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channel.id}/unsubscribe`,
+        {
+          method: "POST",
+        },
       );
-      const response = await sdk.quickAuth.fetch(url, {
-        method: "POST",
-      });
 
       if (!response.ok) {
         console.error(

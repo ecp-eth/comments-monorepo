@@ -22,8 +22,8 @@ import {
   RotateCwIcon,
 } from "lucide-react";
 import { useAccount, useConnect, usePublicClient } from "wagmi";
-import { ChannelManagerABI, SUPPORTED_CHAINS } from "@ecp.eth/sdk";
-import { chain } from "@/wagmi/config";
+import { ChannelManagerABI } from "@ecp.eth/sdk";
+import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/config";
 import { useQuery } from "@tanstack/react-query";
 import { BroadcastHookABI } from "@/abi/generated/broadcast-hook-abi";
 import { publicEnv } from "@/env/public";
@@ -58,7 +58,7 @@ export function ChannelCreationBottomSheet({
 
       const channelCreationFee = await publicClient.readContract({
         abi: ChannelManagerABI,
-        address: SUPPORTED_CHAINS[chain.id].channelManagerAddress,
+        address: CHANNEL_MANAGER_ADDRESS,
         functionName: "getChannelCreationFee",
       });
 

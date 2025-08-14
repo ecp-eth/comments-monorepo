@@ -1,5 +1,4 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
-import { farcasterQuickAuthMiddleware } from "../../../../../middleware/farcaster-quick-auth-middleware";
 import {
   BadRequestResponse,
   InternalServerErrorResponse,
@@ -9,6 +8,7 @@ import { db } from "../../../../../../services";
 import { and, eq } from "drizzle-orm";
 import { schema } from "../../../../../../../schema";
 import { HexSchema } from "@ecp.eth/sdk/core";
+import { siweMiddleware } from "../../../../../middleware/siwe";
 
 export async function channelUnsubscribePOST(api: OpenAPIHono): Promise<void> {
   api.openapi(
@@ -17,7 +17,7 @@ export async function channelUnsubscribePOST(api: OpenAPIHono): Promise<void> {
       path: "/api/apps/:appId/channels/:channelId/unsubscribe",
       tags: ["Channels", "Subscriptions"],
       description: "Unsubscribes from a channel",
-      middleware: [farcasterQuickAuthMiddleware] as const,
+      middleware: siweMiddleware,
       request: {
         params: z.object({
           channelId: z.coerce.bigint(),
@@ -63,7 +63,7 @@ export async function channelUnsubscribePOST(api: OpenAPIHono): Promise<void> {
           and(
             eq(schema.channelSubscription.channelId, channelId),
             eq(schema.channelSubscription.appId, appId),
-            eq(schema.channelSubscription.userFid, c.get("user").fid),
+            eq(schema.channelSubscription.userAddress, c.get("user")!.address),
           ),
         )
         .returning()

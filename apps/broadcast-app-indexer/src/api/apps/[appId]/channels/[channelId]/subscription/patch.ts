@@ -1,5 +1,4 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
-import { farcasterQuickAuthMiddleware } from "../../../../../middleware/farcaster-quick-auth-middleware";
 import {
   BadRequestResponse,
   ChannelSubscriptionUpdateResponse,
@@ -11,6 +10,8 @@ import { db } from "../../../../../../services";
 import { schema } from "../../../../../../../schema";
 import { and, eq } from "drizzle-orm";
 import { HexSchema } from "@ecp.eth/sdk/core";
+import { siweMiddleware } from "../../../../../middleware/siwe";
+import { HTTPException } from "hono/http-exception";
 
 export async function channelSubscriptionPATCH(
   api: OpenAPIHono,
@@ -21,7 +22,7 @@ export async function channelSubscriptionPATCH(
       path: "/api/apps/:appId/channels/:channelId/subscription",
       tags: ["Channels", "Subscriptions"],
       description: "Updates subscription settings for a channel",
-      middleware: [farcasterQuickAuthMiddleware] as const,
+      middleware: siweMiddleware,
       request: {
         params: z.object({
           channelId: z.coerce.bigint(),
@@ -31,6 +32,7 @@ export async function channelSubscriptionPATCH(
           content: {
             "application/json": {
               schema: z.object({
+                userFid: z.number(),
                 notificationsEnabled: z.boolean().optional(),
               }),
             },
@@ -100,32 +102,83 @@ export async function channelSubscriptionPATCH(
         return c.json({ error: "No updates provided" }, 400);
       }
 
-      const [subscription] = await db
-        .update(schema.channelSubscription)
-        .set({
-          ...updates,
-          updatedAt: new Date(),
-        })
-        .where(
-          and(
-            eq(schema.channelSubscription.channelId, channelId),
-            eq(schema.channelSubscription.appId, appId),
-            eq(schema.channelSubscription.userFid, c.get("user").fid),
-          ),
-        )
-        .returning()
-        .execute();
+      const { notificationSettings, subscription } = await db.transaction(
+        async (tx) => {
+          const [subscription] = await db
+            .update(schema.channelSubscription)
+            .set({
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(schema.channelSubscription.channelId, channelId),
+                eq(schema.channelSubscription.appId, appId),
+                eq(
+                  schema.channelSubscription.userAddress,
+                  c.get("user")!.address,
+                ),
+              ),
+            )
+            .returning()
+            .execute();
 
-      if (!subscription) {
-        return c.json({ error: "Subscription not found" }, 404);
-      }
+          if (!subscription) {
+            throw new HTTPException(404, {
+              message: "Subscription not found",
+            });
+          }
+
+          const [notificationSettings] = await tx
+            .update(schema.channelSubscriptionFarcasterNotificationSettings)
+            .set({
+              notificationsEnabled: updates.notificationsEnabled,
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(
+                  schema.channelSubscriptionFarcasterNotificationSettings
+                    .channelId,
+                  channelId,
+                ),
+                eq(
+                  schema.channelSubscriptionFarcasterNotificationSettings.appId,
+                  appId,
+                ),
+                eq(
+                  schema.channelSubscriptionFarcasterNotificationSettings
+                    .userAddress,
+                  c.get("user")!.address,
+                ),
+                eq(
+                  schema.channelSubscriptionFarcasterNotificationSettings
+                    .userFid,
+                  update.userFid,
+                ),
+              ),
+            )
+            .returning()
+            .execute();
+
+          if (!notificationSettings) {
+            throw new HTTPException(404, {
+              message: "Notification settings not found",
+            });
+          }
+
+          return {
+            subscription,
+            notificationSettings,
+          };
+        },
+      );
 
       // hono doesn't run response schema validations therefore we need to validate the response manually
       // which also works as formatter for bigints, etc
       return c.json(
         ChannelSubscriptionUpdateResponse.parse({
           channelId: subscription.channelId,
-          notificationsEnabled: subscription.notificationsEnabled,
+          notificationsEnabled: notificationSettings.notificationsEnabled,
         }),
         200,
       );

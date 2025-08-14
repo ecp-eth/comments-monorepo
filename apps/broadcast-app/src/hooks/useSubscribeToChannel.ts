@@ -40,6 +40,12 @@ export function useSubscribeToChannel({
   return useMutation({
     ...options,
     mutationFn: async () => {
+      if (!miniAppContext.isInMiniApp) {
+        throw new Error(
+          "You need to be in a mini app to subscribe to a channel",
+        );
+      }
+
       let notificationsEnabled = !!miniAppContext.client.notificationDetails;
 
       if (!miniAppContext.client.added) {
@@ -48,18 +54,16 @@ export function useSubscribeToChannel({
         notificationsEnabled = !!result.notificationDetails;
       }
 
-      const url = new URL(
-        `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channel.id}/subscribe`,
-        publicEnv.NEXT_PUBLIC_BROADCAST_APP_INDEXER_URL,
-      );
-
-      const response = await sdk.quickAuth.fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channel.id}/subscribe`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ notificationsEnabled }),
         },
-        body: JSON.stringify({ notificationsEnabled }),
-      });
+      );
 
       if (response.status === 409) {
         throw new AlreadySubscribedError(
