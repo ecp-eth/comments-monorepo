@@ -124,6 +124,7 @@ describe("PremoderationService", () => {
         updatedAt: new Date(),
         revision: 0,
         commentId: "0x123" as Hex,
+        updatedBy: "premoderation",
       };
 
       vi.mocked(commentModerationStatusesFindFirstMock).mockResolvedValueOnce(
@@ -184,6 +185,7 @@ describe("PremoderationService", () => {
         moderationStatus: "pending",
         updatedAt: expect.any(Date),
         revision: mockComment.revision,
+        updatedBy: "premoderation",
       });
     });
 
@@ -227,6 +229,7 @@ describe("PremoderationService", () => {
         moderationStatus: "approved",
         updatedAt: expect.any(Date),
         revision: mockComment.revision,
+        updatedBy: "premoderation",
       });
     });
 
@@ -270,6 +273,7 @@ describe("PremoderationService", () => {
         moderationStatus: "pending",
         updatedAt: expect.any(Date),
         revision: mockComment.revision,
+        updatedBy: "premoderation",
       });
     });
   });
@@ -355,6 +359,7 @@ describe("PremoderationService", () => {
         moderationStatus: "pending",
         updatedAt: expect.any(Date),
         revision: mockComment.revision,
+        updatedBy: "premoderation",
       });
     });
 
@@ -405,6 +410,7 @@ describe("PremoderationService", () => {
         moderationStatus: "approved",
         updatedAt: expect.any(Date),
         revision: mockComment.revision,
+        updatedBy: "premoderation",
       });
     });
 
@@ -455,6 +461,7 @@ describe("PremoderationService", () => {
         moderationStatus: "pending",
         updatedAt: expect.any(Date),
         revision: mockComment.revision,
+        updatedBy: "premoderation",
       });
     });
   });
@@ -470,6 +477,7 @@ describe("PremoderationService", () => {
           commentId: "0x123" as Hex,
           commentRevision: undefined,
           status: "approved" as ModerationStatus,
+          updatedBy: "premoderation",
         }),
       ).rejects.toThrow("Comment moderation status not found");
     });
@@ -488,6 +496,7 @@ describe("PremoderationService", () => {
           commentId: "0x123" as Hex,
           commentRevision: undefined,
           status: "approved" as ModerationStatus,
+          updatedBy: "premoderation",
         }),
       ).rejects.toThrow("Comment 0x123 not found");
     });
@@ -511,6 +520,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         commentRevision: undefined,
         status: "pending" as ModerationStatus,
+        updatedBy: "premoderation",
       });
 
       expect(result).toBe(mockedComment);
@@ -536,6 +546,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         commentRevision: undefined,
         status: "approved" as ModerationStatus,
+        updatedBy: "premoderation",
       });
 
       expect(dbInsertMock).toHaveBeenCalledOnce();
@@ -548,6 +559,7 @@ describe("PremoderationService", () => {
         moderationStatus: "approved" as ModerationStatus,
         updatedAt: expect.any(Date),
         revision: 0,
+        updatedBy: "premoderation",
       });
 
       expect(dbUpdateMock).toHaveBeenCalledWith(schema.comment);
@@ -563,6 +575,7 @@ describe("PremoderationService", () => {
       expect(dbUpdateSetMock).toHaveBeenCalledWith({
         moderationStatus: "approved" as ModerationStatus,
         updatedAt: expect.any(Date),
+        updatedBy: "premoderation",
       });
 
       expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(2);
@@ -588,6 +601,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         commentRevision: 1,
         status: "approved" as ModerationStatus,
+        updatedBy: "premoderation",
       });
 
       expect(dbInsertMock).toHaveBeenCalledOnce();
@@ -600,6 +614,7 @@ describe("PremoderationService", () => {
         moderationStatus: "approved" as ModerationStatus,
         updatedAt: expect.any(Date),
         revision: 1,
+        updatedBy: "premoderation",
       });
 
       expect(dbUpdateMock).toHaveBeenCalledWith(schema.comment);
@@ -615,6 +630,7 @@ describe("PremoderationService", () => {
       expect(dbUpdateSetMock).toHaveBeenCalledWith({
         moderationStatus: "approved" as ModerationStatus,
         updatedAt: expect.any(Date),
+        updatedBy: "premoderation",
       });
 
       expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(2);
@@ -640,6 +656,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         commentRevision: 1,
         status: "pending" as ModerationStatus,
+        updatedBy: "premoderation",
       });
 
       expect(dbInsertMock).toHaveBeenCalledOnce();
@@ -652,6 +669,7 @@ describe("PremoderationService", () => {
         moderationStatus: "pending" as ModerationStatus,
         updatedAt: expect.any(Date),
         revision: 1,
+        updatedBy: "premoderation",
       });
 
       expect(dbUpdateMock).toHaveBeenCalledWith(schema.comment);

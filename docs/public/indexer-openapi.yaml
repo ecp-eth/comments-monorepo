@@ -8140,6 +8140,19 @@ paths:
                           minimum: 0
                       required:
                         - message_id
+                    from:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          minimum: 0
+                        username:
+                          type:
+                            - string
+                            - 'null'
+                      required:
+                        - id
+                        - username
                   required:
                     - id
                     - data

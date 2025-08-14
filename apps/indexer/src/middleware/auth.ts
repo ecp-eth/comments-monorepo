@@ -1,9 +1,20 @@
-import { type Context, type HonoRequest, type MiddlewareHandler } from "hono";
+import {
+  Env,
+  type Context,
+  type HonoRequest,
+  type MiddlewareHandler,
+} from "hono";
 import { verifyAsync } from "@noble/ed25519";
 import { HTTPException } from "hono/http-exception";
 import { managementAuthService } from "../services";
 
 const MAX_REQUEST_AGE_MS = 1 * 60 * 1000; // 1 minute
+
+export type AuthMiddlewareContext = Env & {
+  Variables: {
+    apiKeyId: string;
+  };
+};
 
 /**
  * Middleware to authenticate requests using API keys and signatures
@@ -25,8 +36,8 @@ const MAX_REQUEST_AGE_MS = 1 * 60 * 1000; // 1 minute
  * x-api-key: ...
  * ```
  */
-export function authMiddleware(): MiddlewareHandler {
-  return async (c: Context, next) => {
+export function authMiddleware(): MiddlewareHandler<AuthMiddlewareContext> {
+  return async (c: Context<AuthMiddlewareContext>, next) => {
     // Try to get signature from header first, then from query params
     const signature =
       c.req.header("x-api-signature") || c.req.query("signature");
@@ -79,6 +90,8 @@ export function authMiddleware(): MiddlewareHandler {
         res: Response.json({ message: "Invalid signature" }, { status: 401 }),
       });
     }
+
+    c.set("apiKeyId", keyId);
 
     await next();
   };

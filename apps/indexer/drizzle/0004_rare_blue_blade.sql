@@ -1,0 +1,1 @@
+ALTER TABLE "ecp_indexer_schema"."comment_moderation_statuses" ADD COLUMN "updated_by" text DEFAULT 'premoderation' NOT NULL;
