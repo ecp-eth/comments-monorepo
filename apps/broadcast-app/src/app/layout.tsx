@@ -1,5 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "@rainbow-me/rainbowkit/styles.css";
+
 import { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
 

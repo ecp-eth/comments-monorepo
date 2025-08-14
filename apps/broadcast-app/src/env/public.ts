@@ -1,3 +1,4 @@
+import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod";
 
@@ -9,6 +10,21 @@ const publicEnvSchema = z.object({
   NEXT_PUBLIC_APP_SIGNER_ADDRESS: HexSchema,
   NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS: HexSchema,
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+  NEXT_PUBLIC_WC_PROJECT_ID: z.string().nonempty(),
+  NEXT_PUBLIC_CHAIN_ID: z.custom<keyof typeof SUPPORTED_CHAINS>(
+    (data) => {
+      if (data in SUPPORTED_CHAINS) {
+        return true;
+      }
+
+      return false;
+    },
+    {
+      message:
+        "Invalid chain id, must be one of: " +
+        Object.keys(SUPPORTED_CHAINS).join(", "),
+    },
+  ),
 });
 
 const result = publicEnvSchema.safeParse({
@@ -21,6 +37,8 @@ const result = publicEnvSchema.safeParse({
   NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS:
     process.env.NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS,
   NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  NEXT_PUBLIC_WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
+  NEXT_PUBLIC_CHAIN_ID: process.env.NEXT_PUBLIC_CHAIN_ID,
 });
 
 if (!result.success) {
