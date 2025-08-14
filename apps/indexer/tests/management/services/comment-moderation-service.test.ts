@@ -795,6 +795,7 @@ describe("CommentModerationService", () => {
         callbackQuery: undefined,
         status,
         commentRevision: 0,
+        updatedBy: "premoderation",
       });
 
       expect(result).toEqual(mockUpdatedComment);
@@ -802,6 +803,7 @@ describe("CommentModerationService", () => {
         commentId,
         commentRevision: 0,
         status,
+        updatedBy: "premoderation",
       });
     });
   });

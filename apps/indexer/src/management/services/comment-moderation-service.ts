@@ -228,6 +228,7 @@ export class CommentModerationService {
     commentRevision,
     callbackQuery,
     status,
+    updatedBy,
   }: {
     commentId: Hex;
     /**
@@ -236,11 +237,13 @@ export class CommentModerationService {
     commentRevision: number | undefined;
     callbackQuery: TelegramCallbackQuery | undefined;
     status: ModerationStatus;
+    updatedBy: string;
   }): Promise<CommentSelectType> {
     const comment = await this.premoderationService.updateStatus({
       commentId,
       commentRevision,
       status,
+      updatedBy,
     });
 
     if (!comment) {
