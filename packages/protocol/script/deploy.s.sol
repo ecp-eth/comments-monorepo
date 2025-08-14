@@ -29,15 +29,15 @@ contract DeployScript is Script {
 
     bool isSimulation = vm.envOr("SIM", false);
 
-    address ownerAddress = vm.envAddress("CONTRACT_OWNER_ADDRESS");
     uint256 deployerPrivateKey = env == Env.Prod
       ? vm.envOr("PRIVATE_KEY", uint256(fallbackPrivateKey))
-      : fallbackPrivateKey; // Anvil test account private key
+      : vm.envOr("CUSTOM_ANVIL_DEPLOYER_PRIVATE_KEY", fallbackPrivateKey); // Anvil test account private key
     address deployerAddressFromPrivateKey = vm.addr(deployerPrivateKey);
     address deployerAddress = vm.envOr(
       "PROD_DEPLOYER_ADDRESS",
       deployerAddressFromPrivateKey
     );
+    address ownerAddress = vm.envOr("CONTRACT_OWNER_ADDRESS", deployerAddress);
 
     console.log(
       string.concat(isSimulation ? "Simulation " : "", "Deployer Address:"),
