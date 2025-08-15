@@ -99,7 +99,7 @@ export function CommentSection() {
         signal,
         viewer,
         mode: "flat",
-        commentType: 0,
+        commentType: COMMENT_TYPE_COMMENT,
       });
     },
     refetchInterval: NEW_COMMENTS_CHECK_INTERVAL,

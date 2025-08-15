@@ -131,16 +131,19 @@ describe("CommentModerationService", () => {
 
       await result.saveAndNotify();
 
-      expect(mockPremoderationService.moderate).toHaveBeenCalledWith({
-        author: mockComment.author,
-        channelId: mockComment.channelId,
-        content: mockComment.content,
-        id: mockComment.commentId,
-        parentId: mockComment.parentId,
-        references: mockReferences,
-        targetUri: mockComment.targetUri,
-        revision: 0,
-      });
+      expect(mockPremoderationService.moderate).toHaveBeenCalledWith(
+        {
+          author: mockComment.author,
+          channelId: mockComment.channelId,
+          content: mockComment.content,
+          id: mockComment.commentId,
+          parentId: mockComment.parentId,
+          references: mockReferences,
+          targetUri: mockComment.targetUri,
+          revision: 0,
+        },
+        mockClassifierResult,
+      );
 
       expect(mockClassifierService.classify).toHaveBeenCalledWith({
         author: mockComment.author,
@@ -197,16 +200,19 @@ describe("CommentModerationService", () => {
 
       await result.saveAndNotify();
 
-      expect(mockPremoderationService.moderate).toHaveBeenCalledWith({
-        author: mockComment.author,
-        channelId: mockComment.channelId,
-        content: mockComment.content,
-        id: mockComment.commentId,
-        parentId: mockComment.parentId,
-        references: mockReferences,
-        targetUri: mockComment.targetUri,
-        revision: 0,
-      });
+      expect(mockPremoderationService.moderate).toHaveBeenCalledWith(
+        {
+          author: mockComment.author,
+          channelId: mockComment.channelId,
+          content: mockComment.content,
+          id: mockComment.commentId,
+          parentId: mockComment.parentId,
+          references: mockReferences,
+          targetUri: mockComment.targetUri,
+          revision: 0,
+        },
+        mockClassifierResult,
+      );
 
       expect(mockClassifierService.classify).toHaveBeenCalledWith({
         author: mockComment.author,
@@ -225,7 +231,7 @@ describe("CommentModerationService", () => {
       ).not.toHaveBeenCalled();
       expect(
         mockNotificationService.notifyAutomaticallyClassified,
-      ).toHaveBeenCalled();
+      ).not.toHaveBeenCalled();
     });
 
     it("should not send notifications when classification is skipped", async () => {
@@ -268,16 +274,19 @@ describe("CommentModerationService", () => {
 
       await result.saveAndNotify();
 
-      expect(mockPremoderationService.moderate).toHaveBeenCalledWith({
-        author: mockComment.author,
-        channelId: mockComment.channelId,
-        content: mockComment.content,
-        id: mockComment.commentId,
-        parentId: mockComment.parentId,
-        references: mockReferences,
-        targetUri: mockComment.targetUri,
-        revision: 0,
-      });
+      expect(mockPremoderationService.moderate).toHaveBeenCalledWith(
+        {
+          author: mockComment.author,
+          channelId: mockComment.channelId,
+          content: mockComment.content,
+          id: mockComment.commentId,
+          parentId: mockComment.parentId,
+          references: mockReferences,
+          targetUri: mockComment.targetUri,
+          revision: 0,
+        },
+        mockClassifierResult,
+      );
 
       expect(mockClassifierService.classify).toHaveBeenCalledWith({
         author: mockComment.author,
@@ -334,16 +343,19 @@ describe("CommentModerationService", () => {
 
       await result.saveAndNotify();
 
-      expect(mockPremoderationService.moderate).toHaveBeenCalledWith({
-        author: mockComment.author,
-        channelId: mockComment.channelId,
-        content: mockComment.content,
-        id: mockComment.commentId,
-        parentId: mockComment.parentId,
-        references: mockReferences,
-        targetUri: mockComment.targetUri,
-        revision: 0,
-      });
+      expect(mockPremoderationService.moderate).toHaveBeenCalledWith(
+        {
+          author: mockComment.author,
+          channelId: mockComment.channelId,
+          content: mockComment.content,
+          id: mockComment.commentId,
+          parentId: mockComment.parentId,
+          references: mockReferences,
+          targetUri: mockComment.targetUri,
+          revision: 0,
+        },
+        mockClassifierResult,
+      );
 
       expect(mockClassifierService.classify).toHaveBeenCalledWith({
         author: mockComment.author,
@@ -502,6 +514,7 @@ describe("CommentModerationService", () => {
           revision: 0,
         },
         mockExistingComment,
+        mockClassifierResult,
       );
 
       expect(mockClassifierService.classifyUpdate).toHaveBeenCalledWith(
@@ -579,6 +592,7 @@ describe("CommentModerationService", () => {
           revision: 0,
         },
         mockExistingComment,
+        mockClassifierResult,
       );
 
       expect(mockClassifierService.classifyUpdate).toHaveBeenCalledWith(
@@ -601,7 +615,7 @@ describe("CommentModerationService", () => {
       ).not.toHaveBeenCalled();
       expect(
         mockNotificationService.notifyAutomaticallyClassified,
-      ).toHaveBeenCalled();
+      ).not.toHaveBeenCalled();
     });
 
     it("should not send notifications when classification is skipped for updates", async () => {
@@ -661,6 +675,7 @@ describe("CommentModerationService", () => {
           revision: 0,
         },
         mockExistingComment,
+        mockClassifierResult,
       );
 
       expect(mockClassifierService.classifyUpdate).toHaveBeenCalledWith(
@@ -738,6 +753,7 @@ describe("CommentModerationService", () => {
           revision: 0,
         },
         mockExistingComment,
+        mockClassifierResult,
       );
 
       expect(mockClassifierService.classifyUpdate).toHaveBeenCalledWith(

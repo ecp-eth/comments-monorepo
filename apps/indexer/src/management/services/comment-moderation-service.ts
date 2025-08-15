@@ -68,10 +68,13 @@ export class CommentModerationService {
       revision: DEFAULT_REVISION_ON_ADD,
     };
 
-    const [premoderationResult, classifierResult] = await Promise.all([
-      this.premoderationService.moderate(formattedComment),
-      this.classifierService.classify(formattedComment),
-    ]);
+    const classifierResult =
+      await this.classifierService.classify(formattedComment);
+
+    const premoderationResult = await this.premoderationService.moderate(
+      formattedComment,
+      classifierResult,
+    );
 
     return {
       result: {
@@ -83,21 +86,25 @@ export class CommentModerationService {
         },
       },
       saveAndNotify: async () => {
-        let messageId: number | undefined;
-
         await Promise.all([
           premoderationResult.save(),
           classifierResult.save(),
         ]);
 
-        if (premoderationResult.action !== "skipped") {
-          messageId = await this.sendNewNotification({
-            comment,
-            commentRevision: DEFAULT_REVISION_ON_ADD,
-            references,
-            classifierResult,
-          });
+        const skipNotification =
+          premoderationResult.status === "approved" ||
+          premoderationResult.action === "skipped";
+
+        if (skipNotification) {
+          return;
         }
+
+        const messageId = await this.sendNewNotification({
+          comment,
+          commentRevision: DEFAULT_REVISION_ON_ADD,
+          references,
+          classifierResult,
+        });
 
         if (classifierResult.action !== "skipped") {
           await this.sendNewAutomaticClassification({
@@ -162,13 +169,16 @@ export class CommentModerationService {
       revision: commentRevision,
     };
 
-    const [premoderationResult, classifierResult] = await Promise.all([
-      this.premoderationService.moderateUpdate(
-        formattedComment,
-        existingComment,
-      ),
-      this.classifierService.classifyUpdate(formattedComment, existingComment),
-    ]);
+    const classifierResult = await this.classifierService.classifyUpdate(
+      formattedComment,
+      existingComment,
+    );
+
+    const premoderationResult = await this.premoderationService.moderateUpdate(
+      formattedComment,
+      existingComment,
+      classifierResult,
+    );
 
     return {
       result: {
@@ -180,20 +190,25 @@ export class CommentModerationService {
         changedAt: premoderationResult.changedAt,
       },
       saveAndNotify: async () => {
-        let messageId: number | undefined;
         await Promise.all([
           premoderationResult.save(),
           classifierResult.save(),
         ]);
 
-        if (premoderationResult.action !== "skipped") {
-          messageId = await this.sendUpdateNotification({
-            comment,
-            commentRevision,
-            references,
-            classifierResult,
-          });
+        const skipNotification =
+          premoderationResult.status === "approved" ||
+          premoderationResult.action === "skipped";
+
+        if (skipNotification) {
+          return;
         }
+
+        const messageId = await this.sendUpdateNotification({
+          comment,
+          commentRevision,
+          references,
+          classifierResult,
+        });
 
         if (classifierResult.action !== "skipped") {
           await this.sendUpdateAutomaticClassification({
