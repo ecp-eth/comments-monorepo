@@ -1,0 +1,436 @@
+{
+  "id": "910b7ec5-6785-419f-ab70-3a6b3fd33d95",
+  "prevId": "12df39ef-235c-4bd4-a4be-21db764c7153",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "broadcast_app_indexer_offchain.auth_siwe_refresh_token": {
+      "name": "auth_siwe_refresh_token",
+      "schema": "broadcast_app_indexer_offchain",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "is_used": {
+          "name": "is_used",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "auth_siwe_refresh_token_session_id_auth_siwe_session_id_fk": {
+          "name": "auth_siwe_refresh_token_session_id_auth_siwe_session_id_fk",
+          "tableFrom": "auth_siwe_refresh_token",
+          "tableTo": "auth_siwe_session",
+          "schemaTo": "broadcast_app_indexer_offchain",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "broadcast_app_indexer_offchain.auth_siwe_session": {
+      "name": "auth_siwe_session",
+      "schema": "broadcast_app_indexer_offchain",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "last_used_at": {
+          "name": "last_used_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "broadcast_app_indexer_offchain.channel_subscription": {
+      "name": "channel_subscription",
+      "schema": "broadcast_app_indexer_offchain",
+      "columns": {
+        "channel_id": {
+          "name": "channel_id",
+          "type": "numeric(78, 0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_id": {
+          "name": "app_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_address": {
+          "name": "user_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "channel_subscription_channel_id_app_id_user_address_pk": {
+          "name": "channel_subscription_channel_id_app_id_user_address_pk",
+          "columns": [
+            "channel_id",
+            "app_id",
+            "user_address"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "broadcast_app_indexer_offchain.channel_subscription_farcaster_notification_settings": {
+      "name": "channel_subscription_farcaster_notification_settings",
+      "schema": "broadcast_app_indexer_offchain",
+      "columns": {
+        "channel_id": {
+          "name": "channel_id",
+          "type": "numeric(78, 0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_id": {
+          "name": "app_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_address": {
+          "name": "user_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_fid": {
+          "name": "user_fid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "notifications_enabled": {
+          "name": "notifications_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "channel_subscription_farcaster_notification_settings_enabled_by_channel_app_idx": {
+          "name": "channel_subscription_farcaster_notification_settings_enabled_by_channel_app_idx",
+          "columns": [
+            {
+              "expression": "channel_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "notifications_enabled",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "\"broadcast_app_indexer_offchain\".\"channel_subscription_farcaster_notification_settings\".\"notifications_enabled\" = true",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "channel_subscription_farcaster_notification_settings_channel_id_app_id_user_address_fk": {
+          "name": "channel_subscription_farcaster_notification_settings_channel_id_app_id_user_address_fk",
+          "tableFrom": "channel_subscription_farcaster_notification_settings",
+          "tableTo": "channel_subscription",
+          "schemaTo": "broadcast_app_indexer_offchain",
+          "columnsFrom": [
+            "channel_id",
+            "app_id",
+            "user_address"
+          ],
+          "columnsTo": [
+            "channel_id",
+            "app_id",
+            "user_address"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "channel_subscription_farcaster_notification_settings_pk": {
+          "name": "channel_subscription_farcaster_notification_settings_pk",
+          "columns": [
+            "channel_id",
+            "app_id",
+            "user_address",
+            "user_fid"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "broadcast_app_indexer_offchain.neynar_notification_service_queue": {
+      "name": "neynar_notification_service_queue",
+      "schema": "broadcast_app_indexer_offchain",
+      "columns": {
+        "comment_id": {
+          "name": "comment_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_id": {
+          "name": "app_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "pending_subscriber_fids": {
+          "name": "pending_subscriber_fids",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "neynar_notification_service_queue_status",
+          "typeSchema": "broadcast_app_indexer_offchain",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "notification_uuid": {
+          "name": "notification_uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "notification": {
+          "name": "notification",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {
+        "neynar_notification_service_queue_created_at_idx": {
+          "name": "neynar_notification_service_queue_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "neynar_notification_service_queue_status_idx": {
+          "name": "neynar_notification_service_queue_status_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "neynar_notification_service_queue_comment_id_app_id_pk": {
+          "name": "neynar_notification_service_queue_comment_id_app_id_pk",
+          "columns": [
+            "comment_id",
+            "app_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "broadcast_app_indexer_offchain.neynar_notification_service_queue_status": {
+      "name": "neynar_notification_service_queue_status",
+      "schema": "broadcast_app_indexer_offchain",
+      "values": [
+        "pending",
+        "processing",
+        "completed",
+        "failed"
+      ]
+    }
+  },
+  "schemas": {
+    "broadcast_app_indexer_offchain": "broadcast_app_indexer_offchain"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

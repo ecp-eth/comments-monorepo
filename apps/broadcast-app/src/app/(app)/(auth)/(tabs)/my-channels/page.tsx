@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChannelCard } from "@/components/channel-card";
 import { cn } from "@/lib/utils";
 import { useMyChannelsQuery } from "@/queries/my-channels";
+import { useAuthProtect } from "@/components/auth-provider";
 
 export default function MyChannelsPage() {
   const {
@@ -19,6 +20,8 @@ export default function MyChannelsPage() {
     isFetchingNextPage,
     hasNextPage,
   } = useMyChannelsQuery();
+
+  useAuthProtect(error);
 
   if (error) {
     console.error("Error fetching channels:", error);

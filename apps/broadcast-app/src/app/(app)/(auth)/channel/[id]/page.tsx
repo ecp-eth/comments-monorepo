@@ -58,6 +58,7 @@ import { Hex } from "@ecp.eth/sdk/core";
 import { EditCommentBottomSheet } from "@/components/edit-comment-bottom-sheet";
 import { ReportBottomSheet } from "@/components/report-bottom-sheet";
 import { useRouter } from "next/navigation";
+import { useAuthProtect } from "@/components/auth-provider";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
@@ -84,6 +85,8 @@ export default function ChannelPage(props: {
   );
 
   const channelQuery = useChannelQuery(channelId);
+
+  useAuthProtect(channelQuery.error);
 
   const commentsQueryKey = useMemo(
     () =>

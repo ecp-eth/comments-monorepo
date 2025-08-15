@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useDiscoverChannelsQuery } from "@/queries/discover-channels";
 import { useState } from "react";
 import { ChannelCreationBottomSheet } from "@/components/channel-creation-bottom-sheet";
+import { useAuthProtect } from "@/components/auth-provider";
 
 export default function DiscoverChannelsPage() {
   const {
@@ -26,6 +27,8 @@ export default function DiscoverChannelsPage() {
     hasNextPage,
   } = useDiscoverChannelsQuery();
   const [showChannelCreation, setShowChannelCreation] = useState(false);
+
+  useAuthProtect(error);
 
   if (error) {
     console.error("Error fetching channels:", error);

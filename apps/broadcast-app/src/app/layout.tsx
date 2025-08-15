@@ -34,10 +34,7 @@ export default async function RootLayout({
 }>) {
   const availableCookies = await cookies();
 
-  const isLoggedIn = !!(
-    availableCookies.get(ACCESS_TOKEN_COOKIE_NAME)?.value &&
-    availableCookies.get(REFRESH_TOKEN_COOKIE_NAME)?.value
-  );
+  const isLoggedIn = !!availableCookies.get(REFRESH_TOKEN_COOKIE_NAME)?.value;
 
   return (
     <html lang="en">

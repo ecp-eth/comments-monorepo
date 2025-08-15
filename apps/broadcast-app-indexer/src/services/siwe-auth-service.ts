@@ -177,6 +177,19 @@ export class SiweAuthService {
       throw new SiweAuthInvalidJWTPayloadError();
     }
 
+    const [session] = await this.db
+      .update(schema.authSiweSession)
+      .set({
+        lastUsedAt: new Date(),
+      })
+      .where(eq(schema.authSiweSession.id, payloadResult.data.sessionId))
+      .returning()
+      .execute();
+
+    if (!session) {
+      throw new SiweAuthInvalidJWTPayloadError();
+    }
+
     return payloadResult.data;
   }
 

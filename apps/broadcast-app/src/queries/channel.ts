@@ -11,7 +11,7 @@ import {
   createCommentRepliesQueryKey,
 } from "./query-keys";
 import { publicEnv } from "@/env/public";
-import { ChannelNotFoundError } from "@/errors";
+import { ChannelNotFoundError, UnauthorizedError } from "@/errors";
 import { Channel, ChannelSchema } from "@/api/schemas";
 import { useCallback } from "react";
 import { createChannelCommentsQueryKey } from "./query-keys";
@@ -33,6 +33,10 @@ export function useChannelQuery(channelId: bigint) {
           signal,
         },
       );
+
+      if (channelResponse.status === 401) {
+        throw new UnauthorizedError();
+      }
 
       if (channelResponse.status === 404) {
         throw new ChannelNotFoundError();
