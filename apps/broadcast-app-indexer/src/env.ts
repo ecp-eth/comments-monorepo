@@ -5,10 +5,14 @@ const ChainAnvilConfig = z.union([
   z.object({
     CHAIN_ANVIL_BROADCAST_HOOK_ADDRESS: HexSchema,
     CHAIN_ANVIL_RPC_URL: z.string().url(),
+    CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
+    CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
   }),
   z.object({
     CHAIN_ANVIL_BROADCAST_HOOK_ADDRESS: z.never().optional(),
     CHAIN_ANVIL_RPC_URL: z.never().optional(),
+    CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE: z.never().optional(),
+    CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE: z.never().optional(),
   }),
 ]);
 

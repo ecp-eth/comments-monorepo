@@ -4,6 +4,8 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
 
+    "allowImportingTsExtensions": true,
+
     // Interop constraints
     "verbatimModuleSyntax": false,
     "esModuleInterop": true,
