@@ -39,3 +39,21 @@ export function setTokenCookies({
     maxAge: refreshToken.expiresIn,
   });
 }
+
+export function deleteTokenCookies(response: NextResponse) {
+  response.cookies.delete({
+    name: ACCESS_TOKEN_COOKIE_NAME,
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    path: "/",
+  });
+
+  response.cookies.delete({
+    name: REFRESH_TOKEN_COOKIE_NAME,
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    path: "/",
+  });
+}

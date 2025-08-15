@@ -9,11 +9,11 @@ import {
   type RefreshAccessTokenResponse,
   refreshAccessTokenResponseSchema,
 } from "../../schemas";
-import { setTokenCookies } from "../../utils";
+import { deleteTokenCookies, setTokenCookies } from "../../utils";
 
 async function refreshAccessToken(
   refreshToken: string,
-): Promise<RefreshAccessTokenResponse> {
+): Promise<RefreshAccessTokenResponse | NextResponse> {
   const response = await fetch(
     new URL("/api/auth/siwe/refresh", serverEnv.BROADCAST_APP_INDEXER_URL),
     {
@@ -26,7 +26,7 @@ async function refreshAccessToken(
   );
 
   if (!response.ok) {
-    throw new NextResponse(null, { status: 401 });
+    return new NextResponse(null, { status: 401 });
   }
 
   const json = await response.json();
@@ -81,18 +81,24 @@ async function proxyRequest(
 
   if (upstreamResponse.status === 401 && refreshToken) {
     // try refresh access token by refresh token, if available
-    const tokens = await refreshAccessToken(refreshToken);
+    const tokensOrResponse = await refreshAccessToken(refreshToken);
+
+    if (tokensOrResponse instanceof NextResponse) {
+      deleteTokenCookies(tokensOrResponse);
+
+      return tokensOrResponse;
+    }
 
     setTokenCookies({
       response,
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
+      accessToken: tokensOrResponse.accessToken,
+      refreshToken: tokensOrResponse.refreshToken,
     });
 
     const retriedUpstreamResponse = await callExternal({
       path,
       reqToProxy: req,
-      accessToken: tokens.accessToken.token,
+      accessToken: tokensOrResponse.accessToken.token,
     });
 
     response = new NextResponse(retriedUpstreamResponse.body, {
