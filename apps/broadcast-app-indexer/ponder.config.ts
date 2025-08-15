@@ -2,12 +2,15 @@ import { createConfig } from "ponder";
 import {
   ChannelManagerABI,
   CommentManagerABI,
-  COMMENT_MANAGER_ADDRESS,
-  CHANNEL_MANAGER_ADDRESS,
+  SUPPORTED_CHAINS,
 } from "@ecp.eth/sdk";
 import { env } from "./src/env";
 import { anvil, base } from "viem/chains";
 import { BroadcastHookABI } from "./src/abi/generated/broadcast-hook-abi";
+import {
+  efpListRecordsAbi,
+  efpListRegistryAbi,
+} from "./src/abi/generated/efp-abi";
 
 export default createConfig({
   chains: {
@@ -36,6 +39,7 @@ export default createConfig({
         ...(env.CHAIN_ANVIL_BROADCAST_HOOK_ADDRESS && {
           anvil: {
             address: env.CHAIN_ANVIL_BROADCAST_HOOK_ADDRESS,
+            startBlock: env.CHAIN_ANVIL_START_BLOCK,
           },
         }),
         ...(env.CHAIN_BASE_BROADCAST_HOOK_ADDRESS && {
@@ -51,12 +55,15 @@ export default createConfig({
       chain: {
         ...(env.CHAIN_ANVIL_BROADCAST_HOOK_ADDRESS && {
           anvil: {
-            address: CHANNEL_MANAGER_ADDRESS,
+            address:
+              env.CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE ||
+              SUPPORTED_CHAINS[31337].channelManagerAddress,
+            startBlock: env.CHAIN_ANVIL_START_BLOCK,
           },
         }),
         ...(env.CHAIN_BASE_BROADCAST_HOOK_ADDRESS && {
           base: {
-            address: CHANNEL_MANAGER_ADDRESS,
+            address: SUPPORTED_CHAINS[8453].channelManagerAddress,
             startBlock: env.CHAIN_BASE_CHANNEL_MANAGER_START_BLOCK,
           },
         }),
@@ -67,13 +74,33 @@ export default createConfig({
       chain: {
         ...(env.CHAIN_ANVIL_BROADCAST_HOOK_ADDRESS && {
           anvil: {
-            address: COMMENT_MANAGER_ADDRESS,
+            address:
+              env.CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE ||
+              SUPPORTED_CHAINS[31337].commentManagerAddress,
+            startBlock: env.CHAIN_ANVIL_START_BLOCK,
           },
         }),
         ...(env.CHAIN_BASE_BROADCAST_HOOK_ADDRESS && {
           base: {
-            address: COMMENT_MANAGER_ADDRESS,
+            address: SUPPORTED_CHAINS[8453].commentManagerAddress,
             startBlock: env.CHAIN_BASE_COMMENT_MANAGER_START_BLOCK,
+          },
+        }),
+      },
+    },
+    EFPListRecords: {
+      abi: efpListRecordsAbi,
+      chain: {
+        ...(env.CHAIN_ANVIL_BROADCAST_HOOK_ADDRESS && {
+          anvil: {
+            address: env.EFP_LIST_RECORDS_ADDRESS,
+            startBlock: env.CHAIN_ANVIL_START_BLOCK,
+          },
+        }),
+        ...(env.CHAIN_BASE_BROADCAST_HOOK_ADDRESS && {
+          base: {
+            address: env.EFP_LIST_RECORDS_ADDRESS,
+            startBlock: env.CHAIN_BASE_START_BLOCK,
           },
         }),
       },

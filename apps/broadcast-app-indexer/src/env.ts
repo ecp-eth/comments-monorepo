@@ -7,12 +7,14 @@ const ChainAnvilConfig = z.union([
     CHAIN_ANVIL_RPC_URL: z.string().url(),
     CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
     CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
+    CHAIN_ANVIL_START_BLOCK: z.coerce.number().int().min(0).optional(),
   }),
   z.object({
     CHAIN_ANVIL_BROADCAST_HOOK_ADDRESS: z.never().optional(),
     CHAIN_ANVIL_RPC_URL: z.never().optional(),
     CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE: z.never().optional(),
     CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE: z.never().optional(),
+    CHAIN_ANVIL_START_BLOCK: z.never().optional(),
   }),
 ]);
 
@@ -35,6 +37,7 @@ const ChainBaseConfig = z.union([
       .int()
       .min(0)
       .optional(),
+    CHAIN_BASE_START_BLOCK: z.coerce.number().int().min(0).optional(),
   }),
   z.object({
     CHAIN_BASE_BROADCAST_HOOK_ADDRESS: z.never().optional(),
@@ -42,6 +45,7 @@ const ChainBaseConfig = z.union([
     CHAIN_BASE_BROADCAST_HOOK_START_BLOCK: z.never().optional(),
     CHAIN_BASE_COMMENT_MANAGER_START_BLOCK: z.never().optional(),
     CHAIN_BASE_CHANNEL_MANAGER_START_BLOCK: z.never().optional(),
+    CHAIN_BASE_START_BLOCK: z.never().optional(),
   }),
 ]);
 
@@ -91,6 +95,7 @@ const BaseConfig = z.object({
   JWT_AUDIENCE_NONCE: z.string().nonempty().default("siwe-nonce"),
   JWT_ISSUER: z.string().nonempty().default("broadcast-app-indexer"),
   JWT_SECRET: z.string().nonempty(),
+  EFP_LIST_RECORDS_ADDRESS: HexSchema,
 });
 
 const EnvSchema = z.intersection(BaseConfig, ChainConfig);
