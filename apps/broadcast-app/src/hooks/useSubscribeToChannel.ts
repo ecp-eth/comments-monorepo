@@ -7,6 +7,7 @@ import { useRemoveChannelFromDiscoverQuery } from "@/queries/discover-channels";
 import { useUpdateChannelInChannelQuery } from "@/queries/channel";
 import { toast } from "sonner";
 import type { Channel } from "@/api/schemas";
+import { useAddERC721RecordToPrimaryList } from "./efp/useAddERC721RecordToPrimaryList";
 
 export class AlreadySubscribedError extends Error {
   constructor(message: string) {
@@ -36,10 +37,19 @@ export function useSubscribeToChannel({
   const miniAppContext = useMiniAppContext();
   const updateChannelInChannelQuery = useUpdateChannelInChannelQuery();
   const removeChannelFromDiscoverQuery = useRemoveChannelFromDiscoverQuery();
+  const { mutateAsync: addERC721RecordToPrimaryList } =
+    useAddERC721RecordToPrimaryList({
+      channelId: channel.id,
+    });
 
   return useMutation({
     ...options,
     mutationFn: async () => {
+      console.log(await addERC721RecordToPrimaryList());
+
+      // @todo optimistically update the queries so pretend that the subscription is created
+      // because that is created on the backend during the indexing. Then we should send an information
+      // that user wants to be notified about new posts on the channel.
       if (!miniAppContext.isInMiniApp) {
         throw new Error(
           "You need to be in a mini app to subscribe to a channel",
@@ -61,6 +71,11 @@ export function useSubscribeToChannel({
           headers: {
             "Content-Type": "application/json",
           },
+          // @todo send also fid and notifications enabled if they are available, otherwise don't sent them and just subscribe
+          // @todo change database structure to not isolate data per app because indexer will process list events and create subscriptions automatically
+          // so we will need to wait until the transaction is mined and when the subscription is available in our api
+          // then we can update it with notification settings
+          // so by default we will check if the channel subscription for current user exists after the transaction is processed
           body: JSON.stringify({ notificationsEnabled }),
         },
       );
