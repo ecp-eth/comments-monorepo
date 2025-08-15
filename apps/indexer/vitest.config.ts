@@ -10,7 +10,7 @@ process.env.SIM_API_KEY ||= "test";
 
 export default defineConfig({
   plugins: [
-    // @ts-expect-error - ponder has outdated vite + vitest so we have conflicts
+    // @ts-expect-error - something incompatible regarding the types
     tsconfigPaths({
       skip: (dir) => dir.includes("demo-rn-expo"),
     }),
