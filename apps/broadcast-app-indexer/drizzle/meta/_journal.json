@@ -64,6 +64,13 @@
       "when": 1755165432655,
       "tag": "0008_add_index_to_fetch_notification_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1755242919951,
+      "tag": "0009_session_last_used_at",
+      "breakpoints": true
     }
   ]
 }

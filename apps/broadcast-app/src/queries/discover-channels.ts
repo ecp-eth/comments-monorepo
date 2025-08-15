@@ -7,6 +7,7 @@ import {
   createDiscoverChannelsQueryKey,
   createMyChannelsQueryKey,
 } from "./query-keys";
+import { UnauthorizedError } from "@/errors";
 
 export function useDiscoverChannelsQuery() {
   return useInfiniteQuery({
@@ -22,6 +23,10 @@ export function useDiscoverChannelsQuery() {
         `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels${searchParams.size > 0 ? `?${searchParams.toString()}` : ""}`,
         { signal },
       );
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
 
       if (!response.ok) {
         throw new Error(`Failed to fetch channels: ${response.statusText}`);
