@@ -13,7 +13,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type { NotificationDetails } from "./src/services/types";
 import type { Hex } from "viem";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 export const offchainSchema = pgSchema("broadcast_app_indexer_offchain");
 
@@ -21,6 +21,7 @@ export const authSiweSession = offchainSchema.table("auth_siwe_session", {
   id: uuid().notNull().defaultRandom().primaryKey(),
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  lastUsedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   userId: text().notNull().$type<Hex>(),
 });
 
