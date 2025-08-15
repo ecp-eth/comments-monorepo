@@ -68,6 +68,7 @@ export class PremoderationService implements ICommentPremoderationService {
             moderationStatus: status,
             updatedAt: changedAt,
             revision: comment.revision,
+            updatedBy: "premoderation",
           })
           .execute();
       },
@@ -122,6 +123,7 @@ export class PremoderationService implements ICommentPremoderationService {
             moderationStatus: status,
             updatedAt: changedAt,
             revision: comment.revision,
+            updatedBy: "premoderation",
           })
           .execute();
       },
@@ -132,6 +134,7 @@ export class PremoderationService implements ICommentPremoderationService {
     commentId,
     commentRevision,
     status,
+    updatedBy,
   }: {
     commentId: Hex;
     /**
@@ -139,6 +142,7 @@ export class PremoderationService implements ICommentPremoderationService {
      */
     commentRevision: number | undefined;
     status: ModerationStatus;
+    updatedBy: string;
   }): Promise<CommentSelectType | undefined> {
     return await this.db.transaction(async (tx) => {
       const commentModerationStatus =
@@ -175,6 +179,7 @@ export class PremoderationService implements ICommentPremoderationService {
           moderationStatus: status,
           updatedAt: changedAt,
           revision: commentModerationStatus.revision,
+          updatedBy,
         })
         .onConflictDoUpdate({
           target: [
@@ -184,6 +189,7 @@ export class PremoderationService implements ICommentPremoderationService {
           set: {
             moderationStatus: status,
             updatedAt: changedAt,
+            updatedBy,
           },
         })
         .execute();
@@ -209,6 +215,7 @@ export class PremoderationService implements ICommentPremoderationService {
         .set({
           moderationStatus: status,
           updatedAt: changedAt,
+          updatedBy,
         })
         .where(
           // new status is not pending, mark all older pending revisions to be of the same status

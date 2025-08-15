@@ -4,7 +4,10 @@ import {
   ChangeModerationStatusOnCommentParamsSchema,
   ChangeModerationStatusOnCommentBodySchema,
 } from "../../../lib/schemas";
-import { authMiddleware } from "../../../middleware/auth";
+import {
+  authMiddleware,
+  AuthMiddlewareContext,
+} from "../../../middleware/auth";
 import { IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { resolveAuthorDataAndFormatCommentChangeModerationStatusResponse } from "../../../lib/response-formatters";
 import { commentModerationService } from "../../../services";
@@ -63,10 +66,13 @@ const changeCommentModerationStatusRoute = createRoute({
   },
 });
 
-export function setupChangeCommentModerationStatus(app: OpenAPIHono) {
+export function setupChangeCommentModerationStatus(
+  app: OpenAPIHono<AuthMiddlewareContext>,
+) {
   app.openapi(changeCommentModerationStatusRoute, async (c) => {
     const { commentId } = c.req.valid("param");
     const { moderationStatus, revision } = c.req.valid("json");
+    const apiKeyId = c.get("apiKeyId");
 
     const updatedComment =
       await commentModerationService.updateModerationStatus({
@@ -74,6 +80,7 @@ export function setupChangeCommentModerationStatus(app: OpenAPIHono) {
         commentRevision: revision,
         callbackQuery: undefined,
         status: moderationStatus,
+        updatedBy: `apiKeyId:${apiKeyId}`,
       });
 
     if (!updatedComment) {

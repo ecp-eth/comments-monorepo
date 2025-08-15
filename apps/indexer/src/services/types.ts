@@ -196,6 +196,7 @@ export interface ICommentPremoderationService {
      */
     commentRevision: number | undefined;
     status: ModerationStatus;
+    updatedBy: string;
   }) => Promise<CommentSelectType | undefined>;
 
   getCommentById: (commentId: Hex) => Promise<CommentSelectType | undefined>;

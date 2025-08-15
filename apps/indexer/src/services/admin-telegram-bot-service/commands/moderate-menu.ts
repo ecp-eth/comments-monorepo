@@ -150,6 +150,7 @@ const moderateChangeStatusMenu = new Menu<AdminTelegramBotServiceContext>(
             commentId: comment.id,
             commentRevision: comment.revision,
             status: nextStatus,
+            updatedBy: ctx.from.username ?? ctx.from.id.toString(),
           });
 
           if (!updatedComment) {
