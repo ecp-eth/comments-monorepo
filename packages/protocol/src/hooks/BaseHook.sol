@@ -14,7 +14,8 @@ import { Metadata } from "../types/Metadata.sol";
 /**
  * @title BaseHook
  * @notice Abstract base contract for all hook implementations
- * @dev Provides default implementations that throw HookNotImplemented if not overridden
+ * @dev Provides basic hook method implementations that throw HookNotImplemented if not overridden.
+ * Caveat: Most hooks should inherit from `FeeEstimatableHook` instead, as it provides fee estimator methods, making the channel fees more predictable.
  */
 abstract contract BaseHook is IHook, ERC165 {
   /// @notice Error thrown when a hook function is not implemented

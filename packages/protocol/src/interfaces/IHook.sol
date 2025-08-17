@@ -29,7 +29,7 @@ interface IHook is IERC165 {
   /// @notice Execute after a comment is processed
   /// @param commentData The comment data that was processed
   /// @param metadata The metadata entries for the comment
-  /// @param msgSender The original msg.sender that initiated the transaction
+  /// @param msgSender The original msg.sender that initiated the postComment call (`msg.sender` of CommentMananger.postComment)
   /// @param commentId The unique identifier of the processed comment
   /// @return hookMetadata The hook metadata entries that were generated
   function onCommentAdd(
@@ -43,7 +43,7 @@ interface IHook is IERC165 {
   /// @param commentData The comment data that was deleted
   /// @param metadata The metadata entries for the comment
   /// @param hookMetadata The hook metadata entries for the comment
-  /// @param msgSender The original msg.sender that initiated the transaction
+  /// @param msgSender The original msg.sender that initiated the deleteComment call (`msg.sender` of CommentMananger.deleteComment)
   /// @param commentId The unique identifier of the deleted comment
   /// @return success Whether the hook execution was successful
   function onCommentDelete(
@@ -57,7 +57,7 @@ interface IHook is IERC165 {
   /// @notice Execute after a comment is edited
   /// @param commentData The comment data that was edited
   /// @param metadata The metadata entries for the comment
-  /// @param msgSender The original msg.sender that initiated the transaction
+  /// @param msgSender The original msg.sender that initiated the editComment call (`msg.sender` of CommentMananger.editComment)
   /// @param commentId The unique identifier of the edited comment
   /// @return hookMetadata The hook metadata entries that were generated
   function onCommentEdit(
