@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.28;
 
 import { Test } from "forge-std/Test.sol";
 import { CommentManager } from "../src/CommentManager.sol";
@@ -9,6 +9,7 @@ import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { TestUtils, AlwaysReturningDataHook } from "./utils.sol";
 import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
@@ -67,6 +68,8 @@ contract FeeRequiringHook is BaseHook {
 }
 
 contract CommentsBatchTest is Test, IERC721Receiver {
+  using Strings for uint256;
+
   event CommentAdded(
     bytes32 indexed commentId,
     address indexed author,
@@ -945,87 +948,67 @@ contract CommentsBatchTest is Test, IERC721Receiver {
   }
 
   function test_BatchOperations_GasSavingsVsIndividual() public {
-    // Create batch operations for comparison
-    Comments.CreateComment memory comment1 = TestUtils
-      .generateDummyCreateComment(author, app, "Test comment");
-    comment1.content = "Comment 1";
-    Comments.CreateComment memory comment2 = TestUtils
-      .generateDummyCreateComment(author, app, "Test comment");
-    comment2.content = "Comment 2";
-    Comments.CreateComment memory comment3 = TestUtils
-      .generateDummyCreateComment(author, app, "Test comment");
-    comment3.content = "Comment 3";
+    uint256 numComments = 20;
+    Comments.CreateComment[]
+      memory pendingComments = new Comments.CreateComment[](numComments);
 
-    bytes32 comment1Id = comments.getCommentId(comment1);
-    bytes32 comment2Id = comments.getCommentId(comment2);
-    bytes32 comment3Id = comments.getCommentId(comment3);
+    for (uint256 i = 0; i < numComments; i++) {
+      pendingComments[i] = TestUtils.generateDummyCreateComment(
+        author,
+        app,
+        string(abi.encodePacked("Test comment ", i))
+      );
+    }
 
-    bytes memory sig1Auth = TestUtils.signEIP712(
-      vm,
-      authorPrivateKey,
-      comment1Id
-    );
-    bytes memory sig1App = TestUtils.signEIP712(vm, appPrivateKey, comment1Id);
-    bytes memory sig2Auth = TestUtils.signEIP712(
-      vm,
-      authorPrivateKey,
-      comment2Id
-    );
-    bytes memory sig2App = TestUtils.signEIP712(vm, appPrivateKey, comment2Id);
-    bytes memory sig3Auth = TestUtils.signEIP712(
-      vm,
-      authorPrivateKey,
-      comment3Id
-    );
-    bytes memory sig3App = TestUtils.signEIP712(vm, appPrivateKey, comment3Id);
+    bytes32[] memory commentIds = new bytes32[](numComments);
+    for (uint256 i = 0; i < numComments; i++) {
+      commentIds[i] = comments.getCommentId(pendingComments[i]);
+    }
 
-    // Measure gas for individual operations
+    bytes[] memory authorSigs = new bytes[](numComments);
+    for (uint256 i = 0; i < numComments; i++) {
+      authorSigs[i] = TestUtils.signEIP712(vm, authorPrivateKey, commentIds[i]);
+    }
+
+    bytes[] memory appSigs = new bytes[](numComments);
+    for (uint256 i = 0; i < numComments; i++) {
+      appSigs[i] = TestUtils.signEIP712(vm, appPrivateKey, commentIds[i]);
+    }
+
+    vm.startPrank(author);
     uint256 gasStart = gasleft();
-    vm.prank(author);
-    comments.postCommentWithSig(comment1, sig1Auth, sig1App);
-    vm.prank(author);
-    comments.postCommentWithSig(comment2, sig2Auth, sig2App);
-    vm.prank(author);
-    comments.postCommentWithSig(comment3, sig3Auth, sig3App);
+    for (uint256 i = 0; i < numComments; i++) {
+      comments.postCommentWithSig(
+        pendingComments[i],
+        authorSigs[i],
+        appSigs[i]
+      );
+    }
     uint256 individualGas = gasStart - gasleft();
+    vm.stopPrank();
 
-    // Reset state - create new comments for batch test
-    comment1.content = "Batch Comment 1";
-    comment2.content = "Batch Comment 2";
-    comment3.content = "Batch Comment 3";
-
-    comment1Id = comments.getCommentId(comment1);
-    comment2Id = comments.getCommentId(comment2);
-    comment3Id = comments.getCommentId(comment3);
-
-    sig1Auth = TestUtils.signEIP712(vm, authorPrivateKey, comment1Id);
-    sig1App = TestUtils.signEIP712(vm, appPrivateKey, comment1Id);
-    sig2Auth = TestUtils.signEIP712(vm, authorPrivateKey, comment2Id);
-    sig2App = TestUtils.signEIP712(vm, appPrivateKey, comment2Id);
-    sig3Auth = TestUtils.signEIP712(vm, authorPrivateKey, comment3Id);
-    sig3App = TestUtils.signEIP712(vm, appPrivateKey, comment3Id);
+    for (uint256 i = 0; i < numComments; i++) {
+      Comments.CreateComment memory comment = pendingComments[i];
+      comment.content = string(
+        abi.encodePacked("Batch comment ", i.toString())
+      );
+      commentIds[i] = comments.getCommentId(comment);
+      authorSigs[i] = TestUtils.signEIP712(vm, authorPrivateKey, commentIds[i]);
+      appSigs[i] = TestUtils.signEIP712(vm, appPrivateKey, commentIds[i]);
+    }
 
     Comments.BatchOperation[] memory operations = new Comments.BatchOperation[](
-      3
+      numComments
     );
-    operations[0] = Comments.BatchOperation({
-      operationType: Comments.BatchOperationType.POST_COMMENT_WITH_SIG,
-      data: abi.encode(comment1),
-      signatures: _createSignatureArray(sig1Auth, sig1App),
-      value: 0
-    });
-    operations[1] = Comments.BatchOperation({
-      operationType: Comments.BatchOperationType.POST_COMMENT_WITH_SIG,
-      data: abi.encode(comment2),
-      signatures: _createSignatureArray(sig2Auth, sig2App),
-      value: 0
-    });
-    operations[2] = Comments.BatchOperation({
-      operationType: Comments.BatchOperationType.POST_COMMENT_WITH_SIG,
-      data: abi.encode(comment3),
-      signatures: _createSignatureArray(sig3Auth, sig3App),
-      value: 0
-    });
+    for (uint256 i = 0; i < numComments; i++) {
+      emit log_named_string("batch content", pendingComments[i].content);
+      operations[i] = Comments.BatchOperation({
+        operationType: Comments.BatchOperationType.POST_COMMENT_WITH_SIG,
+        data: abi.encode(pendingComments[i]),
+        signatures: _createSignatureArray(authorSigs[i], appSigs[i]),
+        value: 0
+      });
+    }
 
     // Measure gas for batch operation
     gasStart = gasleft();
@@ -1034,12 +1017,12 @@ contract CommentsBatchTest is Test, IERC721Receiver {
     uint256 batchGas = gasStart - gasleft();
 
     // Note: Gas savings mainly come from reduced transaction base costs (21k gas per tx)
-    // Individual operations: 3 transactions × 21k = 63k gas overhead
+    // Individual operations: 20 transactions × 21k = 420k gas overhead
     // Batch operations: 1 transaction × 21k = 21k gas overhead
-    // Expected savings: 42k gas from transaction overhead
+    // Expected savings: (420 - 21)k gas from transaction overhead
 
     // The batch might use slightly more execution gas but saves significantly on transaction costs
-    uint256 transactionOverheadSavings = 21000 * 2; // Saved 2 transaction base costs
+    uint256 transactionOverheadSavings = 21000 * (numComments - 1); // Saved n - 1 transaction base costs
     uint256 totalSavingsWithTxCosts = individualGas +
       transactionOverheadSavings -
       batchGas;

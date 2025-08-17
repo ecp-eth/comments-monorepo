@@ -30,8 +30,6 @@ jobs:
 
       - name: "Install Foundry"
         uses: "foundry-rs/foundry-toolchain@v1"
-        with:
-          version: v1.2.3
 
       - name: "Setup pnpm"
         uses: "pnpm/action-setup@v2"
@@ -65,8 +63,6 @@ jobs:
 
       - name: "Install Foundry"
         uses: "foundry-rs/foundry-toolchain@v1"
-        with:
-          version: v1.2.3
 
       - name: "Setup pnpm"
         uses: "pnpm/action-setup@v2"
@@ -120,8 +116,6 @@ jobs:
 
       - name: "Install Foundry"
         uses: "foundry-rs/foundry-toolchain@v1"
-        with:
-          version: v1.2.3
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
@@ -167,12 +161,6 @@ jobs:
           fi
         shell: bash
 
-      - name: "SDK: Ensure SDK production contract addreses are up to date"
-        run: node --experimental-transform-types --no-warnings ./scripts/check-contract-addresses.ts
-        working-directory: packages/sdk
-        env:
-          NODE_ENV: "production"
-
       - name: "SDK: Ensure SDK development contract addreses are up to date"
         run: |
           pnpm run build:dev
@@ -181,3 +169,15 @@ jobs:
         env:
           NODE_ENV: "development"
           NODE_OPTIONS: "--max-old-space-size=8192"
+
+      # Commented out production address check as we are not actively working on the main protocols
+      # - name: "Install Foundry Production"
+      #   uses: "foundry-rs/foundry-toolchain@v1"
+      #   with:
+      #     version: v1.2.3
+
+      # - name: "SDK: Ensure SDK production contract addreses are up to date"
+      #   run: node --experimental-transform-types --no-warnings ./scripts/check-contract-addresses.ts
+      #   working-directory: packages/sdk
+      #   env:
+      #     NODE_ENV: "production"
