@@ -39,6 +39,15 @@ const channelManagerAbi = execFileSync(
   },
 );
 
+const baseHookAbi = execFileSync(
+  "pnpm",
+  ["forge", "inspect", "./src/hooks/BaseHook.sol:BaseHook", "abi", "--json"],
+  {
+    cwd: currentDir,
+    encoding: "utf-8",
+  },
+);
+
 const formattedAbi = await format(
   `
   /**
@@ -50,6 +59,11 @@ const formattedAbi = await format(
    * ABI of the ChannelManager contract.
    */
   export const ChannelManagerABI = ${channelManagerAbi.trim()} as const;
+
+  /**
+   * ABI of the BaseHook contract.
+   */
+  export const BaseHookABI = ${baseHookAbi.trim()} as const;
 `,
   { parser: "typescript" },
 );
