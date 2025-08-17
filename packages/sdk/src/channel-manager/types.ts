@@ -153,3 +153,13 @@ export type ContractReadFunctions = {
     >
   >;
 };
+
+/**
+ * FeeEstimation struct returned from fee estimator functions
+ */
+export type FeeEstimation = {
+  amount: bigint;
+  asset: Hex;
+  description: string;
+  metadata: readonly MetadataEntry[];
+};

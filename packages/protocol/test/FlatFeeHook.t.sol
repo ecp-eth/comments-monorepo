@@ -5,15 +5,17 @@ import { Test } from "forge-std/Test.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
+import { IProtocolFees } from "../src/interfaces/IProtocolFees.sol";
 import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 import { TestUtils } from "./utils.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Comments } from "../src/types/Comments.sol";
 import { Metadata } from "../src/types/Metadata.sol";
+import { FeeEstimatable } from "../src/types/FeeEstimatable.sol";
+import { BaseHook } from "../src/hooks/BaseHook.sol";
 
 // Fee charging hook contract
 contract FlatFeeHook is BaseHook {
@@ -68,6 +70,24 @@ contract FlatFeeHook is BaseHook {
       }
     }
     return new Metadata.MetadataEntry[](0);
+  }
+
+  function _estimateAddCommentFee(
+    Comments.Comment calldata,
+    Metadata.MetadataEntry[] calldata,
+    address
+  )
+    internal
+    pure
+    override
+    returns (FeeEstimatable.FeeEstimation memory feeEstimation)
+  {
+    feeEstimation.amount = HOOK_FEE;
+    feeEstimation.asset = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    feeEstimation.description = "Flat fee";
+    feeEstimation.metadata = new Metadata.MetadataEntry[](0);
+
+    return feeEstimation;
   }
 
   function withdrawFees() external {
@@ -135,7 +155,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     return abi.encodePacked(r, s, v);
   }
 
-  function test_FeeHookCollectsExactFee() public {
+  function test_FlatFeeHookCollectsExactFee() public {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
@@ -178,7 +198,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     assertEq(feeHook.totalFeesCollected(), HOOK_FEE);
   }
 
-  function test_FeeHookRefundsExcessPaymentExceptProtocolFee() public {
+  function test_FlatFeeHookRefundsExcessPaymentExceptProtocolFee() public {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
@@ -225,7 +245,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     assertEq(feeHook.totalFeesCollected(), HOOK_FEE);
   }
 
-  function test_FeeHookRejectsInsufficientFee() public {
+  function test_FlatFeeHookRejectsInsufficientFee() public {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
@@ -257,7 +277,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     comments.postComment{ value: 0.0005 ether }(commentData, appSignature);
   }
 
-  function test_FeeWithdrawal() public {
+  function test_FlatFeeHookFeeWithdrawal() public {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
@@ -337,17 +357,106 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     assertEq(feeHook.totalFeesCollected(), 0);
   }
 
-  function test_OnlyFeeCollectorCanWithdraw() public {
+  function test_FlatFeeHookOnlyFeeCollectorCanWithdraw() public {
     // Try to withdraw as non-fee collector
     vm.prank(user1);
     vm.expectRevert("Only fee collector");
     feeHook.withdrawFees();
   }
 
-  function test_CannotWithdrawWithNoFees() public {
+  function test_FlatFeeHookCannotWithdrawWithNoFees() public {
     vm.prank(feeCollector);
     vm.expectRevert("No fees to withdraw");
     feeHook.withdrawFees();
+  }
+
+  function test_FlatFeeHookEstimatedAddCommentFeeIsAccurate() public {
+    // Create channel with fee hook
+    uint256 channelId = channelManager.createChannel{
+      value: CHANNEL_CREATION_FEE
+    }(
+      "Fee Channel",
+      "Pay 0.001 ETH to comment",
+      new Metadata.MetadataEntry[](0),
+      address(feeHook)
+    );
+
+    string memory content = "Test comment";
+    string memory targetUri = "";
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](0);
+
+    Comments.CreateComment memory createCommentData = Comments.CreateComment({
+      content: content,
+      metadata: metadata,
+      targetUri: targetUri,
+      commentType: 0, // COMMENT_TYPE_COMMENT
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    // Create a corresponding comment data object for estimating the fee
+    Comments.Comment memory commentData = Comments.Comment({
+      content: content,
+      targetUri: targetUri,
+      commentType: 0,
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      parentId: bytes32(0),
+      createdAt: uint88(block.timestamp),
+      updatedAt: uint88(block.timestamp),
+      authMethod: Comments.AuthorAuthMethod.DIRECT_TX
+    });
+
+    bytes memory appSignature = _signAppSignature(createCommentData);
+
+    uint256 hookBalanceBefore = address(feeHook).balance;
+    uint256 user1BalanceBefore = user1.balance;
+
+    FeeEstimatable.FeeEstimation memory feeEstimation = feeHook
+      .estimateAddCommentFee(commentData, metadata, user1);
+
+    assertEq(feeEstimation.asset, 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+
+    IProtocolFees protocolFees = IProtocolFees(channelManager);
+
+    uint256 totalFeeIncludingProtocolFee = protocolFees
+      .getCommentCreationFee() +
+      (feeEstimation.amount / (10000 - protocolFees.getHookTransactionFee())) *
+      10000;
+
+    assertEq(totalFeeIncludingProtocolFee, TOTAL_FEE_WITH_PROTOCOL);
+
+    // Post comment as user1 with exact fee plus protocol fee
+    vm.prank(user1);
+    comments.postComment{ value: totalFeeIncludingProtocolFee }(
+      createCommentData,
+      appSignature
+    );
+
+    // Check that the hook received the hook fee (after protocol fee)
+    assertEq(address(feeHook).balance - hookBalanceBefore, HOOK_FEE);
+    // Check that user1 paid the total fee (including protocol fee)
+    assertEq(user1BalanceBefore - user1.balance, TOTAL_FEE_WITH_PROTOCOL);
+    // Check that the hook recorded the fee
+    assertEq(feeHook.totalFeesCollected(), HOOK_FEE);
+
+    emit log_named_uint("feeEstimation.amount", feeEstimation.amount);
+    emit log_named_uint(
+      "protocolFees.getCommentCreationFee()",
+      protocolFees.getCommentCreationFee()
+    );
+    emit log_named_uint(
+      "protocolFees.getHookTransactionFee()",
+      protocolFees.getHookTransactionFee()
+    );
+    emit log_named_uint(
+      "totalFeeIncludingProtocolFee",
+      totalFeeIncludingProtocolFee
+    );
   }
 
   function onERC721Received(

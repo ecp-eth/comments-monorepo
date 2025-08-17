@@ -10,14 +10,17 @@ import {
   MetadataTypeValues,
 } from "@ecp.eth/sdk/comments/metadata";
 
-const { privateKey, rpcUrl, chain } = parseEnv();
+const { authorPrivateKey, rpcUrl, chain, createChannelHookAddress } =
+  parseEnv();
 
 /**
  * This example shows how to create a channel.
  */
 async function main() {
+  console.log(`running with hook address: ${createChannelHookAddress}`);
+
   // Initialize account, ensure the account has enough balance to pay for the channel creation fee
-  const account = privateKeyToAccount(privateKey);
+  const account = privateKeyToAccount(authorPrivateKey);
 
   // public client for read only operations
   const publicClient = createPublicClient({
@@ -51,7 +54,7 @@ async function main() {
           list: ["Be respectful", "No spam"],
         }),
       ],
-      hook: "0x0000000000000000000000000000000000000000", // No hook initially
+      hook: createChannelHookAddress, // No hook initially
       fee: fee,
       writeContract: walletClient.writeContract,
     });
