@@ -8,14 +8,14 @@ import { siweMiddleware } from "../../../middleware/siwe";
 
 function toChannelCursor(channel: { id: bigint; createdAt: Date }): string {
   return Buffer.from(
-    `${channel.id.toString()}:${channel.createdAt.toISOString()}`,
+    `${channel.id.toString()}#${channel.createdAt.toISOString()}`,
   ).toString("base64url");
 }
 
 function fromChannelCursor(cursor: string): { id: bigint; createdAt: Date } {
   const decoded = Buffer.from(cursor, "base64url").toString("utf-8");
 
-  const [id, createdAt] = decoded.split(":");
+  const [id, createdAt] = decoded.split("#");
 
   return z
     .object({
@@ -132,7 +132,8 @@ export async function channelsGET(api: OpenAPIHono) {
         .limit(limit + 1);
 
       const pageResults = results.slice(0, limit);
-      const [nextCursor] = results.slice(limit);
+      const hasNextPage = results.length > limit;
+      const nextCursor = pageResults[pageResults.length - 1];
 
       // hono doesn't run response schema validations therefore we need to validate the response manually
       // which also works as formatter for bigints, etc
@@ -159,7 +160,7 @@ export async function channelsGET(api: OpenAPIHono) {
             },
           ),
           pageInfo: {
-            hasNextPage: nextCursor !== undefined,
+            hasNextPage,
             nextCursor: nextCursor
               ? toChannelCursor(nextCursor.channel)
               : undefined,
