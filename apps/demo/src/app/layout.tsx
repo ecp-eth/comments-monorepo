@@ -30,9 +30,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <main>
-          <Providers>{children}</Providers>
-        </main>
+        <div className="min-h-screen flex flex-col">
+          <main className="flex-1">
+            <Providers>{children}</Providers>
+          </main>
+          <footer className="py-4 text-center text-xs text-gray-500 border-t border-gray-200">
+            <a href="/terms" className="hover:text-gray-700 transition-colors">
+              Demo App Terms & Conditions
+            </a>
+          </footer>
+        </div>
         <Toaster />
       </body>
     </html>
