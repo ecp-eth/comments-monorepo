@@ -44,20 +44,26 @@ function callExternal({
   path: string[];
   accessToken: string | undefined;
 }) {
-  return fetch(
-    new URL("/" + path.join("/"), serverEnv.BROADCAST_APP_INDEXER_URL),
-    {
-      headers: {
-        ...reqToProxy.headers,
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      },
-      method: reqToProxy.method,
-      body: reqToProxy.body,
-      cache: "no-store",
-      // @ts-expect-error - duplex is not a valid property of RequestInit in browser
-      duplex: "half",
-    },
+  const url = new URL(
+    "/" + path.join("/"),
+    serverEnv.BROADCAST_APP_INDEXER_URL,
   );
+
+  for (const [key, value] of reqToProxy.nextUrl.searchParams.entries()) {
+    url.searchParams.set(key, value);
+  }
+
+  return fetch(url, {
+    headers: {
+      ...reqToProxy.headers,
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    method: reqToProxy.method,
+    body: reqToProxy.body,
+    cache: "no-store",
+    // @ts-expect-error - duplex is not a valid property of RequestInit in browser
+    duplex: "half",
+  });
 }
 
 async function proxyRequest(
