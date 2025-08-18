@@ -96,6 +96,9 @@ const BaseConfig = z.object({
   JWT_ISSUER: z.string().nonempty().default("broadcast-app-indexer"),
   JWT_SECRET: z.string().nonempty(),
   EFP_LIST_RECORDS_ADDRESS: HexSchema,
+  EFP_ACCOUNT_METADATA_ADDRESS: HexSchema,
+  EFP_LIST_REGISTRY_ADDRESS: HexSchema,
+  CHAIN_ANVIL_EFP_OVERRIDE_CHAIN_ID: z.coerce.number().int().optional(),
 });
 
 const EnvSchema = z.intersection(BaseConfig, ChainConfig);

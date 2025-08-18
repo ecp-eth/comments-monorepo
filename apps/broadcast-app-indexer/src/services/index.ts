@@ -44,7 +44,7 @@ export const notificationService: INotificationsService = env.NEYNAR_API_KEY
     })
   : new NoopNotificationsService();
 
-notificationService.process();
+// notificationService.process();
 
 if (globalThis.PONDER_COMMON) {
   console.info("Registering notification service graceful shutdown handler");

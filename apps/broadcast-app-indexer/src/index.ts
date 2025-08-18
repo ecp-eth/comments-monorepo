@@ -4,6 +4,15 @@ import { schema } from "../schema";
 import { ponder } from "ponder:registry";
 import { isZeroHex } from "@ecp.eth/sdk/core";
 import { notificationService } from "./services";
+import { Hex, hexToBigInt, hexToNumber, hexToString, sliceHex } from "viem";
+import { AssetId } from "caip";
+import { decodeListStorageLocation } from "@ecp.eth/shared/ethereum-follow-protocol";
+import { isSameHex } from "@ecp.eth/shared/helpers";
+import {
+  efpAccountMetadataAbi,
+  efpListRegistryAbi,
+} from "./abi/generated/efp-abi";
+import { env } from "./env";
 
 ponder.on("BroadcastHook:ChannelCreated", async ({ event, context }) => {
   const channelEvent = event.args;
@@ -102,7 +111,7 @@ ponder.on("ChannelManager:ChannelUpdated", async ({ event, context }) => {
       return;
     }
 
-    throw WebTransportError;
+    throw error;
   }
 });
 
@@ -127,4 +136,170 @@ ponder.on("CommentManager:CommentAdded", async ({ event, context }) => {
     comment: event.args,
     channel,
   });
+});
+
+ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
+  const version = hexToNumber(sliceHex(event.args.op, 0, 1), { size: 1 });
+  const opcode = hexToNumber(sliceHex(event.args.op, 1, 2), { size: 1 });
+  const data = sliceHex(event.args.op, 2);
+
+  if (version !== 1) {
+    if (process.env.NODE_ENV !== "production") {
+      console.info("Skipping list op because it's not a v1 list op", {
+        version,
+      });
+    }
+
+    return;
+  }
+
+  if (opcode !== 1 && opcode !== 2) {
+    if (process.env.NODE_ENV !== "production") {
+      console.info("Skipping list op because it's not a create or update", {
+        opcode,
+      });
+    }
+
+    return;
+  }
+
+  const recordVersion = hexToNumber(sliceHex(data, 0, 1), { size: 1 });
+  const recordType = hexToNumber(sliceHex(data, 1, 2), { size: 1 });
+  const recordData = hexToString(sliceHex(data, 2));
+
+  if (recordType !== 0x80 && recordType !== 0x80) {
+    if (process.env.NODE_ENV !== "production") {
+      console.info(
+        "Skipping list operation because it doesn't contain recognized record type",
+        {
+          recordType,
+          recordVersion,
+          data,
+        },
+      );
+    }
+
+    return;
+  }
+
+  try {
+    const assetId = AssetId.parse(recordData);
+
+    if (typeof assetId.assetName !== "object") {
+      if (process.env.NODE_ENV !== "production") {
+        console.info(
+          "Skipping list operation because it doesn't contain valid asset id, it probably isn't ERC721 record",
+          {
+            recordData,
+          },
+        );
+      }
+
+      return;
+    }
+
+    if (
+      assetId.assetName.namespace === "erc721" &&
+      isSameHex(
+        assetId.assetName.reference as Hex,
+        context.contracts.ChannelManager.address as Hex,
+      )
+    ) {
+      console.log("EFPListRecords:ListOp", {
+        channelId: assetId.tokenId,
+      });
+    }
+
+    const listUser = await context.client.readContract({
+      abi: context.contracts.EFPListRecords.abi,
+      address: context.contracts.EFPListRecords.address,
+      functionName: "getListUser",
+      args: [event.args.slot],
+    });
+
+    const primaryListTokenId = await context.client.readContract({
+      abi: efpAccountMetadataAbi,
+      address: env.EFP_ACCOUNT_METADATA_ADDRESS,
+      functionName: "getValue",
+      args: [listUser, "primary-list"],
+    });
+
+    if (isZeroHex(primaryListTokenId)) {
+      if (process.env.NODE_ENV !== "production") {
+        console.info(
+          "Skipping list operation because the list user doesn't have a primary list",
+          {
+            listUser,
+          },
+        );
+      }
+
+      return;
+    }
+
+    const listStorageLocation = await context.client.readContract({
+      abi: efpListRegistryAbi,
+      address: env.EFP_LIST_REGISTRY_ADDRESS,
+      functionName: "getListStorageLocation",
+      args: [hexToBigInt(primaryListTokenId)],
+    });
+
+    const decodedListStorageLocation =
+      decodeListStorageLocation(listStorageLocation);
+
+    const isPrimary =
+      isSameHex(decodedListStorageLocation.recordsAddress, event.log.address) &&
+      decodedListStorageLocation.chainId ===
+        BigInt(
+          env.CHAIN_ANVIL_EFP_OVERRIDE_CHAIN_ID ??
+            (context.chain?.id as number | undefined) ??
+            0,
+        ) &&
+      decodedListStorageLocation.slot === event.args.slot;
+
+    if (!isPrimary) {
+      if (process.env.NODE_ENV !== "production") {
+        console.info(
+          "Skipping list operation because it's not a primary list",
+          {
+            listStorageLocation,
+            decodedListStorageLocation,
+          },
+        );
+      }
+
+      return;
+    }
+
+    if (opcode === 1) {
+      await context.db.insert(schema.channelSubscription).values({
+        channelId: BigInt(assetId.tokenId),
+        userAddress: listUser,
+        createdAt: new Date(Number(event.block.timestamp) * 1000),
+        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        txHash: event.transaction.hash,
+        logIndex: event.log.logIndex,
+      });
+    } else if (opcode === 2) {
+      await context.db.delete(schema.channelSubscription, {
+        channelId: BigInt(assetId.tokenId),
+        userAddress: listUser,
+      });
+    }
+  } catch (e) {
+    if (e instanceof Error && e.message.includes("Invalid CAIP")) {
+      if (process.env.NODE_ENV !== "production") {
+        console.info(
+          "Skipping list operation because it doesn't contain valid asset id, it probably isn't ERC721 record",
+          {
+            recordData,
+          },
+        );
+      }
+
+      return;
+    }
+
+    return;
+  }
 });

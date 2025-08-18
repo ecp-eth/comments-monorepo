@@ -15,7 +15,7 @@ export function useMyChannelsQuery() {
     queryFn: async ({ pageParam: cursor, signal }) => {
       const searchParams = new URLSearchParams();
 
-      searchParams.set("onlySubscribed", "1");
+      searchParams.set("subscriptionFilter", "subscribed");
 
       if (cursor) {
         searchParams.set("cursor", cursor);

@@ -9,7 +9,6 @@ import {
   jsonb,
   uuid,
   numeric,
-  foreignKey,
 } from "drizzle-orm/pg-core";
 import type { NotificationDetails } from "./src/services/types";
 import type { Hex } from "viem";
@@ -42,21 +41,6 @@ export const authSiweRefreshToken = offchainSchema.table(
   },
 );
 
-export const channelSubscription = offchainSchema.table(
-  "channel_subscription",
-  {
-    channelId: numeric({ scale: 0, precision: 78, mode: "bigint" }).notNull(),
-    appId: text().notNull(),
-    userAddress: text().notNull().$type<Hex>(),
-    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    order: integer().notNull().default(0),
-  },
-  (table) => [
-    primaryKey({ columns: [table.channelId, table.appId, table.userAddress] }),
-  ],
-);
-
 export const channelSubscriptionFarcasterNotificationSettings =
   offchainSchema.table(
     "channel_subscription_farcaster_notification_settings",
@@ -71,7 +55,7 @@ export const channelSubscriptionFarcasterNotificationSettings =
     },
     (table) => [
       primaryKey({
-        name: "channel_subscription_farcaster_notification_settings_pk",
+        name: "csfns_settings_pk",
         columns: [
           table.channelId,
           table.appId,
@@ -79,21 +63,7 @@ export const channelSubscriptionFarcasterNotificationSettings =
           table.userFid,
         ],
       }),
-      foreignKey({
-        name: "channel_subscription_farcaster_notification_settings_channel_id_app_id_user_address_fk",
-        columns: [table.channelId, table.appId, table.userAddress],
-        foreignColumns: [
-          channelSubscription.channelId,
-          channelSubscription.appId,
-          channelSubscription.userAddress,
-        ],
-      })
-        .onDelete("cascade")
-        .onUpdate("cascade"),
-
-      index(
-        "channel_subscription_farcaster_notification_settings_enabled_by_channel_app_idx",
-      )
+      index("csfn_enabled_notification_by_channel_app_idx")
         .on(table.channelId, table.appId, table.notificationsEnabled)
         .where(sql`${table.notificationsEnabled} = true`),
     ],

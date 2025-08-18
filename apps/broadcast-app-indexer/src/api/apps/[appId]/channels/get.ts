@@ -38,10 +38,9 @@ const requestQuerySchema = z.object({
       return fromChannelCursor(val);
     }),
   limit: z.coerce.number().int().min(1).max(100).optional().default(20),
-  onlySubscribed: z
-    .enum(["1", "0"])
-    .transform((val) => val === "1")
-    .default("0")
+  subscriptionFilter: z
+    .enum(["subscribed", "unsubscribed"])
+    .default("unsubscribed")
     .openapi({
       description:
         "If false is passed only unsubscribed channels will be returned",
@@ -82,8 +81,10 @@ export async function channelsGET(api: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { limit, cursor, onlySubscribed } = c.req.valid("query");
+      const { limit, cursor, subscriptionFilter } = c.req.valid("query");
       const { appId } = c.req.valid("param");
+
+      console.log(subscriptionFilter);
 
       const results = await db
         .select()
@@ -92,7 +93,6 @@ export async function channelsGET(api: OpenAPIHono) {
           schema.channelSubscription,
           and(
             eq(schema.channel.id, schema.channelSubscription.channelId),
-            eq(schema.channelSubscription.appId, appId),
             eq(schema.channelSubscription.userAddress, c.get("user")!.address),
           ),
         )
@@ -125,7 +125,7 @@ export async function channelsGET(api: OpenAPIHono) {
                   ),
                 )
               : undefined,
-            onlySubscribed
+            subscriptionFilter === "subscribed"
               ? isNotNull(schema.channelSubscription.userAddress)
               : isNull(schema.channelSubscription.userAddress),
           ),

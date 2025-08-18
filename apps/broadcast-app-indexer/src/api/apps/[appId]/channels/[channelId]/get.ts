@@ -69,7 +69,6 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
           schema.channelSubscription,
           and(
             eq(schema.channel.id, schema.channelSubscription.channelId),
-            eq(schema.channelSubscription.appId, appId),
             eq(schema.channelSubscription.userAddress, c.get("user")!.address),
           ),
         )

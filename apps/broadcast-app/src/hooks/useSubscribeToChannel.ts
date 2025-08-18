@@ -21,7 +21,7 @@ const responseSchema = z.object({
   notificationsEnabled: z.boolean(),
 });
 
-type Response = z.infer<typeof responseSchema>;
+type Response = z.infer<typeof responseSchema> | false;
 
 type UseSubscribeToChannelOptions = {
   channel: Channel;
@@ -45,15 +45,11 @@ export function useSubscribeToChannel({
   return useMutation({
     ...options,
     mutationFn: async () => {
-      console.log(await addERC721RecordToPrimaryList());
+      await addERC721RecordToPrimaryList();
 
-      // @todo optimistically update the queries so pretend that the subscription is created
-      // because that is created on the backend during the indexing. Then we should send an information
-      // that user wants to be notified about new posts on the channel.
+      // if not in mini app, we don't need to do anything about notifications
       if (!miniAppContext.isInMiniApp) {
-        throw new Error(
-          "You need to be in a mini app to subscribe to a channel",
-        );
+        return false;
       }
 
       let notificationsEnabled = !!miniAppContext.client.notificationDetails;
@@ -64,6 +60,7 @@ export function useSubscribeToChannel({
         notificationsEnabled = !!result.notificationDetails;
       }
 
+      // @todo change endpoint to specifically handle just settings and not "subscribe"
       const response = await fetch(
         `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channel.id}/subscribe`,
         {
@@ -71,12 +68,10 @@ export function useSubscribeToChannel({
           headers: {
             "Content-Type": "application/json",
           },
-          // @todo send also fid and notifications enabled if they are available, otherwise don't sent them and just subscribe
-          // @todo change database structure to not isolate data per app because indexer will process list events and create subscriptions automatically
-          // so we will need to wait until the transaction is mined and when the subscription is available in our api
-          // then we can update it with notification settings
-          // so by default we will check if the channel subscription for current user exists after the transaction is processed
-          body: JSON.stringify({ notificationsEnabled }),
+          body: JSON.stringify({
+            notificationsEnabled,
+            userFid: miniAppContext.user.fid,
+          }),
         },
       );
 
@@ -114,7 +109,7 @@ export function useSubscribeToChannel({
 
       updateChannelInChannelQuery(channel.id, {
         isSubscribed: true,
-        notificationsEnabled: data.notificationsEnabled,
+        notificationsEnabled: data ? data.notificationsEnabled : false,
       });
     },
   });
