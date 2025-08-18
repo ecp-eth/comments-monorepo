@@ -75,3 +75,5 @@ packages/react-editor/extract-references
 packages/react-editor/hooks
 packages/react-editor/parser
 packages/react-editor/types
+
+packages/shared/ethereum-follow-protocol
