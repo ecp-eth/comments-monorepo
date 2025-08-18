@@ -60,6 +60,14 @@ query {
 }
 ```
 
+Search comments by content using `content_contains`:
+
+```bash
+curl -X POST https://api.ethcomments.xyz/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"query MyQuery { comments(where: {content_contains: \"build\"}) { items { id content } } }"}'
+```
+
 **Important**: The hosted indexer has moderation enabled by default. If you want comments to appear immediately without waiting for moderation approval, you can filter by moderation status in your GraphQL queries:
 
 ```graphql
