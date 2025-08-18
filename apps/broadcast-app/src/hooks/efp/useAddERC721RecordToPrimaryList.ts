@@ -1,16 +1,8 @@
 import { efpListRecordsAbi, efpListRegistryAbi } from "@/abi/generated/efp-abi";
 import { publicEnv } from "@/env/public";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
-import {
-  stringToHex,
-  concatHex,
-  type Hex,
-  numberToHex,
-  sliceHex,
-  hexToNumber,
-  hexToBigInt,
-  getAddress,
-} from "viem";
+import { decodeListStorageLocation } from "@ecp.eth/shared/ethereum-follow-protocol";
+import { stringToHex, concatHex, type Hex, numberToHex } from "viem";
 import { usePublicClient, useWalletClient } from "wagmi";
 import { AssetId } from "caip";
 import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/config";
@@ -47,7 +39,7 @@ export function useAddERC721RecordToPrimaryList({
         args: [primaryListId],
       });
 
-      const decodedLocation = decodeListLocation(location);
+      const decodedLocation = decodeListStorageLocation(location);
 
       const caip = new AssetId({
         chainId: {
@@ -76,33 +68,6 @@ export function useAddERC721RecordToPrimaryList({
       }
     },
   });
-}
-
-function decodeListLocation(location: Hex): {
-  version: number;
-  locationType: number;
-  chainId: bigint;
-  recordsAddress: Hex;
-  slot: bigint;
-} {
-  const version = hexToNumber(sliceHex(location, 0, 1), { size: 1 });
-  const locationType = hexToNumber(sliceHex(location, 1, 2), { size: 1 });
-
-  if (version !== 1 || locationType !== 1) {
-    throw new Error("Invalid list location");
-  }
-
-  const chainId = hexToBigInt(sliceHex(location, 2, 34));
-  const recordsAddress = getAddress(sliceHex(location, 34, 54));
-  const slot = hexToBigInt(sliceHex(location, 54, 86));
-
-  return {
-    version,
-    locationType,
-    chainId,
-    recordsAddress,
-    slot,
-  };
 }
 
 function encodeListAddOp(record: Hex): Hex {
