@@ -2,25 +2,28 @@ import { efpListRecordsAbi, efpListRegistryAbi } from "@/abi/generated/efp-abi";
 import { publicEnv } from "@/env/public";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import { decodeListStorageLocation } from "@ecp.eth/shared/ethereum-follow-protocol";
+import { concatHex, type Hex, numberToHex } from "viem";
 import { usePublicClient, useWalletClient } from "wagmi";
 import { AssetId } from "caip";
 import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/config";
 import { usePrimaryList } from "./usePrimaryList";
-import { encodeERC721Record, encodeListAddOp } from "@/lib/efp";
+import { encodeERC721Record } from "@/lib/efp";
 
-type UseAddERC721RecordToPrimaryListOptions = {
+type UseRemoveERC721RecordToPrimaryListOptions = {
   channelId: bigint;
 } & Omit<
   UseMutationOptions<void, Error, void>,
   "mutationFn" | "onSuccess" | "onError"
 >;
 
-export function useAddERC721RecordToPrimaryList({
+export function useRemoveERC721RecordToPrimaryList({
   channelId,
-}: UseAddERC721RecordToPrimaryListOptions) {
+}: UseRemoveERC721RecordToPrimaryListOptions) {
   const publicClient = usePublicClient();
   const walletClient = useWalletClient();
-  const { mutateAsync: getOrCreatePrimaryList } = usePrimaryList();
+  const { mutateAsync: getPrimaryList } = usePrimaryList({
+    createIfNotExists: false,
+  });
 
   return useMutation({
     mutationFn: async () => {
@@ -30,7 +33,7 @@ export function useAddERC721RecordToPrimaryList({
         );
       }
 
-      const primaryListId = await getOrCreatePrimaryList();
+      const primaryListId = await getPrimaryList();
 
       const location = await publicClient.readContract({
         abi: efpListRegistryAbi,
@@ -57,15 +60,25 @@ export function useAddERC721RecordToPrimaryList({
         address: decodedLocation.recordsAddress,
         abi: efpListRecordsAbi,
         functionName: "applyListOp",
-        args: [decodedLocation.slot, encodeListAddOp(encodeERC721Record(caip))],
+        args: [
+          decodedLocation.slot,
+          encodeListRemoveOp(encodeERC721Record(caip)),
+        ],
       });
       const applyListOpReceipt = await publicClient.waitForTransactionReceipt({
         hash: applyListOpHash,
       });
 
       if (applyListOpReceipt.status !== "success") {
-        throw new Error("Failed to add record to primary list");
+        throw new Error("Failed to remove record to primary list");
       }
     },
   });
+}
+
+function encodeListRemoveOp(record: Hex): Hex {
+  const opVersion = numberToHex(1, { size: 1 });
+  const op = numberToHex(2, { size: 1 });
+
+  return concatHex([opVersion, op, record]);
 }

@@ -1,9 +1,9 @@
-import { publicEnv } from "@/env/public";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import type { Channel } from "@/api/schemas";
 import { toast } from "sonner";
 import { useUpdateChannelInChannelQuery } from "@/queries/channel";
 import { useRemoveChannelFromMyChannelsQuery } from "@/queries/my-channels";
+import { useRemoveERC721RecordToPrimaryList } from "./efp/useRemoveERC721RecordFromPrimaryList";
 
 type UseUnsubscribeToChannelOptions = {
   channel: Channel;
@@ -19,24 +19,15 @@ export function useUnsubscribeToChannel({
   const updateChannelInChannelQuery = useUpdateChannelInChannelQuery();
   const removeChannelFromMyChannelsQuery =
     useRemoveChannelFromMyChannelsQuery();
+  const { mutateAsync: removeERC721RecordFromPrimaryList } =
+    useRemoveERC721RecordToPrimaryList({
+      channelId: channel.id,
+    });
 
   return useMutation({
     ...options,
     mutationFn: async () => {
-      const response = await fetch(
-        `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channel.id}/unsubscribe`,
-        {
-          method: "POST",
-        },
-      );
-
-      if (!response.ok) {
-        console.error(
-          `Failed to subscribe to channel:\n\nStatus: ${response.status}\n\nResponse: ${await response.text()}`,
-        );
-
-        throw new Error("Server returned invalid response");
-      }
+      await removeERC721RecordFromPrimaryList();
     },
     onSuccess() {
       toast.success(`Unsubscribed from channel ${channel.name}`);

@@ -6,7 +6,7 @@ import { publicEnv } from "@/env/public";
 import { useConnectAccount } from "@/hooks/useConnectAccount";
 import { isZeroHex } from "@ecp.eth/sdk/core";
 import { isSameHex } from "@ecp.eth/shared/helpers";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import {
   type Chain,
   type Account,
@@ -27,12 +27,30 @@ import {
 } from "viem";
 import { usePublicClient, useWalletClient } from "wagmi";
 
-export function usePrimaryList() {
+export class PrimaryListNotFoundError extends Error {
+  constructor() {
+    super("Primary list doesn't exist");
+  }
+}
+
+type UsePrimaryListOptions = {
+  /**
+   * If false and the primary list doesn't exit, will throw an error
+   * @default true
+   */
+  createIfNotExists?: boolean;
+} & Omit<UseMutationOptions<bigint, Error, void>, "mutationFn">;
+
+export function usePrimaryList({
+  createIfNotExists = true,
+  ...rest
+}: UsePrimaryListOptions = {}) {
   const connectAccount = useConnectAccount();
   const publicClient = usePublicClient();
   const walletClient = useWalletClient();
 
   return useMutation({
+    ...rest,
     mutationFn: async () => {
       const address = await connectAccount();
 
@@ -50,6 +68,10 @@ export function usePrimaryList() {
       );
 
       if (existingTokenId == null) {
+        if (!createIfNotExists) {
+          throw new PrimaryListNotFoundError();
+        }
+
         const result = await createPrimaryList(
           address,
           publicClient,
