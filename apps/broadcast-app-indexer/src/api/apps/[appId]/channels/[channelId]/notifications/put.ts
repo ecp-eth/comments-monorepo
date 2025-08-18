@@ -4,7 +4,6 @@ import {
   ChannelSubscriptionUpdateResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
-  UnsupportedMediaTypeResponse,
 } from "../../../../../shared-responses";
 import { db } from "../../../../../../services";
 import { schema } from "../../../../../../../schema";
@@ -12,13 +11,14 @@ import { and, eq } from "drizzle-orm";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { siweMiddleware } from "../../../../../middleware/siwe";
 
-export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
+export async function channelNotificationsPUT(api: OpenAPIHono): Promise<void> {
   api.openapi(
     {
-      method: "post",
-      path: "/api/apps/:appId/channels/:channelId/subscribe",
-      tags: ["Channels", "Subscriptions"],
-      description: "Subscribes to a channel",
+      method: "put",
+      path: "/api/apps/:appId/channels/:channelId/notifications",
+      tags: ["Channels", "Subscriptions", "Notifications", "Farcaster"],
+      description:
+        "Creates or updates farcaster notifications settings for a channel",
       middleware: siweMiddleware,
       request: {
         params: z.object({
@@ -34,11 +34,12 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
               }),
             },
           },
+          required: true,
         },
       },
       responses: {
-        201: {
-          description: "Successfully subscribed to the channel",
+        200: {
+          description: "Successfully created notifications settings",
           content: {
             "application/json": {
               schema: ChannelSubscriptionUpdateResponse,
@@ -54,26 +55,10 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
           },
         },
         404: {
-          description: "Channel not found",
+          description: "Channel not found or not subscribed to the channel",
           content: {
             "application/json": {
               schema: NotFoundResponse,
-            },
-          },
-        },
-        409: {
-          description: "Conflict - already subscribed to the channel",
-          content: {
-            "application/json": {
-              schema: BadRequestResponse,
-            },
-          },
-        },
-        415: {
-          description: "Unsupported media type",
-          content: {
-            "application/json": {
-              schema: UnsupportedMediaTypeResponse,
             },
           },
         },
@@ -90,17 +75,12 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
     async (c) => {
       const { channelId, appId } = c.req.valid("param");
 
-      if (c.req.header("content-type") !== "application/json") {
-        return c.json({ error: "Unsupported media type" }, 415);
-      }
-
       const [result] = await db
         .select()
         .from(schema.channel)
         .leftJoin(
           schema.channelSubscription,
           and(
-            eq(schema.channelSubscription.appId, appId),
             eq(schema.channel.id, schema.channelSubscription.channelId),
             eq(schema.channelSubscription.userAddress, c.get("user")!.address),
           ),
@@ -112,59 +92,53 @@ export async function channelSubscribePOST(api: OpenAPIHono): Promise<void> {
         return c.json({ error: "Channel not found" }, 404);
       }
 
-      if (result.channel_subscription) {
-        return c.json({ error: "Already subscribed to the channel" }, 409);
+      if (!result.channel_subscription) {
+        return c.json({ error: "No subscription found" }, 404);
       }
 
       const { notificationsEnabled, userFid } = c.req.valid("json");
 
-      const { subscription, notificationSettings } = await db.transaction(
-        async (tx) => {
-          const [subscription] = await tx
-            .insert(schema.channelSubscription)
-            .values({
-              appId,
-              channelId: result.channel.id,
-              userAddress: c.get("user")!.address,
-            })
-            .returning()
-            .execute();
-
-          if (!subscription) {
-            throw new Error("Failed to create subscription");
-          }
-
-          const [notificationSettings] = await tx
-            .insert(schema.channelSubscriptionFarcasterNotificationSettings)
-            .values({
-              userFid,
-              appId: subscription.appId,
-              channelId: subscription.channelId,
-              userAddress: subscription.userAddress,
+      const notificationSettings = await db.transaction(async (tx) => {
+        const [settings] = await tx
+          .insert(schema.channelSubscriptionFarcasterNotificationSettings)
+          .values({
+            appId,
+            channelId: result.channel.id,
+            userAddress: c.get("user")!.address,
+            userFid,
+            notificationsEnabled,
+          })
+          .onConflictDoUpdate({
+            target: [
+              schema.channelSubscriptionFarcasterNotificationSettings.appId,
+              schema.channelSubscriptionFarcasterNotificationSettings.channelId,
+              schema.channelSubscriptionFarcasterNotificationSettings
+                .userAddress,
+              schema.channelSubscriptionFarcasterNotificationSettings.userFid,
+            ],
+            set: {
               notificationsEnabled,
-            })
-            .returning()
-            .execute();
+              updatedAt: new Date(),
+            },
+          })
+          .returning()
+          .execute();
 
-          if (!notificationSettings) {
-            throw new Error("Failed to create notification settings");
-          }
+        if (!settings) {
+          throw new Error("Failed to create notification settings");
+        }
 
-          return {
-            subscription,
-            notificationSettings,
-          };
-        },
-      );
+        return settings;
+      });
 
       // hono doesn't run response schema validations therefore we need to validate the response manually
       // which also works as formatter for bigints, etc
       return c.json(
         ChannelSubscriptionUpdateResponse.parse({
-          channelId: subscription.channelId,
+          channelId: result.channel.id,
           notificationsEnabled: notificationSettings.notificationsEnabled,
         }),
-        201,
+        200,
       );
     },
   );

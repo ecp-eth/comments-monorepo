@@ -1,6 +1,6 @@
 {
-  "id": "490817ce-4e10-4867-893f-48cd5c82ce0c",
-  "prevId": "910b7ec5-6785-419f-ab70-3a6b3fd33d95",
+  "id": "9fdfacd0-3fc2-4aef-89d2-1e56feebdd6f",
+  "prevId": "490817ce-4e10-4867-893f-48cd5c82ce0c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -320,6 +320,98 @@
           "columns": [
             "comment_id",
             "app_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "broadcast_app_indexer_offchain.user_farcaster_mini_app_settings": {
+      "name": "user_farcaster_mini_app_settings",
+      "schema": "broadcast_app_indexer_offchain",
+      "columns": {
+        "app_id": {
+          "name": "app_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_address": {
+          "name": "user_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_fid": {
+          "name": "user_fid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "notifications_enabled": {
+          "name": "notifications_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "ufmas_user_address_idx": {
+          "name": "ufmas_user_address_idx",
+          "columns": [
+            {
+              "expression": "user_address",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ufmas_user_fid_idx": {
+          "name": "ufmas_user_fid_idx",
+          "columns": [
+            {
+              "expression": "user_fid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "user_farcaster_mini_app_settings_app_id_user_address_user_fid_pk": {
+          "name": "user_farcaster_mini_app_settings_app_id_user_address_user_fid_pk",
+          "columns": [
+            "app_id",
+            "user_address",
+            "user_fid"
           ]
         }
       },

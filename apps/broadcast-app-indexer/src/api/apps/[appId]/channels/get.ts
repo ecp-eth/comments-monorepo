@@ -84,8 +84,6 @@ export async function channelsGET(api: OpenAPIHono) {
       const { limit, cursor, subscriptionFilter } = c.req.valid("query");
       const { appId } = c.req.valid("param");
 
-      console.log(subscriptionFilter);
-
       const results = await db
         .select()
         .from(schema.channel)

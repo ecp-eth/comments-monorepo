@@ -71,6 +71,13 @@
       "when": 1755242919951,
       "tag": "0009_session_last_used_at",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1755523698685,
+      "tag": "0010_farcaster_mini_app_settings",
+      "breakpoints": true
     }
   ]
 }

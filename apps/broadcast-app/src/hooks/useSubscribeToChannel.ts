@@ -8,13 +8,7 @@ import { useUpdateChannelInChannelQuery } from "@/queries/channel";
 import { toast } from "sonner";
 import type { Channel } from "@/api/schemas";
 import { useAddERC721RecordToPrimaryList } from "./efp/useAddERC721RecordToPrimaryList";
-
-export class AlreadySubscribedError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "AlreadySubscribedError";
-  }
-}
+import { UnauthorizedError } from "@/errors";
 
 const responseSchema = z.object({
   channelId: z.coerce.bigint(),
@@ -45,62 +39,34 @@ export function useSubscribeToChannel({
   return useMutation({
     ...options,
     mutationFn: async () => {
+      let notificationsEnabled = false;
+
+      if (miniAppContext.isInMiniApp) {
+        notificationsEnabled = !!miniAppContext.client.notificationDetails;
+
+        if (!miniAppContext.client.added) {
+          const result = await sdk.actions.addMiniApp();
+
+          notificationsEnabled = !!result.notificationDetails;
+        }
+
+        // store notification settings
+        await storeNotificationSettings({
+          userFid: miniAppContext.user.fid,
+          notificationsEnabled,
+        });
+      }
+
       await addERC721RecordToPrimaryList();
 
-      // if not in mini app, we don't need to do anything about notifications
-      if (!miniAppContext.isInMiniApp) {
-        return false;
-      }
-
-      let notificationsEnabled = !!miniAppContext.client.notificationDetails;
-
-      if (!miniAppContext.client.added) {
-        const result = await sdk.actions.addMiniApp();
-
-        notificationsEnabled = !!result.notificationDetails;
-      }
-
-      // @todo change endpoint to specifically handle just settings and not "subscribe"
-      const response = await fetch(
-        `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channel.id}/subscribe`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            notificationsEnabled,
-            userFid: miniAppContext.user.fid,
-          }),
-        },
-      );
-
-      if (response.status === 409) {
-        throw new AlreadySubscribedError(
-          `You are already subscribed to channel ${channel.name}`,
-        );
-      }
-
-      if (!response.ok) {
-        console.error(
-          `Failed to subscribe to channel:\n\nStatus: ${response.status}\n\nResponse: ${await response.text()}`,
-        );
-
-        throw new Error("Server returned invalid response");
-      }
-
-      const responseData = await responseSchema
-        .promise()
-        .parse(response.json());
-
-      return responseData;
+      return {
+        channelId: channel.id,
+        notificationsEnabled,
+      };
     },
     onError(error) {
-      if (error instanceof AlreadySubscribedError) {
-        toast.error(`You are already subscribed to channel ${channel.name}`);
-      } else {
-        toast.error(`Failed to subscribe to channel: ${error.message}`);
-      }
+      // @todo more human friendly error message in case of wallet (RPC) error
+      toast.error(`Failed to subscribe to channel: ${error.message}`);
     },
     onSuccess(data) {
       toast.success(`Subscribed to channel ${channel.name}`);
@@ -113,4 +79,36 @@ export function useSubscribeToChannel({
       });
     },
   });
+}
+
+async function storeNotificationSettings(params: {
+  notificationsEnabled: boolean;
+  userFid: number;
+}): Promise<Response> {
+  const response = await fetch(
+    `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/farcaster/settings`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(params),
+    },
+  );
+
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
+
+  if (!response.ok) {
+    console.error(
+      `Failed to subscribe to channel:\n\nStatus: ${response.status}\n\nResponse: ${await response.text()}`,
+    );
+
+    throw new Error("Server returned invalid response");
+  }
+
+  const responseData = await responseSchema.promise().parse(response.json());
+
+  return responseData;
 }

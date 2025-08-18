@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/node";
 import { schema } from "../schema";
 import { ponder } from "ponder:registry";
 import { isZeroHex } from "@ecp.eth/sdk/core";
-import { notificationService } from "./services";
+import { db, notificationService } from "./services";
 import { Hex, hexToBigInt, hexToNumber, hexToString, sliceHex } from "viem";
 import { AssetId } from "caip";
 import { decodeListStorageLocation } from "@ecp.eth/shared/ethereum-follow-protocol";
@@ -13,6 +13,7 @@ import {
   efpListRegistryAbi,
 } from "./abi/generated/efp-abi";
 import { env } from "./env";
+import { and, eq } from "drizzle-orm";
 
 ponder.on("BroadcastHook:ChannelCreated", async ({ event, context }) => {
   const channelEvent = event.args;
@@ -199,18 +200,25 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
     }
 
     if (
-      assetId.assetName.namespace === "erc721" &&
-      isSameHex(
+      assetId.assetName.namespace !== "erc721" ||
+      !isSameHex(
         assetId.assetName.reference as Hex,
         context.contracts.ChannelManager.address as Hex,
       )
     ) {
-      console.log("EFPListRecords:ListOp", {
-        channelId: assetId.tokenId,
-      });
+      if (process.env.NODE_ENV !== "production") {
+        console.info(
+          "Skipping list operation because it doesn't contain EFP ERC721 record",
+          {
+            recordData,
+          },
+        );
+      }
+
+      return;
     }
 
-    const listUser = await context.client.readContract({
+    const listUserAddress = await context.client.readContract({
       abi: context.contracts.EFPListRecords.abi,
       address: context.contracts.EFPListRecords.address,
       functionName: "getListUser",
@@ -221,7 +229,7 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
       abi: efpAccountMetadataAbi,
       address: env.EFP_ACCOUNT_METADATA_ADDRESS,
       functionName: "getValue",
-      args: [listUser, "primary-list"],
+      args: [listUserAddress, "primary-list"],
     });
 
     if (isZeroHex(primaryListTokenId)) {
@@ -229,7 +237,7 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
         console.info(
           "Skipping list operation because the list user doesn't have a primary list",
           {
-            listUser,
+            listUser: listUserAddress,
           },
         );
       }
@@ -271,19 +279,72 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
       return;
     }
 
+    const channelId = BigInt(assetId.tokenId);
+
     if (opcode === 1) {
-      await context.db.insert(schema.channelSubscription).values({
-        channelId: BigInt(assetId.tokenId),
-        userAddress: listUser,
-        createdAt: new Date(Number(event.block.timestamp) * 1000),
-        updatedAt: new Date(Number(event.block.timestamp) * 1000),
-        txHash: event.transaction.hash,
-        logIndex: event.log.logIndex,
+      await db.transaction(async (tx) => {
+        await tx.insert(schema.channelSubscription).values({
+          channelId,
+          userAddress: listUserAddress,
+          createdAt: new Date(Number(event.block.timestamp) * 1000),
+          updatedAt: new Date(Number(event.block.timestamp) * 1000),
+          txHash: event.transaction.hash,
+          logIndex: event.log.logIndex,
+        });
+
+        // create farcaster notification settings for the channel
+        const userFarcasterMiniAppSettings =
+          await tx.query.userFarcasterMiniAppSettings.findMany({
+            where(fields, operators) {
+              return operators.eq(fields.userAddress, listUserAddress);
+            },
+          });
+
+        if (userFarcasterMiniAppSettings.length > 0) {
+          await tx
+            .insert(schema.channelSubscriptionFarcasterNotificationSettings)
+            .values(
+              userFarcasterMiniAppSettings.map((settings) => {
+                return {
+                  appId: settings.appId,
+                  channelId: BigInt(assetId.tokenId),
+                  userAddress: listUserAddress,
+                  userFid: settings.userFid,
+                  notificationsEnabled: settings.notificationsEnabled,
+                };
+              }),
+            )
+            .execute();
+        }
       });
     } else if (opcode === 2) {
-      await context.db.delete(schema.channelSubscription, {
-        channelId: BigInt(assetId.tokenId),
-        userAddress: listUser,
+      await db.transaction(async (tx) => {
+        await tx
+          .delete(schema.channelSubscription)
+          .where(
+            and(
+              eq(schema.channelSubscription.channelId, channelId),
+              eq(schema.channelSubscription.userAddress, listUserAddress),
+            ),
+          );
+
+        // delete farcaster notification settings for the channel
+        await tx
+          .delete(schema.channelSubscriptionFarcasterNotificationSettings)
+          .where(
+            and(
+              eq(
+                schema.channelSubscriptionFarcasterNotificationSettings
+                  .channelId,
+                channelId,
+              ),
+              eq(
+                schema.channelSubscriptionFarcasterNotificationSettings
+                  .userAddress,
+                listUserAddress,
+              ),
+            ),
+          );
       });
     }
   } catch (e) {

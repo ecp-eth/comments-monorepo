@@ -1,12 +1,14 @@
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { channelUnsubscribePOST } from "./unsubscribe/post";
-import { channelSubscribePOST } from "./subscribe/post";
 import { channelGET } from "./get";
+import { channelSubscriptionHEAD } from "./subscription/head";
 import { channelSubscriptionPATCH } from "./subscription/patch";
+import { channelNotificationsPUT } from "./notifications/put";
 
 export async function initializeChannelRoutes(api: OpenAPIHono): Promise<void> {
   await channelGET(api);
-  await channelSubscribePOST(api);
   await channelUnsubscribePOST(api);
   await channelSubscriptionPATCH(api);
+  await channelNotificationsPUT(api);
+  await channelSubscriptionHEAD(api);
 }

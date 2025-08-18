@@ -41,6 +41,23 @@ export const authSiweRefreshToken = offchainSchema.table(
   },
 );
 
+export const userFarcasterMiniAppSettings = offchainSchema.table(
+  "user_farcaster_mini_app_settings",
+  {
+    appId: text().notNull(),
+    userAddress: text().notNull(),
+    userFid: integer().notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    notificationsEnabled: boolean().notNull().default(false),
+  },
+  (table) => [
+    primaryKey({ columns: [table.appId, table.userAddress, table.userFid] }),
+    index("ufmas_user_address_idx").on(table.userAddress),
+    index("ufmas_user_fid_idx").on(table.userFid),
+  ],
+);
+
 export const channelSubscriptionFarcasterNotificationSettings =
   offchainSchema.table(
     "channel_subscription_farcaster_notification_settings",

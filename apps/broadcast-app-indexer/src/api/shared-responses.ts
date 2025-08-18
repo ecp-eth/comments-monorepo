@@ -13,10 +13,6 @@ export const NotFoundResponse = z.object({
   error: z.string(),
 });
 
-export const UnsupportedMediaTypeResponse = z.object({
-  error: z.string(),
-});
-
 export const ChannelResponse = z.object({
   id: z.bigint().transform((val) => val.toString()),
   name: z.string(),
@@ -30,5 +26,10 @@ export const ChannelResponse = z.object({
 
 export const ChannelSubscriptionUpdateResponse = z.object({
   channelId: z.bigint().transform((val) => val.toString()),
+  notificationsEnabled: z.boolean(),
+});
+
+export const FarcasterSettingsUpdateResponse = z.object({
+  userFid: z.number(),
   notificationsEnabled: z.boolean(),
 });
