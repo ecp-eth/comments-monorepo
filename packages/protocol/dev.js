@@ -1,4 +1,83 @@
-import { exec, execSync } from "child_process";
+import { exec, execSync } from "node:child_process";
+import path from "node:path";
+import { writeFile, readFile, stat } from "node:fs/promises";
+
+async function getLatestBlock(rpcUrl) {
+  const response = await fetch(rpcUrl, {
+    method: "POST",
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      method: "eth_blockNumber",
+      params: [],
+      id: 1,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to get latest block: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.result) {
+    throw new Error("Failed to get latest block");
+  }
+
+  return parseInt(data.result, 16);
+}
+
+async function storeForkBlockNumber(blockNumber) {
+  // store the block number in .env.local file of both indexers
+  const currentDirectory = import.meta.dirname;
+  const broadcastAppIndexerDirectory = path.resolve(
+    currentDirectory,
+    "../../apps/",
+    "broadcast-app-indexer",
+  );
+
+  const broadcastAppIndexerEnvFile = path.resolve(
+    broadcastAppIndexerDirectory,
+    ".env.local",
+  );
+
+  const broadcastAppIndexerEnvFileExists = await stat(
+    broadcastAppIndexerEnvFile,
+  )
+    .then(() => true)
+    .catch(() => false);
+
+  if (broadcastAppIndexerEnvFileExists) {
+    const broadcastAppIndexerEnvFileContent = await readFile(
+      broadcastAppIndexerEnvFile,
+      "utf8",
+    );
+
+    let broadcastAppIndexerEnvFileContentWithForkBlockNumber =
+      broadcastAppIndexerEnvFileContent;
+
+    if (broadcastAppIndexerEnvFileContent.includes("CHAIN_ANVIL_START_BLOCK")) {
+      broadcastAppIndexerEnvFileContentWithForkBlockNumber =
+        broadcastAppIndexerEnvFileContent.replace(
+          /CHAIN_ANVIL_START_BLOCK=.*/,
+          `CHAIN_ANVIL_START_BLOCK=${blockNumber}`,
+        );
+    } else {
+      broadcastAppIndexerEnvFileContentWithForkBlockNumber =
+        broadcastAppIndexerEnvFileContent +
+        `\nCHAIN_ANVIL_START_BLOCK=${blockNumber}`;
+    }
+
+    await writeFile(
+      broadcastAppIndexerEnvFile,
+      broadcastAppIndexerEnvFileContentWithForkBlockNumber,
+    );
+  } else {
+    await writeFile(
+      broadcastAppIndexerEnvFile,
+      `CHAIN_ANVIL_START_BLOCK=${blockNumber}`,
+    );
+  }
+}
 
 const rpcUrl = process.env.ANVIL_BASE_RPC_URL_FOR_FORK;
 const deployerPrivateKey = process.env.CUSTOM_ANVIL_DEPLOYER_PRIVATE_KEY;
@@ -17,16 +96,21 @@ if (rpcUrl) {
     throw new Error("CUSTOM_ANVIL_DEPLOYER_ADDRESS is not set");
   }
 
+  const forkBlockNumber = await getLatestBlock(rpcUrl);
+
+  await storeForkBlockNumber(forkBlockNumber);
+
   forkSettings = {
     forkUrl: rpcUrl,
     deployerPrivateKey,
     deployerAddress,
+    forkBlockNumber,
   };
 }
 
 const cwd = import.meta.dirname;
 const nodeProcess = exec(
-  `anvil --host 0.0.0.0 --block-time 2 ${forkSettings ? `--fork-url ${forkSettings.forkUrl} --chain-id 31337` : ""}`,
+  `anvil --host 0.0.0.0 --block-time 2 ${forkSettings ? `--fork-url ${forkSettings.forkUrl} --fork-block-number ${forkSettings.forkBlockNumber} --chain-id 31337 --no-rate-limit` : ""}`,
   { cwd },
 );
 
