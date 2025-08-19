@@ -7,7 +7,7 @@ import { PlusIcon, XIcon } from "lucide-react";
 import type { Channel } from "@/api/schemas";
 import { useSubscribeToChannel } from "@/hooks/useSubscribeToChannel";
 import { useUnsubscribeToChannel } from "@/hooks/useUnsubscribeFromChannel";
-import { cn } from "@/lib/utils";
+import { cn, getChannelNftImageUrl } from "@/lib/utils";
 import { ChannelCardNotificationsToggleButton } from "./channel-card-notifications-toggle-button";
 
 interface ChannelCardProps {
@@ -32,7 +32,10 @@ export function ChannelCard({ channel }: ChannelCardProps) {
         className="flex items-center space-x-3 flex-1 min-w-0"
       >
         <Avatar className="h-12 w-12 shrink-0">
-          <AvatarImage src="/placeholder.svg" alt={channel.name} />
+          <AvatarImage
+            src={getChannelNftImageUrl(channel.id, channel.chainId)}
+            alt={channel.name}
+          />
           <AvatarFallback>
             {channel.name.charAt(0).toUpperCase()}
           </AvatarFallback>

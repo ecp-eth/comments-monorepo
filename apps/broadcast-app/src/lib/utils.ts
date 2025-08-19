@@ -14,3 +14,10 @@ export function getChannelCaipUri(params: {
 
   return `eip155:${chainId}:erc-721:${CHANNEL_MANAGER_ADDRESS}/${channelId}`;
 }
+
+export function getChannelNftImageUrl(
+  channelId: bigint,
+  chainId: number,
+): string {
+  return `https://nft.ethcomments.xyz/chain/${chainId}/${channelId}/image`;
+}

@@ -73,6 +73,7 @@ export const SignCommentResponseServerSchema = z.object({
 
 export const ChannelSchema = z.object({
   id: z.coerce.bigint(),
+  chainId: z.number().int().positive(),
   name: z.string(),
   description: z.string(),
   owner: HexSchema,

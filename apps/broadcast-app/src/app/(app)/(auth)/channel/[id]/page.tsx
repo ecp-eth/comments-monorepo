@@ -44,7 +44,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ReplyBottomSheet } from "@/components/reply-bottom-sheet";
 import { useSubscribeToChannel } from "@/hooks/useSubscribeToChannel";
 import { useUnsubscribeToChannel } from "@/hooks/useUnsubscribeFromChannel";
-import { cn } from "@/lib/utils";
+import { cn, getChannelNftImageUrl } from "@/lib/utils";
 import { EditorComposer } from "@/components/editor-composer";
 import { ChannelNotFoundError } from "@/errors";
 import { useChannelQuery, useChannelCommentsQuery } from "@/queries/channel";
@@ -270,7 +270,10 @@ export default function ChannelPage(props: {
           </Button>
 
           <Avatar className="h-10 w-10">
-            <AvatarImage src={"/placeholder.svg"} alt={channel.name} />
+            <AvatarImage
+              src={getChannelNftImageUrl(channel.id, channel.chainId)}
+              alt={channel.name}
+            />
             <AvatarFallback>
               {channel.name.charAt(0).toUpperCase()}
             </AvatarFallback>
