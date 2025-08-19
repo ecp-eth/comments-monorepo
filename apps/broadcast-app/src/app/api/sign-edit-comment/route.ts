@@ -13,7 +13,7 @@ import {
 import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
+import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/server";
 import { createPublicClient } from "viem";
 import { publicEnv } from "@/env/public";
 

@@ -4,7 +4,7 @@ import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
-import { webConfig, miniAppConfig } from "@/wagmi/config";
+import { webConfig, miniAppConfig } from "@/wagmi/client";
 import { MiniAppProvider } from "@/hooks/useMiniAppContext";
 import { PendingWalletConnectionActionsProvider } from "@/components/pending-wallet-connections-context";
 

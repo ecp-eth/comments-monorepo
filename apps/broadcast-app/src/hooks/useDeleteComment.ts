@@ -1,4 +1,4 @@
-import { COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
+import { COMMENT_MANAGER_ADDRESS } from "@/wagmi/client";
 import { deleteComment } from "@ecp.eth/sdk/comments";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { useCommentDeletion } from "@ecp.eth/shared/hooks";

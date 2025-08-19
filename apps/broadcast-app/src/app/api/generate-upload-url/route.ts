@@ -47,8 +47,12 @@ export async function POST(request: Request) {
   } catch (e) {
     console.error(e);
 
-    return new JSONResponse(InternalServerErrorResponseSchema, {
-      error: "Failed to generate upload URL",
-    });
+    return new JSONResponse(
+      InternalServerErrorResponseSchema,
+      {
+        error: "Failed to generate upload URL",
+      },
+      { status: 500 },
+    );
   }
 }

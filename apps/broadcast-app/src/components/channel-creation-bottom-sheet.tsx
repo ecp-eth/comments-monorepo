@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { useAccount, useConnect, usePublicClient } from "wagmi";
 import { ChannelManagerABI } from "@ecp.eth/sdk";
-import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/config";
+import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/client";
 import { useQuery } from "@tanstack/react-query";
 import { BroadcastHookABI } from "@/abi/generated/broadcast-hook-abi";
 import { publicEnv } from "@/env/public";

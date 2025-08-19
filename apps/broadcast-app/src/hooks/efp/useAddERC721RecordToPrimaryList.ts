@@ -4,7 +4,7 @@ import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import { decodeListStorageLocation } from "@ecp.eth/shared/ethereum-follow-protocol";
 import { usePublicClient, useWalletClient } from "wagmi";
 import { AssetId } from "caip";
-import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/config";
+import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/client";
 import { usePrimaryList } from "./usePrimaryList";
 import { encodeERC721Record, encodeListAddOp } from "@/lib/efp";
 

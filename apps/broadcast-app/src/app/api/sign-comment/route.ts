@@ -12,7 +12,7 @@ import {
 import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
+import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/server";
 import { publicEnv } from "@/env/public";
 
 export async function POST(

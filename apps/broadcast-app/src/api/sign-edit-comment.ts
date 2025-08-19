@@ -3,7 +3,6 @@ import {
   SignEditCommentPayloadRequestClientSchema,
   SignEditCommentResponseServerSchema,
 } from "./schemas";
-import { sdk } from "@farcaster/miniapp-sdk";
 import {
   InvalidCommentError,
   throwKnownResponseCodeError,
@@ -31,17 +30,14 @@ export async function signEditComment(
     );
   }
 
-  const signCommentResponse = await sdk.quickAuth.fetch(
-    "/api/sign-edit-comment",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(commmentDataResult.data),
-      signal,
+  const signCommentResponse = await fetch("/api/sign-edit-comment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify(commmentDataResult.data),
+    signal,
+  });
 
   if (!signCommentResponse.ok) {
     await throwKnownResponseCodeError(signCommentResponse);

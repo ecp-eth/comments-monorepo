@@ -42,12 +42,11 @@ import type {
   PendingEditCommentOperationSchemaType,
   PendingPostCommentOperationSchemaType,
 } from "@ecp.eth/shared/schemas";
-import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 import { signCommentOrReaction } from "@/api/sign-comment-or-reaction";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { ContractFunctionExecutionError } from "viem";
 import { signEditComment } from "@/api/sign-edit-comment";
-import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
+import { COMMENT_MANAGER_ADDRESS } from "@/wagmi/client";
 
 interface EditorComposerProps {
   /**

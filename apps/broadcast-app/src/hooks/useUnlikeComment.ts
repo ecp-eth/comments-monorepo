@@ -4,7 +4,7 @@ import { deleteComment } from "@ecp.eth/sdk/comments";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { TX_RECEIPT_TIMEOUT } from "@/constants";
 import { useReactionRemoval } from "@ecp.eth/shared/hooks";
-import { COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
+import { COMMENT_MANAGER_ADDRESS } from "@/wagmi/client";
 import { useMutation, type QueryKey } from "@tanstack/react-query";
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { Comment } from "@ecp.eth/shared/schemas";

@@ -6,10 +6,7 @@ import { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
 import { cookies } from "next/headers";
 import { AuthProvider } from "@/components/auth-provider";
-import {
-  ACCESS_TOKEN_COOKIE_NAME,
-  REFRESH_TOKEN_COOKIE_NAME,
-} from "@/constants";
+import { REFRESH_TOKEN_COOKIE_NAME } from "@/constants";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

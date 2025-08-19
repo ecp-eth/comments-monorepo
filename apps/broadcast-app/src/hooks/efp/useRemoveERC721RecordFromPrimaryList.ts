@@ -5,7 +5,7 @@ import { decodeListStorageLocation } from "@ecp.eth/shared/ethereum-follow-proto
 import { concatHex, type Hex, numberToHex } from "viem";
 import { usePublicClient, useWalletClient } from "wagmi";
 import { AssetId } from "caip";
-import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/config";
+import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/client";
 import { usePrimaryList } from "./usePrimaryList";
 import { encodeERC721Record } from "@/lib/efp";
 

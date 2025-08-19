@@ -2,9 +2,13 @@ import { http, createConfig } from "wagmi";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { farcasterMiniApp as miniAppConnector } from "@farcaster/miniapp-wagmi-connector";
 import { publicEnv } from "@/env/public";
-import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
+import { chain } from "./shared";
 
-export const chain = SUPPORTED_CHAINS[publicEnv.NEXT_PUBLIC_CHAIN_ID].chain;
+export {
+  chain,
+  COMMENT_MANAGER_ADDRESS,
+  CHANNEL_MANAGER_ADDRESS,
+} from "./shared";
 
 export const webConfig = getDefaultConfig({
   chains: [chain],
@@ -25,13 +29,3 @@ export const miniAppConfig = createConfig({
   },
   connectors: [miniAppConnector()],
 });
-
-export const COMMENT_MANAGER_ADDRESS =
-  publicEnv.NEXT_PUBLIC_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE ||
-  SUPPORTED_CHAINS[chain.id as keyof typeof SUPPORTED_CHAINS]
-    .commentManagerAddress;
-
-export const CHANNEL_MANAGER_ADDRESS =
-  publicEnv.NEXT_PUBLIC_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE ||
-  SUPPORTED_CHAINS[chain.id as keyof typeof SUPPORTED_CHAINS]
-    .channelManagerAddress;

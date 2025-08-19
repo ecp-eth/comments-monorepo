@@ -37,7 +37,7 @@ import {
   useCommentRepliesQuery,
 } from "@/queries/comment";
 import { MAX_INITIAL_REPLIES_ON_PARENT_COMMENT } from "@/constants";
-import { chain } from "@/wagmi/config";
+import { chain } from "@/wagmi/client";
 import { useAccount } from "wagmi";
 import type { InfiniteData, QueryKey } from "@tanstack/react-query";
 import { useLikeComment } from "@/hooks/useLikeComment";

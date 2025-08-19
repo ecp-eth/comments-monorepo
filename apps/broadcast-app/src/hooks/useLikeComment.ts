@@ -7,7 +7,7 @@ import { waitForTransactionReceipt } from "@wagmi/core";
 import { TX_RECEIPT_TIMEOUT } from "@/constants";
 import { useReactionSubmission } from "@ecp.eth/shared/hooks";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/config";
+import { chain, COMMENT_MANAGER_ADDRESS } from "@/wagmi/client";
 import { useMutation, type QueryKey } from "@tanstack/react-query";
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { Comment } from "@ecp.eth/shared/schemas";
