@@ -13,7 +13,8 @@ type Status =
   | "disabled"
   | "not-subscribed"
   | "app-not-added"
-  | "app-disabled-notifications";
+  | "app-disabled-notifications"
+  | "not-in-mini-app";
 
 type ChannelManagerAPI = {
   status: Status;
@@ -29,6 +30,7 @@ export function useChannelNotificationsManager(
   const miniAppContext = useMiniAppContext();
   const setNotificationStatusMutation = useSetNotificationStatusOnChannel({
     channelId: channel.id,
+    miniAppContext,
   });
 
   const isAppAdded = miniAppContext.isInMiniApp && miniAppContext.client.added;
@@ -38,7 +40,9 @@ export function useChannelNotificationsManager(
 
   let status: Status;
 
-  if (!channel.isSubscribed) {
+  if (!miniAppContext.isInMiniApp) {
+    status = "not-in-mini-app";
+  } else if (!channel.isSubscribed) {
     status = "not-subscribed";
   } else if (!isAppAdded) {
     status = "app-not-added";

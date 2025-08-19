@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, XIcon, BellIcon, BellOffIcon } from "lucide-react";
+import { PlusIcon, XIcon } from "lucide-react";
 import type { Channel } from "@/api/schemas";
 import { useSubscribeToChannel } from "@/hooks/useSubscribeToChannel";
 import { useUnsubscribeToChannel } from "@/hooks/useUnsubscribeFromChannel";
 import { cn } from "@/lib/utils";
-import { useChannelNotificationsManager } from "@/hooks/useChannelNotificationsManager";
+import { ChannelCardNotificationsToggleButton } from "./channel-card-notifications-toggle-button";
 
 interface ChannelCardProps {
   channel: Channel;
@@ -21,12 +21,6 @@ export function ChannelCard({ channel }: ChannelCardProps) {
   const unsubscribeMutation = useUnsubscribeToChannel({
     channel,
   });
-  const channelNotificationsManager = useChannelNotificationsManager(channel);
-  const {
-    status: notificationsStatus,
-    enableMutation: enableNotificationsMutation,
-    disableMutation: disableNotificationsMutation,
-  } = channelNotificationsManager;
 
   const showSubscribeButton = !channel.isSubscribed;
   const showUnsubscribeButton = channel.isSubscribed;
@@ -55,71 +49,7 @@ export function ChannelCard({ channel }: ChannelCardProps) {
       </Link>
 
       <div className="flex items-center space-x-2 shrink-0">
-        {notificationsStatus === "app-not-added" && (
-          <Button
-            disabled={enableNotificationsMutation.isPending}
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            title="To manage notifications for this channel, you need to add the mini app"
-            onClick={() => enableNotificationsMutation.mutate()}
-          >
-            <BellOffIcon
-              className={cn(
-                "h-4 w-4",
-                enableNotificationsMutation.isPending && "animate-pulse",
-              )}
-            />
-          </Button>
-        )}
-
-        {notificationsStatus === "app-disabled-notifications" && (
-          <Button
-            disabled
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            title="To manage notifications for this channel, you need to enable notifications in the mini app settings"
-          >
-            <BellOffIcon className={cn("h-4 w-4")} />
-          </Button>
-        )}
-
-        {notificationsStatus === "enabled" && (
-          <Button
-            disabled={disableNotificationsMutation.isPending}
-            variant="ghost"
-            size="sm"
-            onClick={() => disableNotificationsMutation.mutate()}
-            className="h-8 w-8 p-0"
-            title="Disable notifications for this channel"
-          >
-            <BellIcon
-              className={cn(
-                "h-4 w-4",
-                disableNotificationsMutation.isPending && "animate-pulse",
-              )}
-            />
-          </Button>
-        )}
-
-        {notificationsStatus === "disabled" && (
-          <Button
-            disabled={enableNotificationsMutation.isPending}
-            variant="ghost"
-            size="sm"
-            onClick={() => enableNotificationsMutation.mutate()}
-            className="h-8 w-8 p-0"
-            title="Enable notifications for this channel"
-          >
-            <BellOffIcon
-              className={cn(
-                "h-4 w-4",
-                enableNotificationsMutation.isPending && "animate-pulse",
-              )}
-            />
-          </Button>
-        )}
+        <ChannelCardNotificationsToggleButton channel={channel} />
 
         {showSubscribeButton && (
           <Button
