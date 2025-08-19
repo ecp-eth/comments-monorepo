@@ -212,7 +212,7 @@ export class NeynarNotificationsService implements INotificationsService {
       0,
       MAX_FIDS_PER_REQUEST,
     );
-    const ramainingFids =
+    const remainingFids =
       notification.pendingSubscriberFids.slice(MAX_FIDS_PER_REQUEST);
 
     // edge case: if there are no fids to process, we can mark the notification as completed
@@ -253,12 +253,12 @@ export class NeynarNotificationsService implements INotificationsService {
         },
       });
 
-      if (ramainingFids.length === 0) {
+      if (remainingFids.length === 0) {
         // if there are no remaining fids, we can mark the notification as completed
         await this.db
           .update(schema.neynarNotificationServiceQueue)
           .set({
-            pendingSubscriberFids: ramainingFids,
+            pendingSubscriberFids: remainingFids,
             status: "completed",
             updatedAt: new Date(),
           })
@@ -273,7 +273,7 @@ export class NeynarNotificationsService implements INotificationsService {
         await this.db
           .update(schema.neynarNotificationServiceQueue)
           .set({
-            pendingSubscriberFids: ramainingFids,
+            pendingSubscriberFids: remainingFids,
             status: "pending",
             updatedAt: new Date(),
           })
