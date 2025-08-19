@@ -15,7 +15,11 @@ import { useAuthProtect } from "@/components/auth-provider";
 type UseSubscribeToChannelOptions = {
   channel: Channel;
 } & Omit<
-  UseMutationOptions<SetMiniAppNotificationStatusResponse, Error, void>,
+  UseMutationOptions<
+    SetMiniAppNotificationStatusResponse & { clientFid: number | undefined },
+    Error,
+    void
+  >,
   "mutationFn" | "onSuccess" | "onError"
 >;
 
@@ -43,8 +47,10 @@ export function useSubscribeToChannel({
     mutationFn: async () => {
       let notificationDetails: MiniAppNotificationDetails | undefined =
         undefined;
+      let clientFid: number | undefined;
 
       if (miniAppContext.isInMiniApp) {
+        clientFid = miniAppContext.client.clientFid;
         notificationDetails = miniAppContext.client.notificationDetails;
 
         if (!miniAppContext.client.added) {
@@ -65,6 +71,7 @@ export function useSubscribeToChannel({
       return {
         channelId: channel.id,
         notificationsEnabled: !!notificationDetails,
+        clientFid,
       };
     },
     onError(error) {
@@ -78,7 +85,12 @@ export function useSubscribeToChannel({
 
       updateChannelInChannelQuery(channel.id, {
         isSubscribed: true,
-        notificationsEnabled: data ? data.notificationsEnabled : false,
+        notificationSettings: {
+          ...channel.notificationSettings,
+          ...(data.clientFid != null && {
+            [data.clientFid]: data.notificationsEnabled,
+          }),
+        },
       });
     },
   });

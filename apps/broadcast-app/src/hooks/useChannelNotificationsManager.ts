@@ -18,8 +18,8 @@ type Status =
 
 type ChannelManagerAPI = {
   status: Status;
-  enableMutation: UseMutationResult<void, Error, void>;
-  disableMutation: UseMutationResult<void, Error, void>;
+  enableMutation: UseMutationResult<{ clientFid: number }, Error, void>;
+  disableMutation: UseMutationResult<{ clientFid: number }, Error, void>;
 };
 
 export function useChannelNotificationsManager(
@@ -36,7 +36,9 @@ export function useChannelNotificationsManager(
   const isAppAdded = miniAppContext.isInMiniApp && miniAppContext.client.added;
   const doesAppHaveNotificationsEnabled =
     miniAppContext.isInMiniApp && !!miniAppContext.client.notificationDetails;
-  const hasChannelNotificationsEnabled = channel.notificationsEnabled;
+  const hasChannelNotificationsEnabled =
+    miniAppContext.isInMiniApp &&
+    channel.notificationSettings[miniAppContext.client.clientFid];
 
   let status: Status;
 
@@ -58,6 +60,10 @@ export function useChannelNotificationsManager(
     mutationFn: async () => {
       let result: AddMiniApp.AddMiniAppResult | undefined;
 
+      if (!miniAppContext.isInMiniApp) {
+        throw new Error("Not in mini app");
+      }
+
       if (status === "not-subscribed") {
         throw new Error(
           "You need to subscribe to the channel to enable notifications",
@@ -75,16 +81,26 @@ export function useChannelNotificationsManager(
         throw new Error("Mini app does not have notifications enabled");
       }
 
-      return setNotificationStatusMutation.mutate(true);
+      await setNotificationStatusMutation.mutateAsync(true);
+
+      return {
+        clientFid: miniAppContext.client.clientFid,
+      };
     },
-    onSuccess() {
+    onSuccess({ clientFid }) {
       toast.success("Notifications enabled");
 
       updateChannelInChannelQuery(channel.id, {
-        notificationsEnabled: true,
+        notificationSettings: {
+          ...channel.notificationSettings,
+          [clientFid]: true,
+        },
       });
       updateChannelInMyChannelsQuery(channel.id, {
-        notificationsEnabled: true,
+        notificationSettings: {
+          ...channel.notificationSettings,
+          [clientFid]: true,
+        },
       });
     },
     onError(error) {
@@ -94,20 +110,34 @@ export function useChannelNotificationsManager(
 
   const disableMutation = useMutation({
     mutationFn: async () => {
+      if (!miniAppContext.isInMiniApp) {
+        throw new Error("Not in mini app");
+      }
+
       if (status !== "enabled") {
         throw new Error("Notifications are already disabled");
       }
 
-      return setNotificationStatusMutation.mutate(false);
+      await setNotificationStatusMutation.mutateAsync(false);
+
+      return {
+        clientFid: miniAppContext.client.clientFid,
+      };
     },
-    onSuccess() {
+    onSuccess({ clientFid }) {
       toast.success("Notifications disabled");
 
       updateChannelInChannelQuery(channel.id, {
-        notificationsEnabled: false,
+        notificationSettings: {
+          ...channel.notificationSettings,
+          [clientFid]: false,
+        },
       });
       updateChannelInMyChannelsQuery(channel.id, {
-        notificationsEnabled: false,
+        notificationSettings: {
+          ...channel.notificationSettings,
+          [clientFid]: false,
+        },
       });
     },
     onError(error) {

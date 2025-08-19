@@ -33,9 +33,9 @@ const setMiniAppNotificationStatusResponseSchema = z.object({
   notificationsEnabled: z.boolean(),
 });
 
-export type SetMiniAppNotificationStatusResponse =
-  | z.infer<typeof setMiniAppNotificationStatusResponseSchema>
-  | false;
+export type SetMiniAppNotificationStatusResponse = z.infer<
+  typeof setMiniAppNotificationStatusResponseSchema
+>;
 
 async function storeNotificationSettings(params: {
   notificationsEnabled: boolean;

@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useUpdateChannelInChannelQuery } from "@/queries/channel";
 import { useRemoveChannelFromMyChannelsQuery } from "@/queries/my-channels";
 import { useRemoveERC721RecordToPrimaryList } from "./efp/useRemoveERC721RecordFromPrimaryList";
+import { useMiniAppContext } from "./useMiniAppContext";
 
 type UseUnsubscribeToChannelOptions = {
   channel: Channel;
@@ -23,6 +24,7 @@ export function useUnsubscribeToChannel({
     useRemoveERC721RecordToPrimaryList({
       channelId: channel.id,
     });
+  const miniAppContext = useMiniAppContext();
 
   return useMutation({
     ...options,
@@ -36,7 +38,12 @@ export function useUnsubscribeToChannel({
 
       updateChannelInChannelQuery(channel.id, {
         isSubscribed: false,
-        notificationsEnabled: false,
+        notificationSettings: {
+          ...channel.notificationSettings,
+          ...(miniAppContext.isInMiniApp && {
+            [miniAppContext.client.clientFid]: false,
+          }),
+        },
       });
     },
     onError(error) {
