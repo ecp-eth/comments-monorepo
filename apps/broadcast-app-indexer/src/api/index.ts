@@ -46,7 +46,14 @@ app.onError((err, c) => {
 });
 
 // all apis are cors: * enabled
-app.use("/api/*", cors());
+app.use(
+  "/api/*",
+  cors({
+    origin: "*",
+    allowHeaders: ["Authorization", "Content-Type"],
+    allowMethods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  }),
+);
 
 await initializeRoutes(app);
 
