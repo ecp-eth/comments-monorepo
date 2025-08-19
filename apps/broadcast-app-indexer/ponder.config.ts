@@ -7,10 +7,7 @@ import {
 import { env } from "./src/env";
 import { anvil, base } from "viem/chains";
 import { BroadcastHookABI } from "./src/abi/generated/broadcast-hook-abi";
-import {
-  efpListRecordsAbi,
-  efpListRegistryAbi,
-} from "./src/abi/generated/efp-abi";
+import { efpListRecordsAbi } from "./src/abi/generated/efp-abi";
 
 export default createConfig({
   chains: {

@@ -5,9 +5,20 @@ import * as offchainSchema from "./schema.offchain";
 
 setDatabaseSchema(onchainSchema, env.DATABASE_SCHEMA);
 
-const onchainChannelSubscriptionRelations = relations(
-  onchainSchema.channelSubscription,
+export const onchainChannelRelations = relations(
+  onchainSchema.channel,
   ({ many }) => ({
+    subscriptions: many(onchainSchema.channelSubscription),
+  }),
+);
+
+export const onchainChannelSubscriptionRelations = relations(
+  onchainSchema.channelSubscription,
+  ({ one, many }) => ({
+    channel: one(onchainSchema.channel, {
+      fields: [onchainSchema.channelSubscription.channelId],
+      references: [onchainSchema.channel.id],
+    }),
     farcasterNotificationSettings: many(
       offchainSchema.channelSubscriptionFarcasterNotificationSettings,
     ),
@@ -57,6 +68,7 @@ const offchainChannelSubscriptionFarcasterNotificationSettingsRelations =
 export const schema = {
   ...onchainSchema,
   ...offchainSchema,
+  onchainChannelRelations,
   onchainChannelSubscriptionRelations,
   offchainChannelSubscriptionFarcasterNotificationSettingsRelations,
 };

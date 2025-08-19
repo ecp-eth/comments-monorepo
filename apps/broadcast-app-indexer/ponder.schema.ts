@@ -1,4 +1,4 @@
-import { index, primaryKey, onchainTable, relations } from "ponder";
+import { index, primaryKey, onchainTable } from "ponder";
 import type { IndexerAPIMetadataSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 export const channel = onchainTable(
@@ -40,19 +40,5 @@ export const channelSubscription = onchainTable(
     primaryKey: primaryKey({ columns: [table.channelId, table.userAddress] }),
     byUserAddress: index().on(table.userAddress),
     byChannelId: index().on(table.channelId),
-  }),
-);
-
-export const onchainChannelRelations = relations(channel, ({ many }) => ({
-  subscriptions: many(channelSubscription),
-}));
-
-export const onchainChannelSubscriptionRelations = relations(
-  channelSubscription,
-  ({ one }) => ({
-    channel: one(channel, {
-      fields: [channelSubscription.channelId],
-      references: [channel.id],
-    }),
   }),
 );
