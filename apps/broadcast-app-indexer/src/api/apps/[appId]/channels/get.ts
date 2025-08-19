@@ -131,6 +131,7 @@ export async function channelsGET(api: OpenAPIHono) {
             })
             .then((notificationSettings) => ({
               id: result.channel.id,
+              chainId: result.channel.chainId,
               name: result.channel.name,
               owner: result.channel.owner,
               description: result.channel.description,

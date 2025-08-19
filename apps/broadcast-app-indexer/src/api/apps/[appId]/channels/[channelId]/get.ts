@@ -89,6 +89,7 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
       return c.json(
         ChannelResponse.parse({
           id: channel.id,
+          chainId: channel.chainId,
           name: channel.name,
           description: channel.description,
           owner: channel.owner,

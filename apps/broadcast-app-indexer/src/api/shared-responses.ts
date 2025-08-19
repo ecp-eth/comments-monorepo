@@ -15,6 +15,7 @@ export const NotFoundResponse = z.object({
 
 export const ChannelResponse = z.object({
   id: z.bigint().transform((val) => val.toString()),
+  chainId: z.number().int().positive(),
   name: z.string(),
   description: z.string(),
   owner: HexSchema,
