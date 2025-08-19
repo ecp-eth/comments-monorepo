@@ -1,5 +1,5 @@
 {
-  "id": "0187d572-b4a0-4eeb-a83c-6e96b5b2567b",
+  "id": "7bed494a-1438-4565-90d6-9d592ada6ebc",
   "prevId": "f093d960-3efa-4324-a271-25390c63f57b",
   "version": "7",
   "dialect": "postgresql",
@@ -97,6 +97,13 @@
           "notNull": true,
           "default": "now()"
         },
+        "last_used_at": {
+          "name": "last_used_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
         "user_id": {
           "name": "user_id",
           "type": "text",
@@ -112,8 +119,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "broadcast_app_indexer_offchain.channel_subscription": {
-      "name": "channel_subscription",
+    "broadcast_app_indexer_offchain.channel_subscription_farcaster_notification_settings": {
+      "name": "channel_subscription_farcaster_notification_settings",
       "schema": "broadcast_app_indexer_offchain",
       "columns": {
         "channel_id": {
@@ -128,11 +135,30 @@
           "primaryKey": false,
           "notNull": true
         },
+        "client_fid": {
+          "name": "client_fid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_address": {
+          "name": "user_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "user_fid": {
           "name": "user_fid",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "notifications_enabled": {
+          "name": "notifications_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
@@ -147,46 +173,62 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
-        },
-        "order": {
-          "name": "order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "notifications_enabled": {
-          "name": "notifications_enabled",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
         }
       },
       "indexes": {
-        "channel_subscription_notifications_enabled_idx": {
-          "name": "channel_subscription_notifications_enabled_idx",
+        "csfn_enabled_notification_by_channel_app_idx": {
+          "name": "csfn_enabled_notification_by_channel_app_idx",
           "columns": [
             {
-              "expression": "notifications_enabled",
+              "expression": "channel_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
           "isUnique": false,
+          "where": "\"broadcast_app_indexer_offchain\".\"channel_subscription_farcaster_notification_settings\".\"notifications_enabled\" = true",
           "concurrently": false,
           "method": "btree",
           "with": {}
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "channel_subscription_farcaster_notification_settings_app_id_client_fid_user_address_user_fid_user_farcaster_mini_app_settings_app_id_client_fid_user_address_user_fid_fk": {
+          "name": "channel_subscription_farcaster_notification_settings_app_id_client_fid_user_address_user_fid_user_farcaster_mini_app_settings_app_id_client_fid_user_address_user_fid_fk",
+          "tableFrom": "channel_subscription_farcaster_notification_settings",
+          "tableTo": "user_farcaster_mini_app_settings",
+          "schemaTo": "broadcast_app_indexer_offchain",
+          "columnsFrom": [
+            "app_id",
+            "client_fid",
+            "user_address",
+            "user_fid"
+          ],
+          "columnsTo": [
+            "app_id",
+            "client_fid",
+            "user_address",
+            "user_fid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {
-        "channel_subscription_channel_id_app_id_user_fid_pk": {
-          "name": "channel_subscription_channel_id_app_id_user_fid_pk",
+        "csfns_settings_pk": {
+          "name": "csfns_settings_pk",
           "columns": [
             "channel_id",
+            "client_fid",
             "app_id",
+            "user_address",
             "user_fid"
           ]
         }
@@ -300,6 +342,105 @@
           "columns": [
             "comment_id",
             "app_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "broadcast_app_indexer_offchain.user_farcaster_mini_app_settings": {
+      "name": "user_farcaster_mini_app_settings",
+      "schema": "broadcast_app_indexer_offchain",
+      "columns": {
+        "app_id": {
+          "name": "app_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_fid": {
+          "name": "client_fid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_address": {
+          "name": "user_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_fid": {
+          "name": "user_fid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "notifications_enabled": {
+          "name": "notifications_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "ufmas_user_address_idx": {
+          "name": "ufmas_user_address_idx",
+          "columns": [
+            {
+              "expression": "user_address",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ufmas_user_fid_idx": {
+          "name": "ufmas_user_fid_idx",
+          "columns": [
+            {
+              "expression": "user_fid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "user_farcaster_mini_app_settings_app_id_client_fid_user_address_user_fid_pk": {
+          "name": "user_farcaster_mini_app_settings_app_id_client_fid_user_address_user_fid_pk",
+          "columns": [
+            "app_id",
+            "client_fid",
+            "user_address",
+            "user_fid"
           ]
         }
       },

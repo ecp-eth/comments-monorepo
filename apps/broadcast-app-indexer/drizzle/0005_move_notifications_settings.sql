@@ -1,2 +1,0 @@
-DROP INDEX "broadcast_app_indexer_offchain"."channel_subscription_notifications_enabled_idx";--> statement-breakpoint
-ALTER TABLE "broadcast_app_indexer_offchain"."channel_subscription" DROP COLUMN "notifications_enabled";

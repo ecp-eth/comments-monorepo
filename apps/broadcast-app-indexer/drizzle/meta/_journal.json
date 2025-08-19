@@ -26,57 +26,8 @@
     {
       "idx": 3,
       "version": "7",
-      "when": 1755156670922,
-      "tag": "0003_siwe_auth",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1755164244687,
-      "tag": "0004_split_subscriptions_by_user_address",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1755164561115,
-      "tag": "0005_move_notifications_settings",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1755164865251,
-      "tag": "0006_add_updated_at_to_fc_notifications",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1755164967728,
-      "tag": "0007_add_pk_to_fc_notification_settings",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1755165432655,
-      "tag": "0008_add_index_to_fetch_notification_settings",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1755242919951,
-      "tag": "0009_session_last_used_at",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1755523698685,
-      "tag": "0010_farcaster_mini_app_settings",
+      "when": 1755588219095,
+      "tag": "0003_refactored_db",
       "breakpoints": true
     }
   ]

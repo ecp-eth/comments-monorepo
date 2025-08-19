@@ -1,1 +1,0 @@
-ALTER TABLE "broadcast_app_indexer_offchain"."channel_subscription_farcaster_notification_settings" ADD COLUMN "updated_at" timestamp with time zone DEFAULT now() NOT NULL;

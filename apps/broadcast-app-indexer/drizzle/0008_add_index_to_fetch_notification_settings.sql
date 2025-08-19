@@ -1,1 +1,0 @@
-CREATE INDEX "channel_subscription_farcaster_notification_settings_enabled_by_channel_app_idx" ON "broadcast_app_indexer_offchain"."channel_subscription_farcaster_notification_settings" USING btree ("channel_id","app_id","notifications_enabled") WHERE "broadcast_app_indexer_offchain"."channel_subscription_farcaster_notification_settings"."notifications_enabled" = true;

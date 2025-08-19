@@ -9,6 +9,7 @@ import {
   jsonb,
   uuid,
   numeric,
+  foreignKey,
 } from "drizzle-orm/pg-core";
 import type { NotificationDetails } from "./src/services/types";
 import type { Hex } from "viem";
@@ -45,6 +46,7 @@ export const userFarcasterMiniAppSettings = offchainSchema.table(
   "user_farcaster_mini_app_settings",
   {
     appId: text().notNull(),
+    clientFid: integer().notNull(),
     userAddress: text().notNull(),
     userFid: integer().notNull(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -52,7 +54,9 @@ export const userFarcasterMiniAppSettings = offchainSchema.table(
     notificationsEnabled: boolean().notNull().default(false),
   },
   (table) => [
-    primaryKey({ columns: [table.appId, table.userAddress, table.userFid] }),
+    primaryKey({
+      columns: [table.appId, table.clientFid, table.userAddress, table.userFid],
+    }),
     index("ufmas_user_address_idx").on(table.userAddress),
     index("ufmas_user_fid_idx").on(table.userFid),
   ],
@@ -64,6 +68,7 @@ export const channelSubscriptionFarcasterNotificationSettings =
     {
       channelId: numeric({ scale: 0, precision: 78, mode: "bigint" }).notNull(),
       appId: text().notNull(),
+      clientFid: integer().notNull(),
       userAddress: text().notNull().$type<Hex>(),
       userFid: integer().notNull(),
       notificationsEnabled: boolean().notNull().default(false),
@@ -75,13 +80,30 @@ export const channelSubscriptionFarcasterNotificationSettings =
         name: "csfns_settings_pk",
         columns: [
           table.channelId,
+          table.clientFid,
           table.appId,
           table.userAddress,
           table.userFid,
         ],
       }),
+      foreignKey({
+        columns: [
+          table.appId,
+          table.clientFid,
+          table.userAddress,
+          table.userFid,
+        ],
+        foreignColumns: [
+          userFarcasterMiniAppSettings.appId,
+          userFarcasterMiniAppSettings.clientFid,
+          userFarcasterMiniAppSettings.userAddress,
+          userFarcasterMiniAppSettings.userFid,
+        ],
+      })
+        .onDelete("cascade")
+        .onUpdate("cascade"),
       index("csfn_enabled_notification_by_channel_app_idx")
-        .on(table.channelId, table.appId, table.notificationsEnabled)
+        .on(table.channelId, table.appId)
         .where(sql`${table.notificationsEnabled} = true`),
     ],
   );
