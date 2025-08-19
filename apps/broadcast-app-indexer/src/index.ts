@@ -15,33 +15,31 @@ import {
 import { env } from "./env";
 import { and, eq } from "drizzle-orm";
 
+function isChain(chain: unknown): chain is { id: number } {
+  if (!chain || typeof chain !== "object") {
+    return false;
+  }
+
+  if (!("id" in chain) || typeof chain.id !== "number") {
+    return false;
+  }
+
+  return true;
+}
+
 ponder.on("BroadcastHook:ChannelCreated", async ({ event, context }) => {
   const channelEvent = event.args;
 
   // Convert block timestamp to Date
   const createdAt = new Date(Number(event.block.timestamp) * 1000);
 
-  if (!context.chain) {
+  if (!isChain(context.chain)) {
     Sentry.captureMessage(
       "Channel created event received without chain context",
       {
         level: "error",
         extra: {
           event,
-        },
-      },
-    );
-    return;
-  }
-
-  if (typeof context.chain.id !== "number") {
-    Sentry.captureMessage(
-      "Channel created event received with invalid chain ID",
-      {
-        level: "error",
-        extra: {
-          event,
-          chainId: context.chain.id,
         },
       },
     );
@@ -140,6 +138,18 @@ ponder.on("CommentManager:CommentAdded", async ({ event, context }) => {
 });
 
 ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
+  if (!isChain(context.chain)) {
+    Sentry.captureMessage("Channel created event received with invalid chain", {
+      level: "error",
+      extra: {
+        event,
+      },
+    });
+
+    return;
+  }
+
+  const chainId = context.chain.id;
   const version = hexToNumber(sliceHex(event.args.op, 0, 1), { size: 1 });
   const opcode = hexToNumber(sliceHex(event.args.op, 1, 2), { size: 1 });
   const data = sliceHex(event.args.op, 2);
@@ -258,11 +268,7 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
     const isPrimary =
       isSameHex(decodedListStorageLocation.recordsAddress, event.log.address) &&
       decodedListStorageLocation.chainId ===
-        BigInt(
-          env.CHAIN_ANVIL_EFP_OVERRIDE_CHAIN_ID ??
-            (context.chain?.id as number | undefined) ??
-            0,
-        ) &&
+        BigInt(env.CHAIN_ANVIL_EFP_OVERRIDE_CHAIN_ID ?? chainId ?? 0) &&
       decodedListStorageLocation.slot === event.args.slot;
 
     if (!isPrimary) {
@@ -285,6 +291,7 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
       await db.transaction(async (tx) => {
         await tx.insert(schema.channelSubscription).values({
           channelId,
+          chainId,
           userAddress: listUserAddress,
           createdAt: new Date(Number(event.block.timestamp) * 1000),
           updatedAt: new Date(Number(event.block.timestamp) * 1000),

@@ -29,6 +29,7 @@ export const channelSubscription = onchainTable(
   "channel_subscription",
   (t) => ({
     channelId: t.bigint().notNull(),
+    chainId: t.integer().notNull(),
     userAddress: t.hex().notNull(),
     createdAt: t.timestamp({ withTimezone: true }).notNull(),
     updatedAt: t.timestamp({ withTimezone: true }).notNull(),
