@@ -59,13 +59,15 @@ import { EditCommentBottomSheet } from "@/components/edit-comment-bottom-sheet";
 import { ReportBottomSheet } from "@/components/report-bottom-sheet";
 import { useRouter } from "next/navigation";
 import { useAuthProtect } from "@/components/auth-provider";
+import { useConnectAccount } from "@/hooks/useConnectAccount";
+import { toast } from "sonner";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
   const { address } = useAccount();
-  const { connect, connectAsync, connectors } = useConnect();
+  const connectAsync = useConnectAccount();
   const chainId = useChainId();
   const { id: channelId } = z
     .object({
@@ -130,13 +132,16 @@ export default function ChannelPage(props: {
   // connect wallet if user is replying to a comment and not connected
   useEffect(() => {
     if (!address && replyingTo) {
-      connectAsync({ connector: connectors[0] }).catch((e) => {
+      connectAsync().catch((e) => {
         console.error(e);
+
+        // @todo human friendly error from e
+        toast.error("Could not connect a wallet");
 
         setReplyingTo(null);
       });
     }
-  }, [address, replyingTo, connectAsync, connectors]);
+  }, [address, replyingTo, connectAsync]);
 
   const handleReply = useCallback(
     (comment: Comment, commentQueryKey: QueryKey) => {
@@ -163,34 +168,6 @@ export default function ChannelPage(props: {
       commentsQuery.data?.pages.flatMap((page) => page.results) ?? []
     ).toReversed();
   }, [commentsQuery.data]);
-
-  if (commentsQuery.status === "pending" || channelQuery.status === "pending") {
-    return (
-      <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col">
-        <div className="p-4 border-b">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-muted rounded-full animate-pulse" />
-            <div className="flex-1">
-              <div className="h-4 bg-muted rounded animate-pulse mb-2" />
-              <div className="h-3 bg-muted rounded w-1/2 animate-pulse" />
-            </div>
-          </div>
-        </div>
-        <div className="p-4 space-y-4 flex flex-col justify-end flex-grow">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-muted rounded-full animate-pulse" />
-                <div className="h-3 bg-muted rounded w-20 animate-pulse" />
-              </div>
-              <div className="h-4 bg-muted rounded animate-pulse" />
-              <div className="h-4 bg-muted rounded w-3/4 animate-pulse" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   if (channelQuery.status === "error") {
     console.error("Error fetching channel:", channelQuery.error);
@@ -248,6 +225,34 @@ export default function ChannelPage(props: {
           />
           Retry
         </Button>
+      </div>
+    );
+  }
+
+  if (commentsQuery.status === "pending" || channelQuery.status === "pending") {
+    return (
+      <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col">
+        <div className="p-4 border-b">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-muted rounded-full animate-pulse" />
+            <div className="flex-1">
+              <div className="h-4 bg-muted rounded animate-pulse mb-2" />
+              <div className="h-3 bg-muted rounded w-1/2 animate-pulse" />
+            </div>
+          </div>
+        </div>
+        <div className="p-4 space-y-4 flex flex-col justify-end flex-grow">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-muted rounded-full animate-pulse" />
+                <div className="h-3 bg-muted rounded w-20 animate-pulse" />
+              </div>
+              <div className="h-4 bg-muted rounded animate-pulse" />
+              <div className="h-4 bg-muted rounded w-3/4 animate-pulse" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -338,7 +343,12 @@ export default function ChannelPage(props: {
         <div className="p-4 border-t">
           <Button
             className="w-full"
-            onClick={() => connect({ connector: connectors[0] })}
+            onClick={() =>
+              connectAsync().catch((e) => {
+                console.error(e);
+                toast.error("Could not connect a wallet");
+              })
+            }
           >
             <WalletIcon className="h-4 w-4 mr-2" />
             Connect Wallet
