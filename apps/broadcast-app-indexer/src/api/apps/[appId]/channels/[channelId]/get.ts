@@ -4,9 +4,10 @@ import {
   ChannelResponse,
   NotFoundResponse,
 } from "../../../../shared-responses";
-import { db } from "../../../../../services";
-import { and, eq } from "drizzle-orm";
-import { schema } from "../../../../../../schema";
+import {
+  db,
+  farcasterChannelNotificationSettingsLoader,
+} from "../../../../../services";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { siweMiddleware } from "../../../../middleware/siwe";
 
@@ -61,47 +62,27 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
     },
     async (c) => {
       const { channelId, appId } = c.req.valid("param");
+      const userAddress = c.get("user")!.address;
 
-      const [result] = await db
-        .select()
-        .from(schema.channel)
-        .leftJoin(
-          schema.channelSubscription,
-          and(
-            eq(schema.channel.id, schema.channelSubscription.channelId),
-            eq(schema.channelSubscription.userAddress, c.get("user")!.address),
-          ),
-        )
-        .leftJoin(
-          schema.channelSubscriptionFarcasterNotificationSettings,
-          and(
-            eq(
-              schema.channelSubscriptionFarcasterNotificationSettings.channelId,
-              schema.channel.id,
-            ),
-            eq(
-              schema.channelSubscriptionFarcasterNotificationSettings.appId,
-              appId,
-            ),
-            eq(
-              schema.channelSubscriptionFarcasterNotificationSettings
-                .userAddress,
-              c.get("user")!.address,
-            ),
-          ),
-        )
-        .where(eq(schema.channel.id, channelId))
-        .limit(1);
+      const result = await db.query.channel.findFirst({
+        with: {
+          subscriptions: {
+            where(fields, operators) {
+              return operators.eq(fields.userAddress, userAddress);
+            },
+          },
+        },
+        where(fields, operators) {
+          return operators.eq(fields.id, channelId);
+        },
+      });
 
       if (!result) {
         return c.json({ error: "Channel not found" }, 404);
       }
 
-      const {
-        channel,
-        channel_subscription,
-        channel_subscription_farcaster_notification_settings,
-      } = result;
+      const { subscriptions, ...channel } = result;
+      const subscription = subscriptions[0];
 
       // hono doesn't run response schema validations therefore we need to validate the response manually
       // which also works as formatter for bigints, etc
@@ -113,10 +94,14 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
           owner: channel.owner,
           createdAt: channel.createdAt,
           updatedAt: channel.updatedAt,
-          isSubscribed: !!channel_subscription,
-          notificationsEnabled:
-            channel_subscription_farcaster_notification_settings?.notificationsEnabled ??
-            false,
+          isSubscribed: !!subscription,
+          // channel notification settings per farcaster client for this app
+          notificationSettings:
+            await farcasterChannelNotificationSettingsLoader.load({
+              appId,
+              channelId: channel.id,
+              userAddress,
+            }),
         }),
         200,
       );

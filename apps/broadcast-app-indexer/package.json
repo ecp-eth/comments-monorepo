@@ -36,6 +36,7 @@
     "@sentry/profiling-node": "^9.3.0",
     "@sentry/tracing": "^7.120.3",
     "caip": "^1.1.1",
+    "dataloader": "^2.2.3",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "0.41.0",
     "ethereum-identity-kit": "^0.2.52",

@@ -43,11 +43,11 @@ export const channelSubscription = onchainTable(
   }),
 );
 
-export const channelRelations = relations(channel, ({ many }) => ({
+export const onchainChannelRelations = relations(channel, ({ many }) => ({
   subscriptions: many(channelSubscription),
 }));
 
-export const channelSubscriptionRelations = relations(
+export const onchainChannelSubscriptionRelations = relations(
   channelSubscription,
   ({ one }) => ({
     channel: one(channel, {

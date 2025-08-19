@@ -8,6 +8,7 @@ import { SiweAuthService } from "./siwe-auth-service";
 import { createPublicClient, http } from "viem";
 import config from "../../ponder.config";
 import { anvil, base } from "viem/chains";
+import { FarcasterChannelNotificationSettingsLoader } from "./farcaster-channel-notification-settings-loader";
 
 export { db };
 
@@ -17,6 +18,11 @@ const publicClient = createPublicClient({
     config.chains.base ? env.CHAIN_BASE_RPC_URL : env.CHAIN_ANVIL_RPC_URL,
   ),
 });
+
+export const farcasterChannelNotificationSettingsLoader =
+  new FarcasterChannelNotificationSettingsLoader({
+    db,
+  });
 
 export const miniAppConfigRegistryService = new MiniAppConfigRegistryService({
   apps: env.BROADCAST_MINI_APPS,

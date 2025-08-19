@@ -1,6 +1,9 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
 import { schema } from "../../../../../schema";
-import { db } from "../../../../services";
+import {
+  db,
+  farcasterChannelNotificationSettingsLoader,
+} from "../../../../services";
 import { and, desc, eq, isNotNull, isNull, lt, or } from "drizzle-orm";
 import { ChannelResponse } from "../../../shared-responses";
 import { HexSchema } from "@ecp.eth/sdk/core";
@@ -83,6 +86,7 @@ export async function channelsGET(api: OpenAPIHono) {
     async (c) => {
       const { limit, cursor, subscriptionFilter } = c.req.valid("query");
       const { appId } = c.req.valid("param");
+      const userAddress = c.get("user")!.address;
 
       const results = await db
         .select()
@@ -91,25 +95,7 @@ export async function channelsGET(api: OpenAPIHono) {
           schema.channelSubscription,
           and(
             eq(schema.channel.id, schema.channelSubscription.channelId),
-            eq(schema.channelSubscription.userAddress, c.get("user")!.address),
-          ),
-        )
-        .leftJoin(
-          schema.channelSubscriptionFarcasterNotificationSettings,
-          and(
-            eq(
-              schema.channelSubscriptionFarcasterNotificationSettings.channelId,
-              schema.channel.id,
-            ),
-            eq(
-              schema.channelSubscriptionFarcasterNotificationSettings.appId,
-              appId,
-            ),
-            eq(
-              schema.channelSubscriptionFarcasterNotificationSettings
-                .userAddress,
-              c.get("user")!.address,
-            ),
+            eq(schema.channelSubscription.userAddress, userAddress),
           ),
         )
         .where(
@@ -135,30 +121,32 @@ export async function channelsGET(api: OpenAPIHono) {
       const hasNextPage = results.length > limit;
       const nextCursor = pageResults[pageResults.length - 1];
 
+      const resultsWithNotificationSettings = await Promise.all(
+        pageResults.map((result) =>
+          farcasterChannelNotificationSettingsLoader
+            .load({
+              appId,
+              channelId: result.channel.id,
+              userAddress,
+            })
+            .then((notificationSettings) => ({
+              id: result.channel.id,
+              name: result.channel.name,
+              owner: result.channel.owner,
+              description: result.channel.description,
+              isSubscribed: result.channel_subscription !== null,
+              createdAt: result.channel.createdAt,
+              updatedAt: result.channel.updatedAt,
+              notificationSettings,
+            })),
+        ),
+      );
+
       // hono doesn't run response schema validations therefore we need to validate the response manually
       // which also works as formatter for bigints, etc
       return c.json(
         responseSchema.parse({
-          results: pageResults.map(
-            ({
-              channel,
-              channel_subscription,
-              channel_subscription_farcaster_notification_settings,
-            }) => {
-              return {
-                id: channel.id,
-                name: channel.name,
-                owner: channel.owner,
-                description: channel.description,
-                isSubscribed: channel_subscription !== null,
-                notificationsEnabled:
-                  channel_subscription_farcaster_notification_settings?.notificationsEnabled ??
-                  false,
-                createdAt: channel.createdAt,
-                updatedAt: channel.updatedAt,
-              };
-            },
-          ),
+          results: resultsWithNotificationSettings,
           pageInfo: {
             hasNextPage,
             nextCursor: nextCursor

@@ -102,6 +102,11 @@ export const channelSubscriptionFarcasterNotificationSettings =
       })
         .onDelete("cascade")
         .onUpdate("cascade"),
+      index("csfns_by_app_channel_user_addr_idx").on(
+        table.appId,
+        table.channelId,
+        table.userAddress,
+      ),
       index("csfn_enabled_notification_by_channel_app_idx")
         .on(table.channelId, table.appId)
         .where(sql`${table.notificationsEnabled} = true`),

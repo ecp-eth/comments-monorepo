@@ -21,7 +21,7 @@ export const ChannelResponse = z.object({
   createdAt: z.date().transform((val) => val.toISOString()),
   updatedAt: z.date().transform((val) => val.toISOString()),
   isSubscribed: z.boolean(),
-  notificationsEnabled: z.boolean(),
+  notificationSettings: z.record(z.number().int(), z.boolean()),
 });
 
 export const ChannelSubscriptionUpdateResponse = z.object({

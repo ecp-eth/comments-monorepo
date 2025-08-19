@@ -107,6 +107,7 @@ export async function farcasterSettingsPUT(api: OpenAPIHono): Promise<void> {
       // which also works as formatter for bigints, etc
       return c.json(
         FarcasterSettingsUpdateResponse.parse({
+          userFid: settings.userFid,
           notificationsEnabled: settings.notificationsEnabled,
         }),
         201,
