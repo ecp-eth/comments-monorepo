@@ -101,29 +101,51 @@ export class NeynarNotificationsService implements INotificationsService {
     const allApps = [...isolatedApps, ...nonIsolatedApps];
 
     for (const app of allApps) {
-      const subscribers =
-        await this.db.query.channelSubscriptionFarcasterNotificationSettings.findMany(
-          {
-            columns: {
-              userFid: true,
-            },
-            where: and(
-              eq(
-                schema.channelSubscriptionFarcasterNotificationSettings.appId,
-                app.appId,
-              ),
-              eq(
-                schema.channelSubscriptionFarcasterNotificationSettings
-                  .channelId,
-                comment.channelId,
-              ),
-              eq(
-                schema.channelSubscriptionFarcasterNotificationSettings
-                  .notificationsEnabled,
-                true,
-              ),
+      const subscribers = await this.db
+        .select({
+          userFid:
+            schema.channelSubscriptionFarcasterNotificationSettings.userFid,
+        })
+        .from(schema.channelSubscriptionFarcasterNotificationSettings)
+        .innerJoin(
+          schema.userFarcasterMiniAppSettings,
+          and(
+            eq(
+              schema.userFarcasterMiniAppSettings.appId,
+              schema.channelSubscriptionFarcasterNotificationSettings.appId,
             ),
-          },
+            eq(
+              schema.userFarcasterMiniAppSettings.userFid,
+              schema.channelSubscriptionFarcasterNotificationSettings.userFid,
+            ),
+            eq(
+              schema.userFarcasterMiniAppSettings.clientFid,
+              schema.channelSubscriptionFarcasterNotificationSettings.clientFid,
+            ),
+            eq(
+              schema.userFarcasterMiniAppSettings.userAddress,
+              schema.channelSubscriptionFarcasterNotificationSettings
+                .userAddress,
+            ),
+            eq(schema.userFarcasterMiniAppSettings.notificationsEnabled, true),
+          ),
+        )
+        .where(
+          and(
+            eq(
+              schema.channelSubscriptionFarcasterNotificationSettings.appId,
+              app.appId,
+            ),
+            eq(
+              schema.channelSubscriptionFarcasterNotificationSettings.channelId,
+              comment.channelId,
+            ),
+            eq(
+              schema.channelSubscriptionFarcasterNotificationSettings
+                .notificationsEnabled,
+              true,
+            ),
+          ),
         );
 
       await this.db
