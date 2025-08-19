@@ -47,7 +47,7 @@ export const userFarcasterMiniAppSettings = offchainSchema.table(
   {
     appId: text().notNull(),
     clientFid: integer().notNull(),
-    userAddress: text().notNull(),
+    userAddress: text().notNull().$type<Hex>(),
     userFid: integer().notNull(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),

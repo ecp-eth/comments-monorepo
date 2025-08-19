@@ -1,20 +1,20 @@
 import { type OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   BadRequestResponse,
-  ChannelSubscriptionUpdateResponse,
+  FarcasterSettingsUpdateResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
-} from "../../../../shared-responses";
-import { db } from "../../../../../services";
-import { schema } from "../../../../../../schema";
+} from "../../../../../shared-responses";
+import { db } from "../../../../../../services";
+import { schema } from "../../../../../../../schema";
 import { HexSchema } from "@ecp.eth/sdk/core";
-import { siweMiddleware } from "../../../../middleware/siwe";
+import { siweMiddleware } from "../../../../../middleware/siwe";
 
 export async function farcasterSettingsPUT(api: OpenAPIHono): Promise<void> {
   api.openapi(
     {
       method: "put",
-      path: "/api/apps/:appId/farcaster/settings",
+      path: "/api/apps/:appId/farcaster/:clientFid/settings",
       tags: ["Farcaster"],
       description:
         "Creates or updates farcaster notifications settings for a user",
@@ -22,6 +22,7 @@ export async function farcasterSettingsPUT(api: OpenAPIHono): Promise<void> {
       request: {
         params: z.object({
           appId: HexSchema,
+          clientFid: z.coerce.number().int(),
         }),
         body: {
           content: {
@@ -40,7 +41,7 @@ export async function farcasterSettingsPUT(api: OpenAPIHono): Promise<void> {
           description: "Successfully created notifications settings",
           content: {
             "application/json": {
-              schema: ChannelSubscriptionUpdateResponse,
+              schema: FarcasterSettingsUpdateResponse,
             },
           },
         },
@@ -71,13 +72,14 @@ export async function farcasterSettingsPUT(api: OpenAPIHono): Promise<void> {
       },
     },
     async (c) => {
-      const { appId } = c.req.valid("param");
+      const { appId, clientFid } = c.req.valid("param");
       const { userFid, notificationsEnabled } = c.req.valid("json");
 
       const [settings] = await db
         .insert(schema.userFarcasterMiniAppSettings)
         .values({
           appId,
+          clientFid,
           userAddress: c.get("user")!.address,
           userFid,
           notificationsEnabled,
@@ -85,6 +87,7 @@ export async function farcasterSettingsPUT(api: OpenAPIHono): Promise<void> {
         .onConflictDoUpdate({
           target: [
             schema.userFarcasterMiniAppSettings.appId,
+            schema.userFarcasterMiniAppSettings.clientFid,
             schema.userFarcasterMiniAppSettings.userAddress,
             schema.userFarcasterMiniAppSettings.userFid,
           ],
@@ -103,7 +106,7 @@ export async function farcasterSettingsPUT(api: OpenAPIHono): Promise<void> {
       // hono doesn't run response schema validations therefore we need to validate the response manually
       // which also works as formatter for bigints, etc
       return c.json(
-        ChannelSubscriptionUpdateResponse.parse({
+        FarcasterSettingsUpdateResponse.parse({
           notificationsEnabled: settings.notificationsEnabled,
         }),
         201,

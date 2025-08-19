@@ -4,18 +4,20 @@ import {
   ChannelSubscriptionUpdateResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
-} from "../../../../../shared-responses";
-import { db } from "../../../../../../services";
-import { schema } from "../../../../../../../schema";
-import { and, eq } from "drizzle-orm";
+} from "../../../../../../shared-responses";
+import { db } from "../../../../../../../services";
+import { schema } from "../../../../../../../../schema";
 import { HexSchema } from "@ecp.eth/sdk/core";
-import { siweMiddleware } from "../../../../../middleware/siwe";
+import { siweMiddleware } from "../../../../../../middleware/siwe";
+import { HTTPException } from "hono/http-exception";
 
-export async function channelNotificationsPUT(api: OpenAPIHono): Promise<void> {
+export async function channelFarcasterNotificationsPUT(
+  api: OpenAPIHono,
+): Promise<void> {
   api.openapi(
     {
       method: "put",
-      path: "/api/apps/:appId/channels/:channelId/notifications",
+      path: "/api/apps/:appId/channels/:channelId/farcaster/:clientFid/notifications",
       tags: ["Channels", "Subscriptions", "Notifications", "Farcaster"],
       description:
         "Creates or updates farcaster notifications settings for a channel",
@@ -24,6 +26,7 @@ export async function channelNotificationsPUT(api: OpenAPIHono): Promise<void> {
         params: z.object({
           channelId: z.coerce.bigint(),
           appId: HexSchema,
+          clientFid: z.coerce.number().int(),
         }),
         body: {
           content: {
@@ -73,44 +76,59 @@ export async function channelNotificationsPUT(api: OpenAPIHono): Promise<void> {
       },
     },
     async (c) => {
-      const { channelId, appId } = c.req.valid("param");
-
-      const [result] = await db
-        .select()
-        .from(schema.channel)
-        .leftJoin(
-          schema.channelSubscription,
-          and(
-            eq(schema.channel.id, schema.channelSubscription.channelId),
-            eq(schema.channelSubscription.userAddress, c.get("user")!.address),
-          ),
-        )
-        .where(eq(schema.channel.id, channelId))
-        .limit(1);
-
-      if (!result) {
-        return c.json({ error: "Channel not found" }, 404);
-      }
-
-      if (!result.channel_subscription) {
-        return c.json({ error: "No subscription found" }, 404);
-      }
-
+      const { clientFid, channelId, appId } = c.req.valid("param");
       const { notificationsEnabled, userFid } = c.req.valid("json");
 
       const notificationSettings = await db.transaction(async (tx) => {
+        // check if subscription to a channel exists
+        const subscription = await tx.query.channelSubscription.findFirst({
+          where(fields, operators) {
+            return operators.and(
+              operators.eq(fields.channelId, channelId),
+              operators.eq(fields.userAddress, c.get("user")!.address),
+            );
+          },
+        });
+
+        if (!subscription) {
+          throw new HTTPException(404, {
+            message: "Channel subscription not found",
+          });
+        }
+
+        // check if global app notification settings exist
+        const existingSettings =
+          await tx.query.userFarcasterMiniAppSettings.findFirst({
+            where(fields, operators) {
+              return operators.and(
+                operators.eq(fields.appId, appId),
+                operators.eq(fields.clientFid, clientFid),
+                operators.eq(fields.userAddress, c.get("user")!.address),
+                operators.eq(fields.userFid, userFid),
+              );
+            },
+          });
+
+        if (!existingSettings) {
+          throw new HTTPException(404, {
+            message: "App notification settings not found",
+          });
+        }
+
         const [settings] = await tx
           .insert(schema.channelSubscriptionFarcasterNotificationSettings)
           .values({
-            appId,
-            channelId: result.channel.id,
-            userAddress: c.get("user")!.address,
-            userFid,
+            appId: existingSettings.appId,
+            clientFid: existingSettings.clientFid,
+            channelId: subscription.channelId,
+            userAddress: existingSettings.userAddress,
+            userFid: existingSettings.userFid,
             notificationsEnabled,
           })
           .onConflictDoUpdate({
             target: [
               schema.channelSubscriptionFarcasterNotificationSettings.appId,
+              schema.channelSubscriptionFarcasterNotificationSettings.clientFid,
               schema.channelSubscriptionFarcasterNotificationSettings.channelId,
               schema.channelSubscriptionFarcasterNotificationSettings
                 .userAddress,
@@ -135,7 +153,7 @@ export async function channelNotificationsPUT(api: OpenAPIHono): Promise<void> {
       // which also works as formatter for bigints, etc
       return c.json(
         ChannelSubscriptionUpdateResponse.parse({
-          channelId: result.channel.id,
+          channelId: notificationSettings.channelId,
           notificationsEnabled: notificationSettings.notificationsEnabled,
         }),
         200,

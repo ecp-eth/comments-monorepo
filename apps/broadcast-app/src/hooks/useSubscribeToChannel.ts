@@ -1,26 +1,21 @@
-import { publicEnv } from "@/env/public";
-import { sdk } from "@farcaster/miniapp-sdk";
+import { MiniAppNotificationDetails, sdk } from "@farcaster/miniapp-sdk";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
-import { z } from "zod";
 import { useMiniAppContext } from "./useMiniAppContext";
 import { useRemoveChannelFromDiscoverQuery } from "@/queries/discover-channels";
 import { useUpdateChannelInChannelQuery } from "@/queries/channel";
 import { toast } from "sonner";
 import type { Channel } from "@/api/schemas";
 import { useAddERC721RecordToPrimaryList } from "./efp/useAddERC721RecordToPrimaryList";
-import { UnauthorizedError } from "@/errors";
-
-const responseSchema = z.object({
-  channelId: z.coerce.bigint(),
-  notificationsEnabled: z.boolean(),
-});
-
-type Response = z.infer<typeof responseSchema> | false;
+import {
+  type SetMiniAppNotificationStatusResponse,
+  useSetMiniAppNotificationsStatus,
+} from "./useSetMiniAppNotificationsStatus";
+import { useAuthProtect } from "@/components/auth-provider";
 
 type UseSubscribeToChannelOptions = {
   channel: Channel;
 } & Omit<
-  UseMutationOptions<Response, Error, void>,
+  UseMutationOptions<SetMiniAppNotificationStatusResponse, Error, void>,
   "mutationFn" | "onSuccess" | "onError"
 >;
 
@@ -36,24 +31,32 @@ export function useSubscribeToChannel({
       channelId: channel.id,
     });
 
+  const {
+    mutateAsync: setNotificationSettings,
+    error: setNotificationSettingsError,
+  } = useSetMiniAppNotificationsStatus();
+
+  useAuthProtect(setNotificationSettingsError);
+
   return useMutation({
     ...options,
     mutationFn: async () => {
-      let notificationsEnabled = false;
+      let notificationDetails: MiniAppNotificationDetails | undefined =
+        undefined;
 
       if (miniAppContext.isInMiniApp) {
-        notificationsEnabled = !!miniAppContext.client.notificationDetails;
+        notificationDetails = miniAppContext.client.notificationDetails;
 
         if (!miniAppContext.client.added) {
           const result = await sdk.actions.addMiniApp();
 
-          notificationsEnabled = !!result.notificationDetails;
+          notificationDetails = result.notificationDetails;
         }
 
         // store notification settings
-        await storeNotificationSettings({
-          userFid: miniAppContext.user.fid,
-          notificationsEnabled,
+        await setNotificationSettings({
+          miniAppContext,
+          notificationDetails,
         });
       }
 
@@ -61,7 +64,7 @@ export function useSubscribeToChannel({
 
       return {
         channelId: channel.id,
-        notificationsEnabled,
+        notificationsEnabled: !!notificationDetails,
       };
     },
     onError(error) {
@@ -79,36 +82,4 @@ export function useSubscribeToChannel({
       });
     },
   });
-}
-
-async function storeNotificationSettings(params: {
-  notificationsEnabled: boolean;
-  userFid: number;
-}): Promise<Response> {
-  const response = await fetch(
-    `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/farcaster/settings`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(params),
-    },
-  );
-
-  if (response.status === 401) {
-    throw new UnauthorizedError();
-  }
-
-  if (!response.ok) {
-    console.error(
-      `Failed to subscribe to channel:\n\nStatus: ${response.status}\n\nResponse: ${await response.text()}`,
-    );
-
-    throw new Error("Server returned invalid response");
-  }
-
-  const responseData = await responseSchema.promise().parse(response.json());
-
-  return responseData;
 }

@@ -307,6 +307,7 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
               userFarcasterMiniAppSettings.map((settings) => {
                 return {
                   appId: settings.appId,
+                  clientFid: settings.clientFid,
                   channelId: BigInt(assetId.tokenId),
                   userAddress: listUserAddress,
                   userFid: settings.userFid,
