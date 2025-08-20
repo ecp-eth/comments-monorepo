@@ -23,8 +23,8 @@ export default createConfig({
         id: base.id,
         rpc: env.CHAIN_BASE_RPC_URL,
         startBlock:
-          env.CHAIN_BASE_BROADCAST_HOOK_START_BLOCK ||
-          env.CHAIN_BASE_CHANNEL_MANAGER_START_BLOCK ||
+          env.CHAIN_BASE_BROADCAST_HOOK_START_BLOCK ??
+          env.CHAIN_BASE_CHANNEL_MANAGER_START_BLOCK ??
           env.CHAIN_BASE_COMMENT_MANAGER_START_BLOCK,
       },
     }),

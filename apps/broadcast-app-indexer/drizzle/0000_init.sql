@@ -1,5 +1,7 @@
 CREATE SCHEMA "broadcast_app_indexer_offchain";
 --> statement-breakpoint
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+--> statement-breakpoint
 CREATE TYPE "broadcast_app_indexer_offchain"."neynar_notification_service_queue_status" AS ENUM('pending', 'processing', 'completed', 'failed');--> statement-breakpoint
 CREATE TABLE "broadcast_app_indexer_offchain"."auth_siwe_refresh_token" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
