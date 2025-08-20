@@ -37,8 +37,8 @@ export async function farcasterSettingsPUT(api: OpenAPIHono): Promise<void> {
         },
       },
       responses: {
-        201: {
-          description: "Successfully created notifications settings",
+        200: {
+          description: "Successfully created / updated notifications settings",
           content: {
             "application/json": {
               schema: FarcasterSettingsUpdateResponse,
@@ -110,7 +110,7 @@ export async function farcasterSettingsPUT(api: OpenAPIHono): Promise<void> {
           userFid: settings.userFid,
           notificationsEnabled: settings.notificationsEnabled,
         }),
-        201,
+        200,
       );
     },
   );
