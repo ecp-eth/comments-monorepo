@@ -16,6 +16,7 @@ export function useDiscoverChannelsQuery() {
 
   return useInfiniteQuery({
     queryKey: createDiscoverChannelsQueryKey(),
+    refetchOnMount: true,
     queryFn: async ({ pageParam: cursor, signal }) => {
       const searchParams = new URLSearchParams();
 

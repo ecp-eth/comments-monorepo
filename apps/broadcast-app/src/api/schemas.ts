@@ -80,7 +80,7 @@ export const ChannelSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   isSubscribed: z.boolean(),
-  notificationSettings: z.record(z.number().int(), z.boolean()),
+  notificationSettings: z.record(z.coerce.number().int(), z.boolean()),
 });
 
 export type Channel = z.infer<typeof ChannelSchema>;
