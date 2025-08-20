@@ -34,49 +34,46 @@ async function storeForkBlockNumber(blockNumber) {
     "../../apps/",
     "broadcast-app-indexer",
   );
+  const indexerDirectory = path.resolve(
+    currentDirectory,
+    "../../apps/",
+    "indexer",
+  );
 
   const broadcastAppIndexerEnvFile = path.resolve(
     broadcastAppIndexerDirectory,
     ".env.local",
   );
+  const indexerEnvFile = path.resolve(indexerDirectory, ".env.local");
 
-  const broadcastAppIndexerEnvFileExists = await stat(
-    broadcastAppIndexerEnvFile,
-  )
-    .then(() => true)
-    .catch(() => false);
+  async function writeStartBlock(filePath, blockNumber) {
+    const fileExists = await stat(filePath)
+      .then(() => true)
+      .catch(() => false);
 
-  if (broadcastAppIndexerEnvFileExists) {
-    const broadcastAppIndexerEnvFileContent = await readFile(
-      broadcastAppIndexerEnvFile,
-      "utf8",
-    );
+    if (fileExists) {
+      const fileContent = await readFile(filePath, "utf8");
 
-    let broadcastAppIndexerEnvFileContentWithForkBlockNumber =
-      broadcastAppIndexerEnvFileContent;
+      let fileContentWithForkBlockNumber = fileContent;
 
-    if (broadcastAppIndexerEnvFileContent.includes("CHAIN_ANVIL_START_BLOCK")) {
-      broadcastAppIndexerEnvFileContentWithForkBlockNumber =
-        broadcastAppIndexerEnvFileContent.replace(
+      if (fileContent.includes("CHAIN_ANVIL_START_BLOCK")) {
+        fileContentWithForkBlockNumber = fileContent.replace(
           /CHAIN_ANVIL_START_BLOCK=.*/,
           `CHAIN_ANVIL_START_BLOCK=${blockNumber}`,
         );
-    } else {
-      broadcastAppIndexerEnvFileContentWithForkBlockNumber =
-        broadcastAppIndexerEnvFileContent +
-        `\nCHAIN_ANVIL_START_BLOCK=${blockNumber}`;
-    }
+      } else {
+        fileContentWithForkBlockNumber =
+          fileContent + `\nCHAIN_ANVIL_START_BLOCK=${blockNumber}`;
+      }
 
-    await writeFile(
-      broadcastAppIndexerEnvFile,
-      broadcastAppIndexerEnvFileContentWithForkBlockNumber,
-    );
-  } else {
-    await writeFile(
-      broadcastAppIndexerEnvFile,
-      `CHAIN_ANVIL_START_BLOCK=${blockNumber}`,
-    );
+      await writeFile(filePath, fileContentWithForkBlockNumber);
+    } else {
+      await writeFile(filePath, `CHAIN_ANVIL_START_BLOCK=${blockNumber}`);
+    }
   }
+
+  await writeStartBlock(broadcastAppIndexerEnvFile, blockNumber);
+  await writeStartBlock(indexerEnvFile, blockNumber);
 }
 
 const rpcUrl = process.env.ANVIL_BASE_RPC_URL_FOR_FORK;
