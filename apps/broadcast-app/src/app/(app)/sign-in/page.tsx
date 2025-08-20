@@ -21,14 +21,22 @@ export default function SignInPage() {
 
   const signInMutation = useMutation({
     mutationFn: async () => {
-      if (!address) {
+      let addr = address;
+
+      if (!addr) {
         if (isInMiniApp) {
-          await connectAccountUsingWagmi({
+          const result = await connectAccountUsingWagmi({
             connector: connectors[0], // use mini app connector
           });
+
+          addr = result.accounts[0];
         } else {
-          await connectAccountUsingRainbowKit();
+          addr = await connectAccountUsingRainbowKit();
         }
+      }
+
+      if (!addr) {
+        throw new Error("Could not connect to wallet");
       }
 
       const nonceResponse = await fetch("/api/auth/siwe/nonce");
@@ -49,7 +57,7 @@ export default function SignInPage() {
 
       const message = new SiweMessage({
         domain: window.location.host,
-        address,
+        address: addr,
         statement: "Sign in with Ethereum to Broadcast App",
         uri: window.location.origin,
         version: "1",

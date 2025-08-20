@@ -122,6 +122,8 @@ async function createPrimaryList(
     functionName: "easyMint",
     args: [
       buildListStorageLocation({
+        // force base chain even when on anvil chain because the efp contracts are forked from base
+        // and they check for this value even when anvil.
         chainId: 8453n,
         managerAddress: address,
       }),

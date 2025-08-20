@@ -23,34 +23,24 @@ export default function AppLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [isReady, setIsReady] = useState(false);
   const [isInMiniApp, setIsInMiniApp] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
 
-  // @todo do not block because of this, it should be done in the background
   useEffect(() => {
     async function ready() {
-      try {
-        await sdk.actions.ready();
-        await sdk.back.enableWebNavigation();
+      const isInMiniApp = await sdk.isInMiniApp();
 
-        const isInMiniApp = await sdk.isInMiniApp();
-
-        setIsInMiniApp(isInMiniApp);
-        setIsReady(true);
-      } catch (error) {
-        console.error(error);
-        setError(error instanceof Error ? error : new Error(String(error)));
+      if (!isInMiniApp) {
+        return;
       }
+
+      await sdk.actions.ready();
+      await sdk.back.enableWebNavigation();
+
+      setIsInMiniApp(isInMiniApp);
     }
 
     ready();
   }, []);
-
-  if (error) {
-    // @todo render nice error page
-    return <div>Error: {error.message}</div>;
-  }
 
   return (
     <AuthProvider>

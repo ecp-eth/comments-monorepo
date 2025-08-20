@@ -349,7 +349,7 @@ export function EditorComposer({
         return true;
       });
 
-      if (removedDueToMimeType > 0 || removedDueToSize) {
+      if (removedDueToMimeType > 0 || removedDueToSize > 0) {
         toast.error("Some files were removed", {
           description: "Some files were removed due to file type or size",
         });

@@ -48,10 +48,6 @@ export function ReportBottomSheet({
     onSuccess: handleSubmitSuccess,
   });
 
-  if (!renderResult) {
-    return null;
-  }
-
   const nameOrAddress = getCommentAuthorNameOrAddress(comment.author);
   const avatarUrl =
     comment.author.ens?.avatarUrl || comment.author.farcaster?.pfpUrl;

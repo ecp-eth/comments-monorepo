@@ -34,7 +34,14 @@ export function EditCommentBottomSheet({
   }, [onCloseRef]);
 
   return (
-    <Sheet open={isOpen} onOpenChange={onCloseRef.current}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          onCloseRef.current();
+        }
+      }}
+    >
       <SheetContent side="bottom" className="max-w-[400px] mx-auto">
         <SheetHeader>
           <SheetTitle>Edit comment</SheetTitle>

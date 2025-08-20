@@ -134,7 +134,7 @@ export default function DiscoverChannelsPage() {
       <ScrollArea className="flex-1" viewportClassName="h-full">
         <div className="p-4 space-y-3">
           {channels.map((channel) => (
-            <ChannelCard key={channel.id} channel={channel} />
+            <ChannelCard key={String(channel.id)} channel={channel} />
           ))}
         </div>
 

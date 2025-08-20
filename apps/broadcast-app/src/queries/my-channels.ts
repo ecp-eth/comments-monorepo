@@ -2,7 +2,7 @@ import { publicEnv } from "@/env/public";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Channel, ListChannelsResponseSchema } from "@/api/schemas";
 import { useCallback } from "react";
-import z from "zod";
+import { z } from "zod";
 import {
   createDiscoverChannelsQueryKey,
   createMyChannelsQueryKey,

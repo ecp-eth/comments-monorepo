@@ -31,7 +31,7 @@ import { formatEther } from "viem";
 import Link from "next/link";
 import { useCreateChannel } from "@/hooks/useCreateChannel";
 import { useFreshRef } from "@ecp.eth/shared/hooks";
-import z from "zod";
+import { z } from "zod";
 import { cn } from "@/lib/utils";
 
 interface ChannelCreationBottomSheetProps {
@@ -90,12 +90,12 @@ export function ChannelCreationBottomSheet({
 
   const handleCreateChannelSubmit = useCallback(
     async (formData: FormData, channelCreationFee: bigint) => {
-      const channelName = formData.get("channel-name") as string;
-      const channelDescription = formData.get("channel-description") as string;
+      const name = formData.get("channel-name") as string;
+      const description = formData.get("channel-description") as string;
 
       await createChannel.mutateAsync({
-        name: channelName,
-        description: channelDescription,
+        name,
+        description,
         fee: channelCreationFee,
       });
 

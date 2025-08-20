@@ -38,7 +38,11 @@ export function useCreateChannel() {
           address: publicEnv.NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS,
           abi: BroadcastHookABI,
           functionName: "createChannel",
-          args: [channelData.name, channelData.name, channelData.metadata],
+          args: [
+            channelData.name,
+            channelData.description ?? "",
+            channelData.metadata,
+          ],
           value: channelData.fee,
         });
 

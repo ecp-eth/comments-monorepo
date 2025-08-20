@@ -74,16 +74,19 @@ export function CommentItem({
   const avatarUrl =
     comment.author.ens?.avatarUrl || comment.author.farcaster?.pfpUrl;
 
+  const [showFullContent, setShowFullContent] = useState(false);
   const { element, isTruncated, mediaReferences } = useMemo(() => {
     return renderToReact({
       content: comment.content,
       references: comment.references,
-      maxLength: 200,
-      maxLines: 5,
+      ...(showFullContent
+        ? {}
+        : {
+            maxLength: 200,
+            maxLines: 5,
+          }),
     });
-  }, [comment.content, comment.references]);
-
-  const [showFullContent, setShowFullContent] = useState(isTruncated);
+  }, [comment.content, comment.references, showFullContent]);
 
   const rootQueryKey = useMemo(
     () =>
@@ -312,7 +315,7 @@ export function CommentItem({
 
           <div className="text-sm">
             <div className="whitespace-pre-wrap break-words">{element}</div>
-            {isTruncated && (
+            {(isTruncated || showFullContent) && (
               <Button
                 variant="link"
                 size="sm"

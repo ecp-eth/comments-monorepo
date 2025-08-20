@@ -179,9 +179,21 @@ export function useMarkChannelCommentsAsHavingNewReplies() {
             return old;
           }
 
-          old.pages[0].pagination.hasPrevious = true;
+          const firstPage = old.pages[0];
 
-          return old;
+          return {
+            ...old,
+            pages: [
+              {
+                ...firstPage,
+                pagination: {
+                  ...firstPage.pagination,
+                  hasPrevious: true,
+                },
+              },
+              ...old.pages.slice(1),
+            ],
+          };
         },
       );
     },

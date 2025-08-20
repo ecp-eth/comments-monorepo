@@ -12,7 +12,7 @@ export function getChannelCaipUri(params: {
 }) {
   const { chainId, channelId } = params;
 
-  return `eip155:${chainId}:erc-721:${CHANNEL_MANAGER_ADDRESS}/${channelId}`;
+  return `eip155:${chainId}:erc721:${CHANNEL_MANAGER_ADDRESS}/${channelId}`;
 }
 
 export function getChannelNftImageUrl(

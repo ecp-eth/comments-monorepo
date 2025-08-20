@@ -171,6 +171,10 @@ export class SiweAuthService {
       iss: this.jwtIssuer,
     });
 
+    if (payload.aud !== this.jwtAudienceAccessToken) {
+      throw new SiweAuthInvalidAudienceError();
+    }
+
     const payloadResult = JWTAccessTokenPayloadSchema.safeParse(payload);
 
     if (!payloadResult.success) {
@@ -201,6 +205,10 @@ export class SiweAuthService {
       alg: "HS256",
       iss: this.jwtIssuer,
     });
+
+    if (payload.aud !== this.jwtAudienceRefreshToken) {
+      throw new SiweAuthInvalidAudienceError();
+    }
 
     const payloadResult = JWTRefreshTokenPayloadSchema.safeParse(payload);
 
@@ -436,5 +444,11 @@ export class SiweAuthInvalidSignatureError extends SiweAuthError {
 export class SiweAuthInvalidJWTPayloadError extends SiweAuthError {
   constructor() {
     super(`Invalid JWT payload`);
+  }
+}
+
+export class SiweAuthInvalidAudienceError extends SiweAuthError {
+  constructor() {
+    super(`Invalid audience`);
   }
 }

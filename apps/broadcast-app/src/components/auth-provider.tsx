@@ -57,7 +57,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY);
 
-    // @todo validate jwt token expired
     if (!refreshToken) {
       return null;
     }

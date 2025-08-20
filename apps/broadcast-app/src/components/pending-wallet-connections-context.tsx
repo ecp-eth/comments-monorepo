@@ -11,6 +11,7 @@
  * This module allows the like/unlike action to be pushed into a queue and then consumed when
  * wallet is connected with up-to-date data and props
  */
+import { useConnectAccount } from "@/hooks/useConnectAccount";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { useFreshRef } from "@ecp.eth/shared/hooks";
 import {
@@ -191,8 +192,8 @@ export const useConsumePendingWalletConnectionActions = ({
  */
 export const useConnectBeforeAction = () => {
   const { addAction } = usePendingWalletConnectionActionsContext();
+  const connectAccount = useConnectAccount();
   const { address: connectedAddress } = useAccount();
-  const { connectAsync, connectors } = useConnect();
 
   return useCallback(
     <TParams extends unknown[]>(
@@ -205,9 +206,7 @@ export const useConnectBeforeAction = () => {
     ) => {
       return async (...args: TParams) => {
         if (!connectedAddress) {
-          await connectAsync({
-            connector: connectors[0],
-          });
+          await connectAccount();
         }
 
         const action = await getAction(...args);
@@ -219,6 +218,6 @@ export const useConnectBeforeAction = () => {
         addAction(action);
       };
     },
-    [addAction, connectAsync, connectors, connectedAddress],
+    [addAction, connectAccount, connectedAddress],
   );
 };
