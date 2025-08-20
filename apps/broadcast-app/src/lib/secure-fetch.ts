@@ -4,6 +4,10 @@ import {
 } from "@/app/api/schemas";
 import type { AuthContextValue } from "@/components/auth-provider";
 
+let refreshAccessTokenPromise:
+  | Promise<false | RefreshAccessTokenResponse>
+  | undefined;
+
 type SecureFetchParams = {
   headers: Record<string, string>;
 };
@@ -38,7 +42,15 @@ export async function secureFetch(
 
     if (response.status === 401) {
       // refresh access token because it probably expired
-      const newTokens = await refreshAccessToken(authContext);
+      if (!refreshAccessTokenPromise) {
+        refreshAccessTokenPromise = refreshAccessToken(authContext);
+      }
+
+      // if there are multiple requests waiting for the access token to be refreshed,
+      // we only want to refresh it once
+      const newTokens = await refreshAccessTokenPromise;
+
+      refreshAccessTokenPromise = undefined;
 
       if (newTokens) {
         headers["Authorization"] = `Bearer ${newTokens.accessToken.token}`;
