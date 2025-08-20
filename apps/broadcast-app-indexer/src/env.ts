@@ -38,6 +38,11 @@ const ChainBaseConfig = z.union([
       .min(0)
       .optional(),
     CHAIN_BASE_START_BLOCK: z.coerce.number().int().min(0).optional(),
+    CHAIN_BASE_EFP_LIST_RECORDS_START_BLOCK: z.coerce
+      .number()
+      .int()
+      .min(0)
+      .optional(),
   }),
   z.object({
     CHAIN_BASE_BROADCAST_HOOK_ADDRESS: z.never().optional(),
@@ -46,6 +51,7 @@ const ChainBaseConfig = z.union([
     CHAIN_BASE_COMMENT_MANAGER_START_BLOCK: z.never().optional(),
     CHAIN_BASE_CHANNEL_MANAGER_START_BLOCK: z.never().optional(),
     CHAIN_BASE_START_BLOCK: z.never().optional(),
+    CHAIN_BASE_EFP_LIST_RECORDS_START_BLOCK: z.never().optional(),
   }),
 ]);
 

@@ -97,7 +97,9 @@ export default createConfig({
         ...(env.CHAIN_BASE_BROADCAST_HOOK_ADDRESS && {
           base: {
             address: env.EFP_LIST_RECORDS_ADDRESS,
-            startBlock: env.CHAIN_BASE_START_BLOCK,
+            startBlock:
+              env.CHAIN_BASE_EFP_LIST_RECORDS_START_BLOCK ??
+              env.CHAIN_BASE_START_BLOCK,
           },
         }),
       },
