@@ -14,8 +14,10 @@ export default function Error({
   const auth = useAuth();
 
   useEffect(() => {
-    if (error instanceof UnauthorizedError && auth.isLoggedIn) {
-      auth.logout();
+    if (error instanceof UnauthorizedError) {
+      if (auth.isLoggedIn) {
+        auth.logout();
+      }
     } else {
       console.error(error);
     }
