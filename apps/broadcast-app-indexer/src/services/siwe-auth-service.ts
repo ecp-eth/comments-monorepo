@@ -152,7 +152,7 @@ export class SiweAuthService {
       await tx.insert(schema.authSiweRefreshToken).values({
         id: refreshToken.tokenId,
         sessionId,
-        expiresAt: new Date(refreshToken.expiresIn * 1000),
+        expiresAt: new Date(Date.now() + refreshToken.expiresIn * 1000),
       });
     });
 
@@ -228,22 +228,47 @@ export class SiweAuthService {
       throw new SiweAuthInvalidJWTPayloadError();
     }
 
-    await this.markRefreshTokenAsUsed(refreshTokenRecord.id);
+    return await this.db.transaction(async (tx) => {
+      // mark refresh token as used
+      await tx
+        .update(schema.authSiweRefreshToken)
+        .set({
+          isUsed: true,
+          updatedAt: new Date(),
+        })
+        .where(eq(schema.authSiweRefreshToken.id, refreshTokenRecord.id))
+        .execute();
 
-    const newAccessToken = await this.issueJWTAccessToken(
-      { address },
-      sessionId,
-    );
+      const newAccessToken = await this.issueJWTAccessToken(
+        { address },
+        sessionId,
+      );
 
-    const newRefreshToken = await this.issueJWTRefreshToken(
-      { address },
-      sessionId,
-    );
+      const newRefreshToken = await this.issueJWTRefreshToken(
+        { address },
+        sessionId,
+      );
 
-    return {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    };
+      await tx
+        .insert(schema.authSiweRefreshToken)
+        .values({
+          id: newRefreshToken.tokenId,
+          sessionId,
+          expiresAt: new Date(Date.now() + newRefreshToken.expiresIn * 1000),
+        })
+        .execute();
+
+      return {
+        accessToken: {
+          token: newAccessToken.token,
+          expiresIn: newAccessToken.expiresIn,
+        },
+        refreshToken: {
+          token: newRefreshToken.token,
+          expiresIn: newRefreshToken.expiresIn,
+        },
+      };
+    });
   }
 
   async revokeSession(sessionId: string) {
