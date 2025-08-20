@@ -95,12 +95,6 @@ async function proxyRequest(
       return tokensOrResponse;
     }
 
-    setTokenCookies({
-      response,
-      accessToken: tokensOrResponse.accessToken,
-      refreshToken: tokensOrResponse.refreshToken,
-    });
-
     const retriedUpstreamResponse = await callExternal({
       path,
       reqToProxy: req,
@@ -111,9 +105,22 @@ async function proxyRequest(
       status: retriedUpstreamResponse.status,
       headers: retriedUpstreamResponse.headers,
     });
+
+    setTokenCookies({
+      response,
+      accessToken: tokensOrResponse.accessToken,
+      refreshToken: tokensOrResponse.refreshToken,
+    });
   }
 
   return response;
+}
+
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ path: string[] }> },
+) {
+  return proxyRequest(req, (await context.params).path);
 }
 
 export async function GET(
@@ -123,7 +130,28 @@ export async function GET(
   return proxyRequest(req, (await context.params).path);
 }
 
+export async function HEAD(
+  req: NextRequest,
+  context: { params: Promise<{ path: string[] }> },
+) {
+  return proxyRequest(req, (await context.params).path);
+}
+
+export async function PATCH(
+  req: NextRequest,
+  context: { params: Promise<{ path: string[] }> },
+) {
+  return proxyRequest(req, (await context.params).path);
+}
+
 export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ path: string[] }> },
+) {
+  return proxyRequest(req, (await context.params).path);
+}
+
+export async function PUT(
   req: NextRequest,
   context: { params: Promise<{ path: string[] }> },
 ) {
