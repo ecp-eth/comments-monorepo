@@ -5,6 +5,8 @@ import { useUpdateChannelInChannelQuery } from "@/queries/channel";
 import { useRemoveChannelFromMyChannelsQuery } from "@/queries/my-channels";
 import { useRemoveERC721RecordToPrimaryList } from "./efp/useRemoveERC721RecordFromPrimaryList";
 import { useMiniAppContext } from "./useMiniAppContext";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { ContractFunctionExecutionError } from "viem";
 
 type UseUnsubscribeToChannelOptions = {
   channel: Channel;
@@ -47,7 +49,12 @@ export function useUnsubscribeToChannel({
       });
     },
     onError(error) {
-      toast.error(`Failed to unsubscribe from channel: ${error.message}`);
+      if (error instanceof ContractFunctionExecutionError) {
+        toast.error(formatContractFunctionExecutionError(error));
+      } else {
+        console.error(error);
+        toast.error("Failed to unsubscribe from channel. Please try again");
+      }
     },
   });
 }

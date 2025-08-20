@@ -1,7 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
-import { useConnectAccount } from "@ecp.eth/shared/hooks/useConnectAccount";
+import {
+  ConnectAccountError,
+  ConnectAccountTimeoutError,
+  useConnectAccount,
+} from "@ecp.eth/shared/hooks/useConnectAccount";
 import { SiweMessage } from "siwe";
 import { useAccount, useChainId, useConnect, useSignMessage } from "wagmi";
 import z from "zod";
@@ -9,6 +13,9 @@ import { useMiniAppContext } from "@/hooks/useMiniAppContext";
 import { Loader2Icon } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
 import { siweVerifyResponseSchema } from "@/app/api/schemas";
+import { toast } from "sonner";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { ContractFunctionExecutionError, UserRejectedRequestError } from "viem";
 
 export default function SignInPage() {
   const auth = useAuth();
@@ -94,6 +101,21 @@ export default function SignInPage() {
         accessToken,
         refreshToken,
       };
+    },
+    onError(error) {
+      if (error instanceof UserRejectedRequestError) {
+        toast.error("Please sign the message to continue.");
+      } else if (error instanceof ContractFunctionExecutionError) {
+        toast.error(formatContractFunctionExecutionError(error));
+      } else if (error instanceof ConnectAccountTimeoutError) {
+        toast.error("Connecting a wallet timed out");
+      } else if (error instanceof ConnectAccountError) {
+        toast.error(error.message);
+      } else {
+        console.error(error);
+
+        toast.error("An unknown error occurred. Please try again.");
+      }
     },
     onSuccess(tokens) {
       auth.updateTokens(tokens.accessToken.token, tokens.refreshToken.token);

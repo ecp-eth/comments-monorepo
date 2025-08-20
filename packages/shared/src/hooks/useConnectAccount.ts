@@ -6,6 +6,22 @@ import { useFreshRef } from "./useFreshRef.js";
 
 const CONNECT_WALLET_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
+export class ConnectAccountError extends Error {
+  constructor(message: string) {
+    super(message);
+
+    this.name = "ConnectAccountError";
+  }
+}
+
+export class ConnectAccountTimeoutError extends ConnectAccountError {
+  constructor() {
+    super("Connecting a wallet timed out");
+
+    this.name = "ConnectAccountTimeoutError";
+  }
+}
+
 type Deferred = {
   resolve: (account: Hex) => void;
   reject: (error: Error) => void;
@@ -38,7 +54,7 @@ export function useConnectAccount() {
       !addressRef.current
     ) {
       deferredRef.current?.reject(
-        new Error("Please connect a wallet to continue"),
+        new ConnectAccountError("Please connect a wallet to continue"),
       );
     }
 
@@ -58,7 +74,7 @@ export function useConnectAccount() {
       resolve: () => {},
       reject: () => {},
       timeout: setTimeout(() => {
-        deferred.reject(new Error("Connecting a wallet timed out"));
+        deferred.reject(new ConnectAccountTimeoutError());
       }, CONNECT_WALLET_TIMEOUT),
     };
 
@@ -73,7 +89,9 @@ export function useConnectAccount() {
       openConnectModal();
     } else {
       deferred.reject(
-        new Error("openConnectModal from rainbowkit is not available"),
+        new ConnectAccountError(
+          "openConnectModal from rainbowkit is not available",
+        ),
       );
     }
 

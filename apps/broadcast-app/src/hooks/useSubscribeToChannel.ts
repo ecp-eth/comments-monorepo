@@ -1,4 +1,4 @@
-import { MiniAppNotificationDetails, sdk } from "@farcaster/miniapp-sdk";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import { useMiniAppContext } from "./useMiniAppContext";
 import { useRemoveChannelFromDiscoverQuery } from "@/queries/discover-channels";
@@ -11,6 +11,8 @@ import {
   useSetMiniAppNotificationsStatus,
 } from "./useSetMiniAppNotificationsStatus";
 import { useAuthProtect } from "@/components/auth-provider";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { ContractFunctionExecutionError } from "viem";
 
 type UseSubscribeToChannelReturnValue =
   | (SetMiniAppNotificationStatusResponse & { clientFid: number })
@@ -76,8 +78,12 @@ export function useSubscribeToChannel({
       return response;
     },
     onError(error) {
-      // @todo more human friendly error message in case of wallet (RPC) error
-      toast.error(`Failed to subscribe to channel: ${error.message}`);
+      if (error instanceof ContractFunctionExecutionError) {
+        toast.error(formatContractFunctionExecutionError(error));
+      } else {
+        console.error(error);
+        toast.error("Failed to subscribe to channel. Please try again");
+      }
     },
     onSuccess(data) {
       toast.success(`Subscribed to channel ${channel.name}`);

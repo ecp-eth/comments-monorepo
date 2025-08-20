@@ -50,7 +50,7 @@ export function useReportComment({
         toast.error("Signing rejected");
       } else {
         console.error(error);
-        toast.error("Failed to report comment");
+        toast.error("Failed to report comment. Please try again.");
       }
       onError?.(error);
     },

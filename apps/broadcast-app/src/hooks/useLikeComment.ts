@@ -66,8 +66,7 @@ export function useLikeComment() {
         pendingOperation = {
           action: "post",
           type: "non-gasless",
-          txHash:
-            "0x0000000000000000000000000000000000000000000000000000000000000000",
+          txHash,
           chainId: chain.id,
           state: {
             status: "pending",

@@ -27,12 +27,13 @@ import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/client";
 import { useQuery } from "@tanstack/react-query";
 import { BroadcastHookABI } from "@/abi/generated/broadcast-hook-abi";
 import { publicEnv } from "@/env/public";
-import { formatEther } from "viem";
+import { ContractFunctionExecutionError, formatEther } from "viem";
 import Link from "next/link";
 import { useCreateChannel } from "@/hooks/useCreateChannel";
 import { useFreshRef } from "@ecp.eth/shared/hooks";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 
 interface ChannelCreationBottomSheetProps {
   isOpen: boolean;
@@ -277,7 +278,10 @@ export function ChannelCreationBottomSheet({
           <div className="pt-4 space-y-2">
             {submitError && (
               <span className="text-destructive text-xs">
-                Could not create channel: {createChannel.error!.message}
+                Could not create channel:{" "}
+                {createChannel.error instanceof ContractFunctionExecutionError
+                  ? formatContractFunctionExecutionError(createChannel.error)
+                  : createChannel.error!.message}
               </span>
             )}
             <Button

@@ -67,7 +67,7 @@ export function useDeleteComment() {
       const message =
         error instanceof ContractFunctionExecutionError
           ? formatContractFunctionExecutionError(error)
-          : "An error occurred while deleting the comment";
+          : "An error occurred while deleting the comment. Please try again.";
 
       toast.error(message);
     },
