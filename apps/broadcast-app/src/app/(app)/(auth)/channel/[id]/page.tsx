@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useAccount, useChainId, useConnect, useDisconnect } from "wagmi";
+import { useAccount, useChainId, useDisconnect } from "wagmi";
 import z from "zod";
 import {
   AlertTriangleIcon,
