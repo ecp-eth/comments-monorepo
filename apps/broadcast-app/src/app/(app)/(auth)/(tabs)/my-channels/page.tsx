@@ -77,9 +77,22 @@ export default function MyChannelsPage() {
         <h2 className="text-lg font-semibold mb-2">
           You haven&apos;t subscribed to any channels yet.
         </h2>
-        <Link href="/">
-          <Button>Discover Channels</Button>
-        </Link>
+        <div className="flex space-x-3">
+          <Button
+            disabled={isRefetching}
+            onClick={() => refetch()}
+            variant="outline"
+            className="gap-2"
+          >
+            <RotateCwIcon
+              className={cn("h-4 w-4", isRefetching && "animate-spin")}
+            />
+            Refresh
+          </Button>
+          <Link href="/">
+            <Button>Discover Channels</Button>
+          </Link>
+        </div>
       </div>
     );
   }

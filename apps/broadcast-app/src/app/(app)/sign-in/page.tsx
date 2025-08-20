@@ -188,11 +188,11 @@ export default function SignInPage() {
         </div>
 
         {/* Footer Info */}
-        <div className="pt-8">
+        {/* <div className="pt-8">
           <p className="text-xs text-muted-foreground">
             By connecting, you agree to our terms of service and privacy policy
           </p>
-        </div>
+        </div>*/}
       </div>
     </div>
   );
