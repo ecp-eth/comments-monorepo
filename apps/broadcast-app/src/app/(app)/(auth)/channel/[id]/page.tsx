@@ -61,6 +61,9 @@ import { useRouter } from "next/navigation";
 import { useAuthProtect } from "@/components/auth-provider";
 import { useConnectAccount } from "@/hooks/useConnectAccount";
 import { toast } from "sonner";
+import { ConnectAccountError } from "@ecp.eth/shared/hooks/useConnectAccount";
+import { ContractFunctionExecutionError } from "viem";
+import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
@@ -133,10 +136,14 @@ export default function ChannelPage(props: {
   useEffect(() => {
     if (!address && replyingTo) {
       connectAsync().catch((e) => {
-        console.error(e);
-
-        // @todo human friendly error from e
-        toast.error("Could not connect a wallet");
+        if (e instanceof ConnectAccountError) {
+          toast.error(e.message);
+        } else if (e instanceof ContractFunctionExecutionError) {
+          toast.error(formatContractFunctionExecutionError(e));
+        } else {
+          console.error(e);
+          toast.error("Could not connect a wallet");
+        }
 
         setReplyingTo(null);
       });
