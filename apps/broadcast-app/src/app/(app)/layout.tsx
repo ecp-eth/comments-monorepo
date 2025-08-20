@@ -7,6 +7,7 @@ import { WagmiProvider } from "wagmi";
 import { webConfig, miniAppConfig } from "@/wagmi/client";
 import { MiniAppProvider } from "@/hooks/useMiniAppContext";
 import { PendingWalletConnectionActionsProvider } from "@/components/pending-wallet-connections-context";
+import { AuthProvider } from "@/components/auth-provider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,21 +52,19 @@ export default function AppLayout({
     return <div>Error: {error.message}</div>;
   }
 
-  if (!isReady) {
-    return null;
-  }
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <MiniAppProvider>
-        <WagmiProvider config={isInMiniApp ? miniAppConfig : webConfig}>
-          <RainbowKitProvider>
-            <PendingWalletConnectionActionsProvider>
-              {children}
-            </PendingWalletConnectionActionsProvider>
-          </RainbowKitProvider>
-        </WagmiProvider>
-      </MiniAppProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <MiniAppProvider>
+          <WagmiProvider config={isInMiniApp ? miniAppConfig : webConfig}>
+            <RainbowKitProvider>
+              <PendingWalletConnectionActionsProvider>
+                {children}
+              </PendingWalletConnectionActionsProvider>
+            </RainbowKitProvider>
+          </WagmiProvider>
+        </MiniAppProvider>
+      </QueryClientProvider>
+    </AuthProvider>
   );
 }

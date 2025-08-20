@@ -1,16 +1,32 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { UnauthorizedError } from "@/errors";
+import { REFRESH_TOKEN_LOCAL_STORAGE_KEY } from "@/constants";
 
-type AuthContextValue = {
-  isLoggedIn: boolean;
-  setAsLoggedIn: (isLoggedIn: boolean) => void;
-};
+export type AuthContextValue =
+  | {
+      isLoggedIn: false;
+      updateTokens: (accessToken: string, refreshToken: string) => void;
+    }
+  | {
+      isLoggedIn: true;
+      accessToken: string | null;
+      refreshToken: string;
+      updateTokens: (accessToken: string, refreshToken: string) => void;
+      logout: () => void;
+    };
 
 const authContext = createContext<AuthContextValue>({
   isLoggedIn: false,
-  setAsLoggedIn: () => {},
+  updateTokens: () => {},
 });
 
 export function useAuth(): AuthContextValue {
@@ -30,23 +46,69 @@ export function useAuthProtect(apiError: Error | undefined | null) {
   }
 }
 
-export function AuthProvider({
-  children,
-  isLoggedIn,
-}: {
-  children: React.ReactNode;
-  isLoggedIn: boolean;
-}) {
-  const [state, setState] = useState(isLoggedIn);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [tokens, setTokens] = useState<null | {
+    accessToken: string | null;
+    refreshToken: string;
+  }>(() => {
+    if (typeof localStorage === "undefined") {
+      return null;
+    }
 
-  const value = useMemo(() => {
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY);
+
+    // @todo validate jwt token expired
+    if (!refreshToken) {
+      return null;
+    }
+
+    // on refresh the access token must be refreshed using refresh token
     return {
-      isLoggedIn: state,
-      setAsLoggedIn: (isLoggedIn: boolean) => {
-        setState(isLoggedIn);
-      },
+      accessToken: null,
+      refreshToken,
     };
-  }, [state, setState]);
+  });
+
+  const logout = useCallback(() => {
+    setTokens(null);
+  }, []);
+
+  const updateTokens = useCallback(
+    (accessToken: string, refreshToken: string) => {
+      setTokens({ accessToken, refreshToken });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (typeof localStorage !== "undefined") {
+      if (tokens) {
+        localStorage.setItem(
+          REFRESH_TOKEN_LOCAL_STORAGE_KEY,
+          tokens.refreshToken,
+        );
+      } else {
+        localStorage.removeItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY);
+      }
+    }
+  }, [tokens]);
+
+  const value = useMemo((): AuthContextValue => {
+    if (!tokens) {
+      return {
+        isLoggedIn: false,
+        updateTokens,
+      };
+    }
+
+    return {
+      isLoggedIn: true,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      updateTokens,
+      logout,
+    };
+  }, [tokens, updateTokens, logout]);
 
   return <authContext.Provider value={value}>{children}</authContext.Provider>;
 }

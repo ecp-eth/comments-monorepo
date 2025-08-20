@@ -22,17 +22,24 @@ import {
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { MAX_COMMENTS_PER_PAGE } from "@/constants";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
+import { secureFetch } from "@/lib/secure-fetch";
+import { useAuth } from "@/components/auth-provider";
 
 export function useChannelQuery(channelId: bigint) {
+  const auth = useAuth();
+
   return useQuery({
     queryKey: createChannelQueryKey(channelId),
     queryFn: async ({ signal }) => {
-      const channelResponse = await fetch(
-        `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channelId}`,
-        {
-          signal,
-        },
-      );
+      const channelResponse = await secureFetch(auth, async ({ headers }) => {
+        return fetch(
+          `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channelId}`,
+          {
+            signal,
+            headers,
+          },
+        );
+      });
 
       if (channelResponse.status === 401) {
         throw new UnauthorizedError();

@@ -2,6 +2,9 @@ import { publicEnv } from "@/env/public";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { z } from "zod";
 import { type MiniAppContext } from "./useMiniAppContext";
+import { useAuth } from "@/components/auth-provider";
+import { secureFetch } from "@/lib/secure-fetch";
+import { UnauthorizedError } from "@/errors";
 
 const responseSchema = z.object({
   channelId: z.coerce.bigint(),
@@ -20,6 +23,8 @@ export function useSetNotificationStatusOnChannel({
   miniAppContext,
   ...options
 }: UseSetNotificationStatusOnChannelOptions) {
+  const auth = useAuth();
+
   return useMutation({
     ...options,
     mutationFn: async (notificationsEnabled: boolean) => {
@@ -27,19 +32,26 @@ export function useSetNotificationStatusOnChannel({
         throw new Error("Not in mini app");
       }
 
-      const response = await fetch(
-        `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channelId}/farcaster/${miniAppContext.client.clientFid}/settings`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(
+          `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels/${channelId}/farcaster/${miniAppContext.client.clientFid}/notifications`,
+          {
+            method: "PUT",
+            headers: {
+              ...headers,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userFid: miniAppContext.user.fid,
+              notificationsEnabled,
+            }),
           },
-          body: JSON.stringify({
-            userFid: miniAppContext.user.fid,
-            notificationsEnabled,
-          }),
-        },
-      );
+        );
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
 
       if (!response.ok) {
         throw new Error(

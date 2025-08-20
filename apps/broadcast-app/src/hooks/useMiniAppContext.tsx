@@ -4,8 +4,6 @@ import {
   type Context,
 } from "@farcaster/miniapp-sdk";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useSetMiniAppNotificationsStatus } from "./useSetMiniAppNotificationsStatus";
-import { useAuthProtect } from "@/components/auth-provider";
 
 export type MiniAppContext =
   | ({
@@ -138,26 +136,6 @@ export function useMiniAppContextState() {
       sdk.off("notificationsEnabled", onNotificationsEnabled);
     };
   }, []);
-
-  const {
-    mutateAsync: setNotificationSettings,
-    error: setNotificationSettingsError,
-  } = useSetMiniAppNotificationsStatus();
-
-  useAuthProtect(setNotificationSettingsError);
-
-  useEffect(() => {
-    // sync notifications state to the server, this is just to keep track of their state
-    // since we are using a neynar as webhook then we don't have a direct way to know their state
-    if (!state.isInMiniApp) {
-      return;
-    }
-
-    setNotificationSettings({
-      miniAppContext: state,
-      notificationDetails: state.client.notificationDetails,
-    });
-  }, [state, setNotificationSettings]);
 
   return state;
 }

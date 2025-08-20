@@ -8,8 +8,12 @@ import {
   createMyChannelsQueryKey,
 } from "./query-keys";
 import { UnauthorizedError } from "@/errors";
+import { useAuth } from "@/components/auth-provider";
+import { secureFetch } from "@/lib/secure-fetch";
 
 export function useDiscoverChannelsQuery() {
+  const auth = useAuth();
+
   return useInfiniteQuery({
     queryKey: createDiscoverChannelsQueryKey(),
     queryFn: async ({ pageParam: cursor, signal }) => {
@@ -19,10 +23,12 @@ export function useDiscoverChannelsQuery() {
         searchParams.set("cursor", cursor);
       }
 
-      const response = await fetch(
-        `/api/indexer/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels${searchParams.size > 0 ? `?${searchParams.toString()}` : ""}`,
-        { signal },
-      );
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(
+          `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels${searchParams.size > 0 ? `?${searchParams.toString()}` : ""}`,
+          { signal, headers },
+        );
+      });
 
       if (response.status === 401) {
         throw new UnauthorizedError();

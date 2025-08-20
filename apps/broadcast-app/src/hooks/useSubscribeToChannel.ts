@@ -12,14 +12,14 @@ import {
 } from "./useSetMiniAppNotificationsStatus";
 import { useAuthProtect } from "@/components/auth-provider";
 
+type UseSubscribeToChannelReturnValue =
+  | (SetMiniAppNotificationStatusResponse & { clientFid: number })
+  | null;
+
 type UseSubscribeToChannelOptions = {
   channel: Channel;
 } & Omit<
-  UseMutationOptions<
-    SetMiniAppNotificationStatusResponse & { clientFid: number | undefined },
-    Error,
-    void
-  >,
+  UseMutationOptions<UseSubscribeToChannelReturnValue, Error, void>,
   "mutationFn" | "onSuccess" | "onError"
 >;
 
@@ -45,13 +45,12 @@ export function useSubscribeToChannel({
   return useMutation({
     ...options,
     mutationFn: async () => {
-      let notificationDetails: MiniAppNotificationDetails | undefined =
-        undefined;
-      let clientFid: number | undefined;
+      let response: UseSubscribeToChannelReturnValue = null;
 
       if (miniAppContext.isInMiniApp) {
-        clientFid = miniAppContext.client.clientFid;
-        notificationDetails = miniAppContext.client.notificationDetails;
+        const userFid = miniAppContext.user.fid;
+        const clientFid = miniAppContext.client.clientFid;
+        let notificationDetails = miniAppContext.client.notificationDetails;
 
         if (!miniAppContext.client.added) {
           const result = await sdk.actions.addMiniApp();
@@ -64,15 +63,17 @@ export function useSubscribeToChannel({
           miniAppContext,
           notificationDetails,
         });
+
+        response = {
+          notificationsEnabled: !!notificationDetails,
+          userFid,
+          clientFid,
+        };
       }
 
       await addERC721RecordToPrimaryList();
 
-      return {
-        channelId: channel.id,
-        notificationsEnabled: !!notificationDetails,
-        clientFid,
-      };
+      return response;
     },
     onError(error) {
       // @todo more human friendly error message in case of wallet (RPC) error
@@ -87,7 +88,7 @@ export function useSubscribeToChannel({
         isSubscribed: true,
         notificationSettings: {
           ...channel.notificationSettings,
-          ...(data.clientFid != null && {
+          ...(data && {
             [data.clientFid]: data.notificationsEnabled,
           }),
         },

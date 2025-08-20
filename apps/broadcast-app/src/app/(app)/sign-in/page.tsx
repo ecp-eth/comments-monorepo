@@ -8,6 +8,7 @@ import z from "zod";
 import { useMiniAppContext } from "@/hooks/useMiniAppContext";
 import { Loader2Icon } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
+import { siweVerifyResponseSchema } from "@/app/api/schemas";
 
 export default function SignInPage() {
   const auth = useAuth();
@@ -30,7 +31,7 @@ export default function SignInPage() {
         }
       }
 
-      const nonceResponse = await fetch("/api/indexer/api/auth/siwe/nonce");
+      const nonceResponse = await fetch("/api/auth/siwe/nonce");
 
       if (!nonceResponse.ok) {
         throw new Error("Failed to get nonce");
@@ -60,7 +61,7 @@ export default function SignInPage() {
         message,
       });
 
-      const verifyResponse = await fetch("/api/auth/siwe/verify", {
+      const verifyResponse = await fetch("api/auth/siwe/verify", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,26 +79,16 @@ export default function SignInPage() {
 
       const verifyResponseData = await verifyResponse.json();
 
-      const { accessToken, refreshToken } = z
-        .object({
-          accessToken: z.object({
-            token: z.string(),
-            expiresIn: z.number(),
-          }),
-          refreshToken: z.object({
-            token: z.string(),
-            expiresIn: z.number(),
-          }),
-        })
-        .parse(verifyResponseData);
+      const { accessToken, refreshToken } =
+        siweVerifyResponseSchema.parse(verifyResponseData);
 
       return {
         accessToken,
         refreshToken,
       };
     },
-    onSuccess() {
-      auth.setAsLoggedIn(true);
+    onSuccess(tokens) {
+      auth.updateTokens(tokens.accessToken.token, tokens.refreshToken.token);
     },
   });
 
