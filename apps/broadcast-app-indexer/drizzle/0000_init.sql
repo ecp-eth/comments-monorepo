@@ -1,27 +1,64 @@
 CREATE SCHEMA "broadcast_app_indexer_offchain";
 --> statement-breakpoint
 CREATE TYPE "broadcast_app_indexer_offchain"."neynar_notification_service_queue_status" AS ENUM('pending', 'processing', 'completed', 'failed');--> statement-breakpoint
-CREATE TABLE "broadcast_app_indexer_offchain"."channel_subscription" (
-	"channel_id" numeric(78, 0) NOT NULL,
-	"user_fid" integer NOT NULL,
+CREATE TABLE "broadcast_app_indexer_offchain"."auth_siwe_refresh_token" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"session_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"order" integer DEFAULT 0 NOT NULL,
+	"is_used" boolean DEFAULT false NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "broadcast_app_indexer_offchain"."auth_siwe_session" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"last_used_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"user_id" text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "broadcast_app_indexer_offchain"."channel_subscription_farcaster_notification_settings" (
+	"channel_id" numeric(78, 0) NOT NULL,
+	"app_id" text NOT NULL,
+	"client_fid" integer NOT NULL,
+	"user_address" text NOT NULL,
+	"user_fid" integer NOT NULL,
 	"notifications_enabled" boolean DEFAULT false NOT NULL,
-	CONSTRAINT "channel_subscription_channel_id_user_fid_pk" PRIMARY KEY("channel_id","user_fid")
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "csfns_settings_pk" PRIMARY KEY("channel_id","client_fid","app_id","user_address","user_fid")
 );
 --> statement-breakpoint
 CREATE TABLE "broadcast_app_indexer_offchain"."neynar_notification_service_queue" (
-	"comment_id" text PRIMARY KEY NOT NULL,
+	"comment_id" text NOT NULL,
+	"app_id" text NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"pending_subscriber_fids" integer[] NOT NULL,
 	"status" "broadcast_app_indexer_offchain"."neynar_notification_service_queue_status" DEFAULT 'pending' NOT NULL,
 	"notification_uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"notification" jsonb NOT NULL,
-	"attempts" integer DEFAULT 0 NOT NULL
+	"attempts" integer DEFAULT 0 NOT NULL,
+	CONSTRAINT "neynar_notification_service_queue_comment_id_app_id_pk" PRIMARY KEY("comment_id","app_id")
 );
 --> statement-breakpoint
-CREATE INDEX "channel_subscription_notifications_enabled_idx" ON "broadcast_app_indexer_offchain"."channel_subscription" USING btree ("notifications_enabled");--> statement-breakpoint
+CREATE TABLE "broadcast_app_indexer_offchain"."user_farcaster_mini_app_settings" (
+	"app_id" text NOT NULL,
+	"client_fid" integer NOT NULL,
+	"user_address" text NOT NULL,
+	"user_fid" integer NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"notifications_enabled" boolean DEFAULT false NOT NULL,
+	CONSTRAINT "user_farcaster_mini_app_settings_app_id_client_fid_user_address_user_fid_pk" PRIMARY KEY("app_id","client_fid","user_address","user_fid")
+);
+--> statement-breakpoint
+ALTER TABLE "broadcast_app_indexer_offchain"."auth_siwe_refresh_token" ADD CONSTRAINT "auth_siwe_refresh_token_session_id_auth_siwe_session_id_fk" FOREIGN KEY ("session_id") REFERENCES "broadcast_app_indexer_offchain"."auth_siwe_session"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "broadcast_app_indexer_offchain"."channel_subscription_farcaster_notification_settings" ADD CONSTRAINT "channel_subscription_farcaster_notification_settings_app_id_client_fid_user_address_user_fid_user_farcaster_mini_app_settings_app_id_client_fid_user_address_user_fid_fk" FOREIGN KEY ("app_id","client_fid","user_address","user_fid") REFERENCES "broadcast_app_indexer_offchain"."user_farcaster_mini_app_settings"("app_id","client_fid","user_address","user_fid") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+CREATE INDEX "csfns_by_app_channel_user_addr_idx" ON "broadcast_app_indexer_offchain"."channel_subscription_farcaster_notification_settings" USING btree ("app_id","channel_id","user_address");--> statement-breakpoint
+CREATE INDEX "csfn_enabled_notification_by_channel_app_idx" ON "broadcast_app_indexer_offchain"."channel_subscription_farcaster_notification_settings" USING btree ("channel_id","app_id") WHERE "broadcast_app_indexer_offchain"."channel_subscription_farcaster_notification_settings"."notifications_enabled" = true;--> statement-breakpoint
 CREATE INDEX "neynar_notification_service_queue_created_at_idx" ON "broadcast_app_indexer_offchain"."neynar_notification_service_queue" USING btree ("created_at");--> statement-breakpoint
-CREATE INDEX "neynar_notification_service_queue_status_idx" ON "broadcast_app_indexer_offchain"."neynar_notification_service_queue" USING btree ("status");
+CREATE INDEX "neynar_notification_service_queue_status_idx" ON "broadcast_app_indexer_offchain"."neynar_notification_service_queue" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "ufmas_user_address_idx" ON "broadcast_app_indexer_offchain"."user_farcaster_mini_app_settings" USING btree ("user_address");--> statement-breakpoint
+CREATE INDEX "ufmas_user_fid_idx" ON "broadcast_app_indexer_offchain"."user_farcaster_mini_app_settings" USING btree ("user_fid");

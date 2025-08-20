@@ -1,1 +1,0 @@
-CREATE INDEX "csfns_by_app_channel_user_addr_idx" ON "broadcast_app_indexer_offchain"."channel_subscription_farcaster_notification_settings" USING btree ("app_id","channel_id","user_address");
