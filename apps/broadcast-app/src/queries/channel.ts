@@ -112,6 +112,7 @@ export function useChannelCommentsQuery({
 }: UseChannelCommentsQueryParams) {
   return useInfiniteQuery({
     ...options,
+    refetchOnMount: true,
     queryKey: createChannelCommentsQueryKey({ channelId, viewer: author }),
     queryFn: async ({ pageParam, signal }) => {
       const response = await fetchComments({
@@ -126,7 +127,6 @@ export function useChannelCommentsQuery({
         signal,
         cursor: pageParam?.cursor,
         limit: MAX_COMMENTS_PER_PAGE,
-        // @todo determine sort because for previous page we need to reverse the sort
       });
 
       return response;

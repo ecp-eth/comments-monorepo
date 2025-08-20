@@ -313,10 +313,10 @@ export default function ChannelPage(props: {
             onVisibilityChange={(isVisible) => {
               if (
                 isVisible &&
-                !commentsQuery.isFetchingPreviousPage &&
-                commentsQuery.hasPreviousPage
+                !commentsQuery.isFetchingNextPage &&
+                commentsQuery.hasNextPage
               ) {
-                commentsQuery.fetchPreviousPage();
+                commentsQuery.fetchNextPage();
               }
             }}
           />
