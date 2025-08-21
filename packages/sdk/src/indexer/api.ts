@@ -772,7 +772,7 @@ export type IsMutedOptions = {
 void ({} as IsMutedOptions satisfies z.input<typeof isMutedOptionsSchema>);
 
 /**
- * Checks if an address is marked as a muted on the indexer of your choice.
+ * Checks if an address is marked as muted on the indexer of your choice.
  *
  * @param options - The options for checking if an address is muted
  * @returns A promise that resolves to `true` if the address is marked as muted, `false` otherwise
