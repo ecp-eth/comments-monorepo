@@ -4,34 +4,37 @@ import {
   ChannelManagerABI,
   CommentManagerABI,
   SUPPORTED_CHAINS,
-  type SupportedChainConfig,
 } from "@ecp.eth/sdk";
 import type { Hex } from "@ecp.eth/sdk/core";
+import { env } from "./src/env";
 
-const chains = Object.entries(process.env).reduce(
-  (acc, [key, value]) => {
-    if (key.startsWith("PONDER_RPC_URL_")) {
-      const chainId = parseInt(key.replace("PONDER_RPC_URL_", ""));
-      const startBlock = parseInt(
-        process.env[`PONDER_START_BLOCK_${chainId}`] || "0",
-      );
+const chains = Object.entries(env.CHAIN_CONFIGS).reduce(
+  (acc, [, chainConfig]) => {
+    const { chainId, rpcUrl, startBlock } = chainConfig;
 
-      const supportedChain: SupportedChainConfig | undefined =
-        SUPPORTED_CHAINS[chainId as keyof typeof SUPPORTED_CHAINS];
-
-      if (!supportedChain) {
-        throw new Error(`Chain ${chainId} not supported by ECP`);
-      }
-
-      acc[chainId] = {
-        id: chainId,
-        transport: http(value),
-        disableCache: chainId === 31337,
-        startBlock,
-        channelManagerAddress: supportedChain.channelManagerAddress,
-        commentManagerAddress: supportedChain.commentManagerAddress,
-      };
-    }
+    acc[chainId] = {
+      id: chainId,
+      transport: http(rpcUrl),
+      disableCache: chainId === 31337,
+      startBlock:
+        // allow override for start block, this is useful if you are using local anvil with base chain fork
+        // so it doesn't reindex always from the beginning on indexer restart
+        chainId === 31337 && env.CHAIN_ANVIL_START_BLOCK
+          ? env.CHAIN_ANVIL_START_BLOCK
+          : startBlock,
+      channelManagerAddress:
+        // allow override for manager address, this is useful if you are using local anvil with base chain fork
+        // and in that case the deployed address of the contract is different because it uses different deployer private key
+        chainId === 31337 &&
+        env.CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE
+          ? env.CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE
+          : SUPPORTED_CHAINS[chainId].channelManagerAddress,
+      commentManagerAddress:
+        chainId === 31337 &&
+        env.CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE
+          ? env.CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE
+          : SUPPORTED_CHAINS[chainId].commentManagerAddress,
+    };
     return acc;
   },
   {} as Record<

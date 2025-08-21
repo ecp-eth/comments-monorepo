@@ -37,6 +37,7 @@
     "packages/react-editor/extract-references": true,
     "packages/react-editor/hooks": true,
     "packages/react-editor/parser": true,
-    "packages/react-editor/types": true
+    "packages/react-editor/types": true,
+    "packages/shared/ethereum-follow-protocol": true
   }
 }
