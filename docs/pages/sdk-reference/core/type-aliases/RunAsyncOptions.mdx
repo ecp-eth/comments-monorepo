@@ -20,6 +20,7 @@ type RunAsyncOptions = {
      type: "none";
    };
   retries?: number;
+  retryCondition?: (error) => boolean;
   signal?: AbortSignal;
 };
 ```
@@ -68,6 +69,35 @@ Defined in: [packages/sdk/src/core/utils.ts:136](https://github.com/ecp-eth/comm
 The number of times to retry the function in case of failure.
 
 If omitted, the function won't be retried.
+
+***
+
+### retryCondition()?
+
+```ts
+optional retryCondition: (error) => boolean;
+```
+
+Defined in: [packages/sdk/src/core/utils.ts:155](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L155)
+
+A function to determine if the function should be retried.
+
+By default, the function will always retry until the number of retries is reached.
+If the number of retries is not set then this function will be ignored.
+
+#### Parameters
+
+##### error
+
+`unknown`
+
+The error that occurred.
+
+#### Returns
+
+`boolean`
+
+True if the function should be retried, false otherwise.
 
 ***
 

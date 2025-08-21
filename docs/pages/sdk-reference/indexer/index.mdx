@@ -9,6 +9,12 @@
 Ethereum Comments Protocol SDK Indexer
 Functionality for indexing and querying comments data
 
+## Classes
+
+| Class | Description |
+| ------ | ------ |
+| [ResponseError](/sdk-reference/indexer/classes/ResponseError.mdx) | An error thrown when a response from the indexer is not successful. |
+
 ## Type Aliases
 
 | Type Alias | Description |
@@ -147,7 +153,9 @@ Functionality for indexing and querying comments data
 | [getChannelCursor](/sdk-reference/indexer/functions/getChannelCursor.mdx) | Get the cursor for a channel |
 | [getCommentCursor](/sdk-reference/indexer/functions/getCommentCursor.mdx) | Get the cursor for a comment |
 | [getReportsCursor](/sdk-reference/indexer/functions/getReportsCursor.mdx) | Get the cursor for a report |
-| [isMuted](/sdk-reference/indexer/functions/isMuted.mdx) | Checks if an address is marked as a muted on the indexer of your choice. |
+| [indexerApiRetryCondition](/sdk-reference/indexer/functions/indexerApiRetryCondition.mdx) | Determine if a fetch error from the indexer API should be retried |
+| [isMuted](/sdk-reference/indexer/functions/isMuted.mdx) | Checks if an address is marked as muted on the indexer of your choice. |
+| [isRetryableHttpResponse](/sdk-reference/indexer/functions/isRetryableHttpResponse.mdx) | Check if a response is retryable |
 | [reportComment](/sdk-reference/indexer/functions/reportComment.mdx) | Report a comment to the Indexer API |
 
 ## References
