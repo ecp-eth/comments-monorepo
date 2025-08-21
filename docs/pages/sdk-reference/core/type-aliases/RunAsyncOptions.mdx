@@ -20,7 +20,7 @@ type RunAsyncOptions = {
      type: "none";
    };
   retries?: number;
-  shouldRetry?: (error) => boolean;
+  retryCondition?: (error) => boolean;
   signal?: AbortSignal;
 };
 ```
@@ -72,17 +72,18 @@ If omitted, the function won't be retried.
 
 ***
 
-### shouldRetry()?
+### retryCondition()?
 
 ```ts
-optional shouldRetry: (error) => boolean;
+optional retryCondition: (error) => boolean;
 ```
 
-Defined in: [packages/sdk/src/core/utils.ts:154](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L154)
+Defined in: [packages/sdk/src/core/utils.ts:155](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/core/utils.ts#L155)
 
 A function to determine if the function should be retried.
 
 By default, the function will always retry until the number of retries is reached.
+If the number of retries is not set then this function will be ignored.
 
 #### Parameters
 

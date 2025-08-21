@@ -96,14 +96,14 @@ describe("runAsync", () => {
       }
     });
 
-    it("should not retry if shouldRetry returns false", async () => {
+    it("should not retry if retryCondition returns false", async () => {
       try {
         await runAsync(
           async () => {
             attemptCount++;
             throw new Error("Failure");
           },
-          { retries: 3, shouldRetry: () => false },
+          { retries: 3, retryCondition: () => false },
         );
 
         assert.fail("Should have thrown an error");

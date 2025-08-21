@@ -158,7 +158,7 @@ export async function fetchComment(
 
       return await response.json();
     },
-    { signal, retries, shouldRetry: shouldRetryFetch },
+    { signal, retries, retryCondition: shouldRetryFetch },
   );
 
   return IndexerAPICommentWithRepliesSchema.parse(responseData);
@@ -414,7 +414,7 @@ export async function fetchComments(
 
       return await response.json();
     },
-    { signal, retries, shouldRetry: shouldRetryFetch },
+    { signal, retries, retryCondition: shouldRetryFetch },
   );
 
   return IndexerAPIListCommentsSchema.parse(responseData);
@@ -652,7 +652,7 @@ export async function fetchCommentReplies(
 
       return await response.json();
     },
-    { signal, retries, shouldRetry: shouldRetryFetch },
+    { signal, retries, retryCondition: shouldRetryFetch },
   );
 
   return IndexerAPIListCommentRepliesSchema.parse(responseData);
@@ -726,7 +726,7 @@ export async function fetchAuthorData(
 
       return await response.json();
     },
-    { signal, retries, shouldRetry: shouldRetryFetch },
+    { signal, retries, retryCondition: shouldRetryFetch },
   );
 
   return IndexerAPIAuthorDataSchema.parse(responseData);
@@ -804,7 +804,7 @@ export async function isMuted(options: IsMutedOptions): Promise<boolean> {
         response,
       );
     },
-    { signal, retries, shouldRetry: shouldRetryFetch },
+    { signal, retries, retryCondition: shouldRetryFetch },
   );
 }
 
@@ -917,7 +917,7 @@ export async function fetchChannels(
 
       return await response.json();
     },
-    { signal, retries, shouldRetry: shouldRetryFetch },
+    { signal, retries, retryCondition: shouldRetryFetch },
   );
 
   return IndexerAPIListChannelsSchema.parse(responseData);
@@ -991,7 +991,7 @@ export async function fetchChannel(
 
       return await response.json();
     },
-    { signal, retries, shouldRetry: shouldRetryFetch },
+    { signal, retries, retryCondition: shouldRetryFetch },
   );
 
   return IndexerAPIChannelOutputSchema.parse(responseData);
@@ -1074,7 +1074,7 @@ export async function fetchAutocomplete(
 
       return await response.json();
     },
-    { signal, retries, shouldRetry: shouldRetryFetch },
+    { signal, retries, retryCondition: shouldRetryFetch },
   );
 
   return IndexerAPIGetAutocompleteOutputSchema.parse(responseData);
@@ -1181,6 +1181,6 @@ export async function reportComment(
         );
       }
     },
-    { signal, retries, shouldRetry: shouldRetryFetch },
+    { signal, retries, retryCondition: shouldRetryFetch },
   );
 }

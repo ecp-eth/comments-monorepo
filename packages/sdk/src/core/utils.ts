@@ -147,11 +147,12 @@ export type RunAsyncOptions = {
    * A function to determine if the function should be retried.
    *
    * By default, the function will always retry until the number of retries is reached.
+   * If the number of retries is not set then this function will be ignored.
    *
    * @param error The error that occurred.
    * @returns True if the function should be retried, false otherwise.
    */
-  shouldRetry?: (error: unknown) => boolean;
+  retryCondition?: (error: unknown) => boolean;
 };
 
 /**
@@ -165,7 +166,7 @@ export function runAsync<T>(
   func: (signal?: AbortSignal) => Promise<T>,
   options: RunAsyncOptions,
 ): Promise<T> {
-  const { signal, retries, backoff, shouldRetry } = options;
+  const { signal, retries, backoff, retryCondition: shouldRetry } = options;
 
   const execute = async (attempt = 0): Promise<T> => {
     try {
@@ -176,13 +177,13 @@ export function runAsync<T>(
 
       return await func(signal);
     } catch (error) {
-      // If the function should not be retried, throw the error
-      if (shouldRetry && !shouldRetry(error)) {
+      // If no more retries, throw the error
+      if (attempt >= (retries ?? 0)) {
         throw error;
       }
 
-      // If no more retries, throw the error
-      if (attempt >= (retries ?? 0)) {
+      // If the function should not be retried, throw the error
+      if (shouldRetry && !shouldRetry(error)) {
         throw error;
       }
 
