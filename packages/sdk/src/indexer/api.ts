@@ -26,6 +26,8 @@ import {
 } from "./schemas.js";
 import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
+import { ResponseError } from "./errors.js";
+import { shouldRetryFetch } from "./utils.js";
 
 const FetchCommentOptionsSchema = z.object({
   commentId: HexSchema,
@@ -148,12 +150,15 @@ export async function fetchComment(
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch comments: ${response.statusText}`);
+        throw new ResponseError(
+          `Failed to fetch comments: ${response.statusText}`,
+          response,
+        );
       }
 
       return await response.json();
     },
-    { signal, retries },
+    { signal, retries, shouldRetry: shouldRetryFetch },
   );
 
   return IndexerAPICommentWithRepliesSchema.parse(responseData);
@@ -401,12 +406,15 @@ export async function fetchComments(
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch comments: ${response.statusText}`);
+        throw new ResponseError(
+          `Failed to fetch comments: ${response.statusText}`,
+          response,
+        );
       }
 
       return await response.json();
     },
-    { signal, retries },
+    { signal, retries, shouldRetry: shouldRetryFetch },
   );
 
   return IndexerAPIListCommentsSchema.parse(responseData);
@@ -636,12 +644,15 @@ export async function fetchCommentReplies(
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch replies: ${response.statusText}`);
+        throw new ResponseError(
+          `Failed to fetch replies: ${response.statusText}`,
+          response,
+        );
       }
 
       return await response.json();
     },
-    { signal, retries },
+    { signal, retries, shouldRetry: shouldRetryFetch },
   );
 
   return IndexerAPIListCommentRepliesSchema.parse(responseData);
@@ -707,12 +718,15 @@ export async function fetchAuthorData(
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch author data: ${response.statusText}`);
+        throw new ResponseError(
+          `Failed to fetch author data: ${response.statusText}`,
+          response,
+        );
       }
 
       return await response.json();
     },
-    { signal, retries },
+    { signal, retries, shouldRetry: shouldRetryFetch },
   );
 
   return IndexerAPIAuthorDataSchema.parse(responseData);
@@ -785,11 +799,12 @@ export async function isMuted(options: IsMutedOptions): Promise<boolean> {
         return false;
       }
 
-      throw new Error(
+      throw new ResponseError(
         `Failed to check if address is muted: ${response.statusText} (${response.status})`,
+        response,
       );
     },
-    { signal, retries },
+    { signal, retries, shouldRetry: shouldRetryFetch },
   );
 }
 
@@ -894,12 +909,15 @@ export async function fetchChannels(
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch channels: ${response.statusText}`);
+        throw new ResponseError(
+          `Failed to fetch channels: ${response.statusText}`,
+          response,
+        );
       }
 
       return await response.json();
     },
-    { signal, retries },
+    { signal, retries, shouldRetry: shouldRetryFetch },
   );
 
   return IndexerAPIListChannelsSchema.parse(responseData);
@@ -965,12 +983,15 @@ export async function fetchChannel(
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch channel: ${response.statusText}`);
+        throw new ResponseError(
+          `Failed to fetch channel: ${response.statusText}`,
+          response,
+        );
       }
 
       return await response.json();
     },
-    { signal, retries },
+    { signal, retries, shouldRetry: shouldRetryFetch },
   );
 
   return IndexerAPIChannelOutputSchema.parse(responseData);
@@ -1045,12 +1066,15 @@ export async function fetchAutocomplete(
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch autocomplete: ${response.statusText}`);
+        throw new ResponseError(
+          `Failed to fetch autocomplete: ${response.statusText}`,
+          response,
+        );
       }
 
       return await response.json();
     },
-    { signal, retries },
+    { signal, retries, shouldRetry: shouldRetryFetch },
   );
 
   return IndexerAPIGetAutocompleteOutputSchema.parse(responseData);
@@ -1151,9 +1175,12 @@ export async function reportComment(
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to report comment: ${response.statusText}`);
+        throw new ResponseError(
+          `Failed to report comment: ${response.statusText}`,
+          response,
+        );
       }
     },
-    { signal, retries },
+    { signal, retries, shouldRetry: shouldRetryFetch },
   );
 }
