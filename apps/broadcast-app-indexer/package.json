@@ -39,7 +39,6 @@
     "dataloader": "^2.2.3",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "0.41.0",
-    "ethereum-identity-kit": "^0.2.52",
     "hono": "^4.9.1",
     "lru-cache": "^11.0.2",
     "pg": "^8.11.3",
