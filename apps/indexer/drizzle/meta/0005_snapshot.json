@@ -1,5 +1,5 @@
 {
-  "id": "a611f536-d656-4549-8a3a-c2fc50d83d0c",
+  "id": "6946996c-d3d1-4ad8-be31-f7e35446231b",
   "prevId": "a892df7a-85e3-4d3c-bb22-d19e16221a63",
   "version": "7",
   "dialect": "postgresql",
@@ -558,13 +558,6 @@
           "notNull": true,
           "default": "now()"
         },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
         "expires_at": {
           "name": "expires_at",
           "type": "timestamp with time zone",
@@ -576,13 +569,6 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
-        },
-        "is_used": {
-          "name": "is_used",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
         }
       },
       "indexes": {},
