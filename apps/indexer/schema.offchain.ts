@@ -190,7 +190,6 @@ export const userAuthSessionSiweRefreshToken = offchainSchema.table(
   {
     id: uuid().primaryKey().defaultRandom(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     expiresAt: timestamp({ withTimezone: true }).notNull(),
     userAuthSessionId: uuid()
       .notNull()
@@ -198,7 +197,6 @@ export const userAuthSessionSiweRefreshToken = offchainSchema.table(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    isUsed: boolean().notNull().default(false),
   },
 );
 
