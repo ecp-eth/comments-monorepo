@@ -1,5 +1,5 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
-import { siweAuthService } from "../../../services";
+import { siweAuthService } from "../../../../services";
 
 export const AuthSiweResponseSchema = z.object({
   nonce: z.string().nonempty(),
