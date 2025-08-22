@@ -98,6 +98,104 @@ export class SiweAuthService implements ISiweAuthService {
     };
   }
 
+  async verifyRefreshTokenAndIssueNewTokens(
+    refreshToken: string,
+  ): Promise<SiweAuthService_VerifyRefreshTokenAndIssueNewTokensResult> {
+    try {
+      const decodedJWTToken = await jwt.verify(
+        refreshToken,
+        this.options.jwtRefreshTokenSecret,
+        {
+          alg: "HS256",
+          iss: this.options.jwtRefreshTokenIssuer,
+        },
+      );
+
+      if (decodedJWTToken.aud !== this.options.jwtRefreshTokenAudience) {
+        throw new SiweAuthService_JwtTokenInvalidAudienceError();
+      }
+
+      const { id } = refreshTokenPayloadSchema.parse(decodedJWTToken);
+      const now = Math.floor(Date.now() / 1000);
+      const refreshTokenExpiresAt = now + this.options.jwtRefreshTokenLifetime;
+
+      const createdTokens = await this.options.db.transaction(async (tx) => {
+        const storedRefreshToken =
+          await tx.query.userAuthSessionSiweRefreshToken.findFirst({
+            where(fields, operators) {
+              return operators.eq(fields.id, id);
+            },
+            with: {
+              userAuthSession: true,
+            },
+          });
+
+        if (!storedRefreshToken) {
+          return;
+        }
+
+        if (storedRefreshToken.expiresAt < new Date()) {
+          await tx
+            .delete(schema.userAuthSession)
+            .where(
+              eq(
+                schema.userAuthSession.id,
+                storedRefreshToken.userAuthSessionId,
+              ),
+            )
+            .execute();
+
+          return;
+        }
+
+        await tx
+          .delete(schema.userAuthSessionSiweRefreshToken)
+          .where(eq(schema.userAuthSessionSiweRefreshToken.id, id))
+          .execute();
+
+        const [newRefreshToken] = await tx
+          .insert(schema.userAuthSessionSiweRefreshToken)
+          .values({
+            expiresAt: new Date(refreshTokenExpiresAt * 1000),
+            userAuthSessionId: storedRefreshToken.userAuthSessionId,
+          })
+          .returning()
+          .execute();
+
+        await tx
+          .update(schema.userAuthCredentials)
+          .set({ lastUsedAt: new Date() })
+          .where(
+            eq(
+              schema.userAuthCredentials.id,
+              storedRefreshToken.userAuthSession.userAuthCredentialsId,
+            ),
+          )
+          .execute();
+
+        if (!newRefreshToken) {
+          throw new SiweAuthService_FailedToCreateRefreshTokenError();
+        }
+
+        return {
+          accessToken: await this.createAccessToken(
+            newRefreshToken.userAuthSessionId,
+            now,
+          ),
+          refreshToken: await this.createRefreshToken(newRefreshToken.id, now),
+        };
+      });
+
+      if (!createdTokens) {
+        throw new SiweAuthService_InvalidRefreshTokenError();
+      }
+
+      return createdTokens;
+    } catch (e) {
+      throwAuthServiceError(e);
+    }
+  }
+
   async verifyAccessToken(
     token: string,
   ): Promise<SiweAuthService_VerifyAccessTokenResult> {
@@ -110,6 +208,10 @@ export class SiweAuthService implements ISiweAuthService {
           iss: this.options.jwtAccessTokenIssuer,
         },
       );
+
+      if (decodedJWTToken.aud !== this.options.jwtAccessTokenAudience) {
+        throw new SiweAuthService_JwtTokenInvalidAudienceError();
+      }
 
       const { sessionId } = accessTokenPayloadSchema.parse(decodedJWTToken);
 
@@ -244,24 +346,8 @@ export class SiweAuthService implements ISiweAuthService {
         }
 
         const now = Math.floor(Date.now() / 1000);
-        const accessTokenExpiresAt = now + this.options.jwtAccessTokenLifetime;
         const refreshTokenExpiresAt =
           now + this.options.jwtRefreshTokenLifetime;
-
-        // create access token
-        const accessToken = await jwt.sign(
-          {
-            exp: accessTokenExpiresAt,
-            iat: now,
-            aud: this.options.jwtAccessTokenAudience,
-            iss: this.options.jwtAccessTokenIssuer,
-            ...accessTokenPayloadSchema.parse({
-              sessionId: session.id,
-            }),
-          },
-          this.options.jwtAccessTokenSecret,
-          "HS256",
-        );
 
         const [storedRefreshToken] = await tx
           .insert(schema.userAuthSessionSiweRefreshToken)
@@ -276,34 +362,81 @@ export class SiweAuthService implements ISiweAuthService {
           throw new SiweAuthService_FailedToCreateRefreshTokenError();
         }
 
-        const refreshToken = await jwt.sign(
-          {
-            exp: refreshTokenExpiresAt,
-            iat: now,
-            aud: this.options.jwtRefreshTokenAudience,
-            iss: this.options.jwtRefreshTokenIssuer,
-            ...refreshTokenPayloadSchema.parse({
-              id: storedRefreshToken.id,
-            }),
-          },
-          this.options.jwtRefreshTokenSecret,
-          "HS256",
-        );
-
         return {
-          accessToken: {
-            token: accessToken,
-            expiresAt: accessTokenExpiresAt,
-          },
-          refreshToken: {
-            token: refreshToken,
-            expiresAt: refreshTokenExpiresAt,
-          },
+          accessToken: await this.createAccessToken(session.id, now),
+          refreshToken: await this.createRefreshToken(
+            storedRefreshToken.id,
+            now,
+          ),
         };
       });
     } catch (e) {
       throwAuthServiceError(e);
     }
+  }
+
+  private async createAccessToken(
+    sessionId: string,
+    /**
+     * Current timestamp in seconds
+     */
+    now: number,
+  ): Promise<{
+    token: string;
+    expiresAt: number;
+  }> {
+    const expiresAt = now + this.options.jwtAccessTokenLifetime;
+
+    const accessToken = await jwt.sign(
+      {
+        exp: expiresAt,
+        iat: now,
+        aud: this.options.jwtAccessTokenAudience,
+        iss: this.options.jwtAccessTokenIssuer,
+        ...accessTokenPayloadSchema.parse({
+          sessionId,
+        }),
+      },
+      this.options.jwtAccessTokenSecret,
+      "HS256",
+    );
+
+    return {
+      token: accessToken,
+      expiresAt: expiresAt * 1000,
+    };
+  }
+
+  private async createRefreshToken(
+    refreshTokenId: string,
+    /**
+     * Current timestamp in seconds
+     */
+    now: number,
+  ): Promise<{
+    token: string;
+    expiresAt: number;
+  }> {
+    const expiresAt = now + this.options.jwtRefreshTokenLifetime;
+
+    const refreshToken = await jwt.sign(
+      {
+        exp: expiresAt,
+        iat: now,
+        aud: this.options.jwtRefreshTokenAudience,
+        iss: this.options.jwtRefreshTokenIssuer,
+        ...refreshTokenPayloadSchema.parse({
+          id: refreshTokenId,
+        }),
+      },
+      this.options.jwtRefreshTokenSecret,
+      "HS256",
+    );
+
+    return {
+      token: refreshToken,
+      expiresAt: expiresAt * 1000,
+    };
   }
 }
 
@@ -360,8 +493,23 @@ export type SiweAuthService_VerifyAccessTokenResult = {
   sessionId: string;
 };
 
+export type SiweAuthService_VerifyRefreshTokenAndIssueNewTokensResult = {
+  accessToken: {
+    token: string;
+    expiresAt: number;
+  };
+  refreshToken: {
+    token: string;
+    expiresAt: number;
+  };
+};
+
 export interface ISiweAuthService {
   generateNonceAndToken: () => Promise<SiweAuthService_GenerateNonceAndTokenResult>;
+
+  verifyRefreshTokenAndIssueNewTokens: (
+    refreshToken: string,
+  ) => Promise<SiweAuthService_VerifyRefreshTokenAndIssueNewTokensResult>;
 
   verifyMessageAndIssueAuthTokens: (
     params: SiweAuthService_VerifyMessageAndNonceParams,
@@ -520,5 +668,12 @@ export class SiweAuthService_InvalidSessionError extends SiweAuthServiceError {
   constructor() {
     super(`Invalid session`);
     this.name = "SiweAuthService_InvalidSessionError";
+  }
+}
+
+export class SiweAuthService_InvalidRefreshTokenError extends SiweAuthServiceError {
+  constructor() {
+    super(`Invalid refresh token`);
+    this.name = "SiweAuthService_InvalidRefreshTokenError";
   }
 }

@@ -21,6 +21,7 @@ import { setupPatchReport } from "./reports/[reportId]/patch";
 import { setupAdminBotWebhook } from "./webhook/bot/post";
 import { setupAuthSiweNonce } from "./auth/siwe/nonce/get";
 import { setupAuthSiweVerify } from "./auth/siwe/verify/post";
+import { setupAuthSiweRefresh } from "./auth/siwe/refresh/post";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -45,6 +46,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAdminBotWebhook(app);
   setupAuthSiweNonce(app);
   setupAuthSiweVerify(app);
+  setupAuthSiweRefresh(app);
 
   return app;
 }
