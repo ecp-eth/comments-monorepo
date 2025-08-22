@@ -32,6 +32,9 @@ export function setupAuthSiweNonce(app: OpenAPIHono) {
           token,
         },
         200,
+        {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
       );
     },
   );
