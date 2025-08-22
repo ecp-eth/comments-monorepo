@@ -24,6 +24,7 @@ import { ManagementAuthService } from "../management/services/auth";
 import { MutedAccountsManagementService } from "../management/services/muted-accounts";
 import { SiweAuthService } from "./siwe-auth-service";
 import { config } from "ponder:internal";
+import { createSiweMiddleware } from "../middleware/siwe";
 
 export { db };
 
@@ -150,4 +151,8 @@ export const siweAuthService = new SiweAuthService({
   resolveChainClient: async (chainId) => {
     return config.default.chains[chainId]?.publicClient;
   },
+});
+
+export const siweMiddleware = createSiweMiddleware({
+  siweAuthService,
 });
