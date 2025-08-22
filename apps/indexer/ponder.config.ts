@@ -1,5 +1,10 @@
 import { createConfig } from "ponder";
-import { http, Transport } from "viem";
+import {
+  createPublicClient,
+  http,
+  type PublicClient,
+  type Transport,
+} from "viem";
 import {
   ChannelManagerABI,
   CommentManagerABI,
@@ -10,11 +15,13 @@ import { env } from "./src/env";
 
 const chains = Object.entries(env.CHAIN_CONFIGS).reduce(
   (acc, [, chainConfig]) => {
-    const { chainId, rpcUrl, startBlock } = chainConfig;
+    const { chainId, rpcUrl, startBlock, chain } = chainConfig;
+
+    const transport = http(rpcUrl);
 
     acc[chainId] = {
       id: chainId,
-      transport: http(rpcUrl),
+      transport,
       disableCache: chainId === 31337,
       startBlock:
         // allow override for start block, this is useful if you are using local anvil with base chain fork
@@ -34,6 +41,10 @@ const chains = Object.entries(env.CHAIN_CONFIGS).reduce(
         env.CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE
           ? env.CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE
           : SUPPORTED_CHAINS[chainId].commentManagerAddress,
+      publicClient: createPublicClient({
+        transport,
+        chain,
+      }),
     };
     return acc;
   },
@@ -46,6 +57,7 @@ const chains = Object.entries(env.CHAIN_CONFIGS).reduce(
       startBlock?: number;
       channelManagerAddress: Hex;
       commentManagerAddress: Hex;
+      publicClient: PublicClient;
     }
   >,
 );

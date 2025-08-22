@@ -23,6 +23,7 @@ import { db } from "./db";
 import { ManagementAuthService } from "../management/services/auth";
 import { MutedAccountsManagementService } from "../management/services/muted-accounts";
 import { SiweAuthService } from "./siwe-auth-service";
+import { config } from "ponder:internal";
 
 export { db };
 
@@ -134,4 +135,19 @@ export const siweAuthService = new SiweAuthService({
   jwtNonceTokenIssuer: env.JWT_SIWE_NONCE_ISSUER,
   jwtNonceTokenLifetime: env.JWT_SIWE_NONCE_LIFETIME,
   jwtNonceTokenSecret: env.JWT_SIWE_NONCE_SECRET,
+
+  jwtAccessTokenLifetime: env.JWT_ACCESS_TOKEN_LIFETIME,
+  jwtAccessTokenIssuer: env.JWT_ACCESS_TOKEN_ISSUER,
+  jwtAccessTokenAudience: env.JWT_ACCESS_TOKEN_AUDIENCE,
+  jwtAccessTokenSecret: env.JWT_ACCESS_TOKEN_SECRET,
+
+  jwtRefreshTokenLifetime: env.JWT_REFRESH_TOKEN_LIFETIME,
+  jwtRefreshTokenIssuer: env.JWT_REFRESH_TOKEN_ISSUER,
+  jwtRefreshTokenAudience: env.JWT_REFRESH_TOKEN_AUDIENCE,
+  jwtRefreshTokenSecret: env.JWT_REFRESH_TOKEN_SECRET,
+
+  db,
+  resolveChainClient: async (chainId) => {
+    return config.default.chains[chainId]?.publicClient;
+  },
 });
