@@ -22,6 +22,7 @@ import { ModeratePendingCommand } from "./admin-telegram-bot-service/commands/mo
 import { db } from "./db";
 import { ManagementAuthService } from "../management/services/auth";
 import { MutedAccountsManagementService } from "../management/services/muted-accounts";
+import { SiweAuthService } from "./siwe-auth-service";
 
 export { db };
 
@@ -127,3 +128,10 @@ export const telegramAdminBotService =
 
 export const mutedAccountsManagementService =
   new MutedAccountsManagementService(db);
+
+export const siweAuthService = new SiweAuthService({
+  jwtNonceTokenAudience: env.JWT_SIWE_NONCE_AUDIENCE,
+  jwtNonceTokenIssuer: env.JWT_SIWE_NONCE_ISSUER,
+  jwtNonceTokenLifetime: env.JWT_SIWE_NONCE_LIFETIME,
+  jwtNonceTokenSecret: env.JWT_SIWE_NONCE_SECRET,
+});

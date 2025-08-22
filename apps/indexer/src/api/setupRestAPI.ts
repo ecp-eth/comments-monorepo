@@ -19,6 +19,7 @@ import { setupGetReports } from "./reports/get";
 import { setupGetReport } from "./reports/[reportId]/get";
 import { setupPatchReport } from "./reports/[reportId]/patch";
 import { setupAdminBotWebhook } from "./webhook/bot/post";
+import { setupAuthSiweNonce } from "./auth/siwe/nonce/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -41,6 +42,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupGetReport(app);
   setupPatchReport(app);
   setupAdminBotWebhook(app);
+  setupAuthSiweNonce(app);
 
   return app;
 }

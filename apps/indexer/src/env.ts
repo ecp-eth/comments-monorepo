@@ -139,6 +139,11 @@ const EnvSchema = z
     ADMIN_TELEGRAM_BOT_WEBHOOK_URL: z.string().url().optional(),
     ADMIN_TELEGRAM_BOT_WEBHOOK_SECRET: z.string().optional(),
     ADMIN_TELEGRAM_BOT_API_ROOT_URL: z.string().url().optional(),
+
+    JWT_SIWE_NONCE_SECRET: z.string().nonempty(),
+    JWT_SIWE_NONCE_LIFETIME: z.coerce.number().int().positive().default(600),
+    JWT_SIWE_NONCE_ISSUER: z.string().nonempty().default("ecp-indexer"),
+    JWT_SIWE_NONCE_AUDIENCE: z.string().nonempty().default("ecp-indexer-nonce"),
   })
   .superRefine((vars, ctx) => {
     if (
