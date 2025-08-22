@@ -144,6 +144,20 @@ const EnvSchema = z
     JWT_SIWE_NONCE_LIFETIME: z.coerce.number().int().positive().default(600),
     JWT_SIWE_NONCE_ISSUER: z.string().nonempty().default("ecp-indexer"),
     JWT_SIWE_NONCE_AUDIENCE: z.string().nonempty().default("ecp-indexer-nonce"),
+
+    JWT_ACCESS_TOKEN_SECRET: z.string().nonempty(),
+    JWT_ACCESS_TOKEN_LIFETIME: z.coerce.number().int().positive().default(900),
+    JWT_ACCESS_TOKEN_ISSUER: z.string().nonempty().default("ecp-indexer"),
+    JWT_ACCESS_TOKEN_AUDIENCE: z.string().nonempty().default("ecp-indexer-at"),
+
+    JWT_REFRESH_TOKEN_SECRET: z.string().nonempty(),
+    JWT_REFRESH_TOKEN_LIFETIME: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(2592000),
+    JWT_REFRESH_TOKEN_ISSUER: z.string().nonempty().default("ecp-indexer"),
+    JWT_REFRESH_TOKEN_AUDIENCE: z.string().nonempty().default("ecp-indexer-rt"),
   })
   .superRefine((vars, ctx) => {
     if (
