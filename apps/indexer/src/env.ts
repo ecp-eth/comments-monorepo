@@ -170,6 +170,11 @@ const EnvSchema = z
     CHAIN_ANVIL_START_BLOCK: z.coerce.number().int().min(0).optional(),
     CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
     CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
+
+    JWT_SIWE_NONCE_SECRET: z.string().nonempty(),
+    JWT_SIWE_NONCE_LIFETIME: z.coerce.number().int().positive().default(600),
+    JWT_SIWE_NONCE_ISSUER: z.string().nonempty().default("ecp-indexer"),
+    JWT_SIWE_NONCE_AUDIENCE: z.string().nonempty().default("ecp-indexer-nonce"),
   })
   .superRefine((vars, ctx) => {
     if (
