@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { sql, relations } from "drizzle-orm";
 import {
   integer,
   primaryKey,
@@ -10,6 +10,8 @@ import {
   jsonb,
   uuid,
   check,
+  boolean,
+  unique,
 } from "drizzle-orm/pg-core";
 import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants.ts";
 import type { Hex } from "viem";
@@ -104,3 +106,108 @@ export const mutedAccounts = offchainSchema.table("muted_accounts", {
 });
 
 export type MutedAccountSelectType = typeof mutedAccounts.$inferSelect;
+
+export const user = offchainSchema.table("user", {
+  id: uuid().primaryKey().defaultRandom(),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+});
+
+export const userRelations = relations(user, ({ many }) => ({
+  authCredentials: many(userAuthCredentials),
+  authSessions: many(userAuthSession),
+}));
+
+export const userAuthCredentials = offchainSchema.table(
+  "user_auth_credentials",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    lastUsedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    userId: uuid()
+      .notNull()
+      .references(() => user.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    method: text().notNull(),
+    identifier: text().notNull(),
+  },
+  (table) => [
+    unique("user_auth_credentials_by_method_and_identifier_uq").on(
+      table.method,
+      table.identifier,
+    ),
+  ],
+);
+
+export const userAuthCredentialsRelations = relations(
+  userAuthCredentials,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userAuthCredentials.userId],
+      references: [user.id],
+    }),
+  }),
+);
+
+export const userAuthSession = offchainSchema.table("user_auth_session", {
+  id: uuid().primaryKey().defaultRandom(),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  lastUsedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  userId: uuid()
+    .notNull()
+    .references(() => user.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  userAuthCredentialsId: uuid()
+    .notNull()
+    .references(() => userAuthCredentials.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+});
+
+export const userAuthSessionRelations = relations(
+  userAuthSession,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userAuthSession.userId],
+      references: [user.id],
+    }),
+    authCredentials: one(userAuthCredentials, {
+      fields: [userAuthSession.userAuthCredentialsId],
+      references: [userAuthCredentials.id],
+    }),
+  }),
+);
+
+export const userAuthSessionSiweRefreshToken = offchainSchema.table(
+  "user_auth_session_siwe_refresh_token",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp({ withTimezone: true }).notNull(),
+    userAuthSessionId: uuid()
+      .notNull()
+      .references(() => userAuthSession.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    isUsed: boolean().notNull().default(false),
+  },
+);
+
+export const userAuthSessionSiweRefreshTokenRelations = relations(
+  userAuthSessionSiweRefreshToken,
+  ({ one }) => ({
+    userAuthSession: one(userAuthSession, {
+      fields: [userAuthSessionSiweRefreshToken.userAuthSessionId],
+      references: [userAuthSession.id],
+    }),
+  }),
+);
