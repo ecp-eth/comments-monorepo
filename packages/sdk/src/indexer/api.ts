@@ -27,7 +27,7 @@ import {
 import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
 import { ResponseError } from "./errors.js";
-import { shouldRetryFetch } from "./utils.js";
+import { indexerApiRetryCondition } from "./utils.js";
 
 const FetchCommentOptionsSchema = z.object({
   commentId: HexSchema,
@@ -158,7 +158,7 @@ export async function fetchComment(
 
       return await response.json();
     },
-    { signal, retries, retryCondition: shouldRetryFetch },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 
   return IndexerAPICommentWithRepliesSchema.parse(responseData);
@@ -414,7 +414,7 @@ export async function fetchComments(
 
       return await response.json();
     },
-    { signal, retries, retryCondition: shouldRetryFetch },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 
   return IndexerAPIListCommentsSchema.parse(responseData);
@@ -652,7 +652,7 @@ export async function fetchCommentReplies(
 
       return await response.json();
     },
-    { signal, retries, retryCondition: shouldRetryFetch },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 
   return IndexerAPIListCommentRepliesSchema.parse(responseData);
@@ -726,7 +726,7 @@ export async function fetchAuthorData(
 
       return await response.json();
     },
-    { signal, retries, retryCondition: shouldRetryFetch },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 
   return IndexerAPIAuthorDataSchema.parse(responseData);
@@ -804,7 +804,7 @@ export async function isMuted(options: IsMutedOptions): Promise<boolean> {
         response,
       );
     },
-    { signal, retries, retryCondition: shouldRetryFetch },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 }
 
@@ -917,7 +917,7 @@ export async function fetchChannels(
 
       return await response.json();
     },
-    { signal, retries, retryCondition: shouldRetryFetch },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 
   return IndexerAPIListChannelsSchema.parse(responseData);
@@ -991,7 +991,7 @@ export async function fetchChannel(
 
       return await response.json();
     },
-    { signal, retries, retryCondition: shouldRetryFetch },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 
   return IndexerAPIChannelOutputSchema.parse(responseData);
@@ -1074,7 +1074,7 @@ export async function fetchAutocomplete(
 
       return await response.json();
     },
-    { signal, retries, retryCondition: shouldRetryFetch },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 
   return IndexerAPIGetAutocompleteOutputSchema.parse(responseData);
@@ -1181,6 +1181,6 @@ export async function reportComment(
         );
       }
     },
-    { signal, retries, retryCondition: shouldRetryFetch },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 }

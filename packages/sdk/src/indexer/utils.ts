@@ -47,11 +47,11 @@ export function isRetryableHttpResponse(response: Response): boolean {
 }
 
 /**
- * Determine if a fetch error should be retried
+ * Determine if a fetch error from the indexer API should be retried
  * @param error The error to check
  * @returns True if the error should be retried, false otherwise
  */
-export function shouldRetryFetch(error: unknown): boolean {
+export function indexerApiRetryCondition(error: unknown): boolean {
   if (!(error instanceof ResponseError)) {
     return true;
   }
