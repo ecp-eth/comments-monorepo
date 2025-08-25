@@ -510,3 +510,11 @@ export const ERC20Caip19Schema = z.custom<ERC20CAIP19>(
     message: "Invalid CAIP-19",
   },
 );
+
+export const OpenAPIDateStringSchema = z
+  .date()
+  .transform((val) => val.toISOString())
+  .openapi({
+    description: "A date string in ISO 8601 format",
+    type: "string",
+  });
