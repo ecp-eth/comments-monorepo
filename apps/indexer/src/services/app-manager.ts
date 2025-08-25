@@ -6,7 +6,7 @@ import type {
   AppSelectType,
   AppSigningKeysSelectType,
 } from "../../schema.offchain";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 type AppManagerOptions = {
   db: NodePgDatabase<typeof schema>;
@@ -36,7 +36,7 @@ export class AppManager implements IAppManager {
         throw new AppManagerFailedToCreateAppError();
       }
 
-      const secret = crypto.randomBytes(32).toString("hex");
+      const secret = this.generateRandomAppSecret();
 
       // create signing key
       const [signingKey] = await tx
@@ -70,13 +70,67 @@ export class AppManager implements IAppManager {
         .execute();
 
       if (!app) {
-        throw new AppManagerFailedToDeleteAppError();
+        throw new AppManagerAppNotFoundError();
       }
 
       return {
         app,
       };
     });
+  }
+
+  async refreshAppSecret(params: IAppManager_RefreshAppSecretParams) {
+    const { id, ownerId } = RefreshAppSecretParamsSchema.parse(params);
+
+    return await this.db.transaction(async (tx) => {
+      const secret = this.generateRandomAppSecret();
+
+      // check if user is the owner of the app
+      const app = await tx.query.app.findFirst({
+        where(fields, operators) {
+          return operators.and(
+            operators.eq(fields.id, id),
+            operators.eq(fields.ownerId, ownerId),
+          );
+        },
+      });
+
+      if (!app) {
+        throw new AppManagerAppNotFoundError();
+      }
+
+      // revoke existing signing key
+      await tx
+        .update(schema.appSigningKeys)
+        .set({ revokedAt: new Date() })
+        .where(
+          and(
+            eq(schema.appSigningKeys.appId, app.id),
+            isNull(schema.appSigningKeys.revokedAt),
+          ),
+        )
+        .execute();
+
+      const [appSigningKey] = await tx
+        .insert(schema.appSigningKeys)
+        .values({
+          appId: app.id,
+          secret,
+        })
+        .returning();
+
+      if (!appSigningKey) {
+        throw new AppManagerFailedToRefreshAppSecretError();
+      }
+
+      return {
+        appSigningKey,
+      };
+    });
+  }
+
+  private generateRandomAppSecret(): string {
+    return crypto.randomBytes(32).toString("hex");
   }
 }
 
@@ -103,6 +157,19 @@ type IAppManager_DeleteAppResult = {
   app: AppSelectType;
 };
 
+const RefreshAppSecretParamsSchema = z.object({
+  id: z.string().uuid(),
+  ownerId: z.string().uuid(),
+});
+
+type IAppManager_RefreshAppSecretParams = z.infer<
+  typeof RefreshAppSecretParamsSchema
+>;
+
+type IAppManager_RefreshAppSecretResult = {
+  appSigningKey: AppSigningKeysSelectType;
+};
+
 export interface IAppManager {
   createApp: (
     params: IAppManager_CreateAppParams,
@@ -111,6 +178,10 @@ export interface IAppManager {
   deleteApp: (
     params: IAppManager_DeleteAppParams,
   ) => Promise<IAppManager_DeleteAppResult>;
+
+  refreshAppSecret: (
+    params: IAppManager_RefreshAppSecretParams,
+  ) => Promise<IAppManager_RefreshAppSecretResult>;
 }
 
 export class AppManagerError extends Error {
@@ -134,9 +205,16 @@ export class AppManagerFailedToCreateSecretKeyError extends AppManagerError {
   }
 }
 
-export class AppManagerFailedToDeleteAppError extends AppManagerError {
+export class AppManagerAppNotFoundError extends AppManagerError {
   constructor() {
-    super("Failed to delete app");
-    this.name = "AppManagerFailedToDeleteAppError";
+    super("App not found");
+    this.name = "AppManagerAppNotFoundError";
+  }
+}
+
+export class AppManagerFailedToRefreshAppSecretError extends AppManagerError {
+  constructor() {
+    super("Failed to refresh app secret");
+    this.name = "AppManagerFailedToRefreshAppSecretError";
   }
 }
