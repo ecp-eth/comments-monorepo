@@ -24,6 +24,7 @@ import { setupAuthSiweVerify } from "./auth/siwe/verify/post";
 import { setupAuthSiweRefresh } from "./auth/siwe/refresh/post";
 import { setupUserMe } from "./user/me/get";
 import { setupAppCreate } from "./apps/post";
+import { setupAppDelete } from "./apps/[id]/delete";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -51,6 +52,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAuthSiweRefresh(app);
   setupUserMe(app);
   setupAppCreate(app);
+  setupAppDelete(app);
 
   return app;
 }
