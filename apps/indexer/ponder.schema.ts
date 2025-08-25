@@ -160,6 +160,8 @@ export const approval = onchainTable(
   }),
 );
 
+export type ApprovalSelectType = typeof approval.$inferSelect;
+
 export const commentRelations = relations(comment, ({ one, many }) => ({
   // Each comment may have many direct replies (children) that reference it.
   replies: many(comment, {
