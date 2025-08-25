@@ -6,7 +6,7 @@ import type {
   AppSelectType,
   AppSigningKeysSelectType,
 } from "../../schema.offchain";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 
 type AppManagerOptions = {
   db: NodePgDatabase<typeof schema>;
@@ -129,6 +129,31 @@ export class AppManager implements IAppManager {
     });
   }
 
+  async listApps(params: IAppManager_ListAppsParams) {
+    const { ownerId, page, limit } = ListAppsParamsSchema.parse(params);
+
+    const totalApps = await this.db.$count(
+      schema.app,
+      and(eq(schema.app.ownerId, ownerId)),
+    );
+
+    const apps = await this.db.query.app.findMany({
+      where(fields, operators) {
+        return operators.and(operators.eq(fields.ownerId, ownerId));
+      },
+      orderBy: [desc(schema.app.createdAt)],
+      limit,
+      offset: (page - 1) * limit,
+    });
+
+    return {
+      apps,
+      pageInfo: {
+        totalPages: Math.ceil(totalApps / limit),
+      },
+    };
+  }
+
   private generateRandomAppSecret(): string {
     return crypto.randomBytes(32).toString("hex");
   }
@@ -170,6 +195,21 @@ type IAppManager_RefreshAppSecretResult = {
   appSigningKey: AppSigningKeysSelectType;
 };
 
+const ListAppsParamsSchema = z.object({
+  ownerId: z.string().uuid(),
+  page: z.coerce.number().int().positive(),
+  limit: z.coerce.number().int().positive().max(100),
+});
+
+type IAppManager_ListAppsParams = z.infer<typeof ListAppsParamsSchema>;
+
+type IAppManager_ListAppsResult = {
+  apps: AppSelectType[];
+  pageInfo: {
+    totalPages: number;
+  };
+};
+
 export interface IAppManager {
   createApp: (
     params: IAppManager_CreateAppParams,
@@ -178,6 +218,10 @@ export interface IAppManager {
   deleteApp: (
     params: IAppManager_DeleteAppParams,
   ) => Promise<IAppManager_DeleteAppResult>;
+
+  listApps: (
+    params: IAppManager_ListAppsParams,
+  ) => Promise<IAppManager_ListAppsResult>;
 
   refreshAppSecret: (
     params: IAppManager_RefreshAppSecretParams,
