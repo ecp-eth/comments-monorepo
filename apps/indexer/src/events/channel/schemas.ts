@@ -1,22 +1,11 @@
 import { HexSchema } from "@ecp.eth/sdk/core";
-import {
-  MetadataArraySchema,
-  MetadataArrayOpSchema,
-} from "@ecp.eth/sdk/comments/schemas";
+import { MetadataArraySchema } from "@ecp.eth/sdk/comments/schemas";
 import z from "zod";
-
-const bigintToStringSchema = z.bigint().transform((val) => val.toString());
-const dateToIsoStringSchema = z.date().transform((val) => val.toISOString());
-
-export type MetadataArray = z.infer<typeof MetadataArraySchema>;
-export type MetadataArrayOp = z.infer<typeof MetadataArrayOpSchema>;
-
-const EventFromChainSchema = z.object({
-  chainId: z.number().int(),
-  blockNumber: bigintToStringSchema,
-  logIndex: z.number().int(),
-  txHash: HexSchema,
-});
+import {
+  bigintToStringSchema,
+  dateToIsoStringSchema,
+  EventFromChainSchema,
+} from "../shared/schemas";
 
 export const ChannelCreatedEventSchema = z
   .object({
@@ -24,15 +13,17 @@ export const ChannelCreatedEventSchema = z
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
-      id: bigintToStringSchema,
-      createdAt: dateToIsoStringSchema,
-      updatedAt: dateToIsoStringSchema,
-      owner: HexSchema,
-      name: z.string(),
-      description: z.string(),
-      hook: HexSchema.nullable(),
-      metadata: MetadataArraySchema,
-      chainId: z.number().int(),
+      channel: z.object({
+        id: bigintToStringSchema,
+        createdAt: dateToIsoStringSchema,
+        updatedAt: dateToIsoStringSchema,
+        owner: HexSchema,
+        name: z.string(),
+        description: z.string(),
+        hook: HexSchema.nullable(),
+        metadata: MetadataArraySchema,
+        chainId: z.number().int(),
+      }),
     }),
   })
   .merge(EventFromChainSchema);
@@ -49,11 +40,13 @@ export const ChannelUpdatedEventSchema = z
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
-      id: bigintToStringSchema,
-      updatedAt: dateToIsoStringSchema,
-      name: z.string(),
-      description: z.string(),
-      metadata: MetadataArraySchema,
+      channel: z.object({
+        id: bigintToStringSchema,
+        updatedAt: dateToIsoStringSchema,
+        name: z.string(),
+        description: z.string(),
+        metadata: MetadataArraySchema,
+      }),
     }),
   })
   .merge(EventFromChainSchema);
