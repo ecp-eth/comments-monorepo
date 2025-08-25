@@ -50,6 +50,13 @@
       "when": 1756106479043,
       "tag": "0006_user_apps",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1756113902853,
+      "tag": "0007_channel_events",
+      "breakpoints": true
     }
   ]
 }

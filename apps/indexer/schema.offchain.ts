@@ -11,14 +11,20 @@ import {
   uuid,
   check,
   unique,
+  bigserial,
 } from "drizzle-orm/pg-core";
 import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants.ts";
 import type { Hex } from "viem";
-import type { CommentReportStatus } from "./src/management/types";
+import type { CommentReportStatus } from "./src/management/types.ts";
 import type {
   CommentModerationLabelsWithScore,
   ModerationStatus,
-} from "./src/services/types";
+} from "./src/services/types.ts";
+import type {
+  Events,
+  EventTypes,
+  EventOutboxAggregateType,
+} from "./src/events/types.ts";
 
 export const offchainSchema = pgSchema(ECP_INDEXER_SCHEMA_NAME);
 
@@ -259,3 +265,21 @@ export const appSigningKeysRelations = relations(appSigningKeys, ({ one }) => ({
     references: [app.id],
   }),
 }));
+
+/**
+ * This table is used to store events that need to be fan-out to the subscribers.
+ */
+export const eventOutbox = offchainSchema.table(
+  "event_outbox",
+  {
+    id: bigserial({ mode: "bigint" }).primaryKey(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    processedAt: timestamp({ withTimezone: true }),
+    eventUid: text().notNull().unique(),
+    eventType: text().$type<EventTypes>().notNull(),
+    aggregateType: text().$type<EventOutboxAggregateType>().notNull(), // allows to find all the events produced by the same aggregate type
+    aggregateId: text().notNull(), // allows to find all the events produced by the same aggregate
+    payload: jsonb().$type<Events>().notNull(),
+  },
+  (table) => [index("event_outbox_by_processed_at_idx").on(table.processedAt)],
+);
