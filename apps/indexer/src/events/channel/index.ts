@@ -13,12 +13,12 @@ import {
   type ChannelMetadataSetEvent,
   ChannelMetadataSetEventSchema,
   type ChannelMetadataSetEventInput,
-  type MetadataArray,
   type ChannelMetadataSetOperation,
   type ChannelTransferEvent,
   ChannelTransferEventSchema,
   type ChannelTransferEventInput,
 } from "./schemas";
+import type { MetadataArray } from "../shared/schemas";
 
 export function ponderEventToCreateChannelEvent({
   event,
@@ -35,15 +35,17 @@ export function ponderEventToCreateChannelEvent({
     txHash: event.transaction.hash,
     chainId: context.chain.id,
     data: {
-      id: event.args.channelId,
-      createdAt: new Date(Number(event.block.timestamp) * 1000),
-      updatedAt: new Date(Number(event.block.timestamp) * 1000),
-      owner: event.args.owner,
-      name: event.args.name,
-      description: event.args.description,
-      hook: event.args.hook === ZERO_ADDRESS ? null : event.args.hook,
-      metadata: event.args.metadata.slice(),
-      chainId: context.chain.id,
+      channel: {
+        id: event.args.channelId,
+        createdAt: new Date(Number(event.block.timestamp) * 1000),
+        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        owner: event.args.owner,
+        name: event.args.name,
+        description: event.args.description,
+        hook: event.args.hook === ZERO_ADDRESS ? null : event.args.hook,
+        metadata: event.args.metadata.slice(),
+        chainId: context.chain.id,
+      },
     },
   } satisfies ChannelCreatedEventInput);
 }
@@ -63,11 +65,13 @@ export function ponderEventToUpdateChannelEvent({
     txHash: event.transaction.hash,
     chainId: context.chain.id,
     data: {
-      id: event.args.channelId,
-      updatedAt: new Date(Number(event.block.timestamp) * 1000),
-      name: event.args.name,
-      description: event.args.description,
-      metadata: event.args.metadata.slice(),
+      channel: {
+        id: event.args.channelId,
+        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        name: event.args.name,
+        description: event.args.description,
+        metadata: event.args.metadata.slice(),
+      },
     },
   } satisfies ChannelUpdatedEventInput);
 }

@@ -47,7 +47,7 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
             eventType: channelCreatedEvent.event,
             eventUid: channelCreatedEvent.uid,
             aggregateType: "channel",
-            aggregateId: channelCreatedEvent.data.id.toString(),
+            aggregateId: channelCreatedEvent.data.channel.id,
             payload: channelCreatedEvent,
           })
           .onConflictDoNothing({
@@ -70,7 +70,8 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
             description: event.args.description,
             metadata: event.args.metadata.slice(),
           })
-          .where(eq(schema.channel.id, event.args.channelId));
+          .where(eq(schema.channel.id, event.args.channelId))
+          .execute();
 
         const channelUpdatedEvent = ponderEventToUpdateChannelEvent({
           event,
@@ -83,7 +84,7 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
             eventType: channelUpdatedEvent.event,
             eventUid: channelUpdatedEvent.uid,
             aggregateType: "channel",
-            aggregateId: channelUpdatedEvent.data.id.toString(),
+            aggregateId: channelUpdatedEvent.data.channel.id,
             payload: channelUpdatedEvent,
           })
           .onConflictDoNothing({
@@ -104,7 +105,8 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
             hook: event.args.enabled ? event.args.hook : null,
             updatedAt: new Date(Number(event.block.timestamp) * 1000),
           })
-          .where(eq(schema.channel.id, event.args.channelId));
+          .where(eq(schema.channel.id, event.args.channelId))
+          .execute();
 
         const channelHookStatusUpdatedEvent =
           ponderEventToUpdateChannelHookStatusEvent({
@@ -118,8 +120,7 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
             eventType: channelHookStatusUpdatedEvent.event,
             eventUid: channelHookStatusUpdatedEvent.uid,
             aggregateType: "channel",
-            aggregateId:
-              channelHookStatusUpdatedEvent.data.channel.id.toString(),
+            aggregateId: channelHookStatusUpdatedEvent.data.channel.id,
             payload: channelHookStatusUpdatedEvent,
           })
           .onConflictDoNothing({
@@ -216,7 +217,7 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
             eventType: channelMetadataSetEvent.event,
             eventUid: channelMetadataSetEvent.uid,
             aggregateType: "channel",
-            aggregateId: channelMetadataSetEvent.data.channel.id.toString(),
+            aggregateId: channelMetadataSetEvent.data.channel.id,
             payload: channelMetadataSetEvent,
           })
           .onConflictDoNothing({
@@ -267,7 +268,7 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
           eventType: channelTransferEvent.event,
           eventUid: channelTransferEvent.uid,
           aggregateType: "channel",
-          aggregateId: channelTransferEvent.data.channel.id.toString(),
+          aggregateId: channelTransferEvent.data.channel.id,
           payload: channelTransferEvent,
         })
         .onConflictDoNothing({
