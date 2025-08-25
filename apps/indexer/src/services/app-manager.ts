@@ -79,6 +79,41 @@ export class AppManager implements IAppManager {
     });
   }
 
+  async getApp(params: IAppManager_GetAppParams) {
+    const { id, ownerId } = GetAppParamsSchema.parse(params);
+
+    const app = await this.db.query.app.findFirst({
+      where(fields, operators) {
+        return operators.and(
+          operators.eq(fields.id, id),
+          operators.eq(fields.ownerId, ownerId),
+        );
+      },
+      with: {
+        appSigningKeys: {
+          where(fields, operators) {
+            return operators.isNull(fields.revokedAt);
+          },
+        },
+      },
+    });
+
+    if (!app) {
+      throw new AppManagerAppNotFoundError();
+    }
+
+    const [signingKey] = app.appSigningKeys;
+
+    if (!signingKey) {
+      throw new AppManagerAppSigningKeyNotFoundError();
+    }
+
+    return {
+      app,
+      signingKey,
+    };
+  }
+
   async refreshAppSecret(params: IAppManager_RefreshAppSecretParams) {
     const { id, ownerId } = RefreshAppSecretParamsSchema.parse(params);
 
@@ -210,6 +245,18 @@ type IAppManager_ListAppsResult = {
   };
 };
 
+const GetAppParamsSchema = z.object({
+  id: z.string().uuid(),
+  ownerId: z.string().uuid(),
+});
+
+type IAppManager_GetAppParams = z.infer<typeof GetAppParamsSchema>;
+
+type IAppManager_GetAppResult = {
+  app: AppSelectType;
+  signingKey: AppSigningKeysSelectType;
+};
+
 export interface IAppManager {
   createApp: (
     params: IAppManager_CreateAppParams,
@@ -218,6 +265,10 @@ export interface IAppManager {
   deleteApp: (
     params: IAppManager_DeleteAppParams,
   ) => Promise<IAppManager_DeleteAppResult>;
+
+  getApp: (
+    params: IAppManager_GetAppParams,
+  ) => Promise<IAppManager_GetAppResult>;
 
   listApps: (
     params: IAppManager_ListAppsParams,
@@ -260,5 +311,12 @@ export class AppManagerFailedToRefreshAppSecretError extends AppManagerError {
   constructor() {
     super("Failed to refresh app secret");
     this.name = "AppManagerFailedToRefreshAppSecretError";
+  }
+}
+
+export class AppManagerAppSigningKeyNotFoundError extends AppManagerError {
+  constructor() {
+    super("App signing key not found");
+    this.name = "AppManagerAppSigningKeyNotFoundError";
   }
 }
