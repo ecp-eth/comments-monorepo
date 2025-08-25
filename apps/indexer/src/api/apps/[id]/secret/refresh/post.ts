@@ -1,40 +1,37 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
-import { appManager, siweMiddleware } from "../../../services";
+import { appManager, siweMiddleware } from "../../../../../services";
+import { APIErrorResponseSchema } from "../../../../../lib/schemas";
 import {
-  APIErrorResponseSchema,
-  OpenAPIDateStringSchema,
-} from "../../../lib/schemas";
-import { AppManagerAppNotFoundError } from "../../../services/app-manager";
+  AppManagerAppNotFoundError,
+  AppManagerFailedToRefreshAppSecretError,
+} from "../../../../../services/app-manager";
 
-export const AppDeleteRequestParamsSchema = z.object({
+export const AppSecretRefreshRequestParamsSchema = z.object({
   id: z.string().uuid(),
 });
 
-export const AppDeleteResponseSchema = z.object({
-  id: z.string().uuid(),
-  createdAt: OpenAPIDateStringSchema,
-  updatedAt: OpenAPIDateStringSchema,
-  name: z.string().nonempty().max(50),
+export const AppSecretRefreshResponseSchema = z.object({
+  secret: z.string().nonempty(),
 });
 
-export function setupAppDelete(app: OpenAPIHono) {
+export function setupAppSecretRefresh(app: OpenAPIHono) {
   app.openapi(
     {
-      method: "delete",
-      path: "/apps/{id}",
+      method: "post",
+      path: "/apps/{id}/secret/refresh",
       tags: ["apps", "webhooks"],
       middleware: siweMiddleware,
       request: {
-        params: AppDeleteRequestParamsSchema,
+        params: AppSecretRefreshRequestParamsSchema,
       },
       responses: {
         200: {
           content: {
             "application/json": {
-              schema: AppDeleteResponseSchema,
+              schema: AppSecretRefreshResponseSchema,
             },
           },
-          description: "App deleted successfully",
+          description: "Secret refreshed successfully",
         },
         401: {
           content: {
@@ -63,22 +60,21 @@ export function setupAppDelete(app: OpenAPIHono) {
       },
     },
     async (c) => {
+      const { id } = c.req.valid("param");
+
       try {
-        const { id } = c.req.valid("param");
-        const deletedApp = await appManager.deleteApp({
+        const { appSigningKey } = await appManager.refreshAppSecret({
           id,
           ownerId: c.get("user").id,
         });
 
-        return c.json(AppDeleteResponseSchema.parse(deletedApp), 200);
+        return c.json(AppSecretRefreshResponseSchema.parse(appSigningKey), 200);
       } catch (e) {
-        if (e instanceof AppManagerAppNotFoundError) {
-          return c.json(
-            {
-              message: "App not found",
-            },
-            404,
-          );
+        if (
+          e instanceof AppManagerAppNotFoundError ||
+          e instanceof AppManagerFailedToRefreshAppSecretError
+        ) {
+          return c.json({ message: "App not found" }, 404);
         }
 
         throw e;
