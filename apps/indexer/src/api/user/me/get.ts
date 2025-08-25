@@ -1,17 +1,20 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { db, siweMiddleware } from "../../../services";
-import { APIErrorResponseSchema } from "../../../lib/schemas";
+import {
+  APIErrorResponseSchema,
+  OpenAPIDateStringSchema,
+} from "../../../lib/schemas";
 import { HTTPException } from "hono/http-exception";
 
 export const UserMeResponseSchema = z.object({
   id: z.string().uuid(),
-  createdAt: z.date().transform((val) => val.toISOString()),
-  updatedAt: z.date().transform((val) => val.toISOString()),
+  createdAt: OpenAPIDateStringSchema,
+  updatedAt: OpenAPIDateStringSchema,
   authMethods: z.array(
     z.object({
       id: z.string().uuid(),
-      createdAt: z.date().transform((val) => val.toISOString()),
-      updatedAt: z.date().transform((val) => val.toISOString()),
+      createdAt: OpenAPIDateStringSchema,
+      updatedAt: OpenAPIDateStringSchema,
       identifier: z.string(),
       method: z.enum(["siwe"]),
     }),
