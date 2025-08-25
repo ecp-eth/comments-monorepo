@@ -25,6 +25,7 @@ import { MutedAccountsManagementService } from "../management/services/muted-acc
 import { SiweAuthService } from "./siwe-auth-service";
 import { config } from "ponder:internal";
 import { createSiweMiddleware } from "../middleware/siwe";
+import { AppManager } from "./app-manager";
 
 export { db };
 
@@ -155,4 +156,8 @@ export const siweAuthService = new SiweAuthService({
 
 export const siweMiddleware = createSiweMiddleware({
   siweAuthService,
+});
+
+export const appManager = new AppManager({
+  db,
 });

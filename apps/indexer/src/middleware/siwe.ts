@@ -8,10 +8,11 @@ import {
 
 export type JWTMiddlewareContext = Env & {
   Variables: {
+    // this is not nullable because you can't access the endpoint if the user is not authenticated
     user: {
       id: string;
       sessionId: string;
-    } | null;
+    };
   };
 };
 
