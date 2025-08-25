@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { sql, relations } from "drizzle-orm";
 import {
   integer,
   primaryKey,
@@ -10,14 +10,21 @@ import {
   jsonb,
   uuid,
   check,
+  unique,
+  bigserial,
 } from "drizzle-orm/pg-core";
 import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants.ts";
 import type { Hex } from "viem";
-import type { CommentReportStatus } from "./src/management/types";
+import type { CommentReportStatus } from "./src/management/types.ts";
 import type {
   CommentModerationLabelsWithScore,
   ModerationStatus,
-} from "./src/services/types";
+} from "./src/services/types.ts";
+import type {
+  Events,
+  EventTypes,
+  EventOutboxAggregateType,
+} from "./src/events/types.ts";
 
 export const offchainSchema = pgSchema(ECP_INDEXER_SCHEMA_NAME);
 
@@ -104,3 +111,175 @@ export const mutedAccounts = offchainSchema.table("muted_accounts", {
 });
 
 export type MutedAccountSelectType = typeof mutedAccounts.$inferSelect;
+
+export const user = offchainSchema.table("user", {
+  id: uuid().primaryKey().defaultRandom(),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+});
+
+export const userRelations = relations(user, ({ many }) => ({
+  authCredentials: many(userAuthCredentials),
+  authSessions: many(userAuthSession),
+}));
+
+export const userAuthCredentials = offchainSchema.table(
+  "user_auth_credentials",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    lastUsedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    userId: uuid()
+      .notNull()
+      .references(() => user.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    method: text().notNull(),
+    identifier: text().notNull(),
+  },
+  (table) => [
+    unique("user_auth_credentials_by_method_and_identifier_uq").on(
+      table.method,
+      table.identifier,
+    ),
+  ],
+);
+
+export const userAuthCredentialsRelations = relations(
+  userAuthCredentials,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userAuthCredentials.userId],
+      references: [user.id],
+    }),
+  }),
+);
+
+export const userAuthSession = offchainSchema.table("user_auth_session", {
+  id: uuid().primaryKey().defaultRandom(),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  lastUsedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  userId: uuid()
+    .notNull()
+    .references(() => user.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  userAuthCredentialsId: uuid()
+    .notNull()
+    .references(() => userAuthCredentials.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+});
+
+export const userAuthSessionRelations = relations(
+  userAuthSession,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userAuthSession.userId],
+      references: [user.id],
+    }),
+    authCredentials: one(userAuthCredentials, {
+      fields: [userAuthSession.userAuthCredentialsId],
+      references: [userAuthCredentials.id],
+    }),
+  }),
+);
+
+export const userAuthSessionSiweRefreshToken = offchainSchema.table(
+  "user_auth_session_siwe_refresh_token",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp({ withTimezone: true }).notNull(),
+    userAuthSessionId: uuid()
+      .notNull()
+      .references(() => userAuthSession.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+  },
+);
+
+export const userAuthSessionSiweRefreshTokenRelations = relations(
+  userAuthSessionSiweRefreshToken,
+  ({ one }) => ({
+    userAuthSession: one(userAuthSession, {
+      fields: [userAuthSessionSiweRefreshToken.userAuthSessionId],
+      references: [userAuthSession.id],
+    }),
+  }),
+);
+
+export const app = offchainSchema.table("app", {
+  id: uuid().primaryKey().defaultRandom(),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  ownerId: uuid()
+    .notNull()
+    .references(() => user.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  name: text().notNull(),
+});
+
+export type AppSelectType = typeof app.$inferSelect;
+
+export const appRelations = relations(app, ({ one, many }) => ({
+  owner: one(user, {
+    fields: [app.ownerId],
+    references: [user.id],
+  }),
+  appSigningKeys: many(appSigningKeys),
+}));
+
+export const appSigningKeys = offchainSchema.table(
+  "app_signing_keys",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    revokedAt: timestamp({ withTimezone: true }),
+    appId: uuid()
+      .notNull()
+      .references(() => app.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    secret: text().notNull(),
+  },
+  (table) => [
+    unique("ask_one_active_secret_uq").on(table.appId, table.revokedAt),
+  ],
+);
+
+export type AppSigningKeysSelectType = typeof appSigningKeys.$inferSelect;
+
+export const appSigningKeysRelations = relations(appSigningKeys, ({ one }) => ({
+  app: one(app, {
+    fields: [appSigningKeys.appId],
+    references: [app.id],
+  }),
+}));
+
+/**
+ * This table is used to store events that need to be fan-out to the subscribers.
+ */
+export const eventOutbox = offchainSchema.table(
+  "event_outbox",
+  {
+    id: bigserial({ mode: "bigint" }).primaryKey(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    processedAt: timestamp({ withTimezone: true }),
+    eventUid: text().notNull().unique(),
+    eventType: text().$type<EventTypes>().notNull(),
+    aggregateType: text().$type<EventOutboxAggregateType>().notNull(), // allows to find all the events produced by the same aggregate type
+    aggregateId: text().notNull(), // allows to find all the events produced by the same aggregate
+    payload: jsonb().$type<Events>().notNull(),
+  },
+  (table) => [index("event_outbox_by_processed_at_idx").on(table.processedAt)],
+);

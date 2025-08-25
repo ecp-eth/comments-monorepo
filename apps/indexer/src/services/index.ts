@@ -22,6 +22,10 @@ import { ModeratePendingCommand } from "./admin-telegram-bot-service/commands/mo
 import { db } from "./db";
 import { ManagementAuthService } from "../management/services/auth";
 import { MutedAccountsManagementService } from "../management/services/muted-accounts";
+import { SiweAuthService } from "./siwe-auth-service";
+import { config } from "ponder:internal";
+import { createSiweMiddleware } from "../middleware/siwe";
+import { AppManager } from "./app-manager";
 
 export { db };
 
@@ -127,3 +131,33 @@ export const telegramAdminBotService =
 
 export const mutedAccountsManagementService =
   new MutedAccountsManagementService(db);
+
+export const siweAuthService = new SiweAuthService({
+  jwtNonceTokenAudience: env.JWT_SIWE_NONCE_AUDIENCE,
+  jwtNonceTokenIssuer: env.JWT_SIWE_NONCE_ISSUER,
+  jwtNonceTokenLifetime: env.JWT_SIWE_NONCE_LIFETIME,
+  jwtNonceTokenSecret: env.JWT_SIWE_NONCE_SECRET,
+
+  jwtAccessTokenLifetime: env.JWT_ACCESS_TOKEN_LIFETIME,
+  jwtAccessTokenIssuer: env.JWT_ACCESS_TOKEN_ISSUER,
+  jwtAccessTokenAudience: env.JWT_ACCESS_TOKEN_AUDIENCE,
+  jwtAccessTokenSecret: env.JWT_ACCESS_TOKEN_SECRET,
+
+  jwtRefreshTokenLifetime: env.JWT_REFRESH_TOKEN_LIFETIME,
+  jwtRefreshTokenIssuer: env.JWT_REFRESH_TOKEN_ISSUER,
+  jwtRefreshTokenAudience: env.JWT_REFRESH_TOKEN_AUDIENCE,
+  jwtRefreshTokenSecret: env.JWT_REFRESH_TOKEN_SECRET,
+
+  db,
+  resolveChainClient: async (chainId) => {
+    return config.default.chains[chainId]?.publicClient;
+  },
+});
+
+export const siweMiddleware = createSiweMiddleware({
+  siweAuthService,
+});
+
+export const appManager = new AppManager({
+  db,
+});

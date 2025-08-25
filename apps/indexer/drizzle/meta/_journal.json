@@ -36,6 +36,27 @@
       "when": 1755549060646,
       "tag": "0004_rare_blue_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1755857034971,
+      "tag": "0005_user_accounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1756106479043,
+      "tag": "0006_user_apps",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1756113902853,
+      "tag": "0007_channel_events",
+      "breakpoints": true
     }
   ]
 }

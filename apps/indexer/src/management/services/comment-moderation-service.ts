@@ -12,7 +12,7 @@ import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer
 import type { CommentModerationClassfierResult } from "../../services/types";
 import { CommentNotFoundError } from "../../services/errors";
 
-type ModerationStatus = "pending" | "approved" | "rejected";
+export type ModerationStatus = "pending" | "approved" | "rejected";
 
 interface CommentModerationServiceOptions {
   knownReactions: Set<string>;
