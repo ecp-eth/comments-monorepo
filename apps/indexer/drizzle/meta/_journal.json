@@ -43,6 +43,13 @@
       "when": 1755857034971,
       "tag": "0005_user_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1756106479043,
+      "tag": "0006_user_apps",
+      "breakpoints": true
     }
   ]
 }

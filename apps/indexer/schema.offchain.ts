@@ -10,7 +10,6 @@ import {
   jsonb,
   uuid,
   check,
-  boolean,
   unique,
 } from "drizzle-orm/pg-core";
 import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants.ts";
@@ -209,3 +208,39 @@ export const userAuthSessionSiweRefreshTokenRelations = relations(
     }),
   }),
 );
+
+export const app = offchainSchema.table("app", {
+  id: uuid().primaryKey().defaultRandom(),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  ownerId: uuid()
+    .notNull()
+    .references(() => user.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  name: text().notNull(),
+});
+
+export type AppSelectType = typeof app.$inferSelect;
+
+export const appSigningKeys = offchainSchema.table(
+  "app_signing_keys",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    revokedAt: timestamp({ withTimezone: true }),
+    appId: uuid()
+      .notNull()
+      .references(() => app.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    secret: text().notNull(),
+  },
+  (table) => [
+    unique("ask_one_active_secret_uq").on(table.appId, table.revokedAt),
+  ],
+);
+
+export type AppSigningKeysSelectType = typeof appSigningKeys.$inferSelect;
