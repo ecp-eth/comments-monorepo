@@ -6,6 +6,7 @@ import type {
   AppSelectType,
   AppSigningKeysSelectType,
 } from "../../schema.offchain";
+import { and, eq } from "drizzle-orm";
 
 type AppManagerOptions = {
   db: NodePgDatabase<typeof schema>;
@@ -57,6 +58,26 @@ export class AppManager implements IAppManager {
       };
     });
   }
+
+  async deleteApp(params: IAppManager_DeleteAppParams) {
+    const { id, ownerId } = DeleteAppParamsSchema.parse(params);
+
+    return await this.db.transaction(async (tx) => {
+      const [app] = await tx
+        .delete(schema.app)
+        .where(and(eq(schema.app.id, id), eq(schema.app.ownerId, ownerId)))
+        .returning()
+        .execute();
+
+      if (!app) {
+        throw new AppManagerFailedToDeleteAppError();
+      }
+
+      return {
+        app,
+      };
+    });
+  }
 }
 
 const CreateAppParamsSchema = z.object({
@@ -71,10 +92,25 @@ type IAppManager_CreateAppResult = {
   signingKey: AppSigningKeysSelectType;
 };
 
+const DeleteAppParamsSchema = z.object({
+  id: z.string().uuid(),
+  ownerId: z.string().uuid(),
+});
+
+type IAppManager_DeleteAppParams = z.infer<typeof DeleteAppParamsSchema>;
+
+type IAppManager_DeleteAppResult = {
+  app: AppSelectType;
+};
+
 export interface IAppManager {
   createApp: (
     params: IAppManager_CreateAppParams,
   ) => Promise<IAppManager_CreateAppResult>;
+
+  deleteApp: (
+    params: IAppManager_DeleteAppParams,
+  ) => Promise<IAppManager_DeleteAppResult>;
 }
 
 export class AppManagerError extends Error {
@@ -95,5 +131,12 @@ export class AppManagerFailedToCreateSecretKeyError extends AppManagerError {
   constructor() {
     super("Failed to create secret");
     this.name = "AppManagerFailedToCreateSecretKeyError";
+  }
+}
+
+export class AppManagerFailedToDeleteAppError extends AppManagerError {
+  constructor() {
+    super("Failed to delete app");
+    this.name = "AppManagerFailedToDeleteAppError";
   }
 }
