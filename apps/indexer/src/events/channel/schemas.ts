@@ -5,6 +5,7 @@ import {
   bigintToStringSchema,
   dateToIsoStringSchema,
   EventFromChainSchema,
+  MetadataSetOperationSchema,
 } from "../shared/schemas";
 
 export const ChannelCreatedEventSchema = z
@@ -84,29 +85,6 @@ export type ChannelHookStatusUpdatedEvent = z.infer<
   typeof ChannelHookStatusUpdatedEventSchema
 >;
 
-export const ChannelMetadataSetOperationSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("delete"),
-    key: HexSchema,
-  }),
-
-  z.object({
-    type: z.literal("create"),
-    key: HexSchema,
-    value: HexSchema,
-  }),
-
-  z.object({
-    type: z.literal("update"),
-    key: HexSchema,
-    value: HexSchema,
-  }),
-]);
-
-export type ChannelMetadataSetOperation = z.infer<
-  typeof ChannelMetadataSetOperationSchema
->;
-
 export const ChannelMetadataSetEventSchema = z
   .object({
     event: z.literal("channel:metadata:set"),
@@ -118,7 +96,7 @@ export const ChannelMetadataSetEventSchema = z
         metadata: MetadataArraySchema,
         updatedAt: dateToIsoStringSchema,
       }),
-      metadataOperation: ChannelMetadataSetOperationSchema,
+      metadataOperation: MetadataSetOperationSchema,
     }),
   })
   .merge(EventFromChainSchema);

@@ -13,12 +13,11 @@ import {
   type ChannelMetadataSetEvent,
   ChannelMetadataSetEventSchema,
   type ChannelMetadataSetEventInput,
-  type ChannelMetadataSetOperation,
   type ChannelTransferEvent,
   ChannelTransferEventSchema,
   type ChannelTransferEventInput,
 } from "./schemas";
-import type { MetadataArray } from "../shared/schemas";
+import type { MetadataArray, MetadataSetOperation } from "../shared/schemas";
 
 export function ponderEventToCreateChannelEvent({
   event,
@@ -111,7 +110,7 @@ export function ponderEventToUpdateChannelMetadataEvent({
   metadataOperation,
 }: IndexingFunctionArgs<"CommentsV1ChannelManager:ChannelMetadataSet"> & {
   metadata: MetadataArray;
-  metadataOperation: ChannelMetadataSetOperation;
+  metadataOperation: MetadataSetOperation;
 }): ChannelMetadataSetEvent {
   const uid = `channel:metadata:set:${context.chain.id}:${event.block.number}:${event.transaction.hash}:${event.log.logIndex}:${event.args.channelId}`;
 

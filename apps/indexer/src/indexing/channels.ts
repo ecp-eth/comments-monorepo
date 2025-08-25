@@ -11,7 +11,7 @@ import {
   ponderEventToUpdateChannelTransferEvent,
 } from "../events/channel";
 import { eq } from "drizzle-orm";
-import type { ChannelMetadataSetOperation } from "../events/channel/schemas";
+import type { MetadataSetOperation } from "../events/shared/schemas";
 
 export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
   ponder.on(
@@ -153,7 +153,7 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
         }
 
         let metadata = channel.metadata;
-        let metadataOperation: ChannelMetadataSetOperation;
+        let metadataOperation: MetadataSetOperation;
 
         if (event.args.value === "0x") {
           // delete the key from metadata

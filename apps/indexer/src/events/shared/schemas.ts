@@ -21,3 +21,24 @@ export const EventFromChainSchema = z.object({
   logIndex: z.number().int(),
   txHash: HexSchema,
 });
+
+export const MetadataSetOperationSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("delete"),
+    key: HexSchema,
+  }),
+
+  z.object({
+    type: z.literal("create"),
+    key: HexSchema,
+    value: HexSchema,
+  }),
+
+  z.object({
+    type: z.literal("update"),
+    key: HexSchema,
+    value: HexSchema,
+  }),
+]);
+
+export type MetadataSetOperation = z.infer<typeof MetadataSetOperationSchema>;

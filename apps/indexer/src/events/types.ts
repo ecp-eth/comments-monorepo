@@ -9,6 +9,12 @@ import type {
   ApprovalAddedEvent,
   ApprovalRemovedEvent,
 } from "./approval/schemas";
+import type {
+  CommentAddedEvent,
+  CommentHookMetadataSetEvent,
+  CommentDeletedEvent,
+  CommentEditedEvent,
+} from "./comment/schemas";
 
 export type Events =
   | ChannelCreatedEvent
@@ -17,8 +23,12 @@ export type Events =
   | ChannelMetadataSetEvent
   | ChannelTransferEvent
   | ApprovalAddedEvent
-  | ApprovalRemovedEvent;
+  | ApprovalRemovedEvent
+  | CommentAddedEvent
+  | CommentHookMetadataSetEvent
+  | CommentDeletedEvent
+  | CommentEditedEvent;
 
 export type EventTypes = Events["event"];
 
-export type EventOutboxAggregateType = "approval" | "channel";
+export type EventOutboxAggregateType = "approval" | "channel" | "comment";
