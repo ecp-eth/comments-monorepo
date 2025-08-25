@@ -224,6 +224,14 @@ export const app = offchainSchema.table("app", {
 
 export type AppSelectType = typeof app.$inferSelect;
 
+export const appRelations = relations(app, ({ one, many }) => ({
+  owner: one(user, {
+    fields: [app.ownerId],
+    references: [user.id],
+  }),
+  appSigningKeys: many(appSigningKeys),
+}));
+
 export const appSigningKeys = offchainSchema.table(
   "app_signing_keys",
   {
@@ -244,3 +252,10 @@ export const appSigningKeys = offchainSchema.table(
 );
 
 export type AppSigningKeysSelectType = typeof appSigningKeys.$inferSelect;
+
+export const appSigningKeysRelations = relations(appSigningKeys, ({ one }) => ({
+  app: one(app, {
+    fields: [appSigningKeys.appId],
+    references: [app.id],
+  }),
+}));

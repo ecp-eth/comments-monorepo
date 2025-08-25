@@ -2,14 +2,14 @@ import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
-} from "../../lib/schemas";
-import { appManager, siweMiddleware } from "../../services";
+} from "../../../lib/schemas";
+import { appManager, siweMiddleware } from "../../../services";
 
-export const AppCreateRequestSchema = z.object({
-  name: z.string().nonempty().max(50),
+export const AppGetRequestParamsSchema = z.object({
+  id: z.string().uuid(),
 });
 
-export const AppCreateResponseSchema = z.object({
+export const AppGetResponseSchema = z.object({
   id: z.string().uuid(),
   createdAt: OpenAPIDateStringSchema,
   updatedAt: OpenAPIDateStringSchema,
@@ -17,42 +17,35 @@ export const AppCreateResponseSchema = z.object({
   secret: z.string().nonempty(),
 });
 
-export function setupAppCreate(app: OpenAPIHono) {
+export function setupAppGet(app: OpenAPIHono) {
   app.openapi(
     {
-      method: "post",
-      path: "/apps",
+      method: "get",
+      path: "/apps/{id}",
       tags: ["apps", "webhooks"],
       middleware: siweMiddleware,
       request: {
-        body: {
-          content: {
-            "application/json": {
-              schema: AppCreateRequestSchema,
-            },
-          },
-          required: true,
-        },
+        params: AppGetRequestParamsSchema,
       },
       responses: {
         200: {
-          description: "App created successfully",
+          description: "App",
           content: {
             "application/json": {
-              schema: AppCreateResponseSchema,
+              schema: AppGetResponseSchema,
             },
           },
         },
-        400: {
-          description: "Invalid request",
+        401: {
+          description: "Unauthorized",
           content: {
             "application/json": {
               schema: APIErrorResponseSchema,
             },
           },
         },
-        401: {
-          description: "Unauthorized",
+        404: {
+          description: "App not found",
           content: {
             "application/json": {
               schema: APIErrorResponseSchema,
@@ -70,14 +63,14 @@ export function setupAppCreate(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { name } = c.req.valid("json");
-      const { app, signingKey } = await appManager.createApp({
-        name,
+      const { id } = c.req.valid("param");
+      const { app, signingKey } = await appManager.getApp({
+        id,
         ownerId: c.get("user").id,
       });
 
       return c.json(
-        AppCreateResponseSchema.parse({
+        AppGetResponseSchema.parse({
           ...app,
           secret: signingKey.secret,
         }),
