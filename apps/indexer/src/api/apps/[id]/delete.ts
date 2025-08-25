@@ -65,12 +65,12 @@ export function setupAppDelete(app: OpenAPIHono) {
     async (c) => {
       try {
         const { id } = c.req.valid("param");
-        const deletedApp = await appManager.deleteApp({
+        const { app } = await appManager.deleteApp({
           id,
           ownerId: c.get("user").id,
         });
 
-        return c.json(AppDeleteResponseSchema.parse(deletedApp), 200);
+        return c.json(AppDeleteResponseSchema.parse(app), 200);
       } catch (e) {
         if (e instanceof AppManagerAppNotFoundError) {
           return c.json(
