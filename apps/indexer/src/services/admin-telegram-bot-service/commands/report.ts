@@ -1,10 +1,10 @@
 import {
   type IAdminTelegramBotServiceCommand,
   type IAdminTelegramBotServiceCommand_RegisterOptions,
-} from "../types";
+} from "../types.ts";
 import { z } from "zod";
-import { renderReport, reportCommandToPayload } from "./report-helpers";
-import { reportMenu } from "./report-menu";
+import { renderReport, reportCommandToPayload } from "./report-helpers.ts";
+import { reportMenu } from "./report-menu.ts";
 
 export class ReportCommand implements IAdminTelegramBotServiceCommand {
   getDefinition() {

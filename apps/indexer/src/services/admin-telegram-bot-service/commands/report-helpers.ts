@@ -1,6 +1,6 @@
 import { FormattedString } from "@grammyjs/parse-mode";
-import type { CommentReportStatus } from "../../../management/types";
-import type { CommentReportSelectType } from "../../../../schema.offchain";
+import type { CommentReportStatus } from "../../../management/types.ts";
+import type { CommentReportSelectType } from "../../../../schema.offchain.ts";
 import { z } from "zod";
 import { parse as parseUUID, stringify as stringifyUUID } from "uuid";
 import type { Hex } from "@ecp.eth/sdk/core";

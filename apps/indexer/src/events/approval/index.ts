@@ -6,7 +6,7 @@ import {
   ApprovalRemovedEventSchema,
   type ApprovalRemovedEventInput,
   type ApprovalRemovedEvent,
-} from "./schemas";
+} from "./schemas.ts";
 import type { ApprovalSelectType } from "ponder:schema";
 
 export function ponderEventToApprovalAddedEvent({

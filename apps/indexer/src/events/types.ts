@@ -5,12 +5,12 @@ import type {
   ChannelMetadataSetEvent,
   ChannelTransferEvent,
   ChannelEvent,
-} from "./channel/schemas";
+} from "./channel/schemas.ts";
 import type {
   ApprovalAddedEvent,
   ApprovalRemovedEvent,
   ApprovalEvent,
-} from "./approval/schemas";
+} from "./approval/schemas.ts";
 import type {
   CommentAddedEvent,
   CommentHookMetadataSetEvent,
@@ -18,8 +18,8 @@ import type {
   CommentEditedEvent,
   CommentModerationStatusUpdatedEvent,
   CommentEvent,
-} from "./comment/schemas";
-import type { TestEvent } from "./test/schemas";
+} from "./comment/schemas.ts";
+import type { TestEvent } from "./test/schemas.ts";
 
 export type Events =
   | ChannelCreatedEvent

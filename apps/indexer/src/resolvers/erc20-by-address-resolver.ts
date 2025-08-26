@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import type { Hex } from "viem";
-import type { ChainID, ResolvedERC20Data } from "./erc20.types";
+import type { ChainID, ResolvedERC20Data } from "./erc20.types.ts";
 import { z } from "zod";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 

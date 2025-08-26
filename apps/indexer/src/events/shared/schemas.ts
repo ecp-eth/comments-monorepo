@@ -4,10 +4,6 @@ import {
   MetadataArrayOpSchema,
 } from "@ecp.eth/sdk/comments/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
-import { ApprovalEvents } from "../approval/schemas";
-import { ChannelEvents } from "../channel/schemas";
-import { CommentEvents } from "../comment/schemas";
-import { TestEvents } from "../test/schemas";
 
 export type MetadataArray = z.infer<typeof MetadataArraySchema>;
 export type MetadataArrayOp = z.infer<typeof MetadataArrayOpSchema>;
@@ -56,12 +52,3 @@ export const CommentModerationStatusSchema = z.enum([
 export type CommentModerationStatus = z.infer<
   typeof CommentModerationStatusSchema
 >;
-
-export const EventNames = [
-  ...ApprovalEvents,
-  ...ChannelEvents,
-  ...CommentEvents,
-  ...TestEvents,
-] as const;
-
-export const EventNamesSchema = z.enum(EventNames);

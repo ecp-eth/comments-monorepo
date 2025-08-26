@@ -1,7 +1,7 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { schema } from "../../schema";
+import { schema } from "../../schema.ts";
 import z from "zod";
-import { createTestEvent } from "../events/test";
+import { createTestEvent } from "../events/test/index.ts";
 
 const PublishTestEventParamsSchema = z.object({
   appId: z.string().uuid(),

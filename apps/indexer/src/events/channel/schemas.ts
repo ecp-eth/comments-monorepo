@@ -6,7 +6,7 @@ import {
   dateToIsoStringSchema,
   EventFromChainSchema,
   MetadataSetOperationSchema,
-} from "../shared/schemas";
+} from "../shared/schemas.ts";
 
 export const ChannelEvents = [
   "channel:created",

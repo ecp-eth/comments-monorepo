@@ -1,8 +1,8 @@
 import { HTTPException } from "hono/http-exception";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { Hex } from "@ecp.eth/sdk/core";
-import type { CommentReportStatus } from "../management/types";
-import type { TelegramCallbackQuery } from "./types";
+import type { CommentReportStatus } from "../management/types.ts";
+import type { TelegramCallbackQuery } from "./types.ts";
 
 /**
  * Base class for all service-level errors

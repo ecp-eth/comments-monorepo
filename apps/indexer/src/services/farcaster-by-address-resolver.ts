@@ -1,11 +1,11 @@
 import { type Hex } from "viem";
 import { LRUCache } from "lru-cache";
 
-import { env } from "../env";
+import { env } from "../env.ts";
 import {
   createFarcasterByAddressResolver,
   type ResolvedFarcasterData,
-} from "../resolvers";
+} from "../resolvers/index.ts";
 
 // could also use redis
 const cacheMap = new LRUCache<Hex, Promise<ResolvedFarcasterData | null>>({

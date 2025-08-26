@@ -1,7 +1,7 @@
 import { type Hex } from "@ecp.eth/sdk/core";
 import { bytesToHex, hexToBytes } from "viem";
 import { z } from "zod";
-import type { CommentModerationStatus } from "../../../management/types";
+import type { CommentModerationStatus } from "../../../management/types.ts";
 import type { CommentSelectType } from "ponder:schema";
 import { FormattedString } from "@grammyjs/parse-mode";
 

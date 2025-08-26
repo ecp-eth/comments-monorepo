@@ -10,7 +10,7 @@ import {
 } from "../../../../lib/schemas.ts";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters.ts";
 import { WebhookAuthConfigSchema } from "../../../../webhooks/schemas.ts";
-import { EventNamesSchema } from "../../../../events/shared/schemas.ts";
+import { EventNamesSchema } from "../../../../events/schemas.ts";
 import { AppManagerAppNotFoundError } from "../../../../services/app-manager-service.ts";
 
 export const AppWebhooksGetRequestParamsSchema = z.object({

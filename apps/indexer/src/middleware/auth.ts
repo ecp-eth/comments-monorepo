@@ -6,7 +6,7 @@ import {
 } from "hono";
 import { verifyAsync } from "@noble/ed25519";
 import { HTTPException } from "hono/http-exception";
-import { managementAuthService } from "../services";
+import { managementAuthService } from "../services/index.ts";
 
 const MAX_REQUEST_AGE_MS = 1 * 60 * 1000; // 1 minute
 

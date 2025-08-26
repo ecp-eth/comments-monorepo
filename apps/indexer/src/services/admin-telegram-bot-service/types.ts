@@ -3,7 +3,7 @@ import type {
   ICommentPremoderationService,
   ICommentReportsService,
   ResolveAuthorFunction,
-} from "../types";
+} from "../types.ts";
 
 /**
  * We have an enum for all menu ids because grammy uses the id directly in payload and payloads

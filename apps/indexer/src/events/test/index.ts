@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { type TestEvent, TestEventSchema } from "./schemas";
+import { type TestEvent, TestEventSchema } from "./schemas.ts";
 
 export function createTestEvent({
   appId,

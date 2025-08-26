@@ -8,8 +8,8 @@ import {
 } from "viem";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
-import type { ResolvedENSData } from "./ens.types";
-import type { ENSByQueryResolver } from "./ens-by-query-resolver";
+import type { ResolvedENSData } from "./ens.types.ts";
+import type { ENSByQueryResolver } from "./ens-by-query-resolver.ts";
 
 export type ENSByAddressResolver = DataLoader<Hex, ResolvedENSData | null>;
 

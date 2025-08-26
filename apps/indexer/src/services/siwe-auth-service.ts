@@ -1,5 +1,5 @@
 import { generateSiweNonce, parseSiweMessage } from "viem/siwe";
-import jwt from "hono/jwt";
+import * as jwt from "hono/jwt";
 import {
   JwtTokenExpired,
   JwtTokenInvalid,
@@ -11,7 +11,7 @@ import {
 import type { Hex, PublicClient } from "viem";
 import z from "zod";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { schema } from "../../schema";
+import { schema } from "../../schema.ts";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { eq } from "drizzle-orm";
 
@@ -73,7 +73,11 @@ export type SiweAuthService_Options = {
   resolveChainClient: (chainId: number) => Promise<PublicClient | undefined>;
 };
 export class SiweAuthService implements ISiweAuthService {
-  constructor(private readonly options: SiweAuthService_Options) {}
+  private readonly options: SiweAuthService_Options;
+
+  constructor(options: SiweAuthService_Options) {
+    this.options = options;
+  }
 
   async generateNonceAndToken(): Promise<SiweAuthService_GenerateNonceAndTokenResult> {
     const nonce = generateSiweNonce();
@@ -560,30 +564,42 @@ export class SiweAuthServiceError extends Error {
 }
 
 export class SiweAuthService_JwtTokenExpiredError extends SiweAuthServiceError {
-  constructor(public readonly innerError: Error) {
+  public readonly innerError: Error;
+
+  constructor(innerError: Error) {
     super(`JWT token is expired`);
     this.name = "SiweAuthService_JwtTokenExpiredError";
+    this.innerError = innerError;
   }
 }
 
 export class SiweAuthService_JwtTokenIssuedAtError extends SiweAuthServiceError {
-  constructor(public readonly innerError: Error) {
+  public readonly innerError: Error;
+
+  constructor(innerError: Error) {
     super(`JWT token is issued at in the future`);
     this.name = "SiweAuthService_JwtTokenIssuedAtError";
+    this.innerError = innerError;
   }
 }
 
 export class SiweAuthService_JwtTokenNotBeforeError extends SiweAuthServiceError {
-  constructor(public readonly innerError: Error) {
+  public readonly innerError: Error;
+
+  constructor(innerError: Error) {
     super(`JWT token is not before the specified time`);
     this.name = "SiweAuthService_JwtTokenNotBeforeError";
+    this.innerError = innerError;
   }
 }
 
 export class SiweAuthService_JwtTokenInvalidError extends SiweAuthServiceError {
-  constructor(public readonly innerError: Error) {
+  public readonly innerError: Error;
+
+  constructor(innerError: Error) {
     super(`JWT token is invalid`);
     this.name = "SiweAuthService_JwtTokenInvalidError";
+    this.innerError = innerError;
   }
 }
 
@@ -595,16 +611,22 @@ export class SiweAuthService_JwtTokenInvalidAudienceError extends SiweAuthServic
 }
 
 export class SiweAuthService_JwtTokenIssuerError extends SiweAuthServiceError {
-  constructor(public readonly innerError: Error) {
+  public readonly innerError: Error;
+
+  constructor(innerError: Error) {
     super(`JWT token has invalid issuer`);
     this.name = "SiweAuthService_JwtTokenIssuerError";
+    this.innerError = innerError;
   }
 }
 
 export class SiweAuthService_JwtTokenSignatureMismatchedError extends SiweAuthServiceError {
-  constructor(public readonly innerError: Error) {
+  public readonly innerError: Error;
+
+  constructor(innerError: Error) {
     super(`JWT token signature mismatched`);
     this.name = "SiweAuthService_JwtTokenSignatureMismatchedError";
+    this.innerError = innerError;
   }
 }
 

@@ -1,12 +1,12 @@
 import type {
   IAdminTelegramBotServiceCommand,
   IAdminTelegramBotServiceCommand_RegisterOptions,
-} from "../types";
+} from "../types.ts";
 import {
   commentModerationCommandToPayload,
   renderComment,
-} from "./moderate-helpers";
-import { moderateMenu } from "./moderate-menu";
+} from "./moderate-helpers.ts";
+import { moderateMenu } from "./moderate-menu.ts";
 
 /**
  * This command must be registered after ModerateCommand because of menu registration.

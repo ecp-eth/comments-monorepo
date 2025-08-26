@@ -3,8 +3,8 @@ import type {
   ModerationNotificationServicePendingComment,
   ICommentPremoderationService,
   CommentPremoderationServiceModerateResult,
-} from "./types";
-import type { CommentModerationStatusesSelectType } from "../../schema.offchain";
+} from "./types.ts";
+import type { CommentModerationStatusesSelectType } from "../../schema.offchain.ts";
 
 export class NoopPremoderationService implements ICommentPremoderationService {
   async moderate(): Promise<CommentPremoderationServiceModerateResult> {

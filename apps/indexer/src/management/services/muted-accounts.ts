@@ -1,7 +1,7 @@
-import { getAddress, Hex } from "viem";
-import type { DB } from "../../services/db";
-import type { MutedAccountSelectType } from "../../../schema.offchain";
-import { schema } from "../../../schema";
+import { getAddress, type Hex } from "viem";
+import type { DB } from "../../services/db.ts";
+import type { MutedAccountSelectType } from "../../../schema.offchain.ts";
+import { schema } from "../../../schema.ts";
 import { eq } from "drizzle-orm";
 
 function normalizeAddress(address: Hex): Hex {
@@ -9,7 +9,11 @@ function normalizeAddress(address: Hex): Hex {
 }
 
 export class MutedAccountsManagementService {
-  constructor(private db: DB) {}
+  private db: DB;
+
+  constructor(db: DB) {
+    this.db = db;
+  }
 
   async muteAccount(address: Hex, reason?: string): Promise<boolean> {
     const [muted] = await this.db

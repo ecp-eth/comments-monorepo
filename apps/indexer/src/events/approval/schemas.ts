@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { dateToIsoStringSchema, EventFromChainSchema } from "../shared/schemas";
+import {
+  dateToIsoStringSchema,
+  EventFromChainSchema,
+} from "../shared/schemas.ts";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 
 export const ApprovalEvents = ["approval:added", "approval:removed"] as const;

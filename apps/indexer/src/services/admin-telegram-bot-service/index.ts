@@ -5,11 +5,11 @@ import type {
   ICommentPremoderationService,
   ICommentReportsService,
   ResolveAuthorFunction,
-} from "../types";
+} from "../types.ts";
 import type {
   AdminTelegramBotServiceContext,
   IAdminTelegramBotServiceCommand,
-} from "./types";
+} from "./types.ts";
 
 type AdminTelegramBotServiceConfig = {
   /**

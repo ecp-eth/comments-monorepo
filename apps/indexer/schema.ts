@@ -1,7 +1,7 @@
 import { setDatabaseSchema } from "@ponder/client";
-import * as onchainSchema from "./ponder.schema";
-import * as offchainSchema from "./schema.offchain";
-import { env } from "./src/env";
+import * as onchainSchema from "./ponder.schema.ts";
+import * as offchainSchema from "./schema.offchain.ts";
+import { env } from "./src/env.ts";
 
 declare global {
   // eslint-disable-next-line no-var

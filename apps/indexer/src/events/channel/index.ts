@@ -16,8 +16,8 @@ import {
   type ChannelTransferEvent,
   ChannelTransferEventSchema,
   type ChannelTransferEventInput,
-} from "./schemas";
-import type { MetadataArray, MetadataSetOperation } from "../shared/schemas";
+} from "./schemas.ts";
+import type { MetadataArray, MetadataSetOperation } from "../shared/schemas.ts";
 
 export function ponderEventToCreateChannelEvent({
   event,

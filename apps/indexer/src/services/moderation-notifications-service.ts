@@ -10,11 +10,11 @@ import type {
   ITelegramNotificationsService,
   ResolveAuthorFunction,
   TelegramCallbackQuery,
-} from "./types";
+} from "./types.ts";
 import type { CommentSelectType } from "ponder:schema";
 import { isZeroHex } from "@ecp.eth/sdk/core";
-import { env } from "../env";
-import { escapeTelegramMarkdownTextElement } from "../utils/escapeTelegramMarkdownTextElement";
+import { env } from "../env.ts";
+import { escapeTelegramMarkdownTextElement } from "../utils/escapeTelegramMarkdownTextElement.ts";
 
 class CommentLengthLimitExceededError extends Error {
   constructor(message: string) {

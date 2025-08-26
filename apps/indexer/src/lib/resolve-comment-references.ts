@@ -20,7 +20,7 @@ import type {
   URLResolver,
   FarcasterByNameResolver,
   FarcasterName,
-} from "../resolvers";
+} from "../resolvers/index.ts";
 
 export type ResolveCommentReferencesOptions = {
   ensByAddressResolver: ENSByAddressResolver;

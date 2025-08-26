@@ -7,7 +7,7 @@ import { NoopPremoderationService } from "./noop-premoderation-service.ts";
 import { ClassificationCacheService } from "./classification-cache-service.ts";
 import { CommentReportsService } from "./comment-reports-service.ts";
 import { CommentModerationService } from "../management/services/comment-moderation-service.ts";
-import { Hex } from "@ecp.eth/sdk/core";
+import { type Hex } from "@ecp.eth/sdk/core";
 import { ensByAddressResolverService } from "./ens-by-address-resolver.ts";
 import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver.ts";
 import { ReportsNotificationsService } from "./reports-notifications-service.ts";
@@ -23,7 +23,7 @@ import { db } from "./db.ts";
 import { ManagementAuthService } from "../management/services/auth.ts";
 import { MutedAccountsManagementService } from "../management/services/muted-accounts.ts";
 import { SiweAuthService } from "./siwe-auth-service.ts";
-import { config } from "ponder:internal";
+import config from "../../ponder.config.ts";
 import { createSiweMiddleware } from "../middleware/siwe.ts";
 import { AppManager } from "./app-manager-service.ts";
 import { AppWebhookManager } from "./app-webhook-manager-service.ts";
@@ -152,7 +152,7 @@ export const siweAuthService = new SiweAuthService({
 
   db,
   resolveChainClient: async (chainId) => {
-    return config.default.chains[chainId]?.publicClient;
+    return config.chains[chainId]?.publicClient;
   },
 });
 

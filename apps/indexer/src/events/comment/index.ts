@@ -1,4 +1,4 @@
-import { type IndexingFunctionArgs } from "ponder:registry";
+import type { IndexingFunctionArgs } from "ponder:registry";
 import {
   type CommentAddedEvent,
   CommentAddedEventSchema,
@@ -15,11 +15,11 @@ import {
   type CommentModerationStatusUpdatedEvent,
   CommentModerationStatusUpdatedEventSchema,
   type CommentModerationStatusUpdatedEventInput,
-} from "./schemas";
+} from "./schemas.ts";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
-import type { ModerationStatus } from "../../services/types";
+import type { ModerationStatus } from "../../services/types.ts";
 import type { CommentSelectType } from "ponder:schema";
-import type { MetadataArray, MetadataSetOperation } from "../shared/schemas";
+import type { MetadataArray, MetadataSetOperation } from "../shared/schemas.ts";
 
 export function ponderEventToCommentAddedEvent({
   event,
