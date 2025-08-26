@@ -27,6 +27,7 @@ import { config } from "ponder:internal";
 import { createSiweMiddleware } from "../middleware/siwe";
 import { AppManager } from "./app-manager";
 import { AppWebhookManager } from "./app-webhook-manager";
+import { EventOutboxService } from "./event-outbox-service";
 
 export { db };
 
@@ -164,5 +165,9 @@ export const appManager = new AppManager({
 });
 
 export const appWebhookManager = new AppWebhookManager({
+  db,
+});
+
+export const eventOutboxService = new EventOutboxService({
   db,
 });

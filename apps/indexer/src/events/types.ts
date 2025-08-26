@@ -19,6 +19,7 @@ import type {
   CommentModerationStatusUpdatedEvent,
   CommentEvent,
 } from "./comment/schemas";
+import type { TestEvent } from "./test/schemas";
 
 export type Events =
   | ChannelCreatedEvent
@@ -32,8 +33,17 @@ export type Events =
   | CommentHookMetadataSetEvent
   | CommentDeletedEvent
   | CommentEditedEvent
-  | CommentModerationStatusUpdatedEvent;
+  | CommentModerationStatusUpdatedEvent
+  | TestEvent;
 
-export type EventTypes = ChannelEvent | ApprovalEvent | CommentEvent;
+export type EventTypes =
+  | ChannelEvent
+  | ApprovalEvent
+  | CommentEvent
+  | TestEvent["event"];
 
-export type EventOutboxAggregateType = "approval" | "channel" | "comment";
+export type EventOutboxAggregateType =
+  | "approval"
+  | "app-webhook"
+  | "channel"
+  | "comment";
