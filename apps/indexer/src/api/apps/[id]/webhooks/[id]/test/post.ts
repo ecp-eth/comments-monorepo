@@ -4,10 +4,10 @@ import {
   appManager,
   eventOutboxService,
   siweMiddleware,
-} from "../../../../../../services";
-import { APIErrorResponseSchema } from "../../../../../../lib/schemas";
-import { AppManagerAppNotFoundError } from "../../../../../../services/app-manager";
-import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../../services/app-webhook-manager";
+} from "../../../../../../services/index.ts";
+import { APIErrorResponseSchema } from "../../../../../../lib/schemas.ts";
+import { AppManagerAppNotFoundError } from "../../../../../../services/app-manager-service.ts";
+import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../../services/app-webhook-manager-service.ts";
 
 export const AppWebhookTestRequestParamsSchema = z.object({
   appId: z.string().uuid(),

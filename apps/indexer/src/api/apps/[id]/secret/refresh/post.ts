@@ -1,11 +1,11 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
-import { appManager, siweMiddleware } from "../../../../../services";
-import { APIErrorResponseSchema } from "../../../../../lib/schemas";
+import { appManager, siweMiddleware } from "../../../../../services/index.ts";
+import { APIErrorResponseSchema } from "../../../../../lib/schemas.ts";
 import {
   AppManagerAppNotFoundError,
   AppManagerFailedToRefreshAppSecretError,
-} from "../../../../../services/app-manager";
-import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters";
+} from "../../../../../services/app-manager-service.ts";
+import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters.ts";
 
 export const AppSecretRefreshRequestParamsSchema = z.object({
   id: z.string().uuid(),
