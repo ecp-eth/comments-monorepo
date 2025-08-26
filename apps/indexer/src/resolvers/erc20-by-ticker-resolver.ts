@@ -4,8 +4,8 @@ import type {
   ResolvedERC20Data,
   ChainID,
   ERC20ClientRegistry,
-} from "./erc20.types";
-import { ERC20TokensService } from "../services/erc20-tokens-service";
+} from "./erc20.types.ts";
+import { ERC20TokensService } from "../services/erc20-tokens-service.ts";
 
 export type ERC20ByTickerResolverKey = [string, ChainID];
 

@@ -4,7 +4,7 @@ import { z } from "zod";
 import {
   SiweAuthServiceError,
   type ISiweAuthService,
-} from "../services/siwe-auth-service";
+} from "../services/siwe-auth-service.ts";
 
 export type JWTMiddlewareContext = Env & {
   Variables: {

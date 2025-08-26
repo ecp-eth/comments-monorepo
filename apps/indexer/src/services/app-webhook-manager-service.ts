@@ -1,9 +1,9 @@
 import z from "zod";
-import { WebhookAuthConfigSchema } from "../webhooks/schemas";
-import type { AppWebhookSelectType } from "../../schema.offchain";
+import { WebhookAuthConfigSchema } from "../webhooks/schemas.ts";
+import type { AppWebhookSelectType } from "../../schema.offchain.ts";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { schema } from "../../schema";
-import { EventNamesSchema } from "../events/shared/schemas";
+import { schema } from "../../schema.ts";
+import { EventNamesSchema } from "../events/schemas.ts";
 import { eq } from "drizzle-orm";
 
 type AppWebhookManagerOptions = {

@@ -2,10 +2,10 @@ import type { Hex } from "@ecp.eth/sdk/core";
 import _normalizeUrl from "normalize-url";
 import { z } from "zod";
 import {
-  ERC20CAIP19,
+  type ERC20CAIP19,
   ERC20Caip19Schema,
   ERC_20_CAIP_19_REGEX,
-} from "./schemas";
+} from "./schemas.ts";
 
 export function normalizeUrl(url: string) {
   return _normalizeUrl(url, {

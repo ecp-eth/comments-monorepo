@@ -2,12 +2,12 @@ import { HexSchema } from "@ecp.eth/sdk/core";
 import type {
   IAdminTelegramBotServiceCommand,
   IAdminTelegramBotServiceCommand_RegisterOptions,
-} from "../types";
-import { moderateMenu } from "./moderate-menu";
+} from "../types.ts";
+import { moderateMenu } from "./moderate-menu.ts";
 import {
   commentModerationCommandToPayload,
   renderComment,
-} from "./moderate-helpers";
+} from "./moderate-helpers.ts";
 
 export class ModerateCommand implements IAdminTelegramBotServiceCommand {
   getDefinition() {

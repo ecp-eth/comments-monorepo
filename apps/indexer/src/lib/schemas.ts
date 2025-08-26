@@ -5,9 +5,9 @@ import {
 } from "@ecp.eth/sdk/indexer/schemas";
 import { z } from "@hono/zod-openapi";
 import { hexToString } from "viem";
-import { normalizeUrl } from "./utils";
-import { SUPPORTED_CHAIN_IDS } from "../env";
-import { CommentModerationLabel } from "../services/types";
+import { normalizeUrl } from "./utils.ts";
+import { SUPPORTED_CHAIN_IDS } from "../env.ts";
+import { CommentModerationLabel } from "../services/types.ts";
 
 export const OpenAPIHexSchema = HexSchema.openapi({
   type: "string",

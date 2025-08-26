@@ -5,17 +5,17 @@ import type {
   CommentPremoderationServiceModerateResult,
   ModerationStatus,
   CommentModerationClassfierResult,
-} from "./types";
+} from "./types.ts";
 import type { Hex } from "@ecp.eth/sdk/core";
-import type { DB } from "./db";
+import type { DB } from "./db.ts";
 import { and, desc, eq, lt } from "drizzle-orm";
-import { schema } from "../../schema";
-import type { CommentModerationStatusesSelectType } from "../../schema.offchain";
+import { schema } from "../../schema.ts";
+import type { CommentModerationStatusesSelectType } from "../../schema.offchain.ts";
 import {
   CommentModerationStatusNotFoundError,
   CommentNotFoundError,
-} from "./errors";
-import { createCommentModerationStatusUpdatedEvent } from "../events/comment";
+} from "./errors.ts";
+import { createCommentModerationStatusUpdatedEvent } from "../events/comment/index.ts";
 
 type PremoderationServiceOptions = {
   classificationThreshold: number;
