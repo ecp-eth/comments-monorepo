@@ -42,3 +42,13 @@ export const MetadataSetOperationSchema = z.discriminatedUnion("type", [
 ]);
 
 export type MetadataSetOperation = z.infer<typeof MetadataSetOperationSchema>;
+
+export const CommentModerationStatusSchema = z.enum([
+  "pending",
+  "approved",
+  "rejected",
+]);
+
+export type CommentModerationStatus = z.infer<
+  typeof CommentModerationStatusSchema
+>;
