@@ -5,7 +5,7 @@ import {
   dateToIsoStringSchema,
   EventFromChainSchema,
   MetadataSetOperationSchema,
-} from "../shared/schemas";
+} from "../shared/schemas.ts";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { MetadataArraySchema } from "@ecp.eth/sdk/comments";
 import { IndexerAPICommentReferencesSchema } from "@ecp.eth/sdk/indexer";

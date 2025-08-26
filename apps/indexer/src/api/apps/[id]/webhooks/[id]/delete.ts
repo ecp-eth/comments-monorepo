@@ -8,7 +8,7 @@ import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
 } from "../../../../../lib/schemas.ts";
-import { EventNamesSchema } from "../../../../../events/shared/schemas.ts";
+import { EventNamesSchema } from "../../../../../events/schemas.ts";
 import { WebhookAuthConfigSchema } from "../../../../../webhooks/schemas.ts";
 import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters.ts";
 import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../services/app-webhook-manager-service.ts";

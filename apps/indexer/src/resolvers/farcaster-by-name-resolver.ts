@@ -7,8 +7,11 @@ import {
 } from "@neynar/nodejs-sdk";
 
 import { type IndexerAPIFarcasterDataSchemaType } from "@ecp.eth/sdk/indexer";
-import type { FarcasterName, ResolvedFarcasterData } from "./farcaster.types";
-import { constructFname, extractFarcasterName } from "./farcaster.utils";
+import type {
+  FarcasterName,
+  ResolvedFarcasterData,
+} from "./farcaster.types.ts";
+import { constructFname, extractFarcasterName } from "./farcaster.utils.ts";
 
 export type FarcasterByNameKey = string | FarcasterName;
 

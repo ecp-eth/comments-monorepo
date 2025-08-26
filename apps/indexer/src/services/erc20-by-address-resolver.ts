@@ -1,10 +1,10 @@
 import { LRUCache } from "lru-cache";
-import { env } from "../env";
+import { env } from "../env.ts";
 import {
   createERC20ByAddressResolver,
   ERC20ByAddressResolverKey,
   ResolvedERC20Data,
-} from "../resolvers";
+} from "../resolvers/index.ts";
 
 // could also use redis
 const cacheMap = new LRUCache<

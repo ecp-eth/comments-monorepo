@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { z } from "zod";
-import { ERC20Caip19Schema } from "../lib/schemas";
+import { ERC20Caip19Schema } from "../lib/schemas.ts";
 import { HexSchema } from "@ecp.eth/sdk/core";
 
 const tokenSchema = z.object({

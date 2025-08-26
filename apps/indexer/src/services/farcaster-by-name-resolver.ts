@@ -3,8 +3,8 @@ import {
   createFarcasterByNameResolver,
   type FarcasterName,
   type ResolvedFarcasterData,
-} from "../resolvers";
-import { env } from "../env";
+} from "../resolvers/index.ts";
+import { env } from "../env.ts";
 
 // could also use redis
 const cacheMap = new LRUCache<

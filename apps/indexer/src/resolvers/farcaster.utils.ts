@@ -1,4 +1,4 @@
-import type { FarcasterName } from "./farcaster.types";
+import type { FarcasterName } from "./farcaster.types.ts";
 
 export function constructFname(username: string): FarcasterName {
   return `${username}.fcast.id`;

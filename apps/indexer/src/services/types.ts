@@ -1,14 +1,14 @@
 import type { Hex } from "@ecp.eth/sdk/core";
-import type { WebhookCallbackData } from "../utils/webhook";
+import type { WebhookCallbackData } from "../utils/webhook.ts";
 import type { CommentSelectType } from "ponder:schema";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { Convenience, Message } from "telegraf/types";
-import type { CommentReportStatus } from "../management/types";
+import type { CommentReportStatus } from "../management/types.ts";
 import type { Handler } from "hono";
 import type {
   CommentModerationStatusesSelectType,
   CommentReportSelectType,
-} from "../../schema.offchain";
+} from "../../schema.offchain.ts";
 
 export type ModerationStatus = "pending" | "approved" | "rejected";
 

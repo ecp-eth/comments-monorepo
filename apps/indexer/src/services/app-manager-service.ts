@@ -1,11 +1,11 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import crypto from "node:crypto";
 import { z } from "zod";
-import { schema } from "../../schema";
+import { schema } from "../../schema.ts";
 import type {
   AppSelectType,
   AppSigningKeysSelectType,
-} from "../../schema.offchain";
+} from "../../schema.offchain.ts";
 import { and, eq, isNull } from "drizzle-orm";
 
 type AppManagerOptions = {
